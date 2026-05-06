@@ -31,3 +31,14 @@ Phase B may proceed only when all of the following are true:
 3. `atm test --atom hello-world --json` reports 5/5 passing smoke checks.
 4. `atm verify --neutrality --json` exits 0 on protected framework surfaces.
 5. The proof does not rely on any downstream-specific script, engine, or local governance tool.
+
+## Advisory Multi-Agent Confidence
+
+The advisory confidence layer uses the same deterministic alpha0 proof, but records the result under a named agent profile.
+
+```bash
+node packages/cli/src/atm.mjs verify --agents-md --json
+node packages/cli/src/atm.mjs self-host-alpha --verify --agent claude-code --json
+```
+
+Supported profiles and the latest advisory results are tracked in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md). These reports do not block alpha0 release.

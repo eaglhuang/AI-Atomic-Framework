@@ -93,6 +93,10 @@ try {
   assert(officialPrompt.includes('bootstrap --cwd .'), 'official prompt must tell the agent to run the official bootstrap command');
   assert(officialPrompt.includes('examples/hello-world/atoms/hello-world.atom.json'), 'official prompt must define the first smoke target');
 
+  const agentsMdTemplate = runAtm(['verify', '--cwd', '.', '--agents-md'], repoCopy);
+  assert(agentsMdTemplate.exitCode === 0, 'verify --agents-md must exit 0 against the repository template copy');
+  assert(agentsMdTemplate.parsed.ok === true, 'verify --agents-md must report ok=true against the repository template copy');
+
   const selfHostAlphaGate = runAtm(['self-host-alpha', '--verify', '--json'], repoCopy);
   assert(selfHostAlphaGate.exitCode === 0, 'self-host-alpha --verify --json must exit 0 in self-hosting repo copy');
   assert(selfHostAlphaGate.parsed.ok === true, 'self-host-alpha --verify --json must report ok=true');
@@ -115,6 +119,12 @@ try {
   const validateSpec = runAtm(['validate', '--cwd', '.', '--spec', 'examples/hello-world/atoms/hello-world.atom.json'], repoCopy);
   assert(validateSpec.exitCode === 0, 'self-hosting first smoke spec validation must exit 0');
   assert(validateSpec.parsed.ok === true, 'self-hosting first smoke spec validation must report ok=true');
+
+  const claudeConfidence = runAtm(['self-host-alpha', '--verify', '--agent', 'claude-code', '--json'], repoCopy);
+  assert(claudeConfidence.exitCode === 0, 'self-host-alpha --verify --agent claude-code must exit 0 in self-hosting repo copy');
+  assert(claudeConfidence.parsed.ok === true, 'self-host-alpha --verify --agent claude-code must report ok=true in self-hosting repo copy');
+  assert(claudeConfidence.parsed.evidence.agentsMd?.ok === true, 'self-host-alpha --verify --agent claude-code must report agentsMd ok=true');
+  assert(claudeConfidence.parsed.evidence.confidence?.advisory === true, 'self-host-alpha --verify --agent claude-code must remain advisory');
 
   const { run } = await import(`${pathToFileURL(path.join(repoCopy, 'examples/hello-world/src/hello-world.atom.mjs')).href}?selfHosting=${Date.now()}`);
   const smokeResult = run({ name: 'ATM' });

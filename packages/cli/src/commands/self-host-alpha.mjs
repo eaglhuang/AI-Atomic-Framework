@@ -2,6 +2,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runBootstrap } from './bootstrap-entry.mjs';
+import { createAgentConfidenceEvidence, resolveAgentProfile, verifyAgentsMarkdown } from './agent-confidence.mjs';
 import { runInit } from './init.mjs';
 import { runHelloWorldSmoke } from './test.mjs';
 import { runVerify } from './verify.mjs';
@@ -29,6 +30,10 @@ export async function runSelfHostAlphaAsync(argv) {
   if (!options.verify) {
     throw new CliError('ATM_CLI_USAGE', 'self-host-alpha requires --verify', { exitCode: 2 });
   }
+  const agentProfile = options.agent ? resolveAgentProfile(options.agent) : null;
+  if (options.agent && !agentProfile) {
+    throw new CliError('ATM_CLI_USAGE', `self-host-alpha does not support unknown agent profile: ${options.agent}`, { exitCode: 2 });
+  }
 
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-self-host-alpha-'));
   try {
@@ -48,6 +53,7 @@ export async function runSelfHostAlphaAsync(argv) {
 
     const neutrality = runVerify(['--cwd', sandbox, '--neutrality']);
     const criteria4 = neutrality.ok === true;
+    const agentsMd = verifyAgentsMarkdown(sandbox);
 
     const criteria = { criteria1, criteria2, criteria3, criteria4 };
     const ok = Object.values(criteria).every((value) => value === true);
@@ -56,6 +62,9 @@ export async function runSelfHostAlphaAsync(argv) {
       'rollback readiness is advisory for alpha0',
       'evolution metrics readiness is advisory for alpha0'
     ];
+    const confidence = agentProfile
+      ? createAgentConfidenceEvidence(agentProfile, criteria, agentsMd)
+      : null;
 
     return {
       ...makeResult({
@@ -66,6 +75,13 @@ export async function runSelfHostAlphaAsync(argv) {
           ok
             ? message('info', 'ATM_SELF_HOST_ALPHA_OK', 'Self-hosting alpha deterministic criteria passed.')
             : message('error', 'ATM_SELF_HOST_ALPHA_FAILED', 'Self-hosting alpha deterministic criteria failed.', criteria),
+          ...(confidence
+            ? [message('warning', 'ATM_SELF_HOST_ALPHA_CONFIDENCE_ADVISORY', 'Multi-agent confidence is advisory and does not block alpha0 release.', {
+              agentId: confidence.agentId,
+              confidenceReady: confidence.confidenceReady,
+              blockers: confidence.blockers
+            })]
+            : []),
           message('warning', 'ATM_SELF_HOST_ALPHA_READINESS_ADVISORY', 'Evolution readiness checks are advisory and do not block alpha0.', { readinessWarnings })
         ],
         evidence: {
@@ -84,10 +100,13 @@ export async function runSelfHostAlphaAsync(argv) {
             exitCode: neutrality.ok ? 0 : 1,
             violationCount: (neutrality.evidence?.termViolations ?? 0) + (neutrality.evidence?.pathViolations ?? 0)
           },
+          agentsMd,
+          confidence,
           readinessWarnings,
           sandboxRelativePath: relativePathFrom(tempRoot, sandbox)
         }
       }),
+      ...(agentProfile ? { agent: agentProfile.id } : {}),
       ...criteria
     };
   } finally {

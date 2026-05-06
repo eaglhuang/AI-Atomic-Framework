@@ -46,6 +46,8 @@ The bootstrap pack writes the default profile, a first task, a scope lock, defau
 
 For the standalone upstream self-hosting alpha proof, see [docs/SELF_HOSTING_ALPHA.md](docs/SELF_HOSTING_ALPHA.md). That contract upgrades the user-facing flow to a single prompt: the AI checks whether ATM is initialized, runs the official `bootstrap` command only when needed, and then completes the first smoke.
 
+For advisory multi-agent confidence, run `node packages/cli/src/atm.mjs verify --agents-md --json` and `node packages/cli/src/atm.mjs self-host-alpha --verify --agent <profile> --json`. The supported profile matrix and latest advisory results live in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md).
+
 ## Core, Adapters, and Plugins
 
 ATM separates governance semantics from host implementation details.

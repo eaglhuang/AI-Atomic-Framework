@@ -165,6 +165,12 @@ try {
   assert(verifyNeutrality.parsed.ok === true, 'verify --neutrality must report ok=true');
   assertMessageCode(verifyNeutrality, 'ATM_VERIFY_NEUTRALITY_OK');
 
+  const verifyAgentsMd = runAtm(['verify', '--agents-md'], root);
+  assert(verifyAgentsMd.exitCode === 0, 'verify --agents-md must exit 0 in repository root');
+  assertReadable(verifyAgentsMd, 'verify');
+  assert(verifyAgentsMd.parsed.ok === true, 'verify --agents-md must report ok=true');
+  assertMessageCode(verifyAgentsMd, 'ATM_VERIFY_AGENTS_MD_OK');
+
   const testHelloWorld = runAtm(['test', '--atom', 'hello-world'], root);
   assert(testHelloWorld.exitCode === 0, 'test --atom hello-world must exit 0 in repository root');
   assertReadable(testHelloWorld, 'test');
@@ -182,6 +188,15 @@ try {
   assert(selfHostAlpha.parsed.criteria3 === true, 'self-host-alpha criteria3 must be true');
   assert(selfHostAlpha.parsed.criteria4 === true, 'self-host-alpha criteria4 must be true');
   assertMessageCode(selfHostAlpha, 'ATM_SELF_HOST_ALPHA_OK');
+
+  const selfHostAlphaClaude = runAtm(['self-host-alpha', '--verify', '--agent', 'claude-code'], root);
+  assert(selfHostAlphaClaude.exitCode === 0, 'self-host-alpha --verify --agent claude-code must exit 0 in repository root');
+  assertReadable(selfHostAlphaClaude, 'self-host-alpha');
+  assert(selfHostAlphaClaude.parsed.ok === true, 'self-host-alpha --verify --agent claude-code must report ok=true');
+  assert(selfHostAlphaClaude.parsed.agent === 'claude-code', 'self-host-alpha --verify --agent claude-code must echo the resolved agent id');
+  assert(selfHostAlphaClaude.parsed.evidence.confidence?.advisory === true, 'self-host-alpha --verify --agent claude-code must mark confidence as advisory');
+  assert(selfHostAlphaClaude.parsed.evidence.confidence?.confidenceReady === true, 'self-host-alpha --verify --agent claude-code must report confidenceReady=true');
+  assertMessageCode(selfHostAlphaClaude, 'ATM_SELF_HOST_ALPHA_CONFIDENCE_ADVISORY');
 
   const frameworkStatus = runAtm(['status'], root);
   assert(frameworkStatus.exitCode === 0, 'status in framework repository root must exit 0');

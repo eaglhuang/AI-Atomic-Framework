@@ -40,12 +40,14 @@ export function parseOptions(argv, commandName) {
     validate: undefined,
     self: false,
     neutrality: false,
+    agentsMd: false,
     verify: false,
     dryRun: false,
     force: false,
     adopt: undefined,
     task: undefined,
-    atom: undefined
+    atom: undefined,
+    agent: undefined
   };
   const positional = [];
 
@@ -83,11 +85,26 @@ export function parseOptions(argv, commandName) {
       options.neutrality = true;
       continue;
     }
+    if (arg === '--agents-md') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agents-md`, { exitCode: 2 });
+      }
+      options.agentsMd = true;
+      continue;
+    }
     if (arg === '--verify') {
       if (commandName !== 'self-host-alpha') {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --verify`, { exitCode: 2 });
       }
       options.verify = true;
+      continue;
+    }
+    if (arg === '--agent') {
+      if (commandName !== 'self-host-alpha') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agent`, { exitCode: 2 });
+      }
+      options.agent = requireOptionValue(argv, index, '--agent', commandName);
+      index += 1;
       continue;
     }
     if (arg === '--dry-run') {

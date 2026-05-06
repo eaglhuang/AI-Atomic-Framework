@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "atm.agentConfidenceReport.v0.1",
+  "generatedAt": "2026-05-07T16-30-00Z",
+  "agentId": "openai-assistants-api",
+  "agentLabel": "OpenAI Assistants API",
+  "blockingRelease": false,
+  "sourceCommand": "node packages/cli/src/atm.mjs self-host-alpha --verify --agent openai-assistants-api --json",
+  "result": {
+    "ok": true,
+    "command": "self-host-alpha",
+    "mode": "standalone",
+    "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+    "messages": [
+      {
+        "level": "info",
+        "code": "ATM_SELF_HOST_ALPHA_OK",
+        "text": "Self-hosting alpha deterministic criteria passed.",
+        "data": {}
+      },
+      {
+        "level": "warning",
+        "code": "ATM_SELF_HOST_ALPHA_CONFIDENCE_ADVISORY",
+        "text": "Multi-agent confidence is advisory and does not block alpha0 release.",
+        "data": {
+          "agentId": "openai-assistants-api",
+          "confidenceReady": true,
+          "blockers": []
+        }
+      },
+      {
+        "level": "warning",
+        "code": "ATM_SELF_HOST_ALPHA_READINESS_ADVISORY",
+        "text": "Evolution readiness checks are advisory and do not block alpha0.",
+        "data": {
+          "readinessWarnings": [
+            "version-history readiness is advisory for alpha0",
+            "rollback readiness is advisory for alpha0",
+            "evolution metrics readiness is advisory for alpha0"
+          ]
+        }
+      }
+    ],
+    "evidence": {
+      "criteria": {
+        "criteria1": true,
+        "criteria2": true,
+        "criteria3": true,
+        "criteria4": true
+      },
+      "initDryRun": {
+        "exitCode": 0,
+        "adoptedAt": "2026-05-06T18:47:57.052Z"
+      },
+      "bootstrap": {
+        "ok": true,
+        "checks": [
+          {
+            "name": "task-created",
+            "passed": true,
+            "path": ".atm/tasks/BOOTSTRAP-0001.json"
+          },
+          {
+            "name": "lock-created",
+            "passed": true,
+            "path": ".atm/locks/BOOTSTRAP-0001.lock.json"
+          },
+          {
+            "name": "artifact-directory-created",
+            "passed": true,
+            "path": ".atm/artifacts"
+          },
+          {
+            "name": "evidence-created",
+            "passed": true,
+            "path": ".atm/evidence/BOOTSTRAP-0001.json"
+          }
+        ],
+        "taskPath": ".atm/tasks/BOOTSTRAP-0001.json",
+        "lockPath": ".atm/locks/BOOTSTRAP-0001.lock.json",
+        "artifactDir": ".atm/artifacts",
+        "evidencePath": ".atm/evidence/BOOTSTRAP-0001.json"
+      },
+      "helloWorld": {
+        "passCount": 5,
+        "total": 5,
+        "checks": [
+          {
+            "name": "spec-exists",
+            "passed": true
+          },
+          {
+            "name": "source-exists",
+            "passed": true
+          },
+          {
+            "name": "spec-validates",
+            "passed": true
+          },
+          {
+            "name": "message-output",
+            "passed": true
+          },
+          {
+            "name": "atom-id-output",
+            "passed": true
+          }
+        ]
+      },
+      "neutrality": {
+        "exitCode": 0,
+        "violationCount": 0
+      },
+      "agentsMd": {
+        "ok": true,
+        "mode": "rendered",
+        "path": "AGENTS.md",
+        "checked": [
+          "# ATM Bootstrap Instructions",
+          "Read README.md if present",
+          ".atm/profile/default.md",
+          ".atm/tasks/BOOTSTRAP-0001.json",
+          ".atm/evidence/BOOTSTRAP-0001.json"
+        ],
+        "issues": []
+      },
+      "confidence": {
+        "advisory": true,
+        "blockingRelease": false,
+        "agentId": "openai-assistants-api",
+        "agentLabel": "OpenAI Assistants API",
+        "executionMode": "profile-confidence",
+        "workflow": "Use the official self-host-alpha prompt through an assistants-compatible message envelope.",
+        "confidenceReady": true,
+        "blockers": [],
+        "agentsMd": {
+          "ok": true,
+          "mode": "rendered",
+          "path": "AGENTS.md",
+          "checked": [
+            "# ATM Bootstrap Instructions",
+            "Read README.md if present",
+            ".atm/profile/default.md",
+            ".atm/tasks/BOOTSTRAP-0001.json",
+            ".atm/evidence/BOOTSTRAP-0001.json"
+          ],
+          "issues": []
+        }
+      },
+      "readinessWarnings": [
+        "version-history readiness is advisory for alpha0",
+        "rollback readiness is advisory for alpha0",
+        "evolution metrics readiness is advisory for alpha0"
+      ],
+      "sandboxRelativePath": "repo"
+    },
+    "agent": "openai-assistants-api",
+    "criteria1": true,
+    "criteria2": true,
+    "criteria3": true,
+    "criteria4": true
+  }
+}
