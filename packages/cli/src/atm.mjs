@@ -3,8 +3,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runBootstrap } from './commands/bootstrap-entry.mjs';
 import { runInit } from './commands/init.mjs';
+import { runSelfHostAlphaAsync } from './commands/self-host-alpha.mjs';
 import { runSpec } from './commands/spec.mjs';
 import { runStatus } from './commands/status.mjs';
+import { runTestAsync } from './commands/test.mjs';
 import { runValidate } from './commands/validate.mjs';
 import { runVerify } from './commands/verify.mjs';
 import { CliError, makeResult, message, writeResult } from './commands/shared.mjs';
@@ -12,13 +14,15 @@ import { CliError, makeResult, message, writeResult } from './commands/shared.mj
 export const cliCommandRunners = {
   bootstrap: runBootstrap,
   init: runInit,
+  'self-host-alpha': runSelfHostAlphaAsync,
   spec: runSpec,
   status: runStatus,
+  test: runTestAsync,
   validate: runValidate,
   verify: runVerify
 };
 
-export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
+export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
   const [commandName, ...commandArgs] = argv;
 
   if (!commandName || commandName === '--help' || commandName === 'help') {
@@ -26,7 +30,7 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
       ok: true,
       command: 'help',
       cwd: process.cwd(),
-      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, init, spec, status, validate, verify.')],
+      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, init, self-host-alpha, spec, status, test, validate, verify.')],
       evidence: {
         commands: Object.keys(cliCommandRunners),
         outputFormat: 'json'
@@ -52,7 +56,7 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
   }
 
   try {
-    const result = runner(commandArgs);
+    const result = await runner(commandArgs);
     writeResult(result, result.ok ? io.stdout : io.stderr);
     return result.ok ? 0 : 1;
   } catch (error) {
@@ -76,5 +80,5 @@ const isDirectRun = process.argv[1]
   : false;
 
 if (isDirectRun) {
-  process.exitCode = runCli();
+  process.exitCode = await runCli();
 }

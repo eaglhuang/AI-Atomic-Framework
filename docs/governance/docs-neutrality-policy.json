@@ -12,6 +12,43 @@
   ],
   "protectedScopes": [
     {
+      "path": "packages/core",
+      "extensions": [
+        ".js",
+        ".mjs",
+        ".ts",
+        ".json",
+        ".md"
+      ]
+    },
+    {
+      "path": "packages/cli",
+      "extensions": [
+        ".js",
+        ".mjs",
+        ".ts",
+        ".json",
+        ".md"
+      ]
+    },
+    {
+      "pathPrefix": "packages/plugin-",
+      "extensions": [
+        ".js",
+        ".mjs",
+        ".ts",
+        ".json",
+        ".md"
+      ]
+    },
+    {
+      "path": "schemas",
+      "extensions": [
+        ".json",
+        ".md"
+      ]
+    },
+    {
       "path": "docs",
       "extensions": [
         ".md"
@@ -41,11 +78,24 @@
     "gacha",
     "UCUF",
     "draft-builder",
+    "eaglhuang/3KLife",
     "task-lock",
     "compute-gate",
     "doc-id-registry",
     "tools_node/",
     "assets/scripts/",
     "docs/agent-briefs/"
+  ],
+  "bannedPathPatterns": [
+    "tools_node/",
+    "assets/scripts/",
+    "docs/agent-briefs/",
+    "<non-ascii-filename>"
+  ],
+  "ignoredPrefixes": [
+    ".git/",
+    "node_modules/",
+    "tests/",
+    "atomic_workbench/"
   ]
 }

@@ -52,6 +52,9 @@ function normalizeRelative(relativePath) {
 
 function listRelativeFiles(relativeDir) {
   const fullDir = path.join(root, relativeDir);
+  if (!existsSync(fullDir)) {
+    return [];
+  }
   const results = [];
   for (const entry of readdirSync(fullDir, { withFileTypes: true })) {
     const relativeEntry = normalizeRelative(path.join(relativeDir, entry.name));
@@ -70,9 +73,15 @@ function basename(relativePath) {
 
 function pathMatchesScope(relativePath, scope) {
   const normalizedPath = normalizeRelative(relativePath);
-  const normalizedRoot = normalizeRelative(scope.path);
-  if (normalizedPath !== normalizedRoot && !normalizedPath.startsWith(`${normalizedRoot}/`)) {
-    return false;
+  if (scope.pathPrefix) {
+    if (!normalizedPath.startsWith(normalizeRelative(scope.pathPrefix))) {
+      return false;
+    }
+  } else {
+    const normalizedRoot = normalizeRelative(scope.path);
+    if (normalizedPath !== normalizedRoot && !normalizedPath.startsWith(`${normalizedRoot}/`)) {
+      return false;
+    }
   }
   if (Array.isArray(scope.excludePrefixes) && scope.excludePrefixes.some((prefix) => normalizedPath.startsWith(prefix))) {
     return false;
@@ -84,6 +93,18 @@ function pathMatchesScope(relativePath, scope) {
     return false;
   }
   return true;
+}
+
+function scopeEnumerationRoot(scope) {
+  if (scope.path) {
+    return scope.path;
+  }
+  if (scope.pathPrefix) {
+    const normalizedPrefix = normalizeRelative(scope.pathPrefix).replace(/\/$/, '');
+    const slashIndex = normalizedPrefix.lastIndexOf('/');
+    return slashIndex >= 0 ? normalizedPrefix.slice(0, slashIndex) : '.';
+  }
+  return '.';
 }
 
 function fail(message) {
@@ -129,7 +150,7 @@ if (!process.exitCode) {
 
   const protectedFiles = new Set(docsNeutralityPolicy.protectedFiles ?? []);
   for (const scope of docsNeutralityPolicy.protectedScopes ?? []) {
-    for (const relativePath of listRelativeFiles(scope.path)) {
+    for (const relativePath of listRelativeFiles(scopeEnumerationRoot(scope))) {
       if (pathMatchesScope(relativePath, scope)) {
         protectedFiles.add(relativePath);
       }

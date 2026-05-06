@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial ATM-CORE-0003 neutrality scanner atom spec."
+  },
+  "id": "atom.plugin-rule-guard.neutrality-scanner",
+  "title": "Neutrality Scanner Atom",
+  "description": "Deterministic scanner that blocks adopter-only references across protected framework surfaces.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [
+      ".mjs",
+      ".ts",
+      ".json",
+      ".md"
+    ],
+    "tooling": [
+      "node"
+    ]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "ci"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": [
+      "filesystem",
+      "artifact-store",
+      "evidence-store"
+    ]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "forbidden"
+  },
+  "inputs": [
+    {
+      "name": "repositoryRoot",
+      "kind": "file",
+      "required": true
+    },
+    {
+      "name": "neutralityPolicy",
+      "kind": "file",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "neutralityReport",
+      "kind": "json",
+      "required": true
+    },
+    {
+      "name": "evidence",
+      "kind": "evidence",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": [
+      "npm run validate:neutrality"
+    ],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1500
+  },
+  "tags": [
+    "alpha0",
+    "neutrality",
+    "governance"
+  ]
+}

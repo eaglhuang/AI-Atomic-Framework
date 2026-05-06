@@ -58,7 +58,7 @@ function assertMessageCode(result, code) {
   assert(result.parsed.messages.some((entry) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/self-host-alpha.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/test.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -85,6 +85,13 @@ try {
   assert(init.parsed.evidence.adapterMode === 'standalone', 'init must report standalone mode');
   assert(init.parsed.evidence.adapterImplemented === false, 'init must not require adapter implementation');
   assert(existsSync(path.join(blankRepo, fixture.configPath)), 'init must create config file');
+
+  const initDryRun = runAtm(['init', '--adopt', '--dry-run'], blankRepo);
+  assert(initDryRun.exitCode === 0, 'init --adopt --dry-run must exit 0');
+  assertReadable(initDryRun, 'init');
+  assert(initDryRun.parsed.ok === true, 'init --adopt --dry-run must report ok=true');
+  assert(initDryRun.parsed.evidence.adoptedAt, 'init --adopt --dry-run must report adoptedAt');
+  assert(initDryRun.parsed.evidence.dryRun === true, 'init --adopt --dry-run must report dryRun=true');
 
   const status = runAtm(['status'], blankRepo);
   assert(status.exitCode === 0, 'status after init must exit 0');
@@ -151,6 +158,30 @@ try {
   assertReadable(verifySelf, 'verify');
   assert(verifySelf.parsed.ok === true, 'verify --self must report ok=true');
   assertMessageCode(verifySelf, 'ATM_VERIFY_SELF_OK');
+
+  const verifyNeutrality = runAtm(['verify', '--neutrality'], root);
+  assert(verifyNeutrality.exitCode === 0, 'verify --neutrality must exit 0 in repository root');
+  assertReadable(verifyNeutrality, 'verify');
+  assert(verifyNeutrality.parsed.ok === true, 'verify --neutrality must report ok=true');
+  assertMessageCode(verifyNeutrality, 'ATM_VERIFY_NEUTRALITY_OK');
+
+  const testHelloWorld = runAtm(['test', '--atom', 'hello-world'], root);
+  assert(testHelloWorld.exitCode === 0, 'test --atom hello-world must exit 0 in repository root');
+  assertReadable(testHelloWorld, 'test');
+  assert(testHelloWorld.parsed.ok === true, 'test --atom hello-world must report ok=true');
+  assert(testHelloWorld.parsed.evidence.passCount === 5, 'test --atom hello-world must report 5 passCount');
+  assert(testHelloWorld.parsed.evidence.total === 5, 'test --atom hello-world must report 5 total checks');
+  assertMessageCode(testHelloWorld, 'ATM_TEST_HELLO_WORLD_OK');
+
+  const selfHostAlpha = runAtm(['self-host-alpha', '--verify'], root);
+  assert(selfHostAlpha.exitCode === 0, 'self-host-alpha --verify must exit 0 in repository root');
+  assertReadable(selfHostAlpha, 'self-host-alpha');
+  assert(selfHostAlpha.parsed.ok === true, 'self-host-alpha --verify must report ok=true');
+  assert(selfHostAlpha.parsed.criteria1 === true, 'self-host-alpha criteria1 must be true');
+  assert(selfHostAlpha.parsed.criteria2 === true, 'self-host-alpha criteria2 must be true');
+  assert(selfHostAlpha.parsed.criteria3 === true, 'self-host-alpha criteria3 must be true');
+  assert(selfHostAlpha.parsed.criteria4 === true, 'self-host-alpha criteria4 must be true');
+  assertMessageCode(selfHostAlpha, 'ATM_SELF_HOST_ALPHA_OK');
 
   const frameworkStatus = runAtm(['status'], root);
   assert(frameworkStatus.exitCode === 0, 'status in framework repository root must exit 0');

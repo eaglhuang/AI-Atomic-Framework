@@ -7,6 +7,9 @@ export function runInit(argv) {
   if (options.adopt && options.adopt !== 'default') {
     throw new CliError('ATM_CLI_USAGE', `init does not support adopt profile ${options.adopt}`, { exitCode: 2 });
   }
+  if (options.dryRun) {
+    return createDryRunResult(options);
+  }
   mkdirSync(options.cwd, { recursive: true });
   ensureAtmDirectory(options.cwd);
 
@@ -62,7 +65,28 @@ export function runInit(argv) {
       projectProbePath: bootstrap.projectProbePath,
       defaultGuardsPath: bootstrap.defaultGuardsPath,
       evidencePath: bootstrap.evidencePath,
-      recommendedPrompt: bootstrap.recommendedPrompt
+      recommendedPrompt: bootstrap.recommendedPrompt,
+      adoptedAt: bootstrap.adoptedProfile ? new Date().toISOString() : null
+    }
+  });
+}
+
+function createDryRunResult(options) {
+  const configPath = configPathFor(options.cwd);
+  return makeResult({
+    ok: true,
+    command: 'init',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_INIT_DRY_RUN_OK', 'ATM init adoption dry-run completed.')],
+    evidence: {
+      configPath: relativePathFrom(options.cwd, configPath),
+      created: [],
+      unchanged: [],
+      adapterMode: 'standalone',
+      adapterImplemented: false,
+      adoptedProfile: options.adopt === 'default' ? 'default' : null,
+      adoptedAt: options.adopt === 'default' ? new Date().toISOString() : null,
+      dryRun: true
     }
   });
 }

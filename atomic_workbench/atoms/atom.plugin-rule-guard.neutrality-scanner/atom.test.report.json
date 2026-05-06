@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.testReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial alpha0 test runner report."
+  },
+  "atomId": "atom.plugin-rule-guard.neutrality-scanner",
+  "ok": true,
+  "exitCode": 0,
+  "generatedAt": "2026-05-07T00:46:00.000Z",
+  "repositoryRoot": "C:/Users/User/AI-Atomic-Framework",
+  "specPath": "C:/Users/User/AI-Atomic-Framework/specs/neutrality-scanner.atom.json",
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "canonicalization": "json-stable-v1"
+  },
+  "validation": {
+    "evidenceRequired": true,
+    "commandCount": 1
+  },
+  "runnerContract": {
+    "executionMode": "delegated",
+    "evidenceRequired": true,
+    "commands": [
+      {
+        "commandId": "validation-1",
+        "commandKind": "test",
+        "command": "npm run validate:neutrality",
+        "required": true
+      }
+    ]
+  },
+  "results": [
+    {
+      "commandId": "validation-1",
+      "commandKind": "test",
+      "command": "npm run validate:neutrality",
+      "required": true,
+      "exitCode": 0,
+      "ok": true,
+      "durationMs": 590,
+      "stdout": "\n> ai-atomic-framework@0.0.0 validate:neutrality\n> node scripts/validate-neutrality-scanner.mjs --mode validate\n\n[neutrality:validate] ok (6 acceptance checks)\n",
+      "stderr": "",
+      "signal": null
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "durationMs": 590
+  },
+  "artifacts": [
+    {
+      "artifactPath": "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner/atom.test.report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    },
+    {
+      "artifactPath": "C:/Users/User/AI-Atomic-Framework/specs/neutrality-scanner.atom.json",
+      "artifactKind": "file",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Atomic test runner verified atom.plugin-rule-guard.neutrality-scanner with 1/1 command(s) passing.",
+      "artifactPaths": [
+        "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner/atom.test.report.json",
+        "C:/Users/User/AI-Atomic-Framework/specs/neutrality-scanner.atom.json"
+      ]
+    }
+  ]
+}

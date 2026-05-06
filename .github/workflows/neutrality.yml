@@ -1,0 +1,73 @@
+name: neutrality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  neutrality-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run neutrality verify
+        id: scan
+        shell: bash
+        run: |
+          set +e
+          node packages/cli/src/atm.mjs verify --neutrality --cwd . > neutrality-report.json
+          status=$?
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          cat neutrality-report.json
+          exit 0
+
+      - name: Emit annotations
+        if: always()
+        shell: bash
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const report = JSON.parse(fs.readFileSync('neutrality-report.json', 'utf8')); const violations = report.evidence?.violations ?? []; for (const violation of violations) { const line = typeof violation.line === 'number' ? ',line=' + violation.line : ''; console.log('::error file=' + violation.file + line + '::Neutrality ' + violation.kind + ' violation (' + violation.matchedRule + ')'); }"
+
+      - name: Comment pull request
+        if: github.event_name == 'pull_request' && steps.scan.outputs.exit_code != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('neutrality-report.json', 'utf8'));
+            const violations = report.evidence?.violations ?? [];
+            const preview = violations.slice(0, 10).map((violation) => {
+              const line = typeof violation.line === 'number' ? `:${violation.line}` : '';
+              return `- ${violation.file}${line} [${violation.kind}] ${violation.matchedRule}`;
+            }).join('\n');
+            const body = [
+              'Neutrality scan failed on protected framework surfaces.',
+              '',
+              `Violations: ${violations.length}`,
+              '',
+              preview || '- no preview available'
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+
+      - name: Fail on violations
+        if: steps.scan.outputs.exit_code != '0'
+        run: exit 1

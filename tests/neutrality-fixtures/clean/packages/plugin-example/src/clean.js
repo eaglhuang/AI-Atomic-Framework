@@ -1,0 +1,1 @@
+export const cleanFixture = () => 'framework-neutral-surface';

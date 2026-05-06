@@ -30,6 +30,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'self-host-alpha',
+    summary: 'Verify alpha0 self-hosting criteria',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'spec',
     summary: 'Validate atomic specs against JSON Schema',
     implemented: true,
@@ -39,6 +46,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   {
     commandName: 'status',
     summary: 'Inspect current governance state',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
+    commandName: 'test',
+    summary: 'Run atom smoke tests',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'json'

@@ -1,0 +1,52 @@
+{
+  "requiredFiles": [
+    ".github/workflows/neutrality.yml",
+    "atomic-registry.json",
+    "docs/governance/docs-neutrality-policy.json",
+    "atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner/atom.test.report.json",
+    "packages/plugin-rule-guard/package.json",
+    "packages/plugin-rule-guard/README.md",
+    "packages/plugin-rule-guard/src/index.ts",
+    "packages/plugin-rule-guard/src/neutrality-scanner.mjs",
+    "scripts/validate-neutrality-scanner.mjs",
+    "specs/neutrality-scanner.atom.json"
+  ],
+  "cases": [
+    {
+      "name": "clean",
+      "rootDir": "tests/neutrality-fixtures/clean",
+      "expectedOk": true,
+      "expectedExitCode": 0,
+      "expectedViolationKinds": []
+    },
+    {
+      "name": "term-violation",
+      "rootDir": "tests/neutrality-fixtures/term-violation",
+      "expectedOk": false,
+      "expectedExitCode": 1,
+      "expectedViolationKinds": ["term"]
+    },
+    {
+      "name": "path-violation",
+      "rootDir": "tests/neutrality-fixtures/path-violation",
+      "expectedOk": false,
+      "expectedExitCode": 1,
+      "expectedViolationKinds": ["path"]
+    },
+    {
+      "name": "governance-exception",
+      "rootDir": "tests/neutrality-fixtures/governance-exception",
+      "expectedOk": true,
+      "expectedExitCode": 0,
+      "expectedViolationKinds": []
+    }
+  ],
+  "acceptance": [
+    "clean fixture passes deterministic neutrality scan",
+    "term fixture fails with a term violation",
+    "path fixture fails with a path violation",
+    "docs/governance policy files stay excluded from the docs scan",
+    "cli verify --neutrality passes in the framework repository root",
+    "atomic-registry.json contains the canonical ATM-CORE-0003 entry and report path"
+  ]
+}

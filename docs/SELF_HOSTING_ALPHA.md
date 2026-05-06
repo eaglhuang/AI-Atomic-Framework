@@ -18,11 +18,16 @@ Read README.md. If .atm/config.json is missing, run "node packages/cli/src/atm.m
 
 ## Phase B Exit Gate
 
+Run the deterministic alpha0 gate with:
+
+```bash
+node packages/cli/src/atm.mjs self-host-alpha --verify --json
+```
+
 Phase B may proceed only when all of the following are true:
 
-1. `bootstrap`, `status`, and `validate` all return machine-readable JSON in standalone mode.
-2. The official single-entry prompt is documented and deterministic.
-3. A clean standalone copy of the upstream repository can bootstrap itself and complete the first smoke.
-4. Protected-surface docs neutrality passes for README, docs, examples, and templates before the alpha gate is considered green.
-5. The generated task, scope lock, evidence record, artifact, log, and context summary all exist after the smoke.
-6. The proof does not rely on any downstream-specific script, engine, or local governance tool.
+1. `atm init --adopt --dry-run --json` exits 0 and reports `adoptedAt`.
+2. The default bootstrap creates the first task, scope lock, evidence record, and artifact directory.
+3. `atm test --atom hello-world --json` reports 5/5 passing smoke checks.
+4. `atm verify --neutrality --json` exits 0 on protected framework surfaces.
+5. The proof does not rely on any downstream-specific script, engine, or local governance tool.

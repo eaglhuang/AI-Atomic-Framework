@@ -12,6 +12,8 @@ const mode = process.argv.includes('--mode')
 const requiredFiles = [
   'docs/SELF_HOSTING_ALPHA.md',
   'packages/cli/src/commands/bootstrap-entry.mjs',
+  'packages/cli/src/commands/self-host-alpha.mjs',
+  'packages/cli/src/commands/test.mjs',
   'examples/hello-world/atoms/hello-world.atom.json',
   'examples/hello-world/src/hello-world.atom.mjs'
 ];
@@ -90,6 +92,14 @@ try {
   assert(officialPrompt.includes('.atm/config.json'), 'official prompt must check for .atm/config.json');
   assert(officialPrompt.includes('bootstrap --cwd .'), 'official prompt must tell the agent to run the official bootstrap command');
   assert(officialPrompt.includes('examples/hello-world/atoms/hello-world.atom.json'), 'official prompt must define the first smoke target');
+
+  const selfHostAlphaGate = runAtm(['self-host-alpha', '--verify', '--json'], repoCopy);
+  assert(selfHostAlphaGate.exitCode === 0, 'self-host-alpha --verify --json must exit 0 in self-hosting repo copy');
+  assert(selfHostAlphaGate.parsed.ok === true, 'self-host-alpha --verify --json must report ok=true');
+  assert(selfHostAlphaGate.parsed.criteria1 === true, 'self-host-alpha criteria1 must be true');
+  assert(selfHostAlphaGate.parsed.criteria2 === true, 'self-host-alpha criteria2 must be true');
+  assert(selfHostAlphaGate.parsed.criteria3 === true, 'self-host-alpha criteria3 must be true');
+  assert(selfHostAlphaGate.parsed.criteria4 === true, 'self-host-alpha criteria4 must be true');
 
   if (!existsSync(path.join(repoCopy, '.atm', 'config.json'))) {
     const bootstrap = runAtm(['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM self-hosting alpha'], repoCopy);

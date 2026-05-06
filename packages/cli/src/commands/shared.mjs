@@ -39,9 +39,13 @@ export function parseOptions(argv, commandName) {
     spec: undefined,
     validate: undefined,
     self: false,
+    neutrality: false,
+    verify: false,
+    dryRun: false,
     force: false,
     adopt: undefined,
-    task: undefined
+    task: undefined,
+    atom: undefined
   };
   const positional = [];
 
@@ -72,6 +76,27 @@ export function parseOptions(argv, commandName) {
       options.self = true;
       continue;
     }
+    if (arg === '--neutrality') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --neutrality`, { exitCode: 2 });
+      }
+      options.neutrality = true;
+      continue;
+    }
+    if (arg === '--verify') {
+      if (commandName !== 'self-host-alpha') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --verify`, { exitCode: 2 });
+      }
+      options.verify = true;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      if (commandName !== 'init') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --dry-run`, { exitCode: 2 });
+      }
+      options.dryRun = true;
+      continue;
+    }
     if (arg === '--force') {
       options.force = true;
       continue;
@@ -80,7 +105,19 @@ export function parseOptions(argv, commandName) {
       if (commandName !== 'init') {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --adopt`, { exitCode: 2 });
       }
-      options.adopt = requireOptionValue(argv, index, '--adopt', commandName);
+      if (!argv[index + 1] || argv[index + 1].startsWith('--')) {
+        options.adopt = 'default';
+      } else {
+        options.adopt = requireOptionValue(argv, index, '--adopt', commandName);
+        index += 1;
+      }
+      continue;
+    }
+    if (arg === '--atom') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --atom`, { exitCode: 2 });
+      }
+      options.atom = requireOptionValue(argv, index, '--atom', commandName);
       index += 1;
       continue;
     }
