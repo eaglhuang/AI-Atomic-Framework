@@ -89,6 +89,16 @@ for (const value of ['forbidden', 'allowed', 'clone-on-write']) {
   }
 }
 
+const lifecycleModeEnum = atomicSchema?.$defs?.compatibility?.properties?.lifecycleMode?.enum || [];
+for (const value of ['birth', 'evolution']) {
+  if (!lifecycleModeEnum.includes(value)) {
+    fail(`atomic-spec compatibility.lifecycleMode missing enum value: ${value}`);
+  }
+}
+if (atomicSchema?.properties?.lifecycleMode) {
+  fail('atomic-spec lifecycleMode must stay under compatibility, not top-level');
+}
+
 const manifestPath = 'tests/schema-fixtures/manifest.json';
 const manifest = readJson(manifestPath);
 for (const fixture of manifest.positive || []) {

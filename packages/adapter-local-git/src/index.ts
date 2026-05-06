@@ -1,5 +1,10 @@
 import type { ArtifactRecord, EvidenceRecord, ScopeLockRecord, WorkItemRef } from '@ai-atomic-framework/core';
-import type { GovernancePluginResult } from '@ai-atomic-framework/plugin-sdk';
+import type {
+  GovernancePluginResult,
+  ProjectAdapter as SdkProjectAdapter,
+  ProjectAdapterContext as SdkProjectAdapterContext,
+  ProjectAdapterResult as SdkProjectAdapterResult
+} from '@ai-atomic-framework/plugin-sdk';
 
 export const adapterLocalGitPackage = {
   packageName: '@ai-atomic-framework/adapter-local-git',
@@ -19,14 +24,14 @@ export interface LocalGitAdapterConfig {
   readonly docMode: 'noop';
 }
 
-export interface LocalGitAdapterContext {
+export interface LocalGitAdapterContext extends SdkProjectAdapterContext<Partial<LocalGitAdapterConfig>> {
   readonly repositoryRoot: string;
   readonly actor?: string;
   readonly config?: Partial<LocalGitAdapterConfig>;
   readonly now?: string;
 }
 
-export interface LocalGitAdapterResult {
+export interface LocalGitAdapterResult extends SdkProjectAdapterResult {
   readonly ok: boolean;
   readonly operation: LocalGitAdapterOperation;
   readonly mode: LocalGitAdapterMode;
@@ -45,7 +50,7 @@ export interface LocalGitRegistryEntry {
   readonly payload: unknown;
 }
 
-export interface ProjectAdapter {
+export interface ProjectAdapter extends SdkProjectAdapter<LocalGitAdapterConfig> {
   readonly adapterName: '@ai-atomic-framework/adapter-local-git';
   readonly defaultConfig: LocalGitAdapterConfig;
   scaffold(context: LocalGitAdapterContext): Promise<LocalGitAdapterResult> | LocalGitAdapterResult;

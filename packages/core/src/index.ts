@@ -119,6 +119,7 @@ export interface RegistryCompatibilityRecord {
   readonly registryVersion: string;
   readonly pluginApiVersion?: string;
   readonly languageAdapter?: string;
+  readonly lifecycleMode?: 'birth' | 'evolution';
 }
 
 export interface RegistryEntryRecord {

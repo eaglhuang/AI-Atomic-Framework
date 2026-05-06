@@ -179,7 +179,8 @@ export function normalizeAtomicSpecModel(specDocument, options = {}) {
         coreVersion: specDocument.compatibility.coreVersion,
         registryVersion: specDocument.compatibility.registryVersion,
         pluginApiVersion: specDocument.compatibility.pluginApiVersion ?? null,
-        languageAdapter: specDocument.compatibility.languageAdapter ?? null
+        languageAdapter: specDocument.compatibility.languageAdapter ?? null,
+        lifecycleMode: specDocument.compatibility.lifecycleMode ?? null
       },
       dependencyPolicy: {
         external: specDocument.dependencyPolicy?.external ?? 'none',

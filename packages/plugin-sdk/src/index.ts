@@ -1,4 +1,53 @@
 import type { EvidenceRecord, WorkItemRef } from '@ai-atomic-framework/core';
+export { AtomLifecycleMode } from './lifecycle';
+export type {
+  AtomLifecycleHookContext,
+  AtomLifecycleHookResult,
+  AtomLifecycleHooks,
+  AtomLifecycleModeValue,
+  QualityMetricsComparator,
+  QualityMetricsComparison,
+  QualityMetricsSnapshot,
+  UpgradeProposal,
+  UpgradeProposalAdapter,
+  UpgradeProposalRequest,
+  VersionResolution,
+  VersionResolver,
+  VersionResolverRequest
+} from './lifecycle';
+export type {
+  CapabilityContext,
+  CapabilityDescriptor,
+  CapabilityKind,
+  CapabilityProvider,
+  CapabilityRegistry,
+  CapabilityResult
+} from './capability';
+export type { ProjectAdapter, ProjectAdapterContext, ProjectAdapterResult } from './project-adapter';
+export type {
+  LanguageAdapter,
+  LanguageAdapterMessage,
+  LanguageAdapterReport,
+  LanguageAdapterValidationRequest,
+  LanguageProjectProfile,
+  LanguageSourceFile
+} from './language-adapter';
+export type { InjectorPlugin, InjectorPluginContext } from './injector-plugin';
+export type {
+  ArtifactStore,
+  ContextSummaryStore,
+  DocumentIndex,
+  EvidenceStore,
+  GovernanceStores,
+  LockStore,
+  LogStore,
+  MarkdownJsonStateStore,
+  RegistryStore,
+  RuleGuard,
+  ShardStore,
+  StoreLifecycle,
+  TaskStore
+} from './governance';
 export type {
   PoliceCheckContract,
   PoliceCheckKind,

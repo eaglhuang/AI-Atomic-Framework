@@ -1,4 +1,5 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
+import type { LanguageAdapter as SdkLanguageAdapter } from '@ai-atomic-framework/plugin-sdk';
 
 export const languageJsPackage = {
   packageName: '@ai-atomic-framework/language-js',
@@ -57,12 +58,7 @@ export interface JavaScriptValidationCommand {
   readonly required: boolean;
 }
 
-export interface LanguageAdapter<Profile, Request, Report> {
-  readonly adapterName: string;
-  readonly languageIds: readonly string[];
-  detectProjectProfile(repositoryRoot: string): Profile;
-  validateComputeAtom(request: Request): Report;
-}
+export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
 
 export interface JavaScriptValidationReport {
   readonly ok: boolean;
