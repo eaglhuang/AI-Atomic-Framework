@@ -13,6 +13,8 @@ const requiredFiles = [
   'CONTRIBUTING.md',
   'docs/ARCHITECTURE.md',
   'docs/ECOSYSTEM_POSITIONING.md',
+  'docs/governance/DOCS_NEUTRALITY_AUDIT.md',
+  'docs/governance/docs-neutrality-policy.json',
   'package.json',
   'pnpm-workspace.yaml',
   'turbo.json'
@@ -38,24 +40,50 @@ const requiredPositioningPhrases = [
   'Core vs Adapter vs Plugin'
 ];
 
-const bannedProtectedSurfaceTerms = [
-  '3KLife',
-  'Cocos',
-  'cocos-creator',
-  'html-to-ucuf',
-  'gacha',
-  'UCUF',
-  'draft-builder',
-  'task-lock',
-  'compute-gate',
-  'doc-id-registry',
-  'tools_node/',
-  'assets/scripts/',
-  'docs/agent-briefs/'
-];
+const docsNeutralityPolicyPath = 'docs/governance/docs-neutrality-policy.json';
 
 function readRelative(relativePath) {
   return readFileSync(path.join(root, relativePath), 'utf8');
+}
+
+function normalizeRelative(relativePath) {
+  return relativePath.replace(/\\/g, '/');
+}
+
+function listRelativeFiles(relativeDir) {
+  const fullDir = path.join(root, relativeDir);
+  const results = [];
+  for (const entry of readdirSync(fullDir, { withFileTypes: true })) {
+    const relativeEntry = normalizeRelative(path.join(relativeDir, entry.name));
+    if (entry.isDirectory()) {
+      results.push(...listRelativeFiles(relativeEntry));
+      continue;
+    }
+    results.push(relativeEntry);
+  }
+  return results;
+}
+
+function basename(relativePath) {
+  return normalizeRelative(relativePath).split('/').pop();
+}
+
+function pathMatchesScope(relativePath, scope) {
+  const normalizedPath = normalizeRelative(relativePath);
+  const normalizedRoot = normalizeRelative(scope.path);
+  if (normalizedPath !== normalizedRoot && !normalizedPath.startsWith(`${normalizedRoot}/`)) {
+    return false;
+  }
+  if (Array.isArray(scope.excludePrefixes) && scope.excludePrefixes.some((prefix) => normalizedPath.startsWith(prefix))) {
+    return false;
+  }
+  if (Array.isArray(scope.extensions) && scope.extensions.length > 0 && !scope.extensions.some((extension) => normalizedPath.endsWith(extension))) {
+    return false;
+  }
+  if (Array.isArray(scope.fileNames) && scope.fileNames.length > 0 && !scope.fileNames.includes(basename(normalizedPath))) {
+    return false;
+  }
+  return true;
 }
 
 function fail(message) {
@@ -90,21 +118,30 @@ if (!process.exitCode) {
       fail(`package.json missing script: ${scriptName}`);
     }
   }
-}
 
-const protectedFiles = [
-  'README.md',
-  'CONTRIBUTING.md',
-  ...readdirSync(path.join(root, 'docs'))
-    .filter((entry) => entry.endsWith('.md'))
-    .map((entry) => `docs/${entry}`)
-];
+  const docsNeutralityPolicy = JSON.parse(readRelative(docsNeutralityPolicyPath));
+  const auditDoc = readRelative(docsNeutralityPolicy.auditDocPath);
+  for (const section of docsNeutralityPolicy.requiredAuditSections ?? []) {
+    if (!auditDoc.includes(section)) {
+      fail(`${docsNeutralityPolicy.auditDocPath} missing required section: ${section}`);
+    }
+  }
 
-for (const relativePath of protectedFiles) {
-  const content = readRelative(relativePath);
-  for (const term of bannedProtectedSurfaceTerms) {
-    if (content.includes(term)) {
-      fail(`${relativePath} contains downstream-only term: ${term}`);
+  const protectedFiles = new Set(docsNeutralityPolicy.protectedFiles ?? []);
+  for (const scope of docsNeutralityPolicy.protectedScopes ?? []) {
+    for (const relativePath of listRelativeFiles(scope.path)) {
+      if (pathMatchesScope(relativePath, scope)) {
+        protectedFiles.add(relativePath);
+      }
+    }
+  }
+
+  for (const relativePath of protectedFiles) {
+    const content = readRelative(relativePath);
+    for (const term of docsNeutralityPolicy.bannedTerms ?? []) {
+      if (content.includes(term)) {
+        fail(`${relativePath} contains downstream-only term: ${term}`);
+      }
     }
   }
 }

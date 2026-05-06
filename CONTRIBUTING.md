@@ -37,6 +37,8 @@ The upstream repository must remain host-neutral. Do not make core contracts, pr
 
 If a feature needs host-specific behavior, put the behavior behind an adapter or plugin boundary and document the contract that core consumes.
 
+Before editing protected-surface docs, examples, or templates, review [docs/governance/DOCS_NEUTRALITY_AUDIT.md](docs/governance/DOCS_NEUTRALITY_AUDIT.md).
+
 ## Documentation Changes
 
 Documentation should explain decisions in terms of ATM concepts:

@@ -23,5 +23,6 @@ Phase B may proceed only when all of the following are true:
 1. `bootstrap`, `status`, and `validate` all return machine-readable JSON in standalone mode.
 2. The official single-entry prompt is documented and deterministic.
 3. A clean standalone copy of the upstream repository can bootstrap itself and complete the first smoke.
-4. The generated task, scope lock, evidence record, artifact, log, and context summary all exist after the smoke.
-5. The proof does not rely on any downstream-specific script, engine, or local governance tool.
+4. Protected-surface docs neutrality passes for README, docs, examples, and templates before the alpha gate is considered green.
+5. The generated task, scope lock, evidence record, artifact, log, and context summary all exist after the smoke.
+6. The proof does not rely on any downstream-specific script, engine, or local governance tool.

@@ -99,6 +99,8 @@ npm run lint
 
 These commands validate the product charter files, required positioning language, and protected-surface boundary terms.
 
+Protected-surface neutrality rules and migration guidance live in [docs/governance/DOCS_NEUTRALITY_AUDIT.md](docs/governance/DOCS_NEUTRALITY_AUDIT.md).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).

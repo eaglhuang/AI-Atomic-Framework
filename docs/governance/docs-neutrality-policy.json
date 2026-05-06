@@ -1,0 +1,51 @@
+{
+  "auditDocPath": "docs/governance/DOCS_NEUTRALITY_AUDIT.md",
+  "requiredAuditSections": [
+    "## Protected Surface Checklist",
+    "## Banned-Term Scan Scope",
+    "## Adopter-Only Reference Migration",
+    "## Self-Hosting Alpha Alignment"
+  ],
+  "protectedFiles": [
+    "README.md",
+    "CONTRIBUTING.md"
+  ],
+  "protectedScopes": [
+    {
+      "path": "docs",
+      "extensions": [
+        ".md"
+      ],
+      "excludePrefixes": [
+        "docs/governance/"
+      ]
+    },
+    {
+      "path": "examples",
+      "extensions": [
+        ".md"
+      ]
+    },
+    {
+      "path": "templates",
+      "extensions": [
+        ".md"
+      ]
+    }
+  ],
+  "bannedTerms": [
+    "3KLife",
+    "Cocos",
+    "cocos-creator",
+    "html-to-ucuf",
+    "gacha",
+    "UCUF",
+    "draft-builder",
+    "task-lock",
+    "compute-gate",
+    "doc-id-registry",
+    "tools_node/",
+    "assets/scripts/",
+    "docs/agent-briefs/"
+  ]
+}
