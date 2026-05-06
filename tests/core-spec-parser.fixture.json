@@ -1,0 +1,122 @@
+{
+  "validCases": [
+    {
+      "name": "hello-world existing fixture",
+      "specPath": "tests/schema-fixtures/positive/hello-world.atom.json",
+      "expectedNormalizedModel": {
+        "schema": {
+          "schemaId": "atm.atomicSpec",
+          "specVersion": "0.1.0"
+        },
+        "identity": {
+          "atomId": "atom.hello-world",
+          "title": "Hello World Atom",
+          "description": "Minimal alpha0 atom used to prove schema validation and hash-lock metadata.",
+          "tags": [
+            "alpha0",
+            "hello-world"
+          ]
+        },
+        "execution": {
+          "language": {
+            "primary": "javascript",
+            "sourceExtensions": [
+              ".js"
+            ],
+            "tooling": [
+              "node"
+            ]
+          },
+          "dependencyPolicy": {
+            "external": "workspace-only",
+            "hostCoupling": "adapter-only"
+          },
+          "validation": {
+            "commands": [
+              "npm test"
+            ],
+            "evidenceRequired": true
+          },
+          "performanceBudget": {
+            "hotPath": false,
+            "inputMutation": "forbidden",
+            "maxDurationMs": 1000
+          }
+        },
+        "ports": {
+          "inputs": [
+            {
+              "name": "goal",
+              "kind": "text",
+              "required": true
+            }
+          ],
+          "outputs": [
+            {
+              "name": "evidence",
+              "kind": "evidence",
+              "required": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "minimal defaults fixture",
+      "specPath": "tests/core-spec-parser-fixtures/minimal-valid.atom.json",
+      "expectedNormalizedModel": {
+        "identity": {
+          "atomId": "atom.minimal-defaults",
+          "title": "Minimal Defaults Atom",
+          "description": "",
+          "tags": []
+        },
+        "execution": {
+          "language": {
+            "primary": "json",
+            "sourceExtensions": [
+              ".json"
+            ],
+            "tooling": []
+          },
+          "dependencyPolicy": {
+            "external": "none",
+            "hostCoupling": "forbidden"
+          },
+          "validation": {
+            "commands": [],
+            "evidenceRequired": false
+          },
+          "performanceBudget": {
+            "hotPath": false,
+            "inputMutation": "forbidden",
+            "maxDurationMs": null
+          }
+        },
+        "ports": {
+          "inputs": [],
+          "outputs": []
+        }
+      }
+    }
+  ],
+  "invalidCases": [
+    {
+      "name": "missing hash lock fixture",
+      "specPath": "tests/schema-fixtures/negative/missing-hash-lock.atom.json",
+      "expectedCode": "ATM_SPEC_REQUIRED_FIELD",
+      "expectedPath": "/hashLock",
+      "expectedPromptSnippet": "hashLock"
+    },
+    {
+      "name": "missing file path",
+      "specPath": "tests/core-spec-parser-fixtures/does-not-exist.atom.json",
+      "expectedCode": "ATM_SPEC_NOT_FOUND",
+      "expectedPath": "C:/Users/User/AI-Atomic-Framework/tests/core-spec-parser-fixtures/does-not-exist.atom.json",
+      "expectedPromptSnippet": "does-not-exist.atom.json"
+    }
+  ],
+  "hostAgnosticCase": {
+    "specPath": "tests/core-spec-parser-fixtures/minimal-valid.atom.json"
+  }
+}

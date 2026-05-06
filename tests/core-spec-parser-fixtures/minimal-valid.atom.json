@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Minimal parser defaults fixture."
+  },
+  "id": "atom.minimal-defaults",
+  "title": "Minimal Defaults Atom",
+  "language": {
+    "primary": "json",
+    "sourceExtensions": [
+      ".json"
+    ]
+  },
+  "runtime": {
+    "kind": "language-neutral",
+    "versionRange": ">=0",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "standalone-seed",
+    "storage": "none",
+    "capabilities": [
+      "schema-validator"
+    ]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "canonicalization": "json-stable-v1"
+  }
+}
