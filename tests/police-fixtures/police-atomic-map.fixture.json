@@ -1,0 +1,27 @@
+{
+  "mapId": "map.police.atom-set",
+  "mapVersion": "0.1.0",
+  "members": [
+    { "atomId": "atom.police.sdk-contract", "version": "0.1.0" },
+    { "atomId": "atom.police.schema", "version": "0.1.0" },
+    { "atomId": "atom.police.dependency-graph", "version": "0.1.0" },
+    { "atomId": "atom.police.layer-boundary", "version": "0.1.0" },
+    { "atomId": "atom.police.forbidden-import", "version": "0.1.0" },
+    { "atomId": "atom.police.registry-consistency", "version": "0.1.0" },
+    { "atomId": "atom.police.runner", "version": "0.1.0" }
+  ],
+  "edges": [
+    { "from": "atom.police.runner", "to": "atom.police.sdk-contract", "binding": "emits-report-contract" },
+    { "from": "atom.police.runner", "to": "atom.police.schema", "binding": "validates-report-shapes" },
+    { "from": "atom.police.runner", "to": "atom.police.dependency-graph", "binding": "checks-map-dag" },
+    { "from": "atom.police.runner", "to": "atom.police.layer-boundary", "binding": "checks-import-policy" },
+    { "from": "atom.police.runner", "to": "atom.police.forbidden-import", "binding": "checks-forbidden-patterns" },
+    { "from": "atom.police.runner", "to": "atom.police.registry-consistency", "binding": "checks-promote-gate" }
+  ],
+  "entrypoints": ["atom.police.runner"],
+  "qualityTargets": {
+    "cycleCount": 0,
+    "requiredChecks": 6,
+    "evolutionPromoteGate": "all-required-reports-pass"
+  }
+}

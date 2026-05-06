@@ -1,0 +1,17 @@
+[
+  {
+    "file": "packages/core/src/police/index.mjs",
+    "fromLayer": "core",
+    "imports": [
+      { "source": "node:path", "toLayer": "external" },
+      { "source": "./dependency-graph.mjs", "toLayer": "relative" }
+    ]
+  },
+  {
+    "file": "packages/plugin-sdk/src/police.ts",
+    "fromLayer": "plugin",
+    "imports": [
+      { "source": "@ai-atomic-framework/core", "toLayer": "core" }
+    ]
+  }
+]

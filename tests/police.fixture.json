@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "schemaFixtures": [
+    {
+      "name": "layer policy",
+      "schemaPath": "schemas/layer-policy.schema.json",
+      "positivePath": "tests/police-fixtures/positive/layer-policy.json"
+    },
+    {
+      "name": "non regression report",
+      "schemaPath": "schemas/police/non-regression-report.schema.json",
+      "positivePath": "tests/police-fixtures/positive/non-regression-report.json",
+      "negativePath": "tests/police-fixtures/negative/non-regression-report.missing-lifecycle.json"
+    },
+    {
+      "name": "quality comparison report",
+      "schemaPath": "schemas/police/quality-comparison-report.schema.json",
+      "positivePath": "tests/police-fixtures/positive/quality-comparison-report.json"
+    },
+    {
+      "name": "registry candidate report",
+      "schemaPath": "schemas/police/registry-candidate-report.schema.json",
+      "positivePath": "tests/police-fixtures/positive/registry-candidate-report.json"
+    }
+  ],
+  "dependencyGraph": {
+    "positivePath": "tests/police-fixtures/positive/dependency-map.json",
+    "negativePath": "tests/police-fixtures/negative/dependency-cycle-map.json"
+  },
+  "layerBoundary": {
+    "policyPath": "tests/police-fixtures/positive/layer-policy.json",
+    "positivePath": "tests/police-fixtures/positive/layer-boundary-imports.json",
+    "negativePath": "tests/police-fixtures/negative/layer-boundary-imports.json"
+  },
+  "forbiddenImport": {
+    "forbiddenPatterns": ["@ai-atomic-framework/adapter-"],
+    "positivePath": "tests/police-fixtures/positive/layer-boundary-imports.json",
+    "negativePath": "tests/police-fixtures/negative/forbidden-imports.json"
+  },
+  "registryGate": {
+    "positivePath": "tests/police-fixtures/positive/promotion-gate.json",
+    "negativePath": "tests/police-fixtures/negative/promotion-gate.json"
+  },
+  "atomicMap": {
+    "fixturePath": "tests/police-fixtures/police-atomic-map.fixture.json"
+  },
+  "acceptance": [
+    "Police SDK contract exposes lifecycle-aware report types",
+    "Police report schemas require lifecycleMode",
+    "dependency graph cycles hard fail",
+    "layer boundary violations hard fail",
+    "forbidden adapter implementation imports hard fail",
+    "evolution promote is blocked when nonRegression, qualityComparison, or registryCandidate fails",
+    "Police Atomic Map integration fixture passes as an acyclic map"
+  ]
+}

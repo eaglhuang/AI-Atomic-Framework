@@ -1,0 +1,30 @@
+{
+  "schemaId": "atm.police.nonRegressionReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial non-regression report fixture."
+  },
+  "reportId": "police.non-regression.fixture",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "lifecycleMode": "evolution",
+  "baseline": {
+    "atomId": "atom.police.fixture",
+    "version": "1.0.0",
+    "reportPath": "reports/baseline.json"
+  },
+  "current": {
+    "atomId": "atom.police.fixture",
+    "version": "1.1.0",
+    "reportPath": "reports/current.json"
+  },
+  "checks": [
+    {
+      "name": "regression-suite",
+      "passed": true,
+      "message": "All baseline fixtures passed."
+    }
+  ],
+  "passed": true
+}

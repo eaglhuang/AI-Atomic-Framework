@@ -1,0 +1,13 @@
+{
+  "mapId": "map.police.cycle-fixture",
+  "mapVersion": "0.1.0",
+  "members": [
+    { "atomId": "atom.police.a", "version": "0.1.0" },
+    { "atomId": "atom.police.b", "version": "0.1.0" }
+  ],
+  "edges": [
+    { "from": "atom.police.a", "to": "atom.police.b", "binding": "runs" },
+    { "from": "atom.police.b", "to": "atom.police.a", "binding": "runs" }
+  ],
+  "entrypoints": ["atom.police.a"]
+}

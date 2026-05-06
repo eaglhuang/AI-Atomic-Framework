@@ -1,4 +1,13 @@
 import type { EvidenceRecord, WorkItemRef } from '@ai-atomic-framework/core';
+export type {
+  PoliceCheckContract,
+  PoliceCheckKind,
+  PoliceCheckResult,
+  PoliceLifecycleMode,
+  PoliceReport,
+  PoliceSeverity,
+  PoliceViolation
+} from './police';
 
 export const pluginSdkPackage = {
   packageName: '@ai-atomic-framework/plugin-sdk',
