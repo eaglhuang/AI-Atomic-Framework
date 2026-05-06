@@ -36,6 +36,8 @@ try {
   check(scaffold.ok === true, 'scaffold must succeed');
   check(scaffold.createdFiles.length === 2, 'first scaffold must create two files');
   check(scaffold.skippedFiles.length === 0, 'first scaffold must not skip files');
+  check(scaffold.workbenchPath.endsWith(fixture.defaultWorkbenchPath), 'default scaffold must resolve canonical workbench path');
+  check(path.basename(scaffold.workbenchPath) === fixture.expectedAtomId, 'default scaffold folder name must equal the Atomic ID exactly');
 
   const workbenchPath = path.join(tempRoot, fixture.defaultWorkbenchPath);
   const specPath = path.join(workbenchPath, defaultAtomSpecFileName);

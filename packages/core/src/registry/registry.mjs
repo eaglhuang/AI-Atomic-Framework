@@ -3,6 +3,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { createSourceHashSnapshot, normalizeSourcePathList } from '../hash-lock/hash-lock.mjs';
+import { resolveAtomWorkbenchPath } from '../manager/atom-space.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
@@ -23,7 +24,11 @@ export function createAtomicRegistryEntry(normalizedModel, options = {}) {
     legacyPlanningId: options.legacyPlanningId ?? null
   });
   const reportPath = deriveReportPath(repositoryRoot, options.reportPath ?? null, options.testReport);
-  const workbenchPath = deriveWorkbenchPath(repositoryRoot, options.workbenchPath ?? null, reportPath);
+  const workbenchPath = deriveWorkbenchPath(normalizedModel, {
+    repositoryRoot,
+    workbenchPath: options.workbenchPath ?? null,
+    reportPath
+  });
 
   return {
     id: options.id ?? normalizedModel.identity.atomId,
@@ -271,9 +276,13 @@ function deriveReportPath(repositoryRoot, reportPath, testReport) {
   return explicitPath ? normalizeProjectPath(repositoryRoot, explicitPath) : null;
 }
 
-function deriveWorkbenchPath(repositoryRoot, workbenchPath, reportPath) {
-  const candidate = workbenchPath ?? (reportPath ? path.dirname(resolveProjectPath(repositoryRoot, reportPath)) : null);
-  return candidate ? normalizeProjectPath(repositoryRoot, candidate) : null;
+function deriveWorkbenchPath(normalizedModel, options) {
+  const candidate = options.workbenchPath
+    ? resolveProjectPath(options.repositoryRoot, options.workbenchPath)
+    : options.reportPath
+      ? path.dirname(resolveProjectPath(options.repositoryRoot, options.reportPath))
+      : resolveAtomWorkbenchPath(normalizedModel, { repositoryRoot: options.repositoryRoot });
+  return candidate ? normalizeProjectPath(options.repositoryRoot, candidate) : null;
 }
 
 function normalizeMigration(migration) {

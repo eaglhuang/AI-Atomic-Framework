@@ -73,6 +73,7 @@ See [docs/ECOSYSTEM_POSITIONING.md](docs/ECOSYSTEM_POSITIONING.md) for the posit
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the initial architecture and package boundary notes.
+Canonical per-atom workspace layout, Atomic ID folder naming, and migration guidance live in [docs/ATOM_SPACE_LAYOUT.md](docs/ATOM_SPACE_LAYOUT.md).
 
 ## Non-Goals
 

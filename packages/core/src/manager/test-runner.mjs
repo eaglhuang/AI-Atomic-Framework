@@ -3,18 +3,19 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { resolveAtomWorkbenchPath } from './scaffold.mjs';
+import { defaultTestReportFileName, resolveAtomicTestReportPath } from './atom-space.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
 
-export const defaultTestReportFileName = 'atom.test.report.json';
 export const defaultTestReportSchemaPath = path.join(repoRoot, 'schemas', 'test-report.schema.json');
 export const defaultTestReportMigration = Object.freeze({
   strategy: 'none',
   fromVersion: null,
   notes: 'Initial alpha0 test runner report.'
 });
+
+export { defaultTestReportFileName, resolveAtomicTestReportPath };
 
 export function createAtomicTestRunnerContract(normalizedModel) {
   const commands = normalizedModel.execution.validation.commands.map((command, index) => ({
@@ -193,20 +194,6 @@ export function validateAtomicTestReportDocument(reportDocument, options = {}) {
       issues: []
     }
   };
-}
-
-export function resolveAtomicTestReportPath(normalizedModel, options = {}) {
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
-  if (options.reportPath) {
-    return path.resolve(repositoryRoot, options.reportPath);
-  }
-
-  const workbenchPath = resolveAtomWorkbenchPath(normalizedModel, {
-    repositoryRoot,
-    workbenchPath: options.workbenchPath,
-    workbenchRoot: options.workbenchRoot
-  });
-  return path.join(workbenchPath, defaultTestReportFileName);
 }
 
 function defaultExecuteCommand(command, context) {

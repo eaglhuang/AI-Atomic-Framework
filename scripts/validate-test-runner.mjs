@@ -87,6 +87,7 @@ try {
   check(passResult.ok === true, 'pass fixture must succeed');
   check(passResult.exitCode === fixture.passCase.expectedExitCode, 'pass fixture exit code mismatch');
   check(passResult.reportPath.endsWith(fixture.passCase.expectedReportPath), 'pass fixture must default report path under atom workbench folder');
+  check(path.basename(path.dirname(passResult.reportPath)) === passParsed.normalizedModel.identity.atomId, 'pass fixture report folder must equal the Atomic ID exactly');
   check(existsSync(path.join(tempRoot, fixture.passCase.expectedReportPath)), 'pass fixture report file must be written');
   check(passResult.report.runnerContract.executionMode === 'delegated', 'runner contract must stay delegated');
   check(passResult.report.results[0]?.command === fixture.passCase.expectedCommand, 'pass fixture command must be preserved exactly');

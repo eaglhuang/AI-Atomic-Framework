@@ -101,6 +101,7 @@ try {
   check(entry.location?.codePaths[0] === fixture.codePath, 'registry entry must record code location');
   check(entry.location?.testPaths[0] === fixture.testPath, 'registry entry must record test location');
   check(entry.location?.workbenchPath === fixture.expectedWorkbenchPath, 'registry entry must derive workbench location from report path');
+  check(path.basename(entry.location?.workbenchPath ?? '') === fixture.expectedId, 'registry workbench folder name must equal the Atomic ID exactly');
   check(entry.evidence.includes(fixture.expectedReportPath), 'registry entry evidence must include machine-readable test report');
 
   const document = createRegistryDocument([entry], {

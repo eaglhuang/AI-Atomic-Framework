@@ -1,24 +1,39 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  createAtomSpaceLayout,
+  defaultAtomSpecFileName,
+  defaultAtomTestFileName,
+  defaultAtomWorkbenchRoot,
+  resolveAtomWorkbenchPath,
+  resolveCanonicalAtomFolderName
+} from './atom-space.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 
-export const defaultAtomWorkbenchRoot = 'atomic_workbench/atoms';
-export const defaultAtomSpecFileName = 'atom.spec.json';
-export const defaultAtomTestFileName = 'atom.test.ts';
 export const defaultAtomSpecTemplatePath = path.join(repoRoot, 'templates', 'atom.spec.template.json');
 export const defaultAtomTestTemplatePath = path.join(repoRoot, 'templates', 'atom.test.template.ts');
 
+export {
+  defaultAtomWorkbenchRoot,
+  defaultAtomSpecFileName,
+  defaultAtomTestFileName,
+  resolveAtomWorkbenchPath
+};
+
 export function scaffoldAtomWorkbench(normalizedModel, options = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
-  const workbenchPath = resolveAtomWorkbenchPath(normalizedModel, {
+  const atomSpace = createAtomSpaceLayout(normalizedModel, {
     repositoryRoot,
     workbenchPath: options.workbenchPath,
-    workbenchRoot: options.workbenchRoot
+    workbenchRoot: options.workbenchRoot,
+    specFileName: options.specFileName,
+    testFileName: options.testFileName
   });
-  const specOutputPath = path.join(workbenchPath, options.specFileName ?? defaultAtomSpecFileName);
-  const testOutputPath = path.join(workbenchPath, options.testFileName ?? defaultAtomTestFileName);
+  const workbenchPath = atomSpace.workbenchPath;
+  const specOutputPath = atomSpace.specPath;
+  const testOutputPath = atomSpace.testPath;
   const templateMap = createTemplateMap(normalizedModel, {
     specPath: specOutputPath,
     testPath: testOutputPath,
@@ -88,21 +103,11 @@ export function scaffoldAtomWorkbench(normalizedModel, options = {}) {
   return result;
 }
 
-export function resolveAtomWorkbenchPath(normalizedModel, options = {}) {
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
-  if (options.workbenchPath) {
-    return path.resolve(repositoryRoot, options.workbenchPath);
-  }
-
-  const workbenchRoot = options.workbenchRoot ?? defaultAtomWorkbenchRoot;
-  return path.resolve(repositoryRoot, workbenchRoot, safeAtomWorkbenchSegment(normalizedModel.identity.atomId));
-}
-
 function createTemplateMap(normalizedModel, options) {
   return {
     atomId: normalizedModel.identity.atomId,
     atomIdJson: JSON.stringify(normalizedModel.identity.atomId),
-    atomIdSafeSegment: safeAtomWorkbenchSegment(normalizedModel.identity.atomId),
+    atomIdSafeSegment: resolveCanonicalAtomFolderName(normalizedModel.identity.atomId),
     titleJson: JSON.stringify(normalizedModel.identity.title),
     descriptionJson: JSON.stringify(normalizedModel.identity.description),
     tagsJson: JSON.stringify(normalizedModel.identity.tags, null, 2),
@@ -150,10 +155,6 @@ function renderTemplate(templatePath, values) {
     }
     return values[key];
   })}\n`;
-}
-
-function safeAtomWorkbenchSegment(atomId) {
-  return String(atomId).replace(/[^a-zA-Z0-9_.-]/g, '-');
 }
 
 function toPortablePath(value) {
