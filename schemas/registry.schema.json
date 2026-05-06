@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/registry.schema.json",
+  "title": "ATM Registry v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "registryId", "generatedAt", "entries"],
+  "properties": {
+    "schemaId": {
+      "const": "atm.registry"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "registryId": {
+      "type": "string",
+      "pattern": "^registry\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/registryEntry"
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "registryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "atomId",
+        "schemaId",
+        "specVersion",
+        "schemaPath",
+        "specPath",
+        "hashLock",
+        "owner",
+        "status",
+        "compatibility",
+        "evidence"
+      ],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "pattern": "^atom\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "schemaId": {
+          "const": "atm.atomicSpec"
+        },
+        "specVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "schemaPath": {
+          "type": "string",
+          "pattern": "^schemas/.+\\.schema\\.json$"
+        },
+        "specPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hashLock": {
+          "$ref": "#/$defs/hashLock"
+        },
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "contact"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "contact": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "status": {
+          "enum": ["seed", "active", "experimental", "deprecated"]
+        },
+        "compatibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["coreVersion", "registryVersion"],
+          "properties": {
+            "coreVersion": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            },
+            "registryVersion": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "hashLock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "digest", "canonicalization"],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "canonicalization": {
+          "enum": ["json-stable-v1", "text-normalized-v1"]
+        }
+      }
+    }
+  }
+}

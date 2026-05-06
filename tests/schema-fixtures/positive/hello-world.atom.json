@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial alpha0 seed fixture."
+  },
+  "id": "atom.hello-world",
+  "title": "Hello World Atom",
+  "description": "Minimal alpha0 atom used to prove schema validation and hash-lock metadata.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [".js"],
+    "tooling": ["node"]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": ["filesystem", "git", "schema-validator", "evidence-store"]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "adapter-only"
+  },
+  "inputs": [
+    {
+      "name": "goal",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "evidence",
+      "kind": "evidence",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": ["npm test"],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": ["alpha0", "hello-world"]
+}

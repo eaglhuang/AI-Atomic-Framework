@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/atomic-spec.schema.json",
+  "title": "ATM Atomic Spec v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "id",
+    "title",
+    "language",
+    "runtime",
+    "adapterRequirements",
+    "compatibility",
+    "hashLock"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.atomicSpec"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^atom\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "language": {
+      "$ref": "#/$defs/language"
+    },
+    "runtime": {
+      "$ref": "#/$defs/runtime"
+    },
+    "adapterRequirements": {
+      "$ref": "#/$defs/adapterRequirements"
+    },
+    "compatibility": {
+      "$ref": "#/$defs/compatibility"
+    },
+    "hashLock": {
+      "$ref": "#/$defs/hashLock"
+    },
+    "dependencyPolicy": {
+      "$ref": "#/$defs/dependencyPolicy"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/port"
+      },
+      "default": []
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/port"
+      },
+      "default": []
+    },
+    "validation": {
+      "$ref": "#/$defs/validation"
+    },
+    "performanceBudget": {
+      "$ref": "#/$defs/performanceBudget"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "language": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "sourceExtensions"],
+      "properties": {
+        "primary": {
+          "enum": ["language-neutral", "javascript", "typescript", "json", "markdown", "shell", "other"]
+        },
+        "sourceExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\.[A-Za-z0-9]+$"
+          },
+          "uniqueItems": true
+        },
+        "tooling": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "versionRange", "environment"],
+      "properties": {
+        "kind": {
+          "enum": ["language-neutral", "node", "browser", "deno", "shell", "custom"]
+        },
+        "versionRange": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment": {
+          "enum": ["local", "ci", "sandbox", "any"]
+        }
+      }
+    },
+    "adapterRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectAdapter", "storage", "capabilities"],
+      "properties": {
+        "projectAdapter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "storage": {
+          "enum": ["local-fs", "git", "host-adapter", "none"]
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "filesystem",
+              "git",
+              "package-manager",
+              "test-runner",
+              "schema-validator",
+              "artifact-store",
+              "log-store",
+              "evidence-store"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coreVersion", "registryVersion"],
+      "properties": {
+        "coreVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "registryVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "pluginApiVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "languageAdapter": {
+          "type": "string"
+        }
+      }
+    },
+    "hashLock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "digest", "canonicalization"],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "canonicalization": {
+          "enum": ["json-stable-v1", "text-normalized-v1"]
+        }
+      }
+    },
+    "dependencyPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external", "hostCoupling"],
+      "properties": {
+        "external": {
+          "enum": ["none", "workspace-only", "declared"]
+        },
+        "hostCoupling": {
+          "enum": ["forbidden", "adapter-only", "allowed"]
+        }
+      }
+    },
+    "port": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "kind": {
+          "enum": ["json", "text", "file", "directory", "artifact", "evidence"]
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidenceRequired": {
+          "type": "boolean"
+        }
+      }
+    },
+    "performanceBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hotPath": {
+          "type": "boolean"
+        },
+        "inputMutation": {
+          "enum": ["forbidden", "allowed", "clone-on-write"]
+        },
+        "maxDurationMs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

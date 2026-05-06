@@ -1,0 +1,35 @@
+{
+  "schemaId": "atm.registry",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial alpha0 registry fixture."
+  },
+  "registryId": "registry.alpha0",
+  "generatedAt": "2026-05-06T00:00:00.000Z",
+  "entries": [
+    {
+      "atomId": "atom.hello-world",
+      "schemaId": "atm.atomicSpec",
+      "specVersion": "0.1.0",
+      "schemaPath": "schemas/atomic-spec.schema.json",
+      "specPath": "tests/schema-fixtures/positive/hello-world.atom.json",
+      "hashLock": {
+        "algorithm": "sha256",
+        "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "canonicalization": "json-stable-v1"
+      },
+      "owner": {
+        "name": "ATM maintainers",
+        "contact": "maintainers@example.invalid"
+      },
+      "status": "seed",
+      "compatibility": {
+        "coreVersion": "0.1.0",
+        "registryVersion": "0.1.0"
+      },
+      "evidence": ["tests/schema-fixtures/positive/hello-world.atom.json"]
+    }
+  ]
+}

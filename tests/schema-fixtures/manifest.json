@@ -1,0 +1,47 @@
+{
+  "positive": [
+    {
+      "name": "hello-world atom",
+      "schema": "atomic-spec",
+      "path": "positive/hello-world.atom.json"
+    },
+    {
+      "name": "minimal registry",
+      "schema": "registry",
+      "path": "positive/minimal-registry.json"
+    },
+    {
+      "name": "minimal regression matrix",
+      "schema": "regression-matrix",
+      "path": "positive/minimal-regression-matrix.json"
+    }
+  ],
+  "negative": [
+    {
+      "name": "missing hash lock",
+      "schema": "atomic-spec",
+      "path": "negative/missing-hash-lock.atom.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "hashLock"
+    },
+    {
+      "name": "missing schema id",
+      "schema": "atomic-spec",
+      "path": "negative/missing-schema-id.atom.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "schemaId"
+    },
+    {
+      "name": "invalid dependency policy",
+      "schema": "atomic-spec",
+      "path": "negative/invalid-dependency-policy.atom.json",
+      "expectedKeyword": "enum"
+    },
+    {
+      "name": "invalid performance budget",
+      "schema": "atomic-spec",
+      "path": "negative/invalid-performance-budget.atom.json",
+      "expectedKeyword": "enum"
+    }
+  ]
+}

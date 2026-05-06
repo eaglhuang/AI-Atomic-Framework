@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/regression-matrix.schema.json",
+  "title": "ATM Regression Matrix v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "matrixId", "target", "environment", "cases"],
+  "properties": {
+    "schemaId": {
+      "const": "atm.regressionMatrix"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "matrixId": {
+      "type": "string",
+      "pattern": "^matrix\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomId", "registryId"],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "pattern": "^atom\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "registryId": {
+          "type": "string",
+          "pattern": "^registry\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime", "adapter"],
+      "properties": {
+        "runtime": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adapter": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/regressionCase"
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "regressionCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "kind", "blocking", "inputs", "expectedEvidence"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^case\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": ["smoke", "contract", "snapshot", "metric"]
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expectedEvidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

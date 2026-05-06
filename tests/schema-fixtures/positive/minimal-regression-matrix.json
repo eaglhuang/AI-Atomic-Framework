@@ -1,0 +1,28 @@
+{
+  "schemaId": "atm.regressionMatrix",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial alpha0 regression matrix fixture."
+  },
+  "matrixId": "matrix.hello-world",
+  "target": {
+    "atomId": "atom.hello-world",
+    "registryId": "registry.alpha0"
+  },
+  "environment": {
+    "runtime": "node>=20",
+    "adapter": "local-fs-git"
+  },
+  "cases": [
+    {
+      "id": "case.hello-world-smoke",
+      "title": "Hello world smoke validation",
+      "kind": "smoke",
+      "blocking": true,
+      "inputs": ["goal"],
+      "expectedEvidence": ["validation-log"]
+    }
+  ]
+}

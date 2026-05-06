@@ -12,8 +12,13 @@
   ],
   "scripts": {
     "packages:list": "node scripts/list-packages.mjs",
-    "test": "node scripts/validate-product-charter.mjs --mode test && node scripts/validate-package-skeleton.mjs --mode test",
-    "typecheck": "node scripts/validate-product-charter.mjs --mode typecheck && node scripts/validate-package-skeleton.mjs --mode typecheck",
-    "lint": "node scripts/validate-product-charter.mjs --mode lint && node scripts/validate-package-skeleton.mjs --mode lint"
+    "validate:schemas": "node scripts/validate-schemas.mjs --mode validate",
+    "test": "node scripts/validate-product-charter.mjs --mode test && node scripts/validate-package-skeleton.mjs --mode test && node scripts/validate-schemas.mjs --mode test",
+    "typecheck": "node scripts/validate-product-charter.mjs --mode typecheck && node scripts/validate-package-skeleton.mjs --mode typecheck && node scripts/validate-schemas.mjs --mode typecheck",
+    "lint": "node scripts/validate-product-charter.mjs --mode lint && node scripts/validate-package-skeleton.mjs --mode lint && node scripts/validate-schemas.mjs --mode lint"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
   }
 }
