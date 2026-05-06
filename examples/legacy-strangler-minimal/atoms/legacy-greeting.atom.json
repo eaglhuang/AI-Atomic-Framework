@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial legacy strangler minimal example spec."
+  },
+  "id": "atom.example.legacy-greeting",
+  "title": "Legacy Greeting Wrapper Atom",
+  "description": "Minimal example that wraps existing code behind an ATM compute atom entrypoint.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [".mjs"],
+    "tooling": ["node"]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-git",
+    "storage": "local-fs",
+    "capabilities": ["filesystem", "schema-validator", "evidence-store"]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "none",
+    "hostCoupling": "forbidden"
+  },
+  "inputs": [
+    {
+      "name": "name",
+      "kind": "text",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "greeting",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": ["npm --workspace @ai-atomic-framework/example-legacy-strangler-minimal test"],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": ["example", "legacy-strangler"]
+}

@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial hello-world example spec."
+  },
+  "id": "atom.example.hello-world",
+  "title": "Hello World Example Atom",
+  "description": "Smallest runnable compute atom example for ATM Quick Start.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [".mjs"],
+    "tooling": ["node"]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-git",
+    "storage": "local-fs",
+    "capabilities": ["filesystem", "schema-validator", "evidence-store"]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "none",
+    "hostCoupling": "forbidden"
+  },
+  "inputs": [
+    {
+      "name": "name",
+      "kind": "text",
+      "required": false
+    }
+  ],
+  "outputs": [
+    {
+      "name": "message",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": ["npm --workspace @ai-atomic-framework/example-hello-world test"],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": ["example", "hello-world"]
+}
