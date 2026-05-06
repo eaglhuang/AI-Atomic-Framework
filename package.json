@@ -6,9 +6,14 @@
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@9.15.0",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
   "scripts": {
-    "test": "node scripts/validate-product-charter.mjs --mode test",
-    "typecheck": "node scripts/validate-product-charter.mjs --mode typecheck",
-    "lint": "node scripts/validate-product-charter.mjs --mode lint"
+    "packages:list": "node scripts/list-packages.mjs",
+    "test": "node scripts/validate-product-charter.mjs --mode test && node scripts/validate-package-skeleton.mjs --mode test",
+    "typecheck": "node scripts/validate-product-charter.mjs --mode typecheck && node scripts/validate-package-skeleton.mjs --mode typecheck",
+    "lint": "node scripts/validate-product-charter.mjs --mode lint && node scripts/validate-package-skeleton.mjs --mode lint"
   }
 }

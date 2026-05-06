@@ -1,0 +1,19 @@
+{
+  "name": "@ai-atomic-framework/adapter-local-git",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Local Git adapter skeleton for ATM host integration.",
+  "license": "MIT",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "files": ["src"],
+  "dependencies": {
+    "@ai-atomic-framework/core": "0.0.0",
+    "@ai-atomic-framework/plugin-sdk": "0.0.0"
+  },
+  "scripts": {
+    "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
+    "typecheck": "node ../../scripts/validate-package-skeleton.mjs --mode typecheck",
+    "lint": "node ../../scripts/validate-package-skeleton.mjs --mode lint"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@ai-atomic-framework/cli",
+  "version": "0.0.0",
+  "private": false,
+  "description": "CLI entrypoint skeleton for AI-Atomic-Framework.",
+  "license": "MIT",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "bin": {
+    "atm": "./src/atm.ts"
+  },
+  "files": ["src"],
+  "dependencies": {
+    "@ai-atomic-framework/core": "0.0.0"
+  },
+  "scripts": {
+    "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
+    "typecheck": "node ../../scripts/validate-package-skeleton.mjs --mode typecheck",
+    "lint": "node ../../scripts/validate-package-skeleton.mjs --mode lint"
+  }
+}
