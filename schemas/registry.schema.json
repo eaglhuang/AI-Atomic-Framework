@@ -62,7 +62,8 @@
         "owner",
         "status",
         "compatibility",
-        "evidence"
+        "evidence",
+        "selfVerification"
       ],
       "properties": {
         "atomId": {
@@ -126,6 +127,9 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "selfVerification": {
+          "$ref": "#/$defs/selfVerification"
         }
       }
     },
@@ -143,6 +147,58 @@
         },
         "canonicalization": {
           "enum": ["json-stable-v1", "text-normalized-v1"]
+        }
+      }
+    },
+    "selfVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "legacyPlanningId",
+        "specHash",
+        "codeHash",
+        "testHash",
+        "sourcePaths"
+      ],
+      "properties": {
+        "legacyPlanningId": {
+          "type": "string",
+          "pattern": "^ATM-CORE-\\d{4}$"
+        },
+        "specHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "codeHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "testHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "sourcePaths": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["spec", "code", "tests"],
+          "properties": {
+            "spec": {
+              "type": "string",
+              "minLength": 1
+            },
+            "code": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tests": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         }
       }
     }

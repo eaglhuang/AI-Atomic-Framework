@@ -58,7 +58,7 @@ function assertMessageCode(result, code) {
   assert(result.parsed.messages.some((entry) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/validate.mjs', fixture.validAtomicSpec]) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -145,6 +145,12 @@ try {
   assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true');
   assert(bootstrap.parsed.evidence.adoptedProfile === 'default', 'bootstrap must adopt default profile');
   assert(existsSync(path.join(bootstrapRepo, 'AGENTS.md')), 'bootstrap must create AGENTS.md');
+
+  const verifySelf = runAtm(['verify', '--self'], root);
+  assert(verifySelf.exitCode === 0, 'verify --self must exit 0 in repository root');
+  assertReadable(verifySelf, 'verify');
+  assert(verifySelf.parsed.ok === true, 'verify --self must report ok=true');
+  assertMessageCode(verifySelf, 'ATM_VERIFY_SELF_OK');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

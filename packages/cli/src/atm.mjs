@@ -6,6 +6,7 @@ import { runInit } from './commands/init.mjs';
 import { runSpec } from './commands/spec.mjs';
 import { runStatus } from './commands/status.mjs';
 import { runValidate } from './commands/validate.mjs';
+import { runVerify } from './commands/verify.mjs';
 import { CliError, makeResult, message, writeResult } from './commands/shared.mjs';
 
 export const cliCommandRunners = {
@@ -13,7 +14,8 @@ export const cliCommandRunners = {
   init: runInit,
   spec: runSpec,
   status: runStatus,
-  validate: runValidate
+  validate: runValidate,
+  verify: runVerify
 };
 
 export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
@@ -24,7 +26,7 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
       ok: true,
       command: 'help',
       cwd: process.cwd(),
-      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, init, spec, status, validate.')],
+      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, init, spec, status, validate, verify.')],
       evidence: {
         commands: Object.keys(cliCommandRunners),
         outputFormat: 'json'

@@ -38,6 +38,7 @@ export function parseOptions(argv, commandName) {
     cwd: process.cwd(),
     spec: undefined,
     validate: undefined,
+    self: false,
     force: false,
     adopt: undefined,
     task: undefined
@@ -62,6 +63,13 @@ export function parseOptions(argv, commandName) {
       }
       options.validate = requireOptionValue(argv, index, '--validate', commandName);
       index += 1;
+      continue;
+    }
+    if (arg === '--self') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --self`, { exitCode: 2 });
+      }
+      options.self = true;
       continue;
     }
     if (arg === '--force') {

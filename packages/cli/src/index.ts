@@ -49,5 +49,12 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     implemented: true,
     standaloneMode: true,
     outputFormat: 'json'
+  },
+  {
+    commandName: 'verify',
+    summary: 'Verify committed seed registry hashes and drift status',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
   }
 ];

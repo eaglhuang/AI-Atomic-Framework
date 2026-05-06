@@ -4,20 +4,20 @@
   "migration": {
     "strategy": "none",
     "fromVersion": null,
-    "notes": "Initial alpha0 registry fixture."
+    "notes": "Initial Phase B1 seed self-verification registry."
   },
-  "registryId": "registry.alpha0",
-  "generatedAt": "2026-05-06T00:00:00.000Z",
+  "registryId": "registry.seed",
+  "generatedAt": "2026-05-06T17:00:00.000Z",
   "entries": [
     {
-      "atomId": "atom.hello-world",
+      "atomId": "atom.core-seed",
       "schemaId": "atm.atomicSpec",
       "specVersion": "0.1.0",
       "schemaPath": "schemas/atomic-spec.schema.json",
-      "specPath": "tests/schema-fixtures/positive/hello-world.atom.json",
+      "specPath": "specs/atom-seed-spec.json",
       "hashLock": {
         "algorithm": "sha256",
-        "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
         "canonicalization": "json-stable-v1"
       },
       "owner": {
@@ -29,13 +29,15 @@
         "coreVersion": "0.1.0",
         "registryVersion": "0.1.0"
       },
-      "evidence": ["tests/schema-fixtures/positive/hello-world.atom.json"]
-      ,
+      "evidence": [
+        "scripts/validate-seed-spec.mjs",
+        "scripts/validate-seed-registry.mjs"
+      ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0001",
-        "specHash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        "codeHash": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
-        "testHash": "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+        "specHash": "sha256:af3b1642873a311473d88f1a765bace9d631f3aad8cfd243f03c5539d73c1fb2",
+        "codeHash": "sha256:921f7bc54f2d87fb56c802325c00667e76a681a2b1d5ef59406aa45eefea27e2",
+        "testHash": "sha256:bbbd432c76c4119aa3405aa989bb5ae76fbe975610da45d36ba47ace6d31682f",
         "sourcePaths": {
           "spec": "specs/atom-seed-spec.json",
           "code": "packages/core/seed.js",
