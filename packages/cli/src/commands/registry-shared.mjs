@@ -6,12 +6,14 @@ import { createRequire } from 'node:module';
 import { makeResult, message, readJsonFile, relativePathFrom } from './shared.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
+export const frameworkRepoRoot = repoRoot;
 export const registrySchemaPath = path.join(repoRoot, 'schemas', 'registry.schema.json');
 export const registryFilePath = path.join(repoRoot, 'atomic-registry.json');
 const require = createRequire(import.meta.url);
 
 export const seedRegistryEvidencePath = 'scripts/validate-seed-registry.mjs';
 export const seedRegistryId = 'registry.seed';
+export const seedGovernedByLegacyPlanningId = 'ATM-CORE-0002';
 
 export function computeSeedRegistrySnapshot() {
   const seedModule = JSON.parse(readFileSync(path.join(repoRoot, 'specs/atom-seed-spec.json'), 'utf8'));
@@ -35,7 +37,7 @@ export function computeSeedRegistrySnapshot() {
         name: 'ATM maintainers',
         contact: 'maintainers@example.invalid'
       },
-      status: 'seed',
+      status: 'governed',
       compatibility: {
         coreVersion: seedModule.compatibility.coreVersion,
         registryVersion: seedModule.compatibility.registryVersion
@@ -70,7 +72,7 @@ export function createSeedRegistryDocument() {
     migration: {
       strategy: 'none',
       fromVersion: null,
-      notes: 'Initial Phase B1 seed self-verification registry.'
+      notes: 'Phase B1 seed governance registry.'
     },
     registryId: seedRegistryId,
     generatedAt: snapshot.generatedAt,
@@ -198,4 +200,22 @@ function sha256ForFiles(filePaths) {
     hash.update(readFileSync(filePath));
   }
   return `sha256:${hash.digest('hex')}`;
+}
+
+export function evaluateSeedGovernance(registry = readRegistryDocument()) {
+  const verification = evaluateSeedSelfVerification(registry);
+  const atomStatus = verification.entry?.status ?? null;
+  const selfVerificationOk = verification.ok === true;
+  const governed = atomStatus === 'governed';
+
+  return {
+    ok: governed && selfVerificationOk,
+    frameworkPhase: governed && selfVerificationOk ? 'B1-complete' : 'B1-incomplete',
+    atomId: verification.entry?.atomId ?? null,
+    atomStatus,
+    legacyPlanningId: verification.report?.legacyPlanningId?.actual ?? null,
+    governedByLegacyPlanningId: seedGovernedByLegacyPlanningId,
+    selfVerificationOk,
+    verificationIssues: verification.issues ?? []
+  };
 }

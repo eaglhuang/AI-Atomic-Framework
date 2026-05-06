@@ -1,11 +1,49 @@
+import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.mjs';
+import { evaluateSeedGovernance, frameworkRepoRoot, registryFilePath, validateRegistryDocumentAgainstSchema } from './registry-shared.mjs';
 
 export function runStatus(argv) {
   const { options } = parseOptions(argv, 'status');
   const configPath = configPathFor(options.cwd);
 
   if (!existsSync(configPath)) {
+    if (path.resolve(options.cwd) === frameworkRepoRoot && existsSync(registryFilePath)) {
+      const registryValidation = validateRegistryDocumentAgainstSchema(options.cwd, registryFilePath, {
+        commandName: 'status',
+        successCode: 'ATM_STATUS_REGISTRY_OK',
+        successText: 'Framework registry is valid.'
+      });
+      if (!registryValidation.ok) {
+        return registryValidation;
+      }
+
+      const governance = evaluateSeedGovernance();
+      return makeResult({
+        ok: governance.ok,
+        command: 'status',
+        cwd: options.cwd,
+        messages: [
+          ...registryValidation.messages,
+          governance.ok
+            ? message('info', 'ATM_STATUS_PHASE_B1_COMPLETE', 'ATM framework Phase B1 is complete.')
+            : message('error', 'ATM_STATUS_PHASE_B1_INCOMPLETE', 'ATM framework Phase B1 is not complete yet.', { issues: governance.verificationIssues })
+        ],
+        evidence: {
+          configPath: relativePathFrom(options.cwd, configPath),
+          initialized: false,
+          frameworkRepository: true,
+          frameworkPhase: governance.frameworkPhase,
+          registryPath: relativePathFrom(options.cwd, registryFilePath),
+          atomId: governance.atomId,
+          atomStatus: governance.atomStatus,
+          legacyPlanningId: governance.legacyPlanningId,
+          governedByLegacyPlanningId: governance.governedByLegacyPlanningId,
+          selfVerificationOk: governance.selfVerificationOk
+        }
+      });
+    }
+
     return makeResult({
       ok: false,
       command: 'status',

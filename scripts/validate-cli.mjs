@@ -151,6 +151,14 @@ try {
   assertReadable(verifySelf, 'verify');
   assert(verifySelf.parsed.ok === true, 'verify --self must report ok=true');
   assertMessageCode(verifySelf, 'ATM_VERIFY_SELF_OK');
+
+  const frameworkStatus = runAtm(['status'], root);
+  assert(frameworkStatus.exitCode === 0, 'status in framework repository root must exit 0');
+  assertReadable(frameworkStatus, 'status');
+  assert(frameworkStatus.parsed.ok === true, 'status in framework repository root must report ok=true');
+  assert(frameworkStatus.parsed.evidence.frameworkPhase === 'B1-complete', 'status in framework repository root must surface frameworkPhase=B1-complete');
+  assert(frameworkStatus.parsed.evidence.atomStatus === 'governed', 'status in framework repository root must surface atomStatus=governed');
+  assertMessageCode(frameworkStatus, 'ATM_STATUS_PHASE_B1_COMPLETE');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

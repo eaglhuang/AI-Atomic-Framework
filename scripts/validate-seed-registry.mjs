@@ -11,6 +11,8 @@ const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
 const registryPath = path.join(root, 'atomic-registry.json');
+const changelogPath = path.join(root, 'CHANGELOG.md');
+const seedSourcePath = path.join(root, 'packages/core/seed.js');
 
 function fail(message) {
   console.error(`[seed-registry:${mode}] ${message}`);
@@ -52,14 +54,30 @@ assert(schemaResult.ok === true, 'atomic-registry.json must pass registry schema
 
 const verification = evaluateSeedSelfVerification();
 assert(verification.ok === true, 'seed self-verification hashes must match committed registry values');
+assert(verification.entry.status === 'governed', 'seed registry entry must be marked governed');
 assert(verification.report.legacyPlanningId.ok === true, 'legacy planning ID must stay ATM-CORE-0001');
 assert(verification.report.specHash.ok === true, 'specHash must match');
 assert(verification.report.codeHash.ok === true, 'codeHash must match');
 assert(verification.report.testHash.ok === true, 'testHash must match');
 
+const seedSource = readFileSync(seedSourcePath, 'utf8');
+assert(seedSource.includes('@deprecated since ATM-CORE-0002 governs this'), 'seed.js must mark the hand-written seed source as deprecated under ATM-CORE-0002');
+
+assert(existsSync(changelogPath), 'CHANGELOG.md must exist');
+const changelog = readFileSync(changelogPath, 'utf8');
+assert(changelog.includes('Phase B1 complete'), 'CHANGELOG.md must record the Phase B1 completion milestone');
+assert(changelog.includes('ATM-CORE-0002'), 'CHANGELOG.md must mention ATM-CORE-0002 as the governance successor');
+
 const cliVerify = runAtm(['verify', '--self']);
 assert(cliVerify.exitCode === 0, 'atm verify --self must exit 0');
 assert(cliVerify.parsed.ok === true, 'atm verify --self must report ok=true');
+
+const cliStatus = runAtm(['status']);
+assert(cliStatus.exitCode === 0, 'atm status must exit 0 in framework repository root');
+assert(cliStatus.parsed.ok === true, 'atm status must report ok=true in framework repository root');
+assert(cliStatus.parsed.evidence.frameworkPhase === 'B1-complete', 'atm status must surface frameworkPhase=B1-complete');
+assert(cliStatus.parsed.evidence.atomStatus === 'governed', 'atm status must surface atomStatus=governed');
+assert(cliStatus.parsed.evidence.governedByLegacyPlanningId === 'ATM-CORE-0002', 'atm status must surface ATM-CORE-0002 as governance successor');
 
 const expected = computeSeedRegistrySnapshot();
 assert(verification.entry.selfVerification.specHash === expected.entry.selfVerification.specHash, 'registry specHash must equal computed specHash');
@@ -80,7 +98,7 @@ try {
 }
 
 if (!process.exitCode) {
-  console.log('[seed-registry:' + mode + '] ok (atomic-registry, self verification, and drift detection verified)');
+  console.log('[seed-registry:' + mode + '] ok (atomic-registry, governed status, status command, self verification, and drift detection verified)');
 }
 
 function computeFileHash(filePath) {

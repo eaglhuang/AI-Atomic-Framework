@@ -3,6 +3,9 @@ export const seedAtomId = 'atom.core-seed';
 export const seedSpecPath = 'specs/atom-seed-spec.json';
 export const seedSourcePath = 'packages/core/seed.js';
 
+// @deprecated since ATM-CORE-0002 governs this hand-written seed source.
+// Kept as deterministic provenance for self-description and self-verification.
+
 export function createSeedAtomSpec() {
   return {
     schemaId: 'atm.atomicSpec',
