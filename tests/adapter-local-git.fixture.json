@@ -1,0 +1,24 @@
+{
+  "name": "local-git-adapter-reference-fixture",
+  "entrypoint": "packages/adapter-local-git/src/local-git-adapter.mjs",
+  "registryPath": ".atm/registry",
+  "reportsPath": ".atm/reports",
+  "workItem": {
+    "workItemId": "ATM-FIXTURE-0001",
+    "title": "Adapter fixture work item",
+    "status": "planned"
+  },
+  "registryEntry": {
+    "id": "atom.fixture",
+    "kind": "atom",
+    "payload": {
+      "title": "Fixture Atom"
+    }
+  },
+  "acceptance": [
+    "scaffold does not require a host lock service",
+    "lock/gate/doc operations are explicit no-op results",
+    "filesystem registry path can write and read entries",
+    "dry-run scaffold does not write files"
+  ]
+}
