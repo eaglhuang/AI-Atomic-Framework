@@ -37,6 +37,7 @@ export function parseOptions(argv, commandName) {
   const options = {
     cwd: process.cwd(),
     spec: undefined,
+    validate: undefined,
     force: false,
     adopt: undefined,
     task: undefined
@@ -52,6 +53,14 @@ export function parseOptions(argv, commandName) {
     }
     if (arg === '--spec') {
       options.spec = requireOptionValue(argv, index, '--spec', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--validate') {
+      if (commandName !== 'spec') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --validate`, { exitCode: 2 });
+      }
+      options.validate = requireOptionValue(argv, index, '--validate', commandName);
       index += 1;
       continue;
     }

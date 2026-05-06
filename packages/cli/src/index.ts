@@ -30,6 +30,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'spec',
+    summary: 'Validate atomic specs against JSON Schema',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'status',
     summary: 'Inspect current governance state',
     implemented: true,

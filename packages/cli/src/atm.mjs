@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runBootstrap } from './commands/bootstrap-entry.mjs';
 import { runInit } from './commands/init.mjs';
+import { runSpec } from './commands/spec.mjs';
 import { runStatus } from './commands/status.mjs';
 import { runValidate } from './commands/validate.mjs';
 import { CliError, makeResult, message, writeResult } from './commands/shared.mjs';
@@ -10,6 +11,7 @@ import { CliError, makeResult, message, writeResult } from './commands/shared.mj
 export const cliCommandRunners = {
   bootstrap: runBootstrap,
   init: runInit,
+  spec: runSpec,
   status: runStatus,
   validate: runValidate
 };
@@ -22,7 +24,7 @@ export function runCli(argv = process.argv.slice(2), io = { stdout: process.stdo
       ok: true,
       command: 'help',
       cwd: process.cwd(),
-      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, init, status, validate.')],
+      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, init, spec, status, validate.')],
       evidence: {
         commands: Object.keys(cliCommandRunners),
         outputFormat: 'json'

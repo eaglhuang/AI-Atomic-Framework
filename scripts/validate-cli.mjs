@@ -58,7 +58,7 @@ function assertMessageCode(result, code) {
   assert(result.parsed.messages.some((entry) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/validate.mjs', fixture.validAtomicSpec]) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/validate.mjs', fixture.validAtomicSpec]) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -105,6 +105,12 @@ try {
   assert(validateSpec.parsed.ok === true, 'validate --spec valid fixture must report ok=true');
   assertMessageCode(validateSpec, 'ATM_VALIDATE_SPEC_OK');
 
+  const specValidate = runAtm(['spec', '--validate', validSpecPath], blankRepo);
+  assert(specValidate.exitCode === 0, 'spec --validate valid fixture must exit 0');
+  assertReadable(specValidate, 'spec');
+  assert(specValidate.parsed.ok === true, 'spec --validate valid fixture must report ok=true');
+  assertMessageCode(specValidate, 'ATM_SPEC_VALIDATE_OK');
+
   const invalidSpecPath = path.join(blankRepo, 'invalid.atom.json');
   writeFileSync(invalidSpecPath, JSON.stringify({ schemaId: 'atm.atomicSpec', specVersion: '0.1.0' }, null, 2), 'utf8');
   const validateInvalidSpec = runAtm(['validate', '--spec', invalidSpecPath], blankRepo);
@@ -113,11 +119,23 @@ try {
   assert(validateInvalidSpec.parsed.ok === false, 'validate --spec invalid fixture must report ok=false');
   assertMessageCode(validateInvalidSpec, 'ATM_SPEC_REQUIRED_FIELD');
 
+  const specValidateInvalid = runAtm(['spec', '--validate', invalidSpecPath], blankRepo);
+  assert(specValidateInvalid.exitCode === 1, 'spec --validate invalid fixture must exit 1');
+  assertReadable(specValidateInvalid, 'spec');
+  assert(specValidateInvalid.parsed.ok === false, 'spec --validate invalid fixture must report ok=false');
+  assertMessageCode(specValidateInvalid, 'ATM_SPEC_REQUIRED_FIELD');
+
   const validateMissingSpec = runAtm(['validate', '--spec', path.join(blankRepo, 'missing.atom.json')], blankRepo);
   assert(validateMissingSpec.exitCode === 1, 'validate --spec missing fixture must exit 1');
   assertReadable(validateMissingSpec, 'validate');
   assert(validateMissingSpec.parsed.ok === false, 'validate --spec missing fixture must report ok=false');
   assertMessageCode(validateMissingSpec, 'ATM_SPEC_NOT_FOUND');
+
+  const specValidateMissing = runAtm(['spec', '--validate', path.join(blankRepo, 'missing.atom.json')], blankRepo);
+  assert(specValidateMissing.exitCode === 1, 'spec --validate missing fixture must exit 1');
+  assertReadable(specValidateMissing, 'spec');
+  assert(specValidateMissing.parsed.ok === false, 'spec --validate missing fixture must report ok=false');
+  assertMessageCode(specValidateMissing, 'ATM_SPEC_NOT_FOUND');
 
   const bootstrapRepo = path.join(tempRoot, 'bootstrap-repo');
   mkdirSync(bootstrapRepo, { recursive: true });
