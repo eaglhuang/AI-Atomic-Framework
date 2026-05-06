@@ -92,6 +92,79 @@ export interface TestReportDocument {
   readonly evidence: readonly EvidenceRecord[];
 }
 
+export interface SourcePathsRecord {
+  readonly spec: string;
+  readonly code: string | readonly string[];
+  readonly tests: readonly string[];
+}
+
+export interface RegistrySelfVerificationRecord {
+  readonly legacyPlanningId: string | null;
+  readonly specHash: string;
+  readonly codeHash: string;
+  readonly testHash: string;
+  readonly sourcePaths: SourcePathsRecord;
+}
+
+export interface RegistryLocationRecord {
+  readonly specPath: string;
+  readonly codePaths: readonly string[];
+  readonly testPaths: readonly string[];
+  readonly reportPath: string | null;
+  readonly workbenchPath: string | null;
+}
+
+export interface RegistryCompatibilityRecord {
+  readonly coreVersion: string;
+  readonly registryVersion: string;
+  readonly pluginApiVersion?: string;
+  readonly languageAdapter?: string;
+}
+
+export interface RegistryEntryRecord {
+  readonly id?: string;
+  readonly atomId: string;
+  readonly atomVersion?: string;
+  readonly schemaId: 'atm.atomicSpec';
+  readonly specVersion: string;
+  readonly schemaPath: string;
+  readonly specPath: string;
+  readonly hashLock: {
+    readonly algorithm: 'sha256';
+    readonly digest: string;
+    readonly canonicalization: 'json-stable-v1' | 'text-normalized-v1';
+  };
+  readonly owner: {
+    readonly name: string;
+    readonly contact: string;
+  };
+  readonly status: 'seed' | 'active' | 'experimental' | 'deprecated' | 'governed';
+  readonly location?: RegistryLocationRecord;
+  readonly compatibility: RegistryCompatibilityRecord;
+  readonly evidence: readonly string[];
+  readonly selfVerification: RegistrySelfVerificationRecord;
+}
+
+export interface RegistryShardingRecord {
+  readonly strategy: 'single-document' | 'external-parts';
+  readonly partPaths: readonly string[];
+  readonly nextRegistryId: string | null;
+}
+
+export interface RegistryDocument {
+  readonly schemaId: 'atm.registry';
+  readonly specVersion: '0.1.0';
+  readonly migration: {
+    readonly strategy: 'none' | 'additive' | 'breaking';
+    readonly fromVersion: string | null;
+    readonly notes: string;
+  };
+  readonly registryId: string;
+  readonly generatedAt: string;
+  readonly sharding?: RegistryShardingRecord;
+  readonly entries: readonly RegistryEntryRecord[];
+}
+
 export interface ContextSummaryRecord {
   readonly workItemId: string;
   readonly summary: string;

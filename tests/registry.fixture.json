@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "expectedRegistryId": "registry.atm-2-0004",
+  "expectedId": "atom.registry-fixture",
+  "expectedAtomVersion": "0.0.1",
+  "expectedStatus": "active",
+  "expectedReportPath": "atomic_workbench/atoms/atom.registry-fixture/atom.test.report.json",
+  "expectedWorkbenchPath": "atomic_workbench/atoms/atom.registry-fixture",
+  "owner": {
+    "name": "ATM maintainers",
+    "contact": "maintainers@example.invalid"
+  },
+  "sharding": {
+    "strategy": "external-parts",
+    "partPaths": [
+      "registry-parts/registry.atm-2-0004-part-1.json"
+    ],
+    "nextRegistryId": null
+  },
+  "specPath": "tests/registry-fixtures/registry.atom.json",
+  "codePath": "tests/registry-fixtures/compute-atom.js",
+  "testPath": "tests/registry-fixtures/registry-test.mjs",
+  "acceptance": [
+    "registry entry records atom version, status, and source/report/workbench locations",
+    "registry document stays JSON-first and can carry future sharding metadata",
+    "editing spec, code, or test source triggers self-verification drift",
+    "seed registry logic can reuse the same core registry/hash-lock helpers"
+  ]
+}

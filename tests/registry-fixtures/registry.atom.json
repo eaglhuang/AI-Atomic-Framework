@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Registry fixture atomic spec."
+  },
+  "id": "atom.registry-fixture",
+  "title": "Registry Fixture Atom",
+  "description": "Fixture proving registry entry creation and hash drift detection.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [".js"],
+    "tooling": ["node"]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": ["filesystem", "git", "test-runner", "artifact-store", "evidence-store"]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "adapter-only"
+  },
+  "inputs": [
+    {
+      "name": "goal",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "registryEvidence",
+      "kind": "evidence",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": ["node tests/registry-fixtures/registry-test.mjs"],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": ["alpha0", "registry"]
+}
