@@ -1,0 +1,51 @@
+{
+  "name": "language-js-import-policy-fixture",
+  "entrypoint": "packages/language-js/src/language-js-adapter.mjs",
+  "policy": {
+    "forbiddenSpecifiers": ["fs", "node:fs", "child_process", "node:child_process"],
+    "allowedSpecifiers": ["node:path", "@ai-atomic-framework/core"]
+  },
+  "validComputeAtom": {
+    "atomId": "atom.language-js.valid-compute",
+    "entrypoint": "src/compute.ts",
+    "sourceFiles": [
+      {
+        "filePath": "src/compute.ts",
+        "sourceText": "import path from 'node:path';\n\nexport function run(input) {\n  return { ok: true, basename: path.basename(input.name) };\n}\n"
+      }
+    ]
+  },
+  "forbiddenImportAtom": {
+    "atomId": "atom.language-js.forbidden-import",
+    "entrypoint": "src/compute.ts",
+    "sourceFiles": [
+      {
+        "filePath": "src/compute.ts",
+        "sourceText": "import fs from 'node:fs';\n\nexport function run(input) {\n  return fs.existsSync(input.path);\n}\n"
+      }
+    ]
+  },
+  "missingEntrypointAtom": {
+    "atomId": "atom.language-js.missing-entrypoint",
+    "entrypoint": "src/compute.ts",
+    "sourceFiles": [
+      {
+        "filePath": "src/compute.ts",
+        "sourceText": "export const value = 1;\n"
+      }
+    ]
+  },
+  "projectPackageJson": {
+    "scripts": {
+      "test": "node test.js",
+      "typecheck": "tsc --noEmit",
+      "lint": "eslint src"
+    }
+  },
+  "acceptance": [
+    "valid JS/TS compute atom passes language adapter validation",
+    "forbidden import fixture fails with ATM_JS_FORBIDDEN_IMPORT",
+    "missing entrypoint export fails with ATM_JS_ENTRYPOINT_EXPORT_MISSING",
+    "test command runner contract delegates to project package scripts"
+  ]
+}
