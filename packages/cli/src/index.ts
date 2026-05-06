@@ -10,10 +10,30 @@ export interface CliCommandDescriptor {
   readonly commandName: string;
   readonly summary: string;
   readonly implemented: boolean;
+  readonly standaloneMode: boolean;
+  readonly outputFormat: 'json';
 }
 
 export const plannedCliCommands: readonly CliCommandDescriptor[] = [
-  { commandName: 'init', summary: 'Adopt ATM in a repository', implemented: false },
-  { commandName: 'status', summary: 'Inspect current governance state', implemented: false },
-  { commandName: 'validate', summary: 'Run deterministic validation', implemented: false }
+  {
+    commandName: 'init',
+    summary: 'Adopt ATM in a repository',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
+    commandName: 'status',
+    summary: 'Inspect current governance state',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
+    commandName: 'validate',
+    summary: 'Run deterministic validation',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  }
 ];
