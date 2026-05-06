@@ -1,13 +1,13 @@
 {
   "name": "cli-init-status-validate-mvp",
   "entrypoint": "packages/cli/src/atm.mjs",
-  "commands": ["init", "status", "validate"],
+  "commands": ["bootstrap", "init", "status", "validate"],
   "standaloneMode": true,
   "configPath": ".atm/config.json",
   "validAtomicSpec": "tests/schema-fixtures/positive/hello-world.atom.json",
   "agentReadableFields": ["ok", "command", "mode", "cwd", "messages", "evidence"],
   "acceptance": [
-    "blank repo can execute init/status/validate",
+    "blank repo can execute bootstrap/init/status/validate",
     "standalone mode works before adapters are implemented",
     "errors are emitted as machine-readable JSON"
   ]

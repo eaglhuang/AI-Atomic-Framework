@@ -58,7 +58,7 @@ function assertMessageCode(result, code) {
   assert(result.parsed.messages.some((entry) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/validate.mjs', fixture.validAtomicSpec]) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/validate.mjs', fixture.validAtomicSpec]) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -118,6 +118,15 @@ try {
   assertReadable(validateMissingSpec, 'validate');
   assert(validateMissingSpec.parsed.ok === false, 'validate --spec missing fixture must report ok=false');
   assertMessageCode(validateMissingSpec, 'ATM_SPEC_NOT_FOUND');
+
+  const bootstrapRepo = path.join(tempRoot, 'bootstrap-repo');
+  mkdirSync(bootstrapRepo, { recursive: true });
+  const bootstrap = runAtm(['bootstrap', '--cwd', bootstrapRepo, '--task', 'Bootstrap ATM self-hosting alpha'], bootstrapRepo);
+  assert(bootstrap.exitCode === 0, 'bootstrap must exit 0 in blank repo');
+  assertReadable(bootstrap, 'bootstrap');
+  assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true');
+  assert(bootstrap.parsed.evidence.adoptedProfile === 'default', 'bootstrap must adopt default profile');
+  assert(existsSync(path.join(bootstrapRepo, 'AGENTS.md')), 'bootstrap must create AGENTS.md');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -17,7 +17,8 @@ const requiredFiles = [
   'examples/agent-bootstrap/static-site-host/README.md',
   'examples/agent-bootstrap/static-site-host/index.html',
   'examples/agent-bootstrap/static-site-host/assets/css/site.css',
-  'packages/cli/src/commands/bootstrap.mjs'
+  'packages/cli/src/commands/bootstrap.mjs',
+  'packages/cli/src/commands/bootstrap-entry.mjs'
 ];
 
 const protectedSurfaceFiles = [
@@ -102,10 +103,10 @@ try {
   writeFileSync(path.join(hostRepo, 'articles', 'index.html'), '<!doctype html><html><body><p>Article list</p></body></html>\n', 'utf8');
   writeFileSync(path.join(hostRepo, 'assets', 'css', 'site.css'), 'body { font-family: serif; }\n', 'utf8');
 
-  const init = runAtm(['init', '--cwd', hostRepo, '--adopt', 'default', '--task', 'Bootstrap static site'], hostRepo);
-  assert(init.exitCode === 0, 'init --adopt default must exit 0');
-  assert(init.parsed.ok === true, 'init --adopt default must report ok=true');
-  assert(init.parsed.evidence.adoptedProfile === 'default', 'init must report adoptedProfile=default');
+  const bootstrap = runAtm(['bootstrap', '--cwd', hostRepo, '--task', 'Bootstrap static site'], hostRepo);
+  assert(bootstrap.exitCode === 0, 'bootstrap must exit 0');
+  assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true');
+  assert(bootstrap.parsed.evidence.adoptedProfile === 'default', 'bootstrap must report adoptedProfile=default');
 
   for (const relativePath of [
     'AGENTS.md',
@@ -146,15 +147,15 @@ try {
   assert(validate.exitCode === 0, 'validate after adopt must exit 0');
   assert(validate.parsed.ok === true, 'validate after adopt must report ok=true');
 
-  const secondInit = runAtm(['init', '--cwd', hostRepo, '--adopt', 'default'], hostRepo);
-  assert(secondInit.exitCode === 0, 'second init must still exit 0');
-  assert(secondInit.parsed.ok === true, 'second init must report ok=true');
-  assert(Array.isArray(secondInit.parsed.evidence.unchanged), 'second init must report unchanged files');
-  assert(secondInit.parsed.evidence.unchanged.includes('AGENTS.md'), 'second init must leave AGENTS.md unchanged without --force');
+  const secondBootstrap = runAtm(['bootstrap', '--cwd', hostRepo], hostRepo);
+  assert(secondBootstrap.exitCode === 0, 'second bootstrap must still exit 0');
+  assert(secondBootstrap.parsed.ok === true, 'second bootstrap must report ok=true');
+  assert(Array.isArray(secondBootstrap.parsed.evidence.unchanged), 'second bootstrap must report unchanged files');
+  assert(secondBootstrap.parsed.evidence.unchanged.includes('AGENTS.md'), 'second bootstrap must leave AGENTS.md unchanged without --force');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
 if (!process.exitCode) {
-  console.log('[bootstrap:' + mode + '] ok (default adopt, static-site probe, and one-line kickoff verified)');
+  console.log('[bootstrap:' + mode + '] ok (bootstrap command, static-site probe, and one-line kickoff verified)');
 }

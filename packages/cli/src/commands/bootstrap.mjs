@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { relativePathFrom, writeJsonFile } from './shared.mjs';
 
 const bootstrapTaskId = 'BOOTSTRAP-0001';
+const defaultBootstrapTaskTitle = 'Bootstrap ATM in this repository';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const templateRoot = path.join(repoRoot, 'templates', 'root-drop');
 const templateFiles = [
@@ -25,7 +26,7 @@ export function adoptDefaultBootstrap(cwd, options = {}) {
   const force = options.force === true;
   const taskTitle = typeof options.taskTitle === 'string' && options.taskTitle.trim().length > 0
     ? options.taskTitle.trim()
-    : 'Bootstrap ATM in this repository';
+    : defaultBootstrapTaskTitle;
   const created = [];
   const unchanged = [];
   const paths = createBootstrapPaths(cwd);
@@ -247,8 +248,16 @@ function createPackageManagerCommand(cwd, packageJson, scriptName) {
   return `npm run ${scriptName}`;
 }
 
-function createRecommendedPrompt() {
+export function createOfficialBootstrapCommand(commandCwd = '.') {
+  return `node packages/cli/src/atm.mjs bootstrap --cwd ${commandCwd} --task \"${defaultBootstrapTaskTitle}\"`;
+}
+
+export function createRecommendedPrompt() {
   return 'Read README.md if present, then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json. Continue the bootstrap task without changing the host workflow, and write evidence to .atm/evidence/BOOTSTRAP-0001.json.';
+}
+
+export function createSelfHostingAlphaPrompt() {
+  return `Read README.md. If .atm/config.json is missing, run \"${createOfficialBootstrapCommand('.')}\" from the repository root. Then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json, complete the bootstrap task, run the first smoke against examples/hello-world/atoms/hello-world.atom.json, and write artifact, log, evidence, and context summary files under .atm/.`;
 }
 
 function ensureDirectory(directoryPath, cwd, created, unchanged) {

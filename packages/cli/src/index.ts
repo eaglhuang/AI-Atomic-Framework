@@ -16,6 +16,13 @@ export interface CliCommandDescriptor {
 
 export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   {
+    commandName: 'bootstrap',
+    summary: 'Create the default ATM bootstrap pack and starter task',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'init',
     summary: 'Adopt ATM in a repository',
     implemented: true,

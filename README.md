@@ -33,7 +33,7 @@ The root-drop experience is an Agent Operating Layer. It is intentionally model-
 From an ATM checkout or release bundle, initialize a host repository with the default bootstrap pack:
 
 ```bash
-node packages/cli/src/atm.mjs init --cwd <host-repo> --adopt default --task "Bootstrap ATM in this repository"
+node packages/cli/src/atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"
 ```
 
 Then give the AI agent one line only:
@@ -43,6 +43,8 @@ Read README.md if present, then read AGENTS.md, .atm/profile/default.md, and .at
 ```
 
 The bootstrap pack writes the default profile, a first task, a scope lock, default guard definitions, and artifact/log/evidence directories so the host repository does not need to become a Node.js project first.
+
+For the standalone upstream self-hosting alpha proof, see [docs/SELF_HOSTING_ALPHA.md](docs/SELF_HOSTING_ALPHA.md). That contract upgrades the user-facing flow to a single prompt: the AI checks whether ATM is initialized, runs the official `bootstrap` command only when needed, and then completes the first smoke.
 
 ## Core, Adapters, and Plugins
 
