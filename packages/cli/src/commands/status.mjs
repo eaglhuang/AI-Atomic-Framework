@@ -22,6 +22,13 @@ export function runStatus(argv) {
   const schemaVersionOk = config.schemaVersion === 'atm.config.v0.1';
   const adapterMode = config.adapter?.mode ?? 'unknown';
   const adapterImplemented = config.adapter?.implemented === true;
+  const adoptedProfile = config.adoption?.profile ?? null;
+  const projectProbePath = config.adoption?.projectProbePath
+    ? `${options.cwd}/${config.adoption.projectProbePath}`.replace(/\\/g, '/')
+    : null;
+  const projectProbe = projectProbePath && existsSync(projectProbePath)
+    ? readJsonFile(projectProbePath, 'ATM_PROJECT_PROBE_MISSING')
+    : null;
 
   return makeResult({
     ok: schemaVersionOk,
@@ -38,7 +45,11 @@ export function runStatus(argv) {
       schemaVersion: config.schemaVersion,
       adapterMode,
       adapterImplemented,
-      standaloneMode: adapterMode === 'standalone' && !adapterImplemented
+      standaloneMode: adapterMode === 'standalone' && !adapterImplemented,
+      adoptedProfile,
+      projectProbePath: config.adoption?.projectProbePath ?? null,
+      repositoryKind: projectProbe?.repositoryKind ?? null,
+      recommendedPrompt: projectProbe?.recommendedPrompt ?? null
     }
   });
 }

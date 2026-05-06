@@ -28,6 +28,22 @@ ATM is intended to support a root-drop, zero-install agent bootstrap workflow.
 
 The root-drop experience is an Agent Operating Layer. It is intentionally model-neutral and editor-neutral.
 
+### Zero-Install Quick Start
+
+From an ATM checkout or release bundle, initialize a host repository with the default bootstrap pack:
+
+```bash
+node packages/cli/src/atm.mjs init --cwd <host-repo> --adopt default --task "Bootstrap ATM in this repository"
+```
+
+Then give the AI agent one line only:
+
+```text
+Read README.md if present, then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json. Continue the bootstrap task without changing the host workflow, and write evidence to .atm/evidence/BOOTSTRAP-0001.json.
+```
+
+The bootstrap pack writes the default profile, a first task, a scope lock, default guard definitions, and artifact/log/evidence directories so the host repository does not need to become a Node.js project first.
+
 ## Core, Adapters, and Plugins
 
 ATM separates governance semantics from host implementation details.

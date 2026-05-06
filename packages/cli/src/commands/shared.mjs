@@ -37,7 +37,9 @@ export function parseOptions(argv, commandName) {
   const options = {
     cwd: process.cwd(),
     spec: undefined,
-    force: false
+    force: false,
+    adopt: undefined,
+    task: undefined
   };
   const positional = [];
 
@@ -55,6 +57,22 @@ export function parseOptions(argv, commandName) {
     }
     if (arg === '--force') {
       options.force = true;
+      continue;
+    }
+    if (arg === '--adopt') {
+      if (commandName !== 'init') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --adopt`, { exitCode: 2 });
+      }
+      options.adopt = requireOptionValue(argv, index, '--adopt', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      if (commandName !== 'init') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --task`, { exitCode: 2 });
+      }
+      options.task = requireOptionValue(argv, index, '--task', commandName);
+      index += 1;
       continue;
     }
     if (arg === '--json') {
