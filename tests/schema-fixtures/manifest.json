@@ -14,6 +14,11 @@
       "name": "minimal regression matrix",
       "schema": "regression-matrix",
       "path": "positive/minimal-regression-matrix.json"
+    },
+    {
+      "name": "minimal test report",
+      "schema": "test-report",
+      "path": "positive/minimal-test-report.json"
     }
   ],
   "negative": [
@@ -42,6 +47,13 @@
       "schema": "atomic-spec",
       "path": "negative/invalid-performance-budget.atom.json",
       "expectedKeyword": "enum"
+    },
+    {
+      "name": "missing runner contract",
+      "schema": "test-report",
+      "path": "negative/missing-runner-contract.test-report.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "runnerContract"
     }
   ]
 }

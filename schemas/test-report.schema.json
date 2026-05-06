@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/test-report.schema.json",
+  "title": "ATM Test Report v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "atomId",
+    "ok",
+    "exitCode",
+    "generatedAt",
+    "repositoryRoot",
+    "hashLock",
+    "validation",
+    "runnerContract",
+    "results",
+    "summary",
+    "artifacts",
+    "evidence"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.testReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^atom\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "exitCode": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repositoryRoot": {
+      "type": "string",
+      "minLength": 1
+    },
+    "specPath": {
+      "type": ["string", "null"]
+    },
+    "hashLock": {
+      "$ref": "#/$defs/hashLock"
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceRequired", "commandCount"],
+      "properties": {
+        "evidenceRequired": {
+          "type": "boolean"
+        },
+        "commandCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "runnerContract": {
+      "$ref": "#/$defs/runnerContract"
+    },
+    "results": {
+      "type": "array",
+          "items": {
+            "$ref": "#/$defs/commandResult"
+          }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "passed", "failed", "durationMs"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifactRecord"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidenceRecord"
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "hashLock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "digest", "canonicalization"],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "canonicalization": {
+          "enum": ["json-stable-v1", "text-normalized-v1"]
+        }
+      }
+    },
+    "runnerContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executionMode", "evidenceRequired", "commands"],
+      "properties": {
+        "executionMode": {
+          "const": "delegated"
+        },
+        "evidenceRequired": {
+          "type": "boolean"
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/commandContract"
+          }
+        }
+      }
+    },
+    "commandContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commandId", "commandKind", "command", "required"],
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commandKind": {
+          "enum": ["test", "typecheck", "lint", "custom"]
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "commandResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commandId", "commandKind", "command", "required", "exitCode", "ok", "durationMs", "stdout", "stderr", "signal"],
+      "properties": {
+        "commandId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commandKind": {
+          "enum": ["test", "typecheck", "lint", "custom"]
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stdout": {
+          "type": "string"
+        },
+        "stderr": {
+          "type": "string"
+        },
+        "signal": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "artifactRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactPath", "artifactKind", "producedBy"],
+      "properties": {
+        "artifactPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactKind": {
+          "enum": ["file", "log", "report", "snapshot"]
+        },
+        "producedBy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidenceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceKind", "summary", "artifactPaths"],
+      "properties": {
+        "evidenceKind": {
+          "enum": ["validation", "review", "metric", "handoff"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

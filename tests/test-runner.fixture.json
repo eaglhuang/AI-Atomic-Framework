@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "passCase": {
+    "specPath": "tests/test-runner-fixtures/pass.atom.json",
+    "commandPath": "tests/test-runner-fixtures/pass-command.mjs",
+    "expectedCommand": "node tests/test-runner-fixtures/pass-command.mjs",
+    "expectedExitCode": 0,
+    "expectedStdoutSnippet": "PASS fixture completed.",
+    "expectedReportPath": "atomic_workbench/atoms/atom.pass-runner/atom.test.report.json"
+  },
+  "failCase": {
+    "specPath": "tests/test-runner-fixtures/fail.atom.json",
+    "commandPath": "tests/test-runner-fixtures/fail-command.mjs",
+    "expectedExitCode": 3,
+    "expectedStderrSnippet": "FAIL fixture completed.",
+    "customReportPath": "custom-reports/fail-runner-report.json"
+  },
+  "acceptance": [
+    "pass fixture writes default per-atom test report under the workbench folder",
+    "fail fixture preserves a non-zero exit code and writes a schema-valid report",
+    "runner contract stays delegated and preserves project-owned commands exactly",
+    "runner implementation does not hard-code a specific third-party test framework"
+  ]
+}

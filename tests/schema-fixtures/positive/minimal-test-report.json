@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.testReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive minimal test report fixture."
+  },
+  "atomId": "atom.hello-world",
+  "ok": true,
+  "exitCode": 0,
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "repositoryRoot": "fixtures/hello-world",
+  "specPath": "tests/schema-fixtures/positive/hello-world.atom.json",
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "canonicalization": "json-stable-v1"
+  },
+  "validation": {
+    "evidenceRequired": true,
+    "commandCount": 1
+  },
+  "runnerContract": {
+    "executionMode": "delegated",
+    "evidenceRequired": true,
+    "commands": [
+      {
+        "commandId": "validation-1",
+        "commandKind": "test",
+        "command": "npm test",
+        "required": true
+      }
+    ]
+  },
+  "results": [
+    {
+      "commandId": "validation-1",
+      "commandKind": "test",
+      "command": "npm test",
+      "required": true,
+      "exitCode": 0,
+      "ok": true,
+      "durationMs": 12,
+      "stdout": "ok",
+      "stderr": "",
+      "signal": null
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "durationMs": 12
+  },
+  "artifacts": [
+    {
+      "artifactPath": "atomic_workbench/atoms/atom.hello-world/atom.test.report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Atomic test runner verified atom.hello-world with 1/1 command(s) passing.",
+      "artifactPaths": [
+        "atomic_workbench/atoms/atom.hello-world/atom.test.report.json"
+      ]
+    }
+  ]
+}
