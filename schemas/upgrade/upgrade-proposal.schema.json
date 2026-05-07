@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json",
+  "title": "ATM Upgrade Proposal v0.1",
+  "description": "Builds a proposal from hash-diff, execution evidence, and police reports for evolution review.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "proposalId", "atomId", "fromVersion", "toVersion", "lifecycleMode", "behaviorId", "target", "decompositionDecision", "automatedGates", "humanReview", "status", "inputs", "proposedBy", "proposedAt"],
+  "properties": {
+    "schemaId": {
+      "const": "atm.upgradeProposal"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^proposal\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "fromVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "toVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "lifecycleMode": {
+      "const": "evolution"
+    },
+    "behaviorId": {
+      "enum": ["behavior.evolve", "behavior.split", "behavior.merge", "behavior.dedup-merge", "behavior.sweep", "behavior.expire", "behavior.polymorphize", "behavior.compose", "behavior.infect", "behavior.atomize"]
+    },
+    "target": {
+      "$ref": "#/$defs/target"
+    },
+    "decompositionDecision": {
+      "enum": ["atom-bump", "atom-extract", "map-bump"]
+    },
+    "automatedGates": {
+      "$ref": "#/$defs/automatedGates"
+    },
+    "humanReview": {
+      "const": "pending"
+    },
+    "status": {
+      "enum": ["pending", "blocked"]
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/inputRef"
+      }
+    },
+    "mapImpactScope": {
+      "$ref": "#/$defs/mapImpactScope"
+    },
+    "fork": {
+      "$ref": "#/$defs/fork"
+    },
+    "proposedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "target": {
+            "properties": {
+              "kind": {
+                "const": "map"
+              }
+            },
+            "required": ["kind"]
+          }
+        },
+        "required": ["target"]
+      },
+      "then": {
+        "required": ["mapImpactScope"],
+        "properties": {
+          "target": {
+            "required": ["kind", "mapId"]
+          },
+          "decompositionDecision": {
+            "const": "map-bump"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decompositionDecision": {
+            "const": "atom-extract"
+          }
+        },
+        "required": ["decompositionDecision"]
+      },
+      "then": {
+        "required": ["fork"],
+        "properties": {
+          "target": {
+            "properties": {
+              "kind": {
+                "const": "atom"
+              }
+            },
+            "required": ["kind"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "behaviorId": {
+            "const": "behavior.atomize"
+          }
+        },
+        "required": ["behaviorId"]
+      },
+      "then": {
+        "properties": {
+          "decompositionDecision": {
+            "const": "atom-extract"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "blocked"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "automatedGates": {
+            "properties": {
+              "allPassed": {
+                "const": false
+              },
+              "blockedGateNames": {
+                "minItems": 1
+              }
+            },
+            "required": ["allPassed", "blockedGateNames"]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "automatedGates": {
+            "properties": {
+              "allPassed": {
+                "const": true
+              },
+              "blockedGateNames": {
+                "maxItems": 0
+              }
+            },
+            "required": ["allPassed", "blockedGateNames"]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "enum": ["atom", "map"]
+        },
+        "mapId": {
+          "type": "string",
+          "pattern": "^ATM-MAP-\\d{4}$"
+        }
+      }
+    },
+    "gateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "reportPath", "summary"],
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "reportId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reportPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "automatedGates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nonRegression", "qualityComparison", "registryCandidate", "allPassed", "blockedGateNames"],
+      "properties": {
+        "nonRegression": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "qualityComparison": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "registryCandidate": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "allPassed": {
+          "type": "boolean"
+        },
+        "blockedGateNames": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate"]
+          }
+        }
+      }
+    },
+    "inputRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "schemaId"],
+      "properties": {
+        "kind": {
+          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate"]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "schemaId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reportId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "fork": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceAtomId", "newAtomId"],
+      "properties": {
+        "sourceAtomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "newAtomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        }
+      }
+    },
+    "mapImpactScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["affectedMapIds", "propagationStatus"],
+      "properties": {
+        "affectedMapIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ATM-MAP-\\d{4}$"
+          }
+        },
+        "propagationStatus": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mapPropagation"
+          }
+        }
+      }
+    },
+    "mapPropagation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapId", "integrationTestPassed"],
+      "properties": {
+        "mapId": {
+          "type": "string",
+          "pattern": "^ATM-MAP-\\d{4}$"
+        },
+        "integrationTestPassed": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

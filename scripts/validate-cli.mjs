@@ -58,7 +58,7 @@ function assertMessageCode(result, code) {
   assert(result.parsed.messages.some((entry) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/create.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/self-host-alpha.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/test.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/create.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/self-host-alpha.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/upgrade.mjs', 'packages/cli/src/commands/test.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -178,6 +178,52 @@ try {
   assertReadable(verifyAgentsMd, 'verify');
   assert(verifyAgentsMd.parsed.ok === true, 'verify --agents-md must report ok=true');
   assertMessageCode(verifyAgentsMd, 'ATM_VERIFY_AGENTS_MD_OK');
+
+  const upgradePass = runAtm([
+    'upgrade',
+    '--propose',
+    '--atom', 'ATM-CORE-0001',
+    '--from', '1.0.0',
+    '--to', '1.1.0',
+    '--dry-run',
+    '--json',
+    '--proposed-at', '2026-01-01T00:00:00.000Z',
+    '--input', 'fixtures/upgrade/hash-diff-report.json',
+    '--input', 'tests/schema-fixtures/positive/minimal-execution-evidence.json',
+    '--input', 'tests/police-fixtures/positive/non-regression-report.json',
+    '--input', 'fixtures/upgrade/quality-comparison-pass.json',
+    '--input', 'tests/police-fixtures/positive/registry-candidate-report.json'
+  ], root);
+  assert(upgradePass.exitCode === 0, 'upgrade pass proposal must exit 0');
+  assertReadable(upgradePass, 'upgrade');
+  assert(upgradePass.parsed.ok === true, 'upgrade pass proposal must report ok=true');
+  assert(upgradePass.parsed.evidence.status === 'pending', 'upgrade pass proposal must report pending status');
+  assert(upgradePass.parsed.evidence.proposal.humanReview === 'pending', 'upgrade pass proposal must set humanReview=pending');
+  assert(upgradePass.parsed.evidence.proposal.automatedGates.allPassed === true, 'upgrade pass proposal gates must pass');
+  assertMessageCode(upgradePass, 'ATM_UPGRADE_PROPOSAL_READY');
+
+  const upgradeBlocked = runAtm([
+    'upgrade',
+    '--propose',
+    '--atom', 'ATM-CORE-0001',
+    '--from', '1.0.0',
+    '--to', '1.1.0',
+    '--dry-run',
+    '--json',
+    '--proposed-at', '2026-01-01T00:00:00.000Z',
+    '--input', 'fixtures/upgrade/hash-diff-report.json',
+    '--input', 'tests/schema-fixtures/positive/minimal-execution-evidence.json',
+    '--input', 'tests/police-fixtures/positive/non-regression-report.json',
+    '--input', 'fixtures/upgrade/quality-comparison-blocked.json',
+    '--input', 'tests/police-fixtures/positive/registry-candidate-report.json'
+  ], root);
+  assert(upgradeBlocked.exitCode === 0, 'upgrade blocked proposal must still exit 0 because proposal generation succeeded');
+  assertReadable(upgradeBlocked, 'upgrade');
+  assert(upgradeBlocked.parsed.ok === true, 'upgrade blocked proposal must report ok=true');
+  assert(upgradeBlocked.parsed.evidence.status === 'blocked', 'upgrade blocked proposal must report blocked status');
+  assert(upgradeBlocked.parsed.evidence.proposal.automatedGates.allPassed === false, 'upgrade blocked proposal gates must fail');
+  assert(upgradeBlocked.parsed.evidence.blockedGateNames.includes('qualityComparison'), 'upgrade blocked proposal must name qualityComparison');
+  assertMessageCode(upgradeBlocked, 'ATM_UPGRADE_PROPOSAL_BLOCKED');
 
   const testHelloWorld = runAtm(['test', '--atom', 'hello-world'], root);
   assert(testHelloWorld.exitCode === 0, 'test --atom hello-world must exit 0 in repository root');

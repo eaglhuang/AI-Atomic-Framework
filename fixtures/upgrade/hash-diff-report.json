@@ -1,0 +1,36 @@
+{
+  "schemaId": "atm.hashDiffReport",
+  "specVersion": "0.1.0",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "1.0.0",
+  "toVersion": "1.1.0",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "deltas": {
+    "specHash": {
+      "from": "sha256:0000000000000000000000000000000000000000000000000000000000000001",
+      "to": "sha256:0000000000000000000000000000000000000000000000000000000000000002",
+      "changed": true
+    },
+    "codeHash": {
+      "from": "sha256:0000000000000000000000000000000000000000000000000000000000000011",
+      "to": "sha256:0000000000000000000000000000000000000000000000000000000000000012",
+      "changed": true
+    },
+    "testHash": {
+      "from": "sha256:00000000000000000000000000000000000000000000000000000000000000aa",
+      "to": "sha256:00000000000000000000000000000000000000000000000000000000000000aa",
+      "changed": false
+    }
+  },
+  "driftSummary": {
+    "totalChanged": 2,
+    "changedFields": ["specHash", "codeHash"],
+    "driftReason": "Upgrade review baseline from 1.0.0 to 1.1.0."
+  },
+  "semanticFingerprintDelta": {
+    "from": "sf:baseline",
+    "to": "sf:candidate",
+    "changed": true
+  },
+  "lineageContinuity": true
+}

@@ -28,6 +28,7 @@ const schemaEntries = {
   'governance-work-item': 'schemas/governance/work-item.schema.json',
   'governance-scope-lock': 'schemas/governance/scope-lock.schema.json',
   'governance-bundle': 'schemas/governance/governance-bundle.schema.json',
+  'upgrade-proposal': 'schemas/upgrade/upgrade-proposal.schema.json',
   registry: 'schemas/registry.schema.json',
   'regression-matrix': 'schemas/regression-matrix.schema.json',
   'test-report': 'schemas/test-report.schema.json'
@@ -170,6 +171,11 @@ const protectedFiles = [
   ...readdirSync(path.join(root, 'tests', 'schema-fixtures', 'positive')).map((entry) => `tests/schema-fixtures/positive/${entry}`),
   ...readdirSync(path.join(root, 'tests', 'schema-fixtures', 'negative')).map((entry) => `tests/schema-fixtures/negative/${entry}`)
 ];
+
+const upgradeFixtureDir = path.join(root, 'fixtures', 'upgrade');
+if (existsSync(upgradeFixtureDir)) {
+  protectedFiles.push(...readdirSync(upgradeFixtureDir).map((entry) => `fixtures/upgrade/${entry}`));
+}
 
 for (const relativePath of protectedFiles) {
   const content = readText(relativePath);

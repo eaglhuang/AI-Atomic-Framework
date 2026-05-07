@@ -1,0 +1,90 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial upgrade proposal contract."
+  },
+  "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "1.0.0",
+  "toVersion": "1.1.0",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "police.non-regression.fixture",
+      "reportPath": "tests/police-fixtures/positive/non-regression-report.json",
+      "summary": "pass (baseline fixtures passed)"
+    },
+    "qualityComparison": {
+      "passed": false,
+      "reportId": "police.upgrade-quality-blocked.fixture",
+      "reportPath": "fixtures/upgrade/quality-comparison-blocked.json",
+      "summary": "blocked (regressed metrics: errorRate, coverage)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "police.registry-candidate.fixture",
+      "reportPath": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "summary": "pass (candidate can promote)"
+    },
+    "allPassed": false,
+    "blockedGateNames": ["qualityComparison"]
+  },
+  "humanReview": "pending",
+  "status": "blocked",
+  "inputs": [
+    {
+      "kind": "hash-diff",
+      "path": "fixtures/upgrade/hash-diff-report.json",
+      "schemaId": "atm.hashDiffReport",
+      "summary": "hash-diff input"
+    },
+    {
+      "kind": "execution-evidence",
+      "path": "tests/schema-fixtures/positive/minimal-execution-evidence.json",
+      "schemaId": "atm.executionEvidence",
+      "summary": "execution-evidence input"
+    },
+    {
+      "kind": "non-regression",
+      "path": "tests/police-fixtures/positive/non-regression-report.json",
+      "schemaId": "atm.police.nonRegressionReport",
+      "reportId": "police.non-regression.fixture",
+      "summary": "non-regression input"
+    },
+    {
+      "kind": "quality-comparison",
+      "path": "fixtures/upgrade/quality-comparison-blocked.json",
+      "schemaId": "atm.police.qualityComparisonReport",
+      "reportId": "police.upgrade-quality-blocked.fixture",
+      "summary": "quality-comparison input"
+    },
+    {
+      "kind": "registry-candidate",
+      "path": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "schemaId": "atm.police.registryCandidateReport",
+      "reportId": "police.registry-candidate.fixture",
+      "summary": "registry-candidate input"
+    }
+  ],
+  "mapImpactScope": {
+    "affectedMapIds": ["ATM-MAP-0001"],
+    "propagationStatus": [
+      {
+        "mapId": "ATM-MAP-0001",
+        "integrationTestPassed": true,
+        "message": "All map tests green."
+      }
+    ]
+  },
+  "proposedBy": "ATM CLI",
+  "proposedAt": "2026-01-01T00:00:00.000Z"
+}

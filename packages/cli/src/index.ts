@@ -58,6 +58,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'upgrade',
+    summary: 'Propose an evolution upgrade from report inputs',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'test',
     summary: 'Run atom smoke tests',
     implemented: true,
