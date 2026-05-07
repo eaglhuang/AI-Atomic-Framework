@@ -194,3 +194,5 @@ The next step is no longer schema invention. It is implementation parity:
 2. let host adapters decide which optional stores they persist
 3. keep replay and evidence generation consistent across adapters
 4. preserve the same contracts even when the physical storage paths differ downstream
+
+HarnessCard-style reporting should be layered on top of these stores instead of becoming a required bundle field. A default plugin may emit a lightweight report into `runReportStore` or typed evidence that maps the current run to Control, Agency, and Runtime: base model/profile, control artifacts, runtime policy, action substrate, execution topology, feedback stack, observability, evaluation protocol, release artifacts, and known risks. The bundle remains valid without that report.

@@ -35,6 +35,16 @@ The Agent Operating Layer teaches a model-neutral agent how to operate inside a 
 
 This layer exists so a user can drop ATM into a project root and let an AI agent discover the expected workflow before editing files.
 
+### CAR Reporting Lens
+
+ATM can be described through the Harness Engineering CAR lens without changing its core layers:
+
+- Control is represented by specs, rules, locks, validation gates, and explicit scope boundaries.
+- Agency is represented by plugins, adapters, capability policies, and the action substrate exposed to an agent.
+- Runtime is represented by context summaries, artifacts, logs, reports, evidence, replay, and budget policy.
+
+This is a reporting and documentation lens. It should help adopters produce HarnessCard-style release artifacts, but it must not create a parallel task model or replace `WorkItem`, `ScopeLock`, `Evidence`, `ContextSummary`, or `AdapterReport`.
+
 ### Default Governance Bundle
 
 The Default Governance Bundle is the official starter profile for repositories that do not yet have their own governance tooling. It is expected to include replaceable plugins for:

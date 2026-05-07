@@ -8,7 +8,7 @@ AI-Atomic-Framework occupies the governance layer for AI-assisted engineering. I
 | --- | --- | --- |
 | Atomic Agents | Building agents from small reusable components. | ATM can govern the work that creates, changes, validates, and releases those components. |
 | Specification-Driven Development | Driving implementation from explicit specs. | ATM can store atomic specs, lock their scope, preserve evidence, and validate changes against contract boundaries. |
-| Harness Engineering | Turning engineering quality into repeatable sensors and gates. | ATM provides the work envelope, evidence model, artifact trail, and plugin boundary for those gates. |
+| Harness Engineering | Describing agent systems through Control, Agency, and Runtime, then making those surfaces inspectable. | ATM provides the work envelope, evidence model, artifact trail, and plugin boundary for those surfaces. HarnessCard-style output should be treated as optional reporting, not as a replacement for core work and evidence contracts. |
 | LangGraph | Orchestrating stateful agent workflows. | ATM can be called by a LangGraph node or can preserve evidence from a LangGraph workflow; it is not a workflow engine itself. |
 | CI systems | Running repository checks after commits or pull requests. | ATM can produce structured evidence before CI and consume CI results as evidence after CI runs. |
 | Issue trackers | Tracking human-visible work state. | ATM can use an issue tracker through an adapter while preserving core work item contracts. |
@@ -24,6 +24,7 @@ ATM adds a common governance vocabulary:
 - Context is summarized for handoff instead of being repeatedly expanded.
 - Host-specific behavior is isolated behind adapters.
 - Optional capabilities are installed as plugins.
+- Control, Agency, and Runtime can be reported from the same contracts without creating a second task or evidence model.
 
 ## What ATM Does Not Replace
 
