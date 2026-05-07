@@ -27,6 +27,10 @@ function extractPluginFamily(atomId, codePaths) {
 }
 
 export function deriveRegistryCatalogCategory(entry, specDocument = {}) {
+  if (entry?.schemaId === 'atm.atomicMap') {
+    return 'map';
+  }
+
   const atomId = String(entry?.atomId || specDocument?.id || '').trim();
   const tags = normalizeStringArray(specDocument?.tags);
   const codePaths = normalizePathList(entry?.location?.codePaths || entry?.selfVerification?.sourcePaths?.code);

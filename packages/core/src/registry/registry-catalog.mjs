@@ -19,19 +19,20 @@ export function createRegistryCatalogRows(registryDocument, options = {}) {
   const entries = Array.isArray(registryDocument?.entries) ? [...registryDocument.entries] : [];
 
   return entries
-    .sort((left, right) => String(left?.atomId || '').localeCompare(String(right?.atomId || '')))
+    .sort((left, right) => resolveEntryId(left).localeCompare(resolveEntryId(right)))
     .map((entry) => {
       const specDocument = readSpecDocument(specRepositoryRoot, entry, specCache);
       const title = normalizeInlineText(specDocument?.title);
       const description = normalizeInlineText(specDocument?.description);
+      const specPath = resolveCatalogSpecPath(entry);
       return {
-        atomId: String(entry?.atomId || '').trim(),
+        entryId: resolveEntryId(entry),
         logicalName: String(entry?.logicalName || specDocument?.logicalName || '').trim(),
-        functionSummary: [title, description].filter(Boolean).join(title && description ? ': ' : ''),
+        functionSummary: [title, description].filter(Boolean).join(title && description ? ': ' : '') || createFallbackFunctionSummary(entry),
         derivedCategory: deriveRegistryCatalogCategory(entry, specDocument),
         provenance: deriveGeneratorProvenance(entry),
-        status: String(entry?.status || '').trim(),
-        specPath: String(entry?.specPath || '').trim()
+        status: String(entry?.status || (entry?.schemaId === 'atm.atomicMap' ? 'active' : '')).trim(),
+        specPath
       };
     });
 }
@@ -53,7 +54,7 @@ export function renderRegistryCatalogMarkdown(registryDocument, options = {}) {
 
   for (const row of rows) {
     lines.push(
-      `| \`${escapeMarkdownCell(row.atomId)}\` | \`${escapeMarkdownCell(row.logicalName || '—')}\` | ${escapeMarkdownCell(row.functionSummary)} | \`${escapeMarkdownCell(row.derivedCategory)}\` | \`${escapeMarkdownCell(row.provenance)}\` | \`${escapeMarkdownCell(row.status)}\` | \`${escapeMarkdownCell(row.specPath)}\` |`
+      `| \`${escapeMarkdownCell(row.entryId)}\` | \`${escapeMarkdownCell(row.logicalName || '—')}\` | ${escapeMarkdownCell(row.functionSummary)} | \`${escapeMarkdownCell(row.derivedCategory)}\` | \`${escapeMarkdownCell(row.provenance)}\` | \`${escapeMarkdownCell(row.status)}\` | \`${escapeMarkdownCell(row.specPath)}\` |`
     );
   }
 
@@ -80,7 +81,7 @@ export function writeRegistryCatalogFile(registryDocument, options = {}) {
 }
 
 function readSpecDocument(repositoryRoot, entry, specCache) {
-  const specPath = String(entry?.specPath || '').trim();
+  const specPath = resolveCatalogSpecPath(entry);
   if (!specPath) {
     return {};
   }
@@ -101,7 +102,33 @@ function normalizeInlineText(value) {
 
 function deriveGeneratorProvenance(entry) {
   const marker = (entry?.evidence ?? []).find((value) => typeof value === 'string' && value.startsWith('generator-provenance:'));
+  if (!marker && entry?.schemaId === 'atm.atomicMap') {
+    return 'generated';
+  }
   return marker ? marker.slice('generator-provenance:'.length) : 'unmarked';
+}
+
+function resolveEntryId(entry) {
+  return String(entry?.atomId || entry?.mapId || '').trim();
+}
+
+function resolveCatalogSpecPath(entry) {
+  const explicitSpecPath = String(entry?.specPath || '').trim();
+  if (explicitSpecPath) {
+    return explicitSpecPath;
+  }
+  const mapId = String(entry?.mapId || '').trim();
+  return mapId ? `atomic_workbench/maps/${mapId}/map.spec.json` : '';
+}
+
+function createFallbackFunctionSummary(entry) {
+  if (entry?.schemaId !== 'atm.atomicMap') {
+    return '';
+  }
+  const entrypoints = Array.isArray(entry?.entrypoints) ? entry.entrypoints : [];
+  return entrypoints.length > 0
+    ? `Atomic Map entrypoints: ${entrypoints.join(', ')}`
+    : 'Atomic Map entry';
 }
 
 function escapeMarkdownCell(value) {

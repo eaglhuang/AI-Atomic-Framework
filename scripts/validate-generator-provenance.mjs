@@ -74,20 +74,29 @@ function buildAuditReport(registryDocument) {
 }
 
 function auditEntry(entry) {
+  const entryId = resolveEntryId(entry);
+  const isMapEntry = entry?.schemaId === 'atm.atomicMap';
   const marker = findProvenanceMarker(entry);
-  const provenance = marker ? marker.slice('generator-provenance:'.length) : 'unmarked';
+  const effectiveMarker = marker ?? (isMapEntry ? 'generator-provenance:generated' : null);
+  const provenance = effectiveMarker ? effectiveMarker.slice('generator-provenance:'.length) : 'unmarked';
   const issues = [];
-  if (!marker) {
+  if (!effectiveMarker) {
     issues.push('missing-generator-provenance-marker');
-  } else if (!allowedMarkers.has(marker)) {
-    issues.push(`unknown-generator-provenance-marker:${marker}`);
+  } else if (!allowedMarkers.has(effectiveMarker)) {
+    issues.push(`unknown-generator-provenance-marker:${effectiveMarker}`);
   }
 
   const location = entry.location ?? {};
-  const workbenchPath = normalizePath(location.workbenchPath ?? `atomic_workbench/atoms/${entry.atomId}`);
-  const specPath = normalizePath(location.specPath ?? entry.specPath);
-  const codePaths = Array.isArray(location.codePaths) ? location.codePaths.map(normalizePath) : [];
-  const testPaths = Array.isArray(location.testPaths) ? location.testPaths.map(normalizePath) : [];
+  const workbenchPath = normalizePath(location.workbenchPath ?? (isMapEntry
+    ? `atomic_workbench/maps/${entry.mapId}`
+    : `atomic_workbench/atoms/${entry.atomId}`));
+  const specPath = normalizePath(location.specPath ?? entry.specPath ?? (isMapEntry ? `${workbenchPath}/map.spec.json` : ''));
+  const codePaths = Array.isArray(location.codePaths)
+    ? location.codePaths.map(normalizePath)
+    : (isMapEntry ? [] : []);
+  const testPaths = Array.isArray(location.testPaths)
+    ? location.testPaths.map(normalizePath)
+    : (isMapEntry ? [`${workbenchPath}/map.integration.test.mjs`] : []);
 
   if (!existsInRepo(workbenchPath)) {
     issues.push('missing-workbench-path');
@@ -106,7 +115,7 @@ function auditEntry(entry) {
     }
   }
 
-  if (provenance === 'generated') {
+  if (provenance === 'generated' && !isMapEntry) {
     if (codePaths.includes(specPath)) {
       issues.push('generated-code-path-must-not-be-spec-path');
     }
@@ -115,7 +124,16 @@ function auditEntry(entry) {
     }
   }
 
-  if (provenance === 'backfilled') {
+  if (provenance === 'generated' && isMapEntry) {
+    if (!testPaths.some((testPath) => testPath.endsWith('/map.integration.test.mjs'))) {
+      issues.push('generated-entry-missing-map-test');
+    }
+    if (!specPath.endsWith('/map.spec.json')) {
+      issues.push('generated-entry-missing-map-spec');
+    }
+  }
+
+  if (provenance === 'backfilled' && !isMapEntry) {
     for (const expectedFileName of ['atom.spec.json', 'atom.test.ts', 'atom.test.report.json']) {
       const expectedPath = `${workbenchPath}/${expectedFileName}`;
       if (!existsInRepo(expectedPath)) {
@@ -124,20 +142,22 @@ function auditEntry(entry) {
     }
   }
 
-  if (provenance === 'bootstrap-self' && !codePaths.some((codePath) => codePath.endsWith('/atom-generator.mjs'))) {
+  if (provenance === 'bootstrap-self' && !isMapEntry && !codePaths.some((codePath) => codePath.endsWith('/atom-generator.mjs'))) {
     issues.push('bootstrap-self-entry-missing-generator-code');
   }
 
-  const drift = evaluateRegistryEntryDrift(entry, { repositoryRoot: root });
+  const drift = isMapEntry
+    ? evaluateMapEntryDrift(entry, { specPath })
+    : evaluateRegistryEntryDrift(entry, { repositoryRoot: root });
   if (!drift.ok) {
     issues.push(`registry-drift:${drift.issues.join('+') || 'unknown'}`);
   }
 
   return {
-    atomId: entry.atomId,
+    atomId: entryId,
     logicalName: entry.logicalName ?? null,
     provenance,
-    marker,
+    marker: effectiveMarker,
     workbenchPath,
     specPath,
     codePaths,
@@ -149,6 +169,76 @@ function auditEntry(entry) {
 
 function findProvenanceMarker(entry) {
   return (entry.evidence ?? []).find((value) => typeof value === 'string' && value.startsWith('generator-provenance:')) ?? null;
+}
+
+function resolveEntryId(entry) {
+  return String(entry?.atomId || entry?.mapId || '').trim();
+}
+
+function evaluateMapEntryDrift(entry, options = {}) {
+  const specPath = normalizePath(options.specPath);
+  if (!existsInRepo(specPath)) {
+    return {
+      ok: false,
+      issues: ['specPath']
+    };
+  }
+
+  let specDocument;
+  try {
+    specDocument = JSON.parse(readFileSync(path.join(root, specPath), 'utf8'));
+  } catch {
+    return {
+      ok: false,
+      issues: ['specJson']
+    };
+  }
+
+  const expected = normalizeMapComparable(entry);
+  const actual = normalizeMapComparable(specDocument);
+  const issues = [];
+  for (const key of Object.keys(expected)) {
+    if (JSON.stringify(expected[key]) !== JSON.stringify(actual[key])) {
+      issues.push(key);
+    }
+  }
+
+  return {
+    ok: issues.length === 0,
+    issues
+  };
+}
+
+function normalizeMapComparable(value) {
+  return {
+    mapId: String(value?.mapId || '').trim(),
+    mapVersion: String(value?.mapVersion || '').trim(),
+    members: [...(Array.isArray(value?.members) ? value.members : [])]
+      .map((member) => ({
+        atomId: String(member.atomId || '').trim(),
+        version: String(member.version || '').trim()
+      }))
+      .sort((left, right) => left.atomId.localeCompare(right.atomId) || left.version.localeCompare(right.version)),
+    edges: [...(Array.isArray(value?.edges) ? value.edges : [])]
+      .map((edge) => ({
+        from: String(edge.from || '').trim(),
+        to: String(edge.to || '').trim(),
+        binding: String(edge.binding || '').trim()
+      }))
+      .sort((left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to) || left.binding.localeCompare(right.binding)),
+    entrypoints: [...(Array.isArray(value?.entrypoints) ? value.entrypoints : [])]
+      .map((entrypoint) => String(entrypoint || '').trim())
+      .sort((left, right) => left.localeCompare(right)),
+    qualityTargets: Object.fromEntries(
+      Object.entries(value?.qualityTargets ?? {})
+        .map(([key, item]) => [String(key).trim(), typeof item === 'string' ? item.trim() : item])
+        .sort(([left], [right]) => left.localeCompare(right))
+    ),
+    mapHash: String(value?.mapHash || '').trim(),
+    semanticFingerprint: String(value?.semanticFingerprint || '').trim(),
+    lineageLogRef: String(value?.lineageLogRef || '').trim(),
+    ttl: typeof value?.ttl === 'number' ? value.ttl : null
+  };
 }
 
 function existsInRepo(relativePath) {
