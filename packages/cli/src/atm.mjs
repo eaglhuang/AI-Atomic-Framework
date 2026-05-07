@@ -11,6 +11,7 @@ import { runStatus } from './commands/status.mjs';
 import { runTestAsync } from './commands/test.mjs';
 import { runValidate } from './commands/validate.mjs';
 import { runVerify } from './commands/verify.mjs';
+import { runRegistryDiff } from './commands/registry-diff.mjs';
 import { CliError, makeResult, message, writeResult } from './commands/shared.mjs';
 
 export const cliCommandRunners = {
@@ -23,7 +24,8 @@ export const cliCommandRunners = {
   status: runStatus,
   test: runTestAsync,
   validate: runValidate,
-  verify: runVerify
+  verify: runVerify,
+  'registry-diff': runRegistryDiff
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {

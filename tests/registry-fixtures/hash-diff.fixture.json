@@ -1,0 +1,137 @@
+{
+  "description": "Hash diff report fixtures for ATM-2-0015 validate script.",
+  "positive": [
+    {
+      "name": "identical-hashes",
+      "description": "Two versions with identical hashes — empty delta.",
+      "input": {
+        "registryEntry": {
+          "atomId": "ATM-CORE-0001",
+          "versions": [
+            {
+              "version": "1.0.0",
+              "specHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "codeHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "testHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "timestamp": "2026-05-01T00:00:00.000Z"
+            },
+            {
+              "version": "1.0.1",
+              "specHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "codeHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "testHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "timestamp": "2026-05-02T00:00:00.000Z"
+            }
+          ]
+        },
+        "fromVersion": "1.0.0",
+        "toVersion": "1.0.1"
+      },
+      "expected": {
+        "totalChanged": 0,
+        "changedFields": [],
+        "lineageContinuity": true
+      }
+    },
+    {
+      "name": "all-three-changed",
+      "description": "All three hashes differ between versions.",
+      "input": {
+        "registryEntry": {
+          "atomId": "ATM-CORE-0002",
+          "versions": [
+            {
+              "version": "1.0.0",
+              "specHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "codeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+              "testHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+              "timestamp": "2026-05-01T00:00:00.000Z"
+            },
+            {
+              "version": "1.1.0",
+              "specHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+              "codeHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+              "testHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+              "timestamp": "2026-05-03T00:00:00.000Z"
+            }
+          ]
+        },
+        "fromVersion": "1.0.0",
+        "toVersion": "1.1.0",
+        "driftReason": "Major refactor: spec, code, and tests all updated for v1.1 evolution."
+      },
+      "expected": {
+        "totalChanged": 3,
+        "changedFields": ["specHash", "codeHash", "testHash"],
+        "lineageContinuity": true
+      }
+    },
+    {
+      "name": "code-only-changed",
+      "description": "Only code hash changed — typical bug fix scenario.",
+      "input": {
+        "registryEntry": {
+          "atomId": "ATM-CORE-0003",
+          "versions": [
+            {
+              "version": "2.0.0",
+              "specHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "codeHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "testHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "timestamp": "2026-05-01T00:00:00.000Z"
+            },
+            {
+              "version": "2.0.1",
+              "specHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "codeHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "testHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "timestamp": "2026-05-02T00:00:00.000Z"
+            }
+          ]
+        },
+        "fromVersion": "2.0.0",
+        "toVersion": "2.0.1"
+      },
+      "expected": {
+        "totalChanged": 1,
+        "changedFields": ["codeHash"],
+        "lineageContinuity": true
+      }
+    }
+  ],
+  "negative": [
+    {
+      "name": "missing-version",
+      "description": "Requested version not found in versions[].",
+      "input": {
+        "registryEntry": {
+          "atomId": "ATM-CORE-0001",
+          "versions": [
+            {
+              "version": "1.0.0",
+              "specHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "codeHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "testHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "timestamp": "2026-05-01T00:00:00.000Z"
+            }
+          ]
+        },
+        "fromVersion": "1.0.0",
+        "toVersion": "9.9.9"
+      },
+      "expectedError": "not found"
+    },
+    {
+      "name": "no-versions-array",
+      "description": "Registry entry has no versions[] at all.",
+      "input": {
+        "registryEntry": {
+          "atomId": "ATM-CORE-0001"
+        },
+        "fromVersion": "1.0.0",
+        "toVersion": "1.0.1"
+      },
+      "expectedError": "not found"
+    }
+  ]
+}
