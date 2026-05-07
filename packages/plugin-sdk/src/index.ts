@@ -35,6 +35,8 @@ export type {
 export type { InjectorPlugin, InjectorPluginContext } from './injector-plugin';
 export type {
   ArtifactStore,
+  GovernanceAdapter,
+  GovernanceLayout,
   ContextSummaryStore,
   DocumentIndex,
   EvidenceStore,
@@ -44,10 +46,12 @@ export type {
   MarkdownJsonStateStore,
   RegistryStore,
   RuleGuard,
+  RunReportStore,
   ShardStore,
   StoreLifecycle,
   TaskStore
 } from './governance';
+export { defaultGovernanceLayout } from './governance';
 export type {
   PoliceCheckContract,
   PoliceCheckKind,

@@ -50,6 +50,11 @@ export interface LogStore extends StoreLifecycle {
   readLog(workItemId: string): Promise<string> | string;
 }
 
+export interface RunReportStore extends StoreLifecycle {
+  writeRunReport(reportId: string, report: Readonly<Record<string, unknown>>): Promise<CapabilityResult> | CapabilityResult;
+  readRunReport(reportId: string): Promise<Readonly<Record<string, unknown>> | null> | Readonly<Record<string, unknown>> | null;
+}
+
 export interface MarkdownJsonStateStore extends StoreLifecycle {
   readMarkdown(path: string): Promise<string> | string;
   writeMarkdown(path: string, content: string): Promise<CapabilityResult> | CapabilityResult;
@@ -83,6 +88,7 @@ export interface GovernanceStores {
   readonly shardStore: ShardStore;
   readonly artifactStore: ArtifactStore;
   readonly logStore: LogStore;
+  readonly runReportStore?: RunReportStore;
   readonly stateStore: MarkdownJsonStateStore;
   readonly ruleGuard: RuleGuard;
   readonly evidenceStore: EvidenceStore;

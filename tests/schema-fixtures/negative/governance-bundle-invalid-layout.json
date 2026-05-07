@@ -1,0 +1,44 @@
+{
+  "schemaId": "atm.governanceBundle",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Negative governance bundle fixture with an invalid layout root."
+  },
+  "layout": {
+    "root": ".not-atm",
+    "taskStorePath": ".atm/tasks",
+    "lockStorePath": ".atm/locks",
+    "documentIndexPath": ".atm/index",
+    "shardStorePath": ".atm/shards",
+    "stateStorePath": ".atm/state",
+    "artifactStorePath": ".atm/artifacts",
+    "logStorePath": ".atm/logs",
+    "runReportStorePath": ".atm/reports",
+    "ruleGuardPath": ".atm/rules",
+    "evidenceStorePath": ".atm/evidence"
+  },
+  "workItem": {
+    "workItemId": "ATM-FIXTURE-0007",
+    "title": "Default governance bundle seed",
+    "status": "locked"
+  },
+  "scopeLock": {
+    "workItemId": "ATM-FIXTURE-0007",
+    "lockedBy": "vs-code-gpt-5.4-mini",
+    "lockedAt": "2026-05-07T00:00:00.000Z",
+    "files": [
+      ".atm/tasks/ATM-FIXTURE-0007.md"
+    ]
+  },
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "This bundle should fail because the layout root is not .atm.",
+      "artifactPaths": [
+        ".atm/reports/minimal-governance-bundle.json"
+      ]
+    }
+  ]
+}

@@ -19,3 +19,13 @@ Alpha0 schemas define contracts only. They do not implement parsing, registry ma
 ## Reserved Performance Budget
 
 `AtomicSpec` reserves an optional `performanceBudget` object with `hotPath` and `inputMutation` fields. Alpha0 does not require measurement, but the shape is reserved now so alpha1 can add budget checks without a breaking schema change.
+
+## Governance Seeds
+
+`schemas/governance/` holds the alpha0 default governance bundle seeds:
+
+- `work-item.schema.json` for the minimal work item record;
+- `scope-lock.schema.json` for the minimal scope lock record;
+- `governance-bundle.schema.json` for the reference `.atm` layout plus a minimal work item, lock, and evidence payload.
+
+These files are host-neutral seeds. They define the default contract shape before any Jira, GitHub Issues, or filesystem adapter is introduced.

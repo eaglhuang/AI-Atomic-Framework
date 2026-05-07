@@ -6,6 +6,21 @@
       "path": "positive/hello-world.atom.json"
     },
     {
+      "name": "minimal governance work item",
+      "schema": "governance-work-item",
+      "path": "positive/governance-work-item.json"
+    },
+    {
+      "name": "minimal governance scope lock",
+      "schema": "governance-scope-lock",
+      "path": "positive/governance-scope-lock.json"
+    },
+    {
+      "name": "minimal governance bundle",
+      "schema": "governance-bundle",
+      "path": "positive/governance-bundle.json"
+    },
+    {
       "name": "minimal registry",
       "schema": "registry",
       "path": "positive/minimal-registry.json"
@@ -52,6 +67,26 @@
       "schema": "atomic-spec",
       "path": "negative/invalid-performance-budget.atom.json",
       "expectedKeyword": "enum"
+    },
+    {
+      "name": "missing governance work item id",
+      "schema": "governance-work-item",
+      "path": "negative/governance-work-item-missing-id.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "workItemId"
+    },
+    {
+      "name": "missing governance scope lock files",
+      "schema": "governance-scope-lock",
+      "path": "negative/governance-scope-lock-missing-files.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "files"
+    },
+    {
+      "name": "invalid governance bundle layout",
+      "schema": "governance-bundle",
+      "path": "negative/governance-bundle-invalid-layout.json",
+      "expectedKeyword": "const"
     },
     {
       "name": "missing runner contract",

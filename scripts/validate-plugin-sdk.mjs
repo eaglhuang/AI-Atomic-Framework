@@ -10,6 +10,7 @@ const mode = process.argv.includes('--mode')
 const requiredFiles = [
   'packages/plugin-sdk/src/capability.ts',
   'packages/plugin-sdk/src/governance/index.ts',
+  'packages/plugin-sdk/src/governance/layout.ts',
   'packages/plugin-sdk/src/governance/stores.ts',
   'packages/plugin-sdk/src/injector-plugin.ts',
   'packages/plugin-sdk/src/language-adapter.ts',
@@ -49,12 +50,16 @@ if (!process.exitCode) {
     'VersionResolver',
     'QualityMetricsComparator',
     'UpgradeProposalAdapter',
+      'GovernanceAdapter',
+      'GovernanceLayout',
+      'defaultGovernanceLayout',
     'TaskStore',
     'LockStore',
     'DocumentIndex',
     'ShardStore',
     'ArtifactStore',
     'LogStore',
+      'RunReportStore',
     'MarkdownJsonStateStore',
     'RuleGuard',
     'EvidenceStore'
@@ -63,6 +68,13 @@ if (!process.exitCode) {
       fail(`packages/plugin-sdk/src/index.ts must export ${exportName}`);
     }
   }
+
+    const layoutSource = readText('packages/plugin-sdk/src/governance/layout.ts');
+    for (const phrase of ['GovernanceLayout', 'GovernanceAdapter', 'defaultGovernanceLayout', '.atm/tasks', '.atm/reports']) {
+      if (!layoutSource.includes(phrase)) {
+        fail(`governance/layout.ts missing ${phrase}`);
+      }
+    }
 
   const lifecycleSource = readText('packages/plugin-sdk/src/lifecycle.ts');
   if (!lifecycleSource.includes('export enum AtomLifecycleMode')) {
@@ -80,7 +92,7 @@ if (!process.exitCode) {
   }
 
   const storesSource = readText('packages/plugin-sdk/src/governance/stores.ts');
-  for (const storeName of ['TaskStore', 'LockStore', 'DocumentIndex', 'ShardStore', 'ArtifactStore', 'LogStore', 'MarkdownJsonStateStore', 'RuleGuard', 'EvidenceStore']) {
+    for (const storeName of ['TaskStore', 'LockStore', 'DocumentIndex', 'ShardStore', 'ArtifactStore', 'LogStore', 'RunReportStore', 'MarkdownJsonStateStore', 'RuleGuard', 'EvidenceStore']) {
     if (!storesSource.includes(`interface ${storeName}`)) {
       fail(`governance/stores.ts missing ${storeName}`);
     }

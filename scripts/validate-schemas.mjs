@@ -12,6 +12,9 @@ const mode = process.argv.includes('--mode')
 const schemaEntries = {
   'atomic-spec': 'schemas/atomic-spec.schema.json',
   'agent-prompt': 'schemas/agent-prompt.schema.json',
+  'governance-work-item': 'schemas/governance/work-item.schema.json',
+  'governance-scope-lock': 'schemas/governance/scope-lock.schema.json',
+  'governance-bundle': 'schemas/governance/governance-bundle.schema.json',
   registry: 'schemas/registry.schema.json',
   'regression-matrix': 'schemas/regression-matrix.schema.json',
   'test-report': 'schemas/test-report.schema.json'

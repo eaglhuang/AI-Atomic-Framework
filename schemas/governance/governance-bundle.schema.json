@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/governance-bundle.schema.json",
+  "title": "ATM Default Governance Bundle v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "layout", "workItem", "scopeLock", "evidence"],
+  "properties": {
+    "schemaId": {
+      "const": "atm.governanceBundle"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "layout": {
+      "$ref": "#/$defs/layout"
+    },
+    "workItem": {
+      "$ref": "#/$defs/workItem"
+    },
+    "scopeLock": {
+      "$ref": "#/$defs/scopeLock"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/evidenceRecord"
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "taskStorePath",
+        "lockStorePath",
+        "documentIndexPath",
+        "shardStorePath",
+        "stateStorePath",
+        "artifactStorePath",
+        "logStorePath",
+        "runReportStorePath",
+        "ruleGuardPath",
+        "evidenceStorePath"
+      ],
+      "properties": {
+        "root": {
+          "const": ".atm"
+        },
+        "taskStorePath": {
+          "const": ".atm/tasks"
+        },
+        "lockStorePath": {
+          "const": ".atm/locks"
+        },
+        "documentIndexPath": {
+          "const": ".atm/index"
+        },
+        "shardStorePath": {
+          "const": ".atm/shards"
+        },
+        "stateStorePath": {
+          "const": ".atm/state"
+        },
+        "artifactStorePath": {
+          "const": ".atm/artifacts"
+        },
+        "logStorePath": {
+          "const": ".atm/logs"
+        },
+        "runReportStorePath": {
+          "const": ".atm/reports"
+        },
+        "ruleGuardPath": {
+          "const": ".atm/rules"
+        },
+        "evidenceStorePath": {
+          "const": ".atm/evidence"
+        },
+        "registryStorePath": {
+          "const": ".atm/registry"
+        },
+        "contextSummaryStorePath": {
+          "const": ".atm/state/context-summary"
+        }
+      }
+    },
+    "workItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workItemId", "title", "status"],
+      "properties": {
+        "workItemId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": ["planned", "locked", "running", "verified", "done", "blocked"]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "externalRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "id"],
+          "properties": {
+            "provider": {
+              "enum": ["atm-local", "jira", "github-issues", "linear", "notion", "custom"]
+            },
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      }
+    },
+    "scopeLock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workItemId", "lockedBy", "lockedAt", "files"],
+      "properties": {
+        "workItemId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "lockedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lockedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "evidenceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceKind", "summary", "artifactPaths"],
+      "properties": {
+        "evidenceKind": {
+          "enum": ["validation", "review", "metric", "handoff"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        }
+      }
+    }
+  }
+}
