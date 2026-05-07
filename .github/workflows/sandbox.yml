@@ -1,0 +1,31 @@
+name: sandbox
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  sandbox-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Prepare sandbox fixture
+        shell: bash
+        run: bash tests/sandbox/setup.sh "$RUNNER_TEMP/atm-sandbox" "$GITHUB_WORKSPACE"
+
+      - name: Verify sandbox fixture
+        shell: bash
+        run: bash tests/sandbox/verify.sh "$RUNNER_TEMP/atm-sandbox"
