@@ -1,0 +1,80 @@
+{
+  "description": "Regression compare gate fixtures for ATM-2-0017.",
+  "positive": [
+    {
+      "name": "v1.0-pass",
+      "description": "Baseline metrics — no comparison, all pass by default.",
+      "input": {
+        "atomId": "ATM-CORE-0001",
+        "fromVersion": "1.0.0",
+        "toVersion": "1.0.0",
+        "baselineMetrics": { "errorRate": 0.05, "coverage": 0.80, "latency": 120, "edgeCaseCount": 5 },
+        "currentMetrics":  { "errorRate": 0.05, "coverage": 0.80, "latency": 120, "edgeCaseCount": 5 }
+      },
+      "expected": { "regressed": false, "passed": true, "regressedMetrics": [] }
+    },
+    {
+      "name": "v1.1-pass-improved",
+      "description": "All metrics improved — coverage up, errorRate down, latency down.",
+      "input": {
+        "atomId": "ATM-CORE-0001",
+        "fromVersion": "1.0.0",
+        "toVersion": "1.1.0",
+        "baselineMetrics": { "errorRate": 0.05, "coverage": 0.80, "latency": 120, "edgeCaseCount": 5 },
+        "currentMetrics":  { "errorRate": 0.02, "coverage": 0.90, "latency": 100, "edgeCaseCount": 8 }
+      },
+      "expected": { "regressed": false, "passed": true, "regressedMetrics": [] }
+    },
+    {
+      "name": "v1.1-pass-with-map-scope",
+      "description": "Metrics improved and all affected maps pass integration test.",
+      "input": {
+        "atomId": "ATM-CORE-0002",
+        "fromVersion": "1.0.0",
+        "toVersion": "1.1.0",
+        "baselineMetrics": { "errorRate": 0.05, "coverage": 0.80 },
+        "currentMetrics":  { "errorRate": 0.03, "coverage": 0.85 },
+        "mapImpactScope": {
+          "affectedMapIds": ["ATM-MAP-0001"],
+          "propagationStatus": [
+            { "mapId": "ATM-MAP-0001", "integrationTestPassed": true, "message": "All map tests green." }
+          ]
+        }
+      },
+      "expected": { "regressed": false, "passed": true, "regressedMetrics": [] }
+    }
+  ],
+  "negative": [
+    {
+      "name": "v1.1-fail-error-rate",
+      "description": "errorRate increased — regression detected, promote must hard fail.",
+      "input": {
+        "atomId": "ATM-CORE-0001",
+        "fromVersion": "1.0.0",
+        "toVersion": "1.1.0",
+        "baselineMetrics": { "errorRate": 0.05, "coverage": 0.80, "latency": 120, "edgeCaseCount": 5 },
+        "currentMetrics":  { "errorRate": 0.10, "coverage": 0.80, "latency": 120, "edgeCaseCount": 5 }
+      },
+      "expected": { "regressed": true, "passed": false, "regressedMetrics": ["errorRate"] }
+    },
+    {
+      "name": "v1.1-fail-map-integration",
+      "description": "Metrics pass but a map integration test fails — promote must hard fail.",
+      "input": {
+        "atomId": "ATM-CORE-0003",
+        "fromVersion": "1.0.0",
+        "toVersion": "1.1.0",
+        "baselineMetrics": { "errorRate": 0.05, "coverage": 0.80 },
+        "currentMetrics":  { "errorRate": 0.03, "coverage": 0.85 },
+        "mapImpactScope": {
+          "affectedMapIds": ["ATM-MAP-0001", "ATM-MAP-0002"],
+          "propagationStatus": [
+            { "mapId": "ATM-MAP-0001", "integrationTestPassed": true },
+            { "mapId": "ATM-MAP-0002", "integrationTestPassed": false, "message": "Integration test failed: assertion error in edge binding." }
+          ]
+        }
+      },
+      "expected": { "regressed": false, "passed": false, "regressedMetrics": [] }
+    }
+  ]
+}
