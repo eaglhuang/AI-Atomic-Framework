@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/evidence/rollback-proof.schema.json",
+  "title": "ATM Rollback Proof Evidence v0.1",
+  "required": ["schemaId", "specVersion", "migration"],
+  "allOf": [
+    {
+      "$ref": "https://schemas.ai-atomic-framework.dev/governance/evidence.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["details"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.evidence.rollbackProof"
+        },
+        "evidenceType": {
+          "const": "rollback-proof"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["targetLabel", "rollbackCommand", "verificationStatus"],
+          "properties": {
+            "targetLabel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rollbackCommand": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "verificationStatus": {
+              "enum": ["passed", "failed"]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

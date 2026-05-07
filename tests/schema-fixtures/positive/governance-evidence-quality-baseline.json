@@ -1,0 +1,35 @@
+{
+  "schemaId": "atm.evidence.qualityBaseline",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive quality baseline evidence fixture."
+  },
+  "evidenceId": "EV-0002",
+  "workItemId": "ATM-FIXTURE-0102",
+  "evidenceKind": "metric",
+  "evidenceType": "quality-baseline",
+  "summary": "Baseline quality metrics captured.",
+  "artifactPaths": [
+    ".atm/reports/quality-baseline.json"
+  ],
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "reproducibility": {
+    "replayable": true,
+    "replayCommand": [
+      "npm",
+      "test"
+    ],
+    "notes": "Replay re-runs the baseline validation command."
+  },
+  "details": {
+    "baselineLabel": "v1.0.0",
+    "qualityMetrics": {
+      "latency": 34,
+      "errorRate": 0,
+      "coverage": 0.92,
+      "edgeCaseCount": 3
+    }
+  }
+}

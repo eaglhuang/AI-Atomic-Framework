@@ -22,10 +22,13 @@ Alpha0 schemas define contracts only. They do not implement parsing, registry ma
 
 ## Governance Seeds
 
-`schemas/governance/` holds the alpha0 default governance bundle seeds:
+`schemas/governance/` holds the default governance bundle contracts:
 
 - `work-item.schema.json` for the minimal work item record;
 - `scope-lock.schema.json` for the minimal scope lock record;
-- `governance-bundle.schema.json` for the reference `.atm` layout plus a minimal work item, lock, and evidence payload.
+- `artifact.schema.json`, `log.schema.json`, `run-report.schema.json`, and `markdown-json-state.schema.json` for replayable governance store surfaces;
+- `evidence.schema.json` plus `schemas/governance/evidence/*.schema.json` for typed evidence payloads;
+- `context-summary.schema.json` and `adapter-report.schema.json` for handoff and adapter-facing reports;
+- `governance-bundle.schema.json` for the reference `.atm` layout plus an alpha0-minimal bundle and optional store expansion points.
 
-These files are host-neutral seeds. They define the default contract shape before any Jira, GitHub Issues, or filesystem adapter is introduced.
+These files are host-neutral seeds. They define the default contract shape before any Jira, GitHub Issues, filesystem adapter, or downstream repo mapping is introduced.

@@ -1,0 +1,44 @@
+{
+  "schemaId": "atm.evidence.usageFeedback",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive usage feedback evidence fixture."
+  },
+  "evidenceId": "EV-0001",
+  "workItemId": "ATM-FIXTURE-0101",
+  "evidenceKind": "metric",
+  "evidenceType": "usage-feedback",
+  "summary": "A short validation run completed successfully.",
+  "artifactPaths": [
+    ".atm/artifacts/bootstrap/session-summary.md"
+  ],
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "producedBy": "@ai-atomic-framework/adapter-local-git",
+  "reproducibility": {
+    "replayable": true,
+    "replayCommand": [
+      "node",
+      "packages/cli/src/atm.mjs",
+      "replay",
+      "--evidence",
+      ".atm/evidence/EV-0001.json"
+    ],
+    "inputs": [
+      ".atm/evidence/EV-0001.json"
+    ],
+    "expectedArtifacts": [
+      ".atm/artifacts/bootstrap/session-summary.md"
+    ],
+    "notes": "Replay regenerates the same usage summary."
+  },
+  "details": {
+    "feedbackSource": "agent",
+    "usageSignals": {
+      "sessions": 1,
+      "tokens": 1400,
+      "interactions": 3
+    }
+  }
+}

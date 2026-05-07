@@ -20,15 +20,44 @@ export interface ScopeLockRecord {
 }
 
 export interface ArtifactRecord {
+  readonly artifactId?: string;
+  readonly workItemId?: string;
   readonly artifactPath: string;
   readonly artifactKind: 'file' | 'log' | 'report' | 'snapshot';
   readonly producedBy: string;
+  readonly createdAt?: string;
+  readonly contentType?: string;
+  readonly digest?: string;
+  readonly tags?: readonly string[];
 }
 
 export interface EvidenceRecord {
+  readonly evidenceId?: string;
+  readonly workItemId?: string;
   readonly evidenceKind: 'validation' | 'review' | 'metric' | 'handoff';
+  readonly evidenceType?: 'usage-feedback' | 'quality-baseline' | 'quality-comparison' | 'rollback-proof';
   readonly summary: string;
   readonly artifactPaths: readonly string[];
+  readonly createdAt?: string;
+  readonly producedBy?: string;
+  readonly reproducibility?: {
+    readonly replayable: boolean;
+    readonly replayCommand: readonly string[];
+    readonly inputs?: readonly string[];
+    readonly expectedArtifacts?: readonly string[];
+    readonly notes: string;
+  };
+  readonly details?: Readonly<Record<string, unknown>>;
+}
+
+export interface ContextSummaryRecord {
+  readonly summaryId?: string;
+  readonly workItemId: string;
+  readonly summary: string;
+  readonly nextActions: readonly string[];
+  readonly generatedAt?: string;
+  readonly artifactPaths?: readonly string[];
+  readonly authoredBy?: string;
 }
 
 export type ValidationCommandKind = 'test' | 'typecheck' | 'lint' | 'custom';

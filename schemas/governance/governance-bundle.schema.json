@@ -30,6 +30,45 @@
       "items": {
         "$ref": "#/$defs/evidenceRecord"
       }
+    },
+    "artifactStore": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.ai-atomic-framework.dev/governance/artifact.schema.json"
+      }
+    },
+    "logStore": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.ai-atomic-framework.dev/governance/log.schema.json"
+      }
+    },
+    "runReportStore": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.ai-atomic-framework.dev/governance/run-report.schema.json"
+      }
+    },
+    "stateStore": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.ai-atomic-framework.dev/governance/markdown-json-state.schema.json"
+      }
+    },
+    "evidenceStore": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.ai-atomic-framework.dev/governance/evidence.schema.json"
+      }
+    },
+    "contextSummary": {
+      "$ref": "https://schemas.ai-atomic-framework.dev/governance/context-summary.schema.json"
+    },
+    "adapterReports": {
+      "type": "array",
+      "items": {
+        "$ref": "https://schemas.ai-atomic-framework.dev/governance/adapter-report.schema.json"
+      }
     }
   },
   "$defs": {

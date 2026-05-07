@@ -1,0 +1,189 @@
+{
+  "schemaId": "atm.governanceBundle",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "0.1.0",
+    "notes": "Expanded bundle fixture with optional governance store surfaces."
+  },
+  "layout": {
+    "root": ".atm",
+    "taskStorePath": ".atm/tasks",
+    "lockStorePath": ".atm/locks",
+    "documentIndexPath": ".atm/index",
+    "shardStorePath": ".atm/shards",
+    "stateStorePath": ".atm/state",
+    "artifactStorePath": ".atm/artifacts",
+    "logStorePath": ".atm/logs",
+    "runReportStorePath": ".atm/reports",
+    "ruleGuardPath": ".atm/rules",
+    "evidenceStorePath": ".atm/evidence",
+    "registryStorePath": ".atm/registry",
+    "contextSummaryStorePath": ".atm/state/context-summary"
+  },
+  "workItem": {
+    "workItemId": "ATM-FIXTURE-0105",
+    "title": "Full governance bundle",
+    "status": "verified",
+    "owner": "vs-code-gpt-5.4"
+  },
+  "scopeLock": {
+    "workItemId": "ATM-FIXTURE-0105",
+    "lockedBy": "vs-code-gpt-5.4",
+    "lockedAt": "2026-01-01T00:00:00.000Z",
+    "files": [
+      ".atm/tasks/ATM-FIXTURE-0105.json"
+    ]
+  },
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Minimal bundle evidence remains available.",
+      "artifactPaths": [
+        ".atm/reports/full-governance-bundle.json"
+      ]
+    }
+  ],
+  "artifactStore": [
+    {
+      "schemaId": "atm.artifact",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Artifact entry inside the full bundle fixture."
+      },
+      "artifactId": "ART-0105",
+      "workItemId": "ATM-FIXTURE-0105",
+      "artifactPath": ".atm/artifacts/ATM-FIXTURE-0105/report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/cli:validate",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "logStore": [
+    {
+      "schemaId": "atm.logRecord",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Log entry inside the full bundle fixture."
+      },
+      "logId": "LOG-0105",
+      "workItemId": "ATM-FIXTURE-0105",
+      "generatedAt": "2026-01-01T00:00:00.000Z",
+      "messages": [
+        {
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "level": "info",
+          "message": "Validation completed.",
+          "actor": "validate"
+        }
+      ]
+    }
+  ],
+  "runReportStore": [
+    {
+      "schemaId": "atm.runReport",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Run report entry inside the full bundle fixture."
+      },
+      "reportId": "RUN-0105",
+      "workItemId": "ATM-FIXTURE-0105",
+      "reportType": "self-host-alpha",
+      "status": "success",
+      "generatedAt": "2026-01-01T00:00:00.000Z",
+      "summary": "Self-host validation passed."
+    }
+  ],
+  "stateStore": [
+    {
+      "schemaId": "atm.markdownJsonState",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "State entry inside the full bundle fixture."
+      },
+      "stateId": "STATE-0105",
+      "workItemId": "ATM-FIXTURE-0105",
+      "statePath": ".atm/state/context-summary/ATM-FIXTURE-0105.md",
+      "stateType": "markdown",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "markdownContent": "# Full bundle\n\n- validation passed"
+    }
+  ],
+  "evidenceStore": [
+    {
+      "schemaId": "atm.evidence.usageFeedback",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Evidence entry inside the full bundle fixture."
+      },
+      "evidenceId": "EV-0105",
+      "workItemId": "ATM-FIXTURE-0105",
+      "evidenceKind": "metric",
+      "evidenceType": "usage-feedback",
+      "summary": "A short validation run generated one evidence record.",
+      "artifactPaths": [
+        ".atm/artifacts/ATM-FIXTURE-0105/report.json"
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "reproducibility": {
+        "replayable": true,
+        "replayCommand": [
+          "npm",
+          "test"
+        ],
+        "notes": "Replay regenerates the same evidence for the same atom."
+      },
+      "details": {
+        "feedbackSource": "agent",
+        "usageSignals": {
+          "sessions": 1,
+          "tokens": 900,
+          "interactions": 2
+        }
+      }
+    }
+  ],
+  "contextSummary": {
+    "schemaId": "atm.contextSummary",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Context summary inside the full bundle fixture."
+    },
+    "workItemId": "ATM-FIXTURE-0105",
+    "summary": "The full governance bundle fixture captures every optional store surface.",
+    "nextActions": [
+      "Replay the stored evidence.",
+      "Inspect the adapter report."
+    ],
+    "generatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  "adapterReports": [
+    {
+      "schemaId": "atm.adapterReport",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Adapter report inside the full bundle fixture."
+      },
+      "reportId": "ADP-0105",
+      "adapterName": "adapter-local-git",
+      "workItemId": "ATM-FIXTURE-0105",
+      "generatedAt": "2026-01-01T00:00:00.000Z",
+      "status": "success",
+      "summary": "Adapter parity checks passed."
+    }
+  ]
+}

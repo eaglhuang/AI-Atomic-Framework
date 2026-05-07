@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/run-report.schema.json",
+  "title": "ATM Governance Run Report v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "reportId",
+    "reportType",
+    "status",
+    "generatedAt",
+    "summary"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.runReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "reportId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workItemId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "reportType": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": ["success", "warning", "failure", "pending"]
+    },
+    "lifecycleMode": {
+      "enum": ["birth", "evolution"]
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifactPaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

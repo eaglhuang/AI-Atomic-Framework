@@ -16,9 +16,74 @@
       "path": "positive/governance-scope-lock.json"
     },
     {
+      "name": "governance artifact",
+      "schema": "governance-artifact",
+      "path": "positive/governance-artifact.json"
+    },
+    {
+      "name": "governance log",
+      "schema": "governance-log",
+      "path": "positive/governance-log.json"
+    },
+    {
+      "name": "governance run report",
+      "schema": "governance-run-report",
+      "path": "positive/governance-run-report.json"
+    },
+    {
+      "name": "governance markdown state",
+      "schema": "governance-state",
+      "path": "positive/governance-state-markdown.json"
+    },
+    {
+      "name": "governance json state",
+      "schema": "governance-state",
+      "path": "positive/governance-state-json.json"
+    },
+    {
+      "name": "governance context summary",
+      "schema": "governance-context-summary",
+      "path": "positive/governance-context-summary.json"
+    },
+    {
+      "name": "governance adapter report",
+      "schema": "governance-adapter-report",
+      "path": "positive/governance-adapter-report.json"
+    },
+    {
+      "name": "base governance evidence",
+      "schema": "governance-evidence",
+      "path": "positive/governance-evidence-usage-feedback.json"
+    },
+    {
+      "name": "usage feedback evidence",
+      "schema": "evidence-usage-feedback",
+      "path": "positive/governance-evidence-usage-feedback.json"
+    },
+    {
+      "name": "quality baseline evidence",
+      "schema": "evidence-quality-baseline",
+      "path": "positive/governance-evidence-quality-baseline.json"
+    },
+    {
+      "name": "quality comparison evidence",
+      "schema": "evidence-quality-comparison",
+      "path": "positive/governance-evidence-quality-comparison.json"
+    },
+    {
+      "name": "rollback proof evidence",
+      "schema": "evidence-rollback-proof",
+      "path": "positive/governance-evidence-rollback-proof.json"
+    },
+    {
       "name": "minimal governance bundle",
       "schema": "governance-bundle",
       "path": "positive/governance-bundle.json"
+    },
+    {
+      "name": "expanded governance bundle",
+      "schema": "governance-bundle",
+      "path": "positive/governance-bundle-full.json"
     },
     {
       "name": "minimal registry",
@@ -106,6 +171,13 @@
       "path": "negative/governance-scope-lock-missing-files.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "files"
+    },
+    {
+      "name": "missing governance evidence reproducibility",
+      "schema": "governance-evidence",
+      "path": "negative/governance-evidence-missing-reproducibility.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "reproducibility"
     },
     {
       "name": "invalid governance bundle layout",

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/evidence/quality-comparison.schema.json",
+  "title": "ATM Quality Comparison Evidence v0.1",
+  "required": ["schemaId", "specVersion", "migration"],
+  "allOf": [
+    {
+      "$ref": "https://schemas.ai-atomic-framework.dev/governance/evidence.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["details"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.evidence.qualityComparison"
+        },
+        "evidenceType": {
+          "const": "quality-comparison"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["baselineLabel", "candidateLabel", "baselineMetrics", "candidateMetrics", "comparisonSummary"],
+          "properties": {
+            "baselineLabel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "candidateLabel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "baselineMetrics": {
+              "$ref": "https://schemas.ai-atomic-framework.dev/test-report/metrics.schema.json"
+            },
+            "candidateMetrics": {
+              "$ref": "https://schemas.ai-atomic-framework.dev/test-report/metrics.schema.json"
+            },
+            "comparisonSummary": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/log.schema.json",
+  "title": "ATM Governance Log Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "logId",
+    "workItemId",
+    "generatedAt",
+    "messages"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.logRecord"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "logId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workItemId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "messages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/logMessage"
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "logMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestamp", "level", "message"],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "level": {
+          "enum": ["debug", "info", "warn", "error"]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

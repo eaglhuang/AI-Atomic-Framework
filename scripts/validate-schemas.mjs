@@ -13,6 +13,17 @@ const schemaEntries = {
   'atomic-spec': 'schemas/atomic-spec.schema.json',
   'atomic-map': 'schemas/registry/atomic-map.schema.json',
   'agent-prompt': 'schemas/agent-prompt.schema.json',
+  'governance-artifact': 'schemas/governance/artifact.schema.json',
+  'governance-log': 'schemas/governance/log.schema.json',
+  'governance-run-report': 'schemas/governance/run-report.schema.json',
+  'governance-state': 'schemas/governance/markdown-json-state.schema.json',
+  'governance-evidence': 'schemas/governance/evidence.schema.json',
+  'governance-context-summary': 'schemas/governance/context-summary.schema.json',
+  'governance-adapter-report': 'schemas/governance/adapter-report.schema.json',
+  'evidence-usage-feedback': 'schemas/governance/evidence/usage-feedback.schema.json',
+  'evidence-quality-baseline': 'schemas/governance/evidence/quality-baseline.schema.json',
+  'evidence-quality-comparison': 'schemas/governance/evidence/quality-comparison.schema.json',
+  'evidence-rollback-proof': 'schemas/governance/evidence/rollback-proof.schema.json',
   'governance-work-item': 'schemas/governance/work-item.schema.json',
   'governance-scope-lock': 'schemas/governance/scope-lock.schema.json',
   'governance-bundle': 'schemas/governance/governance-bundle.schema.json',
@@ -63,43 +74,27 @@ function formatErrors(errors) {
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 
-for (const relativePath of Object.values(supportSchemaEntries)) {
-  if (!existsSync(path.join(root, relativePath))) {
-    fail(`missing support schema file: ${relativePath}`);
-    continue;
-  }
-  const schema = readJson(relativePath);
-  if (!ajv.validateSchema(schema)) {
-    fail(`${relativePath} is not a valid JSON Schema: ${formatErrors(ajv.errors)}`);
-    continue;
-  }
-  if (!schema.$id || !schema.$schema) {
-    fail(`${relativePath} must define $id and $schema`);
-  }
-  ajv.addSchema(schema);
+const supportSchemas = loadSchemas(supportSchemaEntries, { enforceMetadata: false });
+const schemas = loadSchemas(schemaEntries, { enforceMetadata: true });
+
+for (const [schemaName, schema] of supportSchemas.entries()) {
+  ajv.addSchema(schema, schemaName);
 }
 
-const schemas = new Map();
-for (const [schemaName, relativePath] of Object.entries(schemaEntries)) {
-  if (!existsSync(path.join(root, relativePath))) {
-    fail(`missing schema file: ${relativePath}`);
-    continue;
-  }
-  const schema = readJson(relativePath);
-  if (!ajv.validateSchema(schema)) {
-    fail(`${relativePath} is not a valid JSON Schema: ${formatErrors(ajv.errors)}`);
-    continue;
-  }
-  for (const requiredMetadata of ['schemaId', 'specVersion', 'migration']) {
-    if (!schema.required?.includes(requiredMetadata)) {
-      fail(`${relativePath} must require ${requiredMetadata}`);
-    }
-  }
-  if (!schema.$id || !schema.$schema) {
-    fail(`${relativePath} must define $id and $schema`);
-  }
-  schemas.set(schemaName, schema);
+for (const [schemaName, schema] of schemas.entries()) {
   ajv.addSchema(schema, schemaName);
+}
+
+for (const [schemaName, schema] of supportSchemas.entries()) {
+  if (!ajv.validateSchema(schema)) {
+    fail(`${supportSchemaEntries[schemaName]} is not a valid JSON Schema: ${formatErrors(ajv.errors)}`);
+  }
+}
+
+for (const [schemaName, schema] of schemas.entries()) {
+  if (!ajv.validateSchema(schema)) {
+    fail(`${schemaEntries[schemaName]} is not a valid JSON Schema: ${formatErrors(ajv.errors)}`);
+  }
 }
 
 const atomicSchema = schemas.get('atomic-spec');
@@ -186,4 +181,27 @@ for (const relativePath of protectedFiles) {
 
 if (!process.exitCode) {
   console.log(`[schema:${mode}] ok (${Object.keys(schemaEntries).length} schemas, ${manifest.positive.length} positive fixtures, ${manifest.negative.length} negative fixtures)`);
+}
+
+function loadSchemas(entries, options = {}) {
+  const loadedSchemas = new Map();
+  for (const [schemaName, relativePath] of Object.entries(entries)) {
+    if (!existsSync(path.join(root, relativePath))) {
+      fail(`missing schema file: ${relativePath}`);
+      continue;
+    }
+    const schema = readJson(relativePath);
+    if (!schema.$id || !schema.$schema) {
+      fail(`${relativePath} must define $id and $schema`);
+    }
+    if (options.enforceMetadata) {
+      for (const requiredMetadata of ['schemaId', 'specVersion', 'migration']) {
+        if (!schema.required?.includes(requiredMetadata)) {
+          fail(`${relativePath} must require ${requiredMetadata}`);
+        }
+      }
+    }
+    loadedSchemas.set(schemaName, schema);
+  }
+  return loadedSchemas;
 }

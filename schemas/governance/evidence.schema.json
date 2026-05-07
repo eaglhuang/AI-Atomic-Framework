@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/evidence.schema.json",
+  "title": "ATM Governance Evidence Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "evidenceId",
+    "workItemId",
+    "evidenceKind",
+    "evidenceType",
+    "summary",
+    "artifactPaths",
+    "createdAt",
+    "reproducibility"
+  ],
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "pattern": "^atm\\.evidence(?:\\.[A-Za-z][A-Za-z0-9]*)?$"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "evidenceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workItemId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "evidenceKind": {
+      "enum": ["validation", "review", "metric", "handoff"]
+    },
+    "evidenceType": {
+      "enum": ["usage-feedback", "quality-baseline", "quality-comparison", "rollback-proof"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifactPaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reproducibility": {
+      "$ref": "#/$defs/reproducibility"
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["replayable", "replayCommand", "notes"],
+      "properties": {
+        "replayable": {
+          "const": true
+        },
+        "replayCommand": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "expectedArtifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": []
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

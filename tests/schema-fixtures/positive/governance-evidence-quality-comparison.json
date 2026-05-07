@@ -1,0 +1,45 @@
+{
+  "schemaId": "atm.evidence.qualityComparison",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive quality comparison evidence fixture."
+  },
+  "evidenceId": "EV-0003",
+  "workItemId": "ATM-FIXTURE-0103",
+  "evidenceKind": "metric",
+  "evidenceType": "quality-comparison",
+  "summary": "Candidate quality improved over the baseline.",
+  "artifactPaths": [
+    ".atm/reports/quality-comparison.json"
+  ],
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "reproducibility": {
+    "replayable": true,
+    "replayCommand": [
+      "node",
+      "packages/cli/src/atm.mjs",
+      "validate",
+      "--compare"
+    ],
+    "notes": "Replay recomputes the baseline/candidate comparison."
+  },
+  "details": {
+    "baselineLabel": "v1.0.0",
+    "candidateLabel": "v1.1.0",
+    "baselineMetrics": {
+      "latency": 34,
+      "errorRate": 0.04,
+      "coverage": 0.78,
+      "edgeCaseCount": 2
+    },
+    "candidateMetrics": {
+      "latency": 26,
+      "errorRate": 0.02,
+      "coverage": 0.82,
+      "edgeCaseCount": 3
+    },
+    "comparisonSummary": "Latency and coverage improved while keeping error rate lower."
+  }
+}

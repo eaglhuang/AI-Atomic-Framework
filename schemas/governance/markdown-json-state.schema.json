@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/markdown-json-state.schema.json",
+  "title": "ATM Markdown/JSON State Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "stateId",
+    "statePath",
+    "stateType",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.markdownJsonState"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "stateId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workItemId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "statePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stateType": {
+      "enum": ["markdown", "json"]
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "markdownContent": {
+      "type": "string"
+    },
+    "jsonValue": {
+      "type": ["object", "array", "string", "number", "boolean", "null"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "stateType": {
+            "const": "markdown"
+          }
+        }
+      },
+      "then": {
+        "required": ["markdownContent"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stateType": {
+            "const": "json"
+          }
+        }
+      },
+      "then": {
+        "required": ["jsonValue"]
+      }
+    }
+  ],
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

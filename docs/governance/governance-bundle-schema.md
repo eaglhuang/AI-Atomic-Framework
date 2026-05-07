@@ -1,8 +1,8 @@
 # Default Governance Bundle Schema
 
-> Status: alpha0 planning note  
+> Status: alpha0 contract with optional store expansion points  
 > Related schema: `schemas/governance/governance-bundle.schema.json`  
-> Related fixture: `tests/schema-fixtures/positive/governance-bundle.json`
+> Related fixtures: `tests/schema-fixtures/positive/governance-bundle.json`, `tests/schema-fixtures/positive/governance-bundle-full.json`
 
 ## Purpose
 
@@ -15,7 +15,7 @@ Core contracts must remain host-neutral and must not import default plugin imple
 
 ## Alpha0 Boundary
 
-Alpha0 keeps the bundle intentionally small.
+Alpha0 keeps the required bundle intentionally small, but ATM-2-0009 adds optional reusable store contracts so downstream adapters can serialize a fuller governance surface without inventing their own schema family.
 
 Required in v0.1.0:
 
@@ -24,17 +24,17 @@ Required in v0.1.0:
 - `evidence`
 - a canonical `.atm` layout declaration
 
-Planned for later expansion:
+Optional expansion points now available in the same bundle version:
 
-- document index store
-- shard store
-- artifact store
-- log store
-- run report store
-- rule guard outputs
-- context summary state
+- `artifactStore`
+- `logStore`
+- `runReportStore`
+- `stateStore`
+- `evidenceStore`
+- `contextSummary`
+- `adapterReports`
 
-The alpha0 fixture should prove that a repository can record a work item, lock scope, and preserve at least one validation evidence record without relying on any adopter-specific tooling.
+The alpha0 fixture proves the minimum viable contract. The expanded fixture proves the same bundle version can also carry replayable artifact, log, report, state, evidence, handoff, and adapter surfaces when a host needs them.
 
 ## Bundle Shape
 
@@ -54,6 +54,13 @@ Top-level properties:
 | `workItem` | yes | Stores the upstream work item metadata. |
 | `scopeLock` | yes | Stores the active scope lock for the work item. |
 | `evidence` | yes | Stores at least one evidence record. |
+| `artifactStore` | no | Stores replayable artifact records. |
+| `logStore` | no | Stores structured log batches. |
+| `runReportStore` | no | Stores validation or orchestration reports. |
+| `stateStore` | no | Stores markdown/json state snapshots. |
+| `evidenceStore` | no | Stores typed evidence records with reproducibility metadata. |
+| `contextSummary` | no | Stores a handoff-ready summary for the work item. |
+| `adapterReports` | no | Stores adapter-specific execution or parity reports. |
 
 ## Migration
 
@@ -123,7 +130,7 @@ The lock record is intentionally minimal. It should answer only one question: wh
 
 ## Evidence Contract
 
-`evidence` is an array of evidence records. Alpha0 only needs one record to prove the bundle can be validated and replayed.
+`evidence` is an array of lightweight evidence records. Alpha0 only needs one record to prove the bundle can be validated and replayed.
 
 | Field | Required | Notes |
 | --- | --- | --- |
@@ -137,9 +144,18 @@ Alpha0 guidance:
 - keep artifact paths relative to the repo
 - do not require a full evidence database before the bundle exists
 
+When a host needs stronger replay or comparison semantics, use the optional `evidenceStore` with the standalone contracts in `schemas/governance/evidence.schema.json` and `schemas/governance/evidence/*.schema.json`.
+
+Available typed evidence payloads:
+
+- `usage-feedback`
+- `quality-baseline`
+- `quality-comparison`
+- `rollback-proof`
+
 ## Reference Fixture
 
-The positive fixture in `tests/schema-fixtures/positive/governance-bundle.json` is the current alpha0 shape.
+The positive fixture in `tests/schema-fixtures/positive/governance-bundle.json` is the current alpha0-minimal shape.
 It demonstrates:
 
 - a fresh bundle with no previous version
@@ -148,6 +164,16 @@ It demonstrates:
 - a lock file pointing at the matching work item
 - one validation evidence record
 
+The expanded fixture in `tests/schema-fixtures/positive/governance-bundle-full.json` demonstrates the optional store contracts on top of the same bundle version:
+
+- replayable artifact entries
+- structured logs
+- run reports
+- markdown/json state snapshots
+- typed evidence with reproducibility metadata
+- a context summary handoff node
+- adapter-specific reports
+
 ## Design Constraints
 
 - `packages/core` depends on contracts, not default implementations.
@@ -155,17 +181,16 @@ It demonstrates:
 - The bundle must stay host-neutral.
 - Adopter-specific tools, private paths, and repo-specific assumptions do not belong in this schema.
 
+## Downstream Mapping
+
+The bundle schema stays host-neutral, but downstream repositories do not need to mirror `.atm/*` literally.
+See `docs/governance/3klife-governance-mapping.md` for one example of how an adopter can map these store contracts onto an existing docs-first workflow without changing the upstream schema.
+
 ## What Comes Next
 
-The next expansion step is to split the bundle into reusable governance surfaces:
+The next step is no longer schema invention. It is implementation parity:
 
-1. task card storage
-2. document index storage
-3. shard storage
-4. artifact store
-5. log store
-6. run report store
-7. rule guard outputs
-8. context summary state
-
-Those surfaces can then be implemented by default plugins while remaining fully replaceable by a host adapter.
+1. serialize these reusable governance surfaces from default plugins
+2. let host adapters decide which optional stores they persist
+3. keep replay and evidence generation consistent across adapters
+4. preserve the same contracts even when the physical storage paths differ downstream
