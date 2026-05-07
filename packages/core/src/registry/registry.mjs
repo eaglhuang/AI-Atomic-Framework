@@ -1,9 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { createSourceHashSnapshot, normalizeSourcePathList } from '../hash-lock/hash-lock.mjs';
 import { resolveAtomWorkbenchPath } from '../manager/atom-space.mjs';
+import { writeRegistryCatalogFile } from './registry-catalog.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
@@ -69,6 +70,31 @@ export function createRegistryDocument(entries, options = {}) {
   }
 
   return document;
+}
+
+export function writeRegistryArtifacts(registryDocument, options = {}) {
+  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
+  const registryPath = resolveProjectPath(repositoryRoot, options.registryPath ?? 'atomic-registry.json');
+  mkdirSync(path.dirname(registryPath), { recursive: true });
+  writeFileSync(registryPath, `${JSON.stringify(registryDocument, null, 2)}\n`, 'utf8');
+
+  const result = {
+    registryPath: toProjectPath(repositoryRoot, registryPath),
+    catalogPath: null
+  };
+
+  if (options.writeCatalog !== false) {
+    const catalogResult = writeRegistryCatalogFile(registryDocument, {
+      repositoryRoot,
+      specRepositoryRoot: options.specRepositoryRoot ?? repositoryRoot,
+      catalogPath: options.catalogPath,
+      title: options.catalogTitle,
+      sourceOfTruthLabel: options.sourceOfTruthLabel
+    });
+    result.catalogPath = catalogResult.catalogPath;
+  }
+
+  return result;
 }
 
 export function validateRegistryDocument(registryDocument, options = {}) {

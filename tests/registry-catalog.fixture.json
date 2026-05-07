@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "expectedRegistryId": "registry.atm-2-0004",
+  "expectedAtomVersion": "0.0.1",
+  "expectedStatus": "active",
+  "expectedCatalogPath": "atomic_workbench/registry-catalog.md",
+  "provingCatalogPath": "atomic_workbench/原子庫列表.md",
+  "snapshotPath": "tests/registry-catalog.snapshot.md",
+  "owner": {
+    "name": "ATM maintainers",
+    "contact": "maintainers@example.invalid"
+  },
+  "specPath": "tests/registry-fixtures/registry.atom.json",
+  "codePath": "tests/registry-fixtures/compute-atom.js",
+  "testPath": "tests/registry-fixtures/registry-test.mjs",
+  "acceptance": [
+    "rendered registry catalog snapshot stays deterministic for the fixture atom",
+    "catalog markdown lists atomId, function, derived category, status, and specPath",
+    "registry artifacts writer supports a UTF-8 proving path without adding a BOM",
+    "writing the same catalog twice is idempotent",
+    "the committed framework registry catalog stays in sync with atomic-registry.json"
+  ]
+}
