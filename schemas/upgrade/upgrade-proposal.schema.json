@@ -251,6 +251,9 @@
         "registryCandidate": {
           "$ref": "#/$defs/gateResult"
         },
+        "contextBudget": {
+          "$ref": "#/$defs/gateResult"
+        },
         "allPassed": {
           "type": "boolean"
         },
@@ -258,7 +261,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget"]
           }
         }
       }

@@ -65,6 +65,12 @@ export function runInit(argv) {
       projectProbePath: bootstrap.projectProbePath,
       defaultGuardsPath: bootstrap.defaultGuardsPath,
       evidencePath: bootstrap.evidencePath,
+      contextBudgetPolicyPath: bootstrap.contextBudgetPolicyPath,
+      contextBudgetReportPath: bootstrap.contextBudgetReportPath,
+      contextBudgetSummaryPath: bootstrap.contextBudgetSummaryPath,
+      contextSummaryPath: bootstrap.contextSummaryPath,
+      contextSummaryMarkdownPath: bootstrap.contextSummaryMarkdownPath,
+      continuationReportPath: bootstrap.continuationReportPath,
       recommendedPrompt: bootstrap.recommendedPrompt,
       adoptedAt: bootstrap.adoptedProfile ? new Date().toISOString() : null
     }
@@ -85,6 +91,12 @@ function createDryRunResult(options) {
       adapterMode: 'standalone',
       adapterImplemented: false,
       adoptedProfile: options.adopt === 'default' ? 'default' : null,
+      contextBudgetPolicyPath: options.adopt === 'default' ? '.atm/state/context-budget/default-policy.json' : null,
+      contextBudgetReportPath: options.adopt === 'default' ? '.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json' : null,
+      contextBudgetSummaryPath: null,
+      contextSummaryPath: options.adopt === 'default' ? '.atm/state/context-summary/BOOTSTRAP-0001.json' : null,
+      contextSummaryMarkdownPath: options.adopt === 'default' ? '.atm/state/context-summary/BOOTSTRAP-0001.md' : null,
+      continuationReportPath: options.adopt === 'default' ? '.atm/reports/continuation/BOOTSTRAP-0001.json' : null,
       adoptedAt: options.adopt === 'default' ? new Date().toISOString() : null,
       dryRun: true
     }
@@ -110,7 +122,9 @@ function createDefaultConfig(options) {
       artifacts: '.atm/artifacts',
       logs: '.atm/logs',
       evidence: '.atm/evidence',
-      context: '.atm/context'
+      context: '.atm/context',
+      contextBudget: '.atm/state/context-budget',
+      contextSummary: '.atm/state/context-summary'
     },
     validation: {
       command: 'atm validate',

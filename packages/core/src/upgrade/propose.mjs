@@ -79,6 +79,7 @@ export function proposeAtomicUpgrade(request) {
   const nonRegressionGate = buildGateResult('nonRegression', nonRegressionInput.document, nonRegressionInput.path, 'baseline fixtures passed');
   const qualityComparisonGate = buildQualityComparisonGate(qualityComparisonInput.document, qualityComparisonInput.path);
   const registryCandidateGate = buildRegistryCandidateGate(registryCandidateInput.document, registryCandidateInput.path);
+  const contextBudgetGate = normalizedRequest.contextBudgetGate;
 
   const blockedGateNames = [];
   if (!nonRegressionGate.passed) {
@@ -89,6 +90,9 @@ export function proposeAtomicUpgrade(request) {
   }
   if (!registryCandidateGate.passed) {
     blockedGateNames.push('registryCandidate');
+  }
+  if (contextBudgetGate && !contextBudgetGate.passed) {
+    blockedGateNames.push('contextBudget');
   }
 
   const allPassed = blockedGateNames.length === 0;
@@ -119,6 +123,7 @@ export function proposeAtomicUpgrade(request) {
       nonRegression: nonRegressionGate,
       qualityComparison: qualityComparisonGate,
       registryCandidate: registryCandidateGate,
+      ...(contextBudgetGate ? { contextBudget: contextBudgetGate } : {}),
       allPassed,
       blockedGateNames
     },
@@ -161,6 +166,7 @@ function normalizeRequest(request = {}) {
     proposedAt: request.proposedAt ?? new Date().toISOString(),
     proposalId: request.proposalId ?? null,
     migration: request.migration ?? null,
+    contextBudgetGate: normalizeGateResult(request.contextBudgetGate ?? null, 'contextBudget'),
     inputs: request.inputs.map(normalizeInputDocument)
   };
 }
@@ -272,6 +278,30 @@ function buildRegistryCandidateGate(report, reportPath) {
     reportId: report?.reportId ?? 'registry-candidate.missing',
     reportPath,
     summary: passed ? 'pass (candidate can promote)' : 'blocked (candidate cannot promote)'
+  };
+}
+
+function normalizeGateResult(gate, gateName) {
+  if (gate == null) {
+    return null;
+  }
+  if (!gate || typeof gate !== 'object') {
+    throw new Error(`Upgrade proposal ${gateName} gate must be an object.`);
+  }
+  if (typeof gate.passed !== 'boolean') {
+    throw new Error(`Upgrade proposal ${gateName} gate requires a boolean passed field.`);
+  }
+  if (typeof gate.reportPath !== 'string' || gate.reportPath.length === 0) {
+    throw new Error(`Upgrade proposal ${gateName} gate requires a reportPath.`);
+  }
+  if (typeof gate.summary !== 'string' || gate.summary.length === 0) {
+    throw new Error(`Upgrade proposal ${gateName} gate requires a summary.`);
+  }
+  return {
+    passed: gate.passed,
+    reportId: typeof gate.reportId === 'string' && gate.reportId.length > 0 ? gate.reportId : `${gateName}.provided`,
+    reportPath: gate.reportPath,
+    summary: gate.summary
   };
 }
 

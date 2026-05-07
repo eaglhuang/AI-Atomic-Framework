@@ -1,6 +1,12 @@
 import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import {
+  createContinuationRunReport,
+  createContinuationSummaryRecord,
+  createLocalGovernanceAdapter,
+  estimateContextBudgetTokens
+} from '../../../plugin-governance-local/src/index.ts';
 import { runBootstrap } from './bootstrap-entry.mjs';
 import { createAgentConfidenceEvidence, resolveAgentProfile, verifyAgentsMarkdown } from './agent-confidence.mjs';
 import { runInit } from './init.mjs';
@@ -57,6 +63,7 @@ export async function runSelfHostAlphaAsync(argv) {
 
     const criteria = { criteria1, criteria2, criteria3, criteria4 };
     const ok = Object.values(criteria).every((value) => value === true);
+    const selfHostingArtifacts = materializeSelfHostingArtifacts(sandbox, bootstrapEvidence, helloWorld, neutrality, criteria, ok);
     const readinessWarnings = [
       'version-history readiness is advisory for alpha0',
       'rollback readiness is advisory for alpha0',
@@ -96,6 +103,7 @@ export async function runSelfHostAlphaAsync(argv) {
             total: helloWorld.total,
             checks: helloWorld.checks
           },
+          selfHostingArtifacts,
           neutrality: {
             exitCode: neutrality.ok ? 0 : 1,
             violationCount: (neutrality.evidence?.termViolations ?? 0) + (neutrality.evidence?.pathViolations ?? 0)
@@ -128,11 +136,19 @@ function evaluateBootstrapEvidence(cwd) {
   const lockPath = path.join(cwd, '.atm', 'locks', `${bootstrapTaskId}.lock.json`);
   const artifactDir = path.join(cwd, '.atm', 'artifacts');
   const evidencePath = path.join(cwd, '.atm', 'evidence', `${bootstrapTaskId}.json`);
+  const contextBudgetReportPath = path.join(cwd, '.atm', 'reports', 'context-budget', `bootstrap-${bootstrapTaskId}.json`);
+  const continuationReportPath = path.join(cwd, '.atm', 'reports', 'continuation', `${bootstrapTaskId}.json`);
+  const contextSummaryPath = path.join(cwd, '.atm', 'state', 'context-summary', `${bootstrapTaskId}.json`);
+  const contextSummaryMarkdownPath = path.join(cwd, '.atm', 'state', 'context-summary', `${bootstrapTaskId}.md`);
   const checks = [
     { name: 'task-created', passed: existsSync(taskPath), path: relativePathFrom(cwd, taskPath) },
     { name: 'lock-created', passed: existsSync(lockPath), path: relativePathFrom(cwd, lockPath) },
     { name: 'artifact-directory-created', passed: existsSync(artifactDir), path: relativePathFrom(cwd, artifactDir) },
-    { name: 'evidence-created', passed: existsSync(evidencePath), path: relativePathFrom(cwd, evidencePath) }
+    { name: 'evidence-created', passed: existsSync(evidencePath), path: relativePathFrom(cwd, evidencePath) },
+    { name: 'context-budget-report-created', passed: existsSync(contextBudgetReportPath), path: relativePathFrom(cwd, contextBudgetReportPath) },
+    { name: 'continuation-report-created', passed: existsSync(continuationReportPath), path: relativePathFrom(cwd, continuationReportPath) },
+    { name: 'context-summary-created', passed: existsSync(contextSummaryPath), path: relativePathFrom(cwd, contextSummaryPath) },
+    { name: 'context-summary-markdown-created', passed: existsSync(contextSummaryMarkdownPath), path: relativePathFrom(cwd, contextSummaryMarkdownPath) }
   ];
   return {
     ok: checks.every((check) => check.passed),
@@ -140,6 +156,131 @@ function evaluateBootstrapEvidence(cwd) {
     taskPath: relativePathFrom(cwd, taskPath),
     lockPath: relativePathFrom(cwd, lockPath),
     artifactDir: relativePathFrom(cwd, artifactDir),
-    evidencePath: relativePathFrom(cwd, evidencePath)
+    evidencePath: relativePathFrom(cwd, evidencePath),
+    contextBudgetReportPath: relativePathFrom(cwd, contextBudgetReportPath),
+    continuationReportPath: relativePathFrom(cwd, continuationReportPath),
+    contextSummaryPath: relativePathFrom(cwd, contextSummaryPath),
+    contextSummaryMarkdownPath: relativePathFrom(cwd, contextSummaryMarkdownPath)
+  };
+}
+
+function materializeSelfHostingArtifacts(cwd, bootstrapEvidence, helloWorld, neutrality, criteria, ok) {
+  const adapter = createLocalGovernanceAdapter({ repositoryRoot: cwd });
+  const now = new Date().toISOString();
+  const artifactPath = `.atm/artifacts/${bootstrapTaskId}/hello-world-smoke.json`;
+  const logPath = `.atm/logs/${bootstrapTaskId}.log`;
+  const phaseBReportId = `self-host-alpha/${bootstrapTaskId}`;
+  const phaseBReportPath = `.atm/reports/self-host-alpha/${bootstrapTaskId}.json`;
+  const evidencePath = `.atm/evidence/${bootstrapTaskId}.json`;
+  const estimatedTokens = estimateContextBudgetTokens(bootstrapEvidence, helloWorld, criteria, neutrality?.evidence ?? null);
+  const budgetEvaluation = adapter.stores.contextBudgetGuard.evaluateBudget({
+    budgetId: `self-host-alpha/${bootstrapTaskId}`,
+    workItemId: bootstrapTaskId,
+    estimatedTokens,
+    inlineArtifacts: 2,
+    requestedSummary: 'Review the stored self-host-alpha summary and reports instead of replaying the full proof inline.'
+  });
+
+  adapter.stores.artifactStore.writeArtifact({
+    workItemId: bootstrapTaskId,
+    artifactPath,
+    artifactKind: 'report',
+    producedBy: '@ai-atomic-framework/cli:self-host-alpha',
+    createdAt: now,
+    contentType: 'application/json'
+  }, `${JSON.stringify({
+    generatedAt: now,
+    helloWorld,
+    criteria,
+    bootstrap: bootstrapEvidence
+  }, null, 2)}\n`);
+
+  adapter.stores.logStore.appendLog(
+    bootstrapTaskId,
+    `${now} self-host-alpha smoke ${helloWorld.ok ? 'passed' : 'failed'} (${helloWorld.passCount}/${helloWorld.total})`
+  );
+
+  adapter.stores.runReportStore.writeRunReport(phaseBReportId, {
+    schemaVersion: 'atm.phaseBExitGate.v0.1',
+    gate: 'phase-b-exit',
+    generatedAt: now,
+    passed: ok,
+    criteria,
+    bootstrap: bootstrapEvidence,
+    helloWorld: {
+      passCount: helloWorld.passCount,
+      total: helloWorld.total,
+      checks: helloWorld.checks,
+      specPath: helloWorld.specPath,
+      sourcePath: helloWorld.sourcePath
+    },
+    neutrality: {
+      ok: neutrality.ok,
+      evidence: neutrality.evidence ?? {}
+    },
+    contextBudget: {
+      decision: budgetEvaluation.decision,
+      reportPath: budgetEvaluation.reportPath,
+      summaryPath: budgetEvaluation.summaryPath ?? null
+    }
+  });
+
+  adapter.stores.evidenceStore.writeEvidence(bootstrapTaskId, {
+    workItemId: bootstrapTaskId,
+    evidenceKind: 'validation',
+    summary: ok
+      ? 'Self-hosting alpha proof generated replayable smoke evidence.'
+      : 'Self-hosting alpha proof captured a failing deterministic check.',
+    artifactPaths: [artifactPath, phaseBReportPath, budgetEvaluation.reportPath],
+    createdAt: now,
+    producedBy: '@ai-atomic-framework/cli:self-host-alpha',
+    reproducibility: {
+      replayable: true,
+      replayCommand: ['node', 'packages/cli/src/atm.mjs', 'self-host-alpha', '--verify', '--json'],
+      inputs: ['examples/hello-world/atoms/hello-world.atom.json'],
+      expectedArtifacts: [artifactPath, phaseBReportPath, budgetEvaluation.reportPath],
+      notes: 'Replay the deterministic self-host-alpha proof inside a fresh sandbox.'
+    },
+    details: {
+      criteria,
+      budgetDecision: budgetEvaluation.decision,
+      bootstrapContinuationReportPath: bootstrapEvidence.continuationReportPath,
+      bootstrapContextSummaryPath: bootstrapEvidence.contextSummaryPath
+    }
+  });
+
+  const summary = adapter.stores.contextSummaryStore.writeSummary(createContinuationSummaryRecord({
+    workItemId: bootstrapTaskId,
+    generatedAt: now,
+    summaryId: `summary.self-host-alpha.${bootstrapTaskId.toLowerCase()}`,
+    summary: ok
+      ? 'Self-hosting alpha proof passed and preserved a replayable continuation contract.'
+      : 'Self-hosting alpha proof failed and preserved the blocking evidence for follow-up.',
+    nextActions: ok
+      ? ['Review the phase-B gate report.', 'Inspect the recorded evidence entry.', 'Decide whether alpha0 can advance.']
+      : ['Review the failing phase-B gate report.', 'Inspect the recorded smoke artifact and log.', 'Resolve the failing deterministic criteria before retrying.'],
+    artifactPaths: [artifactPath, logPath],
+    evidencePaths: [evidencePath],
+    reportPaths: [phaseBReportPath, budgetEvaluation.reportPath, bootstrapEvidence.continuationReportPath, bootstrapEvidence.contextBudgetReportPath].filter(Boolean),
+    authoredBy: '@ai-atomic-framework/cli:self-host-alpha',
+    handoffKind: 'self-host-alpha',
+    continuationGoal: 'Review the stored phase-B proof and decide whether the self-hosting alpha gate can advance.',
+    resumePrompt: 'Read the stored context summary first, then inspect the phase-B exit gate report and evidence record.',
+    resumeCommand: ['node', 'packages/cli/src/atm.mjs', 'self-host-alpha', '--verify', '--json'],
+    budgetDecision: budgetEvaluation.decision,
+    hardStop: budgetEvaluation.decision === 'hard-stop'
+  }));
+
+  return {
+    artifactPath,
+    logPath,
+    evidencePath,
+    phaseBReportPath,
+    budgetReportPath: budgetEvaluation.reportPath,
+    budgetSummaryPath: budgetEvaluation.summaryPath ?? null,
+    contextSummaryPath: `.atm/state/context-summary/${bootstrapTaskId}.json`,
+    contextSummaryMarkdownPath: summary.summaryMarkdownPath ?? `.atm/state/context-summary/${bootstrapTaskId}.md`,
+    estimatedTokens,
+    budgetDecision: budgetEvaluation.decision
   };
 }

@@ -57,7 +57,16 @@ export interface ContextSummaryRecord {
   readonly nextActions: readonly string[];
   readonly generatedAt?: string;
   readonly artifactPaths?: readonly string[];
+  readonly evidencePaths?: readonly string[];
+  readonly reportPaths?: readonly string[];
   readonly authoredBy?: string;
+  readonly handoffKind?: 'bootstrap' | 'self-host-alpha' | 'continuation' | 'budget-hard-stop';
+  readonly continuationGoal?: string;
+  readonly resumePrompt?: string;
+  readonly resumeCommand?: readonly string[];
+  readonly budgetDecision?: 'pass' | 'summarize-before-continue' | 'hard-stop';
+  readonly hardStop?: boolean;
+  readonly summaryMarkdownPath?: string;
 }
 
 export type ValidationCommandKind = 'test' | 'typecheck' | 'lint' | 'custom';
@@ -252,12 +261,6 @@ export interface RegistryDocument {
   readonly generatedAt: string;
   readonly sharding?: RegistryShardingRecord;
   readonly entries: readonly RegistryDocumentEntryRecord[];
-}
-
-export interface ContextSummaryRecord {
-  readonly workItemId: string;
-  readonly summary: string;
-  readonly nextActions: readonly string[];
 }
 
 export const corePackage: AtomicPackageDescriptor = {

@@ -29,7 +29,7 @@
     },
     "workItemId": {
       "type": "string",
-      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+      "pattern": "^(?:ATM-[A-Z][A-Z0-9]*-\\d{4}|BOOTSTRAP-\\d{4})$"
     },
     "summary": {
       "type": "string",
@@ -55,7 +55,52 @@
       },
       "default": []
     },
+    "evidencePaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    },
+    "reportPaths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    },
     "authoredBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "handoffKind": {
+      "enum": ["bootstrap", "self-host-alpha", "continuation", "budget-hard-stop"]
+    },
+    "continuationGoal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resumePrompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resumeCommand": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    },
+    "budgetDecision": {
+      "enum": ["pass", "summarize-before-continue", "hard-stop"]
+    },
+    "hardStop": {
+      "type": "boolean"
+    },
+    "summaryMarkdownPath": {
       "type": "string",
       "minLength": 1
     }

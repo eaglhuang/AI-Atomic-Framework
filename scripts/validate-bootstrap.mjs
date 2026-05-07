@@ -116,15 +116,24 @@ try {
     '.atm/state/project-probe.json',
     '.atm/state/default-guards.json',
     '.atm/state/context-budget/default-policy.json',
+    '.atm/state/context-summary/BOOTSTRAP-0001.json',
+    '.atm/state/context-summary/BOOTSTRAP-0001.md',
     '.atm/tasks/BOOTSTRAP-0001.json',
     '.atm/locks/BOOTSTRAP-0001.lock.json',
     '.atm/evidence/BOOTSTRAP-0001.json',
+    '.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json',
+    '.atm/reports/continuation/BOOTSTRAP-0001.json',
     '.atm/artifacts',
     '.atm/logs',
     '.atm/reports'
   ]) {
     assert(existsSync(path.join(hostRepo, relativePath)), `bootstrap must create ${relativePath}`);
   }
+
+  assert(bootstrap.parsed.evidence.contextBudgetReportPath === '.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json', 'bootstrap must surface context budget report path');
+  assert(bootstrap.parsed.evidence.contextSummaryPath === '.atm/state/context-summary/BOOTSTRAP-0001.json', 'bootstrap must surface context summary json path');
+  assert(bootstrap.parsed.evidence.contextSummaryMarkdownPath === '.atm/state/context-summary/BOOTSTRAP-0001.md', 'bootstrap must surface context summary markdown path');
+  assert(bootstrap.parsed.evidence.continuationReportPath === '.atm/reports/continuation/BOOTSTRAP-0001.json', 'bootstrap must surface continuation report path');
 
   const probe = readJson(path.join(hostRepo, '.atm', 'state', 'project-probe.json'));
   assert(probe.repositoryKind === 'static-site', 'project probe must detect static-site repository kind');

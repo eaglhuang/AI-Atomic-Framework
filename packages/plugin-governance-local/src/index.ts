@@ -63,8 +63,31 @@ export interface LocalGovernanceBootstrapResult {
   readonly defaultGuardsPath: string;
   readonly evidencePath: string;
   readonly contextBudgetPolicyPath: string;
+  readonly contextBudgetReportPath: string;
+  readonly contextBudgetSummaryPath?: string;
+  readonly contextSummaryPath: string;
+  readonly contextSummaryMarkdownPath: string;
+  readonly continuationReportPath: string;
   readonly projectProbe: Readonly<Record<string, unknown>>;
   readonly recommendedPrompt: string;
+}
+
+export interface ContinuationContractInput {
+  readonly workItemId: string;
+  readonly generatedAt: string;
+  readonly summaryId?: string;
+  readonly summary: string;
+  readonly nextActions: readonly string[];
+  readonly artifactPaths?: readonly string[];
+  readonly evidencePaths?: readonly string[];
+  readonly reportPaths?: readonly string[];
+  readonly authoredBy?: string;
+  readonly handoffKind?: ContextSummaryRecord['handoffKind'];
+  readonly continuationGoal?: string;
+  readonly resumePrompt?: string;
+  readonly resumeCommand?: readonly string[];
+  readonly budgetDecision?: ContextSummaryRecord['budgetDecision'];
+  readonly hardStop?: boolean;
 }
 
 const defaultBootstrapTaskId = 'BOOTSTRAP-0001';
@@ -400,13 +423,20 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     writeEvidence(workItemId, evidence) {
       ensureAllDirectories();
       const filePath = path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`);
-      const existing = readEvidenceRecords(filePath);
-      existing.push(evidence);
-      writeJsonFile(filePath, existing);
+      const existing = readEvidenceDocument(filePath);
+      const nextEvidence = [...existing.evidence, evidence];
+      if (existing.wrapper) {
+        writeJsonFile(filePath, {
+          ...existing.wrapper,
+          evidence: nextEvidence
+        });
+      } else {
+        writeJsonFile(filePath, nextEvidence);
+      }
       return evidence;
     },
     listEvidence(workItemId) {
-      return readEvidenceRecords(path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`));
+      return readEvidenceDocument(path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`)).evidence;
     }
   };
 
@@ -501,8 +531,14 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     writeSummary(summary) {
       ensureAllDirectories();
       const filePath = path.join(absoluteLayout.contextSummaryStorePath, `${summary.workItemId}.json`);
-      writeJsonFile(filePath, summary);
-      return summary;
+      const markdownPath = path.join(absoluteLayout.contextSummaryStorePath, `${summary.workItemId}.md`);
+      const materializedSummary: ContextSummaryRecord = {
+        ...summary,
+        summaryMarkdownPath: summary.summaryMarkdownPath ?? normalizeRelativePath(path.join(layout.contextSummaryStorePath ?? '.atm/state/context-summary', `${summary.workItemId}.md`))
+      };
+      writeJsonFile(filePath, materializedSummary);
+      writeFileSync(markdownPath, renderContextSummaryMarkdown(materializedSummary), 'utf8');
+      return materializedSummary;
     },
     readSummary(workItemId) {
       const filePath = path.join(absoluteLayout.contextSummaryStorePath, `${workItemId}.json`);
@@ -555,18 +591,84 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   stores.ruleGuard.initialize?.();
   stores.evidenceStore.initialize?.();
   stores.contextBudgetGuard?.initialize?.();
+  stores.contextSummaryStore?.initialize?.();
 
   const recommendedPrompt = createRecommendedPrompt(taskId);
   const projectProbe = probeRepository(cwd, recommendedPrompt);
   const defaultGuards = createDefaultGuards(projectProbe);
   const defaultContextBudgetPolicy = createDefaultContextBudgetPolicy(projectProbe.generatedAt ?? new Date().toISOString());
+  const bootstrapBudgetId = `bootstrap/${taskId}`;
+  const contextBudgetReportPath = path.join('.atm', 'reports', 'context-budget', `${sanitizeBudgetFileId(bootstrapBudgetId)}.json`);
+  const contextBudgetSummaryPath = path.join('.atm', 'state', 'context-budget', `${sanitizeBudgetFileId(bootstrapBudgetId)}.md`);
+  const continuationReportPath = path.join('.atm', 'reports', 'continuation', `${taskId}.json`);
+  const contextSummaryPath = path.join('.atm', 'state', 'context-summary', `${taskId}.json`);
+  const contextSummaryMarkdownPath = path.join('.atm', 'state', 'context-summary', `${taskId}.md`);
+  const bootstrapBudgetInput = {
+    budgetId: bootstrapBudgetId,
+    workItemId: taskId,
+    estimatedTokens: estimateContextBudgetTokens(projectProbe, defaultGuards, recommendedPrompt, templateFiles.map((entry) => entry.target)),
+    inlineArtifacts: 0,
+    requestedSummary: 'Continue from the stored bootstrap summary and evidence paths instead of replaying the full bootstrap probe inline.'
+  } satisfies ContextBudgetEvaluationInput;
+  const bootstrapBudgetEvaluation = evaluateContextBudget(defaultContextBudgetPolicy, bootstrapBudgetInput, projectProbe.generatedAt ?? new Date().toISOString());
+  const continuationInput: ContinuationContractInput = {
+    workItemId: taskId,
+    generatedAt: projectProbe.generatedAt ?? new Date().toISOString(),
+    summaryId: `summary.${sanitizeBudgetFileId(taskId).toLowerCase()}`,
+    summary: 'Default ATM bootstrap pack created and linked to evidence, context budget, and the next continuation prompt.',
+    nextActions: [
+      `Read .atm/tasks/${taskId}.json and .atm/profile/default.md.`,
+      'Continue the bootstrap task without changing the host workflow.',
+      'Record the first smoke artifact, log, and evidence before closing the work item.'
+    ],
+    artifactPaths: ['.atm/artifacts', '.atm/logs', '.atm/reports'],
+    evidencePaths: [relativePathFrom(cwd, paths.evidencePath)],
+    reportPaths: [normalizeRelativePath(contextBudgetReportPath), normalizeRelativePath(continuationReportPath)],
+    authoredBy: '@ai-atomic-framework/plugin-governance-local',
+    handoffKind: 'bootstrap',
+    continuationGoal: 'Resume bootstrap from the generated task, profile, evidence, and budget surfaces.',
+    resumePrompt: recommendedPrompt,
+    resumeCommand: ['node', 'packages/cli/src/atm.mjs', 'bootstrap', '--cwd', '.', '--task', defaultBootstrapTaskTitle],
+    budgetDecision: bootstrapBudgetEvaluation.decision,
+    hardStop: bootstrapBudgetEvaluation.decision === 'hard-stop'
+  };
+  const continuationSummary: ContextSummaryRecord = {
+    ...createContinuationSummaryRecord(continuationInput),
+    summaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath)
+  };
+  const bootstrapEvidence = {
+    ...createBootstrapEvidence(projectProbe, defaultGuards, paths),
+    contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
+    contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? null : normalizeRelativePath(contextBudgetSummaryPath),
+    contextSummaryPath: normalizeRelativePath(contextSummaryPath),
+    contextSummaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath),
+    continuationReportPath: normalizeRelativePath(continuationReportPath),
+    budgetDecision: bootstrapBudgetEvaluation.decision,
+    continuationGoal: continuationInput.continuationGoal
+  };
 
   writeJson(paths.projectProbePath, projectProbe, cwd, force, created, unchanged);
   writeJson(paths.defaultGuardsPath, defaultGuards, cwd, force, created, unchanged);
   writeJson(paths.contextBudgetPolicyPath, defaultContextBudgetPolicy, cwd, force, created, unchanged);
   writeJson(paths.taskPath, createBootstrapTask(taskId, taskTitle, projectProbe, paths), cwd, force, created, unchanged);
   writeJson(paths.lockPath, createBootstrapLock(taskId, paths), cwd, force, created, unchanged);
-  writeJson(paths.evidencePath, createBootstrapEvidence(projectProbe, defaultGuards, paths), cwd, force, created, unchanged);
+  writeJson(paths.evidencePath, bootstrapEvidence, cwd, force, created, unchanged);
+  writeJson(resolveRepoPath(cwd, contextBudgetReportPath), {
+    budgetId: bootstrapBudgetId,
+    workItemId: taskId,
+    policyId: defaultContextBudgetPolicy.policyId,
+    decision: bootstrapBudgetEvaluation.decision,
+    estimatedTokens: bootstrapBudgetEvaluation.estimatedTokens,
+    inlineArtifacts: bootstrapBudgetEvaluation.inlineArtifacts,
+    generatedAt: bootstrapBudgetEvaluation.generatedAt,
+    reason: bootstrapBudgetEvaluation.reason
+  }, cwd, force, created, unchanged);
+  if (bootstrapBudgetEvaluation.decision !== 'pass') {
+    writeText(resolveRepoPath(cwd, contextBudgetSummaryPath), createContextBudgetSummary(defaultContextBudgetPolicy, bootstrapBudgetInput, bootstrapBudgetEvaluation), cwd, force, created, unchanged);
+  }
+  writeJson(resolveRepoPath(cwd, continuationReportPath), createContinuationRunReport(`continuation/${taskId}`, continuationInput), cwd, force, created, unchanged);
+  writeJson(resolveRepoPath(cwd, contextSummaryPath), continuationSummary, cwd, force, created, unchanged);
+  writeText(resolveRepoPath(cwd, contextSummaryMarkdownPath), renderContextSummaryMarkdown(continuationSummary), cwd, force, created, unchanged);
 
   const templateTokens = {
     RECOMMENDED_PROMPT: recommendedPrompt,
@@ -605,6 +707,11 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     defaultGuardsPath: relativePathFrom(cwd, paths.defaultGuardsPath),
     evidencePath: relativePathFrom(cwd, paths.evidencePath),
     contextBudgetPolicyPath: relativePathFrom(cwd, paths.contextBudgetPolicyPath),
+    contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
+    contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? undefined : normalizeRelativePath(contextBudgetSummaryPath),
+    contextSummaryPath: normalizeRelativePath(contextSummaryPath),
+    contextSummaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath),
+    continuationReportPath: normalizeRelativePath(continuationReportPath),
     projectProbe,
     recommendedPrompt
   };
@@ -622,6 +729,52 @@ export function createSelfHostingAlphaPrompt(): string {
   return `Read README.md. If .atm/config.json is missing, run "${createOfficialBootstrapCommand('.')}" from the repository root. Then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/${defaultBootstrapTaskId}.json, complete the bootstrap task, run the first smoke against examples/hello-world/atoms/hello-world.atom.json, and write artifact, log, evidence, and context summary files under .atm/.`;
 }
 
+export function estimateContextBudgetTokens(...values: readonly unknown[]): number {
+  const characterCount = values.reduce((total, value) => total + serializeContextValue(value).length, 0);
+  return Math.max(1, Math.ceil(characterCount / 4));
+}
+
+export function createContinuationSummaryRecord(input: ContinuationContractInput): ContextSummaryRecord {
+  return {
+    summaryId: input.summaryId,
+    workItemId: input.workItemId,
+    summary: input.summary,
+    nextActions: [...input.nextActions],
+    generatedAt: input.generatedAt,
+    artifactPaths: uniqueNormalizedPaths(input.artifactPaths),
+    evidencePaths: uniqueNormalizedPaths(input.evidencePaths),
+    reportPaths: uniqueNormalizedPaths(input.reportPaths),
+    authoredBy: input.authoredBy,
+    handoffKind: input.handoffKind ?? 'continuation',
+    continuationGoal: input.continuationGoal,
+    resumePrompt: input.resumePrompt,
+    resumeCommand: input.resumeCommand ? [...input.resumeCommand] : undefined,
+    budgetDecision: input.budgetDecision,
+    hardStop: input.hardStop
+  };
+}
+
+export function createContinuationRunReport(reportId: string, input: ContinuationContractInput): Readonly<Record<string, unknown>> {
+  return {
+    schemaVersion: 'atm.continuationContract.v0.1',
+    reportId,
+    generatedAt: input.generatedAt,
+    workItemId: input.workItemId,
+    handoffKind: input.handoffKind ?? 'continuation',
+    summary: input.summary,
+    nextActions: [...input.nextActions],
+    artifactPaths: uniqueNormalizedPaths(input.artifactPaths),
+    evidencePaths: uniqueNormalizedPaths(input.evidencePaths),
+    reportPaths: uniqueNormalizedPaths(input.reportPaths),
+    continuationGoal: input.continuationGoal ?? null,
+    resumePrompt: input.resumePrompt ?? null,
+    resumeCommand: input.resumeCommand ? [...input.resumeCommand] : [],
+    budgetDecision: input.budgetDecision ?? 'pass',
+    hardStop: input.hardStop === true,
+    authoredBy: input.authoredBy ?? null
+  };
+}
+
 function createBootstrapPaths(cwd: string, taskId: string) {
   const atmRoot = path.join(cwd, '.atm');
   return {
@@ -637,6 +790,7 @@ function createBootstrapPaths(cwd: string, taskId: string) {
       profile: path.join(atmRoot, 'profile'),
       state: path.join(atmRoot, 'state'),
       contextBudget: path.join(atmRoot, 'state', 'context-budget'),
+      contextSummary: path.join(atmRoot, 'state', 'context-summary'),
       tasks: path.join(atmRoot, 'tasks'),
       locks: path.join(atmRoot, 'locks'),
       artifacts: path.join(atmRoot, 'artifacts'),
@@ -644,6 +798,8 @@ function createBootstrapPaths(cwd: string, taskId: string) {
       evidence: path.join(atmRoot, 'evidence'),
       context: path.join(atmRoot, 'context'),
       reports: path.join(atmRoot, 'reports'),
+      reportContextBudget: path.join(atmRoot, 'reports', 'context-budget'),
+      reportContinuation: path.join(atmRoot, 'reports', 'continuation'),
       index: path.join(atmRoot, 'index'),
       shards: path.join(atmRoot, 'shards'),
       rules: path.join(atmRoot, 'rules'),
@@ -705,7 +861,8 @@ function createBootstrapEvidence(projectProbe: Readonly<Record<string, unknown>>
       relativePathFrom(path.dirname(paths.evidencePath), paths.directories.artifacts),
       relativePathFrom(path.dirname(paths.evidencePath), paths.directories.logs),
       relativePathFrom(path.dirname(paths.evidencePath), paths.directories.reports)
-    ]
+    ],
+    evidence: []
   };
 }
 
@@ -859,6 +1016,66 @@ function createContextBudgetSummary(
   ].join('\n');
 }
 
+function renderContextSummaryMarkdown(summary: ContextSummaryRecord): string {
+  const lines = [
+    `# ${summary.workItemId} Continuation Summary`,
+    '',
+    summary.summary,
+    ''
+  ];
+
+  if (summary.handoffKind) {
+    lines.push(`- Handoff kind: ${summary.handoffKind}`);
+  }
+  if (summary.budgetDecision) {
+    lines.push(`- Budget decision: ${summary.budgetDecision}`);
+  }
+  if (summary.continuationGoal) {
+    lines.push(`- Goal: ${summary.continuationGoal}`);
+  }
+  if (summary.resumePrompt) {
+    lines.push(`- Resume prompt: ${summary.resumePrompt}`);
+  }
+  if (summary.resumeCommand && summary.resumeCommand.length > 0) {
+    lines.push(`- Resume command: ${summary.resumeCommand.join(' ')}`);
+  }
+  if (lines[lines.length - 1] !== '') {
+    lines.push('');
+  }
+
+  lines.push('## Next Actions', '');
+  for (const action of summary.nextActions) {
+    lines.push(`- ${action}`);
+  }
+  lines.push('');
+
+  if (summary.artifactPaths && summary.artifactPaths.length > 0) {
+    lines.push('## Artifacts', '');
+    for (const artifactPath of summary.artifactPaths) {
+      lines.push(`- ${artifactPath}`);
+    }
+    lines.push('');
+  }
+
+  if (summary.evidencePaths && summary.evidencePaths.length > 0) {
+    lines.push('## Evidence', '');
+    for (const evidencePath of summary.evidencePaths) {
+      lines.push(`- ${evidencePath}`);
+    }
+    lines.push('');
+  }
+
+  if (summary.reportPaths && summary.reportPaths.length > 0) {
+    lines.push('## Reports', '');
+    for (const reportPath of summary.reportPaths) {
+      lines.push(`- ${reportPath}`);
+    }
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
 function sanitizeBudgetFileId(budgetId: string): string {
   return normalizeRelativePath(budgetId || 'context-budget').replace(/[/:]+/g, '-');
 }
@@ -1003,21 +1220,47 @@ function listFilesRecursive(directoryPath: string): string[] {
   return results.sort((left, right) => left.localeCompare(right));
 }
 
-function readEvidenceRecords(filePath: string): EvidenceRecord[] {
+function uniqueNormalizedPaths(paths: readonly string[] | undefined): readonly string[] | undefined {
+  if (!paths || paths.length === 0) {
+    return undefined;
+  }
+  return [...new Set(paths.map((entry) => normalizeRelativePath(entry)).filter((entry) => entry.length > 0))];
+}
+
+function serializeContextValue(value: unknown): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function readEvidenceDocument(filePath: string): { wrapper: Record<string, unknown> | null; evidence: EvidenceRecord[] } {
   if (!existsSync(filePath)) {
-    return [];
+    return { wrapper: null, evidence: [] };
   }
   const parsed = readJsonFile(filePath);
   if (Array.isArray(parsed)) {
-    return parsed as EvidenceRecord[];
+    return { wrapper: null, evidence: parsed as EvidenceRecord[] };
   }
-  if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { evidence?: unknown[] }).evidence)) {
-    return (parsed as { evidence: EvidenceRecord[] }).evidence;
+  if (parsed && typeof parsed === 'object') {
+    const wrapper = parsed as Record<string, unknown>;
+    if (Array.isArray(wrapper.evidence)) {
+      return { wrapper, evidence: wrapper.evidence as EvidenceRecord[] };
+    }
+    if ('evidenceKind' in wrapper) {
+      return { wrapper: null, evidence: [wrapper as EvidenceRecord] };
+    }
+    return { wrapper, evidence: [] };
   }
-  if (parsed && typeof parsed === 'object' && 'evidenceKind' in (parsed as Record<string, unknown>)) {
-    return [parsed as EvidenceRecord];
-  }
-  return [];
+  return { wrapper: null, evidence: [] };
+}
+
+function readEvidenceRecords(filePath: string): EvidenceRecord[] {
+  return readEvidenceDocument(filePath).evidence;
 }
 
 function normalizeWorkItem(value: unknown): WorkItemRef | null {

@@ -5,7 +5,7 @@ This document defines the standalone self-hosting alpha proof for ATM.
 ## Official Single-Entry Prompt
 
 ```text
-Read README.md. If .atm/config.json is missing, run "node packages/cli/src/atm.mjs bootstrap --cwd . --task \"Bootstrap ATM in this repository\"" from the repository root. Then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json, complete the bootstrap task, run the first smoke against examples/hello-world/atoms/hello-world.atom.json, and write artifact, log, evidence, and context summary files under .atm/.
+Read README.md. If .atm/config.json is missing, run "node packages/cli/src/atm.mjs bootstrap --cwd . --task \"Bootstrap ATM in this repository\"" from the repository root. Then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json, complete the bootstrap task, run the first smoke against examples/hello-world/atoms/hello-world.atom.json, and write artifact, log, evidence, context summary, and budget/continuation reports under .atm/.
 ```
 
 ## Alpha Checklist
@@ -13,7 +13,8 @@ Read README.md. If .atm/config.json is missing, run "node packages/cli/src/atm.m
 - The user can give the AI one official prompt without explaining internal ATM files.
 - If `.atm/config.json` is missing, the AI can trigger the official `bootstrap` command itself.
 - The bootstrap command is idempotent and leaves the repository ready for the next step.
-- The first smoke validates `examples/hello-world/atoms/hello-world.atom.json` and writes artifact, log, evidence, and context summary files under `.atm/`.
+- The bootstrap step seeds `.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json`, `.atm/reports/continuation/BOOTSTRAP-0001.json`, and `.atm/state/context-summary/BOOTSTRAP-0001.{json,md}`.
+- The first smoke validates `examples/hello-world/atoms/hello-world.atom.json` and writes artifact, log, evidence, context summary, and self-host-alpha reports under `.atm/`.
 - The proof does not depend on downstream host tooling, private repository paths, or a non-portable adapter.
 
 ## Phase B Exit Gate

@@ -104,6 +104,13 @@ try {
   assert(selfHostAlphaGate.parsed.criteria2 === true, 'self-host-alpha criteria2 must be true');
   assert(selfHostAlphaGate.parsed.criteria3 === true, 'self-host-alpha criteria3 must be true');
   assert(selfHostAlphaGate.parsed.criteria4 === true, 'self-host-alpha criteria4 must be true');
+  assert(selfHostAlphaGate.parsed.evidence.bootstrap.contextBudgetReportPath === '.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json', 'self-host-alpha bootstrap evidence must surface bootstrap budget report path');
+  assert(selfHostAlphaGate.parsed.evidence.bootstrap.contextSummaryPath === '.atm/state/context-summary/BOOTSTRAP-0001.json', 'self-host-alpha bootstrap evidence must surface bootstrap summary json path');
+  assert(selfHostAlphaGate.parsed.evidence.bootstrap.contextSummaryMarkdownPath === '.atm/state/context-summary/BOOTSTRAP-0001.md', 'self-host-alpha bootstrap evidence must surface bootstrap summary markdown path');
+  assert(selfHostAlphaGate.parsed.evidence.selfHostingArtifacts.phaseBReportPath === '.atm/reports/self-host-alpha/BOOTSTRAP-0001.json', 'self-host-alpha must report the phase B report path');
+  assert(selfHostAlphaGate.parsed.evidence.selfHostingArtifacts.contextSummaryPath === '.atm/state/context-summary/BOOTSTRAP-0001.json', 'self-host-alpha must report the context summary json path');
+  assert(selfHostAlphaGate.parsed.evidence.selfHostingArtifacts.contextSummaryMarkdownPath === '.atm/state/context-summary/BOOTSTRAP-0001.md', 'self-host-alpha must report the context summary markdown path');
+  assert(selfHostAlphaGate.parsed.evidence.selfHostingArtifacts.budgetReportPath === '.atm/reports/context-budget/self-host-alpha-BOOTSTRAP-0001.json', 'self-host-alpha must report the self-hosting budget report path');
 
   if (!existsSync(path.join(repoCopy, '.atm', 'config.json'))) {
     const bootstrap = runAtm(['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM self-hosting alpha'], repoCopy);
@@ -135,11 +142,38 @@ try {
   mkdirSync(artifactDir, { recursive: true });
   const artifactPath = path.join(artifactDir, 'hello-world-smoke.json');
   const logPath = path.join(repoCopy, '.atm', 'logs', 'BOOTSTRAP-0001.log');
-  const summaryPath = path.join(repoCopy, '.atm', 'context', 'BOOTSTRAP-0001-summary.md');
-  const reportPath = path.join(repoCopy, '.atm', 'reports', 'self-hosting-alpha-gate.json');
+  const summaryDir = path.join(repoCopy, '.atm', 'state', 'context-summary');
+  mkdirSync(summaryDir, { recursive: true });
+  const summaryPath = path.join(summaryDir, 'BOOTSTRAP-0001.md');
+  const summaryJsonPath = path.join(summaryDir, 'BOOTSTRAP-0001.json');
+  const reportPath = path.join(repoCopy, '.atm', 'reports', 'self-host-alpha', 'BOOTSTRAP-0001.json');
+  const budgetReportPath = path.join(repoCopy, '.atm', 'reports', 'context-budget', 'self-host-alpha-BOOTSTRAP-0001.json');
+  mkdirSync(path.dirname(reportPath), { recursive: true });
+  mkdirSync(path.dirname(budgetReportPath), { recursive: true });
   writeFileSync(artifactPath, `${JSON.stringify({ smokeResult, specPath: 'examples/hello-world/atoms/hello-world.atom.json' }, null, 2)}\n`, 'utf8');
   writeFileSync(logPath, 'self-hosting alpha smoke: hello-world validated and executed successfully\n', 'utf8');
-  writeFileSync(summaryPath, '# BOOTSTRAP-0001 Summary\n\n- bootstrap complete\n- hello-world smoke passed\n- evidence recorded\n', 'utf8');
+  writeFileSync(summaryPath, '# BOOTSTRAP-0001 Continuation Summary\n\nSelf-hosting alpha smoke passed and preserved replayable evidence.\n\n## Next Actions\n\n- Review the phase-B gate report.\n- Inspect the recorded evidence entry.\n- Decide whether alpha0 can advance.\n', 'utf8');
+  writeFileSync(summaryJsonPath, `${JSON.stringify({
+    schemaId: 'atm.contextSummary',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'Self-hosting alpha proof fixture.' },
+    summaryId: 'summary.self-host-alpha.bootstrap-0001',
+    workItemId: 'BOOTSTRAP-0001',
+    summary: 'Self-hosting alpha smoke passed and preserved replayable evidence.',
+    nextActions: ['Review the phase-B gate report.', 'Inspect the recorded evidence entry.', 'Decide whether alpha0 can advance.'],
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    artifactPaths: ['.atm/artifacts/BOOTSTRAP-0001/hello-world-smoke.json', '.atm/logs/BOOTSTRAP-0001.log'],
+    evidencePaths: ['.atm/evidence/BOOTSTRAP-0001.json'],
+    reportPaths: ['.atm/reports/self-host-alpha/BOOTSTRAP-0001.json', '.atm/reports/context-budget/self-host-alpha-BOOTSTRAP-0001.json'],
+    authoredBy: 'ATM CLI',
+    handoffKind: 'self-host-alpha',
+    continuationGoal: 'Review the stored phase-B proof and decide whether alpha0 can advance.',
+    resumePrompt: 'Read the stored context summary first, then inspect the phase-B exit gate report and evidence record.',
+    resumeCommand: ['node', 'packages/cli/src/atm.mjs', 'self-host-alpha', '--verify', '--json'],
+    budgetDecision: 'pass',
+    hardStop: false,
+    summaryMarkdownPath: '.atm/state/context-summary/BOOTSTRAP-0001.md'
+  }, null, 2)}\n`, 'utf8');
   writeFileSync(reportPath, `${JSON.stringify({
     schemaVersion: 'atm.phaseBExitGate.v0.1',
     gate: 'phase-b-exit',
@@ -152,6 +186,16 @@ try {
       'artifact/log/context summary written'
     ]
   }, null, 2)}\n`, 'utf8');
+  writeFileSync(budgetReportPath, `${JSON.stringify({
+    budgetId: 'self-host-alpha/BOOTSTRAP-0001',
+    workItemId: 'BOOTSTRAP-0001',
+    policyId: 'default-policy',
+    decision: 'pass',
+    estimatedTokens: 1024,
+    inlineArtifacts: 2,
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    reason: 'Estimated 1024 tokens is within the current context budget policy.'
+  }, null, 2)}\n`, 'utf8');
 
   const taskPath = path.join(repoCopy, '.atm', 'tasks', 'BOOTSTRAP-0001.json');
   const lockPath = path.join(repoCopy, '.atm', 'locks', 'BOOTSTRAP-0001.lock.json');
@@ -162,7 +206,9 @@ try {
     validatedSpec: 'examples/hello-world/atoms/hello-world.atom.json',
     artifactPath: '.atm/artifacts/BOOTSTRAP-0001/hello-world-smoke.json',
     logPath: '.atm/logs/BOOTSTRAP-0001.log',
-    summaryPath: '.atm/context/BOOTSTRAP-0001-summary.md'
+    summaryPath: '.atm/state/context-summary/BOOTSTRAP-0001.md',
+    summaryJsonPath: '.atm/state/context-summary/BOOTSTRAP-0001.json',
+    budgetReportPath: '.atm/reports/context-budget/self-host-alpha-BOOTSTRAP-0001.json'
   };
   writeFileSync(taskPath, `${JSON.stringify(task, null, 2)}\n`, 'utf8');
 
@@ -177,8 +223,10 @@ try {
     validatedSpec: 'examples/hello-world/atoms/hello-world.atom.json',
     artifactPath: '.atm/artifacts/BOOTSTRAP-0001/hello-world-smoke.json',
     logPath: '.atm/logs/BOOTSTRAP-0001.log',
-    summaryPath: '.atm/context/BOOTSTRAP-0001-summary.md',
-    reportPath: '.atm/reports/self-hosting-alpha-gate.json'
+    summaryPath: '.atm/state/context-summary/BOOTSTRAP-0001.md',
+    summaryJsonPath: '.atm/state/context-summary/BOOTSTRAP-0001.json',
+    reportPath: '.atm/reports/self-host-alpha/BOOTSTRAP-0001.json',
+    budgetReportPath: '.atm/reports/context-budget/self-host-alpha-BOOTSTRAP-0001.json'
   };
   writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
 
@@ -188,7 +236,9 @@ try {
   assert(existsSync(artifactPath), 'self-hosting smoke artifact must exist');
   assert(existsSync(logPath), 'self-hosting smoke log must exist');
   assert(existsSync(summaryPath), 'self-hosting smoke context summary must exist');
+  assert(existsSync(summaryJsonPath), 'self-hosting smoke context summary json must exist');
   assert(existsSync(reportPath), 'self-hosting Phase B gate report must exist');
+  assert(existsSync(budgetReportPath), 'self-hosting context budget report must exist');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -17,5 +17,25 @@
   "artifactPaths": [
     ".atm/reports/self-host-alpha.json"
   ],
+  "evidencePaths": [
+    ".atm/evidence/ATM-FIXTURE-0101.json"
+  ],
+  "reportPaths": [
+    ".atm/reports/context-budget/fixture.json",
+    ".atm/reports/continuation/ATM-FIXTURE-0101.json"
+  ],
   "authoredBy": "vs-code-gpt-5.4"
+  ,"handoffKind": "continuation"
+  ,"continuationGoal": "Resume the next validation slice from the stored evidence and reports."
+  ,"resumePrompt": "Read the stored summary first, then replay the validation command."
+  ,"resumeCommand": [
+    "node",
+    "packages/cli/src/atm.mjs",
+    "self-host-alpha",
+    "--verify",
+    "--json"
+  ]
+  ,"budgetDecision": "summarize-before-continue"
+  ,"hardStop": false
+  ,"summaryMarkdownPath": ".atm/state/context-summary/ATM-FIXTURE-0101.md"
 }

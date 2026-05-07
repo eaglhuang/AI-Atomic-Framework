@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -81,7 +82,9 @@ function assertInvariants(proposal, expectedStatus) {
   }
 }
 
-function runCliUpgrade(qualityPath) {
+function runCliUpgrade(qualityPath, options = {}) {
+  const cwd = options.cwd ?? root;
+  const dryRun = options.dryRun ?? true;
   const args = [
     path.join(root, 'packages/cli/src/atm.mjs'),
     'upgrade',
@@ -89,21 +92,36 @@ function runCliUpgrade(qualityPath) {
     '--atom', 'ATM-CORE-0001',
     '--from', '1.0.0',
     '--to', '1.1.0',
-    '--dry-run',
     '--json',
     '--proposed-at', '2026-01-01T00:00:00.000Z',
-    '--input', inputPaths.hashDiff,
-    '--input', inputPaths.executionEvidence,
-    '--input', inputPaths.nonRegression,
-    '--input', qualityPath,
-    '--input', inputPaths.registryCandidate
+    ...(dryRun ? ['--dry-run'] : []),
+    '--input', resolveInputPath(options.inputBase ?? root, inputPaths.hashDiff),
+    '--input', resolveInputPath(options.inputBase ?? root, inputPaths.executionEvidence),
+    '--input', resolveInputPath(options.inputBase ?? root, inputPaths.nonRegression),
+    '--input', resolveInputPath(options.inputBase ?? root, qualityPath),
+    '--input', resolveInputPath(options.inputBase ?? root, inputPaths.registryCandidate)
   ];
   const result = spawnSync(process.execPath, args, {
-    cwd: root,
+    cwd,
     encoding: 'utf8'
   });
   check(result.status === 0, `CLI upgrade exited ${result.status}: ${result.stderr || result.stdout}`);
-  return JSON.parse(result.stdout.trim()).evidence.proposal;
+  return JSON.parse(result.stdout.trim());
+}
+
+function resolveInputPath(baseRoot, relativePath) {
+  return path.join(baseRoot, relativePath);
+}
+
+function assertCliContextBudgetGate(result, expectedPassed) {
+  const proposal = result.evidence.proposal;
+  check(proposal.automatedGates.contextBudget, 'CLI proposal must include a contextBudget automated gate');
+  check(proposal.automatedGates.contextBudget.passed === expectedPassed, `CLI contextBudget gate must be passed=${expectedPassed}`);
+  if (expectedPassed) {
+    check(!proposal.automatedGates.blockedGateNames.includes('contextBudget'), 'passing CLI proposal must not block on contextBudget');
+  } else {
+    check(proposal.automatedGates.blockedGateNames.includes('contextBudget'), 'blocked CLI proposal must include contextBudget in blockedGateNames');
+  }
 }
 
 for (const relativePath of [schemaPath, passFixturePath, blockedFixturePath, ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.mjs', 'packages/cli/src/commands/upgrade.mjs']) {
@@ -150,10 +168,14 @@ const generatedBlocked = proposeAtomicUpgrade({
 assert.deepEqual(generatedBlocked, expectedBlocked, 'generated blocked proposal must match fixture');
 
 const cliPass = runCliUpgrade(inputPaths.qualityPass);
-assert.deepEqual(cliPass, expectedPass, 'CLI pass proposal must match fixture');
+assertInvariants(cliPass.evidence.proposal, 'pending');
+validateWithSchema(cliPass.evidence.proposal, validate, 'CLI pass proposal');
+assertCliContextBudgetGate(cliPass, true);
 
 const cliBlocked = runCliUpgrade(inputPaths.qualityBlocked);
-assert.deepEqual(cliBlocked, expectedBlocked, 'CLI blocked proposal must match fixture');
+assertInvariants(cliBlocked.evidence.proposal, 'blocked');
+validateWithSchema(cliBlocked.evidence.proposal, validate, 'CLI blocked proposal');
+assertCliContextBudgetGate(cliBlocked, true);
 
 const mapProposal = proposeAtomicUpgrade({
   atomId: 'ATM-CORE-0001',
@@ -177,5 +199,41 @@ const extractProposal = proposeAtomicUpgrade({
 });
 assertInvariants(extractProposal, 'pending');
 validateWithSchema(extractProposal, validate, 'atom-extract proposal');
+
+const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-upgrade-hard-stop-'));
+try {
+  const governedRepo = path.join(tempRoot, 'repo');
+  mkdirSync(path.join(governedRepo, '.atm', 'state', 'context-budget'), { recursive: true });
+  writeFileSync(path.join(governedRepo, '.atm', 'state', 'context-budget', 'default-policy.json'), `${JSON.stringify({
+    policyId: 'default-policy',
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    unit: 'tokens',
+    warningTokens: 32,
+    summarizeTokens: 64,
+    hardStopTokens: 96,
+    maxInlineArtifacts: 1,
+    defaultSummary: 'Summarize large tool output before continuing.'
+  }, null, 2)}\n`, 'utf8');
+
+  const hardStopResult = runCliUpgrade(inputPaths.qualityPass, {
+    cwd: governedRepo,
+    dryRun: false,
+    inputBase: root
+  });
+  assertInvariants(hardStopResult.evidence.proposal, 'blocked');
+  validateWithSchema(hardStopResult.evidence.proposal, validate, 'CLI hard-stop proposal');
+  assertCliContextBudgetGate(hardStopResult, false);
+  check(hardStopResult.evidence.contextBudget.continuationReportPath === '.atm/reports/continuation/upgrade/ATM-CORE-0001.json', 'hard-stop run must surface continuation report path');
+  check(hardStopResult.evidence.contextBudget.contextSummaryPath === '.atm/state/context-summary/ATM-CORE-0001.json', 'hard-stop run must surface context summary path');
+  check(hardStopResult.evidence.contextBudget.contextSummaryMarkdownPath === '.atm/state/context-summary/ATM-CORE-0001.md', 'hard-stop run must surface context summary markdown path');
+  check(hardStopResult.evidence.contextBudget.evidencePath === '.atm/evidence/ATM-CORE-0001.json', 'hard-stop run must surface handoff evidence path');
+  check(existsSync(path.join(governedRepo, '.atm', 'reports', 'context-budget', 'upgrade-ATM-CORE-0001-1.1.0.json')), 'hard-stop run must persist the context budget report');
+  check(existsSync(path.join(governedRepo, '.atm', 'reports', 'continuation', 'upgrade', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation report');
+  check(existsSync(path.join(governedRepo, '.atm', 'state', 'context-summary', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation summary json');
+  check(existsSync(path.join(governedRepo, '.atm', 'state', 'context-summary', 'ATM-CORE-0001.md')), 'hard-stop run must persist the continuation summary markdown');
+  check(existsSync(path.join(governedRepo, '.atm', 'evidence', 'ATM-CORE-0001.json')), 'hard-stop run must persist the handoff evidence');
+} finally {
+  rmSync(tempRoot, { recursive: true, force: true });
+}
 
 console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, and CLI replay verified)`);
