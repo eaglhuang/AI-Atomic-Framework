@@ -7,7 +7,7 @@ export function run(input = {}) {
   const legacyRecord = buildGreetingRecord(name);
   return {
     ...legacyRecord,
-    atomId: 'atom.example.legacy-greeting',
+    atomId: 'ATM-EXAMPLE-0002',
     wrapped: true
   };
 }

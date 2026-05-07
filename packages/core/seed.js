@@ -1,5 +1,6 @@
 export const seedLegacyPlanningId = 'ATM-CORE-0001';
-export const seedAtomId = 'atom.core-seed';
+export const seedAtomId = 'ATM-CORE-0001';
+export const seedLogicalName = 'atom.core-seed';
 export const seedSpecPath = 'specs/atom-seed-spec.json';
 export const seedSourcePath = 'packages/core/seed.js';
 
@@ -16,8 +17,9 @@ export function createSeedAtomSpec() {
       notes: 'Initial Phase B1 seed self-description.'
     },
     id: seedAtomId,
+    logicalName: seedLogicalName,
     title: 'ATM Core Seed Self Descriptor',
-    description: 'Legacy planning ID ATM-CORE-0001 maps to atom.core-seed in the current atomic-spec vocabulary. This spec describes the handwritten core seed with the same format used for other atoms.',
+    description: 'Canonical Atomic ID uses ATM-CORE-0001. The historical dot-notation name is preserved only as logicalName for human-readable namespace context.',
     language: {
       primary: 'javascript',
       sourceExtensions: ['.js'],

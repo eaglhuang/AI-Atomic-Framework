@@ -129,7 +129,7 @@ try {
   const { run } = await import(`${pathToFileURL(path.join(repoCopy, 'examples/hello-world/src/hello-world.atom.mjs')).href}?selfHosting=${Date.now()}`);
   const smokeResult = run({ name: 'ATM' });
   assert(smokeResult.message === 'Hello, ATM!', 'hello-world atom smoke must return Hello, ATM!');
-  assert(smokeResult.atomId === 'atom.example.hello-world', 'hello-world atom smoke must preserve atomId');
+  assert(smokeResult.atomId === 'ATM-EXAMPLE-0001', 'hello-world atom smoke must preserve atomId');
 
   const artifactDir = path.join(repoCopy, '.atm', 'artifacts', 'BOOTSTRAP-0001');
   mkdirSync(artifactDir, { recursive: true });

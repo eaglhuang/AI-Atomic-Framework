@@ -6,10 +6,10 @@
     "fromVersion": null,
     "notes": "Initial agent prompt bootstrap schema for controlled birth-pipeline delegation."
   },
-  "atomId": "atom.agent-prompt-smoke",
+  "atomId": "ATM-AGENT-0001",
   "title": "Agent Prompt Smoke Atom",
   "lifecycleMode": "birth",
-  "promptPath": "atomic_workbench/atoms/atom.agent-prompt-smoke/prompt.md",
+  "promptPath": "atomic_workbench/atoms/ATM-AGENT-0001/prompt.md",
   "frontmatter": {
     "forbiddenRules": [
       "Keep all host coupling behind adapters; do not call host-specific runtime APIs directly.",
@@ -18,9 +18,9 @@
       "Stay in the birth pipeline; do not propose evolution-only or upgrade-specific work."
     ],
     "allowedFiles": [
-      "atomic_workbench/atoms/atom.agent-prompt-smoke/prompt.md",
-      "atomic_workbench/atoms/atom.agent-prompt-smoke/atom.spec.json",
-      "atomic_workbench/atoms/atom.agent-prompt-smoke/atom.test.ts"
+      "atomic_workbench/atoms/ATM-AGENT-0001/prompt.md",
+      "atomic_workbench/atoms/ATM-AGENT-0001/atom.spec.json",
+      "atomic_workbench/atoms/ATM-AGENT-0001/atom.test.ts"
     ],
     "evidenceContract": {
       "evidenceRequired": true,
@@ -33,7 +33,7 @@
     }
   },
   "sections": {
-    "goal": "Implement atom.agent-prompt-smoke (Agent Prompt Smoke Atom) from its normalized atomic spec.",
+    "goal": "Implement ATM-AGENT-0001 (Agent Prompt Smoke Atom) from its normalized atomic spec.",
     "context": "Minimal birth-pipeline atom used to snapshot the generated agent prompt contract.",
     "inputs": [
       {
@@ -56,5 +56,5 @@
       "Return evidence for the required outputs before closing the work."
     ]
   },
-  "markdown": "---\nschemaId: \"atm.agentPrompt\"\nspecVersion: \"0.1.0\"\natomId: \"atom.agent-prompt-smoke\"\ntitle: \"Agent Prompt Smoke Atom\"\nlifecycleMode: \"birth\"\npromptPath: \"atomic_workbench/atoms/atom.agent-prompt-smoke/prompt.md\"\nforbiddenRules:\n  - \"Keep all host coupling behind adapters; do not call host-specific runtime APIs directly.\"\n  - \"Stay within workspace-only dependencies; do not introduce external services or packages.\"\n  - \"Treat input payloads as immutable; do not mutate provided inputs in place.\"\n  - \"Stay in the birth pipeline; do not propose evolution-only or upgrade-specific work.\"\nallowedFiles:\n  - \"atomic_workbench/atoms/atom.agent-prompt-smoke/prompt.md\"\n  - \"atomic_workbench/atoms/atom.agent-prompt-smoke/atom.spec.json\"\n  - \"atomic_workbench/atoms/atom.agent-prompt-smoke/atom.test.ts\"\nevidenceContract:\n  evidenceRequired: true\n  requiredOutputs:\n    - \"evidence\"\n  validationCommands:\n    - \"npm test\"\n---\n# Build Agent Prompt: Agent Prompt Smoke Atom\n\n## Goal\nImplement atom.agent-prompt-smoke (Agent Prompt Smoke Atom) from its normalized atomic spec.\n\n## Context\nMinimal birth-pipeline atom used to snapshot the generated agent prompt contract.\n\n## Inputs\n- `goal` (`text`, required)\n\n## Outputs\n- `evidence` (`evidence`, required)\n\n## Instructions\n1. Use `javascript` with `node >=20` as the primary execution target.\n2. Keep edits inside the allowed files listed in the frontmatter.\n3. Satisfy the validation commands listed in the evidence contract.\n4. Return evidence for the required outputs before closing the work.\n"
+  "markdown": "---\nschemaId: \"atm.agentPrompt\"\nspecVersion: \"0.1.0\"\natomId: \"ATM-AGENT-0001\"\ntitle: \"Agent Prompt Smoke Atom\"\nlifecycleMode: \"birth\"\npromptPath: \"atomic_workbench/atoms/ATM-AGENT-0001/prompt.md\"\nforbiddenRules:\n  - \"Keep all host coupling behind adapters; do not call host-specific runtime APIs directly.\"\n  - \"Stay within workspace-only dependencies; do not introduce external services or packages.\"\n  - \"Treat input payloads as immutable; do not mutate provided inputs in place.\"\n  - \"Stay in the birth pipeline; do not propose evolution-only or upgrade-specific work.\"\nallowedFiles:\n  - \"atomic_workbench/atoms/ATM-AGENT-0001/prompt.md\"\n  - \"atomic_workbench/atoms/ATM-AGENT-0001/atom.spec.json\"\n  - \"atomic_workbench/atoms/ATM-AGENT-0001/atom.test.ts\"\nevidenceContract:\n  evidenceRequired: true\n  requiredOutputs:\n    - \"evidence\"\n  validationCommands:\n    - \"npm test\"\n---\n# Build Agent Prompt: Agent Prompt Smoke Atom\n\n## Goal\nImplement ATM-AGENT-0001 (Agent Prompt Smoke Atom) from its normalized atomic spec.\n\n## Context\nMinimal birth-pipeline atom used to snapshot the generated agent prompt contract.\n\n## Inputs\n- `goal` (`text`, required)\n\n## Outputs\n- `evidence` (`evidence`, required)\n\n## Instructions\n1. Use `javascript` with `node >=20` as the primary execution target.\n2. Keep edits inside the allowed files listed in the frontmatter.\n3. Satisfy the validation commands listed in the evidence contract.\n4. Return evidence for the required outputs before closing the work.\n"
 }

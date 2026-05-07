@@ -4,6 +4,6 @@ export function run(input = {}) {
     : 'world';
   return {
     message: `Hello, ${name}!`,
-    atomId: 'atom.example.hello-world'
+    atomId: 'ATM-EXAMPLE-0001'
   };
 }

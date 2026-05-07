@@ -18,6 +18,7 @@ export function buildAgentPrompt(normalizedModel, options = {}) {
 
 export function createAgentPromptDocument(normalizedModel, options = {}) {
   const atomId = normalizedModel?.identity?.atomId;
+  const logicalName = normalizedModel?.identity?.logicalName;
   if (!atomId) {
     throw new Error('Normalized model identity.atomId is required.');
   }
@@ -62,7 +63,7 @@ export function createAgentPromptDocument(normalizedModel, options = {}) {
       }
     },
     sections: {
-      goal: `Implement ${atomId} (${normalizedModel.identity?.title ?? atomId}) from its normalized atomic spec.`,
+      goal: `Implement ${atomId}${logicalName ? ` (${logicalName})` : ''} (${normalizedModel.identity?.title ?? atomId}) from its normalized atomic spec.`,
       context: normalizedModel.identity?.description || 'No description provided.',
       inputs: (normalizedModel.ports?.inputs ?? []).map(clonePort),
       outputs: (normalizedModel.ports?.outputs ?? []).map(clonePort),

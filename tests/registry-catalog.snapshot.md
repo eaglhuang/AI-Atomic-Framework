@@ -5,4 +5,4 @@
 
 | atomId | function | derivedCategory | status | specPath |
 | --- | --- | --- | --- | --- |
-| `atom.registry-fixture` | Registry Fixture Atom: Fixture proving registry entry creation and hash drift detection. | `registry / alpha0` | `active` | `tests/registry-fixtures/registry.atom.json` |
+| `ATM-FIXTURE-0004` | Registry Fixture Atom: Fixture proving registry entry creation and hash drift detection. | `registry / alpha0` | `active` | `tests/registry-fixtures/registry.atom.json` |

@@ -2,23 +2,23 @@
   "mapId": "map.police.fixture",
   "mapVersion": "0.1.0",
   "members": [
-    { "atomId": "atom.police.sdk-contract", "version": "0.1.0" },
-    { "atomId": "atom.police.schema", "version": "0.1.0" },
-    { "atomId": "atom.police.dependency-graph", "version": "0.1.0" },
-    { "atomId": "atom.police.layer-boundary", "version": "0.1.0" },
-    { "atomId": "atom.police.forbidden-import", "version": "0.1.0" },
-    { "atomId": "atom.police.registry-consistency", "version": "0.1.0" },
-    { "atomId": "atom.police.runner", "version": "0.1.0" }
+    { "atomId": "ATM-POLICE-0001", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0002", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0003", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0004", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0005", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0006", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0007", "version": "0.1.0" }
   ],
   "edges": [
-    { "from": "atom.police.runner", "to": "atom.police.schema", "binding": "runs" },
-    { "from": "atom.police.runner", "to": "atom.police.dependency-graph", "binding": "runs" },
-    { "from": "atom.police.runner", "to": "atom.police.layer-boundary", "binding": "runs" },
-    { "from": "atom.police.runner", "to": "atom.police.forbidden-import", "binding": "runs" },
-    { "from": "atom.police.runner", "to": "atom.police.registry-consistency", "binding": "runs" },
-    { "from": "atom.police.runner", "to": "atom.police.sdk-contract", "binding": "reports-through" }
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0002", "binding": "runs" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0003", "binding": "runs" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0004", "binding": "runs" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0005", "binding": "runs" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0006", "binding": "runs" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0001", "binding": "reports-through" }
   ],
-  "entrypoints": ["atom.police.runner"],
+  "entrypoints": ["ATM-POLICE-0007"],
   "qualityTargets": {
     "cycleCount": 0,
     "boundaryViolationCount": 0,

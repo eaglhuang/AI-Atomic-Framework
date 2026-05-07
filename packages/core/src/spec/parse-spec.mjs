@@ -155,6 +155,7 @@ export function normalizeAtomicSpecModel(specDocument, options = {}) {
     },
     identity: {
       atomId: specDocument.id,
+      logicalName: specDocument.logicalName ?? null,
       title: specDocument.title,
       description: specDocument.description ?? '',
       tags: normalizeStringList(specDocument.tags ?? [])

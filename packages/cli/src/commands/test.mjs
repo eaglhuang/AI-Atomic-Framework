@@ -24,7 +24,7 @@ export async function runHelloWorldSmoke(cwd) {
     smokeResult = module.run({ name: 'ATM' });
   }
   checks.push({ name: 'message-output', passed: smokeResult?.message === 'Hello, ATM!' });
-  checks.push({ name: 'atom-id-output', passed: smokeResult?.atomId === 'atom.example.hello-world' });
+  checks.push({ name: 'atom-id-output', passed: smokeResult?.atomId === 'ATM-EXAMPLE-0001' });
 
   return {
     ok: checks.every((check) => check.passed),

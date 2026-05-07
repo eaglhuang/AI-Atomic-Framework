@@ -1,19 +1,19 @@
 ---
 schemaId: "atm.agentPrompt"
 specVersion: "0.1.0"
-atomId: "atom.agent-prompt-smoke"
+atomId: "ATM-AGENT-0001"
 title: "Agent Prompt Smoke Atom"
 lifecycleMode: "birth"
-promptPath: "atomic_workbench/atoms/atom.agent-prompt-smoke/prompt.md"
+promptPath: "atomic_workbench/atoms/ATM-AGENT-0001/prompt.md"
 forbiddenRules:
   - "Keep all host coupling behind adapters; do not call host-specific runtime APIs directly."
   - "Stay within workspace-only dependencies; do not introduce external services or packages."
   - "Treat input payloads as immutable; do not mutate provided inputs in place."
   - "Stay in the birth pipeline; do not propose evolution-only or upgrade-specific work."
 allowedFiles:
-  - "atomic_workbench/atoms/atom.agent-prompt-smoke/prompt.md"
-  - "atomic_workbench/atoms/atom.agent-prompt-smoke/atom.spec.json"
-  - "atomic_workbench/atoms/atom.agent-prompt-smoke/atom.test.ts"
+  - "atomic_workbench/atoms/ATM-AGENT-0001/prompt.md"
+  - "atomic_workbench/atoms/ATM-AGENT-0001/atom.spec.json"
+  - "atomic_workbench/atoms/ATM-AGENT-0001/atom.test.ts"
 evidenceContract:
   evidenceRequired: true
   requiredOutputs:
@@ -24,7 +24,7 @@ evidenceContract:
 # Build Agent Prompt: Agent Prompt Smoke Atom
 
 ## Goal
-Implement atom.agent-prompt-smoke (Agent Prompt Smoke Atom) from its normalized atomic spec.
+Implement ATM-AGENT-0001 (atom.agent-prompt-smoke) (Agent Prompt Smoke Atom) from its normalized atomic spec.
 
 ## Context
 Minimal birth-pipeline atom used to snapshot the generated agent prompt contract.

@@ -31,7 +31,7 @@ export function deriveRegistryCatalogCategory(entry, specDocument = {}) {
   const tags = normalizeStringArray(specDocument?.tags);
   const codePaths = normalizePathList(entry?.location?.codePaths || entry?.selfVerification?.sourcePaths?.code);
 
-  if (atomId === 'atom.core-seed') {
+  if (atomId === 'ATM-CORE-0001' || (tags.includes('seed') && codePaths.includes('packages/core/seed.js'))) {
     return 'core / seed / self-descriptor';
   }
 

@@ -114,7 +114,7 @@ function validateAtomicSpecShape(spec) {
 
   requireConst(errors, spec.schemaId, 'atm.atomicSpec', '/schemaId');
   requireConst(errors, spec.specVersion, '0.1.0', '/specVersion');
-  requireStringPattern(errors, spec.id, /^atom\.[a-z0-9]+(?:[.-][a-z0-9]+)*$/, '/id', 'ATM_SPEC_ID_PATTERN');
+  requireStringPattern(errors, spec.id, /^ATM-[A-Z][A-Z0-9]*-\d{4}$/, '/id', 'ATM_SPEC_ID_PATTERN');
   requireNonEmptyString(errors, spec.title, '/title');
   requireEnum(errors, spec.migration?.strategy, ['none', 'additive', 'breaking'], '/migration/strategy');
   requireEnum(errors, spec.language?.primary, ['language-neutral', 'javascript', 'typescript', 'json', 'markdown', 'shell', 'other'], '/language/primary');

@@ -46,7 +46,7 @@ export function scanNeutralityRepository(options = {}) {
       fromVersion: null,
       notes: 'ATM-CORE-0003 deterministic neutrality scan report.'
     },
-    atomId: 'atom.plugin-rule-guard.neutrality-scanner',
+    atomId: 'ATM-CORE-0003',
     legacyPlanningId: 'ATM-CORE-0003',
     repositoryRoot: toPosixPath(repositoryRoot),
     policyPath: policy.policyPath,

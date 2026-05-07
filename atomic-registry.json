@@ -10,7 +10,8 @@
   "generatedAt": "2026-05-06T17:00:00.000Z",
   "entries": [
     {
-      "atomId": "atom.core-seed",
+      "atomId": "ATM-CORE-0001",
+      "logicalName": "atom.core-seed",
       "schemaId": "atm.atomicSpec",
       "specVersion": "0.1.0",
       "schemaPath": "schemas/atomic-spec.schema.json",
@@ -35,9 +36,9 @@
       ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0001",
-        "specHash": "sha256:af3b1642873a311473d88f1a765bace9d631f3aad8cfd243f03c5539d73c1fb2",
-        "codeHash": "sha256:a7b9dba343740966c08bb2d8ba5e7d00f62daf40c50e1758603929ec23366157",
-        "testHash": "sha256:36f9d1220f99903405d9536f17cc58e1b299ee9b88e0020116b93fd81a536b8c",
+        "specHash": "sha256:c1cda089fe8b45e835aad1d6e6a9a5af7486b1fd29dbbab4aebbf806eab5f428",
+        "codeHash": "sha256:148c1ffad1bde63b510ea4048a0f919cc23c5bda263299b97271990e5d359d67",
+        "testHash": "sha256:fbafd2f439e69c770f0424b6c699a4bcc87faaf4ba7a7d10bdb4b874ba36012c",
         "sourcePaths": {
           "spec": "specs/atom-seed-spec.json",
           "code": "packages/core/seed.js",
@@ -49,7 +50,8 @@
       }
     },
     {
-      "atomId": "atom.plugin-rule-guard.neutrality-scanner",
+      "atomId": "ATM-CORE-0003",
+      "logicalName": "atom.plugin-rule-guard.neutrality-scanner",
       "schemaId": "atm.atomicSpec",
       "specVersion": "0.1.0",
       "schemaPath": "schemas/atomic-spec.schema.json",
@@ -72,8 +74,8 @@
         "testPaths": [
           "scripts/validate-neutrality-scanner.mjs"
         ],
-        "reportPath": "atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner/atom.test.report.json",
-        "workbenchPath": "atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner"
+        "reportPath": "atomic_workbench/atoms/ATM-CORE-0003/atom.test.report.json",
+        "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0003"
       },
       "compatibility": {
         "coreVersion": "0.1.0",
@@ -84,13 +86,13 @@
       "evidence": [
         ".github/workflows/neutrality.yml",
         "scripts/validate-neutrality-scanner.mjs",
-        "atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner/atom.test.report.json"
+        "atomic_workbench/atoms/ATM-CORE-0003/atom.test.report.json"
       ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0003",
-        "specHash": "sha256:2017dea41c32000bb7bd7f95459ebe7d3b7dacf8a7c7b94f766a5caa6fb9572d",
-        "codeHash": "sha256:09d04a21e96b3e9545b3f0bb3b72f57de466d734f7ad722995e34ed5119107dc",
-        "testHash": "sha256:21dba1e4cf9d1c6606031656764f9bbd091613a021fe5e974311a60eba96c70a",
+        "specHash": "sha256:d445c71af80dd22412a62e87c3bbb94371773d3090b7a1f11de2362338520a1e",
+        "codeHash": "sha256:fc166d0ba4f4dd1f892eebe1d3b2701a78d39bf6d71f1cef2dd8ec89e3713806",
+        "testHash": "sha256:ac6e4b8790a573c03cb4a8936fd66f62fa092cb5fd096fda85efd772c2957c89",
         "sourcePaths": {
           "spec": "specs/neutrality-scanner.atom.json",
           "code": "packages/plugin-rule-guard/src/neutrality-scanner.mjs",

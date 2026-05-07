@@ -60,7 +60,8 @@ check(policy.bannedPathPatterns.includes('<non-ascii-filename>'), 'neutrality po
 const parsedSpec = parseAtomicSpecFile('specs/neutrality-scanner.atom.json', { cwd: root });
 check(parsedSpec.ok === true, 'neutrality atom spec must parse successfully');
 if (parsedSpec.ok) {
-  check(parsedSpec.normalizedModel.identity.atomId === 'atom.plugin-rule-guard.neutrality-scanner', 'neutrality atom spec must preserve the canonical atom id');
+  check(parsedSpec.normalizedModel.identity.atomId === 'ATM-CORE-0003', 'neutrality atom spec must preserve the canonical atom id');
+  check(parsedSpec.normalizedModel.identity.logicalName === 'atom.plugin-rule-guard.neutrality-scanner', 'neutrality atom spec must preserve the historical logicalName');
 }
 
 const workflow = readText('.github/workflows/neutrality.yml');
@@ -69,12 +70,13 @@ check(workflow.includes('pull_request'), 'neutrality workflow must run on pull r
 check(workflow.includes('push'), 'neutrality workflow must run on push');
 
 const registryDocument = readJson('atomic-registry.json');
-const registryEntry = registryDocument.entries.find((entry) => entry.atomId === 'atom.plugin-rule-guard.neutrality-scanner');
+const registryEntry = registryDocument.entries.find((entry) => entry.atomId === 'ATM-CORE-0003');
 check(Boolean(registryEntry), 'atomic-registry.json must contain the neutrality scanner entry');
 if (registryEntry) {
   check(registryEntry.selfVerification?.legacyPlanningId === 'ATM-CORE-0003', 'registry entry must preserve legacyPlanningId=ATM-CORE-0003');
-  check(registryEntry.location?.workbenchPath === 'atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner', 'registry entry must use the canonical workbench folder');
-  check(registryEntry.location?.reportPath === 'atomic_workbench/atoms/atom.plugin-rule-guard.neutrality-scanner/atom.test.report.json', 'registry entry must point to the canonical neutrality report path');
+  check(registryEntry.logicalName === 'atom.plugin-rule-guard.neutrality-scanner', 'registry entry must preserve logicalName for the neutrality scanner');
+  check(registryEntry.location?.workbenchPath === 'atomic_workbench/atoms/ATM-CORE-0003', 'registry entry must use the canonical workbench folder');
+  check(registryEntry.location?.reportPath === 'atomic_workbench/atoms/ATM-CORE-0003/atom.test.report.json', 'registry entry must point to the canonical neutrality report path');
   check(registryEntry.evidence?.includes('.github/workflows/neutrality.yml'), 'registry entry evidence must include the neutrality workflow');
 }
 

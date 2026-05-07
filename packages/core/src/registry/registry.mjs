@@ -34,6 +34,7 @@ export function createAtomicRegistryEntry(normalizedModel, options = {}) {
   return {
     id: options.id ?? normalizedModel.identity.atomId,
     atomId: normalizedModel.identity.atomId,
+    logicalName: options.logicalName ?? normalizedModel.identity.logicalName ?? undefined,
     atomVersion: options.atomVersion ?? normalizedModel.schema.specVersion,
     schemaId: normalizedModel.schema.schemaId,
     specVersion: normalizedModel.schema.specVersion,

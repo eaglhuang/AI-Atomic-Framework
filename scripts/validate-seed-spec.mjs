@@ -65,12 +65,13 @@ for (const relativePath of requiredFiles) {
   assert(existsSync(path.join(root, relativePath)), `missing required seed file: ${relativePath}`);
 }
 
-const { createSeedAtomSpec, seedAtomId, seedLegacyPlanningId, seedSourcePath, seedSpecPath } = await import(pathToFileURL(path.join(root, 'packages/core/seed.js')).href);
+const { createSeedAtomSpec, seedAtomId, seedLegacyPlanningId, seedLogicalName, seedSourcePath, seedSpecPath } = await import(pathToFileURL(path.join(root, 'packages/core/seed.js')).href);
 const expectedSpec = createSeedAtomSpec();
 const actualSpec = JSON.parse(readFileSync(path.join(root, seedSpecPath), 'utf8'));
 
 assert(seedLegacyPlanningId === 'ATM-CORE-0001', 'seed legacy planning ID must stay ATM-CORE-0001');
-assert(seedAtomId === 'atom.core-seed', 'seed atom ID must stay atom.core-seed under current schema vocabulary');
+assert(seedAtomId === 'ATM-CORE-0001', 'seed atom ID must stay ATM-CORE-0001 as the canonical atomic identifier');
+assert(seedLogicalName === 'atom.core-seed', 'seed logicalName must preserve the historical dot-notation namespace');
 assert(seedSourcePath === 'packages/core/seed.js', 'seed source path must remain packages/core/seed.js');
 assert(seedSpecPath === 'specs/atom-seed-spec.json', 'seed spec path must remain specs/atom-seed-spec.json');
 assert(stableStringify(actualSpec) === stableStringify(expectedSpec), 'atom-seed-spec.json must match packages/core/seed.js seed spec template');
