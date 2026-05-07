@@ -1,19 +1,15 @@
 {
-  "name": "@ai-atomic-framework/cli",
+  "name": "@ai-atomic-framework/plugin-governance-local",
   "version": "0.0.0",
   "private": false,
-  "description": "CLI entrypoint for AI-Atomic-Framework repository adoption and validation.",
+  "description": "Local filesystem reference plugins for the default ATM governance bundle.",
   "license": "MIT",
   "type": "module",
   "exports": "./src/index.ts",
-  "bin": {
-    "atm": "./src/atm.mjs"
-  },
   "files": ["src"],
   "dependencies": {
     "@ai-atomic-framework/core": "0.0.0",
-    "@ai-atomic-framework/plugin-governance-local": "0.0.0",
-    "@ai-atomic-framework/plugin-rule-guard": "0.0.0"
+    "@ai-atomic-framework/plugin-sdk": "0.0.0"
   },
   "scripts": {
     "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",

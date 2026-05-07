@@ -1,0 +1,111 @@
+{
+  "bootstrapTaskTitle": "Bootstrap local governance bundle",
+  "timestamp": "2026-05-07T00:00:00.000Z",
+  "actor": "vs-code-gpt-5.4",
+  "hostFiles": {
+    "README.md": "# Governance Host\n\nStandalone governance host for ATM local bundle smoke.\n",
+    "index.html": "<!doctype html><html><body><h1>Governance Host</h1></body></html>\n",
+    "assets/css/site.css": "body { font-family: serif; }\n",
+    "docs/guide.md": "# Guide\n\nLocal governance document index smoke target.\n"
+  },
+  "expectedPaths": [
+    "AGENTS.md",
+    ".atm/profile/default.md",
+    ".atm/context/INITIAL_SUMMARY.md",
+    ".atm/state/project-probe.json",
+    ".atm/state/default-guards.json",
+    ".atm/tasks/BOOTSTRAP-0001.json",
+    ".atm/locks/BOOTSTRAP-0001.lock.json",
+    ".atm/evidence/BOOTSTRAP-0001.json",
+    ".atm/artifacts",
+    ".atm/logs",
+    ".atm/reports",
+    ".atm/index",
+    ".atm/shards",
+    ".atm/rules",
+    ".atm/registry"
+  ],
+  "workItem": {
+    "workItemId": "ATM-PLUGIN-0008",
+    "title": "Local governance bundle smoke",
+    "status": "planned"
+  },
+  "lockFiles": [
+    "docs/guide.md",
+    "src/host.js"
+  ],
+  "document": {
+    "path": "docs/guide.md",
+    "metadata": {
+      "documentId": "doc_local_governance_0001",
+      "title": "Governance Guide"
+    }
+  },
+  "shard": {
+    "path": ".atm/shards/local/part-01.json",
+    "value": {
+      "id": "part-01",
+      "items": [
+        "task",
+        "lock",
+        "evidence"
+      ]
+    },
+    "indexPath": ".atm/shards/index.json"
+  },
+  "artifact": {
+    "artifactPath": ".atm/artifacts/ATM-PLUGIN-0008/smoke.json",
+    "artifactKind": "report",
+    "producedBy": "validate-governance-local"
+  },
+  "runReport": {
+    "reportId": "governance-local-smoke",
+    "report": {
+      "ok": true,
+      "checks": [
+        "task",
+        "lock",
+        "document-index",
+        "shard",
+        "artifact",
+        "log",
+        "report",
+        "state",
+        "rule-guard",
+        "evidence",
+        "context-summary"
+      ]
+    }
+  },
+  "state": {
+    "markdownPath": ".atm/state/HANDOFF.md",
+    "markdownContent": "# Handoff\n\n- governance local smoke complete\n",
+    "jsonPath": ".atm/state/smoke.json",
+    "jsonValue": {
+      "ready": true,
+      "surface": "governance-local"
+    }
+  },
+  "ruleGuard": {
+    "guardId": "governance-local-smoke",
+    "context": {
+      "mode": "smoke",
+      "bundle": "default"
+    }
+  },
+  "evidence": {
+    "evidenceKind": "validation",
+    "summary": "Local governance bundle smoke passed.",
+    "artifactPaths": [
+      ".atm/reports/governance-local-smoke.json"
+    ]
+  },
+  "summary": {
+    "workItemId": "ATM-PLUGIN-0008",
+    "summary": "Local governance bundle ready for the next agent run.",
+    "nextActions": [
+      "Run root validation.",
+      "Commit the bundle package."
+    ]
+  }
+}

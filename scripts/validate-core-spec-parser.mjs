@@ -27,6 +27,12 @@ function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
+function normalizePortablePath(value) {
+  return String(value ?? '')
+    .replace(/\\/g, '/')
+    .replace(/^([A-Z]):/i, (_match, driveLetter) => `${String(driveLetter).toLowerCase()}:`);
+}
+
 function expectSubset(actual, expected, currentPath = 'root') {
   if (Array.isArray(expected)) {
     assert.deepStrictEqual(actual, expected, `${currentPath} mismatch`);
@@ -53,7 +59,7 @@ for (const invalidCase of fixture.invalidCases) {
   check(result.ok === false, `${invalidCase.name} must fail parsing`);
   const issue = result.promptReport.issues.find((entry) => entry.code === invalidCase.expectedCode);
   check(Boolean(issue), `${invalidCase.name} must contain issue code ${invalidCase.expectedCode}`);
-  check(issue.path === invalidCase.expectedPath, `${invalidCase.name} must point to ${invalidCase.expectedPath}`);
+  check(normalizePortablePath(issue.path) === normalizePortablePath(invalidCase.expectedPath), `${invalidCase.name} must point to ${invalidCase.expectedPath}`);
   check(issue.prompt.includes(invalidCase.expectedPromptSnippet), `${invalidCase.name} must provide prompt hint for ${invalidCase.expectedPromptSnippet}`);
 }
 
