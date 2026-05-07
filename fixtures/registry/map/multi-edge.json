@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.atomicMap",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Multi-edge atomic map fixture."
+  },
+  "mapId": "map.fixture.multi-edge",
+  "mapVersion": "0.1.0",
+  "members": [
+    {
+      "atomId": "ATM-FIXTURE-0003",
+      "version": "0.1.0"
+    },
+    {
+      "atomId": "ATM-FIXTURE-0001",
+      "version": "0.1.0"
+    },
+    {
+      "atomId": "ATM-FIXTURE-0002",
+      "version": "0.1.0"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ATM-FIXTURE-0002",
+      "to": "ATM-FIXTURE-0003",
+      "binding": "validates"
+    },
+    {
+      "from": "ATM-FIXTURE-0001",
+      "to": "ATM-FIXTURE-0003",
+      "binding": "emits"
+    },
+    {
+      "from": "ATM-FIXTURE-0001",
+      "to": "ATM-FIXTURE-0002",
+      "binding": "feeds"
+    }
+  ],
+  "entrypoints": [
+    "ATM-FIXTURE-0001"
+  ],
+  "qualityTargets": {
+    "cycleCount": 0,
+    "requiredChecks": 3,
+    "evolutionPromoteGate": "all-required-reports-pass"
+  },
+  "mapHash": "sha256:87923b3016acc2e976253ab24bd48efa307f1899d197ca1834feb13a2b0b67cb"
+}

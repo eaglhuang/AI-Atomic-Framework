@@ -1,4 +1,10 @@
-import type { RegistryDocument, RegistryEntryRecord, RegistryVersionRecord } from '../index';
+import type {
+  MapRegistryEntryRecord,
+  RegistryDocument,
+  RegistryDocumentEntryRecord,
+  RegistryEntryRecord,
+  RegistryVersionRecord
+} from '../index';
 
 export interface RegistryVersionHistoryMigrationOptions {
   readonly defaultVersion?: string;
@@ -11,7 +17,7 @@ export interface RegistryEntryWithVersionHistory extends RegistryEntryRecord {
 }
 
 export interface RegistryDocumentWithVersionHistory extends Omit<RegistryDocument, 'entries'> {
-  readonly entries: readonly RegistryEntryWithVersionHistory[];
+  readonly entries: readonly (RegistryEntryWithVersionHistory | MapRegistryEntryRecord)[];
 }
 
 export function upcastRegistryDocumentVersionHistory(
@@ -21,7 +27,9 @@ export function upcastRegistryDocumentVersionHistory(
   return {
     ...registryDocument,
     entries: Array.isArray(registryDocument.entries)
-      ? registryDocument.entries.map((entry) => upcastRegistryEntryVersionHistory(entry, options))
+      ? registryDocument.entries.map((entry) => isAtomRegistryEntry(entry)
+        ? upcastRegistryEntryVersionHistory(entry, options)
+        : entry)
       : []
   };
 }
@@ -89,4 +97,8 @@ function resolveRegistryVersion(
 ): string {
   const fallbackVersion = options.defaultVersion ?? entry.currentVersion ?? entry.atomVersion ?? entry.specVersion;
   return String(fallbackVersion || '0.1.0').trim();
+}
+
+function isAtomRegistryEntry(entry: RegistryDocumentEntryRecord): entry is RegistryEntryRecord {
+  return entry?.schemaId === 'atm.atomicSpec';
 }

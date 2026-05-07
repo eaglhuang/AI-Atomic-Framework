@@ -30,7 +30,14 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "#/$defs/registryEntry"
+        "oneOf": [
+          {
+            "$ref": "#/$defs/registryEntry"
+          },
+          {
+            "$ref": "#/$defs/mapRegistryEntry"
+          }
+        ]
       }
     }
   },
@@ -156,6 +163,139 @@
         "selfVerification": {
           "$ref": "#/$defs/selfVerification"
         }
+      }
+    },
+    "mapRegistryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mapId",
+        "mapVersion",
+        "schemaId",
+        "specVersion",
+        "schemaPath",
+        "members",
+        "edges",
+        "entrypoints",
+        "qualityTargets",
+        "mapHash"
+      ],
+      "properties": {
+        "mapId": {
+          "type": "string",
+          "pattern": "^map\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "mapVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "schemaId": {
+          "const": "atm.atomicMap"
+        },
+        "specVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "schemaPath": {
+          "type": "string",
+          "pattern": "^schemas/.+\\.schema\\.json$"
+        },
+        "members": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/mapMember"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mapEdge"
+          }
+        },
+        "entrypoints": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+          }
+        },
+        "qualityTargets": {
+          "$ref": "#/$defs/mapQualityTargets"
+        },
+        "mapHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "semanticFingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "lineageLogRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ttl": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "mapMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomId", "version"],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        }
+      }
+    },
+    "mapEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "binding"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "binding": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "mapQualityTargets": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
       }
     },
     "hashLock": {

@@ -26,6 +26,16 @@
       "path": "positive/minimal-registry.json"
     },
     {
+      "name": "minimal atomic map",
+      "schema": "atomic-map",
+      "path": "../../fixtures/registry/map/minimal.json"
+    },
+    {
+      "name": "multi-edge atomic map",
+      "schema": "atomic-map",
+      "path": "../../fixtures/registry/map/multi-edge.json"
+    },
+    {
       "name": "minimal regression matrix",
       "schema": "regression-matrix",
       "path": "positive/minimal-regression-matrix.json"
@@ -87,6 +97,13 @@
       "schema": "governance-bundle",
       "path": "negative/governance-bundle-invalid-layout.json",
       "expectedKeyword": "const"
+    },
+    {
+      "name": "missing atomic map quality targets",
+      "schema": "atomic-map",
+      "path": "../../fixtures/registry/map/quality-targets-missing.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "qualityTargets"
     },
     {
       "name": "missing runner contract",

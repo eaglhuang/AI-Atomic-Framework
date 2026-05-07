@@ -1,0 +1,67 @@
+import { computeSha256ForContent } from '../hash-lock/hash-lock.mjs';
+import type {
+  RegistryMapEdgeRecord,
+  RegistryMapMemberRecord,
+  RegistryMapQualityTargetsRecord
+} from '../index';
+
+export interface AtomicMapHashInput {
+  readonly members: readonly RegistryMapMemberRecord[];
+  readonly edges: readonly RegistryMapEdgeRecord[];
+  readonly entrypoints: readonly string[];
+  readonly qualityTargets?: RegistryMapQualityTargetsRecord;
+}
+
+export function createAtomicMapHashPayload(input: AtomicMapHashInput) {
+  return {
+    members: normalizeAtomicMapMembers(input.members),
+    edges: normalizeAtomicMapEdges(input.edges),
+    entrypoints: normalizeAtomicMapEntrypoints(input.entrypoints)
+  };
+}
+
+export function computeAtomicMapHash(input: AtomicMapHashInput): string {
+  return computeSha256ForContent(JSON.stringify(createAtomicMapHashPayload(input)));
+}
+
+export function createAtomicMapSemanticFingerprint(input: Pick<AtomicMapHashInput, 'entrypoints' | 'qualityTargets'>): string {
+  return computeSha256ForContent(JSON.stringify({
+    entrypoints: normalizeAtomicMapEntrypoints(input.entrypoints),
+    qualityTargets: normalizeAtomicMapQualityTargets(input.qualityTargets)
+  }));
+}
+
+function normalizeAtomicMapMembers(members: readonly RegistryMapMemberRecord[] = []) {
+  return [...members]
+    .map((member) => ({
+      atomId: String(member.atomId).trim(),
+      version: String(member.version).trim()
+    }))
+    .sort((left, right) => left.atomId.localeCompare(right.atomId) || left.version.localeCompare(right.version));
+}
+
+function normalizeAtomicMapEdges(edges: readonly RegistryMapEdgeRecord[] = []) {
+  return [...edges]
+    .map((edge) => ({
+      from: String(edge.from).trim(),
+      to: String(edge.to).trim(),
+      binding: String(edge.binding).trim()
+    }))
+    .sort((left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to) || left.binding.localeCompare(right.binding));
+}
+
+function normalizeAtomicMapEntrypoints(entrypoints: readonly string[] = []) {
+  return [...entrypoints]
+    .map((entrypoint) => String(entrypoint).trim())
+    .filter(Boolean)
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeAtomicMapQualityTargets(qualityTargets: RegistryMapQualityTargetsRecord = {}) {
+  return Object.fromEntries(
+    Object.entries(qualityTargets)
+      .map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
+      .filter(([key]) => key.length > 0)
+      .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+  );
+}

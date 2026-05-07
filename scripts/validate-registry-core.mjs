@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAtomicSpecFile } from '../packages/core/src/spec/parse-spec.mjs';
 import { runAtomicTestRunner } from '../packages/core/src/manager/test-runner.mjs';
+import { createAtomicMapRegistryEntry, validateAtomicMapRegistryEntryHash } from '../packages/core/src/registry/map-registry.ts';
 import { createAtomicRegistryEntry, createRegistryDocument, evaluateRegistryEntryDrift, validateRegistryDocument } from '../packages/core/src/registry/registry.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -11,6 +12,16 @@ const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
 const fixture = readJson('tests/registry.fixture.json');
+const mapFixtures = {
+  minimal: readJson('fixtures/registry/map/minimal.json'),
+  multiEdge: readJson('fixtures/registry/map/multi-edge.json')
+};
+const mapAcceptance = [
+  'atomic map hash matches the canonical sorted payload for minimal maps',
+  'atomic map hash changes when any member version changes',
+  'registry document accepts atom entries and map entries together',
+  'multi-edge atomic maps validate as registry entries'
+];
 
 function fail(message) {
   console.error(`[registry-core:${mode}] ${message}`);
@@ -161,6 +172,27 @@ try {
   check(drift.ok === false && drift.issues.includes('testHash'), 'editing test must trigger testHash drift');
   restore();
 
+  const minimalMapEntry = createAtomicMapRegistryEntry(mapFixtures.minimal);
+  check(validateAtomicMapRegistryEntryHash(minimalMapEntry).ok === true, 'minimal atomic map entry must preserve computed mapHash');
+
+  const upgradedMinimalMapEntry = createAtomicMapRegistryEntry({
+    ...mapFixtures.minimal,
+    members: mapFixtures.minimal.members.map((member, index) => index === 0
+      ? { ...member, version: '0.1.1' }
+      : member)
+  });
+  check(upgradedMinimalMapEntry.mapHash !== minimalMapEntry.mapHash, 'upgrading a map member version must change mapHash');
+
+  const multiEdgeMapEntry = createAtomicMapRegistryEntry(mapFixtures.multiEdge);
+  check(validateAtomicMapRegistryEntryHash(multiEdgeMapEntry).ok === true, 'multi-edge atomic map entry must preserve computed mapHash');
+
+  const mixedDocument = createRegistryDocument([entry, minimalMapEntry], {
+    registryId: `${fixture.expectedRegistryId}.with-map`,
+    generatedAt: fixture.generatedAt,
+    sharding: fixture.sharding
+  });
+  check(validateRegistryDocument(mixedDocument).ok === true, 'registry document must allow atom entries and map entries together');
+
   assertProtectedFilesStayNeutral();
 
   const currentRegistryDocument = readJson('atomic-registry.json');
@@ -171,5 +203,5 @@ try {
 }
 
 if (!process.exitCode) {
-  console.log(`[registry-core:${mode}] ok (${fixture.acceptance.length} acceptance checks)`);
+  console.log(`[registry-core:${mode}] ok (${fixture.acceptance.length + mapAcceptance.length} acceptance checks)`);
 }

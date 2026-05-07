@@ -122,6 +122,41 @@ export interface RegistryCompatibilityRecord {
   readonly lifecycleMode?: 'birth' | 'evolution';
 }
 
+export interface RegistryMapMemberRecord {
+  readonly atomId: string;
+  readonly version: string;
+}
+
+export interface RegistryMapEdgeRecord {
+  readonly from: string;
+  readonly to: string;
+  readonly binding: string;
+}
+
+export type RegistryMapQualityTargetValue = string | number | boolean;
+
+export type RegistryMapQualityTargetsRecord = Readonly<Record<string, RegistryMapQualityTargetValue>>;
+
+export interface AtomicMapRecord {
+  readonly schemaId: 'atm.atomicMap';
+  readonly specVersion: '0.1.0';
+  readonly migration: {
+    readonly strategy: 'none' | 'additive' | 'breaking';
+    readonly fromVersion: string | null;
+    readonly notes: string;
+  };
+  readonly mapId: string;
+  readonly mapVersion: string;
+  readonly members: readonly RegistryMapMemberRecord[];
+  readonly edges: readonly RegistryMapEdgeRecord[];
+  readonly entrypoints: readonly string[];
+  readonly qualityTargets: RegistryMapQualityTargetsRecord;
+  readonly mapHash: string;
+  readonly semanticFingerprint?: string;
+  readonly lineageLogRef?: string;
+  readonly ttl?: number;
+}
+
 export interface RegistryVersionRecord {
   readonly version: string;
   readonly specHash: string;
@@ -156,6 +191,12 @@ export interface RegistryEntryRecord {
   readonly selfVerification: RegistrySelfVerificationRecord;
 }
 
+export interface MapRegistryEntryRecord extends Omit<AtomicMapRecord, 'migration'> {
+  readonly schemaPath: string;
+}
+
+export type RegistryDocumentEntryRecord = RegistryEntryRecord | MapRegistryEntryRecord;
+
 export interface RegistryShardingRecord {
   readonly strategy: 'single-document' | 'external-parts';
   readonly partPaths: readonly string[];
@@ -173,7 +214,7 @@ export interface RegistryDocument {
   readonly registryId: string;
   readonly generatedAt: string;
   readonly sharding?: RegistryShardingRecord;
-  readonly entries: readonly RegistryEntryRecord[];
+  readonly entries: readonly RegistryDocumentEntryRecord[];
 }
 
 export interface ContextSummaryRecord {
@@ -188,4 +229,6 @@ export const corePackage: AtomicPackageDescriptor = {
   packageVersion: '0.0.0'
 };
 
+export * from './registry/map-hash.ts';
+export * from './registry/map-registry.ts';
 export * from './registry/registry-migration.ts';
