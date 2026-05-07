@@ -266,6 +266,7 @@ export const corePackage: AtomicPackageDescriptor = {
   packageVersion: '0.0.0'
 };
 
+export * from './agent-execute/execute-agent-task.ts';
 export * from './registry/map-hash.ts';
 export * from './registry/map-registry.ts';
 export * from './registry/registry-migration.ts';

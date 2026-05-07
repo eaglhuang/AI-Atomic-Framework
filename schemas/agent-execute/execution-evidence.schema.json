@@ -1,0 +1,303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/agent-execute/execution-evidence.schema.json",
+  "title": "ATM ExecuteAgentTask Evidence v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "atomId",
+    "lifecycleMode",
+    "executionMode",
+    "ok",
+    "generatedAt",
+    "evidencePath",
+    "effectNode",
+    "prompt",
+    "agentRun",
+    "validationPasses",
+    "logSummary",
+    "artifacts"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.executionEvidence"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "lifecycleMode": {
+      "enum": ["birth", "evolution"]
+    },
+    "executionMode": {
+      "enum": ["dry-run", "apply"]
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidencePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "effectNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeKind", "nodeName", "defaultMode", "applyFlag", "proposalDelegatedTo"],
+      "properties": {
+        "nodeKind": {
+          "const": "effect"
+        },
+        "nodeName": {
+          "const": "ExecuteAgentTask"
+        },
+        "defaultMode": {
+          "const": "dry-run"
+        },
+        "applyFlag": {
+          "const": "--apply"
+        },
+        "proposalDelegatedTo": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z0-9.]+-\\d{4}$"
+        }
+      }
+    },
+    "prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promptPath", "allowedFiles", "validationCommands"],
+      "properties": {
+        "promptPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowedFiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "validationCommands": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "agentRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposedChangeCount",
+        "appliedChanges",
+        "hostProjectMutated",
+        "touchedFiles",
+        "appliedTouchedFiles",
+        "summary",
+        "artifactPath",
+        "logPath"
+      ],
+      "properties": {
+        "proposedChangeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "appliedChanges": {
+          "type": "boolean"
+        },
+        "hostProjectMutated": {
+          "type": "boolean"
+        },
+        "touchedFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "appliedTouchedFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "logPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "validationPasses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/validationPass"
+      }
+    },
+    "logSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lineCount", "preview", "warningCount", "errorCount"],
+      "properties": {
+        "lineCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "preview": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warningCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errorCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "$ref": "#/$defs/artifactRecord"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "executionMode": {
+            "const": "dry-run"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "agentRun": {
+            "properties": {
+              "appliedChanges": {
+                "const": false
+              },
+              "hostProjectMutated": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycleMode": {
+            "const": "evolution"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "validationPasses": {
+            "minItems": 2
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "artifactRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactPath", "artifactKind", "producedBy"],
+      "properties": {
+        "artifactPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactKind": {
+          "enum": ["file", "log", "report", "snapshot"]
+        },
+        "producedBy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "validationPass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passId", "fixtureSet", "ok", "exitCode", "reportPath", "summary"],
+      "properties": {
+        "passId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fixtureSet": {
+          "enum": ["baseline", "candidate", "current"]
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reportPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

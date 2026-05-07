@@ -13,6 +13,7 @@ const schemaEntries = {
   'atomic-spec': 'schemas/atomic-spec.schema.json',
   'atomic-map': 'schemas/registry/atomic-map.schema.json',
   'agent-prompt': 'schemas/agent-prompt.schema.json',
+  'execution-evidence': 'schemas/agent-execute/execution-evidence.schema.json',
   'governance-artifact': 'schemas/governance/artifact.schema.json',
   'governance-log': 'schemas/governance/log.schema.json',
   'governance-run-report': 'schemas/governance/run-report.schema.json',

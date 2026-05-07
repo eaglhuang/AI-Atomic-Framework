@@ -16,6 +16,14 @@ export type {
   VersionResolverRequest
 } from './lifecycle';
 export type {
+  EffectNode,
+  EffectNodeContext,
+  EffectNodeMode,
+  EffectNodeResult,
+  ExecuteAgentTaskEffectNode,
+  ExecuteAgentTaskInput
+} from './effect-node';
+export type {
   CapabilityContext,
   CapabilityDescriptor,
   CapabilityKind,

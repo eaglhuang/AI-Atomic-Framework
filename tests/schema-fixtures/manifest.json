@@ -129,6 +129,11 @@
       "name": "minimal agent prompt",
       "schema": "agent-prompt",
       "path": "positive/minimal-agent-prompt.json"
+    },
+    {
+      "name": "minimal execution evidence",
+      "schema": "execution-evidence",
+      "path": "positive/minimal-execution-evidence.json"
     }
   ],
   "negative": [
@@ -205,6 +210,13 @@
       "path": "negative/missing-evidence-contract.agent-prompt.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "evidenceContract"
+    },
+    {
+      "name": "missing validation passes",
+      "schema": "execution-evidence",
+      "path": "negative/missing-validation-passes.execution-evidence.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "validationPasses"
     }
   ]
 }

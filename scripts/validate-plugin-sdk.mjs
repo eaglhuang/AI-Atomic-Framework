@@ -9,6 +9,7 @@ const mode = process.argv.includes('--mode')
 
 const requiredFiles = [
   'packages/plugin-sdk/src/capability.ts',
+  'packages/plugin-sdk/src/effect-node.ts',
   'packages/plugin-sdk/src/governance/index.ts',
   'packages/plugin-sdk/src/governance/layout.ts',
   'packages/plugin-sdk/src/governance/stores.ts',
@@ -47,6 +48,10 @@ if (!process.exitCode) {
     'CapabilityDescriptor',
     'InjectorPlugin',
     'AtomLifecycleMode',
+    'EffectNode',
+    'EffectNodeContext',
+    'EffectNodeMode',
+    'ExecuteAgentTaskEffectNode',
     'VersionResolver',
     'QualityMetricsComparator',
     'UpgradeProposalAdapter',
@@ -88,6 +93,13 @@ if (!process.exitCode) {
   for (const interfaceName of ['VersionResolver', 'QualityMetricsComparator', 'UpgradeProposalAdapter']) {
     if (!lifecycleSource.includes(`interface ${interfaceName}`)) {
       fail(`lifecycle.ts missing ${interfaceName}`);
+    }
+  }
+
+  const effectNodeSource = readText('packages/plugin-sdk/src/effect-node.ts');
+  for (const phrase of ['interface EffectNode', 'defaultMode', "'dry-run'", "'--apply'", 'ExecuteAgentTaskEffectNode']) {
+    if (!effectNodeSource.includes(phrase)) {
+      fail(`effect-node.ts missing ${phrase}`);
     }
   }
 
