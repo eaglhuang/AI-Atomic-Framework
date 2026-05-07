@@ -7,7 +7,7 @@
     "notes": "Phase B1 seed governance registry."
   },
   "registryId": "registry.seed",
-  "generatedAt": "2026-05-07T07:00:02.398Z",
+  "generatedAt": "2026-05-07T07:30:00.000Z",
   "entries": [
     {
       "atomId": "ATM-CORE-0001",
@@ -32,7 +32,9 @@
       },
       "evidence": [
         "scripts/validate-seed-spec.mjs",
-        "scripts/validate-seed-registry.mjs"
+        "scripts/validate-seed-registry.mjs",
+        "generator-provenance:backfilled",
+        "atomic_workbench/atoms/ATM-CORE-0001/atom.test.report.json"
       ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0001",
@@ -41,12 +43,26 @@
         "testHash": "sha256:fbafd2f439e69c770f0424b6c699a4bcc87faaf4ba7a7d10bdb4b874ba36012c",
         "sourcePaths": {
           "spec": "specs/atom-seed-spec.json",
-          "code": "packages/core/seed.js",
+          "code": [
+            "packages/core/seed.js"
+          ],
           "tests": [
             "scripts/validate-seed-spec.mjs",
             "scripts/validate-seed-registry.mjs"
           ]
         }
+      },
+      "location": {
+        "specPath": "specs/atom-seed-spec.json",
+        "codePaths": [
+          "packages/core/seed.js"
+        ],
+        "testPaths": [
+          "scripts/validate-seed-spec.mjs",
+          "scripts/validate-seed-registry.mjs"
+        ],
+        "reportPath": "atomic_workbench/atoms/ATM-CORE-0001/atom.test.report.json",
+        "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0001"
       }
     },
     {
@@ -86,7 +102,8 @@
       "evidence": [
         ".github/workflows/neutrality.yml",
         "scripts/validate-neutrality-scanner.mjs",
-        "atomic_workbench/atoms/ATM-CORE-0003/atom.test.report.json"
+        "atomic_workbench/atoms/ATM-CORE-0003/atom.test.report.json",
+        "generator-provenance:backfilled"
       ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0003",
@@ -95,7 +112,9 @@
         "testHash": "sha256:ac6e4b8790a573c03cb4a8936fd66f62fa092cb5fd096fda85efd772c2957c89",
         "sourcePaths": {
           "spec": "specs/neutrality-scanner.atom.json",
-          "code": "packages/plugin-rule-guard/src/neutrality-scanner.mjs",
+          "code": [
+            "packages/plugin-rule-guard/src/neutrality-scanner.mjs"
+          ],
           "tests": [
             "scripts/validate-neutrality-scanner.mjs"
           ]
@@ -142,13 +161,14 @@
       },
       "evidence": [
         "atomic_workbench/atoms/ATM-CORE-0004/atom.test.report.json",
-        "atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json"
+        "atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json",
+        "generator-provenance:bootstrap-self"
       ],
       "selfVerification": {
         "legacyPlanningId": null,
         "specHash": "sha256:6d216b9881fbe38f3a05d521386f9e3f30f3bedc71fd283087f1c9b14e9dd7cb",
-        "codeHash": "sha256:62c25a39814202b0db5ddd1fe23f5eabfcfb2314a52837e9a26f6cf3f29e4454",
-        "testHash": "sha256:1d1ebc2708fd8e1bd42eba5e9dffcab383bb42bf0a3ac9c4840e97e5e9b11e55",
+        "codeHash": "sha256:b1868f955f26840adda3a2c452705f5dafcd7c30572fb7b8da7b3852bcefa856",
+        "testHash": "sha256:c9c198ca224bd33257392c9deae6f7850a1c5fbcee38902967bb666a74f188ea",
         "sourcePaths": {
           "spec": "atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json",
           "code": [
@@ -185,7 +205,7 @@
       "location": {
         "specPath": "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json",
         "codePaths": [
-          "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json"
+          "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs"
         ],
         "testPaths": [
           "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.test.ts"
@@ -199,18 +219,20 @@
         "languageAdapter": "language-js"
       },
       "evidence": [
+        "generator-provenance:generated",
+        "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs",
         "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.test.report.json",
         "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json"
       ],
       "selfVerification": {
         "legacyPlanningId": null,
-        "specHash": "sha256:c1b7bda782bb83d1121498e51df7d5c6aeed30bc004b8da16e295e3cb8a6010e",
-        "codeHash": "sha256:c1b7bda782bb83d1121498e51df7d5c6aeed30bc004b8da16e295e3cb8a6010e",
+        "specHash": "sha256:2df200d7794e9272982252dabeb69fa34d70fbee1849a5ea1494e4bd2075836a",
+        "codeHash": "sha256:f4abb68a14bbc32509f4f1e08e64facd153354fc9b281abfb6e4a29a1799e358",
         "testHash": "sha256:c21e180a808e3ceaf2762a1370c008acbeb3c9692c7909a948c4fe69bf6c406f",
         "sourcePaths": {
           "spec": "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json",
           "code": [
-            "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json"
+            "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs"
           ],
           "tests": [
             "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.test.ts"

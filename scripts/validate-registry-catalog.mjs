@@ -79,9 +79,10 @@ try {
   const markdown = renderRegistryCatalogMarkdown(document, { repositoryRoot: root });
   const snapshot = normalizeComparableMarkdown(readFileSync(path.join(root, fixture.snapshotPath), 'utf8'));
   check(normalizeComparableMarkdown(markdown) === snapshot, 'fixture registry catalog markdown must match snapshot');
-  check(markdown.includes('| atomId | logicalName | function | derivedCategory | status | specPath |'), 'catalog markdown must contain the required columns');
+  check(markdown.includes('| atomId | logicalName | function | derivedCategory | provenance | status | specPath |'), 'catalog markdown must contain the required columns');
   check(markdown.includes('`ATM-FIXTURE-0004`'), 'catalog markdown must include the fixture atom id');
   check(markdown.includes('`atom.registry-fixture`'), 'catalog markdown must include the fixture logicalName');
+  check(markdown.includes('`unmarked`'), 'catalog markdown must include the fixture provenance marker');
   check(markdown.includes('`registry / alpha0`'), 'catalog markdown must derive the expected category');
 
   const written = writeRegistryArtifacts(document, {

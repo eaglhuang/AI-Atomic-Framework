@@ -29,6 +29,7 @@ export function runCreate(argv) {
       idempotent: result.idempotent === true,
       workbenchPath: result.workbenchPath ?? null,
       specPath: result.specPath ?? null,
+      sourcePath: result.sourcePath ?? null,
       testPath: result.testPath ?? null,
       registryPath: result.registryPath ?? null,
       catalogPath: result.catalogPath ?? null,

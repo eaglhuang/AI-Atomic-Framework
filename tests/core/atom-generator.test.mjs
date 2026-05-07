@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { generateAtom, createMinimalAtomSpec } from '../../packages/core/src/manager/atom-generator.mjs';
@@ -14,6 +15,7 @@ if (process.argv.includes('--self-check')) {
   });
   assert.equal(spec.id, 'ATM-CORE-9999');
   assert.equal(spec.logicalName, 'atom.core-self-check');
+  assert.equal(spec.validation.commands[0], 'node -e "console.log(\'ATM-CORE-9999 validation ok\')"');
   console.log('[atom-generator:self-check] ok');
   process.exit(0);
 }
@@ -40,6 +42,7 @@ try {
   assert.equal(first.atomId, 'ATM-CORE-0001');
   assert.equal(first.allocation.sequence, 1);
   assert.equal(existsSync(path.join(tempRoot, first.specPath)), true);
+  assert.equal(existsSync(path.join(tempRoot, first.sourcePath)), true);
   assert.equal(existsSync(path.join(tempRoot, first.testPath)), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic-registry.json')), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic_workbench/registry-catalog.md')), true);
@@ -47,6 +50,14 @@ try {
   const registry = JSON.parse(readFileSync(path.join(tempRoot, 'atomic-registry.json'), 'utf8'));
   assert.equal(registry.entries.length, 1);
   assert.equal(registry.entries[0].logicalName, 'atom.core-generated-atom');
+  assert.deepEqual(registry.entries[0].location.codePaths, [first.sourcePath]);
+  assert.notEqual(registry.entries[0].selfVerification.sourcePaths.code[0], registry.entries[0].selfVerification.sourcePaths.spec);
+
+  const sourceSelfCheck = spawnSync(process.execPath, [path.join(tempRoot, first.sourcePath), '--self-check'], {
+    cwd: tempRoot,
+    encoding: 'utf8'
+  });
+  assert.equal(sourceSelfCheck.status, 0);
 
   const second = generateAtom({
     bucket: 'CORE',
@@ -84,4 +95,4 @@ try {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log('[atom-generator:test] ok (8 acceptance checks)');
+console.log('[atom-generator:test] ok (10 acceptance checks)');

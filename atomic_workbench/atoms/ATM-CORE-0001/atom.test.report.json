@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.testReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial alpha0 test runner report."
+  },
+  "atomId": "ATM-CORE-0001",
+  "ok": true,
+  "exitCode": 0,
+  "generatedAt": "2026-05-07T07:30:00.000Z",
+  "repositoryRoot": "C:/Users/User/AI-Atomic-Framework",
+  "specPath": "C:/Users/User/AI-Atomic-Framework/specs/atom-seed-spec.json",
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "canonicalization": "json-stable-v1"
+  },
+  "validation": {
+    "evidenceRequired": true,
+    "commandCount": 2
+  },
+  "runnerContract": {
+    "executionMode": "delegated",
+    "evidenceRequired": true,
+    "commands": [
+      {
+        "commandId": "validation-1",
+        "commandKind": "test",
+        "command": "node packages/cli/src/atm.mjs spec --validate specs/atom-seed-spec.json",
+        "required": true
+      },
+      {
+        "commandId": "validation-2",
+        "commandKind": "test",
+        "command": "node scripts/validate-seed-spec.mjs --mode validate",
+        "required": true
+      }
+    ]
+  },
+  "results": [
+    {
+      "commandId": "validation-1",
+      "commandKind": "test",
+      "command": "node packages/cli/src/atm.mjs spec --validate specs/atom-seed-spec.json",
+      "required": true,
+      "exitCode": 0,
+      "ok": true,
+      "durationMs": 225,
+      "stdout": "{\n  \"ok\": true,\n  \"command\": \"spec\",\n  \"mode\": \"standalone\",\n  \"cwd\": \"C:\\\\Users\\\\User\\\\AI-Atomic-Framework\",\n  \"messages\": [\n    {\n      \"level\": \"info\",\n      \"code\": \"ATM_SPEC_VALIDATE_OK\",\n      \"text\": \"Atomic spec validated against JSON Schema.\",\n      \"data\": {}\n    }\n  ],\n  \"evidence\": {\n    \"specPath\": \"specs/atom-seed-spec.json\",\n    \"schemaPath\": \"schemas/atomic-spec.schema.json\",\n    \"schemaId\": \"atm.atomicSpec\",\n    \"specVersion\": \"0.1.0\",\n    \"atomId\": \"ATM-CORE-0001\",\n    \"validated\": [\n      \"specs/atom-seed-spec.json\"\n    ]\n  }\n}\n",
+      "stderr": "",
+      "signal": null
+    },
+    {
+      "commandId": "validation-2",
+      "commandKind": "test",
+      "command": "node scripts/validate-seed-spec.mjs --mode validate",
+      "required": true,
+      "exitCode": 0,
+      "ok": true,
+      "durationMs": 371,
+      "stdout": "[seed-spec:validate] ok (seed self-description and spec validation verified)\n",
+      "stderr": "",
+      "signal": null
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "durationMs": 596
+  },
+  "artifacts": [
+    {
+      "artifactPath": "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0001/atom.test.report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    },
+    {
+      "artifactPath": "C:/Users/User/AI-Atomic-Framework/specs/atom-seed-spec.json",
+      "artifactKind": "file",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Atomic test runner verified ATM-CORE-0001 with 2/2 command(s) passing.",
+      "artifactPaths": [
+        "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0001/atom.test.report.json",
+        "C:/Users/User/AI-Atomic-Framework/specs/atom-seed-spec.json"
+      ]
+    }
+  ]
+}

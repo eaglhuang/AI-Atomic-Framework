@@ -9,7 +9,7 @@
   "atomId": "ATM-FIXTURE-0001",
   "ok": true,
   "exitCode": 0,
-  "generatedAt": "2026-05-07T07:00:14.152Z",
+  "generatedAt": "2026-05-07T07:30:00.000Z",
   "repositoryRoot": "C:/Users/User/AI-Atomic-Framework",
   "specPath": "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json",
   "hashLock": {
@@ -28,7 +28,7 @@
       {
         "commandId": "validation-1",
         "commandKind": "test",
-        "command": "node -e \"console.log('ATM-FIXTURE-0001 validation ok')\"",
+        "command": "node \"atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs\" --self-check",
         "required": true
       }
     ]
@@ -37,12 +37,12 @@
     {
       "commandId": "validation-1",
       "commandKind": "test",
-      "command": "node -e \"console.log('ATM-FIXTURE-0001 validation ok')\"",
+      "command": "node \"atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs\" --self-check",
       "required": true,
       "exitCode": 0,
       "ok": true,
-      "durationMs": 60,
-      "stdout": "ATM-FIXTURE-0001 validation ok\n",
+      "durationMs": 85,
+      "stdout": "ATM-FIXTURE-0001 source self-check ok\n",
       "stderr": "",
       "signal": null
     }
@@ -51,7 +51,7 @@
     "total": 1,
     "passed": 1,
     "failed": 0,
-    "durationMs": 60
+    "durationMs": 85
   },
   "artifacts": [
     {

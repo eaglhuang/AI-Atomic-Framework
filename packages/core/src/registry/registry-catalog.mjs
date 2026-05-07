@@ -29,6 +29,7 @@ export function createRegistryCatalogRows(registryDocument, options = {}) {
         logicalName: String(entry?.logicalName || specDocument?.logicalName || '').trim(),
         functionSummary: [title, description].filter(Boolean).join(title && description ? ': ' : ''),
         derivedCategory: deriveRegistryCatalogCategory(entry, specDocument),
+        provenance: deriveGeneratorProvenance(entry),
         status: String(entry?.status || '').trim(),
         specPath: String(entry?.specPath || '').trim()
       };
@@ -46,13 +47,13 @@ export function renderRegistryCatalogMarkdown(registryDocument, options = {}) {
     `> Projection only. Source of truth remains \`${escapeMarkdownCell(sourceOfTruthLabel)}\`.`,
     `> Generated from registry \`${escapeMarkdownCell(registryId)}\`.`,
     '',
-    '| atomId | logicalName | function | derivedCategory | status | specPath |',
-    '| --- | --- | --- | --- | --- | --- |'
+    '| atomId | logicalName | function | derivedCategory | provenance | status | specPath |',
+    '| --- | --- | --- | --- | --- | --- | --- |'
   ];
 
   for (const row of rows) {
     lines.push(
-      `| \`${escapeMarkdownCell(row.atomId)}\` | \`${escapeMarkdownCell(row.logicalName || '—')}\` | ${escapeMarkdownCell(row.functionSummary)} | \`${escapeMarkdownCell(row.derivedCategory)}\` | \`${escapeMarkdownCell(row.status)}\` | \`${escapeMarkdownCell(row.specPath)}\` |`
+      `| \`${escapeMarkdownCell(row.atomId)}\` | \`${escapeMarkdownCell(row.logicalName || '—')}\` | ${escapeMarkdownCell(row.functionSummary)} | \`${escapeMarkdownCell(row.derivedCategory)}\` | \`${escapeMarkdownCell(row.provenance)}\` | \`${escapeMarkdownCell(row.status)}\` | \`${escapeMarkdownCell(row.specPath)}\` |`
     );
   }
 
@@ -96,6 +97,11 @@ function readSpecDocument(repositoryRoot, entry, specCache) {
 
 function normalizeInlineText(value) {
   return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function deriveGeneratorProvenance(entry) {
+  const marker = (entry?.evidence ?? []).find((value) => typeof value === 'string' && value.startsWith('generator-provenance:'));
+  return marker ? marker.slice('generator-provenance:'.length) : 'unmarked';
 }
 
 function escapeMarkdownCell(value) {

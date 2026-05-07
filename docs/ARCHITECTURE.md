@@ -27,6 +27,8 @@ This layer sits above the stable primitives: spec parsing, atom-space layout, sc
 
 The CLI is only a facade over this layer. The governed generator atom remains the source of truth for allocation, scaffold orchestration, validation, and registry registration.
 
+Generator provenance is also a first-class registry projection. The catalog exposes whether an atom is `generated`, `backfilled`, or `bootstrap-self`, and `scripts/validate-generator-provenance.mjs` keeps that projection honest.
+
 ### Agent Operating Layer
 
 The Agent Operating Layer teaches a model-neutral agent how to operate inside a repository. It includes instructions, profile files, project probing, first-task creation, run envelopes, and handoff guidance.

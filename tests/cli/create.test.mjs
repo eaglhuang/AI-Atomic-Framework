@@ -19,6 +19,7 @@ try {
   assert.equal(create.exitCode, 0);
   assert.equal(create.parsed.ok, true);
   assert.equal(create.parsed.evidence.atomId, 'ATM-FIXTURE-0001');
+  assert.equal(existsSync(path.join(tempRoot, create.parsed.evidence.sourcePath)), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic-registry.json')), true);
 
   const idempotent = runAtm(['create', '--cwd', tempRoot, '--bucket', 'FIXTURE', '--title', 'CliCreate', '--description', 'CLI create.', '--logical-name', 'atom.fixture-cli-create']);
