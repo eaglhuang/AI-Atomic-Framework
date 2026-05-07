@@ -1,0 +1,43 @@
+{
+  "validRegistry": {
+    "schemaId": "atm.registry",
+    "specVersion": "0.1.0",
+    "registryId": "registry.index-fixture",
+    "entries": [
+      {
+        "atomId": "ATM-CORE-0001",
+        "logicalName": "atom.core-seed",
+        "atomVersion": "1.2.0",
+        "semanticFingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "versions": [
+          { "version": "1.0.0" },
+          { "version": "1.2.0" }
+        ]
+      },
+      {
+        "atomId": "ATM-CORE-0002",
+        "logicalName": "atom.legacy-no-sf",
+        "atomVersion": "0.1.0"
+      },
+      {
+        "mapId": "ATM-MAP-0001",
+        "mapVersion": "0.1.0",
+        "schemaId": "atm.atomicMap",
+        "semanticFingerprint": "sf:sha256:2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    ]
+  },
+  "duplicateRegistry": {
+    "registryId": "registry.index-duplicate",
+    "entries": [
+      { "atomId": "ATM-CORE-0001", "atomVersion": "1.0.0" },
+      { "id": "ATM-CORE-0001", "atomId": "ATM-CORE-0001", "atomVersion": "1.0.1" }
+    ]
+  },
+  "invalidUrns": [
+    "urn:atm:atom:atom.core-seed@1.0.0",
+    "urn:atm:map:ATM-CORE-0001@1.0.0",
+    "urn:atm:atom:ATM-MAP-0001@1.0.0",
+    "urn:atm:atom:ATM-CORE-0001@v1"
+  ]
+}
