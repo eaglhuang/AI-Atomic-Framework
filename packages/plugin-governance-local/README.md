@@ -2,7 +2,7 @@
 
 This package provides the local filesystem reference implementation for the default ATM governance bundle.
 
-It keeps governance behavior outside `packages/core` while still giving blank repositories a canonical `.atm/` task, lock, artifact, log, report, state, and evidence surface.
+It keeps governance behavior outside `packages/core` while still giving blank repositories a canonical `.atm/` task, lock, artifact, log, report, state, evidence, and context budget surface.
 
 Primary exports:
 

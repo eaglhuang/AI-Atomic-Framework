@@ -81,6 +81,45 @@ export interface ContextSummaryStore extends StoreLifecycle {
   readSummary(workItemId: string): Promise<ContextSummaryRecord | null> | ContextSummaryRecord | null;
 }
 
+export type ContextBudgetDecision = 'pass' | 'summarize-before-continue' | 'hard-stop';
+
+export interface ContextBudgetPolicy {
+  readonly policyId: string;
+  readonly generatedAt: string;
+  readonly unit: 'tokens';
+  readonly warningTokens: number;
+  readonly summarizeTokens: number;
+  readonly hardStopTokens: number;
+  readonly maxInlineArtifacts: number;
+  readonly defaultSummary: string;
+}
+
+export interface ContextBudgetEvaluationInput {
+  readonly budgetId: string;
+  readonly workItemId?: string;
+  readonly estimatedTokens: number;
+  readonly inlineArtifacts?: number;
+  readonly requestedSummary?: string;
+}
+
+export interface ContextBudgetEvaluationResult {
+  readonly policyId: string;
+  readonly budgetId: string;
+  readonly decision: ContextBudgetDecision;
+  readonly estimatedTokens: number;
+  readonly inlineArtifacts: number;
+  readonly generatedAt: string;
+  readonly reason: string;
+  readonly reportPath: string;
+  readonly summaryPath?: string;
+}
+
+export interface ContextBudgetGuard extends StoreLifecycle {
+  readPolicy(policyId?: string): Promise<ContextBudgetPolicy | null> | ContextBudgetPolicy | null;
+  writePolicy(policy: ContextBudgetPolicy): Promise<ContextBudgetPolicy> | ContextBudgetPolicy;
+  evaluateBudget(input: ContextBudgetEvaluationInput): Promise<ContextBudgetEvaluationResult> | ContextBudgetEvaluationResult;
+}
+
 export interface GovernanceStores {
   readonly taskStore: TaskStore;
   readonly lockStore: LockStore;
@@ -93,5 +132,6 @@ export interface GovernanceStores {
   readonly ruleGuard: RuleGuard;
   readonly evidenceStore: EvidenceStore;
   readonly registryStore?: RegistryStore;
+  readonly contextBudgetGuard?: ContextBudgetGuard;
   readonly contextSummaryStore?: ContextSummaryStore;
 }

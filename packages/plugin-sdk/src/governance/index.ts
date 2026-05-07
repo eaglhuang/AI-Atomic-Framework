@@ -2,6 +2,11 @@ export { defaultGovernanceLayout } from './layout';
 export type { GovernanceAdapter, GovernanceLayout } from './layout';
 export type {
   ArtifactStore,
+  ContextBudgetDecision,
+  ContextBudgetEvaluationInput,
+  ContextBudgetEvaluationResult,
+  ContextBudgetGuard,
+  ContextBudgetPolicy,
   ContextSummaryStore,
   DocumentIndex,
   EvidenceStore,

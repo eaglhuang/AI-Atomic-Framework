@@ -13,6 +13,7 @@ export interface GovernanceLayout {
   readonly ruleGuardPath: string;
   readonly evidenceStorePath: string;
   readonly registryStorePath?: string;
+  readonly contextBudgetStorePath?: string;
   readonly contextSummaryStorePath?: string;
 }
 
@@ -29,6 +30,7 @@ export const defaultGovernanceLayout: GovernanceLayout = {
   ruleGuardPath: '.atm/rules',
   evidenceStorePath: '.atm/evidence',
   registryStorePath: '.atm/registry',
+  contextBudgetStorePath: '.atm/state/context-budget',
   contextSummaryStorePath: '.atm/state/context-summary'
 };
 

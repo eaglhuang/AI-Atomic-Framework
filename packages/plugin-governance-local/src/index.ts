@@ -13,6 +13,10 @@ import type {
 import type {
   ArtifactStore,
   CapabilityResult,
+  ContextBudgetEvaluationInput,
+  ContextBudgetEvaluationResult,
+  ContextBudgetGuard,
+  ContextBudgetPolicy,
   ContextSummaryStore,
   DocumentIndex,
   EvidenceStore,
@@ -58,6 +62,7 @@ export interface LocalGovernanceBootstrapResult {
   readonly projectProbePath: string;
   readonly defaultGuardsPath: string;
   readonly evidencePath: string;
+  readonly contextBudgetPolicyPath: string;
   readonly projectProbe: Readonly<Record<string, unknown>>;
   readonly recommendedPrompt: string;
 }
@@ -79,6 +84,7 @@ const defaultLocalGovernanceLayout: GovernanceLayout = {
   ruleGuardPath: '.atm/rules',
   evidenceStorePath: '.atm/evidence',
   registryStorePath: '.atm/registry',
+  contextBudgetStorePath: '.atm/state/context-budget',
   contextSummaryStorePath: '.atm/state/context-summary'
 };
 const templateFiles = [
@@ -129,6 +135,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     ruleGuardPath: resolveRepoPath(repositoryRoot, layout.ruleGuardPath),
     evidenceStorePath: resolveRepoPath(repositoryRoot, layout.evidenceStorePath),
     registryStorePath: resolveRepoPath(repositoryRoot, layout.registryStorePath ?? '.atm/registry'),
+    contextBudgetStorePath: resolveRepoPath(repositoryRoot, layout.contextBudgetStorePath ?? '.atm/state/context-budget'),
     contextSummaryStorePath: resolveRepoPath(repositoryRoot, layout.contextSummaryStorePath ?? '.atm/state/context-summary')
   };
 
@@ -430,6 +437,64 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     }
   };
 
+  const contextBudgetGuard: ContextBudgetGuard = {
+    initialize() {
+      ensureAllDirectories();
+      const defaultPolicy = createDefaultContextBudgetPolicy(now());
+      const filePath = path.join(absoluteLayout.contextBudgetStorePath, `${defaultPolicy.policyId}.json`);
+      if (!existsSync(filePath)) {
+        writeJsonFile(filePath, defaultPolicy);
+      }
+      return capabilityResult(`Initialized context budget guard at ${layout.contextBudgetStorePath ?? '.atm/state/context-budget'}.`);
+    },
+    healthCheck: () => capabilityResult(`Context budget guard is ready at ${layout.contextBudgetStorePath ?? '.atm/state/context-budget'}.`),
+    readPolicy(policyId = 'default-policy') {
+      const filePath = path.join(absoluteLayout.contextBudgetStorePath, `${policyId}.json`);
+      if (!existsSync(filePath)) {
+        return null;
+      }
+      return readJsonFile(filePath) as ContextBudgetPolicy;
+    },
+    writePolicy(policy) {
+      ensureAllDirectories();
+      const filePath = path.join(absoluteLayout.contextBudgetStorePath, `${policy.policyId}.json`);
+      writeJsonFile(filePath, policy);
+      return policy;
+    },
+    evaluateBudget(input) {
+      ensureAllDirectories();
+      const policy = contextBudgetGuard.readPolicy() ?? createDefaultContextBudgetPolicy(now());
+      const evaluation = evaluateContextBudget(policy, input, now());
+      const reportPath = path.join(layout.runReportStorePath, 'context-budget', `${sanitizeBudgetFileId(input.budgetId)}.json`);
+      writeJsonFile(resolveRepoPath(repositoryRoot, reportPath), {
+        budgetId: input.budgetId,
+        workItemId: input.workItemId ?? null,
+        policyId: policy.policyId,
+        decision: evaluation.decision,
+        estimatedTokens: evaluation.estimatedTokens,
+        inlineArtifacts: evaluation.inlineArtifacts,
+        generatedAt: evaluation.generatedAt,
+        reason: evaluation.reason
+      });
+      let summaryPath: string | undefined;
+      if (evaluation.decision !== 'pass') {
+        summaryPath = path.join(layout.contextBudgetStorePath ?? '.atm/state/context-budget', `${sanitizeBudgetFileId(input.budgetId)}.md`);
+        writeFileSync(
+          resolveRepoPath(repositoryRoot, summaryPath),
+          createContextBudgetSummary(policy, input, evaluation),
+          'utf8'
+        );
+      }
+      return {
+        ...evaluation,
+        policyId: policy.policyId,
+        budgetId: input.budgetId,
+        reportPath: normalizeRelativePath(reportPath),
+        summaryPath: summaryPath ? normalizeRelativePath(summaryPath) : undefined
+      } satisfies ContextBudgetEvaluationResult;
+    }
+  };
+
   const contextSummaryStore: ContextSummaryStore = {
     initialize: () => initializeStore('context summary store'),
     healthCheck: () => capabilityResult(`Context summary store is ready at ${layout.contextSummaryStorePath ?? '.atm/state/context-summary'}.`),
@@ -460,6 +525,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     ruleGuard,
     evidenceStore,
     registryStore,
+    contextBudgetGuard,
     contextSummaryStore
   };
 }
@@ -488,13 +554,16 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   stores.runReportStore?.initialize?.();
   stores.ruleGuard.initialize?.();
   stores.evidenceStore.initialize?.();
+  stores.contextBudgetGuard?.initialize?.();
 
   const recommendedPrompt = createRecommendedPrompt(taskId);
   const projectProbe = probeRepository(cwd, recommendedPrompt);
   const defaultGuards = createDefaultGuards(projectProbe);
+  const defaultContextBudgetPolicy = createDefaultContextBudgetPolicy(projectProbe.generatedAt ?? new Date().toISOString());
 
   writeJson(paths.projectProbePath, projectProbe, cwd, force, created, unchanged);
   writeJson(paths.defaultGuardsPath, defaultGuards, cwd, force, created, unchanged);
+  writeJson(paths.contextBudgetPolicyPath, defaultContextBudgetPolicy, cwd, force, created, unchanged);
   writeJson(paths.taskPath, createBootstrapTask(taskId, taskTitle, projectProbe, paths), cwd, force, created, unchanged);
   writeJson(paths.lockPath, createBootstrapLock(taskId, paths), cwd, force, created, unchanged);
   writeJson(paths.evidencePath, createBootstrapEvidence(projectProbe, defaultGuards, paths), cwd, force, created, unchanged);
@@ -535,6 +604,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     projectProbePath: relativePathFrom(cwd, paths.projectProbePath),
     defaultGuardsPath: relativePathFrom(cwd, paths.defaultGuardsPath),
     evidencePath: relativePathFrom(cwd, paths.evidencePath),
+    contextBudgetPolicyPath: relativePathFrom(cwd, paths.contextBudgetPolicyPath),
     projectProbe,
     recommendedPrompt
   };
@@ -559,12 +629,14 @@ function createBootstrapPaths(cwd: string, taskId: string) {
     profilePath: path.join(atmRoot, 'profile', 'default.md'),
     projectProbePath: path.join(atmRoot, 'state', 'project-probe.json'),
     defaultGuardsPath: path.join(atmRoot, 'state', 'default-guards.json'),
+    contextBudgetPolicyPath: path.join(atmRoot, 'state', 'context-budget', 'default-policy.json'),
     taskPath: path.join(atmRoot, 'tasks', `${taskId}.json`),
     lockPath: path.join(atmRoot, 'locks', `${taskId}.lock.json`),
     evidencePath: path.join(atmRoot, 'evidence', `${taskId}.json`),
     directories: {
       profile: path.join(atmRoot, 'profile'),
       state: path.join(atmRoot, 'state'),
+      contextBudget: path.join(atmRoot, 'state', 'context-budget'),
       tasks: path.join(atmRoot, 'tasks'),
       locks: path.join(atmRoot, 'locks'),
       artifacts: path.join(atmRoot, 'artifacts'),
@@ -653,6 +725,10 @@ function createDefaultGuards(projectProbe: Readonly<Record<string, unknown>>) {
       {
         id: 'evidence-after-change',
         summary: 'Record validation evidence and a short context summary before declaring the task done.'
+      },
+      {
+        id: 'protect-context-budget',
+        summary: 'When estimated context load exceeds the repository policy, summarize or offload before continuing.'
       }
     ]
   };
@@ -680,6 +756,7 @@ function probeRepository(cwd: string, recommendedPrompt: string) {
 
   return {
     schemaVersion: 'atm.projectProbe.v0.1',
+    generatedAt: new Date().toISOString(),
     repositoryKind,
     packageManager: detectPackageManager(cwd, packageJson),
     hostWorkflow: packageJson ? 'script-driven' : (repositoryKind === 'static-site' ? 'file-publish' : 'manual'),
@@ -716,6 +793,74 @@ function createPackageManagerCommand(cwd: string, packageJson: Record<string, un
     return `yarn ${scriptName}`;
   }
   return `npm run ${scriptName}`;
+}
+
+function createDefaultContextBudgetPolicy(timestamp: string): ContextBudgetPolicy {
+  return {
+    policyId: 'default-policy',
+    generatedAt: timestamp,
+    unit: 'tokens',
+    warningTokens: 12000,
+    summarizeTokens: 20000,
+    hardStopTokens: 28000,
+    maxInlineArtifacts: 2,
+    defaultSummary: 'Summarize large tool output before continuing.'
+  };
+}
+
+function evaluateContextBudget(
+  policy: ContextBudgetPolicy,
+  input: ContextBudgetEvaluationInput,
+  generatedAt: string
+): Omit<ContextBudgetEvaluationResult, 'policyId' | 'budgetId' | 'reportPath' | 'summaryPath'> {
+  const estimatedTokens = Math.max(0, Number(input.estimatedTokens || 0));
+  const inlineArtifacts = Math.max(0, Number(input.inlineArtifacts || 0));
+  let decision: ContextBudgetEvaluationResult['decision'] = 'pass';
+  let reason = `Estimated ${estimatedTokens} tokens is within the current context budget policy.`;
+
+  if (estimatedTokens >= policy.hardStopTokens) {
+    decision = 'hard-stop';
+    reason = `Estimated ${estimatedTokens} tokens exceeds the hard-stop threshold ${policy.hardStopTokens}.`;
+  } else if (estimatedTokens >= policy.summarizeTokens) {
+    decision = 'summarize-before-continue';
+    reason = `Estimated ${estimatedTokens} tokens exceeds the summarize threshold ${policy.summarizeTokens}.`;
+  } else if (inlineArtifacts > policy.maxInlineArtifacts) {
+    decision = 'summarize-before-continue';
+    reason = `Inline artifact count ${inlineArtifacts} exceeds the policy limit ${policy.maxInlineArtifacts}.`;
+  } else if (estimatedTokens >= policy.warningTokens) {
+    reason = `Estimated ${estimatedTokens} tokens is approaching the summarize threshold ${policy.summarizeTokens}.`;
+  }
+
+  return {
+    decision,
+    estimatedTokens,
+    inlineArtifacts,
+    generatedAt,
+    reason
+  };
+}
+
+function createContextBudgetSummary(
+  policy: ContextBudgetPolicy,
+  input: ContextBudgetEvaluationInput,
+  evaluation: Omit<ContextBudgetEvaluationResult, 'policyId' | 'budgetId' | 'reportPath' | 'summaryPath'>
+): string {
+  return [
+    '# Context Budget Summary',
+    '',
+    `- Policy: ${policy.policyId}`,
+    `- Decision: ${evaluation.decision}`,
+    `- Estimated tokens: ${evaluation.estimatedTokens}`,
+    `- Inline artifacts: ${evaluation.inlineArtifacts}`,
+    `- Reason: ${evaluation.reason}`,
+    '',
+    input.requestedSummary ?? policy.defaultSummary,
+    ''
+  ].join('\n');
+}
+
+function sanitizeBudgetFileId(budgetId: string): string {
+  return normalizeRelativePath(budgetId || 'context-budget').replace(/[/:]+/g, '-');
 }
 
 function ensureDirectory(directoryPath: string, cwd: string, created: string[], unchanged: string[]) {

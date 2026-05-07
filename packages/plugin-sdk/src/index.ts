@@ -43,6 +43,11 @@ export type {
 export type { InjectorPlugin, InjectorPluginContext } from './injector-plugin';
 export type {
   ArtifactStore,
+  ContextBudgetDecision,
+  ContextBudgetEvaluationInput,
+  ContextBudgetEvaluationResult,
+  ContextBudgetGuard,
+  ContextBudgetPolicy,
   GovernanceAdapter,
   GovernanceLayout,
   ContextSummaryStore,

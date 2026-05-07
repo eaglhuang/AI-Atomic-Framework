@@ -16,13 +16,13 @@ Adapters receive `lifecycleMode` as `birth` or `evolution`. The value is declare
 
 ## Governance Stores
 
-The SDK defines interface-only stores for tasks, locks, document indexes, shards, artifacts, logs, run reports, markdown/json state, rule guards, evidence, registries, and context summaries. Implementations can use files, databases, or hosted services, but Plugin SDK does not prescribe storage.
+The SDK defines interface-only stores for tasks, locks, document indexes, shards, artifacts, logs, run reports, markdown/json state, rule guards, evidence, registries, context summaries, and `ContextBudgetGuard`. Implementations can use files, databases, or hosted services, but Plugin SDK does not prescribe storage.
 
 ## Governance Layout
 
-`packages/plugin-sdk/src/governance/layout.ts` exports `GovernanceLayout`, `GovernanceAdapter`, and `defaultGovernanceLayout`. The alpha0 reference layout uses `.atm/tasks`, `.atm/locks`, `.atm/index`, `.atm/shards`, `.atm/state`, `.atm/artifacts`, `.atm/logs`, `.atm/reports`, `.atm/rules`, and `.atm/evidence` as the default store roots. External adapters may map the same contract onto Jira, GitHub Issues, or another host store, but the SDK still treats the layout as a portable contract.
+`packages/plugin-sdk/src/governance/layout.ts` exports `GovernanceLayout`, `GovernanceAdapter`, and `defaultGovernanceLayout`. The alpha0 reference layout uses `.atm/tasks`, `.atm/locks`, `.atm/index`, `.atm/shards`, `.atm/state`, `.atm/artifacts`, `.atm/logs`, `.atm/reports`, `.atm/rules`, `.atm/evidence`, and `.atm/state/context-budget` as the default store roots. External adapters may map the same contract onto Jira, GitHub Issues, or another host store, but the SDK still treats the layout as a portable contract.
 
-`RunReportStore` is reserved here so alpha0 can name the report boundary without freezing the richer report schema too early; ATM-2-0009 expands the detailed report and evidence contracts.
+`RunReportStore` is reserved here so alpha0 can name the report boundary without freezing the richer report schema too early; ATM-2-0009 expands the detailed report and evidence contracts. `ContextBudgetGuard` gives adapters a model-neutral place to persist policy, evaluate estimated context load, and emit `pass`, `summarize-before-continue`, or `hard-stop` decisions without baking a host's prompt habits into core.
 
 ## Injector Plugins
 

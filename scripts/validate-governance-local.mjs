@@ -120,6 +120,15 @@ try {
   const registry = stores.registryStore.readRegistry();
   assert(registry.schemaId === 'atm.registry', 'registry store must initialize a default registry document');
 
+  const seededPolicy = stores.contextBudgetGuard.readPolicy();
+  assert(seededPolicy?.policyId === 'default-policy', 'context budget guard must seed a default policy');
+  stores.contextBudgetGuard.writePolicy(fixture.contextBudget.policy);
+  assert(stableStringify(stores.contextBudgetGuard.readPolicy(fixture.contextBudget.policy.policyId)) === stableStringify(fixture.contextBudget.policy), 'context budget guard must round-trip policy records');
+  const budgetEvaluation = stores.contextBudgetGuard.evaluateBudget(fixture.contextBudget.evaluation);
+  assert(budgetEvaluation.decision === 'summarize-before-continue', 'context budget guard must request summary when estimated load exceeds the summarize threshold');
+  assert(existsSync(path.join(hostRepo, budgetEvaluation.reportPath)), 'context budget guard must write a report file');
+  assert(typeof budgetEvaluation.summaryPath === 'string' && existsSync(path.join(hostRepo, budgetEvaluation.summaryPath)), 'context budget guard must write a summary file when summarization is required');
+
   stores.contextSummaryStore.writeSummary(fixture.summary);
   assert(stableStringify(stores.contextSummaryStore.readSummary(fixture.summary.workItemId)) === stableStringify(fixture.summary), 'context summary store must round-trip summary records');
 } finally {

@@ -58,6 +58,7 @@ if (!process.exitCode) {
       'GovernanceAdapter',
       'GovernanceLayout',
       'defaultGovernanceLayout',
+    'ContextBudgetGuard',
     'TaskStore',
     'LockStore',
     'DocumentIndex',
@@ -74,8 +75,8 @@ if (!process.exitCode) {
     }
   }
 
-    const layoutSource = readText('packages/plugin-sdk/src/governance/layout.ts');
-    for (const phrase of ['GovernanceLayout', 'GovernanceAdapter', 'defaultGovernanceLayout', '.atm/tasks', '.atm/reports']) {
+  	const layoutSource = readText('packages/plugin-sdk/src/governance/layout.ts');
+  	for (const phrase of ['GovernanceLayout', 'GovernanceAdapter', 'defaultGovernanceLayout', '.atm/tasks', '.atm/reports', '.atm/state/context-budget']) {
       if (!layoutSource.includes(phrase)) {
         fail(`governance/layout.ts missing ${phrase}`);
       }
@@ -104,7 +105,7 @@ if (!process.exitCode) {
   }
 
   const storesSource = readText('packages/plugin-sdk/src/governance/stores.ts');
-    for (const storeName of ['TaskStore', 'LockStore', 'DocumentIndex', 'ShardStore', 'ArtifactStore', 'LogStore', 'RunReportStore', 'MarkdownJsonStateStore', 'RuleGuard', 'EvidenceStore']) {
+    for (const storeName of ['TaskStore', 'LockStore', 'DocumentIndex', 'ShardStore', 'ArtifactStore', 'LogStore', 'RunReportStore', 'MarkdownJsonStateStore', 'RuleGuard', 'EvidenceStore', 'ContextBudgetGuard']) {
     if (!storesSource.includes(`interface ${storeName}`)) {
       fail(`governance/stores.ts missing ${storeName}`);
     }
@@ -120,7 +121,7 @@ if (!process.exitCode) {
   }
 
   const adapterGuide = readText('docs/ADAPTER_GUIDE.md');
-  for (const phrase of ['ProjectAdapter', 'LanguageAdapter', 'InjectorPlugin', 'VersionResolver', 'compatibility.lifecycleMode']) {
+  for (const phrase of ['ProjectAdapter', 'LanguageAdapter', 'InjectorPlugin', 'VersionResolver', 'compatibility.lifecycleMode', 'ContextBudgetGuard']) {
     if (!adapterGuide.includes(phrase)) {
       fail(`docs/ADAPTER_GUIDE.md missing ${phrase}`);
     }

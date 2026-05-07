@@ -115,6 +115,7 @@ try {
     '.atm/context/INITIAL_SUMMARY.md',
     '.atm/state/project-probe.json',
     '.atm/state/default-guards.json',
+    '.atm/state/context-budget/default-policy.json',
     '.atm/tasks/BOOTSTRAP-0001.json',
     '.atm/locks/BOOTSTRAP-0001.lock.json',
     '.atm/evidence/BOOTSTRAP-0001.json',
@@ -131,7 +132,8 @@ try {
   assert(probe.hostWorkflow === 'file-publish', 'project probe must report file-publish host workflow');
 
   const guards = readJson(path.join(hostRepo, '.atm', 'state', 'default-guards.json'));
-  assert(Array.isArray(guards.guards) && guards.guards.length === 3, 'default guards must contain 3 starter guards');
+  assert(Array.isArray(guards.guards) && guards.guards.length === 4, 'default guards must contain 4 starter guards');
+  assert(guards.guards.some((guard) => guard.id === 'protect-context-budget'), 'default guards must include protect-context-budget');
 
   const agents = readFileSync(path.join(hostRepo, 'AGENTS.md'), 'utf8');
   assert(agents.includes('.atm/tasks/BOOTSTRAP-0001.json'), 'AGENTS.md must point to bootstrap task');

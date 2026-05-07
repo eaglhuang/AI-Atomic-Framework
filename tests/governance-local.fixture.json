@@ -14,6 +14,8 @@
     ".atm/context/INITIAL_SUMMARY.md",
     ".atm/state/project-probe.json",
     ".atm/state/default-guards.json",
+    ".atm/state/context-budget",
+    ".atm/state/context-budget/default-policy.json",
     ".atm/tasks/BOOTSTRAP-0001.json",
     ".atm/locks/BOOTSTRAP-0001.lock.json",
     ".atm/evidence/BOOTSTRAP-0001.json",
@@ -73,6 +75,7 @@
         "state",
         "rule-guard",
         "evidence",
+        "context-budget",
         "context-summary"
       ]
     }
@@ -107,5 +110,24 @@
       "Run root validation.",
       "Commit the bundle package."
     ]
+  },
+  "contextBudget": {
+    "policy": {
+      "policyId": "default-policy",
+      "generatedAt": "2026-05-07T00:00:00.000Z",
+      "unit": "tokens",
+      "warningTokens": 12000,
+      "summarizeTokens": 20000,
+      "hardStopTokens": 28000,
+      "maxInlineArtifacts": 2,
+      "defaultSummary": "Summarize large tool output before continuing."
+    },
+    "evaluation": {
+      "budgetId": "context-heavy-turn",
+      "workItemId": "ATM-PLUGIN-0008",
+      "estimatedTokens": 24000,
+      "inlineArtifacts": 3,
+      "requestedSummary": "Reduce inline artifacts before the next turn."
+    }
   }
 }

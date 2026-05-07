@@ -8,7 +8,7 @@
 
 The Default Governance Bundle is the upstream reference contract for a repository's governance surface.
 It defines the minimum structure required for task tracking, scope locking, document indexing, shard storage,
-artifact capture, logs, rule guards, and evidence recording.
+artifact capture, logs, rule guards, evidence recording, and the reserved paths a host can use to apply context budget policy.
 
 The bundle is a reference layout, not a hard dependency of `packages/core`.
 Core contracts must remain host-neutral and must not import default plugin implementations directly.
@@ -97,6 +97,7 @@ Required layout paths:
 Reserved layout hints already allowed by the schema:
 
 - `registryStorePath` -> `.atm/registry`
+- `contextBudgetStorePath` -> `.atm/state/context-budget`
 - `contextSummaryStorePath` -> `.atm/state/context-summary`
 
 These are useful for later phases but are not part of the required layout set in alpha0.
@@ -152,6 +153,8 @@ Available typed evidence payloads:
 - `quality-baseline`
 - `quality-comparison`
 - `rollback-proof`
+
+Context budget decisions do not need a second top-level bundle field. Reference implementations can keep policy under the reserved context budget path, write decision reports into `runReportStore`, and emit markdown guidance into `stateStore` or `contextSummary`.
 
 ## Reference Fixture
 
