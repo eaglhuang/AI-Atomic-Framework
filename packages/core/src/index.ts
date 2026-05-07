@@ -62,6 +62,13 @@ export interface TestReportSummary {
   readonly durationMs: number;
 }
 
+export interface TestReportMetrics {
+  readonly latency?: number;
+  readonly errorRate?: number;
+  readonly coverage?: number | null;
+  readonly edgeCaseCount?: number;
+}
+
 export interface TestReportDocument {
   readonly schemaId: 'atm.testReport';
   readonly specVersion: '0.1.0';
@@ -88,6 +95,7 @@ export interface TestReportDocument {
   readonly runnerContract: TestCommandRunnerContract;
   readonly results: readonly TestCommandResult[];
   readonly summary: TestReportSummary;
+  readonly metrics?: TestReportMetrics;
   readonly artifacts: readonly ArtifactRecord[];
   readonly evidence: readonly EvidenceRecord[];
 }

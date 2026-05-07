@@ -4,11 +4,13 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { defaultTestReportFileName, resolveAtomicTestReportPath } from './atom-space.mjs';
+import { createTestReportMetrics } from '../test-runner/metrics-collector.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
 
 export const defaultTestReportSchemaPath = path.join(repoRoot, 'schemas', 'test-report.schema.json');
+export const defaultTestReportMetricsSchemaPath = path.join(repoRoot, 'schemas', 'test-report', 'metrics.schema.json');
 export const defaultTestReportMigration = Object.freeze({
   strategy: 'none',
   fromVersion: null,
@@ -131,6 +133,11 @@ export function createAtomicTestReport(normalizedModel, options = {}) {
       failed,
       durationMs
     },
+    metrics: createTestReportMetrics({
+      total,
+      failed,
+      durationMs
+    }),
     artifacts: artifactPaths.map((artifactPath, index) => ({
       artifactPath,
       artifactKind: index === 0 && options.reportPath ? 'report' : 'file',
@@ -160,6 +167,7 @@ export function validateAtomicTestReportDocument(reportDocument, options = {}) {
     const addFormatsPlugin = addFormats.default ?? addFormats;
     ajv = new AjvConstructor({ allErrors: true, strict: false });
     addFormatsPlugin(ajv);
+    ajv.addSchema(JSON.parse(readFileSync(defaultTestReportMetricsSchemaPath, 'utf8')));
   } catch (error) {
     return createValidationFailure(schemaPath, 'ATM_TEST_REPORT_VALIDATOR_UNAVAILABLE', [
       {

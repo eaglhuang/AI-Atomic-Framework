@@ -21,6 +21,10 @@ const schemaEntries = {
   'test-report': 'schemas/test-report.schema.json'
 };
 
+const supportSchemaEntries = {
+  'test-report-metrics': 'schemas/test-report/metrics.schema.json'
+};
+
 const bannedProtectedSurfaceTerms = [
   ['3K', 'Life'].join(''),
   ['Co', 'cos'].join(''),
@@ -58,6 +62,22 @@ function formatErrors(errors) {
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
+
+for (const relativePath of Object.values(supportSchemaEntries)) {
+  if (!existsSync(path.join(root, relativePath))) {
+    fail(`missing support schema file: ${relativePath}`);
+    continue;
+  }
+  const schema = readJson(relativePath);
+  if (!ajv.validateSchema(schema)) {
+    fail(`${relativePath} is not a valid JSON Schema: ${formatErrors(ajv.errors)}`);
+    continue;
+  }
+  if (!schema.$id || !schema.$schema) {
+    fail(`${relativePath} must define $id and $schema`);
+  }
+  ajv.addSchema(schema);
+}
 
 const schemas = new Map();
 for (const [schemaName, relativePath] of Object.entries(schemaEntries)) {
@@ -147,6 +167,7 @@ for (const fixture of manifest.negative || []) {
 
 const protectedFiles = [
   ...Object.values(schemaEntries),
+  ...Object.values(supportSchemaEntries),
   'schemas/README.md',
   'scripts/validate-schemas.mjs',
   manifestPath,

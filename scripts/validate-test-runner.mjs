@@ -92,6 +92,10 @@ try {
   check(passResult.report.runnerContract.executionMode === 'delegated', 'runner contract must stay delegated');
   check(passResult.report.results[0]?.command === fixture.passCase.expectedCommand, 'pass fixture command must be preserved exactly');
   check(passResult.report.results[0]?.stdout.includes(fixture.passCase.expectedStdoutSnippet), 'pass fixture stdout evidence missing');
+  check(passResult.report.metrics?.latency === passResult.report.summary.durationMs, 'pass fixture metrics latency must mirror summary duration');
+  check(passResult.report.metrics?.errorRate === 0, 'pass fixture metrics must report zero error rate');
+  check(passResult.report.metrics?.coverage === null, 'pass fixture metrics coverage must default to null when not provided');
+  check(passResult.report.metrics?.edgeCaseCount === 0, 'pass fixture metrics edgeCaseCount must default to zero');
   check(validateAtomicTestReportDocument(passResult.report).ok === true, 'pass fixture report must validate against schema');
 
   const failParsed = parseAtomicSpecFile(fixture.failCase.specPath, { cwd: tempRoot });
@@ -108,6 +112,10 @@ try {
   check(failResult.report.results[0]?.stderr.includes(fixture.failCase.expectedStderrSnippet), 'fail fixture stderr evidence missing');
   check(failResult.reportPath.endsWith(fixture.failCase.customReportPath), 'custom report path must be honored');
   check(existsSync(path.join(tempRoot, fixture.failCase.customReportPath)), 'custom report path file must be written');
+  check(failResult.report.metrics?.latency === failResult.report.summary.durationMs, 'fail fixture metrics latency must mirror summary duration');
+  check(failResult.report.metrics?.errorRate === 1, 'fail fixture metrics must report full error rate for a single failing command');
+  check(failResult.report.metrics?.coverage === null, 'fail fixture metrics coverage must default to null when not provided');
+  check(failResult.report.metrics?.edgeCaseCount === 0, 'fail fixture metrics edgeCaseCount must default to zero');
   check(validateAtomicTestReportDocument(failResult.report).ok === true, 'fail fixture report must still validate against schema');
 
   assertProtectedFilesStayNeutral();

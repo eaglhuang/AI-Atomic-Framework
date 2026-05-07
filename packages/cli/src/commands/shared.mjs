@@ -47,6 +47,8 @@ export function parseOptions(argv, commandName) {
     adopt: undefined,
     task: undefined,
     atom: undefined,
+    map: undefined,
+    propagate: undefined,
     agent: undefined
   };
   const positional = [];
@@ -135,6 +137,22 @@ export function parseOptions(argv, commandName) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --atom`, { exitCode: 2 });
       }
       options.atom = requireOptionValue(argv, index, '--atom', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--map') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --map`, { exitCode: 2 });
+      }
+      options.map = requireOptionValue(argv, index, '--map', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--propagate') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --propagate`, { exitCode: 2 });
+      }
+      options.propagate = requireOptionValue(argv, index, '--propagate', commandName);
       index += 1;
       continue;
     }
