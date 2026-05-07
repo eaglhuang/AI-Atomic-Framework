@@ -23,6 +23,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'create',
+    summary: 'Create and register a new atom through the provisioning facade',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'init',
     summary: 'Adopt ATM in a repository',
     implemented: true,

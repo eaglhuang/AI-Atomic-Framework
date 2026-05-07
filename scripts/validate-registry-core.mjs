@@ -1,4 +1,4 @@
-import { copyFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +25,34 @@ function check(condition, message) {
 
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
+}
+
+function collectDeclaredWorkbenchFolders(registryDocument) {
+  const folders = new Set();
+  for (const entry of Array.isArray(registryDocument?.entries) ? registryDocument.entries : []) {
+    const workbenchPath = String(entry?.location?.workbenchPath || '').trim().replace(/\\/g, '/');
+    if (!workbenchPath.startsWith('atomic_workbench/atoms/')) {
+      continue;
+    }
+    const folderName = workbenchPath.slice('atomic_workbench/atoms/'.length);
+    if (folderName && !folderName.includes('/')) {
+      folders.add(folderName);
+    }
+  }
+  return folders;
+}
+
+function assertNoWorkbenchAliasDrift(repositoryRoot, registryDocument, label) {
+  const workbenchRoot = path.join(repositoryRoot, 'atomic_workbench', 'atoms');
+  if (!existsSync(workbenchRoot)) {
+    return;
+  }
+  const declaredFolders = collectDeclaredWorkbenchFolders(registryDocument);
+  const strayFolders = readdirSync(workbenchRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((folderName) => !declaredFolders.has(folderName));
+  check(strayFolders.length === 0, `${label} contains stray workbench directories not declared by registry workbenchPath: ${strayFolders.join(', ')}`);
 }
 
 function stageFixtureFiles(tempRoot) {
@@ -113,6 +141,7 @@ try {
   check(document.sharding?.strategy === fixture.sharding.strategy, 'registry document must preserve sharding strategy');
   check(document.sharding?.partPaths[0] === fixture.sharding.partPaths[0], 'registry document must preserve shard path metadata');
   check(validateRegistryDocument(document).ok === true, 'registry document must validate against JSON Schema');
+  assertNoWorkbenchAliasDrift(tempRoot, document, 'fixture atomic_workbench/atoms');
 
   const baseline = evaluateRegistryEntryDrift(entry, { repositoryRoot: tempRoot });
   check(baseline.ok === true, 'baseline registry entry must be drift-free');
@@ -133,6 +162,10 @@ try {
   restore();
 
   assertProtectedFilesStayNeutral();
+
+  const currentRegistryDocument = readJson('atomic-registry.json');
+  check(validateRegistryDocument(currentRegistryDocument).ok === true, 'current atomic-registry.json must remain valid for alias drift checks');
+  assertNoWorkbenchAliasDrift(root, currentRegistryDocument, 'current atomic_workbench/atoms');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -28,6 +28,15 @@ function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
+function stageFixtureFiles(tempRoot) {
+  for (const relativePath of [fixture.specPath, fixture.codePath, fixture.testPath]) {
+    const sourcePath = path.join(root, relativePath);
+    const targetPath = path.join(tempRoot, relativePath);
+    mkdirSync(path.dirname(targetPath), { recursive: true });
+    copyFileSync(sourcePath, targetPath);
+  }
+}
+
 function normalizeNewlines(value) {
   return String(value).replace(/\r\n/g, '\n');
 }
@@ -43,17 +52,19 @@ function assertNoBom(filePath) {
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-registry-catalog-'));
 try {
-  const parsed = parseAtomicSpecFile(fixture.specPath, { cwd: root });
+  stageFixtureFiles(tempRoot);
+
+  const parsed = parseAtomicSpecFile(fixture.specPath, { cwd: tempRoot });
   check(parsed.ok === true, 'registry catalog fixture spec must parse successfully');
 
   const testRun = runAtomicTestRunner(parsed.normalizedModel, {
-    repositoryRoot: root,
+    repositoryRoot: tempRoot,
     now: fixture.generatedAt
   });
   check(testRun.ok === true, 'registry catalog fixture test runner must succeed');
 
   const entry = createAtomicRegistryEntry(parsed.normalizedModel, {
-    repositoryRoot: root,
+    repositoryRoot: tempRoot,
     atomVersion: fixture.expectedAtomVersion,
     status: fixture.expectedStatus,
     owner: fixture.owner,
@@ -68,8 +79,9 @@ try {
   const markdown = renderRegistryCatalogMarkdown(document, { repositoryRoot: root });
   const snapshot = normalizeComparableMarkdown(readFileSync(path.join(root, fixture.snapshotPath), 'utf8'));
   check(normalizeComparableMarkdown(markdown) === snapshot, 'fixture registry catalog markdown must match snapshot');
-  check(markdown.includes('| atomId | function | derivedCategory | status | specPath |'), 'catalog markdown must contain the required columns');
+  check(markdown.includes('| atomId | logicalName | function | derivedCategory | status | specPath |'), 'catalog markdown must contain the required columns');
   check(markdown.includes('`ATM-FIXTURE-0004`'), 'catalog markdown must include the fixture atom id');
+  check(markdown.includes('`atom.registry-fixture`'), 'catalog markdown must include the fixture logicalName');
   check(markdown.includes('`registry / alpha0`'), 'catalog markdown must derive the expected category');
 
   const written = writeRegistryArtifacts(document, {

@@ -58,7 +58,7 @@ function assertMessageCode(result, code) {
   assert(result.parsed.messages.some((entry) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/self-host-alpha.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/test.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/create.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/self-host-alpha.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/test.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -85,6 +85,14 @@ try {
   assert(init.parsed.evidence.adapterMode === 'standalone', 'init must report standalone mode');
   assert(init.parsed.evidence.adapterImplemented === false, 'init must not require adapter implementation');
   assert(existsSync(path.join(blankRepo, fixture.configPath)), 'init must create config file');
+
+  const createDryRun = runAtm(['create', '--cwd', blankRepo, '--bucket', 'fixture', '--title', 'CliCreateDryRun', '--description', 'CLI create dry-run fixture.', '--dry-run'], blankRepo);
+  assert(createDryRun.exitCode === 0, 'create --dry-run must exit 0 in blank repo');
+  assertReadable(createDryRun, 'create');
+  assert(createDryRun.parsed.ok === true, 'create --dry-run must report ok=true');
+  assert(createDryRun.parsed.evidence.dryRun === true, 'create --dry-run must report dryRun=true');
+  assert(createDryRun.parsed.evidence.atomId === 'ATM-FIXTURE-0001', 'create --dry-run must allocate ATM-FIXTURE-0001 from blank repo');
+  assertMessageCode(createDryRun, 'ATM_CREATE_DRY_RUN_OK');
 
   const initDryRun = runAtm(['init', '--adopt', '--dry-run'], blankRepo);
   assert(initDryRun.exitCode === 0, 'init --adopt --dry-run must exit 0');

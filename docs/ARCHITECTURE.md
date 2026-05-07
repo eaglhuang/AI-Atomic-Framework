@@ -19,6 +19,14 @@ Core contracts define the data model and lifecycle for AI-governed engineering w
 
 Core contracts must not import default plugins, shell out to host project scripts, or assume a repository-specific layout.
 
+### Provisioning Facade Layer
+
+The Provisioning Facade Layer coordinates atom birth. Its first implementation is `AtomGenerator`, registered as `ATM-CORE-0004` and exposed through `atm create`.
+
+This layer sits above the stable primitives: spec parsing, atom-space layout, scaffold building, test reports, registry entry creation, and catalog writing. It may orchestrate those primitives, but it must not redefine their semantics or create a second ID/path/registry implementation.
+
+The CLI is only a facade over this layer. The governed generator atom remains the source of truth for allocation, scaffold orchestration, validation, and registry registration.
+
 ### Agent Operating Layer
 
 The Agent Operating Layer teaches a model-neutral agent how to operate inside a repository. It includes instructions, profile files, project probing, first-task creation, run envelopes, and handoff guidance.

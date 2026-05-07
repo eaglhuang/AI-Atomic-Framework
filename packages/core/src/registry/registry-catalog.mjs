@@ -26,6 +26,7 @@ export function createRegistryCatalogRows(registryDocument, options = {}) {
       const description = normalizeInlineText(specDocument?.description);
       return {
         atomId: String(entry?.atomId || '').trim(),
+        logicalName: String(entry?.logicalName || specDocument?.logicalName || '').trim(),
         functionSummary: [title, description].filter(Boolean).join(title && description ? ': ' : ''),
         derivedCategory: deriveRegistryCatalogCategory(entry, specDocument),
         status: String(entry?.status || '').trim(),
@@ -45,13 +46,13 @@ export function renderRegistryCatalogMarkdown(registryDocument, options = {}) {
     `> Projection only. Source of truth remains \`${escapeMarkdownCell(sourceOfTruthLabel)}\`.`,
     `> Generated from registry \`${escapeMarkdownCell(registryId)}\`.`,
     '',
-    '| atomId | function | derivedCategory | status | specPath |',
-    '| --- | --- | --- | --- | --- |'
+    '| atomId | logicalName | function | derivedCategory | status | specPath |',
+    '| --- | --- | --- | --- | --- | --- |'
   ];
 
   for (const row of rows) {
     lines.push(
-      `| \`${escapeMarkdownCell(row.atomId)}\` | ${escapeMarkdownCell(row.functionSummary)} | \`${escapeMarkdownCell(row.derivedCategory)}\` | \`${escapeMarkdownCell(row.status)}\` | \`${escapeMarkdownCell(row.specPath)}\` |`
+      `| \`${escapeMarkdownCell(row.atomId)}\` | \`${escapeMarkdownCell(row.logicalName || '—')}\` | ${escapeMarkdownCell(row.functionSummary)} | \`${escapeMarkdownCell(row.derivedCategory)}\` | \`${escapeMarkdownCell(row.status)}\` | \`${escapeMarkdownCell(row.specPath)}\` |`
     );
   }
 

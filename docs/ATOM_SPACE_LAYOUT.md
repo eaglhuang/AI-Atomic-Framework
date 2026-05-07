@@ -39,5 +39,6 @@ ATM-2-0013 does not require every historical atom source file to move immediatel
 3. Existing scattered source files may remain temporarily, but registry `sourcePaths` must continue to point to the real source-of-record paths.
 4. When an existing atom is migrated, its destination folder must be the Atomic ID exactly. Do not introduce parallel alias folders.
 5. If a host needs a non-default layout, that exception must come from an explicit adapter override, not from silently changing the core default.
+6. Empty `atomic_workbench/atoms/atom.*` directories are treated as stale local migration residue, not compatibility aliases. Remove them instead of preserving them as parallel workbench homes.
 
 This policy keeps the migration reversible while still stopping further growth of scattered atom components.
