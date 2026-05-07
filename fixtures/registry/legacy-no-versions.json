@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.registry",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Legacy registry fixture without version history."
+  },
+  "registryId": "registry.alpha0",
+  "generatedAt": "2026-05-06T00:00:00.000Z",
+  "sharding": {
+    "strategy": "external-parts",
+    "partPaths": [
+      "atomic_workbench/registry/registry.alpha0.part-001.json"
+    ],
+    "nextRegistryId": null
+  },
+  "entries": [
+    {
+      "id": "ATM-FIXTURE-0001",
+      "atomId": "ATM-FIXTURE-0001",
+      "logicalName": "atom.hello-world",
+      "atomVersion": "0.0.1",
+      "schemaId": "atm.atomicSpec",
+      "specVersion": "0.1.0",
+      "schemaPath": "schemas/atomic-spec.schema.json",
+      "specPath": "tests/schema-fixtures/positive/hello-world.atom.json",
+      "hashLock": {
+        "algorithm": "sha256",
+        "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "canonicalization": "json-stable-v1"
+      },
+      "owner": {
+        "name": "ATM maintainers",
+        "contact": "maintainers@example.invalid"
+      },
+      "status": "seed",
+      "location": {
+        "specPath": "tests/schema-fixtures/positive/hello-world.atom.json",
+        "codePaths": [
+          "packages/core/seed.js"
+        ],
+        "testPaths": [
+          "scripts/validate-seed-spec.mjs",
+          "scripts/validate-seed-registry.mjs"
+        ],
+        "reportPath": "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.test.report.json",
+        "workbenchPath": "atomic_workbench/atoms/ATM-FIXTURE-0001"
+      },
+      "compatibility": {
+        "coreVersion": "0.1.0",
+        "registryVersion": "0.1.0",
+        "pluginApiVersion": "0.1.0",
+        "languageAdapter": "language-js"
+      },
+      "evidence": [
+        "tests/schema-fixtures/positive/hello-world.atom.json",
+        "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.test.report.json"
+      ],
+      "selfVerification": {
+        "legacyPlanningId": "ATM-CORE-0001",
+        "specHash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "codeHash": "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+        "testHash": "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+        "sourcePaths": {
+          "spec": "specs/atom-seed-spec.json",
+          "code": [
+            "packages/core/seed.js"
+          ],
+          "tests": [
+            "scripts/validate-seed-spec.mjs",
+            "scripts/validate-seed-registry.mjs"
+          ]
+        }
+      }
+    }
+  ]
+}

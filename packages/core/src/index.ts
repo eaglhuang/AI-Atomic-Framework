@@ -122,10 +122,20 @@ export interface RegistryCompatibilityRecord {
   readonly lifecycleMode?: 'birth' | 'evolution';
 }
 
+export interface RegistryVersionRecord {
+  readonly version: string;
+  readonly specHash: string;
+  readonly codeHash: string;
+  readonly testHash: string;
+  readonly timestamp: string;
+}
+
 export interface RegistryEntryRecord {
   readonly id?: string;
   readonly atomId: string;
   readonly atomVersion?: string;
+  readonly currentVersion?: string;
+  readonly versions?: readonly RegistryVersionRecord[];
   readonly schemaId: 'atm.atomicSpec';
   readonly specVersion: string;
   readonly schemaPath: string;
@@ -177,3 +187,5 @@ export const corePackage: AtomicPackageDescriptor = {
   packageRole: 'core-contracts',
   packageVersion: '0.0.0'
 };
+
+export * from './registry/registry-migration.ts';
