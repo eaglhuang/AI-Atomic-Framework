@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Minimal birth-pipeline prompt fixture."
+  },
+  "id": "atom.agent-prompt-smoke",
+  "title": "Agent Prompt Smoke Atom",
+  "description": "Minimal birth-pipeline atom used to snapshot the generated agent prompt contract.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [".js"],
+    "tooling": ["node"]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": ["filesystem", "git", "schema-validator", "evidence-store"]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js",
+    "lifecycleMode": "birth"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "adapter-only"
+  },
+  "inputs": [
+    {
+      "name": "goal",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "evidence",
+      "kind": "evidence",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": ["npm test"],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": ["alpha0", "prompt"]
+}

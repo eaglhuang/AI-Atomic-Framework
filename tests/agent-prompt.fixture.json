@@ -1,0 +1,13 @@
+{
+  "inputSpecPath": "fixtures/agent-prompt/minimal.input.json",
+  "expectedMarkdownPath": "fixtures/agent-prompt/minimal.expected.md",
+  "expectedPromptPath": "atomic_workbench/atoms/atom.agent-prompt-smoke/prompt.md",
+  "expectedRequiredOutput": "evidence",
+  "mutatedTitle": "Agent Prompt Smoke Atom v2",
+  "mutatedValidationCommand": "npm run lint",
+  "acceptance": [
+    "build-agent-prompt 會從 normalized spec 產出受控 prompt.md",
+    "agent-prompt document 通過 schema 驗證",
+    "spec 變更時 markdown snapshot 會跟著改變"
+  ]
+}

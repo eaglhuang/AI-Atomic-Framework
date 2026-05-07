@@ -19,6 +19,11 @@
       "name": "minimal test report",
       "schema": "test-report",
       "path": "positive/minimal-test-report.json"
+    },
+    {
+      "name": "minimal agent prompt",
+      "schema": "agent-prompt",
+      "path": "positive/minimal-agent-prompt.json"
     }
   ],
   "negative": [
@@ -54,6 +59,13 @@
       "path": "negative/missing-runner-contract.test-report.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "runnerContract"
+    },
+    {
+      "name": "missing evidence contract",
+      "schema": "agent-prompt",
+      "path": "negative/missing-evidence-contract.agent-prompt.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "evidenceContract"
     }
   ]
 }
