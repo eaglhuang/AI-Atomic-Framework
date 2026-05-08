@@ -74,6 +74,17 @@ export type {
   PoliceSeverity,
   PoliceViolation
 } from './police';
+export type {
+  AtomBehavior,
+  AtomBehaviorContext,
+  AtomBehaviorInput,
+  AtomBehaviorOutput,
+  AtomBehaviorRegistryTransition,
+  AtomBehaviorRollbackPlan,
+  EvolveDelegationTarget
+} from './behavior';
+export { EVOLVE_DELEGATION_TARGET } from './behavior';
+export { BehaviorRegistry } from './behavior-registry';
 
 export const pluginSdkPackage = {
   packageName: '@ai-atomic-framework/plugin-sdk',

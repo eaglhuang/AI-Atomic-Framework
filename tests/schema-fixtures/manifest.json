@@ -159,6 +159,11 @@
       "name": "minimal execution evidence",
       "schema": "execution-evidence",
       "path": "positive/minimal-execution-evidence.json"
+    },
+    {
+      "name": "behavior proposal valid",
+      "schema": "behavior-proposal",
+      "path": "positive/behavior-proposal-valid.json"
     }
   ],
   "negative": [
@@ -249,6 +254,13 @@
       "path": "negative/human-review-decision-missing-evidence.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "evidence"
+    },
+    {
+      "name": "behavior proposal missing action",
+      "schema": "behavior-proposal",
+      "path": "negative/behavior-proposal-missing-action.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "action"
     }
   ]
 }

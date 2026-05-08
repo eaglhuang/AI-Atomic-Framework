@@ -1,0 +1,64 @@
+{
+  "description": "Evolve delegation blocked: BehaviorRegistry.executeGuarded() rejects behavior.evolve that does not correctly delegate to ProposeAtomicUpgrade.",
+  "evolveDelegationTarget": "ATM-2-0020:ProposeAtomicUpgrade",
+  "cases": [
+    {
+      "name": "evolve-wrong-delegation-blocked",
+      "description": "executeGuarded rejects behavior.evolve that sets delegatedTo to a wrong value",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-CORE-0001",
+        "action": "behavior.evolve",
+        "requestedBy": "test-agent"
+      },
+      "mockOutput": {
+        "ok": true,
+        "delegatedTo": "some-other-flow",
+        "issues": [],
+        "evidence": []
+      },
+      "expect": {
+        "ok": false,
+        "issuesInclude": ["evolve-must-delegate-to-propose-atomic-upgrade"]
+      }
+    },
+    {
+      "name": "evolve-no-delegation-blocked",
+      "description": "executeGuarded rejects behavior.evolve that returns ok:true with no delegatedTo at all",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-CORE-0001",
+        "action": "behavior.evolve",
+        "requestedBy": "test-agent"
+      },
+      "mockOutput": {
+        "ok": true,
+        "issues": [],
+        "evidence": []
+      },
+      "expect": {
+        "ok": false,
+        "issuesInclude": ["evolve-must-delegate-to-propose-atomic-upgrade"]
+      }
+    },
+    {
+      "name": "evolve-failure-passthrough",
+      "description": "executeGuarded passes through ok:false results from behavior.evolve without modifying them (guard only applies when ok:true)",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-CORE-0001",
+        "action": "behavior.evolve",
+        "requestedBy": "test-agent"
+      },
+      "mockOutput": {
+        "ok": false,
+        "issues": ["some-internal-behavior-error"],
+        "evidence": []
+      },
+      "expect": {
+        "ok": false,
+        "issuesInclude": ["some-internal-behavior-error"]
+      }
+    }
+  ]
+}

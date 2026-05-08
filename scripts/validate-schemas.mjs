@@ -36,7 +36,8 @@ const schemaEntries = {
   'registry-v1': 'packages/core/src/registry/registry-v1.schema.json',
   'version-index': 'schemas/registry/version-index.schema.json',
   'regression-matrix': 'schemas/regression-matrix.schema.json',
-  'test-report': 'schemas/test-report.schema.json'
+  'test-report': 'schemas/test-report.schema.json',
+  'behavior-proposal': 'schemas/behavior/behavior-proposal.schema.json'
 };
 
 const supportSchemaEntries = {

@@ -143,8 +143,52 @@ if (!process.exitCode) {
       fail(`docs/LIFECYCLE.md missing ${phrase}`);
     }
   }
+
+  // ---- behavior SDK surface checks ----
+  const behaviorSource = readText('packages/plugin-sdk/src/behavior.ts');
+  for (const phrase of [
+    'EVOLVE_DELEGATION_TARGET',
+    'ATM-2-0020:ProposeAtomicUpgrade',
+    'interface AtomBehavior',
+    'interface AtomBehaviorContext',
+    'interface AtomBehaviorInput',
+    'interface AtomBehaviorOutput',
+    'interface AtomBehaviorRegistryTransition',
+    'interface AtomBehaviorRollbackPlan',
+    'actionCategories',
+    'execute('
+  ]) {
+    if (!behaviorSource.includes(phrase)) {
+      fail(`behavior.ts missing: ${phrase}`);
+    }
+  }
+
+  const behaviorRegistrySource = readText('packages/plugin-sdk/src/behavior-registry.ts');
+  for (const phrase of [
+    'class BehaviorRegistry',
+    'register(',
+    'resolve(',
+    'resolveOrThrow(',
+    'listRegisteredBehaviorIds(',
+    'listActions(',
+    'executeGuarded(',
+    'EVOLVE_DELEGATION_TARGET',
+    'evolve-must-delegate-to-propose-atomic-upgrade',
+    'behavior-not-found:'
+  ]) {
+    if (!behaviorRegistrySource.includes(phrase)) {
+      fail(`behavior-registry.ts missing: ${phrase}`);
+    }
+  }
+
+  const sdkIndexSource = readText('packages/plugin-sdk/src/index.ts');
+  for (const exportName of ['AtomBehavior', 'BehaviorRegistry', 'EVOLVE_DELEGATION_TARGET', 'AtomBehaviorOutput']) {
+    if (!sdkIndexSource.includes(exportName)) {
+      fail(`packages/plugin-sdk/src/index.ts must export ${exportName}`);
+    }
+  }
 }
 
 if (!process.exitCode) {
-  console.log(`[plugin-sdk:${mode}] ok (adapter, language, capability, lifecycle, and governance store contracts verified)`);
+  console.log(`[plugin-sdk:${mode}] ok (adapter, language, capability, lifecycle, governance store, and behavior SDK contracts verified)`);
 }
