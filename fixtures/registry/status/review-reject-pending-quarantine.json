@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "name": "approve-validates-active",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-REVIEW-0001",
+        "status": "validated",
+        "governanceTier": "standard",
+        "reviewDisposition": "approve"
+      },
+      "expect": {
+        "fromStatus": "validated",
+        "toStatus": "active",
+        "governanceTier": "standard",
+        "pendingQuarantineRequest": false,
+        "issues": []
+      }
+    },
+    {
+      "name": "nonfatal-reject-holds-status",
+      "input": {
+        "entryType": "map",
+        "mapId": "ATM-REVIEW-0002",
+        "status": "active",
+        "governanceTier": "governed",
+        "reviewDisposition": "non-fatal-reject"
+      },
+      "expect": {
+        "fromStatus": "active",
+        "toStatus": "active",
+        "governanceTier": "governed",
+        "pendingQuarantineRequest": false,
+        "issues": []
+      }
+    },
+    {
+      "name": "fatal-reject-queues-quarantine",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-REVIEW-0003",
+        "status": "active",
+        "governanceTier": "experimental",
+        "reviewDisposition": "fatal-reject"
+      },
+      "expect": {
+        "fromStatus": "active",
+        "toStatus": "active",
+        "governanceTier": "experimental",
+        "pendingQuarantineRequest": true,
+        "issues": []
+      }
+    },
+    {
+      "name": "police-finalizes-quarantine",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-REVIEW-0004",
+        "status": "active",
+        "governanceTier": "constitutional",
+        "reviewDisposition": "fatal-reject",
+        "policeAction": true
+      },
+      "expect": {
+        "fromStatus": "active",
+        "toStatus": "quarantined",
+        "governanceTier": "constitutional",
+        "pendingQuarantineRequest": false,
+        "issues": []
+      }
+    }
+  ]
+}

@@ -71,6 +71,7 @@
         "hashLock",
         "owner",
         "status",
+        "governance",
         "compatibility",
         "evidence",
         "selfVerification"
@@ -160,7 +161,17 @@
           }
         },
         "status": {
-          "enum": ["seed", "active", "experimental", "deprecated", "governed"]
+          "enum": ["draft", "validated", "active", "transitioning", "deprecated", "expired", "quarantined"]
+        },
+        "governance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tier"],
+          "properties": {
+            "tier": {
+              "enum": ["constitutional", "governed", "standard", "experimental"]
+            }
+          }
         },
         "location": {
           "$ref": "#/$defs/location"
@@ -208,6 +219,8 @@
         "schemaId",
         "specVersion",
         "schemaPath",
+        "status",
+        "governance",
         "members",
         "edges",
         "entrypoints",
@@ -262,6 +275,19 @@
         "mapHash": {
           "type": "string",
           "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "status": {
+          "enum": ["draft", "validated", "active", "transitioning", "deprecated", "expired", "quarantined"]
+        },
+        "governance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tier"],
+          "properties": {
+            "tier": {
+              "enum": ["constitutional", "governed", "standard", "experimental"]
+            }
+          }
         },
         "semanticFingerprint": {
           "oneOf": [

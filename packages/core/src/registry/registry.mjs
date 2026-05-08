@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { createSourceHashSnapshot, normalizeSourcePathList } from '../hash-lock/hash-lock.mjs';
 import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
+import { migrateRegistryStatus } from './status-migration.ts';
 import { resolveAtomWorkbenchPath } from '../manager/atom-space.mjs';
 import { writeRegistryCatalogFile } from './registry-catalog.mjs';
 
@@ -50,6 +51,12 @@ export function createAtomicRegistryEntry(normalizedModel, options = {}) {
     semanticFingerprint
   });
 
+  const statusMigration = migrateRegistryStatus({
+    entryType: 'atom',
+    status: options.status ?? 'active',
+    governanceTier: options.governance?.tier ?? options.governanceTier ?? null
+  });
+
   return {
     id: options.id ?? normalizedModel.identity.atomId,
     atomId: normalizedModel.identity.atomId,
@@ -63,7 +70,8 @@ export function createAtomicRegistryEntry(normalizedModel, options = {}) {
     specPath: selfVerification.sourcePaths.spec,
     hashLock: { ...normalizedModel.hashLock },
     owner: normalizeOwner(options.owner),
-    status: options.status ?? 'active',
+    status: statusMigration.status,
+    governance: statusMigration.governance,
     semanticFingerprint,
     location: {
       specPath: selfVerification.sourcePaths.spec,

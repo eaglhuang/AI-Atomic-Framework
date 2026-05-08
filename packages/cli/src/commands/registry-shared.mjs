@@ -43,7 +43,10 @@ export function computeSeedRegistrySnapshot() {
         name: 'ATM maintainers',
         contact: 'maintainers@example.invalid'
       },
-      status: 'governed',
+      status: 'active',
+      governance: {
+        tier: 'governed'
+      },
       compatibility: {
         coreVersion: seedModule.compatibility.coreVersion,
         registryVersion: seedModule.compatibility.registryVersion
@@ -145,14 +148,16 @@ export function evaluateSeedSelfVerification(registry = readRegistryDocument()) 
 export function evaluateSeedGovernance(registry = readRegistryDocument()) {
   const verification = evaluateSeedSelfVerification(registry);
   const atomStatus = verification.entry?.status ?? null;
+  const governanceTier = verification.entry?.governance?.tier ?? null;
   const selfVerificationOk = verification.ok === true;
-  const governed = atomStatus === 'governed';
+  const governed = atomStatus === 'active' && governanceTier === 'governed';
 
   return {
     ok: governed && selfVerificationOk,
     frameworkPhase: governed && selfVerificationOk ? 'B1-complete' : 'B1-incomplete',
     atomId: verification.entry?.atomId ?? null,
     atomStatus,
+    governanceTier,
     legacyPlanningId: verification.report?.legacyPlanningId?.actual ?? null,
     governedByLegacyPlanningId: seedGovernedByLegacyPlanningId,
     selfVerificationOk,

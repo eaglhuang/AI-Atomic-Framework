@@ -37,6 +37,7 @@ export function runStatus(argv) {
           registryPath: relativePathFrom(options.cwd, registryFilePath),
           atomId: governance.atomId,
           atomStatus: governance.atomStatus,
+          governanceTier: governance.governanceTier,
           legacyPlanningId: governance.legacyPlanningId,
           governedByLegacyPlanningId: governance.governedByLegacyPlanningId,
           selfVerificationOk: governance.selfVerificationOk

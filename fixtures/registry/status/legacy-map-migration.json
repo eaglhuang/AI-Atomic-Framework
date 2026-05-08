@@ -1,0 +1,79 @@
+{
+  "recordCases": [
+    {
+      "name": "seed-versions-record",
+      "entryType": "atom",
+      "entry": {
+        "atomId": "ATM-LEGACY-0001",
+        "status": "seed",
+        "governance": {
+          "tier": "constitutional"
+        },
+        "versions": [
+          {
+            "version": "0.1.0"
+          },
+          {
+            "version": "0.1.1"
+          }
+        ]
+      },
+      "expect": {
+        "status": "active",
+        "governanceTier": "constitutional",
+        "legacyStatus": "seed",
+        "versionsCount": 2
+      }
+    },
+    {
+      "name": "governed-versions-record",
+      "entryType": "atom",
+      "entry": {
+        "atomId": "ATM-LEGACY-0002",
+        "status": "governed",
+        "governance": {
+          "tier": "governed"
+        },
+        "versions": [
+          {
+            "version": "0.2.0"
+          }
+        ]
+      },
+      "expect": {
+        "status": "active",
+        "governanceTier": "governed",
+        "legacyStatus": "governed",
+        "versionsCount": 1
+      }
+    }
+  ],
+  "statusCases": [
+    {
+      "name": "experimental-status",
+      "input": {
+        "entryType": "atom",
+        "status": "experimental",
+        "governanceTier": null
+      },
+      "expect": {
+        "status": "validated",
+        "governanceTier": "standard",
+        "legacyStatus": "experimental"
+      }
+    },
+    {
+      "name": "legacy-map-default",
+      "input": {
+        "entryType": "map",
+        "status": null,
+        "governanceTier": null
+      },
+      "expect": {
+        "status": "draft",
+        "governanceTier": "standard",
+        "legacyStatus": null
+      }
+    }
+  ]
+}

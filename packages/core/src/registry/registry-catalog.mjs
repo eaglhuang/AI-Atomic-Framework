@@ -31,7 +31,7 @@ export function createRegistryCatalogRows(registryDocument, options = {}) {
         functionSummary: [title, description].filter(Boolean).join(title && description ? ': ' : '') || createFallbackFunctionSummary(entry),
         derivedCategory: deriveRegistryCatalogCategory(entry, specDocument),
         provenance: deriveGeneratorProvenance(entry),
-        status: String(entry?.status || (entry?.schemaId === 'atm.atomicMap' ? 'active' : '')).trim(),
+        status: String(entry?.status || (entry?.schemaId === 'atm.atomicMap' ? 'draft' : 'active')).trim(),
         specPath
       };
     });

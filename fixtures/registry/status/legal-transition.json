@@ -1,0 +1,399 @@
+{
+  "entryStatuses": [
+    "draft",
+    "validated",
+    "active",
+    "transitioning",
+    "deprecated",
+    "expired",
+    "quarantined"
+  ],
+  "governanceTiers": [
+    "constitutional",
+    "governed",
+    "standard",
+    "experimental"
+  ],
+  "rules": [
+    {
+      "action": "transition.propose",
+      "entryTypes": [
+        "atom",
+        "map"
+      ],
+      "fromStatuses": [
+        "draft"
+      ],
+      "toStatus": "validated",
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "transition.promote",
+      "entryTypes": [
+        "atom",
+        "map"
+      ],
+      "fromStatuses": [
+        "validated"
+      ],
+      "toStatus": "active",
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "transition.quarantine",
+      "entryTypes": [
+        "atom",
+        "map"
+      ],
+      "fromStatuses": [
+        "draft",
+        "validated",
+        "active",
+        "transitioning",
+        "deprecated",
+        "expired"
+      ],
+      "toStatus": "quarantined",
+      "policeOnly": true,
+      "allowedMutabilityPolicies": [
+        "mutable",
+        "frozen-after-release",
+        "immutable"
+      ]
+    },
+    {
+      "action": "behavior.split",
+      "entryTypes": [
+        "atom"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "active",
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "behavior.merge",
+      "entryTypes": [
+        "atom"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "active",
+      "secondaryStatuses": [
+        "deprecated"
+      ],
+      "minSourceCount": 2,
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "behavior.dedup-merge",
+      "entryTypes": [
+        "atom"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "active",
+      "secondaryStatuses": [
+        "deprecated"
+      ],
+      "minSourceCount": 2,
+      "maxSourceCount": 2,
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "behavior.evolve",
+      "entryTypes": [
+        "atom"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "active",
+      "allowedMutabilityPolicies": [
+        "mutable",
+        "frozen-after-release"
+      ]
+    },
+    {
+      "action": "behavior.sweep",
+      "entryTypes": [
+        "atom",
+        "map"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "deprecated",
+      "requiresZeroCallers": true,
+      "allowedMutabilityPolicies": [
+        "mutable",
+        "immutable"
+      ]
+    },
+    {
+      "action": "behavior.expire",
+      "entryTypes": [
+        "atom",
+        "map"
+      ],
+      "fromStatuses": [
+        "deprecated"
+      ],
+      "toStatus": "expired",
+      "requiresTtlExpired": true,
+      "allowedMutabilityPolicies": [
+        "mutable",
+        "immutable"
+      ]
+    },
+    {
+      "action": "behavior.polymorphize",
+      "entryTypes": [
+        "atom"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "active",
+      "secondaryStatuses": [
+        "validated"
+      ],
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "behavior.compose",
+      "entryTypes": [
+        "map"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "active",
+      "minSourceCount": 2,
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "behavior.infect",
+      "entryTypes": [
+        "atom"
+      ],
+      "fromStatuses": [
+        "active"
+      ],
+      "toStatus": "active",
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    },
+    {
+      "action": "behavior.atomize",
+      "entryTypes": [
+        "atom"
+      ],
+      "fromStatuses": [
+        "draft"
+      ],
+      "toStatus": "active",
+      "secondaryStatuses": [
+        "validated"
+      ],
+      "allowedMutabilityPolicies": [
+        "mutable"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "name": "draft-atom-propose-constitutional",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0001",
+        "status": "draft",
+        "action": "transition.propose",
+        "governanceTier": "constitutional",
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "validated",
+        "governanceTier": "constitutional",
+        "issues": []
+      }
+    },
+    {
+      "name": "draft-atom-atomize",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0001A",
+        "status": "draft",
+        "action": "behavior.atomize",
+        "governanceTier": "standard",
+        "stageStatuses": [
+          "draft",
+          "validated",
+          "active"
+        ],
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "active",
+        "governanceTier": "standard",
+        "issues": []
+      }
+    },
+    {
+      "name": "validated-atom-promote-governed",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0002",
+        "status": "validated",
+        "action": "transition.promote",
+        "governanceTier": "governed",
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "active",
+        "governanceTier": "governed",
+        "issues": []
+      }
+    },
+    {
+      "name": "active-atom-evolve-experimental",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0003",
+        "status": "active",
+        "action": "behavior.evolve",
+        "governanceTier": "experimental",
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "active",
+        "governanceTier": "experimental",
+        "issues": []
+      }
+    },
+    {
+      "name": "frozen-atom-evolve-release",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0003F",
+        "status": "active",
+        "action": "behavior.evolve",
+        "governanceTier": "standard",
+        "mutabilityPolicy": "frozen-after-release"
+      },
+      "expect": {
+        "toStatus": "active",
+        "governanceTier": "standard",
+        "issues": []
+      }
+    },
+    {
+      "name": "transitioning-atom-quarantine-standard",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0004",
+        "status": "transitioning",
+        "action": "transition.quarantine",
+        "governanceTier": "standard",
+        "policeAction": true,
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "quarantined",
+        "governanceTier": "standard",
+        "policeAction": true,
+        "issues": []
+      }
+    },
+    {
+      "name": "active-atom-sweep-standard",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0005",
+        "status": "active",
+        "action": "behavior.sweep",
+        "governanceTier": "standard",
+        "callerCount": 0,
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "deprecated",
+        "governanceTier": "standard",
+        "issues": []
+      }
+    },
+    {
+      "name": "deprecated-atom-expire-standard",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-LEGAL-0006",
+        "status": "deprecated",
+        "action": "behavior.expire",
+        "governanceTier": "standard",
+        "ttlExpired": true,
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "expired",
+        "governanceTier": "standard",
+        "issues": []
+      }
+    },
+    {
+      "name": "expired-map-quarantine-governed",
+      "input": {
+        "entryType": "map",
+        "mapId": "ATM-MAP-0002",
+        "status": "expired",
+        "action": "transition.quarantine",
+        "governanceTier": "governed",
+        "policeAction": true,
+        "mutabilityPolicy": "immutable"
+      },
+      "expect": {
+        "toStatus": "quarantined",
+        "governanceTier": "governed",
+        "policeAction": true,
+        "issues": []
+      }
+    },
+    {
+      "name": "active-map-compose-constitutional",
+      "input": {
+        "entryType": "map",
+        "mapId": "ATM-MAP-0003",
+        "status": "active",
+        "action": "behavior.compose",
+        "governanceTier": "constitutional",
+        "sourceStatuses": [
+          "active",
+          "active"
+        ],
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "toStatus": "active",
+        "governanceTier": "constitutional",
+        "issues": []
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import type { AtomicMapRecord, MapRegistryEntryRecord } from '../index';
 import { computeAtomicMapHash } from './map-hash.ts';
 import { normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
+import { migrateRegistryStatus } from './status-migration.ts';
 
 export interface CreateAtomicMapRegistryEntryOptions {
   readonly schemaPath?: string;
@@ -8,12 +9,20 @@ export interface CreateAtomicMapRegistryEntryOptions {
   readonly lineageLogRef?: string;
   readonly ttl?: number;
   readonly pendingSfCalculation?: boolean;
+  readonly status?: string | null;
+  readonly governanceTier?: string | null;
 }
 
 export function createAtomicMapRegistryEntry(
   atomicMap: AtomicMapRecord,
   options: CreateAtomicMapRegistryEntryOptions = {}
 ): MapRegistryEntryRecord {
+  const statusMigration = migrateRegistryStatus({
+    entryType: 'map',
+    status: options.status ?? 'draft',
+    governanceTier: options.governanceTier ?? null
+  });
+
   const entry: MapRegistryEntryRecord = {
     schemaId: 'atm.atomicMap',
     specVersion: atomicMap.specVersion,
@@ -33,7 +42,9 @@ export function createAtomicMapRegistryEntry(
     qualityTargets: Object.fromEntries(
       Object.entries(atomicMap.qualityTargets).map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
     ),
-    mapHash: computeAtomicMapHash(atomicMap)
+    mapHash: computeAtomicMapHash(atomicMap),
+    status: statusMigration.status,
+    governance: statusMigration.governance
   };
 
   const semanticFingerprint = normalizeSemanticFingerprint(options.semanticFingerprint ?? atomicMap.semanticFingerprint ?? null);

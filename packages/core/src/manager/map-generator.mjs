@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { computeSha256ForContent } from '../hash-lock/hash-lock.mjs';
 import { createAtomicMapSemanticFingerprint, normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
+import { createAtomicMapRegistryEntry } from '../registry/map-registry.ts';
 import { createRegistryDocument, validateRegistryDocumentFile, writeRegistryArtifacts } from '../registry/registry.mjs';
 import { allocateMapId, MapIdAllocationError, parseMapId } from './map-id-allocator.mjs';
 
@@ -99,7 +100,9 @@ export function generateAtomicMap(request, options = {}) {
     }
 
     const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicMapRegistryEntry(specDocument, {
-      schemaPath: 'schemas/registry/atomic-map.schema.json'
+      schemaPath: 'schemas/registry/atomic-map.schema.json',
+      status: options.status ?? 'draft',
+      governanceTier: options.governanceTier ?? 'standard'
     }));
     const updatedRegistryDocument = upsertRegistryEntry(registryDocument, registryEntry, {
       generatedAt: options.now ?? new Date().toISOString()
@@ -422,44 +425,6 @@ function runGeneratedMapTest(options) {
     ok: report.ok,
     report
   };
-}
-
-function createAtomicMapRegistryEntry(atomicMap, options = {}) {
-  const entry = {
-    schemaId: 'atm.atomicMap',
-    specVersion: atomicMap.specVersion,
-    schemaPath: options.schemaPath ?? 'schemas/registry/atomic-map.schema.json',
-    mapId: String(atomicMap.mapId).trim(),
-    mapVersion: String(atomicMap.mapVersion).trim(),
-    members: atomicMap.members.map((member) => ({
-      atomId: String(member.atomId).trim(),
-      version: String(member.version).trim()
-    })),
-    edges: atomicMap.edges.map((edge) => ({
-      from: String(edge.from).trim(),
-      to: String(edge.to).trim(),
-      binding: String(edge.binding).trim()
-    })),
-    entrypoints: atomicMap.entrypoints.map((entrypoint) => String(entrypoint).trim()),
-    qualityTargets: Object.fromEntries(
-      Object.entries(atomicMap.qualityTargets).map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
-    ),
-    mapHash: atomicMap.mapHash,
-    ...(atomicMap.pendingSfCalculation === true ? { pendingSfCalculation: true } : {})
-  };
-
-  if (atomicMap.semanticFingerprint) {
-    entry.semanticFingerprint = normalizeSemanticFingerprint(atomicMap.semanticFingerprint) ?? undefined;
-  } else if (atomicMap.pendingSfCalculation === true) {
-    entry.semanticFingerprint = null;
-  }
-  if (atomicMap.lineageLogRef) {
-    entry.lineageLogRef = atomicMap.lineageLogRef;
-  }
-  if (typeof atomicMap.ttl === 'number') {
-    entry.ttl = atomicMap.ttl;
-  }
-  return entry;
 }
 
 function createAtomicMapHashPayload(input) {

@@ -54,7 +54,8 @@ assert(schemaResult.ok === true, 'atomic-registry.json must pass registry schema
 
 const verification = evaluateSeedSelfVerification();
 assert(verification.ok === true, 'seed self-verification hashes must match committed registry values');
-assert(verification.entry.status === 'governed', 'seed registry entry must be marked governed');
+assert(verification.entry.status === 'active', 'seed registry entry must be marked active');
+assert(verification.entry.governance?.tier === 'governed', 'seed registry entry governance tier must be governed');
 assert(verification.report.legacyPlanningId.ok === true, 'legacy planning ID must stay ATM-CORE-0001');
 assert(verification.report.specHash.ok === true, 'specHash must match');
 assert(verification.report.codeHash.ok === true, 'codeHash must match');
@@ -76,7 +77,8 @@ const cliStatus = runAtm(['status']);
 assert(cliStatus.exitCode === 0, 'atm status must exit 0 in framework repository root');
 assert(cliStatus.parsed.ok === true, 'atm status must report ok=true in framework repository root');
 assert(cliStatus.parsed.evidence.frameworkPhase === 'B1-complete', 'atm status must surface frameworkPhase=B1-complete');
-assert(cliStatus.parsed.evidence.atomStatus === 'governed', 'atm status must surface atomStatus=governed');
+assert(cliStatus.parsed.evidence.atomStatus === 'active', 'atm status must surface atomStatus=active');
+assert(cliStatus.parsed.evidence.governanceTier === 'governed', 'atm status must surface governanceTier=governed');
 assert(cliStatus.parsed.evidence.governedByLegacyPlanningId === 'ATM-CORE-0002', 'atm status must surface ATM-CORE-0002 as governance successor');
 
 const expected = computeSeedRegistrySnapshot();

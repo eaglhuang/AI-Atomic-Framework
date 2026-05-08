@@ -213,6 +213,14 @@ export interface RegistryVersionRecord {
   readonly semanticFingerprint?: string | null;
 }
 
+export type RegistryEntryStatus = 'draft' | 'validated' | 'active' | 'transitioning' | 'deprecated' | 'expired' | 'quarantined';
+
+export type RegistryGovernanceTier = 'constitutional' | 'governed' | 'standard' | 'experimental';
+
+export interface RegistryGovernanceRecord {
+  readonly tier: RegistryGovernanceTier;
+}
+
 export interface RegistryEntryRecord {
   readonly id?: string;
   readonly atomId: string;
@@ -236,7 +244,8 @@ export interface RegistryEntryRecord {
     readonly name: string;
     readonly contact: string;
   };
-  readonly status: 'seed' | 'active' | 'experimental' | 'deprecated' | 'governed';
+  readonly status: RegistryEntryStatus;
+  readonly governance: RegistryGovernanceRecord;
   readonly location?: RegistryLocationRecord;
   readonly compatibility: RegistryCompatibilityRecord;
   readonly evidence: readonly string[];
@@ -245,6 +254,8 @@ export interface RegistryEntryRecord {
 
 export interface MapRegistryEntryRecord extends Omit<AtomicMapRecord, 'migration'> {
   readonly schemaPath: string;
+  readonly status: RegistryEntryStatus;
+  readonly governance: RegistryGovernanceRecord;
 }
 
 export type RegistryDocumentEntryRecord = RegistryEntryRecord | MapRegistryEntryRecord;
@@ -278,6 +289,8 @@ export const corePackage: AtomicPackageDescriptor = {
 export * from './agent-execute/execute-agent-task.ts';
 export * from './registry/map-hash.ts';
 export * from './registry/map-registry.ts';
+export * from './registry/status-migration.ts';
+export * from './registry/status-machine.ts';
 export * from './registry/semantic-fingerprint.ts';
 export * from './registry/rollback.ts';
 export * from './registry/registry-migration.ts';

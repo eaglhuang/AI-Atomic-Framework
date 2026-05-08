@@ -174,6 +174,8 @@ try {
 
   const minimalMapEntry = createAtomicMapRegistryEntry(mapFixtures.minimal);
   check(validateAtomicMapRegistryEntryHash(minimalMapEntry).ok === true, 'minimal atomic map entry must preserve computed mapHash');
+  check(minimalMapEntry.status === 'draft', 'minimal atomic map entry must default to draft status');
+  check(minimalMapEntry.governance?.tier === 'standard', 'minimal atomic map entry must default to standard governance tier');
 
   const upgradedMinimalMapEntry = createAtomicMapRegistryEntry({
     ...mapFixtures.minimal,

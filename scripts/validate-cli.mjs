@@ -390,7 +390,8 @@ try {
   assertReadable(frameworkStatus, 'status');
   assert(frameworkStatus.parsed.ok === true, 'status in framework repository root must report ok=true');
   assert(frameworkStatus.parsed.evidence.frameworkPhase === 'B1-complete', 'status in framework repository root must surface frameworkPhase=B1-complete');
-  assert(frameworkStatus.parsed.evidence.atomStatus === 'governed', 'status in framework repository root must surface atomStatus=governed');
+  assert(frameworkStatus.parsed.evidence.atomStatus === 'active', 'status in framework repository root must surface atomStatus=active');
+  assert(frameworkStatus.parsed.evidence.governanceTier === 'governed', 'status in framework repository root must surface governanceTier=governed');
   assertMessageCode(frameworkStatus, 'ATM_STATUS_PHASE_B1_COMPLETE');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

@@ -29,6 +29,7 @@ const schemaEntries = {
   'governance-work-item': 'schemas/governance/work-item.schema.json',
   'governance-scope-lock': 'schemas/governance/scope-lock.schema.json',
   'governance-bundle': 'schemas/governance/governance-bundle.schema.json',
+  'police-registry-candidate-report': 'schemas/police/registry-candidate-report.schema.json',
   'upgrade-proposal': 'schemas/upgrade/upgrade-proposal.schema.json',
   'rollback-proof': 'schemas/registry/rollback-proof.schema.json',
   registry: 'schemas/registry.schema.json',
@@ -161,6 +162,12 @@ if (!registrySchema?.$defs?.registryEntry?.properties?.currentVersion) {
 if (!registrySchema?.$defs?.registryEntry?.properties?.versions) {
   fail('registry atom entry must expose versions');
 }
+if (registrySchema?.$defs?.registryEntry?.properties?.status?.enum?.join(',') !== 'draft,validated,active,transitioning,deprecated,expired,quarantined') {
+  fail('registry atom entry status enum must be draft/validated/active/transitioning/deprecated/expired/quarantined');
+}
+if (registrySchema?.$defs?.registryEntry?.properties?.governance?.properties?.tier?.enum?.join(',') !== 'constitutional,governed,standard,experimental') {
+  fail('registry atom entry governance.tier enum must be constitutional/governed/standard/experimental');
+}
 if (!registrySchema?.$defs?.registryEntry?.properties?.semanticFingerprint) {
   fail('registry atom entry must expose semanticFingerprint');
 }
@@ -179,13 +186,30 @@ if (!registrySchema?.$defs?.registryVersion?.properties?.semanticFingerprint) {
 if (registrySchema?.$defs?.mapRegistryEntry?.properties?.semanticFingerprint?.oneOf?.length !== 2) {
   fail('registry map entry must allow semanticFingerprint string or null');
 }
+if (registrySchema?.$defs?.mapRegistryEntry?.properties?.status?.enum?.join(',') !== 'draft,validated,active,transitioning,deprecated,expired,quarantined') {
+  fail('registry map entry status enum must be draft/validated/active/transitioning/deprecated/expired/quarantined');
+}
+if (registrySchema?.$defs?.mapRegistryEntry?.properties?.governance?.properties?.tier?.enum?.join(',') !== 'constitutional,governed,standard,experimental') {
+  fail('registry map entry governance.tier enum must be constitutional/governed/standard/experimental');
+}
 if (registrySchema?.$defs?.mapRegistryEntry?.properties?.pendingSfCalculation?.type !== 'boolean') {
   fail('registry map entry must expose pendingSfCalculation');
 }
 
 const registryV1Schema = schemas.get('registry-v1');
+if (registryV1Schema?.$defs?.registryEntry?.properties?.status?.enum?.join(',') !== 'draft,validated,active,transitioning,deprecated,expired,quarantined') {
+  fail('registry-v1 atom entry status enum must be draft/validated/active/transitioning/deprecated/expired/quarantined');
+}
+if (registryV1Schema?.$defs?.registryEntry?.properties?.governance?.properties?.tier?.enum?.join(',') !== 'constitutional,governed,standard,experimental') {
+  fail('registry-v1 atom entry governance.tier enum must be constitutional/governed/standard/experimental');
+}
 if (!registryV1Schema?.$defs?.registryVersion?.properties?.semanticFingerprint) {
   fail('registry-v1 version record must expose semanticFingerprint');
+}
+
+const policeRegistryCandidateSchema = schemas.get('police-registry-candidate-report');
+if (policeRegistryCandidateSchema?.properties?.candidateStatus?.enum?.join(',') !== 'draft,validated,active,transitioning,deprecated,expired,quarantined') {
+  fail('police registry candidate status enum must be draft/validated/active/transitioning/deprecated/expired/quarantined');
 }
 
 const versionIndexSchema = schemas.get('version-index');
