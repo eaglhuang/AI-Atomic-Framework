@@ -82,6 +82,15 @@ atomic_workbench/maps/<mapId>/
 
 The canonical map ID is `ATM-MAP-{NNNN}`. Historical `map.*` names may still appear in legacy fixture labels or human-readable descriptions, but they are no longer valid canonical registry identifiers.
 
+Maps inherit the same "generator owns the canonical birth layout" rule as atoms:
+
+- `map.spec.json` is the source-of-record spec written by `generateAtomicMap()`.
+- `map.integration.test.mjs` is the default validation command contract for generated maps. The default command is `node atomic_workbench/maps/<mapId>/map.integration.test.mjs`.
+- `map.test.report.json` is the replayable self-check result produced by that default command.
+- rerunning `generateAtomicMap()` with the same member/edge/entrypoint/quality-target request is idempotent. The generator must return the existing `mapId` and canonical trio instead of allocating a second workbench.
+
+This keeps map birth aligned with atom birth: one canonical workbench, one default validation contract, one registry projection surface.
+
 ## CLI
 
 ```bash
@@ -149,6 +158,8 @@ The current registry classifies entries as:
 - `bootstrap-self`: the generator atom created during the self-bootstrap step (`ATM-CORE-0004`).
 - `generated`: atoms or maps born through the provisioning facades (`ATM-FIXTURE-0001`, `ATM-MAP-0001`).
 
+Legacy maps follow the same rule after migration. The backfill path allocates a fresh canonical `ATM-MAP-{NNNN}` identifier, writes the canonical trio under `atomic_workbench/maps/<mapId>/`, preserves the old local map as archived lineage evidence, and marks the registry entry with `generator-provenance:backfilled`.
+
 The catalog shows this in its `provenance` column.
 
 ## Provenance Audit
@@ -163,6 +174,15 @@ npm run validate:generator-provenance
 Validation fails if a registry entry has no generator provenance marker, if a generated atom points `codePaths` at its spec, if a backfilled atom is missing its workbench witness files, or if any registry entry has hash drift.
 
 For maps, the same audit derives canonical map workbench paths, checks `map.spec.json` / `map.integration.test.mjs`, and compares the registry entry against the generated map spec instead of atom `selfVerification` hashes.
+
+Map template policy also has its own deterministic gate:
+
+```bash
+node scripts/validate-map-template.mjs --mode validate
+npm run validate:map-template
+```
+
+The validator proves the generator writes the canonical trio, keeps the dry-run and write-mode paths aligned, records map `location` / `evidence` metadata in the registry, and preserves idempotent reruns.
 
 ## Alpha0 Limits
 

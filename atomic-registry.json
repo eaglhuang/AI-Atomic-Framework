@@ -7,7 +7,7 @@
     "notes": "Phase B1 seed governance registry."
   },
   "registryId": "registry.seed",
-  "generatedAt": "2026-05-07T11:08:23.826Z",
+  "generatedAt": "2026-05-08T17:08:05.696Z",
   "entries": [
     {
       "atomId": "ATM-CORE-0001",
@@ -346,8 +346,71 @@
       "governance": {
         "tier": "standard"
       },
+      "location": {
+        "specPath": "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
+        "codePaths": [],
+        "testPaths": [
+          "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs"
+        ],
+        "reportPath": "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+        "workbenchPath": "atomic_workbench/maps/ATM-MAP-0001"
+      },
+      "evidence": [
+        "generator-provenance:generated",
+        "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
+        "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs",
+        "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json"
+      ],
       "mapHash": "sha256:914340fd5c8f3aa0686adbbc67093de0c49fa3b8a1383a77e11da11cc1665fe9",
       "semanticFingerprint": "sha256:2f43cb71826404ba26df831b8ea5f30c46735fbdd24fd12285151bc9f8718529"
+    },
+    {
+      "schemaId": "atm.atomicMap",
+      "specVersion": "0.1.0",
+      "schemaPath": "schemas/registry/atomic-map.schema.json",
+      "mapId": "ATM-MAP-0002",
+      "mapVersion": "0.1.0",
+      "members": [
+        {
+          "atomId": "ATM-CORE-0003",
+          "version": "0.1.0"
+        }
+      ],
+      "edges": [],
+      "entrypoints": [
+        "ATM-CORE-0003"
+      ],
+      "qualityTargets": {
+        "legacyCaseCount": 4,
+        "legacyFailedCaseCount": 3,
+        "legacyMemberCount": 5,
+        "migrationBackfilled": true
+      },
+      "mapHash": "sha256:30d9c1ecf755089c2cf821250d59aafd6e11160c4ba3a39854bb6372a861b032",
+      "status": "draft",
+      "governance": {
+        "tier": "standard"
+      },
+      "semanticFingerprint": "sf:sha256:cb246a3585cb9bcf9fb2369fa223784fd8b944e9ad1590d40bd7e1d30a08451d",
+      "location": {
+        "specPath": "atomic_workbench/maps/ATM-MAP-0002/map.spec.json",
+        "codePaths": [],
+        "testPaths": [
+          "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.mjs"
+        ],
+        "reportPath": "atomic_workbench/maps/ATM-MAP-0002/map.test.report.json",
+        "workbenchPath": "atomic_workbench/maps/ATM-MAP-0002"
+      },
+      "evidence": [
+        "atomic_workbench/maps/ATM-MAP-0002/map.spec.json",
+        "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.mjs",
+        "atomic_workbench/maps/ATM-MAP-0002/map.test.report.json",
+        "generator-provenance:backfilled",
+        "atomic_workbench/maps/ATM-MAP-0002/legacy-source.map.json",
+        "atomic_workbench/maps/ATM-MAP-0002/legacy-source.report.json",
+        "atomic_workbench/maps/ATM-MAP-0002/lineage-log.json"
+      ],
+      "lineageLogRef": "atomic_workbench/maps/ATM-MAP-0002/lineage-log.json"
     }
   ]
 }

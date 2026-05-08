@@ -1,4 +1,4 @@
-import type { AtomicMapRecord, MapRegistryEntryRecord } from '../index';
+import type { AtomicMapRecord, MapRegistryEntryRecord, RegistryLocationRecord } from '../index';
 import { computeAtomicMapHash } from './map-hash.ts';
 import { normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
 import { migrateRegistryStatus } from './status-migration.ts';
@@ -11,6 +11,8 @@ export interface CreateAtomicMapRegistryEntryOptions {
   readonly pendingSfCalculation?: boolean;
   readonly status?: string | null;
   readonly governanceTier?: string | null;
+  readonly location?: RegistryLocationRecord;
+  readonly evidence?: readonly string[];
 }
 
 export function createAtomicMapRegistryEntry(
@@ -69,6 +71,21 @@ export function createAtomicMapRegistryEntry(
     entry.pendingSfCalculation = true;
   }
 
+  if (options.location) {
+    entry.location = {
+      specPath: String(options.location.specPath).trim(),
+      codePaths: normalizeStringArray(options.location.codePaths),
+      testPaths: normalizeStringArray(options.location.testPaths),
+      reportPath: options.location.reportPath == null ? null : String(options.location.reportPath).trim(),
+      workbenchPath: options.location.workbenchPath == null ? null : String(options.location.workbenchPath).trim()
+    };
+  }
+
+  const evidence = normalizeStringArray(options.evidence ?? []);
+  if (evidence.length > 0) {
+    entry.evidence = evidence;
+  }
+
   return entry;
 }
 
@@ -83,4 +100,10 @@ export function validateAtomicMapRegistryEntryHash(entry: MapRegistryEntryRecord
     actual: entry.mapHash,
     expected
   };
+}
+
+function normalizeStringArray(values: readonly string[]) {
+  return [...new Set(values
+    .map((value) => String(value || '').trim())
+    .filter(Boolean))];
 }

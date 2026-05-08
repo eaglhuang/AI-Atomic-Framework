@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "atm.neutrality-map-integration-report.v0",
+  "mapId": "ATM-MAP-NEUTRALITY-0001",
+  "cases": [
+    {
+      "name": "clean",
+      "status": "pass",
+      "exitCode": 0,
+      "totals": {
+        "targets": 1,
+        "termViolations": 0,
+        "pathViolations": 0,
+        "violations": 0
+      }
+    },
+    {
+      "name": "term-violation",
+      "status": "fail",
+      "exitCode": 1,
+      "totals": {
+        "targets": 1,
+        "termViolations": 2,
+        "pathViolations": 0,
+        "violations": 2
+      }
+    },
+    {
+      "name": "path-violation",
+      "status": "fail",
+      "exitCode": 1,
+      "totals": {
+        "targets": 1,
+        "termViolations": 0,
+        "pathViolations": 1,
+        "violations": 1
+      }
+    },
+    {
+      "name": "mixed-violation",
+      "status": "fail",
+      "exitCode": 1,
+      "totals": {
+        "targets": 1,
+        "termViolations": 1,
+        "pathViolations": 1,
+        "violations": 2
+      }
+    }
+  ]
+}

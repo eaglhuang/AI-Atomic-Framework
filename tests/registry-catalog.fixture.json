@@ -14,9 +14,55 @@
   "specPath": "tests/registry-fixtures/registry.atom.json",
   "codePath": "tests/registry-fixtures/compute-atom.js",
   "testPath": "tests/registry-fixtures/registry-test.mjs",
+  "mapFixtures": [
+    {
+      "mapId": "ATM-MAP-0001",
+      "mapVersion": "0.1.0",
+      "status": "draft",
+      "members": [
+        {
+          "atomId": "ATM-FIXTURE-0004",
+          "version": "0.0.1"
+        }
+      ],
+      "edges": [],
+      "entrypoints": [
+        "ATM-FIXTURE-0004"
+      ],
+      "qualityTargets": {
+        "requiredChecks": 1,
+        "promoteGateRequired": true
+      },
+      "provenance": "generated"
+    },
+    {
+      "mapId": "ATM-MAP-0002",
+      "mapVersion": "0.1.0",
+      "status": "draft",
+      "members": [
+        {
+          "atomId": "ATM-FIXTURE-0004",
+          "version": "0.0.1"
+        }
+      ],
+      "edges": [],
+      "entrypoints": [
+        "ATM-FIXTURE-0004"
+      ],
+      "qualityTargets": {
+        "legacyMemberCount": 5,
+        "legacyCaseCount": 4,
+        "migrationBackfilled": true
+      },
+      "provenance": "backfilled",
+      "lineageLogRef": "atomic_workbench/maps/ATM-MAP-0002/lineage-log.json"
+    }
+  ],
   "acceptance": [
     "rendered registry catalog snapshot stays deterministic for the fixture atom",
     "catalog markdown lists atomId, logicalName, function, derived category, provenance, status, and specPath",
+    "catalog markdown renders a dedicated Maps section with member count, status, workbench path, and provenance note",
+    "catalog snapshot covers both generated and backfilled maps",
     "registry artifacts writer supports a UTF-8 proving path without adding a BOM",
     "writing the same catalog twice is idempotent",
     "the committed framework registry catalog stays in sync with atomic-registry.json"

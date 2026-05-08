@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "atm.local-atomic-map.v0",
+  "mapId": "ATM-MAP-NEUTRALITY-0001",
+  "mapVersion": "0.1.0-local",
+  "ownerAtom": "ATM-CORE-0003",
+  "scope": "ATM-2-0012 local map smoke",
+  "mapHashAlgorithm": "sha256(sorted members + edges + entrypoints)",
+  "mapHashInput": {
+    "members": [
+      "ATM-CORE-0003-A@0.1.0-local",
+      "ATM-CORE-0003-B@0.1.0-local",
+      "ATM-CORE-0003-C@0.1.0-local",
+      "ATM-CORE-0003-D@0.1.0-local",
+      "ATM-CORE-0003-E@0.1.0-local"
+    ],
+    "edges": [
+      "ATM-CORE-0003-A -> ATM-CORE-0003-C",
+      "ATM-CORE-0003-A -> ATM-CORE-0003-D",
+      "ATM-CORE-0003-B -> ATM-CORE-0003-C",
+      "ATM-CORE-0003-B -> ATM-CORE-0003-D",
+      "ATM-CORE-0003-C -> ATM-CORE-0003-E",
+      "ATM-CORE-0003-D -> ATM-CORE-0003-E"
+    ],
+    "entrypoints": [
+      "node atomic_workbench/atoms/ATM-CORE-0003/src/run-neutrality-map.js --root <fixture> --output <report>"
+    ]
+  },
+  "members": [
+    { "atomId": "ATM-CORE-0003-A", "role": "enumerate scan targets" },
+    { "atomId": "ATM-CORE-0003-B", "role": "load forbidden lexicon" },
+    { "atomId": "ATM-CORE-0003-C", "role": "scan file text terms" },
+    { "atomId": "ATM-CORE-0003-D", "role": "scan forbidden path patterns" },
+    { "atomId": "ATM-CORE-0003-E", "role": "aggregate report and exit decision" }
+  ]
+}

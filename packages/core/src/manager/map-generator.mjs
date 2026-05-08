@@ -25,10 +25,10 @@ export function generateAtomicMap(request, options = {}) {
       const paths = createMapPaths(existingEntry.mapId);
       return createSuccess({
         mapId: existingEntry.mapId,
-        workbenchPath: paths.workbenchPath,
-        specPath: paths.specPath,
-        testPath: paths.testPath,
-        reportPath: paths.reportPath,
+        workbenchPath: existingEntry.location?.workbenchPath ?? paths.workbenchPath,
+        specPath: existingEntry.location?.specPath ?? paths.specPath,
+        testPath: existingEntry.location?.testPaths?.[0] ?? paths.testPath,
+        reportPath: existingEntry.location?.reportPath ?? paths.reportPath,
         registryEntry: existingEntry,
         registryPath,
         catalogPath: defaultCatalogPath,
@@ -102,7 +102,9 @@ export function generateAtomicMap(request, options = {}) {
     const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicMapRegistryEntry(specDocument, {
       schemaPath: 'schemas/registry/atomic-map.schema.json',
       status: options.status ?? 'draft',
-      governanceTier: options.governanceTier ?? 'standard'
+      governanceTier: options.governanceTier ?? 'standard',
+      location: createMapLocation(paths),
+      evidence: createGeneratedMapEvidence(paths)
     }));
     const updatedRegistryDocument = upsertRegistryEntry(registryDocument, registryEntry, {
       generatedAt: options.now ?? new Date().toISOString()
@@ -379,6 +381,25 @@ function createMapPaths(mapId) {
     testPath: `${workbenchPath}/map.integration.test.mjs`,
     reportPath: `${workbenchPath}/map.test.report.json`
   };
+}
+
+function createMapLocation(paths) {
+  return {
+    specPath: paths.specPath,
+    codePaths: [],
+    testPaths: [paths.testPath],
+    reportPath: paths.reportPath,
+    workbenchPath: paths.workbenchPath
+  };
+}
+
+function createGeneratedMapEvidence(paths) {
+  return [
+    'generator-provenance:generated',
+    paths.specPath,
+    paths.testPath,
+    paths.reportPath
+  ];
 }
 
 function renderDefaultMapIntegrationTest(specDocument) {

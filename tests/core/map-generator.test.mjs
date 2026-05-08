@@ -52,6 +52,19 @@ try {
   assert.ok(createdMapEntry);
   assert.equal(createdMapEntry.schemaId, 'atm.atomicMap');
   assert.equal(createdMapEntry.mapVersion, '0.1.0');
+  assert.deepEqual(createdMapEntry.location, {
+    specPath: 'atomic_workbench/maps/ATM-MAP-0001/map.spec.json',
+    codePaths: [],
+    testPaths: ['atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs'],
+    reportPath: 'atomic_workbench/maps/ATM-MAP-0001/map.test.report.json',
+    workbenchPath: 'atomic_workbench/maps/ATM-MAP-0001'
+  });
+  assert.deepEqual(createdMapEntry.evidence, [
+    'generator-provenance:generated',
+    'atomic_workbench/maps/ATM-MAP-0001/map.spec.json',
+    'atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs',
+    'atomic_workbench/maps/ATM-MAP-0001/map.test.report.json'
+  ]);
 
   const idempotent = generateAtomicMap(baseRequest, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
   assert.equal(idempotent.ok, true);

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -24,6 +24,15 @@ try {
   assert.equal(create.parsed.evidence.mapId, 'ATM-MAP-0001');
   assert.equal(existsSync(path.join(tempRoot, create.parsed.evidence.specPath)), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic-registry.json')), true);
+  const registry = JSON.parse(readFileSync(path.join(tempRoot, 'atomic-registry.json'), 'utf8'));
+  const createdMapEntry = registry.entries.find((entry) => entry.mapId === 'ATM-MAP-0001');
+  assert.ok(createdMapEntry);
+  assert.deepEqual(createdMapEntry.evidence, [
+    'generator-provenance:generated',
+    'atomic_workbench/maps/ATM-MAP-0001/map.spec.json',
+    'atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs',
+    'atomic_workbench/maps/ATM-MAP-0001/map.test.report.json'
+  ]);
 
   const idempotent = runAtm(['create-map', '--cwd', tempRoot, '--members', members, '--entrypoints', entrypoints, '--quality-targets', qualityTargets]);
   assert.equal(idempotent.exitCode, 0);

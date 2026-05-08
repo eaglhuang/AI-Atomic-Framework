@@ -1,0 +1,44 @@
+{
+  "schemaId": "atm.mapGeneratorProvenanceAudit",
+  "specVersion": "0.1.0",
+  "registryId": "registry.seed",
+  "registryGeneratedAt": "2026-05-08T17:08:05.696Z",
+  "summary": {
+    "total": 2,
+    "generatorBorn": 1,
+    "backfilledLegacy": 1,
+    "missingProvenance": 0
+  },
+  "entries": [
+    {
+      "mapId": "ATM-MAP-0001",
+      "provenanceClass": "generator-born",
+      "marker": "generator-provenance:generated",
+      "workbenchPath": "atomic_workbench/maps/ATM-MAP-0001",
+      "specPath": "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
+      "testPaths": [
+        "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs"
+      ],
+      "reportPath": "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+      "lineageLogRef": null,
+      "driftOk": true,
+      "issues": [],
+      "followUp": null
+    },
+    {
+      "mapId": "ATM-MAP-0002",
+      "provenanceClass": "backfilled-legacy",
+      "marker": "generator-provenance:backfilled",
+      "workbenchPath": "atomic_workbench/maps/ATM-MAP-0002",
+      "specPath": "atomic_workbench/maps/ATM-MAP-0002/map.spec.json",
+      "testPaths": [
+        "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.mjs"
+      ],
+      "reportPath": "atomic_workbench/maps/ATM-MAP-0002/map.test.report.json",
+      "lineageLogRef": "atomic_workbench/maps/ATM-MAP-0002/lineage-log.json",
+      "driftOk": true,
+      "issues": [],
+      "followUp": null
+    }
+  ]
+}

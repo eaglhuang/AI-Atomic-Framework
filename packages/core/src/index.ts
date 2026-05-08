@@ -256,6 +256,8 @@ export interface MapRegistryEntryRecord extends Omit<AtomicMapRecord, 'migration
   readonly schemaPath: string;
   readonly status: RegistryEntryStatus;
   readonly governance: RegistryGovernanceRecord;
+  readonly location?: RegistryLocationRecord;
+  readonly evidence?: readonly string[];
 }
 
 export type RegistryDocumentEntryRecord = RegistryEntryRecord | MapRegistryEntryRecord;
