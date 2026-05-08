@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -46,6 +47,11 @@ function runAtm(args, cwd = root) {
   };
 }
 
+function writeJson(filePath, value) {
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
 function assertReadable(result, commandName) {
   for (const field of fixture.agentReadableFields) {
     assert(Object.hasOwn(result.parsed, field), `${commandName} output missing field: ${field}`);
@@ -58,7 +64,7 @@ function assertMessageCode(result, code) {
   assert(result.parsed.messages.some((entry) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/create.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/review.mjs', 'packages/cli/src/commands/self-host-alpha.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/upgrade.mjs', 'packages/cli/src/commands/test.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.mjs', 'packages/cli/src/commands/create.mjs', 'packages/cli/src/commands/init.mjs', 'packages/cli/src/commands/rollback.mjs', 'packages/cli/src/commands/review.mjs', 'packages/cli/src/commands/self-host-alpha.mjs', 'packages/cli/src/commands/spec.mjs', 'packages/cli/src/commands/status.mjs', 'packages/cli/src/commands/upgrade.mjs', 'packages/cli/src/commands/test.mjs', 'packages/cli/src/commands/validate.mjs', 'packages/cli/src/commands/verify.mjs', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -224,6 +230,133 @@ try {
   assert(upgradeBlocked.parsed.evidence.proposal.automatedGates.allPassed === false, 'upgrade blocked proposal gates must fail');
   assert(upgradeBlocked.parsed.evidence.blockedGateNames.includes('qualityComparison'), 'upgrade blocked proposal must name qualityComparison');
   assertMessageCode(upgradeBlocked, 'ATM_UPGRADE_PROPOSAL_BLOCKED');
+
+  const rollbackRepo = path.join(tempRoot, 'rollback-repo');
+  mkdirSync(rollbackRepo, { recursive: true });
+  writeJson(path.join(rollbackRepo, 'atomic-registry.json'), readJson('fixtures/registry/v1-with-versions.json'));
+
+  const rollbackPlan = runAtm([
+    'rollback',
+    '--cwd', rollbackRepo,
+    '--atom', 'ATM-FIXTURE-0001',
+    '--to', '1.0.0',
+    '--plan'
+  ], rollbackRepo);
+  assert(rollbackPlan.exitCode === 0, 'rollback --plan must exit 0');
+  assertReadable(rollbackPlan, 'rollback');
+  assert(rollbackPlan.parsed.ok === true, 'rollback --plan must report ok=true');
+  assert(rollbackPlan.parsed.evidence.proofPreview?.toVersion === '1.0.0', 'rollback --plan must preview target version');
+  assertMessageCode(rollbackPlan, 'ATM_ROLLBACK_PLAN_READY');
+
+  const rollbackApply = runAtm([
+    'rollback',
+    '--cwd', rollbackRepo,
+    '--atom', 'ATM-FIXTURE-0001',
+    '--to', '1.0.0',
+    '--apply'
+  ], rollbackRepo);
+  assert(rollbackApply.exitCode === 0, 'rollback --apply must exit 0');
+  assertReadable(rollbackApply, 'rollback');
+  assert(rollbackApply.parsed.ok === true, 'rollback --apply must report ok=true');
+  assert(rollbackApply.parsed.evidence.proof?.verificationStatus === 'passed', 'rollback --apply must produce passed proof');
+  assertMessageCode(rollbackApply, 'ATM_ROLLBACK_APPLIED');
+
+  const rolledRegistry = JSON.parse(readFileSync(path.join(rollbackRepo, 'atomic-registry.json'), 'utf8'));
+  const rolledEntry = rolledRegistry.entries.find((entry) => entry.atomId === 'ATM-FIXTURE-0001');
+  assert(rolledEntry.currentVersion === '1.0.0', 'rollback --apply must update currentVersion to target version');
+  assert(existsSync(path.join(rollbackRepo, '.atm', 'reports', 'rollback-proof.json')), 'rollback --apply must write rollback-proof.json');
+
+  const reviewRepo = path.join(tempRoot, 'review-repo');
+  mkdirSync(reviewRepo, { recursive: true });
+  const reviewQueuePath = path.join(reviewRepo, '.atm', 'reports', 'upgrade-proposals.json');
+  const reviewProposal = readJson('fixtures/upgrade/proposal-pass.json');
+  const reviewQueueRecord = {
+    proposalId: reviewProposal.proposalId,
+    atomId: reviewProposal.atomId,
+    fromVersion: reviewProposal.fromVersion,
+    toVersion: reviewProposal.toVersion,
+    decompositionDecision: reviewProposal.decompositionDecision,
+    automatedGates: {
+      allPassed: reviewProposal.automatedGates.allPassed,
+      blockedGateNames: reviewProposal.automatedGates.blockedGateNames
+    },
+    status: 'pending',
+    proposalSnapshotHash: computeDecisionSnapshotHash(reviewProposal),
+    proposal: reviewProposal,
+    queuedAt: reviewProposal.proposedAt
+  };
+  writeJson(reviewQueuePath, {
+    schemaId: 'atm.humanReviewQueue',
+    specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'CLI review integration fixture.'
+    },
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    entries: [reviewQueueRecord]
+  });
+
+  const reviewList = runAtm(['review', 'list', '--cwd', reviewRepo], reviewRepo);
+  assert(reviewList.exitCode === 0, 'review list must exit 0');
+  assertReadable(reviewList, 'review');
+  assert(reviewList.parsed.ok === true, 'review list must report ok=true');
+  assertMessageCode(reviewList, 'ATM_REVIEW_LIST_OK');
+
+  const reviewShow = runAtm(['review', 'show', reviewProposal.proposalId, '--cwd', reviewRepo], reviewRepo);
+  assert(reviewShow.exitCode === 0, 'review show must exit 0');
+  assertReadable(reviewShow, 'review');
+  assert(reviewShow.parsed.ok === true, 'review show must report ok=true');
+  assert(reviewShow.parsed.evidence.proposal?.proposalId === reviewProposal.proposalId, 'review show must return requested proposal');
+  assertMessageCode(reviewShow, 'ATM_REVIEW_SHOW_OK');
+
+  const reviewApprove = runAtm([
+    'review',
+    'approve',
+    reviewProposal.proposalId,
+    '--cwd', reviewRepo,
+    '--reason', 'manual check approved',
+    '--by', 'validate-cli'
+  ], reviewRepo);
+  assert(reviewApprove.exitCode === 0, 'review approve must exit 0');
+  assertReadable(reviewApprove, 'review');
+  assert(reviewApprove.parsed.ok === true, 'review approve must report ok=true');
+  assert(reviewApprove.parsed.evidence.status === 'approved', 'review approve must set approved status');
+  assert(reviewApprove.parsed.evidence.decisionSnapshotHash === reviewQueueRecord.proposalSnapshotHash, 'review approve must preserve decision snapshot hash');
+  assertMessageCode(reviewApprove, 'ATM_REVIEW_APPROVED');
+
+  const reviewRejectFreshRepo = path.join(tempRoot, 'review-reject-repo');
+  mkdirSync(reviewRejectFreshRepo, { recursive: true });
+  writeJson(path.join(reviewRejectFreshRepo, '.atm', 'reports', 'upgrade-proposals.json'), {
+    schemaId: 'atm.humanReviewQueue',
+    specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'CLI review reject fixture.'
+    },
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    entries: [reviewQueueRecord]
+  });
+  const reviewRejectMissingReason = runAtm(['review', 'reject', reviewProposal.proposalId, '--cwd', reviewRejectFreshRepo], reviewRejectFreshRepo);
+  assert(reviewRejectMissingReason.exitCode === 2, 'review reject without --reason must exit 2');
+  assertReadable(reviewRejectMissingReason, 'review');
+  assert(reviewRejectMissingReason.parsed.ok === false, 'review reject without --reason must report ok=false');
+  assertMessageCode(reviewRejectMissingReason, 'ATM_CLI_USAGE');
+
+  const reviewReject = runAtm([
+    'review',
+    'reject',
+    reviewProposal.proposalId,
+    '--cwd', reviewRejectFreshRepo,
+    '--reason', 'manual reject for fixture',
+    '--by', 'validate-cli'
+  ], reviewRejectFreshRepo);
+  assert(reviewReject.exitCode === 0, 'review reject must exit 0');
+  assertReadable(reviewReject, 'review');
+  assert(reviewReject.parsed.ok === true, 'review reject must report ok=true');
+  assert(reviewReject.parsed.evidence.status === 'rejected', 'review reject must set rejected status');
+  assertMessageCode(reviewReject, 'ATM_REVIEW_REJECTED');
 
   const testHelloWorld = runAtm(['test', '--atom', 'hello-world'], root);
   assert(testHelloWorld.exitCode === 0, 'test --atom hello-world must exit 0 in repository root');

@@ -272,4 +272,5 @@ export const corePackage: AtomicPackageDescriptor = {
 export * from './agent-execute/execute-agent-task.ts';
 export * from './registry/map-hash.ts';
 export * from './registry/map-registry.ts';
+export * from './registry/rollback.ts';
 export * from './registry/registry-migration.ts';

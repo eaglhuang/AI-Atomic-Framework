@@ -65,6 +65,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'rollback',
+    summary: 'Rollback a target atom or map to a specific historical version',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'review',
     summary: 'Review upgrade proposals and record human decisions',
     implemented: true,

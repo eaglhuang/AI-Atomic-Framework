@@ -30,6 +30,7 @@ const schemaEntries = {
   'governance-scope-lock': 'schemas/governance/scope-lock.schema.json',
   'governance-bundle': 'schemas/governance/governance-bundle.schema.json',
   'upgrade-proposal': 'schemas/upgrade/upgrade-proposal.schema.json',
+  'rollback-proof': 'schemas/registry/rollback-proof.schema.json',
   registry: 'schemas/registry.schema.json',
   'regression-matrix': 'schemas/regression-matrix.schema.json',
   'test-report': 'schemas/test-report.schema.json'
@@ -181,6 +182,11 @@ if (existsSync(upgradeFixtureDir)) {
 const humanReviewFixtureDir = path.join(root, 'fixtures', 'human-review');
 if (existsSync(humanReviewFixtureDir)) {
   protectedFiles.push(...readdirSync(humanReviewFixtureDir).map((entry) => `fixtures/human-review/${entry}`));
+}
+
+const rollbackFixtureDir = path.join(root, 'fixtures', 'rollback');
+if (existsSync(rollbackFixtureDir)) {
+  protectedFiles.push(...readdirSync(rollbackFixtureDir).map((entry) => `fixtures/rollback/${entry}`));
 }
 
 for (const relativePath of protectedFiles) {
