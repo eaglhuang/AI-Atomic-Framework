@@ -1,21 +1,38 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import {
+  computeDecisionSnapshotHash,
   createHumanReviewDecisionLog,
+  createHumanReviewQueueDocument,
   createHumanReviewQueueRecord,
   findHumanReviewQueueRecord,
   loadHumanReviewQueueDocument,
   renderHumanReviewQueueMarkdown,
   replaceHumanReviewQueueRecord,
+  validateHumanReviewDecisionLog,
+  validateHumanReviewQueueDocument,
+  validateHumanReviewQueueRecord,
   writeHumanReviewQueueDocument
 } from '../../../plugin-human-review/src/index.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.mjs';
 
 export function runReview(argv) {
-  const options = parseReviewOptions(argv);
+  const { options, positional } = parseReviewOptions(argv);
+  const action = positional[0] ? String(positional[0]).trim().toLowerCase() : 'list';
+  const proposalId = positional[1] ? String(positional[1]).trim() : '';
+
+  if (!['list', 'show', 'approve', 'reject'].includes(action)) {
+    throw new CliError('ATM_CLI_USAGE', `Unsupported review action: ${action}`, { exitCode: 2 });
+  }
+
   const queuePath = resolvePath(options.cwd, options.queuePath);
   const projectionPath = resolvePath(options.cwd, options.projectionPath);
   const decisionLogPath = resolvePath(options.cwd, options.decisionLogPath);
+
+  if (action === 'list') {
+    return runReviewList(options.cwd, queuePath, projectionPath);
+  }
 
   const queueDocument = loadHumanReviewQueueDocument(queuePath);
   if (!queueDocument) {
@@ -25,58 +42,75 @@ export function runReview(argv) {
     });
   }
 
-  if (options.action === 'list') {
-    return makeResult({
-      ok: true,
-      command: 'review',
-      cwd: options.cwd,
-      messages: [message('info', 'ATM_REVIEW_LIST_OK', `Loaded ${queueDocument.entries.length} review proposal(s).`)],
-      evidence: {
-        action: 'list',
-        queuePath: relativePathFrom(options.cwd, queuePath),
-        generatedAt: queueDocument.generatedAt,
-        proposals: queueDocument.entries
-      }
+  const queueValidation = validateHumanReviewQueueDocument(queueDocument);
+  if (!queueValidation.ok) {
+    throw new CliError('ATM_REVIEW_QUEUE_INVALID', 'Human review queue is invalid.', {
+      exitCode: 2,
+      details: { issues: queueValidation.issues }
     });
   }
 
-  if (!options.proposalId) {
-    throw new CliError('ATM_CLI_USAGE', `review ${options.action} requires --proposal`, { exitCode: 2 });
+  if (!proposalId) {
+    throw new CliError('ATM_CLI_USAGE', `review ${action} requires <proposalId>`, { exitCode: 2 });
   }
 
-  const queueRecord = findHumanReviewQueueRecord(queueDocument, options.proposalId);
+  const queueRecord = findHumanReviewQueueRecord(queueDocument, proposalId);
   if (!queueRecord) {
-    throw new CliError('ATM_REVIEW_PROPOSAL_NOT_FOUND', `Proposal not found in review queue: ${options.proposalId}`, {
+    throw new CliError('ATM_REVIEW_PROPOSAL_NOT_FOUND', `Proposal not found in review queue: ${proposalId}`, {
       exitCode: 2,
       details: {
-        proposalId: options.proposalId,
+        proposalId,
         queuePath: relativePathFrom(options.cwd, queuePath)
       }
     });
   }
 
-  if (options.action === 'show') {
+  if (action === 'show') {
+    const markdown = renderHumanReviewQueueMarkdown(queueDocument);
+    writeTextFile(projectionPath, markdown);
     return makeResult({
       ok: true,
       command: 'review',
       cwd: options.cwd,
-      messages: [message('info', 'ATM_REVIEW_SHOW_OK', `Loaded review proposal ${options.proposalId}.`)],
+      messages: [message('info', 'ATM_REVIEW_SHOW_OK', `Loaded review proposal ${proposalId}.`)],
       evidence: {
         action: 'show',
         queuePath: relativePathFrom(options.cwd, queuePath),
-        proposal: queueRecord
+        projectionPath: relativePathFrom(options.cwd, projectionPath),
+        proposal: queueRecord,
+        markdown
       }
     });
   }
 
-  const decision = options.action === 'approve' ? 'approve' : 'reject';
   if (!options.reason) {
-    throw new CliError('ATM_CLI_USAGE', `review ${options.action} requires --reason`, { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', `review ${action} requires --reason`, { exitCode: 2 });
   }
   if (queueRecord.status === 'approved' || queueRecord.status === 'rejected') {
-    throw new CliError('ATM_REVIEW_ALREADY_DECIDED', `Proposal ${options.proposalId} is already ${queueRecord.status}.`, {
+    throw new CliError('ATM_REVIEW_ALREADY_DECIDED', `Proposal ${proposalId} is already ${queueRecord.status}.`, {
       exitCode: 2,
-      details: { proposalId: options.proposalId, status: queueRecord.status }
+      details: { proposalId, status: queueRecord.status }
+    });
+  }
+
+  const currentValidation = validateHumanReviewQueueRecord(queueRecord);
+  if (!currentValidation.ok) {
+    throw new CliError('ATM_REVIEW_RECORD_INVALID', 'Proposal queue record is invalid.', {
+      exitCode: 2,
+      details: { issues: currentValidation.issues }
+    });
+  }
+
+  const decision = action === 'approve' ? 'approve' : 'reject';
+  const decisionSnapshotHash = computeDecisionSnapshotHash(queueRecord.proposal);
+  if (decisionSnapshotHash !== queueRecord.proposalSnapshotHash) {
+    throw new CliError('ATM_HUMAN_REVIEW_SNAPSHOT_MISMATCH', 'decision-snapshot.hash mismatch.', {
+      exitCode: 2,
+      details: {
+        proposalId,
+        expected: queueRecord.proposalSnapshotHash,
+        actual: decisionSnapshotHash
+      }
     });
   }
 
@@ -87,17 +121,14 @@ export function runReview(argv) {
       reason: options.reason,
       decidedBy: options.decidedBy,
       decidedAt: options.decidedAt,
-      decisionSnapshotHash: queueRecord.proposalSnapshotHash,
+      decisionSnapshotHash,
       evidenceId: `human-review.${queueRecord.proposalId}.${decision}`
     }
   });
   const updatedQueueDocument = replaceHumanReviewQueueRecord(queueDocument, reviewedQueueRecord);
 
-  writeHumanReviewQueueDocument(queuePath, updatedQueueDocument);
-  writeTextFile(projectionPath, renderHumanReviewQueueMarkdown(updatedQueueDocument));
-
   const decisionLog = createHumanReviewDecisionLog({
-    queueRecord,
+    queueRecord: reviewedQueueRecord,
     decision,
     reason: options.reason,
     decidedBy: options.decidedBy,
@@ -106,16 +137,32 @@ export function runReview(argv) {
     projectionPath: relativePathFrom(options.cwd, projectionPath),
     evidenceId: `human-review.${queueRecord.proposalId}.${decision}`
   });
+  const decisionLogValidation = validateHumanReviewDecisionLog(decisionLog);
+  if (!decisionLogValidation.ok) {
+    throw new CliError('ATM_REVIEW_DECISION_INVALID', 'Generated decision log is invalid.', {
+      exitCode: 2,
+      details: { issues: decisionLogValidation.issues }
+    });
+  }
+
+  writeHumanReviewQueueDocument(queuePath, updatedQueueDocument);
+  const markdown = renderHumanReviewQueueMarkdown(updatedQueueDocument);
+  writeTextFile(projectionPath, markdown);
+
   const decisionLogs = readDecisionLogFile(decisionLogPath);
   decisionLogs.push(decisionLog);
   writeJsonFile(decisionLogPath, decisionLogs);
+
+  const governance = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+  const storedEvidence = governance.stores.evidenceStore.writeEvidence(queueRecord.atomId, decisionLog.evidence);
+  const evidencePath = path.join(options.cwd, '.atm', 'evidence', `${queueRecord.atomId}.json`);
 
   return makeResult({
     ok: true,
     command: 'review',
     cwd: options.cwd,
     messages: [
-      message('info', 'ATM_REVIEW_DECISION_RECORDED', `Recorded ${decision} decision for ${queueRecord.proposalId}.`, {
+      message('info', decision === 'approve' ? 'ATM_REVIEW_APPROVED' : 'ATM_REVIEW_REJECTED', `Recorded ${decision} decision for ${queueRecord.proposalId}.`, {
         proposalId: queueRecord.proposalId,
         decision
       })
@@ -128,34 +175,58 @@ export function runReview(argv) {
       projectionPath: relativePathFrom(options.cwd, projectionPath),
       decisionLogPath: relativePathFrom(options.cwd, decisionLogPath),
       decisionLog,
-      evidence: decisionLog.evidence
+      evidence: storedEvidence,
+      evidencePath: relativePathFrom(options.cwd, evidencePath),
+      decisionSnapshotHash,
+      status: reviewedQueueRecord.status
+    }
+  });
+}
+
+function runReviewList(cwd, queuePath, projectionPath) {
+  const queueDocument = loadHumanReviewQueueDocument(queuePath)
+    ?? createHumanReviewQueueDocument([], { generatedAt: new Date().toISOString() });
+  const queueValidation = validateHumanReviewQueueDocument(queueDocument);
+  if (!queueValidation.ok && queueDocument.entries.length > 0) {
+    throw new CliError('ATM_REVIEW_QUEUE_INVALID', 'Human review queue is invalid.', {
+      exitCode: 2,
+      details: { issues: queueValidation.issues }
+    });
+  }
+
+  writeHumanReviewQueueDocument(queuePath, queueDocument);
+  const markdown = renderHumanReviewQueueMarkdown(queueDocument);
+  writeTextFile(projectionPath, markdown);
+
+  return makeResult({
+    ok: true,
+    command: 'review',
+    cwd,
+    messages: [message('info', 'ATM_REVIEW_LIST_OK', `Loaded ${queueDocument.entries.length} review proposal(s).`)],
+    evidence: {
+      action: 'list',
+      queuePath: relativePathFrom(cwd, queuePath),
+      projectionPath: relativePathFrom(cwd, projectionPath),
+      generatedAt: queueDocument.generatedAt,
+      proposals: queueDocument.entries,
+      markdown
     }
   });
 }
 
 function parseReviewOptions(argv) {
-  if (argv.length === 0) {
-    throw new CliError('ATM_CLI_USAGE', 'review requires an action: list, show, approve, reject', { exitCode: 2 });
-  }
-
-  const action = argv[0];
-  if (!['list', 'show', 'approve', 'reject'].includes(action)) {
-    throw new CliError('ATM_CLI_USAGE', `Unsupported review action: ${action}`, { exitCode: 2 });
-  }
-
   const options = {
-    action,
     cwd: process.cwd(),
     queuePath: '.atm/reports/upgrade-proposals.json',
     projectionPath: '.atm/reports/upgrade-proposals.md',
     decisionLogPath: '.atm/reports/human-review-decisions.json',
-    proposalId: null,
     reason: '',
-    decidedBy: 'ATM reviewer',
+    decidedBy: process.env.AGENT_IDENTITY || 'ATM reviewer',
     decidedAt: new Date().toISOString()
   };
+  const positional = [];
 
-  for (let index = 1; index < argv.length; index += 1) {
+  for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--cwd') {
       options.cwd = requireOptionValue(argv, index, '--cwd');
@@ -174,11 +245,6 @@ function parseReviewOptions(argv) {
     }
     if (arg === '--decision-log') {
       options.decisionLogPath = requireOptionValue(argv, index, '--decision-log');
-      index += 1;
-      continue;
-    }
-    if (arg === '--proposal') {
-      options.proposalId = requireOptionValue(argv, index, '--proposal');
       index += 1;
       continue;
     }
@@ -201,13 +267,17 @@ function parseReviewOptions(argv) {
       continue;
     }
     if (arg.startsWith('--')) {
-      throw new CliError('ATM_CLI_USAGE', `review ${options.action} does not support option ${arg}`, { exitCode: 2 });
+      throw new CliError('ATM_CLI_USAGE', `review does not support option ${arg}`, { exitCode: 2 });
     }
+    positional.push(arg);
   }
 
   return {
-    ...options,
-    cwd: path.resolve(options.cwd)
+    options: {
+      ...options,
+      cwd: path.resolve(options.cwd)
+    },
+    positional
   };
 }
 

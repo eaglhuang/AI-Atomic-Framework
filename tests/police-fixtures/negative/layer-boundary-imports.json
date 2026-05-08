@@ -5,5 +5,12 @@
     "imports": [
       { "source": "@ai-atomic-framework/adapter-local-git", "toLayer": "adapter" }
     ]
+  },
+  {
+    "file": "packages/core/src/invalid-human-review-import.ts",
+    "fromLayer": "core",
+    "imports": [
+      { "source": "@ai-atomic-framework/plugin-human-review", "toLayer": "plugin" }
+    ]
   }
 ]

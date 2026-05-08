@@ -4,7 +4,7 @@ import { CliError, makeResult, message } from './shared.mjs';
 const commandTemplates = Object.freeze({
   createAtom: [
     'node packages/cli/src/atm.mjs create --bucket <BUCKET> --title <Title> --description "<Description>" --logical-name <logical-name> --dry-run',
-    'node packages/cli/src/atm.mjs create --bucket H2U --title NormalizeCssColor --description "Canonicalize CSS color input for html-to-ucuf." --logical-name atom.html-to-ucuf.normalize-css-color --dry-run',
+    'node packages/cli/src/atm.mjs create --bucket EXM --title NormalizeCssColor --description "Canonicalize CSS color input for reusable adapters." --logical-name atom.example.normalize-css-color --dry-run',
   ],
   createMap: [
     'node packages/cli/src/atm.mjs create-map --members <json> --edges <json> --entrypoints <json> --quality-targets <json> --dry-run',
