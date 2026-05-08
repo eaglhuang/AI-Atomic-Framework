@@ -76,6 +76,16 @@
       "path": "positive/governance-evidence-rollback-proof.json"
     },
     {
+      "name": "human review decision (approve)",
+      "schema": "human-review-decision",
+      "path": "../../fixtures/human-review/approve.snapshot.json"
+    },
+    {
+      "name": "human review decision (reject)",
+      "schema": "human-review-decision",
+      "path": "../../fixtures/human-review/reject.snapshot.json"
+    },
+    {
       "name": "minimal governance bundle",
       "schema": "governance-bundle",
       "path": "positive/governance-bundle.json"
@@ -227,6 +237,13 @@
       "path": "negative/missing-validation-passes.execution-evidence.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "validationPasses"
+    },
+    {
+      "name": "human review decision missing evidence",
+      "schema": "human-review-decision",
+      "path": "negative/human-review-decision-missing-evidence.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "evidence"
     }
   ]
 }

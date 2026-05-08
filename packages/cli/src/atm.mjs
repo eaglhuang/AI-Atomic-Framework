@@ -14,6 +14,7 @@ import { runTestAsync } from './commands/test.mjs';
 import { runValidate } from './commands/validate.mjs';
 import { runVerify } from './commands/verify.mjs';
 import { runRegistryDiff } from './commands/registry-diff.mjs';
+import { runReview } from './commands/review.mjs';
 import { CliError, makeResult, message, writeResult } from './commands/shared.mjs';
 
 export const cliCommandRunners = {
@@ -29,7 +30,8 @@ export const cliCommandRunners = {
   test: runTestAsync,
   validate: runValidate,
   verify: runVerify,
-  'registry-diff': runRegistryDiff
+  'registry-diff': runRegistryDiff,
+  review: runReview
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
@@ -40,7 +42,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       ok: true,
       command: 'help',
       cwd: process.cwd(),
-      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, create, create-map, guide, init, self-host-alpha, spec, status, upgrade, test, validate, verify.')],
+      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, create, create-map, guide, init, review, self-host-alpha, spec, status, upgrade, test, validate, verify.')],
       evidence: {
         commands: Object.keys(cliCommandRunners),
         outputFormat: 'json'

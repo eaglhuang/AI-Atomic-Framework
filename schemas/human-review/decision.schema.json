@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/human-review/decision.schema.json",
+  "title": "ATM Human Review Decision v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "decisionId",
+    "proposalId",
+    "atomId",
+    "decision",
+    "reason",
+    "decidedBy",
+    "decidedAt",
+    "decisionSnapshotHash",
+    "queuePath",
+    "projectionPath",
+    "queueRecord",
+    "evidence"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.humanReviewDecision"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "../governance/evidence.schema.json#/$defs/migration"
+    },
+    "decisionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^proposal\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "decision": {
+      "enum": ["approve", "reject"]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decidedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "decisionSnapshotHash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "queuePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "projectionPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "queueRecord": {
+      "$ref": "#/$defs/queueRecord"
+    },
+    "evidence": {
+      "$ref": "../governance/evidence.schema.json"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": { "const": "approve" }
+        }
+      },
+      "then": {
+        "properties": {
+          "queueRecord": {
+            "properties": {
+              "status": { "const": "approved" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": { "const": "reject" }
+        }
+      },
+      "then": {
+        "properties": {
+          "queueRecord": {
+            "properties": {
+              "status": { "const": "rejected" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "evidence": {
+          "properties": {
+            "evidenceKind": { "const": "review" },
+            "evidenceType": { "const": "human-review-decision" }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "automatedGates": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["allPassed", "blockedGateNames"],
+      "properties": {
+        "allPassed": {
+          "type": "boolean"
+        },
+        "blockedGateNames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "proposalSnapshot": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "schemaId",
+        "proposalId",
+        "atomId",
+        "fromVersion",
+        "toVersion",
+        "decompositionDecision",
+        "status",
+        "automatedGates"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.upgradeProposal"
+        },
+        "proposalId": {
+          "type": "string",
+          "pattern": "^proposal\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "atomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "fromVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "toVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "decompositionDecision": {
+          "enum": ["atom-bump", "atom-extract", "map-bump"]
+        },
+        "status": {
+          "enum": ["pending", "blocked"]
+        },
+        "automatedGates": {
+          "$ref": "#/$defs/automatedGates"
+        }
+      }
+    },
+    "queueRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposalId",
+        "atomId",
+        "fromVersion",
+        "toVersion",
+        "decompositionDecision",
+        "automatedGates",
+        "status",
+        "proposalSnapshotHash",
+        "proposal",
+        "review"
+      ],
+      "properties": {
+        "proposalId": {
+          "type": "string",
+          "pattern": "^proposal\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "atomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "fromVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "toVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "decompositionDecision": {
+          "enum": ["atom-bump", "atom-extract", "map-bump"]
+        },
+        "automatedGates": {
+          "$ref": "#/$defs/automatedGates"
+        },
+        "status": {
+          "enum": ["approved", "rejected"]
+        },
+        "proposalSnapshotHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "proposal": {
+          "$ref": "#/$defs/proposalSnapshot"
+        },
+        "queuedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["decision", "reason", "decidedBy", "decidedAt", "decisionSnapshotHash"],
+          "properties": {
+            "decision": {
+              "enum": ["approve", "reject"]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "decidedBy": {
+              "type": "string",
+              "minLength": 1
+            },
+            "decidedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "decisionSnapshotHash": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "evidenceId": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

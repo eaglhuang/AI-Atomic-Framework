@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.humanReviewDecision",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Negative fixture for missing evidence."
+  },
+  "decisionId": "decision.proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve.approve",
+  "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+  "atomId": "ATM-CORE-0001",
+  "decision": "approve",
+  "reason": "Missing evidence should fail schema validation.",
+  "decidedBy": "ATM reviewer",
+  "decidedAt": "2026-01-02T00:00:00.000Z",
+  "decisionSnapshotHash": "sha256:83a8f962f8ba55fad1c23f2e26fc6f220d7f6df1f1d3fd3ed5f3d88f9cbb5e14",
+  "queuePath": ".atm/reports/upgrade-proposals.json",
+  "projectionPath": ".atm/reports/upgrade-proposals.md",
+  "queueRecord": {
+    "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+    "atomId": "ATM-CORE-0001",
+    "fromVersion": "1.0.0",
+    "toVersion": "1.1.0",
+    "decompositionDecision": "atom-bump",
+    "automatedGates": {
+      "allPassed": true,
+      "blockedGateNames": []
+    },
+    "status": "approved",
+    "proposalSnapshotHash": "sha256:83a8f962f8ba55fad1c23f2e26fc6f220d7f6df1f1d3fd3ed5f3d88f9cbb5e14",
+    "proposal": {
+      "schemaId": "atm.upgradeProposal",
+      "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+      "atomId": "ATM-CORE-0001",
+      "fromVersion": "1.0.0",
+      "toVersion": "1.1.0",
+      "decompositionDecision": "atom-bump",
+      "status": "pending",
+      "automatedGates": {
+        "allPassed": true,
+        "blockedGateNames": []
+      }
+    },
+    "review": {
+      "decision": "approve",
+      "reason": "Missing evidence should fail schema validation.",
+      "decidedBy": "ATM reviewer",
+      "decidedAt": "2026-01-02T00:00:00.000Z",
+      "decisionSnapshotHash": "sha256:83a8f962f8ba55fad1c23f2e26fc6f220d7f6df1f1d3fd3ed5f3d88f9cbb5e14",
+      "evidenceId": "human-review.proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve.approve"
+    }
+  }
+}

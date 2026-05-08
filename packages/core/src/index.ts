@@ -35,7 +35,7 @@ export interface EvidenceRecord {
   readonly evidenceId?: string;
   readonly workItemId?: string;
   readonly evidenceKind: 'validation' | 'review' | 'metric' | 'handoff';
-  readonly evidenceType?: 'usage-feedback' | 'quality-baseline' | 'quality-comparison' | 'rollback-proof';
+  readonly evidenceType?: 'usage-feedback' | 'quality-baseline' | 'quality-comparison' | 'rollback-proof' | 'human-review-decision';
   readonly summary: string;
   readonly artifactPaths: readonly string[];
   readonly createdAt?: string;

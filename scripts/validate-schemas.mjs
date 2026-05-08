@@ -25,6 +25,7 @@ const schemaEntries = {
   'evidence-quality-baseline': 'schemas/governance/evidence/quality-baseline.schema.json',
   'evidence-quality-comparison': 'schemas/governance/evidence/quality-comparison.schema.json',
   'evidence-rollback-proof': 'schemas/governance/evidence/rollback-proof.schema.json',
+  'human-review-decision': 'schemas/human-review/decision.schema.json',
   'governance-work-item': 'schemas/governance/work-item.schema.json',
   'governance-scope-lock': 'schemas/governance/scope-lock.schema.json',
   'governance-bundle': 'schemas/governance/governance-bundle.schema.json',
@@ -175,6 +176,11 @@ const protectedFiles = [
 const upgradeFixtureDir = path.join(root, 'fixtures', 'upgrade');
 if (existsSync(upgradeFixtureDir)) {
   protectedFiles.push(...readdirSync(upgradeFixtureDir).map((entry) => `fixtures/upgrade/${entry}`));
+}
+
+const humanReviewFixtureDir = path.join(root, 'fixtures', 'human-review');
+if (existsSync(humanReviewFixtureDir)) {
+  protectedFiles.push(...readdirSync(humanReviewFixtureDir).map((entry) => `fixtures/human-review/${entry}`));
 }
 
 for (const relativePath of protectedFiles) {

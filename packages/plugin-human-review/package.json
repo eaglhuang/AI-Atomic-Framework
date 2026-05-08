@@ -1,0 +1,19 @@
+{
+  "name": "@ai-atomic-framework/plugin-human-review",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Reference plugin for human review queues and decision logs.",
+  "license": "MIT",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "files": ["src"],
+  "dependencies": {
+    "@ai-atomic-framework/core": "0.0.0",
+    "@ai-atomic-framework/plugin-sdk": "0.0.0"
+  },
+  "scripts": {
+    "test": "node ../../scripts/validate-human-review.mjs --mode test",
+    "typecheck": "node ../../scripts/validate-human-review.mjs --mode typecheck",
+    "lint": "node ../../scripts/validate-human-review.mjs --mode lint"
+  }
+}
