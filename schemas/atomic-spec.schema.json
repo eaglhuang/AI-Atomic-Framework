@@ -56,6 +56,21 @@
     "hashLock": {
       "$ref": "#/$defs/hashLock"
     },
+    "semanticFingerprint": {
+      "$ref": "#/$defs/semanticFingerprint"
+    },
+    "lineage": {
+      "$ref": "#/$defs/lineage"
+    },
+    "ttl": {
+      "$ref": "#/$defs/ttl"
+    },
+    "deployScope": {
+      "$ref": "#/$defs/deployScope"
+    },
+    "mutabilityPolicy": {
+      "$ref": "#/$defs/mutabilityPolicy"
+    },
     "dependencyPolicy": {
       "$ref": "#/$defs/dependencyPolicy"
     },
@@ -220,6 +235,49 @@
           "enum": ["json-stable-v1", "text-normalized-v1"]
         }
       }
+    },
+    "semanticFingerprint": {
+      "type": "string",
+      "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bornBy", "parentRefs", "bornAt"],
+      "properties": {
+        "bornBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parentRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "bornAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "ttl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expiresAt"],
+      "properties": {
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "deployScope": {
+      "enum": ["all-env", "dev-only", "staging-only", "test-only"]
+    },
+    "mutabilityPolicy": {
+      "enum": ["mutable", "frozen-after-release", "immutable"]
     },
     "dependencyPolicy": {
       "type": "object",

@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { computeSha256ForContent } from '../hash-lock/hash-lock.mjs';
+import { createAtomicMapSemanticFingerprint, normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
 import { createRegistryDocument, validateRegistryDocumentFile, writeRegistryArtifacts } from '../registry/registry.mjs';
 import { allocateMapId, MapIdAllocationError, parseMapId } from './map-id-allocator.mjs';
 
@@ -142,7 +143,10 @@ export function createMinimalAtomicMapSpec(request) {
   const qualityTargets = normalizeQualityTargets(request.qualityTargets);
   const mapVersion = normalizeSemver(request.mapVersion ?? '0.1.0', 'mapVersion');
   const mapHash = computeAtomicMapHash({ members, edges, entrypoints });
-  const semanticFingerprint = createAtomicMapSemanticFingerprint({ entrypoints, qualityTargets });
+  const pendingSfCalculation = request.pendingSfCalculation === true;
+  const semanticFingerprint = pendingSfCalculation
+    ? null
+    : createAtomicMapSemanticFingerprint({ entrypoints, qualityTargets });
 
   return {
     schemaId: 'atm.atomicMap',
@@ -159,7 +163,8 @@ export function createMinimalAtomicMapSpec(request) {
     entrypoints,
     qualityTargets,
     mapHash,
-    semanticFingerprint
+    semanticFingerprint,
+    ...(pendingSfCalculation ? { pendingSfCalculation: true } : {})
   };
 }
 
@@ -173,7 +178,8 @@ function normalizeRequest(request) {
     edges: request.edges ?? [],
     entrypoints: request.entrypoints,
     qualityTargets: request.qualityTargets,
-    mapVersion: request.mapVersion ?? '0.1.0'
+    mapVersion: request.mapVersion ?? '0.1.0',
+    pendingSfCalculation: request.pendingSfCalculation === true
   };
 }
 
@@ -309,10 +315,13 @@ function readRegistryDocument(registryAbsolutePath, options) {
 function findExistingEntry(registryDocument, request) {
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
   const mapHash = computeAtomicMapHash(request);
-  const semanticFingerprint = createAtomicMapSemanticFingerprint(request);
+  const semanticFingerprint = request.pendingSfCalculation === true
+    ? null
+    : createAtomicMapSemanticFingerprint(request);
   return entries.find((entry) => entry?.schemaId === 'atm.atomicMap'
     && entry?.mapHash === mapHash
-    && String(entry?.semanticFingerprint || '').trim() === semanticFingerprint
+    && normalizeSemanticFingerprint(entry?.semanticFingerprint ?? entry?.mapSemanticFingerprint ?? null) === semanticFingerprint
+    && (request.pendingSfCalculation === true ? entry?.pendingSfCalculation === true : true)
     && String(entry?.mapVersion || '').trim() === request.mapVersion) ?? null;
 }
 
@@ -378,7 +387,12 @@ function renderDefaultMapIntegrationTest(specDocument) {
     `assert.equal(spec.schemaId, ${JSON.stringify(specDocument.schemaId)});`,
     `assert.equal(spec.mapId, ${JSON.stringify(specDocument.mapId)});`,
     `assert.equal(spec.mapHash, ${JSON.stringify(specDocument.mapHash)});`,
-    `assert.equal(spec.semanticFingerprint, ${JSON.stringify(specDocument.semanticFingerprint)});`,
+    specDocument.pendingSfCalculation === true
+      ? [
+          `assert.equal(spec.pendingSfCalculation, true);`,
+          `assert.equal(spec.semanticFingerprint, null);`
+        ].join('\n')
+      : `assert.equal(spec.semanticFingerprint, ${JSON.stringify(specDocument.semanticFingerprint)});`,
     `assert.deepEqual(spec.entrypoints, ${JSON.stringify(specDocument.entrypoints)});`,
     `assert.deepEqual(spec.members, ${JSON.stringify(specDocument.members)});`,
     `assert.deepEqual(spec.edges, ${JSON.stringify(specDocument.edges)});`,
@@ -430,11 +444,14 @@ function createAtomicMapRegistryEntry(atomicMap, options = {}) {
     qualityTargets: Object.fromEntries(
       Object.entries(atomicMap.qualityTargets).map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
     ),
-    mapHash: atomicMap.mapHash
+    mapHash: atomicMap.mapHash,
+    ...(atomicMap.pendingSfCalculation === true ? { pendingSfCalculation: true } : {})
   };
 
   if (atomicMap.semanticFingerprint) {
-    entry.semanticFingerprint = atomicMap.semanticFingerprint;
+    entry.semanticFingerprint = normalizeSemanticFingerprint(atomicMap.semanticFingerprint) ?? undefined;
+  } else if (atomicMap.pendingSfCalculation === true) {
+    entry.semanticFingerprint = null;
   }
   if (atomicMap.lineageLogRef) {
     entry.lineageLogRef = atomicMap.lineageLogRef;
@@ -469,21 +486,6 @@ function createAtomicMapHashPayload(input) {
 
 function computeAtomicMapHash(input) {
   return computeSha256ForContent(JSON.stringify(createAtomicMapHashPayload(input)));
-}
-
-function createAtomicMapSemanticFingerprint(input) {
-  return computeSha256ForContent(JSON.stringify({
-    entrypoints: [...input.entrypoints]
-      .map((entrypoint) => String(entrypoint).trim())
-      .filter(Boolean)
-      .sort((left, right) => left.localeCompare(right)),
-    qualityTargets: Object.fromEntries(
-      Object.entries(input.qualityTargets ?? {})
-        .map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
-        .filter(([key]) => key.length > 0)
-        .sort(([left], [right]) => left.localeCompare(right))
-    )
-  }));
 }
 
 function recordPhase(phases, phase, action) {

@@ -103,6 +103,29 @@
             "$ref": "#/$defs/registryVersion"
           }
         },
+        "semanticFingerprint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lineageLogRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceIndexRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ttl": {
+          "type": "integer",
+          "minimum": 0
+        },
         "schemaId": {
           "const": "atm.atomicSpec"
         },
@@ -241,8 +264,18 @@
           "pattern": "^sha256:[a-f0-9]{64}$"
         },
         "semanticFingerprint": {
-          "type": "string",
-          "pattern": "^sha256:[a-f0-9]{64}$"
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pendingSfCalculation": {
+          "type": "boolean"
         },
         "lineageLogRef": {
           "type": "string",
@@ -333,6 +366,17 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "semanticFingerprint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },

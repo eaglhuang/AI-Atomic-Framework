@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
@@ -199,6 +200,16 @@ export function normalizeAtomicSpecModel(specDocument, options = {}) {
           : null
       }
     },
+    governance: {
+      semanticFingerprint: normalizeSemanticFingerprint(
+        specDocument.semanticFingerprint ?? createAtomicSpecSemanticFingerprint(specDocument)
+      ),
+      lineage: normalizeLineage(specDocument.lineage ?? null),
+      ttl: normalizeTtl(specDocument.ttl ?? null),
+      deployScope: normalizeOptionalText(specDocument.deployScope),
+      mutabilityPolicy: normalizeOptionalText(specDocument.mutabilityPolicy),
+      pendingSfCalculation: specDocument.pendingSfCalculation === true
+    },
     hashLock: {
       algorithm: specDocument.hashLock.algorithm,
       digest: specDocument.hashLock.digest,
@@ -237,6 +248,40 @@ function normalizePorts(ports) {
     kind: port.kind,
     required: port.required === true
   }));
+}
+
+function normalizeLineage(lineage) {
+  if (!lineage || typeof lineage !== 'object' || Array.isArray(lineage)) {
+    return null;
+  }
+
+  const parentRefs = Array.isArray(lineage.parentRefs)
+    ? normalizeStringList(lineage.parentRefs)
+    : [];
+
+  return {
+    bornBy: normalizeOptionalText(lineage.bornBy),
+    parentRefs,
+    bornAt: normalizeOptionalText(lineage.bornAt)
+  };
+}
+
+function normalizeTtl(ttl) {
+  if (!ttl || typeof ttl !== 'object' || Array.isArray(ttl)) {
+    return null;
+  }
+
+  return {
+    expiresAt: normalizeOptionalText(ttl.expiresAt)
+  };
+}
+
+function normalizeOptionalText(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const text = value.trim();
+  return text.length > 0 ? text : null;
 }
 
 function normalizeStringList(values) {

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/registry/version-index.schema.json",
+  "title": "ATM Version Index v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "minProperties": 1,
+  "patternProperties": {
+    "^(?:atom|map)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$": {
+      "$ref": "#/$defs/versionIndexRow"
+    }
+  },
+  "$defs": {
+    "versionIndexRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "latest",
+        "versions"
+      ],
+      "properties": {
+        "latest": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          }
+        }
+      }
+    }
+  }
+}

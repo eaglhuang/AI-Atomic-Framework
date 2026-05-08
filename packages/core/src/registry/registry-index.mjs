@@ -1,3 +1,4 @@
+import { normalizeSemanticFingerprint, semanticFingerprintPrefix } from './semantic-fingerprint.ts';
 import { formatAtmUrn, normalizeAtmNodeRef } from './urn.mjs';
 
 export class RegistryIndexError extends Error {
@@ -112,22 +113,7 @@ export function createNodeRef(entry) {
   return null;
 }
 
-export function normalizeSemanticFingerprint(value) {
-  if (!value) {
-    return null;
-  }
-  const text = String(value).trim().toLowerCase();
-  if (/^sf:sha256:[a-f0-9]{64}$/.test(text) || /^sha256:[a-f0-9]{64}$/.test(text) || /^[a-f0-9]{64}$/.test(text)) {
-    return text;
-  }
-  throw new RegistryIndexError('ATM_SEMANTIC_FINGERPRINT_INVALID', 'Semantic fingerprint must be sha256-like text.', { value });
-}
-
-export function semanticFingerprintPrefix(fingerprint, length = 16) {
-  const normalized = normalizeSemanticFingerprint(fingerprint);
-  const hex = normalized.replace(/^sf:sha256:/, '').replace(/^sha256:/, '');
-  return hex.slice(0, length);
-}
+export { normalizeSemanticFingerprint, semanticFingerprintPrefix };
 
 function buildNodeRef(nodeKind, canonicalId, version, entry) {
   const urn = formatAtmUrn({ nodeKind, canonicalId, version });

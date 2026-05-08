@@ -32,6 +32,8 @@ const schemaEntries = {
   'upgrade-proposal': 'schemas/upgrade/upgrade-proposal.schema.json',
   'rollback-proof': 'schemas/registry/rollback-proof.schema.json',
   registry: 'schemas/registry.schema.json',
+  'registry-v1': 'packages/core/src/registry/registry-v1.schema.json',
+  'version-index': 'schemas/registry/version-index.schema.json',
   'regression-matrix': 'schemas/regression-matrix.schema.json',
   'test-report': 'schemas/test-report.schema.json'
 };
@@ -79,7 +81,10 @@ const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 
 const supportSchemas = loadSchemas(supportSchemaEntries, { enforceMetadata: false });
-const schemas = loadSchemas(schemaEntries, { enforceMetadata: true });
+const schemas = loadSchemas(schemaEntries, {
+  enforceMetadata: true,
+  metadataExemptSchemaNames: ['version-index']
+});
 
 for (const [schemaName, schema] of supportSchemas.entries()) {
   ajv.addSchema(schema, schemaName);
@@ -102,6 +107,7 @@ for (const [schemaName, schema] of schemas.entries()) {
 }
 
 const atomicSchema = schemas.get('atomic-spec');
+const atomicMapSchema = schemas.get('atomic-map');
 const performanceBudget = atomicSchema?.$defs?.performanceBudget;
 if (performanceBudget?.properties?.hotPath?.type !== 'boolean') {
   fail('atomic-spec performanceBudget.hotPath must be boolean');
@@ -121,6 +127,76 @@ for (const value of ['birth', 'evolution']) {
 }
 if (atomicSchema?.properties?.lifecycleMode) {
   fail('atomic-spec lifecycleMode must stay under compatibility, not top-level');
+}
+if (atomicSchema?.$defs?.semanticFingerprint?.pattern !== '^(?:sf:)?sha256:[a-f0-9]{64}$') {
+  fail('atomic-spec semanticFingerprint must accept sf:sha256 fingerprints');
+}
+if (atomicSchema?.$defs?.lineage?.required?.join(',') !== 'bornBy,parentRefs,bornAt') {
+  fail('atomic-spec lineage must require bornBy, parentRefs, and bornAt');
+}
+if (atomicSchema?.$defs?.ttl?.required?.[0] !== 'expiresAt') {
+  fail('atomic-spec ttl must require expiresAt');
+}
+for (const value of ['all-env', 'dev-only', 'staging-only', 'test-only']) {
+  if (!atomicSchema?.$defs?.deployScope?.enum?.includes(value)) {
+    fail(`atomic-spec deployScope missing enum value: ${value}`);
+  }
+}
+for (const value of ['mutable', 'frozen-after-release', 'immutable']) {
+  if (!atomicSchema?.$defs?.mutabilityPolicy?.enum?.includes(value)) {
+    fail(`atomic-spec mutabilityPolicy missing enum value: ${value}`);
+  }
+}
+if (atomicMapSchema?.properties?.semanticFingerprint?.oneOf?.length !== 2) {
+  fail('atomic-map semanticFingerprint must allow string or null');
+}
+if (atomicMapSchema?.properties?.pendingSfCalculation?.type !== 'boolean') {
+  fail('atomic-map pendingSfCalculation must be boolean');
+}
+
+const registrySchema = schemas.get('registry');
+if (!registrySchema?.$defs?.registryEntry?.properties?.currentVersion) {
+  fail('registry atom entry must expose currentVersion');
+}
+if (!registrySchema?.$defs?.registryEntry?.properties?.versions) {
+  fail('registry atom entry must expose versions');
+}
+if (!registrySchema?.$defs?.registryEntry?.properties?.semanticFingerprint) {
+  fail('registry atom entry must expose semanticFingerprint');
+}
+if (!registrySchema?.$defs?.registryEntry?.properties?.lineageLogRef) {
+  fail('registry atom entry must expose lineageLogRef');
+}
+if (!registrySchema?.$defs?.registryEntry?.properties?.evidenceIndexRef) {
+  fail('registry atom entry must expose evidenceIndexRef');
+}
+if (!registrySchema?.$defs?.registryEntry?.properties?.ttl) {
+  fail('registry atom entry must expose ttl');
+}
+if (!registrySchema?.$defs?.registryVersion?.properties?.semanticFingerprint) {
+  fail('registry version record must expose semanticFingerprint');
+}
+if (registrySchema?.$defs?.mapRegistryEntry?.properties?.semanticFingerprint?.oneOf?.length !== 2) {
+  fail('registry map entry must allow semanticFingerprint string or null');
+}
+if (registrySchema?.$defs?.mapRegistryEntry?.properties?.pendingSfCalculation?.type !== 'boolean') {
+  fail('registry map entry must expose pendingSfCalculation');
+}
+
+const registryV1Schema = schemas.get('registry-v1');
+if (!registryV1Schema?.$defs?.registryVersion?.properties?.semanticFingerprint) {
+  fail('registry-v1 version record must expose semanticFingerprint');
+}
+
+const versionIndexSchema = schemas.get('version-index');
+if (versionIndexSchema?.minProperties !== 1) {
+  fail('version-index must require at least one row');
+}
+if (!versionIndexSchema?.$defs?.versionIndexRow?.properties?.latest) {
+  fail('version-index row must expose latest');
+}
+if (!versionIndexSchema?.$defs?.versionIndexRow?.properties?.versions) {
+  fail('version-index row must expose versions');
 }
 
 const manifestPath = 'tests/schema-fixtures/manifest.json';
@@ -204,6 +280,7 @@ if (!process.exitCode) {
 
 function loadSchemas(entries, options = {}) {
   const loadedSchemas = new Map();
+  const metadataExemptSchemaNames = new Set(options.metadataExemptSchemaNames ?? []);
   for (const [schemaName, relativePath] of Object.entries(entries)) {
     if (!existsSync(path.join(root, relativePath))) {
       fail(`missing schema file: ${relativePath}`);
@@ -213,7 +290,7 @@ function loadSchemas(entries, options = {}) {
     if (!schema.$id || !schema.$schema) {
       fail(`${relativePath} must define $id and $schema`);
     }
-    if (options.enforceMetadata) {
+    if (options.enforceMetadata && !metadataExemptSchemaNames.has(schemaName)) {
       for (const requiredMetadata of ['schemaId', 'specVersion', 'migration']) {
         if (!schema.required?.includes(requiredMetadata)) {
           fail(`${relativePath} must require ${requiredMetadata}`);

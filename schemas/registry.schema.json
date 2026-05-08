@@ -92,6 +92,40 @@
           "type": "string",
           "pattern": "^\\d+\\.\\d+\\.\\d+$"
         },
+        "currentVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/registryVersion"
+          }
+        },
+        "semanticFingerprint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lineageLogRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceIndexRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ttl": {
+          "type": "integer",
+          "minimum": 0
+        },
         "schemaId": {
           "const": "atm.atomicSpec"
         },
@@ -230,8 +264,18 @@
           "pattern": "^sha256:[a-f0-9]{64}$"
         },
         "semanticFingerprint": {
-          "type": "string",
-          "pattern": "^sha256:[a-f0-9]{64}$"
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pendingSfCalculation": {
+          "type": "boolean"
         },
         "lineageLogRef": {
           "type": "string",
@@ -296,6 +340,44 @@
             "type": "boolean"
           }
         ]
+      }
+    },
+    "registryVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "specHash", "codeHash", "testHash", "timestamp"],
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "specHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "codeHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "testHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "semanticFingerprint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
       }
     },
     "hashLock": {

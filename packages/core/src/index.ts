@@ -198,7 +198,8 @@ export interface AtomicMapRecord {
   readonly entrypoints: readonly string[];
   readonly qualityTargets: RegistryMapQualityTargetsRecord;
   readonly mapHash: string;
-  readonly semanticFingerprint?: string;
+  readonly semanticFingerprint?: string | null;
+  readonly pendingSfCalculation?: boolean;
   readonly lineageLogRef?: string;
   readonly ttl?: number;
 }
@@ -209,6 +210,7 @@ export interface RegistryVersionRecord {
   readonly codeHash: string;
   readonly testHash: string;
   readonly timestamp: string;
+  readonly semanticFingerprint?: string | null;
 }
 
 export interface RegistryEntryRecord {
@@ -217,6 +219,10 @@ export interface RegistryEntryRecord {
   readonly atomVersion?: string;
   readonly currentVersion?: string;
   readonly versions?: readonly RegistryVersionRecord[];
+  readonly semanticFingerprint?: string | null;
+  readonly lineageLogRef?: string;
+  readonly evidenceIndexRef?: string;
+  readonly ttl?: number | null;
   readonly schemaId: 'atm.atomicSpec';
   readonly specVersion: string;
   readonly schemaPath: string;
@@ -272,5 +278,6 @@ export const corePackage: AtomicPackageDescriptor = {
 export * from './agent-execute/execute-agent-task.ts';
 export * from './registry/map-hash.ts';
 export * from './registry/map-registry.ts';
+export * from './registry/semantic-fingerprint.ts';
 export * from './registry/rollback.ts';
 export * from './registry/registry-migration.ts';

@@ -53,8 +53,18 @@
       "pattern": "^sha256:[a-f0-9]{64}$"
     },
     "semanticFingerprint": {
-      "type": "string",
-      "pattern": "^sha256:[a-f0-9]{64}$"
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pendingSfCalculation": {
+      "type": "boolean"
     },
     "lineageLogRef": {
       "type": "string",

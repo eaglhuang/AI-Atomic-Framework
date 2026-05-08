@@ -1,11 +1,13 @@
 import type { AtomicMapRecord, MapRegistryEntryRecord } from '../index';
 import { computeAtomicMapHash } from './map-hash.ts';
+import { normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
 
 export interface CreateAtomicMapRegistryEntryOptions {
   readonly schemaPath?: string;
-  readonly semanticFingerprint?: string;
+  readonly semanticFingerprint?: string | null;
   readonly lineageLogRef?: string;
   readonly ttl?: number;
+  readonly pendingSfCalculation?: boolean;
 }
 
 export function createAtomicMapRegistryEntry(
@@ -34,9 +36,12 @@ export function createAtomicMapRegistryEntry(
     mapHash: computeAtomicMapHash(atomicMap)
   };
 
-  const semanticFingerprint = options.semanticFingerprint ?? atomicMap.semanticFingerprint;
+  const semanticFingerprint = normalizeSemanticFingerprint(options.semanticFingerprint ?? atomicMap.semanticFingerprint ?? null);
   if (semanticFingerprint) {
     entry.semanticFingerprint = semanticFingerprint;
+  } else if (options.pendingSfCalculation === true || atomicMap.pendingSfCalculation === true) {
+    entry.semanticFingerprint = null;
+    entry.pendingSfCalculation = true;
   }
 
   const lineageLogRef = options.lineageLogRef ?? atomicMap.lineageLogRef;
@@ -47,6 +52,10 @@ export function createAtomicMapRegistryEntry(
   const ttl = options.ttl ?? atomicMap.ttl;
   if (typeof ttl === 'number') {
     entry.ttl = ttl;
+  }
+
+  if (options.pendingSfCalculation === true || atomicMap.pendingSfCalculation === true) {
+    entry.pendingSfCalculation = true;
   }
 
   return entry;

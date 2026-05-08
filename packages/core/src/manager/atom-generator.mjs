@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseAtomicSpecDocument } from '../spec/parse-spec.mjs';
+import { createAtomicSpecSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
 import { scaffoldAtomWorkbench } from './scaffold.mjs';
 import { runAtomicTestRunner } from './test-runner.mjs';
 import { allocateAtomId, AtomIdAllocationError, normalizeAtomBucket, parseAtomId } from './id-allocator.mjs';
@@ -125,6 +126,7 @@ export function generateAtom(request, options = {}) {
       testPaths: options.testPaths ?? [paths.testPath],
       testReport: testRun.report,
       logicalName: normalizedRequest.logicalName,
+      semanticFingerprint: parsed.normalizedModel.governance?.semanticFingerprint ?? null,
       evidence: ['generator-provenance:generated', paths.sourcePath, ...(options.evidence ?? [])],
       legacyPlanningId: options.legacyPlanningId ?? null
     }));
@@ -228,6 +230,19 @@ export function createMinimalAtomSpec(request) {
       inputMutation: 'forbidden',
       maxDurationMs: 10000
     },
+    semanticFingerprint: createAtomicSpecSemanticFingerprint({
+      inputs: [{ name: 'request', kind: 'json', required: true }],
+      outputs: [{ name: 'result', kind: 'json', required: true }],
+      language: { primary: 'javascript' },
+      validation: { evidenceRequired: true },
+      performanceBudget: {
+        hotPath: false,
+        inputMutation: 'forbidden',
+        maxDurationMs: 10000
+      }
+    }),
+    deployScope: 'all-env',
+    mutabilityPolicy: 'mutable',
     tags: ['generated', 'provisioning']
   };
 }

@@ -4,6 +4,7 @@ import type {
   RegistryMapMemberRecord,
   RegistryMapQualityTargetsRecord
 } from '../index';
+export { createAtomicMapSemanticFingerprint } from './semantic-fingerprint.ts';
 
 export interface AtomicMapHashInput {
   readonly members: readonly RegistryMapMemberRecord[];
@@ -22,13 +23,6 @@ export function createAtomicMapHashPayload(input: AtomicMapHashInput) {
 
 export function computeAtomicMapHash(input: AtomicMapHashInput): string {
   return computeSha256ForContent(JSON.stringify(createAtomicMapHashPayload(input)));
-}
-
-export function createAtomicMapSemanticFingerprint(input: Pick<AtomicMapHashInput, 'entrypoints' | 'qualityTargets'>): string {
-  return computeSha256ForContent(JSON.stringify({
-    entrypoints: normalizeAtomicMapEntrypoints(input.entrypoints),
-    qualityTargets: normalizeAtomicMapQualityTargets(input.qualityTargets)
-  }));
 }
 
 function normalizeAtomicMapMembers(members: readonly RegistryMapMemberRecord[] = []) {

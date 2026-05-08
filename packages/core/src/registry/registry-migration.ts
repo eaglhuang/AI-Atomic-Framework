@@ -5,6 +5,7 @@ import type {
   RegistryEntryRecord,
   RegistryVersionRecord
 } from '../index';
+import { normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
 
 export interface RegistryVersionHistoryMigrationOptions {
   readonly defaultVersion?: string;
@@ -72,23 +73,37 @@ export function createRegistryVersionRecord(
   timestamp = new Date().toISOString()
 ): RegistryVersionRecord {
   const selfVerification = entry.selfVerification;
-  return {
+  const semanticFingerprint = normalizeSemanticFingerprint(entry.semanticFingerprint ?? null);
+  const record: RegistryVersionRecord = {
     version,
     specHash: selfVerification?.specHash ?? entry.hashLock.digest,
     codeHash: selfVerification?.codeHash ?? entry.hashLock.digest,
     testHash: selfVerification?.testHash ?? entry.hashLock.digest,
     timestamp
   };
+  if (semanticFingerprint) {
+    record.semanticFingerprint = semanticFingerprint;
+  } else if (entry.semanticFingerprint === null) {
+    record.semanticFingerprint = null;
+  }
+  return record;
 }
 
 function normalizeRegistryVersionRecord(versionRecord: RegistryVersionRecord): RegistryVersionRecord {
-  return {
+  const semanticFingerprint = normalizeSemanticFingerprint(versionRecord.semanticFingerprint ?? null);
+  const record: RegistryVersionRecord = {
     version: String(versionRecord.version).trim(),
     specHash: String(versionRecord.specHash).trim(),
     codeHash: String(versionRecord.codeHash).trim(),
     testHash: String(versionRecord.testHash).trim(),
     timestamp: String(versionRecord.timestamp).trim()
   };
+  if (semanticFingerprint) {
+    record.semanticFingerprint = semanticFingerprint;
+  } else if (versionRecord.semanticFingerprint === null) {
+    record.semanticFingerprint = null;
+  }
+  return record;
 }
 
 function resolveRegistryVersion(
