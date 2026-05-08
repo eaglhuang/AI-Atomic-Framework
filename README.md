@@ -48,6 +48,16 @@ For the standalone upstream self-hosting alpha proof, see [docs/SELF_HOSTING_ALP
 
 For advisory multi-agent confidence, run `node packages/cli/src/atm.mjs verify --agents-md --json` and `node packages/cli/src/atm.mjs self-host-alpha --verify --agent <profile> --json`. The supported profile matrix and latest advisory results live in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md).
 
+### Entry Channels For New Atom Birth
+
+Agents should not need a task card to discover the canonical atom birth path.
+
+- If a downstream host repo already has a task router or task card flow, use that host entry first.
+- If there is no task card, or you are operating directly in ATM, run `node packages/cli/src/atm.mjs guide create-atom`.
+- Both paths must converge on the same governed factory: `ATM-CORE-0004` exposed through `atm create`.
+
+This avoids a common failure mode where an agent knows a new atom is needed but does not know which command is the official provisioning path.
+
 ## Core, Adapters, and Plugins
 
 ATM separates governance semantics from host implementation details.

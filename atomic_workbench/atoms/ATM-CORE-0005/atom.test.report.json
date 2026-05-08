@@ -1,0 +1,152 @@
+{
+  "schemaId": "atm.testReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "First html-to-ucuf normalizeCssColor atom test report."
+  },
+  "atomId": "ATM-CORE-0005",
+  "ok": true,
+  "exitCode": 0,
+  "generatedAt": "2026-05-08T02:00:07.712Z",
+  "repositoryRoot": "c:/Users/User/AI-Atomic-Framework",
+  "specPath": "c:/Users/User/AI-Atomic-Framework/specs/normalize-css-color.atom.json",
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:d27318b84c343b90e38be020d547852351aa5c16aeb408d6f5ab4a1359db722f",
+    "canonicalization": "json-stable-v1"
+  },
+  "validation": {
+    "evidenceRequired": true,
+    "commandCount": 1
+  },
+  "runnerContract": {
+    "executionMode": "delegated",
+    "evidenceRequired": true,
+    "commands": [
+      {
+        "commandId": "validation-1",
+        "commandKind": "test",
+        "command": "node atomic_workbench/atoms/ATM-CORE-0005/atom.test.mjs",
+        "required": true
+      }
+    ]
+  },
+  "cases": [
+    {
+      "kind": "positive",
+      "name": "hex-3",
+      "input": "#abc",
+      "expected": "#AABBCCFF",
+      "actual": "#AABBCCFF",
+      "ok": true
+    },
+    {
+      "kind": "positive",
+      "name": "hex-4",
+      "input": "#abcd",
+      "expected": "#AABBCCDD",
+      "actual": "#AABBCCDD",
+      "ok": true
+    },
+    {
+      "kind": "positive",
+      "name": "hex-6",
+      "input": "#a1b2c3",
+      "expected": "#A1B2C3FF",
+      "actual": "#A1B2C3FF",
+      "ok": true
+    },
+    {
+      "kind": "positive",
+      "name": "rgb",
+      "input": "rgb(12, 34, 56)",
+      "expected": "#0C2238FF",
+      "actual": "#0C2238FF",
+      "ok": true
+    },
+    {
+      "kind": "positive",
+      "name": "rgba",
+      "input": "rgba(12, 34, 56, 0.5)",
+      "expected": "#0C223880",
+      "actual": "#0C223880",
+      "ok": true
+    },
+    {
+      "kind": "negative",
+      "name": "transparent",
+      "input": "transparent",
+      "expected": null,
+      "actual": null,
+      "ok": true
+    },
+    {
+      "kind": "negative",
+      "name": "named-color",
+      "input": "rebeccapurple",
+      "expected": null,
+      "actual": null,
+      "ok": true
+    },
+    {
+      "kind": "legacy",
+      "name": "draft-builder-shadow",
+      "input": "rgba(0, 0, 0, 0.5)",
+      "expected": "#00000080",
+      "actual": "#00000080",
+      "legacySource": "legacy://3KLife/tools_node/lib/dom-to-ui/draft-builder.js#L2867-L2890",
+      "ok": true
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "durationMs": 2
+  },
+  "selfVerification": {
+    "legacyPlanningId": "ATM-CORE-0005",
+    "specHash": "sha256:d27318b84c343b90e38be020d547852351aa5c16aeb408d6f5ab4a1359db722f",
+    "codeHash": "sha256:f5b9125212db663bd993cf81f868d6bf32ed180ccea2fe83db709f81c38e5377",
+    "testHash": "sha256:49a14556f5863cebf5e4feeb33cf24c8a446c1c667017bfe7b5a2adf758aaec9",
+    "sourcePaths": {
+      "spec": "c:/Users/User/AI-Atomic-Framework/specs/normalize-css-color.atom.json",
+      "code": [
+        "c:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0005/atom.source.mjs"
+      ],
+      "tests": [
+        "c:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0005/atom.test.mjs"
+      ]
+    }
+  },
+  "artifacts": [
+    {
+      "artifactPath": "c:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0005/atom.test.report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    },
+    {
+      "artifactPath": "c:/Users/User/AI-Atomic-Framework/specs/normalize-css-color.atom.json",
+      "artifactKind": "file",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    },
+    {
+      "artifactPath": "c:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0005/lineage-log.json",
+      "artifactKind": "file",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Atomic test runner verified ATM-CORE-0005 with 8/8 fixture cases passing.",
+      "artifactPaths": [
+        "c:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0005/atom.test.report.json",
+        "c:/Users/User/AI-Atomic-Framework/specs/normalize-css-color.atom.json",
+        "c:/Users/User/AI-Atomic-Framework/atomic_workbench/atoms/ATM-CORE-0005/lineage-log.json"
+      ]
+    }
+  ]
+}

@@ -94,6 +94,16 @@ node packages/cli/src/atm.mjs create \
 
 Use `--dry-run` to preview allocation and planned files without writing to disk.
 
+## Discovery Channels
+
+`atm create` is the canonical birth command, but agents may enter the repository through different routes.
+
+- Task-driven host repo: use the host router or task wrapper first, but it should still terminate at `ATM-CORE-0004` / `atm create`.
+- No task card or ad-hoc framework work: run `node packages/cli/src/atm.mjs guide create-atom`.
+- ATM not initialized yet in the target repo: run `node packages/cli/src/atm.mjs guide bootstrap` first.
+
+The important rule is that task cards are one discovery channel, not the only discovery channel. The canonical provisioning path still lives in the generator.
+
 ## Atomic Map CLI
 
 ```bash

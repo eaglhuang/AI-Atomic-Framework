@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial atomize capture for normalizeCssColor from the html-to-ucuf case study."
+  },
+  "id": "ATM-CORE-0005",
+  "logicalName": "atom.html-to-ucuf.normalize-css-color",
+  "title": "Normalize CSS Color Atom",
+  "description": "Normalize CSS color strings to canonical #RRGGBBAA hex for the first html-to-ucuf case atom.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [
+      ".mjs"
+    ],
+    "tooling": [
+      "node"
+    ]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": [
+      "filesystem",
+      "schema-validator",
+      "evidence-store"
+    ]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js",
+    "lifecycleMode": "birth"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "forbidden"
+  },
+  "inputs": [
+    {
+      "name": "color",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "normalizedColor",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "name": "lineage",
+      "kind": "json",
+      "required": true
+    },
+    {
+      "name": "atomId",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": [
+      "node atomic_workbench/atoms/ATM-CORE-0005/atom.test.mjs"
+    ],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": [
+    "alpha0",
+    "html-to-ucuf",
+    "atomize",
+    "normalize-css-color"
+  ]
+}

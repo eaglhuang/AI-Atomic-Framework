@@ -13,7 +13,8 @@ const reportPath = path.join(root, 'atomic_workbench', 'generator-provenance-aud
 const allowedMarkers = new Set([
   'generator-provenance:bootstrap-self',
   'generator-provenance:generated',
-  'generator-provenance:backfilled'
+  'generator-provenance:backfilled',
+  'generator-provenance:atomize'
 ]);
 
 let failed = false;
@@ -53,7 +54,7 @@ if (failed) {
   process.exit(1);
 }
 
-console.log(`[generator-provenance:${mode}] ok (${report.summary.total} entries audited, ${report.summary.generated} generated, ${report.summary.backfilled} backfilled)`);
+console.log(`[generator-provenance:${mode}] ok (${report.summary.total} entries audited, ${report.summary.generated} generated, ${report.summary.backfilled} backfilled, ${report.summary.atomized} atomized)`);
 
 function buildAuditReport(registryDocument) {
   const entries = registryDocument.entries.map((entry) => auditEntry(entry));
@@ -66,6 +67,7 @@ function buildAuditReport(registryDocument) {
       total: entries.length,
       generated: entries.filter((entry) => entry.provenance === 'generated').length,
       backfilled: entries.filter((entry) => entry.provenance === 'backfilled').length,
+      atomized: entries.filter((entry) => entry.provenance === 'atomize').length,
       bootstrapSelf: entries.filter((entry) => entry.provenance === 'bootstrap-self').length,
       unmarked: entries.filter((entry) => entry.provenance === 'unmarked').length
     },
