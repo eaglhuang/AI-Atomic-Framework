@@ -7,6 +7,7 @@ import { validateLayerBoundary } from '../packages/core/src/police/layer-boundar
 import { validateRegistryConsistency } from '../packages/core/src/police/registry-consistency.mjs';
 import { createSchemaValidator, validateJsonDocument } from '../packages/core/src/police/schema-validator.mjs';
 import { runPoliceChecks } from '../packages/core/src/police/index.mjs';
+import { runLifecyclePolice, LIFECYCLE_POLICE_WRITER } from '../packages/plugin-police-lifecycle/src/index.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -23,10 +24,13 @@ const protectedFiles = [
   'packages/core/src/police/layer-boundary.mjs',
   'packages/core/src/police/forbidden-import-scanner.mjs',
   'packages/core/src/police/registry-consistency.mjs',
+  'packages/plugin-police-lifecycle/src/index.ts',
   'schemas/layer-policy.schema.json',
   'schemas/police/non-regression-report.schema.json',
   'schemas/police/quality-comparison-report.schema.json',
   'schemas/police/registry-candidate-report.schema.json',
+  'schemas/police/lifecycle-finding.schema.json',
+  'schemas/police/lifecycle-notice.schema.json',
   'scripts/validate-police.mjs',
   'tests/police.fixture.json'
 ];
@@ -135,6 +139,22 @@ function validateAtomicMapIntegration() {
   check(report.checks.length === 4, 'Police runner must execute dependency, layer, forbidden import, and registry checks');
 }
 
+function validateLifecyclePoliceFixtures() {
+  const positive = readJson(fixture.lifecyclePolice.positivePath);
+  const positiveReport = runLifecyclePolice(positive);
+  check(positiveReport.schemaId === 'atm.lifecyclePoliceReport', 'lifecycle police report schemaId mismatch');
+  check(positiveReport.quarantineWriteGuard.writer === LIFECYCLE_POLICE_WRITER, 'lifecycle police writer id mismatch');
+  check(positiveReport.quarantineWriteGuard.allowed, 'lifecycle police writer must be allowed to write quarantine');
+  check(positiveReport.findings.some((finding) => finding.trigger === 'ttl-expired' && finding.action === 'expire'), 'lifecycle police must emit ttl-expired expire finding');
+  check(positiveReport.findings.some((finding) => finding.trigger === 'illegal-transition' && finding.action === 'quarantine'), 'lifecycle police must emit illegal-transition quarantine finding');
+  check(positiveReport.notices.length > 0, 'lifecycle police must emit caller migration notices');
+
+  const negativeProduction = readJson(fixture.lifecyclePolice.negativeProductionPath);
+  const negativeReport = runLifecyclePolice(negativeProduction);
+  check(negativeReport.hardFail, 'dev-only atom in production build must hard-fail lifecycle police report');
+  check(negativeReport.findings.some((finding) => finding.trigger === 'deploy-scope-violation' && finding.action === 'hard-fail'), 'lifecycle police must emit deploy-scope-violation hard-fail finding');
+}
+
 function validateProtectedSurfaceNeutrality() {
   for (const relativePath of protectedFiles) {
     check(existsSync(path.join(root, relativePath)), `protected police file is missing: ${relativePath}`);
@@ -151,6 +171,7 @@ validateLayerBoundaryFixtures();
 validateForbiddenImportFixtures();
 validateRegistryGateFixtures();
 validateAtomicMapIntegration();
+validateLifecyclePoliceFixtures();
 validateProtectedSurfaceNeutrality();
 
 if (!process.exitCode) {

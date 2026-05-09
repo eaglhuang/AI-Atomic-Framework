@@ -21,6 +21,17 @@
       "name": "registry candidate report",
       "schemaPath": "schemas/police/registry-candidate-report.schema.json",
       "positivePath": "tests/police-fixtures/positive/registry-candidate-report.json"
+    },
+    {
+      "name": "lifecycle finding",
+      "schemaPath": "schemas/police/lifecycle-finding.schema.json",
+      "positivePath": "tests/police-fixtures/positive/lifecycle-finding.json",
+      "negativePath": "tests/police-fixtures/negative/lifecycle-finding.missing-trigger.json"
+    },
+    {
+      "name": "lifecycle notice",
+      "schemaPath": "schemas/police/lifecycle-notice.schema.json",
+      "positivePath": "tests/police-fixtures/positive/lifecycle-notice.json"
     }
   ],
   "dependencyGraph": {
@@ -44,6 +55,10 @@
   "atomicMap": {
     "fixturePath": "tests/police-fixtures/police-atomic-map.fixture.json"
   },
+  "lifecyclePolice": {
+    "positivePath": "tests/police-fixtures/positive/lifecycle-police-input.json",
+    "negativeProductionPath": "tests/police-fixtures/negative/lifecycle-police-production-dev-only.json"
+  },
   "acceptance": [
     "Police SDK contract exposes lifecycle-aware report types",
     "Police report schemas require lifecycleMode",
@@ -51,6 +66,8 @@
     "layer boundary violations hard fail",
     "forbidden adapter implementation imports hard fail",
     "evolution promote is blocked when nonRegression, qualityComparison, or registryCandidate fails",
-    "Police Atomic Map integration fixture passes as an acyclic map"
+    "Police Atomic Map integration fixture passes as an acyclic map",
+    "Lifecycle police emits ttl/zero-caller/illegal-transition findings plus caller migration notices",
+    "deployScope=dev-only atom in production build triggers hard fail"
   ]
 }

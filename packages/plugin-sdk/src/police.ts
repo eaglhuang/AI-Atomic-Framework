@@ -11,7 +11,8 @@ export type PoliceCheckKind =
   | 'layer-boundary'
   | 'forbidden-import'
   | 'registry-consistency'
-  | 'atomic-map-integration';
+  | 'atomic-map-integration'
+  | 'lifecycle';
 
 export interface PoliceViolation {
   readonly code: string;
@@ -43,4 +44,47 @@ export interface PoliceReport {
   readonly violations: readonly PoliceViolation[];
   readonly artifacts: readonly ArtifactRecord[];
   readonly evidence: readonly EvidenceRecord[];
+}
+
+export type LifecyclePoliceTrigger =
+  | 'ttl-expired'
+  | 'zero-caller'
+  | 'illegal-transition'
+  | 'caller-migration'
+  | 'deploy-scope-violation';
+
+export type LifecyclePoliceSeverity = 'info' | 'warning' | 'error';
+
+export type LifecyclePoliceRoute = 'quarantine' | 'needs-review' | 'follow-up-task';
+
+export interface LifecyclePoliceFinding {
+  readonly findingId: string;
+  readonly atomId: string;
+  readonly trigger: LifecyclePoliceTrigger;
+  readonly scope: string;
+  readonly severity: LifecyclePoliceSeverity;
+  readonly action: 'expire' | 'sweep' | 'quarantine' | 'notify-migration' | 'hard-fail';
+  readonly route: LifecyclePoliceRoute;
+  readonly message: string;
+  readonly callerIds?: readonly string[];
+}
+
+export interface LifecyclePoliceNotice {
+  readonly noticeId: string;
+  readonly atomId: string;
+  readonly callerIds: readonly string[];
+  readonly recommendedAction: string;
+  readonly reason: string;
+}
+
+export interface LifecyclePoliceReport {
+  readonly schemaId: 'atm.lifecyclePoliceReport';
+  readonly specVersion: '0.1.0';
+  readonly findings: readonly LifecyclePoliceFinding[];
+  readonly notices: readonly LifecyclePoliceNotice[];
+  readonly quarantineWriteGuard: {
+    readonly writer: string;
+    readonly allowed: boolean;
+  };
+  readonly hardFail: boolean;
 }

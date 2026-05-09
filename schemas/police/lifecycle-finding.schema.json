@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/police/lifecycle-finding.schema.json",
+  "title": "ATM Lifecycle Police Finding v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "findingId",
+    "atomId",
+    "trigger",
+    "scope",
+    "severity",
+    "action",
+    "route",
+    "message"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.police.lifecycleFinding"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "findingId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "trigger": {
+      "enum": [
+        "ttl-expired",
+        "zero-caller",
+        "illegal-transition",
+        "caller-migration",
+        "deploy-scope-violation"
+      ]
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "severity": {
+      "enum": [
+        "info",
+        "warning",
+        "error"
+      ]
+    },
+    "action": {
+      "enum": [
+        "expire",
+        "sweep",
+        "quarantine",
+        "notify-migration",
+        "hard-fail"
+      ]
+    },
+    "route": {
+      "enum": [
+        "quarantine",
+        "needs-review",
+        "follow-up-task"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "callerIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

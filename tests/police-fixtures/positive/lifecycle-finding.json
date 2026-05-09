@@ -1,0 +1,17 @@
+{
+  "schemaId": "atm.police.lifecycleFinding",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Lifecycle finding fixture"
+  },
+  "findingId": "lifecycle.ttl-expired.ATM-CORE-0001",
+  "atomId": "ATM-CORE-0001",
+  "trigger": "ttl-expired",
+  "scope": "entry",
+  "severity": "warning",
+  "action": "expire",
+  "route": "needs-review",
+  "message": "TTL expired for ATM-CORE-0001; recommend expire."
+}

@@ -1,0 +1,31 @@
+{
+  "entries": [
+    {
+      "atomId": "ATM-CORE-0001",
+      "status": "deprecated",
+      "ttlExpired": true,
+      "callerCount": 0,
+      "deployScope": "all"
+    },
+    {
+      "atomId": "ATM-CORE-0002",
+      "status": "active",
+      "ttlExpired": true,
+      "callerCount": 2,
+      "callerIds": [
+        "ATM-CORE-0100",
+        "ATM-CORE-0101"
+      ],
+      "deployScope": "all"
+    }
+  ],
+  "transitions": [
+    {
+      "atomId": "ATM-CORE-0003",
+      "ok": false,
+      "reason": "Illegal transition active -> draft"
+    }
+  ],
+  "buildTarget": "development",
+  "actor": "lifecycle-police"
+}
