@@ -10,6 +10,8 @@ Adapters receive `lifecycleMode` as `birth` or `evolution`. The value is declare
 
 `ProjectAdapter` is the repository-facing boundary. A project adapter owns repository setup, work item preparation, finalization, and access to governance stores. It exposes capabilities, lifecycle hooks, default config, and the store collection defined under `packages/plugin-sdk/src/governance`.
 
+For legacy strangler flows, `ProjectAdapter` also owns `resolveLegacyUri`, `runAtomizeAdapter`, and `runInfectAdapter`. These methods standardize `legacy://<repository>/<path>[#Lx-Ly]` parsing, require a dry-run patch contract that keeps `applyToHostProject=false`, and must attach a neutrality summary before an adapter hands any payload to proposal review.
+
 ## Language Adapters
 
 `LanguageAdapter` is the language-facing boundary. It detects a project profile and validates compute atoms from source files plus policy. Language-specific packages may add richer request and report types, but should remain assignable to the SDK shape.

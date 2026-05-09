@@ -76,6 +76,23 @@ export function formatGitHubAnnotations(report) {
   });
 }
 
+export function scanNeutralityText(input, options = {}) {
+  const policy = options.policy ?? loadNeutralityPolicy({
+    repositoryRoot: options.repositoryRoot ?? repoRoot,
+    policyPath: options.policyPath
+  });
+  const relativePath = toPosixPath(input?.relativePath ?? '<inline>');
+  const content = String(input?.content ?? '');
+  const termViolations = scanInlineTextViolations(content, relativePath, policy.bannedTerms);
+  const pathViolations = scanPathViolations(relativePath, policy.bannedPathPatterns);
+  return {
+    ok: termViolations.length === 0 && pathViolations.length === 0,
+    relativePath,
+    violations: [...termViolations, ...pathViolations],
+    bannedTerms: [...policy.bannedTerms]
+  };
+}
+
 function enumerateNeutralityTargets(repositoryRoot, policy) {
   const output = [];
   walkDirectory(repositoryRoot, repositoryRoot, policy.ignoredPrefixes, output);
@@ -131,6 +148,10 @@ function matchesScope(relativePath, scope) {
 
 function scanTextViolations(target, bannedTerms) {
   const content = readFileSync(target.fullPath, 'utf8');
+  return scanInlineTextViolations(content, target.relativePath, bannedTerms);
+}
+
+function scanInlineTextViolations(content, relativePath, bannedTerms) {
   const normalizedContent = content.toLowerCase();
   const violations = [];
 
@@ -147,7 +168,7 @@ function scanTextViolations(target, bannedTerms) {
       }
       violations.push({
         kind: 'term',
-        file: target.relativePath,
+        file: relativePath,
         line: lineNumberForIndex(content, matchedIndex),
         matchedRule: term
       });

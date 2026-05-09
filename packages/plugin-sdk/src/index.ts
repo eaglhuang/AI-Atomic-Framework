@@ -31,7 +31,17 @@ export type {
   CapabilityRegistry,
   CapabilityResult
 } from './capability';
-export type { ProjectAdapter, ProjectAdapterContext, ProjectAdapterResult } from './project-adapter';
+export type {
+  AtomizeAdapterRequest,
+  InfectAdapterRequest,
+  ProjectAdapter,
+  ProjectAdapterContext,
+  ProjectAdapterDryRunPatchContract,
+  ProjectAdapterDryRunResult,
+  ProjectAdapterLegacyUriResolution,
+  ProjectAdapterNeutralitySummary,
+  ProjectAdapterResult
+} from './project-adapter';
 export type {
   LanguageAdapter,
   LanguageAdapterMessage,

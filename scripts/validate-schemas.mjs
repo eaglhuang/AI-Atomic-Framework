@@ -21,6 +21,8 @@ const schemaEntries = {
   'governance-evidence': 'schemas/governance/evidence.schema.json',
   'governance-context-summary': 'schemas/governance/context-summary.schema.json',
   'governance-adapter-report': 'schemas/governance/adapter-report.schema.json',
+  'governance-atomize-adapter': 'schemas/governance/atomize-adapter.schema.json',
+  'governance-infect-adapter': 'schemas/governance/infect-adapter.schema.json',
   'evidence-usage-feedback': 'schemas/governance/evidence/usage-feedback.schema.json',
   'evidence-quality-baseline': 'schemas/governance/evidence/quality-baseline.schema.json',
   'evidence-quality-comparison': 'schemas/governance/evidence/quality-comparison.schema.json',

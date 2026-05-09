@@ -1,5 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { parseLegacyUri } from '../../core/src/registry/urn.mjs';
+import { scanNeutralityText } from '../../plugin-rule-guard/src/neutrality-scanner.mjs';
+
+const frameworkRepositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../');
 
 export const defaultLocalGitAdapterConfig = Object.freeze({
   registryPath: '.atm/registry',
@@ -16,6 +22,7 @@ export function createLocalGitAdapter(configOverrides = {}) {
     adapterName: '@ai-atomic-framework/adapter-local-git',
     defaultConfig,
     resolveRegistryPath: (context) => resolveRegistryPath(context.repositoryRoot, mergeConfig(defaultConfig, context.config)),
+    resolveLegacyUri: (context, legacyUri) => resolveLegacyUri(context, defaultConfig, legacyUri),
     scaffold: (context) => scaffoldLocalRepository(context, defaultConfig),
     lockScope: (context, workItem, files) => createNoopOperationResult('lock', context, defaultConfig, {
       workItem,
@@ -31,6 +38,8 @@ export function createLocalGitAdapter(configOverrides = {}) {
       message: 'Doc operation completed as a no-op; no external documentation system was required.',
       extraEvidence: summary ? [createEvidence('handoff', summary, [])] : []
     }),
+    runAtomizeAdapter: (context, request) => runDryRunAdapter('behavior.atomize', context, defaultConfig, request),
+    runInfectAdapter: (context, request) => runDryRunAdapter('behavior.infect', context, defaultConfig, request),
     writeRegistryEntry: (context, entry) => writeRegistryEntry(context, defaultConfig, entry),
     readRegistryEntry: (context, entryId) => readRegistryEntry(context, defaultConfig, entryId)
   };
@@ -109,6 +118,80 @@ export function readRegistryEntry(context, baseConfig, entryId) {
   return JSON.parse(readFileSync(entryPath, 'utf8'));
 }
 
+export function resolveLegacyUri(context, baseConfig, legacyUri) {
+  const config = mergeConfig(baseConfig, context.config);
+  const parsed = parseLegacyUri(legacyUri);
+  const absolutePath = parsed.relativePath
+    ? resolvePath(context.repositoryRoot, parsed.relativePath)
+    : path.resolve(context.repositoryRoot);
+  return {
+    ...parsed,
+    absolutePath,
+    exists: existsSync(absolutePath),
+    repositoryAlias: parsed.repositoryAlias || config.repositoryAlias || path.basename(context.repositoryRoot)
+  };
+}
+
+export function runDryRunAdapter(behaviorId, context, baseConfig, request) {
+  const config = mergeConfig(baseConfig, context.config);
+  const resolvedLegacyUri = resolveLegacyUri(context, config, request.legacySource);
+  const inlineSource = resolveInlineSource(request, resolvedLegacyUri);
+  const neutrality = scanNeutralityText({
+    relativePath: resolvedLegacyUri.relativePath || `${resolvedLegacyUri.repositoryAlias}/<root>`,
+    content: inlineSource
+  }, {
+    repositoryRoot: frameworkRepositoryRoot
+  });
+  const dryRunPatch = {
+    contractId: `${behaviorId.replace('behavior.', 'adapter-')}:${safeRegistryId(request.legacySource)}`,
+    behaviorId,
+    dryRun: true,
+    applyToHostProject: false,
+    hostMutationAllowed: false,
+    patchMode: 'dry-run',
+    proposalSource: 'ATM-2-0020',
+    decompositionDecision: 'atom-extract',
+    patchFiles: [...(request.patchFiles || [])]
+  };
+
+  return createResult({
+    ok: neutrality.ok,
+    operation: 'adapter',
+    context,
+    config,
+    mode: 'dry-run',
+    dryRunOverride: true,
+    noop: false,
+    messages: [
+      neutrality.ok
+        ? `${behaviorId} adapter prepared dry-run patch contract without host mutation.`
+        : `${behaviorId} adapter blocked dry-run patch contract because neutrality violations were detected.`
+    ],
+    evidence: [
+      createEvidence('validation', `Resolved legacy source ${resolvedLegacyUri.uri}`, []),
+      createEvidence(
+        'validation',
+        neutrality.ok
+          ? 'Neutrality scan passed for adapter dry-run payload.'
+          : 'Neutrality scan failed for adapter dry-run payload.',
+        []
+      )
+    ],
+    lockRecords: [],
+    artifacts: [],
+    extra: {
+      resolvedLegacyUri,
+      dryRunPatch,
+      neutrality: {
+        ok: neutrality.ok,
+        violationCount: neutrality.violations.length,
+        bannedTerms: neutrality.bannedTerms,
+        scannedPath: neutrality.relativePath
+      }
+    }
+  });
+}
+
 function createNoopOperationResult(operation, context, baseConfig, details) {
   const config = mergeConfig(baseConfig, context.config);
   const artifactPaths = [];
@@ -130,18 +213,21 @@ function createNoopOperationResult(operation, context, baseConfig, details) {
   });
 }
 
-function createResult({ ok, operation, context, config, mode, noop, messages, evidence, lockRecords = [], artifacts = [] }) {
+function createResult({ ok, operation, context, config, mode, dryRunOverride, noop, messages, evidence, lockRecords = [], artifacts = [], extra = {} }) {
   return {
+    adapterName: '@ai-atomic-framework/adapter-local-git',
+    lifecycleMode: context.lifecycleMode || 'evolution',
     ok,
     operation,
     mode,
-    dryRun: config.dryRun,
+    dryRun: typeof dryRunOverride === 'boolean' ? dryRunOverride : config.dryRun,
     noop,
     messages,
     evidence,
     lockRecords,
     artifacts,
-    registryPath: relativePath(context.repositoryRoot, resolveRegistryPath(context.repositoryRoot, config))
+    registryPath: relativePath(context.repositoryRoot, resolveRegistryPath(context.repositoryRoot, config)),
+    ...extra
   };
 }
 
@@ -160,6 +246,16 @@ function createEvidence(evidenceKind, summary, artifactPaths) {
 
 function createArtifact(artifactPath, artifactKind, producedBy) {
   return { artifactPath, artifactKind, producedBy };
+}
+
+function resolveInlineSource(request, resolvedLegacyUri) {
+  if (typeof request.inlineSource === 'string') {
+    return request.inlineSource;
+  }
+  if (resolvedLegacyUri.exists && resolvedLegacyUri.absolutePath) {
+    return readFileSync(resolvedLegacyUri.absolutePath, 'utf8');
+  }
+  return '';
 }
 
 function mergeConfig(...configs) {

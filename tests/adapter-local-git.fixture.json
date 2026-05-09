@@ -8,6 +8,25 @@
     "title": "Adapter fixture work item",
     "status": "planned"
   },
+  "legacyUri": "legacy://repo/src/legacy-source.ts#L5-L8",
+  "atomizeRequest": {
+    "behaviorId": "behavior.atomize",
+    "legacySource": "legacy://repo/src/legacy-source.ts#L5-L8",
+    "dryRun": true,
+    "inlineSource": "export const cleanLegacySource = 'framework-safe';",
+    "patchFiles": [
+      "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs"
+    ]
+  },
+  "infectRequest": {
+    "behaviorId": "behavior.infect",
+    "legacySource": "legacy://repo/src/legacy-source.ts#L5-L8",
+    "dryRun": true,
+    "inlineSource": "export const adopterSecret = '3KLife internal only';",
+    "patchFiles": [
+      "atomic_workbench/maps/ATM-FIXTURE-0001.map.json"
+    ]
+  },
   "registryEntry": {
     "id": "atom.fixture",
     "kind": "atom",
@@ -19,6 +38,9 @@
     "scaffold does not require a host lock service",
     "lock/gate/doc operations are explicit no-op results",
     "filesystem registry path can write and read entries",
-    "dry-run scaffold does not write files"
+    "dry-run scaffold does not write files",
+    "legacy:// URI resolves into repository-local path metadata",
+    "atomize adapter emits dry-run-only patch contract with neutrality pass",
+    "infect adapter blocks adopter-private inline payloads via neutrality scan"
   ]
 }

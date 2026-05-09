@@ -2,6 +2,8 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -9,6 +11,11 @@ const mode = process.argv.includes('--mode')
   : 'validate';
 const fixture = JSON.parse(readFileSync(path.join(root, 'tests', 'adapter-local-git.fixture.json'), 'utf8'));
 const adapterModule = await import(pathToFileURL(path.join(root, fixture.entrypoint)).href);
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+ajv.addSchema(JSON.parse(readFileSync(path.join(root, 'schemas', 'governance', 'adapter-report.schema.json'), 'utf8')), 'governance-adapter-report');
+const validateAtomizeAdapter = ajv.compile(JSON.parse(readFileSync(path.join(root, 'schemas', 'governance', 'atomize-adapter.schema.json'), 'utf8')));
+const validateInfectAdapter = ajv.compile(JSON.parse(readFileSync(path.join(root, 'schemas', 'governance', 'infect-adapter.schema.json'), 'utf8')));
 
 function fail(message) {
   console.error(`[adapter-local-git:${mode}] ${message}`);
@@ -22,6 +29,8 @@ function assert(condition, message) {
 }
 
 function assertResultShape(result, operation) {
+  assert(typeof result.adapterName === 'string', `${operation} result missing adapterName`);
+  assert(typeof result.lifecycleMode === 'string', `${operation} result missing lifecycleMode`);
   assert(result.operation === operation, `${operation} result operation mismatch`);
   assert(typeof result.ok === 'boolean', `${operation} result missing ok boolean`);
   assert(typeof result.dryRun === 'boolean', `${operation} result missing dryRun boolean`);
@@ -33,12 +42,26 @@ function assertResultShape(result, operation) {
   assert(typeof result.registryPath === 'string', `${operation} result missing registryPath`);
 }
 
+function schemaDocumentFor(result, schemaId) {
+  return {
+    schemaId,
+    specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'Adapter runtime validation fixture.'
+    },
+    ...result
+  };
+}
+
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-local-git-'));
 try {
   const repositoryRoot = path.join(tempRoot, 'repo');
   const adapter = adapterModule.createLocalGitAdapter();
   const context = {
     repositoryRoot,
+    lifecycleMode: 'evolution',
     actor: 'fixture-agent',
     now: '2026-01-01T00:00:00.000Z'
   };
@@ -49,6 +72,7 @@ try {
 
   const dryRunContext = {
     repositoryRoot: path.join(tempRoot, 'dry-run-repo'),
+    lifecycleMode: 'evolution',
     config: { dryRun: true }
   };
   const dryRunScaffold = adapter.scaffold(dryRunContext);
@@ -82,6 +106,30 @@ try {
   assert(doc.noop === true, 'doc must be explicit no-op');
   assert(doc.evidence.some((entry) => entry.evidenceKind === 'handoff'), 'doc no-op must expose handoff evidence');
 
+  const legacyResolution = adapter.resolveLegacyUri(context, fixture.legacyUri);
+  assert(legacyResolution.scheme === 'legacy', 'legacy URI must resolve with legacy scheme');
+  assert(legacyResolution.repositoryAlias === 'repo', 'legacy URI must preserve repository alias');
+  assert(legacyResolution.relativePath === 'src/legacy-source.ts', 'legacy URI must preserve relative path');
+  assert(legacyResolution.lineStart === 5 && legacyResolution.lineEnd === 8, 'legacy URI must preserve line fragment');
+  assert(legacyResolution.absolutePath.endsWith(path.join('repo', 'src', 'legacy-source.ts')), 'legacy URI must resolve under repository root');
+
+  const atomizeAdapter = adapter.runAtomizeAdapter(context, fixture.atomizeRequest);
+  assertResultShape(atomizeAdapter, 'adapter');
+  assert(atomizeAdapter.ok === true, 'atomize adapter dry-run must succeed for neutral payload');
+  assert(atomizeAdapter.mode === 'dry-run', 'atomize adapter must always stay in dry-run mode');
+  assert(atomizeAdapter.dryRunPatch.behaviorId === 'behavior.atomize', 'atomize adapter must preserve behaviorId');
+  assert(atomizeAdapter.dryRunPatch.applyToHostProject === false, 'atomize adapter must forbid host mutation');
+  assert(atomizeAdapter.neutrality.ok === true, 'atomize adapter must report neutrality pass for clean payload');
+  assert(validateAtomizeAdapter(schemaDocumentFor(atomizeAdapter, 'atm.atomizeAdapter')) === true, `atomize adapter schema mismatch: ${ajv.errorsText(validateAtomizeAdapter.errors)}`);
+
+  const infectAdapter = adapter.runInfectAdapter(context, fixture.infectRequest);
+  assertResultShape(infectAdapter, 'adapter');
+  assert(infectAdapter.ok === false, 'infect adapter must fail on adopter-private payload');
+  assert(infectAdapter.dryRunPatch.behaviorId === 'behavior.infect', 'infect adapter must preserve behaviorId');
+  assert(infectAdapter.neutrality.ok === false, 'infect adapter must surface neutrality failure');
+  assert(infectAdapter.neutrality.violationCount > 0, 'infect adapter must report neutrality violations');
+  assert(validateInfectAdapter(schemaDocumentFor(infectAdapter, 'atm.infectAdapter')) === true, `infect adapter schema mismatch: ${ajv.errorsText(validateInfectAdapter.errors)}`);
+
   const registryWrite = adapter.writeRegistryEntry(context, fixture.registryEntry);
   assertResultShape(registryWrite, 'registry');
   assert(registryWrite.ok === true, 'registry write must succeed');
@@ -94,6 +142,7 @@ try {
   const absoluteRegistryPath = path.join(tempRoot, 'absolute-registry');
   const absoluteContext = {
     repositoryRoot,
+    lifecycleMode: 'evolution',
     config: { registryPath: absoluteRegistryPath }
   };
   assert(adapter.resolveRegistryPath(absoluteContext) === path.normalize(absoluteRegistryPath), 'absolute registry path must be preserved');

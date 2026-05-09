@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parseAtomicSpecFile } from '../packages/core/src/spec/parse-spec.mjs';
-import { defaultNeutralityPolicyRelativePath, loadNeutralityPolicy, scanNeutralityRepository } from '../packages/plugin-rule-guard/src/neutrality-scanner.mjs';
+import { defaultNeutralityPolicyRelativePath, loadNeutralityPolicy, scanNeutralityRepository, scanNeutralityText } from '../packages/plugin-rule-guard/src/neutrality-scanner.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -91,6 +91,25 @@ for (const fixtureCase of fixture.cases) {
     check(report.violations.some((violation) => violation.kind === expectedType), `${fixtureCase.name} missing violation kind ${expectedType}`);
   }
 }
+
+const inlineNeutralityPass = scanNeutralityText({
+  relativePath: 'packages/core/src/example-safe.ts',
+  content: 'export const frameworkSafe = true;'
+}, {
+  repositoryRoot: root,
+  policy
+});
+check(inlineNeutralityPass.ok === true, 'scanNeutralityText must pass on framework-safe inline content');
+
+const inlineNeutralityFail = scanNeutralityText({
+  relativePath: 'packages/core/src/example-bad.ts',
+  content: 'export const adopter = "3KLife";'
+}, {
+  repositoryRoot: root,
+  policy
+});
+check(inlineNeutralityFail.ok === false, 'scanNeutralityText must fail on adopter-private inline content');
+check(inlineNeutralityFail.violations.some((violation) => violation.kind === 'term'), 'scanNeutralityText must expose term violations');
 
 const verifyNeutrality = runAtm(['verify', '--neutrality', '--cwd', root], root);
 check(verifyNeutrality.exitCode === 0, 'verify --neutrality must exit 0 in the framework repository root');

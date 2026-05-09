@@ -2,6 +2,7 @@ const atomIdPattern = /^ATM-[A-Z][A-Z0-9]*-\d{4}$/;
 const mapIdPattern = /^ATM-MAP-\d{4}$/;
 const semverPattern = /^\d+\.\d+\.\d+$/;
 const urnPattern = /^urn:atm:([a-z][a-z0-9-]*):([^@\s]+)(?:@(\d+\.\d+\.\d+))?$/;
+const legacyUriPattern = /^legacy:\/\/([^#\s]+)(?:#(L\d+(?:-L?\d+)?))?$/;
 const supportedNodeKinds = new Set(['atom', 'map', 'police', 'behavior']);
 
 export class AtmUrnError extends Error {
@@ -134,5 +135,52 @@ function assertCanonicalIdMatchesKind(canonicalId, nodeKind) {
   }
   if (!atomIdPattern.test(canonicalId) || mapIdPattern.test(canonicalId)) {
     throw new AtmUrnError('ATM_ATOM_ID_INVALID', 'ATM atom-like URN must use ATM-{bucket}-0000 canonical IDs.', { canonicalId, nodeKind });
+  }
+}
+
+export function parseLegacyUri(value) {
+  const text = String(value || '').trim();
+  const match = text.match(legacyUriPattern);
+  if (!match) {
+    throw new AtmUrnError('ATM_LEGACY_URI_INVALID', 'Legacy URI must match legacy://<repository>/<path>[#Lx[-Ly]].', { value });
+  }
+
+  const locator = String(match[1] || '').trim();
+  const slashIndex = locator.indexOf('/');
+  const repositoryAlias = slashIndex >= 0 ? locator.slice(0, slashIndex) : locator;
+  const relativePath = slashIndex >= 0 ? locator.slice(slashIndex + 1) : '';
+  if (!repositoryAlias) {
+    throw new AtmUrnError('ATM_LEGACY_URI_REPOSITORY_REQUIRED', 'Legacy URI requires repository alias.', { value });
+  }
+
+  const fragment = match[2] ?? null;
+  let lineStart = null;
+  let lineEnd = null;
+  if (fragment) {
+    const lineMatch = fragment.match(/^L(\d+)(?:-L?(\d+))?$/);
+    if (!lineMatch) {
+      throw new AtmUrnError('ATM_LEGACY_URI_FRAGMENT_INVALID', 'Legacy URI line fragment must match #Lx or #Lx-Ly.', { value });
+    }
+    lineStart = Number.parseInt(lineMatch[1], 10);
+    lineEnd = Number.parseInt(lineMatch[2] ?? lineMatch[1], 10);
+  }
+
+  return {
+    uri: text,
+    scheme: 'legacy',
+    repositoryAlias,
+    relativePath,
+    fragment,
+    lineStart,
+    lineEnd
+  };
+}
+
+export function isLegacyUri(value) {
+  try {
+    parseLegacyUri(value);
+    return true;
+  } catch (_error) {
+    return false;
   }
 }
