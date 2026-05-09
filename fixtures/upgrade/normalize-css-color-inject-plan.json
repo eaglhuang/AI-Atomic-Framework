@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.injectPlan",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial dry-run injection plan fixture."
+  },
+  "planId": "inject-plan.atm-core-0005.v0.1.0.dry-run",
+  "behaviorId": "behavior.infect",
+  "target": {
+    "atomId": "ATM-CORE-0005",
+    "atomVersion": "0.1.0",
+    "logicalName": "atom.case.normalize-css-color"
+  },
+  "legacyInjectionPoints": [
+    {
+      "legacyUri": "legacy://repo/tools/legacy-color.js#L2867-L2890",
+      "callSymbol": "normalizeCssColorToHex",
+      "mode": "dry-run",
+      "notes": "Replace direct helper call with atom bridge wrapper in dry-run only."
+    }
+  ],
+  "dryRunPatch": {
+    "patchId": "patch.atm-core-0005.inject.001",
+    "patchMode": "dry-run",
+    "applyToHostProject": false,
+    "operations": [
+      {
+        "op": "replace-call",
+        "file": "tools/legacy-color.js",
+        "before": "normalizeCssColorToHex(input)",
+        "after": "normalizeCssColorAtomBridge(input)"
+      }
+    ]
+  },
+  "noApplyGuarantee": {
+    "noApply": true,
+    "legacyRuntimeMutated": false,
+    "guaranteeStatement": "Plan-only dry-run. No host file mutation or runtime rewrite occurs in this round."
+  },
+  "alpha0GateEvidence": {
+    "schema": "tests/schema-fixtures/positive/hello-world.atom.json",
+    "registry": "fixtures/registry/v1-with-versions.json",
+    "hashLock": "tests/schema-fixtures/positive/hello-world.atom.json#hashLock",
+    "cli": "tests/cli-fixtures/cli-mvp.fixture.json",
+    "helloWorld": "examples/hello-world/atoms/hello-world.atom.json",
+    "minimalEvidence": "tests/schema-fixtures/positive/minimal-execution-evidence.json"
+  },
+  "neutralityScopeCheck": {
+    "neutralityPassed": true,
+    "scopePassed": true,
+    "scanner": "ATM-2-0010 neutrality scanner",
+    "scopeBoundary": [
+      "tools/legacy-color.js",
+      "atomic_workbench/atoms/ATM-CORE-0005/"
+    ]
+  },
+  "rollbackSymmetry": {
+    "rollbackPlanId": "rollback-plan.atm-core-0005.v0.1.0.dry-run",
+    "reverseBehaviorId": "behavior.rollback-infect",
+    "contractSymmetric": true
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schemaId": "atm.rollbackPlan",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive rollback plan fixture."
+  },
+  "planId": "rollback-plan.fixture.0001",
+  "forwardPlanId": "inject-plan.fixture.0001",
+  "target": {
+    "atomId": "ATM-FIXTURE-0001",
+    "fromVersion": "1.1.0",
+    "toVersion": "1.0.0"
+  },
+  "behaviorId": "behavior.infect",
+  "reverseBehaviorId": "behavior.rollback-infect",
+  "dryRunOnly": true,
+  "rollbackSteps": [
+    {
+      "step": 1,
+      "action": "Drop pending inject patch artifact.",
+      "verify": "No patch artifact remains in temporary output."
+    }
+  ],
+  "rollbackProofContract": {
+    "schemaId": "atm.rollbackProof",
+    "schemaPath": "schemas/registry/rollback-proof.schema.json",
+    "requiredFields": [
+      "behaviorId",
+      "reverseBehaviorId",
+      "rollbackContractSymmetric",
+      "statusReverted",
+      "semanticFingerprintReverted"
+    ]
+  },
+  "symmetry": {
+    "contractSymmetric": true,
+    "sameTarget": true,
+    "samePatchBoundary": true
+  }
+}

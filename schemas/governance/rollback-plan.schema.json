@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/rollback-plan.schema.json",
+  "title": "ATM Injection Rollback Plan v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "planId",
+    "forwardPlanId",
+    "target",
+    "behaviorId",
+    "reverseBehaviorId",
+    "dryRunOnly",
+    "rollbackSteps",
+    "rollbackProofContract",
+    "symmetry"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.rollbackPlan"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "../governance/adapter-report.schema.json#/$defs/migration"
+    },
+    "planId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "forwardPlanId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomId", "fromVersion", "toVersion"],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "fromVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "toVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        }
+      }
+    },
+    "behaviorId": {
+      "const": "behavior.infect"
+    },
+    "reverseBehaviorId": {
+      "const": "behavior.rollback-infect"
+    },
+    "dryRunOnly": {
+      "const": true
+    },
+    "rollbackSteps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step", "action", "verify"],
+        "properties": {
+          "step": { "type": "integer", "minimum": 1 },
+          "action": { "type": "string", "minLength": 1 },
+          "verify": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "rollbackProofContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "schemaPath",
+        "requiredFields"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.rollbackProof"
+        },
+        "schemaPath": {
+          "const": "schemas/registry/rollback-proof.schema.json"
+        },
+        "requiredFields": {
+          "type": "array",
+          "minItems": 5,
+          "items": { "type": "string", "minLength": 1 },
+          "allOf": [
+            { "contains": { "const": "behaviorId" } },
+            { "contains": { "const": "reverseBehaviorId" } },
+            { "contains": { "const": "rollbackContractSymmetric" } },
+            { "contains": { "const": "statusReverted" } },
+            { "contains": { "const": "semanticFingerprintReverted" } }
+          ]
+        }
+      }
+    },
+    "symmetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractSymmetric", "sameTarget", "samePatchBoundary"],
+      "properties": {
+        "contractSymmetric": { "const": true },
+        "sameTarget": { "const": true },
+        "samePatchBoundary": { "const": true }
+      }
+    }
+  }
+}
