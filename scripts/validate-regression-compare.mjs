@@ -37,13 +37,14 @@ function run() {
   assert(schema.properties?.atomId, 'schema missing atomId');
   assert(schema.properties?.mapImpactScope, 'schema missing mapImpactScope');
   assert(schema.properties?.dedupCandidates, 'schema missing dedupCandidates');
+  assert(schema.properties?.dedupIgnoredAsPolymorph, 'schema missing dedupIgnoredAsPolymorph');
   assert(schema.properties?.regressedMetrics, 'schema missing regressedMetrics');
   assert(schema.$defs?.metricDelta?.properties?.tolerance, 'schema metricDelta missing tolerance');
 
   // --- 2. Fixture 存在 ---
   assert(existsSync(fixturePath), 'regression-compare.fixture.json not found');
   const fixtures = JSON.parse(readFileSync(fixturePath, 'utf8'));
-  assert(fixtures.positive?.length >= 3, 'need at least 3 positive fixtures');
+  assert(fixtures.positive?.length >= 4, 'need at least 4 positive fixtures');
   assert(fixtures.negative?.length >= 2, 'need at least 2 negative fixtures');
 
   // --- 3. Core module 存在 ---
@@ -63,6 +64,12 @@ function run() {
           `${fixture.name}: expected passed=${fixture.expected.passed}, got ${report.passed}`);
         assert(JSON.stringify(report.regressedMetrics.sort()) === JSON.stringify(fixture.expected.regressedMetrics.sort()),
           `${fixture.name}: regressedMetrics mismatch`);
+        if (fixture.name === 'v1.2-pass-polymorph-dedup-ignore') {
+          assert(Array.isArray(report.dedupCandidates), `${fixture.name}: dedupCandidates should exist`);
+          assert(report.dedupCandidates.length === 1, `${fixture.name}: dedupCandidates should keep only non-polymorph candidates`);
+          assert(Array.isArray(report.dedupIgnoredAsPolymorph), `${fixture.name}: dedupIgnoredAsPolymorph should exist`);
+          assert(report.dedupIgnoredAsPolymorph.length === 1, `${fixture.name}: dedupIgnoredAsPolymorph should track ignored candidate`);
+        }
         passedPositive++;
       }
 

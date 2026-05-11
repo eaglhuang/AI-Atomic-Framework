@@ -101,6 +101,21 @@
         "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
       },
       "uniqueItems": true
+    },
+    "polymorphicTemplateRef": {
+      "type": "string",
+      "pattern": "^ATM-POLY-\\d{4}$"
+    },
+    "dimensionSpecRef": {
+      "type": "string",
+      "pattern": "^ATM-DIMSPEC-\\d{4}$"
+    },
+    "polymorphGroupId": {
+      "type": "string",
+      "pattern": "^ATM-POLY-\\d{4}$"
+    },
+    "lazyInstantiation": {
+      "$ref": "#/$defs/lazyInstantiation"
     }
   },
   "$defs": {
@@ -339,6 +354,26 @@
         "maxDurationMs": {
           "type": "integer",
           "minimum": 1
+        }
+      }
+    },
+    "lazyInstantiation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "registryMaterialization", "instanceStatus"],
+      "properties": {
+        "strategy": {
+          "const": "lazy"
+        },
+        "registryMaterialization": {
+          "const": "none"
+        },
+        "instanceStatus": {
+          "const": "validated"
+        },
+        "runtimeInstanceId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}@[a-z0-9.-]+$"
         }
       }
     }

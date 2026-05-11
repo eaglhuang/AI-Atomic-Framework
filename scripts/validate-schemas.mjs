@@ -41,7 +41,9 @@ const schemaEntries = {
   'version-index': 'schemas/registry/version-index.schema.json',
   'regression-matrix': 'schemas/regression-matrix.schema.json',
   'test-report': 'schemas/test-report.schema.json',
-  'behavior-proposal': 'schemas/behavior/behavior-proposal.schema.json'
+  'behavior-proposal': 'schemas/behavior/behavior-proposal.schema.json',
+  'polymorphic-template': 'schemas/polymorphism/polymorphic-template.schema.json',
+  'dimension-spec': 'schemas/polymorphism/dimension-spec.schema.json'
 };
 
 const supportSchemaEntries = {
@@ -142,6 +144,15 @@ if (atomicSchema?.$defs?.lineage?.required?.join(',') !== 'bornBy,parentRefs,bor
 }
 if (atomicSchema?.$defs?.ttl?.required?.[0] !== 'expiresAt') {
   fail('atomic-spec ttl must require expiresAt');
+}
+if (!atomicSchema?.properties?.polymorphicTemplateRef) {
+  fail('atomic-spec must expose polymorphicTemplateRef');
+}
+if (!atomicSchema?.properties?.dimensionSpecRef) {
+  fail('atomic-spec must expose dimensionSpecRef');
+}
+if (!atomicSchema?.properties?.lazyInstantiation) {
+  fail('atomic-spec must expose lazyInstantiation');
 }
 for (const value of ['all-env', 'dev-only', 'staging-only', 'test-only']) {
   if (!atomicSchema?.$defs?.deployScope?.enum?.includes(value)) {

@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/polymorphism/polymorphic-template.schema.json",
+  "title": "ATM Polymorphic Template",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "templateId",
+    "templateAtomId",
+    "status",
+    "dimensions",
+    "lazyInstantiation",
+    "propagationPolicy"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.polymorphicTemplate"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "templateId": {
+      "type": "string",
+      "pattern": "^ATM-POLY-\\d{4}$"
+    },
+    "templateAtomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "deprecated"
+      ]
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/dimensionDefinition"
+      },
+      "uniqueItems": true
+    },
+    "defaultDimensionSpec": {
+      "type": "string",
+      "pattern": "^ATM-DIMSPEC-\\d{4}$"
+    },
+    "lazyInstantiation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registryExpansion",
+        "instantiateOn",
+        "instanceStatus"
+      ],
+      "properties": {
+        "registryExpansion": {
+          "const": "none"
+        },
+        "instantiateOn": {
+          "enum": [
+            "runtime",
+            "test-runner"
+          ]
+        },
+        "instanceStatus": {
+          "const": "validated"
+        }
+      }
+    },
+    "propagationPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "templateUpgradeAction",
+        "inheritanceMode"
+      ],
+      "properties": {
+        "templateUpgradeAction": {
+          "const": "behavior.evolve"
+        },
+        "inheritanceMode": {
+          "enum": [
+            "auto-propagate-all-instances"
+          ]
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "fromVersion",
+        "notes"
+      ],
+      "properties": {
+        "strategy": {
+          "enum": [
+            "none",
+            "additive",
+            "breaking"
+          ]
+        },
+        "fromVersion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "dimensionDefinition": {
+      "type": "string",
+      "enum": [
+        "parameter",
+        "type",
+        "language",
+        "quality",
+        "output-shape",
+        "behavior-variant"
+      ]
+    }
+  }
+}

@@ -42,6 +42,35 @@
         }
       },
       "expected": { "regressed": false, "passed": true, "regressedMetrics": [] }
+    },
+    {
+      "name": "v1.2-pass-polymorph-dedup-ignore",
+      "description": "Dedup candidates from the same polymorph template should be ignored and not block advisory output.",
+      "input": {
+        "atomId": "ATM-CORE-0001",
+        "fromVersion": "1.1.0",
+        "toVersion": "1.2.0",
+        "baselineMetrics": { "errorRate": 0.05, "coverage": 0.80 },
+        "currentMetrics": { "errorRate": 0.04, "coverage": 0.85 },
+        "polymorphContext": {
+          "groupId": "ATM-POLY-0001",
+          "instanceAtomIds": ["ATM-CORE-0002"]
+        },
+        "dedupCandidates": [
+          {
+            "atomId": "ATM-CORE-0002",
+            "similarity": 0.99,
+            "semanticFingerprint": "sf:sha256:1111111111111111111111111111111111111111111111111111111111111111",
+            "polymorphGroupId": "ATM-POLY-0001"
+          },
+          {
+            "atomId": "ATM-CORE-0099",
+            "similarity": 0.93,
+            "semanticFingerprint": "sf:sha256:9999999999999999999999999999999999999999999999999999999999999999"
+          }
+        ]
+      },
+      "expected": { "regressed": false, "passed": true, "regressedMetrics": [] }
     }
   ],
   "negative": [

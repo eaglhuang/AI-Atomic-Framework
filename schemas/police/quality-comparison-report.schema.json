@@ -71,6 +71,13 @@
         "$ref": "#/$defs/dedupCandidate"
       },
       "description": "Advisory: atoms with similar or identical semantic fingerprint."
+    },
+    "dedupIgnoredAsPolymorph": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dedupIgnoredCandidate"
+      },
+      "description": "Candidates ignored because they are polymorphic instances in the same template group."
     }
   },
   "$defs": {
@@ -175,8 +182,32 @@
         },
         "semanticFingerprint": {
           "type": "string"
+        },
+        "polymorphGroupId": {
+          "type": "string",
+          "pattern": "^ATM-POLY-\\d{4}$"
         }
       }
+    },
+    "dedupIgnoredCandidate": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/dedupCandidate"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["atomId", "similarity", "ignoredAsPolymorph", "reason"],
+          "properties": {
+            "ignoredAsPolymorph": {
+              "const": true
+            },
+            "reason": {
+              "enum": ["instance-atom", "same-polymorph-group"]
+            }
+          }
+        }
+      ]
     }
   }
 }

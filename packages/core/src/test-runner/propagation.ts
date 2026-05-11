@@ -3,7 +3,7 @@ import path from 'node:path';
 import { runMapIntegrationTest } from './map-integration.ts';
 import { createTestReportMetrics } from './metrics-collector.ts';
 
-export const propagationTriggerBehaviors = Object.freeze(['split', 'merge', 'atomize', 'infect']);
+export const propagationTriggerBehaviors = Object.freeze(['split', 'merge', 'atomize', 'infect', 'evolve']);
 
 export function shouldPropagateBehavior(behavior) {
   if (typeof behavior !== 'string') {

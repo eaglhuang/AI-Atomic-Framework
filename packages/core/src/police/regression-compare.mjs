@@ -27,6 +27,7 @@ const DEFAULT_METRIC_CONFIG = {
  * @param {object} [options.metricConfig] - 自訂指標方向/容忍度
  * @param {object} [options.mapImpactScope] - { affectedMapIds, propagationStatus }
  * @param {Array}  [options.dedupCandidates] - advisory dedup 候選
+ * @param {object} [options.polymorphContext] - { groupId, instanceAtomIds }
  * @returns {object} 符合 quality-comparison-report.schema.json 的報告
  */
 export function compareQualityMetrics(options) {
@@ -38,7 +39,8 @@ export function compareQualityMetrics(options) {
     currentMetrics,
     metricConfig = {},
     mapImpactScope = null,
-    dedupCandidates = null
+    dedupCandidates = null,
+    polymorphContext = null
   } = options;
 
   const mergedConfig = { ...DEFAULT_METRIC_CONFIG, ...metricConfig };
@@ -112,7 +114,13 @@ export function compareQualityMetrics(options) {
   }
 
   if (dedupCandidates && dedupCandidates.length > 0) {
-    report.dedupCandidates = dedupCandidates;
+    const { kept, ignored } = filterPolymorphDedupCandidates(dedupCandidates, polymorphContext);
+    if (kept.length > 0) {
+      report.dedupCandidates = kept;
+    }
+    if (ignored.length > 0) {
+      report.dedupIgnoredAsPolymorph = ignored;
+    }
   }
 
   return report;
@@ -181,6 +189,17 @@ export function renderQualityReportMarkdown(report) {
     lines.push('');
   }
 
+  if (report.dedupIgnoredAsPolymorph && report.dedupIgnoredAsPolymorph.length > 0) {
+    lines.push('## Dedup Ignored As Polymorph');
+    lines.push('');
+    lines.push('| Atom ID | Reason |');
+    lines.push('|---------|--------|');
+    for (const ignored of report.dedupIgnoredAsPolymorph) {
+      lines.push(`| ${ignored.atomId} | ${ignored.reason} |`);
+    }
+    lines.push('');
+  }
+
   // 結論
   lines.push('## Conclusion');
   lines.push('');
@@ -202,4 +221,37 @@ export function renderQualityReportMarkdown(report) {
   lines.push('');
 
   return lines.join('\n');
+}
+
+function filterPolymorphDedupCandidates(candidates, polymorphContext) {
+  if (!polymorphContext || typeof polymorphContext !== 'object') {
+    return { kept: candidates, ignored: [] };
+  }
+
+  const groupId = typeof polymorphContext.groupId === 'string' ? polymorphContext.groupId : '';
+  const instanceAtomIds = Array.isArray(polymorphContext.instanceAtomIds)
+    ? new Set(polymorphContext.instanceAtomIds.map((atomId) => String(atomId)))
+    : new Set();
+
+  const kept = [];
+  const ignored = [];
+
+  for (const candidate of candidates) {
+    const atomId = String(candidate?.atomId || '');
+    const candidateGroupId = typeof candidate?.polymorphGroupId === 'string' ? candidate.polymorphGroupId : '';
+    const ignoredByInstance = instanceAtomIds.has(atomId);
+    const ignoredByGroup = Boolean(groupId) && candidateGroupId === groupId;
+
+    if (ignoredByInstance || ignoredByGroup) {
+      ignored.push({
+        ...candidate,
+        ignoredAsPolymorph: true,
+        reason: ignoredByInstance ? 'instance-atom' : 'same-polymorph-group'
+      });
+    } else {
+      kept.push(candidate);
+    }
+  }
+
+  return { kept, ignored };
 }

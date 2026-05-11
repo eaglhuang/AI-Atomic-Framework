@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.dimensionSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Dimension spec baseline"
+  },
+  "dimensionSpecId": "ATM-DIMSPEC-0001",
+  "templateId": "ATM-POLY-0001",
+  "variantKey": "typescript.node",
+  "dimensionValues": {
+    "parameter": {
+      "strict": true,
+      "maxDepth": 5
+    },
+    "type": {
+      "output": "typed"
+    },
+    "language": {
+      "primary": "typescript"
+    },
+    "quality": {
+      "coverage": 0.9
+    },
+    "output-shape": {
+      "schema": "object"
+    },
+    "behavior-variant": {
+      "upgradePath": "safe"
+    }
+  },
+  "lazyInstanceRef": {
+    "strategy": "lazy",
+    "registryMaterialization": "none",
+    "runtimeInstanceId": "ATM-CORE-0001@typescript.node"
+  }
+}
