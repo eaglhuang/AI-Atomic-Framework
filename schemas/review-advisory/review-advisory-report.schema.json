@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/review-advisory/review-advisory-report.schema.json",
+  "title": "Review Advisory Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reportId",
+    "status",
+    "provider",
+    "generatedAt",
+    "target",
+    "summary",
+    "findings",
+    "advisoryUnavailable",
+    "needsReview"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "reportId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "warn",
+        "advisory-unavailable"
+      ]
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "providerId"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "stub",
+            "agent-bridge",
+            "external-cli"
+          ]
+        },
+        "providerId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "providerVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transport": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "atom",
+            "map",
+            "proposal",
+            "diff",
+            "scope"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourcePaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "high",
+        "medium",
+        "low",
+        "info"
+      ],
+      "properties": {
+        "high": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "medium": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "low": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "info": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "supplementalContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "humanReviewQueue": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "attachable"
+          ],
+          "properties": {
+            "attachable": {
+              "type": "boolean"
+            },
+            "queuePath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "proposalId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "queueRecordStatus": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "advisoryUnavailable": {
+      "type": "boolean"
+    },
+    "needsReview": {
+      "type": "boolean"
+    },
+    "unavailableReasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "severity",
+        "trigger",
+        "action",
+        "message"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "info"
+          ]
+        },
+        "trigger": {
+          "type": "string",
+          "enum": [
+            "semantic-anomaly",
+            "behavior-route-risk",
+            "policy-coverage-gap",
+            "provider-health",
+            "machine-finding"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "atom",
+            "map",
+            "proposal",
+            "diff",
+            "registry",
+            "queue",
+            "runtime"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "none",
+            "monitor",
+            "needs-review",
+            "request-human-review",
+            "provider-retry"
+          ]
+        },
+        "routeHint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

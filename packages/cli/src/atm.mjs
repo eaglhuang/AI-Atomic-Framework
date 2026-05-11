@@ -16,6 +16,7 @@ import { runVerify } from './commands/verify.mjs';
 import { runRegistryDiff } from './commands/registry-diff.mjs';
 import { runRollback } from './commands/rollback.mjs';
 import { runReview } from './commands/review.mjs';
+import { runReviewAdvisory } from './commands/review-advisory.mjs';
 import { CliError, makeResult, message, writeResult } from './commands/shared.mjs';
 
 export const cliCommandRunners = {
@@ -33,7 +34,8 @@ export const cliCommandRunners = {
   verify: runVerify,
   'registry-diff': runRegistryDiff,
   rollback: runRollback,
-  review: runReview
+  review: runReview,
+  'review-advisory': runReviewAdvisory
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
@@ -44,7 +46,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       ok: true,
       command: 'help',
       cwd: process.cwd(),
-      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, create, create-map, guide, init, rollback, review, self-host-alpha, spec, status, upgrade, test, validate, verify.')],
+      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, create, create-map, guide, init, rollback, review, review-advisory, self-host-alpha, spec, status, upgrade, test, validate, verify.')],
       evidence: {
         commands: Object.keys(cliCommandRunners),
         outputFormat: 'json'

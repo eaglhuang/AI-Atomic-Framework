@@ -79,6 +79,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'review-advisory',
+    summary: 'Generate non-blocking semantic advisory findings for review context',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'test',
     summary: 'Run atom smoke tests',
     implemented: true,

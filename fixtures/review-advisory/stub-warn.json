@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "reportId": "review-advisory.stub-warn",
+  "status": "warn",
+  "provider": {
+    "mode": "stub",
+    "providerId": "stub-provider",
+    "providerVersion": "1.0.0",
+    "transport": "inproc"
+  },
+  "generatedAt": "2026-01-08T00:00:00.000Z",
+  "target": {
+    "kind": "proposal",
+    "id": "proposal.atm-core-0002.from-1.0.0.to-2.0.0.atom.behavior-infect"
+  },
+  "summary": {
+    "high": 1,
+    "medium": 0,
+    "low": 0,
+    "info": 0
+  },
+  "findings": [
+    {
+      "id": "finding.stub.warn.breaking-change",
+      "severity": "high",
+      "trigger": "behavior-route-risk",
+      "scope": "proposal",
+      "action": "request-human-review",
+      "routeHint": "human-review.required",
+      "message": "Potential breaking behavior route detected; human review required.",
+      "evidenceRefs": [
+        "advisory.stub.warn"
+      ]
+    }
+  ],
+  "supplementalContext": {
+    "humanReviewQueue": {
+      "attachable": true,
+      "queuePath": ".atm/reports/upgrade-proposals.json",
+      "proposalId": "proposal.atm-core-0002.from-1.0.0.to-2.0.0.atom.behavior-infect",
+      "queueRecordStatus": "pending"
+    }
+  },
+  "advisoryUnavailable": false,
+  "needsReview": true,
+  "unavailableReasons": []
+}

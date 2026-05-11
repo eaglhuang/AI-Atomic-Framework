@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "reportId": "review-advisory.stub-pass",
+  "status": "ok",
+  "provider": {
+    "mode": "stub",
+    "providerId": "stub-provider",
+    "providerVersion": "1.0.0",
+    "transport": "inproc"
+  },
+  "generatedAt": "2026-01-08T00:00:00.000Z",
+  "target": {
+    "kind": "proposal",
+    "id": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve"
+  },
+  "summary": {
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 1
+  },
+  "findings": [
+    {
+      "id": "finding.stub.pass",
+      "severity": "info",
+      "trigger": "semantic-anomaly",
+      "scope": "proposal",
+      "action": "monitor",
+      "routeHint": "human-review.supplemental",
+      "message": "No semantic risk surfaced by stub provider.",
+      "evidenceRefs": [
+        "advisory.stub.pass"
+      ]
+    }
+  ],
+  "supplementalContext": {
+    "humanReviewQueue": {
+      "attachable": true,
+      "queuePath": ".atm/reports/upgrade-proposals.json",
+      "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+      "queueRecordStatus": "pending"
+    }
+  },
+  "advisoryUnavailable": false,
+  "needsReview": false,
+  "unavailableReasons": []
+}
