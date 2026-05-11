@@ -1,3 +1,11 @@
+import { buildMapProposalContext } from './map-propose.mjs';
+import {
+  deriveDecompositionDecision,
+  resolveReviewTemplate,
+  validateDecisionBehaviorPair,
+  VALID_DECOMPOSITION_DECISIONS
+} from './decomposition-decision.mjs';
+
 const VALID_BEHAVIOR_IDS = [
   'behavior.evolve',
   'behavior.split',
@@ -58,6 +66,10 @@ export function proposeAtomicUpgrade(request) {
     targetKind: target.kind
   });
 
+  if (!VALID_DECOMPOSITION_DECISIONS.includes(decompositionDecision)) {
+    throw new Error(`Unsupported decompositionDecision: ${decompositionDecision}`);
+  }
+
   if (decompositionDecision === 'map-bump' && target.kind !== 'map') {
     throw new Error('map-bump proposals require target.kind === "map".');
   }
@@ -67,9 +79,17 @@ export function proposeAtomicUpgrade(request) {
   if (decompositionDecision === 'atom-extract' && !normalizedRequest.fork) {
     throw new Error('atom-extract proposals require fork information.');
   }
-  if (behaviorId === 'behavior.atomize' && decompositionDecision !== 'atom-extract') {
-    throw new Error('behavior.atomize proposals must use atom-extract.');
-  }
+  validateDecisionBehaviorPair({ behaviorId, decompositionDecision });
+
+  const mapProposalContext = target.kind === 'map'
+    ? buildMapProposalContext({
+      repositoryRoot: normalizedRequest.repositoryRoot,
+      mapId: target.mapId,
+      atomId,
+      fromVersion,
+      toVersion
+    })
+    : null;
 
   const inputs = buildInputRefs(normalizedRequest.inputs);
   const nonRegressionInput = requireInput(normalizedRequest.inputs, 'non-regression');
@@ -119,6 +139,7 @@ export function proposeAtomicUpgrade(request) {
     behaviorId,
     target,
     decompositionDecision,
+    reviewTemplate: resolveReviewTemplate(decompositionDecision),
     automatedGates: {
       nonRegression: nonRegressionGate,
       qualityComparison: qualityComparisonGate,
@@ -134,6 +155,11 @@ export function proposeAtomicUpgrade(request) {
     proposedAt: normalizedRequest.proposedAt
   };
 
+  if (mapProposalContext) {
+    proposal.members = mapProposalContext.members;
+    proposal.generatorProvenance = mapProposalContext.generatorProvenance;
+  }
+
   if (mapImpactScope) {
     proposal.mapImpactScope = mapImpactScope;
   }
@@ -142,6 +168,19 @@ export function proposeAtomicUpgrade(request) {
     proposal.fork = {
       sourceAtomId: normalizedRequest.fork.sourceAtomId,
       newAtomId: normalizedRequest.fork.newAtomId
+    };
+    proposal.extractPlan = {
+      preservedSourceAtom: {
+        atomId: normalizedRequest.fork.sourceAtomId,
+        retainedAtVersion: fromVersion,
+        retentionMode: 'legacy-preserved'
+      },
+      newAtomSpecStub: {
+        atomId: normalizedRequest.fork.newAtomId,
+        seededFromAtomId: normalizedRequest.fork.sourceAtomId,
+        initialVersion: toVersion,
+        lifecycleMode: 'evolution'
+      }
     };
   }
 
@@ -166,6 +205,7 @@ function normalizeRequest(request = {}) {
     proposedAt: request.proposedAt ?? new Date().toISOString(),
     proposalId: request.proposalId ?? null,
     migration: request.migration ?? null,
+    repositoryRoot: request.repositoryRoot ?? process.cwd(),
     contextBudgetGate: normalizeGateResult(request.contextBudgetGate ?? null, 'contextBudget'),
     inputs: request.inputs.map(normalizeInputDocument)
   };
@@ -361,16 +401,6 @@ function normalizeTarget(target) {
     normalized.mapId = target.mapId;
   }
   return normalized;
-}
-
-function deriveDecompositionDecision({ behaviorId, targetKind }) {
-  if (targetKind === 'map') {
-    return 'map-bump';
-  }
-  if (behaviorId === 'behavior.atomize') {
-    return 'atom-extract';
-  }
-  return 'atom-bump';
 }
 
 function createProposalId(atomId, fromVersion, toVersion, target, behaviorId) {

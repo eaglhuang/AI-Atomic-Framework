@@ -6,17 +6,18 @@
     "fromVersion": null,
     "notes": "Initial upgrade proposal contract."
   },
-  "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+  "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.map-atm-map-0001.behavior-evolve",
   "atomId": "ATM-CORE-0001",
   "fromVersion": "1.0.0",
   "toVersion": "1.1.0",
   "lifecycleMode": "evolution",
   "behaviorId": "behavior.evolve",
   "target": {
-    "kind": "atom"
+    "kind": "map",
+    "mapId": "ATM-MAP-0001"
   },
-  "decompositionDecision": "atom-bump",
-  "reviewTemplate": "review.template.atom-bump",
+  "decompositionDecision": "map-bump",
+  "reviewTemplate": "review.template.map-bump",
   "automatedGates": {
     "nonRegression": {
       "passed": true,
@@ -77,7 +78,9 @@
     }
   ],
   "mapImpactScope": {
-    "affectedMapIds": ["ATM-MAP-0001"],
+    "affectedMapIds": [
+      "ATM-MAP-0001"
+    ],
     "propagationStatus": [
       {
         "mapId": "ATM-MAP-0001",
@@ -86,6 +89,21 @@
       }
     ]
   },
+  "members": [
+    {
+      "from": "ATM-CORE-0004@0.1.0",
+      "to": "ATM-CORE-0004@0.1.0"
+    },
+    {
+      "from": "ATM-FIXTURE-0001@0.1.0",
+      "to": "ATM-FIXTURE-0001@0.1.0"
+    },
+    {
+      "from": "ATM-CORE-0001@1.0.0",
+      "to": "ATM-CORE-0001@1.1.0"
+    }
+  ],
+  "generatorProvenance": "generated",
   "proposedBy": "ATM CLI",
   "proposedAt": "2026-01-01T00:00:00.000Z"
 }

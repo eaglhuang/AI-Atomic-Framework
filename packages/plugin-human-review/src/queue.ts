@@ -31,7 +31,7 @@ export interface HumanReviewQueueRecord {
   readonly atomId: string;
   readonly fromVersion: string;
   readonly toVersion: string;
-  readonly decompositionDecision: 'atom-bump' | 'atom-extract' | 'map-bump';
+  readonly decompositionDecision: 'atom-bump' | 'atom-extract' | 'map-bump' | 'polymorphize' | 'extract-shared' | 'infect' | 'atomize';
   readonly automatedGates: HumanReviewQueueAutomatedGatesSummary;
   readonly status: HumanReviewQueueStatus;
   readonly proposalSnapshotHash: string;

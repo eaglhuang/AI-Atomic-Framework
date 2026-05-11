@@ -8,6 +8,7 @@ import {
 } from '../../../plugin-governance-local/src/index.ts';
 import { renderQualityReportMarkdown } from '../../../core/src/police/regression-compare.mjs';
 import { proposeAtomicUpgrade } from '../../../core/src/upgrade/propose.mjs';
+import { runUpgradeMapPropose } from './upgrade-map-propose.mjs';
 import { CliError, makeResult, message, readJsonFile } from './shared.mjs';
 
 export function runUpgrade(argv) {
@@ -17,7 +18,8 @@ export function runUpgrade(argv) {
     : discoverInputDocuments(options.cwd);
   const contextBudget = evaluateUpgradeContextBudget(options, inputDocuments);
 
-  const proposal = proposeAtomicUpgrade({
+  const proposerOptions = {
+    cwd: options.cwd,
     atomId: options.atomId,
     fromVersion: options.fromVersion,
     toVersion: options.toVersion,
@@ -32,7 +34,14 @@ export function runUpgrade(argv) {
     migration: options.migration,
     contextBudgetGate: contextBudget.gate,
     inputs: inputDocuments
-  });
+  };
+
+  const proposal = options.target.kind === 'map'
+    ? runUpgradeMapPropose(proposerOptions)
+    : proposeAtomicUpgrade({
+      ...proposerOptions,
+      repositoryRoot: options.cwd
+    });
 
   return makeResult({
     ok: true,
@@ -115,6 +124,11 @@ function parseUpgradeOptions(argv) {
     }
     if (arg === '--behavior') {
       options.behaviorId = requireOptionValue(argv, index, '--behavior');
+      index += 1;
+      continue;
+    }
+    if (arg === '--decomposition-decision') {
+      options.decompositionDecision = requireOptionValue(argv, index, '--decomposition-decision');
       index += 1;
       continue;
     }

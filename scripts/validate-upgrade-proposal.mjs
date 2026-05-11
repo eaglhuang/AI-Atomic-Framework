@@ -16,6 +16,8 @@ const mode = process.argv.includes('--mode')
 const schemaPath = 'schemas/upgrade/upgrade-proposal.schema.json';
 const passFixturePath = 'fixtures/upgrade/proposal-pass.json';
 const blockedFixturePath = 'fixtures/upgrade/proposal-blocked.json';
+const mapBumpFixturePath = 'fixtures/upgrade/map-bump-proposal.json';
+const atomExtractFixturePath = 'fixtures/upgrade/atom-extract-proposal.json';
 const inputPaths = {
   hashDiff: 'fixtures/upgrade/hash-diff-report.json',
   executionEvidence: 'tests/schema-fixtures/positive/minimal-execution-evidence.json',
@@ -95,6 +97,8 @@ function runCliUpgrade(qualityPath, options = {}) {
     '--json',
     '--proposed-at', '2026-01-01T00:00:00.000Z',
     ...(dryRun ? ['--dry-run'] : []),
+    ...(options.mapId ? ['--target', 'map', '--map', options.mapId] : []),
+    ...(options.decompositionDecision ? ['--decomposition-decision', options.decompositionDecision] : []),
     '--input', resolveInputPath(options.inputBase ?? root, inputPaths.hashDiff),
     '--input', resolveInputPath(options.inputBase ?? root, inputPaths.executionEvidence),
     '--input', resolveInputPath(options.inputBase ?? root, inputPaths.nonRegression),
@@ -124,7 +128,7 @@ function assertCliContextBudgetGate(result, expectedPassed) {
   }
 }
 
-for (const relativePath of [schemaPath, passFixturePath, blockedFixturePath, ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.mjs', 'packages/cli/src/commands/upgrade.mjs']) {
+for (const relativePath of [schemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.mjs', 'packages/cli/src/commands/upgrade.mjs']) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
 
@@ -137,6 +141,10 @@ check(schema.required.includes('humanReview'), 'schema must require humanReview'
 check(schema.required.includes('behaviorId'), 'schema must require behaviorId');
 check(schema.properties.decompositionDecision.enum.includes('atom-extract'), 'schema must include atom-extract decomposition decision');
 check(schema.properties.decompositionDecision.enum.includes('map-bump'), 'schema must include map-bump decomposition decision');
+check(schema.properties.decompositionDecision.enum.includes('polymorphize'), 'schema must include polymorphize decomposition decision');
+check(schema.properties.decompositionDecision.enum.includes('extract-shared'), 'schema must include extract-shared decomposition decision');
+check(schema.properties.decompositionDecision.enum.includes('infect'), 'schema must include infect decomposition decision');
+check(schema.properties.decompositionDecision.enum.includes('atomize'), 'schema must include atomize decomposition decision');
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
@@ -144,10 +152,16 @@ const validate = ajv.compile(schema);
 
 const expectedPass = readJson(passFixturePath);
 const expectedBlocked = readJson(blockedFixturePath);
+const expectedMapBump = readJson(mapBumpFixturePath);
+const expectedAtomExtract = readJson(atomExtractFixturePath);
 validateWithSchema(expectedPass, validate, 'proposal-pass fixture');
 validateWithSchema(expectedBlocked, validate, 'proposal-blocked fixture');
+validateWithSchema(expectedMapBump, validate, 'map-bump fixture');
+validateWithSchema(expectedAtomExtract, validate, 'atom-extract fixture');
 assertInvariants(expectedPass, 'pending');
 assertInvariants(expectedBlocked, 'blocked');
+assertInvariants(expectedMapBump, 'pending');
+assertInvariants(expectedAtomExtract, 'pending');
 
 const generatedPass = proposeAtomicUpgrade({
   atomId: 'ATM-CORE-0001',
@@ -187,18 +201,54 @@ const mapProposal = proposeAtomicUpgrade({
 });
 assertInvariants(mapProposal, 'pending');
 validateWithSchema(mapProposal, validate, 'map proposal');
+assert.deepEqual(mapProposal, expectedMapBump, 'generated map-bump proposal must match fixture');
+
+const cliMapPass = runCliUpgrade(inputPaths.qualityPass, { mapId: 'ATM-MAP-0001' });
+assertInvariants(cliMapPass.evidence.proposal, 'pending');
+validateWithSchema(cliMapPass.evidence.proposal, validate, 'CLI map pass proposal');
 
 const extractProposal = proposeAtomicUpgrade({
   atomId: 'ATM-CORE-0001',
   fromVersion: '1.0.0',
   toVersion: '1.1.0',
-  behaviorId: 'behavior.atomize',
+  behaviorId: 'behavior.evolve',
+  decompositionDecision: 'atom-extract',
   fork: { sourceAtomId: 'ATM-CORE-0001', newAtomId: 'ATM-CORE-0002' },
   proposedAt: '2026-01-01T00:00:00.000Z',
   inputs: createProposalInputs(inputPaths.qualityPass)
 });
 assertInvariants(extractProposal, 'pending');
 validateWithSchema(extractProposal, validate, 'atom-extract proposal');
+assert.deepEqual(extractProposal, expectedAtomExtract, 'generated atom-extract proposal must match fixture');
+
+assert.throws(() => proposeAtomicUpgrade({
+  atomId: 'ATM-CORE-0001',
+  fromVersion: '1.0.0',
+  toVersion: '1.1.0',
+  behaviorId: 'behavior.infect',
+  decompositionDecision: 'atom-bump',
+  proposedAt: '2026-01-01T00:00:00.000Z',
+  inputs: createProposalInputs(inputPaths.qualityPass)
+}), /behavior\.infect/);
+
+assert.throws(() => proposeAtomicUpgrade({
+  atomId: 'ATM-CORE-0001',
+  fromVersion: '1.0.0',
+  toVersion: '1.1.0',
+  behaviorId: 'behavior.evolve',
+  decompositionDecision: 'infect',
+  proposedAt: '2026-01-01T00:00:00.000Z',
+  inputs: createProposalInputs(inputPaths.qualityPass)
+}), /must pair/);
+
+assert.throws(() => proposeAtomicUpgrade({
+  atomId: 'ATM-CORE-0001',
+  fromVersion: '1.0.0',
+  toVersion: '1.1.0',
+  target: { kind: 'map', mapId: 'map.legacy.sandbox' },
+  proposedAt: '2026-01-01T00:00:00.000Z',
+  inputs: createProposalInputs(inputPaths.qualityPass)
+}), /Legacy mapId/);
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-upgrade-hard-stop-'));
 try {

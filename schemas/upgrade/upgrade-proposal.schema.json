@@ -42,7 +42,11 @@
       "$ref": "#/$defs/target"
     },
     "decompositionDecision": {
-      "enum": ["atom-bump", "atom-extract", "map-bump"]
+      "enum": ["atom-bump", "atom-extract", "map-bump", "polymorphize", "extract-shared", "infect", "atomize"]
+    },
+    "reviewTemplate": {
+      "type": "string",
+      "minLength": 1
     },
     "automatedGates": {
       "$ref": "#/$defs/automatedGates"
@@ -65,6 +69,20 @@
     },
     "fork": {
       "$ref": "#/$defs/fork"
+    },
+    "extractPlan": {
+      "$ref": "#/$defs/extractPlan"
+    },
+    "members": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/memberVersionTransition"
+      }
+    },
+    "generatorProvenance": {
+      "type": "string",
+      "minLength": 1
     },
     "proposedBy": {
       "type": "string",
@@ -91,7 +109,7 @@
         "required": ["target"]
       },
       "then": {
-        "required": ["mapImpactScope"],
+        "required": ["mapImpactScope", "members", "generatorProvenance"],
         "properties": {
           "target": {
             "required": ["kind", "mapId"]
@@ -112,7 +130,7 @@
         "required": ["decompositionDecision"]
       },
       "then": {
-        "required": ["fork"],
+        "required": ["fork", "extractPlan"],
         "properties": {
           "target": {
             "properties": {
@@ -137,7 +155,24 @@
       "then": {
         "properties": {
           "decompositionDecision": {
-            "const": "atom-extract"
+            "enum": ["atom-extract", "atomize"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "behaviorId": {
+            "const": "behavior.infect"
+          }
+        },
+        "required": ["behaviorId"]
+      },
+      "then": {
+        "properties": {
+          "decompositionDecision": {
+            "const": "infect"
           }
         }
       }
@@ -341,6 +376,68 @@
         },
         "message": {
           "type": "string"
+        }
+      }
+    },
+    "memberVersionTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}@[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}@[0-9]+\\.[0-9]+\\.[0-9]+$"
+        }
+      }
+    },
+    "extractPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preservedSourceAtom", "newAtomSpecStub"],
+      "properties": {
+        "preservedSourceAtom": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["atomId", "retainedAtVersion", "retentionMode"],
+          "properties": {
+            "atomId": {
+              "type": "string",
+              "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+            },
+            "retainedAtVersion": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            },
+            "retentionMode": {
+              "const": "legacy-preserved"
+            }
+          }
+        },
+        "newAtomSpecStub": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["atomId", "seededFromAtomId", "initialVersion", "lifecycleMode"],
+          "properties": {
+            "atomId": {
+              "type": "string",
+              "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+            },
+            "seededFromAtomId": {
+              "type": "string",
+              "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+            },
+            "initialVersion": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            },
+            "lifecycleMode": {
+              "const": "evolution"
+            }
+          }
         }
       }
     }
