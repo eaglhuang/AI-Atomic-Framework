@@ -1,101 +1,110 @@
 {
-  "auditDocPath": "docs/governance/DOCS_NEUTRALITY_AUDIT.md",
-  "requiredAuditSections": [
-    "## Protected Surface Checklist",
-    "## Banned-Term Scan Scope",
-    "## Adopter-Only Reference Migration",
-    "## Self-Hosting Alpha Alignment"
-  ],
-  "protectedFiles": [
-    "README.md",
-    "CONTRIBUTING.md"
-  ],
-  "protectedScopes": [
-    {
-      "path": "packages/core",
-      "extensions": [
-        ".js",
-        ".mjs",
-        ".ts",
-        ".json",
-        ".md"
-      ]
-    },
-    {
-      "path": "packages/cli",
-      "extensions": [
-        ".js",
-        ".mjs",
-        ".ts",
-        ".json",
-        ".md"
-      ]
-    },
-    {
-      "pathPrefix": "packages/plugin-",
-      "extensions": [
-        ".js",
-        ".mjs",
-        ".ts",
-        ".json",
-        ".md"
-      ]
-    },
-    {
-      "path": "schemas",
-      "extensions": [
-        ".json",
-        ".md"
-      ]
-    },
-    {
-      "path": "docs",
-      "extensions": [
-        ".md"
-      ],
-      "excludePrefixes": [
-        "docs/governance/"
-      ]
-    },
-    {
-      "path": "examples",
-      "extensions": [
-        ".md"
-      ]
-    },
-    {
-      "path": "templates",
-      "extensions": [
-        ".md"
-      ]
-    }
-  ],
-  "bannedTerms": [
-    "3KLife",
-    "Cocos",
-    "cocos-creator",
-    "html-to-ucuf",
-    "gacha",
-    "UCUF",
-    "draft-builder",
-    "eaglhuang/3KLife",
-    "task-lock",
-    "compute-gate",
-    "doc-id-registry",
-    "tools_node/",
-    "assets/scripts/",
-    "docs/agent-briefs/"
-  ],
-  "bannedPathPatterns": [
-    "tools_node/",
-    "assets/scripts/",
-    "docs/agent-briefs/",
-    "<non-ascii-filename>"
-  ],
-  "ignoredPrefixes": [
-    ".git/",
-    "node_modules/",
-    "tests/",
-    "atomic_workbench/"
-  ]
+    "auditDocPath":  "docs/governance/DOCS_NEUTRALITY_AUDIT.md",
+    "requiredAuditSections":  [
+                                  "## Protected Surface Checklist",
+                                  "## Banned-Term Scan Scope",
+                                  "## Adopter-Only Reference Migration",
+                                  "## Self-Hosting Alpha Alignment"
+                              ],
+    "protectedFiles":  [
+                           "README.md",
+                           "CONTRIBUTING.md",
+                           "atomic-registry.json"
+                       ],
+    "protectedScopes":  [
+                            {
+                                "path":  "packages/core",
+                                "extensions":  [
+                                                   ".js",
+                                                   ".mjs",
+                                                   ".ts",
+                                                   ".json",
+                                                   ".md"
+                                               ]
+                            },
+                            {
+                                "path":  "packages/cli",
+                                "extensions":  [
+                                                   ".js",
+                                                   ".mjs",
+                                                   ".ts",
+                                                   ".json",
+                                                   ".md"
+                                               ]
+                            },
+                            {
+                                "pathPrefix":  "packages/plugin-",
+                                "extensions":  [
+                                                   ".js",
+                                                   ".mjs",
+                                                   ".ts",
+                                                   ".json",
+                                                   ".md"
+                                               ]
+                            },
+                            {
+                                "path":  "schemas",
+                                "extensions":  [
+                                                   ".json",
+                                                   ".md"
+                                               ]
+                            },
+                            {
+                                "path":  "docs",
+                                "extensions":  [
+                                                   ".md"
+                                               ],
+                                "excludePrefixes":  [
+                                                        "docs/governance/"
+                                                    ]
+                            },
+                            {
+                                "path":  "examples",
+                                "extensions":  [
+                                                   ".md"
+                                               ]
+                            },
+                            {
+                                "path":  "templates",
+                                "extensions":  [
+                                                   ".md"
+                                               ]
+                            },
+                            {
+                                "path":  "atomic_workbench",
+                                "extensions":  [
+                                                   ".json",
+                                                   ".md",
+                                                   ".mjs",
+                                                   ".js"
+                                               ]
+                            }
+                        ],
+    "bannedTerms":  [
+                        "3KLife",
+                        "Cocos",
+                        "cocos-creator",
+                        "html-to-ucuf",
+                        "gacha",
+                        "UCUF",
+                        "draft-builder",
+                        "eaglhuang/3KLife",
+                        "task-lock",
+                        "compute-gate",
+                        "doc-id-registry",
+                        "tools_node/",
+                        "assets/scripts/",
+                        "docs/agent-briefs/"
+                    ],
+    "bannedPathPatterns":  [
+                               "tools_node/",
+                               "assets/scripts/",
+                               "docs/agent-briefs/",
+                               "\u003cnon-ascii-filename\u003e"
+                           ],
+    "ignoredPrefixes":  [
+                            ".git/",
+                            "node_modules/",
+                            "tests/"
+                        ]
 }
