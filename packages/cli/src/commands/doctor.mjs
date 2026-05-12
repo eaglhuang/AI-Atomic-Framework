@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { runHashPlaceholderAudit } from '../../../../scripts/audit-hash-placeholders.mjs';
+import { createGitHeadEvidenceCheck } from './git-head-evidence.mjs';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.mjs';
 import { makeResult, message, parseOptions, relativePathFrom } from './shared.mjs';
 
@@ -71,19 +72,28 @@ export function runDoctor(argv) {
       layoutVersion: runtime.layoutVersion,
       expectedLayoutVersion: atmLayoutVersion,
       migrationNeeded: runtime.migrationNeeded
-    })
+    }),
+    createGitHeadEvidenceCheck(root, runtime)
   ];
   const ok = checks.every((check) => check.ok);
+  const failedChecks = checks.filter((check) => !check.ok).map((check) => check.name);
   const recommendedAction = ok
     ? 'node atm.mjs next --json'
+    : failedChecks.includes('git-head-evidence')
+      ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
     : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
       ? 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
       : 'npm run validate:full';
+  const messages = ok
+    ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
+    : failedChecks.includes('git-head-evidence')
+      ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
+      : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })];
   return makeResult({
     ok,
     command: 'doctor',
     cwd: root,
-    messages: [ok ? message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.') : message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks: checks.filter((check) => !check.ok).map((check) => check.name) })],
+    messages,
     evidence: {
       checks,
       packageManager: 'npm',
