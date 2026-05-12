@@ -1,13 +1,14 @@
-export function createTestReportMetrics(input = {}) {
-  const total = normalizeNonNegativeInteger(input.total ?? input.totalCount);
-  const failed = normalizeNonNegativeInteger(input.failed ?? input.failedCount);
-  const latency = normalizeNonNegativeInteger(input.latency ?? input.durationMs ?? input.propagationDuration);
+export function createTestReportMetrics(input) {
+  const normalizedInput = input || {};
+  const total = normalizeNonNegativeInteger(normalizedInput.total ?? normalizedInput.totalCount);
+  const failed = normalizeNonNegativeInteger(normalizedInput.failed ?? normalizedInput.failedCount);
+  const latency = normalizeNonNegativeInteger(normalizedInput.latency ?? normalizedInput.durationMs ?? normalizedInput.propagationDuration);
 
   return {
     latency,
     errorRate: total > 0 ? failed / total : 0,
-    coverage: normalizeCoverage(input.coverage),
-    edgeCaseCount: normalizeNonNegativeInteger(input.edgeCaseCount)
+    coverage: normalizeCoverage(normalizedInput.coverage),
+    edgeCaseCount: normalizeNonNegativeInteger(normalizedInput.edgeCaseCount)
   };
 }
 
@@ -28,5 +29,8 @@ function normalizeCoverage(value) {
 }
 
 function normalizeNonNegativeInteger(value) {
-  return Number.isInteger(value) && value >= 0 ? value : 0;
+  if (typeof value === 'number' && Number.isInteger(value) && value >= 0) {
+    return value;
+  }
+  return 0;
 }

@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import type { UpgradeProposal } from '@ai-atomic-framework/plugin-sdk';
 
 export type HumanReviewDecision = 'approve' | 'reject';
 export type HumanReviewQueueStatus = 'pending' | 'blocked' | 'approved' | 'rejected';
+export type HumanReviewDecompositionDecision = 'atom-bump' | 'atom-extract' | 'map-bump' | 'polymorphize' | 'extract-shared' | 'infect' | 'atomize';
 
 export interface HumanReviewQueueMigration {
   readonly strategy: 'none' | 'additive' | 'breaking';
@@ -26,16 +26,28 @@ export interface HumanReviewQueueAutomatedGatesSummary {
   readonly blockedGateNames: readonly string[];
 }
 
+export interface HumanReviewUpgradeProposalSnapshot {
+  readonly proposalId: string;
+  readonly atomId: string;
+  readonly fromVersion: string;
+  readonly toVersion: string;
+  readonly decompositionDecision: HumanReviewDecompositionDecision;
+  readonly automatedGates: HumanReviewQueueAutomatedGatesSummary;
+  readonly status: HumanReviewQueueStatus;
+  readonly proposedAt: string;
+  readonly [key: string]: unknown;
+}
+
 export interface HumanReviewQueueRecord {
   readonly proposalId: string;
   readonly atomId: string;
   readonly fromVersion: string;
   readonly toVersion: string;
-  readonly decompositionDecision: 'atom-bump' | 'atom-extract' | 'map-bump' | 'polymorphize' | 'extract-shared' | 'infect' | 'atomize';
+  readonly decompositionDecision: HumanReviewDecompositionDecision;
   readonly automatedGates: HumanReviewQueueAutomatedGatesSummary;
   readonly status: HumanReviewQueueStatus;
   readonly proposalSnapshotHash: string;
-  readonly proposal: UpgradeProposal;
+  readonly proposal: HumanReviewUpgradeProposalSnapshot;
   readonly queuedAt?: string;
   readonly review?: HumanReviewQueueReviewRecord;
 }
@@ -75,12 +87,15 @@ export const humanReviewQueuePackage = {
   packageVersion: '0.0.0'
 } as const;
 
-export function computeDecisionSnapshotHash(proposal: UpgradeProposal) {
+export function computeDecisionSnapshotHash(proposal: HumanReviewUpgradeProposalSnapshot | Readonly<Record<string, unknown>>) {
   return `sha256:${createHash('sha256').update(stableStringify(proposal), 'utf8').digest('hex')}`;
 }
 
-export function createHumanReviewQueueRecord(proposal: UpgradeProposal, options: HumanReviewQueueRecordOptions = {}): HumanReviewQueueRecord {
-  const proposalSnapshot = cloneJson(proposal) as UpgradeProposal;
+export function createHumanReviewQueueRecord(
+  proposal: HumanReviewUpgradeProposalSnapshot | Readonly<Record<string, unknown>>,
+  options: HumanReviewQueueRecordOptions = {}
+): HumanReviewQueueRecord {
+  const proposalSnapshot = cloneJson(proposal) as HumanReviewUpgradeProposalSnapshot;
   const proposalSnapshotHash = computeDecisionSnapshotHash(proposalSnapshot);
   const record: HumanReviewQueueRecord = {
     proposalId: proposalSnapshot.proposalId,
@@ -98,11 +113,12 @@ export function createHumanReviewQueueRecord(proposal: UpgradeProposal, options:
     queuedAt: options.queuedAt ?? proposalSnapshot.proposedAt
   };
 
-  if (options.review) {
-    record.review = cloneJson(options.review) as HumanReviewQueueReviewRecord;
-  }
-
-  return record;
+  return options.review
+    ? {
+      ...record,
+      review: cloneJson(options.review) as HumanReviewQueueReviewRecord
+    }
+    : record;
 }
 
 export function createHumanReviewQueueDocument(entries: readonly HumanReviewQueueRecord[], options: HumanReviewQueueDocumentOptions = {}): HumanReviewQueueDocument {
@@ -130,7 +146,7 @@ export function writeHumanReviewQueueDocument(filePath: string, document: HumanR
 }
 
 export function normalizeHumanReviewQueueDocument(document: HumanReviewQueueDocument | readonly HumanReviewQueueRecord[]): HumanReviewQueueDocument {
-  if (Array.isArray(document)) {
+  if (!isHumanReviewQueueDocument(document)) {
     return createHumanReviewQueueDocument(document);
   }
   return createHumanReviewQueueDocument(document.entries, {
@@ -259,6 +275,12 @@ function summarizeAutomatedGates(entry: HumanReviewQueueRecord) {
 
 function cloneJson<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
+}
+
+function isHumanReviewQueueDocument(
+  value: HumanReviewQueueDocument | readonly HumanReviewQueueRecord[]
+): value is HumanReviewQueueDocument {
+  return !Array.isArray(value);
 }
 
 function stableStringify(value: unknown): string {

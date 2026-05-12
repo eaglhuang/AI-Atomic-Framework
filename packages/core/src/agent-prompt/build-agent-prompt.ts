@@ -4,8 +4,9 @@ export const defaultAgentPromptWorkbenchRoot = 'atomic_workbench/atoms';
 export const defaultAgentPromptSpecFileName = 'atom.spec.json';
 export const defaultAgentPromptTestFileName = 'atom.test.ts';
 
-export function buildAgentPrompt(normalizedModel, options = {}) {
-  const document = createAgentPromptDocument(normalizedModel, options);
+export function buildAgentPrompt(normalizedModel, options) {
+  const normalizedOptions = options || {};
+  const document = createAgentPromptDocument(normalizedModel, normalizedOptions);
 
   return {
     ok: true,
@@ -16,7 +17,8 @@ export function buildAgentPrompt(normalizedModel, options = {}) {
   };
 }
 
-export function createAgentPromptDocument(normalizedModel, options = {}) {
+export function createAgentPromptDocument(normalizedModel, options) {
+  const normalizedOptions = options || {};
   const atomId = normalizedModel?.identity?.atomId;
   const logicalName = normalizedModel?.identity?.logicalName;
   if (!atomId) {
@@ -24,10 +26,10 @@ export function createAgentPromptDocument(normalizedModel, options = {}) {
   }
 
   const lifecycleMode = normalizedModel.execution?.compatibility?.lifecycleMode ?? 'birth';
-  const workbenchPath = trimSlashes(toPortablePath(options.workbenchPath ?? `${options.workbenchRoot ?? defaultAgentPromptWorkbenchRoot}/${atomId}`));
-  const promptFileName = options.promptFileName ?? defaultAgentPromptFileName;
-  const specFileName = options.specFileName ?? defaultAgentPromptSpecFileName;
-  const testFileName = options.testFileName ?? defaultAgentPromptTestFileName;
+  const workbenchPath = trimSlashes(toPortablePath(normalizedOptions.workbenchPath ?? `${normalizedOptions.workbenchRoot ?? defaultAgentPromptWorkbenchRoot}/${atomId}`));
+  const promptFileName = normalizedOptions.promptFileName ?? defaultAgentPromptFileName;
+  const specFileName = normalizedOptions.specFileName ?? defaultAgentPromptSpecFileName;
+  const testFileName = normalizedOptions.testFileName ?? defaultAgentPromptTestFileName;
   const promptPath = `${workbenchPath}/${promptFileName}`;
   const allowedFiles = unique([
     promptPath,
@@ -71,8 +73,10 @@ export function createAgentPromptDocument(normalizedModel, options = {}) {
     }
   };
 
-  document.markdown = serializeAgentPromptMarkdown(document);
-  return document;
+  return {
+    ...document,
+    markdown: serializeAgentPromptMarkdown(document)
+  };
 }
 
 export function serializeAgentPromptMarkdown(document) {

@@ -52,10 +52,9 @@ function normalizeAtomicMapEntrypoints(entrypoints: readonly string[] = []) {
 }
 
 function normalizeAtomicMapQualityTargets(qualityTargets: RegistryMapQualityTargetsRecord = {}) {
-  return Object.fromEntries(
-    Object.entries(qualityTargets)
-      .map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
-      .filter(([key]) => key.length > 0)
-      .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-  );
+  const normalizedEntries = Object.entries(qualityTargets)
+    .map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value] as const)
+    .filter(([key]) => key.length > 0)
+    .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey));
+  return Object.fromEntries(normalizedEntries) as RegistryMapQualityTargetsRecord;
 }

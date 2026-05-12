@@ -17,6 +17,16 @@ export interface HumanReviewDecisionLogInput {
   readonly evidenceId?: string;
 }
 
+export interface HumanReviewDecisionEvidence extends EvidenceRecord {
+  readonly schemaId: 'atm.evidence.humanReviewDecision';
+  readonly specVersion: '0.1.0';
+  readonly migration: {
+    readonly strategy: 'none' | 'additive' | 'breaking';
+    readonly fromVersion: string | null;
+    readonly notes: string;
+  };
+}
+
 export interface HumanReviewDecisionLog {
   readonly schemaId: 'atm.humanReviewDecision';
   readonly specVersion: '0.1.0';
@@ -36,7 +46,7 @@ export interface HumanReviewDecisionLog {
   readonly queuePath: string;
   readonly projectionPath: string;
   readonly queueRecord: HumanReviewQueueRecord;
-  readonly evidence: EvidenceRecord;
+  readonly evidence: HumanReviewDecisionEvidence;
 }
 
 export interface HumanReviewDecisionValidationResult {
@@ -77,7 +87,7 @@ export function createHumanReviewDecisionLog(input: HumanReviewDecisionLogInput)
     }
   };
 
-  const evidence: EvidenceRecord = {
+  const evidence: HumanReviewDecisionEvidence = {
     schemaId: 'atm.evidence.humanReviewDecision',
     specVersion: '0.1.0',
     migration: {

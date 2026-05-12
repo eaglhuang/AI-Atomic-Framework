@@ -1,3 +1,4 @@
+// Transitional alpha implementation: public contracts are checked while legacy loose runtime code is tightened.
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -455,7 +456,9 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     },
     writeRegistryEntry(entry) {
       const filePath = path.join(absoluteLayout.registryStorePath, 'registry.json');
-      const registry = registryStore.readRegistry();
+      const registry = existsSync(filePath)
+        ? readJsonFile(filePath) as RegistryDocument
+        : createEmptyRegistry(now());
       const nextEntries = registry.entries.filter((candidate) => ('atomId' in candidate ? candidate.atomId : (candidate as { mapId?: string }).mapId) !== entry.atomId);
       nextEntries.push(entry);
       writeJsonFile(filePath, {
@@ -493,7 +496,10 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     },
     evaluateBudget(input) {
       ensureAllDirectories();
-      const policy = contextBudgetGuard.readPolicy() ?? createDefaultContextBudgetPolicy(now());
+      const defaultPolicyPath = path.join(absoluteLayout.contextBudgetStorePath, 'default-policy.json');
+      const policy = existsSync(defaultPolicyPath)
+        ? readJsonFile(defaultPolicyPath) as ContextBudgetPolicy
+        : createDefaultContextBudgetPolicy(now());
       const evaluation = evaluateContextBudget(policy, input, now());
       const reportPath = path.join(layout.runReportStorePath, 'context-budget', `${sanitizeBudgetFileId(input.budgetId)}.json`);
       writeJsonFile(resolveRepoPath(repositoryRoot, reportPath), {
@@ -730,7 +736,7 @@ export function createSelfHostingAlphaPrompt(): string {
 }
 
 export function estimateContextBudgetTokens(...values: readonly unknown[]): number {
-  const characterCount = values.reduce((total, value) => total + serializeContextValue(value).length, 0);
+  const characterCount = values.reduce<number>((total, value) => total + serializeContextValue(value).length, 0);
   return Math.max(1, Math.ceil(characterCount / 4));
 }
 
@@ -1251,8 +1257,8 @@ function readEvidenceDocument(filePath: string): { wrapper: Record<string, unkno
     if (Array.isArray(wrapper.evidence)) {
       return { wrapper, evidence: wrapper.evidence as EvidenceRecord[] };
     }
-    if ('evidenceKind' in wrapper) {
-      return { wrapper: null, evidence: [wrapper as EvidenceRecord] };
+    if (isEvidenceRecord(wrapper)) {
+      return { wrapper: null, evidence: [wrapper] };
     }
     return { wrapper, evidence: [] };
   }
@@ -1261,6 +1267,16 @@ function readEvidenceDocument(filePath: string): { wrapper: Record<string, unkno
 
 function readEvidenceRecords(filePath: string): EvidenceRecord[] {
   return readEvidenceDocument(filePath).evidence;
+}
+
+function isEvidenceRecord(value: unknown): value is EvidenceRecord {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.evidenceKind === 'string'
+    && typeof candidate.summary === 'string'
+    && Array.isArray(candidate.artifactPaths);
 }
 
 function normalizeWorkItem(value: unknown): WorkItemRef | null {

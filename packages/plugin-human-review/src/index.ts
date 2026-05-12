@@ -20,7 +20,7 @@ export {
 } from './decision-log.ts';
 export type {
   HumanReviewDecision,
-  HumanReviewDecisionLog,
+  HumanReviewDecompositionDecision,
   HumanReviewQueueAutomatedGatesSummary,
   HumanReviewQueueDocument,
   HumanReviewQueueDocumentOptions,
@@ -29,6 +29,7 @@ export type {
   HumanReviewQueueRecordOptions,
   HumanReviewQueueReviewRecord,
   HumanReviewQueueStatus,
+  HumanReviewUpgradeProposalSnapshot,
   HumanReviewQueueValidationIssue,
   HumanReviewQueueValidationResult
 } from './queue.ts';

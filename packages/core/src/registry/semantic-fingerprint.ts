@@ -105,12 +105,11 @@ function normalizeMapEntrypoints(entrypoints: readonly string[] = []) {
 }
 
 function normalizeMapQualityTargets(qualityTargets: Readonly<Record<string, string | number | boolean>> = {}) {
-  return Object.fromEntries(
-    Object.entries(qualityTargets)
-      .map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
-      .filter(([key]) => key.length > 0)
-      .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-  );
+  const normalizedEntries = Object.entries(qualityTargets)
+    .map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value] as const)
+    .filter(([key]) => key.length > 0)
+    .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey));
+  return Object.fromEntries(normalizedEntries);
 }
 
 function normalizeRequiredText(value: string) {

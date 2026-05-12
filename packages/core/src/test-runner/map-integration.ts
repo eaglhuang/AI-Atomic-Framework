@@ -19,8 +19,9 @@ export function resolveCanonicalMapPaths(mapId) {
   };
 }
 
-export function resolveMapIntegrationTarget(mapId, options = {}) {
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
+export function resolveMapIntegrationTarget(mapId, options) {
+  const normalizedOptions = options || {};
+  const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const canonical = resolveCanonicalMapPaths(mapId);
   const canonicalSpecPath = path.join(repositoryRoot, canonical.specPath);
   const canonicalTestPath = path.join(repositoryRoot, canonical.testPath);
@@ -57,9 +58,10 @@ export function resolveMapIntegrationTarget(mapId, options = {}) {
   });
 }
 
-export function runMapIntegrationTest(mapId, options = {}) {
-  const target = resolveMapIntegrationTarget(mapId, options);
-  const generatedAt = options.now ?? new Date().toISOString();
+export function runMapIntegrationTest(mapId, options) {
+  const normalizedOptions = options || {};
+  const target = resolveMapIntegrationTarget(mapId, normalizedOptions);
+  const generatedAt = normalizedOptions.now ?? new Date().toISOString();
   const startedAt = Date.now();
   const result = spawnSync(process.execPath, [path.join(target.repositoryRoot, target.testPath)], {
     cwd: target.repositoryRoot,
@@ -91,7 +93,7 @@ export function runMapIntegrationTest(mapId, options = {}) {
     propagationDuration: durationMs
   });
 
-  if (options.writeReport !== false) {
+  if (normalizedOptions.writeReport !== false) {
     const reportAbsolutePath = path.join(target.repositoryRoot, target.reportPath);
     mkdirSync(path.dirname(reportAbsolutePath), { recursive: true });
     writeFileSync(reportAbsolutePath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
@@ -159,8 +161,9 @@ export function createMapIntegrationReport(input) {
   };
 }
 
-function resolveLegacyMapTarget(mapId, options = {}) {
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
+function resolveLegacyMapTarget(mapId, options) {
+  const normalizedOptions = options || {};
+  const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const atomsRoot = path.join(repositoryRoot, 'atomic_workbench', 'atoms');
   if (!existsSync(atomsRoot)) {
     return null;
@@ -196,8 +199,8 @@ function resolveLegacyMapTarget(mapId, options = {}) {
 function createMapRunnerError(code, message, details = {}) {
   const error = new Error(message);
   error.name = 'MapIntegrationRunnerError';
-  error.code = code;
-  error.details = details;
+  error['code'] = code;
+  error['details'] = details;
   return error;
 }
 

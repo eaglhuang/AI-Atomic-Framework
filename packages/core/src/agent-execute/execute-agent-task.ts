@@ -19,33 +19,35 @@ export const defaultExecutionEvidenceMigration = Object.freeze({
   notes: 'Initial ExecuteAgentTask effect node evidence contract.'
 });
 
-export function createExecuteAgentTaskEffectContract(options = {}) {
+export function createExecuteAgentTaskEffectContract(options) {
+  const normalizedOptions = options || {};
   return {
     nodeKind: executeAgentTaskNodeKind,
     nodeName: executeAgentTaskNodeName,
     defaultMode: 'dry-run',
     applyFlag: executeAgentTaskApplyFlag,
-    proposalDelegatedTo: String(options.proposalDelegatedTo || defaultProposalDelegatedTo)
+    proposalDelegatedTo: String(normalizedOptions.proposalDelegatedTo || defaultProposalDelegatedTo)
   };
 }
 
-export function executeAgentTask(normalizedModel, options = {}) {
+export function executeAgentTask(normalizedModel, options) {
+  const normalizedOptions = options || {};
   const atomId = normalizedModel?.identity?.atomId;
   if (!atomId) {
     throw new Error('Normalized model identity.atomId is required.');
   }
 
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
+  const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const lifecycleMode = normalizeLifecycleMode(normalizedModel?.execution?.compatibility?.lifecycleMode);
-  const executionMode = options.applyChanges === true ? 'apply' : 'dry-run';
-  const generatedAt = String(options.now || new Date().toISOString());
-  const effectNode = createExecuteAgentTaskEffectContract(options);
-  const promptDocument = normalizePromptDocument(normalizedModel, options.promptDocument || options.prompt);
-  const workbenchPath = resolveWorkbenchPath(normalizedModel, repositoryRoot, options);
-  const artifactTargets = resolveArtifactTargets(repositoryRoot, workbenchPath, options);
+  const executionMode = normalizedOptions.applyChanges === true ? 'apply' : 'dry-run';
+  const generatedAt = String(normalizedOptions.now || new Date().toISOString());
+  const effectNode = createExecuteAgentTaskEffectContract(normalizedOptions);
+  const promptDocument = normalizePromptDocument(normalizedModel, normalizedOptions.promptDocument || normalizedOptions.prompt);
+  const workbenchPath = resolveWorkbenchPath(normalizedModel, repositoryRoot, normalizedOptions);
+  const artifactTargets = resolveArtifactTargets(repositoryRoot, workbenchPath, normalizedOptions);
   const validationCommands = uniqueStrings(promptDocument.validationCommands);
-  const agentExecutor = typeof options.agentExecutor === 'function'
-    ? options.agentExecutor
+  const agentExecutor = typeof normalizedOptions.agentExecutor === 'function'
+    ? normalizedOptions.agentExecutor
     : defaultAgentExecutor;
   const rawAgentOutcome = agentExecutor({
     repositoryRoot,
@@ -74,8 +76,8 @@ export function executeAgentTask(normalizedModel, options = {}) {
   };
 
   if (executionMode === 'apply') {
-    const applyExecution = typeof options.applyExecution === 'function'
-      ? options.applyExecution
+    const applyExecution = typeof normalizedOptions.applyExecution === 'function'
+      ? normalizedOptions.applyExecution
       : defaultApplyExecution;
     const rawApplyOutcome = applyExecution({
       repositoryRoot,
@@ -90,8 +92,8 @@ export function executeAgentTask(normalizedModel, options = {}) {
   }
 
   const validationPlan = createValidationPassPlan(lifecycleMode, artifactTargets.reportsDirPath);
-  const validationExecutor = typeof options.runValidationPass === 'function'
-    ? options.runValidationPass
+  const validationExecutor = typeof normalizedOptions.runValidationPass === 'function'
+    ? normalizedOptions.runValidationPass
     : defaultRunValidationPass;
   const validationPasses = validationPlan.map((pass) => {
     const rawPassOutcome = validationExecutor({
@@ -475,7 +477,10 @@ function normalizeLifecycleMode(value) {
 }
 
 function normalizeExitCode(value, fallback) {
-  return Number.isInteger(value) && value >= 0 ? value : fallback;
+  if (typeof value === 'number' && Number.isInteger(value) && value >= 0) {
+    return value;
+  }
+  return fallback;
 }
 
 function normalizeText(value) {

@@ -25,7 +25,7 @@ export function createAtomicMapRegistryEntry(
     governanceTier: options.governanceTier ?? null
   });
 
-  const entry: MapRegistryEntryRecord = {
+  const baseEntry: MapRegistryEntryRecord = {
     schemaId: 'atm.atomicMap',
     specVersion: atomicMap.specVersion,
     schemaPath: options.schemaPath ?? 'schemas/registry/atomic-map.schema.json',
@@ -50,43 +50,29 @@ export function createAtomicMapRegistryEntry(
   };
 
   const semanticFingerprint = normalizeSemanticFingerprint(options.semanticFingerprint ?? atomicMap.semanticFingerprint ?? null);
-  if (semanticFingerprint) {
-    entry.semanticFingerprint = semanticFingerprint;
-  } else if (options.pendingSfCalculation === true || atomicMap.pendingSfCalculation === true) {
-    entry.semanticFingerprint = null;
-    entry.pendingSfCalculation = true;
-  }
-
+  const pendingSfCalculation = options.pendingSfCalculation === true || atomicMap.pendingSfCalculation === true;
   const lineageLogRef = options.lineageLogRef ?? atomicMap.lineageLogRef;
-  if (lineageLogRef) {
-    entry.lineageLogRef = lineageLogRef;
-  }
-
   const ttl = options.ttl ?? atomicMap.ttl;
-  if (typeof ttl === 'number') {
-    entry.ttl = ttl;
-  }
-
-  if (options.pendingSfCalculation === true || atomicMap.pendingSfCalculation === true) {
-    entry.pendingSfCalculation = true;
-  }
-
-  if (options.location) {
-    entry.location = {
+  const location = options.location
+    ? {
       specPath: String(options.location.specPath).trim(),
       codePaths: normalizeStringArray(options.location.codePaths),
       testPaths: normalizeStringArray(options.location.testPaths),
       reportPath: options.location.reportPath == null ? null : String(options.location.reportPath).trim(),
       workbenchPath: options.location.workbenchPath == null ? null : String(options.location.workbenchPath).trim()
-    };
-  }
-
+    }
+    : undefined;
   const evidence = normalizeStringArray(options.evidence ?? []);
-  if (evidence.length > 0) {
-    entry.evidence = evidence;
-  }
 
-  return entry;
+  return {
+    ...baseEntry,
+    ...(semanticFingerprint ? { semanticFingerprint } : (pendingSfCalculation ? { semanticFingerprint: null } : {})),
+    ...(pendingSfCalculation ? { pendingSfCalculation: true } : {}),
+    ...(lineageLogRef ? { lineageLogRef } : {}),
+    ...(typeof ttl === 'number' ? { ttl } : {}),
+    ...(location ? { location } : {}),
+    ...(evidence.length > 0 ? { evidence } : {})
+  };
 }
 
 export function isAtomicMapRegistryEntry(value: unknown): value is MapRegistryEntryRecord {

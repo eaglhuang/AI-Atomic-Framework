@@ -74,36 +74,38 @@ export function createRegistryVersionRecord(
 ): RegistryVersionRecord {
   const selfVerification = entry.selfVerification;
   const semanticFingerprint = normalizeSemanticFingerprint(entry.semanticFingerprint ?? null);
-  const record: RegistryVersionRecord = {
+  const baseRecord: RegistryVersionRecord = {
     version,
     specHash: selfVerification?.specHash ?? entry.hashLock.digest,
     codeHash: selfVerification?.codeHash ?? entry.hashLock.digest,
     testHash: selfVerification?.testHash ?? entry.hashLock.digest,
     timestamp
   };
-  if (semanticFingerprint) {
-    record.semanticFingerprint = semanticFingerprint;
-  } else if (entry.semanticFingerprint === null) {
-    record.semanticFingerprint = null;
-  }
-  return record;
+
+  return {
+    ...baseRecord,
+    ...(semanticFingerprint
+      ? { semanticFingerprint }
+      : (entry.semanticFingerprint === null ? { semanticFingerprint: null } : {}))
+  };
 }
 
 function normalizeRegistryVersionRecord(versionRecord: RegistryVersionRecord): RegistryVersionRecord {
   const semanticFingerprint = normalizeSemanticFingerprint(versionRecord.semanticFingerprint ?? null);
-  const record: RegistryVersionRecord = {
+  const baseRecord: RegistryVersionRecord = {
     version: String(versionRecord.version).trim(),
     specHash: String(versionRecord.specHash).trim(),
     codeHash: String(versionRecord.codeHash).trim(),
     testHash: String(versionRecord.testHash).trim(),
     timestamp: String(versionRecord.timestamp).trim()
   };
-  if (semanticFingerprint) {
-    record.semanticFingerprint = semanticFingerprint;
-  } else if (versionRecord.semanticFingerprint === null) {
-    record.semanticFingerprint = null;
-  }
-  return record;
+
+  return {
+    ...baseRecord,
+    ...(semanticFingerprint
+      ? { semanticFingerprint }
+      : (versionRecord.semanticFingerprint === null ? { semanticFingerprint: null } : {}))
+  };
 }
 
 function resolveRegistryVersion(

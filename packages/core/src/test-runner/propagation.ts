@@ -12,10 +12,11 @@ export function shouldPropagateBehavior(behavior) {
   return propagationTriggerBehaviors.includes(behavior.trim().toLowerCase());
 }
 
-export function discoverMapsForAtom(atomId, options = {}) {
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
-  const discovered = new Set();
-  for (const mapId of discoverMapsFromRegistry(atomId, { repositoryRoot, registryDocument: options.registryDocument, registryPath: options.registryPath })) {
+export function discoverMapsForAtom(atomId, options) {
+  const normalizedOptions = options || {};
+  const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
+  const discovered = new Set<string>();
+  for (const mapId of discoverMapsFromRegistry(atomId, { repositoryRoot, registryDocument: normalizedOptions.registryDocument, registryPath: normalizedOptions.registryPath })) {
     discovered.add(mapId);
   }
   for (const mapId of discoverMapsFromFilesystem(atomId, { repositoryRoot })) {
@@ -24,11 +25,12 @@ export function discoverMapsForAtom(atomId, options = {}) {
   return [...discovered].sort((left, right) => left.localeCompare(right));
 }
 
-export function runPropagationIntegration(atomId, options = {}) {
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
-  const requestedBehavior = options.behavior ?? null;
+export function runPropagationIntegration(atomId, options) {
+  const normalizedOptions = options || {};
+  const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
+  const requestedBehavior = normalizedOptions.behavior ?? null;
   const behaviorTriggersPropagation = requestedBehavior == null ? true : shouldPropagateBehavior(requestedBehavior);
-  const maps = discoverMapsForAtom(atomId, { repositoryRoot, registryDocument: options.registryDocument, registryPath: options.registryPath });
+  const maps = discoverMapsForAtom(atomId, { repositoryRoot, registryDocument: normalizedOptions.registryDocument, registryPath: normalizedOptions.registryPath });
   if (!behaviorTriggersPropagation) {
     return {
       ok: true,
@@ -51,8 +53,8 @@ export function runPropagationIntegration(atomId, options = {}) {
   const startedAt = Date.now();
   const results = maps.map((mapId) => runMapIntegrationTest(mapId, {
     repositoryRoot,
-    now: options.now,
-    writeReport: options.writeReport
+      now: normalizedOptions.now,
+      writeReport: normalizedOptions.writeReport
   }));
   const propagationDuration = Date.now() - startedAt;
   const perMapStatus = results.map((result) => result.mapStatus);
@@ -80,8 +82,9 @@ export function runPropagationIntegration(atomId, options = {}) {
   };
 }
 
-function discoverMapsFromRegistry(atomId, options = {}) {
-  const registryDocument = options.registryDocument ?? readRegistryDocument(path.resolve(options.repositoryRoot ?? process.cwd(), options.registryPath ?? 'atomic-registry.json'));
+function discoverMapsFromRegistry(atomId, options) {
+  const normalizedOptions = options || {};
+  const registryDocument = normalizedOptions.registryDocument ?? readRegistryDocument(path.resolve(normalizedOptions.repositoryRoot ?? process.cwd(), normalizedOptions.registryPath ?? 'atomic-registry.json'));
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
   return entries
     .filter((entry) => entry?.schemaId === 'atm.atomicMap')
@@ -90,8 +93,9 @@ function discoverMapsFromRegistry(atomId, options = {}) {
     .filter(Boolean);
 }
 
-function discoverMapsFromFilesystem(atomId, options = {}) {
-  const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
+function discoverMapsFromFilesystem(atomId, options) {
+  const normalizedOptions = options || {};
+  const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const discovered = [];
   const canonicalMapsRoot = path.join(repositoryRoot, 'atomic_workbench', 'maps');
   if (existsSync(canonicalMapsRoot)) {
