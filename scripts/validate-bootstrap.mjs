@@ -1,8 +1,8 @@
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createTempWorkspace } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -61,7 +61,7 @@ function readJson(absolutePath) {
 }
 
 function runAtm(args, cwd) {
-  const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
     encoding: 'utf8'
   });
@@ -92,7 +92,7 @@ for (const relativePath of protectedSurfaceFiles) {
   }
 }
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-bootstrap-'));
+const tempRoot = createTempWorkspace('atm-bootstrap-');
 try {
   const hostRepo = path.join(tempRoot, 'static-site-host');
   mkdirSync(path.join(hostRepo, '.git'), { recursive: true });
@@ -111,41 +111,42 @@ try {
   for (const relativePath of [
     'AGENTS.md',
     '.atm/config.json',
-    '.atm/profile/default.md',
-    '.atm/context/INITIAL_SUMMARY.md',
-    '.atm/state/project-probe.json',
-    '.atm/state/default-guards.json',
-    '.atm/state/context-budget/default-policy.json',
-    '.atm/state/context-summary/BOOTSTRAP-0001.json',
-    '.atm/state/context-summary/BOOTSTRAP-0001.md',
-    '.atm/tasks/BOOTSTRAP-0001.json',
-    '.atm/locks/BOOTSTRAP-0001.lock.json',
-    '.atm/evidence/BOOTSTRAP-0001.json',
-    '.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json',
-    '.atm/reports/continuation/BOOTSTRAP-0001.json',
-    '.atm/artifacts',
-    '.atm/logs',
-    '.atm/reports'
+    '.atm/runtime/profile/default.md',
+    '.atm/runtime/current-task.json',
+    '.atm/runtime/project-probe.json',
+    '.atm/runtime/default-guards.json',
+    '.atm/runtime/budget/default-policy.json',
+    '.atm/history/handoff/INITIAL_SUMMARY.md',
+    '.atm/history/handoff/BOOTSTRAP-0001.json',
+    '.atm/history/handoff/BOOTSTRAP-0001.md',
+    '.atm/history/tasks/BOOTSTRAP-0001.json',
+    '.atm/runtime/locks/BOOTSTRAP-0001.lock.json',
+    '.atm/history/evidence/BOOTSTRAP-0001.json',
+    '.atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json',
+    '.atm/history/reports/continuation/BOOTSTRAP-0001.json',
+    '.atm/history/artifacts',
+    '.atm/history/logs',
+    '.atm/history/reports'
   ]) {
     assert(existsSync(path.join(hostRepo, relativePath)), `bootstrap must create ${relativePath}`);
   }
 
-  assert(bootstrap.parsed.evidence.contextBudgetReportPath === '.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json', 'bootstrap must surface context budget report path');
-  assert(bootstrap.parsed.evidence.contextSummaryPath === '.atm/state/context-summary/BOOTSTRAP-0001.json', 'bootstrap must surface context summary json path');
-  assert(bootstrap.parsed.evidence.contextSummaryMarkdownPath === '.atm/state/context-summary/BOOTSTRAP-0001.md', 'bootstrap must surface context summary markdown path');
-  assert(bootstrap.parsed.evidence.continuationReportPath === '.atm/reports/continuation/BOOTSTRAP-0001.json', 'bootstrap must surface continuation report path');
+  assert(bootstrap.parsed.evidence.contextBudgetReportPath === '.atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json', 'bootstrap must surface context budget report path');
+  assert(bootstrap.parsed.evidence.contextSummaryPath === '.atm/history/handoff/BOOTSTRAP-0001.json', 'bootstrap must surface context summary json path');
+  assert(bootstrap.parsed.evidence.contextSummaryMarkdownPath === '.atm/history/handoff/BOOTSTRAP-0001.md', 'bootstrap must surface context summary markdown path');
+  assert(bootstrap.parsed.evidence.continuationReportPath === '.atm/history/reports/continuation/BOOTSTRAP-0001.json', 'bootstrap must surface continuation report path');
 
-  const probe = readJson(path.join(hostRepo, '.atm', 'state', 'project-probe.json'));
+  const probe = readJson(path.join(hostRepo, '.atm', 'runtime', 'project-probe.json'));
   assert(probe.repositoryKind === 'static-site', 'project probe must detect static-site repository kind');
   assert(probe.packageManager === 'none', 'project probe must keep packageManager=none for static site');
   assert(probe.hostWorkflow === 'file-publish', 'project probe must report file-publish host workflow');
 
-  const guards = readJson(path.join(hostRepo, '.atm', 'state', 'default-guards.json'));
+  const guards = readJson(path.join(hostRepo, '.atm', 'runtime', 'default-guards.json'));
   assert(Array.isArray(guards.guards) && guards.guards.length === 4, 'default guards must contain 4 starter guards');
   assert(guards.guards.some((guard) => guard.id === 'protect-context-budget'), 'default guards must include protect-context-budget');
 
   const agents = readFileSync(path.join(hostRepo, 'AGENTS.md'), 'utf8');
-  assert(agents.includes('.atm/tasks/BOOTSTRAP-0001.json'), 'AGENTS.md must point to bootstrap task');
+  assert(agents.includes('.atm/history/tasks/BOOTSTRAP-0001.json'), 'AGENTS.md must point to bootstrap task');
   assert(agents.includes('Read README.md if present'), 'AGENTS.md must contain the one-line kickoff prompt');
 
   const status = runAtm(['status', '--cwd', hostRepo], hostRepo);

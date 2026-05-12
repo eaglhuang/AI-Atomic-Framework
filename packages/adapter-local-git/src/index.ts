@@ -80,7 +80,7 @@ export interface LocalGitAdapterReport {
 
 export const defaultLocalGitAdapterConfig: LocalGitAdapterConfig = {
   registryPath: '.atm/registry',
-  reportsPath: '.atm/reports',
+  reportsPath: '.atm/history/reports',
   dryRun: false,
   lockMode: 'noop',
   gateMode: 'noop',

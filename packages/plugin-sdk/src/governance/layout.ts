@@ -19,19 +19,19 @@ export interface GovernanceLayout {
 
 export const defaultGovernanceLayout: GovernanceLayout = {
   root: '.atm',
-  taskStorePath: '.atm/tasks',
-  lockStorePath: '.atm/locks',
-  documentIndexPath: '.atm/index',
-  shardStorePath: '.atm/shards',
-  stateStorePath: '.atm/state',
-  artifactStorePath: '.atm/artifacts',
-  logStorePath: '.atm/logs',
-  runReportStorePath: '.atm/reports',
-  ruleGuardPath: '.atm/rules',
-  evidenceStorePath: '.atm/evidence',
-  registryStorePath: '.atm/registry',
-  contextBudgetStorePath: '.atm/state/context-budget',
-  contextSummaryStorePath: '.atm/state/context-summary'
+  taskStorePath: '.atm/history/tasks',
+  lockStorePath: '.atm/runtime/locks',
+  documentIndexPath: '.atm/catalog/index',
+  shardStorePath: '.atm/catalog/shards',
+  stateStorePath: '.atm/runtime/state',
+  artifactStorePath: '.atm/history/artifacts',
+  logStorePath: '.atm/history/logs',
+  runReportStorePath: '.atm/history/reports',
+  ruleGuardPath: '.atm/runtime/rules',
+  evidenceStorePath: '.atm/history/evidence',
+  registryStorePath: '.atm/catalog/registry',
+  contextBudgetStorePath: '.atm/runtime/budget',
+  contextSummaryStorePath: '.atm/history/handoff'
 };
 
 export interface GovernanceAdapter {

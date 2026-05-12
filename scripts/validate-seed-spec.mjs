@@ -33,7 +33,7 @@ function assert(condition, message) {
 }
 
 function runAtm(args) {
-  const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
     encoding: 'utf8'
   });

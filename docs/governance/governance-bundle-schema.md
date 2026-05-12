@@ -83,22 +83,22 @@ Required layout paths:
 | Path field | Canonical value | Purpose |
 | --- | --- | --- |
 | `root` | `.atm` | Governance root folder. |
-| `taskStorePath` | `.atm/tasks` | Task cards and task manifests. |
-| `lockStorePath` | `.atm/locks` | Scope lock records. |
-| `documentIndexPath` | `.atm/index` | Document index projections. |
-| `shardStorePath` | `.atm/shards` | Large document shard projections. |
-| `stateStorePath` | `.atm/state` | Markdown and JSON state files. |
-| `artifactStorePath` | `.atm/artifacts` | Generated outputs and artifacts. |
-| `logStorePath` | `.atm/logs` | System and run logs. |
-| `runReportStorePath` | `.atm/reports` | Validation and run reports. |
-| `ruleGuardPath` | `.atm/rules` | Rule guard outputs. |
-| `evidenceStorePath` | `.atm/evidence` | Evidence records. |
+| `taskStorePath` | `.atm/history/tasks` | Task cards and task manifests. |
+| `lockStorePath` | `.atm/runtime/locks` | Scope lock records. |
+| `documentIndexPath` | `.atm/catalog/index` | Document index projections. |
+| `shardStorePath` | `.atm/catalog/shards` | Large document shard projections. |
+| `stateStorePath` | `.atm/runtime/state` | Markdown and JSON state files. |
+| `artifactStorePath` | `.atm/history/artifacts` | Generated outputs and artifacts. |
+| `logStorePath` | `.atm/history/logs` | System and run logs. |
+| `runReportStorePath` | `.atm/history/reports` | Validation and run reports. |
+| `ruleGuardPath` | `.atm/runtime/rules` | Rule guard outputs. |
+| `evidenceStorePath` | `.atm/history/evidence` | Evidence records. |
 
 Reserved layout hints already allowed by the schema:
 
-- `registryStorePath` -> `.atm/registry`
-- `contextBudgetStorePath` -> `.atm/state/context-budget`
-- `contextSummaryStorePath` -> `.atm/state/context-summary`
+- `registryStorePath` -> `.atm/catalog/registry`
+- `contextBudgetStorePath` -> `.atm/runtime/budget`
+- `contextSummaryStorePath` -> `.atm/history/handoff`
 
 These are useful for later phases but are not part of the required layout set in alpha0.
 

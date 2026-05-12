@@ -69,10 +69,10 @@ const templateRequiredMarkers = [
 
 const renderedRequiredMarkers = [
   '# ATM Bootstrap Instructions',
-  'Read README.md if present',
-  '.atm/profile/default.md',
-  '.atm/tasks/BOOTSTRAP-0001.json',
-  '.atm/evidence/BOOTSTRAP-0001.json'
+  'node atm.mjs next --json',
+  '.atm/runtime/profile/default.md',
+  '.atm/history/tasks/BOOTSTRAP-0001.json',
+  '.atm/history/evidence/BOOTSTRAP-0001.json'
 ];
 
 export function listSupportedAgentIds() {

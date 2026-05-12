@@ -93,23 +93,24 @@ export interface ContinuationContractInput {
 
 const defaultBootstrapTaskId = 'BOOTSTRAP-0001';
 const defaultBootstrapTaskTitle = 'Bootstrap ATM in this repository';
+const currentLayoutVersion = 2;
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../');
 const templateRoot = path.join(repoRoot, 'templates', 'root-drop');
 const defaultLocalGovernanceLayout: GovernanceLayout = {
   root: '.atm',
-  taskStorePath: '.atm/tasks',
-  lockStorePath: '.atm/locks',
-  documentIndexPath: '.atm/index',
-  shardStorePath: '.atm/shards',
-  stateStorePath: '.atm/state',
-  artifactStorePath: '.atm/artifacts',
-  logStorePath: '.atm/logs',
-  runReportStorePath: '.atm/reports',
-  ruleGuardPath: '.atm/rules',
-  evidenceStorePath: '.atm/evidence',
-  registryStorePath: '.atm/registry',
-  contextBudgetStorePath: '.atm/state/context-budget',
-  contextSummaryStorePath: '.atm/state/context-summary'
+  taskStorePath: '.atm/history/tasks',
+  lockStorePath: '.atm/runtime/locks',
+  documentIndexPath: '.atm/catalog/index',
+  shardStorePath: '.atm/catalog/shards',
+  stateStorePath: '.atm/runtime/state',
+  artifactStorePath: '.atm/history/artifacts',
+  logStorePath: '.atm/history/logs',
+  runReportStorePath: '.atm/history/reports',
+  ruleGuardPath: '.atm/runtime/rules',
+  evidenceStorePath: '.atm/history/evidence',
+  registryStorePath: '.atm/catalog/registry',
+  contextBudgetStorePath: '.atm/runtime/budget',
+  contextSummaryStorePath: '.atm/history/handoff'
 };
 const templateFiles = [
   {
@@ -118,11 +119,11 @@ const templateFiles = [
   },
   {
     source: path.join('.atm', 'profile', 'default.md'),
-    target: path.join('.atm', 'profile', 'default.md')
+    target: path.join('.atm', 'runtime', 'profile', 'default.md')
   },
   {
     source: path.join('.atm', 'context', 'INITIAL_SUMMARY.md'),
-    target: path.join('.atm', 'context', 'INITIAL_SUMMARY.md')
+    target: path.join('.atm', 'history', 'handoff', 'INITIAL_SUMMARY.md')
   }
 ] as const;
 
@@ -158,9 +159,9 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     runReportStorePath: resolveRepoPath(repositoryRoot, layout.runReportStorePath),
     ruleGuardPath: resolveRepoPath(repositoryRoot, layout.ruleGuardPath),
     evidenceStorePath: resolveRepoPath(repositoryRoot, layout.evidenceStorePath),
-    registryStorePath: resolveRepoPath(repositoryRoot, layout.registryStorePath ?? '.atm/registry'),
-    contextBudgetStorePath: resolveRepoPath(repositoryRoot, layout.contextBudgetStorePath ?? '.atm/state/context-budget'),
-    contextSummaryStorePath: resolveRepoPath(repositoryRoot, layout.contextSummaryStorePath ?? '.atm/state/context-summary')
+    registryStorePath: resolveRepoPath(repositoryRoot, layout.registryStorePath ?? '.atm/catalog/registry'),
+    contextBudgetStorePath: resolveRepoPath(repositoryRoot, layout.contextBudgetStorePath ?? '.atm/runtime/budget'),
+    contextSummaryStorePath: resolveRepoPath(repositoryRoot, layout.contextSummaryStorePath ?? '.atm/history/handoff')
   };
 
   function ensureAllDirectories() {
@@ -443,7 +444,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
 
   const registryStore: RegistryStore = {
     initialize: () => initializeStore('registry store'),
-    healthCheck: () => capabilityResult(`Registry store is ready at ${layout.registryStorePath ?? '.atm/registry'}.`),
+    healthCheck: () => capabilityResult(`Registry store is ready at ${layout.registryStorePath ?? '.atm/catalog/registry'}.`),
     readRegistry() {
       ensureAllDirectories();
       const filePath = path.join(absoluteLayout.registryStorePath, 'registry.json');
@@ -478,9 +479,9 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       if (!existsSync(filePath)) {
         writeJsonFile(filePath, defaultPolicy);
       }
-      return capabilityResult(`Initialized context budget guard at ${layout.contextBudgetStorePath ?? '.atm/state/context-budget'}.`);
+      return capabilityResult(`Initialized context budget guard at ${layout.contextBudgetStorePath ?? '.atm/runtime/budget'}.`);
     },
-    healthCheck: () => capabilityResult(`Context budget guard is ready at ${layout.contextBudgetStorePath ?? '.atm/state/context-budget'}.`),
+    healthCheck: () => capabilityResult(`Context budget guard is ready at ${layout.contextBudgetStorePath ?? '.atm/runtime/budget'}.`),
     readPolicy(policyId = 'default-policy') {
       const filePath = path.join(absoluteLayout.contextBudgetStorePath, `${policyId}.json`);
       if (!existsSync(filePath)) {
@@ -514,7 +515,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       });
       let summaryPath: string | undefined;
       if (evaluation.decision !== 'pass') {
-        summaryPath = path.join(layout.contextBudgetStorePath ?? '.atm/state/context-budget', `${sanitizeBudgetFileId(input.budgetId)}.md`);
+        summaryPath = path.join(layout.contextBudgetStorePath ?? '.atm/runtime/budget', `${sanitizeBudgetFileId(input.budgetId)}.md`);
         writeFileSync(
           resolveRepoPath(repositoryRoot, summaryPath),
           createContextBudgetSummary(policy, input, evaluation),
@@ -533,14 +534,14 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
 
   const contextSummaryStore: ContextSummaryStore = {
     initialize: () => initializeStore('context summary store'),
-    healthCheck: () => capabilityResult(`Context summary store is ready at ${layout.contextSummaryStorePath ?? '.atm/state/context-summary'}.`),
+    healthCheck: () => capabilityResult(`Context summary store is ready at ${layout.contextSummaryStorePath ?? '.atm/history/handoff'}.`),
     writeSummary(summary) {
       ensureAllDirectories();
       const filePath = path.join(absoluteLayout.contextSummaryStorePath, `${summary.workItemId}.json`);
       const markdownPath = path.join(absoluteLayout.contextSummaryStorePath, `${summary.workItemId}.md`);
       const materializedSummary: ContextSummaryRecord = {
         ...summary,
-        summaryMarkdownPath: summary.summaryMarkdownPath ?? normalizeRelativePath(path.join(layout.contextSummaryStorePath ?? '.atm/state/context-summary', `${summary.workItemId}.md`))
+        summaryMarkdownPath: summary.summaryMarkdownPath ?? normalizeRelativePath(path.join(layout.contextSummaryStorePath ?? '.atm/history/handoff', `${summary.workItemId}.md`))
       };
       writeJsonFile(filePath, materializedSummary);
       writeFileSync(markdownPath, renderContextSummaryMarkdown(materializedSummary), 'utf8');
@@ -583,6 +584,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   const created: string[] = [];
   const unchanged: string[] = [];
   const paths = createBootstrapPaths(cwd, taskId);
+  const migration = migrateLegacyBootstrapLayout(cwd, taskId, paths, force, created, unchanged);
   const stores = createLocalGovernanceStores({ repositoryRoot: cwd });
 
   for (const directoryPath of Object.values(paths.directories)) {
@@ -604,11 +606,11 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   const defaultGuards = createDefaultGuards(projectProbe);
   const defaultContextBudgetPolicy = createDefaultContextBudgetPolicy(projectProbe.generatedAt ?? new Date().toISOString());
   const bootstrapBudgetId = `bootstrap/${taskId}`;
-  const contextBudgetReportPath = path.join('.atm', 'reports', 'context-budget', `${sanitizeBudgetFileId(bootstrapBudgetId)}.json`);
-  const contextBudgetSummaryPath = path.join('.atm', 'state', 'context-budget', `${sanitizeBudgetFileId(bootstrapBudgetId)}.md`);
-  const continuationReportPath = path.join('.atm', 'reports', 'continuation', `${taskId}.json`);
-  const contextSummaryPath = path.join('.atm', 'state', 'context-summary', `${taskId}.json`);
-  const contextSummaryMarkdownPath = path.join('.atm', 'state', 'context-summary', `${taskId}.md`);
+  const contextBudgetReportPath = path.join('.atm', 'history', 'reports', 'context-budget', `bootstrap-${sanitizeBudgetFileId(bootstrapBudgetId)}.json`);
+  const contextBudgetSummaryPath = relativePathFrom(cwd, paths.contextBudgetSummaryPath);
+  const continuationReportPath = path.join('.atm', 'history', 'reports', 'continuation', `${taskId}.json`);
+  const contextSummaryPath = relativePathFrom(cwd, paths.contextSummaryPath);
+  const contextSummaryMarkdownPath = relativePathFrom(cwd, paths.contextSummaryMarkdownPath);
   const bootstrapBudgetInput = {
     budgetId: bootstrapBudgetId,
     workItemId: taskId,
@@ -623,18 +625,18 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     summaryId: `summary.${sanitizeBudgetFileId(taskId).toLowerCase()}`,
     summary: 'Default ATM bootstrap pack created and linked to evidence, context budget, and the next continuation prompt.',
     nextActions: [
-      `Read .atm/tasks/${taskId}.json and .atm/profile/default.md.`,
-      'Continue the bootstrap task without changing the host workflow.',
-      'Record the first smoke artifact, log, and evidence before closing the work item.'
+      `Read .atm/history/tasks/${taskId}.json and .atm/runtime/profile/default.md.`,
+      'Run node atm.mjs next --json and execute exactly the returned next action.',
+      'Record the first smoke artifact, log, evidence, and handoff before closing the work item.'
     ],
-    artifactPaths: ['.atm/artifacts', '.atm/logs', '.atm/reports'],
+    artifactPaths: ['.atm/history/artifacts', '.atm/history/logs', '.atm/history/reports'],
     evidencePaths: [relativePathFrom(cwd, paths.evidencePath)],
     reportPaths: [normalizeRelativePath(contextBudgetReportPath), normalizeRelativePath(continuationReportPath)],
     authoredBy: '@ai-atomic-framework/plugin-governance-local',
     handoffKind: 'bootstrap',
     continuationGoal: 'Resume bootstrap from the generated task, profile, evidence, and budget surfaces.',
     resumePrompt: recommendedPrompt,
-    resumeCommand: ['node', 'packages/cli/src/atm.mjs', 'bootstrap', '--cwd', '.', '--task', defaultBootstrapTaskTitle],
+    resumeCommand: ['node', 'atm.mjs', 'next', '--json'],
     budgetDecision: bootstrapBudgetEvaluation.decision,
     hardStop: bootstrapBudgetEvaluation.decision === 'hard-stop'
   };
@@ -643,7 +645,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     summaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath)
   };
   const bootstrapEvidence = {
-    ...createBootstrapEvidence(projectProbe, defaultGuards, paths),
+    ...createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths),
     contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
     contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? null : normalizeRelativePath(contextBudgetSummaryPath),
     contextSummaryPath: normalizeRelativePath(contextSummaryPath),
@@ -653,6 +655,8 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     continuationGoal: continuationInput.continuationGoal
   };
 
+  writeJson(paths.configPath, createBootstrapConfig(taskId), cwd, force, created, unchanged);
+  writeJson(paths.currentTaskPath, createCurrentTaskState(taskId, taskTitle, paths), cwd, force, created, unchanged);
   writeJson(paths.projectProbePath, projectProbe, cwd, force, created, unchanged);
   writeJson(paths.defaultGuardsPath, defaultGuards, cwd, force, created, unchanged);
   writeJson(paths.contextBudgetPolicyPath, defaultContextBudgetPolicy, cwd, force, created, unchanged);
@@ -675,6 +679,9 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   writeJson(resolveRepoPath(cwd, continuationReportPath), createContinuationRunReport(`continuation/${taskId}`, continuationInput), cwd, force, created, unchanged);
   writeJson(resolveRepoPath(cwd, contextSummaryPath), continuationSummary, cwd, force, created, unchanged);
   writeText(resolveRepoPath(cwd, contextSummaryMarkdownPath), renderContextSummaryMarkdown(continuationSummary), cwd, force, created, unchanged);
+  if (migration !== null) {
+    writeJson(migration.path, migration.report, cwd, force, created, unchanged);
+  }
 
   const templateTokens = {
     RECOMMENDED_PROMPT: recommendedPrompt,
@@ -724,15 +731,15 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
 }
 
 export function createOfficialBootstrapCommand(commandCwd = '.'): string {
-  return `node packages/cli/src/atm.mjs bootstrap --cwd ${commandCwd} --task "${defaultBootstrapTaskTitle}"`;
+  return `node atm.mjs bootstrap --cwd ${commandCwd} --task "${defaultBootstrapTaskTitle}"`;
 }
 
 export function createRecommendedPrompt(taskId = defaultBootstrapTaskId): string {
-  return `Read README.md if present, then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/${taskId}.json. Continue the bootstrap task without changing the host workflow, and write evidence to .atm/evidence/${taskId}.json.`;
+  return `Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
 }
 
 export function createSelfHostingAlphaPrompt(): string {
-  return `Read README.md. If .atm/config.json is missing, run "${createOfficialBootstrapCommand('.')}" from the repository root. Then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/${defaultBootstrapTaskId}.json, complete the bootstrap task, run the first smoke against examples/hello-world/atoms/hello-world.atom.json, and write artifact, log, evidence, and context summary files under .atm/.`;
+  return 'Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.';
 }
 
 export function estimateContextBudgetTokens(...values: readonly unknown[]): number {
@@ -781,35 +788,152 @@ export function createContinuationRunReport(reportId: string, input: Continuatio
   };
 }
 
+function createBootstrapConfig(taskId: string) {
+  return {
+    schemaVersion: 'atm.config.v0.1',
+    layoutVersion: currentLayoutVersion,
+    createdBy: '@ai-atomic-framework/plugin-governance-local',
+    adapter: {
+      mode: 'standalone',
+      implemented: false
+    },
+    paths: {
+      runtime: '.atm/runtime',
+      history: '.atm/history',
+      catalog: '.atm/catalog',
+      profile: '.atm/runtime/profile',
+      currentTask: '.atm/runtime/current-task.json',
+      projectProbe: '.atm/runtime/project-probe.json',
+      defaultGuards: '.atm/runtime/default-guards.json',
+      contextBudget: '.atm/runtime/budget',
+      tasks: '.atm/history/tasks',
+      locks: '.atm/runtime/locks',
+      evidence: '.atm/history/evidence',
+      handoff: '.atm/history/handoff',
+      artifacts: '.atm/history/artifacts',
+      logs: '.atm/history/logs',
+      reports: '.atm/history/reports',
+      registry: '.atm/catalog/registry',
+      index: '.atm/catalog/index',
+      shards: '.atm/catalog/shards'
+    },
+    adoption: {
+      profile: 'default',
+      taskPath: `.atm/history/tasks/${taskId}.json`,
+      lockPath: `.atm/runtime/locks/${taskId}.lock.json`,
+      projectProbePath: '.atm/runtime/project-probe.json',
+      defaultGuardsPath: '.atm/runtime/default-guards.json',
+      evidencePath: `.atm/history/evidence/${taskId}.json`,
+      currentTaskPath: '.atm/runtime/current-task.json'
+    }
+  };
+}
+
+function createCurrentTaskState(taskId: string, taskTitle: string, paths: ReturnType<typeof createBootstrapPaths>) {
+  return {
+    workItemId: taskId,
+    title: taskTitle,
+    status: 'open',
+    updatedAt: new Date().toISOString(),
+    lockPath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.lockPath),
+    evidencePath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath),
+    summaryPath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.contextSummaryPath)
+  };
+}
+
+function migrateLegacyBootstrapLayout(
+  cwd: string,
+  taskId: string,
+  paths: ReturnType<typeof createBootstrapPaths>,
+  force: boolean,
+  created: string[],
+  unchanged: string[]
+) {
+  const legacyPairs = [
+    [path.join(cwd, '.atm', 'profile', 'default.md'), paths.profilePath],
+    [path.join(cwd, '.atm', 'state', 'project-probe.json'), paths.projectProbePath],
+    [path.join(cwd, '.atm', 'state', 'default-guards.json'), paths.defaultGuardsPath],
+    [path.join(cwd, '.atm', 'state', 'context-budget', 'default-policy.json'), paths.contextBudgetPolicyPath],
+    [path.join(cwd, '.atm', 'tasks', `${taskId}.json`), paths.taskPath],
+    [path.join(cwd, '.atm', 'locks', `${taskId}.lock.json`), paths.lockPath],
+    [path.join(cwd, '.atm', 'evidence', `${taskId}.json`), paths.evidencePath],
+    [path.join(cwd, '.atm', 'state', 'context-summary', `${taskId}.json`), paths.contextSummaryPath],
+    [path.join(cwd, '.atm', 'state', 'context-summary', `${taskId}.md`), paths.contextSummaryMarkdownPath]
+  ] as const;
+  const moved: string[] = [];
+
+  for (const [legacyPath, nextPath] of legacyPairs) {
+    if (!existsSync(legacyPath)) {
+      continue;
+    }
+    if (existsSync(nextPath) && !force) {
+      unchanged.push(relativePathFrom(cwd, nextPath));
+      continue;
+    }
+    mkdirSync(path.dirname(nextPath), { recursive: true });
+    writeFileSync(nextPath, readFileSync(legacyPath));
+    created.push(relativePathFrom(cwd, nextPath));
+    moved.push(relativePathFrom(cwd, legacyPath));
+  }
+
+  if (moved.length === 0) {
+    return null;
+  }
+
+  return {
+    path: path.join(cwd, '.atm', 'history', 'reports', 'migrations', `layout-v1-to-v${currentLayoutVersion}.json`),
+    report: {
+      schemaVersion: 'atm.layoutMigration.v0.1',
+      migrationId: `layout-v1-to-v${currentLayoutVersion}`,
+      migratedAt: new Date().toISOString(),
+      taskId,
+      fromLayoutVersion: 1,
+      toLayoutVersion: currentLayoutVersion,
+      copiedFrom: moved,
+      notes: 'Legacy ATM layout paths were copied forward into the v2 runtime/history/catalog layout.'
+    }
+  };
+}
+
 function createBootstrapPaths(cwd: string, taskId: string) {
   const atmRoot = path.join(cwd, '.atm');
   return {
+    configPath: path.join(atmRoot, 'config.json'),
     agentInstructionsPath: path.join(cwd, 'AGENTS.md'),
-    profilePath: path.join(atmRoot, 'profile', 'default.md'),
-    projectProbePath: path.join(atmRoot, 'state', 'project-probe.json'),
-    defaultGuardsPath: path.join(atmRoot, 'state', 'default-guards.json'),
-    contextBudgetPolicyPath: path.join(atmRoot, 'state', 'context-budget', 'default-policy.json'),
-    taskPath: path.join(atmRoot, 'tasks', `${taskId}.json`),
-    lockPath: path.join(atmRoot, 'locks', `${taskId}.lock.json`),
-    evidencePath: path.join(atmRoot, 'evidence', `${taskId}.json`),
+    profilePath: path.join(atmRoot, 'runtime', 'profile', 'default.md'),
+    currentTaskPath: path.join(atmRoot, 'runtime', 'current-task.json'),
+    projectProbePath: path.join(atmRoot, 'runtime', 'project-probe.json'),
+    defaultGuardsPath: path.join(atmRoot, 'runtime', 'default-guards.json'),
+    contextBudgetPolicyPath: path.join(atmRoot, 'runtime', 'budget', 'default-policy.json'),
+    contextBudgetSummaryPath: path.join(atmRoot, 'runtime', 'budget', `bootstrap-${sanitizeBudgetFileId(`bootstrap/${taskId}`)}.md`),
+    taskPath: path.join(atmRoot, 'history', 'tasks', `${taskId}.json`),
+    lockPath: path.join(atmRoot, 'runtime', 'locks', `${taskId}.lock.json`),
+    evidencePath: path.join(atmRoot, 'history', 'evidence', `${taskId}.json`),
+    contextSummaryPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.json`),
+    contextSummaryMarkdownPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.md`),
+    contextPath: path.join(atmRoot, 'history', 'handoff', 'INITIAL_SUMMARY.md'),
     directories: {
-      profile: path.join(atmRoot, 'profile'),
-      state: path.join(atmRoot, 'state'),
-      contextBudget: path.join(atmRoot, 'state', 'context-budget'),
-      contextSummary: path.join(atmRoot, 'state', 'context-summary'),
-      tasks: path.join(atmRoot, 'tasks'),
-      locks: path.join(atmRoot, 'locks'),
-      artifacts: path.join(atmRoot, 'artifacts'),
-      logs: path.join(atmRoot, 'logs'),
-      evidence: path.join(atmRoot, 'evidence'),
-      context: path.join(atmRoot, 'context'),
-      reports: path.join(atmRoot, 'reports'),
-      reportContextBudget: path.join(atmRoot, 'reports', 'context-budget'),
-      reportContinuation: path.join(atmRoot, 'reports', 'continuation'),
-      index: path.join(atmRoot, 'index'),
-      shards: path.join(atmRoot, 'shards'),
-      rules: path.join(atmRoot, 'rules'),
-      registry: path.join(atmRoot, 'registry')
+      runtime: path.join(atmRoot, 'runtime'),
+      profile: path.join(atmRoot, 'runtime', 'profile'),
+      state: path.join(atmRoot, 'runtime', 'state'),
+      locks: path.join(atmRoot, 'runtime', 'locks'),
+      rules: path.join(atmRoot, 'runtime', 'rules'),
+      contextBudget: path.join(atmRoot, 'runtime', 'budget'),
+      history: path.join(atmRoot, 'history'),
+      tasks: path.join(atmRoot, 'history', 'tasks'),
+      evidence: path.join(atmRoot, 'history', 'evidence'),
+      artifacts: path.join(atmRoot, 'history', 'artifacts'),
+      logs: path.join(atmRoot, 'history', 'logs'),
+      reports: path.join(atmRoot, 'history', 'reports'),
+      reportContextBudget: path.join(atmRoot, 'history', 'reports', 'context-budget'),
+      reportContinuation: path.join(atmRoot, 'history', 'reports', 'continuation'),
+      reportSelfHost: path.join(atmRoot, 'history', 'reports', 'self-host-alpha'),
+      reportMigrations: path.join(atmRoot, 'history', 'reports', 'migrations'),
+      context: path.join(atmRoot, 'history', 'handoff'),
+      catalog: path.join(atmRoot, 'catalog'),
+      index: path.join(atmRoot, 'catalog', 'index'),
+      shards: path.join(atmRoot, 'catalog', 'shards'),
+      registry: path.join(atmRoot, 'catalog', 'registry')
     }
   };
 }
@@ -825,13 +949,13 @@ function createBootstrapTask(taskId: string, taskTitle: string, projectProbe: Re
     summary: 'Establish the default ATM bootstrap pack, verify the host workflow, and leave initial evidence for the next agent run.',
     scope: [
       'AGENTS.md',
-      relativePathFrom(path.dirname(paths.taskPath), paths.taskPath),
-      relativePathFrom(path.dirname(paths.lockPath), paths.lockPath)
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.taskPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.lockPath)
     ],
     guardPaths: [
-      relativePathFrom(path.dirname(paths.taskPath), paths.defaultGuardsPath)
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.defaultGuardsPath)
     ],
-    evidencePath: relativePathFrom(path.dirname(paths.taskPath), paths.evidencePath),
+    evidencePath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath),
     nextPrompt: createRecommendedPrompt(taskId)
   };
 }
@@ -844,19 +968,20 @@ function createBootstrapLock(taskId: string, paths: ReturnType<typeof createBoot
     files: [
       'AGENTS.md',
       '.atm/config.json',
-      relativePathFrom(path.dirname(paths.lockPath), paths.profilePath),
-      relativePathFrom(path.dirname(paths.lockPath), paths.projectProbePath),
-      relativePathFrom(path.dirname(paths.lockPath), paths.defaultGuardsPath),
-      relativePathFrom(path.dirname(paths.lockPath), paths.taskPath),
-      relativePathFrom(path.dirname(paths.lockPath), paths.evidencePath)
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.profilePath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.currentTaskPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.projectProbePath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.defaultGuardsPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.taskPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath)
     ]
   };
 }
 
-function createBootstrapEvidence(projectProbe: Readonly<Record<string, unknown>>, defaultGuards: { guards: readonly { id: string }[] }, paths: ReturnType<typeof createBootstrapPaths>) {
+function createBootstrapEvidence(taskId: string, projectProbe: Readonly<Record<string, unknown>>, defaultGuards: { guards: readonly { id: string }[] }, paths: ReturnType<typeof createBootstrapPaths>) {
   return {
     schemaVersion: 'atm.evidence.v0.1',
-    taskId: defaultBootstrapTaskId,
+    taskId,
     status: 'seeded',
     summary: 'Default ATM bootstrap pack created.',
     repositoryKind: projectProbe.repositoryKind,
@@ -864,9 +989,9 @@ function createBootstrapEvidence(projectProbe: Readonly<Record<string, unknown>>
     recommendedPrompt: createRecommendedPrompt(),
     guardIds: defaultGuards.guards.map((guard) => guard.id),
     artifactDirectories: [
-      relativePathFrom(path.dirname(paths.evidencePath), paths.directories.artifacts),
-      relativePathFrom(path.dirname(paths.evidencePath), paths.directories.logs),
-      relativePathFrom(path.dirname(paths.evidencePath), paths.directories.reports)
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.artifacts),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.logs),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.reports)
     ],
     evidence: []
   };

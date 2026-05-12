@@ -91,12 +91,12 @@ function createDryRunResult(options) {
       adapterMode: 'standalone',
       adapterImplemented: false,
       adoptedProfile: options.adopt === 'default' ? 'default' : null,
-      contextBudgetPolicyPath: options.adopt === 'default' ? '.atm/state/context-budget/default-policy.json' : null,
-      contextBudgetReportPath: options.adopt === 'default' ? '.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json' : null,
+      contextBudgetPolicyPath: options.adopt === 'default' ? '.atm/runtime/budget/default-policy.json' : null,
+      contextBudgetReportPath: options.adopt === 'default' ? '.atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json' : null,
       contextBudgetSummaryPath: null,
-      contextSummaryPath: options.adopt === 'default' ? '.atm/state/context-summary/BOOTSTRAP-0001.json' : null,
-      contextSummaryMarkdownPath: options.adopt === 'default' ? '.atm/state/context-summary/BOOTSTRAP-0001.md' : null,
-      continuationReportPath: options.adopt === 'default' ? '.atm/reports/continuation/BOOTSTRAP-0001.json' : null,
+      contextSummaryPath: options.adopt === 'default' ? '.atm/history/handoff/BOOTSTRAP-0001.json' : null,
+      contextSummaryMarkdownPath: options.adopt === 'default' ? '.atm/history/handoff/BOOTSTRAP-0001.md' : null,
+      continuationReportPath: options.adopt === 'default' ? '.atm/history/reports/continuation/BOOTSTRAP-0001.json' : null,
       adoptedAt: options.adopt === 'default' ? new Date().toISOString() : null,
       dryRun: true
     }
@@ -106,6 +106,7 @@ function createDryRunResult(options) {
 function createDefaultConfig(options) {
   const config = {
     schemaVersion: 'atm.config.v0.1',
+    layoutVersion: 2,
     frameworkVersion,
     createdBy: '@ai-atomic-framework/cli',
     adapter: {
@@ -114,17 +115,24 @@ function createDefaultConfig(options) {
     },
     paths: {
       atomicSpecs: 'atoms',
-      reports: '.atm/reports',
-      profile: '.atm/profile',
-      state: '.atm/state',
-      tasks: '.atm/tasks',
-      locks: '.atm/locks',
-      artifacts: '.atm/artifacts',
-      logs: '.atm/logs',
-      evidence: '.atm/evidence',
-      context: '.atm/context',
-      contextBudget: '.atm/state/context-budget',
-      contextSummary: '.atm/state/context-summary'
+      runtime: '.atm/runtime',
+      history: '.atm/history',
+      catalog: '.atm/catalog',
+      profile: '.atm/runtime/profile',
+      currentTask: '.atm/runtime/current-task.json',
+      state: '.atm/runtime/state',
+      tasks: '.atm/history/tasks',
+      locks: '.atm/runtime/locks',
+      artifacts: '.atm/history/artifacts',
+      logs: '.atm/history/logs',
+      evidence: '.atm/history/evidence',
+      handoff: '.atm/history/handoff',
+      reports: '.atm/history/reports',
+      contextBudget: '.atm/runtime/budget',
+      contextSummary: '.atm/history/handoff',
+      registry: '.atm/catalog/registry',
+      index: '.atm/catalog/index',
+      shards: '.atm/catalog/shards'
     },
     validation: {
       command: 'atm validate',
@@ -135,11 +143,12 @@ function createDefaultConfig(options) {
   if (options.adopt === 'default') {
     config.adoption = {
       profile: 'default',
-      taskPath: '.atm/tasks/BOOTSTRAP-0001.json',
-      lockPath: '.atm/locks/BOOTSTRAP-0001.lock.json',
-      projectProbePath: '.atm/state/project-probe.json',
-      defaultGuardsPath: '.atm/state/default-guards.json',
-      evidencePath: '.atm/evidence/BOOTSTRAP-0001.json'
+      taskPath: '.atm/history/tasks/BOOTSTRAP-0001.json',
+      lockPath: '.atm/runtime/locks/BOOTSTRAP-0001.lock.json',
+      projectProbePath: '.atm/runtime/project-probe.json',
+      defaultGuardsPath: '.atm/runtime/default-guards.json',
+      evidencePath: '.atm/history/evidence/BOOTSTRAP-0001.json',
+      currentTaskPath: '.atm/runtime/current-task.json'
     };
   }
 

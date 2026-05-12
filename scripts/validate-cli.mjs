@@ -1,9 +1,9 @@
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
+import { createTempWorkspace } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -73,7 +73,7 @@ for (const commandName of fixture.commands) {
   assert(cliIndex.includes(`commandName: '${commandName}'`), `index.ts missing command descriptor: ${commandName}`);
 }
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-cli-'));
+const tempRoot = createTempWorkspace('atm-cli-');
 try {
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
@@ -264,11 +264,11 @@ try {
   const rolledRegistry = JSON.parse(readFileSync(path.join(rollbackRepo, 'atomic-registry.json'), 'utf8'));
   const rolledEntry = rolledRegistry.entries.find((entry) => entry.atomId === 'ATM-FIXTURE-0001');
   assert(rolledEntry.currentVersion === '1.0.0', 'rollback --apply must update currentVersion to target version');
-  assert(existsSync(path.join(rollbackRepo, '.atm', 'reports', 'rollback-proof.json')), 'rollback --apply must write rollback-proof.json');
+  assert(existsSync(path.join(rollbackRepo, '.atm', 'history', 'reports', 'rollback-proof.json')), 'rollback --apply must write rollback-proof.json');
 
   const reviewRepo = path.join(tempRoot, 'review-repo');
   mkdirSync(reviewRepo, { recursive: true });
-  const reviewQueuePath = path.join(reviewRepo, '.atm', 'reports', 'upgrade-proposals.json');
+  const reviewQueuePath = path.join(reviewRepo, '.atm', 'history', 'reports', 'upgrade-proposals.json');
   const reviewProposal = readJson('fixtures/upgrade/proposal-pass.json');
   const reviewQueueRecord = {
     proposalId: reviewProposal.proposalId,
@@ -327,7 +327,7 @@ try {
 
   const reviewRejectFreshRepo = path.join(tempRoot, 'review-reject-repo');
   mkdirSync(reviewRejectFreshRepo, { recursive: true });
-  writeJson(path.join(reviewRejectFreshRepo, '.atm', 'reports', 'upgrade-proposals.json'), {
+  writeJson(path.join(reviewRejectFreshRepo, '.atm', 'history', 'reports', 'upgrade-proposals.json'), {
     schemaId: 'atm.humanReviewQueue',
     specVersion: '0.1.0',
     migration: {

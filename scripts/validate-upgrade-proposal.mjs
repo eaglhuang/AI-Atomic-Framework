@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { proposeAtomicUpgrade } from '../packages/core/src/upgrade/propose.mjs';
+import { createTempWorkspace } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -88,7 +88,7 @@ function runCliUpgrade(qualityPath, options = {}) {
   const cwd = options.cwd ?? root;
   const dryRun = options.dryRun ?? true;
   const args = [
-    path.join(root, 'packages/cli/src/atm.mjs'),
+    path.join(root, 'atm.mjs'),
     'upgrade',
     '--propose',
     '--atom', 'ATM-CORE-0001',
@@ -250,11 +250,11 @@ assert.throws(() => proposeAtomicUpgrade({
   inputs: createProposalInputs(inputPaths.qualityPass)
 }), /Legacy mapId/);
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-upgrade-hard-stop-'));
+const tempRoot = createTempWorkspace('atm-upgrade-hard-stop-');
 try {
   const governedRepo = path.join(tempRoot, 'repo');
-  mkdirSync(path.join(governedRepo, '.atm', 'state', 'context-budget'), { recursive: true });
-  writeFileSync(path.join(governedRepo, '.atm', 'state', 'context-budget', 'default-policy.json'), `${JSON.stringify({
+  mkdirSync(path.join(governedRepo, '.atm', 'runtime', 'budget'), { recursive: true });
+  writeFileSync(path.join(governedRepo, '.atm', 'runtime', 'budget', 'default-policy.json'), `${JSON.stringify({
     policyId: 'default-policy',
     generatedAt: '2026-01-01T00:00:00.000Z',
     unit: 'tokens',
@@ -273,15 +273,15 @@ try {
   assertInvariants(hardStopResult.evidence.proposal, 'blocked');
   validateWithSchema(hardStopResult.evidence.proposal, validate, 'CLI hard-stop proposal');
   assertCliContextBudgetGate(hardStopResult, false);
-  check(hardStopResult.evidence.contextBudget.continuationReportPath === '.atm/reports/continuation/upgrade/ATM-CORE-0001.json', 'hard-stop run must surface continuation report path');
-  check(hardStopResult.evidence.contextBudget.contextSummaryPath === '.atm/state/context-summary/ATM-CORE-0001.json', 'hard-stop run must surface context summary path');
-  check(hardStopResult.evidence.contextBudget.contextSummaryMarkdownPath === '.atm/state/context-summary/ATM-CORE-0001.md', 'hard-stop run must surface context summary markdown path');
-  check(hardStopResult.evidence.contextBudget.evidencePath === '.atm/evidence/ATM-CORE-0001.json', 'hard-stop run must surface handoff evidence path');
-  check(existsSync(path.join(governedRepo, '.atm', 'reports', 'context-budget', 'upgrade-ATM-CORE-0001-1.1.0.json')), 'hard-stop run must persist the context budget report');
-  check(existsSync(path.join(governedRepo, '.atm', 'reports', 'continuation', 'upgrade', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation report');
-  check(existsSync(path.join(governedRepo, '.atm', 'state', 'context-summary', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation summary json');
-  check(existsSync(path.join(governedRepo, '.atm', 'state', 'context-summary', 'ATM-CORE-0001.md')), 'hard-stop run must persist the continuation summary markdown');
-  check(existsSync(path.join(governedRepo, '.atm', 'evidence', 'ATM-CORE-0001.json')), 'hard-stop run must persist the handoff evidence');
+  check(hardStopResult.evidence.contextBudget.continuationReportPath === '.atm/history/reports/continuation/upgrade/ATM-CORE-0001.json', 'hard-stop run must surface continuation report path');
+  check(hardStopResult.evidence.contextBudget.contextSummaryPath === '.atm/history/handoff/ATM-CORE-0001.json', 'hard-stop run must surface context summary path');
+  check(hardStopResult.evidence.contextBudget.contextSummaryMarkdownPath === '.atm/history/handoff/ATM-CORE-0001.md', 'hard-stop run must surface context summary markdown path');
+  check(hardStopResult.evidence.contextBudget.evidencePath === '.atm/history/evidence/ATM-CORE-0001.json', 'hard-stop run must surface handoff evidence path');
+  check(existsSync(path.join(governedRepo, '.atm', 'history', 'reports', 'context-budget', 'upgrade-ATM-CORE-0001-1.1.0.json')), 'hard-stop run must persist the context budget report');
+  check(existsSync(path.join(governedRepo, '.atm', 'history', 'reports', 'continuation', 'upgrade', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation report');
+  check(existsSync(path.join(governedRepo, '.atm', 'history', 'handoff', 'ATM-CORE-0001.json')), 'hard-stop run must persist the continuation summary json');
+  check(existsSync(path.join(governedRepo, '.atm', 'history', 'handoff', 'ATM-CORE-0001.md')), 'hard-stop run must persist the continuation summary markdown');
+  check(existsSync(path.join(governedRepo, '.atm', 'history', 'evidence', 'ATM-CORE-0001.json')), 'hard-stop run must persist the handoff evidence');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createTempWorkspace } from '../../scripts/temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-cli-create-'));
+const tempRoot = createTempWorkspace('atm-cli-create-');
 try {
   const dryRun = runAtm(['create', '--cwd', tempRoot, '--bucket', 'fixture', '--title', 'CliDryRun', '--description', 'CLI dry-run.', '--dry-run']);
   assert.equal(dryRun.exitCode, 0);
@@ -36,7 +36,7 @@ try {
 console.log('[cli-create:test] ok (4 acceptance checks)');
 
 function runAtm(args) {
-  const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
     encoding: 'utf8'
   });

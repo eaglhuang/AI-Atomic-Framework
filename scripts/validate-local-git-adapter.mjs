@@ -1,9 +1,9 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import { createTempWorkspace } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -55,7 +55,7 @@ function schemaDocumentFor(result, schemaId) {
   };
 }
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-local-git-'));
+const tempRoot = createTempWorkspace('atm-local-git-');
 try {
   const repositoryRoot = path.join(tempRoot, 'repo');
   const adapter = adapterModule.createLocalGitAdapter();

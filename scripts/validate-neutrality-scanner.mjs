@@ -31,7 +31,7 @@ function readText(relativePath) {
 }
 
 function runAtm(args, cwd = root) {
-  const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
     encoding: 'utf8'
   });

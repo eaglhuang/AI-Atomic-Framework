@@ -19,41 +19,51 @@ The north star for the first release is a blank repository that can run a hello-
 
 ## Root-Drop Bootstrap
 
-ATM is intended to support a root-drop, zero-install agent bootstrap workflow.
+ATM is intended to support a release-bundle root-drop bootstrap workflow.
 
 1. A user places ATM files or an ATM release bundle in a project root.
-2. Any AI agent reads this README, the AGENTS template, and the default `.atm/profile` guidance.
+2. Any AI agent reads this README, the AGENTS template, and the default `.atm/runtime/profile` guidance.
 3. The agent probes the project, creates the first task, locks the scope, runs default guards, and stores artifacts, logs, and evidence.
 4. The host project may later replace the default filesystem profile with a GitHub, Jira, Linear, Notion, local database, or custom adapter.
 
 The root-drop experience is an Agent Operating Layer. It is intentionally model-neutral and editor-neutral.
 
-### Zero-Install Quick Start
+### Root-Drop Quick Start
 
-From an ATM checkout or release bundle, initialize a host repository with the default bootstrap pack:
+From an ATM checkout or release bundle, initialize a host repository with the default bootstrap pack. Upstream builds now refresh:
+
+- `release/atm-root-drop/` (portable bundle directory)
+- `release/atm-onefile/atm.mjs` (single-file embedded runtime)
+
+Use either route:
 
 ```bash
-node packages/cli/src/atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"
+npm run build
+node release/atm-root-drop/atm.mjs next --json
+node release/atm-onefile/atm.mjs next --json
+node atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"
 ```
 
 Then give the AI agent one line only:
 
 ```text
-Read README.md if present, then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json. Continue the bootstrap task without changing the host workflow, and write evidence to .atm/evidence/BOOTSTRAP-0001.json.
+Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.
 ```
 
-The bootstrap pack writes the default profile, a first task, a scope lock, default guard definitions, and artifact/log/evidence directories so the host repository does not need to become a Node.js project first.
+The bootstrap pack writes the default profile, a first task, a scope lock, default guard definitions, and the v2 `runtime/history/catalog` layout so the host repository does not need to memorize internal ATM paths first.
 
 For the standalone upstream self-hosting alpha proof, see [docs/SELF_HOSTING_ALPHA.md](docs/SELF_HOSTING_ALPHA.md). That contract upgrades the user-facing flow to a single prompt: the AI checks whether ATM is initialized, runs the official `bootstrap` command only when needed, and then completes the first smoke.
 
-For advisory multi-agent confidence, run `node packages/cli/src/atm.mjs verify --agents-md --json` and `node packages/cli/src/atm.mjs self-host-alpha --verify --agent <profile> --json`. The supported profile matrix and latest advisory results live in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md).
+For advisory multi-agent confidence, run `node atm.mjs verify --agents-md --json` and `node atm.mjs self-host-alpha --verify --agent <profile> --json`. The supported profile matrix and latest advisory results live in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md).
+
+For the neutral command-level handoff flow, see [examples/agent-handoff-flow/README.md](examples/agent-handoff-flow/README.md). For behavior naming guidance, see [docs/governance/behavior-taxonomy.md](docs/governance/behavior-taxonomy.md).
 
 ### Entry Channels For New Atom Birth
 
 Agents should not need a task card to discover the canonical atom birth path.
 
 - If a downstream host repo already has a task router or task card flow, use that host entry first.
-- If there is no task card, or you are operating directly in ATM, run `node packages/cli/src/atm.mjs guide create-atom`.
+- If there is no task card, or you are operating directly in ATM, run `node atm.mjs guide create-atom`.
 - Both paths must converge on the same governed factory: `ATM-CORE-0004` exposed through `atm create`.
 
 This avoids a common failure mode where an agent knows a new atom is needed but does not know which command is the official provisioning path.

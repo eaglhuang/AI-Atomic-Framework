@@ -9,7 +9,7 @@ const frameworkRepositoryRoot = path.resolve(path.dirname(fileURLToPath(import.m
 
 export const defaultLocalGitAdapterConfig = Object.freeze({
   registryPath: '.atm/registry',
-  reportsPath: '.atm/reports',
+  reportsPath: '.atm/history/reports',
   dryRun: false,
   lockMode: 'noop',
   gateMode: 'noop',

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createTempWorkspace } from '../../scripts/temp-root.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..', '..');
@@ -29,13 +29,13 @@ const repoCopyEntries = [
 ];
 
 const agentsMarkdownTokens = {
-  RECOMMENDED_PROMPT: 'Read README.md if present, then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json. Continue the bootstrap task without changing the host workflow, and write evidence to .atm/evidence/BOOTSTRAP-0001.json.',
-  BOOTSTRAP_TASK_PATH: '.atm/tasks/BOOTSTRAP-0001.json',
-  BOOTSTRAP_LOCK_PATH: '.atm/locks/BOOTSTRAP-0001.lock.json',
-  BOOTSTRAP_PROFILE_PATH: '.atm/profile/default.md',
-  PROJECT_PROBE_PATH: '.atm/state/project-probe.json',
-  DEFAULT_GUARDS_PATH: '.atm/state/default-guards.json',
-  BOOTSTRAP_EVIDENCE_PATH: '.atm/evidence/BOOTSTRAP-0001.json',
+  RECOMMENDED_PROMPT: 'Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.',
+  BOOTSTRAP_TASK_PATH: '.atm/history/tasks/BOOTSTRAP-0001.json',
+  BOOTSTRAP_LOCK_PATH: '.atm/runtime/locks/BOOTSTRAP-0001.lock.json',
+  BOOTSTRAP_PROFILE_PATH: '.atm/runtime/profile/default.md',
+  PROJECT_PROBE_PATH: '.atm/runtime/project-probe.json',
+  DEFAULT_GUARDS_PATH: '.atm/runtime/default-guards.json',
+  BOOTSTRAP_EVIDENCE_PATH: '.atm/history/evidence/BOOTSTRAP-0001.json',
   HOST_WORKFLOW: 'npm-workspace',
   REPOSITORY_KIND: 'workspace',
   PACKAGE_MANAGER: 'npm'
@@ -80,14 +80,11 @@ function resolveSandboxRoot(inputPath, createIfMissing = true) {
     return resolved;
   }
 
-  return mkTempDir(path.join(os.tmpdir(), 'atm-sandbox-fixture-'));
+  return mkTempDir('atm-sandbox-fixture-');
 }
 
 function mkTempDir(prefix) {
-  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  const targetRoot = `${prefix}${suffix}`;
-  mkdirSync(targetRoot, { recursive: true });
-  return targetRoot;
+  return createTempWorkspace(prefix);
 }
 
 function resolveSourceRoot(inputPath) {

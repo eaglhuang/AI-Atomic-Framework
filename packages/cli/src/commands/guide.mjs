@@ -3,14 +3,14 @@ import { CliError, makeResult, message } from './shared.mjs';
 
 const commandTemplates = Object.freeze({
   createAtom: [
-    'node packages/cli/src/atm.mjs create --bucket <BUCKET> --title <Title> --description "<Description>" --logical-name <logical-name> --dry-run',
-    'node packages/cli/src/atm.mjs create --bucket EXM --title NormalizeCssColor --description "Canonicalize CSS color input for reusable adapters." --logical-name atom.example.normalize-css-color --dry-run',
+    'node atm.mjs create --bucket <BUCKET> --title <Title> --description "<Description>" --logical-name <logical-name> --dry-run',
+    'node atm.mjs create --bucket EXM --title NormalizeCssColor --description "Canonicalize CSS color input for reusable adapters." --logical-name atom.example.normalize-css-color --dry-run',
   ],
   createMap: [
-    'node packages/cli/src/atm.mjs create-map --members <json> --edges <json> --entrypoints <json> --quality-targets <json> --dry-run',
+    'node atm.mjs create-map --members <json> --edges <json> --entrypoints <json> --quality-targets <json> --dry-run',
   ],
   bootstrap: [
-    'node packages/cli/src/atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"',
+    'node atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"',
   ],
 });
 
@@ -67,12 +67,12 @@ function buildOverviewGuide() {
       {
         channel: 'framework-guide',
         when: 'You are in ATM itself, or the host has no task-card flow for the current job.',
-        action: 'Run `node packages/cli/src/atm.mjs guide create-atom` to get the canonical create-atom path.',
+        action: 'Run `node atm.mjs guide create-atom` to get the canonical create-atom path.',
       },
       {
         channel: 'bootstrap',
         when: 'ATM is not initialized yet in the target repository.',
-        action: 'Run `node packages/cli/src/atm.mjs guide bootstrap` before attempting atom birth.',
+        action: 'Run `node atm.mjs guide bootstrap` before attempting atom birth.',
       },
     ],
   };

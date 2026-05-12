@@ -9,27 +9,27 @@ ATM upstream development uses npm only for the alpha route. Run `npm install`, `
 ## Official Single-Entry Prompt
 
 ```text
-Read README.md. If .atm/config.json is missing, run "node packages/cli/src/atm.mjs bootstrap --cwd . --task \"Bootstrap ATM in this repository\"" from the repository root. Then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json, complete the bootstrap task, run the first smoke against examples/hello-world/atoms/hello-world.atom.json, and write artifact, log, evidence, context summary, and budget/continuation reports under .atm/.
+Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.
 ```
 
 ## Alpha Checklist
 
 - The user can give the AI one official prompt without explaining internal ATM files.
-- If `.atm/config.json` is missing, the AI can trigger the official `bootstrap` command itself.
+- If `.atm/config.json` is missing, the AI can trigger the official `bootstrap` command itself through `next`.
 - The bootstrap command is idempotent and leaves the repository ready for the next step.
-- The bootstrap step seeds `.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json`, `.atm/reports/continuation/BOOTSTRAP-0001.json`, and `.atm/state/context-summary/BOOTSTRAP-0001.{json,md}`.
-- The first smoke validates `examples/hello-world/atoms/hello-world.atom.json` and writes artifact, log, evidence, context summary, and self-host-alpha reports under `.atm/`.
+- The bootstrap step seeds `.atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json`, `.atm/history/reports/continuation/BOOTSTRAP-0001.json`, and `.atm/history/handoff/BOOTSTRAP-0001.{json,md}`.
+- The first smoke validates `examples/hello-world/atoms/hello-world.atom.json` and writes artifact, log, evidence, context summary, and self-host-alpha reports under `.atm/history/`.
 - The proof does not depend on downstream host tooling, private repository paths, or a non-portable adapter.
 
 ## Phase B Exit Gate
 
-Before running the deterministic alpha0 gate in the upstream checkout, `node packages/cli/src/atm.mjs doctor --json` should report `ATM_DOCTOR_OK`.
+Before running the deterministic alpha0 gate in the upstream checkout, `node atm.mjs doctor --json` should report `ATM_DOCTOR_OK`.
 
 
 Run the deterministic alpha0 gate with:
 
 ```bash
-node packages/cli/src/atm.mjs self-host-alpha --verify --json
+node atm.mjs self-host-alpha --verify --json
 ```
 
 Phase B may proceed only when all of the following are true:
@@ -45,8 +45,8 @@ Phase B may proceed only when all of the following are true:
 The advisory confidence layer uses the same deterministic alpha0 proof, but records the result under a named agent profile.
 
 ```bash
-node packages/cli/src/atm.mjs verify --agents-md --json
-node packages/cli/src/atm.mjs self-host-alpha --verify --agent claude-code --json
+node atm.mjs verify --agents-md --json
+node atm.mjs self-host-alpha --verify --agent claude-code --json
 ```
 
 Supported profiles and the latest advisory results are tracked in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md). These reports do not block alpha0 release.

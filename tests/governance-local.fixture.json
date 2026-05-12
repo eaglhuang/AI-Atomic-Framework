@@ -10,26 +10,28 @@
   },
   "expectedPaths": [
     "AGENTS.md",
-    ".atm/profile/default.md",
-    ".atm/context/INITIAL_SUMMARY.md",
-    ".atm/state/project-probe.json",
-    ".atm/state/default-guards.json",
-    ".atm/state/context-budget",
-    ".atm/state/context-budget/default-policy.json",
-    ".atm/state/context-summary/BOOTSTRAP-0001.json",
-    ".atm/state/context-summary/BOOTSTRAP-0001.md",
-    ".atm/tasks/BOOTSTRAP-0001.json",
-    ".atm/locks/BOOTSTRAP-0001.lock.json",
-    ".atm/evidence/BOOTSTRAP-0001.json",
-    ".atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json",
-    ".atm/reports/continuation/BOOTSTRAP-0001.json",
-    ".atm/artifacts",
-    ".atm/logs",
-    ".atm/reports",
-    ".atm/index",
-    ".atm/shards",
-    ".atm/rules",
-    ".atm/registry"
+    ".atm/config.json",
+    ".atm/runtime/profile/default.md",
+    ".atm/runtime/current-task.json",
+    ".atm/runtime/project-probe.json",
+    ".atm/runtime/default-guards.json",
+    ".atm/runtime/budget",
+    ".atm/runtime/budget/default-policy.json",
+    ".atm/history/handoff/INITIAL_SUMMARY.md",
+    ".atm/history/handoff/BOOTSTRAP-0001.json",
+    ".atm/history/handoff/BOOTSTRAP-0001.md",
+    ".atm/history/tasks/BOOTSTRAP-0001.json",
+    ".atm/runtime/locks/BOOTSTRAP-0001.lock.json",
+    ".atm/history/evidence/BOOTSTRAP-0001.json",
+    ".atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json",
+    ".atm/history/reports/continuation/BOOTSTRAP-0001.json",
+    ".atm/history/artifacts",
+    ".atm/history/logs",
+    ".atm/history/reports",
+    ".atm/catalog/index",
+    ".atm/catalog/shards",
+    ".atm/runtime/rules",
+    ".atm/catalog/registry"
   ],
   "workItem": {
     "workItemId": "ATM-PLUGIN-0008",
@@ -48,7 +50,7 @@
     }
   },
   "shard": {
-    "path": ".atm/shards/local/part-01.json",
+    "path": ".atm/catalog/shards/local/part-01.json",
     "value": {
       "id": "part-01",
       "items": [
@@ -57,10 +59,10 @@
         "evidence"
       ]
     },
-    "indexPath": ".atm/shards/index.json"
+    "indexPath": ".atm/catalog/shards/index.json"
   },
   "artifact": {
-    "artifactPath": ".atm/artifacts/ATM-PLUGIN-0008/smoke.json",
+    "artifactPath": ".atm/history/artifacts/ATM-PLUGIN-0008/smoke.json",
     "artifactKind": "report",
     "producedBy": "validate-governance-local"
   },
@@ -85,9 +87,9 @@
     }
   },
   "state": {
-    "markdownPath": ".atm/state/HANDOFF.md",
+    "markdownPath": ".atm/runtime/state/HANDOFF.md",
     "markdownContent": "# Handoff\n\n- governance local smoke complete\n",
-    "jsonPath": ".atm/state/smoke.json",
+    "jsonPath": ".atm/runtime/state/smoke.json",
     "jsonValue": {
       "ready": true,
       "surface": "governance-local"
@@ -104,7 +106,7 @@
     "evidenceKind": "validation",
     "summary": "Local governance bundle smoke passed.",
     "artifactPaths": [
-      ".atm/reports/governance-local-smoke.json"
+      ".atm/history/reports/governance-local-smoke.json"
     ]
   },
   "summary": {
@@ -114,7 +116,7 @@
       "Run root validation.",
       "Commit the bundle package."
     ],
-    "summaryMarkdownPath": ".atm/state/context-summary/ATM-PLUGIN-0008.md"
+    "summaryMarkdownPath": ".atm/history/handoff/ATM-PLUGIN-0008.md"
   },
   "contextBudget": {
     "policy": {

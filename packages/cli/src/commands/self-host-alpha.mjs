@@ -1,5 +1,4 @@
-import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
-import os from 'node:os';
+import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import {
   createContinuationRunReport,
@@ -7,15 +6,16 @@ import {
   createLocalGovernanceAdapter,
   estimateContextBudgetTokens
 } from '../../../plugin-governance-local/src/index.ts';
+import { createTempWorkspace } from '../../../../scripts/temp-root.mjs';
 import { runBootstrap } from './bootstrap-entry.mjs';
 import { createAgentConfidenceEvidence, resolveAgentProfile, verifyAgentsMarkdown } from './agent-confidence.mjs';
+import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.mjs';
 import { runInit } from './init.mjs';
 import { runHelloWorldSmoke } from './test.mjs';
 import { runVerify } from './verify.mjs';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.mjs';
-
-const bootstrapTaskId = 'BOOTSTRAP-0001';
 const repoCopyEntries = [
+  'atm.mjs',
   'CONTRIBUTING.md',
   'LICENSE',
   'README.md',
@@ -44,7 +44,7 @@ export async function runSelfHostAlphaAsync(argv) {
     throw new CliError('ATM_CLI_USAGE', `self-host-alpha does not support unknown agent profile: ${options.agent}`, { exitCode: 2 });
   }
 
-  const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-self-host-alpha-'));
+  const tempRoot = createTempWorkspace('atm-self-host-alpha-');
   try {
     const sandbox = path.join(tempRoot, 'repo');
     mkdirSync(sandbox, { recursive: true });
@@ -135,14 +135,16 @@ function copyRepositorySubset(sourceRoot, targetRoot) {
 }
 
 function evaluateBootstrapEvidence(cwd) {
-  const taskPath = path.join(cwd, '.atm', 'tasks', `${bootstrapTaskId}.json`);
-  const lockPath = path.join(cwd, '.atm', 'locks', `${bootstrapTaskId}.lock.json`);
-  const artifactDir = path.join(cwd, '.atm', 'artifacts');
-  const evidencePath = path.join(cwd, '.atm', 'evidence', `${bootstrapTaskId}.json`);
-  const contextBudgetReportPath = path.join(cwd, '.atm', 'reports', 'context-budget', `bootstrap-${bootstrapTaskId}.json`);
-  const continuationReportPath = path.join(cwd, '.atm', 'reports', 'continuation', `${bootstrapTaskId}.json`);
-  const contextSummaryPath = path.join(cwd, '.atm', 'state', 'context-summary', `${bootstrapTaskId}.json`);
-  const contextSummaryMarkdownPath = path.join(cwd, '.atm', 'state', 'context-summary', `${bootstrapTaskId}.md`);
+  const runtime = detectGovernanceRuntime(cwd, bootstrapTaskId);
+  const { paths } = runtime;
+  const taskPath = path.join(cwd, paths.taskPath);
+  const lockPath = path.join(cwd, paths.lockPath);
+  const artifactDir = path.join(cwd, paths.directories?.historyArtifacts ?? '.atm/history/artifacts');
+  const evidencePath = path.join(cwd, paths.evidencePath);
+  const contextBudgetReportPath = path.join(cwd, paths.contextBudgetReportPath);
+  const continuationReportPath = path.join(cwd, paths.continuationReportPath);
+  const contextSummaryPath = path.join(cwd, paths.contextSummaryPath);
+  const contextSummaryMarkdownPath = path.join(cwd, paths.contextSummaryMarkdownPath);
   const checks = [
     { name: 'task-created', passed: existsSync(taskPath), path: relativePathFrom(cwd, taskPath) },
     { name: 'lock-created', passed: existsSync(lockPath), path: relativePathFrom(cwd, lockPath) },
@@ -169,12 +171,13 @@ function evaluateBootstrapEvidence(cwd) {
 
 function materializeSelfHostingArtifacts(cwd, bootstrapEvidence, helloWorld, neutrality, criteria, ok) {
   const adapter = createLocalGovernanceAdapter({ repositoryRoot: cwd });
+  const runtime = detectGovernanceRuntime(cwd, bootstrapTaskId);
   const now = new Date().toISOString();
-  const artifactPath = `.atm/artifacts/${bootstrapTaskId}/hello-world-smoke.json`;
-  const logPath = `.atm/logs/${bootstrapTaskId}.log`;
+  const artifactPath = `.atm/history/artifacts/${bootstrapTaskId}/hello-world-smoke.json`;
+  const logPath = `.atm/history/logs/${bootstrapTaskId}.log`;
   const phaseBReportId = `self-host-alpha/${bootstrapTaskId}`;
-  const phaseBReportPath = `.atm/reports/self-host-alpha/${bootstrapTaskId}.json`;
-  const evidencePath = `.atm/evidence/${bootstrapTaskId}.json`;
+  const phaseBReportPath = `.atm/history/reports/self-host-alpha/${bootstrapTaskId}.json`;
+  const evidencePath = `.atm/history/evidence/${bootstrapTaskId}.json`;
   const estimatedTokens = estimateContextBudgetTokens(bootstrapEvidence, helloWorld, criteria, neutrality?.evidence ?? null);
   const budgetEvaluation = adapter.stores.contextBudgetGuard.evaluateBudget({
     budgetId: `self-host-alpha/${bootstrapTaskId}`,
@@ -239,7 +242,7 @@ function materializeSelfHostingArtifacts(cwd, bootstrapEvidence, helloWorld, neu
     producedBy: '@ai-atomic-framework/cli:self-host-alpha',
     reproducibility: {
       replayable: true,
-      replayCommand: ['node', 'packages/cli/src/atm.mjs', 'self-host-alpha', '--verify', '--json'],
+      replayCommand: ['node', 'atm.mjs', 'self-host-alpha', '--verify', '--json'],
       inputs: ['examples/hello-world/atoms/hello-world.atom.json'],
       expectedArtifacts: [artifactPath, phaseBReportPath, budgetEvaluation.reportPath],
       notes: 'Replay the deterministic self-host-alpha proof inside a fresh sandbox.'
@@ -269,7 +272,7 @@ function materializeSelfHostingArtifacts(cwd, bootstrapEvidence, helloWorld, neu
     handoffKind: 'self-host-alpha',
     continuationGoal: 'Review the stored phase-B proof and decide whether the self-hosting alpha gate can advance.',
     resumePrompt: 'Read the stored context summary first, then inspect the phase-B exit gate report and evidence record.',
-    resumeCommand: ['node', 'packages/cli/src/atm.mjs', 'self-host-alpha', '--verify', '--json'],
+    resumeCommand: ['node', 'atm.mjs', 'self-host-alpha', '--verify', '--json'],
     budgetDecision: budgetEvaluation.decision,
     hardStop: budgetEvaluation.decision === 'hard-stop'
   }));
@@ -281,9 +284,13 @@ function materializeSelfHostingArtifacts(cwd, bootstrapEvidence, helloWorld, neu
     phaseBReportPath,
     budgetReportPath: budgetEvaluation.reportPath,
     budgetSummaryPath: budgetEvaluation.summaryPath ?? null,
-    contextSummaryPath: `.atm/state/context-summary/${bootstrapTaskId}.json`,
-    contextSummaryMarkdownPath: summary.summaryMarkdownPath ?? `.atm/state/context-summary/${bootstrapTaskId}.md`,
+    contextSummaryPath: normalizePortablePath(runtime.paths.contextSummaryPath),
+    contextSummaryMarkdownPath: normalizePortablePath(summary.summaryMarkdownPath ?? runtime.paths.contextSummaryMarkdownPath),
     estimatedTokens,
     budgetDecision: budgetEvaluation.decision
   };
+}
+
+function normalizePortablePath(value) {
+  return String(value || '').replace(/\\/g, '/');
 }

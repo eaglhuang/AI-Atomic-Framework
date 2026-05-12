@@ -8,6 +8,7 @@ export default [
       '**/dist/**',
       '.types/**',
       '.atm/**',
+      'release/**',
       '.turbo/**',
       'coverage/**',
       'templates/**/*.ts'

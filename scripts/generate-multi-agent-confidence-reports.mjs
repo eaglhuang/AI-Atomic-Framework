@@ -14,7 +14,7 @@ const batchTimestamp = timestampArgIndex >= 0 && process.argv[timestampArgIndex 
   : new Date().toISOString().replace(/:/g, '-');
 
 function runAtm(args) {
-  const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
     encoding: 'utf8'
   });
@@ -42,7 +42,7 @@ for (const profile of supportedAgentProfiles) {
     agentId: profile.id,
     agentLabel: profile.label,
     blockingRelease: false,
-    sourceCommand: `node packages/cli/src/atm.mjs ${command.join(' ')}`,
+    sourceCommand: `node atm.mjs ${command.join(' ')}`,
     result: result.parsed
   };
   writeFileSync(path.join(resultsDir, fileName), `${JSON.stringify(reportDocument, null, 2)}\n`, 'utf8');

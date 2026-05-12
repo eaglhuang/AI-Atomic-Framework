@@ -137,8 +137,8 @@ function parseRollbackOptions(argv) {
     toVersion: '',
     behaviorId: 'behavior.evolve',
     registryPath: 'atomic-registry.json',
-    proofPath: '.atm/reports/rollback-proof.json',
-    failureProofPath: '.atm/reports/rollback-proof.failure.json',
+    proofPath: '.atm/history/reports/rollback-proof.json',
+    failureProofPath: '.atm/history/reports/rollback-proof.failure.json',
     decidedBy: process.env.AGENT_IDENTITY || 'ATM rollback engine',
     verifiedAt: new Date().toISOString()
   };

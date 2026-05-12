@@ -39,6 +39,27 @@ const manifest = readJson(manifestPath);
 const entries = Array.isArray(manifest.behaviors) ? manifest.behaviors : [];
 assert(entries.length === 10, `behavior manifest must list exactly 10 behaviors, got ${entries.length}`);
 
+const taxonomyDoc = readText('docs/governance/behavior-taxonomy.md');
+for (const expectedFragment of [
+  '## Split Family',
+  '## Merge Family',
+  '## Evolution Family',
+  '## Lifecycle Family',
+  '## Propagation Family',
+  '`behavior.split`',
+  '`behavior.atomize`',
+  '`behavior.merge`',
+  '`behavior.dedup-merge`',
+  '`behavior.compose`',
+  '`behavior.evolve`',
+  '`behavior.polymorphize`',
+  '`behavior.expire`',
+  '`behavior.sweep`',
+  '`behavior.infect`'
+]) {
+  assert(taxonomyDoc.includes(expectedFragment), `behavior taxonomy doc missing fragment: ${expectedFragment}`);
+}
+
 const expectedActions = [
   'behavior.split',
   'behavior.merge',

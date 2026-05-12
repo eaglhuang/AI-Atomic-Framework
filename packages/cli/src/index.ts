@@ -23,6 +23,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'budget',
+    summary: 'Evaluate ATM context budget policy against an estimated turn load',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'create',
     summary: 'Create and register a new atom through the provisioning facade',
     implemented: true,
@@ -37,8 +44,29 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'guard',
+    summary: 'Run small governance guards such as encoding checks',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
+    commandName: 'handoff',
+    summary: 'Write a continuation summary for the current governed task',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'init',
     summary: 'Adopt ATM in a repository',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
+    commandName: 'lock',
+    summary: 'Check, acquire, or release a governed scope lock',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'json'

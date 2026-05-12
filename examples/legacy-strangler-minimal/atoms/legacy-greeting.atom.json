@@ -12,8 +12,12 @@
   "description": "Minimal example that wraps existing code behind an ATM compute atom entrypoint.",
   "language": {
     "primary": "javascript",
-    "sourceExtensions": [".mjs"],
-    "tooling": ["node"]
+    "sourceExtensions": [
+      ".mjs"
+    ],
+    "tooling": [
+      "node"
+    ]
   },
   "runtime": {
     "kind": "node",
@@ -23,7 +27,11 @@
   "adapterRequirements": {
     "projectAdapter": "local-git",
     "storage": "local-fs",
-    "capabilities": ["filesystem", "schema-validator", "evidence-store"]
+    "capabilities": [
+      "filesystem",
+      "schema-validator",
+      "evidence-store"
+    ]
   },
   "compatibility": {
     "coreVersion": "0.1.0",
@@ -33,7 +41,7 @@
   },
   "hashLock": {
     "algorithm": "sha256",
-    "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "digest": "sha256:a6ba372b9a273504d9e029ec066304dbb512df910304409fc657ee23a97429db",
     "canonicalization": "json-stable-v1"
   },
   "dependencyPolicy": {
@@ -55,7 +63,9 @@
     }
   ],
   "validation": {
-    "commands": ["npm --workspace @ai-atomic-framework/example-legacy-strangler-minimal test"],
+    "commands": [
+      "npm --workspace @ai-atomic-framework/example-legacy-strangler-minimal test"
+    ],
     "evidenceRequired": true
   },
   "performanceBudget": {
@@ -63,5 +73,8 @@
     "inputMutation": "forbidden",
     "maxDurationMs": 1000
   },
-  "tags": ["example", "legacy-strangler"]
+  "tags": [
+    "example",
+    "legacy-strangler"
+  ]
 }

@@ -22,7 +22,7 @@ const requiredFiles = [
 
 const requiredReadmePhrases = [
   'is not just an atom runner',
-  'root-drop, zero-install agent bootstrap',
+  'release-bundle root-drop bootstrap workflow',
   'Default Governance Bundle is the official default experience',
   'not a `packages/core` hard dependency',
   'toolchain is a recommendation, not a semantic requirement',

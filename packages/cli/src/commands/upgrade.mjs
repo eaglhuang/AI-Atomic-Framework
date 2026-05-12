@@ -220,9 +220,9 @@ function loadExplicitInputDocuments(cwd, inputPaths) {
 }
 
 function discoverInputDocuments(cwd) {
-  const reportsRoot = path.join(cwd, '.atm', 'reports');
+  const reportsRoot = path.join(cwd, '.atm', 'history', 'reports');
   if (!existsSync(reportsRoot)) {
-    throw new CliError('ATM_UPGRADE_INPUTS_NOT_FOUND', 'Upgrade requires input reports. Provide --input paths or stage reports under .atm/reports.', {
+    throw new CliError('ATM_UPGRADE_INPUTS_NOT_FOUND', 'Upgrade requires input reports. Provide --input paths or stage reports under .atm/history/reports.', {
       exitCode: 2,
       details: { reportsRoot }
     });
@@ -243,7 +243,7 @@ function discoverInputDocuments(cwd) {
   }
 
   if (inputDocuments.length === 0) {
-    throw new CliError('ATM_UPGRADE_INPUTS_NOT_FOUND', 'Upgrade could not discover any recognized input reports under .atm/reports.', {
+    throw new CliError('ATM_UPGRADE_INPUTS_NOT_FOUND', 'Upgrade could not discover any recognized input reports under .atm/history/reports.', {
       exitCode: 2,
       details: { reportsRoot }
     });
@@ -272,7 +272,7 @@ function evaluateUpgradeContextBudget(options, inputDocuments) {
   const atomId = options.atomId ?? hashDiffInput?.document?.atomId ?? qualityComparisonInput.document.atomId ?? 'ATM-UPGRADE-0000';
   const toVersion = options.toVersion ?? hashDiffInput?.document?.toVersion ?? qualityComparisonInput.document.toVersion ?? 'pending';
   const budgetId = `upgrade/${atomId}/${toVersion}`;
-  const fallbackReportPath = `.atm/reports/context-budget/${sanitizeUpgradeBudgetId(budgetId)}.json`;
+  const fallbackReportPath = `.atm/history/reports/context-budget/${sanitizeUpgradeBudgetId(budgetId)}.json`;
   const estimatedTokens = estimateContextBudgetTokens(
     qualityComparisonInput.document,
     renderQualityReportMarkdown(qualityComparisonInput.document)
@@ -321,10 +321,10 @@ function evaluateUpgradeContextBudget(options, inputDocuments) {
 function materializeUpgradeHardStop(cwd, atomId, qualityReportPath, evaluation, generatedAt) {
   const adapter = createLocalGovernanceAdapter({ repositoryRoot: cwd });
   const continuationReportId = `continuation/upgrade/${atomId}`;
-  const continuationReportPath = `.atm/reports/continuation/upgrade/${atomId}.json`;
-  const evidencePath = `.atm/evidence/${atomId}.json`;
-  const contextSummaryPath = `.atm/state/context-summary/${atomId}.json`;
-  const contextSummaryMarkdownPath = `.atm/state/context-summary/${atomId}.md`;
+  const continuationReportPath = `.atm/history/reports/continuation/upgrade/${atomId}.json`;
+  const evidencePath = `.atm/history/evidence/${atomId}.json`;
+  const contextSummaryPath = `.atm/history/handoff/${atomId}.json`;
+  const contextSummaryMarkdownPath = `.atm/history/handoff/${atomId}.md`;
 
   const continuationInput = {
     workItemId: atomId,
@@ -343,7 +343,7 @@ function materializeUpgradeHardStop(cwd, atomId, qualityReportPath, evaluation, 
     handoffKind: 'budget-hard-stop',
     continuationGoal: 'Reduce the quality-comparison review surface until it fits within the configured context budget.',
     resumePrompt: 'Read the stored continuation summary first, then inspect the budget report and the original quality-comparison report.',
-    resumeCommand: ['node', 'packages/cli/src/atm.mjs', 'upgrade', '--propose', '--atom', atomId, '--to', 'REPLACE_WITH_TARGET_VERSION', '--json'],
+    resumeCommand: ['node', 'atm.mjs', 'upgrade', '--propose', '--atom', atomId, '--to', 'REPLACE_WITH_TARGET_VERSION', '--json'],
     budgetDecision: evaluation.decision,
     hardStop: evaluation.decision === 'hard-stop'
   };
@@ -373,7 +373,7 @@ function materializeUpgradeHardStop(cwd, atomId, qualityReportPath, evaluation, 
 }
 
 function readUpgradeContextBudgetPolicy(cwd) {
-  const policyPath = path.join(cwd, '.atm', 'state', 'context-budget', 'default-policy.json');
+  const policyPath = path.join(cwd, '.atm', 'runtime', 'budget', 'default-policy.json');
   if (!existsSync(policyPath)) {
     return {
       policyId: 'default-policy',
@@ -413,7 +413,7 @@ function evaluateContextBudgetInline(policy, input, generatedAt, reportPath) {
     generatedAt,
     reason,
     reportPath,
-    summaryPath: decision === 'pass' ? undefined : `.atm/state/context-budget/${sanitizeUpgradeBudgetId(input.budgetId)}.md`
+    summaryPath: decision === 'pass' ? undefined : `.atm/runtime/budget/${sanitizeUpgradeBudgetId(input.budgetId)}.md`
   };
 }
 

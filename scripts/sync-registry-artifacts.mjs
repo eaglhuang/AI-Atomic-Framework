@@ -2,9 +2,12 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateRegistryDocumentFile, writeRegistryArtifacts } from '../packages/core/src/registry/registry.mjs';
+import { syncProtectedSurfaceDigests } from './hash-protected-surfaces.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = path.join(root, 'atomic-registry.json');
+
+const digestSync = syncProtectedSurfaceDigests(root);
 
 const validation = validateRegistryDocumentFile(registryPath);
 if (!validation.ok) {
@@ -19,4 +22,4 @@ const written = writeRegistryArtifacts(registryDocument, {
   catalogPath: 'atomic_workbench/registry-catalog.md'
 });
 
-console.log(`[sync-registry-artifacts] wrote ${written.registryPath} and ${written.catalogPath}`);
+console.log(`[sync-registry-artifacts] synced ${digestSync.touched.length} protected surfaces and wrote ${written.registryPath} and ${written.catalogPath}`);

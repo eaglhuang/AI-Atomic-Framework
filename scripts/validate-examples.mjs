@@ -1,8 +1,8 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createTempWorkspace } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -92,7 +92,7 @@ for (const example of examples) {
   const testOutput = testResult.stdout || '';
   assert(testOutput.includes(example.expectedOutput) || testOutput.includes('[example:'), `${example.name} test output missing expected evidence`);
 
-  const validateSpec = run(process.execPath, ['packages/cli/src/atm.mjs', 'validate', '--spec', example.atomSpec]);
+  const validateSpec = run(process.execPath, ['atm.mjs', 'validate', '--spec', example.atomSpec]);
   const validateSpecJson = parseCliJson(validateSpec, `${example.name} spec validation`);
   assert(validateSpecJson.ok === true, `${example.name} spec validation failed`);
 
@@ -101,14 +101,14 @@ for (const example of examples) {
   assert(spec.compatibility?.languageAdapter === 'language-js', `${example.atomSpec} must use language-js compatibility`);
 }
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-examples-'));
+const tempRoot = createTempWorkspace('atm-examples-');
 try {
-  const initResult = run(process.execPath, ['packages/cli/src/atm.mjs', 'init', '--cwd', tempRoot]);
+  const initResult = run(process.execPath, ['atm.mjs', 'init', '--cwd', tempRoot]);
   const initJson = parseCliJson(initResult, 'temp init');
   assert(initJson.ok === true, 'standalone init for examples must pass');
   assert(existsSync(path.join(tempRoot, '.atm', 'config.json')), 'standalone init must create .atm/config.json');
 
-  const statusResult = run(process.execPath, ['packages/cli/src/atm.mjs', 'status', '--cwd', tempRoot]);
+  const statusResult = run(process.execPath, ['atm.mjs', 'status', '--cwd', tempRoot]);
   const statusJson = parseCliJson(statusResult, 'temp status');
   assert(statusJson.ok === true, 'standalone status for examples must pass');
 } finally {

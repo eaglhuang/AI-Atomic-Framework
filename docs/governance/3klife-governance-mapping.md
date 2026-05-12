@@ -13,16 +13,16 @@ Instead, an adapter can map the logical stores onto the existing surfaces.
 
 | Governance surface | Default `.atm` contract | 3KLife mapping candidate |
 | --- | --- | --- |
-| work item store | `.atm/tasks` | `docs/agent-briefs/tasks/*.md` |
-| scope lock store | `.atm/locks` | `tools_node/task-lock.js` managed lock records |
+| work item store | `.atm/history/tasks` | `docs/agent-briefs/tasks/*.md` |
+| scope lock store | `.atm/runtime/locks` | `tools_node/task-lock.js` managed lock records |
 | document index | `.atm/index` | `docs/doc-id-registry-shards/*` |
 | shard store | `.atm/shards` | `docs/tasks/*.json` shards and doc-id registry shards |
-| artifact store | `.atm/artifacts` | `artifacts/` |
-| log store | `.atm/logs` | generated run logs under `artifacts/` or other repo-approved log sinks |
-| run report store | `.atm/reports` | validation and workflow reports under `artifacts/` |
-| state store | `.atm/state` | markdown/json state files already tracked under `docs/` or `artifacts/` |
-| evidence store | `.atm/evidence` | evidence JSON stored beside reports or other generated artifacts |
-| context summary store | `.atm/state/context-summary` | generated handoff summaries or task-level context summaries |
+| artifact store | `.atm/history/artifacts` | `artifacts/` |
+| log store | `.atm/history/logs` | generated run logs under `artifacts/` or other repo-approved log sinks |
+| run report store | `.atm/history/reports` | validation and workflow reports under `artifacts/` |
+| state store | `.atm/runtime/state` | markdown/json state files already tracked under `docs/` or `artifacts/` |
+| evidence store | `.atm/history/evidence` | evidence JSON stored beside reports or other generated artifacts |
+| context summary store | `.atm/history/handoff` | generated handoff summaries or task-level context summaries |
 | adapter reports | optional | adapter-specific JSON reports under `artifacts/` |
 
 ## Important Constraint

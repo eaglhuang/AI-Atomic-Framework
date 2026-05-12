@@ -13,41 +13,43 @@ Minimal host type:
 Bootstrap command:
 
 ```bash
-node packages/cli/src/atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"
+node atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"
 ```
 
 One-line AI kickoff:
 
 ```text
-Read README.md if present, then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json. Continue the bootstrap task without changing the host workflow, and write evidence to .atm/evidence/BOOTSTRAP-0001.json.
+Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.
 ```
 
 Standalone self-hosting alpha prompt:
 
 ```text
-Read README.md. If .atm/config.json is missing, run "node packages/cli/src/atm.mjs bootstrap --cwd . --task \"Bootstrap ATM in this repository\"" from the repository root. Then read AGENTS.md, .atm/profile/default.md, and .atm/tasks/BOOTSTRAP-0001.json, complete the bootstrap task, run the first smoke against examples/hello-world/atoms/hello-world.atom.json, and write artifact, log, evidence, context summary, and budget/continuation reports under .atm/.
+Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.
 ```
 
 Expected generated paths:
 
 - `AGENTS.md`
-- `.atm/profile/default.md`
-- `.atm/state/project-probe.json`
-- `.atm/state/default-guards.json`
-- `.atm/state/context-summary/BOOTSTRAP-0001.json`
-- `.atm/state/context-summary/BOOTSTRAP-0001.md`
-- `.atm/tasks/BOOTSTRAP-0001.json`
-- `.atm/locks/BOOTSTRAP-0001.lock.json`
-- `.atm/evidence/BOOTSTRAP-0001.json`
-- `.atm/reports/context-budget/bootstrap-BOOTSTRAP-0001.json`
-- `.atm/reports/continuation/BOOTSTRAP-0001.json`
-- `.atm/index/`
-- `.atm/shards/`
-- `.atm/artifacts/`
-- `.atm/logs/`
-- `.atm/reports/`
-- `.atm/rules/`
-- `.atm/registry/`
+- `.atm/runtime/profile/default.md`
+- `.atm/runtime/current-task.json`
+- `.atm/runtime/project-probe.json`
+- `.atm/runtime/default-guards.json`
+- `.atm/runtime/budget/default-policy.json`
+- `.atm/history/handoff/BOOTSTRAP-0001.json`
+- `.atm/history/handoff/BOOTSTRAP-0001.md`
+- `.atm/history/tasks/BOOTSTRAP-0001.json`
+- `.atm/runtime/locks/BOOTSTRAP-0001.lock.json`
+- `.atm/history/evidence/BOOTSTRAP-0001.json`
+- `.atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json`
+- `.atm/history/reports/continuation/BOOTSTRAP-0001.json`
+- `.atm/catalog/index/`
+- `.atm/catalog/shards/`
+- `.atm/history/artifacts/`
+- `.atm/history/logs/`
+- `.atm/history/reports/`
+- `.atm/runtime/rules/`
+- `.atm/catalog/registry/`
 
 See `static-site-host/` for a minimal static-site host layout.
 

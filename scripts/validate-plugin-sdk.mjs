@@ -76,7 +76,7 @@ if (!process.exitCode) {
   }
 
   	const layoutSource = readText('packages/plugin-sdk/src/governance/layout.ts');
-  	for (const phrase of ['GovernanceLayout', 'GovernanceAdapter', 'defaultGovernanceLayout', '.atm/tasks', '.atm/reports', '.atm/state/context-budget']) {
+  	for (const phrase of ['GovernanceLayout', 'GovernanceAdapter', 'defaultGovernanceLayout', '.atm/history/tasks', '.atm/history/reports', '.atm/runtime/budget']) {
       if (!layoutSource.includes(phrase)) {
         fail(`governance/layout.ts missing ${phrase}`);
       }

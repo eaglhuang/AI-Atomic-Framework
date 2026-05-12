@@ -21,13 +21,15 @@ function listFiles(directory) {
 
 function rewriteSpecifier(specifier, sourceFile) {
   if (!specifier.startsWith('.')) return specifier;
-  if (specifier.endsWith('.ts')) return specifier.replace(/\.ts$/, '.js');
-  if (specifier.endsWith('.js') || specifier.endsWith('.mjs') || specifier.endsWith('.json')) return specifier;
+  let rewritten = specifier.replace(/\/src\//g, '/dist/');
+  if (rewritten.endsWith('.ts')) return rewritten.replace(/\.ts$/, '.js');
+  if (rewritten.endsWith('.js') || rewritten.endsWith('.mjs') || rewritten.endsWith('.json')) return rewritten;
   const resolved = path.resolve(path.dirname(sourceFile), specifier);
-  if (existsSync(`${resolved}.ts`)) return `${specifier}.js`;
-  if (existsSync(`${resolved}.mjs`)) return `${specifier}.mjs`;
-  if (existsSync(path.join(resolved, 'index.ts'))) return `${specifier.replace(/\/$/, '')}/index.js`;
-  return specifier;
+  if (existsSync(`${resolved}.ts`)) return `${rewritten}.js`;
+  if (existsSync(`${resolved}.mjs`)) return `${rewritten}.mjs`;
+  if (existsSync(path.join(resolved, 'index.ts'))) return `${rewritten.replace(/\/$/, '')}/index.js`;
+  if (existsSync(path.join(resolved, 'index.mjs'))) return `${rewritten.replace(/\/$/, '')}/index.mjs`;
+  return rewritten;
 }
 
 function rewriteRelativeImports(source, sourceFile) {
@@ -83,7 +85,13 @@ function buildPackage(packageDir) {
       writeFileSync(outputPath, transpiled.outputText, 'utf8');
       continue;
     }
-    if (filePath.endsWith('.mjs') || filePath.endsWith('.json')) {
+    if (filePath.endsWith('.mjs')) {
+      const source = rewriteRelativeImports(readFileSync(filePath, 'utf8'), filePath);
+      ensureDir(targetBase);
+      writeFileSync(targetBase, source, 'utf8');
+      continue;
+    }
+    if (filePath.endsWith('.json')) {
       ensureDir(targetBase);
       copyFileSync(filePath, targetBase);
     }

@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), 'self-host-alpha', '--verify', '--agent', 'openai-assistants-api', '--json'], {
+const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'self-host-alpha', '--verify', '--agent', 'openai-assistants-api', '--json'], {
   cwd: root,
   encoding: 'utf8'
 });

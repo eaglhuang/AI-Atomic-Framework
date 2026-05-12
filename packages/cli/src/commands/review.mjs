@@ -26,9 +26,9 @@ export function runReview(argv) {
     throw new CliError('ATM_CLI_USAGE', `Unsupported review action: ${action}`, { exitCode: 2 });
   }
 
-  const queuePath = resolvePath(options.cwd, options.queuePath);
-  const projectionPath = resolvePath(options.cwd, options.projectionPath);
-  const decisionLogPath = resolvePath(options.cwd, options.decisionLogPath);
+  const queuePath = resolveExistingPath(options.cwd, options.queuePath, '.atm/reports/upgrade-proposals.json');
+  const projectionPath = resolveExistingPath(options.cwd, options.projectionPath, '.atm/reports/upgrade-proposals.md');
+  const decisionLogPath = resolveExistingPath(options.cwd, options.decisionLogPath, '.atm/reports/human-review-decisions.json');
 
   if (action === 'list') {
     return runReviewList(options.cwd, queuePath, projectionPath);
@@ -155,7 +155,7 @@ export function runReview(argv) {
 
   const governance = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
   const storedEvidence = governance.stores.evidenceStore.writeEvidence(queueRecord.atomId, decisionLog.evidence);
-  const evidencePath = path.join(options.cwd, '.atm', 'evidence', `${queueRecord.atomId}.json`);
+  const evidencePath = path.join(options.cwd, '.atm', 'history', 'evidence', `${queueRecord.atomId}.json`);
 
   return makeResult({
     ok: true,
@@ -217,9 +217,9 @@ function runReviewList(cwd, queuePath, projectionPath) {
 function parseReviewOptions(argv) {
   const options = {
     cwd: process.cwd(),
-    queuePath: '.atm/reports/upgrade-proposals.json',
-    projectionPath: '.atm/reports/upgrade-proposals.md',
-    decisionLogPath: '.atm/reports/human-review-decisions.json',
+    queuePath: '.atm/history/reports/upgrade-proposals.json',
+    projectionPath: '.atm/history/reports/upgrade-proposals.md',
+    decisionLogPath: '.atm/history/reports/human-review-decisions.json',
     reason: '',
     decidedBy: process.env.AGENT_IDENTITY || 'ATM reviewer',
     decidedAt: new Date().toISOString()
@@ -293,6 +293,15 @@ function resolvePath(cwd, maybeRelativePath) {
   return path.isAbsolute(maybeRelativePath)
     ? maybeRelativePath
     : path.resolve(cwd, maybeRelativePath);
+}
+
+function resolveExistingPath(cwd, primaryRelativePath, legacyRelativePath) {
+  const primaryPath = resolvePath(cwd, primaryRelativePath);
+  if (existsSync(primaryPath)) {
+    return primaryPath;
+  }
+  const legacyPath = resolvePath(cwd, legacyRelativePath);
+  return existsSync(legacyPath) ? legacyPath : primaryPath;
 }
 
 function readDecisionLogFile(filePath) {

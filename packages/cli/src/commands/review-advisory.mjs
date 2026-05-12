@@ -104,7 +104,7 @@ function parseReviewAdvisoryOptions(argv) {
     cwd: process.cwd(),
     mode: 'stub',
     stubProfile: 'pass',
-    outputPath: '.atm/reports/review-advisory.json',
+    outputPath: '.atm/history/reports/review-advisory.json',
     reportId: '',
     targetKind: 'scope',
     targetId: '',
@@ -112,7 +112,7 @@ function parseReviewAdvisoryOptions(argv) {
     providerResponse: '',
     providerCommand: '',
     machineFindings: '',
-    queuePath: '.atm/reports/upgrade-proposals.json',
+    queuePath: '.atm/history/reports/upgrade-proposals.json',
     proposalId: ''
   };
 

@@ -86,8 +86,8 @@ const decisionLog = createHumanReviewDecisionLog({
   reason: 'Automated gates are green and no manual risk surfaced.',
   decidedBy: 'ATM reviewer',
   decidedAt: '2026-01-02T00:00:00.000Z',
-  queuePath: '.atm/reports/upgrade-proposals.json',
-  projectionPath: '.atm/reports/upgrade-proposals.md',
+  queuePath: '.atm/history/reports/upgrade-proposals.json',
+  projectionPath: '.atm/history/reports/upgrade-proposals.md',
   evidenceId: 'human-review.proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve.approve'
 });
 

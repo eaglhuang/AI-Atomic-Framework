@@ -1,7 +1,7 @@
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createTempWorkspace } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -42,14 +42,14 @@ const {
 } = governanceModule;
 
 assert(createOfficialBootstrapCommand('.').includes('bootstrap --cwd .'), 'official bootstrap command must target the CLI bootstrap entrypoint');
-assert(createRecommendedPrompt().includes('.atm/tasks/BOOTSTRAP-0001.json'), 'recommended prompt must point to the bootstrap task');
-assert(createSelfHostingAlphaPrompt().includes('.atm/config.json'), 'self-hosting alpha prompt must check for .atm/config.json');
+assert(createRecommendedPrompt().includes('node atm.mjs next --json'), 'recommended prompt must route through next');
+assert(createSelfHostingAlphaPrompt().includes('node atm.mjs next --json'), 'self-hosting alpha prompt must route through next');
 
 const exampleReadme = readFileSync(path.join(root, 'examples/agent-bootstrap/README.md'), 'utf8');
 assert(exampleReadme.includes('packages/plugin-governance-local/'), 'agent bootstrap example must mention the local governance package');
-assert(exampleReadme.includes('.atm/reports/'), 'agent bootstrap example must mention the reports store');
+assert(exampleReadme.includes('.atm/history/reports/'), 'agent bootstrap example must mention the history reports store');
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-governance-local-'));
+const tempRoot = createTempWorkspace('atm-governance-local-');
 try {
   const hostRepo = path.join(tempRoot, 'host');
   mkdirSync(hostRepo, { recursive: true });
@@ -82,7 +82,7 @@ try {
   assert(lock.files.length === fixture.lockFiles.length, 'lock store must preserve scoped files');
   assert(stores.lockStore.getLock(fixture.workItem.workItemId)?.files.length === fixture.lockFiles.length, 'lock store must read back the lock record');
   stores.lockStore.releaseLock(fixture.workItem.workItemId, fixture.actor);
-  const releasedLock = JSON.parse(readFileSync(path.join(hostRepo, '.atm/locks', `${fixture.workItem.workItemId}.lock.json`), 'utf8'));
+  const releasedLock = JSON.parse(readFileSync(path.join(hostRepo, '.atm/runtime/locks', `${fixture.workItem.workItemId}.lock.json`), 'utf8'));
   assert(releasedLock.released === true, 'lock release must persist a released marker');
 
   stores.documentIndex.updateDocument(fixture.document.path, fixture.document.metadata);
@@ -112,7 +112,7 @@ try {
 
   const guardResult = stores.ruleGuard.runGuard(fixture.ruleGuard.guardId, fixture.ruleGuard.context);
   assert(guardResult.ok === true, 'rule guard store must report ok=true');
-  assert(existsSync(path.join(hostRepo, '.atm/rules', `${fixture.ruleGuard.guardId}.json`)), 'rule guard must write a report file');
+  assert(existsSync(path.join(hostRepo, '.atm/runtime/rules', `${fixture.ruleGuard.guardId}.json`)), 'rule guard must write a report file');
 
   stores.evidenceStore.writeEvidence(fixture.workItem.workItemId, fixture.evidence);
   assert(stores.evidenceStore.listEvidence(fixture.workItem.workItemId).length === 1, 'evidence store must list the recorded evidence');

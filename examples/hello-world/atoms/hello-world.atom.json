@@ -12,8 +12,12 @@
   "description": "Smallest runnable compute atom example for ATM Quick Start.",
   "language": {
     "primary": "javascript",
-    "sourceExtensions": [".mjs"],
-    "tooling": ["node"]
+    "sourceExtensions": [
+      ".mjs"
+    ],
+    "tooling": [
+      "node"
+    ]
   },
   "runtime": {
     "kind": "node",
@@ -23,7 +27,11 @@
   "adapterRequirements": {
     "projectAdapter": "local-git",
     "storage": "local-fs",
-    "capabilities": ["filesystem", "schema-validator", "evidence-store"]
+    "capabilities": [
+      "filesystem",
+      "schema-validator",
+      "evidence-store"
+    ]
   },
   "compatibility": {
     "coreVersion": "0.1.0",
@@ -33,7 +41,7 @@
   },
   "hashLock": {
     "algorithm": "sha256",
-    "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "digest": "sha256:6b488e41dbcc080ec5890efe754b56895bcd19626a49fa1726053923d46f363e",
     "canonicalization": "json-stable-v1"
   },
   "dependencyPolicy": {
@@ -55,7 +63,9 @@
     }
   ],
   "validation": {
-    "commands": ["npm --workspace @ai-atomic-framework/example-hello-world test"],
+    "commands": [
+      "npm --workspace @ai-atomic-framework/example-hello-world test"
+    ],
     "evidenceRequired": true
   },
   "performanceBudget": {
@@ -63,5 +73,8 @@
     "inputMutation": "forbidden",
     "maxDurationMs": 1000
   },
-  "tags": ["example", "hello-world"]
+  "tags": [
+    "example",
+    "hello-world"
+  ]
 }

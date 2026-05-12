@@ -3,17 +3,25 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const defaultRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const zeroDigestPattern = /sha256:0{64}/i;
+const repeatedDigitDigestPattern = /sha256:([0-9a-f])\1{63}/i;
 
 export function runHashPlaceholderAudit(options = {}) {
   const root = path.resolve(options.root ?? defaultRoot);
   const findings = [];
-  const files = [path.join(root, 'atomic-registry.json'), ...listJsonFiles(path.join(root, 'specs'))];
+  const files = [
+    path.join(root, 'atomic-registry.json'),
+    ...listJsonFiles(path.join(root, 'specs')),
+    ...listExampleAtomSpecs(path.join(root, 'examples'))
+  ];
   for (const filePath of files) {
     if (!existsSync(filePath)) continue;
+    const relativePath = relative(root, filePath);
+    if (isAllowedPlaceholderPath(relativePath)) {
+      continue;
+    }
     const content = readFileSync(filePath, 'utf8');
-    if (zeroDigestPattern.test(content)) findings.push({ file: relative(root, filePath), issue: 'placeholder-zero-sha256-digest' });
-    if (/placeholder digest|dummy digest/i.test(content)) findings.push({ file: relative(root, filePath), issue: 'placeholder-digest-text' });
+    if (repeatedDigitDigestPattern.test(content)) findings.push({ file: relativePath, issue: 'placeholder-repeated-sha256-digest' });
+    if (/placeholder digest|dummy digest/i.test(content)) findings.push({ file: relativePath, issue: 'placeholder-digest-text' });
   }
   return { ok: findings.length === 0, checked: files.filter(existsSync).map((filePath) => relative(root, filePath)), findings };
 }
@@ -29,6 +37,21 @@ function listJsonFiles(directory) {
   return results;
 }
 
+function listExampleAtomSpecs(examplesRoot) {
+  if (!existsSync(examplesRoot)) return [];
+  const results = [];
+  for (const entry of readdirSync(examplesRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    results.push(...listJsonFiles(path.join(examplesRoot, entry.name, 'atoms')));
+  }
+  return results;
+}
+
+function isAllowedPlaceholderPath(relativePath) {
+  const normalized = relativePath.replace(/\\/g, '/');
+  return normalized.startsWith('fixtures/') || normalized.startsWith('tests/');
+}
+
 function relative(root, filePath) {
   return path.relative(root, filePath).replace(/\\/g, '/');
 }
@@ -41,5 +64,5 @@ if (isDirectRun) {
     for (const finding of report.findings) console.error(`[hash-placeholders:${mode}] ${finding.file}: ${finding.issue}`);
     process.exit(1);
   }
-  console.log(`[hash-placeholders:${mode}] ok (${report.checked.length} protected registry/spec files checked)`);
+  console.log(`[hash-placeholders:${mode}] ok (${report.checked.length} protected registry/spec/example files checked)`);
 }

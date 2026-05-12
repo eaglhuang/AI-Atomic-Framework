@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import os from 'node:os';
+import { copyFileSync, existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { computeSeedRegistrySnapshot, evaluateSeedSelfVerification, validateRegistryDocumentAgainstSchema } from '../packages/cli/src/commands/registry-shared.mjs';
+import { createTempWorkspace } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -26,7 +26,7 @@ function assert(condition, message) {
 }
 
 function runAtm(args) {
-  const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
     encoding: 'utf8'
   });
@@ -86,7 +86,7 @@ assert(verification.entry.selfVerification.specHash === expected.entry.selfVerif
 assert(verification.entry.selfVerification.codeHash === expected.entry.selfVerification.codeHash, 'registry codeHash must equal computed codeHash');
 assert(verification.entry.selfVerification.testHash === expected.entry.selfVerification.testHash, 'registry testHash must equal computed testHash');
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-seed-drift-'));
+const tempRoot = createTempWorkspace('atm-seed-drift-');
 try {
   const driftFile = path.join(tempRoot, 'seed-drift.js');
   copyFileSync(path.join(root, 'packages/core/seed.js'), driftFile);

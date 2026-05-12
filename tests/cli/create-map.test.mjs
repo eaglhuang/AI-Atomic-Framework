@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import os from 'node:os';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createTempWorkspace } from '../../scripts/temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-cli-create-map-'));
+const tempRoot = createTempWorkspace('atm-cli-create-map-');
 const members = JSON.stringify([{ atomId: 'ATM-FIXTURE-0001', version: '0.1.0' }]);
 const entrypoints = JSON.stringify(['ATM-FIXTURE-0001']);
 const qualityTargets = JSON.stringify({ requiredChecks: 1, promoteGateRequired: true });
@@ -48,7 +48,7 @@ try {
 console.log('[cli-create-map:test] ok (4 acceptance checks)');
 
 function runAtm(args) {
-  const result = spawnSync(process.execPath, [path.join(root, 'packages/cli/src/atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
     encoding: 'utf8'
   });
