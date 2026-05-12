@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { parseAtomicSpecFile } from '../packages/core/src/spec/parse-spec.mjs';
@@ -35,9 +35,7 @@ function readJson(relativePath) {
 }
 
 async function importFromTypeScript(relativePath) {
-  const source = readText(relativePath);
-  const dataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`;
-  return import(dataUrl);
+  return import(pathToFileURL(path.join(root, relativePath)).href);
 }
 
 function stageFixtureFiles(tempRoot) {
@@ -50,6 +48,9 @@ function stageFixtureFiles(tempRoot) {
 function assertProtectedFilesStayNeutral() {
   const protectedFiles = [
     'packages/core/src/agent-execute/execute-agent-task.ts',
+    'packages/core/src/agent-execute/execution-constants.ts',
+    'packages/core/src/agent-execute/execution-documents.ts',
+    'packages/core/src/agent-execute/execution-validation.ts',
     'packages/plugin-sdk/src/effect-node.ts',
     'schemas/agent-execute/execution-evidence.schema.json',
     'scripts/validate-agent-execute.mjs',
