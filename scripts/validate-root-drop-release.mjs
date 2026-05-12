@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.mjs';
-import { createTempWorkspace } from './temp-root.mjs';
+import { createTempWorkspace, initializeGitRepository } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -44,6 +44,7 @@ try {
   const bundleRepo = path.join(tempRoot, 'bundle-repo');
   mkdirSync(bundleRepo, { recursive: true });
   cpSync(release.releaseRoot, bundleRepo, { recursive: true });
+  initializeGitRepository(bundleRepo);
 
   const bundleDoctor = runAtm(bundleRepo, ['doctor', '--json']);
   assert(bundleDoctor.exitCode === 0, 'release bundle doctor must exit 0');
@@ -56,6 +57,7 @@ try {
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
   cpSync(release.releaseRoot, blankRepo, { recursive: true });
+  initializeGitRepository(blankRepo);
 
   const nextBeforeBootstrap = runAtm(blankRepo, ['next', '--json']);
   assert(nextBeforeBootstrap.exitCode === 1, 'blank root-drop repo next must exit 1 before bootstrap');

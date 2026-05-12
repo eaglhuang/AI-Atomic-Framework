@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildOnefileRelease } from './build-onefile-release.mjs';
-import { createTempWorkspace } from './temp-root.mjs';
+import { createTempWorkspace, initializeGitRepository } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -41,6 +41,7 @@ try {
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
   copyFileSync(release.outputFilePath, path.join(blankRepo, 'atm.mjs'));
+  initializeGitRepository(blankRepo);
   assert(!existsSync(path.join(blankRepo, 'packages')), 'blank onefile host must not contain packages directory');
   assert(!existsSync(path.join(blankRepo, 'scripts')), 'blank onefile host must not contain scripts directory');
 

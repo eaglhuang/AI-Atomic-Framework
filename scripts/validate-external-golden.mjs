@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.mjs';
-import { createTempWorkspace } from './temp-root.mjs';
+import { createTempWorkspace, initializeGitRepository } from './temp-root.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -52,6 +52,7 @@ try {
   mkdirSync(hostRepo, { recursive: true });
   cpSync(fixtureRoot, hostRepo, { recursive: true });
   copyReleaseBundleIntoHost(release.releaseRoot, hostRepo);
+  initializeGitRepository(hostRepo);
 
   const hostPackage = JSON.parse(readFileSync(path.join(hostRepo, 'package.json'), 'utf8'));
   assert(hostPackage.name === 'downstream-js-repo-fixture', 'release overlay must preserve downstream package.json');
