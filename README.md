@@ -1,5 +1,7 @@
 # AI-Atomic-Framework
 
+[![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
+
 AI-Atomic-Framework, also called ATM in this repository, is a governance framework for AI-assisted engineering. It is not just an atom runner. It defines how AI work is scoped, locked, validated, evidenced, summarized, and safely handed off across iterations.
 
 The project is designed for AI vibe coding teams that need repeatable engineering control without binding the framework to one model provider, editor, workflow engine, database, or host project.
