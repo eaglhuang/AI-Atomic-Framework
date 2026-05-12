@@ -42,6 +42,10 @@ for (const relativePath of [
   statusFailProofPath,
   semanticFailProofPath,
   'packages/core/src/registry/rollback.ts',
+  'packages/core/src/registry/rollback-types.ts',
+  'packages/core/src/registry/rollback-proof.ts',
+  'packages/core/src/registry/rollback-map.ts',
+  'packages/core/src/registry/rollback-registry-helpers.ts',
   'packages/cli/src/commands/rollback.mjs'
 ]) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
