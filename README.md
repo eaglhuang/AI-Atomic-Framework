@@ -159,6 +159,7 @@ npm run validate:full
 ```
 
 Protected-surface neutrality rules and migration guidance live in [docs/governance/DOCS_NEUTRALITY_AUDIT.md](docs/governance/DOCS_NEUTRALITY_AUDIT.md).
+For host-side enforcement options such as Git hooks, CI gates, branch protection, and review policy, see [docs/HOST_GOVERNANCE_INTEGRATION.md](docs/HOST_GOVERNANCE_INTEGRATION.md).
 
 ## Contributing
 
