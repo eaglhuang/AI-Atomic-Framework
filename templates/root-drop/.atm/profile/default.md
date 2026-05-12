@@ -1,3 +1,4 @@
+<!-- ATM TEMPLATE: root-drop-default-profile -->
 # ATM Default Profile
 
 Purpose: give any AI agent a model-neutral starter workflow for repositories that do not yet have their own governance layer.

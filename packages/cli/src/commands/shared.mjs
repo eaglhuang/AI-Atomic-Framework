@@ -29,8 +29,120 @@ export function makeResult({ ok, command, cwd, mode = 'standalone', messages = [
   };
 }
 
-export function writeResult(result, stream) {
+export function defineCommandSpec(spec) {
+  const name = String(spec?.name || '').trim();
+  if (!name) {
+    throw new Error('Command spec requires a name.');
+  }
+  return Object.freeze({
+    name,
+    summary: String(spec?.summary || '').trim(),
+    positional: normalizeSpecArray(spec?.positional),
+    options: normalizeSpecArray(spec?.options),
+    examples: normalizeSpecArray(spec?.examples)
+  });
+}
+
+export function parseArgsForCommand(spec, argv = [], options = {}) {
+  const state = {
+    options: {},
+    positional: [],
+    helpRequested: false,
+    outputFormat: null
+  };
+  const allowUnknown = options.allowUnknown === true;
+  const optionMap = buildOptionMap(spec?.options ?? []);
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--help' || arg === '-h') {
+      state.helpRequested = true;
+      continue;
+    }
+    if (arg === '--json') {
+      state.outputFormat = 'json';
+      continue;
+    }
+    if (arg === '--pretty') {
+      if (state.outputFormat !== 'json') {
+        state.outputFormat = 'pretty';
+      }
+      continue;
+    }
+
+    if (arg.startsWith('--') || arg.startsWith('-')) {
+      const optionSpec = optionMap.get(arg);
+      if (!optionSpec) {
+        if (allowUnknown) {
+          state.positional.push(arg);
+          continue;
+        }
+        throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} does not support option ${arg}`, { exitCode: 2 });
+      }
+
+      const key = optionSpec.flag.replace(/^-+/, '').replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+      if (optionSpec.value) {
+        const value = argv[index + 1];
+        if (!value || value.startsWith('--') || value === '-h') {
+          throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for ${optionSpec.flag}`, { exitCode: 2 });
+        }
+        if (optionSpec.repeatable) {
+          state.options[key] = Array.isArray(state.options[key]) ? [...state.options[key], value] : [value];
+        } else {
+          state.options[key] = value;
+        }
+        index += 1;
+        continue;
+      }
+
+      state.options[key] = true;
+      continue;
+    }
+
+    state.positional.push(arg);
+  }
+
+  return state;
+}
+
+export function makeHelpResult(spec, cwd = process.cwd()) {
+  const usage = {
+    command: spec.name,
+    summary: spec.summary,
+    positional: spec.positional ?? [],
+    options: spec.options ?? [],
+    examples: spec.examples ?? []
+  };
+  return makeResult({
+    ok: true,
+    command: spec.name,
+    cwd,
+    messages: [message('info', 'ATM_CLI_HELP_READY', `Help for ${spec.name}.`)],
+    evidence: {
+      usage
+    }
+  });
+}
+
+export function writeResult(result, stream, outputFormat = 'json') {
+  if (outputFormat === 'pretty') {
+    stream.write(formatPrettyResult(result));
+    return;
+  }
   stream.write(`${JSON.stringify(result, null, 2)}\n`);
+}
+
+export function formatPrettyResult(result) {
+  const statusText = result.ok ? 'OK' : 'FAIL';
+  const lines = [`[${statusText}] ${result.command} (${result.cwd})`];
+  for (const entry of result.messages ?? []) {
+    lines.push(`${entry.level}: ${entry.code} - ${entry.text}`);
+  }
+  if (result.evidence && Object.keys(result.evidence).length > 0) {
+    lines.push('evidence:');
+    lines.push(JSON.stringify(result.evidence, null, 2));
+  }
+  return `${lines.join('\n')}\n`;
 }
 
 export function parseOptions(argv, commandName) {
@@ -164,7 +276,7 @@ export function parseOptions(argv, commandName) {
       index += 1;
       continue;
     }
-    if (arg === '--json') {
+    if (arg === '--json' || arg === '--pretty') {
       continue;
     }
     if (arg.startsWith('--')) {
@@ -216,6 +328,23 @@ export function writeJsonFile(filePath, value) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+function normalizeSpecArray(value) {
+  return Array.isArray(value) ? value.map((entry) => entry) : [];
+}
+
+function buildOptionMap(options) {
+  const map = new Map();
+  for (const option of options) {
+    if (option?.flag) {
+      map.set(option.flag, option);
+    }
+    if (option?.alias) {
+      map.set(option.alias, option);
+    }
+  }
+  return map;
+}
+
 function requireOptionValue(argv, optionIndex, optionName, commandName) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
@@ -223,3 +352,4 @@ function requireOptionValue(argv, optionIndex, optionName, commandName) {
   }
   return value;
 }
+

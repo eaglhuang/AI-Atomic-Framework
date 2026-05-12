@@ -10,6 +10,12 @@ const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
 const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
+const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');
+const perCommandHelpSnapshots = {
+  next: readJson('tests/cli-fixtures/help-snapshots/next.json'),
+  guide: readJson('tests/cli-fixtures/help-snapshots/guide.json'),
+  upgrade: readJson('tests/cli-fixtures/help-snapshots/upgrade.json')
+};
 
 function fail(message) {
   console.error(`[cli:${mode}] ${message}`);
@@ -71,6 +77,30 @@ for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/boots
 const cliIndex = readFileSync(path.join(root, 'packages/cli/src/index.ts'), 'utf8');
 for (const commandName of fixture.commands) {
   assert(cliIndex.includes(`commandName: '${commandName}'`), `index.ts missing command descriptor: ${commandName}`);
+}
+
+const globalHelp = runAtm(['--help'], root);
+assert(globalHelp.exitCode === 0, '--help must exit 0');
+assertReadable(globalHelp, '--help');
+assert(globalHelp.parsed.ok === true, '--help must report ok=true');
+const listedCommands = (Array.isArray(globalHelp.parsed.evidence?.commands) ? globalHelp.parsed.evidence.commands : [])
+  .map((entry) => typeof entry === 'string' ? entry : entry.command)
+  .filter(Boolean)
+  .sort((left, right) => left.localeCompare(right));
+assert(JSON.stringify(listedCommands) === JSON.stringify([...helpCommandSnapshot.commands].sort((left, right) => left.localeCompare(right))), '--help command list must match snapshot fixture');
+
+for (const commandName of helpCommandSnapshot.commands) {
+  const commandHelp = runAtm([commandName, '--help'], root);
+  assert(commandHelp.exitCode === 0, `${commandName} --help must exit 0`);
+  assertReadable(commandHelp, `${commandName} --help`);
+  assert(commandHelp.parsed.ok === true, `${commandName} --help must report ok=true`);
+  assert(commandHelp.parsed.command === commandName, `${commandName} --help must keep command identity`);
+  assert(commandHelp.parsed.evidence?.usage?.command === commandName, `${commandName} --help must report usage.command`);
+
+  const snapshotUsage = perCommandHelpSnapshots[commandName];
+  if (snapshotUsage) {
+    assert(JSON.stringify(commandHelp.parsed.evidence?.usage ?? null) === JSON.stringify(snapshotUsage), `${commandName} --help usage snapshot must match fixture`);
+  }
 }
 
 const tempRoot = createTempWorkspace('atm-cli-');

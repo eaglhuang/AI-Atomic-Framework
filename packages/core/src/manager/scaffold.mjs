@@ -148,13 +148,17 @@ function createTemplateMap(normalizedModel, options) {
 }
 
 function renderTemplate(templatePath, values) {
-  const template = readFileSync(templatePath, 'utf8');
+  const template = stripTemplateHeader(readFileSync(templatePath, 'utf8'));
   return `${template.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, (match, key) => {
     if (!Object.hasOwn(values, key)) {
       throw new Error(`Unknown scaffold template token: ${key}`);
     }
     return values[key];
   })}\n`;
+}
+
+function stripTemplateHeader(template) {
+  return template.replace(/^\s*<!--\s*ATM TEMPLATE:[\s\S]*?-->\s*/i, '');
 }
 
 function toPortablePath(value) {

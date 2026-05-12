@@ -48,10 +48,15 @@ try {
   const scaffoldedSpec = JSON.parse(readFileSync(specPath, 'utf8'));
   check(scaffoldedSpec.id === fixture.expectedAtomId, 'scaffolded spec must preserve atom id');
   check(scaffoldedSpec.title === fixture.expectedTitle, 'scaffolded spec must preserve atom title');
+  const scaffoldedSpecRaw = readFileSync(specPath, 'utf8');
+  check(!scaffoldedSpecRaw.includes('ATM TEMPLATE'), 'scaffolded spec must not contain template headers');
+  check(!scaffoldedSpecRaw.includes('{{'), 'scaffolded spec must not contain unresolved template placeholders');
 
   const scaffoldedTest = readFileSync(testPath, 'utf8');
   check(scaffoldedTest.includes(fixture.expectedAtomId), 'scaffolded test must mention atom id');
   check(scaffoldedTest.includes(defaultAtomSpecFileName), 'scaffolded test must reference atom spec file');
+  check(!scaffoldedTest.includes('ATM TEMPLATE'), 'scaffolded test must not contain template headers');
+  check(!scaffoldedTest.includes('{{'), 'scaffolded test must not contain unresolved template placeholders');
 
   writeFileSync(testPath, `${scaffoldedTest}\n// manual edit\n`, 'utf8');
   const secondScaffold = scaffoldAtomWorkbench(parsed.normalizedModel, { repositoryRoot: tempRoot });
