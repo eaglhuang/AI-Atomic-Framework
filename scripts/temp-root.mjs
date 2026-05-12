@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -11,6 +12,16 @@ export function createTempWorkspace(prefix) {
   );
   mkdirSync(workspacePath, { recursive: true });
   return workspacePath;
+}
+
+export function initializeGitRepository(repositoryRoot) {
+  const result = spawnSync('git', ['init', '-q'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8'
+  });
+  if (result.status !== 0) {
+    throw new Error(`git init failed for ${repositoryRoot}: ${result.stderr || result.stdout}`);
+  }
 }
 
 function resolveTempBaseRoot() {
