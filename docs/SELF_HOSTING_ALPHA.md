@@ -2,6 +2,10 @@
 
 This document defines the standalone self-hosting alpha proof for ATM.
 
+## Official npm Route
+
+ATM upstream development uses npm only for the alpha route. Run `npm install`, `npm run build`, `npm run typecheck`, `npm run lint`, and `npm test` before treating the repo as ready. pnpm/corepack support is intentionally out of scope for this first optimization pass.
+
 ## Official Single-Entry Prompt
 
 ```text
@@ -18,6 +22,9 @@ Read README.md. If .atm/config.json is missing, run "node packages/cli/src/atm.m
 - The proof does not depend on downstream host tooling, private repository paths, or a non-portable adapter.
 
 ## Phase B Exit Gate
+
+Before running the deterministic alpha0 gate in the upstream checkout, `node packages/cli/src/atm.mjs doctor --json` should report `ATM_DOCTOR_OK`.
+
 
 Run the deterministic alpha0 gate with:
 

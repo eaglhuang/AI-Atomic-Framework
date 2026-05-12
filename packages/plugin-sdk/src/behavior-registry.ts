@@ -1,6 +1,5 @@
 import type { RegistryTransitionAction } from '@ai-atomic-framework/core';
-import type { AtomBehavior, AtomBehaviorContext, AtomBehaviorInput, AtomBehaviorOutput } from './behavior.ts';
-import { EVOLVE_DELEGATION_TARGET } from './behavior.ts';
+import { EVOLVE_DELEGATION_TARGET, type AtomBehavior, type AtomBehaviorContext, type AtomBehaviorInput, type AtomBehaviorOutput } from './behavior.ts';
 
 /**
  * BehaviorRegistry — central hub for registering and resolving AtomBehavior

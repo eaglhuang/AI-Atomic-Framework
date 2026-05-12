@@ -5,11 +5,24 @@
   "description": "Deterministic rule guards for protected framework surfaces.",
   "license": "MIT",
   "type": "module",
-  "exports": "./src/index.ts",
-  "files": ["src"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
+    "build": "node ../../scripts/build-package-dist.mjs --package packages/plugin-rule-guard",
     "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
-    "typecheck": "node ../../scripts/validate-package-skeleton.mjs --mode typecheck",
-    "lint": "node ../../scripts/validate-package-skeleton.mjs --mode lint"
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@ai-atomic-framework/plugin-sdk": "0.0.0"
   }
 }

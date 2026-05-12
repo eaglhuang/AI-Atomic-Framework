@@ -5,11 +5,21 @@
   "description": "Core contracts and shared primitives for AI-Atomic-Framework.",
   "license": "MIT",
   "type": "module",
-  "exports": "./src/index.ts",
-  "files": ["src"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
+    "build": "node ../../scripts/build-package-dist.mjs --package packages/core",
     "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
-    "typecheck": "node ../../scripts/validate-package-skeleton.mjs --mode typecheck",
-    "lint": "node ../../scripts/validate-package-skeleton.mjs --mode lint"
-  }
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
 }

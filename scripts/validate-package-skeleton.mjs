@@ -77,13 +77,17 @@ for (const packageSpec of fixture.packages) {
   if (manifest.type !== 'module') {
     fail(`${manifestPath} must use type=module`);
   }
-  if (manifest.exports !== './src/index.ts') {
-    fail(`${manifestPath} must export ./src/index.ts during skeleton phase`);
+  const exportTarget = manifest.exports?.['.'] ?? manifest.exports;
+  if (exportTarget?.import !== './dist/index.js' || exportTarget?.types !== './dist/index.d.ts') {
+    fail(`${manifestPath} must export ./dist/index.js with ./dist/index.d.ts types`);
   }
-  if (manifest.files?.[0] !== 'src') {
-    fail(`${manifestPath} must publish src during skeleton phase`);
+  if (!Array.isArray(manifest.files) || !manifest.files.includes('dist')) {
+    fail(`${manifestPath} must publish dist artifacts`);
   }
-  for (const scriptName of ['test', 'typecheck', 'lint']) {
+  if (manifest.types !== './dist/index.d.ts') {
+    fail(`${manifestPath} must set types=./dist/index.d.ts`);
+  }
+  for (const scriptName of ['build', 'test', 'typecheck', 'lint']) {
     if (!manifest.scripts?.[scriptName]) {
       fail(`${manifestPath} missing script: ${scriptName}`);
     }

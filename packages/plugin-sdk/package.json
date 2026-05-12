@@ -5,14 +5,24 @@
   "description": "Plugin SDK skeleton for ATM governance capabilities.",
   "license": "MIT",
   "type": "module",
-  "exports": "./src/index.ts",
-  "files": ["src"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "dependencies": {
     "@ai-atomic-framework/core": "0.0.0"
   },
   "scripts": {
-    "test": "node ../../scripts/validate-plugin-sdk.mjs --mode test",
-    "typecheck": "node ../../scripts/validate-plugin-sdk.mjs --mode typecheck",
-    "lint": "node ../../scripts/validate-plugin-sdk.mjs --mode lint"
-  }
+    "build": "node ../../scripts/build-package-dist.mjs --package packages/plugin-sdk",
+    "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
 }

@@ -16,7 +16,7 @@ const requiredFiles = [
   'docs/governance/DOCS_NEUTRALITY_AUDIT.md',
   'docs/governance/docs-neutrality-policy.json',
   'package.json',
-  'pnpm-workspace.yaml',
+  'package-lock.json',
   'turbo.json'
 ];
 
@@ -134,7 +134,7 @@ if (!process.exitCode) {
   }
 
   const packageJson = JSON.parse(readRelative('package.json'));
-  for (const scriptName of ['test', 'typecheck', 'lint']) {
+  for (const scriptName of ['build', 'test', 'typecheck', 'lint', 'validate:quick', 'validate:standard', 'validate:full']) {
     if (!packageJson.scripts?.[scriptName]) {
       fail(`package.json missing script: ${scriptName}`);
     }

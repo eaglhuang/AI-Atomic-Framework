@@ -5,11 +5,19 @@
   "description": "CLI entrypoint for AI-Atomic-Framework repository adoption and validation.",
   "license": "MIT",
   "type": "module",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "bin": {
     "atm": "./src/atm.mjs"
   },
-  "files": ["src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "dependencies": {
     "@ai-atomic-framework/core": "0.0.0",
     "@ai-atomic-framework/plugin-human-review": "0.0.0",
@@ -17,8 +25,10 @@
     "@ai-atomic-framework/plugin-rule-guard": "0.0.0"
   },
   "scripts": {
+    "build": "node ../../scripts/build-package-dist.mjs --package packages/cli",
     "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
-    "typecheck": "node ../../scripts/validate-package-skeleton.mjs --mode typecheck",
-    "lint": "node ../../scripts/validate-package-skeleton.mjs --mode lint"
-  }
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
 }

@@ -1,128 +1,112 @@
 {
-    "schemaId":  "atm.generatorProvenanceAudit",
-    "specVersion":  "0.1.0",
-    "registryId":  "registry.seed",
-    "registryGeneratedAt":  "2026-05-08T17:08:05.696Z",
-    "summary":  {
-                    "total":  6,
-                    "generated":  2,
-                    "backfilled":  3,
-                    "atomized":  0,
-                    "bootstrapSelf":  1,
-                    "unmarked":  0
-                },
-    "entries":  [
-                    {
-                        "atomId":  "ATM-CORE-0001",
-                        "logicalName":  "atom.core-seed",
-                        "provenance":  "backfilled",
-                        "marker":  "generator-provenance:backfilled",
-                        "workbenchPath":  "atomic_workbench/atoms/ATM-CORE-0001",
-                        "specPath":  "specs/atom-seed-spec.json",
-                        "codePaths":  [
-                                          "packages/core/seed.js"
-                                      ],
-                        "testPaths":  [
-                                          "scripts/validate-seed-spec.mjs",
-                                          "scripts/validate-seed-registry.mjs"
-                                      ],
-                        "driftOk":  true,
-                        "issues":  [
-
-                                   ]
-                    },
-                    {
-                        "atomId":  "ATM-CORE-0003",
-                        "logicalName":  "atom.plugin-rule-guard.neutrality-scanner",
-                        "provenance":  "backfilled",
-                        "marker":  "generator-provenance:backfilled",
-                        "workbenchPath":  "atomic_workbench/atoms/ATM-CORE-0003",
-                        "specPath":  "specs/neutrality-scanner.atom.json",
-                        "codePaths":  [
-                                          "packages/plugin-rule-guard/src/neutrality-scanner.mjs"
-                                      ],
-                        "testPaths":  [
-                                          "scripts/validate-neutrality-scanner.mjs"
-                                      ],
-                        "driftOk":  true,
-                        "issues":  [
-
-                                   ]
-                    },
-                    {
-                        "atomId":  "ATM-CORE-0004",
-                        "logicalName":  "atom.core-atom-generator",
-                        "provenance":  "bootstrap-self",
-                        "marker":  "generator-provenance:bootstrap-self",
-                        "workbenchPath":  "atomic_workbench/atoms/ATM-CORE-0004",
-                        "specPath":  "atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json",
-                        "codePaths":  [
-                                          "packages/core/src/manager/atom-generator.mjs",
-                                          "packages/core/src/manager/id-allocator.mjs"
-                                      ],
-                        "testPaths":  [
-                                          "atomic_workbench/atoms/ATM-CORE-0004/atom.test.ts",
-                                          "tests/core/atom-generator.test.mjs",
-                                          "tests/core/id-allocator.test.mjs"
-                                      ],
-                        "driftOk":  true,
-                        "issues":  [
-
-                                   ]
-                    },
-                    {
-                        "atomId":  "ATM-FIXTURE-0001",
-                        "logicalName":  "atom.fixture-generator-dogfood",
-                        "provenance":  "generated",
-                        "marker":  "generator-provenance:generated",
-                        "workbenchPath":  "atomic_workbench/atoms/ATM-FIXTURE-0001",
-                        "specPath":  "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json",
-                        "codePaths":  [
-                                          "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs"
-                                      ],
-                        "testPaths":  [
-                                          "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.test.ts"
-                                      ],
-                        "driftOk":  true,
-                        "issues":  [
-
-                                   ]
-                    },
-                    {
-                        "atomId":  "ATM-MAP-0001",
-                        "logicalName":  null,
-                        "provenance":  "generated",
-                        "marker":  "generator-provenance:generated",
-                        "workbenchPath":  "atomic_workbench/maps/ATM-MAP-0001",
-                        "specPath":  "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
-                        "codePaths":  [
-
-                                      ],
-                        "testPaths":  [
-                                          "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs"
-                                      ],
-                        "driftOk":  true,
-                        "issues":  [
-
-                                   ]
-                    },
-                    {
-                        "atomId":  "ATM-MAP-0002",
-                        "logicalName":  null,
-                        "provenance":  "backfilled",
-                        "marker":  "generator-provenance:backfilled",
-                        "workbenchPath":  "atomic_workbench/maps/ATM-MAP-0002",
-                        "specPath":  "atomic_workbench/maps/ATM-MAP-0002/map.spec.json",
-                        "codePaths":  [
-
-                                      ],
-                        "testPaths":  [
-                                          "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.mjs"
-                                      ],
-                        "driftOk":  true,
-                        "issues":  [
-
-                                   ]
-                    }
-                ]
+  "schemaId": "atm.generatorProvenanceAudit",
+  "specVersion": "0.1.0",
+  "registryId": "registry.seed",
+  "registryGeneratedAt": "2026-05-11T13:56:46.0805195Z",
+  "summary": {
+    "total": 6,
+    "generated": 2,
+    "backfilled": 3,
+    "atomized": 0,
+    "bootstrapSelf": 1,
+    "unmarked": 0
+  },
+  "entries": [
+    {
+      "atomId": "ATM-CORE-0001",
+      "logicalName": "atom.core-seed",
+      "provenance": "backfilled",
+      "marker": "generator-provenance:backfilled",
+      "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0001",
+      "specPath": "specs/atom-seed-spec.json",
+      "codePaths": [
+        "packages/core/seed.js"
+      ],
+      "testPaths": [
+        "scripts/validate-seed-spec.mjs",
+        "scripts/validate-seed-registry.mjs"
+      ],
+      "driftOk": true,
+      "issues": []
+    },
+    {
+      "atomId": "ATM-CORE-0003",
+      "logicalName": "atom.plugin-rule-guard.neutrality-scanner",
+      "provenance": "backfilled",
+      "marker": "generator-provenance:backfilled",
+      "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0003",
+      "specPath": "specs/neutrality-scanner.atom.json",
+      "codePaths": [
+        "packages/plugin-rule-guard/src/neutrality-scanner.mjs"
+      ],
+      "testPaths": [
+        "scripts/validate-neutrality-scanner.mjs"
+      ],
+      "driftOk": true,
+      "issues": []
+    },
+    {
+      "atomId": "ATM-CORE-0004",
+      "logicalName": "atom.core-atom-generator",
+      "provenance": "bootstrap-self",
+      "marker": "generator-provenance:bootstrap-self",
+      "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0004",
+      "specPath": "atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json",
+      "codePaths": [
+        "packages/core/src/manager/atom-generator.mjs",
+        "packages/core/src/manager/id-allocator.mjs"
+      ],
+      "testPaths": [
+        "atomic_workbench/atoms/ATM-CORE-0004/atom.test.ts",
+        "tests/core/atom-generator.test.mjs",
+        "tests/core/id-allocator.test.mjs"
+      ],
+      "driftOk": true,
+      "issues": []
+    },
+    {
+      "atomId": "ATM-FIXTURE-0001",
+      "logicalName": "atom.fixture-generator-dogfood",
+      "provenance": "generated",
+      "marker": "generator-provenance:generated",
+      "workbenchPath": "atomic_workbench/atoms/ATM-FIXTURE-0001",
+      "specPath": "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.spec.json",
+      "codePaths": [
+        "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs"
+      ],
+      "testPaths": [
+        "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.test.ts"
+      ],
+      "driftOk": true,
+      "issues": []
+    },
+    {
+      "atomId": "ATM-MAP-0001",
+      "logicalName": null,
+      "provenance": "generated",
+      "marker": "generator-provenance:generated",
+      "workbenchPath": "atomic_workbench/maps/ATM-MAP-0001",
+      "specPath": "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
+      "codePaths": [],
+      "testPaths": [
+        "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs"
+      ],
+      "driftOk": true,
+      "issues": []
+    },
+    {
+      "atomId": "ATM-MAP-0002",
+      "logicalName": null,
+      "provenance": "backfilled",
+      "marker": "generator-provenance:backfilled",
+      "workbenchPath": "atomic_workbench/maps/ATM-MAP-0002",
+      "specPath": "atomic_workbench/maps/ATM-MAP-0002/map.spec.json",
+      "codePaths": [],
+      "testPaths": [
+        "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.mjs"
+      ],
+      "driftOk": true,
+      "issues": []
+    }
+  ]
 }

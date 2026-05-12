@@ -102,7 +102,7 @@ ATM is not trying to be:
 
 ## Validation
 
-This seed repository keeps validation dependency-free while the monorepo skeleton is still forming:
+This repository now uses npm as the single official package-manager route and keeps engineering signals separated by what they actually verify:
 
 ```bash
 npm test
@@ -110,7 +110,7 @@ npm run typecheck
 npm run lint
 ```
 
-These commands validate the product charter files, required positioning language, and protected-surface boundary terms.
+These commands build the TypeScript package surface, run real typecheck/lint signals, execute the smoke validation set, and expose agent-readable readiness guidance. Broader governance validators live behind `npm run validate:quick`, `npm run validate:standard`, and `npm run validate:full`.
 
 Protected-surface neutrality rules and migration guidance live in [docs/governance/DOCS_NEUTRALITY_AUDIT.md](docs/governance/DOCS_NEUTRALITY_AUDIT.md).
 

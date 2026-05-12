@@ -58,10 +58,11 @@ for (const behaviorEntry of entries) {
   const action = behaviorEntry.action;
   const packageName = behaviorEntry.pluginPackage;
   const fixturePath = behaviorEntry.fixture;
+  const exportName = behaviorEntry.exportName;
 
   const packageDir = packageName.replace('@ai-atomic-framework/', 'packages/');
   const packageJsonPath = `${packageDir}/package.json`;
-  const sourcePath = `${packageDir}/src/index.ts`;
+  const sourcePath = behaviorEntry.source ?? `${packageDir}/src/index.ts`;
 
   assert(existsSync(path.join(root, packageJsonPath)), `missing plugin package.json: ${packageJsonPath}`);
   assert(existsSync(path.join(root, sourcePath)), `missing plugin source file: ${sourcePath}`);
@@ -71,7 +72,7 @@ for (const behaviorEntry of entries) {
   assert(!source.includes('@ai-atomic-framework/core'), `${sourcePath} must not import @ai-atomic-framework/core`);
 
   const loaded = await import(pathToFileURL(path.join(root, sourcePath)).href);
-  const behavior = loaded.behavior ?? loaded.default;
+  const behavior = (exportName ? loaded[exportName] : null) ?? loaded.behavior ?? loaded.default;
   assert(Boolean(behavior), `${sourcePath} must export behavior object`);
   if (!behavior) {
     continue;
@@ -143,4 +144,4 @@ if (failed) {
   process.exit(1);
 }
 
-console.log(`[behavior-pack:${mode}] ok (${entries.length} plugins, ${expectedActions.length} actions, fixture replay passed)`);
+console.log(`[behavior-pack:${mode}] ok (${entries.length} behaviors from consolidated pack, ${expectedActions.length} actions, fixture replay passed)`);

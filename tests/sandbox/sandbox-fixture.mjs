@@ -15,14 +15,16 @@ const repoCopyEntries = [
   'README.md',
   'docs',
   'examples',
+  'eslint.config.mjs',
   'package-lock.json',
   'package.json',
   'packages',
-  'pnpm-workspace.yaml',
   'schemas',
   'scripts',
   'templates',
   'tests',
+  'tsconfig.build.json',
+  'tsconfig.json',
   'turbo.json'
 ];
 

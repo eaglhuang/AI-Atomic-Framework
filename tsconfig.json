@@ -1,0 +1,64 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ES2022"
+    ],
+    "strict": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@ai-atomic-framework/core": [
+        "packages/core/src/index.ts"
+      ],
+      "@ai-atomic-framework/cli": [
+        "packages/cli/src/index.ts"
+      ],
+      "@ai-atomic-framework/plugin-sdk": [
+        "packages/plugin-sdk/src/index.ts"
+      ],
+      "@ai-atomic-framework/plugin-rule-guard": [
+        "packages/plugin-rule-guard/src/index.ts"
+      ],
+      "@ai-atomic-framework/plugin-governance-local": [
+        "packages/plugin-governance-local/src/index.ts"
+      ],
+      "@ai-atomic-framework/plugin-human-review": [
+        "packages/plugin-human-review/src/index.ts"
+      ],
+      "@ai-atomic-framework/plugin-review-advisory": [
+        "packages/plugin-review-advisory/src/index.ts"
+      ],
+      "@ai-atomic-framework/plugin-behavior-pack": [
+        "packages/plugin-behavior-pack/src/index.ts"
+      ],
+      "@ai-atomic-framework/adapter-local-git": [
+        "packages/adapter-local-git/src/index.ts"
+      ],
+      "@ai-atomic-framework/language-js": [
+        "packages/language-js/src/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "packages/**/*.ts",
+    "tests/**/*.ts",
+    "atomic_workbench/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/dist/**",
+    ".types"
+  ]
+}

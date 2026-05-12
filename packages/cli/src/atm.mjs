@@ -4,8 +4,10 @@ import { fileURLToPath } from 'node:url';
 import { runBootstrap } from './commands/bootstrap-entry.mjs';
 import { runCreate } from './commands/create.mjs';
 import { runCreateMap } from './commands/create-map.mjs';
+import { runDoctor } from './commands/doctor.mjs';
 import { runGuide } from './commands/guide.mjs';
 import { runInit } from './commands/init.mjs';
+import { runNext } from './commands/next.mjs';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.mjs';
 import { runSpec } from './commands/spec.mjs';
 import { runStatus } from './commands/status.mjs';
@@ -23,8 +25,10 @@ export const cliCommandRunners = {
   bootstrap: runBootstrap,
   create: runCreate,
   'create-map': runCreateMap,
+  doctor: runDoctor,
   guide: runGuide,
   init: runInit,
+  next: runNext,
   'self-host-alpha': runSelfHostAlphaAsync,
   spec: runSpec,
   status: runStatus,
@@ -46,7 +50,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       ok: true,
       command: 'help',
       cwd: process.cwd(),
-      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, create, create-map, guide, init, rollback, review, review-advisory, self-host-alpha, spec, status, upgrade, test, validate, verify.')],
+      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, create, create-map, doctor, guide, init, next, rollback, review, review-advisory, self-host-alpha, spec, status, upgrade, test, validate, verify.')],
       evidence: {
         commands: Object.keys(cliCommandRunners),
         outputFormat: 'json'

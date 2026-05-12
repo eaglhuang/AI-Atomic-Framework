@@ -30,6 +30,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'json'
   },
   {
+    commandName: 'doctor',
+    summary: 'Inspect ATM engineering readiness and trust signals',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
     commandName: 'init',
     summary: 'Adopt ATM in a repository',
     implemented: true,
@@ -39,6 +46,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   {
     commandName: 'self-host-alpha',
     summary: 'Verify alpha0 self-hosting criteria',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'json'
+  },
+  {
+    commandName: 'next',
+    summary: 'Recommend the next official action from the current ATM state',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'json'

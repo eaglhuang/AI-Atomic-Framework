@@ -5,15 +5,25 @@
   "description": "Reference plugin for human review queues and decision logs.",
   "license": "MIT",
   "type": "module",
-  "exports": "./src/index.ts",
-  "files": ["src"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "dependencies": {
     "@ai-atomic-framework/core": "0.0.0",
     "@ai-atomic-framework/plugin-sdk": "0.0.0"
   },
   "scripts": {
-    "test": "node ../../scripts/validate-human-review.mjs --mode test",
-    "typecheck": "node ../../scripts/validate-human-review.mjs --mode typecheck",
-    "lint": "node ../../scripts/validate-human-review.mjs --mode lint"
-  }
+    "build": "node ../../scripts/build-package-dist.mjs --package packages/plugin-human-review",
+    "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
 }

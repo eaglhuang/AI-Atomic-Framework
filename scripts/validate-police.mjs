@@ -7,7 +7,7 @@ import { validateLayerBoundary } from '../packages/core/src/police/layer-boundar
 import { validateRegistryConsistency } from '../packages/core/src/police/registry-consistency.mjs';
 import { createSchemaValidator, validateJsonDocument } from '../packages/core/src/police/schema-validator.mjs';
 import { runPoliceChecks } from '../packages/core/src/police/index.mjs';
-import { runLifecyclePolice, LIFECYCLE_POLICE_WRITER } from '../packages/plugin-police-lifecycle/src/index.ts';
+import { runLifecyclePolice, LIFECYCLE_POLICE_WRITER } from '../packages/plugin-rule-guard/src/lifecycle-police.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -24,7 +24,7 @@ const protectedFiles = [
   'packages/core/src/police/layer-boundary.mjs',
   'packages/core/src/police/forbidden-import-scanner.mjs',
   'packages/core/src/police/registry-consistency.mjs',
-  'packages/plugin-police-lifecycle/src/index.ts',
+  'packages/plugin-rule-guard/src/lifecycle-police.ts',
   'schemas/layer-policy.schema.json',
   'schemas/police/non-regression-report.schema.json',
   'schemas/police/quality-comparison-report.schema.json',
