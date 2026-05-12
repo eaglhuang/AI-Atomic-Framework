@@ -23,7 +23,8 @@ import { runRegistryDiff } from './commands/registry-diff.mjs';
 import { runRollback } from './commands/rollback.mjs';
 import { runReview } from './commands/review.mjs';
 import { runReviewAdvisory } from './commands/review-advisory.mjs';
-import { CliError, makeResult, message, writeResult } from './commands/shared.mjs';
+import { getCommandSpec, listCommandSpecs } from './commands/command-specs.mjs';
+import { CliError, makeHelpResult, makeResult, message, writeResult } from './commands/shared.mjs';
 
 export const cliCommandRunners = {
   bootstrap: runBootstrap,
@@ -51,20 +52,36 @@ export const cliCommandRunners = {
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
-  const [commandName, ...commandArgs] = argv;
+  const [commandName, ...rawCommandArgs] = argv;
+  const outputFormat = selectOutputFormat(argv, io);
+  const commandArgs = stripFormatFlags(rawCommandArgs);
 
-  if (!commandName || commandName === '--help' || commandName === 'help') {
-    const result = makeResult({
-      ok: true,
-      command: 'help',
-      cwd: process.cwd(),
-      messages: [message('info', 'ATM_CLI_HELP', 'Available commands: bootstrap, budget, create, create-map, doctor, guard, guide, handoff, init, lock, next, rollback, review, review-advisory, self-host-alpha, spec, status, upgrade, test, validate, verify.')],
-      evidence: {
-        commands: Object.keys(cliCommandRunners),
-        outputFormat: 'json'
-      }
-    });
-    writeResult(result, io.stdout);
+  if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
+    writeResult(createGlobalHelpResult(process.cwd()), io.stdout, outputFormat);
+    return 0;
+  }
+
+  if (commandName === 'help') {
+    const targetCommand = commandArgs.find((arg) => !arg.startsWith('-'));
+    if (!targetCommand) {
+      writeResult(createGlobalHelpResult(process.cwd()), io.stdout, outputFormat);
+      return 0;
+    }
+    const spec = getCommandSpec(targetCommand);
+    if (!spec) {
+      const result = makeResult({
+        ok: false,
+        command: 'help',
+        cwd: process.cwd(),
+        messages: [message('error', 'ATM_CLI_UNKNOWN_COMMAND', `Unknown command: ${targetCommand}`)],
+        evidence: {
+          commands: Object.keys(cliCommandRunners)
+        }
+      });
+      writeResult(result, io.stderr, outputFormat);
+      return 2;
+    }
+    writeResult(makeHelpResult(spec, process.cwd()), io.stdout, outputFormat);
     return 0;
   }
 
@@ -79,13 +96,30 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         commands: Object.keys(cliCommandRunners)
       }
     });
-    writeResult(result, io.stderr);
+    writeResult(result, io.stderr, outputFormat);
     return 2;
+  }
+
+  if (commandArgs.includes('--help') || commandArgs.includes('-h')) {
+    const spec = getCommandSpec(commandName);
+    if (!spec) {
+      const result = makeResult({
+        ok: false,
+        command: commandName,
+        cwd: process.cwd(),
+        messages: [message('error', 'ATM_CLI_HELP_NOT_FOUND', `No help spec found for ${commandName}.`)],
+        evidence: {}
+      });
+      writeResult(result, io.stderr, outputFormat);
+      return 2;
+    }
+    writeResult(makeHelpResult(spec, process.cwd()), io.stdout, outputFormat);
+    return 0;
   }
 
   try {
     const result = await runner(commandArgs);
-    writeResult(result, result.ok ? io.stdout : io.stderr);
+    writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
     return result.ok ? 0 : 1;
   } catch (error) {
     const cliError = error instanceof CliError
@@ -98,9 +132,39 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       messages: [message('error', cliError.code, cliError.message, cliError.details)],
       evidence: {}
     });
-    writeResult(result, io.stderr);
+    writeResult(result, io.stderr, outputFormat);
     return cliError.exitCode;
   }
+}
+
+function createGlobalHelpResult(cwd) {
+  const commands = listCommandSpecs()
+    .map((spec) => ({ command: spec.name, summary: spec.summary }))
+    .sort((left, right) => left.command.localeCompare(right.command));
+  return makeResult({
+    ok: true,
+    command: 'help',
+    cwd,
+    messages: [message('info', 'ATM_CLI_HELP', 'Use "node atm.mjs <command> --help" for command details.')],
+    evidence: {
+      commands,
+      outputModes: ['json', 'pretty']
+    }
+  });
+}
+
+function stripFormatFlags(argv) {
+  return argv.filter((arg) => arg !== '--json' && arg !== '--pretty');
+}
+
+function selectOutputFormat(argv, io) {
+  if (argv.includes('--json')) {
+    return 'json';
+  }
+  if (argv.includes('--pretty')) {
+    return 'pretty';
+  }
+  return io.stdout?.isTTY ? 'pretty' : 'json';
 }
 
 const isDirectRun = process.argv[1]

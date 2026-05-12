@@ -1,0 +1,101 @@
+{
+  "command": "upgrade",
+  "summary": "Propose upgrade evolution from report evidence inputs.",
+  "positional": [],
+  "options": [
+    {
+      "flag": "--cwd",
+      "value": "path",
+      "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--propose",
+      "summary": "Generate an upgrade proposal."
+    },
+    {
+      "flag": "--dry-run",
+      "summary": "Generate proposal without mutating persisted artifacts."
+    },
+    {
+      "flag": "--atom",
+      "value": "id",
+      "summary": "Target atom id."
+    },
+    {
+      "flag": "--from",
+      "value": "version",
+      "summary": "Source version."
+    },
+    {
+      "flag": "--to",
+      "value": "version",
+      "summary": "Target version."
+    },
+    {
+      "flag": "--target",
+      "value": "kind",
+      "summary": "Target kind: atom | map."
+    },
+    {
+      "flag": "--map",
+      "value": "id",
+      "summary": "Target map id when target kind is map."
+    },
+    {
+      "flag": "--behavior",
+      "value": "id",
+      "summary": "Behavior id to route proposal generation."
+    },
+    {
+      "flag": "--decomposition-decision",
+      "value": "decision",
+      "summary": "Explicit decomposition decision override."
+    },
+    {
+      "flag": "--fork-source",
+      "value": "id",
+      "summary": "Fork source atom id."
+    },
+    {
+      "flag": "--new-atom-id",
+      "value": "id",
+      "summary": "Fork destination atom id."
+    },
+    {
+      "flag": "--input",
+      "value": "path",
+      "summary": "Input report path (repeatable)."
+    },
+    {
+      "flag": "--proposal-id",
+      "value": "id",
+      "summary": "Override proposal id."
+    },
+    {
+      "flag": "--proposed-by",
+      "value": "name",
+      "summary": "Proposal author label."
+    },
+    {
+      "flag": "--proposed-at",
+      "value": "timestamp",
+      "summary": "Proposal timestamp override."
+    },
+    {
+      "flag": "--json",
+      "summary": "Force machine-readable JSON output."
+    },
+    {
+      "flag": "--pretty",
+      "summary": "Force human-readable pretty output."
+    },
+    {
+      "flag": "--help",
+      "alias": "-h",
+      "summary": "Show command help."
+    }
+  ],
+  "examples": [
+    "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json"
+  ]
+}

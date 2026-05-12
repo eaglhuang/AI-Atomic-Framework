@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-05-12
+
+- Delivered ATM v0.2 phase-3 portable onefile pipeline.
+- Removed remaining `@ts-nocheck` debt across core governance flows.
+- Converged npm-first tooling and governance entrypoints.
+
+## 2026-05-11
+
+- Added adopter-local workbench localization migration guidance.
+- Removed adopter-derived artifacts from protected upstream surfaces.
+- Added polymorphic template and dimension contracts (ATM-2-0032).
+- Added non-blocking review advisory provider flow (ATM-2-0035).
+- Delivered case-study pilots ATM-4-0004 and ATM-4-0008.
+- Implemented map evolution routing (ATM-2-0024).
+
+## 2026-05-10
+
+- Added inject rollback dry-run plans in case-study fixtures.
+
+## 2026-05-09
+
+- Added legacy dry-run adapter contract.
+- Implemented lifecycle police plugin (ATM-2-0031).
+- Completed consolidated behavior pack delivery (ATM-2-0029).
+- Backfilled missing semantic fingerprints.
+- Completed atomic map provenance family ATM-2-0043 to ATM-2-0046.
+- Implemented AtomBehavior Plugin SDK with evolve delegation guard (ATM-2-0028).
+- Implemented atom/map status state machine with governance tiers (ATM-2-0027).
+
+## 2026-05-08
+
+- Refreshed generator provenance evidence.
+- Added semantic fingerprint extension (ATM-2-0026).
+- Finalized review gate command flow (ATM-2-0021).
+
 ## 2026-05-07
 
 - Added registry version-history scaffolding: `currentVersion`, `versions[]`, an in-memory upcast helper, and legacy/versioned fixtures.

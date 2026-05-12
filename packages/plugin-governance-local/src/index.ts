@@ -1245,11 +1245,15 @@ function writeText(targetPath: string, value: string, cwd: string, force: boolea
 }
 
 function renderTemplate(template: string, tokens: Record<string, string>) {
-  let rendered = template;
+  let rendered = stripTemplateHeader(template);
   for (const [token, value] of Object.entries(tokens)) {
     rendered = rendered.replaceAll(`{{${token}}}`, value);
   }
   return rendered;
+}
+
+function stripTemplateHeader(template: string): string {
+  return template.replace(/^\s*<!--\s*ATM TEMPLATE:[\s\S]*?-->\s*/i, '');
 }
 
 function capabilityResult(text: string, artifacts: readonly ArtifactRecord[] = [], evidence: readonly EvidenceRecord[] = []): CapabilityResult {

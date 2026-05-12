@@ -148,6 +148,12 @@ try {
   const agents = readFileSync(path.join(hostRepo, 'AGENTS.md'), 'utf8');
   assert(agents.includes('.atm/history/tasks/BOOTSTRAP-0001.json'), 'AGENTS.md must point to bootstrap task');
   assert(agents.includes('Read README.md if present'), 'AGENTS.md must contain the one-line kickoff prompt');
+  assert(!agents.includes('{{'), 'AGENTS.md must not leak unresolved template placeholders');
+  assert(!agents.includes('ATM TEMPLATE'), 'AGENTS.md must not leak template headers');
+
+  const profile = readFileSync(path.join(hostRepo, '.atm', 'runtime', 'profile', 'default.md'), 'utf8');
+  assert(!profile.includes('{{'), 'default profile must not leak unresolved template placeholders');
+  assert(!profile.includes('ATM TEMPLATE'), 'default profile must not leak template headers');
 
   const status = runAtm(['status', '--cwd', hostRepo], hostRepo);
   assert(status.exitCode === 0, 'status after adopt must exit 0');

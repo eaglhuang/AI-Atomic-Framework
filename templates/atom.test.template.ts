@@ -1,3 +1,4 @@
+<!-- ATM TEMPLATE: atom-test-scaffold -->
 /**
  * {{atomId}} scaffold test stub.
  * Generated in {{workbenchPathJson}}.

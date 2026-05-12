@@ -1,0 +1,121 @@
+{
+  "profiles": {
+    "test": {
+      "mode": "test",
+      "validators": [
+        "validate-behavior-pack",
+        "validate-schemas",
+        "validate-cli",
+        "validate-guide",
+        "validate-self-hosting-alpha",
+        "audit-hash-placeholders"
+      ]
+    },
+    "quick": {
+      "mode": "validate",
+      "validators": [
+        "validate-product-charter",
+        "validate-package-skeleton",
+        "validate-behavior-pack",
+        "audit-hash-placeholders"
+      ]
+    },
+    "standard": {
+      "mode": "validate",
+      "validators": [
+        "validate-product-charter",
+        "validate-package-skeleton",
+        "validate-schemas",
+        "validate-core-spec-parser",
+        "validate-scaffold-builder",
+        "validate-agent-prompt",
+        "validate-agent-execute",
+        "validate-behavior-sdk",
+        "validate-behavior-pack",
+        "validate-plugin-sdk",
+        "validate-governance-local",
+        "validate-neutrality-scanner",
+        "validate-cli",
+        "validate-guide",
+        "validate-local-git-adapter",
+        "validate-language-js",
+        "validate-examples",
+        "validate-bootstrap",
+        "validate-seed-spec",
+        "validate-seed-registry",
+        "validate-registry-diff",
+        "validate-regression-compare",
+        "audit-hash-placeholders"
+      ]
+    },
+    "full": {
+      "mode": "validate",
+      "extends": "standard",
+      "validators": [
+        "validate-upgrade-proposal",
+        "validate-rollback-proof",
+        "validate-human-review",
+        "validate-review-advisory",
+        "validate-polymorph-template",
+        "validate-test-runner",
+        "validate-registry-core",
+        "validate-status-machine",
+        "validate-registry-index",
+        "validate-registry-catalog",
+        "validate-generator-provenance",
+        "validate-map-template",
+        "validate-map-generator-provenance",
+        "validate-police",
+        "validate-governance-commands",
+        "validate-external-golden",
+        "validate-root-drop-release",
+        "validate-onefile-release",
+        "validate-self-hosting-alpha"
+      ]
+    }
+  },
+  "validators": [
+    { "name": "validate-product-charter", "entry": "scripts/validate-product-charter.mjs", "tags": ["docs", "contract"], "slow": false },
+    { "name": "validate-package-skeleton", "entry": "scripts/validate-package-skeleton.mjs", "tags": ["packages", "contract"], "slow": false },
+    { "name": "validate-schemas", "entry": "scripts/validate-schemas.mjs", "tags": ["schema"], "slow": false },
+    { "name": "validate-core-spec-parser", "entry": "scripts/validate-core-spec-parser.mjs", "tags": ["core", "spec"], "slow": false },
+    { "name": "validate-scaffold-builder", "entry": "scripts/validate-scaffold-builder.mjs", "tags": ["core", "template"], "slow": false },
+    { "name": "validate-agent-prompt", "entry": "scripts/validate-agent-prompt.mjs", "tags": ["agent", "prompt"], "slow": false },
+    { "name": "validate-agent-execute", "entry": "scripts/validate-agent-execute.mjs", "tags": ["agent", "execution"], "slow": false },
+    { "name": "validate-behavior-sdk", "entry": "scripts/validate-behavior-sdk.mjs", "tags": ["plugin", "behavior"], "slow": false },
+    { "name": "validate-behavior-pack", "entry": "scripts/validate-behavior-pack.mjs", "tags": ["plugin", "behavior"], "slow": false },
+    { "name": "validate-plugin-sdk", "entry": "scripts/validate-plugin-sdk.mjs", "tags": ["plugin", "sdk"], "slow": false },
+    { "name": "validate-governance-local", "entry": "scripts/validate-governance-local.mjs", "tags": ["plugin", "governance"], "slow": false },
+    { "name": "validate-neutrality-scanner", "entry": "scripts/validate-neutrality-scanner.mjs", "tags": ["neutrality", "docs"], "slow": false },
+    { "name": "validate-cli", "entry": "scripts/validate-cli.mjs", "tags": ["cli"], "slow": true },
+    { "name": "validate-guide", "entry": "scripts/validate-guide.mjs", "tags": ["cli", "guide"], "slow": false },
+    { "name": "validate-local-git-adapter", "entry": "scripts/validate-local-git-adapter.mjs", "tags": ["adapter", "git"], "slow": false },
+    { "name": "validate-language-js", "entry": "scripts/validate-language-js.mjs", "tags": ["language", "adapter"], "slow": false },
+    { "name": "validate-examples", "entry": "scripts/validate-examples.mjs", "tags": ["examples"], "slow": false },
+    { "name": "validate-bootstrap", "entry": "scripts/validate-bootstrap.mjs", "tags": ["bootstrap", "template"], "slow": true },
+    { "name": "validate-seed-spec", "entry": "scripts/validate-seed-spec.mjs", "tags": ["seed", "registry"], "slow": false },
+    { "name": "validate-seed-registry", "entry": "scripts/validate-seed-registry.mjs", "tags": ["seed", "registry"], "slow": false },
+    { "name": "validate-registry-diff", "entry": "scripts/validate-registry-diff.mjs", "tags": ["registry"], "slow": false },
+    { "name": "validate-regression-compare", "entry": "scripts/validate-regression-compare.mjs", "tags": ["regression"], "slow": false },
+    { "name": "audit-hash-placeholders", "entry": "scripts/audit-hash-placeholders.mjs", "tags": ["hash", "guard"], "slow": false },
+    { "name": "validate-upgrade-proposal", "entry": "scripts/validate-upgrade-proposal.mjs", "tags": ["upgrade"], "slow": false },
+    { "name": "validate-rollback-proof", "entry": "scripts/validate-rollback-proof.mjs", "tags": ["rollback"], "slow": false },
+    { "name": "validate-human-review", "entry": "scripts/validate-human-review.mjs", "tags": ["review"], "slow": false },
+    { "name": "validate-review-advisory", "entry": "scripts/validate-review-advisory.mjs", "tags": ["review"], "slow": false },
+    { "name": "validate-polymorph-template", "entry": "scripts/validate-polymorph-template.mjs", "tags": ["polymorph"], "slow": false },
+    { "name": "validate-test-runner", "entry": "scripts/validate-test-runner.mjs", "tags": ["test-runner"], "slow": false },
+    { "name": "validate-registry-core", "entry": "scripts/validate-registry-core.mjs", "tags": ["registry"], "slow": false },
+    { "name": "validate-status-machine", "entry": "scripts/validate-status-machine.mjs", "tags": ["registry"], "slow": false },
+    { "name": "validate-registry-index", "entry": "scripts/validate-registry-index.mjs", "tags": ["registry"], "slow": false },
+    { "name": "validate-registry-catalog", "entry": "scripts/validate-registry-catalog.mjs", "tags": ["registry"], "slow": false },
+    { "name": "validate-generator-provenance", "entry": "scripts/validate-generator-provenance.mjs", "tags": ["generator"], "slow": false },
+    { "name": "validate-map-template", "entry": "scripts/validate-map-template.mjs", "tags": ["map"], "slow": false },
+    { "name": "validate-map-generator-provenance", "entry": "scripts/validate-map-generator-provenance.mjs", "tags": ["map", "generator"], "slow": false },
+    { "name": "validate-police", "entry": "scripts/validate-police.mjs", "tags": ["police"], "slow": false },
+    { "name": "validate-governance-commands", "entry": "scripts/validate-governance-commands.mjs", "tags": ["governance"], "slow": false },
+    { "name": "validate-external-golden", "entry": "scripts/validate-external-golden.mjs", "tags": ["golden"], "slow": false },
+    { "name": "validate-root-drop-release", "entry": "scripts/validate-root-drop-release.mjs", "tags": ["release"], "slow": true },
+    { "name": "validate-onefile-release", "entry": "scripts/validate-onefile-release.mjs", "tags": ["release"], "slow": true },
+    { "name": "validate-self-hosting-alpha", "entry": "scripts/validate-self-hosting-alpha.mjs", "tags": ["self-host"], "slow": true }
+  ]
+}

@@ -1,3 +1,4 @@
+<!-- ATM TEMPLATE: root-drop-agent-instructions -->
 # ATM Bootstrap Instructions
 
 This repository uses the default ATM bootstrap pack.

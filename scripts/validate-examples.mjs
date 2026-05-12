@@ -64,6 +64,10 @@ function runNpm(args) {
   if (process.env.npm_execpath && existsSync(process.env.npm_execpath)) {
     return run(process.execPath, [process.env.npm_execpath, ...args]);
   }
+  const bundledNpmCli = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+  if (existsSync(bundledNpmCli)) {
+    return run(process.execPath, [bundledNpmCli, ...args]);
+  }
   return run(process.platform === 'win32' ? 'npm.cmd' : 'npm', args);
 }
 

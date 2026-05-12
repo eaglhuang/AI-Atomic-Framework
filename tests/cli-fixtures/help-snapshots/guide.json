@@ -1,0 +1,41 @@
+{
+  "command": "guide",
+  "summary": "Show guided ATM workflows and glossary/help references.",
+  "positional": [
+    {
+      "name": "intent",
+      "summary": "overview | create-atom | create-map | bootstrap | glossary | help",
+      "required": false
+    },
+    {
+      "name": "command",
+      "summary": "Command name when intent is help.",
+      "required": false
+    }
+  ],
+  "options": [
+    {
+      "flag": "--cwd",
+      "value": "path",
+      "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--json",
+      "summary": "Force machine-readable JSON output."
+    },
+    {
+      "flag": "--pretty",
+      "summary": "Force human-readable pretty output."
+    },
+    {
+      "flag": "--help",
+      "alias": "-h",
+      "summary": "Show command help."
+    }
+  ],
+  "examples": [
+    "node atm.mjs guide overview --json",
+    "node atm.mjs guide glossary --json",
+    "node atm.mjs guide help next --json"
+  ]
+}

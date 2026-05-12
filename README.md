@@ -17,7 +17,31 @@ ATM provides a neutral work envelope for AI agents and humans:
 
 The north star for the first release is a blank repository that can run a hello-world atom and leave a minimal task, scope lock, artifact, evidence, and context summary trail.
 
-## Root-Drop Bootstrap
+## For Adopters: 60-Second Drop-In
+
+Use this route when you want to adopt ATM in another repository quickly.
+
+1. Copy one official distribution into the target repository root:
+   - `release/atm-root-drop/` for portable multi-file root-drop.
+   - `release/atm-onefile/atm.mjs` for a single-file runtime.
+2. Give your AI agent one line:
+
+```text
+Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.
+```
+
+3. The agent will bootstrap when needed, then keep routing through `next`.
+
+### Entry Points
+
+| Entry | Audience | Usage |
+| --- | --- | --- |
+| `./atm.mjs` | Everyday users and CI in this repository | Root router that uses `packages/cli/src/atm.mjs` when source is present, and falls back to `packages/cli/dist/atm.mjs` |
+| `packages/cli/src/atm.mjs` | Framework contributors | Source CLI entrypoint for local development |
+| `release/atm-root-drop/atm.mjs` | Downstream adopters | Portable root-drop bundle entrypoint |
+| `release/atm-onefile/atm.mjs` | Downstream adopters | Single-file embedded runtime for zero-dependency distribution |
+
+### Root-Drop Bootstrap
 
 ATM is intended to support a release-bundle root-drop bootstrap workflow.
 
@@ -27,30 +51,6 @@ ATM is intended to support a release-bundle root-drop bootstrap workflow.
 4. The host project may later replace the default filesystem profile with a GitHub, Jira, Linear, Notion, local database, or custom adapter.
 
 The root-drop experience is an Agent Operating Layer. It is intentionally model-neutral and editor-neutral.
-
-### Root-Drop Quick Start
-
-From an ATM checkout or release bundle, initialize a host repository with the default bootstrap pack. Upstream builds now refresh:
-
-- `release/atm-root-drop/` (portable bundle directory)
-- `release/atm-onefile/atm.mjs` (single-file embedded runtime)
-
-Use either route:
-
-```bash
-npm run build
-node release/atm-root-drop/atm.mjs next --json
-node release/atm-onefile/atm.mjs next --json
-node atm.mjs bootstrap --cwd <host-repo> --task "Bootstrap ATM in this repository"
-```
-
-Then give the AI agent one line only:
-
-```text
-Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.
-```
-
-The bootstrap pack writes the default profile, a first task, a scope lock, default guard definitions, and the v2 `runtime/history/catalog` layout so the host repository does not need to memorize internal ATM paths first.
 
 For the standalone upstream self-hosting alpha proof, see [docs/SELF_HOSTING_ALPHA.md](docs/SELF_HOSTING_ALPHA.md). That contract upgrades the user-facing flow to a single prompt: the AI checks whether ATM is initialized, runs the official `bootstrap` command only when needed, and then completes the first smoke.
 
@@ -82,6 +82,23 @@ ATM separates governance semantics from host implementation details.
 
 The Default Governance Bundle is the official default experience, but it is not a `packages/core` hard dependency. Core defines contracts. The default bundle is a reference implementation of those contracts.
 
+## For Contributors
+
+This repository now uses npm as the single official package-manager route.
+
+Build and refresh distribution artifacts:
+
+```bash
+npm run build
+```
+
+Local release entrypoint checks:
+
+```bash
+node release/atm-root-drop/atm.mjs next --json
+node release/atm-onefile/atm.mjs next --json
+```
+
 ## Recommended First Implementation
 
 The first implementation is expected to use TypeScript, Node.js, JSON schemas, and a small CLI because those tools make the alpha path easy to inspect and test. That toolchain is a recommendation, not a semantic requirement of ATM. Other language implementations should remain possible if they preserve the same contracts.
@@ -112,7 +129,18 @@ ATM is not trying to be:
 
 ## Validation
 
-This repository now uses npm as the single official package-manager route and keeps engineering signals separated by what they actually verify:
+### Adopters
+
+Use command-level health checks from the target repository root:
+
+```bash
+node atm.mjs doctor --json
+node atm.mjs next --json
+```
+
+### Contributors
+
+Use engineering signal commands:
 
 ```bash
 npm test
@@ -120,7 +148,13 @@ npm run typecheck
 npm run lint
 ```
 
-These commands build the TypeScript package surface, run real typecheck/lint signals, execute the smoke validation set, and expose agent-readable readiness guidance. Broader governance validators live behind `npm run validate:quick`, `npm run validate:standard`, and `npm run validate:full`.
+Broader governance validators live behind:
+
+```bash
+npm run validate:quick
+npm run validate:standard
+npm run validate:full
+```
 
 Protected-surface neutrality rules and migration guidance live in [docs/governance/DOCS_NEUTRALITY_AUDIT.md](docs/governance/DOCS_NEUTRALITY_AUDIT.md).
 
