@@ -20,7 +20,7 @@ Default per-map workspace layout:
 ```text
 atomic_workbench/maps/<mapId>/
   map.spec.json
-  map.integration.test.mjs
+  map.integration.test.ts
   map.test.report.json
 ```
 
