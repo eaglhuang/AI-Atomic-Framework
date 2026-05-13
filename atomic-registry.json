@@ -18,7 +18,7 @@
       "specPath": "specs/atom-seed-spec.json",
       "hashLock": {
         "algorithm": "sha256",
-        "digest": "sha256:24eb862d8e62b14f6f95b9b728d036827fee8ad0a683ee5cdd4a244b02bbe3c6",
+        "digest": "sha256:0f1f2ec20d8d985b437b281a804d4f5d25803a6bf078e600eecb1e1ddd2bf3d4",
         "canonicalization": "json-stable-v1"
       },
       "owner": {
@@ -34,24 +34,24 @@
         "registryVersion": "0.1.0"
       },
       "evidence": [
-        "scripts/validate-seed-spec.mjs",
-        "scripts/validate-seed-registry.mjs",
+        "scripts/validate-seed-spec.ts",
+        "scripts/validate-seed-registry.ts",
         "generator-provenance:backfilled",
         "atomic_workbench/atoms/ATM-CORE-0001/atom.test.report.json"
       ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0001",
-        "specHash": "sha256:214c4396f07ff1ee7d9bf8e3cb8094c3e137fa27298a089e929cf626157c0035",
-        "codeHash": "sha256:14e1fad9acae895daa56eeffd6653d471740bd015c171968e030820c6132f22f",
-        "testHash": "sha256:a94c15917a34a29ed11ca7e906ef563cefcad7044b707a739a2c4b83b7825303",
+        "specHash": "sha256:3a35b00c4239215d151c08c0e31318abe9db99c614153a62e69f9b770693aeff",
+        "codeHash": "sha256:1314286a21f5e7e640497bdb03e5e91ea493b3a83ec390c42274dff19bcac545",
+        "testHash": "sha256:e7108e8b94a7b8a3ae691c2f335750ce6f33e277d48f9d7e5b5a3d2e3c167446",
         "sourcePaths": {
           "spec": "specs/atom-seed-spec.json",
           "code": [
             "packages/core/seed.js"
           ],
           "tests": [
-            "scripts/validate-seed-spec.mjs",
-            "scripts/validate-seed-registry.mjs"
+            "scripts/validate-seed-spec.ts",
+            "scripts/validate-seed-registry.ts"
           ]
         }
       },
@@ -61,8 +61,8 @@
           "packages/core/seed.js"
         ],
         "testPaths": [
-          "scripts/validate-seed-spec.mjs",
-          "scripts/validate-seed-registry.mjs"
+          "scripts/validate-seed-spec.ts",
+          "scripts/validate-seed-registry.ts"
         ],
         "reportPath": "atomic_workbench/atoms/ATM-CORE-0001/atom.test.report.json",
         "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0001"
@@ -78,7 +78,7 @@
       "specPath": "specs/neutrality-scanner.atom.json",
       "hashLock": {
         "algorithm": "sha256",
-        "digest": "sha256:6cf306dfa1e5acae3bfff5590ec200a2327059c79d6baa32568a414bf06b1fe0",
+        "digest": "sha256:c0ad6b7cc250a52ffb44b089026e0610540bd0e3d4775facad80ae17d10c2b8f",
         "canonicalization": "json-stable-v1"
       },
       "owner": {
@@ -92,10 +92,10 @@
       "location": {
         "specPath": "specs/neutrality-scanner.atom.json",
         "codePaths": [
-          "packages/plugin-rule-guard/src/neutrality-scanner.mjs"
+          "packages/plugin-rule-guard/src/neutrality-scanner.ts"
         ],
         "testPaths": [
-          "scripts/validate-neutrality-scanner.mjs"
+          "scripts/validate-neutrality-scanner.ts"
         ],
         "reportPath": "atomic_workbench/atoms/ATM-CORE-0003/atom.test.report.json",
         "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0003"
@@ -108,22 +108,22 @@
       },
       "evidence": [
         ".github/workflows/neutrality.yml",
-        "scripts/validate-neutrality-scanner.mjs",
+        "scripts/validate-neutrality-scanner.ts",
         "atomic_workbench/atoms/ATM-CORE-0003/atom.test.report.json",
         "generator-provenance:backfilled"
       ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0003",
-        "specHash": "sha256:94bce44cf4316bf02eafdeb4622cb8df72638463991874f4a13fb01748a5392b",
-        "codeHash": "sha256:8c8172c883a2b35f3f329c60ebba01e48031603d0e0a0f87f8877e1923a824ac",
-        "testHash": "sha256:9e970464d73c808886f39944f1ab8a0486e04e33ea1aa217cfb920fd7bfa66b2",
+        "specHash": "sha256:c82c2ce926ef6300a499ef5bbc0247caaea1a4b932bb8dd10d3fb343cea3e2d7",
+        "codeHash": "sha256:5d35c7ca203ba743904084b0984f138fcf15c462e98697f07c00e797fdd19724",
+        "testHash": "sha256:571fc9258b88ee3b2b52806ec4a3e3f6a736f9307c5bafc0c8f6576a666877a3",
         "sourcePaths": {
           "spec": "specs/neutrality-scanner.atom.json",
           "code": [
-            "packages/plugin-rule-guard/src/neutrality-scanner.mjs"
+            "packages/plugin-rule-guard/src/neutrality-scanner.ts"
           ],
           "tests": [
-            "scripts/validate-neutrality-scanner.mjs"
+            "scripts/validate-neutrality-scanner.ts"
           ]
         }
       },
@@ -154,13 +154,13 @@
       "location": {
         "specPath": "atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json",
         "codePaths": [
-          "packages/core/src/manager/atom-generator.mjs",
-          "packages/core/src/manager/id-allocator.mjs"
+          "packages/core/src/manager/atom-generator.ts",
+          "packages/core/src/manager/id-allocator.ts"
         ],
         "testPaths": [
           "atomic_workbench/atoms/ATM-CORE-0004/atom.test.ts",
-          "tests/core/atom-generator.test.mjs",
-          "tests/core/id-allocator.test.mjs"
+          "tests/core/atom-generator.test.ts",
+          "tests/core/id-allocator.test.ts"
         ],
         "reportPath": "atomic_workbench/atoms/ATM-CORE-0004/atom.test.report.json",
         "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0004"
@@ -178,18 +178,18 @@
       "selfVerification": {
         "legacyPlanningId": null,
         "specHash": "sha256:e1d74a420804d2b49899538e657cd559034c8d7b17b5a31128064df21eda1a77",
-        "codeHash": "sha256:314ff3297a2cc060842de046653da537a3a0de4d05b85a2debcbd4cd0880f3c5",
-        "testHash": "sha256:c9c198ca224bd33257392c9deae6f7850a1c5fbcee38902967bb666a74f188ea",
+        "codeHash": "sha256:27eb5307316b0719d39d2f01b398e0b8fe6fce6dff263baeb8661992481c6bdd",
+        "testHash": "sha256:b055f676a49c230ed94ec32b4ef63a9e26cfbc2ae7f8a5c5ccd5d73848644296",
         "sourcePaths": {
           "spec": "atomic_workbench/atoms/ATM-CORE-0004/atom.spec.json",
           "code": [
-            "packages/core/src/manager/atom-generator.mjs",
-            "packages/core/src/manager/id-allocator.mjs"
+            "packages/core/src/manager/atom-generator.ts",
+            "packages/core/src/manager/id-allocator.ts"
           ],
           "tests": [
             "atomic_workbench/atoms/ATM-CORE-0004/atom.test.ts",
-            "tests/core/atom-generator.test.mjs",
-            "tests/core/id-allocator.test.mjs"
+            "tests/core/atom-generator.test.ts",
+            "tests/core/id-allocator.test.ts"
           ]
         }
       },
@@ -294,7 +294,7 @@
         "specPath": "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
         "codePaths": [],
         "testPaths": [
-          "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs"
+          "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.ts"
         ],
         "reportPath": "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
         "workbenchPath": "atomic_workbench/maps/ATM-MAP-0001"
@@ -302,7 +302,7 @@
       "evidence": [
         "generator-provenance:generated",
         "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
-        "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.mjs",
+        "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.ts",
         "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json"
       ],
       "mapHash": "sha256:914340fd5c8f3aa0686adbbc67093de0c49fa3b8a1383a77e11da11cc1665fe9",
@@ -340,14 +340,14 @@
         "specPath": "atomic_workbench/maps/ATM-MAP-0002/map.spec.json",
         "codePaths": [],
         "testPaths": [
-          "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.mjs"
+          "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.ts"
         ],
         "reportPath": "atomic_workbench/maps/ATM-MAP-0002/map.test.report.json",
         "workbenchPath": "atomic_workbench/maps/ATM-MAP-0002"
       },
       "evidence": [
         "atomic_workbench/maps/ATM-MAP-0002/map.spec.json",
-        "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.mjs",
+        "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.ts",
         "atomic_workbench/maps/ATM-MAP-0002/map.test.report.json",
         "generator-provenance:backfilled",
         "atomic_workbench/maps/ATM-MAP-0002/legacy-source.map.json",

@@ -22,7 +22,7 @@
   },
   "runtime": {
     "kind": "node",
-    "versionRange": ">=20",
+    "versionRange": ">=24",
     "environment": "local"
   },
   "adapterRequirements": {
@@ -43,7 +43,7 @@
   },
   "hashLock": {
     "algorithm": "sha256",
-    "digest": "sha256:24eb862d8e62b14f6f95b9b728d036827fee8ad0a683ee5cdd4a244b02bbe3c6",
+    "digest": "sha256:0f1f2ec20d8d985b437b281a804d4f5d25803a6bf078e600eecb1e1ddd2bf3d4",
     "canonicalization": "json-stable-v1"
   },
   "dependencyPolicy": {
@@ -72,7 +72,7 @@
   "validation": {
     "commands": [
       "node atm.mjs spec --validate specs/atom-seed-spec.json",
-      "node scripts/validate-seed-spec.mjs --mode validate"
+      "node --experimental-strip-types scripts/validate-seed-spec.ts --mode validate"
     ],
     "evidenceRequired": true
   },

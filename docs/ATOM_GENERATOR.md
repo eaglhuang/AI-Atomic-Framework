@@ -76,7 +76,7 @@ Generated maps now use a three-file workbench shape:
 ```text
 atomic_workbench/maps/<mapId>/
   map.spec.json
-  map.integration.test.mjs
+  map.integration.test.ts
   map.test.report.json
 ```
 
@@ -85,7 +85,7 @@ The canonical map ID is `ATM-MAP-{NNNN}`. Historical `map.*` names may still app
 Maps inherit the same "generator owns the canonical birth layout" rule as atoms:
 
 - `map.spec.json` is the source-of-record spec written by `generateAtomicMap()`.
-- `map.integration.test.mjs` is the default validation command contract for generated maps. The default command is `node atomic_workbench/maps/<mapId>/map.integration.test.mjs`.
+- `map.integration.test.ts` is the default validation command contract for generated maps. The default command is `node atomic_workbench/maps/<mapId>/map.integration.test.ts`.
 - `map.test.report.json` is the replayable self-check result produced by that default command.
 - rerunning `generateAtomicMap()` with the same member/edge/entrypoint/quality-target request is idempotent. The generator must return the existing `mapId` and canonical trio instead of allocating a second workbench.
 
@@ -173,7 +173,7 @@ npm run validate:generator-provenance
 
 Validation fails if a registry entry has no generator provenance marker, if a generated atom points `codePaths` at its spec, if a backfilled atom is missing its workbench witness files, or if any registry entry has hash drift.
 
-For maps, the same audit derives canonical map workbench paths, checks `map.spec.json` / `map.integration.test.mjs`, and compares the registry entry against the generated map spec instead of atom `selfVerification` hashes.
+For maps, the same audit derives canonical map workbench paths, checks `map.spec.json` / `map.integration.test.ts`, and compares the registry entry against the generated map spec instead of atom `selfVerification` hashes.
 
 Map template policy also has its own deterministic gate:
 
