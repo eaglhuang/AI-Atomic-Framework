@@ -6,6 +6,10 @@ AI-Atomic-Framework, also called ATM in this repository, is a governance framewo
 
 The project is designed for AI vibe coding teams that need repeatable engineering control without binding the framework to one model provider, editor, workflow engine, database, or host project.
 
+> Agent first action (required): read this README, then run `node atm.mjs next --json` from repository root, and execute exactly the returned `nextCommand`.
+
+ATM source-tree development now targets Node.js 24 and runs `.ts` modules through `node --experimental-strip-types`. The stable public wrappers remain `atm.mjs`, `release/atm-root-drop/atm.mjs`, and `release/atm-onefile/atm.mjs`.
+
 ## Product Charter
 
 ATM provides a neutral work envelope for AI agents and humans:
@@ -38,8 +42,8 @@ Read README.md if present, then run "node atm.mjs next --json" from the reposito
 
 | Entry | Audience | Usage |
 | --- | --- | --- |
-| `./atm.mjs` | Everyday users and CI in this repository | Root router that uses `packages/cli/src/atm.mjs` when source is present, and falls back to `packages/cli/dist/atm.mjs` |
-| `packages/cli/src/atm.mjs` | Framework contributors | Source CLI entrypoint for local development |
+| `./atm.mjs` | Everyday users and CI in this repository | Root router that uses `packages/cli/src/atm.ts` when source is present, and falls back to `packages/cli/dist/atm.mjs` |
+| `packages/cli/src/atm.ts` | Framework contributors | Source CLI entrypoint for local development |
 | `release/atm-root-drop/atm.mjs` | Downstream adopters | Portable root-drop bundle entrypoint |
 | `release/atm-onefile/atm.mjs` | Downstream adopters | Single-file embedded runtime for zero-dependency distribution |
 
@@ -87,6 +91,7 @@ The Default Governance Bundle is the official default experience, but it is not 
 ## For Contributors
 
 This repository now uses npm as the single official package-manager route.
+For local development against source files, use Node.js 24.
 
 Build and refresh distribution artifacts:
 

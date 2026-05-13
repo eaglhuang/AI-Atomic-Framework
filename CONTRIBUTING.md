@@ -29,6 +29,8 @@ npm run typecheck
 npm run lint
 ```
 
+Use Node.js 24 when running source-tree `.ts` entrypoints locally. Repository scripts invoke `node --experimental-strip-types` for source modules; the stable public wrapper remains `atm.mjs`.
+
 Until the package skeleton is expanded, these scripts validate the product charter, documentation boundaries, and repository seed metadata.
 
 ## Boundary Rules
