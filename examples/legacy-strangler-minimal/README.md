@@ -14,4 +14,4 @@ Run only the example test:
 npm --workspace @ai-atomic-framework/example-legacy-strangler-minimal test
 ```
 
-`src/legacy-system.mjs` stands in for existing code. `src/greeting.atom.mjs` is the atom wrapper that gives ATM a clean entrypoint.
+`src/legacy-system.ts` stands in for existing code. `src/greeting.atom.ts` is the atom wrapper that gives ATM a clean entrypoint.

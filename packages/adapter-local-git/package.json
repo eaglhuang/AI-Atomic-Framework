@@ -21,8 +21,8 @@
     "@ai-atomic-framework/plugin-rule-guard": "0.0.0"
   },
   "scripts": {
-    "build": "node ../../scripts/build-package-dist.mjs --package packages/adapter-local-git",
-    "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/adapter-local-git",
+    "test": "node --experimental-strip-types ../../scripts/validate-package-skeleton.ts --mode test",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },

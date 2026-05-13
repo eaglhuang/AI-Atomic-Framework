@@ -5,14 +5,14 @@ import { createTestReportMetrics } from './metrics-collector.ts';
 
 export const propagationTriggerBehaviors = Object.freeze(['split', 'merge', 'atomize', 'infect', 'evolve']);
 
-export function shouldPropagateBehavior(behavior) {
+export function shouldPropagateBehavior(behavior: any) {
   if (typeof behavior !== 'string') {
     return false;
   }
   return propagationTriggerBehaviors.includes(behavior.trim().toLowerCase());
 }
 
-export function discoverMapsForAtom(atomId, options) {
+export function discoverMapsForAtom(atomId: any, options: any) {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const discovered = new Set<string>();
@@ -25,7 +25,7 @@ export function discoverMapsForAtom(atomId, options) {
   return [...discovered].sort((left, right) => left.localeCompare(right));
 }
 
-export function runPropagationIntegration(atomId, options) {
+export function runPropagationIntegration(atomId: any, options: any) {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const requestedBehavior = normalizedOptions.behavior ?? null;
@@ -82,18 +82,18 @@ export function runPropagationIntegration(atomId, options) {
   };
 }
 
-function discoverMapsFromRegistry(atomId, options) {
+function discoverMapsFromRegistry(atomId: any, options: any) {
   const normalizedOptions = options || {};
   const registryDocument = normalizedOptions.registryDocument ?? readRegistryDocument(path.resolve(normalizedOptions.repositoryRoot ?? process.cwd(), normalizedOptions.registryPath ?? 'atomic-registry.json'));
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
   return entries
-    .filter((entry) => entry?.schemaId === 'atm.atomicMap')
-    .filter((entry) => Array.isArray(entry?.members) && entry.members.some((member) => String(member?.atomId || '').trim() === atomId))
-    .map((entry) => String(entry.mapId || '').trim())
+    .filter((entry: any) => entry?.schemaId === 'atm.atomicMap')
+    .filter((entry: any) => Array.isArray(entry?.members) && entry.members.some((member: any) => String(member?.atomId || '').trim() === atomId))
+    .map((entry: any) => String(entry.mapId || '').trim())
     .filter(Boolean);
 }
 
-function discoverMapsFromFilesystem(atomId, options) {
+function discoverMapsFromFilesystem(atomId: any, options: any) {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const discovered = [];
@@ -124,14 +124,14 @@ function discoverMapsFromFilesystem(atomId, options) {
   return [...new Set(discovered)];
 }
 
-function tryReadMapIdForAtom(specPath, atomId) {
+function tryReadMapIdForAtom(specPath: any, atomId: any) {
   if (!existsSync(specPath)) {
     return null;
   }
   try {
     const specDocument = JSON.parse(readFileSync(specPath, 'utf8'));
     const hasAtom = Array.isArray(specDocument?.members)
-      && specDocument.members.some((member) => String(member?.atomId || '').trim() === atomId);
+      && specDocument.members.some((member: any) => String(member?.atomId || '').trim() === atomId);
     if (!hasAtom) {
       return null;
     }
@@ -141,7 +141,7 @@ function tryReadMapIdForAtom(specPath, atomId) {
   }
 }
 
-function readRegistryDocument(registryPath) {
+function readRegistryDocument(registryPath: any) {
   if (!existsSync(registryPath)) {
     return { entries: [] };
   }

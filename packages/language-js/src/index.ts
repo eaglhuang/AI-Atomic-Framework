@@ -79,7 +79,7 @@ export const defaultJavaScriptImportPolicy: JavaScriptImportPolicy = {
 };
 
 export const languageJsRuntime = {
-  entrypoint: './language-js-adapter.mjs',
+  entrypoint: './language-js-adapter.ts',
   supportsImportScan: true,
   supportsEntrypointRules: true,
   supportsDelegatedTestCommands: true,

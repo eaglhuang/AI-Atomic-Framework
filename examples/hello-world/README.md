@@ -14,4 +14,4 @@ Run only the example test:
 npm --workspace @ai-atomic-framework/example-hello-world test
 ```
 
-The atom source lives in `src/hello-world.atom.mjs`, and the ATM spec lives in `atoms/hello-world.atom.json`.
+The atom source lives in `src/hello-world.atom.ts`, and the ATM spec lives in `atoms/hello-world.atom.json`.

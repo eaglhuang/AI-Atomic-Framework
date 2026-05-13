@@ -10,7 +10,7 @@ export {
   loadNeutralityPolicy,
   scanNeutralityRepository,
   scanNeutralityText
-} from './neutrality-scanner.mjs';
+} from './neutrality-scanner.ts';
 
 export {
   LIFECYCLE_POLICE_WRITER,

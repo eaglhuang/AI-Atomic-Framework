@@ -4,13 +4,13 @@ import {
   defaultExecutionProducer
 } from './execution-constants.ts';
 
-export function createExecutionEvidenceDocument(context) {
+export function createExecutionEvidenceDocument(context: any) {
   const logSummary = createLogSummary(context.logLines);
   const artifacts = [
     createArtifactRecord(context.artifactTargets.snapshotPath, 'snapshot'),
     createArtifactRecord(context.artifactTargets.logPath, 'log'),
     createArtifactRecord(context.artifactTargets.evidencePath, 'report'),
-    ...context.validationPasses.map((pass) => createArtifactRecord(pass.reportPath, 'report'))
+    ...context.validationPasses.map((pass: any) => createArtifactRecord(pass.reportPath, 'report'))
   ];
 
   return {
@@ -47,7 +47,7 @@ export function createExecutionEvidenceDocument(context) {
   };
 }
 
-export function createExecutionSnapshotDocument(context) {
+export function createExecutionSnapshotDocument(context: any) {
   return {
     atomId: context.atomId,
     lifecycleMode: context.lifecycleMode,
@@ -61,7 +61,7 @@ export function createExecutionSnapshotDocument(context) {
   };
 }
 
-export function createLogLines(context) {
+export function createLogLines(context: any) {
   const lines = [...context.agentOutcome.logLines];
   const validationSummary = context.lifecycleMode === 'evolution'
     ? 'VALIDATION: baseline + candidate fixture passes recorded'
@@ -75,7 +75,7 @@ export function createLogLines(context) {
   return lines;
 }
 
-function createArtifactRecord(artifactPath, artifactKind) {
+function createArtifactRecord(artifactPath: any, artifactKind: any) {
   return {
     artifactPath,
     artifactKind,
@@ -83,11 +83,11 @@ function createArtifactRecord(artifactPath, artifactKind) {
   };
 }
 
-function createLogSummary(logLines) {
+function createLogSummary(logLines: any) {
   return {
     lineCount: logLines.length,
     preview: logLines.slice(0, 3),
-    warningCount: logLines.filter((line) => /warn/i.test(line)).length,
-    errorCount: logLines.filter((line) => /error/i.test(line)).length
+    warningCount: logLines.filter((line: any) => /warn/i.test(line)).length,
+    errorCount: logLines.filter((line: any) => /error/i.test(line)).length
   };
 }

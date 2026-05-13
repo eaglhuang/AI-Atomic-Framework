@@ -1,4 +1,4 @@
-export function createTestReportMetrics(input) {
+export function createTestReportMetrics(input: any) {
   const normalizedInput = input || {};
   const total = normalizeNonNegativeInteger(normalizedInput.total ?? normalizedInput.totalCount);
   const failed = normalizeNonNegativeInteger(normalizedInput.failed ?? normalizedInput.failedCount);
@@ -12,7 +12,7 @@ export function createTestReportMetrics(input) {
   };
 }
 
-function normalizeCoverage(value) {
+function normalizeCoverage(value: any) {
   if (value == null) {
     return null;
   }
@@ -28,7 +28,7 @@ function normalizeCoverage(value) {
   return value;
 }
 
-function normalizeNonNegativeInteger(value) {
+function normalizeNonNegativeInteger(value: any) {
   if (typeof value === 'number' && Number.isInteger(value) && value >= 0) {
     return value;
   }

@@ -4,7 +4,7 @@ export const defaultAgentPromptWorkbenchRoot = 'atomic_workbench/atoms';
 export const defaultAgentPromptSpecFileName = 'atom.spec.json';
 export const defaultAgentPromptTestFileName = 'atom.test.ts';
 
-export function buildAgentPrompt(normalizedModel, options) {
+export function buildAgentPrompt(normalizedModel: any, options: any) {
   const normalizedOptions = options || {};
   const document = createAgentPromptDocument(normalizedModel, normalizedOptions);
 
@@ -17,7 +17,7 @@ export function buildAgentPrompt(normalizedModel, options) {
   };
 }
 
-export function createAgentPromptDocument(normalizedModel, options) {
+export function createAgentPromptDocument(normalizedModel: any, options: any) {
   const normalizedOptions = options || {};
   const atomId = normalizedModel?.identity?.atomId;
   const logicalName = normalizedModel?.identity?.logicalName;
@@ -39,8 +39,8 @@ export function createAgentPromptDocument(normalizedModel, options) {
   const validationCommands = unique(normalizedModel.execution?.validation?.commands ?? []);
   const requiredOutputs = unique(
     (normalizedModel.ports?.outputs ?? [])
-      .filter((port) => port.kind === 'evidence' || port.required === true)
-      .map((port) => port.name)
+      .filter((port: any) => port.kind === 'evidence' || port.required === true)
+      .map((port: any) => port.name)
   );
 
   const document = {
@@ -79,7 +79,7 @@ export function createAgentPromptDocument(normalizedModel, options) {
   };
 }
 
-export function serializeAgentPromptMarkdown(document) {
+export function serializeAgentPromptMarkdown(document: any) {
   const lines = [
     '---',
     `schemaId: ${quoteYaml(document.schemaId)}`,
@@ -131,14 +131,14 @@ export function serializeAgentPromptMarkdown(document) {
   }
   lines.push('');
   lines.push('## Instructions');
-  document.sections.instructions.forEach((instruction, index) => {
+  document.sections.instructions.forEach((instruction: any, index: any) => {
     lines.push(`${index + 1}. ${instruction}`);
   });
 
   return `${lines.join('\n')}\n`;
 }
 
-function createForbiddenRules(normalizedModel, lifecycleMode) {
+function createForbiddenRules(normalizedModel: any, lifecycleMode: any) {
   const rules = [];
   const hostCoupling = normalizedModel.execution?.dependencyPolicy?.hostCoupling ?? 'forbidden';
   if (hostCoupling === 'adapter-only') {
@@ -168,7 +168,7 @@ function createForbiddenRules(normalizedModel, lifecycleMode) {
   return unique(rules);
 }
 
-function createInstructionList(normalizedModel) {
+function createInstructionList(normalizedModel: any) {
   const instructions = [
     `Use ${quoteInline(normalizedModel.execution?.language?.primary ?? 'unknown')} with ${quoteInline(`${normalizedModel.execution?.runtime?.kind ?? 'runtime'} ${normalizedModel.execution?.runtime?.versionRange ?? ''}`.trim())} as the primary execution target.`,
     'Keep edits inside the allowed files listed in the frontmatter.'
@@ -185,7 +185,7 @@ function createInstructionList(normalizedModel) {
   return instructions;
 }
 
-function clonePort(port) {
+function clonePort(port: any) {
   return {
     name: port.name,
     kind: port.kind,
@@ -193,26 +193,26 @@ function clonePort(port) {
   };
 }
 
-function renderPort(port) {
+function renderPort(port: any) {
   return `\`${port.name}\` (\`${port.kind}\`, ${port.required ? 'required' : 'optional'})`;
 }
 
-function quoteInline(value) {
+function quoteInline(value: any) {
   return `\`${String(value)}\``;
 }
 
-function quoteYaml(value) {
+function quoteYaml(value: any) {
   return JSON.stringify(String(value));
 }
 
-function unique(values) {
-  return [...new Set(values.map((value) => String(value)))];
+function unique(values: any) {
+  return [...new Set(values.map((value: any) => String(value)))];
 }
 
-function toPortablePath(value) {
+function toPortablePath(value: any) {
   return String(value).replace(/\\/g, '/');
 }
 
-function trimSlashes(value) {
+function trimSlashes(value: any) {
   return value.replace(/\/+$/g, '');
 }

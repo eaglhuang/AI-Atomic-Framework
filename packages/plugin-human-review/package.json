@@ -20,8 +20,8 @@
     "@ai-atomic-framework/plugin-sdk": "0.0.0"
   },
   "scripts": {
-    "build": "node ../../scripts/build-package-dist.mjs --package packages/plugin-human-review",
-    "test": "node ../../scripts/validate-package-skeleton.mjs --mode test",
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/plugin-human-review",
+    "test": "node --experimental-strip-types ../../scripts/validate-package-skeleton.ts --mode test",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },

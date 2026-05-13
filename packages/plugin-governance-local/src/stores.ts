@@ -76,7 +76,11 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       const current = readJsonFile(filePath) as Record<string, unknown>;
       const updated = { ...current, status };
       writeJsonFile(filePath, updated);
-      return normalizeWorkItem(updated);
+      const normalized = normalizeWorkItem(updated);
+      if (!normalized) {
+        throw new Error(`Task store generated an invalid work item record for ${workItemId}`);
+      }
+      return normalized;
     },
     listTasks() {
       if (!existsSync(absoluteLayout.taskStorePath)) {
