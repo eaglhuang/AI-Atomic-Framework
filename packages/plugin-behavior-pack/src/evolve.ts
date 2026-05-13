@@ -1,4 +1,4 @@
-import { EVOLVE_DELEGATION_TARGET, type AtomBehavior, type AtomBehaviorOutput } from '@ai-atomic-framework/plugin-sdk';
+import { EVOLVE_DELEGATION_TARGET, type AtomBehavior, type AtomBehaviorOutput } from '../../plugin-sdk/src/behavior.ts';
 
 function fail(issue: string, details: Readonly<Record<string, unknown>> = {}): AtomBehaviorOutput {
   return {
