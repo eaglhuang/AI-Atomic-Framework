@@ -105,7 +105,7 @@ export function createHumanReviewDecisionLog(input: HumanReviewDecisionLogInput)
     producedBy: input.decidedBy,
     reproducibility: {
       replayable: true,
-      replayCommand: ['node', 'scripts/validate-human-review.mjs'],
+      replayCommand: ['node', 'scripts/validate-human-review.ts'],
       inputs: [input.queuePath],
       expectedArtifacts: [input.queuePath, input.projectionPath],
       notes: 'Replay the human review decision against the queue snapshot and decision hash.'

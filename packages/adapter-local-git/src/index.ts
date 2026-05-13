@@ -88,7 +88,7 @@ export const defaultLocalGitAdapterConfig: LocalGitAdapterConfig = {
 };
 
 export const localGitAdapterRuntime = {
-  entrypoint: './local-git-adapter.mjs',
+  entrypoint: './local-git-adapter.ts',
   supportsFilesystemRegistryPath: true,
   hostGovernanceRequired: false,
   noopOperations: ['lock', 'gate', 'doc'] as const,

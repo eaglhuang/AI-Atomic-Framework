@@ -9,17 +9,17 @@ export const defaultMapIntegrationReportMigration = Object.freeze({
   notes: 'Initial alpha0 map integration report.'
 });
 
-export function resolveCanonicalMapPaths(mapId) {
+export function resolveCanonicalMapPaths(mapId: any) {
   const workbenchPath = `atomic_workbench/maps/${mapId}`;
   return {
     workbenchPath,
     specPath: `${workbenchPath}/map.spec.json`,
-    testPath: `${workbenchPath}/map.integration.test.mjs`,
+    testPath: `${workbenchPath}/map.integration.test.ts`,
     reportPath: `${workbenchPath}/map.test.report.json`
   };
 }
 
-export function resolveMapIntegrationTarget(mapId, options) {
+export function resolveMapIntegrationTarget(mapId: any, options: any) {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const canonical = resolveCanonicalMapPaths(mapId);
@@ -58,7 +58,7 @@ export function resolveMapIntegrationTarget(mapId, options) {
   });
 }
 
-export function runMapIntegrationTest(mapId, options) {
+export function runMapIntegrationTest(mapId: any, options: any) {
   const normalizedOptions = options || {};
   const target = resolveMapIntegrationTarget(mapId, normalizedOptions);
   const generatedAt = normalizedOptions.now ?? new Date().toISOString();
@@ -110,7 +110,7 @@ export function runMapIntegrationTest(mapId, options) {
   };
 }
 
-export function createMapIntegrationReport(input) {
+export function createMapIntegrationReport(input: any) {
   const perMapStatus = [...(input.perMapStatus ?? [])];
   const failedDownstream = [...(input.failedDownstream ?? [])];
   const total = perMapStatus.length;
@@ -161,7 +161,7 @@ export function createMapIntegrationReport(input) {
   };
 }
 
-function resolveLegacyMapTarget(mapId, options) {
+function resolveLegacyMapTarget(mapId: any, options: any) {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const atomsRoot = path.join(repositoryRoot, 'atomic_workbench', 'atoms');
@@ -173,7 +173,7 @@ function resolveLegacyMapTarget(mapId, options) {
   for (const ownerDirectory of ownerDirectories) {
     const legacyWorkbenchPath = path.join(atomsRoot, ownerDirectory.name, 'map');
     const legacySpecPath = path.join(legacyWorkbenchPath, 'map.spec.json');
-    const legacyTestPath = path.join(legacyWorkbenchPath, 'map.integration.test.mjs');
+    const legacyTestPath = path.join(legacyWorkbenchPath, 'map.integration.test.ts');
     if (!existsSync(legacySpecPath) || !existsSync(legacyTestPath)) {
       continue;
     }
@@ -196,18 +196,18 @@ function resolveLegacyMapTarget(mapId, options) {
   return null;
 }
 
-function createMapRunnerError(code, message, details = {}) {
-  const error = new Error(message);
+function createMapRunnerError(code: any, message: any, details: Record<string, unknown> = {}) {
+  const error = new Error(message) as Error & { code: string; details: Record<string, unknown> };
   error.name = 'MapIntegrationRunnerError';
-  error['code'] = code;
-  error['details'] = details;
+  error.code = code;
+  error.details = details;
   return error;
 }
 
-function normalizeText(value) {
+function normalizeText(value: any) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function toPortablePath(value) {
+function toPortablePath(value: any) {
   return String(value || '').replace(/\\/g, '/');
 }

@@ -24,7 +24,7 @@ import {
 
 export * from './execution-constants.ts';
 
-export function createExecuteAgentTaskEffectContract(options) {
+export function createExecuteAgentTaskEffectContract(options: any) {
   const normalizedOptions = options || {};
   return {
     nodeKind: executeAgentTaskNodeKind,
@@ -35,7 +35,7 @@ export function createExecuteAgentTaskEffectContract(options) {
   };
 }
 
-export function executeAgentTask(normalizedModel, options) {
+export function executeAgentTask(normalizedModel: any, options: any) {
   const normalizedOptions = options || {};
   const atomId = normalizedModel?.identity?.atomId;
   if (!atomId) {
@@ -71,7 +71,12 @@ export function executeAgentTask(normalizedModel, options) {
     logPath: artifactTargets.logPath
   });
 
-  let applyOutcome = {
+  let applyOutcome: {
+    ok: boolean;
+    appliedChanges: boolean;
+    touchedFiles: string[];
+    summary: string;
+  } = {
     ok: true,
     appliedChanges: false,
     touchedFiles: [],
@@ -171,7 +176,7 @@ export function executeAgentTask(normalizedModel, options) {
   };
 }
 
-function defaultAgentExecutor(context) {
+function defaultAgentExecutor(context: any) {
   const targetFile = context.promptDocument.allowedFiles[context.promptDocument.allowedFiles.length - 1] || context.promptDocument.promptPath;
   return {
     ok: true,
@@ -199,7 +204,7 @@ function defaultApplyExecution() {
   };
 }
 
-function normalizeAgentOutcome(rawOutcome, fallback) {
+function normalizeAgentOutcome(rawOutcome: any, fallback: any) {
   const proposedChanges = normalizeProposedChanges(rawOutcome?.proposedChanges, fallback.defaultTouchedFile);
   const summary = String(rawOutcome?.summary || (fallback.executionMode === 'dry-run'
     ? 'Dry-run captured a candidate patch without mutating the host project.'
@@ -216,7 +221,7 @@ function normalizeAgentOutcome(rawOutcome, fallback) {
   };
 }
 
-function normalizeApplyOutcome(rawOutcome) {
+function normalizeApplyOutcome(rawOutcome: any) {
   return {
     ok: rawOutcome?.ok !== false,
     appliedChanges: rawOutcome?.appliedChanges === true,
@@ -227,7 +232,7 @@ function normalizeApplyOutcome(rawOutcome) {
   };
 }
 
-function normalizePromptDocument(normalizedModel, promptDocument) {
+function normalizePromptDocument(normalizedModel: any, promptDocument: any) {
   const atomId = normalizedModel?.identity?.atomId;
   const promptPath = toPortablePath(promptDocument?.promptPath || `${defaultExecutionWorkbenchRoot}/${atomId}/prompt.md`);
   const frontmatter = promptDocument?.frontmatter || {};
@@ -239,7 +244,7 @@ function normalizePromptDocument(normalizedModel, promptDocument) {
   };
 }
 
-function normalizeProposedChanges(proposedChanges, fallbackFilePath) {
+function normalizeProposedChanges(proposedChanges: any, fallbackFilePath: any) {
   const normalized = Array.isArray(proposedChanges)
     ? proposedChanges
       .filter((entry) => entry && typeof entry === 'object')
@@ -263,7 +268,7 @@ function normalizeProposedChanges(proposedChanges, fallbackFilePath) {
   ];
 }
 
-function normalizeLogLines(logLines, executionMode) {
+function normalizeLogLines(logLines: any, executionMode: any) {
   if (Array.isArray(logLines) && logLines.length > 0) {
     return logLines.map((line) => String(line));
   }
@@ -272,7 +277,7 @@ function normalizeLogLines(logLines, executionMode) {
     : 'APPLY: prepared candidate patch'];
 }
 
-function resolveArtifactTargets(repositoryRoot, workbenchPath, options) {
+function resolveArtifactTargets(repositoryRoot: any, workbenchPath: any, options: any) {
   const snapshotPath = toPortablePath(path.relative(repositoryRoot, path.join(workbenchPath, options.snapshotFileName || defaultExecutionSnapshotFileName)));
   const logPath = toPortablePath(path.relative(repositoryRoot, path.join(workbenchPath, options.logFileName || defaultExecutionLogFileName)));
   const evidencePath = toPortablePath(path.relative(repositoryRoot, path.join(workbenchPath, options.evidenceFileName || defaultExecutionEvidenceFileName)));
@@ -286,7 +291,7 @@ function resolveArtifactTargets(repositoryRoot, workbenchPath, options) {
   };
 }
 
-function resolveWorkbenchPath(normalizedModel, repositoryRoot, options) {
+function resolveWorkbenchPath(normalizedModel: any, repositoryRoot: any, options: any) {
   if (options.workbenchPath) {
     return path.resolve(repositoryRoot, options.workbenchPath);
   }
@@ -294,7 +299,7 @@ function resolveWorkbenchPath(normalizedModel, repositoryRoot, options) {
   return path.resolve(repositoryRoot, workbenchRoot, resolveCanonicalAtomFolderName(normalizedModel.identity.atomId));
 }
 
-function resolveCanonicalAtomFolderName(atomId) {
+function resolveCanonicalAtomFolderName(atomId: any) {
   const folderName = String(atomId || '').trim();
   if (!folderName) {
     throw new Error('Atomic ID is required to resolve the canonical atom folder.');
@@ -305,23 +310,23 @@ function resolveCanonicalAtomFolderName(atomId) {
   return folderName;
 }
 
-function normalizeLifecycleMode(value) {
+function normalizeLifecycleMode(value: any) {
   return String(value || '').trim() === 'evolution' ? 'evolution' : 'birth';
 }
 
-function writeJson(filePath, value) {
+function writeJson(filePath: any, value: any) {
   writeText(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-function writeText(filePath, content) {
+function writeText(filePath: any, content: any) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, content, 'utf8');
 }
 
-function uniqueStrings(values) {
-  return [...new Set((values || []).map((value) => toPortablePath(String(value))).filter(Boolean))];
+function uniqueStrings(values: any): string[] {
+  return Array.from(new Set<string>((values || []).map((value: any) => toPortablePath(String(value))).filter(Boolean)));
 }
 
-function toPortablePath(value) {
+function toPortablePath(value: any) {
   return String(value || '').replace(/\\/g, '/');
 }

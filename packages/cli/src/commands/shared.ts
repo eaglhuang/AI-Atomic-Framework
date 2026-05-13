@@ -1,0 +1,391 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+
+export const configRelativePath = path.join('.atm', 'config.json');
+export const frameworkVersion = '0.0.0';
+
+export class CliError extends Error {
+  code: string;
+  exitCode: number;
+  details: Record<string, unknown>;
+
+  constructor(code: string, text: string, options: { exitCode?: number; details?: Record<string, unknown> } = {}) {
+    super(text);
+    this.name = 'CliError';
+    this.code = code;
+    this.exitCode = options.exitCode ?? 1;
+    this.details = options.details ?? {};
+  }
+}
+
+export function message(level: any, code: any, text: any, data = {}) {
+  return { level, code, text, data };
+}
+
+export async function resolveValue<T>(value: T | Promise<T>): Promise<T> {
+  return await Promise.resolve(value);
+}
+
+export function makeResult({ ok, command, cwd, mode = 'standalone', messages = [], evidence = {} }: any) {
+  return {
+    ok,
+    command,
+    mode,
+    cwd,
+    messages,
+    evidence
+  };
+}
+
+export function defineCommandSpec(spec: any) {
+  const name = String(spec?.name || '').trim();
+  if (!name) {
+    throw new Error('Command spec requires a name.');
+  }
+  return Object.freeze({
+    name,
+    summary: String(spec?.summary || '').trim(),
+    positional: normalizeSpecArray(spec?.positional),
+    options: normalizeSpecArray(spec?.options),
+    examples: normalizeSpecArray(spec?.examples)
+  });
+}
+
+type ParsedCommandArgs = {
+  options: Record<string, unknown>;
+  positional: string[];
+  helpRequested: boolean;
+  outputFormat: 'json' | 'pretty' | null;
+};
+
+export function parseArgsForCommand(
+  spec: any,
+  argv: string[] = [],
+  options: { allowUnknown?: boolean } = {}
+): ParsedCommandArgs {
+  const state = {
+    options: {} as Record<string, unknown>,
+    positional: [] as string[],
+    helpRequested: false,
+    outputFormat: null as 'json' | 'pretty' | null
+  };
+  const allowUnknown = options.allowUnknown === true;
+  const optionMap = buildOptionMap(spec?.options ?? []);
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--help' || arg === '-h') {
+      state.helpRequested = true;
+      continue;
+    }
+    if (arg === '--json') {
+      state.outputFormat = 'json';
+      continue;
+    }
+    if (arg === '--pretty') {
+      if (state.outputFormat !== 'json') {
+        state.outputFormat = 'pretty';
+      }
+      continue;
+    }
+
+    if (arg.startsWith('--') || arg.startsWith('-')) {
+      const optionSpec = optionMap.get(arg);
+      if (!optionSpec) {
+        if (allowUnknown) {
+          state.positional.push(arg);
+          continue;
+        }
+        throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} does not support option ${arg}`, { exitCode: 2 });
+      }
+
+      const key = optionSpec.flag.replace(/^-+/, '').replace(/-([a-z])/g, (_: any, char: any) => char.toUpperCase());
+      if (optionSpec.value) {
+        const value = argv[index + 1];
+        if (!value || value.startsWith('--') || value === '-h') {
+          throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for ${optionSpec.flag}`, { exitCode: 2 });
+        }
+        if (optionSpec.repeatable) {
+          state.options[key] = Array.isArray(state.options[key]) ? [...state.options[key], value] : [value];
+        } else {
+          state.options[key] = value;
+        }
+        index += 1;
+        continue;
+      }
+
+      state.options[key] = true;
+      continue;
+    }
+
+    state.positional.push(arg);
+  }
+
+  return state;
+}
+
+export function makeHelpResult(spec: any, cwd = process.cwd()) {
+  const usage = {
+    command: spec.name,
+    summary: spec.summary,
+    positional: spec.positional ?? [],
+    options: spec.options ?? [],
+    examples: spec.examples ?? []
+  };
+  return makeResult({
+    ok: true,
+    command: spec.name,
+    cwd,
+    messages: [message('info', 'ATM_CLI_HELP_READY', `Help for ${spec.name}.`)],
+    evidence: {
+      usage
+    }
+  });
+}
+
+export function writeResult(result: any, stream: any, outputFormat = 'json') {
+  if (outputFormat === 'pretty') {
+    stream.write(formatPrettyResult(result));
+    return;
+  }
+  stream.write(`${JSON.stringify(result, null, 2)}\n`);
+}
+
+export function formatPrettyResult(result: any) {
+  const statusText = result.ok ? 'OK' : 'FAIL';
+  const lines = [`[${statusText}] ${result.command} (${result.cwd})`];
+  for (const entry of result.messages ?? []) {
+    lines.push(`${entry.level}: ${entry.code} - ${entry.text}`);
+  }
+  if (result.evidence && Object.keys(result.evidence).length > 0) {
+    lines.push('evidence:');
+    lines.push(JSON.stringify(result.evidence, null, 2));
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+type ParsedCliOptions = {
+  cwd: string;
+  spec?: string;
+  validate?: string;
+  self: boolean;
+  neutrality: boolean;
+  agentsMd: boolean;
+  verify: boolean;
+  dryRun: boolean;
+  force: boolean;
+  adopt?: string;
+  task?: string;
+  atom?: string;
+  map?: string;
+  propagate?: string;
+  agent?: string;
+};
+
+export function parseOptions(argv: string[], commandName: string) {
+  const options: ParsedCliOptions = {
+    cwd: process.cwd(),
+    spec: undefined,
+    validate: undefined,
+    self: false,
+    neutrality: false,
+    agentsMd: false,
+    verify: false,
+    dryRun: false,
+    force: false,
+    adopt: undefined,
+    task: undefined,
+    atom: undefined,
+    map: undefined,
+    propagate: undefined,
+    agent: undefined
+  };
+  const positional = [];
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireOptionValue(argv, index, '--cwd', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--spec') {
+      options.spec = requireOptionValue(argv, index, '--spec', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--validate') {
+      if (commandName !== 'spec') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --validate`, { exitCode: 2 });
+      }
+      options.validate = requireOptionValue(argv, index, '--validate', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--self') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --self`, { exitCode: 2 });
+      }
+      options.self = true;
+      continue;
+    }
+    if (arg === '--neutrality') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --neutrality`, { exitCode: 2 });
+      }
+      options.neutrality = true;
+      continue;
+    }
+    if (arg === '--agents-md') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agents-md`, { exitCode: 2 });
+      }
+      options.agentsMd = true;
+      continue;
+    }
+    if (arg === '--verify') {
+      if (commandName !== 'self-host-alpha') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --verify`, { exitCode: 2 });
+      }
+      options.verify = true;
+      continue;
+    }
+    if (arg === '--agent') {
+      if (commandName !== 'self-host-alpha') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agent`, { exitCode: 2 });
+      }
+      options.agent = requireOptionValue(argv, index, '--agent', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      if (commandName !== 'init') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --dry-run`, { exitCode: 2 });
+      }
+      options.dryRun = true;
+      continue;
+    }
+    if (arg === '--force') {
+      options.force = true;
+      continue;
+    }
+    if (arg === '--adopt') {
+      if (commandName !== 'init') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --adopt`, { exitCode: 2 });
+      }
+      if (!argv[index + 1] || argv[index + 1].startsWith('--')) {
+        options.adopt = 'default';
+      } else {
+        options.adopt = requireOptionValue(argv, index, '--adopt', commandName);
+        index += 1;
+      }
+      continue;
+    }
+    if (arg === '--atom') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --atom`, { exitCode: 2 });
+      }
+      options.atom = requireOptionValue(argv, index, '--atom', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--map') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --map`, { exitCode: 2 });
+      }
+      options.map = requireOptionValue(argv, index, '--map', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--propagate') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --propagate`, { exitCode: 2 });
+      }
+      options.propagate = requireOptionValue(argv, index, '--propagate', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      if (commandName !== 'init' && commandName !== 'bootstrap') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --task`, { exitCode: 2 });
+      }
+      options.task = requireOptionValue(argv, index, '--task', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    if (arg.startsWith('--')) {
+      throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option ${arg}`, { exitCode: 2 });
+    }
+    positional.push(arg);
+  }
+
+  return {
+    options: {
+      ...options,
+      cwd: path.resolve(options.cwd)
+    },
+    positional
+  };
+}
+
+export function configPathFor(cwd: any) {
+  return path.join(cwd, configRelativePath);
+}
+
+export function relativePathFrom(cwd: any, absolutePath: any) {
+  return path.relative(cwd, absolutePath).replace(/\\/g, '/');
+}
+
+export function ensureAtmDirectory(cwd: any) {
+  const directory = path.join(cwd, '.atm');
+  mkdirSync(directory, { recursive: true });
+  return directory;
+}
+
+export function readJsonFile(filePath: any, missingCode = 'ATM_JSON_NOT_FOUND') {
+  if (!existsSync(filePath)) {
+    throw new CliError(missingCode, `JSON file not found: ${filePath}`, { details: { filePath } });
+  }
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8'));
+  } catch (error) {
+    throw new CliError('ATM_JSON_INVALID', `Invalid JSON file: ${filePath}`, {
+      details: {
+        filePath,
+        reason: error instanceof Error ? error.message : String(error)
+      }
+    });
+  }
+}
+
+export function writeJsonFile(filePath: any, value: any) {
+  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function normalizeSpecArray(value: any) {
+  return Array.isArray(value) ? value.map((entry) => entry) : [];
+}
+
+function buildOptionMap(options: any) {
+  const map = new Map();
+  for (const option of options) {
+    if (option?.flag) {
+      map.set(option.flag, option);
+    }
+    if (option?.alias) {
+      map.set(option.alias, option);
+    }
+  }
+  return map;
+}
+
+function requireOptionValue(argv: any, optionIndex: any, optionName: any, commandName: any) {
+  const value = argv[optionIndex + 1];
+  if (!value || value.startsWith('--')) {
+    throw new CliError('ATM_CLI_USAGE', `${commandName} requires a value for ${optionName}`, { exitCode: 2 });
+  }
+  return value;
+}

@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 
-export function normalizeValidationPassOutcome(rawOutcome, pass) {
+export function normalizeValidationPassOutcome(rawOutcome: any, pass: any) {
   const ok = rawOutcome?.ok !== false;
   const exitCode = normalizeExitCode(rawOutcome?.exitCode, ok ? 0 : 1);
   const summary = String(rawOutcome?.summary || `${pass.label} validated delegated commands.`);
@@ -30,7 +30,7 @@ export function normalizeValidationPassOutcome(rawOutcome, pass) {
   };
 }
 
-export function createValidationPassPlan(lifecycleMode, reportsDirPath) {
+export function createValidationPassPlan(lifecycleMode: any, reportsDirPath: any) {
   if (lifecycleMode === 'evolution') {
     return [
       createValidationPass('baseline-fixtures-x-new-code', 'baseline', 'Baseline fixtures validated against the candidate code.', reportsDirPath),
@@ -42,8 +42,8 @@ export function createValidationPassPlan(lifecycleMode, reportsDirPath) {
   ];
 }
 
-export function defaultRunValidationPass(context) {
-  const results = context.validationCommands.map((command, index) => {
+export function defaultRunValidationPass(context: any) {
+  const results = context.validationCommands.map((command: any, index: any) => {
     const startedAt = Date.now();
     const processResult = spawnSync(command, {
       cwd: context.repositoryRoot,
@@ -63,8 +63,8 @@ export function defaultRunValidationPass(context) {
     };
   });
 
-  const exitCode = results.find((entry) => entry.exitCode !== 0)?.exitCode ?? 0;
-  const ok = results.every((entry) => entry.ok === true);
+  const exitCode = results.find((entry: any) => entry.exitCode !== 0)?.exitCode ?? 0;
+  const ok = results.every((entry: any) => entry.ok === true);
   return {
     ok,
     exitCode,
@@ -75,7 +75,7 @@ export function defaultRunValidationPass(context) {
   };
 }
 
-function createValidationPass(passId, fixtureSet, label, reportsDirPath) {
+function createValidationPass(passId: any, fixtureSet: any, label: any, reportsDirPath: any) {
   return {
     passId,
     fixtureSet,
@@ -84,17 +84,17 @@ function createValidationPass(passId, fixtureSet, label, reportsDirPath) {
   };
 }
 
-function normalizeExitCode(value, fallback) {
+function normalizeExitCode(value: any, fallback: any) {
   if (typeof value === 'number' && Number.isInteger(value) && value >= 0) {
     return value;
   }
   return fallback;
 }
 
-function normalizeText(value) {
+function normalizeText(value: any) {
   return String(value || '');
 }
 
-function toPortablePath(value) {
+function toPortablePath(value: any) {
   return String(value || '').replace(/\\/g, '/');
 }

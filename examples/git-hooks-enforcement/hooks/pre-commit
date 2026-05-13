@@ -4,4 +4,4 @@ set -eu
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-node examples/git-hooks-enforcement/pre-commit.mjs
+node --experimental-strip-types examples/git-hooks-enforcement/pre-commit.ts

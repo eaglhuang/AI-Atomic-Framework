@@ -23,7 +23,7 @@ export interface RegistryStatusMigrationResult {
 
 export function migrateRegistryStatus(input: RegistryStatusMigrationInput): RegistryStatusMigrationResult {
   const rawStatus = String(input.status ?? '').trim();
-  const legacyMigration = rawStatus && legacyRegistryStatusMigrationMap[rawStatus];
+  const legacyMigration = rawStatus ? legacyRegistryStatusMigrationMap[rawStatus] : undefined;
   const status = legacyMigration?.status ?? (isRegistryEntryStatus(rawStatus) ? rawStatus : (input.entryType === 'map' ? 'draft' : 'active'));
   const governanceTier = normalizeRegistryGovernanceTier(
     input.governanceTier ?? legacyMigration?.governanceTier ?? resolveRegistryDefaultGovernanceTier(status, input.entryType)

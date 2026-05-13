@@ -6,8 +6,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "test": "node test/run.mjs",
-    "typecheck": "node test/run.mjs --typecheck",
-    "lint": "node test/run.mjs --lint"
+    "test": "node --experimental-strip-types test/run.ts",
+    "typecheck": "node --experimental-strip-types test/run.ts --typecheck",
+    "lint": "node --experimental-strip-types test/run.ts --lint"
   }
 }

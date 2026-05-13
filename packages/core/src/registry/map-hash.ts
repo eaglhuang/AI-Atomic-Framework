@@ -1,4 +1,4 @@
-import { computeSha256ForContent } from '../hash-lock/hash-lock.mjs';
+import { computeSha256ForContent } from '../hash-lock/hash-lock.ts';
 import type {
   RegistryMapEdgeRecord,
   RegistryMapMemberRecord,
