@@ -9,7 +9,7 @@ export function computeSha256ForContent(content: any) {
 export function computeSha256ForFile(filePath: any) {
   const resolvedPath = path.resolve(filePath);
   ensureFileExists(resolvedPath);
-  return computeSha256ForContent(readFileSync(resolvedPath));
+  return computeSha256ForContent(readHashBytes(resolvedPath));
 }
 
 export function computeSha256ForFiles(filePaths: any) {
@@ -21,7 +21,7 @@ export function computeSha256ForFiles(filePaths: any) {
   const hash = createHash('sha256');
   for (const filePath of normalizedPaths) {
     ensureFileExists(filePath);
-    hash.update(readFileSync(filePath));
+    hash.update(readHashBytes(filePath));
   }
   return `sha256:${hash.digest('hex')}`;
 }
@@ -89,4 +89,16 @@ function toProjectPath(repositoryRoot: any, filePath: any) {
 
 function toPortablePath(value: any) {
   return value.replace(/\\/g, '/');
+}
+
+function readHashBytes(filePath: any) {
+  const raw = readFileSync(filePath);
+  if (isLikelyText(raw)) {
+    return Buffer.from(raw.toString('utf8').replace(/\r\n/g, '\n'), 'utf8');
+  }
+  return raw;
+}
+
+function isLikelyText(content: Buffer) {
+  return !content.includes(0);
 }
