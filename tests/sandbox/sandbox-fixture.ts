@@ -111,12 +111,31 @@ function setupSandbox(sandboxRoot: any, sourceRoot: any) {
 
 function verifySandbox(sandboxRoot: any, expectedPath: any) {
   const expected = JSON.parse(readFileSync(expectedPath, 'utf8'));
-  const cliPath = path.join(sandboxRoot, 'packages', 'cli', 'src', 'atm.mjs');
-  if (!existsSync(cliPath)) {
-    throw new Error(`sandbox CLI entrypoint not found: ${path.relative(sandboxRoot, cliPath)}`);
+  const cliEntrypoints = [
+    {
+      path: path.join(sandboxRoot, 'packages', 'cli', 'src', 'atm.ts'),
+      useStripTypes: true
+    },
+    {
+      path: path.join(sandboxRoot, 'packages', 'cli', 'src', 'atm.mjs'),
+      useStripTypes: false
+    }
+  ];
+  const selectedEntrypoint = cliEntrypoints.find((candidate) => existsSync(candidate.path));
+  if (!selectedEntrypoint) {
+    const candidates = cliEntrypoints
+      .map((candidate) => path.relative(sandboxRoot, candidate.path))
+      .join(', ');
+    throw new Error(`sandbox CLI entrypoint not found: ${candidates}`);
   }
 
-  const result = spawnSync(process.execPath, [cliPath, 'self-host-alpha', '--verify', '--json'], {
+  const result = spawnSync(process.execPath, [
+    ...(selectedEntrypoint.useStripTypes ? ['--experimental-strip-types'] : []),
+    selectedEntrypoint.path,
+    'self-host-alpha',
+    '--verify',
+    '--json'
+  ], {
     cwd: sandboxRoot,
     encoding: 'utf8'
   });
