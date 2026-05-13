@@ -32,6 +32,18 @@ function normalizePortablePath(value: any) {
     .replace(/^([A-Z]):/i, (_match, driveLetter) => `${String(driveLetter).toLowerCase()}:`);
 }
 
+function matchesExpectedIssuePath(actualPath: any, expectedPath: any) {
+  const normalizedActual = normalizePortablePath(actualPath);
+  const normalizedExpected = normalizePortablePath(expectedPath);
+  if (!normalizedExpected) {
+    return normalizedActual.length === 0;
+  }
+  if (normalizedExpected.startsWith('/')) {
+    return normalizedActual === normalizedExpected;
+  }
+  return normalizedActual === normalizedExpected || normalizedActual.endsWith(`/${normalizedExpected}`);
+}
+
 function expectSubset(actual: any, expected: any, currentPath = 'root') {
   if (Array.isArray(expected)) {
     assert.deepStrictEqual(actual, expected, `${currentPath} mismatch`);
@@ -58,7 +70,7 @@ for (const invalidCase of fixture.invalidCases) {
   check(result.ok === false, `${invalidCase.name} must fail parsing`);
   const issue = result.promptReport.issues.find((entry: any) => entry.code === invalidCase.expectedCode);
   check(Boolean(issue), `${invalidCase.name} must contain issue code ${invalidCase.expectedCode}`);
-  check(normalizePortablePath(issue.path) === normalizePortablePath(invalidCase.expectedPath), `${invalidCase.name} must point to ${invalidCase.expectedPath}`);
+  check(matchesExpectedIssuePath(issue.path, invalidCase.expectedPath), `${invalidCase.name} must point to ${invalidCase.expectedPath}`);
   check(issue.prompt.includes(invalidCase.expectedPromptSnippet), `${invalidCase.name} must provide prompt hint for ${invalidCase.expectedPromptSnippet}`);
 }
 

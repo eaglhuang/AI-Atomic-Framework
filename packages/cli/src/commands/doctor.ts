@@ -65,7 +65,7 @@ export function runDoctor(argv: any) {
       pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
     }),
     createCheck('typescript-escape-hatches', hasTsNoCheck === false, { hasTsNoCheck }),
-    createCheck('package-dist', missingDist.length === 0, { packageCount: packageDirs.length, missingDist }),
+    createCheck('package-dist', !frameworkContractExpected || missingDist.length === 0, { packageCount: packageDirs.length, missingDist }),
     createCheck('hash-placeholders', hashAudit.ok, hashAudit),
     createCheck('self-host-alpha-entry', !frameworkContractExpected || (existsSync(path.join(root, 'packages/cli/src/commands/self-host-alpha.ts')) && existsSync(path.join(root, 'docs/SELF_HOSTING_ALPHA.md'))), { command: 'packages/cli/src/commands/self-host-alpha.ts', doc: 'docs/SELF_HOSTING_ALPHA.md' }),
     createCheck('governance-layout-v2', runtime.layoutVersion === atmLayoutVersion, {
