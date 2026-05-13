@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: npm
 
       - name: Install dependencies
@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          node packages/cli/src/atm.mjs verify --neutrality --cwd . > neutrality-report.json
+          node atm.mjs verify --neutrality --json --cwd . > neutrality-report.json
           status=$?
           echo "exit_code=$status" >> "$GITHUB_OUTPUT"
           cat neutrality-report.json
