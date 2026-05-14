@@ -1,12 +1,22 @@
 {
-  "command": "next",
-  "summary": "Recommend the next official ATM guidance action from current state.",
+  "command": "start",
+  "summary": "Start an ATM guidance session for a concrete goal.",
   "positional": [],
   "options": [
     {
       "flag": "--cwd",
       "value": "path",
       "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--goal",
+      "value": "text",
+      "summary": "Goal the agent is trying to accomplish."
+    },
+    {
+      "flag": "--actor",
+      "value": "name",
+      "summary": "Optional actor label for session audit."
     },
     {
       "flag": "--json",
@@ -23,7 +33,6 @@
     }
   ],
   "examples": [
-    "node atm.mjs next --json",
-    "node atm.mjs next --cwd <host-repo> --json"
+    "node atm.mjs start --cwd . --goal \"Extract legacy helper\" --json"
   ]
 }

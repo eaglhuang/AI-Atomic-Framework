@@ -16,7 +16,7 @@ export function buildOnefileRelease(options: any = {}) {
   const outputFilePath = path.join(outputRoot, 'atm.mjs');
 
   if (!existsSync(rootDropRoot)) {
-    buildRootDropRelease({ repositoryRoot });
+    buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot });
   }
 
   const payloadFiles = collectPayloadFiles(rootDropRoot);

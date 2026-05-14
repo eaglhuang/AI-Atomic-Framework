@@ -1,3 +1,4 @@
+import { evaluateMutationGate, type GuidanceSession } from '../../core/src/guidance/index.ts';
 import type { RegistryTransitionAction } from '@ai-atomic-framework/core';
 import { EVOLVE_DELEGATION_TARGET, type AtomBehavior, type AtomBehaviorContext, type AtomBehaviorInput, type AtomBehaviorOutput } from './behavior.ts';
 
@@ -85,6 +86,20 @@ export class BehaviorRegistry {
       };
     }
 
+    const mutationGate = evaluateBehaviorMutationGate(input);
+    if (!mutationGate.allowed) {
+      return {
+        ok: false,
+        issues: mutationGate.issues.map((issue) => issue.code),
+        evidence: mutationGate.issues.map((issue) => ({
+          evidenceKind: 'validation',
+          summary: issue.message,
+          artifactPaths: [],
+          details: issue.details
+        }))
+      };
+    }
+
     const output = await behavior.execute(context, input);
 
     // Hard guard: behavior.evolve MUST delegate to ProposeAtomicUpgrade.
@@ -103,4 +118,43 @@ export class BehaviorRegistry {
 
     return output;
   }
+}
+
+function evaluateBehaviorMutationGate(input: AtomBehaviorInput) {
+  const payload = (input.payload ?? {}) as Record<string, unknown>;
+  const hostMutationRequested = payload.hostMutationRequested === true
+    || payload.applyRequested === true
+    || payload.promoteRequested === true
+    || payload.requireGuidanceGate === true
+    || payload.unguided === true;
+  if (!hostMutationRequested) {
+    return { allowed: true, advisory: false, auditRequired: false, issues: [] };
+  }
+  const activeSession = payload.activeGuidanceSession && typeof payload.activeGuidanceSession === 'object'
+    ? payload.activeGuidanceSession as GuidanceSession
+    : null;
+  const releaseBlockers = Array.isArray(payload.releaseBlockers)
+    ? payload.releaseBlockers.map((entry) => String(entry))
+    : [];
+  const targetSegmentRole = payload.targetSegmentRole === 'trunk'
+    || payload.targetSegmentRole === 'leaf'
+    || payload.targetSegmentRole === 'adapter-boundary'
+    ? payload.targetSegmentRole
+    : 'unknown';
+  const profile = payload.profile === 'ci' || payload.profile === 'release' ? payload.profile : 'dev';
+  return evaluateMutationGate({
+    action: input.action,
+    profile,
+    activeSession,
+    isLegacyTarget: payload.isLegacyTarget === true || typeof payload.legacySource === 'string',
+    hasLegacyRoutePlan: payload.hasLegacyRoutePlan === true || Boolean(payload.legacyRoutePlan),
+    hasDryRunProposal: payload.hasDryRunProposal === true || Boolean(payload.dryRunProposal),
+    applyRequested: payload.applyRequested === true,
+    promoteRequested: payload.promoteRequested === true,
+    reviewApproved: payload.reviewApproved === true,
+    releaseBlockers,
+    targetSegmentRole,
+    unguided: payload.unguided === true,
+    unguidedReason: typeof payload.unguidedReason === 'string' ? payload.unguidedReason : null
+  });
 }

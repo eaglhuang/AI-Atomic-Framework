@@ -6,14 +6,17 @@ import { runBudget } from './commands/budget.ts';
 import { runCreate } from './commands/create.ts';
 import { runCreateMap } from './commands/create-map.ts';
 import { runDoctor } from './commands/doctor.ts';
+import { runExplain } from './commands/explain.ts';
 import { runGuard } from './commands/guard.ts';
 import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
 import { runInit } from './commands/init.ts';
 import { runLock } from './commands/lock.ts';
 import { runNext } from './commands/next.ts';
+import { runOrient } from './commands/orient.ts';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.ts';
 import { runSpec } from './commands/spec.ts';
+import { runStart } from './commands/start.ts';
 import { runStatus } from './commands/status.ts';
 import { runUpgrade } from './commands/upgrade.ts';
 import { runTestAsync } from './commands/test.ts';
@@ -32,14 +35,17 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   create: runCreate,
   'create-map': runCreateMap,
   doctor: runDoctor,
+  explain: runExplain,
   guard: runGuard,
   guide: runGuide,
   handoff: runHandoff,
   init: runInit,
   lock: runLock,
   next: runNext,
+  orient: runOrient,
   'self-host-alpha': runSelfHostAlphaAsync,
   spec: runSpec,
+  start: runStart,
   status: runStatus,
   upgrade: runUpgrade,
   test: runTestAsync,

@@ -1,6 +1,6 @@
 {
-  "command": "next",
-  "summary": "Recommend the next official ATM guidance action from current state.",
+  "command": "orient",
+  "summary": "Inspect a repository and emit an ATM guidance orientation report.",
   "positional": [],
   "options": [
     {
@@ -23,7 +23,6 @@
     }
   ],
   "examples": [
-    "node atm.mjs next --json",
-    "node atm.mjs next --cwd <host-repo> --json"
+    "node atm.mjs orient --cwd . --json"
   ]
 }

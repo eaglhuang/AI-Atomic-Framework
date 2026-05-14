@@ -85,23 +85,23 @@ function parseGuideArgs(argv: string[] = []) {
 function buildOverviewGuide() {
   return {
     intent: 'overview',
-    summary: 'Use guide create-atom when you need to birth an atom and do not have a host-specific task router or task card.',
+    summary: 'Start with guidance: orient the repository, start a goal-bound session, then follow the single next action.',
     supportedIntents: supportedGuideIntents,
     channels: [
       {
-        channel: 'host-task-router',
-        when: 'A downstream host repo already has a task card or wrapper.',
-        action: 'Prefer the host wrapper first so host scope, evidence, and guardrails stay in sync.'
+        channel: 'guidance-first',
+        when: 'An agent is entering an unfamiliar repository or goal.',
+        action: 'Run `node atm.mjs orient --cwd . --json`, then `node atm.mjs start --cwd . --goal "<goal>" --json`.'
       },
       {
-        channel: 'framework-guide',
-        when: 'You are in ATM itself, or the host has no task-card flow for the current job.',
-        action: 'Run `node atm.mjs guide create-atom` to get the canonical create-atom path.'
+        channel: 'single-next-action',
+        when: 'A guidance session exists.',
+        action: 'Run `node atm.mjs next --cwd . --json` and execute exactly the returned command.'
       },
       {
-        channel: 'bootstrap',
-        when: 'ATM is not initialized yet in the target repository.',
-        action: 'Run `node atm.mjs guide bootstrap` before attempting atom birth.'
+        channel: 'blocked-path',
+        when: 'A mutation or apply step is blocked by missing gates or evidence.',
+        action: 'Run `node atm.mjs explain --why blocked --cwd . --json` and satisfy the listed evidence before retrying.'
       }
     ]
   };

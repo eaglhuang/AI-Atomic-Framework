@@ -1,4 +1,4 @@
-import type { WorkItemRef } from '@ai-atomic-framework/core';
+import type { HostGate, MutationPolicy, NoTouchZone, WorkItemRef } from '@ai-atomic-framework/core';
 import type { CapabilityDescriptor, CapabilityResult } from './capability';
 import type { GovernanceStores } from './governance';
 import type { AtomLifecycleHooks, AtomLifecycleModeValue } from './lifecycle';
@@ -46,6 +46,8 @@ export interface ProjectAdapterNeutralitySummary {
   readonly scannedPath: string;
 }
 
+export type { HostGate, MutationPolicy, NoTouchZone };
+
 export interface AtomizeAdapterRequest {
   readonly behaviorId: 'behavior.atomize';
   readonly legacySource: string;
@@ -81,5 +83,8 @@ export interface ProjectAdapter<Config = unknown> {
   initialize(context: ProjectAdapterContext<Config>): Promise<ProjectAdapterResult> | ProjectAdapterResult;
   prepareWorkItem(context: ProjectAdapterContext<Config>, workItem: WorkItemRef): Promise<ProjectAdapterResult> | ProjectAdapterResult;
   finalizeWorkItem(context: ProjectAdapterContext<Config>, workItem: WorkItemRef): Promise<ProjectAdapterResult> | ProjectAdapterResult;
+  listHostGates?(context: ProjectAdapterContext<Config>): Promise<readonly HostGate[]> | readonly HostGate[];
+  listNoTouchZones?(context: ProjectAdapterContext<Config>): Promise<readonly NoTouchZone[]> | readonly NoTouchZone[];
+  resolveMutationPolicy?(context: ProjectAdapterContext<Config>): Promise<MutationPolicy> | MutationPolicy;
   dispose?(context: ProjectAdapterContext<Config>): Promise<ProjectAdapterResult> | ProjectAdapterResult;
 }

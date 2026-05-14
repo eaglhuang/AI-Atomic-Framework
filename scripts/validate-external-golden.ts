@@ -48,9 +48,12 @@ assert(
 const fixtureReadme = readFileSync(path.join(fixtureRoot, 'README.md'), 'utf8');
 assert(!fixtureReadme.includes('ATM-CORE-0001'), 'external golden fixture README must not depend on ATM seed identifiers');
 
-const release = buildRootDropRelease({ repositoryRoot: root });
 const tempRoot = createTempWorkspace('atm-external-golden-');
 try {
+  const release = buildRootDropRelease({
+    repositoryRoot: root,
+    releaseRoot: path.join(tempRoot, 'release', 'atm-root-drop')
+  });
   const hostRepo = path.join(tempRoot, 'downstream-js-repo');
   mkdirSync(hostRepo, { recursive: true });
   cpSync(fixtureRoot, hostRepo, { recursive: true });

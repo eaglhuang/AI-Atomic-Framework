@@ -33,7 +33,10 @@ export type {
 } from './capability';
 export type {
   AtomizeAdapterRequest,
+  HostGate,
   InfectAdapterRequest,
+  MutationPolicy,
+  NoTouchZone,
   ProjectAdapter,
   ProjectAdapterContext,
   ProjectAdapterDryRunPatchContract,
