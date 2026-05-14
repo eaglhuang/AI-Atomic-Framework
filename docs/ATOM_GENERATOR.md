@@ -24,7 +24,7 @@ The generators are intentionally facades. They do not redefine the parser, atom-
 ## API
 
 ```js
-import { generateAtom } from './packages/core/src/manager/atom-generator.mjs';
+import { generateAtom } from './packages/core/src/manager/atom-generator.ts';
 
 const result = generateAtom({
   bucket: 'FIXTURE',
@@ -39,7 +39,7 @@ The result includes `atomId`, `workbenchPath`, `specPath`, `sourcePath`, `testPa
 ## Atomic Map API
 
 ```js
-import { generateAtomicMap } from './packages/core/src/manager/map-generator.mjs';
+import { generateAtomicMap } from './packages/core/src/manager/map-generator.ts';
 
 const result = generateAtomicMap({
   members: [
@@ -136,7 +136,7 @@ atomic_workbench/atoms/ATM-CORE-0004/
   atom.test.report.json
 ```
 
-This keeps the provisioning facade under the same registry, hash-lock, and evidence rules as the atoms it creates. The CLI command is only a host facade; the core behavior lives in `packages/core/src/manager/atom-generator.mjs` and `packages/core/src/manager/id-allocator.mjs`.
+This keeps the provisioning facade under the same registry, hash-lock, and evidence rules as the atoms it creates. The CLI command is only a host facade; the core behavior lives in `packages/core/src/manager/atom-generator.ts` and `packages/core/src/manager/id-allocator.ts`.
 
 ## Dogfood Evidence
 
@@ -149,7 +149,7 @@ This keeps the provisioning facade under the same registry, hash-lock, and evide
 Pre-generator entries keep their original atom IDs and source-of-truth paths. The backfill process adds generator provenance evidence, creates canonical workbench witness files, refreshes test reports, and keeps registry hash-locks aligned with the real source paths.
 
 ```bash
-node scripts/backfill-generator-provenance.mjs
+node --experimental-strip-types scripts/backfill-generator-provenance.ts
 ```
 
 The current registry classifies entries as:
@@ -167,7 +167,7 @@ The catalog shows this in its `provenance` column.
 The provenance audit is deterministic and committed as `atomic_workbench/generator-provenance-audit.json`.
 
 ```bash
-node scripts/validate-generator-provenance.mjs --write
+node --experimental-strip-types scripts/validate-generator-provenance.ts --write
 npm run validate:generator-provenance
 ```
 
@@ -178,7 +178,7 @@ For maps, the same audit derives canonical map workbench paths, checks `map.spec
 Map template policy also has its own deterministic gate:
 
 ```bash
-node scripts/validate-map-template.mjs --mode validate
+node --experimental-strip-types scripts/validate-map-template.ts --mode validate
 npm run validate:map-template
 ```
 
