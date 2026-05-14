@@ -208,10 +208,10 @@ Evidence 進入 Reviewer Bridge 前必須支援 redaction policy：
 
 Checklist：
 
-- [ ] 文件只使用 ATM 術語。
-- [ ] 文件明確區分已存在 contract 與未來 runtime component。
-- [ ] 文件包含里程碑、驗證命令、風險與回滾策略。
-- [ ] 文件通過 documentation review。
+- [x] 文件只使用 ATM 術語。
+- [x] 文件明確區分已存在 contract 與未來 runtime component。
+- [x] 文件包含里程碑、驗證命令、風險與回滾策略。
+- [x] 文件通過 documentation review。
 
 驗證：
 
@@ -233,10 +233,10 @@ Checklist：
 
 Checklist：
 
-- [ ] EvidenceRecord 新增欄位都是 optional。
-- [ ] UpgradeProposal 新增欄位不破壞既有 fixtures。
-- [ ] 新 proposal fixtures 覆蓋 `proposalSource`、`targetSurface`、base version、evidence watermark 與 `reversibility`。
-- [ ] TypeScript 與 JSON Schema 保持同步。
+- [x] EvidenceRecord 新增欄位都是 optional。
+- [x] UpgradeProposal 新增欄位不破壞既有 fixtures。
+- [x] 新 proposal fixtures 覆蓋 `proposalSource`、`targetSurface`、base version、evidence watermark 與 `reversibility`。
+- [x] TypeScript 與 JSON Schema 保持同步。
 
 驗證：
 
@@ -244,6 +244,8 @@ Checklist：
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:schemas`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:type-schema-sync`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:upgrade-proposal`
+
+M0 與 M1 已於 2026-05-15 完成並提交。
 
 ### M2 - Evidence Pattern Detector
 
