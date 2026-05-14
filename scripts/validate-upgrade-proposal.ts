@@ -18,6 +18,8 @@ const passFixturePath = 'fixtures/upgrade/proposal-pass.json';
 const blockedFixturePath = 'fixtures/upgrade/proposal-blocked.json';
 const mapBumpFixturePath = 'fixtures/upgrade/map-bump-proposal.json';
 const atomExtractFixturePath = 'fixtures/upgrade/atom-extract-proposal.json';
+const evidenceDrivenFixturePath = 'fixtures/upgrade/evidence-driven-proposal.json';
+const staleFixturePath = 'fixtures/upgrade/stale-proposal.json';
 const inputPaths = {
   hashDiff: 'fixtures/upgrade/hash-diff-report.json',
   executionEvidence: 'tests/schema-fixtures/positive/minimal-execution-evidence.json',
@@ -128,7 +130,7 @@ function assertCliContextBudgetGate(result: any, expectedPassed: any) {
   }
 }
 
-for (const relativePath of [schemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/cli/src/commands/upgrade.ts']) {
+for (const relativePath of [schemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/cli/src/commands/upgrade.ts']) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
 
@@ -145,6 +147,11 @@ check(schema.properties.decompositionDecision.enum.includes('polymorphize'), 'sc
 check(schema.properties.decompositionDecision.enum.includes('extract-shared'), 'schema must include extract-shared decomposition decision');
 check(schema.properties.decompositionDecision.enum.includes('infect'), 'schema must include infect decomposition decision');
 check(schema.properties.decompositionDecision.enum.includes('atomize'), 'schema must include atomize decomposition decision');
+check(schema.properties.proposalSource.enum.includes('evidence-driven'), 'schema must include evidence-driven proposal source');
+check(schema.properties.targetSurface.enum.includes('atom-spec'), 'schema must include atom-spec target surface');
+check(schema.properties.reversibility.enum.includes('rollback-safe'), 'schema must include rollback-safe reversibility');
+check(schema.$defs?.inputRef?.properties?.kind?.enum?.includes('evolution-evidence'), 'schema must include evolution-evidence input kind');
+check(schema.$defs?.automatedGates?.properties?.staleProposal, 'schema must expose staleProposal gate');
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
@@ -154,14 +161,24 @@ const expectedPass = readJson(passFixturePath);
 const expectedBlocked = readJson(blockedFixturePath);
 const expectedMapBump = readJson(mapBumpFixturePath);
 const expectedAtomExtract = readJson(atomExtractFixturePath);
+const expectedEvidenceDriven = readJson(evidenceDrivenFixturePath);
+const expectedStale = readJson(staleFixturePath);
 validateWithSchema(expectedPass, validate, 'proposal-pass fixture');
 validateWithSchema(expectedBlocked, validate, 'proposal-blocked fixture');
 validateWithSchema(expectedMapBump, validate, 'map-bump fixture');
 validateWithSchema(expectedAtomExtract, validate, 'atom-extract fixture');
+validateWithSchema(expectedEvidenceDriven, validate, 'evidence-driven fixture');
+validateWithSchema(expectedStale, validate, 'stale proposal fixture');
 assertInvariants(expectedPass, 'pending');
 assertInvariants(expectedBlocked, 'blocked');
 assertInvariants(expectedMapBump, 'pending');
 assertInvariants(expectedAtomExtract, 'pending');
+assertInvariants(expectedEvidenceDriven, 'pending');
+assertInvariants(expectedStale, 'blocked');
+check(expectedEvidenceDriven.proposalSource === 'evidence-driven', 'evidence-driven fixture must declare proposalSource');
+check(expectedEvidenceDriven.targetSurface === 'atom-spec', 'evidence-driven fixture must target atom-spec');
+check(expectedEvidenceDriven.evidenceGate?.matchedEvidenceIds?.length >= 1, 'evidence-driven fixture must cite evidence IDs');
+check(expectedStale.automatedGates.blockedGateNames.includes('staleProposal'), 'stale fixture must block on staleProposal');
 
 const generatedPass = proposeAtomicUpgrade({
   atomId: 'ATM-CORE-0001',

@@ -76,12 +76,32 @@ export interface UpgradeProposalRequest {
   readonly rationale: string;
 }
 
+export type UpgradeProposalSource = 'evidence-driven' | 'metric-driven' | 'manual' | 'spec-diff';
+
+export type UpgradeProposalTargetSurface = 'host-local-overlay' | 'workflow-recipe' | 'atom-spec' | 'atom-map';
+
+export type UpgradeProposalReversibility = 'rollback-safe' | 'breaking';
+
+export interface UpgradeProposalEvidenceGate {
+  readonly requiredSignals?: readonly string[];
+  readonly matchedEvidenceIds: readonly string[];
+  readonly rejectedEvidenceIds?: readonly string[];
+  readonly notes?: string;
+}
+
 export interface UpgradeProposal {
   readonly proposalId: string;
   readonly atomId: string;
   readonly fromVersion: string;
   readonly toVersion: string;
   readonly lifecycleMode: AtomLifecycleModeValue;
+  readonly proposalSource?: UpgradeProposalSource;
+  readonly targetSurface?: UpgradeProposalTargetSurface;
+  readonly baseAtomVersion?: string;
+  readonly baseMapVersion?: string;
+  readonly baseEvidenceWatermark?: string;
+  readonly reversibility?: UpgradeProposalReversibility;
+  readonly evidenceGate?: UpgradeProposalEvidenceGate;
   readonly accepted: boolean;
   readonly evidence: readonly EvidenceRecord[];
 }

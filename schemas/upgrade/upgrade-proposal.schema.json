@@ -44,6 +44,30 @@
     "decompositionDecision": {
       "enum": ["atom-bump", "atom-extract", "map-bump", "polymorphize", "extract-shared", "infect", "atomize"]
     },
+    "proposalSource": {
+      "enum": ["evidence-driven", "metric-driven", "manual", "spec-diff"]
+    },
+    "targetSurface": {
+      "enum": ["host-local-overlay", "workflow-recipe", "atom-spec", "atom-map"]
+    },
+    "baseAtomVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "baseMapVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "baseEvidenceWatermark": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reversibility": {
+      "enum": ["rollback-safe", "breaking"]
+    },
+    "evidenceGate": {
+      "$ref": "#/$defs/evidenceGate"
+    },
     "reviewTemplate": {
       "type": "string",
       "minLength": 1
@@ -118,6 +142,32 @@
             "const": "map-bump"
           }
         }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "targetSurface": {
+            "const": "atom-spec"
+          }
+        },
+        "required": ["targetSurface"]
+      },
+      "then": {
+        "required": ["baseAtomVersion", "baseEvidenceWatermark", "reversibility"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "targetSurface": {
+            "const": "atom-map"
+          }
+        },
+        "required": ["targetSurface"]
+      },
+      "then": {
+        "required": ["baseMapVersion", "baseEvidenceWatermark", "reversibility"]
       }
     },
     {
@@ -289,6 +339,12 @@
         "contextBudget": {
           "$ref": "#/$defs/gateResult"
         },
+        "staleProposal": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "privacy": {
+          "$ref": "#/$defs/gateResult"
+        },
         "allPassed": {
           "type": "boolean"
         },
@@ -296,7 +352,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy"]
           }
         }
       }
@@ -307,7 +363,7 @@
       "required": ["kind", "path", "schemaId"],
       "properties": {
         "kind": {
-          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate"]
+          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate", "evolution-evidence", "redaction-report"]
         },
         "path": {
           "type": "string",
@@ -324,6 +380,37 @@
         "summary": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "evidenceGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matchedEvidenceIds"],
+      "properties": {
+        "requiredSignals": {
+          "type": "array",
+          "items": {
+            "enum": ["user-correction", "recurring-failure", "loaded-but-wrong", "novel-technique", "workflow-success", "metric-regression", "rollback-success"]
+          }
+        },
+        "matchedEvidenceIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rejectedEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "string"
         }
       }
     },

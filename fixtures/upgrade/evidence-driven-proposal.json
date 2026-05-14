@@ -1,0 +1,113 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "1.1.0",
+    "notes": "Evidence-driven atom-spec proposal fixture."
+  },
+  "proposalId": "proposal.atm-core-0001.from-1.1.0.to-1.1.1.atom.evidence-driven",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "1.1.0",
+  "toVersion": "1.1.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-spec",
+  "baseAtomVersion": "1.1.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T00-00-00Z",
+  "reversibility": "rollback-safe",
+  "evidenceGate": {
+    "requiredSignals": ["user-correction", "recurring-failure"],
+    "matchedEvidenceIds": ["evidence.atm-core-0001.user-correction.001", "evidence.atm-core-0001.recurring-failure.001"],
+    "notes": "Dual-condition trigger satisfied for fixture."
+  },
+  "reviewTemplate": "review.template.atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "police.non-regression.fixture",
+      "reportPath": "tests/police-fixtures/positive/non-regression-report.json",
+      "summary": "pass (baseline fixtures passed)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "police.upgrade-quality-pass.fixture",
+      "reportPath": "fixtures/upgrade/quality-comparison-pass.json",
+      "summary": "pass (quality metrics improved; map propagation passed)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "police.registry-candidate.fixture",
+      "reportPath": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "summary": "pass (candidate can promote)"
+    },
+    "staleProposal": {
+      "passed": true,
+      "reportId": "stale-proposal.evidence-driven.fixture",
+      "reportPath": "fixtures/upgrade/evidence-driven-proposal.json",
+      "summary": "pass (base atom version and evidence watermark are current)"
+    },
+    "privacy": {
+      "passed": true,
+      "reportId": "privacy.evidence-driven.fixture",
+      "reportPath": "fixtures/upgrade/evidence-driven-proposal.json",
+      "summary": "pass (no sensitive input in fixture)"
+    },
+    "allPassed": true,
+    "blockedGateNames": []
+  },
+  "humanReview": "pending",
+  "status": "pending",
+  "inputs": [
+    {
+      "kind": "hash-diff",
+      "path": "fixtures/upgrade/hash-diff-report.json",
+      "schemaId": "atm.hashDiffReport",
+      "summary": "hash-diff input"
+    },
+    {
+      "kind": "evolution-evidence",
+      "path": "fixtures/upgrade/evidence-driven-proposal.json#/evidenceGate",
+      "schemaId": "atm.evolutionEvidenceGate",
+      "summary": "evidence-driven evolution signal input"
+    },
+    {
+      "kind": "non-regression",
+      "path": "tests/police-fixtures/positive/non-regression-report.json",
+      "schemaId": "atm.police.nonRegressionReport",
+      "reportId": "police.non-regression.fixture",
+      "summary": "non-regression input"
+    },
+    {
+      "kind": "quality-comparison",
+      "path": "fixtures/upgrade/quality-comparison-pass.json",
+      "schemaId": "atm.police.qualityComparisonReport",
+      "reportId": "police.upgrade-quality-pass.fixture",
+      "summary": "quality-comparison input"
+    },
+    {
+      "kind": "registry-candidate",
+      "path": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "schemaId": "atm.police.registryCandidateReport",
+      "reportId": "police.registry-candidate.fixture",
+      "summary": "registry-candidate input"
+    }
+  ],
+  "mapImpactScope": {
+    "affectedMapIds": ["ATM-MAP-0001"],
+    "propagationStatus": [
+      {
+        "mapId": "ATM-MAP-0001",
+        "integrationTestPassed": true,
+        "message": "All map tests green."
+      }
+    ]
+  },
+  "proposedBy": "ATM Evolution Draft Bridge",
+  "proposedAt": "2026-05-15T00:00:00.000Z"
+}

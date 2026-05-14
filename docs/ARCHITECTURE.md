@@ -29,6 +29,12 @@ The CLI is only a facade over this layer. The governed generator atom remains th
 
 Generator provenance is also a first-class registry projection. The catalog exposes whether an atom is `generated`, `backfilled`, or `bootstrap-self`, and `scripts/validate-generator-provenance.ts` keeps that projection honest.
 
+### Evidence-Driven Evolution Layer
+
+The Evidence-Driven Evolution Layer coordinates governed Atom and Atom Map improvement from accumulated usage evidence. It may classify friction signals, group recurring patterns, and draft `UpgradeProposal` documents, but it must not mutate `AtomicRegistry` directly or create a parallel registry, task model, approval workflow, or promotion path.
+
+All promotion decisions remain owned by the existing JSON Schema validators, `ReviewAdvisory`, `HumanReviewDecision`, behavior guards, registry transitions, and mutability policy. The design plan lives in `docs/ATOM_EVOLUTION_PLAN.md`.
+
 ### Agent Operating Layer
 
 The Agent Operating Layer teaches a model-neutral agent how to operate inside a repository. It includes instructions, profile files, project probing, first-task creation, run envelopes, and handoff guidance.

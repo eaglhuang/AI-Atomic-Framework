@@ -31,11 +31,36 @@ export interface ArtifactRecord {
   readonly tags?: readonly string[];
 }
 
+export type EvidenceSignalKind =
+  | 'user-correction'
+  | 'recurring-failure'
+  | 'loaded-but-wrong'
+  | 'novel-technique'
+  | 'workflow-success'
+  | 'metric-regression'
+  | 'rollback-success';
+
+export type EvidenceSignalScope = 'host-local' | 'repo' | 'atom' | 'atom-map' | 'global';
+
+export interface EvidenceRecurrence {
+  readonly window: string;
+  readonly count: number;
+  readonly firstSeenAt?: string;
+  readonly lastSeenAt?: string;
+}
+
 export interface EvidenceRecord {
   readonly evidenceId?: string;
   readonly workItemId?: string;
   readonly evidenceKind: 'validation' | 'review' | 'metric' | 'handoff';
   readonly evidenceType?: 'usage-feedback' | 'quality-baseline' | 'quality-comparison' | 'rollback-proof' | 'human-review-decision';
+  readonly signalKind?: EvidenceSignalKind;
+  readonly signalScope?: EvidenceSignalScope;
+  readonly atomId?: string;
+  readonly atomMapId?: string;
+  readonly patternTags?: readonly string[];
+  readonly confidence?: number;
+  readonly recurrence?: EvidenceRecurrence;
   readonly summary: string;
   readonly artifactPaths: readonly string[];
   readonly createdAt?: string;

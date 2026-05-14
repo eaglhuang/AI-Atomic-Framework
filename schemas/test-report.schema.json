@@ -261,6 +261,55 @@
         "evidenceKind": {
           "enum": ["validation", "review", "metric", "handoff"]
         },
+        "signalKind": {
+          "enum": ["user-correction", "recurring-failure", "loaded-but-wrong", "novel-technique", "workflow-success", "metric-regression", "rollback-success"]
+        },
+        "signalScope": {
+          "enum": ["host-local", "repo", "atom", "atom-map", "global"]
+        },
+        "atomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "atomMapId": {
+          "type": "string",
+          "pattern": "^ATM-MAP-\\d{4}$"
+        },
+        "patternTags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "recurrence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["window", "count"],
+          "properties": {
+            "window": {
+              "type": "string",
+              "minLength": 1
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "firstSeenAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "lastSeenAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
         "summary": {
           "type": "string",
           "minLength": 1
