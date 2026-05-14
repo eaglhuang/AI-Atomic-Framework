@@ -23,6 +23,8 @@ The generators are intentionally facades. They do not redefine the parser, atom-
 
 ## API
 
+The API examples below assume repo-local execution with Node 24+ and `node --experimental-strip-types`, because they import internal `.ts` sources directly. For published-package consumers, prefer the built package entrypoints instead of these repo-internal paths.
+
 ```js
 import { generateAtom } from './packages/core/src/manager/atom-generator.ts';
 
