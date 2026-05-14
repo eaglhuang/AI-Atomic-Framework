@@ -158,7 +158,7 @@ Regenerate with `npm run generate:error-codes`.
 | `ATM_TEST_MAP_OK` | `packages/cli/src/commands/test.ts:91` | ? message('info', 'ATM_TEST_MAP_OK', 'Atomic map integration test passed.', { mapId }) |
 | `ATM_TEST_PROPAGATE_FAILED` | `packages/cli/src/commands/test.ts:111` | const infoCode = propagation.ok ? 'ATM_TEST_PROPAGATE_OK' : 'ATM_TEST_PROPAGATE_FAILED'; |
 | `ATM_TEST_PROPAGATE_OK` | `packages/cli/src/commands/test.ts:111` | const infoCode = propagation.ok ? 'ATM_TEST_PROPAGATE_OK' : 'ATM_TEST_PROPAGATE_FAILED'; |
-| `ATM_TEST_REPORT_INVALID` | `packages/core/src/manager/test-runner.ts:187` | return createValidationFailure(schemaPath, 'ATM_TEST_REPORT_INVALID', (validate.errors \&#124;\&#124; []).map((error: any) =&gt; ({ |
+| `ATM_TEST_REPORT_INVALID` | `packages/core/src/manager/test-runner.ts:187` | return createValidationFailure(schemaPath, 'ATM_TEST_REPORT_INVALID', (validate.errors &#124;&#124; []).map((error: any) =&gt; ({ |
 | `ATM_TEST_REPORT_OK` | `packages/core/src/manager/test-runner.ts:200` | code: 'ATM_TEST_REPORT_OK', |
 | `ATM_TEST_REPORT_VALIDATOR_UNAVAILABLE` | `packages/core/src/manager/test-runner.ts:172` | return createValidationFailure(schemaPath, 'ATM_TEST_REPORT_VALIDATOR_UNAVAILABLE', [ |
 | `ATM_TEST_SPEC_FAILED` | `packages/cli/src/commands/test.ts:174` | : message('error', 'ATM_TEST_SPEC_FAILED', 'Atomic spec validation commands failed.', { atomId: testRun.atomId }) |

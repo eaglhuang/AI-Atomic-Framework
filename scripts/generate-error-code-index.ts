@@ -95,7 +95,7 @@ function walk(directory: string): string[] {
 }
 
 function trimContext(line: string): string {
-  return line.trim().replace(/\|/g, '\\|');
+  return line.trim();
 }
 
 function escapeTableCell(value: string): string {
