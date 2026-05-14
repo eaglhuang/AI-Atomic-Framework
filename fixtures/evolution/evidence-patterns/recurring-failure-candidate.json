@@ -1,0 +1,76 @@
+{
+  "input": {
+    "window": "2026-W20",
+    "generatedAt": "2026-05-15T00:00:00.000Z",
+    "thresholds": {
+      "minUsageCount": 10,
+      "minFrictionEvidence": 1,
+      "minConfidence": 0.5
+    },
+    "evidence": [
+      {
+        "evidenceId": "evidence.recurring-failure.001",
+        "evidenceKind": "review",
+        "signalKind": "recurring-failure",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0001",
+        "patternTags": ["parser", "friction"],
+        "confidence": 0.9,
+        "recurrence": {
+          "window": "2026-W20",
+          "count": 12,
+          "firstSeenAt": "2026-05-15T00:00:00.000Z",
+          "lastSeenAt": "2026-05-15T00:30:00.000Z"
+        },
+        "summary": "Recurring parse correction pattern reached the evidence threshold.",
+        "artifactPaths": ["artifacts/evolution/recurring-failure-001.json"]
+      }
+    ]
+  },
+  "expectedReport": {
+    "schemaId": "atm.evidencePatternDetectorReport",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Initial deterministic evidence pattern detector report."
+    },
+    "generatedAt": "2026-05-15T00:00:00.000Z",
+    "detectorName": "deterministic-evidence-pattern-detector",
+    "window": "2026-W20",
+    "thresholds": {
+      "minUsageCount": 10,
+      "minFrictionEvidence": 1,
+      "minConfidence": 0.5
+    },
+    "summary": {
+      "totalEvidence": 1,
+      "acceptedEvidence": 1,
+      "rejectedEvidence": 0,
+      "candidateGroups": 1
+    },
+    "groups": [
+      {
+        "groupId": "evidence-pattern.atom.atm-core-0001.2026-w20.recurring-failure",
+        "targetKind": "atom",
+        "targetId": "ATM-CORE-0001",
+        "signalKind": "recurring-failure",
+        "signalScope": "atom",
+        "window": "2026-W20",
+        "usageCount": 12,
+        "frictionEvidenceCount": 1,
+        "positiveEvidenceCount": 0,
+        "neutralEvidenceCount": 0,
+        "matchedEvidenceIds": ["evidence.recurring-failure.001"],
+        "rejectedEvidenceIds": [],
+        "patternTags": ["friction", "parser"],
+        "confidence": 0.9,
+        "recommendation": "proposal-candidate",
+        "reasons": []
+      }
+    ],
+    "proposalCandidateGroupIds": ["evidence-pattern.atom.atm-core-0001.2026-w20.recurring-failure"],
+    "rejectedEvidenceIds": [],
+    "empty": false
+  }
+}

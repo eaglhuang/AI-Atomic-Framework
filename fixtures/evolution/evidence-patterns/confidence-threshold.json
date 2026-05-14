@@ -1,0 +1,87 @@
+{
+  "input": {
+    "window": "2026-W20",
+    "generatedAt": "2026-05-15T00:00:00.000Z",
+    "thresholds": {
+      "minUsageCount": 10,
+      "minFrictionEvidence": 1,
+      "minConfidence": 0.7
+    },
+    "evidence": [
+      {
+        "evidenceId": "evidence.confidence.low",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0001",
+        "confidence": 0.4,
+        "recurrence": {
+          "window": "2026-W20",
+          "count": 99
+        },
+        "summary": "Low-confidence signal must not contribute to thresholds.",
+        "artifactPaths": []
+      },
+      {
+        "evidenceId": "evidence.confidence.high",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0001",
+        "confidence": 0.8,
+        "recurrence": {
+          "window": "2026-W20",
+          "count": 10
+        },
+        "summary": "High-confidence correction signal contributes to thresholds.",
+        "artifactPaths": []
+      }
+    ]
+  },
+  "expectedReport": {
+    "schemaId": "atm.evidencePatternDetectorReport",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Initial deterministic evidence pattern detector report."
+    },
+    "generatedAt": "2026-05-15T00:00:00.000Z",
+    "detectorName": "deterministic-evidence-pattern-detector",
+    "window": "2026-W20",
+    "thresholds": {
+      "minUsageCount": 10,
+      "minFrictionEvidence": 1,
+      "minConfidence": 0.7
+    },
+    "summary": {
+      "totalEvidence": 2,
+      "acceptedEvidence": 1,
+      "rejectedEvidence": 1,
+      "candidateGroups": 1
+    },
+    "groups": [
+      {
+        "groupId": "evidence-pattern.atom.atm-core-0001.2026-w20.user-correction",
+        "targetKind": "atom",
+        "targetId": "ATM-CORE-0001",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "window": "2026-W20",
+        "usageCount": 10,
+        "frictionEvidenceCount": 1,
+        "positiveEvidenceCount": 0,
+        "neutralEvidenceCount": 0,
+        "matchedEvidenceIds": ["evidence.confidence.high"],
+        "rejectedEvidenceIds": ["evidence.confidence.low"],
+        "patternTags": [],
+        "confidence": 0.8,
+        "recommendation": "proposal-candidate",
+        "reasons": []
+      }
+    ],
+    "proposalCandidateGroupIds": ["evidence-pattern.atom.atm-core-0001.2026-w20.user-correction"],
+    "rejectedEvidenceIds": ["evidence.confidence.low"],
+    "empty": false
+  }
+}

@@ -8,6 +8,7 @@ type JsonSchema = {
   required?: string[];
   properties?: Record<string, JsonSchema>;
   enum?: string[];
+  $ref?: string;
   $defs?: Record<string, JsonSchema>;
 };
 
@@ -15,6 +16,7 @@ const coreSource = ts.createSourceFile('index.ts', readText('packages/core/src/i
 const rollbackSource = ts.createSourceFile('rollback-types.ts', readText('packages/core/src/registry/rollback-types.ts'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 const registrySchema = readJson<JsonSchema>('schemas/registry.schema.json');
 const evidenceSchema = readJson<JsonSchema>('schemas/governance/evidence.schema.json');
+const governanceBundleSchema = readJson<JsonSchema>('schemas/governance/governance-bundle.schema.json');
 const rollbackSchema = readJson<JsonSchema>('schemas/registry/rollback-proof.schema.json');
 const testReportSchema = readJson<JsonSchema>('schemas/test-report.schema.json');
 const typeAliases = new Map<string, ts.TypeAliasDeclaration>();
@@ -105,9 +107,36 @@ function assertArrayEquals(actual: string[], expected: string[], label: string):
 
 const registryEntryStatus = getStringUnionValues(findTypeAlias(coreSource, 'RegistryEntryStatus').type);
 const registryGovernanceTier = getStringUnionValues(findTypeAlias(coreSource, 'RegistryGovernanceTier').type);
+const evidenceSignalKind = getStringUnionValues(findTypeAlias(coreSource, 'EvidenceSignalKind').type);
+const evidenceSignalScope = getStringUnionValues(findTypeAlias(coreSource, 'EvidenceSignalScope').type);
 const evidenceType = getStringUnionValues(getInterfaceProperty(findInterface(coreSource, 'EvidenceRecord'), 'evidenceType').type);
 const rollbackVerificationStatus = getStringUnionValues(getInterfaceProperty(findInterface(rollbackSource, 'RollbackProof'), 'verificationStatus').type);
 const rollbackTargetKind = getStringUnionValues(getInterfaceProperty(findInterface(rollbackSource, 'RollbackProof'), 'targetKind').type);
+
+function assertEvidenceEvolutionFields(schemaNode: JsonSchema | undefined, label: string): void {
+  const properties = schemaNode?.properties ?? {};
+  for (const propertyName of ['signalKind', 'signalScope', 'atomId', 'atomMapId', 'patternTags', 'confidence', 'recurrence']) {
+    assert(Boolean(properties[propertyName]), `${label} missing optional evolution field: ${propertyName}`);
+  }
+  assertArrayEquals(
+    evidenceSignalKind,
+    properties.signalKind?.enum ?? [],
+    `${label}.signalKind enum vs EvidenceSignalKind`
+  );
+  assertArrayEquals(
+    evidenceSignalScope,
+    properties.signalScope?.enum ?? [],
+    `${label}.signalScope enum vs EvidenceSignalScope`
+  );
+  const recurrence = properties.recurrence;
+  const recurrenceProperties = recurrence?.properties ?? (
+    recurrence?.$ref === '#/$defs/recurrence'
+      ? schemaNode?.$defs?.recurrence?.properties
+      : undefined
+  ) ?? {};
+  assert(Boolean(recurrenceProperties.window), `${label}.recurrence missing window`);
+  assert(Boolean(recurrenceProperties.count), `${label}.recurrence missing count`);
+}
 
 assertArrayEquals(
   registryEntryStatus,
@@ -124,6 +153,9 @@ assertArrayEquals(
   evidenceSchema.properties?.evidenceType?.enum ?? [],
   'EvidenceRecord.evidenceType vs evidence schema enum'
 );
+assertEvidenceEvolutionFields(evidenceSchema, 'governance evidence schema');
+assertEvidenceEvolutionFields(governanceBundleSchema.$defs?.evidenceRecord, 'governance bundle embedded evidence schema');
+assertEvidenceEvolutionFields(testReportSchema.$defs?.evidenceRecord, 'test report embedded evidence schema');
 assertArrayEquals(
   rollbackVerificationStatus,
   rollbackSchema.properties?.verificationStatus?.enum ?? [],

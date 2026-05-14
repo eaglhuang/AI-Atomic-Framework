@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/detector-report.schema.json",
+  "title": "ATM Evidence Pattern Detector Report v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "generatedAt",
+    "detectorName",
+    "thresholds",
+    "summary",
+    "groups",
+    "proposalCandidateGroupIds",
+    "rejectedEvidenceIds",
+    "empty"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.evidencePatternDetectorReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "detectorName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "window": {
+      "type": "string",
+      "minLength": 1
+    },
+    "thresholds": {
+      "$ref": "#/$defs/thresholds"
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totalEvidence", "acceptedEvidence", "rejectedEvidence", "candidateGroups"],
+      "properties": {
+        "totalEvidence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "acceptedEvidence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rejectedEvidence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidateGroups": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/group"
+      }
+    },
+    "proposalCandidateGroupIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "rejectedEvidenceIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "empty": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minUsageCount", "minFrictionEvidence", "minConfidence"],
+      "properties": {
+        "minUsageCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minFrictionEvidence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "groupId",
+        "targetKind",
+        "signalKind",
+        "window",
+        "usageCount",
+        "frictionEvidenceCount",
+        "positiveEvidenceCount",
+        "neutralEvidenceCount",
+        "matchedEvidenceIds",
+        "rejectedEvidenceIds",
+        "patternTags",
+        "confidence",
+        "recommendation",
+        "reasons"
+      ],
+      "properties": {
+        "groupId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetKind": {
+          "enum": ["atom", "atom-map", "host-local", "repo", "global", "unscoped"]
+        },
+        "targetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signalKind": {
+          "enum": ["user-correction", "recurring-failure", "loaded-but-wrong", "novel-technique", "workflow-success", "metric-regression", "rollback-success"]
+        },
+        "signalScope": {
+          "enum": ["host-local", "repo", "atom", "atom-map", "global"]
+        },
+        "window": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usageCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "frictionEvidenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "positiveEvidenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "neutralEvidenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "matchedEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rejectedEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "patternTags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "recommendation": {
+          "enum": ["proposal-candidate", "observation-only"]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "no-evidence-above-confidence-threshold",
+              "non-friction-signal",
+              "usage-threshold-not-met",
+              "friction-threshold-not-met",
+              "target-not-proposal-surface"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

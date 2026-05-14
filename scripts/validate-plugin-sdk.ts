@@ -13,6 +13,8 @@ const requiredFiles = [
   'packages/plugin-sdk/src/governance/index.ts',
   'packages/plugin-sdk/src/governance/layout.ts',
   'packages/plugin-sdk/src/governance/stores.ts',
+  'packages/plugin-sdk/src/detector/index.ts',
+  'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts',
   'packages/plugin-sdk/src/injector-plugin.ts',
   'packages/plugin-sdk/src/language-adapter.ts',
   'packages/plugin-sdk/src/lifecycle.ts',
@@ -72,6 +74,29 @@ if (!process.exitCode) {
   ]) {
     if (!indexSource.includes(exportName)) {
       fail(`packages/plugin-sdk/src/index.ts must export ${exportName}`);
+    }
+  }
+
+  const detectorSource = readText('packages/plugin-sdk/src/detector/evidence-pattern-detector.ts');
+  for (const phrase of [
+    'interface EvidencePatternDetectorReport',
+    'detectEvidencePatterns',
+    'defaultEvidencePatternDetectorThresholds',
+    'minUsageCount',
+    'minFrictionEvidence',
+    'minConfidence',
+    'proposal-candidate',
+    'observation-only'
+  ]) {
+    if (!detectorSource.includes(phrase)) {
+      fail(`detector/evidence-pattern-detector.ts missing ${phrase}`);
+    }
+  }
+
+  const detectorIndexSource = readText('packages/plugin-sdk/src/detector/index.ts');
+  for (const exportName of ['detectEvidencePatterns', 'EvidencePatternDetectorReport', 'EvidencePatternGroup']) {
+    if (!detectorIndexSource.includes(exportName)) {
+      fail(`detector/index.ts must export ${exportName}`);
     }
   }
 
@@ -182,7 +207,7 @@ if (!process.exitCode) {
   }
 
   const sdkIndexSource = readText('packages/plugin-sdk/src/index.ts');
-  for (const exportName of ['AtomBehavior', 'BehaviorRegistry', 'EVOLVE_DELEGATION_TARGET', 'AtomBehaviorOutput']) {
+  for (const exportName of ['AtomBehavior', 'BehaviorRegistry', 'EVOLVE_DELEGATION_TARGET', 'AtomBehaviorOutput', 'detectEvidencePatterns', 'EvidencePatternDetectorReport']) {
     if (!sdkIndexSource.includes(exportName)) {
       fail(`packages/plugin-sdk/src/index.ts must export ${exportName}`);
     }
