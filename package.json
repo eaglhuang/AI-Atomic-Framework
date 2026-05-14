@@ -20,7 +20,7 @@
     "test": "node --experimental-strip-types scripts/run-validators.ts test",
     "validate:quick": "node --experimental-strip-types scripts/run-validators.ts quick",
     "validate:standard": "node --experimental-strip-types scripts/run-validators.ts standard",
-    "validate:full": "node --experimental-strip-types scripts/run-validators.ts full",
+    "validate:full": "node --experimental-strip-types scripts/run-validators.ts full --parallel",
     "validate:schemas": "node --experimental-strip-types scripts/validate-schemas.ts --mode validate",
     "validate:cli": "node --experimental-strip-types scripts/validate-cli.ts --mode validate",
     "validate:guide": "node --experimental-strip-types scripts/validate-guide.ts --mode validate",
@@ -68,7 +68,10 @@
     "validate:registry-diff": "node --experimental-strip-types scripts/validate-registry-diff.ts --mode validate",
     "validate:regression-compare": "node --experimental-strip-types scripts/validate-regression-compare.ts --mode validate",
     "validate:hash-placeholders": "node --experimental-strip-types scripts/audit-hash-placeholders.ts --mode validate",
-    "generate:multi-agent-confidence": "node --experimental-strip-types scripts/generate-multi-agent-confidence-reports.ts"
+    "generate:multi-agent-confidence": "node --experimental-strip-types scripts/generate-multi-agent-confidence-reports.ts",
+    "generate:error-codes": "node --experimental-strip-types scripts/generate-error-code-index.ts",
+    "sync:registry-versions": "node --experimental-strip-types scripts/backfill-registry-versions.ts",
+    "health:post-merge": "node --experimental-strip-types scripts/check-main-health.ts"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

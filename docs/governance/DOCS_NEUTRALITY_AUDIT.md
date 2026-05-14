@@ -19,7 +19,7 @@ The machine-readable policy lives in `docs/governance/docs-neutrality-policy.jso
 - Protected examples: `examples/**/*.md`
 - Protected templates and prompt assets: `templates/**/*.md`
 
-`scripts/validate-product-charter.mjs` loads that policy and fails if a protected surface contains a banned downstream-only term.
+`scripts/validate-product-charter.ts` loads that policy and fails if a protected surface contains a banned downstream-only term.
 
 ## Adopter-Only Reference Migration
 
