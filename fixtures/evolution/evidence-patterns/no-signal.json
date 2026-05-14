@@ -1,0 +1,46 @@
+{
+  "input": {
+    "window": "2026-W20",
+    "generatedAt": "2026-05-15T00:00:00.000Z",
+    "thresholds": {
+      "minUsageCount": 10,
+      "minFrictionEvidence": 1,
+      "minConfidence": 0.5
+    },
+    "evidence": [
+      {
+        "evidenceId": "evidence.no-signal.001",
+        "evidenceKind": "handoff",
+        "summary": "Evidence without an evolution signal is observation-only input.",
+        "artifactPaths": []
+      }
+    ]
+  },
+  "expectedReport": {
+    "schemaId": "atm.evidencePatternDetectorReport",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Initial deterministic evidence pattern detector report."
+    },
+    "generatedAt": "2026-05-15T00:00:00.000Z",
+    "detectorName": "deterministic-evidence-pattern-detector",
+    "window": "2026-W20",
+    "thresholds": {
+      "minUsageCount": 10,
+      "minFrictionEvidence": 1,
+      "minConfidence": 0.5
+    },
+    "summary": {
+      "totalEvidence": 1,
+      "acceptedEvidence": 0,
+      "rejectedEvidence": 1,
+      "candidateGroups": 0
+    },
+    "groups": [],
+    "proposalCandidateGroupIds": [],
+    "rejectedEvidenceIds": ["evidence.no-signal.001"],
+    "empty": true
+  }
+}

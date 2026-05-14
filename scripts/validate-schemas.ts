@@ -20,6 +20,7 @@ const schemaEntries: Record<string, string> = {
   'governance-state': 'schemas/governance/markdown-json-state.schema.json',
   'governance-evidence': 'schemas/governance/evidence.schema.json',
   'governance-context-summary': 'schemas/governance/context-summary.schema.json',
+  'governance-detector-report': 'schemas/governance/detector-report.schema.json',
   'governance-adapter-report': 'schemas/governance/adapter-report.schema.json',
   'governance-atomize-adapter': 'schemas/governance/atomize-adapter.schema.json',
   'governance-infect-adapter': 'schemas/governance/infect-adapter.schema.json',
@@ -302,6 +303,11 @@ const protectedFiles = [
 const upgradeFixtureDir = path.join(root, 'fixtures', 'upgrade');
 if (existsSync(upgradeFixtureDir)) {
   protectedFiles.push(...readdirSync(upgradeFixtureDir).map((entry) => `fixtures/upgrade/${entry}`));
+}
+
+const evolutionPatternFixtureDir = path.join(root, 'fixtures', 'evolution', 'evidence-patterns');
+if (existsSync(evolutionPatternFixtureDir)) {
+  protectedFiles.push(...readdirSync(evolutionPatternFixtureDir).map((entry) => `fixtures/evolution/evidence-patterns/${entry}`));
 }
 
 const humanReviewFixtureDir = path.join(root, 'fixtures', 'human-review');

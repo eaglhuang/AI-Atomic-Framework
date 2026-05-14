@@ -104,6 +104,18 @@ export type {
 } from './behavior';
 export { EVOLVE_DELEGATION_TARGET } from './behavior';
 export { BehaviorRegistry } from './behavior-registry';
+export {
+  defaultEvidencePatternDetectorThresholds,
+  detectEvidencePatterns
+} from './detector';
+export type {
+  EvidencePatternDetectorInput,
+  EvidencePatternDetectorReport,
+  EvidencePatternDetectorThresholds,
+  EvidencePatternGroup,
+  EvidencePatternRecommendation,
+  EvidencePatternTargetKind
+} from './detector';
 
 export const pluginSdkPackage = {
   packageName: '@ai-atomic-framework/plugin-sdk',

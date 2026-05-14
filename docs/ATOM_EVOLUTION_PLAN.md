@@ -1,8 +1,8 @@
 # Atom 證據驅動進化規劃書
 
-Status: Draft  
-Date: 2026-05-15  
-Audience: ATM core maintainers, plugin authors, host adapter authors  
+Status: In progress
+Date: 2026-05-15
+Audience: ATM core maintainers, plugin authors, host adapter authors
 Target repo: AI-Atomic-Framework
 
 ## 0. 摘要
@@ -256,14 +256,15 @@ M0 與 M1 已於 2026-05-15 完成並提交。
 - 適合 SDK 或 plugin package 的 detector module。
 - `fixtures/evolution/evidence-patterns/*.json`。
 - Detector report schema。
+- `npm run validate:evidence-detector` 驗證入口。
 
 Checklist：
 
-- [ ] 支援 `signalKind` grouping。
-- [ ] 支援 recurrence windows。
-- [ ] 支援 confidence thresholds。
-- [ ] 支援 `atomId` 與 `atomMapId` grouping。
-- [ ] 訊號不足時輸出 empty report。
+- [x] 支援 `signalKind` grouping。
+- [x] 支援 recurrence windows。
+- [x] 支援 confidence thresholds。
+- [x] 支援 `atomId` 與 `atomMapId` grouping。
+- [x] 訊號不足時輸出 empty report。
 
 驗證：
 
