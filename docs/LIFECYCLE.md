@@ -9,6 +9,12 @@ Atom specs declare lifecycle intent through `compatibility.lifecycleMode`.
 - `birth` means a new atom is being introduced.
 - `evolution` means an existing atom is being upgraded or compared against prior quality metrics.
 
+## Evidence-Driven Evolution
+
+Evidence-driven evolution is an advisory path for drafting `UpgradeProposal` documents from recurring usage signals, corrective evidence, metric regressions, and successful rollback or workflow evidence. It does not create a third lifecycle mode: generated proposals still use `evolution` and must pass the same schema, review, human-decision, behavior, registry-transition, and mutability-policy gates as any other upgrade proposal.
+
+Evidence-driven proposal drafts must be traceable to evidence inputs and should record target surface, proposal source, base target version, evidence watermark, and reversibility metadata when those fields are available. The full rollout plan is documented in `docs/ATOM_EVOLUTION_PLAN.md`.
+
 ## Breaking Change Policy
 
 Changes to exported Plugin SDK interfaces are breaking when they remove fields, rename fields, tighten required fields, or move lifecycle meaning out of `compatibility.lifecycleMode`.
