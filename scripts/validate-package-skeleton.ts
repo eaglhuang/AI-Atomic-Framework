@@ -65,6 +65,9 @@ for (const packageSpec of fixture.packages) {
   }
 
   const manifest = readJson(manifestPath);
+  const allowedExternalDependencies = typeof packageSpec.externalDependencies === 'object' && packageSpec.externalDependencies !== null
+    ? packageSpec.externalDependencies as Record<string, unknown>
+    : {};
   if (manifest.name !== packageSpec.name) {
     fail(`${manifestPath} name mismatch: expected ${packageSpec.name}`);
   }
@@ -95,11 +98,25 @@ for (const packageSpec of fixture.packages) {
 
   const dependencyEntries = Object.entries(manifest.dependencies || {});
   for (const [dependencyName, dependencyVersion] of dependencyEntries) {
-    if (!packageNames.has(dependencyName)) {
-      fail(`${manifestPath} has non-workspace dependency: ${dependencyName}`);
+    if (packageNames.has(dependencyName)) {
+      if (dependencyVersion !== rootPackage.version) {
+        fail(`${manifestPath} dependency ${dependencyName} must use root version ${rootPackage.version}`);
+      }
+      continue;
     }
-    if (dependencyVersion !== rootPackage.version) {
-      fail(`${manifestPath} dependency ${dependencyName} must use root version ${rootPackage.version}`);
+
+    if (!Object.hasOwn(allowedExternalDependencies, dependencyName)) {
+      fail(`${manifestPath} has non-workspace dependency outside fixture whitelist: ${dependencyName}`);
+      continue;
+    }
+
+    const expectedVersion = allowedExternalDependencies[dependencyName];
+    if (typeof expectedVersion !== 'string') {
+      fail(`${manifestPath} fixture whitelist for ${dependencyName} must be a string version`);
+      continue;
+    }
+    if (dependencyVersion !== expectedVersion) {
+      fail(`${manifestPath} dependency ${dependencyName} must use whitelisted version ${expectedVersion}`);
     }
   }
 
