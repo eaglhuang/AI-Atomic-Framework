@@ -1,8 +1,10 @@
 import type { GuidanceRoute, ProjectOrientationReport, RouteChoice, RouteDecision } from './guidance-packet.ts';
+import type { LegacyRoutePlan, LegacyRoutePlanSegment } from './legacy-route-plan.ts';
 
 export interface RouteEngineEvidence {
   readonly existingAtomMatches?: readonly string[];
   readonly demandPoliceFindings?: readonly string[];
+  readonly legacyRoutePlan?: LegacyRoutePlan;
   readonly legacyTargetFile?: string | null;
 }
 
@@ -38,6 +40,10 @@ export function decideGuidanceRoute(input: RouteEngineInput): RouteDecision {
       blockedBy: releaseBlockers,
       nextCommand: 'node atm.mjs guide overview --json'
     });
+  }
+
+  if (evidence.legacyRoutePlan) {
+    return decideLegacyRoute(input.orientation, evidence.legacyRoutePlan);
   }
 
   if ((evidence.demandPoliceFindings?.length ?? 0) > 0 || /split|decompos|拆|拆分/.test(lowerGoal)) {
@@ -96,6 +102,53 @@ export function decideGuidanceRoute(input: RouteEngineInput): RouteDecision {
       { route: 'docs-first', reason: 'choose this if the goal is only specification/documentation' }
     ]
   });
+}
+
+function decideLegacyRoute(orientation: ProjectOrientationReport, plan: LegacyRoutePlan): RouteDecision {
+  const safeSegments = plan.segments.filter((segment) => plan.safeFirstAtoms.includes(segment.symbolName));
+  const preferredSegment = choosePreferredSafeSegment(safeSegments);
+  const trunkBlockers = plan.trunkFunctions.filter((symbolName) => plan.releaseBlockers.includes(symbolName));
+  const reasons = trunkBlockers.length > 0
+    ? [`Legacy route plan marks trunk release blocker(s): ${trunkBlockers.join(', ')}. Direct trunk mutation is blocked; proceed leaf-first.`]
+    : ['Legacy route plan is available; proceed with dry-run proposal evidence before mutation.'];
+
+  if (!preferredSegment) {
+    return buildDecision({
+      route: 'split',
+      confidence: 0.78,
+      reasons: [...reasons, 'No safe leaf segment is available, so the only next action is split/proposal evidence generation.'],
+      requiredEvidence: ['LegacyRoutePlan', 'split proposal evidence', 'human review before apply'],
+      blockedBy: orientation.releaseBlockers,
+      nextCommand: 'node atm.mjs upgrade --propose --behavior behavior.split --dry-run --json'
+    });
+  }
+
+  const route = behaviorToRoute(preferredSegment.recommendedBehavior);
+  return buildDecision({
+    route,
+    confidence: route === 'split' ? 0.9 : 0.86,
+    reasons: [...reasons, `Selected safe leaf ${preferredSegment.symbolName} for ${preferredSegment.recommendedBehavior} dry-run proposal.`],
+    requiredEvidence: ['LegacyRoutePlan', `${preferredSegment.recommendedBehavior} dry-run proposal`, 'human review before apply'],
+    blockedBy: orientation.releaseBlockers,
+    nextCommand: `node atm.mjs upgrade --propose --behavior behavior.${preferredSegment.recommendedBehavior} --dry-run --json`,
+    routeChoices: [{ route, reason: `safe leaf ${preferredSegment.symbolName}` }]
+  });
+}
+
+function choosePreferredSafeSegment(segments: readonly LegacyRoutePlanSegment[]): LegacyRoutePlanSegment | null {
+  return segments.find((segment) => segment.recommendedBehavior === 'split')
+    ?? segments.find((segment) => segment.recommendedBehavior === 'infect')
+    ?? segments.find((segment) => segment.recommendedBehavior === 'atomize')
+    ?? null;
+}
+
+function behaviorToRoute(behavior: LegacyRoutePlanSegment['recommendedBehavior']): GuidanceRoute {
+  switch (behavior) {
+    case 'infect': return 'infect';
+    case 'split': return 'split';
+    case 'atomize': return 'atomize';
+    default: return 'legacy-fix';
+  }
 }
 
 function buildDecision(input: {
