@@ -2,6 +2,7 @@ import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
@@ -33,11 +34,19 @@ function runOnefile(entrypointPath: any, cwd: any, args: any) {
   };
 }
 
-const release = buildOnefileRelease({ repositoryRoot: root });
-assert(existsSync(release.outputFilePath), 'onefile build must emit release/atm-onefile/atm.mjs');
-
 const tempRoot = createTempWorkspace('atm-onefile-release-');
 try {
+  const rootDrop = buildRootDropRelease({
+    repositoryRoot: root,
+    releaseRoot: path.join(tempRoot, 'release', 'atm-root-drop')
+  });
+  const release = buildOnefileRelease({
+    repositoryRoot: root,
+    rootDropRoot: rootDrop.releaseRoot,
+    outputRoot: path.join(tempRoot, 'release', 'atm-onefile')
+  });
+  assert(existsSync(release.outputFilePath), 'onefile build must emit release/atm-onefile/atm.mjs');
+
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
   copyFileSync(release.outputFilePath, path.join(blankRepo, 'atm.mjs'));
@@ -48,6 +57,20 @@ try {
   const nextBeforeBootstrap = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['next', '--json']);
   assert(nextBeforeBootstrap.exitCode === 1, 'onefile next must exit 1 before bootstrap');
   assert(nextBeforeBootstrap.parsed.evidence?.nextAction?.status === 'needs-bootstrap', 'onefile next must recommend bootstrap');
+
+  const orient = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['orient', '--cwd', '.', '--json']);
+  assert(orient.exitCode === 0, 'onefile orient must exit 0');
+  assert(orient.parsed.ok === true, 'onefile orient must report ok=true');
+  assert(orient.parsed.evidence?.orientation?.schemaId === 'atm.projectOrientationReport', 'onefile orient must emit orientation report');
+
+  const start = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['start', '--cwd', '.', '--goal', 'Bootstrap onefile repo', '--json']);
+  assert(start.exitCode === 0, 'onefile start must exit 0');
+  assert(start.parsed.ok === true, 'onefile start must report ok=true');
+  assert(start.parsed.evidence?.guidancePacket?.nextCommand, 'onefile start must emit guidance packet');
+
+  const explain = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['explain', '--cwd', '.', '--why', 'blocked', '--json']);
+  assert(explain.exitCode === 0, 'onefile explain must exit 0 with active guidance session');
+  assert(explain.parsed.ok === true, 'onefile explain must report ok=true');
 
   const bootstrap = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'onefile bootstrap must exit 0');

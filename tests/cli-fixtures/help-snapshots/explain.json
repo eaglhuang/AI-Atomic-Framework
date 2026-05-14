@@ -1,12 +1,22 @@
 {
-  "command": "next",
-  "summary": "Recommend the next official ATM guidance action from current state.",
+  "command": "explain",
+  "summary": "Explain guidance blocks and the evidence needed to proceed.",
   "positional": [],
   "options": [
     {
       "flag": "--cwd",
       "value": "path",
       "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--why",
+      "value": "reason",
+      "summary": "Currently supports: blocked."
+    },
+    {
+      "flag": "--session",
+      "value": "id",
+      "summary": "Guidance session id; defaults to the active session."
     },
     {
       "flag": "--json",
@@ -23,7 +33,7 @@
     }
   ],
   "examples": [
-    "node atm.mjs next --json",
-    "node atm.mjs next --cwd <host-repo> --json"
+    "node atm.mjs explain --why blocked --json",
+    "node atm.mjs explain --why blocked --session <session-id> --json"
   ]
 }

@@ -296,3 +296,4 @@ export * from './registry/status-machine.ts';
 export * from './registry/semantic-fingerprint.ts';
 export * from './registry/rollback.ts';
 export * from './registry/registry-migration.ts';
+export * from './guidance/index.ts';

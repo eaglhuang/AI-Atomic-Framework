@@ -94,6 +94,50 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs doctor --json'
     ]
   }),
+  orient: defineCommandSpec({
+    name: 'orient',
+    summary: 'Inspect a repository and emit an ATM guidance orientation report.',
+    options: [
+      commonCwdOption,
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs orient --cwd . --json'
+    ]
+  }),
+  start: defineCommandSpec({
+    name: 'start',
+    summary: 'Start an ATM guidance session for a concrete goal.',
+    options: [
+      commonCwdOption,
+      { flag: '--goal', value: 'text', summary: 'Goal the agent is trying to accomplish.' },
+      { flag: '--actor', value: 'name', summary: 'Optional actor label for session audit.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs start --cwd . --goal "Extract legacy helper" --json'
+    ]
+  }),
+  explain: defineCommandSpec({
+    name: 'explain',
+    summary: 'Explain guidance blocks and the evidence needed to proceed.',
+    options: [
+      commonCwdOption,
+      { flag: '--why', value: 'reason', summary: 'Currently supports: blocked.' },
+      { flag: '--session', value: 'id', summary: 'Guidance session id; defaults to the active session.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs explain --why blocked --json',
+      'node atm.mjs explain --why blocked --session <session-id> --json'
+    ]
+  }),
   guard: defineCommandSpec({
     name: 'guard',
     summary: 'Run small governance guards such as encoding checks.',
@@ -185,7 +229,7 @@ export const commandSpecs = Object.freeze({
   }),
   next: defineCommandSpec({
     name: 'next',
-    summary: 'Recommend the next official ATM action from current state.',
+    summary: 'Recommend the next official ATM guidance action from current state.',
     options: [
       commonCwdOption,
       commonJsonOption,
@@ -193,7 +237,8 @@ export const commandSpecs = Object.freeze({
       commonHelpOption
     ],
     examples: [
-      'node atm.mjs next --json'
+      'node atm.mjs next --json',
+      'node atm.mjs next --cwd <host-repo> --json'
     ]
   }),
   'self-host-alpha': defineCommandSpec({

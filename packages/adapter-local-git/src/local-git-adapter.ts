@@ -40,8 +40,21 @@ export function createLocalGitAdapter(configOverrides = {}) {
     }),
     runAtomizeAdapter: (context: any, request: any) => runDryRunAdapter('behavior.atomize', context, defaultConfig, request),
     runInfectAdapter: (context: any, request: any) => runDryRunAdapter('behavior.infect', context, defaultConfig, request),
+    listHostGates: () => [],
+    listNoTouchZones: () => [],
+    resolveMutationPolicy: () => createNeutralMutationPolicy(),
     writeRegistryEntry: (context: any, entry: any) => writeRegistryEntry(context, defaultConfig, entry),
     readRegistryEntry: (context: any, entryId: any) => readRegistryEntry(context, defaultConfig, entryId)
+  };
+}
+
+export function createNeutralMutationPolicy() {
+  return {
+    requireSession: true,
+    requireDryRunProposal: true,
+    requireReviewBeforeApply: true,
+    allowUnguidedInDev: true,
+    allowUnguidedInCI: false
   };
 }
 

@@ -33,14 +33,17 @@ function runAtm(cwd: any, args: any) {
   };
 }
 
-const release = buildRootDropRelease({ repositoryRoot: root });
-const manifest = JSON.parse(readFileSync(release.manifestPath, 'utf8'));
-assert(existsSync(release.entrypointPath), 'release bundle must emit atm.mjs');
-assert(existsSync(path.join(release.releaseRoot, 'packages', 'cli', 'dist', 'atm.mjs')), 'release bundle must include CLI dist entrypoint');
-assert(manifest.entrypoint === 'atm.mjs', 'release manifest must preserve atm.mjs entrypoint');
-
 const tempRoot = createTempWorkspace('atm-root-drop-release-');
 try {
+  const release = buildRootDropRelease({
+    repositoryRoot: root,
+    releaseRoot: path.join(tempRoot, 'release', 'atm-root-drop')
+  });
+  const manifest = JSON.parse(readFileSync(release.manifestPath, 'utf8'));
+  assert(existsSync(release.entrypointPath), 'release bundle must emit atm.mjs');
+  assert(existsSync(path.join(release.releaseRoot, 'packages', 'cli', 'dist', 'atm.mjs')), 'release bundle must include CLI dist entrypoint');
+  assert(manifest.entrypoint === 'atm.mjs', 'release manifest must preserve atm.mjs entrypoint');
+
   const bundleRepo = path.join(tempRoot, 'bundle-repo');
   mkdirSync(bundleRepo, { recursive: true });
   cpSync(release.releaseRoot, bundleRepo, { recursive: true });
@@ -62,6 +65,20 @@ try {
   const nextBeforeBootstrap = runAtm(blankRepo, ['next', '--json']);
   assert(nextBeforeBootstrap.exitCode === 1, 'blank root-drop repo next must exit 1 before bootstrap');
   assert(nextBeforeBootstrap.parsed.evidence?.nextAction?.status === 'needs-bootstrap', 'blank root-drop repo must recommend bootstrap first');
+
+  const orient = runAtm(blankRepo, ['orient', '--cwd', '.', '--json']);
+  assert(orient.exitCode === 0, 'blank root-drop repo orient must exit 0');
+  assert(orient.parsed.ok === true, 'blank root-drop repo orient must report ok=true');
+  assert(orient.parsed.evidence?.orientation?.schemaId === 'atm.projectOrientationReport', 'blank root-drop repo orient must emit orientation report');
+
+  const start = runAtm(blankRepo, ['start', '--cwd', '.', '--goal', 'Bootstrap release bundle repo', '--json']);
+  assert(start.exitCode === 0, 'blank root-drop repo start must exit 0');
+  assert(start.parsed.ok === true, 'blank root-drop repo start must report ok=true');
+  assert(start.parsed.evidence?.guidancePacket?.nextCommand, 'blank root-drop repo start must emit guidance packet');
+
+  const explain = runAtm(blankRepo, ['explain', '--cwd', '.', '--why', 'blocked', '--json']);
+  assert(explain.exitCode === 0, 'blank root-drop repo explain must exit 0 with active guidance session');
+  assert(explain.parsed.ok === true, 'blank root-drop repo explain must report ok=true');
 
   const bootstrap = runAtm(blankRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'blank root-drop repo bootstrap must exit 0');

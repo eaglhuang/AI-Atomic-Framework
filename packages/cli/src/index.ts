@@ -44,6 +44,27 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'orient',
+    summary: 'Inspect a repository and emit a guidance orientation report',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
+    commandName: 'start',
+    summary: 'Start a goal-bound guidance session',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
+    commandName: 'explain',
+    summary: 'Explain guidance blocks and missing evidence',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'guard',
     summary: 'Run small governance guards such as encoding checks',
     implemented: true,

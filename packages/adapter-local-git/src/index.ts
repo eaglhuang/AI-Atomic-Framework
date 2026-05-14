@@ -1,7 +1,10 @@
 import type { ArtifactRecord, EvidenceRecord, ScopeLockRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import type {
   AtomizeAdapterRequest,
+  HostGate,
   InfectAdapterRequest,
+  MutationPolicy,
+  NoTouchZone,
   GovernancePluginResult,
   ProjectAdapter as SdkProjectAdapter,
   ProjectAdapterContext as SdkProjectAdapterContext,
@@ -66,6 +69,9 @@ export interface ProjectAdapter extends SdkProjectAdapter<LocalGitAdapterConfig>
   writeDocRecord(context: LocalGitAdapterContext, workItem: WorkItemRef, summary: string): Promise<LocalGitAdapterResult> | LocalGitAdapterResult;
   runAtomizeAdapter(context: LocalGitAdapterContext, request: AtomizeAdapterRequest): Promise<LocalGitAdapterDryRunResult> | LocalGitAdapterDryRunResult;
   runInfectAdapter(context: LocalGitAdapterContext, request: InfectAdapterRequest): Promise<LocalGitAdapterDryRunResult> | LocalGitAdapterDryRunResult;
+  listHostGates(context: LocalGitAdapterContext): Promise<readonly HostGate[]> | readonly HostGate[];
+  listNoTouchZones(context: LocalGitAdapterContext): Promise<readonly NoTouchZone[]> | readonly NoTouchZone[];
+  resolveMutationPolicy(context: LocalGitAdapterContext): Promise<MutationPolicy> | MutationPolicy;
   writeRegistryEntry(context: LocalGitAdapterContext, entry: LocalGitRegistryEntry): Promise<LocalGitAdapterResult> | LocalGitAdapterResult;
   readRegistryEntry(context: LocalGitAdapterContext, entryId: string): Promise<LocalGitRegistryEntry | null> | LocalGitRegistryEntry | null;
   resolveRegistryPath(context: LocalGitAdapterContext): string;

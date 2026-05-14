@@ -69,6 +69,15 @@ try {
   assert(adapter.adapterName === '@ai-atomic-framework/adapter-local-git', 'adapter name mismatch');
   assert(adapter.defaultConfig.registryPath === fixture.registryPath, 'default registry path mismatch');
   assert(adapter.resolveRegistryPath(context).endsWith(path.join('repo', '.atm', 'registry')), 'relative registry path did not resolve under repository root');
+  assert(Array.isArray(adapter.listHostGates(context)), 'local-git adapter must expose host gates array');
+  assert(adapter.listHostGates(context).length === 0, 'local-git adapter host gates must default to empty');
+  assert(Array.isArray(adapter.listNoTouchZones(context)), 'local-git adapter must expose no-touch zones array');
+  assert(adapter.listNoTouchZones(context).length === 0, 'local-git adapter no-touch zones must default to empty');
+  const mutationPolicy = adapter.resolveMutationPolicy(context);
+  assert(mutationPolicy.requireSession === true, 'local-git mutation policy must require guidance session');
+  assert(mutationPolicy.requireDryRunProposal === true, 'local-git mutation policy must require dry-run proposal');
+  assert(mutationPolicy.requireReviewBeforeApply === true, 'local-git mutation policy must require review before apply');
+  assert(mutationPolicy.allowUnguidedInCI === false, 'local-git mutation policy must forbid unguided CI mutation');
 
   const dryRunContext = {
     repositoryRoot: path.join(tempRoot, 'dry-run-repo'),
