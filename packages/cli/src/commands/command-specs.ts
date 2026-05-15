@@ -290,6 +290,7 @@ export const commandSpecs = Object.freeze({
     options: [
       commonCwdOption,
       { flag: '--propose', summary: 'Generate an upgrade proposal.' },
+      { flag: '--scan', summary: 'Run the evidence-driven draft bridge from detector reports.' },
       { flag: '--dry-run', summary: 'Generate proposal without mutating persisted artifacts.' },
       { flag: '--atom', value: 'id', summary: 'Target atom id.' },
       { flag: '--from', value: 'version', summary: 'Source version.' },
@@ -309,7 +310,8 @@ export const commandSpecs = Object.freeze({
       commonHelpOption
     ],
     examples: [
-      'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json'
+      'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json',
+      'node atm.mjs upgrade --scan --input fixtures/evolution/evidence-patterns/recurring-failure-candidate.json --json'
     ]
   }),
   test: defineCommandSpec({

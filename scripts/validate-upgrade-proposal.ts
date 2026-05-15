@@ -5,7 +5,9 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import { detectEvidencePatterns } from '../packages/plugin-sdk/src/detector/evidence-pattern-detector.ts';
 import { proposeAtomicUpgrade } from '../packages/core/src/upgrade/propose.ts';
+import { scanEvidencePatternReports } from '../packages/core/src/upgrade/evolution-draft.ts';
 import { createTempWorkspace } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,6 +22,7 @@ const mapBumpFixturePath = 'fixtures/upgrade/map-bump-proposal.json';
 const atomExtractFixturePath = 'fixtures/upgrade/atom-extract-proposal.json';
 const evidenceDrivenFixturePath = 'fixtures/upgrade/evidence-driven-proposal.json';
 const staleFixturePath = 'fixtures/upgrade/stale-proposal.json';
+const scanSchemaPath = 'schemas/governance/evolution-scan-report.schema.json';
 const inputPaths = {
   hashDiff: 'fixtures/upgrade/hash-diff-report.json',
   executionEvidence: 'tests/schema-fixtures/positive/minimal-execution-evidence.json',
@@ -68,7 +71,8 @@ function assertInvariants(proposal: any, expectedStatus: any) {
   check(proposal.humanReview === 'pending', 'humanReview must remain pending');
   check(proposal.status === expectedStatus, `expected status=${expectedStatus}`);
   check(proposal.behaviorId.startsWith('behavior.'), 'behaviorId must be behavior.*');
-  check(Array.isArray(proposal.inputs) && proposal.inputs.length >= 4, 'proposal must keep input references');
+  const minimumInputs = proposal.proposalSource === 'evidence-driven' ? 1 : 4;
+  check(Array.isArray(proposal.inputs) && proposal.inputs.length >= minimumInputs, 'proposal must keep input references');
   if (proposal.status === 'blocked') {
     check(proposal.automatedGates.allPassed === false, 'blocked proposal must have allPassed=false');
     check(proposal.automatedGates.blockedGateNames.length > 0, 'blocked proposal must name blocked gates');
@@ -130,11 +134,12 @@ function assertCliContextBudgetGate(result: any, expectedPassed: any) {
   }
 }
 
-for (const relativePath of [schemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/cli/src/commands/upgrade.ts']) {
+for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
 
 const schema = readJson(schemaPath);
+const scanSchema = readJson(scanSchemaPath);
 check(schema.required.includes('atomId'), 'schema must require atomId');
 check(schema.required.includes('fromVersion'), 'schema must require fromVersion');
 check(schema.required.includes('toVersion'), 'schema must require toVersion');
@@ -152,10 +157,15 @@ check(schema.properties.targetSurface.enum.includes('atom-spec'), 'schema must i
 check(schema.properties.reversibility.enum.includes('rollback-safe'), 'schema must include rollback-safe reversibility');
 check(schema.$defs?.inputRef?.properties?.kind?.enum?.includes('evolution-evidence'), 'schema must include evolution-evidence input kind');
 check(schema.$defs?.automatedGates?.properties?.staleProposal, 'schema must expose staleProposal gate');
+check(scanSchema.required.includes('scanId'), 'scan schema must require scanId');
+check(scanSchema.properties?.scanMode?.const === 'dry-run', 'scan schema must enforce dry-run scanMode');
+check(scanSchema.$defs?.proposalDraftBundleItem?.properties?.proposal?.$ref === 'https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json', 'scan schema must reference upgrade proposal schema');
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
+ajv.addSchema(readJson('schemas/governance/detector-report.schema.json'));
 const validate = ajv.compile(schema);
+const validateScan = ajv.compile(scanSchema);
 
 const expectedPass = readJson(passFixturePath);
 const expectedBlocked = readJson(blockedFixturePath);
@@ -223,6 +233,88 @@ assert.deepEqual(mapProposal, expectedMapBump, 'generated map-bump proposal must
 const cliMapPass = runCliUpgrade(inputPaths.qualityPass, { mapId: 'ATM-MAP-0001' });
 assertInvariants(cliMapPass.evidence.proposal, 'pending');
 validateWithSchema(cliMapPass.evidence.proposal, validate, 'CLI map pass proposal');
+
+const noSignalPatternFixture = readJson('fixtures/evolution/evidence-patterns/no-signal.json');
+const noSignalScan = scanEvidencePatternReports({
+  repositoryRoot: root,
+  detectorReports: [
+    {
+      path: 'fixtures/evolution/evidence-patterns/no-signal.json',
+      document: noSignalPatternFixture.expectedReport
+    }
+  ],
+  proposedBy: 'ATM Evolution Draft Bridge',
+  proposedAt: '2026-05-15T00:00:00.000Z'
+});
+validateWithSchema(noSignalScan, validateScan, 'no-signal scan report');
+check(noSignalScan.empty === true, 'no-signal scan report must be empty');
+check(noSignalScan.proposalDrafts.length === 0, 'no-signal scan report must not produce proposal drafts');
+
+const positiveSignalReport = detectEvidencePatterns({
+  window: '2026-W20',
+  generatedAt: '2026-05-15T00:00:00.000Z',
+  thresholds: {
+    minUsageCount: 10,
+    minFrictionEvidence: 1,
+    minConfidence: 0.5
+  },
+  evidence: [
+    {
+      evidenceId: 'evidence.positive.001',
+      evidenceKind: 'review',
+      signalKind: 'workflow-success',
+      signalScope: 'atom',
+      atomId: 'ATM-CORE-0001',
+      confidence: 0.9,
+      recurrence: {
+        window: '2026-W20',
+        count: 12
+      },
+      summary: 'Positive evidence should remain observation-only.',
+      artifactPaths: []
+    }
+  ]
+});
+const positiveSignalScan = scanEvidencePatternReports({
+  repositoryRoot: root,
+  detectorReports: [
+    {
+      path: 'synthetic/positive-signal-report.json',
+      document: positiveSignalReport as any
+    }
+  ],
+  proposedBy: 'ATM Evolution Draft Bridge',
+  proposedAt: '2026-05-15T00:00:00.000Z'
+});
+validateWithSchema(positiveSignalScan, validateScan, 'positive-signal scan report');
+check(positiveSignalScan.empty === true, 'positive-signal scan report must not produce a proposal draft');
+check(positiveSignalScan.proposalDrafts.length === 0, 'positive-signal scan report must not produce proposal drafts');
+
+const recurringFailurePatternFixture = readJson('fixtures/evolution/evidence-patterns/recurring-failure-candidate.json');
+const recurringFailureScan = scanEvidencePatternReports({
+  repositoryRoot: root,
+  detectorReports: [
+    {
+      path: 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json',
+      document: recurringFailurePatternFixture.expectedReport
+    }
+  ],
+  proposedBy: 'ATM Evolution Draft Bridge',
+  proposedAt: '2026-05-15T00:00:00.000Z'
+});
+validateWithSchema(recurringFailureScan, validateScan, 'recurring-failure scan report');
+check(recurringFailureScan.empty === false, 'recurring-failure scan report must produce proposal drafts');
+check(recurringFailureScan.proposalDrafts.length === 1, 'recurring-failure scan report must produce one proposal draft');
+check(recurringFailureScan.observation.proposalDraftCount === 1, 'recurring-failure scan observation must count one proposal draft');
+const recurringFailureDraft = recurringFailureScan.proposalDrafts[0].proposal;
+validateWithSchema(recurringFailureDraft, validate, 'recurring-failure proposal draft');
+assertInvariants(recurringFailureDraft, 'pending');
+check(recurringFailureDraft.proposalSource === 'evidence-driven', 'scan proposal draft must declare proposalSource');
+check(recurringFailureDraft.targetSurface === 'atom-spec', 'scan proposal draft must target atom-spec');
+check(recurringFailureDraft.baseAtomVersion === '0.1.0', 'scan proposal draft must resolve the current atom base version');
+check(recurringFailureDraft.toVersion === '0.1.1', 'scan proposal draft must bump patch version');
+check(recurringFailureDraft.inputs.length === 1, 'scan proposal draft must keep one evolution-evidence input');
+check(recurringFailureScan.proposalDrafts[0].groupIds.includes('evidence-pattern.atom.atm-core-0001.2026-w20.recurring-failure'), 'scan proposal draft must trace candidate group ids');
 
 const extractProposal = proposeAtomicUpgrade({
   atomId: 'ATM-CORE-0001',
