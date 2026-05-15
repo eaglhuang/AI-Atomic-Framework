@@ -1,6 +1,6 @@
 # Atom 證據驅動進化規劃書
 
-Status: In progress
+Status: Completed
 Date: 2026-05-15
 Audience: ATM core maintainers, plugin authors, host adapter authors
 Target repo: AI-Atomic-Framework
@@ -427,7 +427,7 @@ Checklist：
 - [x] Curator merge accuracy 可由 human review 抽查。
 - [x] Daily proposal cap 可配置。
 
-M8 已於 2026-05-15 完成並提交。新增 `schemas/governance/rollout-metrics-report.schema.json`、`fixtures/rollout-metrics/sample-rollout-metrics.json`、`scripts/validate-rollout-metrics.ts`；`validate:rollout-metrics` 已加入 standard suite（31/31 通過）。
+M8 已於 2026-05-15 完成並提交。初版新增 `schemas/governance/rollout-metrics-report.schema.json`、`fixtures/rollout-metrics/sample-rollout-metrics.json`、`scripts/validate-rollout-metrics.ts`；`validate:rollout-metrics` 已加入 standard suite（31/31 通過）。後續修正：補齊 `proposalMetrics.pending`、`proposalMetrics.precisionRate`、`proposalMetrics.falsePositiveReview` 與 `costBudgetMetrics`，讓 proposal precision report、false-positive review report 與 host cost/budget report 都有可驗證承載；`validate-rollout-metrics.ts` 也新增 total accounting、blocked reason sum、acceptance/stale/precision/false-positive/rollback/cost-budget 算式一致性檢查，避免 fixture 只符合 schema 但數字彼此矛盾。
 
 驗證：
 

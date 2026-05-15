@@ -13,12 +13,22 @@
     "totalProposed": 12,
     "accepted": 8,
     "blocked": 3,
+    "pending": 1,
     "stale": 1,
+    "precisionRate": 0.833,
     "acceptanceRate": 0.667,
     "staleRate": 0.083,
     "blockedReasonCounts": {
       "qualityComparison": 2,
       "staleProposal": 1
+    },
+    "falsePositiveReview": {
+      "reviewed": 6,
+      "confirmedFalsePositive": 1,
+      "falsePositiveRate": 0.167,
+      "reasonCounts": {
+        "insufficientFrictionEvidence": 1
+      }
     },
     "promotionLatencyP50Ms": 86400000,
     "promotionLatencyP95Ms": 259200000
@@ -34,5 +44,13 @@
     "dailyProposalCap": 10,
     "dryRunEnabled": false,
     "confidenceThreshold": 0.6
+  },
+  "costBudgetMetrics": {
+    "unit": "tokens",
+    "budgetLimit": 250000,
+    "actualUsage": 186000,
+    "remainingBudget": 64000,
+    "overBudget": false,
+    "notes": "Host-provided usage snapshot for rollout measurement coverage."
   }
 }

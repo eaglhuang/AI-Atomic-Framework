@@ -285,6 +285,15 @@ try {
     path.join(downstreamCwd, 'src', 'downstream-helper.js'),
     readFileSync(path.join(downstreamFixtureRoot, 'src', 'downstream-helper.js'))
   );
+  mkdirSync(path.join(downstreamCwd, 'fixtures'), { recursive: true });
+  writeFileSync(
+    path.join(downstreamCwd, 'fixtures', 'atom-index.json'),
+    readFileSync(path.join(downstreamFixtureRoot, 'fixtures', 'atom-index.json'))
+  );
+  writeFileSync(
+    path.join(downstreamCwd, 'fixtures', 'demand-report.json'),
+    readFileSync(path.join(downstreamFixtureRoot, 'fixtures', 'demand-report.json'))
+  );
 
   // start --target-file --release-blocker --legacy-flow
   const startLegacy = runAtmJson([
@@ -330,8 +339,58 @@ try {
     'config-driven legacy-flow must produce LegacyRoutePlan');
   assert(Array.isArray(configFlowPlan?.trunkFunctions) && configFlowPlan.trunkFunctions.includes('processRequest'),
     'config release blocker must classify processRequest as trunk');
+
+  // ── A. shadow mode: config defaultLegacyFlow=shadow must activate shadowMode ──────────────────
+  assert(startConfigFlow.parsed.evidence?.shadowMode === true,
+    'start --legacy-flow must activate shadowMode when config defaultLegacyFlow=shadow');
+  assert(startConfigFlow.parsed.evidence?.effectiveLegacyFlow === 'shadow',
+    'effectiveLegacyFlow must be "shadow" when config defaultLegacyFlow=shadow');
+
+  // ── B. infect leaf: existingAtomIndexPath match must route normalizePayload → infect ──────────
+  const normalizeSegment = (configFlowPlan?.segments as Array<Record<string, unknown>> | undefined)
+    ?.find((s) => s['symbolName'] === 'normalizePayload');
+  assert(normalizeSegment !== undefined, 'config-driven plan must contain normalizePayload segment');
+  assert(normalizeSegment?.['recommendedBehavior'] === 'infect',
+    'normalizePayload with existingAtomIndexPath match must route to infect');
+  assert(normalizeSegment?.['existingAtomMatch'] === 'ATM-FIXTURE-NORMALIZE-0001',
+    'normalizePayload existingAtomMatch must be populated from atom-index fixture');
+
+  // ── C. split leaf: demandReportPath callerDemand > threshold must route applyTransform → split ─
+  const transformSegment = (configFlowPlan?.segments as Array<Record<string, unknown>> | undefined)
+    ?.find((s) => s['symbolName'] === 'applyTransform');
+  assert(transformSegment !== undefined, 'config-driven plan must contain applyTransform segment');
+  assert(transformSegment?.['recommendedBehavior'] === 'split',
+    'applyTransform with callerDemand > threshold must route to split');
+
+  // ── D. next command contains --legacy-target, --guidance-session, --dry-run ─────────────────────
+  const nextConfigFlow = runAtmJson(['next', '--cwd', downstreamCwd, '--json']);
+  assert(nextConfigFlow.exitCode === 0, 'next after config-flow start must exit 0');
+  const configNextAction = nextConfigFlow.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
+  assert(typeof configNextAction?.['command'] === 'string',
+    'next after config-flow must return command string');
+  const configNextCmd = String(configNextAction?.['command'] ?? '');
+  assert(configNextCmd.includes('--legacy-target'),
+    'next command must include --legacy-target');
+  assert(configNextCmd.includes('--guidance-session'),
+    'next command must include --guidance-session');
+  assert(configNextCmd.includes('--dry-run'),
+    'next command must include --dry-run');
+  assert(!configNextCmd.includes('processRequest'),
+    'next command --legacy-target must not point to trunk processRequest');
+  assert(typeof configNextAction?.['legacyTarget'] === 'string',
+    'next action must expose legacyTarget field');
+  assert(typeof configNextAction?.['targetFile'] === 'string',
+    'next action must expose targetFile field');
+  assert(typeof configNextAction?.['selectedBehavior'] === 'string',
+    'next action must expose selectedBehavior field');
+
+  // ── E. blockedSegments still includes trunk functions ─────────────────────────────────────────
+  assert(Array.isArray(configNextAction?.['blockedSegments']),
+    'next action must include blockedSegments array');
+  assert((configNextAction?.['blockedSegments'] as string[]).includes('processRequest'),
+    'blockedSegments must include trunk processRequest');
 } finally {
   rmSync(downstreamTemp, { recursive: true, force: true });
 }
 
-ok('orientation, reference legacy route plans, CLI session flow, mutation gate, and proposal pairing verified');
+ok('orientation, reference legacy route plans, CLI session flow, mutation gate, proposal pairing, and host-local shadow+evidence wiring verified');
