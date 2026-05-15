@@ -478,4 +478,34 @@ check(
   'regression draft must block on qualityComparison'
 );
 
-console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, CLI replay, and metric-driven track verified)`);
+// M7 — evolution-loop example governance fixtures
+const evolutionLoopGovernanceDir = 'examples/atom-evolution-loop/governance';
+const evolutionLoopFixtures: [string, string][] = [
+  ['demo-atom-spec-proposal.json', 'demo-atom-spec evolution-loop fixture'],
+  ['demo-atom-map-proposal.json', 'demo-atom-map evolution-loop fixture'],
+  ['demo-rejected-proposal.json', 'demo-rejected evolution-loop fixture'],
+  ['demo-stale-proposal.json', 'demo-stale evolution-loop fixture']
+];
+for (const [file, label] of evolutionLoopFixtures) {
+  const fixture = readJson(`${evolutionLoopGovernanceDir}/${file}`);
+  validateWithSchema(fixture, validate, label);
+  assertInvariants(fixture, fixture.status);
+}
+check(
+  (readJson('examples/atom-evolution-loop/governance/demo-atom-spec-proposal.json') as any).targetSurface === 'atom-spec',
+  'M7 demo-atom-spec fixture must target atom-spec'
+);
+check(
+  (readJson('examples/atom-evolution-loop/governance/demo-atom-map-proposal.json') as any).targetSurface === 'atom-map',
+  'M7 demo-atom-map fixture must target atom-map'
+);
+check(
+  (readJson('examples/atom-evolution-loop/governance/demo-rejected-proposal.json') as any).automatedGates?.blockedGateNames?.includes('qualityComparison'),
+  'M7 demo-rejected fixture must block on qualityComparison'
+);
+check(
+  (readJson('examples/atom-evolution-loop/governance/demo-stale-proposal.json') as any).automatedGates?.blockedGateNames?.includes('staleProposal'),
+  'M7 demo-stale fixture must block on staleProposal'
+);
+
+console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, CLI replay, metric-driven track, and evolution-loop fixtures verified)`);

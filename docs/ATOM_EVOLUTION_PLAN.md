@@ -399,7 +399,7 @@ Checklist：
 - [x] Demo 包含 rejected proposal case。
 - [x] Demo 包含 stale proposal case。
 
-M7 已於 2026-05-15 完成並提交。新增 `examples/atom-evolution-loop/`（含 atom spec、src、test、governance bundle 四種 demo proposal、README）；`validate-examples` 涵蓋第三個範例。
+M7 已於 2026-05-15 完成並提交。新增 `examples/atom-evolution-loop/`（含 atom spec、src、test、governance bundle 四種 demo proposal、README）；`validate-examples` 涵蓋第三個範例。後續修正：`demo-rejected-proposal.json` 補上 `baseEvidenceWatermark`（atom-spec target 必要欄位）；`demo-atom-map-proposal.json` 修正 `members` 格式為 schema 規定的 `memberVersionTransition`（`from`/`to` 版本轉換對）並補 `generatorProvenance`；`validate-upgrade-proposal.ts` 新增 M7 section 確保 evolution-loop 所有 governance fixtures 都通過 schema 驗證。
 
 驗證：
 
