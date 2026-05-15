@@ -69,9 +69,10 @@
     "notes": "Demo: curator detected repeated caller graph pattern."
   },
   "members": [
-    { "atomId": "ATM-EXAMPLE-0003", "role": "primary" },
-    { "atomId": "ATM-CORE-0001", "role": "dependency" }
+    { "from": "ATM-EXAMPLE-0003@0.1.0", "to": "ATM-EXAMPLE-0003@0.1.1" },
+    { "from": "ATM-CORE-0001@0.1.0", "to": "ATM-CORE-0001@0.1.0" }
   ],
+  "generatorProvenance": "atom-map-curator.detector-v1",
   "mapImpactScope": {
     "affectedMapIds": ["ATM-MAP-0001"],
     "propagationStatus": [
