@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { detectEvidencePatterns } from '../packages/plugin-sdk/src/detector/evidence-pattern-detector.ts';
+import { metricsToProposalDraft } from '../packages/core/src/upgrade/metrics-to-proposal.ts';
 import { proposeAtomicUpgrade } from '../packages/core/src/upgrade/propose.ts';
 import { scanEvidencePatternReports } from '../packages/core/src/upgrade/evolution-draft.ts';
 import { createTempWorkspace } from './temp-root.ts';
@@ -26,6 +27,8 @@ const mapCuratorComposeFixturePath = 'fixtures/upgrade/map-curator-compose-propo
 const mapCuratorMergeFixturePath = 'fixtures/upgrade/map-curator-merge-proposal.json';
 const mapCuratorDedupMergeFixturePath = 'fixtures/upgrade/map-curator-dedup-merge-proposal.json';
 const mapCuratorSweepFixturePath = 'fixtures/upgrade/map-curator-sweep-proposal.json';
+const metricDrivenFixturePath = 'fixtures/upgrade/metric-driven-proposal.json';
+const metricRegressionBlockedFixturePath = 'fixtures/upgrade/metric-regression-blocked-proposal.json';
 const scanSchemaPath = 'schemas/governance/evolution-scan-report.schema.json';
 const inputPaths = {
   hashDiff: 'fixtures/upgrade/hash-diff-report.json',
@@ -75,7 +78,7 @@ function assertInvariants(proposal: any, expectedStatus: any) {
   check(proposal.humanReview === 'pending', 'humanReview must remain pending');
   check(proposal.status === expectedStatus, `expected status=${expectedStatus}`);
   check(proposal.behaviorId.startsWith('behavior.'), 'behaviorId must be behavior.*');
-  const minimumInputs = proposal.proposalSource === 'evidence-driven' ? 1 : 4;
+  const minimumInputs = ['evidence-driven', 'metric-driven'].includes(proposal.proposalSource) ? 1 : 4;
   check(Array.isArray(proposal.inputs) && proposal.inputs.length >= minimumInputs, 'proposal must keep input references');
   if (proposal.status === 'blocked') {
     check(proposal.automatedGates.allPassed === false, 'blocked proposal must have allPassed=false');
@@ -138,7 +141,7 @@ function assertCliContextBudgetGate(result: any, expectedPassed: any) {
   }
 }
 
-for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, mapCuratorComposeFixturePath, mapCuratorMergeFixturePath, mapCuratorDedupMergeFixturePath, mapCuratorSweepFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
+for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, mapCuratorComposeFixturePath, mapCuratorMergeFixturePath, mapCuratorDedupMergeFixturePath, mapCuratorSweepFixturePath, metricDrivenFixturePath, metricRegressionBlockedFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
 
@@ -423,4 +426,48 @@ try {
   rmSync(tempRoot, { recursive: true, force: true });
 }
 
-console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, and CLI replay verified)`);
+// M6 — metric-driven track
+const expectedMetricDriven = readJson(metricDrivenFixturePath);
+const expectedMetricRegressionBlocked = readJson(metricRegressionBlockedFixturePath);
+validateWithSchema(expectedMetricDriven, validate, 'metric-driven fixture');
+validateWithSchema(expectedMetricRegressionBlocked, validate, 'metric-regression-blocked fixture');
+assertInvariants(expectedMetricDriven, 'pending');
+assertInvariants(expectedMetricRegressionBlocked, 'blocked');
+check(expectedMetricDriven.proposalSource === 'metric-driven', 'metric-driven fixture must declare proposalSource');
+check(expectedMetricDriven.targetSurface === 'atom-spec', 'metric-driven fixture must target atom-spec');
+check(expectedMetricRegressionBlocked.proposalSource === 'metric-driven', 'metric-regression-blocked fixture must declare proposalSource');
+check(expectedMetricRegressionBlocked.automatedGates.blockedGateNames.includes('qualityComparison'), 'metric-regression-blocked fixture must block on qualityComparison');
+
+const metricImprovedDraft = metricsToProposalDraft({
+  atomId: 'ATM-CORE-0001',
+  fromVersion: '1.1.0',
+  toVersion: '1.1.1',
+  proposedAt: '2026-05-15T00:00:00.000Z',
+  qualityReport: {
+    passed: true,
+    reportId: 'police.upgrade-quality-pass.fixture',
+    reportPath: 'fixtures/upgrade/quality-comparison-pass.json'
+  }
+});
+check(metricImprovedDraft.blocked === false, 'metricsToProposalDraft must return non-blocked for improvement');
+validateWithSchema(metricImprovedDraft.draft, validate, 'metrics-to-proposal adapter pass output');
+
+const metricRegressionDraft = metricsToProposalDraft({
+  atomId: 'ATM-CORE-0001',
+  fromVersion: '1.1.0',
+  toVersion: '1.1.1',
+  proposedAt: '2026-05-15T00:00:00.000Z',
+  qualityReport: {
+    passed: false,
+    reportId: 'police.upgrade-quality-blocked.fixture',
+    reportPath: 'fixtures/upgrade/quality-comparison-blocked.json'
+  }
+});
+check(metricRegressionDraft.blocked === true, 'metricsToProposalDraft must return blocked for regression');
+validateWithSchema(metricRegressionDraft.draft, validate, 'metrics-to-proposal adapter blocked output');
+check(
+  (metricRegressionDraft.draft.automatedGates as Record<string, unknown> & { blockedGateNames: string[] }).blockedGateNames.includes('qualityComparison'),
+  'regression draft must block on qualityComparison'
+);
+
+console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, CLI replay, and metric-driven track verified)`);

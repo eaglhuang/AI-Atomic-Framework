@@ -1,0 +1,87 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "0.1.0",
+    "notes": "Demo atom-map compose proposal for the atom-evolution-loop walkthrough."
+  },
+  "proposalId": "proposal.demo.map-curator.compose.evolution-loop",
+  "atomId": "ATM-EXAMPLE-0003",
+  "fromVersion": "0.1.0",
+  "toVersion": "0.1.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.compose",
+  "target": {
+    "kind": "map",
+    "mapId": "ATM-MAP-0001"
+  },
+  "decompositionDecision": "map-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-map",
+  "baseMapVersion": "0.1.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T00-00-00Z",
+  "reversibility": "rollback-safe",
+  "reviewTemplate": "review.template.map-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "demo.map.non-regression",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-atom-map-proposal.json",
+      "summary": "pass (demo fixture: curator dry-run)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "demo.map.quality-comparison",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-atom-map-proposal.json",
+      "summary": "pass (demo fixture: curator dry-run)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "demo.map.registry-candidate",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-atom-map-proposal.json",
+      "summary": "pass (demo fixture: curator produced reviewable candidate)"
+    },
+    "mutabilityPolicy": {
+      "passed": true,
+      "reportId": "demo.map.mutability",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-atom-map-proposal.json",
+      "summary": "pass (demo fixture: target mutability allows dry-run proposal)"
+    },
+    "allPassed": true,
+    "blockedGateNames": []
+  },
+  "humanReview": "pending",
+  "status": "pending",
+  "inputs": [
+    {
+      "kind": "evolution-evidence",
+      "path": "examples/atom-evolution-loop/governance/demo-atom-map-proposal.json",
+      "schemaId": "atm.atomMapCuratorReport",
+      "reportId": "demo.map.curator.evolution-loop",
+      "summary": "caller-graph input for behavior.compose"
+    }
+  ],
+  "evidenceGate": {
+    "requiredSignals": ["workflow-success"],
+    "matchedEvidenceIds": ["evidence.demo.map.caller-graph.001"],
+    "rejectedEvidenceIds": [],
+    "notes": "Demo: curator detected repeated caller graph pattern."
+  },
+  "members": [
+    { "atomId": "ATM-EXAMPLE-0003", "role": "primary" },
+    { "atomId": "ATM-CORE-0001", "role": "dependency" }
+  ],
+  "mapImpactScope": {
+    "affectedMapIds": ["ATM-MAP-0001"],
+    "propagationStatus": [
+      {
+        "mapId": "ATM-MAP-0001",
+        "integrationTestPassed": true,
+        "message": "Demo: curator dry-run; map integration must run before promotion."
+      }
+    ]
+  },
+  "proposedBy": "ATM Evolution Loop Demo",
+  "proposedAt": "2026-05-15T00:00:00.000Z"
+}
