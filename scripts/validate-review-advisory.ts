@@ -5,6 +5,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import {
   appendMachineFindings,
+  checkPromotionSafetyGates,
   createStubReviewAdvisoryReport,
   createUnavailableAdvisoryReport,
   normalizeProviderPayload
@@ -28,12 +29,17 @@ function readJson(relativePath: any) {
 for (const relativePath of [
   'packages/plugin-review-advisory/package.json',
   'packages/plugin-review-advisory/src/index.ts',
+  'packages/plugin-review-advisory/src/promotion-gates.ts',
   'packages/cli/src/commands/review-advisory.ts',
   'schemas/review-advisory/review-advisory-report.schema.json',
   'fixtures/review-advisory/stub-pass.json',
   'fixtures/review-advisory/stub-warn.json',
   'fixtures/review-advisory/malformed-provider-response.json',
-  'fixtures/review-advisory/no-provider-dry-run.json'
+  'fixtures/review-advisory/no-provider-dry-run.json',
+  'fixtures/upgrade/stale-proposal.json',
+  'fixtures/upgrade/downgrade-preference-proposal.json',
+  'fixtures/upgrade/breaking-proposal.json',
+  'fixtures/upgrade/redaction-blocked-proposal.json'
 ]) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
@@ -114,3 +120,107 @@ check(mergedWithMachineFindings.status === 'warn', 'high severity machine findin
 check(mergedWithMachineFindings.needsReview === true, 'machine finding merge must keep needsReview=true when severity is high');
 
 console.log('[review-advisory:' + mode + '] ok (provider modes, fallback behavior, machine-finding ingest, and schema fixtures verified)');
+
+// ── M4: Promotion Safety Gates ────────────────────────────────────────────────
+
+// Gate 1: baseAtomVersion mismatch blocks promotion
+const staleProposalFixture = readJson('fixtures/upgrade/stale-proposal.json');
+const staleMismatchResult = checkPromotionSafetyGates(staleProposalFixture, {
+  currentAtomVersion: '1.2.0' // stale-proposal has baseAtomVersion 1.1.0 → mismatch
+});
+check(staleMismatchResult.passed === false, 'Gate 1: baseAtomVersion mismatch must block promotion');
+check(staleMismatchResult.blockedGates.includes('baseAtomVersionMismatch'), 'Gate 1: blockedGates must contain baseAtomVersionMismatch');
+check(staleMismatchResult.findings.some((f) => f.gate === 'baseAtomVersionMismatch' && f.blocked), 'Gate 1: findings must have blocked=true for baseAtomVersionMismatch');
+
+// Gate 1 pass: versions match
+const stalePassResult = checkPromotionSafetyGates(staleProposalFixture, {
+  currentAtomVersion: '1.1.0' // matches baseAtomVersion 1.1.0
+});
+check(
+  !stalePassResult.blockedGates.includes('baseAtomVersionMismatch'),
+  'Gate 1: matching versions must not block baseAtomVersionMismatch gate'
+);
+
+// Gate 2: stale evidence watermark blocks promotion
+const staleWatermarkResult = checkPromotionSafetyGates(staleProposalFixture, {
+  isEvidenceWatermarkStale: true
+});
+check(staleWatermarkResult.passed === false, 'Gate 2: stale evidence watermark must block promotion');
+check(staleWatermarkResult.blockedGates.includes('staleEvidenceWatermark'), 'Gate 2: blockedGates must contain staleEvidenceWatermark');
+
+// Gate 2 pass: watermark is current
+const freshWatermarkResult = checkPromotionSafetyGates(staleProposalFixture, {
+  isEvidenceWatermarkStale: false
+});
+check(
+  !freshWatermarkResult.blockedGates.includes('staleEvidenceWatermark'),
+  'Gate 2: current watermark must not block staleEvidenceWatermark gate'
+);
+
+// Gate 3: single-user preference cannot auto-promote to atom-spec
+const downgradeFixture = readJson('fixtures/upgrade/downgrade-preference-proposal.json');
+const downgradeResult = checkPromotionSafetyGates(downgradeFixture, {
+  evidenceScopeIsUserLocal: true
+});
+check(downgradeResult.passed === false, 'Gate 3: single-user evidence targeting atom-spec must block promotion');
+check(downgradeResult.blockedGates.includes('targetSurfaceDowngrade'), 'Gate 3: blockedGates must contain targetSurfaceDowngrade');
+check(downgradeResult.findings.some((f) => f.gate === 'targetSurfaceDowngrade' && f.blocked), 'Gate 3: findings must have blocked=true for targetSurfaceDowngrade');
+
+// Gate 3 pass: evidence scope is broader than single user
+const downgradePassResult = checkPromotionSafetyGates(downgradeFixture, {
+  evidenceScopeIsUserLocal: false
+});
+check(
+  !downgradePassResult.blockedGates.includes('targetSurfaceDowngrade'),
+  'Gate 3: cross-user evidence must not block targetSurfaceDowngrade gate'
+);
+
+// Gate 4: breaking proposals must route to human review
+const breakingFixture = readJson('fixtures/upgrade/breaking-proposal.json');
+const breakingResult = checkPromotionSafetyGates(breakingFixture, {});
+check(breakingResult.passed === false, 'Gate 4: breaking proposal must block promotion until human review');
+check(breakingResult.blockedGates.includes('breakingHumanReview'), 'Gate 4: blockedGates must contain breakingHumanReview');
+check(breakingResult.findings.some((f) => f.gate === 'breakingHumanReview' && f.blocked), 'Gate 4: findings must have blocked=true for breakingHumanReview');
+
+// Gate 4 pass: rollback-safe proposal does not trigger this gate
+const nonBreakingProposal = { ...breakingFixture, reversibility: 'rollback-safe' };
+const nonBreakingResult = checkPromotionSafetyGates(nonBreakingProposal, {});
+check(
+  !nonBreakingResult.blockedGates.includes('breakingHumanReview'),
+  'Gate 4: rollback-safe proposal must not block breakingHumanReview gate'
+);
+
+// Gate 5: missing redaction report blocks promotion
+const redactionFixture = readJson('fixtures/upgrade/redaction-blocked-proposal.json');
+const redactionResult = checkPromotionSafetyGates(redactionFixture, {
+  hasRedactionReport: false
+});
+check(redactionResult.passed === false, 'Gate 5: missing redaction report must block promotion');
+check(redactionResult.blockedGates.includes('missingRedactionReport'), 'Gate 5: blockedGates must contain missingRedactionReport');
+
+// Gate 5 pass: redaction report is present in context
+const redactionPassResult = checkPromotionSafetyGates(redactionFixture, {
+  hasRedactionReport: true
+});
+check(
+  !redactionPassResult.blockedGates.includes('missingRedactionReport'),
+  'Gate 5: proposal with redaction report must not block missingRedactionReport gate'
+);
+
+// Gate 5 pass: redaction-report input reference provided in proposal
+const proposalWithRedactionInput = {
+  ...redactionFixture,
+  inputs: [
+    ...(redactionFixture.inputs ?? []),
+    { kind: 'redaction-report', path: 'fixtures/upgrade/redaction-blocked-proposal.json', schemaId: 'atm.redactionReport' }
+  ]
+};
+const redactionInputPassResult = checkPromotionSafetyGates(proposalWithRedactionInput, {
+  hasRedactionReport: false // context says false, but input ref overrides
+});
+check(
+  !redactionInputPassResult.blockedGates.includes('missingRedactionReport'),
+  'Gate 5: redaction-report input reference must satisfy the missing-redaction-report gate'
+);
+
+console.log('[review-advisory:' + mode + '] ok (M4 promotion safety gates: all 5 gates verified — baseAtomVersionMismatch, staleEvidenceWatermark, targetSurfaceDowngrade, breakingHumanReview, missingRedactionReport)');

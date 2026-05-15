@@ -1,0 +1,109 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "breaking",
+    "fromVersion": "1.1.0",
+    "notes": "Blocked evidence-driven breaking proposal fixture. reversibility=breaking requires explicit human review before promotion."
+  },
+  "proposalId": "proposal.atm-core-0001.from-1.1.0.to-2.0.0.atom.breaking-human-review",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "1.1.0",
+  "toVersion": "2.0.0",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-spec",
+  "baseAtomVersion": "1.1.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T00-00-00Z",
+  "reversibility": "breaking",
+  "evidenceGate": {
+    "requiredSignals": ["recurring-failure", "user-correction"],
+    "matchedEvidenceIds": [
+      "evidence.atm-core-0001.recurring-failure.003",
+      "evidence.atm-core-0001.user-correction.002"
+    ],
+    "notes": "Breaking change required to resolve persistent API contract violation. Evidence satisfies dual-condition trigger but proposal reversibility is breaking and must be escalated to human review."
+  },
+  "reviewTemplate": "review.template.atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "police.non-regression.fixture",
+      "reportPath": "tests/police-fixtures/positive/non-regression-report.json",
+      "summary": "pass (baseline fixtures passed)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "police.upgrade-quality-pass.fixture",
+      "reportPath": "fixtures/upgrade/quality-comparison-pass.json",
+      "summary": "pass (quality metrics improved)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "police.registry-candidate.fixture",
+      "reportPath": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "summary": "pass (candidate can promote)"
+    },
+    "staleProposal": {
+      "passed": true,
+      "reportId": "stale-proposal.breaking.fixture",
+      "reportPath": "fixtures/upgrade/breaking-proposal.json",
+      "summary": "pass (base atom version and evidence watermark are current)"
+    },
+    "privacy": {
+      "passed": true,
+      "reportId": "privacy.breaking.fixture",
+      "reportPath": "fixtures/upgrade/breaking-proposal.json",
+      "summary": "pass (no sensitive input)"
+    },
+    "breakingHumanReview": {
+      "passed": false,
+      "reportId": "breaking-human-review.fixture",
+      "reportPath": "fixtures/upgrade/breaking-proposal.json",
+      "summary": "blocked (reversibility is breaking; proposal must receive explicit human review before promotion)"
+    },
+    "allPassed": false,
+    "blockedGateNames": ["breakingHumanReview"]
+  },
+  "humanReview": "pending",
+  "status": "blocked",
+  "inputs": [
+    {
+      "kind": "hash-diff",
+      "path": "fixtures/upgrade/hash-diff-report.json",
+      "schemaId": "atm.hashDiffReport",
+      "summary": "hash-diff input"
+    },
+    {
+      "kind": "evolution-evidence",
+      "path": "fixtures/upgrade/breaking-proposal.json#/evidenceGate",
+      "schemaId": "atm.evolutionEvidenceGate",
+      "summary": "breaking change evidence input"
+    },
+    {
+      "kind": "non-regression",
+      "path": "tests/police-fixtures/positive/non-regression-report.json",
+      "schemaId": "atm.nonRegressionReport",
+      "summary": "non-regression input"
+    },
+    {
+      "kind": "registry-candidate",
+      "path": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "schemaId": "atm.registryCandidateReport",
+      "summary": "registry candidate input"
+    },
+    {
+      "kind": "quality-comparison",
+      "path": "fixtures/upgrade/quality-comparison-pass.json",
+      "schemaId": "atm.qualityComparisonReport",
+      "summary": "quality comparison input"
+    }
+  ],
+  "proposedBy": "evidence-detector.v1",
+  "proposedAt": "2026-05-15T10:00:00.000Z"
+}
