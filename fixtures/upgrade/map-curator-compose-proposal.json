@@ -1,0 +1,101 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "0.1.0",
+    "notes": "Atom Map curator generated behavior.compose proposal from caller-graph signal."
+  },
+  "proposalId": "proposal.map-curator.compose.caller-graph-compose",
+  "atomId": "ATM-CORE-0004",
+  "fromVersion": "0.1.0",
+  "toVersion": "0.1.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.compose",
+  "target": {
+    "kind": "map",
+    "mapId": "ATM-MAP-0001"
+  },
+  "decompositionDecision": "map-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-map",
+  "baseMapVersion": "0.1.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T12-00-00Z",
+  "reversibility": "rollback-safe",
+  "evidenceGate": {
+    "requiredSignals": ["workflow-success"],
+    "matchedEvidenceIds": [
+      "evidence.map-curator.caller-graph.001",
+      "evidence.map-curator.caller-graph.002"
+    ],
+    "rejectedEvidenceIds": [],
+    "notes": "Derived from Atom Map curator candidate caller-graph-compose."
+  },
+  "reviewTemplate": "review.template.map-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "map-curator.nonRegression",
+      "reportPath": "fixtures/evolution/map-curator/caller-graph-compose.json",
+      "summary": "pass (curator dry-run did not re-run non-regression)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "map-curator.qualityComparison",
+      "reportPath": "fixtures/evolution/map-curator/caller-graph-compose.json",
+      "summary": "pass (curator dry-run did not re-run quality comparison)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "map-curator.registryCandidate",
+      "reportPath": "fixtures/evolution/map-curator/caller-graph-compose.json",
+      "summary": "pass (curator produced a reviewable registry candidate)"
+    },
+    "mutabilityPolicy": {
+      "passed": true,
+      "reportId": "map-curator.mutability.caller-graph-compose",
+      "reportPath": "fixtures/evolution/map-curator/caller-graph-compose.json",
+      "summary": "pass (target mutability policy allows a reviewable dry-run proposal)"
+    },
+    "allPassed": true,
+    "blockedGateNames": []
+  },
+  "humanReview": "pending",
+  "status": "pending",
+  "inputs": [
+    {
+      "kind": "evolution-evidence",
+      "path": "fixtures/evolution/map-curator/caller-graph-compose.json",
+      "schemaId": "atm.atomMapCuratorReport",
+      "reportId": "proposal.map-curator.compose.caller-graph-compose.curator-report",
+      "summary": "caller-graph input for behavior.compose"
+    }
+  ],
+  "mapImpactScope": {
+    "affectedMapIds": ["ATM-MAP-0001"],
+    "propagationStatus": [
+      {
+        "mapId": "ATM-MAP-0001",
+        "integrationTestPassed": true,
+        "message": "Curator dry-run; map integration must run before promotion."
+      }
+    ]
+  },
+  "members": [
+    {
+      "from": "ATM-CORE-0004@0.1.0",
+      "to": "ATM-CORE-0004@0.1.0"
+    },
+    {
+      "from": "ATM-FIXTURE-0001@0.1.0",
+      "to": "ATM-FIXTURE-0001@0.1.0"
+    },
+    {
+      "from": "ATM-CORE-0001@0.1.0",
+      "to": "ATM-CORE-0001@0.1.0"
+    }
+  ],
+  "generatorProvenance": "atom-map-curator.detector-v1",
+  "proposedBy": "ATM Atom Map Curator",
+  "proposedAt": "2026-05-15T12:00:00.000Z"
+}

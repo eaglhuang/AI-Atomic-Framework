@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/map-curator-report.schema.json",
+  "title": "ATM Atom Map Curator Report v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "reportId",
+    "generatedAt",
+    "curatorName",
+    "thresholds",
+    "summary",
+    "observations",
+    "proposalDrafts",
+    "empty"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.atomMapCuratorReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "reportId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "curatorName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "thresholds": {
+      "$ref": "#/$defs/thresholds"
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callerGraphSignals",
+        "inputOutputOverlapSignals",
+        "recurringFailureClusterSignals",
+        "proposalDrafts",
+        "blockedProposalDrafts",
+        "observationOnly"
+      ],
+      "properties": {
+        "callerGraphSignals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inputOutputOverlapSignals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recurringFailureClusterSignals": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "proposalDrafts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blockedProposalDrafts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observationOnly": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "proposalDrafts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/proposalDraft"
+      }
+    },
+    "empty": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minCallerGraphOccurrences", "minInputOutputOverlapScore", "minRecurringFailureCount", "minConfidence"],
+      "properties": {
+        "minCallerGraphOccurrences": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minInputOutputOverlapScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "minRecurringFailureCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidateId", "signalKind", "reasons"],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signalKind": {
+          "enum": ["caller-graph", "input-output-overlap", "recurring-failure-cluster", "zero-caller-sweep"]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "proposalDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "behaviorId",
+        "signalKind",
+        "targetMapId",
+        "sourceEvidenceIds",
+        "autoPromoteEligible",
+        "proposal"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "behaviorId": {
+          "enum": ["behavior.compose", "behavior.merge", "behavior.dedup-merge", "behavior.sweep"]
+        },
+        "signalKind": {
+          "enum": ["caller-graph", "input-output-overlap", "recurring-failure-cluster", "zero-caller-sweep"]
+        },
+        "targetMapId": {
+          "type": "string",
+          "pattern": "^ATM-MAP-\\d{4}$"
+        },
+        "sourceEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "autoPromoteEligible": {
+          "type": "boolean"
+        },
+        "proposal": {
+          "$ref": "https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json"
+        }
+      }
+    }
+  }
+}

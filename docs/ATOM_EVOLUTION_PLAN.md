@@ -339,18 +339,21 @@ M4 已於 2026-05-15 完成並提交。
 
 Checklist：
 
-- [ ] Compose proposal 列出 members。
-- [ ] Merge proposal 列出 source Atoms 與 target Atom。
-- [ ] Sweep proposal 只封存，不刪除。
-- [ ] Immutable targets 不可 auto-promote。
-- [ ] Generated proposals 引用 evidence inputs。
+- [x] Compose proposal 列出 members。
+- [x] Merge proposal 列出 source Atoms 與 target Atom。
+- [x] Sweep proposal 只封存，不刪除。
+- [x] Immutable targets 不可 auto-promote。
+- [x] Generated proposals 引用 evidence inputs。
 
 驗證：
 
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:map-curator`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:behavior-sdk`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:behavior-pack`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:status-machine`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:registry-core`
+
+M5 已於 2026-05-15 完成並提交。
 
 ### M6 - Metric-Driven Track
 
