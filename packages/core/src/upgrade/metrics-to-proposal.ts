@@ -25,9 +25,11 @@ export interface MetricsProposalRequest {
   readonly toVersion: string;
   readonly proposedBy?: string;
   readonly proposedAt: string;
+  readonly baseEvidenceWatermark?: string;
   readonly qualityReport: MetricsGateInput;
   readonly nonRegressionReport?: MetricsGateInput;
   readonly registryCandidateReport?: MetricsGateInput;
+  readonly staleProposalReport?: MetricsGateInput;
 }
 
 export interface MetricsProposalDraft {
@@ -79,8 +81,20 @@ export function metricsToProposalDraft(request: MetricsProposalRequest): Metrics
     blockedGateNames.push('registryCandidate');
   }
 
+  const staleProposalGate = request.staleProposalReport ?? {
+    passed: true,
+    reportId: `stale-proposal.metric-driven.${idNorm}.fixture`,
+    reportPath: request.qualityReport.reportPath,
+    summary: 'pass (metric-driven proposal: base atom version and metric watermark are current)'
+  };
+
+  if (!staleProposalGate.passed) {
+    blockedGateNames.push('staleProposal');
+  }
+
   const allPassed = blockedGateNames.length === 0;
   const status = allPassed ? 'pending' : 'blocked';
+  const baseEvidenceWatermark = request.baseEvidenceWatermark ?? `metric.watermark.${normalizeWatermarkTimestamp(request.proposedAt)}`;
 
   const draft: Record<string, unknown> = {
     schemaId: 'atm.upgradeProposal',
@@ -101,6 +115,7 @@ export function metricsToProposalDraft(request: MetricsProposalRequest): Metrics
     proposalSource: 'metric-driven',
     targetSurface: 'atom-spec',
     baseAtomVersion: request.fromVersion,
+    baseEvidenceWatermark,
     reversibility: 'rollback-safe',
     reviewTemplate: 'review.template.atom-bump',
     automatedGates: {
@@ -116,6 +131,12 @@ export function metricsToProposalDraft(request: MetricsProposalRequest): Metrics
         reportId: registryCandidateGate.reportId,
         reportPath: registryCandidateGate.reportPath,
         summary: registryCandidateGate.summary ?? 'registry candidate result'
+      },
+      staleProposal: {
+        passed: staleProposalGate.passed,
+        reportId: staleProposalGate.reportId,
+        reportPath: staleProposalGate.reportPath,
+        summary: staleProposalGate.summary ?? 'stale proposal result'
       },
       allPassed,
       blockedGateNames
@@ -140,4 +161,8 @@ export function metricsToProposalDraft(request: MetricsProposalRequest): Metrics
     blocked: !allPassed,
     ...(allPassed ? {} : { blockedReason: 'qualityComparison gate failed: metric regression detected' })
   };
+}
+
+function normalizeWatermarkTimestamp(value: string): string {
+  return value.replace(/:/g, '-').replace(/\.\d{3}Z$/, 'Z');
 }

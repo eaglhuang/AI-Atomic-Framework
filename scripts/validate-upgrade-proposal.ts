@@ -435,7 +435,11 @@ assertInvariants(expectedMetricDriven, 'pending');
 assertInvariants(expectedMetricRegressionBlocked, 'blocked');
 check(expectedMetricDriven.proposalSource === 'metric-driven', 'metric-driven fixture must declare proposalSource');
 check(expectedMetricDriven.targetSurface === 'atom-spec', 'metric-driven fixture must target atom-spec');
+check(Boolean(expectedMetricDriven.baseEvidenceWatermark), 'metric-driven fixture must include baseEvidenceWatermark');
+check(expectedMetricDriven.automatedGates.staleProposal?.passed === true, 'metric-driven fixture must share staleProposal gate');
 check(expectedMetricRegressionBlocked.proposalSource === 'metric-driven', 'metric-regression-blocked fixture must declare proposalSource');
+check(Boolean(expectedMetricRegressionBlocked.baseEvidenceWatermark), 'metric-regression-blocked fixture must include baseEvidenceWatermark');
+check(expectedMetricRegressionBlocked.automatedGates.staleProposal?.passed === true, 'metric-regression-blocked fixture must share staleProposal gate');
 check(expectedMetricRegressionBlocked.automatedGates.blockedGateNames.includes('qualityComparison'), 'metric-regression-blocked fixture must block on qualityComparison');
 
 const metricImprovedDraft = metricsToProposalDraft({
@@ -451,6 +455,8 @@ const metricImprovedDraft = metricsToProposalDraft({
 });
 check(metricImprovedDraft.blocked === false, 'metricsToProposalDraft must return non-blocked for improvement');
 validateWithSchema(metricImprovedDraft.draft, validate, 'metrics-to-proposal adapter pass output');
+check(Boolean(metricImprovedDraft.draft.baseEvidenceWatermark), 'metrics-to-proposal adapter pass output must include baseEvidenceWatermark');
+check((metricImprovedDraft.draft.automatedGates as any).staleProposal?.passed === true, 'metrics-to-proposal adapter pass output must include staleProposal gate');
 
 const metricRegressionDraft = metricsToProposalDraft({
   atomId: 'ATM-CORE-0001',
@@ -465,6 +471,8 @@ const metricRegressionDraft = metricsToProposalDraft({
 });
 check(metricRegressionDraft.blocked === true, 'metricsToProposalDraft must return blocked for regression');
 validateWithSchema(metricRegressionDraft.draft, validate, 'metrics-to-proposal adapter blocked output');
+check(Boolean(metricRegressionDraft.draft.baseEvidenceWatermark), 'metrics-to-proposal adapter blocked output must include baseEvidenceWatermark');
+check((metricRegressionDraft.draft.automatedGates as any).staleProposal?.passed === true, 'metrics-to-proposal adapter blocked output must include staleProposal gate');
 check(
   (metricRegressionDraft.draft.automatedGates as Record<string, unknown> & { blockedGateNames: string[] }).blockedGateNames.includes('qualityComparison'),
   'regression draft must block on qualityComparison'
