@@ -345,6 +345,12 @@
         "privacy": {
           "$ref": "#/$defs/gateResult"
         },
+        "targetSurfaceDowngrade": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "breakingHumanReview": {
+          "$ref": "#/$defs/gateResult"
+        },
         "allPassed": {
           "type": "boolean"
         },
@@ -352,7 +358,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview"]
           }
         }
       }

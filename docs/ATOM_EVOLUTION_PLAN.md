@@ -311,17 +311,19 @@ Checklist：
 
 Checklist：
 
-- [ ] `baseAtomVersion` mismatch 會 block promotion。
-- [ ] `baseEvidenceWatermark` stale condition 會 block promotion。
-- [ ] Single-user preference 不會自動 promote 到 `atom-spec`。
-- [ ] Breaking proposals 必須 human review。
-- [ ] 若 proposal 考量過 sensitive inputs，缺 redaction report 時必須 blocked。
+- [x] `baseAtomVersion` mismatch 會 block promotion。
+- [x] `baseEvidenceWatermark` stale condition 會 block promotion。
+- [x] Single-user preference 不會自動 promote 到 `atom-spec`。
+- [x] Breaking proposals 必須 human review。
+- [x] 若 proposal 考量過 sensitive inputs，缺 redaction report 時必須 blocked。
 
 驗證：
 
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:review-advisory`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:human-review`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:governance-commands`
+
+M4 已於 2026-05-15 完成並提交。
 
 ### M5 - Atom Map Curator Detector
 

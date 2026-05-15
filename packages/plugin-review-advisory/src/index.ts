@@ -1,3 +1,14 @@
+export {
+  checkPromotionSafetyGates
+} from './promotion-gates.ts';
+export type {
+  PromotionSafetyGateName,
+  PromotionSafetyFinding,
+  PromotionSafetyGateResult,
+  PromotionSafetyContext,
+  ProposalForSafetyCheck
+} from './promotion-gates.ts';
+
 export const pluginReviewAdvisoryPackage = {
   packageName: '@ai-atomic-framework/plugin-review-advisory',
   packageRole: 'semantic-review-advisory-provider',
