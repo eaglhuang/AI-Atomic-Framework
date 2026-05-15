@@ -109,6 +109,9 @@ export interface GuidanceNextAction {
   readonly missingEvidence: readonly string[];
   readonly selectedSegment?: string;
   readonly blockedSegments?: readonly string[];
+  readonly legacyTarget?: string;
+  readonly targetFile?: string;
+  readonly selectedBehavior?: string;
 }
 
 export interface GuidancePacket {
