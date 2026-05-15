@@ -116,6 +116,24 @@ check(verifyNeutrality.exitCode === 0, 'verify --neutrality must exit 0 in the f
 check(verifyNeutrality.parsed.ok === true, 'verify --neutrality must report ok=true in the framework repository root');
 check(verifyNeutrality.parsed.messages.some((entry: any) => entry.code === 'ATM_VERIFY_NEUTRALITY_OK'), 'verify --neutrality must emit ATM_VERIFY_NEUTRALITY_OK');
 
+// Adopter shadow cleanup regression
+check(
+  !existsSync(path.join(root, 'docs/governance/3klife-governance-mapping.md')),
+  'docs/governance/3klife-governance-mapping.md must be removed from the framework repository'
+);
+check(
+  existsSync(path.join(root, 'docs/governance/downstream-adopter-governance-mapping.md')),
+  'docs/governance/downstream-adopter-governance-mapping.md must exist as the neutral replacement'
+);
+const neutralMappingContent = existsSync(path.join(root, 'docs/governance/downstream-adopter-governance-mapping.md'))
+  ? readFileSync(path.join(root, 'docs/governance/downstream-adopter-governance-mapping.md'), 'utf8')
+  : '';
+const neutralMappingScan = scanNeutralityText({
+  relativePath: 'docs/governance/downstream-adopter-governance-mapping.md',
+  content: neutralMappingContent
+}, { repositoryRoot: root, policy });
+check(neutralMappingScan.ok === true, 'downstream-adopter-governance-mapping.md must not contain banned adopter terms');
+
 if (!process.exitCode) {
   console.log(`[neutrality:${mode}] ok (${fixture.acceptance.length} acceptance checks)`);
 }

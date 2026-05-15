@@ -1,3 +1,5 @@
+import type { LegacyRoutePlan } from './legacy-route-plan.ts';
+
 export type GuidanceRoute =
   | 'create-atom'
   | 'atomize'
@@ -56,7 +58,9 @@ export interface ProjectOrientationReport {
   readonly noTouchZones: readonly NoTouchZone[];
   readonly mutationPolicy: MutationPolicy;
   readonly legacyHotspots: readonly LegacyHotspot[];
+  readonly configLegacyHotspots: readonly LegacyHotspotConfig[];
   readonly releaseBlockers: readonly string[];
+  readonly defaultLegacyFlow?: 'shadow' | 'dry-run';
   readonly unknowns: readonly string[];
 }
 
@@ -70,6 +74,13 @@ export interface LegacyHotspot {
   readonly path: string;
   readonly reason: string;
   readonly riskLevel: 'low' | 'medium' | 'high';
+}
+
+export interface LegacyHotspotConfig {
+  readonly path: string;
+  readonly releaseBlockers: readonly string[];
+  readonly demandReportPath?: string | null;
+  readonly existingAtomIndexPath?: string | null;
 }
 
 export interface RouteChoice {
@@ -96,6 +107,8 @@ export interface GuidanceNextAction {
   readonly allowedCommands: readonly string[];
   readonly blockedCommands: readonly string[];
   readonly missingEvidence: readonly string[];
+  readonly selectedSegment?: string;
+  readonly blockedSegments?: readonly string[];
 }
 
 export interface GuidancePacket {
@@ -125,6 +138,8 @@ export interface GuidanceSession {
   readonly orientation: ProjectOrientationReport;
   readonly routeDecision: RouteDecision;
   readonly packet: GuidancePacket;
+  readonly legacyRoutePlan?: LegacyRoutePlan;
+  readonly shadowMode?: boolean;
 }
 
 export const defaultMutationPolicy: MutationPolicy = Object.freeze({
