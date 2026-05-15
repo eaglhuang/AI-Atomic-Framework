@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.rolloutMetricsReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Sample rollout metrics report fixture — weekly snapshot for 2026-W20."
+  },
+  "reportId": "rollout-metrics.sample.2026-W20",
+  "generatedAt": "2026-05-15T00:00:00.000Z",
+  "window": "2026-W20",
+  "proposalMetrics": {
+    "totalProposed": 12,
+    "accepted": 8,
+    "blocked": 3,
+    "stale": 1,
+    "acceptanceRate": 0.667,
+    "staleRate": 0.083,
+    "blockedReasonCounts": {
+      "qualityComparison": 2,
+      "staleProposal": 1
+    },
+    "promotionLatencyP50Ms": 86400000,
+    "promotionLatencyP95Ms": 259200000
+  },
+  "curatorMetrics": {
+    "mergeProposalsTotal": 4,
+    "humanReviewSampled": 2,
+    "mergeAccuracyEstimate": 0.9,
+    "rollbackCount": 0,
+    "rollbackRate": 0
+  },
+  "configuration": {
+    "dailyProposalCap": 10,
+    "dryRunEnabled": false,
+    "confidenceThreshold": 0.6
+  }
+}

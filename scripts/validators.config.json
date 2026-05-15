@@ -55,7 +55,8 @@
         "validate-seed-registry",
         "validate-registry-diff",
         "validate-regression-compare",
-        "audit-hash-placeholders"
+        "audit-hash-placeholders",
+        "validate-rollout-metrics"
       ]
     },
     "full": {
@@ -115,6 +116,7 @@
     { "name": "validate-registry-diff", "entry": "scripts/validate-registry-diff.ts", "tags": ["registry"], "slow": false },
     { "name": "validate-regression-compare", "entry": "scripts/validate-regression-compare.ts", "tags": ["regression"], "slow": false },
     { "name": "audit-hash-placeholders", "entry": "scripts/audit-hash-placeholders.ts", "tags": ["hash", "guard"], "slow": false },
+    { "name": "validate-rollout-metrics", "entry": "scripts/validate-rollout-metrics.ts", "tags": ["evolution", "metrics"], "slow": false },
     { "name": "validate-upgrade-proposal", "entry": "scripts/validate-upgrade-proposal.ts", "tags": ["upgrade"], "slow": false },
     { "name": "validate-rollback-proof", "entry": "scripts/validate-rollback-proof.ts", "tags": ["rollback"], "slow": false },
     { "name": "validate-human-review", "entry": "scripts/validate-human-review.ts", "tags": ["review"], "slow": false },

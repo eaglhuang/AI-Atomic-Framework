@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "1.1.0",
+    "notes": "Metric-driven atom-spec proposal fixture — metric improvement confirmed."
+  },
+  "proposalId": "proposal.atm-core-0001.from-1.1.0.to-1.1.1.atom.metric-driven",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "1.1.0",
+  "toVersion": "1.1.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "proposalSource": "metric-driven",
+  "targetSurface": "atom-spec",
+  "baseAtomVersion": "1.1.0",
+  "reversibility": "rollback-safe",
+  "reviewTemplate": "review.template.atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "police.non-regression.metric-driven.fixture",
+      "reportPath": "fixtures/upgrade/metric-driven-proposal.json",
+      "summary": "pass (metric-driven proposal: no code change; regression check delegated to quality gate)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "police.upgrade-quality-pass.fixture",
+      "reportPath": "fixtures/upgrade/quality-comparison-pass.json",
+      "summary": "pass (metric improvement confirmed; regression gate cleared)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "police.registry-candidate.metric-driven.fixture",
+      "reportPath": "fixtures/upgrade/metric-driven-proposal.json",
+      "summary": "pass (metric-driven proposal: registry candidate status assumed pending human review)"
+    },
+    "allPassed": true,
+    "blockedGateNames": []
+  },
+  "humanReview": "pending",
+  "status": "pending",
+  "inputs": [
+    {
+      "kind": "quality-comparison",
+      "path": "fixtures/upgrade/quality-comparison-pass.json",
+      "schemaId": "atm.police.qualityComparisonReport",
+      "reportId": "police.upgrade-quality-pass.fixture",
+      "summary": "quality-comparison input — metric improvement confirmed"
+    }
+  ],
+  "proposedBy": "ATM Metrics-to-Proposal Adapter",
+  "proposedAt": "2026-05-15T00:00:00.000Z"
+}

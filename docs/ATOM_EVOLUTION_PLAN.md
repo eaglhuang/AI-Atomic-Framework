@@ -367,10 +367,12 @@ M5 已於 2026-05-15 完成並提交。
 
 Checklist：
 
-- [ ] Metric regression 可產 proposal。
-- [ ] Metric improvement 可成為 promotion evidence。
-- [ ] Holdout 或 regression failure 會 block promotion。
-- [ ] Metric-driven 與 evidence-driven proposals 共用後段 gates。
+- [x] Metric regression 可產 proposal。
+- [x] Metric improvement 可成為 promotion evidence。
+- [x] Holdout 或 regression failure 會 block promotion。
+- [x] Metric-driven 與 evidence-driven proposals 共用後段 gates。
+
+M6 已於 2026-05-15 完成並提交。新增 `fixtures/upgrade/metric-driven-proposal.json`、`fixtures/upgrade/metric-regression-blocked-proposal.json`、`packages/core/src/upgrade/metrics-to-proposal.ts`；`validate-upgrade-proposal` 延伸驗證 metric-driven track。
 
 驗證：
 
@@ -391,11 +393,13 @@ Checklist：
 
 Checklist：
 
-- [ ] Demo 可在五分鐘內跑完。
-- [ ] Demo 至少產生一個 `atom-spec` proposal。
-- [ ] Demo 至少產生一個 `atom-map` proposal。
-- [ ] Demo 包含 rejected proposal case。
-- [ ] Demo 包含 stale proposal case。
+- [x] Demo 可在五分鐘內跑完。
+- [x] Demo 至少產生一個 `atom-spec` proposal。
+- [x] Demo 至少產生一個 `atom-map` proposal。
+- [x] Demo 包含 rejected proposal case。
+- [x] Demo 包含 stale proposal case。
+
+M7 已於 2026-05-15 完成並提交。新增 `examples/atom-evolution-loop/`（含 atom spec、src、test、governance bundle 四種 demo proposal、README）；`validate-examples` 涵蓋第三個範例。
 
 驗證：
 
@@ -417,11 +421,13 @@ Checklist：
 
 Checklist：
 
-- [ ] Proposal acceptance rate 可量測。
-- [ ] Blocked reasons 可分類。
-- [ ] Stale rate 可量測。
-- [ ] Curator merge accuracy 可由 human review 抽查。
-- [ ] Daily proposal cap 可配置。
+- [x] Proposal acceptance rate 可量測。
+- [x] Blocked reasons 可分類。
+- [x] Stale rate 可量測。
+- [x] Curator merge accuracy 可由 human review 抽查。
+- [x] Daily proposal cap 可配置。
+
+M8 已於 2026-05-15 完成並提交。新增 `schemas/governance/rollout-metrics-report.schema.json`、`fixtures/rollout-metrics/sample-rollout-metrics.json`、`scripts/validate-rollout-metrics.ts`；`validate:rollout-metrics` 已加入 standard suite（31/31 通過）。
 
 驗證：
 

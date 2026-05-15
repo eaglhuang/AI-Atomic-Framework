@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/rollout-metrics-report.schema.json",
+  "title": "ATM Rollout Metrics Report v0.1",
+  "description": "Tracks proposal acceptance rates, stale rates, blocked-reason distributions, curator merge accuracy, and configuration parameters for the ATM atom evolution rollout.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "reportId",
+    "generatedAt",
+    "window",
+    "proposalMetrics",
+    "curatorMetrics",
+    "configuration"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.rolloutMetricsReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "reportId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this metrics report."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp when this report was generated."
+    },
+    "window": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Time window this report covers (e.g. '2026-W20', '2026-05', '2026-05-15')."
+    },
+    "proposalMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalProposed",
+        "accepted",
+        "blocked",
+        "stale",
+        "acceptanceRate",
+        "staleRate",
+        "blockedReasonCounts"
+      ],
+      "properties": {
+        "totalProposed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total proposals generated in this window."
+        },
+        "accepted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals that passed all gates and were accepted by human review."
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals blocked by one or more automated gates."
+        },
+        "stale": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals that were blocked specifically by the staleProposal gate."
+        },
+        "acceptanceRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "accepted / totalProposed — proposal acceptance rate (可量測)."
+        },
+        "staleRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "stale / totalProposed — stale proposal rate (可量測)."
+        },
+        "blockedReasonCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "Map of gate name → count of proposals it blocked (可分類)."
+        },
+        "promotionLatencyP50Ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Median promotion latency in milliseconds (optional)."
+        },
+        "promotionLatencyP95Ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "95th-percentile promotion latency in milliseconds (optional)."
+        }
+      }
+    },
+    "curatorMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mergeProposalsTotal",
+        "humanReviewSampled",
+        "mergeAccuracyEstimate"
+      ],
+      "properties": {
+        "mergeProposalsTotal": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total map-curator merge proposals in this window."
+        },
+        "humanReviewSampled": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many merge proposals were sampled for human review (curator merge accuracy 可由 human review 抽查)."
+        },
+        "mergeAccuracyEstimate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Estimated merge accuracy based on human review sample."
+        },
+        "rollbackCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many promoted changes were rolled back in this window (optional)."
+        },
+        "rollbackRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "rollbackCount / mergeProposalsTotal (optional)."
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dailyProposalCap"
+      ],
+      "properties": {
+        "dailyProposalCap": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum proposals allowed per day — daily proposal cap (可配置)."
+        },
+        "dryRunEnabled": {
+          "type": "boolean",
+          "description": "Whether the evolution pipeline ran in dry-run mode."
+        },
+        "confidenceThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum confidence score required to auto-propose."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

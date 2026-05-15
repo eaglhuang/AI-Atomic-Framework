@@ -23,6 +23,13 @@ const examples = [
     atomSpec: 'examples/legacy-strangler-minimal/atoms/legacy-greeting.atom.json',
     source: 'examples/legacy-strangler-minimal/src/greeting.atom.ts',
     expectedOutput: 'Welcome back, team.'
+  },
+  {
+    name: '@ai-atomic-framework/example-atom-evolution-loop',
+    directory: 'examples/atom-evolution-loop',
+    atomSpec: 'examples/atom-evolution-loop/atoms/evolution-target.atom.json',
+    source: 'examples/atom-evolution-loop/src/evolution-target.atom.ts',
+    expectedOutput: '[example:evolution-loop]'
   }
 ];
 

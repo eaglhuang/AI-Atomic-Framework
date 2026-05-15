@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "1.0.0",
+    "notes": "Demo atom-spec evolution proposal for the atom-evolution-loop walkthrough."
+  },
+  "proposalId": "proposal.atm-example-0003.from-1.0.0.to-1.0.1.atom.evidence-driven",
+  "atomId": "ATM-EXAMPLE-0003",
+  "fromVersion": "1.0.0",
+  "toVersion": "1.0.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-spec",
+  "baseAtomVersion": "1.0.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T00-00-00Z",
+  "reversibility": "rollback-safe",
+  "reviewTemplate": "review.template.atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "demo.non-regression",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-atom-spec-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "demo.quality-comparison",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-atom-spec-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "demo.registry-candidate",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-atom-spec-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "allPassed": true,
+    "blockedGateNames": []
+  },
+  "humanReview": "pending",
+  "status": "pending",
+  "inputs": [
+    {
+      "kind": "evolution-evidence",
+      "path": "examples/atom-evolution-loop/governance/demo-atom-spec-proposal.json#/evidenceGate",
+      "schemaId": "atm.evolutionEvidenceGate",
+      "summary": "demo evidence-driven evolution signal"
+    }
+  ],
+  "evidenceGate": {
+    "requiredSignals": ["recurring-failure"],
+    "matchedEvidenceIds": ["evidence.atm-example-0003.demo.001"],
+    "notes": "Demo: dual-condition trigger satisfied."
+  },
+  "proposedBy": "ATM Evolution Loop Demo",
+  "proposedAt": "2026-05-15T00:00:00.000Z"
+}

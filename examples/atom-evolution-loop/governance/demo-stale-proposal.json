@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "1.0.0",
+    "notes": "Demo stale proposal for the atom-evolution-loop walkthrough — blocked by stale gate."
+  },
+  "proposalId": "proposal.atm-example-0003.from-1.0.0.to-1.0.1.atom.stale",
+  "atomId": "ATM-EXAMPLE-0003",
+  "fromVersion": "1.0.0",
+  "toVersion": "1.0.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-spec",
+  "baseAtomVersion": "0.9.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-04-01T00-00-00Z",
+  "reversibility": "rollback-safe",
+  "reviewTemplate": "review.template.atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "demo.stale.non-regression",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-stale-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "demo.stale.quality-comparison",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-stale-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "demo.stale.registry-candidate",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-stale-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "staleProposal": {
+      "passed": false,
+      "reportId": "demo.stale.staleness-check",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-stale-proposal.json",
+      "summary": "blocked (demo: baseAtomVersion=0.9.0 is behind current 1.0.0; proposal is stale)"
+    },
+    "allPassed": false,
+    "blockedGateNames": ["staleProposal"]
+  },
+  "humanReview": "pending",
+  "status": "blocked",
+  "inputs": [
+    {
+      "kind": "evolution-evidence",
+      "path": "examples/atom-evolution-loop/governance/demo-stale-proposal.json#/evidenceGate",
+      "schemaId": "atm.evolutionEvidenceGate",
+      "summary": "demo stale proposal evidence"
+    }
+  ],
+  "evidenceGate": {
+    "requiredSignals": ["recurring-failure"],
+    "matchedEvidenceIds": ["evidence.atm-example-0003.demo.stale.001"],
+    "notes": "Demo: proposal blocked because baseAtomVersion is behind current version — shows stale case."
+  },
+  "proposedBy": "ATM Evolution Loop Demo",
+  "proposedAt": "2026-04-01T00:00:00.000Z"
+}

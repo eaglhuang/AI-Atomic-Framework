@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "1.0.0",
+    "notes": "Demo rejected proposal for the atom-evolution-loop walkthrough — blocked by quality gate."
+  },
+  "proposalId": "proposal.atm-example-0003.from-1.0.0.to-1.0.1.atom.rejected",
+  "atomId": "ATM-EXAMPLE-0003",
+  "fromVersion": "1.0.0",
+  "toVersion": "1.0.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-spec",
+  "baseAtomVersion": "1.0.0",
+  "reversibility": "rollback-safe",
+  "reviewTemplate": "review.template.atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "demo.rejected.non-regression",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-rejected-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "qualityComparison": {
+      "passed": false,
+      "reportId": "demo.rejected.quality-comparison",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-rejected-proposal.json",
+      "summary": "blocked (demo: quality regression detected)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "demo.rejected.registry-candidate",
+      "reportPath": "examples/atom-evolution-loop/governance/demo-rejected-proposal.json",
+      "summary": "pass (demo fixture)"
+    },
+    "allPassed": false,
+    "blockedGateNames": ["qualityComparison"]
+  },
+  "humanReview": "pending",
+  "status": "blocked",
+  "inputs": [
+    {
+      "kind": "evolution-evidence",
+      "path": "examples/atom-evolution-loop/governance/demo-rejected-proposal.json#/evidenceGate",
+      "schemaId": "atm.evolutionEvidenceGate",
+      "summary": "demo rejected proposal evidence"
+    }
+  ],
+  "evidenceGate": {
+    "requiredSignals": ["recurring-failure"],
+    "matchedEvidenceIds": ["evidence.atm-example-0003.demo.rejected.001"],
+    "notes": "Demo: proposal blocked by quality gate — shows rejected case in lifecycle."
+  },
+  "proposedBy": "ATM Evolution Loop Demo",
+  "proposedAt": "2026-05-15T00:00:00.000Z"
+}
