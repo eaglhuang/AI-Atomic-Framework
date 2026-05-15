@@ -73,7 +73,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -263,6 +263,39 @@ try {
   assert(upgradeBlocked.parsed.evidence.proposal.automatedGates.allPassed === false, 'upgrade blocked proposal gates must fail');
   assert(upgradeBlocked.parsed.evidence.blockedGateNames.includes('qualityComparison'), 'upgrade blocked proposal must name qualityComparison');
   assertMessageCode(upgradeBlocked, 'ATM_UPGRADE_PROPOSAL_BLOCKED');
+
+  const upgradeScanEmpty = runAtm([
+    'upgrade',
+    '--scan',
+    '--json',
+    '--proposed-at', '2026-01-01T00:00:00.000Z',
+    '--input', 'fixtures/evolution/evidence-patterns/no-signal.json'
+  ], root);
+  assert(upgradeScanEmpty.exitCode === 0, 'upgrade --scan empty report must exit 0');
+  assertReadable(upgradeScanEmpty, 'upgrade');
+  assert(upgradeScanEmpty.parsed.ok === true, 'upgrade --scan empty report must report ok=true');
+  assert(upgradeScanEmpty.parsed.evidence.dryRun === true, 'upgrade --scan empty report must be dry-run');
+  assert(upgradeScanEmpty.parsed.evidence.proposalDraftCount === 0, 'upgrade --scan empty report must not emit drafts');
+  assertMessageCode(upgradeScanEmpty, 'ATM_EVIDENCE_SCAN_EMPTY');
+
+  const upgradeScanDraft = runAtm([
+    'upgrade',
+    '--scan',
+    '--json',
+    '--proposed-at', '2026-01-01T00:00:00.000Z',
+    '--input', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json'
+  ], root);
+  assert(upgradeScanDraft.exitCode === 0, 'upgrade --scan proposal draft must exit 0');
+  assertReadable(upgradeScanDraft, 'upgrade');
+  assert(upgradeScanDraft.parsed.ok === true, 'upgrade --scan proposal draft must report ok=true');
+  assert(upgradeScanDraft.parsed.evidence.dryRun === true, 'upgrade --scan proposal draft must remain dry-run');
+  assert(upgradeScanDraft.parsed.evidence.proposalDraftCount === 1, 'upgrade --scan proposal draft must emit one draft');
+  assert(upgradeScanDraft.parsed.evidence.proposalDrafts[0].proposal.proposalSource === 'evidence-driven', 'upgrade --scan proposal draft must use evidence-driven source');
+  assert(upgradeScanDraft.parsed.evidence.proposalDrafts[0].proposal.targetSurface === 'atom-spec', 'upgrade --scan proposal draft must target atom-spec');
+  assert(upgradeScanDraft.parsed.evidence.proposalDrafts[0].proposal.baseAtomVersion === '0.1.0', 'upgrade --scan proposal draft must resolve current atom version');
+  assert(upgradeScanDraft.parsed.evidence.proposalDrafts[0].proposal.toVersion === '0.1.1', 'upgrade --scan proposal draft must bump patch version');
+  assert(upgradeScanDraft.parsed.evidence.proposalDrafts[0].groupIds.includes('evidence-pattern.atom.atm-core-0001.2026-w20.recurring-failure'), 'upgrade --scan proposal draft must keep the candidate group id');
+  assertMessageCode(upgradeScanDraft, 'ATM_EVIDENCE_SCAN_READY');
 
   const rollbackRepo = path.join(tempRoot, 'rollback-repo');
   mkdirSync(rollbackRepo, { recursive: true });

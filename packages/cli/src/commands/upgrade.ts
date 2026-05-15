@@ -8,12 +8,16 @@ import {
   estimateContextBudgetTokens
 } from '../../../plugin-governance-local/src/index.ts';
 import { renderQualityReportMarkdown } from '../../../core/src/police/regression-compare.ts';
+import { scanEvidencePatternReports } from '../../../core/src/upgrade/evolution-draft.ts';
 import { proposeAtomicUpgrade } from '../../../core/src/upgrade/propose.ts';
 import { runUpgradeMapPropose } from './upgrade-map-propose.ts';
 import { CliError, makeResult, message, readJsonFile, resolveValue } from './shared.ts';
 
 export async function runUpgrade(argv: any) {
   const options = parseUpgradeOptions(argv);
+  if (options.scan) {
+    return runUpgradeScan(options);
+  }
   const inputDocuments = options.inputPaths.length > 0
     ? loadExplicitInputDocuments(options.cwd, options.inputPaths)
     : discoverInputDocuments(options.cwd);
@@ -73,10 +77,64 @@ export async function runUpgrade(argv: any) {
   });
 }
 
+async function runUpgradeScan(options: any) {
+  const detectorReports = options.inputPaths.length > 0
+    ? loadExplicitInputDocuments(options.cwd, options.inputPaths)
+    : discoverDetectorReportDocuments(options.cwd);
+
+  if (detectorReports.length === 0) {
+    throw new CliError('ATM_EVIDENCE_SCAN_INPUTS_NOT_FOUND', 'Upgrade scan requires detector reports. Provide --input paths or stage detector reports under .atm/history/reports.', {
+      exitCode: 2,
+      details: { reportsRoot: path.join(options.cwd, '.atm', 'history', 'reports') }
+    });
+  }
+
+  const scanReport = scanEvidencePatternReports({
+    repositoryRoot: options.cwd,
+    detectorReports: detectorReports.map((entry: any) => ({
+      path: entry.path,
+      document: entry.document
+    })),
+    proposedBy: options.proposedBy,
+    proposedAt: options.proposedAt,
+    dryRun: true
+  });
+
+  const proposalDrafts = scanReport.proposalDrafts;
+  return makeResult({
+    ok: true,
+    command: 'upgrade',
+    cwd: options.cwd,
+    messages: [
+      proposalDrafts.length === 0
+        ? message('info', 'ATM_EVIDENCE_SCAN_EMPTY', 'Evidence scan completed with no proposal candidates.', {
+          scanId: scanReport.scanId,
+          detectorReportCount: scanReport.detectorReports.length
+        })
+        : message('info', 'ATM_EVIDENCE_SCAN_READY', 'Evidence scan produced dry-run proposal drafts.', {
+          scanId: scanReport.scanId,
+          proposalDraftCount: proposalDrafts.length,
+          proposalIds: proposalDrafts.map((draft: any) => draft.proposal.proposalId)
+        })
+    ],
+    evidence: {
+      scanReport,
+      proposalDrafts,
+      observationReport: scanReport.observation,
+      dryRun: true,
+      detectorReportCount: scanReport.detectorReports.length,
+      proposalDraftCount: proposalDrafts.length,
+      inputKinds: detectorReports.map((entry: any) => entry.document.schemaId),
+      inputCount: detectorReports.length
+    }
+  });
+}
+
 function parseUpgradeOptions(argv: any) {
   const options: any = {
     cwd: process.cwd(),
     propose: false,
+    scan: false,
     dryRun: false,
     atomId: null,
     fromVersion: null,
@@ -102,6 +160,10 @@ function parseUpgradeOptions(argv: any) {
     }
     if (arg === '--propose') {
       options.propose = true;
+      continue;
+    }
+    if (arg === '--scan') {
+      options.scan = true;
       continue;
     }
     if (arg === '--dry-run') {
@@ -187,20 +249,22 @@ function parseUpgradeOptions(argv: any) {
     }
   }
 
-  if (!options.propose) {
-    throw new CliError('ATM_CLI_USAGE', 'upgrade requires --propose', { exitCode: 2 });
+  if (!options.propose && !options.scan) {
+    throw new CliError('ATM_CLI_USAGE', 'upgrade requires --propose or --scan', { exitCode: 2 });
   }
-  if (!options.atomId) {
-    throw new CliError('ATM_CLI_USAGE', 'upgrade requires --atom', { exitCode: 2 });
-  }
-  if (!options.toVersion) {
-    throw new CliError('ATM_CLI_USAGE', 'upgrade requires --to', { exitCode: 2 });
-  }
-  if (options.target.kind === 'map' && !options.target.mapId) {
-    throw new CliError('ATM_CLI_USAGE', 'upgrade --target map requires --map', { exitCode: 2 });
-  }
-  if (options.fork && (!options.fork.sourceAtomId || !options.fork.newAtomId)) {
-    throw new CliError('ATM_CLI_USAGE', 'upgrade fork mode requires both --fork-source and --new-atom-id', { exitCode: 2 });
+  if (options.propose) {
+    if (!options.atomId) {
+      throw new CliError('ATM_CLI_USAGE', 'upgrade requires --atom', { exitCode: 2 });
+    }
+    if (!options.toVersion) {
+      throw new CliError('ATM_CLI_USAGE', 'upgrade requires --to', { exitCode: 2 });
+    }
+    if (options.target.kind === 'map' && !options.target.mapId) {
+      throw new CliError('ATM_CLI_USAGE', 'upgrade --target map requires --map', { exitCode: 2 });
+    }
+    if (options.fork && (!options.fork.sourceAtomId || !options.fork.newAtomId)) {
+      throw new CliError('ATM_CLI_USAGE', 'upgrade fork mode requires both --fork-source and --new-atom-id', { exitCode: 2 });
+    }
   }
 
   return {
@@ -213,11 +277,20 @@ function parseUpgradeOptions(argv: any) {
 function loadExplicitInputDocuments(cwd: any, inputPaths: any) {
   return inputPaths.map((inputPath: any) => {
     const resolvedPath = path.isAbsolute(inputPath) ? inputPath : path.resolve(cwd, inputPath);
+    const rawDocument = readJsonFile(resolvedPath, 'ATM_UPGRADE_INPUT_NOT_FOUND');
+    const document = normalizeUpgradeInputDocument(rawDocument);
     return {
       path: path.relative(cwd, resolvedPath).replace(/\\/g, '/'),
-      document: readJsonFile(resolvedPath, 'ATM_UPGRADE_INPUT_NOT_FOUND')
+      document
     };
   });
+}
+
+function normalizeUpgradeInputDocument(document: any) {
+  if (document && typeof document === 'object' && !Array.isArray(document) && document.expectedReport && !document.schemaId) {
+    return document.expectedReport;
+  }
+  return document;
 }
 
 function discoverInputDocuments(cwd: any) {
@@ -251,6 +324,21 @@ function discoverInputDocuments(cwd: any) {
   }
 
   return inputDocuments;
+}
+
+function discoverDetectorReportDocuments(cwd: any) {
+  const reportsRoot = path.join(cwd, '.atm', 'history', 'reports');
+  if (!existsSync(reportsRoot)) {
+    return [];
+  }
+
+  const discoveredFiles = collectJsonFiles(reportsRoot).sort((left: any, right: any) => left.localeCompare(right));
+  return discoveredFiles
+    .map((filePath: any) => ({
+      path: path.relative(cwd, filePath).replace(/\\/g, '/'),
+      document: readJsonFile(filePath, 'ATM_EVIDENCE_SCAN_INPUT_NOT_FOUND')
+    }))
+    .filter((entry: any) => entry.document?.schemaId === 'atm.evidencePatternDetectorReport');
 }
 
 async function evaluateUpgradeContextBudget(options: any, inputDocuments: any) {
@@ -454,6 +542,8 @@ function inferInputKind(schemaId: any) {
       return 'quality-comparison';
     case 'atm.police.registryCandidateReport':
       return 'registry-candidate';
+    case 'atm.evidencePatternDetectorReport':
+      return 'evidence-pattern-report';
     default:
       return null;
   }

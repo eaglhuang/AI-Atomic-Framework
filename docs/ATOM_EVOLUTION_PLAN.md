@@ -285,11 +285,11 @@ Checklist：
 
 Checklist：
 
-- [ ] CLI 預設 dry-run。
-- [ ] 缺少 evidence IDs 時不產 proposal。
-- [ ] 缺少 friction evidence 時不產 proposal。
-- [ ] Proposal draft 包含 `targetSurface`。
-- [ ] Draft 只進 queue 或 output path，不 promote。
+- [x] CLI 預設 dry-run。
+- [x] 缺少 evidence IDs 時不產 proposal。
+- [x] 缺少 friction evidence 時不產 proposal。
+- [x] Proposal draft 包含 `targetSurface`。
+- [x] Draft 只進 queue 或 output path，不 promote。
 
 驗證：
 
