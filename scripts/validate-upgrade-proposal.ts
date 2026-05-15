@@ -22,6 +22,10 @@ const mapBumpFixturePath = 'fixtures/upgrade/map-bump-proposal.json';
 const atomExtractFixturePath = 'fixtures/upgrade/atom-extract-proposal.json';
 const evidenceDrivenFixturePath = 'fixtures/upgrade/evidence-driven-proposal.json';
 const staleFixturePath = 'fixtures/upgrade/stale-proposal.json';
+const mapCuratorComposeFixturePath = 'fixtures/upgrade/map-curator-compose-proposal.json';
+const mapCuratorMergeFixturePath = 'fixtures/upgrade/map-curator-merge-proposal.json';
+const mapCuratorDedupMergeFixturePath = 'fixtures/upgrade/map-curator-dedup-merge-proposal.json';
+const mapCuratorSweepFixturePath = 'fixtures/upgrade/map-curator-sweep-proposal.json';
 const scanSchemaPath = 'schemas/governance/evolution-scan-report.schema.json';
 const inputPaths = {
   hashDiff: 'fixtures/upgrade/hash-diff-report.json',
@@ -134,7 +138,7 @@ function assertCliContextBudgetGate(result: any, expectedPassed: any) {
   }
 }
 
-for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
+for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, mapCuratorComposeFixturePath, mapCuratorMergeFixturePath, mapCuratorDedupMergeFixturePath, mapCuratorSweepFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
 
@@ -157,6 +161,10 @@ check(schema.properties.targetSurface.enum.includes('atom-spec'), 'schema must i
 check(schema.properties.reversibility.enum.includes('rollback-safe'), 'schema must include rollback-safe reversibility');
 check(schema.$defs?.inputRef?.properties?.kind?.enum?.includes('evolution-evidence'), 'schema must include evolution-evidence input kind');
 check(schema.$defs?.automatedGates?.properties?.staleProposal, 'schema must expose staleProposal gate');
+check(schema.$defs?.automatedGates?.properties?.mutabilityPolicy, 'schema must expose mutabilityPolicy gate for curator proposals');
+check(schema.properties.sourceAtomIds, 'schema must expose sourceAtomIds for merge and sweep proposals');
+check(schema.properties.targetAtomId, 'schema must expose targetAtomId for merge proposals');
+check(schema.properties.sweepPlan, 'schema must expose sweepPlan for archive-only sweep proposals');
 check(scanSchema.required.includes('scanId'), 'scan schema must require scanId');
 check(scanSchema.properties?.scanMode?.const === 'dry-run', 'scan schema must enforce dry-run scanMode');
 check(scanSchema.$defs?.proposalDraftBundleItem?.properties?.proposal?.$ref === 'https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json', 'scan schema must reference upgrade proposal schema');
@@ -173,22 +181,42 @@ const expectedMapBump = readJson(mapBumpFixturePath);
 const expectedAtomExtract = readJson(atomExtractFixturePath);
 const expectedEvidenceDriven = readJson(evidenceDrivenFixturePath);
 const expectedStale = readJson(staleFixturePath);
+const expectedMapCuratorCompose = readJson(mapCuratorComposeFixturePath);
+const expectedMapCuratorMerge = readJson(mapCuratorMergeFixturePath);
+const expectedMapCuratorDedupMerge = readJson(mapCuratorDedupMergeFixturePath);
+const expectedMapCuratorSweep = readJson(mapCuratorSweepFixturePath);
 validateWithSchema(expectedPass, validate, 'proposal-pass fixture');
 validateWithSchema(expectedBlocked, validate, 'proposal-blocked fixture');
 validateWithSchema(expectedMapBump, validate, 'map-bump fixture');
 validateWithSchema(expectedAtomExtract, validate, 'atom-extract fixture');
 validateWithSchema(expectedEvidenceDriven, validate, 'evidence-driven fixture');
 validateWithSchema(expectedStale, validate, 'stale proposal fixture');
+validateWithSchema(expectedMapCuratorCompose, validate, 'map-curator compose fixture');
+validateWithSchema(expectedMapCuratorMerge, validate, 'map-curator merge fixture');
+validateWithSchema(expectedMapCuratorDedupMerge, validate, 'map-curator dedup-merge fixture');
+validateWithSchema(expectedMapCuratorSweep, validate, 'map-curator sweep fixture');
 assertInvariants(expectedPass, 'pending');
 assertInvariants(expectedBlocked, 'blocked');
 assertInvariants(expectedMapBump, 'pending');
 assertInvariants(expectedAtomExtract, 'pending');
 assertInvariants(expectedEvidenceDriven, 'pending');
 assertInvariants(expectedStale, 'blocked');
+assertInvariants(expectedMapCuratorCompose, 'pending');
+assertInvariants(expectedMapCuratorMerge, 'pending');
+assertInvariants(expectedMapCuratorDedupMerge, 'blocked');
+assertInvariants(expectedMapCuratorSweep, 'pending');
 check(expectedEvidenceDriven.proposalSource === 'evidence-driven', 'evidence-driven fixture must declare proposalSource');
 check(expectedEvidenceDriven.targetSurface === 'atom-spec', 'evidence-driven fixture must target atom-spec');
 check(expectedEvidenceDriven.evidenceGate?.matchedEvidenceIds?.length >= 1, 'evidence-driven fixture must cite evidence IDs');
 check(expectedStale.automatedGates.blockedGateNames.includes('staleProposal'), 'stale fixture must block on staleProposal');
+check(expectedMapCuratorCompose.behaviorId === 'behavior.compose' && expectedMapCuratorCompose.members.length >= 2, 'map-curator compose fixture must list members');
+check(expectedMapCuratorMerge.behaviorId === 'behavior.merge' && expectedMapCuratorMerge.sourceAtomIds.length >= 1 && expectedMapCuratorMerge.targetAtomId, 'map-curator merge fixture must list source atoms and target atom');
+check(expectedMapCuratorDedupMerge.behaviorId === 'behavior.dedup-merge' && expectedMapCuratorDedupMerge.automatedGates.blockedGateNames.includes('mutabilityPolicy'), 'map-curator dedup-merge fixture must block immutable target auto-promotion');
+check(expectedMapCuratorSweep.behaviorId === 'behavior.sweep' && expectedMapCuratorSweep.sweepPlan.deletionAllowed === false, 'map-curator sweep fixture must be archive-only and never delete atoms');
+for (const proposal of [expectedMapCuratorCompose, expectedMapCuratorMerge, expectedMapCuratorDedupMerge, expectedMapCuratorSweep]) {
+  check(proposal.inputs.some((entry: any) => entry.kind === 'evolution-evidence'), `${proposal.proposalId} must cite evolution evidence input`);
+  check(proposal.evidenceGate?.matchedEvidenceIds?.length >= 1, `${proposal.proposalId} must cite evidence ids`);
+}
 
 const generatedPass = proposeAtomicUpgrade({
   atomId: 'ATM-CORE-0001',

@@ -1,0 +1,38 @@
+{
+  "input": {
+    "repositoryRoot": ".",
+    "reportPath": "fixtures/evolution/map-curator/input-output-overlap.json",
+    "generatedAt": "2026-05-15T12:10:00.000Z",
+    "proposedBy": "ATM Atom Map Curator",
+    "inputOutputOverlaps": [
+      {
+        "overlapId": "input-output-overlap-merge",
+        "mode": "merge",
+        "sourceAtomIds": ["ATM-CORE-0003", "ATM-CORE-0004"],
+        "targetAtomId": "ATM-CORE-0001",
+        "overlapScore": 0.86,
+        "evidenceIds": [
+          "evidence.map-curator.overlap.merge.001",
+          "evidence.map-curator.overlap.merge.002"
+        ],
+        "targetMapId": "ATM-MAP-0002",
+        "confidence": 0.88,
+        "targetMutabilityPolicy": "mutable"
+      },
+      {
+        "overlapId": "input-output-overlap-dedup",
+        "mode": "dedup-merge",
+        "sourceAtomIds": ["ATM-CORE-0004", "ATM-FIXTURE-0001"],
+        "targetAtomId": "ATM-CORE-0003",
+        "overlapScore": 0.93,
+        "evidenceIds": [
+          "evidence.map-curator.overlap.dedup.001",
+          "evidence.map-curator.overlap.dedup.002"
+        ],
+        "targetMapId": "ATM-MAP-0002",
+        "confidence": 0.9,
+        "targetMutabilityPolicy": "immutable"
+      }
+    ]
+  }
+}

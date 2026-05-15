@@ -91,6 +91,22 @@
     "mapImpactScope": {
       "$ref": "#/$defs/mapImpactScope"
     },
+    "sourceAtomIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+      }
+    },
+    "targetAtomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "sweepPlan": {
+      "$ref": "#/$defs/sweepPlan"
+    },
     "fork": {
       "$ref": "#/$defs/fork"
     },
@@ -351,6 +367,9 @@
         "breakingHumanReview": {
           "$ref": "#/$defs/gateResult"
         },
+        "mutabilityPolicy": {
+          "$ref": "#/$defs/gateResult"
+        },
         "allPassed": {
           "type": "boolean"
         },
@@ -358,7 +377,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy"]
           }
         }
       }
@@ -531,6 +550,32 @@
               "const": "evolution"
             }
           }
+        }
+      }
+    },
+    "sweepPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "candidateAtomIds", "deletionAllowed", "reason"],
+      "properties": {
+        "mode": {
+          "const": "archive-only"
+        },
+        "candidateAtomIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+          }
+        },
+        "deletionAllowed": {
+          "const": false
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }

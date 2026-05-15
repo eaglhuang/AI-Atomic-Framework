@@ -1,0 +1,100 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "0.1.0",
+    "notes": "Atom Map curator generated behavior.sweep proposal from zero-caller-sweep signal."
+  },
+  "proposalId": "proposal.map-curator.sweep.recurring-failure-sweep",
+  "atomId": "ATM-CORE-0003",
+  "fromVersion": "0.1.0",
+  "toVersion": "0.1.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.sweep",
+  "target": {
+    "kind": "map",
+    "mapId": "ATM-MAP-0002"
+  },
+  "decompositionDecision": "map-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-map",
+  "baseMapVersion": "0.1.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T12-20-00Z",
+  "reversibility": "rollback-safe",
+  "evidenceGate": {
+    "requiredSignals": ["recurring-failure"],
+    "matchedEvidenceIds": [
+      "evidence.map-curator.failure.sweep.001",
+      "evidence.map-curator.failure.sweep.002"
+    ],
+    "rejectedEvidenceIds": [],
+    "notes": "Derived from Atom Map curator candidate recurring-failure-sweep."
+  },
+  "reviewTemplate": "review.template.map-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "map-curator.nonRegression",
+      "reportPath": "fixtures/evolution/map-curator/recurring-failure-cluster.json",
+      "summary": "pass (curator dry-run did not re-run non-regression)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "map-curator.qualityComparison",
+      "reportPath": "fixtures/evolution/map-curator/recurring-failure-cluster.json",
+      "summary": "pass (curator dry-run did not re-run quality comparison)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "map-curator.registryCandidate",
+      "reportPath": "fixtures/evolution/map-curator/recurring-failure-cluster.json",
+      "summary": "pass (curator produced a reviewable registry candidate)"
+    },
+    "mutabilityPolicy": {
+      "passed": true,
+      "reportId": "map-curator.mutability.recurring-failure-sweep",
+      "reportPath": "fixtures/evolution/map-curator/recurring-failure-cluster.json",
+      "summary": "pass (target mutability policy allows a reviewable dry-run proposal)"
+    },
+    "allPassed": true,
+    "blockedGateNames": []
+  },
+  "humanReview": "pending",
+  "status": "pending",
+  "inputs": [
+    {
+      "kind": "evolution-evidence",
+      "path": "fixtures/evolution/map-curator/recurring-failure-cluster.json",
+      "schemaId": "atm.atomMapCuratorReport",
+      "reportId": "proposal.map-curator.sweep.recurring-failure-sweep.curator-report",
+      "summary": "zero-caller-sweep input for behavior.sweep"
+    }
+  ],
+  "mapImpactScope": {
+    "affectedMapIds": ["ATM-MAP-0002"],
+    "propagationStatus": [
+      {
+        "mapId": "ATM-MAP-0002",
+        "integrationTestPassed": true,
+        "message": "Curator dry-run; map integration must run before promotion."
+      }
+    ]
+  },
+  "members": [
+    {
+      "from": "ATM-CORE-0003@0.1.0",
+      "to": "ATM-CORE-0003@0.1.0"
+    }
+  ],
+  "sourceAtomIds": ["ATM-CORE-0003"],
+  "sweepPlan": {
+    "mode": "archive-only",
+    "candidateAtomIds": ["ATM-CORE-0003"],
+    "deletionAllowed": false,
+    "reason": "Zero-caller recurring failure cluster; archive instead of delete."
+  },
+  "generatorProvenance": "atom-map-curator.detector-v1",
+  "proposedBy": "ATM Atom Map Curator",
+  "proposedAt": "2026-05-15T12:20:00.000Z"
+}

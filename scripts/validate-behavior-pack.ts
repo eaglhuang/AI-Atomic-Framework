@@ -73,6 +73,36 @@ const expectedActions = [
   'behavior.atomize'
 ];
 
+const mapCuratorProposalPaths = [
+  'fixtures/upgrade/map-curator-compose-proposal.json',
+  'fixtures/upgrade/map-curator-merge-proposal.json',
+  'fixtures/upgrade/map-curator-dedup-merge-proposal.json',
+  'fixtures/upgrade/map-curator-sweep-proposal.json'
+];
+for (const fixturePath of mapCuratorProposalPaths) {
+  assert(existsSync(path.join(root, fixturePath)), `missing M5 map curator proposal fixture: ${fixturePath}`);
+}
+
+const mapCuratorComposeProposal = readJson('fixtures/upgrade/map-curator-compose-proposal.json');
+const mapCuratorMergeProposal = readJson('fixtures/upgrade/map-curator-merge-proposal.json');
+const mapCuratorDedupMergeProposal = readJson('fixtures/upgrade/map-curator-dedup-merge-proposal.json');
+const mapCuratorSweepProposal = readJson('fixtures/upgrade/map-curator-sweep-proposal.json');
+assert(mapCuratorComposeProposal.behaviorId === 'behavior.compose', 'M5 compose proposal must use behavior.compose');
+assert(mapCuratorComposeProposal.members.length >= 2, 'M5 compose proposal must list composed members');
+assert(mapCuratorMergeProposal.behaviorId === 'behavior.merge', 'M5 merge proposal must use behavior.merge');
+assert(mapCuratorMergeProposal.sourceAtomIds.length >= 1, 'M5 merge proposal must list source atoms');
+assert(Boolean(mapCuratorMergeProposal.targetAtomId), 'M5 merge proposal must list target atom');
+assert(mapCuratorDedupMergeProposal.behaviorId === 'behavior.dedup-merge', 'M5 dedup proposal must use behavior.dedup-merge');
+assert(mapCuratorDedupMergeProposal.status === 'blocked', 'M5 immutable dedup proposal must be blocked');
+assert(mapCuratorDedupMergeProposal.automatedGates.blockedGateNames.includes('mutabilityPolicy'), 'M5 immutable dedup proposal must block on mutabilityPolicy');
+assert(mapCuratorSweepProposal.behaviorId === 'behavior.sweep', 'M5 sweep proposal must use behavior.sweep');
+assert(mapCuratorSweepProposal.sweepPlan.mode === 'archive-only', 'M5 sweep proposal must be archive-only');
+assert(mapCuratorSweepProposal.sweepPlan.deletionAllowed === false, 'M5 sweep proposal must not delete atoms');
+for (const proposal of [mapCuratorComposeProposal, mapCuratorMergeProposal, mapCuratorDedupMergeProposal, mapCuratorSweepProposal]) {
+  assert(proposal.inputs.some((entry: any) => entry.kind === 'evolution-evidence'), `${proposal.proposalId} must cite evolution evidence input`);
+  assert(proposal.evidenceGate.matchedEvidenceIds.length >= 1, `${proposal.proposalId} must cite matched evidence IDs`);
+}
+
 const registry = new BehaviorRegistry();
 
 for (const behaviorEntry of entries) {
@@ -165,4 +195,4 @@ if (failed) {
   process.exit(1);
 }
 
-console.log(`[behavior-pack:${mode}] ok (${entries.length} behaviors from consolidated pack, ${expectedActions.length} actions, fixture replay passed)`);
+console.log(`[behavior-pack:${mode}] ok (${entries.length} behaviors from consolidated pack, ${expectedActions.length} actions, fixture replay passed, M5 map curator proposal fixtures verified)`);
