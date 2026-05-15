@@ -11,7 +11,7 @@ export function runNext(argv: any) {
   if (activeGuidanceSession) {
     const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
     const legacyPlan = activeGuidanceSession.legacyRoutePlan ?? null;
-    const nextAction = legacyPlan ? enrichWithLegacyPlan(baseAction, legacyPlan) : baseAction;
+    const nextAction = legacyPlan ? enrichWithLegacyPlan(baseAction, legacyPlan, activeGuidanceSession.sessionId) : baseAction;
     return makeResult({
       ok: nextAction.status !== 'blocked',
       command: 'next',
@@ -131,7 +131,7 @@ function blockedMutationCommands() {
   ];
 }
 
-function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan): GuidanceNextAction {
+function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {
   const safeSegments = plan.segments.filter((s: LegacyRoutePlanSegment) => plan.safeFirstAtoms.includes(s.symbolName));
   const preferredSegment: LegacyRoutePlanSegment | null =
     safeSegments.find((s: LegacyRoutePlanSegment) => s.recommendedBehavior === 'split')
@@ -149,10 +149,22 @@ function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan): 
     };
   }
 
+  const legacyTarget = `${plan.targetFile}#${preferredSegment.symbolName}`;
+  const command = `node atm.mjs upgrade --propose --behavior behavior.${preferredSegment.recommendedBehavior} --legacy-target ${quoteCliValue(legacyTarget)} --guidance-session ${quoteCliValue(sessionId)} --dry-run --json`;
+
   return {
     ...base,
     status: 'action',
+    command,
+    allowedCommands: Array.from(new Set([...base.allowedCommands, command])),
     selectedSegment: preferredSegment.symbolName,
+    legacyTarget,
+    targetFile: plan.targetFile,
+    selectedBehavior: preferredSegment.recommendedBehavior,
     blockedSegments
   };
+}
+
+function quoteCliValue(value: string): string {
+  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
