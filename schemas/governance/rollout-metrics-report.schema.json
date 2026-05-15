@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.ai-atomic-framework.dev/governance/rollout-metrics-report.schema.json",
   "title": "ATM Rollout Metrics Report v0.1",
-  "description": "Tracks proposal acceptance rates, stale rates, blocked-reason distributions, curator merge accuracy, and configuration parameters for the ATM atom evolution rollout.",
+  "description": "Tracks proposal precision, acceptance rates, stale rates, false-positive review results, blocked-reason distributions, curator merge accuracy, rollback rates, optional cost/budget usage, and configuration parameters for the ATM atom evolution rollout.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -48,10 +48,15 @@
         "totalProposed",
         "accepted",
         "blocked",
+        "pending",
         "stale",
+        "precisionRate",
         "acceptanceRate",
         "staleRate",
-        "blockedReasonCounts"
+        "blockedReasonCounts",
+        "falsePositiveReview",
+        "promotionLatencyP50Ms",
+        "promotionLatencyP95Ms"
       ],
       "properties": {
         "totalProposed": {
@@ -69,10 +74,21 @@
           "minimum": 0,
           "description": "Proposals blocked by one or more automated gates."
         },
+        "pending": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals still awaiting review or promotion decision in this window."
+        },
         "stale": {
           "type": "integer",
           "minimum": 0,
           "description": "Proposals that were blocked specifically by the staleProposal gate."
+        },
+        "precisionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Proposal precision estimate from human false-positive sampling: (reviewed - confirmedFalsePositive) / reviewed."
         },
         "acceptanceRate": {
           "type": "number",
@@ -93,6 +109,42 @@
             "minimum": 0
           },
           "description": "Map of gate name → count of proposals it blocked (可分類)."
+        },
+        "falsePositiveReview": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reviewed",
+            "confirmedFalsePositive",
+            "falsePositiveRate",
+            "reasonCounts"
+          ],
+          "properties": {
+            "reviewed": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of proposals sampled by human review for false-positive classification."
+            },
+            "confirmedFalsePositive": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Sampled proposals confirmed as false positives."
+            },
+            "falsePositiveRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "confirmedFalsePositive / reviewed."
+            },
+            "reasonCounts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "description": "False-positive reason → count from sampled human review."
+            }
+          }
         },
         "promotionLatencyP50Ms": {
           "type": "number",
@@ -134,13 +186,13 @@
         "rollbackCount": {
           "type": "integer",
           "minimum": 0,
-          "description": "How many promoted changes were rolled back in this window (optional)."
+          "description": "How many promoted changes were rolled back in this window."
         },
         "rollbackRate": {
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "rollbackCount / mergeProposalsTotal (optional)."
+          "description": "rollbackCount / mergeProposalsTotal."
         }
       }
     },
@@ -165,6 +217,45 @@
           "minimum": 0,
           "maximum": 1,
           "description": "Minimum confidence score required to auto-propose."
+        }
+      }
+    },
+    "costBudgetMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "budgetLimit",
+        "actualUsage",
+        "remainingBudget",
+        "overBudget"
+      ],
+      "properties": {
+        "unit": {
+          "enum": ["tokens", "credits", "usd", "milliseconds"],
+          "description": "Host-provided cost or budget unit."
+        },
+        "budgetLimit": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Configured rollout budget for this window."
+        },
+        "actualUsage": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Observed usage consumed by rollout activity in this window."
+        },
+        "remainingBudget": {
+          "type": "number",
+          "minimum": 0,
+          "description": "budgetLimit - actualUsage, floored at 0."
+        },
+        "overBudget": {
+          "type": "boolean",
+          "description": "True when actualUsage exceeds budgetLimit."
+        },
+        "notes": {
+          "type": "string"
         }
       }
     }
