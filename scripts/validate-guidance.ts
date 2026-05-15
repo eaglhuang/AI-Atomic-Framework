@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { atomizeBehavior } from '../packages/plugin-behavior-pack/src/atomize.ts';
 import { infectBehavior } from '../packages/plugin-behavior-pack/src/infect.ts';
@@ -254,5 +254,84 @@ try {
   mismatchThrew = true;
 }
 assert(mismatchThrew, 'behaviorId/decompositionDecision mismatch must hard fail');
+
+// ── Phase: config-driven legacy hotspot guidance ──────────────────────────────
+const downstreamFixtureRoot = path.join(root, 'tests/guidance-fixtures/downstream-legacy-config');
+requireFile('tests/guidance-fixtures/downstream-legacy-config/.atm/config.json', 'missing downstream config fixture');
+requireFile('tests/guidance-fixtures/downstream-legacy-config/src/downstream-helper.js', 'missing downstream helper fixture');
+
+const downstreamOrientation = probeProject(downstreamFixtureRoot);
+assert(Array.isArray(downstreamOrientation.configLegacyHotspots) && downstreamOrientation.configLegacyHotspots.length > 0,
+  'config hotspot fixture must surface configLegacyHotspots');
+assert(downstreamOrientation.configLegacyHotspots[0].path === 'src/downstream-helper.js',
+  'config hotspot path must match fixture');
+assert(downstreamOrientation.configLegacyHotspots[0].releaseBlockers.includes('processRequest'),
+  'config hotspot must declare processRequest as release blocker');
+assert(downstreamOrientation.defaultLegacyFlow === 'shadow',
+  'config must declare defaultLegacyFlow=shadow');
+assert(downstreamOrientation.noTouchZones.some((z) => z.path.includes('processRequest')),
+  'config no-touch zones must be merged into orientation.noTouchZones');
+
+const downstreamTemp = createTempWorkspace('atm-downstream-');
+try {
+  const downstreamCwd = path.join(downstreamTemp, 'downstream');
+  mkdirSync(path.join(downstreamCwd, '.atm'), { recursive: true });
+  mkdirSync(path.join(downstreamCwd, 'src'), { recursive: true });
+  writeFileSync(
+    path.join(downstreamCwd, '.atm', 'config.json'),
+    readFileSync(path.join(downstreamFixtureRoot, '.atm', 'config.json'))
+  );
+  writeFileSync(
+    path.join(downstreamCwd, 'src', 'downstream-helper.js'),
+    readFileSync(path.join(downstreamFixtureRoot, 'src', 'downstream-helper.js'))
+  );
+
+  // start --target-file --release-blocker --legacy-flow
+  const startLegacy = runAtmJson([
+    'start', '--cwd', downstreamCwd,
+    '--goal', 'extract leaf helper from downstream legacy',
+    '--target-file', 'src/downstream-helper.js',
+    '--release-blocker', 'processRequest',
+    '--legacy-flow', '--json'
+  ]);
+  assert(startLegacy.exitCode === 0, 'start --target-file --legacy-flow must exit 0');
+  assert(typeof startLegacy.parsed.evidence?.sessionId === 'string', 'start --legacy-flow must create sessionId');
+  const storedPlan = startLegacy.parsed.evidence?.legacyRoutePlan
+    ?? startLegacy.parsed.evidence?.session?.legacyRoutePlan;
+  assert(storedPlan?.schemaId === 'atm.legacyRoutePlan', 'start --legacy-flow must produce LegacyRoutePlan');
+  assert(Array.isArray(storedPlan?.trunkFunctions) && storedPlan.trunkFunctions.includes('processRequest'),
+    'processRequest must be classified as trunk function');
+  assert(Array.isArray(storedPlan?.safeFirstAtoms) && storedPlan.safeFirstAtoms.length > 0,
+    'fixture must have at least one safe leaf atom');
+
+  // next -- active session with legacyRoutePlan must return selectedSegment / blockedSegments
+  const nextLegacy = runAtmJson(['next', '--cwd', downstreamCwd, '--json']);
+  assert(nextLegacy.exitCode === 0, 'next with active legacy session must exit 0');
+  const nextAction = nextLegacy.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
+  assert(typeof nextAction?.selectedSegment === 'string',
+    'next must return selectedSegment from LegacyRoutePlan');
+  assert(Array.isArray(nextAction?.blockedSegments),
+    'next must return blockedSegments from LegacyRoutePlan');
+  assert((nextAction?.blockedSegments as string[]).includes('processRequest'),
+    'blockedSegments must include trunk processRequest');
+  assert(nextAction?.selectedSegment !== 'processRequest',
+    'selectedSegment must not be the trunk function');
+
+  // start --legacy-flow with config hotspot (no --target-file)
+  const startConfigFlow = runAtmJson([
+    'start', '--cwd', downstreamCwd,
+    '--goal', 'refactor first config hotspot via legacy flow',
+    '--legacy-flow', '--json'
+  ]);
+  assert(startConfigFlow.exitCode === 0, 'start --legacy-flow with config hotspot must exit 0');
+  const configFlowPlan = startConfigFlow.parsed.evidence?.legacyRoutePlan
+    ?? startConfigFlow.parsed.evidence?.session?.legacyRoutePlan;
+  assert(configFlowPlan?.schemaId === 'atm.legacyRoutePlan',
+    'config-driven legacy-flow must produce LegacyRoutePlan');
+  assert(Array.isArray(configFlowPlan?.trunkFunctions) && configFlowPlan.trunkFunctions.includes('processRequest'),
+    'config release blocker must classify processRequest as trunk');
+} finally {
+  rmSync(downstreamTemp, { recursive: true, force: true });
+}
 
 ok('orientation, reference legacy route plans, CLI session flow, mutation gate, and proposal pairing verified');

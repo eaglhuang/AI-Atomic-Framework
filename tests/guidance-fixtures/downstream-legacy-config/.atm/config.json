@@ -1,0 +1,22 @@
+{
+  "schemaId": "atm.hostConfig",
+  "specVersion": "0.1.0",
+  "guidance": {
+    "legacyHotspots": [
+      {
+        "path": "src/downstream-helper.js",
+        "releaseBlockers": ["processRequest"],
+        "demandReportPath": null,
+        "existingAtomIndexPath": null
+      }
+    ],
+    "noTouchZones": [
+      {
+        "path": "src/downstream-helper.js#processRequest",
+        "reason": "release blocker: processRequest is a trunk coordination function",
+        "scope": "file"
+      }
+    ],
+    "defaultLegacyFlow": "shadow"
+  }
+}

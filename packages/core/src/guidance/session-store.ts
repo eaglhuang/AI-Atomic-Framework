@@ -2,6 +2,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { buildGuidancePacket, type GuidancePacket, type GuidanceSession, type ProjectOrientationReport, type RouteDecision } from './guidance-packet.ts';
+import type { LegacyRoutePlan } from './legacy-route-plan.ts';
 
 export interface CreateGuidanceSessionInput {
   readonly repositoryRoot: string;
@@ -10,6 +11,8 @@ export interface CreateGuidanceSessionInput {
   readonly routeDecision: RouteDecision;
   readonly actor?: string;
   readonly now?: string;
+  readonly legacyRoutePlan?: LegacyRoutePlan;
+  readonly shadowMode?: boolean;
 }
 
 export interface GuidanceAuditRecord {
@@ -42,7 +45,9 @@ export function createGuidanceSession(input: CreateGuidanceSessionInput): Guidan
     actor,
     orientation: input.orientation,
     routeDecision: input.routeDecision,
-    packet
+    packet,
+    ...(input.legacyRoutePlan !== undefined ? { legacyRoutePlan: input.legacyRoutePlan } : {}),
+    ...(input.shadowMode !== undefined ? { shadowMode: input.shadowMode } : {})
   };
   writeGuidanceSession(session);
   writeGuidanceAudit(session.repositoryRoot, {

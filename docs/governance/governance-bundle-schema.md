@@ -187,7 +187,7 @@ The expanded fixture in `tests/schema-fixtures/positive/governance-bundle-full.j
 ## Downstream Mapping
 
 The bundle schema stays host-neutral, but downstream repositories do not need to mirror `.atm/*` literally.
-See `docs/governance/3klife-governance-mapping.md` for one example of how an adopter can map these store contracts onto an existing docs-first workflow without changing the upstream schema.
+See `docs/governance/downstream-adopter-governance-mapping.md` for one example of how an adopter can map these store contracts onto an existing docs-first workflow without changing the upstream schema.
 
 ## What Comes Next
 

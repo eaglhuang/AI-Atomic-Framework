@@ -1,4 +1,6 @@
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
+import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
+import type { LegacyRoutePlan, LegacyRoutePlanSegment } from '../../../core/src/guidance/legacy-route-plan.ts';
 import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { makeResult, message, parseOptions } from './shared.ts';
@@ -7,7 +9,9 @@ export function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
   if (activeGuidanceSession) {
-    const nextAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
+    const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
+    const legacyPlan = activeGuidanceSession.legacyRoutePlan ?? null;
+    const nextAction = legacyPlan ? enrichWithLegacyPlan(baseAction, legacyPlan) : baseAction;
     return makeResult({
       ok: nextAction.status !== 'blocked',
       command: 'next',
@@ -125,4 +129,30 @@ function blockedMutationCommands() {
     'atomize/infect/split apply without dry-run proposal',
     'apply without human review approval'
   ];
+}
+
+function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan): GuidanceNextAction {
+  const safeSegments = plan.segments.filter((s: LegacyRoutePlanSegment) => plan.safeFirstAtoms.includes(s.symbolName));
+  const preferredSegment: LegacyRoutePlanSegment | null =
+    safeSegments.find((s: LegacyRoutePlanSegment) => s.recommendedBehavior === 'split')
+    ?? safeSegments.find((s: LegacyRoutePlanSegment) => s.recommendedBehavior === 'infect')
+    ?? safeSegments.find((s: LegacyRoutePlanSegment) => s.recommendedBehavior === 'atomize')
+    ?? null;
+  const blockedSegments: readonly string[] = plan.trunkFunctions;
+
+  if (!preferredSegment) {
+    return {
+      ...base,
+      status: 'blocked',
+      reason: 'No safe leaf segment is available in the LegacyRoutePlan. Submit a split proposal before proceeding.',
+      blockedSegments
+    };
+  }
+
+  return {
+    ...base,
+    status: 'action',
+    selectedSegment: preferredSegment.symbolName,
+    blockedSegments
+  };
 }
