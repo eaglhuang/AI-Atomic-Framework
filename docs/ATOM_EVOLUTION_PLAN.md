@@ -272,6 +272,8 @@ Checklist：
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run test`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:plugin-sdk`
 
+M2 已於 2026-05-15 完成並提交。新增 `packages/core/src/upgrade/evidence-detector.ts` 與 `fixtures/evolution/evidence-patterns/*.json`（`no-signal.json`、`recurring-failure-candidate.json`）；`validate-evidence-detector` 驗證 signalKind grouping、recurrence window 與 confidence threshold 邏輯，並確認 no-signal 輸入輸出 empty report。
+
 ### M3 - Proposal Draft Bridge
 
 目的：新增 dry-run bridge，將 detector reports 轉成 schema-valid UpgradeProposal drafts。
@@ -297,6 +299,8 @@ Checklist：
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:upgrade-proposal`
 - No-signal fixture 輸出 empty report。
 - Correction fixture 輸出 evidence-driven proposal。
+
+M3 已於 2026-05-15 完成並提交。新增 `packages/core/src/upgrade/evolution-draft.ts`（`scanEvidencePatternReports`）與 `atm upgrade --scan` CLI 入口；預設 dry-run 模式，缺少 evidence IDs 或 friction evidence 時不產 proposal；`validate-cli` 與 `validate:upgrade-proposal` 均覆蓋 scan bridge 路徑。
 
 ### M4 - Promotion Safety Gates
 
