@@ -372,7 +372,7 @@ Checklist：
 - [x] Holdout 或 regression failure 會 block promotion。
 - [x] Metric-driven 與 evidence-driven proposals 共用後段 gates。
 
-M6 已於 2026-05-15 完成並提交。新增 `fixtures/upgrade/metric-driven-proposal.json`、`fixtures/upgrade/metric-regression-blocked-proposal.json`、`packages/core/src/upgrade/metrics-to-proposal.ts`；`validate-upgrade-proposal` 延伸驗證 metric-driven track。
+M6 已於 2026-05-15 完成並提交。新增 `fixtures/upgrade/metric-driven-proposal.json`、`fixtures/upgrade/metric-regression-blocked-proposal.json`、`packages/core/src/upgrade/metrics-to-proposal.ts`；`validate-upgrade-proposal` 延伸驗證 metric-driven track。Metric-driven proposals 需與 evidence-driven proposals 共用後段 stale gate，並提供 `baseEvidenceWatermark`。
 
 驗證：
 

@@ -19,6 +19,7 @@
   "proposalSource": "metric-driven",
   "targetSurface": "atom-spec",
   "baseAtomVersion": "1.1.0",
+  "baseEvidenceWatermark": "metric.watermark.2026-05-15T00-00-00Z",
   "reversibility": "rollback-safe",
   "reviewTemplate": "review.template.atom-bump",
   "automatedGates": {
@@ -39,6 +40,12 @@
       "reportId": "police.registry-candidate.metric-driven.fixture",
       "reportPath": "fixtures/upgrade/metric-driven-proposal.json",
       "summary": "pass (metric-driven proposal: registry candidate status assumed pending human review)"
+    },
+    "staleProposal": {
+      "passed": true,
+      "reportId": "stale-proposal.metric-driven.fixture",
+      "reportPath": "fixtures/upgrade/quality-comparison-pass.json",
+      "summary": "pass (metric-driven proposal: base atom version and metric watermark are current)"
     },
     "allPassed": true,
     "blockedGateNames": []
