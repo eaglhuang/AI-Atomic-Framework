@@ -18,7 +18,8 @@ export type PromotionSafetyGateName =
   | 'staleEvidenceWatermark'
   | 'targetSurfaceDowngrade'
   | 'breakingHumanReview'
-  | 'missingRedactionReport';
+  | 'missingRedactionReport'
+  | 'charterInvariantViolation';
 
 export interface PromotionSafetyFinding {
   /** Gate that produced this finding. */
@@ -72,6 +73,11 @@ export interface PromotionSafetyContext {
    * 'redaction-report' entry.
    */
   hasRedactionReport?: boolean;
+  /**
+   * List of charter invariant rule IDs that this proposal violates.
+   * When non-empty and no charterWaiver is attached to the proposal, gate 6 blocks.
+   */
+  charterViolations?: string[];
 }
 
 /**
@@ -85,6 +91,7 @@ export interface ProposalForSafetyCheck {
   targetSurface?: string;
   reversibility?: string;
   inputs?: Array<{ kind: string }>;
+  charterWaiver?: { reason: string; approvedBy: string; approvedAt: string };
 }
 
 /**
@@ -196,6 +203,31 @@ export function checkPromotionSafetyGates(
       gate: 'missingRedactionReport',
       blocked: false,
       reason: 'Redaction report requirement is satisfied or not applicable to this proposal.'
+    });
+  }
+
+  // ── Gate 6: charter invariant violation ───────────────────────────────────
+  const hasCharterViolations =
+    Array.isArray(context.charterViolations) && context.charterViolations.length > 0;
+  const hasCharterWaiver =
+    proposal.charterWaiver !== undefined &&
+    typeof proposal.charterWaiver?.reason === 'string' &&
+    proposal.charterWaiver.reason.length > 0;
+
+  if (hasCharterViolations && !hasCharterWaiver) {
+    findings.push({
+      gate: 'charterInvariantViolation',
+      blocked: true,
+      reason: `Proposal violates charter invariants: ${context.charterViolations!.join(', ')}. Attach a charterWaiver with human approval to override.`,
+      remediation: 'Add a charterWaiver block (reason, approvedBy, approvedAt) to the proposal or resolve the invariant conflict before promoting.'
+    });
+  } else {
+    findings.push({
+      gate: 'charterInvariantViolation',
+      blocked: false,
+      reason: hasCharterViolations
+        ? 'Charter invariant violations present but charterWaiver is attached; gate overridden.'
+        : 'No charter invariant violations detected.'
     });
   }
 

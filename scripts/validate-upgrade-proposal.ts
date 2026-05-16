@@ -29,6 +29,8 @@ const mapCuratorDedupMergeFixturePath = 'fixtures/upgrade/map-curator-dedup-merg
 const mapCuratorSweepFixturePath = 'fixtures/upgrade/map-curator-sweep-proposal.json';
 const metricDrivenFixturePath = 'fixtures/upgrade/metric-driven-proposal.json';
 const metricRegressionBlockedFixturePath = 'fixtures/upgrade/metric-regression-blocked-proposal.json';
+const charterViolationBlockedFixturePath = 'fixtures/upgrade/charter-violation-blocked-proposal.json';
+const charterWaiverFixturePath = 'fixtures/upgrade/charter-waiver-proposal.json';
 const scanSchemaPath = 'schemas/governance/evolution-scan-report.schema.json';
 const inputPaths = {
   hashDiff: 'fixtures/upgrade/hash-diff-report.json',
@@ -141,7 +143,7 @@ function assertCliContextBudgetGate(result: any, expectedPassed: any) {
   }
 }
 
-for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, mapCuratorComposeFixturePath, mapCuratorMergeFixturePath, mapCuratorDedupMergeFixturePath, mapCuratorSweepFixturePath, metricDrivenFixturePath, metricRegressionBlockedFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
+for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, mapCuratorComposeFixturePath, mapCuratorMergeFixturePath, mapCuratorDedupMergeFixturePath, mapCuratorSweepFixturePath, metricDrivenFixturePath, metricRegressionBlockedFixturePath, charterViolationBlockedFixturePath, charterWaiverFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
 
@@ -165,6 +167,9 @@ check(schema.properties.reversibility.enum.includes('rollback-safe'), 'schema mu
 check(schema.$defs?.inputRef?.properties?.kind?.enum?.includes('evolution-evidence'), 'schema must include evolution-evidence input kind');
 check(schema.$defs?.automatedGates?.properties?.staleProposal, 'schema must expose staleProposal gate');
 check(schema.$defs?.automatedGates?.properties?.mutabilityPolicy, 'schema must expose mutabilityPolicy gate for curator proposals');
+check(schema.$defs?.automatedGates?.properties?.charterGate, 'schema must expose charterGate for charter promotion gate');
+check(schema.$defs?.automatedGates?.properties?.blockedGateNames?.items?.enum?.includes('charterInvariantViolation'), 'schema blockedGateNames must include charterInvariantViolation');
+check(schema.properties.charterWaiver, 'schema must expose charterWaiver for human-approved charter overrides');
 check(schema.properties.sourceAtomIds, 'schema must expose sourceAtomIds for merge and sweep proposals');
 check(schema.properties.targetAtomId, 'schema must expose targetAtomId for merge proposals');
 check(schema.properties.sweepPlan, 'schema must expose sweepPlan for archive-only sweep proposals');
@@ -508,4 +513,19 @@ check(
   'M7 demo-stale fixture must block on staleProposal'
 );
 
-console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, CLI replay, metric-driven track, and evolution-loop fixtures verified)`);
+// M3 — charter promotion gate fixtures
+const expectedCharterViolationBlocked = readJson(charterViolationBlockedFixturePath);
+const expectedCharterWaiver = readJson(charterWaiverFixturePath);
+validateWithSchema(expectedCharterViolationBlocked, validate, 'charter-violation-blocked fixture');
+validateWithSchema(expectedCharterWaiver, validate, 'charter-waiver fixture');
+assertInvariants(expectedCharterViolationBlocked, 'blocked');
+assertInvariants(expectedCharterWaiver, 'pending');
+check(expectedCharterViolationBlocked.automatedGates.blockedGateNames.includes('charterInvariantViolation'), 'charter-violation-blocked fixture must block on charterInvariantViolation');
+check(expectedCharterViolationBlocked.automatedGates.charterGate?.passed === false, 'charter-violation-blocked fixture must have charterGate.passed=false');
+check(expectedCharterViolationBlocked.charterWaiver === undefined, 'charter-violation-blocked fixture must not have a charterWaiver');
+check(expectedCharterWaiver.charterWaiver?.reason?.length > 0, 'charter-waiver fixture must have a charterWaiver with a reason');
+check(typeof expectedCharterWaiver.charterWaiver?.approvedBy === 'string', 'charter-waiver fixture must record approvedBy');
+check(expectedCharterWaiver.automatedGates.charterGate?.passed === true, 'charter-waiver fixture must have charterGate.passed=true');
+check(!expectedCharterWaiver.automatedGates.blockedGateNames.includes('charterInvariantViolation'), 'charter-waiver fixture must not block on charterInvariantViolation');
+
+console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, CLI replay, metric-driven track, evolution-loop fixtures, and charter promotion gate verified)`);
