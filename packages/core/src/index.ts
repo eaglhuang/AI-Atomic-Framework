@@ -196,12 +196,20 @@ export interface RegistryCompatibilityRecord {
 export interface RegistryMapMemberRecord {
   readonly atomId: string;
   readonly version: string;
+  readonly role?: 'entry-adapter' | 'domain-step' | 'validator' | 'side-effect' | 'rollback-adapter';
 }
 
 export interface RegistryMapEdgeRecord {
   readonly from: string;
   readonly to: string;
   readonly binding: string;
+  readonly edgeKind?: 'data-flow' | 'control-flow' | 'event-flow' | 'validation' | 'fallback' | 'side-effect' | 'rollback';
+}
+
+export interface AtomicMapReplacementRecord {
+  readonly legacyUris: readonly string[];
+  readonly mode: 'draft' | 'shadow' | 'canary' | 'active' | 'legacy-retired';
+  readonly evidenceRefs: readonly string[];
 }
 
 export type RegistryMapQualityTargetValue = string | number | boolean;
@@ -210,7 +218,7 @@ export type RegistryMapQualityTargetsRecord = Readonly<Record<string, RegistryMa
 
 export interface AtomicMapRecord {
   readonly schemaId: 'atm.atomicMap';
-  readonly specVersion: '0.1.0';
+  readonly specVersion: '0.1.0' | '0.2.0';
   readonly migration: {
     readonly strategy: 'none' | 'additive' | 'breaking';
     readonly fromVersion: string | null;
@@ -223,6 +231,7 @@ export interface AtomicMapRecord {
   readonly entrypoints: readonly string[];
   readonly qualityTargets: RegistryMapQualityTargetsRecord;
   readonly mapHash: string;
+  readonly replacement?: AtomicMapReplacementRecord;
   readonly semanticFingerprint?: string | null;
   readonly pendingSfCalculation?: boolean;
   readonly lineageLogRef?: string;

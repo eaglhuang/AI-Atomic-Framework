@@ -33,18 +33,21 @@ export function createAtomicMapRegistryEntry(
     mapVersion: String(atomicMap.mapVersion).trim(),
     members: atomicMap.members.map((member) => ({
       atomId: String(member.atomId).trim(),
-      version: String(member.version).trim()
+      version: String(member.version).trim(),
+      ...(member.role ? { role: String(member.role).trim() as typeof member.role } : {})
     })),
     edges: atomicMap.edges.map((edge) => ({
       from: String(edge.from).trim(),
       to: String(edge.to).trim(),
-      binding: String(edge.binding).trim()
+      binding: String(edge.binding).trim(),
+      ...(edge.edgeKind ? { edgeKind: String(edge.edgeKind).trim() as typeof edge.edgeKind } : {})
     })),
     entrypoints: atomicMap.entrypoints.map((entrypoint) => String(entrypoint).trim()),
     qualityTargets: Object.fromEntries(
       Object.entries(atomicMap.qualityTargets).map(([key, value]) => [String(key).trim(), typeof value === 'string' ? value.trim() : value])
     ),
     mapHash: computeAtomicMapHash(atomicMap),
+    ...(atomicMap.replacement ? { replacement: normalizeReplacement(atomicMap.replacement) } : {}),
     status: statusMigration.status,
     governance: statusMigration.governance
   };
@@ -92,4 +95,12 @@ function normalizeStringArray(values: readonly string[]) {
   return [...new Set(values
     .map((value) => String(value || '').trim())
     .filter(Boolean))];
+}
+
+function normalizeReplacement(replacement: NonNullable<AtomicMapRecord['replacement']>) {
+  return {
+    legacyUris: normalizeStringArray(replacement.legacyUris),
+    mode: replacement.mode,
+    evidenceRefs: normalizeStringArray(replacement.evidenceRefs)
+  };
 }

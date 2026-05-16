@@ -2,7 +2,8 @@ import { computeSha256ForContent } from '../hash-lock/hash-lock.ts';
 import type {
   RegistryMapEdgeRecord,
   RegistryMapMemberRecord,
-  RegistryMapQualityTargetsRecord
+  RegistryMapQualityTargetsRecord,
+  AtomicMapReplacementRecord
 } from '../index';
 export { createAtomicMapSemanticFingerprint } from './semantic-fingerprint.ts';
 
@@ -11,13 +12,15 @@ export interface AtomicMapHashInput {
   readonly edges: readonly RegistryMapEdgeRecord[];
   readonly entrypoints: readonly string[];
   readonly qualityTargets?: RegistryMapQualityTargetsRecord;
+  readonly replacement?: AtomicMapReplacementRecord;
 }
 
 export function createAtomicMapHashPayload(input: AtomicMapHashInput) {
   return {
     members: normalizeAtomicMapMembers(input.members),
     edges: normalizeAtomicMapEdges(input.edges),
-    entrypoints: normalizeAtomicMapEntrypoints(input.entrypoints)
+    entrypoints: normalizeAtomicMapEntrypoints(input.entrypoints),
+    ...(input.replacement ? { replacement: normalizeAtomicMapReplacement(input.replacement) } : {})
   };
 }
 
@@ -29,9 +32,10 @@ function normalizeAtomicMapMembers(members: readonly RegistryMapMemberRecord[] =
   return [...members]
     .map((member) => ({
       atomId: String(member.atomId).trim(),
-      version: String(member.version).trim()
+      version: String(member.version).trim(),
+      ...(member.role ? { role: String(member.role).trim() } : {})
     }))
-    .sort((left, right) => left.atomId.localeCompare(right.atomId) || left.version.localeCompare(right.version));
+    .sort((left, right) => left.atomId.localeCompare(right.atomId) || left.version.localeCompare(right.version) || String(left.role ?? '').localeCompare(String(right.role ?? '')));
 }
 
 function normalizeAtomicMapEdges(edges: readonly RegistryMapEdgeRecord[] = []) {
@@ -39,9 +43,10 @@ function normalizeAtomicMapEdges(edges: readonly RegistryMapEdgeRecord[] = []) {
     .map((edge) => ({
       from: String(edge.from).trim(),
       to: String(edge.to).trim(),
-      binding: String(edge.binding).trim()
+      binding: String(edge.binding).trim(),
+      ...(edge.edgeKind ? { edgeKind: String(edge.edgeKind).trim() } : {})
     }))
-    .sort((left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to) || left.binding.localeCompare(right.binding));
+    .sort((left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to) || left.binding.localeCompare(right.binding) || String(left.edgeKind ?? '').localeCompare(String(right.edgeKind ?? '')));
 }
 
 function normalizeAtomicMapEntrypoints(entrypoints: readonly string[] = []) {
@@ -57,4 +62,13 @@ function normalizeAtomicMapQualityTargets(qualityTargets: RegistryMapQualityTarg
     .filter(([key]) => key.length > 0)
     .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey));
   return Object.fromEntries(normalizedEntries) as RegistryMapQualityTargetsRecord;
+}
+
+function normalizeAtomicMapReplacement(replacement: AtomicMapReplacementRecord) {
+  return {
+    legacyUris: [...replacement.legacyUris]
+      .map((legacyUri) => String(legacyUri).trim())
+      .filter(Boolean)
+      .sort((left, right) => left.localeCompare(right))
+  };
 }

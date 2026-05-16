@@ -3,6 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import os from 'node:os';
 import path from 'node:path';
 import { generateAtomicMap, createMinimalAtomicMapSpec } from '../../packages/core/src/manager/map-generator.ts';
+import { computeAtomicMapHash } from '../../packages/core/src/registry/map-hash.ts';
 
 if (process.argv.includes('--self-check')) {
   const spec = createMinimalAtomicMapSpec({
@@ -16,6 +17,52 @@ if (process.argv.includes('--self-check')) {
   assert.equal(spec.mapId, 'ATM-MAP-9999');
   assert.equal(spec.entrypoints[0], 'ATM-CORE-9999');
   assert.equal(spec.semanticFingerprint?.startsWith('sha256:') === true, true);
+
+  const replacementSpec = createMinimalAtomicMapSpec({
+    mapId: 'ATM-MAP-9998',
+    mapVersion: '0.1.0',
+    members: [
+      { atomId: 'ATM-CORE-9998', version: '0.1.0', role: 'entry-adapter' },
+      { atomId: 'ATM-CORE-9997', version: '0.1.0', role: 'domain-step' }
+    ],
+    edges: [{ from: 'ATM-CORE-9998', to: 'ATM-CORE-9997', binding: 'delegates', edgeKind: 'control-flow' }],
+    entrypoints: ['ATM-CORE-9998'],
+    qualityTargets: { requiredChecks: 1 },
+    replacement: {
+      legacyUris: ['legacy://samples/checkout-mini'],
+      mode: 'draft',
+      evidenceRefs: []
+    }
+  });
+  assert.equal(replacementSpec.specVersion, '0.2.0');
+  assert.equal(replacementSpec.members[0].role, 'entry-adapter');
+  assert.equal(replacementSpec.edges[0].edgeKind, 'control-flow');
+  assert.deepEqual(replacementSpec.replacement?.legacyUris, ['legacy://samples/checkout-mini']);
+  assert.equal(replacementSpec.mapHash, computeAtomicMapHash({
+    members: replacementSpec.members,
+    edges: replacementSpec.edges,
+    entrypoints: replacementSpec.entrypoints,
+    replacement: replacementSpec.replacement
+  }));
+  assert.equal(replacementSpec.mapHash, computeAtomicMapHash({
+    members: replacementSpec.members,
+    edges: replacementSpec.edges,
+    entrypoints: replacementSpec.entrypoints,
+    replacement: {
+      legacyUris: ['legacy://samples/checkout-mini'],
+      mode: 'active',
+      evidenceRefs: ['map-equivalence:sample']
+    }
+  }));
+  assert.notEqual(replacementSpec.mapHash, computeAtomicMapHash({
+    members: [
+      { atomId: 'ATM-CORE-9998', version: '0.1.0', role: 'validator' },
+      { atomId: 'ATM-CORE-9997', version: '0.1.0', role: 'domain-step' }
+    ],
+    edges: replacementSpec.edges,
+    entrypoints: replacementSpec.entrypoints,
+    replacement: replacementSpec.replacement
+  }));
   console.log('[map-generator:self-check] ok');
   process.exit(0);
 }
@@ -87,6 +134,31 @@ try {
   }, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
   assert.equal(next.ok, true);
   assert.equal(next.mapId, 'ATM-MAP-0002');
+
+  const replacementMap = generateAtomicMap({
+    members: [
+      { atomId: 'ATM-FIXTURE-0001', version: '0.1.0', role: 'entry-adapter' },
+      { atomId: 'ATM-FIXTURE-0002', version: '0.1.0', role: 'domain-step' }
+    ],
+    edges: [
+      { from: 'ATM-FIXTURE-0001', to: 'ATM-FIXTURE-0002', binding: 'feeds', edgeKind: 'data-flow' }
+    ],
+    entrypoints: ['ATM-FIXTURE-0001'],
+    qualityTargets: {
+      requiredChecks: 2,
+      promoteGateRequired: true
+    },
+    replacement: {
+      legacyUris: ['legacy://samples/checkout-mini'],
+      mode: 'draft',
+      evidenceRefs: []
+    }
+  }, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
+  assert.equal(replacementMap.ok, true);
+  assert.equal(replacementMap.registryEntry.specVersion, '0.2.0');
+  assert.equal(replacementMap.registryEntry.members[0].role, 'entry-adapter');
+  assert.equal(replacementMap.registryEntry.edges[0].edgeKind, 'data-flow');
+  assert.deepEqual(replacementMap.registryEntry.replacement.legacyUris, ['legacy://samples/checkout-mini']);
 
   const invalid = generateAtomicMap({ members: [], edges: [], entrypoints: [], qualityTargets: {} }, { repositoryRoot: tempRoot });
   assert.equal(invalid.ok, false);
