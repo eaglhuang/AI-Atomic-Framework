@@ -45,6 +45,8 @@ export function runInit(argv: any) {
     continuationReportPath: null;
     projectProbe: null;
     recommendedPrompt: null;
+    charterPath: null;
+    charterInvariantsPath: null;
   } = options.adopt === 'default'
     ? adoptDefaultBootstrap(options.cwd, { force: options.force, taskTitle: options.task })
     : {
@@ -65,7 +67,9 @@ export function runInit(argv: any) {
         contextSummaryMarkdownPath: null,
         continuationReportPath: null,
         projectProbe: null,
-        recommendedPrompt: null
+        recommendedPrompt: null,
+        charterPath: null,
+        charterInvariantsPath: null
       };
 
   return makeResult({
@@ -98,6 +102,8 @@ export function runInit(argv: any) {
       contextSummaryMarkdownPath: bootstrap.contextSummaryMarkdownPath,
       continuationReportPath: bootstrap.continuationReportPath,
       recommendedPrompt: bootstrap.recommendedPrompt,
+      charterPath: bootstrap.charterPath,
+      charterInvariantsPath: bootstrap.charterInvariantsPath,
       adoptedAt: bootstrap.adoptedProfile ? new Date().toISOString() : null
     }
   });

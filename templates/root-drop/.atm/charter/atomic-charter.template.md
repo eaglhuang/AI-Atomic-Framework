@@ -1,12 +1,13 @@
-# AtomicCharter — [PROJECT_NAME]
+<!-- ATM TEMPLATE: root-drop-atomic-charter -->
+# AtomicCharter — {{PROJECT_NAME}}
 
 > **Framework authority level.** The rules in this charter are enforced by ATM at the
 > framework layer. Host project rules and profiles are secondary. Conflicts must be
 > resolved through a governed charter waiver proposal (`behavior.evolve` +
 > `charterWaiver` + `HumanReviewDecision`), not by silent override.
 
-**Charter version**: [CHARTER_VERSION]  
-**Last amended**: [LAST_AMENDED_DATE]  
+**Charter version**: {{CHARTER_VERSION}}  
+**Last amended**: {{LAST_AMENDED_DATE}}  
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
 
 ---

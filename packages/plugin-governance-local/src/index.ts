@@ -63,6 +63,8 @@ export interface LocalGovernanceBootstrapResult {
   readonly continuationReportPath: string;
   readonly projectProbe: Readonly<Record<string, unknown>>;
   readonly recommendedPrompt: string;
+  readonly charterPath: string;
+  readonly charterInvariantsPath: string;
 }
 
 export interface ContinuationContractInput {
@@ -100,6 +102,17 @@ const templateFiles = [
   {
     source: path.join('.atm', 'context', 'INITIAL_SUMMARY.md'),
     target: path.join('.atm', 'history', 'handoff', 'INITIAL_SUMMARY.md')
+  }
+] as const;
+
+const charterTemplateFiles = [
+  {
+    source: path.join('.atm', 'charter', 'atomic-charter.template.md'),
+    target: path.join('.atm', 'charter', 'atomic-charter.md')
+  },
+  {
+    source: path.join('.atm', 'charter', 'charter-invariants.template.json'),
+    target: path.join('.atm', 'charter', 'charter-invariants.json')
   }
 ] as const;
 
@@ -247,6 +260,29 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     );
   }
 
+  const now = projectProbe.generatedAt ? new Date(String(projectProbe.generatedAt)) : new Date();
+  const lastAmendedDate = now.toISOString().slice(0, 10);
+  const projectName = (typeof projectProbe.repositoryKind === 'string'
+    ? (readProjectName(cwd) ?? projectProbe.repositoryKind)
+    : (readProjectName(cwd) ?? path.basename(cwd))) || 'unknown-project';
+  const charterTokens = {
+    PROJECT_NAME: projectName,
+    CHARTER_VERSION: '1.0.0',
+    LAST_AMENDED_DATE: `${lastAmendedDate}T00:00:00.000Z`
+  };
+
+  for (const charterFile of charterTemplateFiles) {
+    writeTemplate(
+      path.join(templateRoot, charterFile.source),
+      path.join(cwd, charterFile.target),
+      charterTokens,
+      cwd,
+      force,
+      created,
+      unchanged
+    );
+  }
+
   return {
     created,
     unchanged,
@@ -265,7 +301,9 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     contextSummaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath),
     continuationReportPath: normalizeRelativePath(continuationReportPath),
     projectProbe,
-    recommendedPrompt
+    recommendedPrompt,
+    charterPath: relativePathFrom(cwd, paths.charterPath),
+    charterInvariantsPath: relativePathFrom(cwd, paths.charterInvariantsPath)
   };
 }
 
@@ -472,8 +510,11 @@ function createBootstrapPaths(cwd: string, taskId: string) {
       catalog: path.join(atmRoot, 'catalog'),
       index: path.join(atmRoot, 'catalog', 'index'),
       shards: path.join(atmRoot, 'catalog', 'shards'),
-      registry: path.join(atmRoot, 'catalog', 'registry')
-    }
+      registry: path.join(atmRoot, 'catalog', 'registry'),
+      charter: path.join(atmRoot, 'charter')
+    },
+    charterPath: path.join(atmRoot, 'charter', 'atomic-charter.md'),
+    charterInvariantsPath: path.join(atmRoot, 'charter', 'charter-invariants.json')
   };
 }
 
@@ -559,6 +600,16 @@ function createDefaultGuards(projectProbe: Readonly<Record<string, unknown>>) {
       }
     ]
   };
+}
+
+function readProjectName(cwd: string): string | null {
+  const packageJsonPath = path.join(cwd, 'package.json');
+  if (!existsSync(packageJsonPath)) {
+    return null;
+  }
+  const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as Record<string, unknown>;
+  const name = typeof pkg.name === 'string' ? pkg.name.trim() : '';
+  return name.length > 0 ? name : null;
 }
 
 function probeRepository(cwd: string, recommendedPrompt: string) {
