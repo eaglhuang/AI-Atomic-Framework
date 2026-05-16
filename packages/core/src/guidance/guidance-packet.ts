@@ -164,6 +164,7 @@ const defaultBlockedCommands = [
   'host mutation without active guidance session',
   'atomize/infect/split apply without dry-run proposal',
   'apply without human review approval',
+  'apply without rollback proof or rollback instructions',
   'direct trunk function rewrite',
   'release promote while release blockers exist'
 ];

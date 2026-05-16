@@ -149,6 +149,7 @@ function evaluateBehaviorMutationGate(input: AtomBehaviorInput) {
     isLegacyTarget: payload.isLegacyTarget === true || typeof payload.legacySource === 'string',
     hasLegacyRoutePlan: payload.hasLegacyRoutePlan === true || Boolean(payload.legacyRoutePlan),
     hasDryRunProposal: payload.hasDryRunProposal === true || Boolean(payload.dryRunProposal),
+    hasRollbackProof: payload.hasRollbackProof === true || Boolean(payload.rollbackProof) || Boolean(payload.rollbackInstructions),
     applyRequested: payload.applyRequested === true,
     promoteRequested: payload.promoteRequested === true,
     reviewApproved: payload.reviewApproved === true,

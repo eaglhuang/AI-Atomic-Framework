@@ -163,6 +163,10 @@ const noSessionGate = evaluateMutationGate({
 });
 assert(noSessionGate.allowed === false, 'mutation gate must block atomize without session');
 assert(noSessionGate.issues.some((issue) => issue.code === 'ATM_GUIDANCE_SESSION_REQUIRED'), 'mutation gate must report session required');
+assert(noSessionGate.issues.some((issue) => String(issue.details.nextStep ?? '').includes('guide --goal')),
+  'mutation gate session failure must point back to guide --goal');
+assert(noSessionGate.issues.some((issue) => issue.code === 'ATM_GUIDANCE_ROLLBACK_PROOF_REQUIRED'),
+  'apply mutation gate must require rollback proof or rollback instructions');
 
 const trunkGate = evaluateMutationGate({
   action: 'behavior.atomize',
@@ -383,6 +387,39 @@ try {
     'next action must expose targetFile field');
   assert(typeof configNextAction?.['selectedBehavior'] === 'string',
     'next action must expose selectedBehavior field');
+
+  const guidedProposal = runAtmJson([
+    'upgrade', '--cwd', downstreamCwd,
+    '--propose',
+    '--behavior', `behavior.${String(configNextAction?.['selectedBehavior'])}`,
+    '--legacy-target', String(configNextAction?.['legacyTarget']),
+    '--guidance-session', String(nextConfigFlow.parsed.evidence?.guidanceSession?.sessionId),
+    '--dry-run', '--json'
+  ]);
+  assert(guidedProposal.exitCode === 0,
+    'guided legacy dry-run proposal command returned by next must execute successfully');
+  assert(guidedProposal.parsed.evidence?.proposal?.schemaId === 'atm.guidedLegacyDryRunProposal',
+    'guided legacy dry-run proposal must emit proposal evidence');
+  assert(guidedProposal.parsed.evidence?.humanReviewRequired === true,
+    'guided legacy dry-run proposal must require human review');
+  assert(guidedProposal.parsed.evidence?.rollbackProofRequired === true,
+    'guided legacy dry-run proposal must require rollback proof');
+  assert(guidedProposal.parsed.evidence?.queued === true,
+    'guided legacy dry-run proposal must be enqueued for human review');
+
+  const reviewList = runAtmJson(['review', 'list', '--cwd', downstreamCwd, '--json']);
+  assert(reviewList.exitCode === 0,
+    'review list must exit 0 after guided legacy dry-run proposal');
+  assert((reviewList.parsed.evidence?.proposals as unknown[] | undefined)?.length === 1,
+    'review list must include the guided legacy dry-run proposal');
+  const reviewShow = runAtmJson([
+    'review', 'show', String(guidedProposal.parsed.evidence?.proposalId),
+    '--cwd', downstreamCwd, '--json'
+  ]);
+  assert(reviewShow.exitCode === 0,
+    'review show must load the guided legacy dry-run proposal');
+  assert(reviewShow.parsed.evidence?.proposal?.proposalId === guidedProposal.parsed.evidence?.proposalId,
+    'review show must return the guided legacy dry-run proposal');
 
   // ── E. blockedSegments still includes trunk functions ─────────────────────────────────────────
   assert(Array.isArray(configNextAction?.['blockedSegments']),

@@ -56,6 +56,16 @@
       "summary": "Explicit decomposition decision override."
     },
     {
+      "flag": "--legacy-target",
+      "value": "path#symbol",
+      "summary": "LegacyRoutePlan-selected target for guided atomize/infect/split dry-run proposals."
+    },
+    {
+      "flag": "--guidance-session",
+      "value": "id",
+      "summary": "Guidance session id that authorized a guided legacy dry-run proposal."
+    },
+    {
       "flag": "--fork-source",
       "value": "id",
       "summary": "Fork source atom id."
@@ -101,6 +111,7 @@
   ],
   "examples": [
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json",
+    "node atm.mjs upgrade --propose --behavior behavior.infect --legacy-target \"src/legacy.js#normalizeInput\" --guidance-session <session-id> --dry-run --json",
     "node atm.mjs upgrade --scan --input fixtures/evolution/evidence-patterns/recurring-failure-candidate.json --json"
   ]
 }

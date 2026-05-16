@@ -4,7 +4,7 @@ import path from 'node:path';
 
 export type HumanReviewDecision = 'approve' | 'reject';
 export type HumanReviewQueueStatus = 'pending' | 'blocked' | 'approved' | 'rejected';
-export type HumanReviewDecompositionDecision = 'atom-bump' | 'atom-extract' | 'map-bump' | 'polymorphize' | 'extract-shared' | 'infect' | 'atomize';
+export type HumanReviewDecompositionDecision = 'atom-bump' | 'atom-extract' | 'map-bump' | 'polymorphize' | 'extract-shared' | 'infect' | 'atomize' | 'split';
 
 export interface HumanReviewQueueMigration {
   readonly strategy: 'none' | 'additive' | 'breaking';
