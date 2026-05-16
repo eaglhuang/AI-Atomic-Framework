@@ -1,0 +1,28 @@
+{
+  "name": "@ai-atomic-framework/integration-claude-code",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Claude Code integration adapter for ATM agent entry skills.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@ai-atomic-framework/integrations-core": "0.0.0"
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/integration-claude-code",
+    "test": "node --experimental-strip-types ../../scripts/validate-integration-adapter.ts --mode test --filter claude-code",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
+}

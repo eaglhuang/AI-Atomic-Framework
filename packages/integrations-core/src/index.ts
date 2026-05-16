@@ -15,6 +15,54 @@ export type IntegrationPlaceholderStyle = '$ARGUMENTS' | '{{vars}}' | 'toml-fiel
 export type InstallManifestFileSource = 'template' | 'generated' | 'copied';
 export type Sha256Digest = `sha256:${string}`;
 
+export const atmFirstCommand = 'node atm.mjs next --json';
+export const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
+
+export const minimumAtmEntrySkillDefinitions = [
+  {
+    id: 'atm-next',
+    title: 'ATM Next',
+    summary: 'Recommend the next official ATM guidance action from current state.',
+    command: 'node atm.mjs next --json'
+  },
+  {
+    id: 'atm-orient',
+    title: 'ATM Orient',
+    summary: 'Inspect a repository and emit a guidance orientation report.',
+    command: 'node atm.mjs orient --cwd . --json'
+  },
+  {
+    id: 'atm-create',
+    title: 'ATM Create',
+    summary: 'Create and register an atom through the provisioning facade.',
+    command: 'node atm.mjs create --bucket CORE --title "$ARGUMENTS" --dry-run --json'
+  },
+  {
+    id: 'atm-lock',
+    title: 'ATM Lock',
+    summary: 'Check, acquire, or release a governed scope lock.',
+    command: 'node atm.mjs lock check --json'
+  },
+  {
+    id: 'atm-evidence',
+    title: 'ATM Evidence',
+    summary: 'Explain missing evidence or blocked guidance before proceeding.',
+    command: 'node atm.mjs explain --why blocked --json'
+  },
+  {
+    id: 'atm-upgrade-scan',
+    title: 'ATM Upgrade Scan',
+    summary: 'Scan evidence reports and draft governed upgrade proposals.',
+    command: 'node atm.mjs upgrade --scan --input "$ARGUMENTS" --json'
+  },
+  {
+    id: 'atm-handoff',
+    title: 'ATM Handoff',
+    summary: 'Write a continuation summary for governed work.',
+    command: 'node atm.mjs handoff summarize --task "$ARGUMENTS" --json'
+  }
+] as const;
+
 export interface IntegrationInstallContext {
   readonly repositoryRoot: string;
   readonly actor?: string;
@@ -111,6 +159,16 @@ export interface IntegrationAdapter {
   uninstall(context: IntegrationInstallContext, manifest: InstallManifest): Promise<IntegrationUninstallResult> | IntegrationUninstallResult;
 }
 
+export interface StaticIntegrationAdapterInput {
+  readonly id: IntegrationAdapterId;
+  readonly displayName: string;
+  readonly adapterVersion: string;
+  readonly targetDir: string;
+  readonly fileFormat: IntegrationFileFormat;
+  readonly placeholderStyle: IntegrationPlaceholderStyle;
+  readonly sourceFiles: readonly IntegrationSourceFile[];
+}
+
 export interface CodexSkillsAdapterOptions {
   readonly adapterVersion?: string;
   readonly targetDir?: string;
@@ -180,26 +238,36 @@ export function createManifestFileRecord(input: {
 }
 
 export function createCodexSkillsAdapter(sourceFiles: readonly IntegrationSourceFile[], options: CodexSkillsAdapterOptions = {}): IntegrationAdapter {
-  const adapterVersion = options.adapterVersion ?? integrationsCorePackage.packageVersion;
-  const targetDirectory = normalizeManifestPath(options.targetDir ?? 'integrations/codex-skills');
-  const adapterId: KnownIntegrationAdapterId = 'codex';
-  return {
-    id: adapterId,
+  return createStaticIntegrationAdapter({
+    id: 'codex',
     displayName: 'Codex skills',
-    adapterVersion,
+    adapterVersion: options.adapterVersion ?? integrationsCorePackage.packageVersion,
+    targetDir: options.targetDir ?? 'integrations/codex-skills',
     fileFormat: 'skill',
     placeholderStyle: '$ARGUMENTS',
+    sourceFiles
+  });
+}
+
+export function createStaticIntegrationAdapter(input: StaticIntegrationAdapterInput): IntegrationAdapter {
+  const targetDirectory = normalizeManifestPath(input.targetDir);
+  return {
+    id: input.id,
+    displayName: input.displayName,
+    adapterVersion: input.adapterVersion,
+    fileFormat: input.fileFormat,
+    placeholderStyle: input.placeholderStyle,
     targetDir: () => targetDirectory,
     install: (context) => installSourceFiles({
-      adapterId,
-      adapterVersion,
+      adapterId: input.id,
+      adapterVersion: input.adapterVersion,
       context,
-      defaultFileFormat: 'skill',
-      sourceFiles,
+      defaultFileFormat: input.fileFormat,
+      sourceFiles: input.sourceFiles,
       targetDirectory
     }),
-    verify: (context, manifest) => verifyManifestFiles(adapterId, context, manifest),
-    uninstall: (context, manifest) => uninstallManifestFiles(adapterId, context, manifest)
+    verify: (context, manifest) => verifyManifestFiles(input.id, context, manifest),
+    uninstall: (context, manifest) => uninstallManifestFiles(input.id, context, manifest)
   };
 }
 
