@@ -157,6 +157,8 @@ identity:
 
 M4 is delivered as the first concrete Integration Adapter Layer contract. `packages/integrations-core` now defines `IntegrationAdapter`, `InstallManifest`, SHA-256 helpers, and a Codex skills adapter factory. `schemas/integrations/install-manifest.schema.json` validates the hash-locked manifest, and `scripts/validate-integration-adapter.ts` exercises install, verify, drift detection, and hash-guarded uninstall for the existing Codex skill surface.
 
+M5 is delivered as four installable agent adapters: `integration-claude-code`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each adapter emits the seven minimum ATM entrypoints, includes the `{{CHARTER_INVARIANTS}}` placeholder, makes `node atm.mjs next --json` the required first command, and participates in the shared install/verify/uninstall manifest validation.
+
 See [CHANGELOG.md](../CHANGELOG.md) for delivered milestone entries.
 
 ## Related Documentation

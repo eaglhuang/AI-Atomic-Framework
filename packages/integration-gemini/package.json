@@ -1,0 +1,28 @@
+{
+  "name": "@ai-atomic-framework/integration-gemini",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Gemini CLI integration adapter for ATM agent entry commands.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@ai-atomic-framework/integrations-core": "0.0.0"
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/integration-gemini",
+    "test": "node --experimental-strip-types ../../scripts/validate-integration-adapter.ts --mode test --filter gemini",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
+}

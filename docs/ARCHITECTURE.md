@@ -69,6 +69,8 @@ The charter is not a `packages/core` contract. It lives entirely in the Agent Op
 
 The Integration Adapter Layer translates ATM's governance entry points into the native skill or instruction format understood by different AI agent environments (such as Claude Code, GitHub Copilot, Cursor, and Gemini). Its typed contract lives in `packages/integrations-core`: adapters expose `install`, `verify`, and hash-guarded `uninstall`, while install output is recorded as an `InstallManifest`. Adapters write integration files to agent-specific directories (`.claude/skills/`, `.github/`, `.cursor/rules/`, `.gemini/`) and record file hashes in `.atm/integrations/manifest.json` to support clean install, verify, and uninstall operations.
 
+The first adapter set lives in separate packages: `integration-claude-code`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each package emits the same minimum ATM entrypoints and keeps charter injection as a delivery-time placeholder instead of copying host-specific rule text into framework core.
+
 Integration adapters are a delivery mechanism only. They wrap existing ATM CLI commands and must not introduce a parallel governance model, task store, or approval workflow. All governed actions remain routed through `node atm.mjs next --json`.
 
 ### CAR Reporting Lens

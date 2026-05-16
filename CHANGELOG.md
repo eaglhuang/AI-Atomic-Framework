@@ -2,6 +2,7 @@
 
 ## 2026-05-17
 
+- Delivered M5 agent adapters for Claude Code, GitHub Copilot, Cursor, and Gemini, each with seven ATM entrypoints, charter invariant placeholders, first-command routing, and shared manifest validation.
 - Delivered M4 Integration Adapter contract: `packages/integrations-core`, install manifest schema, Codex skills reference adapter validation, and `validate:integration-adapter` in the standard suite.
 
 ## 2026-05-12
