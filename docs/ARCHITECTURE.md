@@ -35,6 +35,14 @@ The Evidence-Driven Evolution Layer coordinates governed Atom and Atom Map impro
 
 All promotion decisions remain owned by the existing JSON Schema validators, `ReviewAdvisory`, `HumanReviewDecision`, behavior guards, registry transitions, and mutability policy. The design plan lives in `docs/ATOM_EVOLUTION_PLAN.md`.
 
+### Atomic Map Replacement Surface
+
+Atomic maps may also serve as the governed replacement surface for a larger feature. In that role, a map is more than an atom relationship graph: it carries member roles, edge semantics, feature or legacy entrypoints, equivalence evidence, rollout state, and rollback requirements for the larger capability it represents.
+
+Replacement rollout is tracked separately from registry lifecycle state. The public lane is `draft -> shadow -> canary -> active -> legacy-retired`; registry states such as `validated` or `deprecated` must not be reused as rollout modes.
+
+The public protocol is documented in `docs/MAP_REPLACEMENT_PROTOCOL.md`. Internal implementation task cards should stay in the host workspace that coordinates the work, not in the framework core repository.
+
 ### Agent Operating Layer
 
 The Agent Operating Layer teaches a model-neutral agent how to operate inside a repository. It includes instructions, profile files, project probing, first-task creation, run envelopes, and handoff guidance.
@@ -59,7 +67,7 @@ The charter is not a `packages/core` contract. It lives entirely in the Agent Op
 
 #### Integration Adapter Layer
 
-The Integration Adapter Layer translates ATM's governance entry points into the native skill or instruction format understood by different AI agent environments (such as Claude Code, GitHub Copilot, Cursor, and Gemini). Adapters write integration files to agent-specific directories (`.claude/skills/`, `.github/`, `.cursor/rules/`, `.gemini/`) and record file hashes in `.atm/integrations/manifest.json` to support clean install, verify, and uninstall operations.
+The Integration Adapter Layer translates ATM's governance entry points into the native skill or instruction format understood by different AI agent environments (such as Claude Code, GitHub Copilot, Cursor, and Gemini). Its typed contract lives in `packages/integrations-core`: adapters expose `install`, `verify`, and hash-guarded `uninstall`, while install output is recorded as an `InstallManifest`. Adapters write integration files to agent-specific directories (`.claude/skills/`, `.github/`, `.cursor/rules/`, `.gemini/`) and record file hashes in `.atm/integrations/manifest.json` to support clean install, verify, and uninstall operations.
 
 Integration adapters are a delivery mechanism only. They wrap existing ATM CLI commands and must not introduce a parallel governance model, task store, or approval workflow. All governed actions remain routed through `node atm.mjs next --json`.
 

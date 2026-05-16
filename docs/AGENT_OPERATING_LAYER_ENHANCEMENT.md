@@ -155,6 +155,8 @@ identity:
 
 ## Implementation Status
 
+M4 is delivered as the first concrete Integration Adapter Layer contract. `packages/integrations-core` now defines `IntegrationAdapter`, `InstallManifest`, SHA-256 helpers, and a Codex skills adapter factory. `schemas/integrations/install-manifest.schema.json` validates the hash-locked manifest, and `scripts/validate-integration-adapter.ts` exercises install, verify, drift detection, and hash-guarded uninstall for the existing Codex skill surface.
+
 See [CHANGELOG.md](../CHANGELOG.md) for delivered milestone entries.
 
 ## Related Documentation

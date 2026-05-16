@@ -1,0 +1,25 @@
+{
+  "name": "@ai-atomic-framework/integrations-core",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Integration adapter contracts and install manifest utilities for ATM agent entrypoints.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/integrations-core",
+    "test": "node --experimental-strip-types ../../scripts/validate-integration-adapter.ts --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
+}

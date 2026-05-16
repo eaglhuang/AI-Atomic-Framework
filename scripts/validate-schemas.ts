@@ -47,7 +47,8 @@ const schemaEntries: Record<string, string> = {
   'behavior-proposal': 'schemas/behavior/behavior-proposal.schema.json',
   'polymorphic-template': 'schemas/polymorphism/polymorphic-template.schema.json',
   'dimension-spec': 'schemas/polymorphism/dimension-spec.schema.json',
-  'charter-invariants': 'schemas/charter/charter-invariants.schema.json'
+  'charter-invariants': 'schemas/charter/charter-invariants.schema.json',
+  'integration-install-manifest': 'schemas/integrations/install-manifest.schema.json'
 };
 
 const supportSchemaEntries: Record<string, string> = {

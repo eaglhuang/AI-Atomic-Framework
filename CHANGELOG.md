@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-05-17
+
+- Delivered M4 Integration Adapter contract: `packages/integrations-core`, install manifest schema, Codex skills reference adapter validation, and `validate:integration-adapter` in the standard suite.
+
 ## 2026-05-12
 
 - Delivered ATM v0.2 phase-3 portable onefile pipeline.
