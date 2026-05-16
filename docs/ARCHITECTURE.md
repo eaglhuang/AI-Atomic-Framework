@@ -41,6 +41,28 @@ The Agent Operating Layer teaches a model-neutral agent how to operate inside a 
 
 This layer exists so a user can drop ATM into a project root and let an AI agent discover the expected workflow before editing files.
 
+#### AtomicCharter Authority
+
+The Agent Operating Layer hosts a framework-level authority document — the **AtomicCharter** — installed at `.atm/charter/atomic-charter.md` alongside a machine-readable companion file `.atm/charter/charter-invariants.json`. The charter sits above host project rules in the authority hierarchy:
+
+```
+AtomicCharter (framework layer)     ← highest authority
+    ↑ conflicts require waiver flow
+host project rules / profiles       ← secondary
+    ↑ extends
+single-agent / single-user overlays ← lowest
+```
+
+`atm doctor` enforces charter integrity through a dedicated `charter-integrity` check. Promotion gates (`atm upgrade --propose`) compare proposed changes against invariants before allowing advancement. Host rule conflicts must be resolved through a `charterWaiver` field in a `behavior.evolve` UpgradeProposal with a linked `HumanReviewDecision`.
+
+The charter is not a `packages/core` contract. It lives entirely in the Agent Operating Layer and is installed by `atm init --adopt default`.
+
+#### Integration Adapter Layer
+
+The Integration Adapter Layer translates ATM's governance entry points into the native skill or instruction format understood by different AI agent environments (such as Claude Code, GitHub Copilot, Cursor, and Gemini). Adapters write integration files to agent-specific directories (`.claude/skills/`, `.github/`, `.cursor/rules/`, `.gemini/`) and record file hashes in `.atm/integrations/manifest.json` to support clean install, verify, and uninstall operations.
+
+Integration adapters are a delivery mechanism only. They wrap existing ATM CLI commands and must not introduce a parallel governance model, task store, or approval workflow. All governed actions remain routed through `node atm.mjs next --json`.
+
 ### CAR Reporting Lens
 
 ATM can be described through the Harness Engineering CAR lens without changing its core layers:

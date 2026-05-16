@@ -1,0 +1,55 @@
+{
+  "schemaId": "atm.charterInvariants",
+  "specVersion": "0.1.0",
+  "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial installation by atm init." },
+  "charterVersion": "1.0.0",
+  "projectName": "[PROJECT_NAME]",
+  "lastAmendedAt": "2026-05-17T00:00:00.000Z",
+  "invariants": [
+    {
+      "id": "INV-ATM-001",
+      "title": "No second registry",
+      "rule": "A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.",
+      "enforcement": "gate",
+      "breakingChange": true,
+      "tags": ["registry", "core-boundary"],
+      "rationale": "A second registry would split the source of truth for atom identity and lifecycle, making cross-tool governance impossible."
+    },
+    {
+      "id": "INV-ATM-002",
+      "title": "Lock before edit",
+      "rule": "No governed file mutation may occur without a valid ScopeLock recorded in .atm/locks/ for the current WorkItem. Agents must call atm lock before editing files.",
+      "enforcement": "doctor",
+      "breakingChange": false,
+      "tags": ["lock", "governance", "default-guard"],
+      "rationale": "Scope locks are the primary contention signal that lets multiple agents or humans work in the same repository without stepping on each other."
+    },
+    {
+      "id": "INV-ATM-003",
+      "title": "Schema-validated promotion only",
+      "rule": "An UpgradeProposal must pass all automatedGates (including JSON Schema validation) before promotion. Direct registry mutation that bypasses the UpgradeProposal path is forbidden.",
+      "enforcement": "gate",
+      "breakingChange": true,
+      "tags": ["upgrade", "registry", "schema"],
+      "rationale": "Schema validation gates are the deterministic backbone that makes ATM governance auditable and reproducible."
+    },
+    {
+      "id": "INV-ATM-004",
+      "title": "No competing highest authority",
+      "rule": "No host project rule, profile, or configuration may declare itself to have authority equal to or higher than the AtomicCharter. Any rule that contradicts an invariant must go through a charter waiver proposal.",
+      "enforcement": "doctor",
+      "breakingChange": true,
+      "tags": ["charter", "authority"],
+      "rationale": "A single authoritative charter is what makes ATM composable across different host projects with different conventions."
+    },
+    {
+      "id": "INV-ATM-005",
+      "title": "Host rule amendments require waiver flow",
+      "rule": "When a host project rule conflicts with a charter invariant, the host must submit a behavior.evolve UpgradeProposal with a charterWaiver field and a linked HumanReviewDecision. Silent override is not permitted.",
+      "enforcement": "waiver-required",
+      "breakingChange": false,
+      "tags": ["charter", "host-rules", "waiver"],
+      "rationale": "Making conflict resolution explicit and auditable prevents silent governance drift across projects that adopt ATM."
+    }
+  ]
+}

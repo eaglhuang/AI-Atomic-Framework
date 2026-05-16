@@ -8,6 +8,39 @@ Host repositories can choose stronger enforcement without changing ATM core cont
 This document explains what ATM enforces natively, where the cooperation boundary
 is, and how a host can add harder gates on top.
 
+## Framework Charter Authority
+
+ATM ships a framework-level authority document — the **AtomicCharter** — that applies to every repository that adopts ATM. The charter resides at `.atm/charter/atomic-charter.md` with a machine-readable companion at `.atm/charter/charter-invariants.json`.
+
+The charter establishes a non-negotiable authority hierarchy:
+
+```
+AtomicCharter (framework layer)     ← highest authority
+    ↑ conflicts require waiver flow
+host project rules / profiles       ← secondary
+    ↑ extends
+single-agent / single-user overlays ← lowest
+```
+
+**What this means in practice:**
+
+- Host project rules and profiles may extend or restrict ATM behavior within the bounds defined by the charter invariants.
+- A host rule that contradicts a charter invariant must go through a governed `charterWaiver` proposal — it cannot silently override the invariant.
+- `atm doctor` runs a `charter-integrity` check on every call. A missing charter file or hash mismatch produces `ATM_DOCTOR_CHARTER_MISSING` or `ATM_DOCTOR_CHARTER_HASH_MISMATCH` and routes `atm next` to charter repair before any other governed action.
+- `atm upgrade --propose` compares the proposal against invariants before allowing promotion. Proposals that violate an invariant and lack a `charterWaiver` field are blocked with `ATM_CHARTER_INVARIANT_GATE`.
+
+The charter is installed automatically by `atm init --adopt default`. The five seed invariants are:
+
+| ID | Title | Enforcement |
+|----|-------|-------------|
+| INV-ATM-001 | No second registry | gate |
+| INV-ATM-002 | Lock before edit | doctor |
+| INV-ATM-003 | Schema-validated promotion only | gate |
+| INV-ATM-004 | No competing highest authority | doctor |
+| INV-ATM-005 | Host rule amendments require waiver flow | waiver-required |
+
+See `schemas/charter/charter-invariants.schema.json` for the authoritative data contract.
+
 ## How ATM Enforces Governance
 
 ATM's native governance comes from three places.
