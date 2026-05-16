@@ -6,6 +6,7 @@ import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const legacySkillRelativePath = path.join('integrations', 'codex-skills', 'atm-legacy-atomization-guidance', 'SKILL.md');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
@@ -42,6 +43,8 @@ try {
   const manifest = JSON.parse(readFileSync(release.manifestPath, 'utf8'));
   assert(existsSync(release.entrypointPath), 'release bundle must emit atm.mjs');
   assert(existsSync(path.join(release.releaseRoot, 'packages', 'cli', 'dist', 'atm.mjs')), 'release bundle must include CLI dist entrypoint');
+  assert(existsSync(path.join(release.releaseRoot, legacySkillRelativePath)), 'release bundle must include ATM legacy atomization skill');
+  assert(manifest.entries.includes('integrations'), 'release manifest must include integrations');
   assert(manifest.entrypoint === 'atm.mjs', 'release manifest must preserve atm.mjs entrypoint');
 
   const bundleRepo = path.join(tempRoot, 'bundle-repo');
@@ -83,6 +86,12 @@ try {
   const bootstrap = runAtm(blankRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'blank root-drop repo bootstrap must exit 0');
   assert(bootstrap.parsed.ok === true, 'blank root-drop repo bootstrap must report ok=true');
+
+  const installSkill = runAtm(blankRepo, ['guide', 'install-skill', '--cwd', '.', '--target', 'host', '--json']);
+  assert(installSkill.exitCode === 0, 'blank root-drop repo guide install-skill must exit 0');
+  assert(installSkill.parsed.ok === true, 'blank root-drop repo guide install-skill must report ok=true');
+  assert(existsSync(path.join(blankRepo, '.agents', 'skills', 'atm-legacy-atomization-guidance', 'SKILL.md')),
+    'blank root-drop repo guide install-skill must install the legacy atomization skill');
 
   const doctorAfterBootstrap = runAtm(blankRepo, ['doctor', '--json']);
   assert(doctorAfterBootstrap.exitCode === 0, 'blank root-drop repo doctor must exit 0 after bootstrap');
