@@ -120,6 +120,9 @@
         "$ref": "#/$defs/memberVersionTransition"
       }
     },
+    "charterWaiver": {
+      "$ref": "#/$defs/charterWaiver"
+    },
     "generatorProvenance": {
       "type": "string",
       "minLength": 1
@@ -370,6 +373,9 @@
         "mutabilityPolicy": {
           "$ref": "#/$defs/gateResult"
         },
+        "charterGate": {
+          "$ref": "#/$defs/gateResult"
+        },
         "allPassed": {
           "type": "boolean"
         },
@@ -377,7 +383,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy", "charterInvariantViolation"]
           }
         }
       }
@@ -576,6 +582,25 @@
         "reason": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "charterWaiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "approvedBy", "approvedAt"],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approvedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approvedAt": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     }
