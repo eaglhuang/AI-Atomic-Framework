@@ -1,16 +1,49 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.ai-atomic-framework.dev/registry/atomic-map.schema.json",
-  "title": "ATM Atomic Map v0.1",
+  "title": "ATM Atomic Map v0.2",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaId", "specVersion", "migration", "mapId", "mapVersion", "members", "edges", "entrypoints", "qualityTargets", "mapHash"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "specVersion": {
+            "const": "0.1.0"
+          }
+        },
+        "required": ["specVersion"]
+      },
+      "then": {
+        "not": {
+          "required": ["replacement"]
+        },
+        "properties": {
+          "members": {
+            "items": {
+              "not": {
+                "required": ["role"]
+              }
+            }
+          },
+          "edges": {
+            "items": {
+              "not": {
+                "required": ["edgeKind"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "properties": {
     "schemaId": {
       "const": "atm.atomicMap"
     },
     "specVersion": {
-      "const": "0.1.0"
+      "enum": ["0.1.0", "0.2.0"]
     },
     "migration": {
       "$ref": "#/$defs/migration"
@@ -51,6 +84,9 @@
     "mapHash": {
       "type": "string",
       "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "replacement": {
+      "$ref": "#/$defs/replacement"
     },
     "semanticFingerprint": {
       "oneOf": [
@@ -105,6 +141,9 @@
         "version": {
           "type": "string",
           "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "role": {
+          "enum": ["entry-adapter", "domain-step", "validator", "side-effect", "rollback-adapter"]
         }
       }
     },
@@ -124,6 +163,36 @@
         "binding": {
           "type": "string",
           "minLength": 1
+        },
+        "edgeKind": {
+          "enum": ["data-flow", "control-flow", "event-flow", "validation", "fallback", "side-effect", "rollback"]
+        }
+      }
+    },
+    "replacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["legacyUris", "mode", "evidenceRefs"],
+      "properties": {
+        "legacyUris": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^legacy://.+$"
+          }
+        },
+        "mode": {
+          "enum": ["draft", "shadow", "canary", "active", "legacy-retired"]
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },

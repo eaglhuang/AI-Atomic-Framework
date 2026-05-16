@@ -276,6 +276,9 @@
           "type": "string",
           "pattern": "^sha256:[a-f0-9]{64}$"
         },
+        "replacement": {
+          "$ref": "#/$defs/mapReplacement"
+        },
         "status": {
           "enum": ["draft", "validated", "active", "transitioning", "deprecated", "expired", "quarantined"]
         },
@@ -335,6 +338,9 @@
         "version": {
           "type": "string",
           "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "role": {
+          "enum": ["entry-adapter", "domain-step", "validator", "side-effect", "rollback-adapter"]
         }
       }
     },
@@ -354,6 +360,36 @@
         "binding": {
           "type": "string",
           "minLength": 1
+        },
+        "edgeKind": {
+          "enum": ["data-flow", "control-flow", "event-flow", "validation", "fallback", "side-effect", "rollback"]
+        }
+      }
+    },
+    "mapReplacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["legacyUris", "mode", "evidenceRefs"],
+      "properties": {
+        "legacyUris": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^legacy://.+$"
+          }
+        },
+        "mode": {
+          "enum": ["draft", "shadow", "canary", "active", "legacy-retired"]
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },

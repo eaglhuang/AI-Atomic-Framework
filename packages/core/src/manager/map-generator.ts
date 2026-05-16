@@ -9,6 +9,9 @@ import { allocateMapId, MapIdAllocationError, parseMapId } from './map-id-alloca
 
 const defaultRegistryPath = 'atomic-registry.json';
 const defaultCatalogPath = 'atomic_workbench/registry-catalog.md';
+const memberRoles = new Set(['entry-adapter', 'domain-step', 'validator', 'side-effect', 'rollback-adapter']);
+const edgeKinds = new Set(['data-flow', 'control-flow', 'event-flow', 'validation', 'fallback', 'side-effect', 'rollback']);
+const replacementModes = new Set(['draft', 'shadow', 'canary', 'active', 'legacy-retired']);
 type GeneratorError = Error & {
   code: string;
   details: Record<string, unknown>;
@@ -151,7 +154,10 @@ export function createMinimalAtomicMapSpec(request: any) {
   const entrypoints = normalizeEntrypoints(request.entrypoints, memberIds);
   const qualityTargets = normalizeQualityTargets(request.qualityTargets);
   const mapVersion = normalizeSemver(request.mapVersion ?? '0.1.0', 'mapVersion');
-  const mapHash = computeAtomicMapHash({ members, edges, entrypoints });
+  const replacement = normalizeReplacement(request.replacement);
+  const specVersion = normalizeSpecVersion(request.specVersion ?? inferSpecVersion({ members, edges, replacement }));
+  assertSpecVersionSupportsMapSurface(specVersion, { members, edges, replacement });
+  const mapHash = computeAtomicMapHash({ members, edges, entrypoints, replacement });
   const pendingSfCalculation = request.pendingSfCalculation === true;
   const semanticFingerprint = pendingSfCalculation
     ? null
@@ -159,7 +165,7 @@ export function createMinimalAtomicMapSpec(request: any) {
 
   return {
     schemaId: 'atm.atomicMap',
-    specVersion: '0.1.0',
+    specVersion,
     migration: {
       strategy: 'none',
       fromVersion: null,
@@ -172,6 +178,7 @@ export function createMinimalAtomicMapSpec(request: any) {
     entrypoints,
     qualityTargets,
     mapHash,
+    ...(replacement ? { replacement } : {}),
     semanticFingerprint,
     ...(pendingSfCalculation ? { pendingSfCalculation: true } : {})
   };
@@ -188,6 +195,8 @@ function normalizeRequest(request: any) {
     entrypoints: request.entrypoints,
     qualityTargets: request.qualityTargets,
     mapVersion: request.mapVersion ?? '0.1.0',
+    specVersion: request.specVersion,
+    replacement: normalizeReplacement(request.replacement),
     pendingSfCalculation: request.pendingSfCalculation === true
   };
 }
@@ -199,7 +208,8 @@ function normalizeMembers(members: any) {
 
   return members.map((member) => ({
     atomId: normalizeAtomId(member?.atomId, 'members[].atomId'),
-    version: normalizeSemver(member?.version, 'members[].version')
+    version: normalizeSemver(member?.version, 'members[].version'),
+    ...normalizeOptionalMemberRole(member?.role)
   }));
 }
 
@@ -221,7 +231,12 @@ function normalizeEdges(edges: any, memberIds: any) {
         to
       });
     }
-    return { from, to, binding };
+    return {
+      from,
+      to,
+      binding,
+      ...normalizeOptionalEdgeKind(edge?.edgeKind)
+    };
   });
 }
 
@@ -299,6 +314,96 @@ function normalizeRequiredText(value: any, fieldName: any) {
     throw createGeneratorError('ATM_MAP_GENERATOR_REQUEST_INVALID', `Atomic map generator requires ${fieldName}.`, { fieldName });
   }
   return value.trim();
+}
+
+function normalizeSpecVersion(value: any) {
+  const specVersion = String(value || '').trim();
+  if (!['0.1.0', '0.2.0'].includes(specVersion)) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_SPEC_VERSION_INVALID', 'Atomic map specVersion must be 0.1.0 or 0.2.0.', { specVersion: value });
+  }
+  return specVersion;
+}
+
+function inferSpecVersion(input: any) {
+  const hasMemberRoles = input.members.some((member: any) => Boolean(member.role));
+  const hasEdgeKinds = input.edges.some((edge: any) => Boolean(edge.edgeKind));
+  return hasMemberRoles || hasEdgeKinds || input.replacement ? '0.2.0' : '0.1.0';
+}
+
+function assertSpecVersionSupportsMapSurface(specVersion: any, input: any) {
+  if (specVersion !== '0.1.0') {
+    return;
+  }
+  const hasMemberRoles = input.members.some((member: any) => Boolean(member.role));
+  const hasEdgeKinds = input.edges.some((edge: any) => Boolean(edge.edgeKind));
+  if (hasMemberRoles || hasEdgeKinds || input.replacement) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_SPEC_VERSION_INVALID', 'Atomic map replacement surface fields require specVersion 0.2.0.', { specVersion });
+  }
+}
+
+function normalizeOptionalMemberRole(value: any) {
+  if (value == null || String(value).trim() === '') {
+    return {};
+  }
+  const role = String(value).trim();
+  if (!memberRoles.has(role)) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_MEMBER_ROLE_INVALID', 'members[].role is not a known atomic map member role.', { role });
+  }
+  return { role };
+}
+
+function normalizeOptionalEdgeKind(value: any) {
+  if (value == null || String(value).trim() === '') {
+    return {};
+  }
+  const edgeKind = String(value).trim();
+  if (!edgeKinds.has(edgeKind)) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_EDGE_KIND_INVALID', 'edges[].edgeKind is not a known atomic map edge kind.', { edgeKind });
+  }
+  return { edgeKind };
+}
+
+function normalizeReplacement(replacement: any) {
+  if (replacement == null) {
+    return null;
+  }
+  if (typeof replacement !== 'object' || Array.isArray(replacement)) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement must be an object.', { fieldName: 'replacement' });
+  }
+  const legacyUris = normalizeLegacyUris(replacement.legacyUris);
+  const mode = normalizeReplacementMode(replacement.mode ?? 'draft');
+  const evidenceRefs = normalizeEvidenceRefs(replacement.evidenceRefs ?? []);
+  return { legacyUris, mode, evidenceRefs };
+}
+
+function normalizeLegacyUris(values: any) {
+  if (!Array.isArray(values) || values.length === 0) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement.legacyUris must contain at least one legacy:// URI.', { fieldName: 'replacement.legacyUris' });
+  }
+  return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))]
+    .map((legacyUri) => {
+      if (!/^legacy:\/\/.+/.test(legacyUri)) {
+        throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement.legacyUris entries must start with legacy://.', { legacyUri });
+      }
+      return legacyUri;
+    })
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeReplacementMode(value: any) {
+  const mode = String(value || '').trim();
+  if (!replacementModes.has(mode)) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement.mode is not a valid rollout mode.', { mode: value });
+  }
+  return mode;
+}
+
+function normalizeEvidenceRefs(values: any) {
+  if (!Array.isArray(values)) {
+    throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement.evidenceRefs must be an array.', { fieldName: 'replacement.evidenceRefs' });
+  }
+  return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
 }
 
 function readRegistryDocument(registryAbsolutePath: any, options: any) {
@@ -457,25 +562,37 @@ function createAtomicMapHashPayload(input: any) {
     members: [...input.members]
       .map((member) => ({
         atomId: String(member.atomId).trim(),
-        version: String(member.version).trim()
+        version: String(member.version).trim(),
+        ...(member.role ? { role: String(member.role).trim() } : {})
       }))
-      .sort((left, right) => left.atomId.localeCompare(right.atomId) || left.version.localeCompare(right.version)),
+      .sort((left, right) => left.atomId.localeCompare(right.atomId) || left.version.localeCompare(right.version) || String(left.role ?? '').localeCompare(String(right.role ?? ''))),
     edges: [...input.edges]
       .map((edge) => ({
         from: String(edge.from).trim(),
         to: String(edge.to).trim(),
-        binding: String(edge.binding).trim()
+        binding: String(edge.binding).trim(),
+        ...(edge.edgeKind ? { edgeKind: String(edge.edgeKind).trim() } : {})
       }))
-      .sort((left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to) || left.binding.localeCompare(right.binding)),
+      .sort((left, right) => left.from.localeCompare(right.from) || left.to.localeCompare(right.to) || left.binding.localeCompare(right.binding) || String(left.edgeKind ?? '').localeCompare(String(right.edgeKind ?? ''))),
     entrypoints: [...input.entrypoints]
       .map((entrypoint) => String(entrypoint).trim())
       .filter(Boolean)
-      .sort((left, right) => left.localeCompare(right))
+      .sort((left, right) => left.localeCompare(right)),
+    ...(input.replacement ? { replacement: normalizeAtomicMapReplacementForHash(input.replacement) } : {})
   };
 }
 
 function computeAtomicMapHash(input: any) {
   return computeSha256ForContent(JSON.stringify(createAtomicMapHashPayload(input)));
+}
+
+function normalizeAtomicMapReplacementForHash(replacement: any) {
+  return {
+    legacyUris: [...replacement.legacyUris]
+      .map((legacyUri) => String(legacyUri).trim())
+      .filter(Boolean)
+      .sort((left, right) => left.localeCompare(right))
+  };
 }
 
 function recordPhase(phases: any, phase: any, action: any) {
