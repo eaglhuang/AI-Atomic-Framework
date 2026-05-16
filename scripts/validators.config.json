@@ -9,6 +9,7 @@
         "validate-guidance",
         "validate-guide",
         "validate-evidence-detector",
+        "validate-conversation-evolution",
         "validate-map-curator",
         "validate-self-hosting-alpha",
         "audit-hash-placeholders"
@@ -44,6 +45,7 @@
         "validate-guidance",
         "validate-guide",
         "validate-evidence-detector",
+        "validate-conversation-evolution",
         "validate-map-curator",
         "validate-git-head-evidence",
         "validate-git-hooks-enforcement",
@@ -56,7 +58,8 @@
         "validate-registry-diff",
         "validate-regression-compare",
         "audit-hash-placeholders",
-        "validate-rollout-metrics"
+        "validate-rollout-metrics",
+        "validate-charter"
       ]
     },
     "full": {
@@ -104,6 +107,7 @@
     { "name": "validate-guidance", "entry": "scripts/validate-guidance.ts", "tags": ["cli", "guidance"], "slow": false },
     { "name": "validate-guide", "entry": "scripts/validate-guide.ts", "tags": ["cli", "guide"], "slow": false },
     { "name": "validate-evidence-detector", "entry": "scripts/validate-evidence-detector.ts", "tags": ["evidence", "evolution"], "slow": false },
+    { "name": "validate-conversation-evolution", "entry": "scripts/validate-conversation-evolution.ts", "tags": ["evidence", "evolution", "conversation"], "slow": false },
     { "name": "validate-map-curator", "entry": "scripts/validate-map-curator.ts", "tags": ["map", "evolution"], "slow": false },
     { "name": "validate-git-head-evidence", "entry": "scripts/validate-git-head-evidence.ts", "tags": ["cli", "git", "evidence"], "slow": false },
     { "name": "validate-git-hooks-enforcement", "entry": "scripts/validate-git-hooks-enforcement.ts", "tags": ["examples", "git", "evidence"], "slow": false },
@@ -117,6 +121,7 @@
     { "name": "validate-regression-compare", "entry": "scripts/validate-regression-compare.ts", "tags": ["regression"], "slow": false },
     { "name": "audit-hash-placeholders", "entry": "scripts/audit-hash-placeholders.ts", "tags": ["hash", "guard"], "slow": false },
     { "name": "validate-rollout-metrics", "entry": "scripts/validate-rollout-metrics.ts", "tags": ["evolution", "metrics"], "slow": false },
+    { "name": "validate-charter", "entry": "scripts/validate-charter.ts", "tags": ["charter", "contract"], "slow": false },
     { "name": "validate-upgrade-proposal", "entry": "scripts/validate-upgrade-proposal.ts", "tags": ["upgrade"], "slow": false },
     { "name": "validate-rollback-proof", "entry": "scripts/validate-rollback-proof.ts", "tags": ["rollback"], "slow": false },
     { "name": "validate-human-review", "entry": "scripts/validate-human-review.ts", "tags": ["review"], "slow": false },

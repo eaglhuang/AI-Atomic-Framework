@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/charter/charter-invariants.schema.json",
+  "title": "ATM Charter Invariants v0.1",
+  "description": "Machine-readable list of framework-level invariants that no host project rule may override without a governed charter waiver.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "charterVersion", "lastAmendedAt", "invariants"],
+  "properties": {
+    "schemaId": {
+      "const": "atm.charterInvariants"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "charterVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "SemVer version of the charter. Breaking changes require a charter waiver proposal."
+    },
+    "projectName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display name of the host repository (substituted from [PROJECT_NAME] template placeholder)."
+    },
+    "lastAmendedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp of the last amendment to this invariants file."
+    },
+    "charterHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the companion atomic-charter.md at the time this invariants file was generated."
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "invariants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/invariant"
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "rule", "enforcement"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^INV-ATM-\\d{3}$",
+          "description": "Stable identifier for this invariant. Never reuse a retired ID."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable statement of what is forbidden or required."
+        },
+        "enforcement": {
+          "enum": ["doctor", "gate", "waiver-required"],
+          "description": "doctor: reported by atm doctor; gate: blocks promotion; waiver-required: needs charterWaiver + human review."
+        },
+        "breakingChange": {
+          "type": "boolean",
+          "description": "True when amending this invariant constitutes a breaking charter change requiring SemVer major bump."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Brief explanation of why this invariant exists."
+        }
+      }
+    }
+  }
+}
