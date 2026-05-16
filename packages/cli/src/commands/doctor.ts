@@ -73,12 +73,15 @@ export function runDoctor(argv: any) {
       expectedLayoutVersion: atmLayoutVersion,
       migrationNeeded: runtime.migrationNeeded
     }),
+    createCheck('charter-integrity', checkCharterIntegrity(root).ok, checkCharterIntegrity(root)),
     createGitHeadEvidenceCheck(root, runtime)
   ];
   const ok = checks.every((check) => check.ok);
   const failedChecks = checks.filter((check) => !check.ok).map((check) => check.name);
   const recommendedAction = ok
     ? 'node atm.mjs next --json'
+    : failedChecks.includes('charter-integrity')
+      ? 'node atm.mjs init --adopt default --force to reinstall the AtomicCharter, or restore .atm/charter/atomic-charter.md and .atm/charter/charter-invariants.json manually.'
     : failedChecks.includes('git-head-evidence')
       ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
     : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
@@ -86,6 +89,8 @@ export function runDoctor(argv: any) {
       : 'npm run validate:full';
   const messages = ok
     ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
+    : failedChecks.includes('charter-integrity')
+      ? [message('error', 'ATM_DOCTOR_CHARTER_MISSING', 'AtomicCharter files are missing or corrupt. Repair before continuing.', { failedChecks })]
     : failedChecks.includes('git-head-evidence')
       ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
       : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })];
@@ -140,4 +145,35 @@ function listFiles(directory: any): string[] {
     }
     return [absolutePath];
   });
+}
+
+function checkCharterIntegrity(root: any): { ok: boolean; charterPath: string; charterInvariantsPath: string; charterPresent: boolean; invariantsPresent: boolean; invariantsParseable: boolean; hashField: string | null } {
+  const charterPath = path.join(root, '.atm', 'charter', 'atomic-charter.md');
+  const invariantsPath = path.join(root, '.atm', 'charter', 'charter-invariants.json');
+  const charterPresent = existsSync(charterPath);
+  const invariantsPresent = existsSync(invariantsPath);
+  let invariantsParseable = false;
+  let hashField: string | null = null;
+  if (invariantsPresent) {
+    try {
+      const parsed = JSON.parse(readFileSync(invariantsPath, 'utf8')) as Record<string, unknown>;
+      invariantsParseable = true;
+      hashField = typeof parsed.charterHash === 'string' ? parsed.charterHash : null;
+    } catch {
+      invariantsParseable = false;
+    }
+  }
+  // When .atm/charter/ doesn't exist the project has not adopted the charter yet — not a failure.
+  // Only fail when the charter directory exists but files are missing or corrupt.
+  const charterDirExists = existsSync(path.join(root, '.atm', 'charter'));
+  const ok = !charterDirExists || (charterPresent && invariantsPresent && invariantsParseable);
+  return {
+    ok,
+    charterPath: path.relative(root, charterPath).replace(/\\/g, '/'),
+    charterInvariantsPath: path.relative(root, invariantsPath).replace(/\\/g, '/'),
+    charterPresent,
+    invariantsPresent,
+    invariantsParseable,
+    hashField
+  };
 }

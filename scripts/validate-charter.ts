@@ -166,9 +166,9 @@ const requiredTemplateSections = [
   'Agent Entry Point',
   'node atm.mjs next --json',
   'Amending This Charter',
-  '[PROJECT_NAME]',
-  '[CHARTER_VERSION]',
-  '[LAST_AMENDED_DATE]'
+  '{{PROJECT_NAME}}',
+  '{{CHARTER_VERSION}}',
+  '{{LAST_AMENDED_DATE}}'
 ];
 for (const section of requiredTemplateSections) {
   if (!charterTemplate.includes(section)) {
@@ -177,16 +177,18 @@ for (const section of requiredTemplateSections) {
 }
 
 // --- Charter invariants template is valid JSON and validates against schema ---
+// Template uses {{PLACEHOLDER}} tokens so date-time format checks are skipped;
+// use a format-free Ajv instance to validate structure only.
 
 if (!process.exitCode && invariantsSchema) {
-  const validate = ajv.getSchema('charter-invariants');
+  const ajvNoFormats = new Ajv2020({ allErrors: true, strict: false });
+  ajvNoFormats.addSchema(invariantsSchema, 'charter-invariants-no-fmt');
+  const validateNoFmt = ajvNoFormats.getSchema('charter-invariants-no-fmt');
   const templateJson = readJson('templates/root-drop/.atm/charter/charter-invariants.template.json');
-  if (validate && templateJson) {
-    // Template uses placeholder strings for some fields — validate the structure only
-    // The [PROJECT_NAME] placeholder makes projectName a literal string, which is fine
-    const valid = validate(templateJson);
+  if (validateNoFmt && templateJson) {
+    const valid = validateNoFmt(templateJson);
     if (!valid) {
-      fail(`templates/root-drop/.atm/charter/charter-invariants.template.json failed schema validation: ${formatErrors(validate.errors)}`);
+      fail(`templates/root-drop/.atm/charter/charter-invariants.template.json failed schema validation: ${formatErrors(validateNoFmt.errors)}`);
     }
   }
 }
