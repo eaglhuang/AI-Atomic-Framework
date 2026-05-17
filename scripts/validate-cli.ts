@@ -159,6 +159,12 @@ try {
   assert(atmChartVerify.parsed.ok === true, 'atm-chart verify must report ok=true when fresh');
   assertMessageCode(atmChartVerify, 'ATM_CHART_VERIFY_OK');
 
+  const atmChartVersionVerify = runAtm(['atm-chart', 'verify', '--version-check', '--cwd', atmChartRepo], atmChartRepo);
+  assert(atmChartVersionVerify.exitCode === 0, 'atm-chart verify --version-check must exit 0 for default rendered chart');
+  assertReadable(atmChartVersionVerify, 'atm-chart');
+  assert(atmChartVersionVerify.parsed.evidence.versionCompatibility.status === 'supported', 'atm-chart verify --version-check must report supported status');
+  assertMessageCode(atmChartVersionVerify, 'ATM_CHART_VERSION_CHECK_OK');
+
   const agentPackList = runAtm(['agent-pack', 'list', '--cwd', atmChartRepo], atmChartRepo);
   assert(agentPackList.exitCode === 0, 'agent-pack list must exit 0');
   assertReadable(agentPackList, 'agent-pack');
@@ -184,6 +190,9 @@ try {
   assertReadable(welcomeDryRun, 'welcome');
   assert(welcomeDryRun.parsed.ok === true, 'welcome --dry-run must report ok=true');
   assert(welcomeDryRun.parsed.evidence.dryRun === true, 'welcome --dry-run must report dryRun=true');
+  assert(welcomeDryRun.parsed.evidence.versions.frameworkVersion === fixture.frameworkVersion || typeof welcomeDryRun.parsed.evidence.versions.frameworkVersion === 'string', 'welcome --dry-run must report framework version');
+  assert(welcomeDryRun.parsed.evidence.versions.chartVersion === '0.1.0', 'welcome --dry-run must report chart version');
+  assert(welcomeDryRun.parsed.evidence.versions.templateVersion === '0.1.0', 'welcome --dry-run must report template version');
   assert(welcomeDryRun.parsed.evidence.lineagePath === null, 'welcome --dry-run must not report a persisted lineage path');
   assert(!existsSync(path.join(atmChartRepo, '.atm/runtime/welcome.lineage.json')), 'welcome --dry-run must not write welcome lineage');
   assertMessageCode(welcomeDryRun, 'ATM_WELCOME_DRY_RUN');
@@ -209,7 +218,10 @@ try {
   const welcomeDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
   assertReadable(welcomeDoctor, 'doctor');
   const onboardingCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
+  const versionCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'version-compatibility');
   assert(onboardingCheck.ok === true, 'doctor onboarding-lifecycle check must pass after ATMChart render and welcome');
+  assert(versionCheck.ok === true, 'doctor version-compatibility check must pass after default ATMChart render');
+  assert(versionCheck.details.compatibility.status === 'supported', 'doctor version-compatibility check must report supported status');
   assert(onboardingCheck.details.stage === 'welcomed', 'doctor onboarding-lifecycle check must report welcomed stage');
   assert(onboardingCheck.details.atmChartFreshness === 'fresh', 'doctor onboarding-lifecycle check must report fresh ATMChart');
 

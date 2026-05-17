@@ -1,5 +1,6 @@
 import path from 'node:path';
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import {
   type ContinuationContractInput,
   createContinuationRunReport,
@@ -20,9 +21,21 @@ import {
   writeHumanReviewQueueDocument
 } from '../../../plugin-human-review/src/index.ts';
 import { runUpgradeMapPropose } from './upgrade-map-propose.ts';
-import { CliError, makeResult, message, quoteCliValue, readJsonFile, resolveValue } from './shared.ts';
+import { createATMVersionSummary, loadCompatibilityMatrix, runATMChart } from './atm-chart.ts';
+import { CliError, makeResult, message, quoteCliValue, readJsonFile, resolveValue, writeJsonFile } from './shared.ts';
 
 export async function runUpgrade(argv: any) {
+  const safeAction = firstSafeUpgradeAction(argv);
+  if (safeAction === 'plan') {
+    return runSafeUpgradePlan(parseSafeUpgradeOptions(argv, 'plan'));
+  }
+  if (safeAction === 'apply') {
+    return runSafeUpgradeApply(parseSafeUpgradeOptions(argv, 'apply'));
+  }
+  if (safeAction === 'rollback') {
+    return runSafeUpgradeRollback(parseSafeUpgradeOptions(argv, 'rollback'));
+  }
+
   const options = parseUpgradeOptions(argv);
   if (options.scan) {
     return runUpgradeScan(options);
@@ -96,6 +109,307 @@ export async function runUpgrade(argv: any) {
       inputKinds: proposal.inputs.map((entry: any) => entry.kind)
     }
   });
+}
+
+function firstSafeUpgradeAction(argv: readonly string[]) {
+  const flagsWithValues = new Set(['--cwd', '--out', '--from-plan', '--backup']);
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (flagsWithValues.has(argument)) {
+      index += 1;
+      continue;
+    }
+    if (argument === 'plan' || argument === 'apply' || argument === 'rollback') {
+      return argument;
+    }
+  }
+  return null;
+}
+
+function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' | 'apply' | 'rollback') {
+  const options: any = {
+    action,
+    cwd: process.cwd(),
+    out: null,
+    fromPlan: null,
+    backup: null
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (argument === action) continue;
+    if (argument === '--cwd') {
+      options.cwd = requireOptionValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (argument === '--out') {
+      options.out = requireOptionValue(argv, index, '--out');
+      index += 1;
+      continue;
+    }
+    if (argument === '--from-plan') {
+      options.fromPlan = requireOptionValue(argv, index, '--from-plan');
+      index += 1;
+      continue;
+    }
+    if (argument === '--backup') {
+      options.backup = requireOptionValue(argv, index, '--backup');
+      index += 1;
+      continue;
+    }
+    if (argument === '--json' || argument === '--pretty') continue;
+    if (argument.startsWith('--')) {
+      throw new CliError('ATM_CLI_USAGE', `upgrade ${action} does not support option ${argument}`, { exitCode: 2 });
+    }
+  }
+
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd)
+  };
+}
+
+function runSafeUpgradePlan(options: any) {
+  const versionSummary = createATMVersionSummary(options.cwd);
+  const planId = `atm-upgrade-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+  const backupPath = `.atm/backups/${planId}`;
+  const backupFiles = collectSafeUpgradeFiles(options.cwd);
+  const willModify = [
+    '.atm/memory/atm-chart.md',
+    '.atm/runtime/compatibility-matrix.snapshot.json'
+  ].filter((filePath) => backupFiles.some((entry) => entry.path === filePath) || filePath.endsWith('compatibility-matrix.snapshot.json'));
+  const plan = {
+    schemaId: 'atm.safeUpgradePlan',
+    specVersion: '0.1.0',
+    planId,
+    createdAt: new Date().toISOString(),
+    cwd: options.cwd,
+    status: versionSummary.compatibility.status,
+    readOnlyDiagnostic: versionSummary.compatibility.readOnlyDiagnostic,
+    requiresExplicitApply: true,
+    versions: versionSummary,
+    backupPath,
+    rollbackPath: `${backupPath}/backup-manifest.json`,
+    willModify,
+    backupFiles
+  };
+
+  const outPath = typeof options.out === 'string'
+    ? resolveRepositoryPath(options.cwd, options.out)
+    : null;
+  if (outPath) {
+    writeJsonFile(outPath, plan);
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'upgrade',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_UPGRADE_PLAN_READY', 'Safe ATM onboarding upgrade plan generated as dry-run output.')],
+    evidence: {
+      action: 'plan',
+      planPath: outPath ? path.relative(options.cwd, outPath).replace(/\\/g, '/') : null,
+      plan
+    }
+  });
+}
+
+async function runSafeUpgradeApply(options: any) {
+  if (typeof options.fromPlan !== 'string') {
+    throw new CliError('ATM_CLI_USAGE', 'upgrade apply requires --from-plan <plan.json>', { exitCode: 2 });
+  }
+  const planPath = resolveRepositoryPath(options.cwd, options.fromPlan);
+  const plan = readJsonFile(planPath, 'ATM_UPGRADE_PLAN_NOT_FOUND');
+  if (plan?.schemaId !== 'atm.safeUpgradePlan') {
+    throw new CliError('ATM_UPGRADE_PLAN_INVALID', 'Safe upgrade apply requires an atm.safeUpgradePlan document.', { exitCode: 2 });
+  }
+  const cwd = path.resolve(String(plan.cwd ?? options.cwd));
+  const backupRoot = resolveRepositoryPath(cwd, String(plan.backupPath));
+  const backupManifestPath = path.join(backupRoot, 'backup-manifest.json');
+  const backedUpFiles = backupSafeUpgradeFiles(cwd, backupRoot, Array.isArray(plan.backupFiles) ? plan.backupFiles : []);
+  const compatibilitySnapshotPath = path.join(backupRoot, 'compatibility-matrix.snapshot.json');
+  writeJsonFile(compatibilitySnapshotPath, loadCompatibilityMatrix());
+  writeJsonFile(backupManifestPath, {
+    schemaId: 'atm.safeUpgradeBackupManifest',
+    specVersion: '0.1.0',
+    createdAt: new Date().toISOString(),
+    planId: plan.planId,
+    plan,
+    backedUpFiles
+  });
+
+  await runATMChart(['render', '--cwd', cwd]);
+  writeJsonFile(resolveRepositoryPath(cwd, '.atm/runtime/compatibility-matrix.snapshot.json'), loadCompatibilityMatrix());
+
+  return makeResult({
+    ok: true,
+    command: 'upgrade',
+    cwd,
+    messages: [message('info', 'ATM_UPGRADE_APPLIED', 'Safe ATM onboarding upgrade applied after backup.')],
+    evidence: {
+      action: 'apply',
+      planPath: path.relative(cwd, planPath).replace(/\\/g, '/'),
+      backupPath: path.relative(cwd, backupRoot).replace(/\\/g, '/'),
+      rollbackPath: path.relative(cwd, backupManifestPath).replace(/\\/g, '/'),
+      backedUpFiles,
+      modifiedFiles: ['.atm/memory/atm-chart.md', '.atm/runtime/compatibility-matrix.snapshot.json']
+    }
+  });
+}
+
+function runSafeUpgradeRollback(options: any) {
+  if (typeof options.backup !== 'string') {
+    throw new CliError('ATM_CLI_USAGE', 'upgrade rollback requires --backup <backup-dir>', { exitCode: 2 });
+  }
+  const backupRoot = resolveRepositoryPath(options.cwd, options.backup);
+  const backupManifestPath = path.join(backupRoot, 'backup-manifest.json');
+  const manifest = readJsonFile(backupManifestPath, 'ATM_UPGRADE_BACKUP_NOT_FOUND');
+  if (manifest?.schemaId !== 'atm.safeUpgradeBackupManifest' || !Array.isArray(manifest.backedUpFiles)) {
+    throw new CliError('ATM_UPGRADE_BACKUP_INVALID', 'Rollback requires an atm.safeUpgradeBackupManifest document.', { exitCode: 2 });
+  }
+
+  const restoredFiles = [];
+  const removedFiles = [];
+  for (const fileRecord of manifest.backedUpFiles) {
+    const relativeFilePath = normalizeRepositoryRelativePath(fileRecord.path);
+    const targetPath = resolveRepositoryPath(options.cwd, relativeFilePath);
+    const backupFilePath = path.join(backupRoot, 'files', relativeFilePath);
+    if (fileRecord.present === true && existsSync(backupFilePath)) {
+      mkdirSync(path.dirname(targetPath), { recursive: true });
+      copyFileSync(backupFilePath, targetPath);
+      restoredFiles.push(relativeFilePath);
+      continue;
+    }
+    if (fileRecord.present === false && existsSync(targetPath)) {
+      rmSync(targetPath, { force: true });
+      removedFiles.push(relativeFilePath);
+    }
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'upgrade',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_UPGRADE_ROLLBACK_OK', 'Safe ATM onboarding upgrade rollback restored the previous files.')],
+    evidence: {
+      action: 'rollback',
+      backupPath: path.relative(options.cwd, backupRoot).replace(/\\/g, '/'),
+      restoredFiles,
+      removedFiles
+    }
+  });
+}
+
+function collectSafeUpgradeFiles(cwd: string) {
+  const records = new Map<string, any>();
+  addBackupRecord(records, cwd, '.atm/memory/atm-chart.md', { role: 'atm-chart' });
+  addManifestFiles(records, cwd, '.atm/agent-pack', 'agent-pack-manifest');
+  addManifestFiles(records, cwd, '.atm/integrations', 'integration-manifest');
+  addBackupRecord(records, cwd, '.atm/runtime/compatibility-matrix.snapshot.json', { role: 'compatibility-matrix-snapshot' });
+  return [...records.values()].sort((left, right) => left.path.localeCompare(right.path));
+}
+
+function addManifestFiles(records: Map<string, any>, cwd: string, manifestDir: string, role: string) {
+  const absoluteManifestDir = resolveRepositoryPath(cwd, manifestDir);
+  if (!existsSync(absoluteManifestDir)) return;
+  for (const entryName of readdirSync(absoluteManifestDir).filter((entry) => entry.endsWith('.manifest.json')).sort((left, right) => left.localeCompare(right))) {
+    const manifestPath = `${manifestDir}/${entryName}`;
+    addBackupRecord(records, cwd, manifestPath, { role });
+    const manifest = safeReadJson(resolveRepositoryPath(cwd, manifestPath));
+    for (const managedFile of extractManagedFilesFromManifest(manifest)) {
+      addBackupRecord(records, cwd, managedFile.path, {
+        role: 'agent-native-entry-file',
+        expectedHash: managedFile.expectedHash,
+        hashFormat: managedFile.hashFormat
+      });
+    }
+  }
+}
+
+function extractManagedFilesFromManifest(manifest: any) {
+  if (Array.isArray(manifest?.renderedManifest?.renderedFiles)) {
+    return manifest.renderedManifest.renderedFiles.map((entry: any) => ({
+      path: entry.path,
+      expectedHash: entry.contentHash,
+      hashFormat: 'hex'
+    }));
+  }
+  if (Array.isArray(manifest?.files)) {
+    return manifest.files.map((entry: any) => ({
+      path: entry.path,
+      expectedHash: entry.sha256,
+      hashFormat: 'prefixed'
+    }));
+  }
+  return [];
+}
+
+function addBackupRecord(records: Map<string, any>, cwd: string, filePath: string, details: Record<string, unknown>) {
+  const relativeFilePath = normalizeRepositoryRelativePath(filePath);
+  const absolutePath = resolveRepositoryPath(cwd, relativeFilePath);
+  const exists = existsSync(absolutePath);
+  const currentHash = exists ? sha256File(absolutePath) : null;
+  const expectedHash = typeof details.expectedHash === 'string' ? details.expectedHash : null;
+  const expectedComparable = expectedHash?.startsWith('sha256:') ? expectedHash.slice('sha256:'.length) : expectedHash;
+  records.set(relativeFilePath, {
+    path: relativeFilePath,
+    role: details.role,
+    exists,
+    userModified: Boolean(exists && expectedComparable && currentHash !== expectedComparable),
+    currentHash,
+    expectedHash
+  });
+}
+
+function backupSafeUpgradeFiles(cwd: string, backupRoot: string, backupFiles: readonly any[]) {
+  const backedUpFiles = [];
+  for (const fileRecord of backupFiles) {
+    const relativeFilePath = normalizeRepositoryRelativePath(fileRecord.path);
+    const sourcePath = resolveRepositoryPath(cwd, relativeFilePath);
+    const backupFilePath = path.join(backupRoot, 'files', relativeFilePath);
+    if (!existsSync(sourcePath)) {
+      backedUpFiles.push({ path: relativeFilePath, present: false, backupPath: null });
+      continue;
+    }
+    mkdirSync(path.dirname(backupFilePath), { recursive: true });
+    copyFileSync(sourcePath, backupFilePath);
+    backedUpFiles.push({ path: relativeFilePath, present: true, backupPath: path.relative(cwd, backupFilePath).replace(/\\/g, '/') });
+  }
+  return backedUpFiles;
+}
+
+function safeReadJson(filePath: string) {
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function sha256File(filePath: string) {
+  return createHash('sha256').update(readFileSync(filePath)).digest('hex');
+}
+
+function resolveRepositoryPath(cwd: string, relativePath: string) {
+  const absoluteRoot = path.resolve(cwd);
+  const resolvedPath = path.isAbsolute(relativePath)
+    ? path.resolve(relativePath)
+    : path.resolve(absoluteRoot, normalizeRepositoryRelativePath(relativePath));
+  const comparableRoot = absoluteRoot.toLowerCase();
+  const comparablePath = resolvedPath.toLowerCase();
+  if (comparablePath !== comparableRoot && !comparablePath.startsWith(`${comparableRoot}${path.sep}`)) {
+    throw new CliError('ATM_UPGRADE_UNSAFE_PATH', `Unsafe upgrade path: ${relativePath}`, { exitCode: 2 });
+  }
+  return resolvedPath;
+}
+
+function normalizeRepositoryRelativePath(filePath: string) {
+  const normalizedPath = String(filePath ?? '').replace(/\\/g, '/').replace(/^\.\/+/, '').replace(/\/+/g, '/');
+  if (!normalizedPath || normalizedPath.startsWith('/') || normalizedPath.includes(':') || normalizedPath === '..' || normalizedPath.startsWith('../') || normalizedPath.includes('/../')) {
+    throw new CliError('ATM_UPGRADE_UNSAFE_PATH', `Unsafe upgrade path: ${filePath}`, { exitCode: 2 });
+  }
+  return normalizedPath;
 }
 
 function buildUpgradeNextActionHint(cwd: string, proposal: any) {

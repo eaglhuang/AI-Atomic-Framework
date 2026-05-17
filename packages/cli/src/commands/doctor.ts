@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { runHashPlaceholderAudit } from '../../../../scripts/audit-hash-placeholders.ts';
 import { computeSha256ForFile } from '../../../core/src/hash-lock/hash-lock.ts';
+import { createATMVersionSummary } from './atm-chart.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { checkIntegrationHealth } from './integration.ts';
@@ -44,6 +45,7 @@ export async function runDoctor(argv: any) {
   const charterIntegrity = checkCharterIntegrity(root);
   const integrationHealth = await checkIntegrationHealth(root);
   const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
+  const versionSummary = createATMVersionSummary(root);
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -80,6 +82,7 @@ export async function runDoctor(argv: any) {
     }),
     createCheck('charter-integrity', charterIntegrity.ok, charterIntegrity),
     createCheck('onboarding-lifecycle', onboardingLifecycle.ok, onboardingLifecycle),
+    createCheck('version-compatibility', versionSummary.compatibility.ok || versionSummary.compatibility.code === 'chart-missing', versionSummary),
     createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
     createGitHeadEvidenceCheck(root, runtime)
   ];
@@ -91,6 +94,8 @@ export async function runDoctor(argv: any) {
       ? 'node atm.mjs init --adopt default --force to reinstall the AtomicCharter, or restore .atm/charter/atomic-charter.md and .atm/charter/charter-invariants.json manually.'
     : failedChecks.includes('onboarding-lifecycle')
       ? onboardingLifecycle.recommendedAction
+    : failedChecks.includes('version-compatibility')
+      ? 'node atm.mjs upgrade plan --json'
     : failedChecks.includes('git-head-evidence')
       ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
     : failedChecks.includes('integration-adapters')
@@ -104,6 +109,8 @@ export async function runDoctor(argv: any) {
       ? [message('error', 'ATM_DOCTOR_CHARTER_MISSING', 'AtomicCharter files are missing or corrupt. Repair before continuing.', { failedChecks })]
     : failedChecks.includes('onboarding-lifecycle')
       ? [message('error', 'ATM_DOCTOR_ONBOARDING_STALE', 'Onboarding ATMChart sources are missing or stale. Refresh the first-touch artifacts before continuing.', { failedChecks })]
+    : failedChecks.includes('version-compatibility')
+      ? [message('error', 'ATM_DOCTOR_UNSUPPORTED_CHART_VERSION', 'ATMChart/framework/template versions are outside the supported release train.', { failedChecks, versionStatus: versionSummary.compatibility.code })]
     : failedChecks.includes('git-head-evidence')
       ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
     : failedChecks.includes('integration-adapters')
@@ -128,6 +135,7 @@ export async function runDoctor(argv: any) {
       lastHandoffAt: runtime.lastHandoffAt,
       missingPaths: runtime.missingPaths,
       migrationNeeded: runtime.migrationNeeded,
+      versionSummary,
       recommendedAction
     }
   });
