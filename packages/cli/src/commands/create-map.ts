@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { generateAtomicMap } from '../../../core/src/manager/map-generator.ts';
 import { createAtomicMapRequestFromDecompositionPlan, readDecompositionPlan } from '../../../core/src/registry/decomposition-plan.ts';
-import { CliError, makeResult, message, readJsonFile, relativePathFrom } from './shared.ts';
+import { validateAtomicSpecFileAgainstSchema } from './spec-shared.ts';
+import { CliError, makeResult, message, quoteCliValue, readJsonFile, relativePathFrom } from './shared.ts';
 
 export function runCreateMap(argv: any) {
   const { options } = parseCreateMapOptions(argv);
@@ -32,6 +33,7 @@ export function runCreateMap(argv: any) {
       sourceMode: input.sourceMode,
       sourcePath: input.sourcePath,
       defaultsUsed: input.defaultsUsed,
+      nextActionHint: buildCreateMapNextActionHint(options.cwd, result.mapId, options.dryRun),
       dryRun: options.dryRun,
       idempotent: result.idempotent === true,
       workbenchPath: result.workbenchPath ?? null,
@@ -44,6 +46,19 @@ export function runCreateMap(argv: any) {
       phases: result.phases ?? []
     }
   });
+}
+
+function buildCreateMapNextActionHint(cwd: string, mapId: string | null | undefined, dryRun: boolean) {
+  if (dryRun || !mapId) {
+    return null;
+  }
+  return {
+    status: 'ready',
+    route: 'map-integration-test',
+    reason: 'Canonical map workspace is ready; run the integration test before replacement-lane promotion.',
+    command: `node atm.mjs test --cwd ${quoteCliValue(cwd)} --map ${quoteCliValue(mapId)} --json`,
+    producesEvidenceKind: 'map-integration'
+  };
 }
 
 type CreateMapOptions = {
@@ -218,6 +233,16 @@ function resolveCreateMapInput(options: CreateMapOptions) {
 
 function loadCreateMapInputFromSpec(cwd: string, specPath: string) {
   const absoluteSpecPath = path.resolve(cwd, specPath);
+  const validation = validateCreateMapSpecInput(cwd, specPath, absoluteSpecPath);
+  if (!validation.ok) {
+    throw new CliError('ATM_MAP_SPEC_INVALID', 'create-map --spec requires a valid atm.atomicMap document.', {
+      exitCode: 2,
+      details: {
+        specPath: relativePathFrom(cwd, absoluteSpecPath),
+        validationMessages: validation.messages
+      }
+    });
+  }
   const document = readJsonFile(absoluteSpecPath, 'ATM_MAP_SPEC_INVALID') as Record<string, any>;
   if (document?.schemaId !== 'atm.atomicMap') {
     throw new CliError('ATM_MAP_SPEC_INVALID', 'create-map --spec requires an atm.atomicMap document.', {
@@ -253,4 +278,32 @@ function loadCreateMapInputFromSpec(cwd: string, specPath: string) {
     sourcePath: relativePathFrom(cwd, absoluteSpecPath),
     defaultsUsed: []
   };
+}
+
+function validateCreateMapSpecInput(cwd: string, specPath: string, absoluteSpecPath: string) {
+  try {
+    return validateAtomicSpecFileAgainstSchema(cwd, specPath, {
+      commandName: 'create-map',
+      successCode: 'ATM_MAP_SPEC_VALIDATE_OK',
+      successText: 'Atomic map spec validated against JSON Schema.'
+    });
+  } catch (error) {
+    if (error instanceof CliError) {
+      return makeResult({
+        ok: false,
+        command: 'create-map',
+        cwd,
+        messages: [message('error', 'ATM_MAP_SPEC_INVALID', error.message, {
+          specPath: relativePathFrom(cwd, absoluteSpecPath),
+          code: error.code,
+          ...(Object.keys(error.details ?? {}).length > 0 ? { details: error.details } : {})
+        })],
+        evidence: {
+          specPath: relativePathFrom(cwd, absoluteSpecPath),
+          validated: []
+        }
+      });
+    }
+    throw error;
+  }
 }

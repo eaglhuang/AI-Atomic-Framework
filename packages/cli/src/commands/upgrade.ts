@@ -20,7 +20,7 @@ import {
   writeHumanReviewQueueDocument
 } from '../../../plugin-human-review/src/index.ts';
 import { runUpgradeMapPropose } from './upgrade-map-propose.ts';
-import { CliError, makeResult, message, readJsonFile, resolveValue } from './shared.ts';
+import { CliError, makeResult, message, quoteCliValue, readJsonFile, resolveValue } from './shared.ts';
 
 export async function runUpgrade(argv: any) {
   const options = parseUpgradeOptions(argv);
@@ -85,11 +85,45 @@ export async function runUpgrade(argv: any) {
       contextBudget,
       dryRun: options.dryRun,
       target: proposal.target,
+      nextActionHint: buildUpgradeNextActionHint(options.cwd, proposal),
       behaviorId: proposal.behaviorId,
       inputCount: proposal.inputs.length,
       inputKinds: proposal.inputs.map((entry: any) => entry.kind)
     }
   });
+}
+
+function buildUpgradeNextActionHint(cwd: string, proposal: any) {
+  if (proposal?.target?.kind !== 'map') {
+    return null;
+  }
+
+  const mapId = proposal.target.mapId;
+  const requiredJustification = proposal.requiredJustification;
+  if (proposal.status === 'blocked' && requiredJustification) {
+    if (requiredJustification.requiredEvidenceKinds?.includes('map-equivalence')) {
+      return {
+        status: 'blocked',
+        route: 'map-equivalence-required',
+        reason: requiredJustification.rationale,
+        command: `node atm.mjs test --cwd ${quoteCliValue(cwd)} --map ${quoteCliValue(mapId)} --equivalence-fixtures ${quoteCliValue('<fixtures.json>')} --json`,
+        commandTemplate: true,
+        requiredEvidenceKinds: requiredJustification.requiredEvidenceKinds,
+        requiredCliOptions: requiredJustification.requiredCliOptions,
+        missingInputs: ['equivalence-fixtures']
+      };
+    }
+    return {
+      status: 'blocked',
+      route: 'governed-next',
+      reason: requiredJustification.rationale,
+      command: `node atm.mjs next --cwd ${quoteCliValue(cwd)} --json`,
+      requiredEvidenceKinds: requiredJustification.requiredEvidenceKinds,
+      requiredCliOptions: requiredJustification.requiredCliOptions
+    };
+  }
+
+  return null;
 }
 
 async function runUpgradeScan(options: any) {

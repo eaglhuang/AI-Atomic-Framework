@@ -7,6 +7,7 @@ const atomicSpecSchemaPath = defaultAtomicSpecSchemaPath;
 const frameworkRoot = path.resolve(path.dirname(atomicSpecSchemaPath), '..');
 const requireFromSpecShared = createRequire(import.meta.url);
 const supportedReportSchemas: Record<string, string> = {
+  'atm.atomicMap': 'schemas/registry/atomic-map.schema.json',
   'atm.mapEquivalenceReport': 'schemas/governance/map-equivalence-report.schema.json',
   'atm.decompositionPlan': 'schemas/governance/decomposition-plan.schema.json'
 };
@@ -31,7 +32,9 @@ export function validateAtomicSpecFileAgainstSchema(cwd: any, specOption: any, o
       specPath,
       relativeSpecPath,
       successCode,
-      successText: 'Report validated against JSON Schema.'
+      successText: document?.schemaId === 'atm.atomicMap'
+        ? 'Atomic map validated against JSON Schema.'
+        : 'Report validated against JSON Schema.'
     });
   }
 
