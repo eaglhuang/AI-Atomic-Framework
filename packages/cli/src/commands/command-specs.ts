@@ -62,22 +62,22 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs create --bucket CORE --title NormalizeCssColor --description "Canonicalize CSS color input." --dry-run'
     ]
   }),
-  constitution: defineCommandSpec({
-    name: 'constitution',
-    summary: 'Render or verify constitution markdown from ATM guard sources.',
+  'atm-chart': defineCommandSpec({
+    name: 'atm-chart',
+    summary: 'Render or verify ATMChart markdown from ATM guard sources.',
     positional: [
       { name: 'action', summary: 'render | verify', required: false }
     ],
     options: [
       commonCwdOption,
-      { flag: '--out', value: 'path', summary: 'Override constitution markdown output path (default: .atm/memory/constitution.md).' },
+      { flag: '--out', value: 'path', summary: 'Override ATMChart markdown output path (default: .atm/memory/atm-chart.md).' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
     ],
     examples: [
-      'node atm.mjs constitution render --cwd .',
-      'node atm.mjs constitution verify --cwd .'
+      'node atm.mjs atm-chart render --cwd .',
+      'node atm.mjs atm-chart verify --cwd .'
     ]
   }),
   'create-map': defineCommandSpec({
@@ -365,7 +365,11 @@ export const commandSpecs = Object.freeze({
       { flag: '--replacement-mode', value: 'mode', summary: 'Requested replacement rollout mode for map proposals: draft | shadow | canary | active | legacy-retired.' },
       { flag: '--equivalence-report', value: 'path', summary: 'Map equivalence report path for map proposals.' },
       { flag: '--polymorph-impact-report', value: 'path', summary: 'Polymorph impact report path for active map proposals with template-bound members.' },
+      { flag: '--propagation-report', value: 'path', summary: 'Propagation report path for active map proposals.' },
+      { flag: '--review-advisory', value: 'path', summary: 'Review advisory report path for active map proposals.' },
+      { flag: '--human-review', value: 'path', summary: 'Human review decision path for active map proposals.' },
       { flag: '--rollback-proof', value: 'path', summary: 'Rollback proof path for map proposals.' },
+      { flag: '--retirement-proof', value: 'path', summary: 'Retirement proof path for legacy-retired map proposals.' },
       { flag: '--behavior', value: 'id', summary: 'Behavior id to route proposal generation.' },
       { flag: '--decomposition-decision', value: 'decision', summary: 'Explicit decomposition decision override.' },
       { flag: '--legacy-target', value: 'path#symbol', summary: 'LegacyRoutePlan-selected target for guided atomize/infect/split dry-run proposals.' },
@@ -383,7 +387,8 @@ export const commandSpecs = Object.freeze({
     examples: [
       'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json',
       'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --equivalence-report atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json --input fixtures/upgrade/hash-diff-report.json --json',
-      'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --polymorph-impact-report atomic_workbench/maps/ATM-MAP-0001/polymorph-impact-report.json --input fixtures/upgrade/hash-diff-report.json --json',
+      'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --polymorph-impact-report atomic_workbench/maps/ATM-MAP-0001/polymorph-impact-report.json --propagation-report .atm/history/reports/propagation-report.json --review-advisory .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --input fixtures/upgrade/hash-diff-report.json --json',
+      'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode legacy-retired --retirement-proof .atm/history/reports/retirement-proof.json --input fixtures/upgrade/hash-diff-report.json --json',
       'node atm.mjs upgrade --propose --behavior behavior.infect --legacy-target "src/legacy.js#normalizeInput" --guidance-session <session-id> --dry-run --json',
       'node atm.mjs upgrade --scan --input fixtures/evolution/evidence-patterns/recurring-failure-candidate.json --json'
     ]
@@ -425,7 +430,7 @@ export const commandSpecs = Object.freeze({
   }),
   welcome: defineCommandSpec({
     name: 'welcome',
-    summary: 'Summarize constitution, integration health, and the next ATM action for first-touch onboarding.',
+    summary: 'Summarize ATMChart, integration health, and the next ATM action for first-touch onboarding.',
     positional: [],
     options: [
       commonCwdOption,

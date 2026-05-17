@@ -37,8 +37,8 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
-    commandName: 'constitution',
-    summary: 'Render or verify constitution markdown from ATM guard sources',
+    commandName: 'atm-chart',
+    summary: 'Render or verify ATMChart markdown from ATM guard sources',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'
@@ -185,7 +185,7 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   },
   {
     commandName: 'welcome',
-    summary: 'Summarize constitution, integrations, and next ATM action for onboarding',
+    summary: 'Summarize ATMChart, integrations, and next ATM action for onboarding',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'

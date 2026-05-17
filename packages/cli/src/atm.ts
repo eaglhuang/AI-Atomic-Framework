@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runATMChart } from './commands/atm-chart.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runBudget } from './commands/budget.ts';
-import { runConstitution } from './commands/constitution.ts';
 import { runCreate } from './commands/create.ts';
 import { runCreateMap } from './commands/create-map.ts';
 import { runDoctor } from './commands/doctor.ts';
@@ -34,9 +34,9 @@ import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, writeResult } from './commands/shared.ts';
 
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
+  'atm-chart': runATMChart,
   bootstrap: runBootstrap,
   budget: runBudget,
-  constitution: runConstitution,
   create: runCreate,
   'create-map': runCreateMap,
   doctor: runDoctor,

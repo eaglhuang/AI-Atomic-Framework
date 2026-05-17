@@ -63,8 +63,8 @@ function decideNextAction(runtime: any, failedCheckName: any) {
   if (failedCheckName === 'onboarding-lifecycle') {
     return {
       status: 'needs-onboarding-refresh',
-      command: 'node atm.mjs constitution render --cwd . --json',
-      reason: 'onboarding constitution sources are missing or stale',
+      command: 'node atm.mjs atm-chart render --cwd . --json',
+      reason: 'onboarding ATMChart sources are missing or stale',
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
     };

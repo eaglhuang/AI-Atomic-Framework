@@ -2,7 +2,7 @@ import type { MapRegistryEntryRecord, RegistryEntryRecord, RegistryEntryStatus, 
 
 export const registryEntryStatuses = ['draft', 'validated', 'active', 'transitioning', 'deprecated', 'expired', 'quarantined'] as const;
 
-export const registryGovernanceTiers = ['constitutional', 'governed', 'standard', 'experimental'] as const;
+export const registryGovernanceTiers = ['foundation', 'governed', 'standard', 'experimental'] as const;
 
 export const registryTransitionActions = [
   'transition.propose',

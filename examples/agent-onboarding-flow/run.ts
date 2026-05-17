@@ -80,8 +80,8 @@ try {
     const verify = runAtm(['integration', 'verify', plan.adapterId, '--cwd', hostRoot, '--json']);
     assert(verify.ok === true, `${plan.adapterId} integration verify must succeed`);
 
-    const constitution = runAtm(['constitution', 'render', '--cwd', hostRoot, '--json']);
-    assert(constitution.ok === true, `${plan.adapterId} constitution render must succeed`);
+    const atmChart = runAtm(['atm-chart', 'render', '--cwd', hostRoot, '--json']);
+    assert(atmChart.ok === true, `${plan.adapterId} atm-chart render must succeed`);
 
     const welcome = runAtm(['welcome', '--cwd', hostRoot, '--json']);
     assert(welcome.ok === true, `${plan.adapterId} welcome must succeed`);
