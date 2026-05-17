@@ -16,6 +16,11 @@
       "path": "positive/governance-scope-lock.json"
     },
     {
+      "name": "governance scope lock with map selectors",
+      "schema": "governance-scope-lock",
+      "path": "positive/governance-scope-lock-0.2-map-selector.json"
+    },
+    {
       "name": "governance artifact",
       "schema": "governance-artifact",
       "path": "positive/governance-artifact.json"
@@ -89,6 +94,11 @@
       "name": "map equivalence report",
       "schema": "governance-map-equivalence-report",
       "path": "map-equivalence-report/positive.json"
+    },
+    {
+      "name": "polymorph impact report",
+      "schema": "governance-polymorph-impact-report",
+      "path": "polymorph-impact-report/positive.json"
     },
     {
       "name": "decomposition plan",
@@ -281,6 +291,12 @@
       "path": "negative/governance-scope-lock-missing-files.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "files"
+    },
+    {
+      "name": "scope lock selectors require v0.2.0",
+      "schema": "governance-scope-lock",
+      "path": "negative/governance-scope-lock-selectors-require-v020.json",
+      "expectedKeyword": "not"
     },
     {
       "name": "missing governance evidence reproducibility",

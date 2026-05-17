@@ -381,6 +381,9 @@
         "mapEquivalence": {
           "$ref": "#/$defs/gateResult"
         },
+        "polymorphImpact": {
+          "$ref": "#/$defs/gateResult"
+        },
         "rollbackProof": {
           "$ref": "#/$defs/gateResult"
         },
@@ -412,7 +415,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "mapEquivalence", "rollbackProof", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy", "charterInvariantViolation"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "mapEquivalence", "polymorphImpact", "rollbackProof", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy", "charterInvariantViolation"]
           }
         }
       }
@@ -430,7 +433,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "enum": ["mapEquivalence", "rollbackProof"]
+            "enum": ["mapEquivalence", "polymorphImpact", "rollbackProof"]
           }
         },
         "requiredEvidenceKinds": {
@@ -438,7 +441,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "enum": ["map-equivalence", "rollback-proof"]
+            "enum": ["map-equivalence", "polymorph-impact", "rollback-proof"]
           }
         },
         "requiredCliOptions": {
@@ -446,7 +449,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "enum": ["--equivalence-report", "--rollback-proof"]
+            "enum": ["--equivalence-report", "--polymorph-impact-report", "--rollback-proof"]
           }
         },
         "humanReviewRequired": {
@@ -464,7 +467,7 @@
       "required": ["kind", "path", "schemaId"],
       "properties": {
         "kind": {
-          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate", "map-equivalence", "rollback-proof", "evolution-evidence", "redaction-report"]
+          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate", "map-equivalence", "polymorph-impact", "rollback-proof", "evolution-evidence", "redaction-report"]
         },
         "path": {
           "type": "string",

@@ -51,6 +51,7 @@ export async function runUpgrade(argv: any) {
     migration: options.migration,
     requestedReplacementMode: options.requestedReplacementMode,
     equivalenceReport: options.equivalenceReport,
+    polymorphImpactReport: options.polymorphImpactReport,
     rollbackProof: options.rollbackProof,
     contextBudgetGate: contextBudget.gate,
     inputs: inputDocuments
@@ -101,7 +102,7 @@ function buildUpgradeNextActionHint(cwd: string, proposal: any) {
   const mapId = proposal.target.mapId;
   const requiredJustification = proposal.requiredJustification;
   if (proposal.status === 'blocked' && requiredJustification) {
-    if (requiredJustification.requiredEvidenceKinds?.includes('map-equivalence')) {
+    if (requiredJustification.requiredEvidenceKinds?.length === 1 && requiredJustification.requiredEvidenceKinds?.includes('map-equivalence')) {
       return {
         status: 'blocked',
         route: 'map-equivalence-required',
@@ -111,6 +112,18 @@ function buildUpgradeNextActionHint(cwd: string, proposal: any) {
         requiredEvidenceKinds: requiredJustification.requiredEvidenceKinds,
         requiredCliOptions: requiredJustification.requiredCliOptions,
         missingInputs: ['equivalence-fixtures']
+      };
+    }
+    if (requiredJustification.requiredEvidenceKinds?.length === 1 && requiredJustification.requiredEvidenceKinds?.includes('polymorph-impact')) {
+      return {
+        status: 'blocked',
+        route: 'polymorph-impact-required',
+        reason: requiredJustification.rationale,
+        command: `node atm.mjs upgrade --cwd ${quoteCliValue(cwd)} --propose --target map --map ${quoteCliValue(mapId)} --replacement-mode active --polymorph-impact-report ${quoteCliValue('<polymorph-impact-report.json>')} --json`,
+        commandTemplate: true,
+        requiredEvidenceKinds: requiredJustification.requiredEvidenceKinds,
+        requiredCliOptions: requiredJustification.requiredCliOptions,
+        missingInputs: ['polymorph-impact-report']
       };
     }
     return {
@@ -198,6 +211,7 @@ function parseUpgradeOptions(argv: any) {
     guidanceSession: null,
     requestedReplacementMode: null,
     equivalenceReport: null,
+    polymorphImpactReport: null,
     rollbackProof: null,
     proposalId: null,
     proposedBy: 'ATM CLI',
@@ -283,6 +297,11 @@ function parseUpgradeOptions(argv: any) {
       index += 1;
       continue;
     }
+    if (arg === '--polymorph-impact-report') {
+      options.polymorphImpactReport = requireOptionValue(argv, index, '--polymorph-impact-report');
+      index += 1;
+      continue;
+    }
     if (arg === '--rollback-proof') {
       options.rollbackProof = requireOptionValue(argv, index, '--rollback-proof');
       index += 1;
@@ -352,8 +371,8 @@ function parseUpgradeOptions(argv: any) {
     if (options.target.kind === 'map' && !options.target.mapId) {
       throw new CliError('ATM_CLI_USAGE', 'upgrade --target map requires --map', { exitCode: 2 });
     }
-    if (options.target.kind !== 'map' && (options.requestedReplacementMode || options.equivalenceReport || options.rollbackProof)) {
-      throw new CliError('ATM_CLI_USAGE', '--replacement-mode, --equivalence-report, and --rollback-proof require --target map with --map', { exitCode: 2 });
+    if (options.target.kind !== 'map' && (options.requestedReplacementMode || options.equivalenceReport || options.polymorphImpactReport || options.rollbackProof)) {
+      throw new CliError('ATM_CLI_USAGE', '--replacement-mode, --equivalence-report, --polymorph-impact-report, and --rollback-proof require --target map with --map', { exitCode: 2 });
     }
     if (options.fork && (!options.fork.sourceAtomId || !options.fork.newAtomId)) {
       throw new CliError('ATM_CLI_USAGE', 'upgrade fork mode requires both --fork-source and --new-atom-id', { exitCode: 2 });
@@ -723,6 +742,8 @@ function inferInputKind(schemaId: any) {
       return 'registry-candidate';
     case 'atm.mapEquivalenceReport':
       return 'map-equivalence';
+    case 'atm.polymorphImpactReport':
+      return 'polymorph-impact';
     case 'atm.rollbackProof':
     case 'atm.evidence.rollbackProof':
       return 'rollback-proof';

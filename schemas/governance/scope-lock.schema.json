@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.ai-atomic-framework.dev/governance/scope-lock.schema.json",
-  "title": "ATM Governance Scope Lock v0.1",
+  "title": "ATM Governance Scope Lock",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaId", "specVersion", "migration", "workItemId", "lockedBy", "lockedAt", "files"],
@@ -10,14 +10,13 @@
       "const": "atm.governanceScopeLock"
     },
     "specVersion": {
-      "const": "0.1.0"
+      "enum": ["0.1.0", "0.2.0"]
     },
     "migration": {
       "$ref": "#/$defs/migration"
     },
     "workItemId": {
-      "type": "string",
-      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+      "$ref": "#/$defs/workItemId"
     },
     "lockedBy": {
       "type": "string",
@@ -38,9 +37,58 @@
     },
     "reason": {
       "type": "string"
+    },
+    "selectors": {
+      "$ref": "#/$defs/selectors"
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "specVersion": {
+            "const": "0.1.0"
+          }
+        },
+        "required": ["specVersion"]
+      },
+      "then": {
+        "not": {
+          "required": ["selectors"]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "specVersion": {
+            "const": "0.2.0"
+          }
+        },
+        "required": ["specVersion"]
+      },
+      "then": {
+        "required": ["selectors"]
+      }
+    }
+  ],
   "$defs": {
+    "workItemId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "mapId": {
+      "type": "string",
+      "pattern": "^ATM-MAP-\\d{4}$"
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "legacyUri": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9+.-]*://.+$"
+    },
     "migration": {
       "type": "object",
       "additionalProperties": false,
@@ -57,6 +105,63 @@
           "type": "string"
         }
       }
+    },
+    "selectorEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/atomId"
+        },
+        "to": {
+          "$ref": "#/$defs/atomId"
+        },
+        "edgeKind": {
+          "enum": ["data-flow", "control-flow", "event-flow", "validation", "fallback", "side-effect", "rollback"]
+        }
+      }
+    },
+    "selectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mapId": {
+          "$ref": "#/$defs/mapId"
+        },
+        "mapMembers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/atomId"
+          },
+          "uniqueItems": true
+        },
+        "mapEdges": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/selectorEdge"
+          }
+        },
+        "mapEntrypoints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/atomId"
+          },
+          "uniqueItems": true
+        },
+        "legacyUris": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/legacyUri"
+          },
+          "uniqueItems": true
+        }
+      },
+      "minProperties": 1
     }
   }
 }

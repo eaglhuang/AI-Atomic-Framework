@@ -30,6 +30,7 @@ const schemaEntries: Record<string, string> = {
   'governance-evolution-scan-report': 'schemas/governance/evolution-scan-report.schema.json',
   'governance-map-curator-report': 'schemas/governance/map-curator-report.schema.json',
   'governance-map-equivalence-report': 'schemas/governance/map-equivalence-report.schema.json',
+  'governance-polymorph-impact-report': 'schemas/governance/polymorph-impact-report.schema.json',
   'governance-decomposition-plan': 'schemas/governance/decomposition-plan.schema.json',
   'governance-adapter-report': 'schemas/governance/adapter-report.schema.json',
   'governance-atomize-adapter': 'schemas/governance/atomize-adapter.schema.json',
