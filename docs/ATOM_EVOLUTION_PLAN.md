@@ -486,24 +486,26 @@ Checklist：
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:schemas`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
 
-### M10 - Transcript Review Extractor
+### M10 - Transcript Review Extractor ✅ DONE
 
 目的：從 redacted raw transcript 或 canonical session log 萃取 M9 定義的 review findings。
 
 交付物：
 
-- Conversation transcript canonical JSON input schema。
-- Deterministic transcript reviewer runtime。
-- Positive / negative transcript fixtures。
-- Privacy-block fixture：含 sensitive input 但缺 redaction report 時必須 blocked。
+- `schemas/governance/conversation-transcript.schema.json`。✅
+- `packages/plugin-sdk/src/conversation/conversation-transcript-reviewer.ts`。✅
+- Positive / negative transcript fixtures。✅
+- Privacy-block fixture：含 sensitive input 但缺 redaction report 時必須 blocked。✅
 
 Checklist：
 
-- [ ] 可從原始對話軌跡辨識四類 findings。
-- [ ] 可連回 `EvidenceRecord` refs 或產生待入庫 Evidence refs。
-- [ ] 不依賴暫態 agent memory 作為唯一訊號來源。
-- [ ] 未 redacted transcript 不可進入 reviewer。
-- [ ] LLM reviewer 若存在，只能輸出 findings，不可直接產生 mutation。
+- [x] 可從原始對話軌跡辨識四類 findings。
+- [x] 可連回 `EvidenceRecord` refs 或產生待入庫 Evidence refs。
+- [x] 不依賴暫態 agent memory 作為唯一訊號來源。
+- [x] 未 redacted transcript 不可進入 reviewer。
+- [x] LLM reviewer 若存在，只能輸出 findings，不可直接產生 mutation。
+
+M10 已於 2026-05-17 完成。新增 canonical redacted transcript schema、deterministic transcript reviewer runtime、schema positive / negative fixtures，並延伸 `validate-conversation-skill-review` 覆蓋 transcript -> findings report deep-equal 驗證。
 
 驗證：
 

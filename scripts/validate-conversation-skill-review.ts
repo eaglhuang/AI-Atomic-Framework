@@ -1,6 +1,11 @@
-import { readdirSync } from 'node:fs';
+import assert from 'node:assert/strict';
+import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { conversationReviewFindingKinds, type ConversationReviewFindingsReport } from '../packages/plugin-sdk/src/conversation/conversation-review-finding.ts';
+import {
+  reviewConversationTranscript,
+  type ConversationTranscriptReviewInput
+} from '../packages/plugin-sdk/src/conversation/conversation-transcript-reviewer.ts';
 import { createValidator } from './lib/validator-harness.ts';
 import type { AnySchema } from 'ajv';
 
@@ -8,14 +13,27 @@ const validator = createValidator('conversation-skill-review');
 const { createAjv, readJson, repoPath, assert: check, ok } = validator;
 
 const schema = readJson<AnySchema>('schemas/governance/conversation-review-findings-report.schema.json');
+const transcriptSchema = readJson<AnySchema>('schemas/governance/conversation-transcript.schema.json');
 const ajv = createAjv();
 const validateReport = ajv.compile(schema);
+const validateTranscript = ajv.compile(transcriptSchema);
 const fixtureRoot = repoPath('fixtures', 'evolution', 'conversation-skill-review');
 const fixtureFiles = readdirSync(fixtureRoot)
   .filter((entry) => entry.endsWith('.json'))
   .sort();
+const transcriptFixtureRoot = repoPath('fixtures', 'evolution', 'conversation-skill-review', 'transcript-reviewer');
+const transcriptFixtureFiles = existsSync(transcriptFixtureRoot)
+  ? readdirSync(transcriptFixtureRoot).filter((entry) => entry.endsWith('.json')).sort()
+  : [];
 
 check(fixtureFiles.length >= 1, 'expected conversation skill review fixtures');
+check(transcriptFixtureFiles.length >= 1, 'expected conversation transcript reviewer fixtures');
+
+type TranscriptReviewFixture = {
+  readonly description?: string;
+  readonly input: ConversationTranscriptReviewInput;
+  readonly expectedReport: ConversationReviewFindingsReport;
+};
 
 const seenKinds = new Set<string>();
 let validatedReports = 0;
@@ -72,8 +90,27 @@ for (const fixtureFile of fixtureFiles) {
   validatedFindings += report.findings.length;
 }
 
+let validatedTranscriptFixtures = 0;
+
+for (const fixtureFile of transcriptFixtureFiles) {
+  const relativePath = path.join('fixtures', 'evolution', 'conversation-skill-review', 'transcript-reviewer', fixtureFile).replace(/\\/g, '/');
+  const fixture = readJson<TranscriptReviewFixture>(relativePath);
+  check(validateTranscript(fixture.input.transcript) === true, `${fixtureFile} transcript failed schema validation: ${JSON.stringify(validateTranscript.errors)}`);
+  const generatedReport = reviewConversationTranscript(fixture.input);
+  check(validateReport(generatedReport) === true, `${fixtureFile} generated report failed schema validation: ${JSON.stringify(validateReport.errors)}`);
+  check(validateReport(fixture.expectedReport) === true, `${fixtureFile} expected report failed schema validation: ${JSON.stringify(validateReport.errors)}`);
+  assert.deepEqual(generatedReport, fixture.expectedReport, `${fixtureFile} generated report must match expectedReport`);
+
+  for (const finding of generatedReport.findings) {
+    seenKinds.add(finding.findingKind);
+  }
+  validatedTranscriptFixtures += 1;
+  validatedReports += 1;
+  validatedFindings += generatedReport.findings.length;
+}
+
 for (const findingKind of conversationReviewFindingKinds) {
   check(seenKinds.has(findingKind), `conversation skill review fixtures must cover ${findingKind}`);
 }
 
-ok(`validated ${validatedReports} conversation skill review report(s), ${validatedFindings} finding(s), ${seenKinds.size} finding kinds`);
+ok(`validated ${validatedReports} conversation skill review report(s), ${validatedFindings} finding(s), ${seenKinds.size} finding kinds, transcriptFixtures=${validatedTranscriptFixtures}`);

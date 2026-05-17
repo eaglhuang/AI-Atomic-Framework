@@ -20,6 +20,7 @@ const schemaEntries: Record<string, string> = {
   'governance-state': 'schemas/governance/markdown-json-state.schema.json',
   'governance-evidence': 'schemas/governance/evidence.schema.json',
   'governance-context-summary': 'schemas/governance/context-summary.schema.json',
+  'governance-conversation-transcript': 'schemas/governance/conversation-transcript.schema.json',
   'governance-detector-report': 'schemas/governance/detector-report.schema.json',
   'governance-conversation-review-findings-report': 'schemas/governance/conversation-review-findings-report.schema.json',
   'governance-evolution-scan-report': 'schemas/governance/evolution-scan-report.schema.json',

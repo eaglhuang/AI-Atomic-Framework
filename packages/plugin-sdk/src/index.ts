@@ -118,14 +118,21 @@ export type {
 } from './detector';
 export {
   ConversationDrivenExtractionError,
+  ConversationTranscriptReviewError,
   conversationReviewFindingKinds,
   conversationEvidenceExtractorName,
+  conversationTranscriptReviewerName,
+  reviewConversationTranscript,
   extractEvidenceFromConversations
 } from './conversation';
 export type {
   ConversationDrivenExtractionErrorCode,
   ConversationEvidenceExtractionInput,
   ConversationEvidenceExtractionReport,
+  ConversationTranscript,
+  ConversationTranscriptReviewErrorCode,
+  ConversationTranscriptReviewInput,
+  ConversationTranscriptTurn,
   ConversationReviewFinding,
   ConversationReviewFindingKind,
   ConversationReviewFindingsReport,

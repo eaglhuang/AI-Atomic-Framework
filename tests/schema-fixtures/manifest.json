@@ -46,6 +46,11 @@
       "path": "positive/governance-context-summary.json"
     },
     {
+      "name": "conversation transcript",
+      "schema": "governance-conversation-transcript",
+      "path": "positive/conversation-transcript.json"
+    },
+    {
       "name": "conversation review findings report",
       "schema": "governance-conversation-review-findings-report",
       "path": "positive/conversation-review-findings-report.json"
@@ -316,6 +321,12 @@
       "name": "conversation review findings must stay draft-only",
       "schema": "governance-conversation-review-findings-report",
       "path": "negative/conversation-review-findings-mutating.json",
+      "expectedKeyword": "const"
+    },
+    {
+      "name": "conversation transcript must be redacted",
+      "schema": "governance-conversation-transcript",
+      "path": "negative/conversation-transcript-unredacted.json",
       "expectedKeyword": "const"
     }
   ]

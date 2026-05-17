@@ -21,3 +21,14 @@ export type {
   ConversationReviewRecommendation,
   ConversationReviewRecommendedTarget
 } from './conversation-review-finding';
+export {
+  ConversationTranscriptReviewError,
+  conversationTranscriptReviewerName,
+  reviewConversationTranscript
+} from './conversation-transcript-reviewer';
+export type {
+  ConversationTranscript,
+  ConversationTranscriptReviewErrorCode,
+  ConversationTranscriptReviewInput,
+  ConversationTranscriptTurn
+} from './conversation-transcript-reviewer';
