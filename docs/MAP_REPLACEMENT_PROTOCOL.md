@@ -69,10 +69,10 @@ A replacement map should be promoted only through deterministic gates:
 
 - `draft -> shadow` requires passing map integration evidence.
 - `shadow -> canary` requires passing map equivalence evidence, or reviewed and accepted known divergences.
-- `canary -> active` requires passing equivalence, propagation, review advisory, and human review.
-- `active -> legacy-retired` requires rollback proof or retirement proof.
+- `canary -> active` requires passing map equivalence, propagation, review advisory, and approved human review evidence.
+- `active -> legacy-retired` requires rollback proof or retirement proof, and retirement proof must clear caller and entrypoint risk.
 
-The upgrade proposal pipeline should consume map-level evidence directly. For map replacement work, the important input kinds are expected to include `map-equivalence`, `polymorph-impact`, and `rollback-proof`. When a replacement map contains members that participate in a polymorphic template group, `active` proposals should require a passing polymorph impact report in addition to equivalence evidence.
+The upgrade proposal pipeline should consume map-level evidence directly. For map replacement work, the important input kinds are expected to include `map-equivalence`, `polymorph-impact`, `propagation-report`, `review-advisory`, `human-review`, `rollback-proof`, and `retirement-proof`. When a replacement map contains members that participate in a polymorphic template group, `active` proposals should require a passing polymorph impact report in addition to equivalence evidence.
 
 ## CLI Workflow Direction
 
@@ -85,10 +85,11 @@ node atm.mjs test --map <mapId> --json
 node atm.mjs replacement-lane transition --map <mapId> --to shadow --evidence atomic_workbench/maps/<mapId>/map.test.report.json --json
 node atm.mjs test --map <mapId> --equivalence-fixtures <fixtures.json> --json
 node atm.mjs replacement-lane transition --map <mapId> --to canary --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --json
-node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode active --equivalence-report atomic_workbench/maps/<mapId>/map.equivalence.report.json --polymorph-impact-report atomic_workbench/maps/<mapId>/polymorph-impact-report.json --json
-node atm.mjs replacement-lane transition --map <mapId> --to active --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --evidence .atm/history/reports/review-advisory.json --json
-node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode legacy-retired --rollback-proof .atm/history/reports/rollback-proof.json --json
-node atm.mjs replacement-lane transition --map <mapId> --to legacy-retired --evidence .atm/history/reports/rollback-proof.json --json
+node atm.mjs test --propagate <atomId> --json
+node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode active --equivalence-report atomic_workbench/maps/<mapId>/map.equivalence.report.json --polymorph-impact-report atomic_workbench/maps/<mapId>/polymorph-impact-report.json --propagation-report .atm/history/reports/propagation-report.json --review-advisory .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --json
+node atm.mjs replacement-lane transition --map <mapId> --to active --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --evidence .atm/history/reports/propagation-report.json --evidence .atm/history/reports/review-advisory.json --evidence .atm/history/reports/human-review-approve.json --json
+node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode legacy-retired --retirement-proof .atm/history/reports/retirement-proof.json --json
+node atm.mjs replacement-lane transition --map <mapId> --to legacy-retired --evidence .atm/history/reports/retirement-proof.json --json
 ```
 
 The current M4 implementation uses delegated executors from the fixture set: one `mapExecutor`, one `legacyExecutor`, plus lineage from `replacement.legacyUris`. It writes `map.equivalence.report.json` into the canonical map workbench path and treats reviewed known divergences as promotable evidence.
@@ -100,6 +101,8 @@ The current M6 implementation adds an explicit forward-only replacement lane val
 The current M7 implementation adds `atm.decompositionPlan` plus `create-map --from-plan <path>`, so a large-feature decomposition can deterministically materialize a canonical replacement map instead of leaving only loose atoms. The plan path also feeds the generated draft map back through `create-map --spec` for round-trip verification.
 
 The current M9 implementation hardens `create-map --spec <path>` into a schema-validated deterministic artifact lane for both `0.1.0` and `0.2.0` map documents, including Windows PowerShell paths with spaces. The replacement-facing CLI surface also emits machine-readable `nextActionHint` data so `create-map`, `test --map --equivalence-fixtures`, and blocked `upgrade --propose --replacement-mode ...` flows can point callers at the next deterministic CLI step without introducing prompt-only orchestration.
+
+The current M10 implementation closes the replacement evidence loop for both proposal-time and replacement-lane transitions. `upgrade --propose --replacement-mode active` now consumes `propagation-report`, `review-advisory`, and `human-review` inputs in addition to map equivalence and optional polymorph impact evidence. `legacy-retired` proposals and lane transitions now accept either rollback proof or retirement proof, and retirement proof must explicitly clear caller and entrypoint risk before the legacy surface can be retired.
 
 The first implementation should favor deterministic artifacts over runtime magic. A map may initially describe delegated or documented execution. Full orchestrated execution can arrive later once map execution contracts are mature.
 

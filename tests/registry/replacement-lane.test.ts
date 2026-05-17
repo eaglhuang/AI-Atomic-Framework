@@ -6,7 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { createTempWorkspace } from '../../scripts/temp-root.ts';
 import { createMinimalAtomicMapSpec } from '../../packages/core/src/manager/map-generator.ts';
 import { createAtomicMapRegistryEntry } from '../../packages/core/src/registry/map-registry.ts';
+import { createRollbackProof } from '../../packages/core/src/registry/rollback-proof.ts';
 import { createRegistryDocument } from '../../packages/core/src/registry/registry.ts';
+import { createPropagationReport } from '../../packages/core/src/test-runner/propagation.ts';
 import { resolveCanonicalMapPaths } from '../../packages/core/src/test-runner/map-integration.ts';
 import { ReplacementMode, transitionReplacementMode } from '../../packages/core/src/registry/replacement-lane.ts';
 
@@ -40,7 +42,8 @@ function run() {
         evidenceRefs: [
           'atomic_workbench/maps/ATM-MAP-9701/map.equivalence.report.json',
           '.atm/history/reports/propagation-report.json',
-          '.atm/history/reports/review-advisory.json'
+          '.atm/history/reports/review-advisory.json',
+          '.atm/history/reports/human-review-approve.json'
         ]
       },
       {
@@ -114,7 +117,7 @@ function run() {
         repositoryRoot: activeMissingEvidenceWorkspace.repositoryRoot,
         actor: 'tester.active-missing',
         now: '2026-01-01T02:00:00.000Z'
-      }), /requires map equivalence \/ propagation \/ review evidence/);
+      }), /requires map equivalence \/ propagation \/ review advisory \/ human review evidence/);
     } finally {
       rmSync(activeMissingEvidenceWorkspace.repositoryRoot, { recursive: true, force: true });
     }
@@ -211,6 +214,7 @@ function createFixtureWorkspace(options: { initialMode: string; mapId: string })
   writeJson(path.join(repositoryRoot, paths.specPath), spec);
   writeFileSync(path.join(repositoryRoot, paths.testPath), "console.log('integration ok');\n", 'utf8');
   writeJson(path.join(repositoryRoot, paths.reportPath), { ok: true, mapId });
+  writeReplacementEvidenceFixtures(repositoryRoot, mapId);
 
   const registryEntry = createAtomicMapRegistryEntry(spec as any, {
     status: 'draft',
@@ -245,4 +249,216 @@ function readJson(filePath: string) {
 function writeJson(filePath: string, document: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+}
+
+function writeReplacementEvidenceFixtures(repositoryRoot: string, mapId: string) {
+  writeJson(path.join(repositoryRoot, 'atomic_workbench', 'maps', mapId, 'map.equivalence.report.json'), createPassingMapEquivalenceReport(mapId));
+  writeJson(path.join(repositoryRoot, '.atm', 'history', 'reports', 'propagation-report.json'), createPassingPropagationReport(mapId));
+  writeJson(path.join(repositoryRoot, '.atm', 'history', 'reports', 'review-advisory.json'), createPassingReviewAdvisory(mapId));
+  writeJson(path.join(repositoryRoot, '.atm', 'history', 'reports', 'human-review-approve.json'), createApprovedHumanReviewDecision(mapId));
+  writeJson(path.join(repositoryRoot, '.atm', 'history', 'reports', 'rollback-proof.json'), createPassingRollbackProof(mapId));
+}
+
+function createPassingMapEquivalenceReport(mapId: string) {
+  return {
+    schemaId: 'atm.mapEquivalenceReport',
+    specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'Replacement lane map equivalence fixture.'
+    },
+    reportId: `map-equivalence.${mapId.toLowerCase()}.lane-pass`,
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    mapId,
+    legacyUris: ['legacy://samples/checkout-mini'],
+    fixtures: [],
+    cases: [],
+    summary: {
+      totalCases: 1,
+      passedCases: 1,
+      failedCases: 0,
+      knownDivergenceCount: 0
+    },
+    metrics: {
+      latency: 10,
+      errorRate: 0,
+      coverage: 1,
+      edgeCaseCount: 0
+    },
+    artifacts: [],
+    evidence: [],
+    passed: true
+  };
+}
+
+function createPassingPropagationReport(mapId: string) {
+  return createPropagationReport({
+    ok: true,
+    discoveredMaps: [mapId],
+    perMapStatus: [
+      {
+        mapId,
+        ok: true,
+        exitCode: 0,
+        durationMs: 8,
+        resolutionMode: 'canonical',
+        reportPath: `atomic_workbench/maps/${mapId}/map.test.report.json`,
+        warnings: []
+      }
+    ],
+    failedDownstream: [],
+    propagationDuration: 8,
+    metrics: {
+      latency: 8,
+      errorRate: 0,
+      coverage: 1,
+      edgeCaseCount: 0
+    },
+    summary: {
+      total: 1,
+      passed: 1,
+      failed: 0,
+      durationMs: 8
+    }
+  }, {
+    atomId: 'ATM-CORE-0001',
+    behaviorId: 'behavior.evolve',
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    reportId: `propagation.${mapId.toLowerCase()}.lane-pass`
+  });
+}
+
+function createPassingReviewAdvisory(mapId: string) {
+  return {
+    schemaVersion: '1.0.0',
+    reportId: `review-advisory.${mapId.toLowerCase()}.lane-pass`,
+    status: 'ok',
+    provider: {
+      mode: 'stub',
+      providerId: 'stub-provider',
+      providerVersion: '1.0.0',
+      transport: 'inproc'
+    },
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    target: {
+      kind: 'map',
+      id: mapId
+    },
+    summary: {
+      high: 0,
+      medium: 0,
+      low: 0,
+      info: 1
+    },
+    findings: [],
+    supplementalContext: {
+      humanReviewQueue: {
+        attachable: true,
+        queuePath: '.atm/history/reports/upgrade-proposals.json',
+        proposalId: `proposal.${mapId.toLowerCase()}.lane-pass`,
+        queueRecordStatus: 'pending'
+      }
+    },
+    advisoryUnavailable: false,
+    needsReview: false,
+    unavailableReasons: []
+  };
+}
+
+function createApprovedHumanReviewDecision(mapId: string) {
+  return {
+    schemaId: 'atm.humanReviewDecision',
+    specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'Replacement lane human review fixture.'
+    },
+    decisionId: `decision.${mapId.toLowerCase()}.approve`,
+    proposalId: `proposal.${mapId.toLowerCase()}.lane-pass`,
+    atomId: 'ATM-CORE-0001',
+    decision: 'approve',
+    reason: 'Lane evidence approved.',
+    decidedBy: 'ATM reviewer',
+    decidedAt: '2026-01-01T00:00:00.000Z',
+    decisionSnapshotHash: `sha256:${'b'.repeat(64)}`,
+    queuePath: '.atm/history/reports/upgrade-proposals.json',
+    projectionPath: '.atm/history/reports/upgrade-proposals.md',
+    queueRecord: {
+      proposalId: `proposal.${mapId.toLowerCase()}.lane-pass`,
+      atomId: 'ATM-CORE-0001',
+      fromVersion: '1.0.0',
+      toVersion: '1.1.0',
+      decompositionDecision: 'map-bump',
+      automatedGates: {
+        allPassed: true,
+        blockedGateNames: []
+      },
+      status: 'approved',
+      proposalSnapshotHash: `sha256:${'b'.repeat(64)}`,
+      proposal: {
+        schemaId: 'atm.upgradeProposal',
+        proposalId: `proposal.${mapId.toLowerCase()}.lane-pass`,
+        atomId: 'ATM-CORE-0001',
+        fromVersion: '1.0.0',
+        toVersion: '1.1.0',
+        target: {
+          kind: 'map',
+          mapId
+        },
+        decompositionDecision: 'map-bump',
+        status: 'pending',
+        automatedGates: {
+          allPassed: true,
+          blockedGateNames: []
+        }
+      }
+    }
+  };
+}
+
+function createPassingRollbackProof(mapId: string) {
+  return createRollbackProof({
+    targetKind: 'map',
+    mapId,
+    fromVersion: '1.1.0',
+    toVersion: '1.0.0',
+    behaviorId: 'behavior.evolve',
+    reverseBehaviorId: 'behavior.rollback-evolve',
+    hashesVerified: {
+      spec: true,
+      code: true,
+      test: true,
+      allVerified: true
+    },
+    verifiedAt: '2026-01-01T00:00:00.000Z',
+    statusReverted: true,
+    semanticFingerprintReverted: true,
+    memberAtomProofs: [
+      {
+        atomId: 'ATM-CORE-0001',
+        version: '1.0.0',
+        expected: createHashTriplet('a'),
+        actual: createHashTriplet('a'),
+        matched: true
+      }
+    ],
+    mapGeneratorProvenance: true,
+    mapWorkbenchResolution: {
+      canonicalPath: `atomic_workbench/maps/${mapId}`,
+      legacyPath: `legacy/maps/${mapId}`,
+      selectedPath: `atomic_workbench/maps/${mapId}`,
+      selectedSource: 'canonical'
+    }
+  });
+}
+
+function createHashTriplet(hexDigit: string) {
+  const payload = `sha256:${hexDigit.repeat(64)}`;
+  return {
+    specHash: payload,
+    codeHash: payload,
+    testHash: payload
+  };
 }

@@ -10,6 +10,8 @@ const supportedReportSchemas: Record<string, string> = {
   'atm.atomicMap': 'schemas/registry/atomic-map.schema.json',
   'atm.mapEquivalenceReport': 'schemas/governance/map-equivalence-report.schema.json',
   'atm.polymorphImpactReport': 'schemas/governance/polymorph-impact-report.schema.json',
+  'atm.propagationReport': 'schemas/governance/propagation-report.schema.json',
+  'atm.retirementProof': 'schemas/governance/retirement-proof.schema.json',
   'atm.decompositionPlan': 'schemas/governance/decomposition-plan.schema.json'
 };
 const supportSchemaPaths = ['schemas/test-report/metrics.schema.json'];

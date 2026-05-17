@@ -2,6 +2,7 @@
 
 ## 2026-05-17
 
+- Closed replacement evidence gating for M10: added `atm.propagationReport` and `atm.retirementProof`, required propagation/review/human approval before `canary -> active`, and allowed `legacy-retired` promotion through rollback proof or caller/entrypoint-cleared retirement proof.
 - Added ScopeLock 0.2.0 map selectors and polymorph impact gating: `scope-lock` now round-trips `0.1.0` and `0.2.0`, `upgrade --propose --replacement-mode active` can require `--polymorph-impact-report`, and active map proposals now validate impacted instance maps for template-bound members.
 - Hardened spec-based map provisioning: `create-map --spec <path>` now validates `atm.atomicMap` JSON Schema, preserves `0.2.0` replacement metadata, emits machine-readable `nextActionHint`, and includes Windows PowerShell path smoke coverage.
 - Added decomposition-plan map provisioning: `atm.decompositionPlan` schema, `create-map --from-plan <path>`, sample checkout-mini plan, and CLI smoke coverage including spec round-trip into canonical map workspaces.

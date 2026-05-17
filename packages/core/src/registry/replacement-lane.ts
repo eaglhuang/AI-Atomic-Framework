@@ -1,7 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { validatePropagationReport } from '../test-runner/propagation.ts';
 import { resolveCanonicalMapPaths } from '../test-runner/map-integration.ts';
 import { createAtomicMapRegistryEntry, isAtomicMapRegistryEntry } from './map-registry.ts';
+import { validateRetirementProof } from './retirement-proof.ts';
+import { validateRollbackProof } from './rollback-proof.ts';
 import { validateRegistryDocumentFile, writeRegistryArtifacts } from './registry.ts';
 
 export const ReplacementMode = Object.freeze({
@@ -23,7 +26,7 @@ const orderedReplacementModes = [
 const evidenceRequirementByTarget = Object.freeze({
   [ReplacementMode.Shadow]: 'map integration evidence',
   [ReplacementMode.Canary]: 'map equivalence evidence',
-  [ReplacementMode.Active]: 'map equivalence / propagation / review evidence',
+  [ReplacementMode.Active]: 'map equivalence / propagation / review advisory / human review evidence',
   [ReplacementMode.LegacyRetired]: 'rollback proof or retirement proof'
 });
 
@@ -40,7 +43,8 @@ export function transitionReplacementMode(mapId: string, to: string, evidence: a
     from: fromMode,
     to: targetMode,
     evidenceRefs,
-    canonicalMapId: target.mapId
+    canonicalMapId: target.mapId,
+    repositoryRoot
   });
 
   const reason = normalizeReason(evidence.reason, defaultTransitionReason(fromMode, targetMode));
@@ -209,6 +213,258 @@ function validateTransition(input: any) {
       mapId: input.canonicalMapId
     });
   }
+
+  if (input.to === ReplacementMode.Active) {
+    validateActiveTransitionEvidence(input);
+  }
+  if (input.to === ReplacementMode.LegacyRetired) {
+    validateLegacyRetiredEvidence(input);
+  }
+}
+
+function validateActiveTransitionEvidence(input: any) {
+  const evidenceDocuments = loadEvidenceDocuments(input.repositoryRoot, input.evidenceRefs);
+  const gateResults = {
+    mapEquivalence: findMapEquivalenceEvidence(input.canonicalMapId, evidenceDocuments),
+    propagationReport: findPropagationEvidence(input.canonicalMapId, evidenceDocuments),
+    reviewAdvisory: findReviewAdvisoryEvidence(input.canonicalMapId, evidenceDocuments),
+    humanReview: findHumanReviewEvidence(input.canonicalMapId, evidenceDocuments)
+  };
+  const blockedGateNames = Object.entries(gateResults)
+    .filter(([, gate]) => gate.passed !== true)
+    .map(([gateName]) => gateName);
+  if (blockedGateNames.length === 0) {
+    return;
+  }
+
+  const requiredEvidenceKinds = blockedGateNames.map(mapGateNameToEvidenceKind);
+  throw createReplacementLaneError('ATM_REPLACEMENT_TRANSITION_INVALID', `Transition to ${input.to} requires ${evidenceRequirementByTarget[input.to]}.`, {
+    from: input.from,
+    to: input.to,
+    requiredEvidence: evidenceRequirementByTarget[input.to],
+    mapId: input.canonicalMapId,
+    blockedGateNames,
+    missingEvidenceKinds: requiredEvidenceKinds,
+    invalidEvidenceRefs: evidenceDocuments.filter((entry) => entry.error).map((entry) => ({
+      path: entry.path,
+      error: entry.error
+    })),
+    requiredJustification: {
+      requestedReplacementMode: ReplacementMode.Active,
+      requiredGateNames: blockedGateNames,
+      requiredEvidenceKinds,
+      humanReviewRequired: true,
+      rationale: 'Canary promotion to active requires passing map equivalence, propagation, review advisory, and approved human review evidence.'
+    },
+    nextActionHint: buildReplacementLaneNextActionHint(input, requiredEvidenceKinds)
+  });
+}
+
+function validateLegacyRetiredEvidence(input: any) {
+  const evidenceDocuments = loadEvidenceDocuments(input.repositoryRoot, input.evidenceRefs);
+  const rollbackProof = findRollbackProofEvidence(input.canonicalMapId, evidenceDocuments);
+  const retirementProof = findRetirementProofEvidence(input.canonicalMapId, evidenceDocuments);
+  if (rollbackProof.passed === true || retirementProof.passed === true) {
+    return;
+  }
+
+  const blockedGateNames = ['rollbackProof', 'retirementProof'];
+  const requiredEvidenceKinds = blockedGateNames.map(mapGateNameToEvidenceKind);
+  throw createReplacementLaneError('ATM_REPLACEMENT_TRANSITION_INVALID', `Transition to ${input.to} requires ${evidenceRequirementByTarget[input.to]}.`, {
+    from: input.from,
+    to: input.to,
+    requiredEvidence: evidenceRequirementByTarget[input.to],
+    mapId: input.canonicalMapId,
+    blockedGateNames,
+    missingEvidenceKinds: requiredEvidenceKinds,
+    invalidEvidenceRefs: evidenceDocuments.filter((entry) => entry.error).map((entry) => ({
+      path: entry.path,
+      error: entry.error
+    })),
+    requiredJustification: {
+      requestedReplacementMode: ReplacementMode.LegacyRetired,
+      requiredGateNames: blockedGateNames,
+      requiredEvidenceKinds,
+      humanReviewRequired: true,
+      rationale: 'Active promotion to legacy-retired requires a passing rollback proof or retirement proof, and retirement proof must clear caller and entrypoint risk.'
+    },
+    nextActionHint: buildReplacementLaneNextActionHint(input, requiredEvidenceKinds)
+  });
+}
+
+function loadEvidenceDocuments(repositoryRoot: string, evidenceRefs: readonly string[]) {
+  return evidenceRefs.map((evidenceRef) => {
+    const absolutePath = path.isAbsolute(evidenceRef) ? evidenceRef : path.join(repositoryRoot, evidenceRef);
+    if (!existsSync(absolutePath)) {
+      return {
+        path: evidenceRef,
+        absolutePath,
+        document: null,
+        error: 'evidence file was not found'
+      };
+    }
+    try {
+      return {
+        path: evidenceRef,
+        absolutePath,
+        document: readJson(absolutePath),
+        error: null
+      };
+    } catch (error) {
+      return {
+        path: evidenceRef,
+        absolutePath,
+        document: null,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  });
+}
+
+function findMapEquivalenceEvidence(mapId: string, evidenceDocuments: any[]) {
+  const match = evidenceDocuments.find((entry) => entry.document?.schemaId === 'atm.mapEquivalenceReport'
+    && entry.document?.mapId === mapId
+    && entry.document?.passed === true);
+  return {
+    passed: Boolean(match),
+    path: match?.path ?? null
+  };
+}
+
+function findPropagationEvidence(mapId: string, evidenceDocuments: any[]) {
+  const match = evidenceDocuments.find((entry) => safeValidatePropagationEvidence(entry.document, mapId).ok === true);
+  return {
+    passed: Boolean(match),
+    path: match?.path ?? null
+  };
+}
+
+function findReviewAdvisoryEvidence(mapId: string, evidenceDocuments: any[]) {
+  const match = evidenceDocuments.find((entry) => {
+    const document = entry.document;
+    if (!document || typeof document !== 'object') {
+      return false;
+    }
+    const advisoryTarget = document.target ?? null;
+    const targetMatches = advisoryTarget == null
+      || advisoryTarget.kind === 'proposal'
+      || advisoryTarget.id == null
+      || advisoryTarget.id === mapId;
+    return targetMatches
+      && document.advisoryUnavailable !== true
+      && (document.status === 'ok' || document.status === 'warn')
+      && typeof document.reportId === 'string';
+  });
+  return {
+    passed: Boolean(match),
+    path: match?.path ?? null
+  };
+}
+
+function findHumanReviewEvidence(mapId: string, evidenceDocuments: any[]) {
+  const match = evidenceDocuments.find((entry) => {
+    const document = entry.document;
+    if (!document || typeof document !== 'object') {
+      return false;
+    }
+    const reviewedMapId = document.queueRecord?.proposal?.target?.mapId ?? document.proposal?.target?.mapId ?? null;
+    return document.schemaId === 'atm.humanReviewDecision'
+      && document.decision === 'approve'
+      && document.queueRecord?.status === 'approved'
+      && (reviewedMapId == null || reviewedMapId === mapId);
+  });
+  return {
+    passed: Boolean(match),
+    path: match?.path ?? null
+  };
+}
+
+function findRollbackProofEvidence(mapId: string, evidenceDocuments: any[]) {
+  const match = evidenceDocuments.find((entry) => safeValidateRollbackEvidence(entry.document, mapId).ok === true);
+  return {
+    passed: Boolean(match),
+    path: match?.path ?? null
+  };
+}
+
+function findRetirementProofEvidence(mapId: string, evidenceDocuments: any[]) {
+  const match = evidenceDocuments.find((entry) => safeValidateRetirementEvidence(entry.document, mapId).ok === true);
+  return {
+    passed: Boolean(match),
+    path: match?.path ?? null
+  };
+}
+
+function safeValidatePropagationEvidence(document: any, mapId: string) {
+  try {
+    return validatePropagationReport(document, { mapId });
+  } catch (error) {
+    return {
+      ok: false,
+      issues: [error instanceof Error ? error.message : String(error)]
+    };
+  }
+}
+
+function safeValidateRollbackEvidence(document: any, mapId: string) {
+  try {
+    if (document?.schemaId !== 'atm.rollbackProof' || document?.targetKind !== 'map' || document?.mapId !== mapId || document?.verificationStatus !== 'passed') {
+      return { ok: false, issues: ['rollback proof does not match target map or did not pass'] };
+    }
+    return validateRollbackProof(document);
+  } catch (error) {
+    return {
+      ok: false,
+      issues: [error instanceof Error ? error.message : String(error)]
+    };
+  }
+}
+
+function safeValidateRetirementEvidence(document: any, mapId: string) {
+  try {
+    if (document?.schemaId !== 'atm.retirementProof' || document?.mapId !== mapId || document?.verificationStatus !== 'passed') {
+      return { ok: false, issues: ['retirement proof does not match target map or did not pass'] };
+    }
+    return validateRetirementProof(document);
+  } catch (error) {
+    return {
+      ok: false,
+      issues: [error instanceof Error ? error.message : String(error)]
+    };
+  }
+}
+
+function mapGateNameToEvidenceKind(gateName: string) {
+  switch (gateName) {
+    case 'mapEquivalence':
+      return 'map-equivalence';
+    case 'propagationReport':
+      return 'propagation-report';
+    case 'reviewAdvisory':
+      return 'review-advisory';
+    case 'humanReview':
+      return 'human-review';
+    case 'rollbackProof':
+      return 'rollback-proof';
+    case 'retirementProof':
+      return 'retirement-proof';
+    default:
+      return gateName;
+  }
+}
+
+function buildReplacementLaneNextActionHint(input: any, requiredEvidenceKinds: readonly string[]) {
+  const evidenceArgs = requiredEvidenceKinds
+    .map((kind) => `--evidence <${kind}.json>`)
+    .join(' ');
+  return {
+    status: 'blocked',
+    route: 'replacement-evidence-required',
+    reason: `Replacement lane transition to ${input.to} requires additional machine-readable evidence.`,
+    command: `node atm.mjs replacement-lane transition --cwd <repository-root> --map ${input.canonicalMapId} --to ${input.to} ${evidenceArgs} --json`,
+    commandTemplate: true,
+    requiredEvidenceKinds
+  };
 }
 
 function appendTransitionRecord(existingLog: any, input: any) {

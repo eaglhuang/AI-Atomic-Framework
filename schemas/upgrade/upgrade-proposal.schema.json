@@ -384,7 +384,19 @@
         "polymorphImpact": {
           "$ref": "#/$defs/gateResult"
         },
+        "propagationReport": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "reviewAdvisory": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "humanReview": {
+          "$ref": "#/$defs/gateResult"
+        },
         "rollbackProof": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "retirementProof": {
           "$ref": "#/$defs/gateResult"
         },
         "contextBudget": {
@@ -415,7 +427,7 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "mapEquivalence", "polymorphImpact", "rollbackProof", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy", "charterInvariantViolation"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "mapEquivalence", "polymorphImpact", "propagationReport", "reviewAdvisory", "humanReview", "rollbackProof", "retirementProof", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy", "charterInvariantViolation"]
           }
         }
       }
@@ -433,7 +445,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "enum": ["mapEquivalence", "polymorphImpact", "rollbackProof"]
+            "enum": ["mapEquivalence", "polymorphImpact", "propagationReport", "reviewAdvisory", "humanReview", "rollbackProof", "retirementProof"]
           }
         },
         "requiredEvidenceKinds": {
@@ -441,7 +453,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "enum": ["map-equivalence", "polymorph-impact", "rollback-proof"]
+            "enum": ["map-equivalence", "polymorph-impact", "propagation-report", "review-advisory", "human-review", "rollback-proof", "retirement-proof"]
           }
         },
         "requiredCliOptions": {
@@ -449,7 +461,7 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "enum": ["--equivalence-report", "--polymorph-impact-report", "--rollback-proof"]
+            "enum": ["--equivalence-report", "--polymorph-impact-report", "--propagation-report", "--review-advisory", "--human-review", "--rollback-proof", "--retirement-proof"]
           }
         },
         "humanReviewRequired": {
@@ -467,7 +479,7 @@
       "required": ["kind", "path", "schemaId"],
       "properties": {
         "kind": {
-          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate", "map-equivalence", "polymorph-impact", "rollback-proof", "evolution-evidence", "redaction-report"]
+          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate", "map-equivalence", "polymorph-impact", "propagation-report", "review-advisory", "human-review", "rollback-proof", "retirement-proof", "evolution-evidence", "redaction-report"]
         },
         "path": {
           "type": "string",

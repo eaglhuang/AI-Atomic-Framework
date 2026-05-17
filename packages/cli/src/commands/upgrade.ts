@@ -52,7 +52,11 @@ export async function runUpgrade(argv: any) {
     requestedReplacementMode: options.requestedReplacementMode,
     equivalenceReport: options.equivalenceReport,
     polymorphImpactReport: options.polymorphImpactReport,
+    propagationReport: options.propagationReport,
+    reviewAdvisory: options.reviewAdvisory,
+    humanReview: options.humanReview,
     rollbackProof: options.rollbackProof,
+    retirementProof: options.retirementProof,
     contextBudgetGate: contextBudget.gate,
     inputs: inputDocuments
   };
@@ -212,7 +216,11 @@ function parseUpgradeOptions(argv: any) {
     requestedReplacementMode: null,
     equivalenceReport: null,
     polymorphImpactReport: null,
+    propagationReport: null,
+    reviewAdvisory: null,
+    humanReview: null,
     rollbackProof: null,
+    retirementProof: null,
     proposalId: null,
     proposedBy: 'ATM CLI',
     proposedAt: null,
@@ -302,8 +310,28 @@ function parseUpgradeOptions(argv: any) {
       index += 1;
       continue;
     }
+    if (arg === '--propagation-report') {
+      options.propagationReport = requireOptionValue(argv, index, '--propagation-report');
+      index += 1;
+      continue;
+    }
+    if (arg === '--review-advisory') {
+      options.reviewAdvisory = requireOptionValue(argv, index, '--review-advisory');
+      index += 1;
+      continue;
+    }
+    if (arg === '--human-review') {
+      options.humanReview = requireOptionValue(argv, index, '--human-review');
+      index += 1;
+      continue;
+    }
     if (arg === '--rollback-proof') {
       options.rollbackProof = requireOptionValue(argv, index, '--rollback-proof');
+      index += 1;
+      continue;
+    }
+    if (arg === '--retirement-proof') {
+      options.retirementProof = requireOptionValue(argv, index, '--retirement-proof');
       index += 1;
       continue;
     }
@@ -371,8 +399,8 @@ function parseUpgradeOptions(argv: any) {
     if (options.target.kind === 'map' && !options.target.mapId) {
       throw new CliError('ATM_CLI_USAGE', 'upgrade --target map requires --map', { exitCode: 2 });
     }
-    if (options.target.kind !== 'map' && (options.requestedReplacementMode || options.equivalenceReport || options.polymorphImpactReport || options.rollbackProof)) {
-      throw new CliError('ATM_CLI_USAGE', '--replacement-mode, --equivalence-report, --polymorph-impact-report, and --rollback-proof require --target map with --map', { exitCode: 2 });
+    if (options.target.kind !== 'map' && (options.requestedReplacementMode || options.equivalenceReport || options.polymorphImpactReport || options.propagationReport || options.reviewAdvisory || options.humanReview || options.rollbackProof || options.retirementProof)) {
+      throw new CliError('ATM_CLI_USAGE', '--replacement-mode, --equivalence-report, --polymorph-impact-report, --propagation-report, --review-advisory, --human-review, --rollback-proof, and --retirement-proof require --target map with --map', { exitCode: 2 });
     }
     if (options.fork && (!options.fork.sourceAtomId || !options.fork.newAtomId)) {
       throw new CliError('ATM_CLI_USAGE', 'upgrade fork mode requires both --fork-source and --new-atom-id', { exitCode: 2 });
@@ -487,6 +515,15 @@ function loadExplicitInputDocuments(cwd: any, inputPaths: any) {
 function normalizeUpgradeInputDocument(document: any) {
   if (document && typeof document === 'object' && !Array.isArray(document) && document.expectedReport && !document.schemaId) {
     return document.expectedReport;
+  }
+  if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.propagationReport && !document.schemaId) {
+    return document.evidence.propagationReport;
+  }
+  if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.report && !document.schemaId) {
+    return document.evidence.report;
+  }
+  if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.decisionLog && !document.schemaId) {
+    return document.evidence.decisionLog;
   }
   return document;
 }

@@ -33,8 +33,9 @@ try {
   assert.equal(blockedProposal.status, 'blocked');
   assert.equal(blockedProposal.automatedGates.rollbackProof.passed, false);
   assert.equal(blockedProposal.automatedGates.blockedGateNames.includes('rollbackProof'), true);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredEvidenceKinds, ['rollback-proof']);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredCliOptions, ['--rollback-proof']);
+  assert.equal(blockedProposal.automatedGates.blockedGateNames.includes('retirementProof'), true);
+  assert.deepEqual(blockedProposal.requiredJustification.requiredEvidenceKinds, ['rollback-proof', 'retirement-proof']);
+  assert.deepEqual(blockedProposal.requiredJustification.requiredCliOptions, ['--rollback-proof', '--retirement-proof']);
 
   const readyProposal = proposeAtomicUpgrade({
     atomId: 'ATM-CORE-0001',
@@ -64,7 +65,8 @@ try {
   validateProposal(cliBlocked.parsed.evidence.proposal, validate, 'CLI blocked legacy-retired proposal');
   assert.equal(cliBlocked.parsed.evidence.proposal.status, 'blocked');
   assert.equal(cliBlocked.parsed.evidence.blockedGateNames.includes('rollbackProof'), true);
-  assert.deepEqual(cliBlocked.parsed.evidence.proposal.requiredJustification.requiredEvidenceKinds, ['rollback-proof']);
+  assert.equal(cliBlocked.parsed.evidence.blockedGateNames.includes('retirementProof'), true);
+  assert.deepEqual(cliBlocked.parsed.evidence.proposal.requiredJustification.requiredEvidenceKinds, ['rollback-proof', 'retirement-proof']);
 
   const cliReady = runUpgradeCli({
     mapId,
