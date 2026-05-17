@@ -5,7 +5,7 @@ import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { makeResult, message, parseOptions } from './shared.ts';
 
-export function runNext(argv: any) {
+export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
   if (activeGuidanceSession) {
@@ -29,7 +29,7 @@ export function runNext(argv: any) {
     });
   }
 
-  const doctor = runDoctor(['--cwd', options.cwd]);
+  const doctor = await runDoctor(['--cwd', options.cwd]);
   const runtime = detectGovernanceRuntime(options.cwd, bootstrapTaskId);
   const failed = doctor.evidence.checks.find((check: any) => check.ok !== true);
   const nextAction = decideNextAction(runtime, failed?.name ?? null);

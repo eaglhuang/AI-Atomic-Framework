@@ -2,8 +2,9 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { CliError, configPathFor, ensureAtmDirectory, frameworkVersion, makeResult, message, parseOptions, relativePathFrom, writeJsonFile } from './shared.ts';
 import { adoptDefaultBootstrap } from './bootstrap.ts';
 import type { LocalGovernanceBootstrapResult } from '../../../plugin-governance-local/src/index.ts';
+import { installIntegrationAdapter } from './integration.ts';
 
-export function runInit(argv: any) {
+export async function runInit(argv: any) {
   const { options } = parseOptions(argv, 'init');
   if (options.adopt && options.adopt !== 'default') {
     throw new CliError('ATM_CLI_USAGE', `init does not support adopt profile ${options.adopt}`, { exitCode: 2 });
@@ -72,6 +73,13 @@ export function runInit(argv: any) {
         charterInvariantsPath: null
       };
 
+  const integrationInstall = options.integration
+    ? await installIntegrationAdapter(options.cwd, options.integration, {
+        actor: '@ai-atomic-framework/cli',
+        force: options.force
+      })
+    : null;
+
   return makeResult({
     ok: true,
     command: 'init',
@@ -79,7 +87,8 @@ export function runInit(argv: any) {
     messages: [
       configExists && !options.force
         ? message('info', 'ATM_INIT_ALREADY_INITIALIZED', 'ATM config already exists; no files were changed.')
-        : message('info', 'ATM_INIT_CREATED', 'ATM standalone config created.')
+        : message('info', 'ATM_INIT_CREATED', 'ATM standalone config created.'),
+      ...(integrationInstall ? [message('info', 'ATM_INIT_INTEGRATION_ADDED', `Integration adapter ${integrationInstall.adapter.id} installed during init.`)] : [])
     ],
     evidence: {
       configPath: relativePathFrom(options.cwd, configPath),
@@ -104,6 +113,7 @@ export function runInit(argv: any) {
       recommendedPrompt: bootstrap.recommendedPrompt,
       charterPath: bootstrap.charterPath,
       charterInvariantsPath: bootstrap.charterInvariantsPath,
+      integrationInstall,
       adoptedAt: bootstrap.adoptedProfile ? new Date().toISOString() : null
     }
   });
@@ -130,6 +140,7 @@ function createDryRunResult(options: any) {
       contextSummaryMarkdownPath: options.adopt === 'default' ? '.atm/history/handoff/BOOTSTRAP-0001.md' : null,
       continuationReportPath: options.adopt === 'default' ? '.atm/history/reports/continuation/BOOTSTRAP-0001.json' : null,
       adoptedAt: options.adopt === 'default' ? new Date().toISOString() : null,
+      integrationId: options.integration ?? null,
       dryRun: true
     }
   });

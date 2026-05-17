@@ -50,10 +50,10 @@ export async function runSelfHostAlphaAsync(argv: any) {
     mkdirSync(sandbox, { recursive: true });
     copyRepositorySubset(options.cwd, sandbox);
 
-    const initDryRun = runInit(['--cwd', sandbox, '--adopt', '--dry-run', '--json']);
+    const initDryRun = await runInit(['--cwd', sandbox, '--adopt', '--dry-run', '--json']);
     const criteria1 = initDryRun.ok === true && typeof initDryRun.evidence?.adoptedAt === 'string';
 
-    const bootstrap = runBootstrap(['--cwd', sandbox, '--task', 'Bootstrap ATM self-hosting alpha']);
+    const bootstrap = await runBootstrap(['--cwd', sandbox, '--task', 'Bootstrap ATM self-hosting alpha']);
     const bootstrapEvidence = evaluateBootstrapEvidence(sandbox);
     const criteria2 = bootstrap.ok === true && bootstrapEvidence.ok;
 

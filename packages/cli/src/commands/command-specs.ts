@@ -213,6 +213,7 @@ export const commandSpecs = Object.freeze({
     options: [
       commonCwdOption,
       { flag: '--adopt', value: 'profile', summary: 'Adoption profile (default when flag is present without value: default).' },
+      { flag: '--integration', value: 'id', summary: 'Install an integration adapter during init.' },
       { flag: '--task', value: 'text', summary: 'Bootstrap task title override.' },
       { flag: '--dry-run', summary: 'Preview init/adopt changes without writing files.' },
       { flag: '--force', summary: 'Overwrite existing config and bootstrap files.' },
@@ -221,7 +222,32 @@ export const commandSpecs = Object.freeze({
       commonHelpOption
     ],
     examples: [
-      'node atm.mjs init --adopt default --json'
+      'node atm.mjs init --adopt default --json',
+      'node atm.mjs init --integration claude-code --json'
+    ]
+  }),
+  integration: defineCommandSpec({
+    name: 'integration',
+    summary: 'List, install, verify, or remove ATM agent integration adapters.',
+    positional: [
+      { name: 'action', summary: 'list | add | verify | remove', required: false },
+      { name: 'adapter-id', summary: 'Adapter id for add/verify/remove.', required: false }
+    ],
+    options: [
+      commonCwdOption,
+      { flag: '--actor', value: 'name', summary: 'Actor label recorded in install manifests.' },
+      { flag: '--at', value: 'timestamp', summary: 'Install timestamp override.' },
+      { flag: '--dry-run', summary: 'Preview integration install without writing files.' },
+      { flag: '--force', summary: 'Overwrite existing manifests and target files.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs integration list --json',
+      'node atm.mjs integration add claude-code --json',
+      'node atm.mjs integration verify claude-code --json',
+      'node atm.mjs integration remove claude-code --json'
     ]
   }),
   lock: defineCommandSpec({

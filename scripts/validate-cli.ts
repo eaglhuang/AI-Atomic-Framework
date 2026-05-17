@@ -73,7 +73,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -151,6 +151,68 @@ try {
   assertReadable(validateRepo, 'validate');
   assert(validateRepo.parsed.ok === true, 'validate after init must report ok=true');
   assertMessageCode(validateRepo, 'ATM_VALIDATE_REPOSITORY_OK');
+
+  const integrationRepo = path.join(tempRoot, 'integration-repo');
+  mkdirSync(integrationRepo, { recursive: true });
+  const integrationList = runAtm(['integration', 'list', '--cwd', integrationRepo], integrationRepo);
+  assert(integrationList.exitCode === 0, 'integration list must exit 0');
+  assertReadable(integrationList, 'integration');
+  assert(integrationList.parsed.ok === true, 'integration list must report ok=true');
+  assert(integrationList.parsed.evidence.available.includes('claude-code'), 'integration list must include claude-code');
+  assert(integrationList.parsed.evidence.available.includes('copilot'), 'integration list must include copilot');
+  assert(integrationList.parsed.evidence.available.includes('cursor'), 'integration list must include cursor');
+  assert(integrationList.parsed.evidence.available.includes('gemini'), 'integration list must include gemini');
+  assertMessageCode(integrationList, 'ATM_INTEGRATION_LIST_OK');
+
+  const integrationAdd = runAtm(['integration', 'add', 'claude-code', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
+  assert(integrationAdd.exitCode === 0, 'integration add claude-code must exit 0');
+  assertReadable(integrationAdd, 'integration');
+  assert(integrationAdd.parsed.ok === true, 'integration add claude-code must report ok=true');
+  assert(integrationAdd.parsed.evidence.manifestPath === '.atm/integrations/claude-code.manifest.json', 'integration add must use per-adapter manifest path');
+  assert(existsSync(path.join(integrationRepo, '.atm/integrations/claude-code.manifest.json')), 'integration add must write per-adapter manifest');
+  assert(existsSync(path.join(integrationRepo, '.claude/skills/atm-next/SKILL.md')), 'integration add must write agent-native entry files');
+  assertMessageCode(integrationAdd, 'ATM_INTEGRATION_ADDED');
+
+  const integrationVerify = runAtm(['integration', 'verify', 'claude-code', '--cwd', integrationRepo], integrationRepo);
+  assert(integrationVerify.exitCode === 0, 'integration verify claude-code must exit 0 after install');
+  assertReadable(integrationVerify, 'integration');
+  assert(integrationVerify.parsed.ok === true, 'integration verify claude-code must report ok=true');
+  assert(integrationVerify.parsed.evidence.driftedFiles.length === 0, 'integration verify must report no drift after install');
+  assertMessageCode(integrationVerify, 'ATM_INTEGRATION_VERIFY_OK');
+
+  const integrationRemove = runAtm(['integration', 'remove', 'claude-code', '--cwd', integrationRepo], integrationRepo);
+  assert(integrationRemove.exitCode === 0, 'integration remove claude-code must exit 0');
+  assertReadable(integrationRemove, 'integration');
+  assert(integrationRemove.parsed.ok === true, 'integration remove claude-code must report ok=true');
+  assert(!existsSync(path.join(integrationRepo, '.atm/integrations/claude-code.manifest.json')), 'integration remove must remove unchanged manifest');
+  assert(!existsSync(path.join(integrationRepo, '.claude/skills/atm-next/SKILL.md')), 'integration remove must remove unchanged entry file');
+  assertMessageCode(integrationRemove, 'ATM_INTEGRATION_REMOVED');
+
+  const initIntegrationRepo = path.join(tempRoot, 'init-integration-repo');
+  mkdirSync(initIntegrationRepo, { recursive: true });
+  const initWithIntegration = runAtm(['init', '--cwd', initIntegrationRepo, '--integration', 'cursor'], initIntegrationRepo);
+  assert(initWithIntegration.exitCode === 0, 'init --integration cursor must exit 0');
+  assertReadable(initWithIntegration, 'init');
+  assert(initWithIntegration.parsed.ok === true, 'init --integration cursor must report ok=true');
+  assert(initWithIntegration.parsed.evidence.integrationInstall?.adapter?.id === 'cursor', 'init --integration must report installed adapter id');
+  assert(existsSync(path.join(initIntegrationRepo, '.atm/integrations/cursor.manifest.json')), 'init --integration must write per-adapter manifest');
+  assert(existsSync(path.join(initIntegrationRepo, '.cursor/rules/skills/atm-next/SKILL.md')), 'init --integration must write adapter files');
+  assertMessageCode(initWithIntegration, 'ATM_INIT_INTEGRATION_ADDED');
+
+  const initIntegrationDoctor = runAtm(['doctor', '--cwd', initIntegrationRepo], initIntegrationRepo);
+  assertReadable(initIntegrationDoctor, 'doctor');
+  const integrationDoctorCheck = initIntegrationDoctor.parsed.evidence.checks.find((check: any) => check.name === 'integration-adapters');
+  assert(integrationDoctorCheck.ok === true, 'doctor integration-adapters check must pass after init --integration');
+  assert(integrationDoctorCheck.details.installed.includes('cursor'), 'doctor integration-adapters check must report installed cursor adapter');
+
+  const cursorSkillPath = path.join(initIntegrationRepo, '.cursor/rules/skills/atm-next/SKILL.md');
+  writeFileSync(cursorSkillPath, `${readFileSync(cursorSkillPath, 'utf8')}\n# drift\n`, 'utf8');
+  const initIntegrationDoctorDrift = runAtm(['doctor', '--cwd', initIntegrationRepo], initIntegrationRepo);
+  assert(initIntegrationDoctorDrift.exitCode === 1, 'doctor must fail after adapter file drift');
+  assertReadable(initIntegrationDoctorDrift, 'doctor');
+  const integrationDriftCheck = initIntegrationDoctorDrift.parsed.evidence.checks.find((check: any) => check.name === 'integration-adapters');
+  assert(integrationDriftCheck.ok === false, 'doctor integration-adapters check must fail after drift');
+  assert(integrationDriftCheck.details.failed[0].driftedFiles.includes('.cursor/rules/skills/atm-next/SKILL.md'), 'doctor integration-adapters check must report drifted file');
 
   const validSpecPath = path.join(root, fixture.validAtomicSpec);
   const validateSpec = runAtm(['validate', '--spec', validSpecPath], blankRepo);

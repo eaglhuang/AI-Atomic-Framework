@@ -1,11 +1,11 @@
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { makeResult, message, readJsonFile, relativePathFrom } from './shared.ts';
 import { defaultAtomicSpecSchemaPath, parseAtomicSpecFile } from '../../../core/src/spec/parse-spec.ts';
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
 
 const atomicSpecSchemaPath = defaultAtomicSpecSchemaPath;
 const frameworkRoot = path.resolve(path.dirname(atomicSpecSchemaPath), '..');
+const requireFromSpecShared = createRequire(import.meta.url);
 const supportedReportSchemas: Record<string, string> = {
   'atm.mapEquivalenceReport': 'schemas/governance/map-equivalence-report.schema.json'
 };
@@ -66,6 +66,7 @@ function validateSupportedReportAgainstSchema(document: any, options: {
   successCode: string;
   successText: string;
 }) {
+  const { Ajv2020, addFormats } = loadJsonSchemaValidatorModules();
   const ajv = new Ajv2020({ allErrors: true, strict: false });
   addFormats(ajv);
   for (const supportSchemaPath of supportSchemaPaths) {
@@ -98,4 +99,13 @@ function validateSupportedReportAgainstSchema(document: any, options: {
       validated: ok ? [options.relativeSpecPath] : []
     }
   });
+}
+
+function loadJsonSchemaValidatorModules() {
+  const ajvModule = requireFromSpecShared('ajv/dist/2020.js');
+  const formatsModule = requireFromSpecShared('ajv-formats');
+  return {
+    Ajv2020: ajvModule.default ?? ajvModule,
+    addFormats: formatsModule.default ?? formatsModule
+  };
 }

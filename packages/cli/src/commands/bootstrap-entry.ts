@@ -3,10 +3,10 @@ import { message } from './shared.ts';
 
 const defaultBootstrapTaskTitle = 'Bootstrap ATM in this repository';
 
-export function runBootstrap(argv: any) {
+export async function runBootstrap(argv: any) {
   const hasTask = Array.isArray(argv) && argv.includes('--task');
   const effectiveArgs = hasTask ? argv : [...argv, '--task', defaultBootstrapTaskTitle];
-  const result = runInit([...effectiveArgs, '--adopt', 'default']);
+  const result = await runInit([...effectiveArgs, '--adopt', 'default']);
   const created = Array.isArray(result.evidence?.created) ? result.evidence.created : [];
   const bootstrapCreated = created.length > 0;
 
