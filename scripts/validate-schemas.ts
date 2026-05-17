@@ -59,7 +59,8 @@ const schemaEntries: Record<string, string> = {
   'polymorphic-template': 'schemas/polymorphism/polymorphic-template.schema.json',
   'dimension-spec': 'schemas/polymorphism/dimension-spec.schema.json',
   'charter-invariants': 'schemas/charter/charter-invariants.schema.json',
-  'integration-install-manifest': 'schemas/integrations/install-manifest.schema.json'
+  'integration-install-manifest': 'schemas/integrations/install-manifest.schema.json',
+  'agent-pack-manifest': 'schemas/agent-pack/manifest.schema.json'
 };
 
 const supportSchemaEntries: Record<string, string> = {
