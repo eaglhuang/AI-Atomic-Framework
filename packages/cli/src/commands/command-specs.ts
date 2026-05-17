@@ -86,6 +86,8 @@ export const commandSpecs = Object.freeze({
     options: [
       commonCwdOption,
       { flag: '--map-version', value: 'semver', summary: 'Map version, defaults to 0.1.0.' },
+      { flag: '--spec', value: 'path', summary: 'Create from an existing atm.atomicMap document.' },
+      { flag: '--from-plan', value: 'path', summary: 'Create from an atm.decompositionPlan document.' },
       { flag: '--members', value: 'json', summary: 'JSON member list.' },
       { flag: '--edges', value: 'json', summary: 'JSON dependency edge list.' },
       { flag: '--entrypoints', value: 'json', summary: 'JSON entrypoint list.' },
@@ -96,7 +98,9 @@ export const commandSpecs = Object.freeze({
       commonHelpOption
     ],
     examples: [
-      'node atm.mjs create-map --members "[{\\"atomId\\":\\"ATM-CORE-0001\\",\\"version\\":\\"1.0.0\\"}]" --entrypoints "[\\"ATM-CORE-0001\\"]" --quality-targets "{\\"latency\\":\\"p95<100ms\\"}" --dry-run'
+      'node atm.mjs create-map --members "[{\\"atomId\\":\\"ATM-CORE-0001\\",\\"version\\":\\"1.0.0\\"}]" --entrypoints "[\\"ATM-CORE-0001\\"]" --quality-targets "{\\"latency\\":\\"p95<100ms\\"}" --dry-run',
+      'node atm.mjs create-map --spec samples/checkout-mini.map.json --json',
+      'node atm.mjs create-map --from-plan samples/checkout-mini.plan.json --json'
     ]
   }),
   doctor: defineCommandSpec({
@@ -415,6 +419,22 @@ export const commandSpecs = Object.freeze({
     examples: [
       'node atm.mjs validate --json',
       'node atm.mjs validate --spec tests/schema-fixtures/positive/hello-world.atom.json --json'
+    ]
+  }),
+  welcome: defineCommandSpec({
+    name: 'welcome',
+    summary: 'Summarize constitution, integration health, and the next ATM action for first-touch onboarding.',
+    positional: [],
+    options: [
+      commonCwdOption,
+      { flag: '--dry-run', summary: 'Preview welcome output without writing welcome lineage.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs welcome --cwd . --json',
+      'node atm.mjs welcome --cwd . --dry-run --json'
     ]
   }),
   verify: defineCommandSpec({

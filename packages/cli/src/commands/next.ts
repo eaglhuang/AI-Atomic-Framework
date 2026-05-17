@@ -60,6 +60,15 @@ function decideNextAction(runtime: any, failedCheckName: any) {
       blockedCommands: blockedMutationCommands()
     };
   }
+  if (failedCheckName === 'onboarding-lifecycle') {
+    return {
+      status: 'needs-onboarding-refresh',
+      command: 'node atm.mjs constitution render --cwd . --json',
+      reason: 'onboarding constitution sources are missing or stale',
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: blockedMutationCommands()
+    };
+  }
   if (!runtime.config) {
     return {
       status: 'needs-bootstrap',

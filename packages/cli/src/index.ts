@@ -37,6 +37,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'constitution',
+    summary: 'Render or verify constitution markdown from ATM guard sources',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'doctor',
     summary: 'Inspect ATM engineering readiness and trust signals',
     implemented: true,
@@ -172,6 +179,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   {
     commandName: 'validate',
     summary: 'Run deterministic validation',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
+    commandName: 'welcome',
+    summary: 'Summarize constitution, integrations, and next ATM action for onboarding',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'

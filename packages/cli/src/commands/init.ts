@@ -6,6 +6,7 @@ import { installIntegrationAdapter } from './integration.ts';
 
 export async function runInit(argv: any) {
   const { options } = parseOptions(argv, 'init');
+  const shouldAdoptDefault = options.adopt === 'default' || typeof options.integration === 'string';
   if (options.adopt && options.adopt !== 'default') {
     throw new CliError('ATM_CLI_USAGE', `init does not support adopt profile ${options.adopt}`, { exitCode: 2 });
   }
@@ -49,7 +50,7 @@ export async function runInit(argv: any) {
     charterPath: null;
     charterInvariantsPath: null;
     scriptPaths: [];
-  } = options.adopt === 'default'
+  } = shouldAdoptDefault
     ? adoptDefaultBootstrap(options.cwd, { force: options.force, taskTitle: options.task })
     : {
         created: [],
@@ -75,7 +76,7 @@ export async function runInit(argv: any) {
         scriptPaths: []
       };
 
-  const scriptInstall = options.adopt === 'default'
+  const scriptInstall = shouldAdoptDefault
     ? { created: [], unchanged: [], scriptPaths: bootstrap.scriptPaths, platformHintPath: process.platform === 'win32' ? '.atm/scripts/ps' : '.atm/scripts/sh' }
     : installDefaultRootDropScripts(options.cwd, { force: options.force });
 
@@ -129,6 +130,7 @@ export async function runInit(argv: any) {
 
 function createDryRunResult(options: any) {
   const configPath = configPathFor(options.cwd);
+  const shouldAdoptDefault = options.adopt === 'default' || typeof options.integration === 'string';
   return makeResult({
     ok: true,
     command: 'init',
@@ -140,16 +142,16 @@ function createDryRunResult(options: any) {
       unchanged: [],
       adapterMode: 'standalone',
       adapterImplemented: false,
-      adoptedProfile: options.adopt === 'default' ? 'default' : null,
-      contextBudgetPolicyPath: options.adopt === 'default' ? '.atm/runtime/budget/default-policy.json' : null,
-      contextBudgetReportPath: options.adopt === 'default' ? '.atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json' : null,
+      adoptedProfile: shouldAdoptDefault ? 'default' : null,
+      contextBudgetPolicyPath: shouldAdoptDefault ? '.atm/runtime/budget/default-policy.json' : null,
+      contextBudgetReportPath: shouldAdoptDefault ? '.atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json' : null,
       contextBudgetSummaryPath: null,
-      contextSummaryPath: options.adopt === 'default' ? '.atm/history/handoff/BOOTSTRAP-0001.json' : null,
-      contextSummaryMarkdownPath: options.adopt === 'default' ? '.atm/history/handoff/BOOTSTRAP-0001.md' : null,
-      continuationReportPath: options.adopt === 'default' ? '.atm/history/reports/continuation/BOOTSTRAP-0001.json' : null,
+      contextSummaryPath: shouldAdoptDefault ? '.atm/history/handoff/BOOTSTRAP-0001.json' : null,
+      contextSummaryMarkdownPath: shouldAdoptDefault ? '.atm/history/handoff/BOOTSTRAP-0001.md' : null,
+      continuationReportPath: shouldAdoptDefault ? '.atm/history/reports/continuation/BOOTSTRAP-0001.json' : null,
       scriptPaths: expectedRootDropScriptPaths(),
       scriptPlatformHintPath: process.platform === 'win32' ? '.atm/scripts/ps' : '.atm/scripts/sh',
-      adoptedAt: options.adopt === 'default' ? new Date().toISOString() : null,
+      adoptedAt: shouldAdoptDefault ? new Date().toISOString() : null,
       integrationId: options.integration ?? null,
       dryRun: true
     }
@@ -172,6 +174,7 @@ function expectedRootDropScriptPaths() {
 }
 
 function createDefaultConfig(options: any) {
+  const shouldAdoptDefault = options.adopt === 'default' || typeof options.integration === 'string';
   const config: Record<string, any> = {
     schemaVersion: 'atm.config.v0.1',
     layoutVersion: 2,
@@ -208,7 +211,7 @@ function createDefaultConfig(options: any) {
     }
   };
 
-  if (options.adopt === 'default') {
+  if (shouldAdoptDefault) {
     config.adoption = {
       profile: 'default',
       taskPath: '.atm/history/tasks/BOOTSTRAP-0001.json',
