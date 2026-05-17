@@ -159,6 +159,26 @@ try {
   assert(atmChartVerify.parsed.ok === true, 'atm-chart verify must report ok=true when fresh');
   assertMessageCode(atmChartVerify, 'ATM_CHART_VERIFY_OK');
 
+  const agentPackList = runAtm(['agent-pack', 'list', '--cwd', atmChartRepo], atmChartRepo);
+  assert(agentPackList.exitCode === 0, 'agent-pack list must exit 0');
+  assertReadable(agentPackList, 'agent-pack');
+  assert(agentPackList.parsed.ok === true, 'agent-pack list must report ok=true');
+  assert(Array.isArray(agentPackList.parsed.evidence.installedPacks), 'agent-pack list must report installedPacks array');
+
+  const agentPackInstall = runAtm(['agent-pack', 'install', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  assert(agentPackInstall.exitCode === 0, 'agent-pack install --id must exit 0 after bootstrap');
+  assertReadable(agentPackInstall, 'agent-pack');
+  assert(agentPackInstall.parsed.ok === true, 'agent-pack install --id must report ok=true');
+  assert(agentPackInstall.parsed.evidence.manifestPath === '.atm/agent-pack/claude-code.manifest.json', 'agent-pack install must write the pack manifest path');
+  assert(existsSync(path.join(atmChartRepo, '.atm/agent-pack/claude-code.manifest.json')), 'agent-pack install must write the pack manifest');
+  assertMessageCode(agentPackInstall, 'ATM_AGENT_PACK_INSTALL');
+
+  const agentPackVerifyFresh = runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  assert(agentPackVerifyFresh.exitCode === 0, 'agent-pack verify-fresh must exit 0 immediately after install');
+  assertReadable(agentPackVerifyFresh, 'agent-pack');
+  assert(agentPackVerifyFresh.parsed.ok === true, 'agent-pack verify-fresh must report ok=true when fresh');
+  assertMessageCode(agentPackVerifyFresh, 'ATM_AGENT_PACK_VERIFY_FRESH_OK');
+
   const welcomeDryRun = runAtm(['welcome', '--cwd', atmChartRepo, '--dry-run'], atmChartRepo);
   assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must exit 0 after ATMChart render');
   assertReadable(welcomeDryRun, 'welcome');
@@ -194,6 +214,11 @@ try {
   assert(atmChartStale.exitCode === 2, 'atm-chart verify must exit 2 when source guards drift');
   assert(atmChartStale.parsed.ok === false, 'atm-chart verify must report ok=false when stale');
   assertMessageCode(atmChartStale, 'ATM_CHART_STALE');
+
+  const agentPackStale = runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  assert(agentPackStale.exitCode === 2, 'agent-pack verify-fresh must exit 2 when source guards drift');
+  assert(agentPackStale.parsed.ok === false, 'agent-pack verify-fresh must report ok=false when stale');
+  assertMessageCode(agentPackStale, 'ATM_AGENT_PACK_STALE');
 
   const staleDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
   assert(staleDoctor.exitCode === 1, 'doctor must fail when onboarding ATMChart is stale');

@@ -1,4 +1,4 @@
-import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -58,6 +58,14 @@ function installHooks(repo: any) {
   chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
   chmodSync(path.join(hooksDir, 'post-commit'), 0o755);
 }
+
+const preCommitTemplate = readFileSync(path.join(root, 'templates', 'enforcement', 'pre-commit.sh'), 'utf8');
+assert(preCommitTemplate.includes('node atm.mjs atm-chart verify --json'), 'pre-commit enforcement template must verify ATMChart freshness');
+assert(preCommitTemplate.includes('node atm.mjs agent-pack verify-fresh --id "$pack_id" --json'), 'pre-commit enforcement template must verify installed agent-pack freshness');
+
+const ciTemplate = readFileSync(path.join(root, 'templates', 'enforcement', 'ci-atm-onboarding.yml'), 'utf8');
+assert(ciTemplate.includes('node atm.mjs atm-chart verify --json'), 'CI enforcement template must verify ATMChart freshness');
+assert(ciTemplate.includes('node atm.mjs agent-pack verify-fresh --id "$pack_id" --json'), 'CI enforcement template must verify installed agent-pack freshness');
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-hooks-'));
 try {

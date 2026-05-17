@@ -61,9 +61,29 @@
       "summary": "Polymorph impact report path for active map proposals with template-bound members."
     },
     {
+      "flag": "--propagation-report",
+      "value": "path",
+      "summary": "Propagation report path for active map proposals."
+    },
+    {
+      "flag": "--review-advisory",
+      "value": "path",
+      "summary": "Review advisory report path for active map proposals."
+    },
+    {
+      "flag": "--human-review",
+      "value": "path",
+      "summary": "Human review decision path for active map proposals."
+    },
+    {
       "flag": "--rollback-proof",
       "value": "path",
       "summary": "Rollback proof path for map proposals."
+    },
+    {
+      "flag": "--retirement-proof",
+      "value": "path",
+      "summary": "Retirement proof path for legacy-retired map proposals."
     },
     {
       "flag": "--behavior",
@@ -132,7 +152,8 @@
   "examples": [
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json",
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --equivalence-report atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json --input fixtures/upgrade/hash-diff-report.json --json",
-    "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --polymorph-impact-report atomic_workbench/maps/ATM-MAP-0001/polymorph-impact-report.json --input fixtures/upgrade/hash-diff-report.json --json",
+    "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --polymorph-impact-report atomic_workbench/maps/ATM-MAP-0001/polymorph-impact-report.json --propagation-report .atm/history/reports/propagation-report.json --review-advisory .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --input fixtures/upgrade/hash-diff-report.json --json",
+    "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode legacy-retired --retirement-proof .atm/history/reports/retirement-proof.json --input fixtures/upgrade/hash-diff-report.json --json",
     "node atm.mjs upgrade --propose --behavior behavior.infect --legacy-target \"src/legacy.js#normalizeInput\" --guidance-session <session-id> --dry-run --json",
     "node atm.mjs upgrade --scan --input fixtures/evolution/evidence-patterns/recurring-failure-candidate.json --json"
   ]
