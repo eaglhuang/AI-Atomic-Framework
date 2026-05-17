@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export const integrationsCorePackage = {
   packageName: '@ai-atomic-framework/integrations-core',
@@ -62,6 +63,246 @@ export const minimumAtmEntrySkillDefinitions = [
     command: 'node atm.mjs handoff summarize --task "$ARGUMENTS" --json'
   }
 ] as const;
+
+const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../');
+export const defaultSkillTemplateDirectory = path.join(integrationsCoreRepoRoot, 'templates', 'skills');
+
+export type SkillTemplateAdapterTarget = 'claude-code' | 'copilot' | 'cursor' | 'gemini';
+
+export interface AtmSkillTemplateFrontmatter {
+  readonly schemaId: 'atm.skillTemplate';
+  readonly specVersion: '0.1.0';
+  readonly id: string;
+  readonly title: string;
+  readonly summary: string;
+  readonly command: string;
+  readonly firstCommand: string;
+  readonly 'charter-invariants-injected': boolean;
+  readonly handoffs: string;
+}
+
+export interface AtmSkillTemplate {
+  readonly frontmatter: AtmSkillTemplateFrontmatter;
+  readonly body: string;
+  readonly sourcePath: string;
+}
+
+export function parseSkillTemplate(content: string, sourcePath = '<inline>'): AtmSkillTemplate {
+  const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!frontmatterMatch) {
+    throw new Error(`skill template missing frontmatter: ${sourcePath}`);
+  }
+  const frontmatter = parseSkillTemplateFrontmatter(frontmatterMatch[1], sourcePath);
+  return {
+    frontmatter,
+    body: frontmatterMatch[2],
+    sourcePath
+  };
+}
+
+export function loadSkillTemplates(templateDirectory = defaultSkillTemplateDirectory): readonly AtmSkillTemplate[] {
+  return readdirSync(templateDirectory)
+    .filter((entryName) => entryName.endsWith('.skill.md'))
+    .sort((left, right) => left.localeCompare(right))
+    .map((entryName) => {
+      const templatePath = path.join(templateDirectory, entryName);
+      return parseSkillTemplate(readFileSync(templatePath, 'utf8'), path.relative(integrationsCoreRepoRoot, templatePath).replace(/\\/g, '/'));
+    });
+}
+
+export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTemplateDirectory): readonly AtmSkillTemplate[] {
+  const templatesById = new Map(loadSkillTemplates(templateDirectory).map((template) => [template.frontmatter.id, template]));
+  return minimumAtmEntrySkillDefinitions.map((entryDefinition) => {
+    const template = templatesById.get(entryDefinition.id);
+    if (!template) {
+      throw new Error(`missing ATM skill template: ${entryDefinition.id}`);
+    }
+    return template;
+  });
+}
+
+export function compileSkillTemplatesForAdapter(adapterTarget: SkillTemplateAdapterTarget, templates: readonly AtmSkillTemplate[] = loadMinimumAtmSkillTemplates()): readonly IntegrationSourceFile[] {
+  if (adapterTarget === 'claude-code') {
+    return templates.map((template) => ({
+      relativePath: `${template.frontmatter.id}/SKILL.md`,
+      content: compileSkillTemplate(template, 'claude-code'),
+      fileFormat: 'skill',
+      source: 'template'
+    }));
+  }
+  if (adapterTarget === 'cursor') {
+    return templates.map((template) => ({
+      relativePath: `${template.frontmatter.id}/SKILL.md`,
+      content: compileSkillTemplate(template, 'cursor'),
+      fileFormat: 'markdown',
+      source: 'template'
+    }));
+  }
+  if (adapterTarget === 'gemini') {
+    return templates.map((template) => ({
+      relativePath: `${template.frontmatter.id}.toml`,
+      content: compileSkillTemplate(template, 'gemini'),
+      fileFormat: 'toml',
+      source: 'template'
+    }));
+  }
+  return [
+    {
+      relativePath: 'copilot-instructions.md',
+      content: compileCopilotRootInstructions(templates),
+      fileFormat: 'instructions-md',
+      source: 'template'
+    },
+    ...templates.flatMap((template) => [
+      {
+        relativePath: `instructions/${template.frontmatter.id}.instructions.md`,
+        content: compileSkillTemplate(template, 'copilot-instructions'),
+        fileFormat: 'instructions-md' as const,
+        source: 'template' as const
+      },
+      {
+        relativePath: `prompts/${template.frontmatter.id}.prompt.md`,
+        content: compileSkillTemplate(template, 'copilot-prompt'),
+        fileFormat: 'prompt-md' as const,
+        source: 'template' as const
+      }
+    ])
+  ];
+}
+
+export function compileSkillTemplate(template: AtmSkillTemplate, adapterTarget: SkillTemplateAdapterTarget | 'copilot-instructions' | 'copilot-prompt'): string {
+  const frontmatter = template.frontmatter;
+  const body = renderSkillTemplateBody(template);
+  if (adapterTarget === 'claude-code') {
+    return `---
+name: ${frontmatter.id}
+description: ${frontmatter.summary}
+argument-hint: "<ATM context>"
+charter-invariants-injected: true
+---
+
+${body}
+`;
+  }
+  if (adapterTarget === 'copilot-instructions') {
+    return `---
+applyTo: "**"
+---
+
+${body}
+
+Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.
+`;
+  }
+  if (adapterTarget === 'copilot-prompt') {
+    return `---
+mode: agent
+description: ${frontmatter.summary}
+---
+
+${body}
+
+Do not introduce a second registry, task state, or approval path.
+`;
+  }
+  if (adapterTarget === 'cursor') {
+    return `${body}
+
+## Rules
+
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.
+`;
+  }
+  return `name = "${escapeTomlBasicString(frontmatter.id)}"
+description = "${escapeTomlBasicString(frontmatter.summary)}"
+first_command = "${escapeTomlBasicString(frontmatter.firstCommand)}"
+command = "${escapeTomlBasicString(frontmatter.command)}"
+handoff = "${escapeTomlBasicString(frontmatter.handoffs)}"
+charter_invariants_injected = true
+
+[atm]
+entry_id = "${escapeTomlBasicString(frontmatter.id)}"
+first_command = "${escapeTomlBasicString(frontmatter.firstCommand)}"
+route_command = "${escapeTomlBasicString(frontmatter.command)}"
+handoff_command = "${escapeTomlBasicString(frontmatter.handoffs)}"
+
+[atm.guardrails]
+no_parallel_registry = true
+no_parallel_task_model = true
+hash_guarded_uninstall = true
+
+charter_invariants = """
+${charterInvariantsPlaceholder}
+"""
+`;
+}
+
+function parseSkillTemplateFrontmatter(frontmatterSource: string, sourcePath: string): AtmSkillTemplateFrontmatter {
+  const frontmatter = Object.fromEntries(frontmatterSource
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => {
+      const separatorIndex = line.indexOf(':');
+      if (separatorIndex < 0) {
+        throw new Error(`invalid skill template frontmatter line in ${sourcePath}: ${line}`);
+      }
+      const key = line.slice(0, separatorIndex).trim();
+      const value = parseFrontmatterScalar(line.slice(separatorIndex + 1).trim());
+      return [key, value];
+    }));
+  return frontmatter as unknown as AtmSkillTemplateFrontmatter;
+}
+
+function parseFrontmatterScalar(value: string): string | boolean {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value.replace(/^['"]|['"]$/g, '');
+}
+
+function renderSkillTemplateBody(template: AtmSkillTemplate): string {
+  const frontmatter = template.frontmatter;
+  return template.body
+    .replaceAll('{{id}}', frontmatter.id)
+    .replaceAll('{{title}}', frontmatter.title)
+    .replaceAll('{{summary}}', frontmatter.summary)
+    .replaceAll('{{firstCommand}}', frontmatter.firstCommand)
+    .replaceAll('{{command}}', frontmatter.command)
+    .replaceAll('{{handoffs}}', frontmatter.handoffs)
+    .trimEnd();
+}
+
+function compileCopilotRootInstructions(templates: readonly AtmSkillTemplate[]): string {
+  const entryList = templates.map((template) => `- ${template.frontmatter.id}: ${template.frontmatter.summary}`).join('\n');
+  return `# ATM Copilot Instructions
+
+First command:
+
+\`\`\`bash
+${atmFirstCommand}
+\`\`\`
+
+## Charter Invariants
+
+${charterInvariantsPlaceholder}
+
+## Entry Skills
+
+${entryList}
+
+## Operating Rules
+
+- Route governed work through ATM before editing files.
+- Use the ATM prompt and instruction files for specific next, orient, create, lock, evidence, upgrade-scan, and handoff flows.
+- Do not create a parallel task model, registry, or approval workflow.
+`;
+}
+
+function escapeTomlBasicString(value: string) {
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
 
 export interface IntegrationInstallContext {
   readonly repositoryRoot: string;

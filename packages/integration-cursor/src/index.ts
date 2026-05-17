@@ -1,8 +1,6 @@
 import {
-  atmFirstCommand,
-  charterInvariantsPlaceholder,
+  compileSkillTemplatesForAdapter,
   createStaticIntegrationAdapter,
-  minimumAtmEntrySkillDefinitions,
   type IntegrationAdapter,
   type IntegrationSourceFile
 } from '../../integrations-core/src/index.ts';
@@ -18,8 +16,6 @@ export interface CursorIntegrationAdapterOptions {
   readonly targetDir?: string;
 }
 
-type AtmEntrySkillDefinition = (typeof minimumAtmEntrySkillDefinitions)[number];
-
 export function createCursorIntegrationAdapter(options: CursorIntegrationAdapterOptions = {}): IntegrationAdapter {
   return createStaticIntegrationAdapter({
     id: 'cursor',
@@ -33,39 +29,5 @@ export function createCursorIntegrationAdapter(options: CursorIntegrationAdapter
 }
 
 export function createCursorSourceFiles(): readonly IntegrationSourceFile[] {
-  return minimumAtmEntrySkillDefinitions.map((entryDefinition) => ({
-    relativePath: `${entryDefinition.id}/SKILL.md`,
-    content: renderCursorSkill(entryDefinition),
-    fileFormat: 'markdown',
-    source: 'template'
-  }));
-}
-
-function renderCursorSkill(entryDefinition: AtmEntrySkillDefinition): string {
-  return `# ${entryDefinition.title}
-
-First command:
-
-\`\`\`bash
-${atmFirstCommand}
-\`\`\`
-
-## Route
-
-After ATM confirms this route, run:
-
-\`\`\`bash
-${entryDefinition.command}
-\`\`\`
-
-## Charter Invariants
-
-${charterInvariantsPlaceholder}
-
-## Rules
-
-- Use ATM as the only governance route for this action.
-- Do not create a second registry, task state, or approval workflow.
-- Preserve user-edited integration files; manifest hashes decide uninstall safety.
-`;
+  return compileSkillTemplatesForAdapter('cursor');
 }

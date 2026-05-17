@@ -2,7 +2,8 @@ import {
   adoptLocalGovernanceBundle,
   createOfficialBootstrapCommand,
   createRecommendedPrompt,
-  createSelfHostingAlphaPrompt
+  createSelfHostingAlphaPrompt,
+  installRootDropScripts
 } from '../../../plugin-governance-local/src/index.ts';
 
 export {
@@ -13,4 +14,8 @@ export {
 
 export function adoptDefaultBootstrap(cwd: any, options = {}) {
   return adoptLocalGovernanceBundle(cwd, options);
+}
+
+export function installDefaultRootDropScripts(cwd: any, options = {}) {
+  return installRootDropScripts(cwd, options);
 }

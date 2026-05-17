@@ -75,6 +75,10 @@ Integration adapters are a delivery mechanism only. They wrap existing ATM CLI c
 
 The lifecycle is exposed through `atm integration list/add/verify/remove`, and `atm init --integration <id>` can install an adapter during repository adoption. `atm doctor` reads installed per-adapter manifests and reports drift, missing files, or stale manifests through the `integration-adapters` check.
 
+Adapter entry files are compiled from framework-neutral source templates under `templates/skills/`. The compiler in `packages/integrations-core` emits Claude Code skills, GitHub Copilot instructions/prompts, Cursor skill markdown, and Gemini command TOML from the same seven ATM entry definitions. The source templates carry charter-invariant injection metadata and handoff commands that route back through ATM CLI, so host-specific formats cannot become a second governance model.
+
+Root-drop adoption also installs paired POSIX and PowerShell wrappers under `.atm/scripts/sh/` and `.atm/scripts/ps/`. These wrappers stay thin: each resolves the repository root and invokes the same `node atm.mjs ...` command route. The platform hint can prefer the native directory, but both script sets are written so Windows, Linux, and macOS entry surfaces remain in parity.
+
 ### CAR Reporting Lens
 
 ATM can be described through the Harness Engineering CAR lens without changing its core layers:
