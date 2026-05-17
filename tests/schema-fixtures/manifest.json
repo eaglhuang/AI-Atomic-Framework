@@ -56,6 +56,11 @@
       "path": "positive/conversation-review-findings-report.json"
     },
     {
+      "name": "conversation patch draft report",
+      "schema": "governance-conversation-patch-draft-report",
+      "path": "positive/conversation-patch-draft-report.json"
+    },
+    {
       "name": "governance adapter report",
       "schema": "governance-adapter-report",
       "path": "positive/governance-adapter-report.json"
@@ -327,6 +332,12 @@
       "name": "conversation transcript must be redacted",
       "schema": "governance-conversation-transcript",
       "path": "negative/conversation-transcript-unredacted.json",
+      "expectedKeyword": "const"
+    },
+    {
+      "name": "conversation patch draft must not mutate files",
+      "schema": "governance-conversation-patch-draft-report",
+      "path": "negative/conversation-patch-draft-mutating.json",
       "expectedKeyword": "const"
     }
   ]

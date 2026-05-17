@@ -22,6 +22,20 @@ export type {
   ConversationReviewRecommendedTarget
 } from './conversation-review-finding';
 export {
+  conversationPatchDraftBridgeName,
+  draftConversationPatches
+} from './conversation-patch-draft-bridge';
+export type {
+  ConversationAtomUpgradeProposalDraft,
+  ConversationPatchDraftBridgeInput,
+  ConversationPatchDraftGateResult,
+  ConversationPatchDraftItem,
+  ConversationPatchDraftOperation,
+  ConversationPatchDraftProposalInput,
+  ConversationPatchDraftReport,
+  ConversationPatchDraftSurface
+} from './conversation-patch-draft-bridge';
+export {
   ConversationTranscriptReviewError,
   conversationTranscriptReviewerName,
   reviewConversationTranscript
