@@ -27,6 +27,14 @@ The north star for the first release is a blank repository that can run a hello-
 
 Use this route when you want to adopt ATM in another repository quickly.
 
+ATM can also be initialized through npm as a governance framework starter:
+
+```bash
+npx create-atm test-app --agent claude-code
+```
+
+`create-atm` creates the project directory, runs the official ATM bootstrap, renders the ATMChart rule summary, and installs the requested agent pack. Agent packs are opt-in; omit `--agent` to initialize only the governed ATM project and rule chart.
+
 1. Copy one official distribution into the target repository root:
    - `release/atm-root-drop/` for portable multi-file root-drop.
    - `release/atm-onefile/atm.mjs` for a single-file runtime.

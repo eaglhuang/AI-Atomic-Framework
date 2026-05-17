@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -32,6 +32,49 @@ function runAtm(cwd: any, args: any) {
     exitCode: result.status ?? 0,
     parsed: payload ? JSON.parse(payload) : {}
   };
+}
+
+function runGit(cwd: any, args: any) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  assert(result.status === 0, `git ${args.join(' ')} must exit 0`);
+  return result.stdout.trim();
+}
+
+function tryReadHeadCommitSha(cwd: any) {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' });
+  return result.status === 0 ? result.stdout.trim() : null;
+}
+
+function refreshOnboarding(cwd: any) {
+  const atmChart = runAtm(cwd, ['atm-chart', 'render', '--cwd', '.', '--json']);
+  assert(atmChart.exitCode === 0, 'blank root-drop repo atm-chart render must exit 0 after bootstrap');
+  assert(atmChart.parsed.ok === true, 'blank root-drop repo atm-chart render must report ok=true after bootstrap');
+
+  const welcome = runAtm(cwd, ['welcome', '--cwd', '.', '--json']);
+  assert(welcome.exitCode === 0, 'blank root-drop repo welcome must exit 0 after bootstrap');
+  assert(welcome.parsed.ok === true, 'blank root-drop repo welcome must report ok=true after bootstrap');
+}
+
+function writeGitHeadEvidence(cwd: any) {
+  const commitSha = tryReadHeadCommitSha(cwd);
+  if (!commitSha) return;
+  const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', 'git-head.json');
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  writeFileSync(evidencePath, `${JSON.stringify({
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        summary: 'Release validator covered the current Git HEAD before doctor.',
+        artifactPaths: [],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        producedBy: 'validate-root-drop-release',
+        details: {
+          git: { commitSha }
+        }
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
 }
 
 const tempRoot = createTempWorkspace('atm-root-drop-release-');
@@ -86,6 +129,8 @@ try {
   const bootstrap = runAtm(blankRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'blank root-drop repo bootstrap must exit 0');
   assert(bootstrap.parsed.ok === true, 'blank root-drop repo bootstrap must report ok=true');
+  refreshOnboarding(blankRepo);
+  writeGitHeadEvidence(blankRepo);
 
   const installSkill = runAtm(blankRepo, ['guide', 'install-skill', '--cwd', '.', '--target', 'host', '--json']);
   assert(installSkill.exitCode === 0, 'blank root-drop repo guide install-skill must exit 0');
