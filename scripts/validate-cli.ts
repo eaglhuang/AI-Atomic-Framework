@@ -198,6 +198,14 @@ try {
   assert(typeof welcome.parsed.evidence.nextAction?.command === 'string', 'welcome must surface the next action command');
   assertMessageCode(welcome, 'ATM_WELCOME_READY');
 
+  const nextAfterWelcome = runAtm(['next', '--cwd', atmChartRepo], atmChartRepo);
+  assertReadable(nextAfterWelcome, 'next');
+  assert(nextAfterWelcome.parsed.evidence.agent_pack_hint != null, 'next must surface agent_pack_hint');
+  assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.slashCommandId === 'string', 'agent_pack_hint must have slashCommandId');
+  assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.route === 'string', 'agent_pack_hint must have route');
+  assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.command === 'string', 'agent_pack_hint must have command');
+  assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.reason === 'string', 'agent_pack_hint must have reason');
+
   const welcomeDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
   assertReadable(welcomeDoctor, 'doctor');
   const onboardingCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');

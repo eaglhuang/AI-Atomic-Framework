@@ -126,6 +126,47 @@
     "markdown": {
       "type": "string",
       "minLength": 1
+    },
+    "agent_pack_hint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slashCommandId", "route", "command", "reason"],
+      "properties": {
+        "slashCommandId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "handoff_chain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slashCommandId", "reason"],
+        "properties": {
+          "slashCommandId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     }
   },
   "$defs": {
