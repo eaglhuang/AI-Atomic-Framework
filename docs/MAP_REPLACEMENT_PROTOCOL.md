@@ -80,10 +80,13 @@ A minimal workflow can be implemented without introducing a runtime orchestratio
 node atm.mjs create-map --spec <map-spec.json>
 node atm.mjs test --map <mapId> --json
 node atm.mjs test --map <mapId> --equivalence-fixtures <fixtures.json> --json
-node atm.mjs upgrade --target map --map <mapId> --json
+node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode active --equivalence-report atomic_workbench/maps/<mapId>/map.equivalence.report.json --json
+node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode legacy-retired --rollback-proof .atm/history/reports/rollback-proof.json --json
 ```
 
 The current M4 implementation uses delegated executors from the fixture set: one `mapExecutor`, one `legacyExecutor`, plus lineage from `replacement.legacyUris`. It writes `map.equivalence.report.json` into the canonical map workbench path and treats reviewed known divergences as promotable evidence.
+
+The current M5 implementation keeps upgrade proposals additive and review-first: map proposals remain `status: "pending"` when automated gates pass, but they hard-block with machine-readable `requiredJustification` when `active` is requested without passing `map-equivalence`, or when `legacy-retired` is requested without passing `rollback-proof`.
 
 The first implementation should favor deterministic artifacts over runtime magic. A map may initially describe delegated or documented execution. Full orchestrated execution can arrive later once map execution contracts are mature.
 

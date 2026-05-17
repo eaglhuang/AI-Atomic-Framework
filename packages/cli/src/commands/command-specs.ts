@@ -340,6 +340,9 @@ export const commandSpecs = Object.freeze({
       { flag: '--to', value: 'version', summary: 'Target version.' },
       { flag: '--target', value: 'kind', summary: 'Target kind: atom | map.' },
       { flag: '--map', value: 'id', summary: 'Target map id when target kind is map.' },
+      { flag: '--replacement-mode', value: 'mode', summary: 'Requested replacement rollout mode for map proposals: draft | shadow | canary | active | legacy-retired.' },
+      { flag: '--equivalence-report', value: 'path', summary: 'Map equivalence report path for map proposals.' },
+      { flag: '--rollback-proof', value: 'path', summary: 'Rollback proof path for map proposals.' },
       { flag: '--behavior', value: 'id', summary: 'Behavior id to route proposal generation.' },
       { flag: '--decomposition-decision', value: 'decision', summary: 'Explicit decomposition decision override.' },
       { flag: '--legacy-target', value: 'path#symbol', summary: 'LegacyRoutePlan-selected target for guided atomize/infect/split dry-run proposals.' },
@@ -356,6 +359,7 @@ export const commandSpecs = Object.freeze({
     ],
     examples: [
       'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json',
+      'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --equivalence-report atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json --input fixtures/upgrade/hash-diff-report.json --json',
       'node atm.mjs upgrade --propose --behavior behavior.infect --legacy-target "src/legacy.js#normalizeInput" --guidance-session <session-id> --dry-run --json',
       'node atm.mjs upgrade --scan --input fixtures/evolution/evidence-patterns/recurring-failure-candidate.json --json'
     ]

@@ -1,4 +1,5 @@
 import { buildMapProposalContext } from './map-propose.ts';
+import { validateRollbackProof } from '../registry/rollback-proof.ts';
 import {
   deriveDecompositionDecision,
   resolveReviewTemplate,
@@ -19,12 +20,16 @@ const VALID_BEHAVIOR_IDS = [
   'behavior.atomize'
 ];
 
+const VALID_REPLACEMENT_MODES = ['draft', 'shadow', 'canary', 'active', 'legacy-retired'];
+
 const INPUT_KIND_PRIORITY = new Map([
   ['hash-diff', 0],
   ['execution-evidence', 1],
   ['non-regression', 2],
   ['quality-comparison', 3],
-  ['registry-candidate', 4]
+  ['registry-candidate', 4],
+  ['map-equivalence', 5],
+  ['rollback-proof', 6]
 ]);
 
 export function proposeAtomicUpgrade(request: any) {
@@ -61,6 +66,7 @@ export function proposeAtomicUpgrade(request: any) {
   }
 
   const target: { kind: 'atom' | 'map'; mapId?: string } = normalizeTarget(normalizedRequest.target);
+  const requestedReplacementMode = normalizeRequestedReplacementMode(normalizedRequest.requestedReplacementMode, target);
   const decompositionDecision = normalizedRequest.decompositionDecision ?? deriveDecompositionDecision({
     behaviorId,
     targetKind: target.kind
@@ -99,6 +105,8 @@ export function proposeAtomicUpgrade(request: any) {
   const nonRegressionGate = buildGateResult('nonRegression', nonRegressionInput.document, nonRegressionInput.path, 'baseline fixtures passed');
   const qualityComparisonGate = buildQualityComparisonGate(qualityComparisonInput.document, qualityComparisonInput.path);
   const registryCandidateGate = buildRegistryCandidateGate(registryCandidateInput.document, registryCandidateInput.path);
+  const mapEquivalenceGate = buildMapEquivalenceGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'map-equivalence'));
+  const rollbackProofGate = buildRollbackProofGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'rollback-proof'));
   const contextBudgetGate = normalizedRequest.contextBudgetGate;
 
   const blockedGateNames = [];
@@ -111,6 +119,12 @@ export function proposeAtomicUpgrade(request: any) {
   if (!registryCandidateGate.passed) {
     blockedGateNames.push('registryCandidate');
   }
+  if (mapEquivalenceGate && !mapEquivalenceGate.passed) {
+    blockedGateNames.push('mapEquivalence');
+  }
+  if (rollbackProofGate && !rollbackProofGate.passed) {
+    blockedGateNames.push('rollbackProof');
+  }
   if (contextBudgetGate && !contextBudgetGate.passed) {
     blockedGateNames.push('contextBudget');
   }
@@ -118,6 +132,11 @@ export function proposeAtomicUpgrade(request: any) {
   const allPassed = blockedGateNames.length === 0;
   const status = allPassed ? 'pending' : 'blocked';
   const proposalId = normalizedRequest.proposalId ?? createProposalId(atomId, fromVersion, toVersion, target, behaviorId);
+  const requiredJustification = buildRequiredJustification({
+    requestedReplacementMode,
+    mapEquivalenceGate,
+    rollbackProofGate
+  });
   const mapImpactScope = normalizedRequest.mapImpactScope
     ?? qualityComparisonInput.document.mapImpactScope
     ?? (target.kind === 'map'
@@ -144,6 +163,8 @@ export function proposeAtomicUpgrade(request: any) {
       nonRegression: nonRegressionGate,
       qualityComparison: qualityComparisonGate,
       registryCandidate: registryCandidateGate,
+      ...(mapEquivalenceGate ? { mapEquivalence: mapEquivalenceGate } : {}),
+      ...(rollbackProofGate ? { rollbackProof: rollbackProofGate } : {}),
       ...(contextBudgetGate ? { contextBudget: contextBudgetGate } : {}),
       allPassed,
       blockedGateNames
@@ -154,6 +175,13 @@ export function proposeAtomicUpgrade(request: any) {
     proposedBy: normalizedRequest.proposedBy,
     proposedAt: normalizedRequest.proposedAt
   };
+
+  if (requestedReplacementMode) {
+    proposal.requestedReplacementMode = requestedReplacementMode;
+  }
+  if (requiredJustification) {
+    proposal.requiredJustification = requiredJustification;
+  }
 
   if (mapProposalContext) {
     proposal.members = mapProposalContext.members;
@@ -205,6 +233,7 @@ function normalizeRequest(request: any = {}) {
     proposedAt: request.proposedAt ?? new Date().toISOString(),
     proposalId: request.proposalId ?? null,
     migration: request.migration ?? null,
+    requestedReplacementMode: request.requestedReplacementMode ?? null,
     repositoryRoot: request.repositoryRoot ?? process.cwd(),
     contextBudgetGate: normalizeGateResult(request.contextBudgetGate ?? null, 'contextBudget'),
     inputs: request.inputs.map(normalizeInputDocument)
@@ -251,13 +280,24 @@ function inferInputKind(kindOrSchemaId: any) {
     case 'registry-candidate':
     case 'atm.police.registryCandidateReport':
       return 'registry-candidate';
+    case 'map-equivalence':
+    case 'atm.mapEquivalenceReport':
+      return 'map-equivalence';
+    case 'rollback-proof':
+    case 'atm.rollbackProof':
+    case 'atm.evidence.rollbackProof':
+      return 'rollback-proof';
     default:
       throw new Error(`Unsupported upgrade proposal input kind: ${kindOrSchemaId}`);
   }
 }
 
+function findInput(inputs: any, expectedKind: any) {
+  return inputs.find((entry: any) => entry.kind === expectedKind) ?? null;
+}
+
 function requireInput(inputs: any, expectedKind: any) {
-  const input = inputs.find((entry: any) => entry.kind === expectedKind);
+  const input = findInput(inputs, expectedKind);
   if (!input) {
     throw new Error(`Upgrade proposal requires a ${expectedKind} input document.`);
   }
@@ -321,6 +361,82 @@ function buildRegistryCandidateGate(report: any, reportPath: any) {
   };
 }
 
+function buildMapEquivalenceGate(target: any, requestedReplacementMode: any, input: any) {
+  if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
+    return null;
+  }
+  if (!input) {
+    return {
+      passed: false,
+      reportId: 'map-equivalence.missing',
+      reportPath: '[missing]',
+      summary: 'blocked (active replacement requires a passing map equivalence report)'
+    };
+  }
+
+  const schemaValid = input.document?.schemaId === 'atm.mapEquivalenceReport';
+  const mapMatches = input.document?.mapId === target.mapId;
+  const passed = schemaValid && mapMatches && input.document?.passed === true;
+  const reason = !schemaValid
+    ? 'report schemaId must be atm.mapEquivalenceReport'
+    : !mapMatches
+      ? `report mapId ${String(input.document?.mapId ?? 'unknown')} does not match ${target.mapId}`
+      : 'map equivalence report did not pass';
+
+  return {
+    passed,
+    reportId: input.document?.reportId ?? 'map-equivalence.missing',
+    reportPath: input.path,
+    summary: passed
+      ? 'pass (map equivalence passed for active replacement)'
+      : `blocked (${reason})`
+  };
+}
+
+function buildRollbackProofGate(target: any, requestedReplacementMode: any, input: any) {
+  if (target.kind !== 'map' || requestedReplacementMode !== 'legacy-retired') {
+    return null;
+  }
+  if (!input) {
+    return {
+      passed: false,
+      reportId: 'rollback-proof.missing',
+      reportPath: '[missing]',
+      summary: 'blocked (legacy-retired replacement requires a passing rollback proof)'
+    };
+  }
+
+  const schemaValid = input.document?.schemaId === 'atm.rollbackProof';
+  const targetKindValid = input.document?.targetKind === 'map';
+  const mapMatches = input.document?.mapId === target.mapId;
+  const validation = schemaValid && targetKindValid && mapMatches
+    ? safeValidateRollbackProof(input.document)
+    : { ok: false, issues: [] };
+  const passed = schemaValid
+    && targetKindValid
+    && mapMatches
+    && input.document?.verificationStatus === 'passed'
+    && validation.ok;
+  const reason = !schemaValid
+    ? 'report schemaId must be atm.rollbackProof'
+    : !targetKindValid
+      ? 'rollback proof targetKind must be map'
+      : !mapMatches
+        ? `rollback proof mapId ${String(input.document?.mapId ?? 'unknown')} does not match ${target.mapId}`
+        : input.document?.verificationStatus !== 'passed'
+          ? 'rollback proof verificationStatus must be passed'
+          : validation.issues.join(', ') || 'rollback proof validation failed';
+
+  return {
+    passed,
+    reportId: input.document?.proofId ?? 'rollback-proof.missing',
+    reportPath: input.path,
+    summary: passed
+      ? 'pass (rollback proof verified for legacy-retired replacement)'
+      : `blocked (${reason})`
+  };
+}
+
 function normalizeGateResult(gate: any, gateName: any) {
   if (gate == null) {
     return null;
@@ -357,6 +473,10 @@ function createInputSummary(kind: any) {
       return 'quality-comparison input';
     case 'registry-candidate':
       return 'registry-candidate input';
+    case 'map-equivalence':
+      return 'map-equivalence input';
+    case 'rollback-proof':
+      return 'rollback-proof input';
     default:
       return 'upgrade-input';
   }
@@ -403,6 +523,45 @@ function normalizeTarget(target: any) {
   return normalized;
 }
 
+function normalizeRequestedReplacementMode(value: any, target: any) {
+  if (value == null) {
+    return null;
+  }
+
+  const mode = String(value).trim();
+  if (!VALID_REPLACEMENT_MODES.includes(mode)) {
+    throw new Error(`Unsupported requestedReplacementMode: ${mode}`);
+  }
+  if (target.kind !== 'map') {
+    throw new Error('requestedReplacementMode requires target.kind === "map".');
+  }
+  return mode;
+}
+
+function buildRequiredJustification({ requestedReplacementMode, mapEquivalenceGate, rollbackProofGate }: any) {
+  if (requestedReplacementMode === 'active' && mapEquivalenceGate && !mapEquivalenceGate.passed) {
+    return {
+      requestedReplacementMode,
+      requiredGateNames: ['mapEquivalence'],
+      requiredEvidenceKinds: ['map-equivalence'],
+      requiredCliOptions: ['--equivalence-report'],
+      humanReviewRequired: true,
+      rationale: 'Map promotion to active requires a passing map equivalence report before review can proceed.'
+    };
+  }
+  if (requestedReplacementMode === 'legacy-retired' && rollbackProofGate && !rollbackProofGate.passed) {
+    return {
+      requestedReplacementMode,
+      requiredGateNames: ['rollbackProof'],
+      requiredEvidenceKinds: ['rollback-proof'],
+      requiredCliOptions: ['--rollback-proof'],
+      humanReviewRequired: true,
+      rationale: 'Map promotion to legacy-retired requires a passing rollback proof before review can proceed.'
+    };
+  }
+  return null;
+}
+
 function createProposalId(atomId: any, fromVersion: any, toVersion: any, target: any, behaviorId: any) {
   const safeAtomId = String(atomId).toLowerCase();
   const targetSuffix = target.kind === 'map'
@@ -418,4 +577,15 @@ function normalizeMigration(migration: any) {
     fromVersion: migration?.fromVersion ?? null,
     notes: migration?.notes ?? 'Initial upgrade proposal contract.'
   };
+}
+
+function safeValidateRollbackProof(document: any) {
+  try {
+    return validateRollbackProof(document);
+  } catch (error) {
+    return {
+      ok: false,
+      issues: [error instanceof Error ? error.message : String(error)]
+    };
+  }
 }
