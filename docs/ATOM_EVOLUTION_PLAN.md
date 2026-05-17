@@ -145,6 +145,28 @@ Reviewer Bridge 是後續要新增的 runtime component，負責把 evidence clu
 - `reversibility`。
 - Rollback plan 或 rollback-proof requirement。
 
+### 5.4 Conversation Skill Review Bridge
+
+Conversation Skill Review Bridge 是 Reviewer Bridge 的 runtime extension，目標是把 redacted conversation transcript 中自然出現的對話摩擦轉成可審查的 review findings，再轉成 skill 或 Atom patch draft。它不得直接修改 `SKILL.md`、Atom spec、Atom Map 或 registry。
+
+可辨識的四類 findings：
+
+- `style-format-correction`：使用者要求調整輸出風格、節奏或格式。
+- `workflow-adjustment`：使用者指出遺漏步驟、錯誤順序或流程邏輯缺口。
+- `non-trivial-debug-path`：多次錯誤嘗試後形成可重用的除錯路徑。
+- `stale-or-wrong-skill`：已載入 skill 產生過時、錯誤或不適用的結果。
+
+權限邊界：
+
+- 允許讀取 redacted transcript、Evidence、ContextSummary、skill metadata 與 Atom spec reads。
+- 允許輸出 conversation review findings report、Observation reports、UpgradeProposal drafts 與 dry-run patch drafts。
+- 禁止直接套用 patch。
+- 禁止直接 promote。
+- 禁止把單一使用者格式偏好自動升級為 `atom-spec`。
+- 禁止引用未 redacted transcript 或缺少 redaction report 的 sensitive input。
+
+第一版應採 fixture-first deterministic reviewer；若未來加入 LLM reviewer，LLM 只能作為 finding producer，不得成為治理權威。
+
 ## 6. Atom Map Curator
 
 Atom Map curator 是後續要新增的 detector。它應以結構與證據為主，不以文字相似度作為主要判斷依據。
@@ -439,6 +461,130 @@ M8 已於 2026-05-15 完成並提交。初版新增 `schemas/governance/rollout-
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:governance-commands`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
 
+### M9 - Conversation Review Finding Contract
+
+目的：建立對話摩擦的標準化 review finding 契約，作為 transcript reviewer 與 patch draft bridge 的共同語言。
+
+交付物：
+
+- `schemas/governance/conversation-review-findings-report.schema.json`。
+- `packages/plugin-sdk/src/conversation/conversation-review-finding.ts`。
+- `fixtures/evolution/conversation-skill-review/*.json`。
+- `scripts/validate-conversation-skill-review.ts` + `npm run validate:conversation-skill-review`。
+
+Checklist：
+
+- [x] Report schema 必須要求 `schemaId`、`specVersion`、`migration`。
+- [x] Finding kind 覆蓋 `style-format-correction`、`workflow-adjustment`、`non-trivial-debug-path`、`stale-or-wrong-skill`。
+- [x] Draft-only 欄位必須明確禁止 automatic apply、registry mutation 與 skill file mutation。
+- [x] Sensitive transcript 必須引用 redaction report。
+- [x] Host-local style preference 不得帶出 `atomId` 或 `atomMapId`。
+
+驗證：
+
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-skill-review`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:schemas`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
+
+### M10 - Transcript Review Extractor
+
+目的：從 redacted raw transcript 或 canonical session log 萃取 M9 定義的 review findings。
+
+交付物：
+
+- Conversation transcript canonical JSON input schema。
+- Deterministic transcript reviewer runtime。
+- Positive / negative transcript fixtures。
+- Privacy-block fixture：含 sensitive input 但缺 redaction report 時必須 blocked。
+
+Checklist：
+
+- [ ] 可從原始對話軌跡辨識四類 findings。
+- [ ] 可連回 `EvidenceRecord` refs 或產生待入庫 Evidence refs。
+- [ ] 不依賴暫態 agent memory 作為唯一訊號來源。
+- [ ] 未 redacted transcript 不可進入 reviewer。
+- [ ] LLM reviewer 若存在，只能輸出 findings，不可直接產生 mutation。
+
+驗證：
+
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-skill-review`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-evolution`
+
+### M11 - Skill / Atom Patch Draft Bridge
+
+目的：把 conversation review findings 轉成可審查、可回滾、不可自動套用的 patch draft。
+
+交付物：
+
+- Skill patch draft contract。
+- Atom patch draft bridge。
+- Host-local overlay draft fixture。
+- Observation-only fixture。
+
+Checklist：
+
+- [ ] `style-format-correction` 預設只產 `host-local-overlay` 或 observation。
+- [ ] `workflow-adjustment` 可產 Atom patch draft 或 skill patch draft，但不得直接改檔。
+- [ ] `non-trivial-debug-path` 可轉成 SOP / Pitfall draft，仍須 human review。
+- [ ] `stale-or-wrong-skill` 可產 skill repair draft，必須引用 skill id 與 evidence refs。
+- [ ] 所有 draft 必須維持 dry-run、human-review-required。
+
+驗證：
+
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-skill-review`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:upgrade-proposal`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:review-advisory`
+
+### M12 - Review Advisory Integration Gates
+
+目的：把 conversation review findings 接入 ReviewAdvisory 與既有 promotion gates，避免對話摩擦繞過治理。
+
+交付物：
+
+- ReviewAdvisory machine findings mapping。
+- Conversation-driven privacy gate fixture。
+- Single-user preference downgrade fixture。
+- Stale skill repair blocked fixture。
+
+Checklist：
+
+- [ ] Findings 必須進入 ReviewAdvisory，而非另建 approval workflow。
+- [ ] 缺少 evidence refs 或 transcript refs 時必須 blocked。
+- [ ] 缺少 redaction report 時必須 blocked。
+- [ ] Single-user preference 不得 promote 到 global Atom behavior。
+- [ ] Breaking skill / Atom patch 必須 human review。
+
+驗證：
+
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:review-advisory`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:human-review`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
+
+### M13 - Conversation Learning Loop Demo And Metrics
+
+目的：驗證 transcript -> findings -> evidence -> detector -> draft -> review -> human decision 的完整學習迴圈。
+
+交付物：
+
+- `examples/conversation-learning-loop/`。
+- Demo transcript fixtures。
+- Demo skill patch draft 與 Atom patch draft。
+- Rollout metrics extension：finding precision、patch draft acceptance、false-positive review、skill repair rate、privacy block rate。
+
+Checklist：
+
+- [ ] Demo 可在五分鐘內跑完。
+- [ ] Demo 覆蓋四類 conversation findings。
+- [ ] Demo 至少產生一個 skill patch draft。
+- [ ] Demo 至少產生一個 Atom patch draft。
+- [ ] Demo 包含 rejected / blocked case。
+
+驗證：
+
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:examples`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:rollout-metrics`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
+
 ## 9. 風險與緩解
 
 | Risk | Mitigation |
@@ -448,6 +594,9 @@ M8 已於 2026-05-15 完成並提交。初版新增 `schemas/governance/rollout-
 | Stale proposal 覆蓋較新的狀態。 | Base version 與 evidence watermark checks。 |
 | Sensitive data 進入 proposal。 | Redaction policy 與 redaction report gate。 |
 | Curator 錯誤合併 Atoms。 | Compose 與 merge outputs 都只是 proposal，必須 review。 |
+| 對話 reviewer 把單一使用者偏好誤判為全域規則。 | Host-local downgrade、target surface gate、human review。 |
+| Skill patch draft 被誤用為可直接套用 patch。 | Draft-only schema、dry-run flag、ReviewAdvisory gate。 |
+| LLM reviewer 產生不可追溯 findings。 | Finding 必須引用 transcript refs、evidence refs 與 redaction report。 |
 | Additive schema fields 破壞 adapter 假設。 | Optional fields、backward-compatible fixtures、type-schema sync validation。 |
 | Runtime cost 過高。 | Scan windows、daily caps、dry-run mode、host scheduling。 |
 
@@ -459,6 +608,8 @@ M8 已於 2026-05-15 完成並提交。初版新增 `schemas/governance/rollout-
 - 不自動把 host-local preferences promote 成 global rules。
 - 不要求特定模型、database 或 optimizer。
 - Safety gates 完成前，不啟用 automatic promotion。
+- 不讓 conversation reviewer 直接修改 `SKILL.md`、Atom spec 或 registry。
+- 不把 LLM reviewer 的判斷視為治理決策；它只能產出可審查 findings。
 
 ## 11. 完成定義
 
@@ -468,6 +619,7 @@ M8 已於 2026-05-15 完成並提交。初版新增 `schemas/governance/rollout-
 - UpgradeProposal 可以宣告 source、target surface、version baseline、evidence watermark 與 reversibility。
 - Detector 可以從 evidence clusters 找出值得提案的 friction patterns。
 - Draft bridge 可以產生 schema-valid proposals，且不能寫 registry。
+- Conversation Skill Review Bridge 可以從 redacted transcript 產生四類 review findings，且只能產生 draft-only output。
 - Review gates 可以阻擋 stale proposals、sensitive data leaks、single-user preference pollution 與 breaking proposals。
 - Atom Map curator 可以從 graph 與 evidence structure 提出 compose、merge、sweep 變更。
 - End-to-end example 可以驗證完整流程。
@@ -482,3 +634,8 @@ M8 已於 2026-05-15 完成並提交。初版新增 `schemas/governance/rollout-
 6. M5 再加入 Atom Map curator behavior。
 7. 保留 M6 metric-driven track，確保 objective capability upgrades 仍依賴 metrics。
 8. 用 M7 與 M8 判斷是否值得開啟更多自動化。
+9. M9 先固定 conversation review finding contract。
+10. M10 再接 raw transcript reviewer。
+11. M11 將 findings 轉成 skill / Atom patch draft。
+12. M12 接入 ReviewAdvisory 與 promotion gates。
+13. M13 用 demo 與 metrics 驗證 conversation learning loop。

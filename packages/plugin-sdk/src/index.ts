@@ -116,6 +116,27 @@ export type {
   EvidencePatternRecommendation,
   EvidencePatternTargetKind
 } from './detector';
+export {
+  ConversationDrivenExtractionError,
+  conversationReviewFindingKinds,
+  conversationEvidenceExtractorName,
+  extractEvidenceFromConversations
+} from './conversation';
+export type {
+  ConversationDrivenExtractionErrorCode,
+  ConversationEvidenceExtractionInput,
+  ConversationEvidenceExtractionReport,
+  ConversationReviewFinding,
+  ConversationReviewFindingKind,
+  ConversationReviewFindingsReport,
+  ConversationReviewPatchDraft,
+  ConversationReviewPatchDraftKind,
+  ConversationReviewRecommendation,
+  ConversationReviewRecommendedTarget,
+  ConversationLog,
+  ConversationTurn,
+  ConversationTurnIntent
+} from './conversation';
 
 export const pluginSdkPackage = {
   packageName: '@ai-atomic-framework/plugin-sdk',

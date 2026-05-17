@@ -1,0 +1,146 @@
+{
+  "description": "C6 - One session emits two evidence records (correction + failure) deterministically; neutral turns are dropped.",
+  "input": {
+    "window": "2026-W20",
+    "logs": [
+      {
+        "sessionId": "s-c6-mixed-intents",
+        "window": "2026-W20",
+        "redacted": true,
+        "atomId": "ATM-CORE-0006",
+        "producedBy": "test-suite",
+        "turns": [
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Caller corrected the parser output.", "tags": ["parser"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "failure", "summary": "Runtime threw on edge token.", "tags": ["regression"], "confidence": 0.9 },
+          { "role": "agent", "intent": "neutral", "summary": "Ack." },
+          { "role": "agent", "intent": "neutral", "summary": "Ack." },
+          { "role": "agent", "intent": "neutral", "summary": "Ack." }
+        ]
+      }
+    ]
+  },
+  "expectedReport": {
+    "schemaId": "atm.conversationEvidenceExtractionReport",
+    "specVersion": "0.1.0",
+    "extractorName": "deterministic-conversation-evidence-extractor",
+    "window": "2026-W20",
+    "summary": {
+      "totalLogs": 1,
+      "totalTurns": 27,
+      "emittedEvidence": 2,
+      "skippedSessions": 0
+    },
+    "evidence": [
+      {
+        "evidenceId": "evidence.conv.s-c6-mixed-intents.recurring-failure.ATM-CORE-0006",
+        "evidenceKind": "review",
+        "signalKind": "recurring-failure",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0006",
+        "patternTags": ["regression"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 12 },
+        "summary": "Runtime threw on edge token.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      },
+      {
+        "evidenceId": "evidence.conv.s-c6-mixed-intents.user-correction.ATM-CORE-0006",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0006",
+        "patternTags": ["parser"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 12 },
+        "summary": "Caller corrected the parser output.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      }
+    ],
+    "skippedSessions": []
+  },
+  "detector": {
+    "input": {
+      "window": "2026-W20",
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 }
+    },
+    "expectedReport": {
+      "schemaId": "atm.evidencePatternDetectorReport",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial deterministic evidence pattern detector report." },
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "detectorName": "deterministic-evidence-pattern-detector",
+      "window": "2026-W20",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 },
+      "summary": { "totalEvidence": 2, "acceptedEvidence": 2, "rejectedEvidence": 0, "candidateGroups": 2 },
+      "groups": [
+        {
+          "groupId": "evidence-pattern.atom.atm-core-0006.2026-w20.recurring-failure",
+          "targetKind": "atom",
+          "targetId": "ATM-CORE-0006",
+          "signalKind": "recurring-failure",
+          "signalScope": "atom",
+          "window": "2026-W20",
+          "usageCount": 12,
+          "frictionEvidenceCount": 1,
+          "positiveEvidenceCount": 0,
+          "neutralEvidenceCount": 0,
+          "matchedEvidenceIds": ["evidence.conv.s-c6-mixed-intents.recurring-failure.ATM-CORE-0006"],
+          "rejectedEvidenceIds": [],
+          "patternTags": ["regression"],
+          "confidence": 0.9,
+          "recommendation": "proposal-candidate",
+          "reasons": []
+        },
+        {
+          "groupId": "evidence-pattern.atom.atm-core-0006.2026-w20.user-correction",
+          "targetKind": "atom",
+          "targetId": "ATM-CORE-0006",
+          "signalKind": "user-correction",
+          "signalScope": "atom",
+          "window": "2026-W20",
+          "usageCount": 12,
+          "frictionEvidenceCount": 1,
+          "positiveEvidenceCount": 0,
+          "neutralEvidenceCount": 0,
+          "matchedEvidenceIds": ["evidence.conv.s-c6-mixed-intents.user-correction.ATM-CORE-0006"],
+          "rejectedEvidenceIds": [],
+          "patternTags": ["parser"],
+          "confidence": 0.9,
+          "recommendation": "proposal-candidate",
+          "reasons": []
+        }
+      ],
+      "proposalCandidateGroupIds": [
+        "evidence-pattern.atom.atm-core-0006.2026-w20.recurring-failure",
+        "evidence-pattern.atom.atm-core-0006.2026-w20.user-correction"
+      ],
+      "rejectedEvidenceIds": [],
+      "empty": false
+    }
+  }
+}

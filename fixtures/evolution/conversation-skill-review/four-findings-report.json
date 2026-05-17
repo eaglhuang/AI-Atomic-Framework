@@ -1,0 +1,126 @@
+{
+  "schemaId": "atm.conversationReviewFindingsReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial conversation skill review fixture covering all four finding kinds."
+  },
+  "generatedAt": "2026-05-17T00:00:00.000Z",
+  "reviewerName": "deterministic-conversation-skill-reviewer",
+  "window": "2026-W20",
+  "sourceTranscript": {
+    "transcriptId": "transcript.conv-review.001",
+    "sessionId": "session.conv-review.001",
+    "artifactPaths": ["artifacts/conversation-review/transcript-001.redacted.jsonl"],
+    "redactionReportPaths": ["artifacts/conversation-review/transcript-001.redaction.json"]
+  },
+  "privacy": {
+    "redacted": true,
+    "containsSensitiveInput": true,
+    "redactionReportPaths": ["artifacts/conversation-review/transcript-001.redaction.json"]
+  },
+  "summary": {
+    "totalFindings": 4,
+    "draftCount": 4,
+    "observationCount": 0,
+    "findingKinds": [
+      "style-format-correction",
+      "workflow-adjustment",
+      "non-trivial-debug-path",
+      "stale-or-wrong-skill"
+    ]
+  },
+  "findings": [
+    {
+      "findingId": "finding.conv-review.style-format.001",
+      "findingKind": "style-format-correction",
+      "signalKind": "user-correction",
+      "signalScope": "host-local",
+      "confidence": 0.92,
+      "sourceTranscriptRefs": ["transcript.conv-review.001#turn-004"],
+      "evidenceRefs": ["evidence.conv.session.conv-review.001.user-correction.none"],
+      "recommendedTarget": "host-local-overlay",
+      "recommendation": "draft-host-local-preference",
+      "rationale": "User repeatedly asked for shorter answers with a fixed checklist shape.",
+      "patchDraft": {
+        "draftKind": "host-local-overlay",
+        "patchMode": "dry-run",
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "requiresHumanReview": true,
+        "summary": "Draft a host-local output-shape preference; do not promote to an atom contract."
+      }
+    },
+    {
+      "findingId": "finding.conv-review.workflow.001",
+      "findingKind": "workflow-adjustment",
+      "signalKind": "user-correction",
+      "signalScope": "atom",
+      "atomId": "ATM-CORE-0001",
+      "confidence": 0.88,
+      "sourceTranscriptRefs": ["transcript.conv-review.001#turn-011"],
+      "evidenceRefs": ["evidence.conv.session.conv-review.001.user-correction.ATM-CORE-0001"],
+      "recommendedTarget": "atom-patch-draft",
+      "recommendation": "draft-atom-patch",
+      "rationale": "User identified a missing preflight step that changed the correct workflow order.",
+      "patchDraft": {
+        "draftKind": "atom-patch",
+        "patchMode": "dry-run",
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "requiresHumanReview": true,
+        "summary": "Draft an atom evolution proposal that adds the missing preflight step."
+      }
+    },
+    {
+      "findingId": "finding.conv-review.debug-path.001",
+      "findingKind": "non-trivial-debug-path",
+      "signalKind": "novel-technique",
+      "signalScope": "repo",
+      "confidence": 0.84,
+      "sourceTranscriptRefs": ["transcript.conv-review.001#turn-018", "transcript.conv-review.001#turn-026"],
+      "evidenceRefs": ["evidence.conv.session.conv-review.001.novel-technique.none"],
+      "recommendedTarget": "skill-patch-draft",
+      "recommendation": "draft-skill-patch",
+      "rationale": "A multi-step failed attempt sequence ended in a reusable debugging path.",
+      "patchDraft": {
+        "draftKind": "skill-patch",
+        "patchMode": "dry-run",
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "requiresHumanReview": true,
+        "summary": "Draft a reusable troubleshooting path as a skill pitfall note.",
+        "patchFiles": [".agents/skills/example-skill/SKILL.md"]
+      }
+    },
+    {
+      "findingId": "finding.conv-review.stale-skill.001",
+      "findingKind": "stale-or-wrong-skill",
+      "signalKind": "loaded-but-wrong",
+      "signalScope": "repo",
+      "skillId": "atm-upgrade-scan",
+      "confidence": 0.9,
+      "sourceTranscriptRefs": ["transcript.conv-review.001#turn-033"],
+      "evidenceRefs": ["evidence.conv.session.conv-review.001.loaded-but-wrong.none"],
+      "recommendedTarget": "skill-patch-draft",
+      "recommendation": "draft-skill-patch",
+      "rationale": "The loaded skill produced an outdated command sequence that the user corrected.",
+      "patchDraft": {
+        "draftKind": "skill-patch",
+        "patchMode": "dry-run",
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "requiresHumanReview": true,
+        "summary": "Draft a skill repair proposal for the stale command sequence.",
+        "patchFiles": [".agents/skills/atm-upgrade-scan/SKILL.md"]
+      }
+    }
+  ],
+  "draftOnly": {
+    "appliesAutomatically": false,
+    "mutatesRegistry": false,
+    "mutatesSkillFiles": false,
+    "requiresHumanReview": true
+  }
+}

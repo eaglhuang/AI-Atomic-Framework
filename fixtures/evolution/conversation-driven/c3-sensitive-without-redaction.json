@@ -1,0 +1,22 @@
+{
+  "description": "C3 - Sensitive conversation input without redactionReport must abort extraction with ConversationDrivenExtractionError.",
+  "input": {
+    "window": "2026-W20",
+    "logs": [
+      {
+        "sessionId": "s-c3-sensitive",
+        "window": "2026-W20",
+        "redacted": true,
+        "containsSensitiveInput": true,
+        "atomId": "ATM-CORE-0003",
+        "turns": [
+          { "role": "user", "intent": "correction", "summary": "(redacted) credential pattern was rejected.", "confidence": 0.9 }
+        ]
+      }
+    ]
+  },
+  "expectError": {
+    "code": "sensitive-without-redaction-report",
+    "sessionId": "s-c3-sensitive"
+  }
+}

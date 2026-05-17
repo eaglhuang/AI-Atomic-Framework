@@ -1,0 +1,168 @@
+{
+  "description": "C7 - Four short sessions on the same atom accumulate to reach the usage threshold; detector groups all four evidence records into one proposal candidate.",
+  "input": {
+    "window": "2026-W20",
+    "logs": [
+      {
+        "sessionId": "s-c7-cross-1",
+        "window": "2026-W20",
+        "redacted": true,
+        "atomId": "ATM-CORE-0007",
+        "producedBy": "test-suite",
+        "turns": [
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 }
+        ]
+      },
+      {
+        "sessionId": "s-c7-cross-2",
+        "window": "2026-W20",
+        "redacted": true,
+        "atomId": "ATM-CORE-0007",
+        "producedBy": "test-suite",
+        "turns": [
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 }
+        ]
+      },
+      {
+        "sessionId": "s-c7-cross-3",
+        "window": "2026-W20",
+        "redacted": true,
+        "atomId": "ATM-CORE-0007",
+        "producedBy": "test-suite",
+        "turns": [
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 }
+        ]
+      },
+      {
+        "sessionId": "s-c7-cross-4",
+        "window": "2026-W20",
+        "redacted": true,
+        "atomId": "ATM-CORE-0007",
+        "producedBy": "test-suite",
+        "turns": [
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 },
+          { "role": "user", "intent": "correction", "summary": "Renamed slot output to match spec.", "tags": ["naming"], "confidence": 0.9 }
+        ]
+      }
+    ]
+  },
+  "expectedReport": {
+    "schemaId": "atm.conversationEvidenceExtractionReport",
+    "specVersion": "0.1.0",
+    "extractorName": "deterministic-conversation-evidence-extractor",
+    "window": "2026-W20",
+    "summary": {
+      "totalLogs": 4,
+      "totalTurns": 12,
+      "emittedEvidence": 4,
+      "skippedSessions": 0
+    },
+    "evidence": [
+      {
+        "evidenceId": "evidence.conv.s-c7-cross-1.user-correction.ATM-CORE-0007",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0007",
+        "patternTags": ["naming"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 3 },
+        "summary": "Renamed slot output to match spec.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      },
+      {
+        "evidenceId": "evidence.conv.s-c7-cross-2.user-correction.ATM-CORE-0007",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0007",
+        "patternTags": ["naming"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 3 },
+        "summary": "Renamed slot output to match spec.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      },
+      {
+        "evidenceId": "evidence.conv.s-c7-cross-3.user-correction.ATM-CORE-0007",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0007",
+        "patternTags": ["naming"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 3 },
+        "summary": "Renamed slot output to match spec.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      },
+      {
+        "evidenceId": "evidence.conv.s-c7-cross-4.user-correction.ATM-CORE-0007",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0007",
+        "patternTags": ["naming"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 3 },
+        "summary": "Renamed slot output to match spec.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      }
+    ],
+    "skippedSessions": []
+  },
+  "detector": {
+    "input": {
+      "window": "2026-W20",
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 }
+    },
+    "expectedReport": {
+      "schemaId": "atm.evidencePatternDetectorReport",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial deterministic evidence pattern detector report." },
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "detectorName": "deterministic-evidence-pattern-detector",
+      "window": "2026-W20",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 },
+      "summary": { "totalEvidence": 4, "acceptedEvidence": 4, "rejectedEvidence": 0, "candidateGroups": 1 },
+      "groups": [
+        {
+          "groupId": "evidence-pattern.atom.atm-core-0007.2026-w20.user-correction",
+          "targetKind": "atom",
+          "targetId": "ATM-CORE-0007",
+          "signalKind": "user-correction",
+          "signalScope": "atom",
+          "window": "2026-W20",
+          "usageCount": 12,
+          "frictionEvidenceCount": 4,
+          "positiveEvidenceCount": 0,
+          "neutralEvidenceCount": 0,
+          "matchedEvidenceIds": [
+            "evidence.conv.s-c7-cross-1.user-correction.ATM-CORE-0007",
+            "evidence.conv.s-c7-cross-2.user-correction.ATM-CORE-0007",
+            "evidence.conv.s-c7-cross-3.user-correction.ATM-CORE-0007",
+            "evidence.conv.s-c7-cross-4.user-correction.ATM-CORE-0007"
+          ],
+          "rejectedEvidenceIds": [],
+          "patternTags": ["naming"],
+          "confidence": 0.9,
+          "recommendation": "proposal-candidate",
+          "reasons": []
+        }
+      ],
+      "proposalCandidateGroupIds": ["evidence-pattern.atom.atm-core-0007.2026-w20.user-correction"],
+      "rejectedEvidenceIds": [],
+      "empty": false
+    }
+  }
+}
