@@ -27,6 +27,7 @@ const schemaEntries: Record<string, string> = {
   'governance-conversation-feedback-report': 'schemas/governance/conversation-feedback-report.schema.json',
   'governance-evolution-scan-report': 'schemas/governance/evolution-scan-report.schema.json',
   'governance-map-curator-report': 'schemas/governance/map-curator-report.schema.json',
+  'governance-map-equivalence-report': 'schemas/governance/map-equivalence-report.schema.json',
   'governance-adapter-report': 'schemas/governance/adapter-report.schema.json',
   'governance-atomize-adapter': 'schemas/governance/atomize-adapter.schema.json',
   'governance-infect-adapter': 'schemas/governance/infect-adapter.schema.json',

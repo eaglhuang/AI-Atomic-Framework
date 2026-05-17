@@ -3,6 +3,7 @@
 ## 2026-05-17
 
 - Delivered atomic map schema 0.2.0 replacement surface support with member roles, edge kinds, replacement metadata, hash-boundary tests, and 0.1.0 compatibility fixtures.
+- Added the map equivalence report schema, fixtures, schema validation coverage, and `atm spec --validate` support for map equivalence reports.
 - Delivered M5 agent adapters for Claude Code, GitHub Copilot, Cursor, and Gemini, each with seven ATM entrypoints, charter invariant placeholders, first-command routing, and shared manifest validation.
 - Delivered M4 Integration Adapter contract: `packages/integrations-core`, install manifest schema, Codex skills reference adapter validation, and `validate:integration-adapter` in the standard suite.
 

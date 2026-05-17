@@ -1,0 +1,110 @@
+{
+  "schemaId": "atm.mapEquivalenceReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial map equivalence report contract."
+  },
+  "reportId": "map-equivalence.checkout-mini.shadow",
+  "generatedAt": "2026-05-17T00:00:00.000Z",
+  "mapId": "ATM-MAP-0003",
+  "legacyUris": ["legacy://samples/checkout-mini"],
+  "fixtures": [
+    {
+      "fixtureId": "fixture.checkout.basic",
+      "path": "fixtures/equivalence/checkout-basic.json",
+      "description": "Single cart checkout equivalence fixture."
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "case.checkout.basic",
+      "input": {
+        "cart": [{ "sku": "sample", "quantity": 1 }]
+      },
+      "expected": {
+        "total": 100,
+        "currency": "USD"
+      },
+      "actual": {
+        "total": 100,
+        "currency": "USD"
+      },
+      "metric": {
+        "name": "semanticMatch",
+        "baseline": 1,
+        "current": 1,
+        "delta": 0,
+        "direction": "higher-is-better",
+        "tolerance": 0,
+        "passed": true
+      },
+      "evidenceRefs": ["evidence://map-equivalence/case.checkout.basic"],
+      "passed": true,
+      "knownDivergence": false
+    },
+    {
+      "caseId": "case.checkout.rounding",
+      "input": {
+        "cart": [{ "sku": "sample-fractional", "quantity": 3 }]
+      },
+      "expected": {
+        "total": 100
+      },
+      "actual": {
+        "total": 100
+      },
+      "metric": {
+        "name": "roundingParity",
+        "baseline": 1,
+        "current": 1,
+        "delta": 0,
+        "direction": "higher-is-better",
+        "tolerance": 0,
+        "passed": true
+      },
+      "evidenceRefs": ["evidence://map-equivalence/case.checkout.rounding"],
+      "passed": true,
+      "knownDivergence": true
+    }
+  ],
+  "knownDivergences": [
+    {
+      "caseId": "case.checkout.rounding",
+      "reason": "Legacy and map runners document the same cent-level rounding boundary.",
+      "justification": "The observed behavior is accepted for the fixture because the public outcome is identical.",
+      "reviewer": "reviewer.fixture",
+      "reviewRef": "review-advisory://map-equivalence/rounding"
+    }
+  ],
+  "summary": {
+    "totalCases": 2,
+    "passedCases": 2,
+    "failedCases": 0,
+    "knownDivergenceCount": 1
+  },
+  "metrics": {
+    "latency": 10,
+    "errorRate": 0,
+    "coverage": 1,
+    "edgeCaseCount": 1
+  },
+  "artifacts": [
+    {
+      "artifactPath": "atomic_workbench/maps/ATM-MAP-0003/map.equivalence.report.json",
+      "artifactKind": "report",
+      "producedBy": "map-equivalence-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "signalScope": "atom-map",
+      "atomMapId": "ATM-MAP-0003",
+      "summary": "Map equivalence fixtures passed with one reviewed known divergence.",
+      "artifactPaths": ["atomic_workbench/maps/ATM-MAP-0003/map.equivalence.report.json"]
+    }
+  ],
+  "passed": true
+}

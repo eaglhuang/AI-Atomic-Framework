@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { generateAtomicMap, createMinimalAtomicMapSpec } from '../../packages/core/src/manager/map-generator.ts';
 import { computeAtomicMapHash } from '../../packages/core/src/registry/map-hash.ts';
+import type { AtomicMapReplacementRecord, RegistryMapEdgeRecord, RegistryMapMemberRecord } from '../../packages/core/src/index.ts';
 
 if (process.argv.includes('--self-check')) {
   const spec = createMinimalAtomicMapSpec({
@@ -16,7 +17,7 @@ if (process.argv.includes('--self-check')) {
   });
   assert.equal(spec.mapId, 'ATM-MAP-9999');
   assert.equal(spec.entrypoints[0], 'ATM-CORE-9999');
-  assert.equal(spec.semanticFingerprint?.startsWith('sha256:') === true, true);
+  assert.match(spec.semanticFingerprint ?? '', /^(?:sf:)?sha256:[a-f0-9]{64}$/);
 
   const replacementSpec = createMinimalAtomicMapSpec({
     mapId: 'ATM-MAP-9998',
@@ -38,15 +39,18 @@ if (process.argv.includes('--self-check')) {
   assert.equal(replacementSpec.members[0].role, 'entry-adapter');
   assert.equal(replacementSpec.edges[0].edgeKind, 'control-flow');
   assert.deepEqual(replacementSpec.replacement?.legacyUris, ['legacy://samples/checkout-mini']);
+  const replacementMembers = replacementSpec.members as readonly RegistryMapMemberRecord[];
+  const replacementEdges = replacementSpec.edges as readonly RegistryMapEdgeRecord[];
+  const replacement = replacementSpec.replacement as AtomicMapReplacementRecord;
   assert.equal(replacementSpec.mapHash, computeAtomicMapHash({
-    members: replacementSpec.members,
-    edges: replacementSpec.edges,
+    members: replacementMembers,
+    edges: replacementEdges,
     entrypoints: replacementSpec.entrypoints,
-    replacement: replacementSpec.replacement
+    replacement
   }));
   assert.equal(replacementSpec.mapHash, computeAtomicMapHash({
-    members: replacementSpec.members,
-    edges: replacementSpec.edges,
+    members: replacementMembers,
+    edges: replacementEdges,
     entrypoints: replacementSpec.entrypoints,
     replacement: {
       legacyUris: ['legacy://samples/checkout-mini'],
@@ -58,10 +62,10 @@ if (process.argv.includes('--self-check')) {
     members: [
       { atomId: 'ATM-CORE-9998', version: '0.1.0', role: 'validator' },
       { atomId: 'ATM-CORE-9997', version: '0.1.0', role: 'domain-step' }
-    ],
-    edges: replacementSpec.edges,
+    ] as readonly RegistryMapMemberRecord[],
+    edges: replacementEdges,
     entrypoints: replacementSpec.entrypoints,
-    replacement: replacementSpec.replacement
+    replacement
   }));
   console.log('[map-generator:self-check] ok');
   process.exit(0);
