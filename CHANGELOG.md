@@ -2,6 +2,7 @@
 
 ## 2026-05-17
 
+- Added `replacement-lane transition` for atomic maps: explicit `draft -> shadow -> canary -> active -> legacy-retired` validation, lineage transition logging, and registry-status-independent replacement mode updates.
 - Added map upgrade evidence gates: `upgrade --propose --target map` now supports `--replacement-mode`, `--equivalence-report`, and `--rollback-proof`, and blocks `active` / `legacy-retired` proposals without the required evidence.
 - Delivered M9/M10 integration rollout proof: framework-neutral agent onboarding flow example, multi-agent charter/first-command results, integration rollout metrics schema, and adapter rollout sample validation.
 - Delivered M7/M8 agent entry hardening: framework-neutral skill templates, multi-agent skill compiler output, source template validation, POSIX/PowerShell root-drop wrappers, and script parity validation.

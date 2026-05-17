@@ -61,6 +61,8 @@ Suggested replacement modes:
 
 Registry states such as `draft`, `validated`, `active`, `deprecated`, or `expired` must not be reused as replacement rollout states. The two lanes may influence each other, but they are different contracts.
 
+The current M6 implementation exposes that separation explicitly: `atm replacement-lane transition` advances only the replacement lane, appends a transition record into `atomic_workbench/maps/<mapId>/lineage-log.json`, and leaves registry lifecycle status unchanged unless another workflow updates it.
+
 ## Evidence Gates
 
 A replacement map should be promoted only through deterministic gates:
@@ -79,14 +81,20 @@ A minimal workflow can be implemented without introducing a runtime orchestratio
 ```bash
 node atm.mjs create-map --spec <map-spec.json>
 node atm.mjs test --map <mapId> --json
+node atm.mjs replacement-lane transition --map <mapId> --to shadow --evidence atomic_workbench/maps/<mapId>/map.test.report.json --json
 node atm.mjs test --map <mapId> --equivalence-fixtures <fixtures.json> --json
+node atm.mjs replacement-lane transition --map <mapId> --to canary --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --json
 node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode active --equivalence-report atomic_workbench/maps/<mapId>/map.equivalence.report.json --json
+node atm.mjs replacement-lane transition --map <mapId> --to active --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --evidence .atm/history/reports/review-advisory.json --json
 node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode legacy-retired --rollback-proof .atm/history/reports/rollback-proof.json --json
+node atm.mjs replacement-lane transition --map <mapId> --to legacy-retired --evidence .atm/history/reports/rollback-proof.json --json
 ```
 
 The current M4 implementation uses delegated executors from the fixture set: one `mapExecutor`, one `legacyExecutor`, plus lineage from `replacement.legacyUris`. It writes `map.equivalence.report.json` into the canonical map workbench path and treats reviewed known divergences as promotable evidence.
 
 The current M5 implementation keeps upgrade proposals additive and review-first: map proposals remain `status: "pending"` when automated gates pass, but they hard-block with machine-readable `requiredJustification` when `active` is requested without passing `map-equivalence`, or when `legacy-retired` is requested without passing `rollback-proof`.
+
+The current M6 implementation adds an explicit forward-only replacement lane validator and CLI. Each transition records `from`, `to`, `reason`, `evidenceRefs`, `actor`, and `timestamp` into the map lineage log so replacement promotion history remains deterministic and reviewable.
 
 The first implementation should favor deterministic artifacts over runtime magic. A map may initially describe delegated or documented execution. Full orchestrated execution can arrive later once map execution contracts are mature.
 

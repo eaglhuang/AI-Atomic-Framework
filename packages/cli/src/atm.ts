@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runBudget } from './commands/budget.ts';
+import { runConstitution } from './commands/constitution.ts';
 import { runCreate } from './commands/create.ts';
 import { runCreateMap } from './commands/create-map.ts';
 import { runDoctor } from './commands/doctor.ts';
@@ -24,6 +25,7 @@ import { runTestAsync } from './commands/test.ts';
 import { runValidate } from './commands/validate.ts';
 import { runVerify } from './commands/verify.ts';
 import { runRegistryDiff } from './commands/registry-diff.ts';
+import { runReplacementLane } from './commands/replacement-lane.ts';
 import { runRollback } from './commands/rollback.ts';
 import { runReview } from './commands/review.ts';
 import { runReviewAdvisory } from './commands/review-advisory.ts';
@@ -33,6 +35,7 @@ import { CliError, makeHelpResult, makeResult, message, writeResult } from './co
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
   bootstrap: runBootstrap,
   budget: runBudget,
+  constitution: runConstitution,
   create: runCreate,
   'create-map': runCreateMap,
   doctor: runDoctor,
@@ -54,6 +57,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   validate: runValidate,
   verify: runVerify,
   'registry-diff': runRegistryDiff,
+  'replacement-lane': runReplacementLane,
   rollback: runRollback,
   review: runReview,
   'review-advisory': runReviewAdvisory

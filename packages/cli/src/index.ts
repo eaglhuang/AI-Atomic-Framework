@@ -156,6 +156,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'replacement-lane',
+    summary: 'Advance a map through the explicit replacement rollout lane',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'test',
     summary: 'Run atom smoke tests',
     implemented: true,
