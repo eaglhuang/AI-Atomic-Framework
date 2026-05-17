@@ -7,6 +7,7 @@ const defaultReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
 const releaseEntries = [
   'atm.mjs',
   'CHANGELOG.md',
+  'compatibility-matrix.json',
   'CONTRIBUTING.md',
   'LICENSE',
   'README.md',

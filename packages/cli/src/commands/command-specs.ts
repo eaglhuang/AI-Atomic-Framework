@@ -71,6 +71,7 @@ export const commandSpecs = Object.freeze({
     options: [
       commonCwdOption,
       { flag: '--out', value: 'path', summary: 'Override ATMChart markdown output path (default: .atm/memory/atm-chart.md).' },
+      { flag: '--version-check', summary: 'Also verify ATMChart/framework/template compatibility against the bundled release train matrix.' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
@@ -351,9 +352,15 @@ export const commandSpecs = Object.freeze({
   }),
   upgrade: defineCommandSpec({
     name: 'upgrade',
-    summary: 'Propose upgrade evolution from report evidence inputs.',
+    summary: 'Propose upgrade evolution from report evidence inputs or plan safe ATM onboarding upgrades.',
+    positional: [
+      { name: 'action', summary: 'plan | apply | rollback (or legacy --propose / --scan)', required: false }
+    ],
     options: [
       commonCwdOption,
+      { flag: '--out', value: 'path', summary: 'Write a safe upgrade plan JSON file.' },
+      { flag: '--from-plan', value: 'path', summary: 'Apply a previously reviewed safe upgrade plan.' },
+      { flag: '--backup', value: 'path', summary: 'Rollback from a backup directory created by upgrade apply.' },
       { flag: '--propose', summary: 'Generate an upgrade proposal.' },
       { flag: '--scan', summary: 'Run the evidence-driven draft bridge from detector reports.' },
       { flag: '--dry-run', summary: 'Generate proposal without mutating persisted artifacts.' },
@@ -385,6 +392,9 @@ export const commandSpecs = Object.freeze({
       commonHelpOption
     ],
     examples: [
+      'node atm.mjs upgrade plan --cwd . --out .atm/history/reports/upgrade-plan.json --json',
+      'node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --json',
+      'node atm.mjs upgrade rollback --backup .atm/backups/<backup-id> --json',
       'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json',
       'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --equivalence-report atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json --input fixtures/upgrade/hash-diff-report.json --json',
       'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --polymorph-impact-report atomic_workbench/maps/ATM-MAP-0001/polymorph-impact-report.json --propagation-report .atm/history/reports/propagation-report.json --review-advisory .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --input fixtures/upgrade/hash-diff-report.json --json',

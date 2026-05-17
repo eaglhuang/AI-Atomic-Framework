@@ -55,6 +55,10 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           npm version "$version" --workspaces --include-workspace-root --no-git-tag-version
 
+      - name: Validate release version compatibility
+        shell: bash
+        run: node --experimental-strip-types scripts/validate-version-compatibility.ts --mode validate --release-tag "$GITHUB_REF_NAME"
+
       - name: Publish ATM CLI
         run: npm publish --workspace @ai-atomic-framework/cli --access public
         env:

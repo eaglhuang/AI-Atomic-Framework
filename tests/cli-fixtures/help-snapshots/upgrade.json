@@ -1,12 +1,33 @@
 {
   "command": "upgrade",
-  "summary": "Propose upgrade evolution from report evidence inputs.",
-  "positional": [],
+  "summary": "Propose upgrade evolution from report evidence inputs or plan safe ATM onboarding upgrades.",
+  "positional": [
+    {
+      "name": "action",
+      "summary": "plan | apply | rollback (or legacy --propose / --scan)",
+      "required": false
+    }
+  ],
   "options": [
     {
       "flag": "--cwd",
       "value": "path",
       "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--out",
+      "value": "path",
+      "summary": "Write a safe upgrade plan JSON file."
+    },
+    {
+      "flag": "--from-plan",
+      "value": "path",
+      "summary": "Apply a previously reviewed safe upgrade plan."
+    },
+    {
+      "flag": "--backup",
+      "value": "path",
+      "summary": "Rollback from a backup directory created by upgrade apply."
     },
     {
       "flag": "--propose",
@@ -150,6 +171,9 @@
     }
   ],
   "examples": [
+    "node atm.mjs upgrade plan --cwd . --out .atm/history/reports/upgrade-plan.json --json",
+    "node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --json",
+    "node atm.mjs upgrade rollback --backup .atm/backups/<backup-id> --json",
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json",
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --equivalence-report atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json --input fixtures/upgrade/hash-diff-report.json --json",
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --target map --map ATM-MAP-0001 --replacement-mode active --polymorph-impact-report atomic_workbench/maps/ATM-MAP-0001/polymorph-impact-report.json --propagation-report .atm/history/reports/propagation-report.json --review-advisory .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --input fixtures/upgrade/hash-diff-report.json --json",

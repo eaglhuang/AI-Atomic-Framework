@@ -1,11 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
-import { loadATMChartSummary } from './atm-chart.ts';
+import { createATMVersionSummary, loadATMChartSummary } from './atm-chart.ts';
 import { relativePathFrom } from './governance-runtime.ts';
 import { checkIntegrationHealth } from './integration.ts';
 import { runNext } from './next.ts';
-import { makeResult, message, parseArgsForCommand } from './shared.ts';
+import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
 
 const defaultWelcomeLineageRelativePath = path.join('.atm', 'runtime', 'welcome.lineage.json');
@@ -34,6 +34,13 @@ export async function runWelcome(argv: string[]) {
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
   const dryRun = parsed.options.dryRun === true;
   const atmChart = loadATMChartSummary(cwd);
+  const versionSummary = createATMVersionSummary(cwd);
+  if (!versionSummary.compatibility.ok && !dryRun) {
+    throw new CliError('ATM_WELCOME_READ_ONLY_DIAGNOSTIC', 'ATMChart version is unsupported or unknown; run `node atm.mjs welcome --dry-run --json` or `node atm.mjs upgrade plan --json` before writing lineage.', {
+      exitCode: 2,
+      details: versionSummary
+    });
+  }
   const integrationHealth = await checkIntegrationHealth(cwd);
   const nextResult = await runNext(['--cwd', cwd]);
   const nextAction = nextResult.evidence?.nextAction ?? null;
@@ -60,9 +67,11 @@ export async function runWelcome(argv: string[]) {
       dryRun,
       atmChart: {
         path: atmChart.atmChartPath,
+        version: versionSummary.chartVersion,
         sourceGuardsSha256: atmChart.frontmatter.source_guards_sha256,
         guardSummary: atmChart.guardSummary
       },
+      versions: versionSummary,
       integrations: {
         ok: integrationHealth.ok,
         manifestDir: integrationHealth.manifestDir,

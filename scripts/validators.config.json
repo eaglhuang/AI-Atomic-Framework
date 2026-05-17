@@ -67,7 +67,10 @@
         "validate-charter",
         "validate-integration-adapter",
         "validate-skill-templates",
-        "validate-script-parity"
+        "validate-script-parity",
+        "validate-version-compatibility",
+        "validate-breaking-changes",
+        "validate-upgrade-rollback"
       ]
     },
     "full": {
@@ -136,6 +139,9 @@
     { "name": "validate-integration-adapter", "entry": "scripts/validate-integration-adapter.ts", "tags": ["integration", "adapter"], "slow": false },
     { "name": "validate-skill-templates", "entry": "scripts/validate-skill-templates.ts", "tags": ["integration", "templates"], "slow": false },
     { "name": "validate-script-parity", "entry": "scripts/validate-script-parity.ts", "tags": ["scripts", "parity", "windows"], "slow": true },
+    { "name": "validate-version-compatibility", "entry": "scripts/validate-version-compatibility.ts", "tags": ["version", "compatibility", "release"], "slow": false },
+    { "name": "validate-breaking-changes", "entry": "scripts/validate-breaking-changes.ts", "tags": ["version", "breaking", "release"], "slow": false },
+    { "name": "validate-upgrade-rollback", "entry": "scripts/validate-upgrade-rollback.ts", "tags": ["version", "upgrade", "rollback"], "slow": false },
     { "name": "validate-upgrade-proposal", "entry": "scripts/validate-upgrade-proposal.ts", "tags": ["upgrade"], "slow": false },
     { "name": "validate-rollback-proof", "entry": "scripts/validate-rollback-proof.ts", "tags": ["rollback"], "slow": false },
     { "name": "validate-human-review", "entry": "scripts/validate-human-review.ts", "tags": ["review"], "slow": false },
