@@ -64,27 +64,27 @@ try {
   assert.ok(Array.isArray(list.parsed.evidence.installedPacks));
 
   // ── CLI: agent-pack install (dry-run) ─────────────────────────────────────
-  const installDry = runAtm(['agent-pack', 'install', '--pack', 'test-pack', '--dry-run', '--cwd', tempRoot]);
+  const installDry = runAtm(['agent-pack', 'install', '--pack', 'claude-code', '--dry-run', '--cwd', tempRoot]);
   assert.equal(installDry.exitCode, 0, 'agent-pack install --dry-run should exit 0');
   assert.equal(installDry.parsed.ok, true);
   assert.equal(installDry.parsed.evidence.action, 'install');
   assert.equal(installDry.parsed.evidence.dryRun, true);
 
   // ── CLI: agent-pack install (real) ────────────────────────────────────────
-  const install = runAtm(['agent-pack', 'install', '--pack', 'test-pack', '--cwd', tempRoot]);
+  const install = runAtm(['agent-pack', 'install', '--pack', 'claude-code', '--cwd', tempRoot]);
   assert.equal(install.exitCode, 0, 'agent-pack install should exit 0');
   assert.equal(install.parsed.ok, true);
-  assert.equal(install.parsed.evidence.manifest.packId, 'test-pack');
+  assert.equal(install.parsed.evidence.manifest.packId, 'claude-code');
 
   // ── CLI: agent-pack diff ──────────────────────────────────────────────────
-  const diff = runAtm(['agent-pack', 'diff', '--pack', 'test-pack', '--cwd', tempRoot]);
+  const diff = runAtm(['agent-pack', 'diff', '--pack', 'claude-code', '--cwd', tempRoot]);
   assert.equal(diff.exitCode, 0, 'agent-pack diff should exit 0');
   assert.equal(diff.parsed.ok, true);
   assert.equal(diff.parsed.evidence.action, 'diff');
   assert.ok(Array.isArray(diff.parsed.evidence.changedFiles));
 
   // ── CLI: agent-pack uninstall ─────────────────────────────────────────────
-  const uninstall = runAtm(['agent-pack', 'uninstall', '--pack', 'test-pack', '--cwd', tempRoot]);
+  const uninstall = runAtm(['agent-pack', 'uninstall', '--pack', 'claude-code', '--cwd', tempRoot]);
   assert.equal(uninstall.exitCode, 0, 'agent-pack uninstall should exit 0');
   assert.equal(uninstall.parsed.ok, true);
   assert.equal(uninstall.parsed.evidence.action, 'uninstall');
