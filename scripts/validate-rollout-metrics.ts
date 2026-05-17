@@ -16,6 +16,9 @@
  * - Conversation patch acceptance 可量測      → conversationMetrics.patchDraftAcceptanceRate
  * - Conversation skill repair rate 可量測     → conversationMetrics.skillRepairRate
  * - Conversation privacy block rate 可量測    → conversationMetrics.privacyBlockRate
+ * - Charter conflict frequency 可量測         → integrationMetrics.charterViolationRate
+ * - Integration drift ratio 可量測             → integrationMetrics.integrationDriftRate
+ * - Adapter install success rate 可量測        → integrationMetrics.adapterInstallSuccessRate
  * - Daily proposal cap 可配置                → configuration.dailyProposalCap
  * - Host usage data 可補 cost/budget report  → costBudgetMetrics
  */
@@ -66,11 +69,51 @@ function checkApprox(actual: number, expected: number, msg: string): void {
   check(Math.abs(actual - expected) <= 0.001, `${msg}: expected ${expected.toFixed(3)}, got ${actual}`);
 }
 
+function checkIntegrationMetrics(report: Record<string, unknown>, label: string): void {
+  const integrationMetrics = asRecord(report.integrationMetrics, `${label} must include integrationMetrics`);
+  const adaptersTotal = asNumber(integrationMetrics.adaptersTotal, `${label} integrationMetrics.adaptersTotal must be a number`);
+  const installSucceeded = asNumber(integrationMetrics.installSucceeded, `${label} integrationMetrics.installSucceeded must be a number`);
+  const installFailed = asNumber(integrationMetrics.installFailed, `${label} integrationMetrics.installFailed must be a number`);
+  const driftChecked = asNumber(integrationMetrics.driftChecked, `${label} integrationMetrics.driftChecked must be a number`);
+  const drifted = asNumber(integrationMetrics.drifted, `${label} integrationMetrics.drifted must be a number`);
+  const charterChecks = asNumber(integrationMetrics.charterChecks, `${label} integrationMetrics.charterChecks must be a number`);
+  const charterViolations = asNumber(integrationMetrics.charterViolations, `${label} integrationMetrics.charterViolations must be a number`);
+  for (const [metricName, value] of Object.entries({ adaptersTotal, installSucceeded, installFailed, driftChecked, drifted, charterChecks, charterViolations })) {
+    checkInteger(value, `${label} integrationMetrics.${metricName} must be an integer`);
+  }
+  check(adaptersTotal === installSucceeded + installFailed, `${label} adaptersTotal must equal installSucceeded + installFailed`);
+  check(drifted <= driftChecked, `${label} drifted must be <= driftChecked`);
+  check(charterViolations <= charterChecks, `${label} charterViolations must be <= charterChecks`);
+  checkApprox(integrationMetrics.adapterInstallSuccessRate as number, expectedRate(installSucceeded, adaptersTotal), `${label} adapterInstallSuccessRate must equal installSucceeded / adaptersTotal`);
+  checkApprox(integrationMetrics.integrationDriftRate as number, expectedRate(drifted, driftChecked), `${label} integrationDriftRate must equal drifted / driftChecked`);
+  checkApprox(integrationMetrics.charterViolationRate as number, expectedRate(charterViolations, charterChecks), `${label} charterViolationRate must equal charterViolations / charterChecks`);
+
+  const charterConflictCounts = asRecord(integrationMetrics.charterConflictCounts, `${label} integrationMetrics.charterConflictCounts must be an object`);
+  check(sumCounts(charterConflictCounts, `${label} charterConflictCounts`) === charterViolations, `${label} charterConflictCounts must sum to charterViolations`);
+
+  const adapterResults = integrationMetrics.adapterResults;
+  check(Array.isArray(adapterResults), `${label} integrationMetrics.adapterResults must be an array`);
+  check(adapterResults.length === adaptersTotal, `${label} adapterResults length must equal adaptersTotal`);
+  const installedCount = adapterResults.filter((entry: any) => entry.installed === true).length;
+  const driftCount = adapterResults.filter((entry: any) => entry.driftDetected === true).length;
+  const charterViolationCount = adapterResults.filter((entry: any) => entry.charterViolationDetected === true).length;
+  check(installedCount === installSucceeded, `${label} adapterResults installed count must equal installSucceeded`);
+  check(driftCount === drifted, `${label} adapterResults drift count must equal drifted`);
+  check(charterViolationCount === charterViolations, `${label} adapterResults charter violation count must equal charterViolations`);
+  for (const [index, adapterResult] of adapterResults.entries()) {
+    const entry = asRecord(adapterResult, `${label} adapterResults[${index}] must be an object`);
+    check(entry.firstCommand === 'node atm.mjs next --json', `${label} adapterResults[${index}] must preserve the first command`);
+    check(entry.charterInjected === true, `${label} adapterResults[${index}] must inject charter invariants`);
+  }
+}
+
 const schemaRel = 'schemas/governance/rollout-metrics-report.schema.json';
 const fixtureRel = 'fixtures/rollout-metrics/sample-rollout-metrics.json';
+const integrationFixtureRel = 'fixtures/rollout-metrics/integration-adapter-sample.json';
 
 check(existsSync(path.join(root, schemaRel)), `missing schema: ${schemaRel}`);
 check(existsSync(path.join(root, fixtureRel)), `missing fixture: ${fixtureRel}`);
+check(existsSync(path.join(root, integrationFixtureRel)), `missing fixture: ${integrationFixtureRel}`);
 
 const schema = readJson(schemaRel);
 
@@ -83,6 +126,7 @@ const proposalMetricsProps = (pmProps.proposalMetrics as { properties?: Record<s
 const curatorMetricsProps = (pmProps.curatorMetrics as { properties?: Record<string, unknown> })?.properties;
 const configProps = (pmProps.configuration as { properties?: Record<string, unknown> })?.properties;
 const conversationMetricsProps = (pmProps.conversationMetrics as { properties?: Record<string, unknown> })?.properties;
+const integrationMetricsProps = (pmProps.integrationMetrics as { properties?: Record<string, unknown> })?.properties;
 
 check(proposalMetricsProps?.acceptanceRate, 'schema must expose acceptanceRate (proposal acceptance rate 可量測)');
 check(proposalMetricsProps?.precisionRate, 'schema must expose precisionRate (proposal precision report 可量測)');
@@ -98,6 +142,10 @@ check(conversationMetricsProps?.findingPrecision, 'schema must expose conversati
 check(conversationMetricsProps?.patchDraftAcceptanceRate, 'schema must expose patchDraftAcceptanceRate (patch draft acceptance 可量測)');
 check(conversationMetricsProps?.skillRepairRate, 'schema must expose skillRepairRate (skill repair rate 可量測)');
 check(conversationMetricsProps?.privacyBlockRate, 'schema must expose privacyBlockRate (privacy block rate 可量測)');
+check(integrationMetricsProps?.charterViolationRate, 'schema must expose charterViolationRate (charter conflict frequency 可量測)');
+check(integrationMetricsProps?.integrationDriftRate, 'schema must expose integrationDriftRate (integration drift ratio 可量測)');
+check(integrationMetricsProps?.adapterInstallSuccessRate, 'schema must expose adapterInstallSuccessRate (adapter install success rate 可量測)');
+check(integrationMetricsProps?.adapterResults, 'schema must expose adapterResults (per-adapter rollout evidence 可量測)');
 check(configProps?.dailyProposalCap, 'schema must expose dailyProposalCap (daily proposal cap 可配置)');
 check(pmProps.costBudgetMetrics, 'schema must expose costBudgetMetrics (host cost/budget report 可補)');
 
@@ -108,6 +156,9 @@ const validate = ajv.compile(schema);
 const sample = readJson(fixtureRel);
 const valid = validate(sample);
 check(valid, `sample fixture failed schema validation: ${JSON.stringify(validate.errors, null, 2)}`);
+const integrationSample = readJson(integrationFixtureRel);
+const integrationValid = validate(integrationSample);
+check(integrationValid, `integration fixture failed schema validation: ${JSON.stringify(validate.errors, null, 2)}`);
 
 // Verify fixture content covers all M8 measurement dimensions
 const sampleAny = sample as Record<string, unknown>;
@@ -116,6 +167,8 @@ const curMetrics = asRecord(sampleAny.curatorMetrics, 'sample fixture must inclu
 const config = asRecord(sampleAny.configuration, 'sample fixture must include configuration');
 const conversationMetrics = asRecord(sampleAny.conversationMetrics, 'sample fixture must include conversationMetrics');
 const costBudgetMetrics = asRecord(sampleAny.costBudgetMetrics, 'sample fixture must include costBudgetMetrics');
+checkIntegrationMetrics(sampleAny, 'sample fixture');
+checkIntegrationMetrics(integrationSample, 'integration fixture');
 
 const totalProposed = asNumber(propMetrics.totalProposed, 'sample fixture must record totalProposed');
 const accepted = asNumber(propMetrics.accepted, 'sample fixture must record accepted');
@@ -215,4 +268,4 @@ const remainingBudget = asNumber(costBudgetMetrics.remainingBudget, 'sample fixt
 checkApprox(remainingBudget, Math.max(0, budgetLimit - actualUsage), 'sample fixture remainingBudget must equal max(0, budgetLimit - actualUsage)');
 check(costBudgetMetrics.overBudget === actualUsage > budgetLimit, 'sample fixture overBudget must match actualUsage > budgetLimit');
 
-console.log(`[rollout-metrics:${mode}] ok (schema and sample verified: precision, false-positive review, acceptance/stale rates, blocked reasons, latency, rollback, conversation metrics, daily cap, cost/budget)`);
+console.log(`[rollout-metrics:${mode}] ok (schema and samples verified: precision, false-positive review, acceptance/stale rates, blocked reasons, latency, rollback, conversation metrics, integration metrics, daily cap, cost/budget)`);
