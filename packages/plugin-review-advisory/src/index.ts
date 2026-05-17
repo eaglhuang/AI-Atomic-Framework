@@ -1,3 +1,6 @@
+import type { ConversationPatchDraftReport } from '@ai-atomic-framework/plugin-sdk';
+import { mapConversationPatchDraftsToMachineFindings } from './conversation-machine-findings.ts';
+
 export {
   checkPromotionSafetyGates
 } from './promotion-gates.ts';
@@ -8,6 +11,9 @@ export type {
   PromotionSafetyContext,
   ProposalForSafetyCheck
 } from './promotion-gates.ts';
+export {
+  mapConversationPatchDraftsToMachineFindings
+};
 
 export const pluginReviewAdvisoryPackage = {
   packageName: '@ai-atomic-framework/plugin-review-advisory',
@@ -110,6 +116,32 @@ export function createReviewAdvisoryReport(init: ReviewAdvisoryReportInit): Revi
     needsReview,
     unavailableReasons
   };
+}
+
+export function createConversationPatchDraftAdvisoryReport(input: {
+  reportId: string;
+  patchDraftReport: ConversationPatchDraftReport;
+  generatedAt?: string;
+  target?: ReviewAdvisoryTarget;
+}): ReviewAdvisoryReport {
+  return createReviewAdvisoryReport({
+    reportId: input.reportId,
+    provider: {
+      mode: 'stub',
+      providerId: 'conversation-patch-draft-machine-findings',
+      providerVersion: '0.1.0',
+      transport: 'inproc'
+    },
+    generatedAt: input.generatedAt ?? input.patchDraftReport.generatedAt,
+    target: input.target ?? {
+      kind: 'proposal',
+      id: input.patchDraftReport.sourceFindingsReport.transcriptId,
+      sourcePaths: input.patchDraftReport.sourceFindingsReport.artifactPath
+        ? [input.patchDraftReport.sourceFindingsReport.artifactPath]
+        : undefined
+    },
+    findings: mapConversationPatchDraftsToMachineFindings(input.patchDraftReport)
+  });
 }
 
 export function createUnavailableAdvisoryReport(input: {
@@ -335,8 +367,10 @@ function dedupeStrings(input: string[]): string[] {
 export default {
   pluginReviewAdvisoryPackage,
   createReviewAdvisoryReport,
+  createConversationPatchDraftAdvisoryReport,
   createUnavailableAdvisoryReport,
   createStubReviewAdvisoryReport,
   appendMachineFindings,
+  mapConversationPatchDraftsToMachineFindings,
   normalizeProviderPayload
 };

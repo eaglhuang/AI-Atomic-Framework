@@ -539,24 +539,26 @@ M11 已於 2026-05-17 完成。新增 conversation patch draft report schema、d
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:upgrade-proposal`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:review-advisory`
 
-### M12 - Review Advisory Integration Gates
+### M12 - Review Advisory Integration Gates ✅ DONE
 
 目的：把 conversation review findings 接入 ReviewAdvisory 與既有 promotion gates，避免對話摩擦繞過治理。
 
 交付物：
 
-- ReviewAdvisory machine findings mapping。
-- Conversation-driven privacy gate fixture。
-- Single-user preference downgrade fixture。
-- Stale skill repair blocked fixture。
+- `packages/plugin-review-advisory/src/conversation-machine-findings.ts`。✅
+- Conversation-driven privacy gate fixture。✅
+- Single-user preference downgrade fixture。✅
+- Stale skill repair blocked fixture。✅
 
 Checklist：
 
-- [ ] Findings 必須進入 ReviewAdvisory，而非另建 approval workflow。
-- [ ] 缺少 evidence refs 或 transcript refs 時必須 blocked。
-- [ ] 缺少 redaction report 時必須 blocked。
-- [ ] Single-user preference 不得 promote 到 global Atom behavior。
-- [ ] Breaking skill / Atom patch 必須 human review。
+- [x] Findings 必須進入 ReviewAdvisory，而非另建 approval workflow。
+- [x] 缺少 evidence refs 或 transcript refs 時必須 blocked。
+- [x] 缺少 redaction report 時必須 blocked。
+- [x] Single-user preference 不得 promote 到 global Atom behavior。
+- [x] Breaking skill / Atom patch 必須 human review。
+
+M12 已於 2026-05-17 完成。新增 conversation patch draft -> ReviewAdvisory machine findings mapping，讓 host-local / skill / atom / observation drafts 進入既有 advisory report；新增 missing refs、missing redaction report、single-user preference downgrade、stale skill repair blocked fixtures。`validate-review-advisory` 會確認所有 blocked route 都以 high severity、`request-human-review` 進入 ReviewAdvisory，而非另建 approval workflow。
 
 驗證：
 
