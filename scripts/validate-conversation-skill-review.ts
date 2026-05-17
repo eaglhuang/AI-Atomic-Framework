@@ -142,10 +142,11 @@ for (const fixtureFile of patchDraftFixtureFiles) {
   const fixture = readJson<PatchDraftBridgeFixture>(relativePath);
   const findingsReport = fixture.input.findingsReport ?? (fixture.input.findingsReportPath ? readJson<ConversationReviewFindingsReport>(fixture.input.findingsReportPath) : undefined);
   check(findingsReport !== undefined, `${fixtureFile} must provide findingsReport or findingsReportPath`);
-  check(validateReport(findingsReport) === true, `${fixtureFile} input findings report failed schema validation: ${JSON.stringify(validateReport.errors)}`);
+  const safeReport = findingsReport as ConversationReviewFindingsReport;
+  check(validateReport(safeReport) === true, `${fixtureFile} input findings report failed schema validation: ${JSON.stringify(validateReport.errors)}`);
 
   const generatedReport = draftConversationPatches({
-    findingsReport,
+    findingsReport: safeReport,
     generatedAt: fixture.input.generatedAt,
     bridgeName: fixture.input.bridgeName,
     sourceReportPath: fixture.input.sourceReportPath,
@@ -201,7 +202,7 @@ function assertPatchDraftReportInvariants(report: ConversationPatchDraftReport, 
     if (draft.draftKind === 'atom-patch') {
       check(draft.atomId !== undefined, `${label} ${draft.draftId} atom patch draft must cite atomId`);
       check(draft.upgradeProposalDraft !== undefined, `${label} ${draft.draftId} atom patch draft must include upgrade proposal draft`);
-      check(validateUpgradeProposal(draft.upgradeProposalDraft) === true, `${label} ${draft.draftId} upgrade proposal draft failed schema validation: ${JSON.stringify(validateUpgradeProposal.errors)}`);
+      check(validateUpgradeProposal!(draft.upgradeProposalDraft) === true, `${label} ${draft.draftId} upgrade proposal draft failed schema validation: ${JSON.stringify(validateUpgradeProposal!.errors)}`);
       check(draft.upgradeProposalDraft?.humanReview === 'pending', `${label} ${draft.draftId} upgrade proposal draft must await human review`);
       check(draft.upgradeProposalDraft?.targetSurface === 'atom-spec', `${label} ${draft.draftId} upgrade proposal draft must target atom-spec`);
       check(draft.upgradeProposalDraft?.inputs.some((entry) => entry.kind === 'evolution-evidence'), `${label} ${draft.draftId} upgrade proposal draft must cite evolution evidence input`);
