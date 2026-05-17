@@ -30,6 +30,15 @@ jobs:
       - name: Verify ATMChart freshness
         run: node atm.mjs atm-chart verify --json
 
+      - name: Verify installed agent packs are fresh
+        shell: bash
+        run: |
+          shopt -s nullglob
+          for manifest in .atm/agent-pack/*.manifest.json; do
+            pack_id="$(basename "$manifest" .manifest.json)"
+            node atm.mjs agent-pack verify-fresh --id "$pack_id" --json
+          done
+
       - name: Verify installed integrations
         shell: bash
         run: |

@@ -9,7 +9,7 @@ import { getCommandSpec } from './command-specs.ts';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 export const defaultATMChartRelativePath = path.join('.atm', 'memory', 'atm-chart.md');
-const atmChartSourceSchemas = Object.freeze({
+export const atmChartSourceSchemas = Object.freeze({
   'governance/default-guards': 'schemas/governance/default-guards.schema.json',
   'charter/charter-invariants': 'schemas/charter/charter-invariants.schema.json',
   'integrations/install-manifest': 'schemas/integrations/install-manifest.schema.json',
@@ -18,11 +18,17 @@ const atmChartSourceSchemas = Object.freeze({
 });
 
 type ATMChartFrontmatter = {
-  readonly generated_at: string;
   readonly source_guards_path: string;
   readonly source_guards_sha256: string;
   readonly source_schema_sha256s: Record<string, string>;
 };
+
+export interface ATMChartSourceSnapshot {
+  readonly sourceGuardsPath: string;
+  readonly sourceGuardsSha256: string;
+  readonly sourceSchemaSha256s: Record<string, string>;
+  readonly guardDocument: DefaultGuardsDocument;
+}
 
 export interface ATMChartSummary {
   readonly atmChartPath: string;
@@ -60,9 +66,7 @@ export async function runATMChart(argv: string[]) {
 
 function renderATMChart(cwd: string, atmChartAbsolutePath: string) {
   const sources = collectATMChartSources(cwd);
-  const generatedAt = new Date().toISOString();
   const markdown = createATMChartMarkdown({
-    generatedAt,
     sourceGuardsPath: sources.sourceGuardsPath,
     sourceGuardsSha256: sources.sourceGuardsSha256,
     sourceSchemaSha256s: sources.sourceSchemaSha256s,
@@ -132,7 +136,7 @@ function verifyATMChart(cwd: string, atmChartAbsolutePath: string) {
   });
 }
 
-function collectATMChartSources(cwd: string) {
+export function collectATMChartSources(cwd: string): ATMChartSourceSnapshot {
   const runtime = detectGovernanceRuntime(cwd);
   const sourceGuardsAbsolutePath = path.join(cwd, runtime.paths.defaultGuardsPath);
   if (!existsSync(sourceGuardsAbsolutePath)) {
@@ -167,7 +171,6 @@ function collectATMChartSources(cwd: string) {
 }
 
 function createATMChartMarkdown(input: {
-  readonly generatedAt: string;
   readonly sourceGuardsPath: string;
   readonly sourceGuardsSha256: string;
   readonly sourceSchemaSha256s: Record<string, string>;
@@ -182,7 +185,6 @@ function createATMChartMarkdown(input: {
 
   return [
     '---',
-    `generated_at: ${input.generatedAt}`,
     `source_guards_path: ${input.sourceGuardsPath}`,
     `source_guards_sha256: ${input.sourceGuardsSha256}`,
     `source_schema_sha256s: ${JSON.stringify(input.sourceSchemaSha256s)}`,
@@ -241,7 +243,7 @@ function readATMChartFrontmatter(filePath: string): ATMChartFrontmatter {
       return [key, parseFrontmatterValue(rawValue)];
     })) as Partial<ATMChartFrontmatter>;
 
-  if (typeof frontmatter.generated_at !== 'string' || typeof frontmatter.source_guards_path !== 'string' || typeof frontmatter.source_guards_sha256 !== 'string' || !frontmatter.source_schema_sha256s || typeof frontmatter.source_schema_sha256s !== 'object') {
+  if (typeof frontmatter.source_guards_path !== 'string' || typeof frontmatter.source_guards_sha256 !== 'string' || !frontmatter.source_schema_sha256s || typeof frontmatter.source_schema_sha256s !== 'object') {
     throw new CliError('ATM_CHART_FRONTMATTER_INVALID', 'ATMChart frontmatter is missing one or more required fields.', {
       exitCode: 2,
       details: {
@@ -260,7 +262,7 @@ function parseFrontmatterValue(rawValue: string) {
   return rawValue;
 }
 
-function collectSchemaDrift(recorded: Record<string, string>, current: Record<string, string>) {
+export function collectSchemaDrift(recorded: Record<string, string>, current: Record<string, string>) {
   const drift = Object.entries(current)
     .filter(([schemaId, digest]) => recorded[schemaId] !== digest)
     .map(([schemaId, digest]) => ({
