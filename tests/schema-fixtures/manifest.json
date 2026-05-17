@@ -46,6 +46,11 @@
       "path": "positive/governance-context-summary.json"
     },
     {
+      "name": "conversation review findings report",
+      "schema": "governance-conversation-review-findings-report",
+      "path": "positive/conversation-review-findings-report.json"
+    },
+    {
       "name": "governance adapter report",
       "schema": "governance-adapter-report",
       "path": "positive/governance-adapter-report.json"
@@ -306,6 +311,12 @@
       "path": "negative/behavior-proposal-missing-action.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "action"
+    },
+    {
+      "name": "conversation review findings must stay draft-only",
+      "schema": "governance-conversation-review-findings-report",
+      "path": "negative/conversation-review-findings-mutating.json",
+      "expectedKeyword": "const"
     }
   ]
 }
