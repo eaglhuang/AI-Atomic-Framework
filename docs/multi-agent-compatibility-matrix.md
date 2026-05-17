@@ -17,3 +17,5 @@ All profiles also require `atm verify --agents-md --json` to confirm that the bo
 The framework-neutral adapter smoke lives in `examples/agent-onboarding-flow/run.ts`. It installs and verifies Claude Code, Cursor, and GitHub Copilot Agent adapters, checks that generated files preserve `node atm.mjs next --json`, and confirms that charter conflict fixtures are detectable.
 
 If a profile fails in the future, record the failure in `docs/multi-agent-results.md`, link the follow-up issue, and decide separately whether it blocks alpha1.
+
+For the first-touch onboarding surface that wraps these adapters for a new agent, see [docs/AGENT_PACK_ONBOARDING.md](docs/AGENT_PACK_ONBOARDING.md).
