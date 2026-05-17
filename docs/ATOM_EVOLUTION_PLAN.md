@@ -90,7 +90,14 @@ Atom proposal draft 只有在以下條件同時成立時才能產生：
 - `usageCount(atomId, window) >= N`
 - `frictionEvidence(atomId, window) >= M`
 
-建議初始預設值為 `N = 10`、`M = 1`。早期 rollout 應預設 dry-run，只產報告，不直接送入 review queue。
+建議初始預設值分層處理，而不是只用單一 `N = 10` 門檻：
+
+- L0 記錄層：每一次明確的使用者批評、糾正或流程否定都必須立即記錄為 conversation finding / evidence candidate，並回饋使用者「已記錄」。
+- L1 詢問層：第一次看到明確且可定位的批評時，就可以詢問使用者是否要產生 dry-run 改進草案；不必等到 recurrence 達高門檻。
+- L2 草案層：使用者同意、同 pattern 再次出現、或嚴重度高且可重現時，可產生 patch draft / UpgradeProposal draft，但仍不得自動套用。
+- L3 queue 層：只有進入正式 proposal queue 或 promotion path 時，才使用較保守的 usage threshold、daily cap、confidence gate 與 ReviewAdvisory / HumanReviewDecision。
+
+早期 rollout 應預設 dry-run，只產報告、詢問與草案，不直接送入 promote path。
 
 ### 4.2 抑制規則
 
@@ -103,6 +110,27 @@ Atom proposal draft 只有在以下條件同時成立時才能產生：
 ### 4.3 持久化要求
 
 Usage count 與 recurrence state 不得只存在暫態 agent state。它們必須表示在 Evidence、governance bundle、run report 或 registry-side telemetry 中，讓短 session 與跨 session 工作仍能累積訊號。
+
+### 4.4 即時批評回饋與使用者選擇
+
+每一次明確的使用者批評都必須有可見回饋，不能等到 detector recurrence 達門檻才讓使用者知道 ATM 有記錄。當使用者指出「你漏了步驟」、「這個流程錯了」、「這個工具不該這樣跑」、「這應該寫進原子」等明確批評時，agent / host 應立即回應：
+
+- 已建立或準備建立的 finding / evidence id。
+- 初步 target 判斷，例如 `atom-spec`、`atom-map`、`workflow-recipe`、`agent-guidance`、`legacy-tool` 或 `observation-only`。
+- 是否需要 redaction report 或其他 artifact 才能進一步處理。
+- 下一步選項：立即產生 dry-run 改進草案、暫不處理但繼續累計、或永久不再詢問同一 pattern。
+
+第一版互動選項建議固定為：
+
+- `Y`：現在產生 dry-run 改進草案；若 target 可定位到 Atom / Atom Map，草案仍須經 ReviewAdvisory 與 HumanReviewDecision。
+- `N`：這次不產生草案，但 evidence / recurrence 保留；下次同 pattern 再出現或達門檻時可再詢問。
+- `X`：對同一 `suppressionKey` 永久不再詢問；仍可記錄 evidence，但不得再以互動提示打擾使用者，除非使用者手動解除。
+
+`suppressionKey` 應至少包含 target surface、target id（若可定位）、finding kind 與 normalized pattern tags，避免使用者只想關閉某個噪音提示時，把所有改進提醒都關掉。
+
+使用者選擇 `N` 或 `X` 都不得刪除已記錄 evidence，也不得把問題視為不存在；它們只影響是否立刻產生草案與是否再次主動詢問。若後續出現高嚴重度錯誤、可重現失敗、資料遺失、安全風險或使用者明確要求「現在升級 / 寫進 Atom」，host 可以重新進入 ReviewAdvisory，但仍必須顯示 suppression / override reason。
+
+此規則的產品目的，是讓使用者第一次批評時就看到 ATM 有把問題納入治理軌跡，同時保留「不要現在處理」與「永遠不要再問這個 pattern」的控制權。
 
 ## 5. Reviewer Bridge
 
@@ -149,6 +177,8 @@ Reviewer Bridge 是後續要新增的 runtime component，負責把 evidence clu
 
 Conversation Skill Review Bridge 是 Reviewer Bridge 的 runtime extension，目標是把 redacted conversation transcript 中自然出現的對話摩擦轉成可審查的 review findings，再轉成 skill 或 Atom patch draft。它不得直接修改 `SKILL.md`、Atom spec、Atom Map 或 registry。
 
+本節中的 skill 不是 ATM core 的內建驅動器，而是 host / agent environment 可選的操作知識表面，例如 instructions、rules、runbook、prompt profile 或外部 agent skill。ATM 不依賴 skill 來推動流程；skill 只是 evidence 可能指向的改進表面之一。
+
 可辨識的四類 findings：
 
 - `style-format-correction`：使用者要求調整輸出風格、節奏或格式。
@@ -166,6 +196,8 @@ Conversation Skill Review Bridge 是 Reviewer Bridge 的 runtime extension，目
 - 禁止引用未 redacted transcript 或缺少 redaction report 的 sensitive input。
 
 第一版應採 fixture-first deterministic reviewer；若未來加入 LLM reviewer，LLM 只能作為 finding producer，不得成為治理權威。
+
+Conversation review 不得只在 recurrence 足夠時才回饋使用者。第一次明確批評就應進入即時批評回饋流程；recurrence gate 只決定何時升級為草案、queue candidate 或正式 review input。
 
 ## 6. Atom Map Curator
 
@@ -566,7 +598,36 @@ M12 已於 2026-05-17 完成。新增 conversation patch draft -> ReviewAdvisory
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:human-review`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
 
-### M13 - Conversation Learning Loop Demo And Metrics
+### M13 - Immediate Criticism Feedback And User Choice Loop
+
+目的：讓每一次明確的使用者批評都立即被記錄、回饋，並讓使用者第一次就能選擇是否產生 dry-run 改進草案。
+
+交付物：
+
+- Criticism feedback event contract，記錄 finding / evidence refs、target 判斷、使用者選擇與 suppression key。
+- User choice state store，支援 `Y` / `N` / `X` 三種選擇。
+- Immediate feedback renderer，讓 agent 在對話中回覆「已記錄、目標判斷、下一步選項」。
+- Fixtures：first criticism ask、decline then accumulate、opt-out suppression、高嚴重度 override。
+- `npm run validate:conversation-feedback` 驗證入口。
+
+Checklist：
+
+- [ ] 每一次明確批評都會產生可追溯 finding / evidence candidate。
+- [ ] 第一次明確且可定位的批評即可詢問是否產生 dry-run 改進草案。
+- [ ] 使用者選 `N` 時，不產草案但保留 evidence 與 recurrence，下次同 pattern 可再問。
+- [ ] 使用者選 `X` 時，對同一 suppression key 不再主動詢問，但仍可記錄 evidence。
+- [ ] Suppression key 必須至少包含 target surface、target id、finding kind 與 normalized pattern tags。
+- [ ] `Y` 只能產生 dry-run draft，不得直接修改 Atom、Atom Map、registry、script 或 agent guidance。
+- [ ] 高嚴重度 override 必須顯示 override reason，並仍通過 ReviewAdvisory / HumanReviewDecision。
+
+驗證：
+
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-feedback`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-skill-review`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:review-advisory`
+- `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
+
+### M14 - Conversation Learning Loop Demo And Metrics
 
 目的：驗證 transcript -> findings -> evidence -> detector -> draft -> review -> human decision 的完整學習迴圈。
 
@@ -575,6 +636,7 @@ M12 已於 2026-05-17 完成。新增 conversation patch draft -> ReviewAdvisory
 - `examples/conversation-learning-loop/`。
 - Demo transcript fixtures。
 - Demo skill patch draft 與 Atom patch draft。
+- Demo criticism feedback choices：`Y`、`N`、`X`。
 - Rollout metrics extension：finding precision、patch draft acceptance、false-positive review、skill repair rate、privacy block rate。
 
 Checklist：
@@ -584,6 +646,7 @@ Checklist：
 - [ ] Demo 至少產生一個 skill patch draft。
 - [ ] Demo 至少產生一個 Atom patch draft。
 - [ ] Demo 包含 rejected / blocked case。
+- [ ] Demo 展示第一次批評即時回饋與使用者選擇如何影響後續 recurrence。
 
 驗證：
 
@@ -603,6 +666,8 @@ Checklist：
 | 對話 reviewer 把單一使用者偏好誤判為全域規則。 | Host-local downgrade、target surface gate、human review。 |
 | Skill patch draft 被誤用為可直接套用 patch。 | Draft-only schema、dry-run flag、ReviewAdvisory gate。 |
 | LLM reviewer 產生不可追溯 findings。 | Finding 必須引用 transcript refs、evidence refs 與 redaction report。 |
+| 使用者覺得 ATM 沒有學習或沒有回應批評。 | 每一次明確批評都立即回饋 finding / evidence 記錄，第一次即可詢問是否產生 dry-run 改進草案。 |
+| 改進提示過度打擾使用者。 | 提供 `N` 暫不處理與 `X` suppression key 永久不再詢問同 pattern；仍保留 evidence。 |
 | Additive schema fields 破壞 adapter 假設。 | Optional fields、backward-compatible fixtures、type-schema sync validation。 |
 | Runtime cost 過高。 | Scan windows、daily caps、dry-run mode、host scheduling。 |
 
@@ -626,6 +691,7 @@ Checklist：
 - Detector 可以從 evidence clusters 找出值得提案的 friction patterns。
 - Draft bridge 可以產生 schema-valid proposals，且不能寫 registry。
 - Conversation Skill Review Bridge 可以從 redacted transcript 產生四類 review findings，且只能產生 draft-only output。
+- 明確使用者批評可以立即產生可見回饋，並支援 `Y` / `N` / `X` 控制是否產生草案與是否再次詢問。
 - Review gates 可以阻擋 stale proposals、sensitive data leaks、single-user preference pollution 與 breaking proposals。
 - Atom Map curator 可以從 graph 與 evidence structure 提出 compose、merge、sweep 變更。
 - End-to-end example 可以驗證完整流程。
@@ -644,4 +710,5 @@ Checklist：
 10. M10 再接 raw transcript reviewer。
 11. M11 將 findings 轉成 skill / Atom patch draft。
 12. M12 接入 ReviewAdvisory 與 promotion gates。
-13. M13 用 demo 與 metrics 驗證 conversation learning loop。
+13. M13 實作即時批評回饋與使用者選擇 loop。
+14. M14 用 demo 與 metrics 驗證 conversation learning loop。
