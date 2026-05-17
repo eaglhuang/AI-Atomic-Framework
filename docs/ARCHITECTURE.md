@@ -49,6 +49,12 @@ The Agent Operating Layer teaches a model-neutral agent how to operate inside a 
 
 This layer exists so a user can drop ATM into a project root and let an AI agent discover the expected workflow before editing files.
 
+#### Agent Pack Onboarding Surface
+
+Agent pack onboarding is the first-touch surface of the Agent Operating Layer. It gives a newly arrived agent a readable orientation through `atm welcome`, a rendered rule summary through `atm-chart`, and optional host-native entry files for environments such as Claude Code, GitHub Copilot, Cursor, Gemini, and Windsurf.
+
+This surface is a delivery layer only. It must route governed actions back through `node atm.mjs next --json`, preserve ATMChart freshness through source hashes, and avoid creating a second task model, approval workflow, or rule authority. The public adopter-facing contract lives in `docs/AGENT_PACK_ONBOARDING.md`.
+
 #### AtomicCharter Authority
 
 The Agent Operating Layer hosts a framework-level authority document — the **AtomicCharter** — installed at `.atm/charter/atomic-charter.md` alongside a machine-readable companion file `.atm/charter/charter-invariants.json`. The charter sits above host project rules in the authority hierarchy:
