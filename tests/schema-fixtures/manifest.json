@@ -86,6 +86,11 @@
       "path": "positive/governance-inject-plan.json"
     },
     {
+      "name": "map equivalence report",
+      "schema": "governance-map-equivalence-report",
+      "path": "map-equivalence-report/positive.json"
+    },
+    {
       "name": "governance rollback plan",
       "schema": "governance-rollback-plan",
       "path": "positive/governance-rollback-plan.json"
@@ -350,6 +355,13 @@
       "schema": "governance-conversation-feedback-report",
       "path": "negative/conversation-feedback-mutating.json",
       "expectedKeyword": "const"
+    },
+    {
+      "name": "map equivalence known divergence missing review ref",
+      "schema": "governance-map-equivalence-report",
+      "path": "map-equivalence-report/known-divergence-missing-review-ref.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "reviewRef"
     }
   ]
 }
