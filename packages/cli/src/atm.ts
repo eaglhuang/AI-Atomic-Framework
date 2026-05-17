@@ -30,6 +30,7 @@ import { runReplacementLane } from './commands/replacement-lane.ts';
 import { runRollback } from './commands/rollback.ts';
 import { runReview } from './commands/review.ts';
 import { runReviewAdvisory } from './commands/review-advisory.ts';
+import { runMigrate } from './commands/migrate.ts';
 import { runAgentPack } from './commands/agent-pack.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, writeResult } from './commands/shared.ts';
@@ -64,6 +65,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   rollback: runRollback,
   review: runReview,
   'review-advisory': runReviewAdvisory,
+  migrate: runMigrate,
   'agent-pack': runAgentPack
 };
 
