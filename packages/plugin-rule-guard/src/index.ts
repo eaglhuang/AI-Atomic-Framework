@@ -18,9 +18,19 @@ export {
   canWriteQuarantine,
   lifecyclePolicePlugin,
   runLifecyclePolice
-} from './lifecycle-police';
+} from './lifecycle-police.ts';
 export type {
   LifecyclePoliceInputEntry,
   LifecyclePoliceRunOptions,
   LifecyclePoliceTransitionCheck
-} from './lifecycle-police';
+} from './lifecycle-police.ts';
+
+export {
+  checkGuardJustification
+} from './rule-justification.ts';
+export type {
+  GuardJustificationInput,
+  GuardJustificationResult,
+  GuardViolation,
+  RequiredJustification
+} from './rule-justification.ts';

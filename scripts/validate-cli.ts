@@ -73,7 +73,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json', 'fixtures/verify/guard-evidence-pass.json', 'fixtures/verify/guard-evidence-missing-justification.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -367,6 +367,21 @@ try {
   assertReadable(verifyAgentsMd, 'verify');
   assert(verifyAgentsMd.parsed.ok === true, 'verify --agents-md must report ok=true');
   assertMessageCode(verifyAgentsMd, 'ATM_VERIFY_AGENTS_MD_OK');
+
+  const verifyGuardsPass = runAtm(['verify', '--guards', '--evidence', path.join(root, 'fixtures/verify/guard-evidence-pass.json')], root);
+  assert(verifyGuardsPass.exitCode === 0, 'verify --guards --evidence pass must exit 0');
+  assertReadable(verifyGuardsPass, 'verify');
+  assert(verifyGuardsPass.parsed.ok === true, 'verify --guards --evidence pass must report ok=true');
+  assertMessageCode(verifyGuardsPass, 'ATM_VERIFY_GUARDS_OK');
+
+  const verifyGuardsMissing = runAtm(['verify', '--guards', '--evidence', path.join(root, 'fixtures/verify/guard-evidence-missing-justification.json')], root);
+  assert(verifyGuardsMissing.exitCode === 1, 'verify --guards --evidence missing-justification must exit 1');
+  assertReadable(verifyGuardsMissing, 'verify');
+  assert(verifyGuardsMissing.parsed.ok === false, 'verify --guards --evidence missing-justification must report ok=false');
+  assertMessageCode(verifyGuardsMissing, 'ATM_VERIFY_GUARDS_MISSING_JUSTIFICATION');
+  assert(verifyGuardsMissing.parsed.evidence.requiredJustification !== null, 'verify --guards missing-justification must report requiredJustification');
+  assert(Array.isArray(verifyGuardsMissing.parsed.evidence.missingJustifications), 'verify --guards missing-justification must list missingJustifications');
+  assert(verifyGuardsMissing.parsed.evidence.missingJustifications.includes('evidence-after-change'), 'verify --guards missing-justification must name the offending guardId');
 
   const upgradePass = runAtm([
     'upgrade',

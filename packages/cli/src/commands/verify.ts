@@ -2,12 +2,14 @@ import { CliError, makeResult, message, parseOptions, relativePathFrom } from '.
 import { listSupportedAgentIds, verifyAgentsMarkdown } from './agent-confidence.ts';
 import { evaluateSeedSelfVerification, registryFilePath, validateRegistryDocumentAgainstSchema } from './registry-shared.ts';
 import { defaultNeutralityPolicyRelativePath, scanNeutralityRepository } from '../../../plugin-rule-guard/src/neutrality-scanner.ts';
+import { checkGuardJustification } from '../../../plugin-rule-guard/src/rule-justification.ts';
+import { existsSync, readFileSync } from 'node:fs';
 
 export function runVerify(argv: any) {
   const { options } = parseOptions(argv, 'verify');
-  const selectedModes = [options.self, options.neutrality, options.agentsMd].filter((value) => value === true).length;
+  const selectedModes = [options.self, options.neutrality, options.agentsMd, options.guards].filter((value) => value === true).length;
   if (selectedModes !== 1) {
-    throw new CliError('ATM_CLI_USAGE', 'verify requires exactly one of --self, --neutrality, or --agents-md', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'verify requires exactly one of --self, --neutrality, --agents-md, or --guards', { exitCode: 2 });
   }
 
   if (options.neutrality) {
@@ -16,6 +18,10 @@ export function runVerify(argv: any) {
 
   if (options.agentsMd) {
     return runAgentsMdVerify(options.cwd);
+  }
+
+  if (options.guards) {
+    return runGuardsVerify(options.cwd, options.evidence);
   }
 
   return runSelfVerify(options.cwd);
@@ -100,6 +106,69 @@ function runAgentsMdVerify(cwd: any) {
       issues: verification.issues,
       supportedAgents: listSupportedAgentIds(),
       validated: verification.path ? [verification.path] : []
+    }
+  });
+}
+
+function runGuardsVerify(cwd: any, evidencePath: string | undefined) {
+  if (!evidencePath) {
+    throw new CliError('ATM_CLI_USAGE', 'verify --guards requires --evidence <path>', { exitCode: 2 });
+  }
+
+  const absoluteEvidencePath = evidencePath.startsWith('/') || /^[A-Za-z]:/.test(evidencePath)
+    ? evidencePath
+    : `${cwd}/${evidencePath}`;
+
+  if (!existsSync(absoluteEvidencePath)) {
+    throw new CliError('ATM_VERIFY_GUARDS_EVIDENCE_NOT_FOUND', `Guard evidence file not found: ${evidencePath}`, {
+      exitCode: 1,
+      details: { evidencePath }
+    });
+  }
+
+  let evidenceDoc: any;
+  try {
+    evidenceDoc = JSON.parse(readFileSync(absoluteEvidencePath, 'utf8'));
+  } catch {
+    throw new CliError('ATM_VERIFY_GUARDS_EVIDENCE_PARSE_ERROR', `Guard evidence file is not valid JSON: ${evidencePath}`, {
+      exitCode: 1,
+      details: { evidencePath }
+    });
+  }
+
+  const violations = Array.isArray(evidenceDoc.violations) ? evidenceDoc.violations : [];
+  const result = checkGuardJustification({ violations });
+
+  if (!result.ok) {
+    return makeResult({
+      ok: false,
+      command: 'verify',
+      cwd,
+      messages: [message('error', 'ATM_VERIFY_GUARDS_MISSING_JUSTIFICATION',
+        `Guard violations are missing required justification: ${result.missingJustifications.join(', ')}`,
+        { missingJustifications: result.missingJustifications }
+      )],
+      evidence: {
+        evidencePath: relativePathFrom(cwd, absoluteEvidencePath),
+        checkedViolations: result.checkedViolations,
+        missingJustifications: result.missingJustifications,
+        requiredJustification: result.requiredJustification
+      }
+    });
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'verify',
+    cwd,
+    messages: [message('info', 'ATM_VERIFY_GUARDS_OK',
+      `All ${result.checkedViolations} guard violation(s) have justification.`
+    )],
+    evidence: {
+      evidencePath: relativePathFrom(cwd, absoluteEvidencePath),
+      checkedViolations: result.checkedViolations,
+      missingJustifications: [],
+      requiredJustification: null
     }
   });
 }

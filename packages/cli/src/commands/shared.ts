@@ -175,6 +175,8 @@ type ParsedCliOptions = {
   self: boolean;
   neutrality: boolean;
   agentsMd: boolean;
+  guards: boolean;
+  evidence?: string;
   verify: boolean;
   dryRun: boolean;
   force: boolean;
@@ -196,6 +198,8 @@ export function parseOptions(argv: string[], commandName: string) {
     self: false,
     neutrality: false,
     agentsMd: false,
+    guards: false,
+    evidence: undefined,
     verify: false,
     dryRun: false,
     force: false,
@@ -248,6 +252,21 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agents-md`, { exitCode: 2 });
       }
       options.agentsMd = true;
+      continue;
+    }
+    if (arg === '--guards') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --guards`, { exitCode: 2 });
+      }
+      options.guards = true;
+      continue;
+    }
+    if (arg === '--evidence') {
+      if (commandName !== 'verify') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --evidence`, { exitCode: 2 });
+      }
+      options.evidence = requireOptionValue(argv, index, '--evidence', commandName);
+      index += 1;
       continue;
     }
     if (arg === '--verify') {
