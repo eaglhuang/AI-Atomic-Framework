@@ -33,7 +33,7 @@ interface AgentPackManifestRecord {
   readonly installedAt: string;
   readonly manifestPath: string;
   readonly sourceHashes: {
-    readonly guardsHash: string;
+    readonly guardsHash: string | null;
     readonly schemaHashes: Record<string, string>;
   };
   readonly renderedManifest: ReturnType<typeof renderManifest>;
@@ -93,16 +93,39 @@ function runAgentPackInstall(cwd: string, packId: string | undefined, dryRun: bo
     throw new CliError('ATM_CLI_USAGE', 'agent-pack install requires --pack <pack-id> (or --id <pack-id>)', { exitCode: 2 });
   }
   const registeredPack = packRegistry[packId];
-  const sources = collectATMChartSources(cwd);
-  const pack: AgentPack = registeredPack ?? {
-    packId,
-    name: packId,
-    version: '0.1.0',
-    agentTarget: packId,
-    targetFiles: [],
-    sourceHash: hashFiles([packId, sources.sourceGuardsSha256, JSON.stringify(sources.sourceSchemaSha256s)])
-  };
   const context: RenderContext = { cwd };
+
+  let pack: AgentPack;
+  let sourceGuardsSha256: string | null = null;
+  let sourceSchemaSha256s: Record<string, string> = {};
+
+  if (registeredPack) {
+    pack = registeredPack;
+    // Try to collect ATM chart sources for guards/schema freshness tracking.
+    // If the host repo is not bootstrapped yet, skip gracefully (guards tracking disabled).
+    try {
+      const sources = collectATMChartSources(cwd);
+      sourceGuardsSha256 = sources.sourceGuardsSha256;
+      sourceSchemaSha256s = sources.sourceSchemaSha256s;
+    } catch (e) {
+      if (!(e instanceof CliError) || (e as CliError).code !== 'ATM_CHART_GUARDS_MISSING') throw e;
+      // Non-bootstrapped repo: leave guards/schema hashes as null/{} — always fresh.
+    }
+  } else {
+    // Bespoke pack: ATM chart sources are required.
+    const sources = collectATMChartSources(cwd);
+    pack = {
+      packId,
+      name: packId,
+      version: '0.1.0',
+      agentTarget: packId,
+      targetFiles: [],
+      sourceHash: hashFiles([packId, sources.sourceGuardsSha256, JSON.stringify(sources.sourceSchemaSha256s)])
+    };
+    sourceGuardsSha256 = sources.sourceGuardsSha256;
+    sourceSchemaSha256s = sources.sourceSchemaSha256s;
+  }
+
   const renderedManifest = renderManifest(pack, context);
   const mPath = resolveAgentPackManifestPath(cwd, packId);
   const manifest = createAgentPackManifest({
@@ -110,8 +133,8 @@ function runAgentPackInstall(cwd: string, packId: string | undefined, dryRun: bo
     pack,
     manifestPath: mPath,
     renderedManifest,
-    sourceGuardsSha256: sources.sourceGuardsSha256,
-    sourceSchemaSha256s: sources.sourceSchemaSha256s
+    sourceGuardsSha256,
+    sourceSchemaSha256s
   });
 
   if (!dryRun) {
@@ -241,9 +264,25 @@ function runAgentPackVerifyFresh(cwd: string, packId: string | undefined) {
   }
 
   const manifest = readAgentPackManifest(manifestPath);
-  const sources = collectATMChartSources(cwd);
-  const schemaDrift = collectSchemaDrift(manifest.sourceHashes.schemaHashes, sources.sourceSchemaSha256s);
-  const guardsDrifted = manifest.sourceHashes.guardsHash !== sources.sourceGuardsSha256;
+  const storedGuardsHash = manifest.sourceHashes.guardsHash;
+
+  // Try to collect ATM chart sources. If not bootstrapped, skip staleness checks.
+  let currentGuardsHash: string | null = null;
+  let currentSchemaHashes: Record<string, string> = {};
+  try {
+    const sources = collectATMChartSources(cwd);
+    currentGuardsHash = sources.sourceGuardsSha256;
+    currentSchemaHashes = sources.sourceSchemaSha256s;
+  } catch (e) {
+    if (!(e instanceof CliError) || (e as CliError).code !== 'ATM_CHART_GUARDS_MISSING') throw e;
+    // Non-bootstrapped repo: no guards to compare — treat as fresh.
+  }
+
+  // Only report stale when both stored and current guards hashes are available.
+  const guardsDrifted = storedGuardsHash !== null && currentGuardsHash !== null && storedGuardsHash !== currentGuardsHash;
+  const schemaDrift = (storedGuardsHash !== null && currentGuardsHash !== null)
+    ? collectSchemaDrift(manifest.sourceHashes.schemaHashes, currentSchemaHashes)
+    : [];
 
   if (guardsDrifted || schemaDrift.length > 0) {
     throw new CliError('ATM_AGENT_PACK_STALE', 'Agent pack manifest is stale. Reinstall or re-render the pack from the current SSoT.', {
@@ -251,8 +290,8 @@ function runAgentPackVerifyFresh(cwd: string, packId: string | undefined) {
       details: {
         packId,
         manifestPath: relativePathFrom(cwd, manifestPath),
-        recordedGuardsHash: manifest.sourceHashes.guardsHash,
-        currentGuardsHash: sources.sourceGuardsSha256,
+        recordedGuardsHash: storedGuardsHash,
+        currentGuardsHash,
         schemaDrift
       }
     });
@@ -267,8 +306,8 @@ function runAgentPackVerifyFresh(cwd: string, packId: string | undefined) {
       action: 'verify-fresh',
       packId,
       manifestPath: relativePathFrom(cwd, manifestPath),
-      guardsHash: sources.sourceGuardsSha256,
-      schemaHashes: sources.sourceSchemaSha256s
+      guardsHash: currentGuardsHash,
+      schemaHashes: currentSchemaHashes
     }
   });
 }
@@ -286,7 +325,7 @@ function createAgentPackManifest(input: {
   readonly pack: AgentPack;
   readonly manifestPath: string;
   readonly renderedManifest: ReturnType<typeof renderManifest>;
-  readonly sourceGuardsSha256: string;
+  readonly sourceGuardsSha256: string | null;
   readonly sourceSchemaSha256s: Record<string, string>;
 }): AgentPackManifestRecord {
   return {
