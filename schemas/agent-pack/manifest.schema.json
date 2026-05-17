@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/agent-pack/manifest.schema.json",
+  "title": "ATM Agent Pack Manifest v0.1",
+  "description": "Machine-readable record written after a successful ATM agent pack install.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "migration", "packId", "version", "installedAt", "renderedFiles", "sourceHash"],
+  "properties": {
+    "schemaId": {
+      "const": "atm.agentPackManifest"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "packId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique agent pack identifier."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+",
+      "description": "Semver version of the installed pack."
+    },
+    "installedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the pack was installed."
+    },
+    "renderedFiles": {
+      "type": "array",
+      "description": "List of files written by this pack.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "contentHash"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Destination path relative to host repo root."
+          },
+          "contentHash": {
+            "type": "string",
+            "minLength": 1,
+            "description": "SHA-256 hex digest of the rendered file content."
+          }
+        }
+      }
+    },
+    "sourceHash": {
+      "type": "string",
+      "minLength": 1,
+      "description": "SHA-256 hex digest of the pack source definition for freshness checks."
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
