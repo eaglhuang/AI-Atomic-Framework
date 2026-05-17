@@ -3,6 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { supportedAgentProfiles } from '../packages/cli/src/commands/agent-confidence.ts';
+import { collectAgentPackRows, renderAgentMatrixMarkdown } from './render-agent-matrix.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -59,6 +60,8 @@ assert(verifyAgentsMd.parsed.ok === true, 'verify --agents-md must report ok=tru
 const resultsDoc = readFileSync(path.join(root, 'docs/multi-agent-results.md'), 'utf8');
 const matrixDoc = readFileSync(path.join(root, 'docs/multi-agent-compatibility-matrix.md'), 'utf8');
 const batch = readJson('tests/agents/results/latest-batch.json');
+const generatedMatrixDoc = renderAgentMatrixMarkdown();
+assert(matrixDoc === generatedMatrixDoc, 'multi-agent compatibility matrix must match scripts/render-agent-matrix.ts output');
 assert(Array.isArray(batch.reports) && batch.reports.length === supportedAgentProfiles.length, 'latest-batch.json must cover all supported agent profiles');
 
 for (const marker of ['Integration Adapter', 'Charter Entry Status', 'First Command', 'Adapter Install + First Command', 'examples/agent-onboarding-flow/run.ts']) {
@@ -72,7 +75,13 @@ const adapterInstallReadyRows = [
 ].filter((rowMarker) => resultsDoc.includes(rowMarker));
 assert(adapterInstallReadyRows.length >= 3, 'multi-agent results must show at least three agents with adapter install + first command pass');
 
-for (const integrationAdapterId of ['`claude-code`', '`cursor`', '`copilot`']) {
+const agentPackRows = collectAgentPackRows();
+assert(agentPackRows.length === 5, 'agent-pack matrix must include five built-in packs');
+for (const packId of ['claude-code', 'cursor', 'copilot', 'gemini', 'windsurf']) {
+  assert(agentPackRows.some((row) => row.packId === packId), `agent-pack matrix rows missing ${packId}`);
+}
+
+for (const integrationAdapterId of ['`claude-code`', '`cursor`', '`copilot`', '`gemini`', '`windsurf`']) {
   assert(matrixDoc.includes(integrationAdapterId), `multi-agent matrix must expose integration adapter ${integrationAdapterId}`);
 }
 
