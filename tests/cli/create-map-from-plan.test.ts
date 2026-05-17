@@ -3,11 +3,16 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createPropagationReport } from '../../packages/core/src/test-runner/propagation.ts';
 import { createTempWorkspace } from '../../scripts/temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempRoot = createTempWorkspace('atm-cli-create-map-from-plan-');
 const samplePlanPath = path.join(root, 'samples', 'checkout-mini.plan.json');
+
+// Fixed timestamp so proposal ID is deterministic (M10 active gate requires human-review proposalId match)
+const FIXED_PROPOSED_AT = '2026-01-01T00:00:00.000Z';
+const E2E_MAP_PROPOSAL_ID = 'proposal.atm-core-0001.from-1.0.0.to-1.1.0.map-atm-map-0007.behavior-evolve';
 
 try {
   const validPlan = runAtm(['spec', '--validate', samplePlanPath, '--json']);
@@ -57,6 +62,14 @@ try {
   const equivalenceReportPath = path.join(tempRoot, 'atomic_workbench', 'maps', 'ATM-MAP-0007', 'map.equivalence.report.json');
   assert.equal(existsSync(equivalenceReportPath), true);
 
+  // M10 active gate requires propagation-report + review-advisory + human-review in addition to equivalence
+  const propagationReportPath = path.join(tempRoot, 'propagation-report.pass.json');
+  const reviewAdvisoryPath = path.join(tempRoot, 'review-advisory.pass.json');
+  const humanReviewPath = path.join(tempRoot, 'human-review.approve.json');
+  writeJson(propagationReportPath, createPassingPropagationReport());
+  writeJson(reviewAdvisoryPath, createPassingReviewAdvisory());
+  writeJson(humanReviewPath, createApprovedHumanReviewDecision());
+
   const upgrade = runAtm([
     'upgrade',
     '--cwd', tempRoot,
@@ -68,7 +81,11 @@ try {
     '--map', 'ATM-MAP-0007',
     '--replacement-mode', 'active',
     '--dry-run',
+    '--proposed-at', FIXED_PROPOSED_AT,
     '--equivalence-report', equivalenceReportPath,
+    '--propagation-report', propagationReportPath,
+    '--review-advisory', reviewAdvisoryPath,
+    '--human-review', humanReviewPath,
     '--input', path.join(root, 'fixtures', 'upgrade', 'hash-diff-report.json'),
     '--input', path.join(root, 'tests', 'schema-fixtures', 'positive', 'minimal-execution-evidence.json'),
     '--input', path.join(root, 'tests', 'police-fixtures', 'positive', 'non-regression-report.json'),
@@ -125,6 +142,71 @@ function runAtm(args: string[]) {
 
 function readJson(filePath: string) {
   return JSON.parse(readFileSync(filePath, 'utf8'));
+}
+
+function writeJson(filePath: string, document: unknown) {
+  writeFileSync(filePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+}
+
+function createPassingPropagationReport() {
+  return createPropagationReport({
+    ok: true,
+    discoveredMaps: ['ATM-MAP-0007'],
+    perMapStatus: [
+      {
+        mapId: 'ATM-MAP-0007',
+        ok: true,
+        exitCode: 0,
+        durationMs: 12,
+        resolutionMode: 'canonical',
+        reportPath: 'atomic_workbench/maps/ATM-MAP-0007/map.test.report.json',
+        warnings: []
+      }
+    ],
+    failedDownstream: [],
+    propagationDuration: 12,
+    metrics: { latency: 12, errorRate: 0, coverage: 1, edgeCaseCount: 0 },
+    summary: { total: 1, passed: 1, failed: 0, durationMs: 12 }
+  }, {
+    atomId: 'ATM-CORE-0001',
+    behaviorId: 'behavior.evolve',
+    generatedAt: FIXED_PROPOSED_AT,
+    reportId: 'propagation.atm-core-0001.evolve.e2e'
+  });
+}
+
+function createPassingReviewAdvisory() {
+  // Use mapId as target.id to avoid a strict proposalId dependency at construction time
+  return {
+    schemaVersion: '1.0.0',
+    reportId: 'review-advisory.e2e-pass',
+    status: 'ok',
+    generatedAt: FIXED_PROPOSED_AT,
+    target: { kind: 'proposal', id: 'ATM-MAP-0007' },
+    summary: { high: 0, medium: 0, low: 0, info: 0 },
+    findings: [],
+    advisoryUnavailable: false,
+    needsReview: false,
+    unavailableReasons: []
+  };
+}
+
+function createApprovedHumanReviewDecision() {
+  return {
+    schemaId: 'atm.humanReviewDecision',
+    specVersion: '0.1.0',
+    proposalId: E2E_MAP_PROPOSAL_ID,
+    atomId: 'ATM-CORE-0001',
+    decision: 'approve',
+    reason: 'All automated gates passed — approved for active replacement.',
+    decidedBy: 'ATM E2E test harness',
+    decidedAt: FIXED_PROPOSED_AT,
+    queueRecord: {
+      proposalId: E2E_MAP_PROPOSAL_ID,
+      atomId: 'ATM-CORE-0001',
+      status: 'approved'
+    }
+  };
 }
 
 function writeEquivalenceFixture(repositoryRoot: string, mapId: string) {
