@@ -86,6 +86,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'integration',
+    summary: 'List, install, verify, or remove ATM agent integration adapters',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'lock',
     summary: 'Check, acquire, or release a governed scope lock',
     implemented: true,

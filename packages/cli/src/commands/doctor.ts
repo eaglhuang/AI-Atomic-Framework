@@ -3,6 +3,7 @@ import path from 'node:path';
 import { runHashPlaceholderAudit } from '../../../../scripts/audit-hash-placeholders.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
+import { checkIntegrationHealth } from './integration.ts';
 import { makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 
 const legacyBehaviorPackageNames = [
@@ -19,7 +20,7 @@ const legacyBehaviorPackageNames = [
   'plugin-police-lifecycle'
 ];
 
-export function runDoctor(argv: any) {
+export async function runDoctor(argv: any) {
   const { options } = parseOptions(argv, 'doctor');
   const root = options.cwd;
   const rootPackage = readJsonIfExists(path.join(root, 'package.json')) ?? {};
@@ -39,6 +40,8 @@ export function runDoctor(argv: any) {
     .map((packageDir) => ({ packageDir, js: path.join(root, packageDir, 'dist', 'index.js'), dts: path.join(root, packageDir, 'dist', 'index.d.ts') }))
     .filter((entry) => !existsSync(entry.js) || !existsSync(entry.dts))
     .map((entry) => packageDirLabel(root, entry.packageDir));
+  const charterIntegrity = checkCharterIntegrity(root);
+  const integrationHealth = await checkIntegrationHealth(root);
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -73,7 +76,8 @@ export function runDoctor(argv: any) {
       expectedLayoutVersion: atmLayoutVersion,
       migrationNeeded: runtime.migrationNeeded
     }),
-    createCheck('charter-integrity', checkCharterIntegrity(root).ok, checkCharterIntegrity(root)),
+    createCheck('charter-integrity', charterIntegrity.ok, charterIntegrity),
+    createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
     createGitHeadEvidenceCheck(root, runtime)
   ];
   const ok = checks.every((check) => check.ok);
@@ -84,6 +88,8 @@ export function runDoctor(argv: any) {
       ? 'node atm.mjs init --adopt default --force to reinstall the AtomicCharter, or restore .atm/charter/atomic-charter.md and .atm/charter/charter-invariants.json manually.'
     : failedChecks.includes('git-head-evidence')
       ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
+    : failedChecks.includes('integration-adapters')
+      ? 'Run node atm.mjs integration verify <id> --json for each failed adapter, then reinstall or remove the drifted integration manifest.'
     : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
       ? 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
       : 'npm run validate:full';
@@ -93,6 +99,8 @@ export function runDoctor(argv: any) {
       ? [message('error', 'ATM_DOCTOR_CHARTER_MISSING', 'AtomicCharter files are missing or corrupt. Repair before continuing.', { failedChecks })]
     : failedChecks.includes('git-head-evidence')
       ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
+    : failedChecks.includes('integration-adapters')
+      ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', { failedChecks })]
       : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })];
   return makeResult({
     ok,

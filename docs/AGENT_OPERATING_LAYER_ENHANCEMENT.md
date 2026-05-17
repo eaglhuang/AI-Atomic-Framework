@@ -95,7 +95,7 @@ A typed `IntegrationAdapter` interface allows each agent environment to be
 supported as an installable adapter. Adapters:
 
 1. Write integration files to the agent-native directory.
-2. Record every file's SHA-256 hash in `.atm/integrations/manifest.json`.
+2. Record every file's SHA-256 hash in `.atm/integrations/<id>.manifest.json`.
 3. Expose `verify()` for `atm doctor` drift detection.
 4. Expose `uninstall(manifest)` that only removes files whose hashes still match
    (preserving any host edits made after installation).
@@ -139,6 +139,10 @@ atm integration remove <id>            # clean uninstall (hash-guarded)
 `atm init --integration <id>` installs an adapter in one step during project
 bootstrapping.
 
+`atm doctor` reports installed adapter health through an `integration-adapters`
+check. It treats missing files and hash mismatches as drift, and unknown or
+misplaced manifests as stale integration state.
+
 ---
 
 ## Non-goals
@@ -158,6 +162,8 @@ identity:
 M4 is delivered as the first concrete Integration Adapter Layer contract. `packages/integrations-core` now defines `IntegrationAdapter`, `InstallManifest`, SHA-256 helpers, and a Codex skills adapter factory. `schemas/integrations/install-manifest.schema.json` validates the hash-locked manifest, and `scripts/validate-integration-adapter.ts` exercises install, verify, drift detection, and hash-guarded uninstall for the existing Codex skill surface.
 
 M5 is delivered as four installable agent adapters: `integration-claude-code`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each adapter emits the seven minimum ATM entrypoints, includes the `{{CHARTER_INVARIANTS}}` placeholder, makes `node atm.mjs next --json` the required first command, and participates in the shared install/verify/uninstall manifest validation.
+
+M6 is delivered as the CLI lifecycle for those adapters. `atm integration list/add/verify/remove` exposes install, manifest verification, hash-guarded removal, and available/installed adapter listing. `atm init --integration <id>` installs an adapter during repository adoption, manifests are stored per adapter under `.atm/integrations/<id>.manifest.json`, and `atm doctor` reports integration drift or stale manifests through the `integration-adapters` check.
 
 See [CHANGELOG.md](../CHANGELOG.md) for delivered milestone entries.
 

@@ -175,6 +175,7 @@ type ParsedCliOptions = {
   dryRun: boolean;
   force: boolean;
   adopt?: string;
+  integration?: string;
   task?: string;
   atom?: string;
   map?: string;
@@ -195,6 +196,7 @@ export function parseOptions(argv: string[], commandName: string) {
     dryRun: false,
     force: false,
     adopt: undefined,
+    integration: undefined,
     task: undefined,
     atom: undefined,
     map: undefined,
@@ -280,6 +282,14 @@ export function parseOptions(argv: string[], commandName: string) {
         options.adopt = requireOptionValue(argv, index, '--adopt', commandName);
         index += 1;
       }
+      continue;
+    }
+    if (arg === '--integration') {
+      if (commandName !== 'init') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --integration`, { exitCode: 2 });
+      }
+      options.integration = requireOptionValue(argv, index, '--integration', commandName);
+      index += 1;
       continue;
     }
     if (arg === '--atom') {

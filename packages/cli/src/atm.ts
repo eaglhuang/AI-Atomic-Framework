@@ -11,6 +11,7 @@ import { runGuard } from './commands/guard.ts';
 import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
 import { runInit } from './commands/init.ts';
+import { runIntegration } from './commands/integration.ts';
 import { runLock } from './commands/lock.ts';
 import { runNext } from './commands/next.ts';
 import { runOrient } from './commands/orient.ts';
@@ -40,6 +41,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   guide: runGuide,
   handoff: runHandoff,
   init: runInit,
+  integration: runIntegration,
   lock: runLock,
   next: runNext,
   orient: runOrient,
