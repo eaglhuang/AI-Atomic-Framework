@@ -80,6 +80,13 @@ try {
     const verify = runAtm(['integration', 'verify', plan.adapterId, '--cwd', hostRoot, '--json']);
     assert(verify.ok === true, `${plan.adapterId} integration verify must succeed`);
 
+    const constitution = runAtm(['constitution', 'render', '--cwd', hostRoot, '--json']);
+    assert(constitution.ok === true, `${plan.adapterId} constitution render must succeed`);
+
+    const welcome = runAtm(['welcome', '--cwd', hostRoot, '--json']);
+    assert(welcome.ok === true, `${plan.adapterId} welcome must succeed`);
+    assert(welcome.evidence?.welcomeLineage?.welcomeCount >= 1, `${plan.adapterId} welcome must record lineage`);
+
     const manifest = readInstalledManifest(hostRoot, plan.adapterId);
     assert(manifest.adapterId === plan.adapterId, `${plan.adapterId} manifest adapterId mismatch`);
     assert(Array.isArray(manifest.files) && manifest.files.length > 0, `${plan.adapterId} manifest must record installed files`);
@@ -90,7 +97,7 @@ try {
 
     const firstCommand = runAtm(['next', '--cwd', hostRoot, '--json'], root, { allowNonZero: true });
     assert(firstCommand.command === 'next', `${plan.adapterId} first command route must return a next report`);
-    assert(firstCommand.messages?.[0]?.data?.status === 'needs-guidance-start', `${plan.adapterId} blank host must receive official guidance-start next action`);
+    assert(firstCommand.evidence?.nextAction?.status !== 'needs-onboarding-refresh', `${plan.adapterId} first command must not be blocked by onboarding freshness`);
 
     return {
       agentLabel: plan.agentLabel,
@@ -99,6 +106,7 @@ try {
       installedFileCount: manifest.files.length,
       verified: verify.ok === true,
       firstCommand: atmFirstCommand,
+      welcomeRecorded: true,
       charterInjected: true
     };
   });

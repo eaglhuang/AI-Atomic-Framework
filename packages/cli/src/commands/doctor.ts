@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { runHashPlaceholderAudit } from '../../../../scripts/audit-hash-placeholders.ts';
+import { computeSha256ForFile } from '../../../core/src/hash-lock/hash-lock.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { checkIntegrationHealth } from './integration.ts';
@@ -42,6 +43,7 @@ export async function runDoctor(argv: any) {
     .map((entry) => packageDirLabel(root, entry.packageDir));
   const charterIntegrity = checkCharterIntegrity(root);
   const integrationHealth = await checkIntegrationHealth(root);
+  const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -77,6 +79,7 @@ export async function runDoctor(argv: any) {
       migrationNeeded: runtime.migrationNeeded
     }),
     createCheck('charter-integrity', charterIntegrity.ok, charterIntegrity),
+    createCheck('onboarding-lifecycle', onboardingLifecycle.ok, onboardingLifecycle),
     createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
     createGitHeadEvidenceCheck(root, runtime)
   ];
@@ -86,6 +89,8 @@ export async function runDoctor(argv: any) {
     ? 'node atm.mjs next --json'
     : failedChecks.includes('charter-integrity')
       ? 'node atm.mjs init --adopt default --force to reinstall the AtomicCharter, or restore .atm/charter/atomic-charter.md and .atm/charter/charter-invariants.json manually.'
+    : failedChecks.includes('onboarding-lifecycle')
+      ? onboardingLifecycle.recommendedAction
     : failedChecks.includes('git-head-evidence')
       ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
     : failedChecks.includes('integration-adapters')
@@ -97,6 +102,8 @@ export async function runDoctor(argv: any) {
     ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
     : failedChecks.includes('charter-integrity')
       ? [message('error', 'ATM_DOCTOR_CHARTER_MISSING', 'AtomicCharter files are missing or corrupt. Repair before continuing.', { failedChecks })]
+    : failedChecks.includes('onboarding-lifecycle')
+      ? [message('error', 'ATM_DOCTOR_ONBOARDING_STALE', 'Onboarding constitution sources are missing or stale. Refresh the first-touch artifacts before continuing.', { failedChecks })]
     : failedChecks.includes('git-head-evidence')
       ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
     : failedChecks.includes('integration-adapters')
@@ -124,6 +131,93 @@ export async function runDoctor(argv: any) {
       recommendedAction
     }
   });
+}
+
+function checkOnboardingLifecycle(root: any, runtime: any) {
+  const configPresent = existsSync(path.join(root, '.atm', 'config.json'));
+  const constitutionPath = path.join(root, '.atm', 'memory', 'constitution.md');
+  const welcomeLineagePath = path.join(root, '.atm', 'runtime', 'welcome.lineage.json');
+  if (!configPresent) {
+    return {
+      ok: true,
+      stage: 'uninstalled',
+      constitutionPath: relativePathFrom(root, constitutionPath),
+      welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
+      constitutionFreshness: 'not-applicable',
+      welcomeRecorded: false,
+      recommendedAction: 'node atm.mjs bootstrap --cwd . --task "Bootstrap ATM in this repository"'
+    };
+  }
+
+  const defaultGuardsPath = path.join(root, runtime.paths.defaultGuardsPath);
+  const defaultGuardsPresent = existsSync(defaultGuardsPath);
+  const constitutionPresent = existsSync(constitutionPath);
+  const welcomeLineage = readJsonIfExists(welcomeLineagePath);
+  if (!defaultGuardsPresent) {
+    return {
+      ok: false,
+      stage: 'installed',
+      defaultGuardsPath: runtime.paths.defaultGuardsPath,
+      constitutionPath: relativePathFrom(root, constitutionPath),
+      welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
+      constitutionFreshness: 'guards-missing',
+      welcomeRecorded: Boolean(welcomeLineage),
+      recommendedAction: 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
+    };
+  }
+
+  if (!constitutionPresent) {
+    return {
+      ok: false,
+      stage: 'installed',
+      defaultGuardsPath: runtime.paths.defaultGuardsPath,
+      constitutionPath: relativePathFrom(root, constitutionPath),
+      welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
+      constitutionFreshness: 'missing',
+      welcomeRecorded: Boolean(welcomeLineage),
+      recommendedAction: 'node atm.mjs constitution render --cwd .'
+    };
+  }
+
+  const constitutionFrontmatter = readConstitutionFrontmatter(constitutionPath);
+  const currentGuardsHash = computeSha256ForFile(defaultGuardsPath);
+  const constitutionFresh = constitutionFrontmatter?.source_guards_sha256 === currentGuardsHash;
+  const welcomeRecorded = Boolean(welcomeLineage && typeof welcomeLineage.firstWelcomedAt === 'string');
+  return {
+    ok: constitutionFresh,
+    stage: welcomeRecorded ? 'welcomed' : 'constitution-rendered',
+    defaultGuardsPath: runtime.paths.defaultGuardsPath,
+    constitutionPath: relativePathFrom(root, constitutionPath),
+    welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
+    constitutionFreshness: constitutionFresh ? 'fresh' : 'stale',
+    recordedSourceGuardsSha256: constitutionFrontmatter?.source_guards_sha256 ?? null,
+    currentSourceGuardsSha256: currentGuardsHash,
+    welcomeRecorded,
+    welcomeCount: Number(welcomeLineage?.welcomeCount ?? 0),
+    recommendedAction: constitutionFresh ? 'node atm.mjs welcome --cwd .' : 'node atm.mjs constitution render --cwd .'
+  };
+}
+
+function readConstitutionFrontmatter(filePath: string): Record<string, any> | null {
+  try {
+    const content = readFileSync(filePath, 'utf8');
+    const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+    if (!match) {
+      return null;
+    }
+    return Object.fromEntries(match[1]
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const separatorIndex = line.indexOf(':');
+        const key = line.slice(0, separatorIndex).trim();
+        const value = line.slice(separatorIndex + 1).trim();
+        return [key, value.startsWith('{') ? JSON.parse(value) : value];
+      }));
+  } catch {
+    return null;
+  }
 }
 
 function createCheck(name: any, ok: any, details: any) { return { name, ok: ok === true, details }; }

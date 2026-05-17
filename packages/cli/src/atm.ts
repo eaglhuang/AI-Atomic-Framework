@@ -24,6 +24,7 @@ import { runUpgrade } from './commands/upgrade.ts';
 import { runTestAsync } from './commands/test.ts';
 import { runValidate } from './commands/validate.ts';
 import { runVerify } from './commands/verify.ts';
+import { runWelcome } from './commands/welcome.ts';
 import { runRegistryDiff } from './commands/registry-diff.ts';
 import { runReplacementLane } from './commands/replacement-lane.ts';
 import { runRollback } from './commands/rollback.ts';
@@ -56,6 +57,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   test: runTestAsync,
   validate: runValidate,
   verify: runVerify,
+  welcome: runWelcome,
   'registry-diff': runRegistryDiff,
   'replacement-lane': runReplacementLane,
   rollback: runRollback,

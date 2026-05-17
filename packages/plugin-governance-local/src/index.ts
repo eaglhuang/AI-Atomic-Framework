@@ -20,11 +20,13 @@ import type {
   GovernanceAdapter,
   GovernanceLayout,
 } from '@ai-atomic-framework/plugin-sdk';
+import { createDefaultGuards } from './default-guards.ts';
 import { resolveLocalGovernanceLayout } from './layout.ts';
 import { createLocalGovernanceStores } from './stores.ts';
 
 export { resolveLocalGovernanceLayout } from './layout.ts';
 export { createLocalGovernanceStores } from './stores.ts';
+export { createDefaultGuards, defaultGuardCatalog } from './default-guards.ts';
 
 export const pluginGovernanceLocalPackage = {
   packageName: '@ai-atomic-framework/plugin-governance-local',
@@ -620,31 +622,6 @@ function createBootstrapEvidence(taskId: string, projectProbe: Readonly<Record<s
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.reports)
     ],
     evidence: []
-  };
-}
-
-function createDefaultGuards(projectProbe: Readonly<Record<string, unknown>>) {
-  return {
-    schemaVersion: 'atm.defaultGuards.v0.1',
-    repositoryKind: projectProbe.repositoryKind,
-    guards: [
-      {
-        id: 'preserve-host-workflow',
-        summary: 'Do not invent a build step, package manager, or runtime workflow that the host repository does not already use.'
-      },
-      {
-        id: 'lock-before-edit',
-        summary: 'Create or respect a scope lock before editing files outside the bootstrap pack.'
-      },
-      {
-        id: 'evidence-after-change',
-        summary: 'Record validation evidence and a short context summary before declaring the task done.'
-      },
-      {
-        id: 'protect-context-budget',
-        summary: 'When estimated context load exceeds the repository policy, summarize or offload before continuing.'
-      }
-    ]
   };
 }
 

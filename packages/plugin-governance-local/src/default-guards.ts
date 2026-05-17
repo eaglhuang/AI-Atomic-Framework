@@ -1,0 +1,60 @@
+export interface DefaultGuardRecord {
+  readonly id: string;
+  readonly summary: string;
+}
+
+export interface DefaultGuardsDocument {
+  readonly schemaId: 'atm.defaultGuards';
+  readonly specVersion: '0.1.0';
+  readonly schemaVersion: 'atm.defaultGuards.v0.1';
+  readonly migration: {
+    readonly strategy: 'none';
+    readonly fromVersion: null;
+    readonly notes: string;
+  };
+  readonly generatedAt: string;
+  readonly repositoryKind: string;
+  readonly guards: readonly DefaultGuardRecord[];
+}
+
+export const defaultGuardCatalog = Object.freeze<readonly DefaultGuardRecord[]>([
+  {
+    id: 'preserve-host-workflow',
+    summary: 'Do not invent a build step, package manager, or runtime workflow that the host repository does not already use.'
+  },
+  {
+    id: 'lock-before-edit',
+    summary: 'Create or respect a scope lock before editing files outside the bootstrap pack.'
+  },
+  {
+    id: 'evidence-after-change',
+    summary: 'Record validation evidence and a short context summary before declaring the task done.'
+  },
+  {
+    id: 'protect-context-budget',
+    summary: 'When estimated context load exceeds the repository policy, summarize or offload before continuing.'
+  }
+]);
+
+export function createDefaultGuards(projectProbe: Readonly<Record<string, unknown>>): DefaultGuardsDocument {
+  const generatedAt = typeof projectProbe.generatedAt === 'string' && projectProbe.generatedAt.trim().length > 0
+    ? projectProbe.generatedAt
+    : new Date().toISOString();
+  const repositoryKind = typeof projectProbe.repositoryKind === 'string' && projectProbe.repositoryKind.trim().length > 0
+    ? projectProbe.repositoryKind
+    : 'generic-repository';
+
+  return {
+    schemaId: 'atm.defaultGuards',
+    specVersion: '0.1.0',
+    schemaVersion: 'atm.defaultGuards.v0.1',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'Initial default guard surface seeded during ATM bootstrap.'
+    },
+    generatedAt,
+    repositoryKind,
+    guards: defaultGuardCatalog.map((guard) => ({ ...guard }))
+  };
+}

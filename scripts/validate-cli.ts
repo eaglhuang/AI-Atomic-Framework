@@ -73,7 +73,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/constitution.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -139,6 +139,69 @@ try {
   assert(initDryRun.parsed.ok === true, 'init --adopt --dry-run must report ok=true');
   assert(initDryRun.parsed.evidence.adoptedAt, 'init --adopt --dry-run must report adoptedAt');
   assert(initDryRun.parsed.evidence.dryRun === true, 'init --adopt --dry-run must report dryRun=true');
+
+  const constitutionRepo = path.join(tempRoot, 'constitution-repo');
+  mkdirSync(constitutionRepo, { recursive: true });
+  const constitutionBootstrap = runAtm(['bootstrap', '--cwd', constitutionRepo], constitutionRepo);
+  assert(constitutionBootstrap.exitCode === 0, 'bootstrap must exit 0 before constitution render');
+
+  const constitutionRender = runAtm(['constitution', 'render', '--cwd', constitutionRepo], constitutionRepo);
+  assert(constitutionRender.exitCode === 0, 'constitution render must exit 0 after bootstrap');
+  assertReadable(constitutionRender, 'constitution');
+  assert(constitutionRender.parsed.ok === true, 'constitution render must report ok=true');
+  assert(constitutionRender.parsed.evidence.constitutionPath === '.atm/memory/constitution.md', 'constitution render must use the default memory path');
+  assert(existsSync(path.join(constitutionRepo, '.atm/memory/constitution.md')), 'constitution render must write .atm/memory/constitution.md');
+  assertMessageCode(constitutionRender, 'ATM_CONSTITUTION_RENDERED');
+
+  const constitutionVerify = runAtm(['constitution', 'verify', '--cwd', constitutionRepo], constitutionRepo);
+  assert(constitutionVerify.exitCode === 0, 'constitution verify must exit 0 immediately after render');
+  assertReadable(constitutionVerify, 'constitution');
+  assert(constitutionVerify.parsed.ok === true, 'constitution verify must report ok=true when fresh');
+  assertMessageCode(constitutionVerify, 'ATM_CONSTITUTION_VERIFY_OK');
+
+  const welcomeDryRun = runAtm(['welcome', '--cwd', constitutionRepo, '--dry-run'], constitutionRepo);
+  assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must exit 0 after constitution render');
+  assertReadable(welcomeDryRun, 'welcome');
+  assert(welcomeDryRun.parsed.ok === true, 'welcome --dry-run must report ok=true');
+  assert(welcomeDryRun.parsed.evidence.dryRun === true, 'welcome --dry-run must report dryRun=true');
+  assert(welcomeDryRun.parsed.evidence.lineagePath === null, 'welcome --dry-run must not report a persisted lineage path');
+  assert(!existsSync(path.join(constitutionRepo, '.atm/runtime/welcome.lineage.json')), 'welcome --dry-run must not write welcome lineage');
+  assertMessageCode(welcomeDryRun, 'ATM_WELCOME_DRY_RUN');
+
+  const welcome = runAtm(['welcome', '--cwd', constitutionRepo], constitutionRepo);
+  assert(welcome.exitCode === 0, 'welcome must exit 0 after constitution render');
+  assertReadable(welcome, 'welcome');
+  assert(welcome.parsed.ok === true, 'welcome must report ok=true');
+  assert(welcome.parsed.evidence.lineagePath === '.atm/runtime/welcome.lineage.json', 'welcome must report the welcome lineage path');
+  assert(existsSync(path.join(constitutionRepo, '.atm/runtime/welcome.lineage.json')), 'welcome must write welcome lineage');
+  assert(welcome.parsed.evidence.welcomeLineage.welcomeCount === 1, 'welcome lineage must start with welcomeCount=1');
+  assert(typeof welcome.parsed.evidence.nextAction?.command === 'string', 'welcome must surface the next action command');
+  assertMessageCode(welcome, 'ATM_WELCOME_READY');
+
+  const welcomeDoctor = runAtm(['doctor', '--cwd', constitutionRepo], constitutionRepo);
+  assertReadable(welcomeDoctor, 'doctor');
+  const onboardingCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
+  assert(onboardingCheck.ok === true, 'doctor onboarding-lifecycle check must pass after constitution render and welcome');
+  assert(onboardingCheck.details.stage === 'welcomed', 'doctor onboarding-lifecycle check must report welcomed stage');
+  assert(onboardingCheck.details.constitutionFreshness === 'fresh', 'doctor onboarding-lifecycle check must report fresh constitution');
+
+  const guardsPath = path.join(constitutionRepo, '.atm', 'runtime', 'default-guards.json');
+  const guards = JSON.parse(readFileSync(guardsPath, 'utf8'));
+  guards.guards[0].summary = `${guards.guards[0].summary} (drift)`;
+  writeFileSync(guardsPath, `${JSON.stringify(guards, null, 2)}\n`, 'utf8');
+
+  const constitutionStale = runAtm(['constitution', 'verify', '--cwd', constitutionRepo], constitutionRepo);
+  assert(constitutionStale.exitCode === 2, 'constitution verify must exit 2 when source guards drift');
+  assert(constitutionStale.parsed.ok === false, 'constitution verify must report ok=false when stale');
+  assertMessageCode(constitutionStale, 'ATM_CONSTITUTION_STALE');
+
+  const staleDoctor = runAtm(['doctor', '--cwd', constitutionRepo], constitutionRepo);
+  assert(staleDoctor.exitCode === 1, 'doctor must fail when onboarding constitution is stale');
+  assertReadable(staleDoctor, 'doctor');
+  const staleOnboardingCheck = staleDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
+  assert(staleOnboardingCheck.ok === false, 'doctor onboarding-lifecycle check must fail when constitution is stale');
+  assert(staleOnboardingCheck.details.constitutionFreshness === 'stale', 'doctor onboarding-lifecycle check must report stale constitution');
+  assertMessageCode(staleDoctor, 'ATM_DOCTOR_ONBOARDING_STALE');
 
   const status = runAtm(['status'], blankRepo);
   assert(status.exitCode === 0, 'status after init must exit 0');

@@ -1,0 +1,40 @@
+name: atm-onboarding-enforcement
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  atm-onboarding:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify ATM doctor
+        run: node atm.mjs doctor --json
+
+      - name: Verify constitution freshness
+        run: node atm.mjs constitution verify --json
+
+      - name: Verify installed integrations
+        shell: bash
+        run: |
+          shopt -s nullglob
+          for manifest in .atm/integrations/*.manifest.json; do
+            adapter_id="$(basename "$manifest" .manifest.json)"
+            node atm.mjs integration verify "$adapter_id" --json
+          done

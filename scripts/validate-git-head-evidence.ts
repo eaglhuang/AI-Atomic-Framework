@@ -67,6 +67,24 @@ function bootstrap(repo: any) {
   const parsed = payload ? JSON.parse(payload) : {};
   assert(result.status === 0, 'bootstrap must exit 0');
   assert(parsed.ok === true, 'bootstrap must report ok=true');
+
+  const constitution = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'constitution', 'render', '--cwd', repo, '--json'], {
+    cwd: repo,
+    encoding: 'utf8'
+  });
+  const constitutionPayload = (constitution.stdout || constitution.stderr || '').trim();
+  const constitutionParsed = constitutionPayload ? JSON.parse(constitutionPayload) : {};
+  assert(constitution.status === 0, 'constitution render must exit 0');
+  assert(constitutionParsed.ok === true, 'constitution render must report ok=true');
+
+  const welcome = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'welcome', '--cwd', repo, '--json'], {
+    cwd: repo,
+    encoding: 'utf8'
+  });
+  const welcomePayload = (welcome.stdout || welcome.stderr || '').trim();
+  const welcomeParsed = welcomePayload ? JSON.parse(welcomePayload) : {};
+  assert(welcome.status === 0, 'welcome must exit 0');
+  assert(welcomeParsed.ok === true, 'welcome must report ok=true');
 }
 
 function commitAll(repo: any, message: any) {
