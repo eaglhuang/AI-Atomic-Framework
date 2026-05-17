@@ -107,9 +107,13 @@ Atom proposal draft 只有在以下條件同時成立時才能產生：
 - 每個 Atom 設定每日 proposal cap。
 - 若 draft 產生後 target version 已變更，promotion 必須 blocked，並在 review output 標示 stale condition。
 
+開源語意：以上規則是 proposal queue / promotion path 的治理合約，不是 detector 或 dry-run bridge 可以私下維護的全域狀態。`packages/core` 應保持 storage-neutral，只輸出可審查的 observation、dry-run draft、gate result 與 report；每日 cap、confidence gate 與 stale condition 的跨 run 強制執行，應由 host adapter、Default Governance Bundle 或明確傳入的 telemetry / run report 承擔。若缺少可追溯的持久化來源，core 可以產生 observation 或 dry-run draft，但不得宣稱已滿足正式 queue gate。
+
 ### 4.3 持久化要求
 
 Usage count 與 recurrence state 不得只存在暫態 agent state。它們必須表示在 Evidence、governance bundle、run report 或 registry-side telemetry 中，讓短 session 與跨 session 工作仍能累積訊號。
+
+實作邊界：ATM core 不綁定特定 database 或 host 記憶體格式；可接受的持久化表面是 schema-valid Evidence recurrence、governance bundle 狀態、rollout / scan run report，或 registry-side telemetry。Host 若只把 `usageCount`、`occurrenceCountBySuppressionKey` 或 suppression choice 放在單次 agent memory，這只能支撐即時回饋，不能作為 L3 queue 層、daily cap 或正式 promotion 的唯一依據。
 
 ### 4.4 即時批評回饋與使用者選擇
 
@@ -493,7 +497,7 @@ M8 已於 2026-05-15 完成並提交。初版新增 `schemas/governance/rollout-
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:governance-commands`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
 
-### M9 - Conversation Review Finding Contract
+### M9 - Conversation Review Finding Contract ✅ DONE
 
 目的：建立對話摩擦的標準化 review finding 契約，作為 transcript reviewer 與 patch draft bridge 的共同語言。
 
@@ -517,6 +521,8 @@ Checklist：
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-skill-review`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:schemas`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
+
+M9 已於 2026-05-15 完成。新增 `schemas/governance/conversation-review-findings-report.schema.json`、`packages/plugin-sdk/src/conversation/conversation-review-finding.ts`；`validate-conversation-skill-review` 覆蓋四類 finding kinds、draft-only 欄位驗證、sensitive transcript redaction requirement。
 
 ### M10 - Transcript Review Extractor ✅ DONE
 

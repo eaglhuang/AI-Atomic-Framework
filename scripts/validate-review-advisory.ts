@@ -165,8 +165,8 @@ for (const fixturePath of conversationAdvisoryFixturePaths) {
     for (const routeHint of fixture.expected.blockedRouteHints) {
       const finding = advisoryReport.findings.find((candidate: any) => candidate.routeHint === routeHint);
       check(finding !== undefined, `${fixturePath} missing blocked routeHint ${routeHint}`);
-      check(finding.severity === 'high', `${fixturePath} ${routeHint} must be high severity`);
-      check(finding.action === 'request-human-review', `${fixturePath} ${routeHint} must request human review`);
+      check((finding as any).severity === 'high', `${fixturePath} ${routeHint} must be high severity`);
+      check((finding as any).action === 'request-human-review', `${fixturePath} ${routeHint} must request human review`);
     }
   }
 }
