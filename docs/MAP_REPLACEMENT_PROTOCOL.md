@@ -79,6 +79,7 @@ The upgrade proposal pipeline should consume map-level evidence directly. For ma
 A minimal workflow can be implemented without introducing a runtime orchestration engine:
 
 ```bash
+node atm.mjs create-map --from-plan <decomposition-plan.json>
 node atm.mjs create-map --spec <map-spec.json>
 node atm.mjs test --map <mapId> --json
 node atm.mjs replacement-lane transition --map <mapId> --to shadow --evidence atomic_workbench/maps/<mapId>/map.test.report.json --json
@@ -95,6 +96,8 @@ The current M4 implementation uses delegated executors from the fixture set: one
 The current M5 implementation keeps upgrade proposals additive and review-first: map proposals remain `status: "pending"` when automated gates pass, but they hard-block with machine-readable `requiredJustification` when `active` is requested without passing `map-equivalence`, or when `legacy-retired` is requested without passing `rollback-proof`.
 
 The current M6 implementation adds an explicit forward-only replacement lane validator and CLI. Each transition records `from`, `to`, `reason`, `evidenceRefs`, `actor`, and `timestamp` into the map lineage log so replacement promotion history remains deterministic and reviewable.
+
+The current M7 implementation adds `atm.decompositionPlan` plus `create-map --from-plan <path>`, so a large-feature decomposition can deterministically materialize a canonical replacement map instead of leaving only loose atoms. The plan path also feeds the generated draft map back through `create-map --spec` for round-trip verification.
 
 The first implementation should favor deterministic artifacts over runtime magic. A map may initially describe delegated or documented execution. Full orchestrated execution can arrive later once map execution contracts are mature.
 

@@ -91,6 +91,11 @@
       "path": "map-equivalence-report/positive.json"
     },
     {
+      "name": "decomposition plan",
+      "schema": "governance-decomposition-plan",
+      "path": "positive/decomposition-plan.json"
+    },
+    {
       "name": "governance rollback plan",
       "schema": "governance-rollback-plan",
       "path": "positive/governance-rollback-plan.json"
@@ -362,6 +367,13 @@
       "path": "map-equivalence-report/known-divergence-missing-review-ref.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "reviewRef"
+    },
+    {
+      "name": "decomposition plan missing legacyUris",
+      "schema": "governance-decomposition-plan",
+      "path": "negative/decomposition-plan-missing-legacy-uris.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "legacyUris"
     }
   ]
 }

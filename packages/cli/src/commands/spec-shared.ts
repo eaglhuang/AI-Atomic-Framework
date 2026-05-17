@@ -7,7 +7,8 @@ const atomicSpecSchemaPath = defaultAtomicSpecSchemaPath;
 const frameworkRoot = path.resolve(path.dirname(atomicSpecSchemaPath), '..');
 const requireFromSpecShared = createRequire(import.meta.url);
 const supportedReportSchemas: Record<string, string> = {
-  'atm.mapEquivalenceReport': 'schemas/governance/map-equivalence-report.schema.json'
+  'atm.mapEquivalenceReport': 'schemas/governance/map-equivalence-report.schema.json',
+  'atm.decompositionPlan': 'schemas/governance/decomposition-plan.schema.json'
 };
 const supportSchemaPaths = ['schemas/test-report/metrics.schema.json'];
 
