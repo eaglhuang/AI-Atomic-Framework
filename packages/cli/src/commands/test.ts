@@ -6,7 +6,7 @@ import { runAtomicTestRunner } from '../../../core/src/manager/test-runner.ts';
 import { runMapEquivalence } from '../../../core/src/equivalence/run-map-equivalence.ts';
 import { runMapIntegrationTest } from '../../../core/src/test-runner/map-integration.ts';
 import { runPropagationIntegration } from '../../../core/src/test-runner/propagation.ts';
-import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
+import { CliError, makeResult, message, parseOptions, quoteCliValue, relativePathFrom } from './shared.ts';
 import { runValidate } from './validate.ts';
 
 const helloWorldSpecPath = path.join('examples', 'hello-world', 'atoms', 'hello-world.atom.json');
@@ -100,6 +100,7 @@ async function runMapTest(cwd: any, mapId: any, equivalenceFixtures?: any) {
         mapId,
         fixturePath: testRun.fixturePath,
         reportPath: testRun.reportPath,
+        nextActionHint: testRun.ok ? buildMapEquivalenceNextActionHint(cwd, mapId, testRun.reportPath) : null,
         resolutionMode: testRun.resolutionMode,
         warnings: testRun.warnings,
         legacyUris: testRun.legacyUris,
@@ -126,6 +127,7 @@ async function runMapTest(cwd: any, mapId: any, equivalenceFixtures?: any) {
     evidence: {
       mapId,
       reportPath: relativePathFrom(cwd, path.join(cwd, testRun.reportPath)),
+      nextActionHint: testRun.ok ? buildMapIntegrationNextActionHint(cwd, mapId, testRun.reportPath) : null,
       resolutionMode: testRun.resolutionMode,
       warnings: testRun.warnings,
       specPath: testRun.report.specPath,
@@ -136,6 +138,28 @@ async function runMapTest(cwd: any, mapId: any, equivalenceFixtures?: any) {
       metrics: testRun.report.metrics
     }
   });
+}
+
+function buildMapIntegrationNextActionHint(cwd: string, mapId: string, reportPath: string) {
+  const relativeReportPath = relativePathFrom(cwd, path.join(cwd, reportPath));
+  return {
+    status: 'ready',
+    route: 'replacement-lane-shadow',
+    reason: 'Integration evidence is ready; promote the replacement lane to shadow.',
+    command: `node atm.mjs replacement-lane transition --cwd ${quoteCliValue(cwd)} --map ${quoteCliValue(mapId)} --to shadow --evidence ${quoteCliValue(relativeReportPath)} --json`,
+    consumesEvidenceKind: 'map-integration'
+  };
+}
+
+function buildMapEquivalenceNextActionHint(cwd: string, mapId: string, reportPath: string) {
+  const relativeReportPath = relativePathFrom(cwd, path.join(cwd, reportPath));
+  return {
+    status: 'ready',
+    route: 'replacement-lane-canary',
+    reason: 'Equivalence evidence is ready; promote the replacement lane to canary or feed it into map upgrade review.',
+    command: `node atm.mjs replacement-lane transition --cwd ${quoteCliValue(cwd)} --map ${quoteCliValue(mapId)} --to canary --evidence ${quoteCliValue(relativeReportPath)} --json`,
+    consumesEvidenceKind: 'map-equivalence'
+  };
 }
 
 async function runPropagateTest(cwd: any, atomId: any) {

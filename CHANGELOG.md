@@ -2,6 +2,7 @@
 
 ## 2026-05-17
 
+- Hardened spec-based map provisioning: `create-map --spec <path>` now validates `atm.atomicMap` JSON Schema, preserves `0.2.0` replacement metadata, emits machine-readable `nextActionHint`, and includes Windows PowerShell path smoke coverage.
 - Added decomposition-plan map provisioning: `atm.decompositionPlan` schema, `create-map --from-plan <path>`, sample checkout-mini plan, and CLI smoke coverage including spec round-trip into canonical map workspaces.
 - Added `replacement-lane transition` for atomic maps: explicit `draft -> shadow -> canary -> active -> legacy-retired` validation, lineage transition logging, and registry-status-independent replacement mode updates.
 - Added map upgrade evidence gates: `upgrade --propose --target map` now supports `--replacement-mode`, `--equivalence-report`, and `--rollback-proof`, and blocks `active` / `legacy-retired` proposals without the required evidence.

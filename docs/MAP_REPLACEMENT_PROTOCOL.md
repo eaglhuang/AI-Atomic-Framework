@@ -99,6 +99,8 @@ The current M6 implementation adds an explicit forward-only replacement lane val
 
 The current M7 implementation adds `atm.decompositionPlan` plus `create-map --from-plan <path>`, so a large-feature decomposition can deterministically materialize a canonical replacement map instead of leaving only loose atoms. The plan path also feeds the generated draft map back through `create-map --spec` for round-trip verification.
 
+The current M9 implementation hardens `create-map --spec <path>` into a schema-validated deterministic artifact lane for both `0.1.0` and `0.2.0` map documents, including Windows PowerShell paths with spaces. The replacement-facing CLI surface also emits machine-readable `nextActionHint` data so `create-map`, `test --map --equivalence-fixtures`, and blocked `upgrade --propose --replacement-mode ...` flows can point callers at the next deterministic CLI step without introducing prompt-only orchestration.
+
 The first implementation should favor deterministic artifacts over runtime magic. A map may initially describe delegated or documented execution. Full orchestrated execution can arrive later once map execution contracts are mature.
 
 ## Open Source Boundary

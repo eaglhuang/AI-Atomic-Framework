@@ -86,7 +86,7 @@ export const commandSpecs = Object.freeze({
     options: [
       commonCwdOption,
       { flag: '--map-version', value: 'semver', summary: 'Map version, defaults to 0.1.0.' },
-      { flag: '--spec', value: 'path', summary: 'Create from an existing atm.atomicMap document.' },
+      { flag: '--spec', value: 'path', summary: 'Create from an existing atm.atomicMap document instead of inline JSON members/entrypoints/quality-targets input.' },
       { flag: '--from-plan', value: 'path', summary: 'Create from an atm.decompositionPlan document.' },
       { flag: '--members', value: 'json', summary: 'JSON member list.' },
       { flag: '--edges', value: 'json', summary: 'JSON dependency edge list.' },

@@ -164,6 +164,10 @@ export function formatPrettyResult(result: any) {
   return `${lines.join('\n')}\n`;
 }
 
+export function quoteCliValue(value: unknown) {
+  return `"${String(value ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
 type ParsedCliOptions = {
   cwd: string;
   spec?: string;
