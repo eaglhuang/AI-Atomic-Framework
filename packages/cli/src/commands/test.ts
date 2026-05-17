@@ -5,7 +5,7 @@ import { parseAtomicSpecFile } from '../../../core/src/spec/parse-spec.ts';
 import { runAtomicTestRunner } from '../../../core/src/manager/test-runner.ts';
 import { runMapEquivalence } from '../../../core/src/equivalence/run-map-equivalence.ts';
 import { runMapIntegrationTest } from '../../../core/src/test-runner/map-integration.ts';
-import { runPropagationIntegration } from '../../../core/src/test-runner/propagation.ts';
+import { createPropagationReport, runPropagationIntegration } from '../../../core/src/test-runner/propagation.ts';
 import { CliError, makeResult, message, parseOptions, quoteCliValue, relativePathFrom } from './shared.ts';
 import { runValidate } from './validate.ts';
 
@@ -164,6 +164,7 @@ function buildMapEquivalenceNextActionHint(cwd: string, mapId: string, reportPat
 
 async function runPropagateTest(cwd: any, atomId: any) {
   const propagation = await executeMapRunner(() => runPropagationIntegration(atomId, { repositoryRoot: cwd }));
+  const propagationReport = createPropagationReport(propagation, { atomId });
   const infoCode = propagation.ok ? 'ATM_TEST_PROPAGATE_OK' : 'ATM_TEST_PROPAGATE_FAILED';
   const infoText = propagation.ok
     ? (propagation.discoveredMaps.length > 0
@@ -182,7 +183,8 @@ async function runPropagateTest(cwd: any, atomId: any) {
       failedDownstream: propagation.failedDownstream,
       propagationDuration: propagation.propagationDuration,
       metrics: propagation.metrics,
-      summary: propagation.summary
+      summary: propagation.summary,
+      propagationReport
     }
   });
 }

@@ -4,6 +4,11 @@ import { runMapIntegrationTest } from './map-integration.ts';
 import { createTestReportMetrics } from './metrics-collector.ts';
 
 export const propagationTriggerBehaviors = Object.freeze(['split', 'merge', 'atomize', 'infect', 'evolve']);
+export const defaultPropagationReportMigration = Object.freeze({
+  strategy: 'none',
+  fromVersion: null,
+  notes: 'Initial propagation report contract.'
+});
 
 export function shouldPropagateBehavior(behavior: any) {
   if (typeof behavior !== 'string') {
@@ -82,6 +87,60 @@ export function runPropagationIntegration(atomId: any, options: any) {
   };
 }
 
+export function createPropagationReport(propagation: any, options: any = {}) {
+  const atomId = String(options.atomId ?? propagation?.atomId ?? '').trim();
+  const reportIdBase = atomId.toLowerCase();
+  const behaviorId = normalizeBehaviorId(options.behaviorId ?? propagation?.behavior ?? null);
+
+  return {
+    schemaId: 'atm.propagationReport',
+    specVersion: '0.1.0',
+    migration: defaultPropagationReportMigration,
+    reportId: options.reportId ?? `propagation.${reportIdBase}${behaviorId ? `.${behaviorId.replace(/^behavior\./, '').replace(/[^a-z0-9.-]/g, '-')}` : ''}`,
+    generatedAt: options.generatedAt ?? new Date().toISOString(),
+    atomId,
+    ...(behaviorId ? { behaviorId } : {}),
+    discoveredMaps: normalizeStringSet(propagation?.discoveredMaps),
+    perMapStatus: normalizePerMapStatus(propagation?.perMapStatus),
+    failedDownstream: normalizeStringSet(propagation?.failedDownstream),
+    propagationDuration: Number.isInteger(propagation?.propagationDuration) ? propagation.propagationDuration : 0,
+    metrics: propagation?.metrics ?? createTestReportMetrics({ latency: 0, total: 0, failed: 0 }),
+    summary: {
+      total: Number(propagation?.summary?.total ?? 0),
+      passed: Number(propagation?.summary?.passed ?? 0),
+      failed: Number(propagation?.summary?.failed ?? 0),
+      durationMs: Number(propagation?.summary?.durationMs ?? propagation?.propagationDuration ?? 0)
+    },
+    passed: propagation?.ok === true
+  };
+}
+
+export function validatePropagationReport(report: any, options: { atomId?: string; mapId?: string } = {}) {
+  const issues: string[] = [];
+  if (report?.schemaId !== 'atm.propagationReport') {
+    issues.push('propagation report schemaId must be atm.propagationReport.');
+  }
+  if (report?.passed !== true) {
+    issues.push('propagation report must pass.');
+  }
+  if (Array.isArray(report?.failedDownstream) && report.failedDownstream.length > 0) {
+    issues.push('propagation report still has failing downstream maps.');
+  }
+  if (typeof options.atomId === 'string' && options.atomId.length > 0 && report?.atomId !== options.atomId) {
+    issues.push(`propagation report atomId ${String(report?.atomId ?? 'unknown')} does not match ${options.atomId}.`);
+  }
+  if (typeof options.mapId === 'string' && options.mapId.length > 0) {
+    const discoveredMaps = normalizeStringSet(report?.discoveredMaps);
+    if (!discoveredMaps.includes(options.mapId)) {
+      issues.push(`propagation report does not cover target map ${options.mapId}.`);
+    }
+  }
+  return {
+    ok: issues.length === 0,
+    issues
+  };
+}
+
 function discoverMapsFromRegistry(atomId: any, options: any) {
   const normalizedOptions = options || {};
   const registryDocument = normalizedOptions.registryDocument ?? readRegistryDocument(path.resolve(normalizedOptions.repositoryRoot ?? process.cwd(), normalizedOptions.registryPath ?? 'atomic-registry.json'));
@@ -146,4 +205,29 @@ function readRegistryDocument(registryPath: any) {
     return { entries: [] };
   }
   return JSON.parse(readFileSync(registryPath, 'utf8'));
+}
+
+function normalizePerMapStatus(values: any) {
+  return (Array.isArray(values) ? values : []).map((entry) => ({
+    mapId: String(entry?.mapId ?? '').trim(),
+    ok: entry?.ok === true,
+    exitCode: Number.isInteger(entry?.exitCode) ? entry.exitCode : 1,
+    durationMs: Number.isInteger(entry?.durationMs) ? entry.durationMs : 0,
+    resolutionMode: entry?.resolutionMode === 'legacy' ? 'legacy' : 'canonical',
+    reportPath: String(entry?.reportPath ?? '').trim(),
+    ...(typeof entry?.stdout === 'string' ? { stdout: entry.stdout } : {}),
+    ...(typeof entry?.stderr === 'string' ? { stderr: entry.stderr } : {}),
+    warnings: normalizeStringSet(entry?.warnings)
+  }));
+}
+
+function normalizeStringSet(values: any) {
+  return [...new Set((Array.isArray(values) ? values : [])
+    .map((value) => String(value ?? '').trim())
+    .filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeBehaviorId(value: any) {
+  const normalized = String(value ?? '').trim();
+  return /^behavior\.[a-z0-9]+(?:[.-][a-z0-9]+)*$/.test(normalized) ? normalized : null;
 }

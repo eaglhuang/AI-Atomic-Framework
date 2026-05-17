@@ -1,6 +1,8 @@
 import { buildMapProposalContext } from './map-propose.ts';
 import { validateRollbackProof } from '../registry/rollback-proof.ts';
+import { validateRetirementProof } from '../registry/retirement-proof.ts';
 import { analyzePolymorphImpact } from '../polymorph/impact.ts';
+import { validatePropagationReport } from '../test-runner/propagation.ts';
 import {
   deriveDecompositionDecision,
   resolveReviewTemplate,
@@ -31,7 +33,11 @@ const INPUT_KIND_PRIORITY = new Map([
   ['registry-candidate', 4],
   ['map-equivalence', 5],
   ['polymorph-impact', 6],
-  ['rollback-proof', 7]
+  ['propagation-report', 7],
+  ['review-advisory', 8],
+  ['human-review', 9],
+  ['rollback-proof', 10],
+  ['retirement-proof', 11]
 ]);
 
 export function proposeAtomicUpgrade(request: any) {
@@ -98,6 +104,7 @@ export function proposeAtomicUpgrade(request: any) {
       toVersion
     })
     : null;
+  const proposalId = normalizedRequest.proposalId ?? createProposalId(atomId, fromVersion, toVersion, target, behaviorId);
 
   const inputs = buildInputRefs(normalizedRequest.inputs);
   const nonRegressionInput = requireInput(normalizedRequest.inputs, 'non-regression');
@@ -115,7 +122,33 @@ export function proposeAtomicUpgrade(request: any) {
     toVersion,
     findInput(normalizedRequest.inputs, 'polymorph-impact')
   );
+  const propagationReportGate = buildPropagationReportGate(
+    target,
+    requestedReplacementMode,
+    atomId,
+    findInput(normalizedRequest.inputs, 'propagation-report')
+  );
+  const reviewAdvisoryGate = buildReviewAdvisoryGate(
+    target,
+    requestedReplacementMode,
+    proposalId,
+    findInput(normalizedRequest.inputs, 'review-advisory')
+  );
+  const humanReviewGate = buildHumanReviewGate(
+    target,
+    requestedReplacementMode,
+    proposalId,
+    atomId,
+    findInput(normalizedRequest.inputs, 'human-review')
+  );
   const rollbackProofGate = buildRollbackProofGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'rollback-proof'));
+  const retirementProofGate = buildRetirementProofGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'retirement-proof'));
+  const legacyRetirementSatisfied = requestedReplacementMode !== 'legacy-retired'
+    || target.kind !== 'map'
+    || rollbackProofGate?.passed === true
+    || retirementProofGate?.passed === true;
+  const visibleRollbackProofGate = legacyRetirementSatisfied && rollbackProofGate?.passed !== true ? null : rollbackProofGate;
+  const visibleRetirementProofGate = legacyRetirementSatisfied && retirementProofGate?.passed !== true ? null : retirementProofGate;
   const contextBudgetGate = normalizedRequest.contextBudgetGate;
 
   const blockedGateNames = [];
@@ -134,8 +167,22 @@ export function proposeAtomicUpgrade(request: any) {
   if (polymorphImpactGate && !polymorphImpactGate.passed) {
     blockedGateNames.push('polymorphImpact');
   }
-  if (rollbackProofGate && !rollbackProofGate.passed) {
-    blockedGateNames.push('rollbackProof');
+  if (propagationReportGate && !propagationReportGate.passed) {
+    blockedGateNames.push('propagationReport');
+  }
+  if (reviewAdvisoryGate && !reviewAdvisoryGate.passed) {
+    blockedGateNames.push('reviewAdvisory');
+  }
+  if (humanReviewGate && !humanReviewGate.passed) {
+    blockedGateNames.push('humanReview');
+  }
+  if (requestedReplacementMode === 'legacy-retired' && target.kind === 'map' && !legacyRetirementSatisfied) {
+    if (rollbackProofGate && !rollbackProofGate.passed) {
+      blockedGateNames.push('rollbackProof');
+    }
+    if (retirementProofGate && !retirementProofGate.passed) {
+      blockedGateNames.push('retirementProof');
+    }
   }
   if (contextBudgetGate && !contextBudgetGate.passed) {
     blockedGateNames.push('contextBudget');
@@ -143,12 +190,15 @@ export function proposeAtomicUpgrade(request: any) {
 
   const allPassed = blockedGateNames.length === 0;
   const status = allPassed ? 'pending' : 'blocked';
-  const proposalId = normalizedRequest.proposalId ?? createProposalId(atomId, fromVersion, toVersion, target, behaviorId);
   const requiredJustification = buildRequiredJustification({
     requestedReplacementMode,
     mapEquivalenceGate,
     polymorphImpactGate,
-    rollbackProofGate
+    propagationReportGate,
+    reviewAdvisoryGate,
+    humanReviewGate,
+    rollbackProofGate,
+    retirementProofGate
   });
   const mapImpactScope = normalizedRequest.mapImpactScope
     ?? qualityComparisonInput.document.mapImpactScope
@@ -178,7 +228,11 @@ export function proposeAtomicUpgrade(request: any) {
       registryCandidate: registryCandidateGate,
       ...(mapEquivalenceGate ? { mapEquivalence: mapEquivalenceGate } : {}),
       ...(polymorphImpactGate ? { polymorphImpact: polymorphImpactGate } : {}),
-      ...(rollbackProofGate ? { rollbackProof: rollbackProofGate } : {}),
+      ...(propagationReportGate ? { propagationReport: propagationReportGate } : {}),
+      ...(reviewAdvisoryGate ? { reviewAdvisory: reviewAdvisoryGate } : {}),
+      ...(humanReviewGate ? { humanReview: humanReviewGate } : {}),
+      ...(visibleRollbackProofGate ? { rollbackProof: visibleRollbackProofGate } : {}),
+      ...(visibleRetirementProofGate ? { retirementProof: visibleRetirementProofGate } : {}),
       ...(contextBudgetGate ? { contextBudget: contextBudgetGate } : {}),
       allPassed,
       blockedGateNames
@@ -259,7 +313,7 @@ function normalizeInputDocument(input: any) {
     throw new Error('Upgrade proposal inputs must be objects.');
   }
 
-  const document = input.document ?? input.report ?? input.value ?? null;
+  const document = unwrapKnownInputDocument(input.document ?? input.report ?? input.value ?? null);
   if (!document || typeof document !== 'object') {
     throw new Error('Upgrade proposal inputs require a document payload.');
   }
@@ -300,10 +354,22 @@ function inferInputKind(kindOrSchemaId: any) {
     case 'polymorph-impact':
     case 'atm.polymorphImpactReport':
       return 'polymorph-impact';
+    case 'propagation-report':
+    case 'atm.propagationReport':
+      return 'propagation-report';
+    case 'review-advisory':
+    case 'atm.reviewAdvisoryReport':
+      return 'review-advisory';
+    case 'human-review':
+    case 'atm.humanReviewDecision':
+      return 'human-review';
     case 'rollback-proof':
     case 'atm.rollbackProof':
     case 'atm.evidence.rollbackProof':
       return 'rollback-proof';
+    case 'retirement-proof':
+    case 'atm.retirementProof':
+      return 'retirement-proof';
     default:
       throw new Error(`Unsupported upgrade proposal input kind: ${kindOrSchemaId}`);
   }
@@ -335,11 +401,15 @@ function buildInputRefs(inputs: any) {
       const ref: any = {
         kind: input.kind,
         path: input.path,
-        schemaId: input.document.schemaId,
+          schemaId: resolveInputSchemaId(input.kind, input.document),
         summary: createInputSummary(input.kind)
       };
       if (typeof input.document.reportId === 'string' && input.document.reportId.length > 0) {
         ref.reportId = input.document.reportId;
+        } else if (typeof input.document.proofId === 'string' && input.document.proofId.length > 0) {
+          ref.reportId = input.document.proofId;
+        } else if (typeof input.document.evidenceId === 'string' && input.document.evidenceId.length > 0) {
+          ref.reportId = input.document.evidenceId;
       }
       return ref;
     });
@@ -513,6 +583,152 @@ function buildRollbackProofGate(target: any, requestedReplacementMode: any, inpu
   };
 }
 
+function buildPropagationReportGate(target: any, requestedReplacementMode: any, atomId: any, input: any) {
+  if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
+    return null;
+  }
+  if (!input) {
+    return {
+      passed: false,
+      reportId: 'propagation-report.missing',
+      reportPath: '[missing]',
+      summary: 'blocked (active replacement requires a passing propagation report)'
+    };
+  }
+
+  const validation = safeValidatePropagationReport(input.document, {
+    atomId,
+    mapId: target.mapId
+  });
+  const passed = validation.ok;
+  return {
+    passed,
+    reportId: input.document?.reportId ?? 'propagation-report.missing',
+    reportPath: input.path,
+    summary: passed
+      ? 'pass (propagation report verified downstream map coverage for active replacement)'
+      : `blocked (${validation.issues.join(', ') || 'propagation report validation failed'})`
+  };
+}
+
+function buildReviewAdvisoryGate(target: any, requestedReplacementMode: any, proposalId: any, input: any) {
+  if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
+    return null;
+  }
+  if (!input) {
+    return {
+      passed: false,
+      reportId: 'review-advisory.missing',
+      reportPath: '[missing]',
+      summary: 'blocked (active replacement requires a review advisory report)'
+    };
+  }
+
+  const advisoryTargetId = typeof input.document?.target?.id === 'string' ? input.document.target.id : null;
+  const status = String(input.document?.status ?? '').trim();
+  const targetMatches = advisoryTargetId == null || advisoryTargetId === proposalId || advisoryTargetId === target.mapId;
+  const passed = targetMatches
+    && input.document?.advisoryUnavailable !== true
+    && (status === 'ok' || status === 'warn');
+  const reason = !targetMatches
+    ? `review advisory target ${String(advisoryTargetId ?? 'unknown')} does not match proposal ${proposalId}`
+    : input.document?.advisoryUnavailable === true || status === 'advisory-unavailable'
+      ? 'review advisory is unavailable'
+      : 'review advisory status must be ok or warn';
+
+  return {
+    passed,
+    reportId: input.document?.reportId ?? 'review-advisory.missing',
+    reportPath: input.path,
+    summary: passed
+      ? 'pass (review advisory completed for active replacement)'
+      : `blocked (${reason})`
+  };
+}
+
+function buildHumanReviewGate(target: any, requestedReplacementMode: any, proposalId: any, atomId: any, input: any) {
+  if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
+    return null;
+  }
+  if (!input) {
+    return {
+      passed: false,
+      reportId: 'human-review.missing',
+      reportPath: '[missing]',
+      summary: 'blocked (active replacement requires an approved human review decision)'
+    };
+  }
+
+  const schemaValid = input.document?.schemaId === 'atm.humanReviewDecision';
+  const proposalMatches = input.document?.proposalId === proposalId || input.document?.queueRecord?.proposalId === proposalId;
+  const atomMatches = input.document?.atomId === atomId || input.document?.queueRecord?.atomId === atomId;
+  const reviewedMapId = input.document?.queueRecord?.proposal?.target?.mapId ?? input.document?.proposal?.target?.mapId ?? null;
+  const mapMatches = reviewedMapId == null || reviewedMapId === target.mapId;
+  const decisionApproved = input.document?.decision === 'approve';
+  const queueApproved = input.document?.queueRecord?.status === 'approved';
+  const passed = schemaValid && proposalMatches && atomMatches && mapMatches && decisionApproved && queueApproved;
+  const reason = !schemaValid
+    ? 'human review decision schemaId must be atm.humanReviewDecision'
+    : !proposalMatches
+      ? `human review proposalId ${String(input.document?.proposalId ?? input.document?.queueRecord?.proposalId ?? 'unknown')} does not match ${proposalId}`
+      : !atomMatches
+        ? `human review atomId ${String(input.document?.atomId ?? input.document?.queueRecord?.atomId ?? 'unknown')} does not match ${atomId}`
+        : !mapMatches
+          ? `human review target map ${String(reviewedMapId ?? 'unknown')} does not match ${target.mapId}`
+          : !decisionApproved || !queueApproved
+            ? 'human review decision must be approve with queueRecord.status approved'
+            : 'human review validation failed';
+
+  return {
+    passed,
+    reportId: input.document?.evidenceId ?? input.document?.proposalId ?? 'human-review.missing',
+    reportPath: input.path,
+    summary: passed
+      ? 'pass (human review approved active replacement)'
+      : `blocked (${reason})`
+  };
+}
+
+function buildRetirementProofGate(target: any, requestedReplacementMode: any, input: any) {
+  if (target.kind !== 'map' || requestedReplacementMode !== 'legacy-retired') {
+    return null;
+  }
+  if (!input) {
+    return {
+      passed: false,
+      reportId: 'retirement-proof.missing',
+      reportPath: '[missing]',
+      summary: 'blocked (legacy-retired replacement requires a passing retirement proof)'
+    };
+  }
+
+  const schemaValid = input.document?.schemaId === 'atm.retirementProof';
+  const mapMatches = input.document?.mapId === target.mapId;
+  const validation = schemaValid && mapMatches
+    ? safeValidateRetirementProof(input.document)
+    : { ok: false, issues: [] };
+  const passed = schemaValid
+    && mapMatches
+    && input.document?.verificationStatus === 'passed'
+    && validation.ok;
+  const reason = !schemaValid
+    ? 'retirement proof schemaId must be atm.retirementProof'
+    : !mapMatches
+      ? `retirement proof mapId ${String(input.document?.mapId ?? 'unknown')} does not match ${target.mapId}`
+      : input.document?.verificationStatus !== 'passed'
+        ? 'retirement proof verificationStatus must be passed'
+        : validation.issues.join(', ') || 'retirement proof validation failed';
+
+  return {
+    passed,
+    reportId: input.document?.proofId ?? 'retirement-proof.missing',
+    reportPath: input.path,
+    summary: passed
+      ? 'pass (retirement proof cleared caller and entrypoint risk for legacy-retired replacement)'
+      : `blocked (${reason})`
+  };
+}
+
 function normalizeGateResult(gate: any, gateName: any) {
   if (gate == null) {
     return null;
@@ -537,6 +753,16 @@ function normalizeGateResult(gate: any, gateName: any) {
   };
 }
 
+function resolveInputSchemaId(kind: any, document: any) {
+  if (typeof document?.schemaId === 'string' && document.schemaId.length > 0) {
+    return document.schemaId;
+  }
+  if (kind === 'review-advisory') {
+    return 'atm.reviewAdvisoryReport';
+  }
+  return String(kind);
+}
+
 function createInputSummary(kind: any) {
   switch (kind) {
     case 'hash-diff':
@@ -553,8 +779,16 @@ function createInputSummary(kind: any) {
       return 'map-equivalence input';
     case 'polymorph-impact':
       return 'polymorph-impact input';
+    case 'propagation-report':
+      return 'propagation-report input';
+    case 'review-advisory':
+      return 'review-advisory input';
+    case 'human-review':
+      return 'human-review input';
     case 'rollback-proof':
       return 'rollback-proof input';
+    case 'retirement-proof':
+      return 'retirement-proof input';
     default:
       return 'upgrade-input';
   }
@@ -616,7 +850,16 @@ function normalizeRequestedReplacementMode(value: any, target: any) {
   return mode;
 }
 
-function buildRequiredJustification({ requestedReplacementMode, mapEquivalenceGate, polymorphImpactGate, rollbackProofGate }: any) {
+function buildRequiredJustification({
+  requestedReplacementMode,
+  mapEquivalenceGate,
+  polymorphImpactGate,
+  propagationReportGate,
+  reviewAdvisoryGate,
+  humanReviewGate,
+  rollbackProofGate,
+  retirementProofGate
+}: any) {
   if (requestedReplacementMode === 'active') {
     const requiredGateNames = [];
     const requiredEvidenceKinds = [];
@@ -631,6 +874,21 @@ function buildRequiredJustification({ requestedReplacementMode, mapEquivalenceGa
       requiredEvidenceKinds.push('polymorph-impact');
       requiredCliOptions.push('--polymorph-impact-report');
     }
+    if (propagationReportGate && !propagationReportGate.passed) {
+      requiredGateNames.push('propagationReport');
+      requiredEvidenceKinds.push('propagation-report');
+      requiredCliOptions.push('--propagation-report');
+    }
+    if (reviewAdvisoryGate && !reviewAdvisoryGate.passed) {
+      requiredGateNames.push('reviewAdvisory');
+      requiredEvidenceKinds.push('review-advisory');
+      requiredCliOptions.push('--review-advisory');
+    }
+    if (humanReviewGate && !humanReviewGate.passed) {
+      requiredGateNames.push('humanReview');
+      requiredEvidenceKinds.push('human-review');
+      requiredCliOptions.push('--human-review');
+    }
     if (requiredGateNames.length > 0) {
       return {
         requestedReplacementMode,
@@ -638,22 +896,19 @@ function buildRequiredJustification({ requestedReplacementMode, mapEquivalenceGa
         requiredEvidenceKinds,
         requiredCliOptions,
         humanReviewRequired: true,
-        rationale: requiredGateNames.length === 1 && requiredGateNames[0] === 'mapEquivalence'
-          ? 'Map promotion to active requires a passing map equivalence report before review can proceed.'
-          : requiredGateNames.length === 1 && requiredGateNames[0] === 'polymorphImpact'
-            ? 'Map promotion to active requires a passing polymorph impact report when member atoms participate in template propagation.'
-            : 'Map promotion to active requires all replacement evidence gates to pass before review can proceed.'
+        rationale: buildActiveReplacementRationale(requiredGateNames)
       };
     }
   }
-  if (requestedReplacementMode === 'legacy-retired' && rollbackProofGate && !rollbackProofGate.passed) {
+  if (requestedReplacementMode === 'legacy-retired' && rollbackProofGate && retirementProofGate
+    && !rollbackProofGate.passed && !retirementProofGate.passed) {
     return {
       requestedReplacementMode,
-      requiredGateNames: ['rollbackProof'],
-      requiredEvidenceKinds: ['rollback-proof'],
-      requiredCliOptions: ['--rollback-proof'],
+      requiredGateNames: ['rollbackProof', 'retirementProof'],
+      requiredEvidenceKinds: ['rollback-proof', 'retirement-proof'],
+      requiredCliOptions: ['--rollback-proof', '--retirement-proof'],
       humanReviewRequired: true,
-      rationale: 'Map promotion to legacy-retired requires a passing rollback proof before review can proceed.'
+      rationale: 'Map promotion to legacy-retired requires a passing rollback proof or retirement proof, and retirement proof must clear caller and entrypoint risk.'
     };
   }
   return null;
@@ -685,6 +940,66 @@ function safeValidateRollbackProof(document: any) {
       issues: [error instanceof Error ? error.message : String(error)]
     };
   }
+}
+
+function safeValidateRetirementProof(document: any) {
+  try {
+    return validateRetirementProof(document);
+  } catch (error) {
+    return {
+      ok: false,
+      issues: [error instanceof Error ? error.message : String(error)]
+    };
+  }
+}
+
+function safeValidatePropagationReport(document: any, options: any) {
+  try {
+    return validatePropagationReport(document, options);
+  } catch (error) {
+    return {
+      ok: false,
+      issues: [error instanceof Error ? error.message : String(error)]
+    };
+  }
+}
+
+function buildActiveReplacementRationale(requiredGateNames: readonly string[]) {
+  if (requiredGateNames.length === 1 && requiredGateNames[0] === 'mapEquivalence') {
+    return 'Map promotion to active requires a passing map equivalence report before review can proceed.';
+  }
+  if (requiredGateNames.length === 1 && requiredGateNames[0] === 'polymorphImpact') {
+    return 'Map promotion to active requires a passing polymorph impact report when member atoms participate in template propagation.';
+  }
+  if (requiredGateNames.length === 1 && requiredGateNames[0] === 'propagationReport') {
+    return 'Map promotion to active requires a passing propagation report that proves downstream maps remain healthy.';
+  }
+  if (requiredGateNames.length === 1 && requiredGateNames[0] === 'reviewAdvisory') {
+    return 'Map promotion to active requires a review advisory report before human approval can proceed.';
+  }
+  if (requiredGateNames.length === 1 && requiredGateNames[0] === 'humanReview') {
+    return 'Map promotion to active requires an approved human review decision before review can proceed.';
+  }
+  return 'Map promotion to active requires all replacement evidence gates to pass before review can proceed.';
+}
+
+function unwrapKnownInputDocument(document: any) {
+  if (!document || typeof document !== 'object' || Array.isArray(document)) {
+    return document;
+  }
+  if (document.expectedReport && !document.schemaId) {
+    return document.expectedReport;
+  }
+  if (document.evidence?.propagationReport && !document.schemaId) {
+    return document.evidence.propagationReport;
+  }
+  if (document.evidence?.report && !document.schemaId) {
+    return document.evidence.report;
+  }
+  if (document.evidence?.decisionLog && !document.schemaId) {
+    return document.evidence.decisionLog;
+  }
+  return document;
 }
 
 function sameStringSet(left: any, right: any) {

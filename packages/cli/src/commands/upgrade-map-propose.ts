@@ -34,8 +34,20 @@ function buildMapProposalInputs(options: any) {
   if (options.polymorphImpactReport) {
     inputs.push(loadSpecialInput(options.cwd, options.polymorphImpactReport, 'polymorph-impact'));
   }
+  if (options.propagationReport) {
+    inputs.push(loadSpecialInput(options.cwd, options.propagationReport, 'propagation-report'));
+  }
+  if (options.reviewAdvisory) {
+    inputs.push(loadSpecialInput(options.cwd, options.reviewAdvisory, 'review-advisory'));
+  }
+  if (options.humanReview) {
+    inputs.push(loadSpecialInput(options.cwd, options.humanReview, 'human-review'));
+  }
   if (options.rollbackProof) {
     inputs.push(loadSpecialInput(options.cwd, options.rollbackProof, 'rollback-proof'));
+  }
+  if (options.retirementProof) {
+    inputs.push(loadSpecialInput(options.cwd, options.retirementProof, 'retirement-proof'));
   }
 
   const deduped = new Map();
