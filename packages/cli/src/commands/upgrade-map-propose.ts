@@ -31,6 +31,9 @@ function buildMapProposalInputs(options: any) {
   if (options.equivalenceReport) {
     inputs.push(loadSpecialInput(options.cwd, options.equivalenceReport, 'map-equivalence'));
   }
+  if (options.polymorphImpactReport) {
+    inputs.push(loadSpecialInput(options.cwd, options.polymorphImpactReport, 'polymorph-impact'));
+  }
   if (options.rollbackProof) {
     inputs.push(loadSpecialInput(options.cwd, options.rollbackProof, 'rollback-proof'));
   }

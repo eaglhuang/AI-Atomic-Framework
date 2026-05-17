@@ -12,11 +12,34 @@ export interface WorkItemRef {
   readonly status: AtomLifecycleStatus;
 }
 
+export interface ScopeLockMapEdgeSelectorRecord {
+  readonly from: string;
+  readonly to: string;
+  readonly edgeKind?: 'data-flow' | 'control-flow' | 'event-flow' | 'validation' | 'fallback' | 'side-effect' | 'rollback';
+}
+
+export interface ScopeLockSelectorsRecord {
+  readonly mapId?: string;
+  readonly mapMembers?: readonly string[];
+  readonly mapEdges?: readonly ScopeLockMapEdgeSelectorRecord[];
+  readonly mapEntrypoints?: readonly string[];
+  readonly legacyUris?: readonly string[];
+}
+
 export interface ScopeLockRecord {
+  readonly schemaId?: 'atm.governanceScopeLock';
+  readonly specVersion?: '0.1.0' | '0.2.0';
+  readonly migration?: {
+    readonly strategy: 'none' | 'additive' | 'breaking';
+    readonly fromVersion: string | null;
+    readonly notes: string;
+  };
   readonly workItemId: string;
   readonly lockedBy: string;
   readonly lockedAt: string;
   readonly files: readonly string[];
+  readonly reason?: string;
+  readonly selectors?: ScopeLockSelectorsRecord;
 }
 
 export interface ArtifactRecord {

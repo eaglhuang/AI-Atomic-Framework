@@ -72,7 +72,7 @@ A replacement map should be promoted only through deterministic gates:
 - `canary -> active` requires passing equivalence, propagation, review advisory, and human review.
 - `active -> legacy-retired` requires rollback proof or retirement proof.
 
-The upgrade proposal pipeline should consume map-level evidence directly. For map replacement work, the important input kinds are expected to include `map-equivalence` and `rollback-proof`.
+The upgrade proposal pipeline should consume map-level evidence directly. For map replacement work, the important input kinds are expected to include `map-equivalence`, `polymorph-impact`, and `rollback-proof`. When a replacement map contains members that participate in a polymorphic template group, `active` proposals should require a passing polymorph impact report in addition to equivalence evidence.
 
 ## CLI Workflow Direction
 
@@ -85,7 +85,7 @@ node atm.mjs test --map <mapId> --json
 node atm.mjs replacement-lane transition --map <mapId> --to shadow --evidence atomic_workbench/maps/<mapId>/map.test.report.json --json
 node atm.mjs test --map <mapId> --equivalence-fixtures <fixtures.json> --json
 node atm.mjs replacement-lane transition --map <mapId> --to canary --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --json
-node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode active --equivalence-report atomic_workbench/maps/<mapId>/map.equivalence.report.json --json
+node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode active --equivalence-report atomic_workbench/maps/<mapId>/map.equivalence.report.json --polymorph-impact-report atomic_workbench/maps/<mapId>/polymorph-impact-report.json --json
 node atm.mjs replacement-lane transition --map <mapId> --to active --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --evidence .atm/history/reports/review-advisory.json --json
 node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode legacy-retired --rollback-proof .atm/history/reports/rollback-proof.json --json
 node atm.mjs replacement-lane transition --map <mapId> --to legacy-retired --evidence .atm/history/reports/rollback-proof.json --json
@@ -93,7 +93,7 @@ node atm.mjs replacement-lane transition --map <mapId> --to legacy-retired --evi
 
 The current M4 implementation uses delegated executors from the fixture set: one `mapExecutor`, one `legacyExecutor`, plus lineage from `replacement.legacyUris`. It writes `map.equivalence.report.json` into the canonical map workbench path and treats reviewed known divergences as promotable evidence.
 
-The current M5 implementation keeps upgrade proposals additive and review-first: map proposals remain `status: "pending"` when automated gates pass, but they hard-block with machine-readable `requiredJustification` when `active` is requested without passing `map-equivalence`, or when `legacy-retired` is requested without passing `rollback-proof`.
+The current M5/M8 implementation keeps upgrade proposals additive and review-first: map proposals remain `status: "pending"` when automated gates pass, but they hard-block with machine-readable `requiredJustification` when `active` is requested without passing `map-equivalence`, when template-bound members lack a passing `polymorph-impact` report, or when `legacy-retired` is requested without passing `rollback-proof`.
 
 The current M6 implementation adds an explicit forward-only replacement lane validator and CLI. Each transition records `from`, `to`, `reason`, `evidenceRefs`, `actor`, and `timestamp` into the map lineage log so replacement promotion history remains deterministic and reviewable.
 

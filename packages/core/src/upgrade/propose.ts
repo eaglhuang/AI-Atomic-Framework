@@ -1,5 +1,6 @@
 import { buildMapProposalContext } from './map-propose.ts';
 import { validateRollbackProof } from '../registry/rollback-proof.ts';
+import { analyzePolymorphImpact } from '../polymorph/impact.ts';
 import {
   deriveDecompositionDecision,
   resolveReviewTemplate,
@@ -29,7 +30,8 @@ const INPUT_KIND_PRIORITY = new Map([
   ['quality-comparison', 3],
   ['registry-candidate', 4],
   ['map-equivalence', 5],
-  ['rollback-proof', 6]
+  ['polymorph-impact', 6],
+  ['rollback-proof', 7]
 ]);
 
 export function proposeAtomicUpgrade(request: any) {
@@ -106,6 +108,13 @@ export function proposeAtomicUpgrade(request: any) {
   const qualityComparisonGate = buildQualityComparisonGate(qualityComparisonInput.document, qualityComparisonInput.path);
   const registryCandidateGate = buildRegistryCandidateGate(registryCandidateInput.document, registryCandidateInput.path);
   const mapEquivalenceGate = buildMapEquivalenceGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'map-equivalence'));
+  const polymorphImpactGate = buildPolymorphImpactGate(
+    target,
+    requestedReplacementMode,
+    normalizedRequest.repositoryRoot,
+    toVersion,
+    findInput(normalizedRequest.inputs, 'polymorph-impact')
+  );
   const rollbackProofGate = buildRollbackProofGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'rollback-proof'));
   const contextBudgetGate = normalizedRequest.contextBudgetGate;
 
@@ -122,6 +131,9 @@ export function proposeAtomicUpgrade(request: any) {
   if (mapEquivalenceGate && !mapEquivalenceGate.passed) {
     blockedGateNames.push('mapEquivalence');
   }
+  if (polymorphImpactGate && !polymorphImpactGate.passed) {
+    blockedGateNames.push('polymorphImpact');
+  }
   if (rollbackProofGate && !rollbackProofGate.passed) {
     blockedGateNames.push('rollbackProof');
   }
@@ -135,6 +147,7 @@ export function proposeAtomicUpgrade(request: any) {
   const requiredJustification = buildRequiredJustification({
     requestedReplacementMode,
     mapEquivalenceGate,
+    polymorphImpactGate,
     rollbackProofGate
   });
   const mapImpactScope = normalizedRequest.mapImpactScope
@@ -164,6 +177,7 @@ export function proposeAtomicUpgrade(request: any) {
       qualityComparison: qualityComparisonGate,
       registryCandidate: registryCandidateGate,
       ...(mapEquivalenceGate ? { mapEquivalence: mapEquivalenceGate } : {}),
+      ...(polymorphImpactGate ? { polymorphImpact: polymorphImpactGate } : {}),
       ...(rollbackProofGate ? { rollbackProof: rollbackProofGate } : {}),
       ...(contextBudgetGate ? { contextBudget: contextBudgetGate } : {}),
       allPassed,
@@ -283,6 +297,9 @@ function inferInputKind(kindOrSchemaId: any) {
     case 'map-equivalence':
     case 'atm.mapEquivalenceReport':
       return 'map-equivalence';
+    case 'polymorph-impact':
+    case 'atm.polymorphImpactReport':
+      return 'polymorph-impact';
     case 'rollback-proof':
     case 'atm.rollbackProof':
     case 'atm.evidence.rollbackProof':
@@ -393,6 +410,65 @@ function buildMapEquivalenceGate(target: any, requestedReplacementMode: any, inp
   };
 }
 
+function buildPolymorphImpactGate(target: any, requestedReplacementMode: any, repositoryRoot: any, toVersion: any, input: any) {
+  if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
+    return null;
+  }
+
+  const analysis = analyzePolymorphImpact({
+    repositoryRoot,
+    mapId: target.mapId,
+    toVersion
+  });
+  if (!analysis.reportRequired) {
+    return null;
+  }
+
+  if (!input) {
+    return {
+      passed: false,
+      reportId: 'polymorph-impact.missing',
+      reportPath: '[missing]',
+      summary: 'blocked (active replacement with polymorph template members requires a passing polymorph impact report)'
+    };
+  }
+
+  const schemaValid = input.document?.schemaId === 'atm.polymorphImpactReport';
+  const mapMatches = input.document?.targetMapId === target.mapId;
+  const versionMatches = input.document?.toVersion === analysis.toVersion;
+  const templateSetMatches = sameStringSet(
+    (Array.isArray(input.document?.templateHits) ? input.document.templateHits : []).map((entry: any) => String(entry?.templateId ?? '').trim()).filter(Boolean),
+    analysis.templateHits.map((entry: any) => entry.templateId)
+  );
+  const impactedSetMatches = sameStringSet(input.document?.impactedMapIds, analysis.impactedMapIds);
+  const passed = schemaValid
+    && mapMatches
+    && versionMatches
+    && templateSetMatches
+    && impactedSetMatches
+    && input.document?.passed === true;
+  const reason = !schemaValid
+    ? 'report schemaId must be atm.polymorphImpactReport'
+    : !mapMatches
+      ? `report targetMapId ${String(input.document?.targetMapId ?? 'unknown')} does not match ${target.mapId}`
+      : !versionMatches
+        ? `report toVersion ${String(input.document?.toVersion ?? 'unknown')} does not match ${analysis.toVersion}`
+        : !templateSetMatches
+          ? 'report templateHits do not match the current polymorph scan'
+          : !impactedSetMatches
+            ? 'report impactedMapIds do not match the current polymorph scan'
+            : 'polymorph impact report did not pass';
+
+  return {
+    passed,
+    reportId: input.document?.reportId ?? 'polymorph-impact.missing',
+    reportPath: input.path,
+    summary: passed
+      ? 'pass (polymorph impact verified for active replacement)'
+      : `blocked (${reason})`
+  };
+}
+
 function buildRollbackProofGate(target: any, requestedReplacementMode: any, input: any) {
   if (target.kind !== 'map' || requestedReplacementMode !== 'legacy-retired') {
     return null;
@@ -475,6 +551,8 @@ function createInputSummary(kind: any) {
       return 'registry-candidate input';
     case 'map-equivalence':
       return 'map-equivalence input';
+    case 'polymorph-impact':
+      return 'polymorph-impact input';
     case 'rollback-proof':
       return 'rollback-proof input';
     default:
@@ -538,16 +616,35 @@ function normalizeRequestedReplacementMode(value: any, target: any) {
   return mode;
 }
 
-function buildRequiredJustification({ requestedReplacementMode, mapEquivalenceGate, rollbackProofGate }: any) {
-  if (requestedReplacementMode === 'active' && mapEquivalenceGate && !mapEquivalenceGate.passed) {
-    return {
-      requestedReplacementMode,
-      requiredGateNames: ['mapEquivalence'],
-      requiredEvidenceKinds: ['map-equivalence'],
-      requiredCliOptions: ['--equivalence-report'],
-      humanReviewRequired: true,
-      rationale: 'Map promotion to active requires a passing map equivalence report before review can proceed.'
-    };
+function buildRequiredJustification({ requestedReplacementMode, mapEquivalenceGate, polymorphImpactGate, rollbackProofGate }: any) {
+  if (requestedReplacementMode === 'active') {
+    const requiredGateNames = [];
+    const requiredEvidenceKinds = [];
+    const requiredCliOptions = [];
+    if (mapEquivalenceGate && !mapEquivalenceGate.passed) {
+      requiredGateNames.push('mapEquivalence');
+      requiredEvidenceKinds.push('map-equivalence');
+      requiredCliOptions.push('--equivalence-report');
+    }
+    if (polymorphImpactGate && !polymorphImpactGate.passed) {
+      requiredGateNames.push('polymorphImpact');
+      requiredEvidenceKinds.push('polymorph-impact');
+      requiredCliOptions.push('--polymorph-impact-report');
+    }
+    if (requiredGateNames.length > 0) {
+      return {
+        requestedReplacementMode,
+        requiredGateNames,
+        requiredEvidenceKinds,
+        requiredCliOptions,
+        humanReviewRequired: true,
+        rationale: requiredGateNames.length === 1 && requiredGateNames[0] === 'mapEquivalence'
+          ? 'Map promotion to active requires a passing map equivalence report before review can proceed.'
+          : requiredGateNames.length === 1 && requiredGateNames[0] === 'polymorphImpact'
+            ? 'Map promotion to active requires a passing polymorph impact report when member atoms participate in template propagation.'
+            : 'Map promotion to active requires all replacement evidence gates to pass before review can proceed.'
+      };
+    }
   }
   if (requestedReplacementMode === 'legacy-retired' && rollbackProofGate && !rollbackProofGate.passed) {
     return {
@@ -588,4 +685,19 @@ function safeValidateRollbackProof(document: any) {
       issues: [error instanceof Error ? error.message : String(error)]
     };
   }
+}
+
+function sameStringSet(left: any, right: any) {
+  const leftValues = normalizeStringSet(left);
+  const rightValues = normalizeStringSet(right);
+  if (leftValues.length !== rightValues.length) {
+    return false;
+  }
+  return leftValues.every((value, index) => value === rightValues[index]);
+}
+
+function normalizeStringSet(values: any) {
+  return [...new Set((Array.isArray(values) ? values : [])
+    .map((value) => String(value ?? '').trim())
+    .filter(Boolean))].sort();
 }
