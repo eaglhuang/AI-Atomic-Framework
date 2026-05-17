@@ -2,6 +2,7 @@
 
 ## 2026-05-17
 
+- Added `test --map --equivalence-fixtures <path>` with delegated map/legacy executor comparison, report output, known-divergence handling, and CLI coverage.
 - Delivered atomic map schema 0.2.0 replacement surface support with member roles, edge kinds, replacement metadata, hash-boundary tests, and 0.1.0 compatibility fixtures.
 - Added the map equivalence report schema, fixtures, schema validation coverage, and `atm spec --validate` support for map equivalence reports.
 - Delivered M5 agent adapters for Claude Code, GitHub Copilot, Cursor, and Gemini, each with seven ATM entrypoints, charter invariant placeholders, first-command routing, and shared manifest validation.

@@ -83,6 +83,8 @@ node atm.mjs test --map <mapId> --equivalence-fixtures <fixtures.json> --json
 node atm.mjs upgrade --target map --map <mapId> --json
 ```
 
+The current M4 implementation uses delegated executors from the fixture set: one `mapExecutor`, one `legacyExecutor`, plus lineage from `replacement.legacyUris`. It writes `map.equivalence.report.json` into the canonical map workbench path and treats reviewed known divergences as promotable evidence.
+
 The first implementation should favor deterministic artifacts over runtime magic. A map may initially describe delegated or documented execution. Full orchestrated execution can arrive later once map execution contracts are mature.
 
 ## Open Source Boundary

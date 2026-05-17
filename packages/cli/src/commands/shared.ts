@@ -178,6 +178,7 @@ type ParsedCliOptions = {
   task?: string;
   atom?: string;
   map?: string;
+  equivalenceFixtures?: string;
   propagate?: string;
   agent?: string;
 };
@@ -294,6 +295,14 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --map`, { exitCode: 2 });
       }
       options.map = requireOptionValue(argv, index, '--map', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--equivalence-fixtures') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --equivalence-fixtures`, { exitCode: 2 });
+      }
+      options.equivalenceFixtures = requireOptionValue(argv, index, '--equivalence-fixtures', commandName);
       index += 1;
       continue;
     }

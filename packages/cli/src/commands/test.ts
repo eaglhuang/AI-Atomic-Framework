@@ -3,6 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseAtomicSpecFile } from '../../../core/src/spec/parse-spec.ts';
 import { runAtomicTestRunner } from '../../../core/src/manager/test-runner.ts';
+import { runMapEquivalence } from '../../../core/src/equivalence/run-map-equivalence.ts';
 import { runMapIntegrationTest } from '../../../core/src/test-runner/map-integration.ts';
 import { runPropagationIntegration } from '../../../core/src/test-runner/propagation.ts';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
@@ -47,17 +48,20 @@ export async function runTestAsync(argv: any) {
   if (selectedModes.length > 1) {
     throw new CliError('ATM_CLI_USAGE', 'test accepts only one of --spec, --map, --propagate, or --atom.', { exitCode: 2 });
   }
+  if (options.equivalenceFixtures && !options.map) {
+    throw new CliError('ATM_CLI_USAGE', 'test option --equivalence-fixtures must be paired with --map.', { exitCode: 2 });
+  }
   if (options.spec) {
     return runSpecTest(options.cwd, options.spec);
   }
   if (options.map) {
-    return runMapTest(options.cwd, options.map);
+    return runMapTest(options.cwd, options.map, options.equivalenceFixtures);
   }
   if (options.propagate) {
     return runPropagateTest(options.cwd, options.propagate);
   }
   if (options.atom !== 'hello-world') {
-    throw new CliError('ATM_CLI_USAGE', 'test requires --atom hello-world, --spec <path>, --map <mapId>, or --propagate <atomId>', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'test requires --atom hello-world, --spec <path>, --map <mapId>, or --propagate <atomId>; --equivalence-fixtures must be paired with --map.', { exitCode: 2 });
   }
   const smoke = await runHelloWorldSmoke(options.cwd);
   return makeResult({
@@ -80,8 +84,36 @@ export async function runTestAsync(argv: any) {
   });
 }
 
-function runMapTest(cwd: any, mapId: any) {
-  const testRun = executeMapRunner(() => runMapIntegrationTest(mapId, { repositoryRoot: cwd }));
+async function runMapTest(cwd: any, mapId: any, equivalenceFixtures?: any) {
+  if (equivalenceFixtures) {
+    const testRun = await executeMapRunner(() => runMapEquivalence(mapId, equivalenceFixtures, { repositoryRoot: cwd }));
+    return makeResult({
+      ok: testRun.ok,
+      command: 'test',
+      cwd,
+      messages: [
+        testRun.ok
+          ? message('info', 'ATM_TEST_MAP_EQUIVALENCE_OK', 'Atomic map equivalence test passed.', { mapId, acceptedKnownDivergenceIds: testRun.acceptedKnownDivergenceIds })
+          : message('error', 'ATM_TEST_MAP_EQUIVALENCE_FAILED', 'Atomic map equivalence test failed.', { mapId, failedCaseIds: testRun.failedCaseIds })
+      ],
+      evidence: {
+        mapId,
+        fixturePath: testRun.fixturePath,
+        reportPath: testRun.reportPath,
+        resolutionMode: testRun.resolutionMode,
+        warnings: testRun.warnings,
+        legacyUris: testRun.legacyUris,
+        acceptedKnownDivergenceIds: testRun.acceptedKnownDivergenceIds,
+        failedCaseIds: testRun.failedCaseIds,
+        summary: testRun.report.summary,
+        metrics: testRun.report.metrics,
+        cases: testRun.report.cases,
+        knownDivergences: testRun.report.knownDivergences ?? [],
+        passed: testRun.report.passed
+      }
+    });
+  }
+  const testRun = await executeMapRunner(() => runMapIntegrationTest(mapId, { repositoryRoot: cwd }));
   return makeResult({
     ok: testRun.ok,
     command: 'test',
@@ -106,8 +138,8 @@ function runMapTest(cwd: any, mapId: any) {
   });
 }
 
-function runPropagateTest(cwd: any, atomId: any) {
-  const propagation = executeMapRunner(() => runPropagationIntegration(atomId, { repositoryRoot: cwd }));
+async function runPropagateTest(cwd: any, atomId: any) {
+  const propagation = await executeMapRunner(() => runPropagationIntegration(atomId, { repositoryRoot: cwd }));
   const infoCode = propagation.ok ? 'ATM_TEST_PROPAGATE_OK' : 'ATM_TEST_PROPAGATE_FAILED';
   const infoText = propagation.ok
     ? (propagation.discoveredMaps.length > 0
@@ -131,9 +163,9 @@ function runPropagateTest(cwd: any, atomId: any) {
   });
 }
 
-function executeMapRunner(callback: any) {
+async function executeMapRunner(callback: any) {
   try {
-    return callback();
+    return await callback();
   } catch (error) {
     if (error instanceof CliError) {
       throw error;
