@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.conversationFeedbackReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Minimal positive conversation feedback report fixture."
+  },
+  "generatedAt": "2026-05-17T02:00:00.000Z",
+  "rendererName": "deterministic-conversation-feedback-loop",
+  "sourceFindingsReport": {
+    "schemaId": "atm.conversationReviewFindingsReport",
+    "artifactPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+    "transcriptId": "transcript.conv-review.001",
+    "sessionId": "session.conv-review.001",
+    "findingIds": ["finding.conv-review.style-format.001"]
+  },
+  "privacy": {
+    "redacted": true,
+    "containsSensitiveInput": true,
+    "redactionReportPaths": ["artifacts/conversation-review/transcript-001.redaction.json"]
+  },
+  "summary": {
+    "totalFindings": 1,
+    "totalEvents": 1,
+    "recordedEvidenceCount": 1,
+    "promptCount": 1,
+    "draftNowCount": 0,
+    "deferredCount": 0,
+    "suppressedCount": 0,
+    "overrideCount": 0
+  },
+  "events": [
+    {
+      "eventId": "feedback.finding-conv-review-style-format-001",
+      "sourceFindingId": "finding.conv-review.style-format.001",
+      "findingKind": "style-format-correction",
+      "targetSurface": "host-local-overlay",
+      "patternTags": ["host-local", "style-format-correction", "user-correction"],
+      "suppressionKey": "surface=host-local-overlay|target=none|kind=style-format-correction|tags=host-local+style-format-correction+user-correction",
+      "occurrenceCount": 1,
+      "userChoice": "none",
+      "promptAction": "ask-user",
+      "shouldAskAgain": true,
+      "feedbackMessage": "Recorded finding finding.conv-review.style-format.001 for host-local-overlay; suppressionKey=surface=host-local-overlay|target=none|kind=style-format-correction|tags=host-local+style-format-correction+user-correction. Ask user: Y=create a dry-run improvement draft, N=defer and keep recurrence, X=never ask for this pattern.",
+      "sourceTranscriptRefs": ["transcript.conv-review.001#turn-004"],
+      "evidenceRefs": ["evidence.conv.session.conv-review.001.user-correction.none"],
+      "nextSteps": ["show-choice-prompt:Y/N/X", "record-feedback-event", "do-not-mutate"]
+    }
+  ],
+  "draftOnly": {
+    "appliesAutomatically": false,
+    "mutatesFiles": false,
+    "mutatesRegistry": false,
+    "mutatesSkillFiles": false,
+    "requiresHumanReview": true
+  }
+}

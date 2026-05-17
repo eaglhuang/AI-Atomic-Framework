@@ -120,12 +120,16 @@ export {
   ConversationDrivenExtractionError,
   ConversationTranscriptReviewError,
   conversationPatchDraftBridgeName,
+  conversationFeedbackRendererName,
   conversationReviewFindingKinds,
   conversationEvidenceExtractorName,
+  createConversationFeedbackReport,
+  createConversationSuppressionKey,
   conversationTranscriptReviewerName,
   draftConversationPatches,
   reviewConversationTranscript,
-  extractEvidenceFromConversations
+  extractEvidenceFromConversations,
+  upsertConversationFeedbackChoiceState
 } from './conversation';
 export type {
   ConversationAtomUpgradeProposalDraft,
@@ -139,6 +143,14 @@ export type {
   ConversationPatchDraftProposalInput,
   ConversationPatchDraftReport,
   ConversationPatchDraftSurface,
+  ConversationFeedbackChoiceState,
+  ConversationFeedbackEvent,
+  ConversationFeedbackLoopInput,
+  ConversationFeedbackPromptAction,
+  ConversationFeedbackReport,
+  ConversationFeedbackSummary,
+  ConversationFeedbackTargetSurface,
+  ConversationFeedbackUserChoice,
   ConversationTranscript,
   ConversationTranscriptReviewErrorCode,
   ConversationTranscriptReviewInput,

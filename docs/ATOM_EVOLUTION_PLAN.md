@@ -598,27 +598,31 @@ M12 已於 2026-05-17 完成。新增 conversation patch draft -> ReviewAdvisory
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:human-review`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
 
-### M13 - Immediate Criticism Feedback And User Choice Loop
+### M13 - Immediate Criticism Feedback And User Choice Loop ✅ DONE
 
 目的：讓每一次明確的使用者批評都立即被記錄、回饋，並讓使用者第一次就能選擇是否產生 dry-run 改進草案。
 
 交付物：
 
-- Criticism feedback event contract，記錄 finding / evidence refs、target 判斷、使用者選擇與 suppression key。
-- User choice state store，支援 `Y` / `N` / `X` 三種選擇。
-- Immediate feedback renderer，讓 agent 在對話中回覆「已記錄、目標判斷、下一步選項」。
-- Fixtures：first criticism ask、decline then accumulate、opt-out suppression、高嚴重度 override。
-- `npm run validate:conversation-feedback` 驗證入口。
+- `schemas/governance/conversation-feedback-report.schema.json`。✅
+- `packages/plugin-sdk/src/conversation/conversation-feedback-loop.ts`。✅
+- Criticism feedback event contract，記錄 finding / evidence refs、target 判斷、使用者選擇與 suppression key。✅
+- User choice state store helpers，支援 `Y` / `N` / `X` 三種選擇。✅
+- Immediate feedback renderer，讓 agent 在對話中回覆「已記錄、目標判斷、下一步選項」。✅
+- Fixtures：first criticism ask、decline then accumulate、opt-out suppression、高嚴重度 override。✅
+- `npm run validate:conversation-feedback` 驗證入口。✅
 
 Checklist：
 
-- [ ] 每一次明確批評都會產生可追溯 finding / evidence candidate。
-- [ ] 第一次明確且可定位的批評即可詢問是否產生 dry-run 改進草案。
-- [ ] 使用者選 `N` 時，不產草案但保留 evidence 與 recurrence，下次同 pattern 可再問。
-- [ ] 使用者選 `X` 時，對同一 suppression key 不再主動詢問，但仍可記錄 evidence。
-- [ ] Suppression key 必須至少包含 target surface、target id、finding kind 與 normalized pattern tags。
-- [ ] `Y` 只能產生 dry-run draft，不得直接修改 Atom、Atom Map、registry、script 或 agent guidance。
-- [ ] 高嚴重度 override 必須顯示 override reason，並仍通過 ReviewAdvisory / HumanReviewDecision。
+- [x] 每一次明確批評都會產生可追溯 finding / evidence candidate。
+- [x] 第一次明確且可定位的批評即可詢問是否產生 dry-run 改進草案。
+- [x] 使用者選 `N` 時，不產草案但保留 evidence 與 recurrence，下次同 pattern 可再問。
+- [x] 使用者選 `X` 時，對同一 suppression key 不再主動詢問，但仍可記錄 evidence。
+- [x] Suppression key 必須至少包含 target surface、target id、finding kind 與 normalized pattern tags。
+- [x] `Y` 只能產生 dry-run draft，不得直接修改 Atom、Atom Map、registry、script 或 agent guidance。
+- [x] 高嚴重度 override 必須顯示 override reason，並仍通過 ReviewAdvisory / HumanReviewDecision。
+
+M13 已於 2026-05-17 完成。新增 conversation feedback report schema、deterministic feedback loop renderer、suppression key helper、choice state helper、schema fixtures 與 `fixtures/evolution/conversation-feedback/*`。`validate-conversation-feedback` 會驗證 first ask、`Y` dry-run draft route、`N` ask-later recurrence、`X` suppression、high-severity override 以及所有 feedback report 仍不得自動套用或修改 registry / files。
 
 驗證：
 
@@ -627,26 +631,28 @@ Checklist：
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:review-advisory`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:standard`
 
-### M14 - Conversation Learning Loop Demo And Metrics
+### M14 - Conversation Learning Loop Demo And Metrics ✅ DONE
 
 目的：驗證 transcript -> findings -> evidence -> detector -> draft -> review -> human decision 的完整學習迴圈。
 
 交付物：
 
-- `examples/conversation-learning-loop/`。
-- Demo transcript fixtures。
-- Demo skill patch draft 與 Atom patch draft。
-- Demo criticism feedback choices：`Y`、`N`、`X`。
-- Rollout metrics extension：finding precision、patch draft acceptance、false-positive review、skill repair rate、privacy block rate。
+- `examples/conversation-learning-loop/`。✅
+- Demo transcript fixtures。✅
+- Demo skill patch draft 與 Atom patch draft。✅
+- Demo criticism feedback choices：`Y`、`N`、`X`。✅
+- Rollout metrics extension：finding precision、patch draft acceptance、false-positive review、skill repair rate、privacy block rate。✅
 
 Checklist：
 
-- [ ] Demo 可在五分鐘內跑完。
-- [ ] Demo 覆蓋四類 conversation findings。
-- [ ] Demo 至少產生一個 skill patch draft。
-- [ ] Demo 至少產生一個 Atom patch draft。
-- [ ] Demo 包含 rejected / blocked case。
-- [ ] Demo 展示第一次批評即時回饋與使用者選擇如何影響後續 recurrence。
+- [x] Demo 可在五分鐘內跑完。
+- [x] Demo 覆蓋四類 conversation findings。
+- [x] Demo 至少產生一個 skill patch draft。
+- [x] Demo 至少產生一個 Atom patch draft。
+- [x] Demo 包含 rejected / blocked case。
+- [x] Demo 展示第一次批評即時回饋與使用者選擇如何影響後續 recurrence。
+
+M14 已於 2026-05-17 完成。新增 `examples/conversation-learning-loop/run.ts` 與 demo transcript fixture，驗證 redacted transcript -> findings -> feedback choices -> dry-run patch drafts 的完整 loop，並覆蓋缺 base Atom version 時必須留在 promotion queue 外的 blocked dry-run route；`validate-examples` 會執行 demo smoke。Rollout metrics schema、sample fixture 與 validator 也新增 conversation metrics，覆蓋 finding precision、patch draft acceptance、skill repair rate、privacy block rate 與 `Y` / `N` / `X` choice counts。
 
 驗證：
 

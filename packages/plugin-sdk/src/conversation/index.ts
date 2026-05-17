@@ -36,6 +36,22 @@ export type {
   ConversationPatchDraftSurface
 } from './conversation-patch-draft-bridge';
 export {
+  conversationFeedbackRendererName,
+  createConversationFeedbackReport,
+  createConversationSuppressionKey,
+  upsertConversationFeedbackChoiceState
+} from './conversation-feedback-loop';
+export type {
+  ConversationFeedbackChoiceState,
+  ConversationFeedbackEvent,
+  ConversationFeedbackLoopInput,
+  ConversationFeedbackPromptAction,
+  ConversationFeedbackReport,
+  ConversationFeedbackSummary,
+  ConversationFeedbackTargetSurface,
+  ConversationFeedbackUserChoice
+} from './conversation-feedback-loop';
+export {
   ConversationTranscriptReviewError,
   conversationTranscriptReviewerName,
   reviewConversationTranscript
