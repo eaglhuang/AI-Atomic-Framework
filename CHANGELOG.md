@@ -2,6 +2,7 @@
 
 ## 2026-05-17
 
+- Delivered M7/M8 agent entry hardening: framework-neutral skill templates, multi-agent skill compiler output, source template validation, POSIX/PowerShell root-drop wrappers, and script parity validation.
 - Delivered M6 integration lifecycle CLI: `atm integration list/add/verify/remove`, `atm init --integration <id>`, per-adapter manifests, and `atm doctor` integration drift checks.
 - Added `test --map --equivalence-fixtures <path>` with delegated map/legacy executor comparison, report output, known-divergence handling, and CLI coverage.
 - Delivered atomic map schema 0.2.0 replacement surface support with member roles, edge kinds, replacement metadata, hash-boundary tests, and 0.1.0 compatibility fixtures.

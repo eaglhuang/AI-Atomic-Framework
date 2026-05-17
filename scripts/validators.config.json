@@ -64,7 +64,9 @@
         "audit-hash-placeholders",
         "validate-rollout-metrics",
         "validate-charter",
-        "validate-integration-adapter"
+        "validate-integration-adapter",
+        "validate-skill-templates",
+        "validate-script-parity"
       ]
     },
     "full": {
@@ -130,6 +132,8 @@
     { "name": "validate-rollout-metrics", "entry": "scripts/validate-rollout-metrics.ts", "tags": ["evolution", "metrics"], "slow": false },
     { "name": "validate-charter", "entry": "scripts/validate-charter.ts", "tags": ["charter", "contract"], "slow": false },
     { "name": "validate-integration-adapter", "entry": "scripts/validate-integration-adapter.ts", "tags": ["integration", "adapter"], "slow": false },
+    { "name": "validate-skill-templates", "entry": "scripts/validate-skill-templates.ts", "tags": ["integration", "templates"], "slow": false },
+    { "name": "validate-script-parity", "entry": "scripts/validate-script-parity.ts", "tags": ["scripts", "parity", "windows"], "slow": true },
     { "name": "validate-upgrade-proposal", "entry": "scripts/validate-upgrade-proposal.ts", "tags": ["upgrade"], "slow": false },
     { "name": "validate-rollback-proof", "entry": "scripts/validate-rollback-proof.ts", "tags": ["rollback"], "slow": false },
     { "name": "validate-human-review", "entry": "scripts/validate-human-review.ts", "tags": ["review"], "slow": false },

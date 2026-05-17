@@ -65,6 +65,14 @@ export interface LocalGovernanceBootstrapResult {
   readonly recommendedPrompt: string;
   readonly charterPath: string;
   readonly charterInvariantsPath: string;
+  readonly scriptPaths: readonly string[];
+}
+
+export interface LocalGovernanceScriptInstallResult {
+  readonly created: readonly string[];
+  readonly unchanged: readonly string[];
+  readonly scriptPaths: readonly string[];
+  readonly platformHintPath: string;
 }
 
 export interface ContinuationContractInput {
@@ -116,12 +124,47 @@ const charterTemplateFiles = [
   }
 ] as const;
 
+const rootDropScriptNames = [
+  'atm-next',
+  'atm-orient',
+  'atm-create',
+  'atm-lock',
+  'atm-evidence',
+  'atm-upgrade-scan',
+  'atm-handoff'
+] as const;
+
+const rootDropScriptTemplateFiles = rootDropScriptNames.flatMap((scriptName) => [
+  {
+    source: path.join('.atm', 'scripts', 'sh', `${scriptName}.sh`),
+    target: path.join('.atm', 'scripts', 'sh', `${scriptName}.sh`)
+  },
+  {
+    source: path.join('.atm', 'scripts', 'ps', `${scriptName}.ps1`),
+    target: path.join('.atm', 'scripts', 'ps', `${scriptName}.ps1`)
+  }
+]);
+
 export function createLocalGovernanceAdapter(config: LocalGovernanceConfig): GovernanceAdapter {
   const layout = resolveLocalGovernanceLayout(config.layout);
   return {
     adapterName: '@ai-atomic-framework/plugin-governance-local',
     layout,
     stores: createLocalGovernanceStores({ ...config, layout })
+  };
+}
+
+export function installRootDropScripts(cwd: string, options: { readonly force?: boolean } = {}): LocalGovernanceScriptInstallResult {
+  const created: string[] = [];
+  const unchanged: string[] = [];
+  writeRootDropScripts(cwd, options.force === true, created, unchanged);
+  return {
+    created,
+    unchanged,
+    scriptPaths: rootDropScriptTemplateFiles.map((templateFile) => normalizeRelativePath(templateFile.target)),
+    platformHintPath: process.platform === 'win32'
+      ? '.atm/scripts/ps'
+      : '.atm/scripts/sh'
   };
 }
 
@@ -283,6 +326,8 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     );
   }
 
+  writeRootDropScripts(cwd, force, created, unchanged);
+
   return {
     created,
     unchanged,
@@ -303,7 +348,8 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     projectProbe,
     recommendedPrompt,
     charterPath: relativePathFrom(cwd, paths.charterPath),
-    charterInvariantsPath: relativePathFrom(cwd, paths.charterInvariantsPath)
+    charterInvariantsPath: relativePathFrom(cwd, paths.charterInvariantsPath),
+    scriptPaths: rootDropScriptTemplateFiles.map((templateFile) => normalizeRelativePath(templateFile.target))
   };
 }
 
@@ -813,6 +859,20 @@ function ensureDirectory(directoryPath: string, cwd: string, created: string[], 
 function writeTemplate(sourcePath: string, targetPath: string, tokens: Record<string, string>, cwd: string, force: boolean, created: string[], unchanged: string[]) {
   const rendered = renderTemplate(readFileSync(sourcePath, 'utf8'), tokens);
   writeText(targetPath, rendered, cwd, force, created, unchanged);
+}
+
+function writeRootDropScripts(cwd: string, force: boolean, created: string[], unchanged: string[]) {
+  for (const scriptFile of rootDropScriptTemplateFiles) {
+    writeTemplate(
+      path.join(templateRoot, scriptFile.source),
+      path.join(cwd, scriptFile.target),
+      {},
+      cwd,
+      force,
+      created,
+      unchanged
+    );
+  }
 }
 
 function writeJson(targetPath: string, value: unknown, cwd: string, force: boolean, created: string[], unchanged: string[]) {

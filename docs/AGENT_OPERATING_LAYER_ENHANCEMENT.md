@@ -143,6 +143,23 @@ bootstrapping.
 check. It treats missing files and hash mismatches as drift, and unknown or
 misplaced manifests as stale integration state.
 
+### Entry Template Compiler
+
+The seven minimum ATM entry skills are authored once under `templates/skills/` as
+framework-neutral source templates. Each template declares
+`charter-invariants-injected: true`, records its ATM CLI handoff route, and keeps
+planning hints out of the static source. `packages/integrations-core` compiles
+those sources into Claude Code `SKILL.md`, GitHub Copilot instruction and prompt
+Markdown, Cursor skill Markdown, and Gemini TOML.
+
+### Script Wrapper Parity
+
+Root-drop adoption installs both `.atm/scripts/sh/atm-*.sh` and
+`.atm/scripts/ps/atm-*.ps1`. Both script families are thin wrappers around the
+same `node atm.mjs ...` route for each entry. The active platform only changes
+which directory is recommended in hints; it does not change the installed script
+surface.
+
 ---
 
 ## Non-goals
@@ -164,6 +181,10 @@ M4 is delivered as the first concrete Integration Adapter Layer contract. `packa
 M5 is delivered as four installable agent adapters: `integration-claude-code`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each adapter emits the seven minimum ATM entrypoints, includes the `{{CHARTER_INVARIANTS}}` placeholder, makes `node atm.mjs next --json` the required first command, and participates in the shared install/verify/uninstall manifest validation.
 
 M6 is delivered as the CLI lifecycle for those adapters. `atm integration list/add/verify/remove` exposes install, manifest verification, hash-guarded removal, and available/installed adapter listing. `atm init --integration <id>` installs an adapter during repository adoption, manifests are stored per adapter under `.atm/integrations/<id>.manifest.json`, and `atm doctor` reports integration drift or stale manifests through the `integration-adapters` check.
+
+M7 is delivered as a framework-neutral entry template compiler. `templates/skills/*.skill.md` holds the seven ATM entry sources plus `skill.schema.json`; `packages/integrations-core` parses and compiles them for Claude Code, Copilot, Cursor, and Gemini; `validate:skill-templates` locks schema validity, charter injection, ATM CLI handoffs, and the rule that planning hints stay out of static templates.
+
+M8 is delivered as paired script wrapper parity. `templates/root-drop/.atm/scripts/sh/atm-*.sh` and `templates/root-drop/.atm/scripts/ps/atm-*.ps1` wrap the same node routes, `atm init` installs both sets, and `validate:script-parity` checks route parity, wrapper thinness, wrapper smoke, and hello-world compatibility.
 
 See [CHANGELOG.md](../CHANGELOG.md) for delivered milestone entries.
 

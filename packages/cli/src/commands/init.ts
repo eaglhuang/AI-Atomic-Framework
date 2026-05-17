@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import { CliError, configPathFor, ensureAtmDirectory, frameworkVersion, makeResult, message, parseOptions, relativePathFrom, writeJsonFile } from './shared.ts';
-import { adoptDefaultBootstrap } from './bootstrap.ts';
+import { adoptDefaultBootstrap, installDefaultRootDropScripts } from './bootstrap.ts';
 import type { LocalGovernanceBootstrapResult } from '../../../plugin-governance-local/src/index.ts';
 import { installIntegrationAdapter } from './integration.ts';
 
@@ -48,6 +48,7 @@ export async function runInit(argv: any) {
     recommendedPrompt: null;
     charterPath: null;
     charterInvariantsPath: null;
+    scriptPaths: [];
   } = options.adopt === 'default'
     ? adoptDefaultBootstrap(options.cwd, { force: options.force, taskTitle: options.task })
     : {
@@ -70,8 +71,13 @@ export async function runInit(argv: any) {
         projectProbe: null,
         recommendedPrompt: null,
         charterPath: null,
-        charterInvariantsPath: null
+        charterInvariantsPath: null,
+        scriptPaths: []
       };
+
+  const scriptInstall = options.adopt === 'default'
+    ? { created: [], unchanged: [], scriptPaths: bootstrap.scriptPaths, platformHintPath: process.platform === 'win32' ? '.atm/scripts/ps' : '.atm/scripts/sh' }
+    : installDefaultRootDropScripts(options.cwd, { force: options.force });
 
   const integrationInstall = options.integration
     ? await installIntegrationAdapter(options.cwd, options.integration, {
@@ -92,8 +98,8 @@ export async function runInit(argv: any) {
     ],
     evidence: {
       configPath: relativePathFrom(options.cwd, configPath),
-      created: [...created, ...bootstrap.created],
-      unchanged: [...unchanged, ...bootstrap.unchanged],
+      created: [...created, ...bootstrap.created, ...scriptInstall.created],
+      unchanged: [...unchanged, ...bootstrap.unchanged, ...scriptInstall.unchanged],
       adapterMode: 'standalone',
       adapterImplemented: false,
       adoptedProfile: bootstrap.adoptedProfile,
@@ -113,6 +119,8 @@ export async function runInit(argv: any) {
       recommendedPrompt: bootstrap.recommendedPrompt,
       charterPath: bootstrap.charterPath,
       charterInvariantsPath: bootstrap.charterInvariantsPath,
+      scriptPaths: scriptInstall.scriptPaths,
+      scriptPlatformHintPath: scriptInstall.platformHintPath,
       integrationInstall,
       adoptedAt: bootstrap.adoptedProfile ? new Date().toISOString() : null
     }
@@ -139,11 +147,28 @@ function createDryRunResult(options: any) {
       contextSummaryPath: options.adopt === 'default' ? '.atm/history/handoff/BOOTSTRAP-0001.json' : null,
       contextSummaryMarkdownPath: options.adopt === 'default' ? '.atm/history/handoff/BOOTSTRAP-0001.md' : null,
       continuationReportPath: options.adopt === 'default' ? '.atm/history/reports/continuation/BOOTSTRAP-0001.json' : null,
+      scriptPaths: expectedRootDropScriptPaths(),
+      scriptPlatformHintPath: process.platform === 'win32' ? '.atm/scripts/ps' : '.atm/scripts/sh',
       adoptedAt: options.adopt === 'default' ? new Date().toISOString() : null,
       integrationId: options.integration ?? null,
       dryRun: true
     }
   });
+}
+
+function expectedRootDropScriptPaths() {
+  return [
+    'atm-next',
+    'atm-orient',
+    'atm-create',
+    'atm-lock',
+    'atm-evidence',
+    'atm-upgrade-scan',
+    'atm-handoff'
+  ].flatMap((scriptName) => [
+    `.atm/scripts/sh/${scriptName}.sh`,
+    `.atm/scripts/ps/${scriptName}.ps1`
+  ]);
 }
 
 function createDefaultConfig(options: any) {

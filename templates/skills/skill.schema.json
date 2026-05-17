@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/skill-template.schema.json",
+  "title": "ATM Skill Template",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "id",
+    "title",
+    "summary",
+    "command",
+    "firstCommand",
+    "charter-invariants-injected",
+    "handoffs"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.skillTemplate" },
+    "specVersion": { "const": "0.1.0" },
+    "id": { "type": "string", "pattern": "^atm-[a-z0-9-]+$" },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "command": { "type": "string", "pattern": "^node atm\\.mjs " },
+    "firstCommand": { "const": "node atm.mjs next --json" },
+    "charter-invariants-injected": { "const": true },
+    "handoffs": { "type": "string", "pattern": "^node atm\\.mjs " }
+  }
+}
