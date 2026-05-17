@@ -49,6 +49,9 @@ export async function runUpgrade(argv: any) {
     proposedBy: options.proposedBy,
     proposedAt: options.proposedAt,
     migration: options.migration,
+    requestedReplacementMode: options.requestedReplacementMode,
+    equivalenceReport: options.equivalenceReport,
+    rollbackProof: options.rollbackProof,
     contextBudgetGate: contextBudget.gate,
     inputs: inputDocuments
   };
@@ -159,6 +162,9 @@ function parseUpgradeOptions(argv: any) {
     mapImpactScope: null,
     legacyTarget: null,
     guidanceSession: null,
+    requestedReplacementMode: null,
+    equivalenceReport: null,
+    rollbackProof: null,
     proposalId: null,
     proposedBy: 'ATM CLI',
     proposedAt: null,
@@ -233,6 +239,21 @@ function parseUpgradeOptions(argv: any) {
       index += 1;
       continue;
     }
+    if (arg === '--replacement-mode') {
+      options.requestedReplacementMode = requireOptionValue(argv, index, '--replacement-mode');
+      index += 1;
+      continue;
+    }
+    if (arg === '--equivalence-report') {
+      options.equivalenceReport = requireOptionValue(argv, index, '--equivalence-report');
+      index += 1;
+      continue;
+    }
+    if (arg === '--rollback-proof') {
+      options.rollbackProof = requireOptionValue(argv, index, '--rollback-proof');
+      index += 1;
+      continue;
+    }
     if (arg === '--fork-source') {
       options.fork = options.fork ?? {};
       options.fork.sourceAtomId = requireOptionValue(argv, index, '--fork-source');
@@ -296,6 +317,9 @@ function parseUpgradeOptions(argv: any) {
     }
     if (options.target.kind === 'map' && !options.target.mapId) {
       throw new CliError('ATM_CLI_USAGE', 'upgrade --target map requires --map', { exitCode: 2 });
+    }
+    if (options.target.kind !== 'map' && (options.requestedReplacementMode || options.equivalenceReport || options.rollbackProof)) {
+      throw new CliError('ATM_CLI_USAGE', '--replacement-mode, --equivalence-report, and --rollback-proof require --target map with --map', { exitCode: 2 });
     }
     if (options.fork && (!options.fork.sourceAtomId || !options.fork.newAtomId)) {
       throw new CliError('ATM_CLI_USAGE', 'upgrade fork mode requires both --fork-source and --new-atom-id', { exitCode: 2 });
@@ -663,6 +687,11 @@ function inferInputKind(schemaId: any) {
       return 'quality-comparison';
     case 'atm.police.registryCandidateReport':
       return 'registry-candidate';
+    case 'atm.mapEquivalenceReport':
+      return 'map-equivalence';
+    case 'atm.rollbackProof':
+    case 'atm.evidence.rollbackProof':
+      return 'rollback-proof';
     case 'atm.evidencePatternDetectorReport':
       return 'evidence-pattern-report';
     default:

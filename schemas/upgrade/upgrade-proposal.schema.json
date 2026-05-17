@@ -72,8 +72,14 @@
       "type": "string",
       "minLength": 1
     },
+    "requestedReplacementMode": {
+      "enum": ["draft", "shadow", "canary", "active", "legacy-retired"]
+    },
     "automatedGates": {
       "$ref": "#/$defs/automatedGates"
+    },
+    "requiredJustification": {
+      "$ref": "#/$defs/requiredJustification"
     },
     "humanReview": {
       "const": "pending"
@@ -137,6 +143,23 @@
     }
   },
   "allOf": [
+    {
+      "if": {
+        "required": ["requestedReplacementMode"]
+      },
+      "then": {
+        "properties": {
+          "target": {
+            "properties": {
+              "kind": {
+                "const": "map"
+              }
+            },
+            "required": ["kind"]
+          }
+        }
+      }
+    },
     {
       "if": {
         "properties": {
@@ -355,6 +378,12 @@
         "registryCandidate": {
           "$ref": "#/$defs/gateResult"
         },
+        "mapEquivalence": {
+          "$ref": "#/$defs/gateResult"
+        },
+        "rollbackProof": {
+          "$ref": "#/$defs/gateResult"
+        },
         "contextBudget": {
           "$ref": "#/$defs/gateResult"
         },
@@ -383,8 +412,49 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy", "charterInvariantViolation"]
+            "enum": ["nonRegression", "qualityComparison", "registryCandidate", "mapEquivalence", "rollbackProof", "contextBudget", "staleProposal", "privacy", "targetSurfaceDowngrade", "breakingHumanReview", "mutabilityPolicy", "charterInvariantViolation"]
           }
+        }
+      }
+    },
+    "requiredJustification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestedReplacementMode", "requiredGateNames", "requiredEvidenceKinds", "requiredCliOptions", "humanReviewRequired", "rationale"],
+      "properties": {
+        "requestedReplacementMode": {
+          "enum": ["draft", "shadow", "canary", "active", "legacy-retired"]
+        },
+        "requiredGateNames": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["mapEquivalence", "rollbackProof"]
+          }
+        },
+        "requiredEvidenceKinds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["map-equivalence", "rollback-proof"]
+          }
+        },
+        "requiredCliOptions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["--equivalence-report", "--rollback-proof"]
+          }
+        },
+        "humanReviewRequired": {
+          "type": "boolean"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -394,7 +464,7 @@
       "required": ["kind", "path", "schemaId"],
       "properties": {
         "kind": {
-          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate", "evolution-evidence", "redaction-report"]
+          "enum": ["hash-diff", "execution-evidence", "non-regression", "quality-comparison", "registry-candidate", "map-equivalence", "rollback-proof", "evolution-evidence", "redaction-report"]
         },
         "path": {
           "type": "string",

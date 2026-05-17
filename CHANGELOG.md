@@ -2,6 +2,7 @@
 
 ## 2026-05-17
 
+- Added map upgrade evidence gates: `upgrade --propose --target map` now supports `--replacement-mode`, `--equivalence-report`, and `--rollback-proof`, and blocks `active` / `legacy-retired` proposals without the required evidence.
 - Delivered M9/M10 integration rollout proof: framework-neutral agent onboarding flow example, multi-agent charter/first-command results, integration rollout metrics schema, and adapter rollout sample validation.
 - Delivered M7/M8 agent entry hardening: framework-neutral skill templates, multi-agent skill compiler output, source template validation, POSIX/PowerShell root-drop wrappers, and script parity validation.
 - Delivered M6 integration lifecycle CLI: `atm integration list/add/verify/remove`, `atm init --integration <id>`, per-adapter manifests, and `atm doctor` integration drift checks.
