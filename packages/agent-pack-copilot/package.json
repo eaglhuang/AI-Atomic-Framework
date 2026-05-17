@@ -1,8 +1,8 @@
 {
-  "name": "@ai-atomic-framework/agent-pack-claude-code",
+  "name": "@ai-atomic-framework/agent-pack-copilot",
   "version": "0.0.0",
   "private": false,
-  "description": "Claude Code agent pack for ATM — installs governed slash commands into .claude/commands/.",
+  "description": "GitHub Copilot agent pack for ATM instructions and prompts under .github/.",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -13,17 +13,18 @@
   },
   "files": [
     "dist",
-    "src",
-    "templates"
+    "src"
   ],
   "scripts": {
-    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/agent-pack-claude-code",
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/agent-pack-copilot",
     "test": "node --experimental-strip-types ../../scripts/validate-package-skeleton.ts --mode test",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {
     "@ai-atomic-framework/agent-pack-sdk": "0.0.0",
+    "@ai-atomic-framework/integration-copilot": "0.0.0",
+    "@ai-atomic-framework/integrations-core": "0.0.0",
     "typescript": "^5.9.3"
   },
   "types": "./dist/index.d.ts"

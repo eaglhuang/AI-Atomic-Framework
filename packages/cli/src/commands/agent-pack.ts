@@ -4,6 +4,10 @@ import path from 'node:path';
 import { hashFiles, renderManifest } from '../../../agent-pack-sdk/src/index.ts';
 import type { AgentPack, RenderContext } from '../../../agent-pack-sdk/src/index.ts';
 import { claudeCodePack } from '../../../agent-pack-claude-code/src/index.ts';
+import { copilotPack } from '../../../agent-pack-copilot/src/index.ts';
+import { cursorPack } from '../../../agent-pack-cursor/src/index.ts';
+import { geminiPack } from '../../../agent-pack-gemini/src/index.ts';
+import { windsurfPack } from '../../../agent-pack-windsurf/src/index.ts';
 import { collectATMChartSources, collectSchemaDrift } from './atm-chart.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
@@ -13,6 +17,10 @@ const defaultAgentPackManifestDir = path.join('.atm', 'agent-pack');
 /** Registry of all built-in agent packs available for install. */
 const packRegistry: Record<string, AgentPack> = {
   'claude-code': claudeCodePack,
+  copilot: copilotPack,
+  cursor: cursorPack,
+  gemini: geminiPack,
+  windsurf: windsurfPack,
 };
 
 /** Return a SHA-256 hex digest of the given string. */
