@@ -1,0 +1,74 @@
+{
+  "description": "M12 fixture: missing evidence refs and transcript refs must block conversation-derived review advisory promotion paths.",
+  "input": {
+    "reportId": "review-advisory.conversation.missing-refs",
+    "generatedAt": "2026-05-17T03:05:00.000Z",
+    "patchDraftReport": {
+      "schemaId": "atm.conversationPatchDraftReport",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Synthetic malformed report for advisory gate coverage."
+      },
+      "generatedAt": "2026-05-17T03:04:00.000Z",
+      "bridgeName": "deterministic-conversation-patch-draft-bridge",
+      "sourceFindingsReport": {
+        "schemaId": "atm.conversationReviewFindingsReport",
+        "transcriptId": "transcript.conv-review.missing-refs.001",
+        "findingIds": ["finding.conv-review.missing-refs.001"]
+      },
+      "privacy": {
+        "redacted": true,
+        "containsSensitiveInput": false,
+        "redactionReportPaths": []
+      },
+      "summary": {
+        "totalFindings": 1,
+        "totalDrafts": 1,
+        "hostLocalDraftCount": 0,
+        "skillDraftCount": 1,
+        "atomDraftCount": 0,
+        "atomMapDraftCount": 0,
+        "observationCount": 0,
+        "humanReviewRequiredCount": 1
+      },
+      "drafts": [
+        {
+          "draftId": "draft.conversation.missing-refs.001",
+          "sourceFindingId": "finding.conv-review.missing-refs.001",
+          "findingKind": "workflow-adjustment",
+          "draftKind": "skill-patch",
+          "draftSurface": "skill",
+          "operation": "repair-workflow",
+          "patchMode": "dry-run",
+          "appliesAutomatically": false,
+          "mutatesFiles": false,
+          "mutatesRegistry": false,
+          "mutatesSkillFiles": false,
+          "requiresHumanReview": true,
+          "summary": "Malformed draft without refs.",
+          "rationale": "The advisory gate must catch missing refs even before schema-valid promotion.",
+          "sourceTranscriptRefs": [],
+          "evidenceRefs": [],
+          "notes": ["Malformed draft for M12 gate coverage."]
+        }
+      ],
+      "draftOnly": {
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true
+      }
+    }
+  },
+  "expected": {
+    "status": "warn",
+    "needsReview": true,
+    "blockedRouteHints": [
+      "conversation-review.blocked.missing-evidence-refs",
+      "conversation-review.blocked.missing-transcript-refs"
+    ]
+  }
+}

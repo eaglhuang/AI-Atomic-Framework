@@ -6,8 +6,10 @@ import addFormats from 'ajv-formats';
 import {
   appendMachineFindings,
   checkPromotionSafetyGates,
+  createConversationPatchDraftAdvisoryReport,
   createStubReviewAdvisoryReport,
   createUnavailableAdvisoryReport,
+  mapConversationPatchDraftsToMachineFindings,
   normalizeProviderPayload
 } from '../packages/plugin-review-advisory/src/index.ts';
 
@@ -36,6 +38,12 @@ for (const relativePath of [
   'fixtures/review-advisory/stub-warn.json',
   'fixtures/review-advisory/malformed-provider-response.json',
   'fixtures/review-advisory/no-provider-dry-run.json',
+  'fixtures/review-advisory/conversation-machine-findings.json',
+  'fixtures/review-advisory/conversation-missing-refs-blocked.json',
+  'fixtures/review-advisory/conversation-privacy-gate.json',
+  'fixtures/review-advisory/conversation-single-user-downgrade.json',
+  'fixtures/review-advisory/conversation-stale-skill-repair-blocked.json',
+  'fixtures/evolution/conversation-skill-review/patch-draft-bridge/four-findings-patch-drafts.json',
   'fixtures/upgrade/stale-proposal.json',
   'fixtures/upgrade/downgrade-preference-proposal.json',
   'fixtures/upgrade/breaking-proposal.json',
@@ -119,7 +127,51 @@ check(validateReport(mergedWithMachineFindings) === true, `appendMachineFindings
 check(mergedWithMachineFindings.status === 'warn', 'high severity machine finding must escalate report status to warn');
 check(mergedWithMachineFindings.needsReview === true, 'machine finding merge must keep needsReview=true when severity is high');
 
-console.log('[review-advisory:' + mode + '] ok (provider modes, fallback behavior, machine-finding ingest, and schema fixtures verified)');
+const conversationAdvisoryFixturePaths = [
+  'fixtures/review-advisory/conversation-machine-findings.json',
+  'fixtures/review-advisory/conversation-missing-refs-blocked.json',
+  'fixtures/review-advisory/conversation-privacy-gate.json',
+  'fixtures/review-advisory/conversation-single-user-downgrade.json',
+  'fixtures/review-advisory/conversation-stale-skill-repair-blocked.json'
+];
+
+for (const fixturePath of conversationAdvisoryFixturePaths) {
+  const fixture = readJson(fixturePath);
+  const patchDraftReport = resolveConversationPatchDraftReport(fixture.input);
+  const machineFindings = mapConversationPatchDraftsToMachineFindings(patchDraftReport);
+  check(machineFindings.length >= 1, `${fixturePath} must produce at least one conversation machine finding`);
+  check(machineFindings.every((finding: any) => finding.trigger === 'machine-finding'), `${fixturePath} findings must enter ReviewAdvisory as machine findings`);
+
+  const advisoryReport = createConversationPatchDraftAdvisoryReport({
+    reportId: fixture.input.reportId,
+    patchDraftReport,
+    generatedAt: fixture.input.generatedAt
+  });
+  check(validateReport(advisoryReport) === true, `${fixturePath} conversation advisory report schema validation failed: ${JSON.stringify(validateReport.errors)}`);
+  check(advisoryReport.status === fixture.expected.status, `${fixturePath} status mismatch`);
+  check(advisoryReport.needsReview === fixture.expected.needsReview, `${fixturePath} needsReview mismatch`);
+
+  if (fixture.expected.summary) {
+    check(JSON.stringify(advisoryReport.summary) === JSON.stringify(fixture.expected.summary), `${fixturePath} summary mismatch`);
+  }
+
+  if (fixture.expected.routeHints) {
+    for (const routeHint of fixture.expected.routeHints) {
+      check(advisoryReport.findings.some((finding: any) => finding.routeHint === routeHint), `${fixturePath} missing routeHint ${routeHint}`);
+    }
+  }
+
+  if (fixture.expected.blockedRouteHints) {
+    for (const routeHint of fixture.expected.blockedRouteHints) {
+      const finding = advisoryReport.findings.find((candidate: any) => candidate.routeHint === routeHint);
+      check(finding !== undefined, `${fixturePath} missing blocked routeHint ${routeHint}`);
+      check(finding.severity === 'high', `${fixturePath} ${routeHint} must be high severity`);
+      check(finding.action === 'request-human-review', `${fixturePath} ${routeHint} must request human review`);
+    }
+  }
+}
+
+console.log('[review-advisory:' + mode + '] ok (provider modes, fallback behavior, machine-finding ingest, conversation machine findings, and schema fixtures verified)');
 
 // ── M4: Promotion Safety Gates ────────────────────────────────────────────────
 
@@ -224,3 +276,14 @@ check(
 );
 
 console.log('[review-advisory:' + mode + '] ok (M4 promotion safety gates: all 5 gates verified — baseAtomVersionMismatch, staleEvidenceWatermark, targetSurfaceDowngrade, breakingHumanReview, missingRedactionReport)');
+
+function resolveConversationPatchDraftReport(inputFixture: any) {
+  if (inputFixture.patchDraftReport) {
+    return inputFixture.patchDraftReport;
+  }
+  if (inputFixture.patchDraftFixturePath) {
+    const patchFixture = readJson(inputFixture.patchDraftFixturePath);
+    return patchFixture.expectedReport;
+  }
+  throw new Error('conversation advisory fixture must provide patchDraftReport or patchDraftFixturePath');
+}

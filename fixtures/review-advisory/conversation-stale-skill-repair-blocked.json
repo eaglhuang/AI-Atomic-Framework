@@ -1,0 +1,74 @@
+{
+  "description": "M12 fixture: stale skill repair drafts are blocked when they lack skillId or human-review-required semantics.",
+  "input": {
+    "reportId": "review-advisory.conversation.stale-skill-blocked",
+    "generatedAt": "2026-05-17T03:20:00.000Z",
+    "patchDraftReport": {
+      "schemaId": "atm.conversationPatchDraftReport",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Synthetic stale skill repair report for advisory coverage."
+      },
+      "generatedAt": "2026-05-17T03:19:00.000Z",
+      "bridgeName": "deterministic-conversation-patch-draft-bridge",
+      "sourceFindingsReport": {
+        "schemaId": "atm.conversationReviewFindingsReport",
+        "transcriptId": "transcript.conv-review.stale-skill.001",
+        "findingIds": ["finding.conv-review.stale-skill.001"]
+      },
+      "privacy": {
+        "redacted": true,
+        "containsSensitiveInput": false,
+        "redactionReportPaths": []
+      },
+      "summary": {
+        "totalFindings": 1,
+        "totalDrafts": 1,
+        "hostLocalDraftCount": 0,
+        "skillDraftCount": 1,
+        "atomDraftCount": 0,
+        "atomMapDraftCount": 0,
+        "observationCount": 0,
+        "humanReviewRequiredCount": 0
+      },
+      "drafts": [
+        {
+          "draftId": "draft.conversation.stale-skill.001",
+          "sourceFindingId": "finding.conv-review.stale-skill.001",
+          "findingKind": "stale-or-wrong-skill",
+          "draftKind": "skill-patch",
+          "draftSurface": "skill",
+          "operation": "repair-stale-skill",
+          "patchMode": "dry-run",
+          "appliesAutomatically": false,
+          "mutatesFiles": false,
+          "mutatesRegistry": false,
+          "mutatesSkillFiles": false,
+          "requiresHumanReview": false,
+          "summary": "Invalid stale skill repair draft without human review.",
+          "rationale": "The stale skill repair path must identify the skill and require human review.",
+          "sourceTranscriptRefs": ["transcript.conv-review.stale-skill.001#turn-001"],
+          "evidenceRefs": ["evidence.conv-review.stale-skill.001"],
+          "notes": ["Synthetic stale skill repair gate fixture."]
+        }
+      ],
+      "draftOnly": {
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true
+      }
+    }
+  },
+  "expected": {
+    "status": "warn",
+    "needsReview": true,
+    "blockedRouteHints": [
+      "conversation-review.blocked.missing-human-review",
+      "conversation-review.blocked.stale-skill-missing-skill-id"
+    ]
+  }
+}
