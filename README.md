@@ -60,6 +60,8 @@ The root-drop experience is an Agent Operating Layer. It is intentionally model-
 
 For the standalone upstream self-hosting alpha proof, see [docs/SELF_HOSTING_ALPHA.md](docs/SELF_HOSTING_ALPHA.md). That contract upgrades the user-facing flow to a single prompt: the AI checks whether ATM is initialized, runs the official `bootstrap` command only when needed, and then completes the first smoke.
 
+For the first-touch agent pack onboarding surface, see [docs/AGENT_PACK_ONBOARDING.md](docs/AGENT_PACK_ONBOARDING.md). It explains how `atm welcome`, `atm-chart`, and generated agent entry files guide a new agent back to `node atm.mjs next --json` without creating a second governance model.
+
 For advisory multi-agent confidence, run `node atm.mjs verify --agents-md --json` and `node atm.mjs self-host-alpha --verify --agent <profile> --json`. The supported profile matrix and latest advisory results live in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md).
 
 For the neutral command-level handoff flow, see [examples/agent-handoff-flow/README.md](examples/agent-handoff-flow/README.md). For behavior naming guidance, see [docs/governance/behavior-taxonomy.md](docs/governance/behavior-taxonomy.md).
@@ -119,6 +121,7 @@ See [docs/ECOSYSTEM_POSITIONING.md](docs/ECOSYSTEM_POSITIONING.md) for the posit
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the initial architecture and package boundary notes.
+Agent pack onboarding and first-touch rule rendering are described in [docs/AGENT_PACK_ONBOARDING.md](docs/AGENT_PACK_ONBOARDING.md).
 Canonical per-atom workspace layout, Atomic ID folder naming, and migration guidance live in [docs/ATOM_SPACE_LAYOUT.md](docs/ATOM_SPACE_LAYOUT.md).
 Atomic map replacement semantics live in [docs/MAP_REPLACEMENT_PROTOCOL.md](docs/MAP_REPLACEMENT_PROTOCOL.md).
 
