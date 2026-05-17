@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +33,49 @@ function runOnefile(entrypointPath: any, cwd: any, args: any) {
     exitCode: result.status ?? 0,
     parsed: payload ? JSON.parse(payload) : {}
   };
+}
+
+function runGit(cwd: any, args: any) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  assert(result.status === 0, `git ${args.join(' ')} must exit 0`);
+  return result.stdout.trim();
+}
+
+function tryReadHeadCommitSha(cwd: any) {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' });
+  return result.status === 0 ? result.stdout.trim() : null;
+}
+
+function refreshOnboarding(entrypointPath: any, cwd: any) {
+  const atmChart = runOnefile(entrypointPath, cwd, ['atm-chart', 'render', '--cwd', '.', '--json']);
+  assert(atmChart.exitCode === 0, 'onefile atm-chart render must exit 0 after bootstrap');
+  assert(atmChart.parsed.ok === true, 'onefile atm-chart render must report ok=true after bootstrap');
+
+  const welcome = runOnefile(entrypointPath, cwd, ['welcome', '--cwd', '.', '--json']);
+  assert(welcome.exitCode === 0, 'onefile welcome must exit 0 after bootstrap');
+  assert(welcome.parsed.ok === true, 'onefile welcome must report ok=true after bootstrap');
+}
+
+function writeGitHeadEvidence(cwd: any) {
+  const commitSha = tryReadHeadCommitSha(cwd);
+  if (!commitSha) return;
+  const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', 'git-head.json');
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  writeFileSync(evidencePath, `${JSON.stringify({
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        summary: 'Release validator covered the current Git HEAD before doctor.',
+        artifactPaths: [],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        producedBy: 'validate-onefile-release',
+        details: {
+          git: { commitSha }
+        }
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
 }
 
 const tempRoot = createTempWorkspace('atm-onefile-release-');
@@ -77,6 +120,8 @@ try {
   const bootstrap = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'onefile bootstrap must exit 0');
   assert(bootstrap.parsed.ok === true, 'onefile bootstrap must report ok=true');
+  refreshOnboarding(path.join(blankRepo, 'atm.mjs'), blankRepo);
+  writeGitHeadEvidence(blankRepo);
 
   const installSkill = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['guide', 'install-skill', '--cwd', '.', '--target', 'host', '--json']);
   assert(installSkill.exitCode === 0, 'onefile guide install-skill must exit 0');
