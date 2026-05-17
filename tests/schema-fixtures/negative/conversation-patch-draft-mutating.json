@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.conversationPatchDraftReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Negative conversation patch draft report fixture."
+  },
+  "generatedAt": "2026-05-17T02:05:00.000Z",
+  "bridgeName": "deterministic-conversation-patch-draft-bridge",
+  "sourceFindingsReport": {
+    "schemaId": "atm.conversationReviewFindingsReport",
+    "transcriptId": "transcript.conv-review.negative.001",
+    "findingIds": ["finding.conv-review.negative.001"]
+  },
+  "privacy": {
+    "redacted": true,
+    "containsSensitiveInput": false,
+    "redactionReportPaths": []
+  },
+  "summary": {
+    "totalFindings": 1,
+    "totalDrafts": 1,
+    "hostLocalDraftCount": 0,
+    "skillDraftCount": 0,
+    "atomDraftCount": 0,
+    "atomMapDraftCount": 0,
+    "observationCount": 1,
+    "humanReviewRequiredCount": 1
+  },
+  "drafts": [
+    {
+      "draftId": "draft.conversation.finding.conv-review.negative.001",
+      "sourceFindingId": "finding.conv-review.negative.001",
+      "findingKind": "workflow-adjustment",
+      "draftKind": "observation",
+      "draftSurface": "observation",
+      "operation": "observe-only",
+      "patchMode": "dry-run",
+      "appliesAutomatically": false,
+      "mutatesFiles": true,
+      "mutatesRegistry": false,
+      "mutatesSkillFiles": false,
+      "requiresHumanReview": true,
+      "summary": "Invalid mutating draft.",
+      "rationale": "This fixture must fail because patch drafts cannot mutate files.",
+      "sourceTranscriptRefs": ["transcript.conv-review.negative.001#turn-001"],
+      "evidenceRefs": ["evidence.conv-review.negative.001"],
+      "notes": ["Invalid mutating draft."]
+    }
+  ],
+  "draftOnly": {
+    "appliesAutomatically": false,
+    "mutatesFiles": false,
+    "mutatesRegistry": false,
+    "mutatesSkillFiles": false,
+    "requiresHumanReview": true
+  }
+}

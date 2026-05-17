@@ -1,0 +1,414 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/conversation-patch-draft-report.schema.json",
+  "title": "ATM Conversation Patch Draft Report v0.1",
+  "description": "Draft-only report that converts conversation review findings into host-local, skill, atom, atom-map, or observation patch drafts without applying them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "generatedAt",
+    "bridgeName",
+    "sourceFindingsReport",
+    "privacy",
+    "summary",
+    "drafts",
+    "draftOnly"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.conversationPatchDraftReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "bridgeName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceFindingsReport": {
+      "$ref": "#/$defs/sourceFindingsReport"
+    },
+    "privacy": {
+      "$ref": "#/$defs/privacy"
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "drafts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/draft"
+      }
+    },
+    "draftOnly": {
+      "$ref": "#/$defs/draftOnly"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sourceFindingsReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaId", "transcriptId", "findingIds"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.conversationReviewFindingsReport"
+        },
+        "artifactPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transcriptId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "findingIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["redacted", "containsSensitiveInput", "redactionReportPaths"],
+      "properties": {
+        "redacted": {
+          "const": true
+        },
+        "containsSensitiveInput": {
+          "type": "boolean"
+        },
+        "redactionReportPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "containsSensitiveInput": {
+                "const": true
+              }
+            },
+            "required": ["containsSensitiveInput"]
+          },
+          "then": {
+            "properties": {
+              "redactionReportPaths": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalFindings",
+        "totalDrafts",
+        "hostLocalDraftCount",
+        "skillDraftCount",
+        "atomDraftCount",
+        "atomMapDraftCount",
+        "observationCount",
+        "humanReviewRequiredCount"
+      ],
+      "properties": {
+        "totalFindings": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "totalDrafts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "hostLocalDraftCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skillDraftCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "atomDraftCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "atomMapDraftCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "humanReviewRequiredCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "draft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draftId",
+        "sourceFindingId",
+        "findingKind",
+        "draftKind",
+        "draftSurface",
+        "operation",
+        "patchMode",
+        "appliesAutomatically",
+        "mutatesFiles",
+        "mutatesRegistry",
+        "mutatesSkillFiles",
+        "requiresHumanReview",
+        "summary",
+        "rationale",
+        "sourceTranscriptRefs",
+        "evidenceRefs",
+        "notes"
+      ],
+      "properties": {
+        "draftId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceFindingId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "findingKind": {
+          "enum": ["style-format-correction", "workflow-adjustment", "non-trivial-debug-path", "stale-or-wrong-skill"]
+        },
+        "draftKind": {
+          "enum": ["host-local-overlay", "skill-patch", "atom-patch", "atom-map-patch", "observation"]
+        },
+        "draftSurface": {
+          "enum": ["host-local-overlay", "skill", "atom-spec", "atom-map", "observation"]
+        },
+        "operation": {
+          "enum": ["record-host-local-preference", "repair-workflow", "capture-debug-path", "repair-stale-skill", "observe-only"]
+        },
+        "patchMode": {
+          "const": "dry-run"
+        },
+        "appliesAutomatically": {
+          "const": false
+        },
+        "mutatesFiles": {
+          "const": false
+        },
+        "mutatesRegistry": {
+          "const": false
+        },
+        "mutatesSkillFiles": {
+          "const": false
+        },
+        "requiresHumanReview": {
+          "const": true
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceTranscriptRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "patchFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "skillId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "atomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "atomMapId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upgradeProposalDraft": {
+          "$ref": "https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "draftKind": {
+                "const": "atom-patch"
+              }
+            },
+            "required": ["draftKind"]
+          },
+          "then": {
+            "required": ["atomId", "upgradeProposalDraft"],
+            "properties": {
+              "draftSurface": {
+                "const": "atom-spec"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "draftKind": {
+                "const": "host-local-overlay"
+              }
+            },
+            "required": ["draftKind"]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["atomId"] },
+                { "required": ["atomMapId"] },
+                { "required": ["upgradeProposalDraft"] }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "findingKind": {
+                "const": "stale-or-wrong-skill"
+              }
+            },
+            "required": ["findingKind"]
+          },
+          "then": {
+            "required": ["skillId"],
+            "properties": {
+              "draftKind": {
+                "const": "skill-patch"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "draftKind": {
+                "const": "observation"
+              }
+            },
+            "required": ["draftKind"]
+          },
+          "then": {
+            "properties": {
+              "draftSurface": {
+                "const": "observation"
+              },
+              "operation": {
+                "const": "observe-only"
+              }
+            },
+            "not": {
+              "required": ["upgradeProposalDraft"]
+            }
+          }
+        }
+      ]
+    },
+    "draftOnly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["appliesAutomatically", "mutatesFiles", "mutatesRegistry", "mutatesSkillFiles", "requiresHumanReview"],
+      "properties": {
+        "appliesAutomatically": {
+          "const": false
+        },
+        "mutatesFiles": {
+          "const": false
+        },
+        "mutatesRegistry": {
+          "const": false
+        },
+        "mutatesSkillFiles": {
+          "const": false
+        },
+        "requiresHumanReview": {
+          "const": true
+        }
+      }
+    }
+  }
+}

@@ -31,6 +31,7 @@ const metricDrivenFixturePath = 'fixtures/upgrade/metric-driven-proposal.json';
 const metricRegressionBlockedFixturePath = 'fixtures/upgrade/metric-regression-blocked-proposal.json';
 const charterViolationBlockedFixturePath = 'fixtures/upgrade/charter-violation-blocked-proposal.json';
 const charterWaiverFixturePath = 'fixtures/upgrade/charter-waiver-proposal.json';
+const conversationPatchDraftFixturePath = 'fixtures/evolution/conversation-skill-review/patch-draft-bridge/four-findings-patch-drafts.json';
 const scanSchemaPath = 'schemas/governance/evolution-scan-report.schema.json';
 const inputPaths = {
   hashDiff: 'fixtures/upgrade/hash-diff-report.json',
@@ -143,7 +144,7 @@ function assertCliContextBudgetGate(result: any, expectedPassed: any) {
   }
 }
 
-for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, mapCuratorComposeFixturePath, mapCuratorMergeFixturePath, mapCuratorDedupMergeFixturePath, mapCuratorSweepFixturePath, metricDrivenFixturePath, metricRegressionBlockedFixturePath, charterViolationBlockedFixturePath, charterWaiverFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
+for (const relativePath of [schemaPath, scanSchemaPath, passFixturePath, blockedFixturePath, mapBumpFixturePath, atomExtractFixturePath, evidenceDrivenFixturePath, staleFixturePath, mapCuratorComposeFixturePath, mapCuratorMergeFixturePath, mapCuratorDedupMergeFixturePath, mapCuratorSweepFixturePath, metricDrivenFixturePath, metricRegressionBlockedFixturePath, charterViolationBlockedFixturePath, charterWaiverFixturePath, conversationPatchDraftFixturePath, 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', ...Object.values(inputPaths), 'packages/core/src/upgrade/propose.ts', 'packages/core/src/upgrade/evolution-draft.ts', 'packages/plugin-sdk/src/detector/evidence-pattern-detector.ts', 'packages/cli/src/commands/upgrade.ts']) {
   check(existsSync(path.join(root, relativePath)), `missing required file: ${relativePath}`);
 }
 
@@ -528,4 +529,15 @@ check(typeof expectedCharterWaiver.charterWaiver?.approvedBy === 'string', 'char
 check(expectedCharterWaiver.automatedGates.charterGate?.passed === true, 'charter-waiver fixture must have charterGate.passed=true');
 check(!expectedCharterWaiver.automatedGates.blockedGateNames.includes('charterInvariantViolation'), 'charter-waiver fixture must not block on charterInvariantViolation');
 
-console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, CLI replay, metric-driven track, evolution-loop fixtures, and charter promotion gate verified)`);
+// M11 — conversation patch draft bridge emits schema-valid atom UpgradeProposal drafts
+const conversationPatchDraftFixture = readJson(conversationPatchDraftFixturePath);
+const conversationAtomPatchDraft = conversationPatchDraftFixture.expectedReport.drafts.find((draft: any) => draft.draftKind === 'atom-patch');
+check(conversationAtomPatchDraft?.upgradeProposalDraft, 'M11 fixture must include an atom patch UpgradeProposal draft');
+validateWithSchema(conversationAtomPatchDraft.upgradeProposalDraft, validate, 'conversation atom patch proposal draft');
+assertInvariants(conversationAtomPatchDraft.upgradeProposalDraft, 'pending');
+check(conversationAtomPatchDraft.upgradeProposalDraft.proposalSource === 'evidence-driven', 'conversation atom patch proposal must be evidence-driven');
+check(conversationAtomPatchDraft.upgradeProposalDraft.targetSurface === 'atom-spec', 'conversation atom patch proposal must target atom-spec');
+check(conversationAtomPatchDraft.upgradeProposalDraft.inputs.some((entry: any) => entry.kind === 'evolution-evidence'), 'conversation atom patch proposal must cite evolution evidence input');
+check(conversationAtomPatchDraft.upgradeProposalDraft.inputs.some((entry: any) => entry.kind === 'redaction-report'), 'conversation atom patch proposal must preserve redaction report input');
+
+console.log(`[upgrade-proposal:${mode}] ok (schema, invariants, core proposer, CLI replay, metric-driven track, evolution-loop fixtures, charter promotion gate, and conversation patch draft bridge verified)`);

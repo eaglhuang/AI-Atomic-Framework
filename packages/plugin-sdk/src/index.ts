@@ -119,16 +119,26 @@ export type {
 export {
   ConversationDrivenExtractionError,
   ConversationTranscriptReviewError,
+  conversationPatchDraftBridgeName,
   conversationReviewFindingKinds,
   conversationEvidenceExtractorName,
   conversationTranscriptReviewerName,
+  draftConversationPatches,
   reviewConversationTranscript,
   extractEvidenceFromConversations
 } from './conversation';
 export type {
+  ConversationAtomUpgradeProposalDraft,
   ConversationDrivenExtractionErrorCode,
   ConversationEvidenceExtractionInput,
   ConversationEvidenceExtractionReport,
+  ConversationPatchDraftBridgeInput,
+  ConversationPatchDraftGateResult,
+  ConversationPatchDraftItem,
+  ConversationPatchDraftOperation,
+  ConversationPatchDraftProposalInput,
+  ConversationPatchDraftReport,
+  ConversationPatchDraftSurface,
   ConversationTranscript,
   ConversationTranscriptReviewErrorCode,
   ConversationTranscriptReviewInput,

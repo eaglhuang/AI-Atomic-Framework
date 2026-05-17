@@ -1,0 +1,125 @@
+{
+  "description": "M11 patch draft bridge fixture proving observation-only findings do not become patch or upgrade proposal drafts.",
+  "input": {
+    "findingsReport": {
+      "schemaId": "atm.conversationReviewFindingsReport",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Observation-only conversation review finding fixture."
+      },
+      "generatedAt": "2026-05-17T02:00:00.000Z",
+      "reviewerName": "deterministic-conversation-skill-reviewer",
+      "window": "2026-W20",
+      "sourceTranscript": {
+        "transcriptId": "transcript.conv-review.observation.001",
+        "sessionId": "session.conv-review.observation.001",
+        "artifactPaths": ["artifacts/conversation-review/observation-001.redacted.jsonl"]
+      },
+      "privacy": {
+        "redacted": true,
+        "containsSensitiveInput": false,
+        "redactionReportPaths": []
+      },
+      "summary": {
+        "totalFindings": 1,
+        "draftCount": 0,
+        "observationCount": 1,
+        "findingKinds": ["workflow-adjustment"]
+      },
+      "findings": [
+        {
+          "findingId": "finding.conv-review.observation.001",
+          "findingKind": "workflow-adjustment",
+          "signalKind": "user-correction",
+          "signalScope": "repo",
+          "confidence": 0.42,
+          "sourceTranscriptRefs": ["transcript.conv-review.observation.001#turn-006"],
+          "evidenceRefs": ["evidence.conv.session.conv-review.observation.001.user-correction.none"],
+          "recommendedTarget": "observation-only",
+          "recommendation": "observation-only",
+          "rationale": "Single low-confidence workflow note should wait for recurrence before drafting a patch.",
+          "patchDraft": {
+            "draftKind": "observation",
+            "patchMode": "dry-run",
+            "mutatesFiles": false,
+            "mutatesRegistry": false,
+            "requiresHumanReview": true,
+            "summary": "Keep as observation until recurring evidence appears."
+          }
+        }
+      ],
+      "draftOnly": {
+        "appliesAutomatically": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true
+      }
+    },
+    "generatedAt": "2026-05-17T02:05:00.000Z",
+    "sourceReportPath": "synthetic/observation-only-findings.json",
+    "proposedBy": "ATM Conversation Patch Draft Bridge"
+  },
+  "expectedReport": {
+    "schemaId": "atm.conversationPatchDraftReport",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Deterministic bridge from conversation review findings to dry-run patch drafts."
+    },
+    "generatedAt": "2026-05-17T02:05:00.000Z",
+    "bridgeName": "deterministic-conversation-patch-draft-bridge",
+    "sourceFindingsReport": {
+      "schemaId": "atm.conversationReviewFindingsReport",
+      "artifactPath": "synthetic/observation-only-findings.json",
+      "transcriptId": "transcript.conv-review.observation.001",
+      "sessionId": "session.conv-review.observation.001",
+      "findingIds": ["finding.conv-review.observation.001"]
+    },
+    "privacy": {
+      "redacted": true,
+      "containsSensitiveInput": false,
+      "redactionReportPaths": []
+    },
+    "summary": {
+      "totalFindings": 1,
+      "totalDrafts": 1,
+      "hostLocalDraftCount": 0,
+      "skillDraftCount": 0,
+      "atomDraftCount": 0,
+      "atomMapDraftCount": 0,
+      "observationCount": 1,
+      "humanReviewRequiredCount": 1
+    },
+    "drafts": [
+      {
+        "draftId": "draft.conversation.finding.conv-review.observation.001",
+        "sourceFindingId": "finding.conv-review.observation.001",
+        "findingKind": "workflow-adjustment",
+        "draftKind": "observation",
+        "draftSurface": "observation",
+        "operation": "observe-only",
+        "patchMode": "dry-run",
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true,
+        "summary": "Keep as observation until recurring evidence appears.",
+        "rationale": "Single low-confidence workflow note should wait for recurrence before drafting a patch.",
+        "sourceTranscriptRefs": ["transcript.conv-review.observation.001#turn-006"],
+        "evidenceRefs": ["evidence.conv.session.conv-review.observation.001.user-correction.none"],
+        "notes": ["Observation-only finding; no patch or proposal draft was produced."]
+      }
+    ],
+    "draftOnly": {
+      "appliesAutomatically": false,
+      "mutatesFiles": false,
+      "mutatesRegistry": false,
+      "mutatesSkillFiles": false,
+      "requiresHumanReview": true
+    }
+  }
+}

@@ -512,24 +512,26 @@ M10 已於 2026-05-17 完成。新增 canonical redacted transcript schema、det
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-skill-review`
 - `npm --prefix C:\Users\User\AI-Atomic-Framework run validate:conversation-evolution`
 
-### M11 - Skill / Atom Patch Draft Bridge
+### M11 - Skill / Atom Patch Draft Bridge ✅ DONE
 
 目的：把 conversation review findings 轉成可審查、可回滾、不可自動套用的 patch draft。
 
 交付物：
 
-- Skill patch draft contract。
-- Atom patch draft bridge。
-- Host-local overlay draft fixture。
-- Observation-only fixture。
+- `schemas/governance/conversation-patch-draft-report.schema.json`。✅
+- `packages/plugin-sdk/src/conversation/conversation-patch-draft-bridge.ts`。✅
+- Host-local overlay draft fixture。✅
+- Observation-only fixture。✅
 
 Checklist：
 
-- [ ] `style-format-correction` 預設只產 `host-local-overlay` 或 observation。
-- [ ] `workflow-adjustment` 可產 Atom patch draft 或 skill patch draft，但不得直接改檔。
-- [ ] `non-trivial-debug-path` 可轉成 SOP / Pitfall draft，仍須 human review。
-- [ ] `stale-or-wrong-skill` 可產 skill repair draft，必須引用 skill id 與 evidence refs。
-- [ ] 所有 draft 必須維持 dry-run、human-review-required。
+- [x] `style-format-correction` 預設只產 `host-local-overlay` 或 observation。
+- [x] `workflow-adjustment` 可產 Atom patch draft 或 skill patch draft，但不得直接改檔。
+- [x] `non-trivial-debug-path` 可轉成 SOP / Pitfall draft，仍須 human review。
+- [x] `stale-or-wrong-skill` 可產 skill repair draft，必須引用 skill id 與 evidence refs。
+- [x] 所有 draft 必須維持 dry-run、human-review-required。
+
+M11 已於 2026-05-17 完成。新增 conversation patch draft report schema、deterministic patch draft bridge、host-local / atom / skill / observation fixtures，並延伸 `validate-conversation-skill-review` 與 `validate-upgrade-proposal`，確認 atom patch draft 會生成 schema-valid `UpgradeProposal`，但所有 draft 仍維持 dry-run、不可直接改檔、不可改 registry、必須 human review。
 
 驗證：
 

@@ -3,6 +3,11 @@ import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { conversationReviewFindingKinds, type ConversationReviewFindingsReport } from '../packages/plugin-sdk/src/conversation/conversation-review-finding.ts';
 import {
+  draftConversationPatches,
+  type ConversationPatchDraftBridgeInput,
+  type ConversationPatchDraftReport
+} from '../packages/plugin-sdk/src/conversation/conversation-patch-draft-bridge.ts';
+import {
   reviewConversationTranscript,
   type ConversationTranscriptReviewInput
 } from '../packages/plugin-sdk/src/conversation/conversation-transcript-reviewer.ts';
@@ -14,9 +19,15 @@ const { createAjv, readJson, repoPath, assert: check, ok } = validator;
 
 const schema = readJson<AnySchema>('schemas/governance/conversation-review-findings-report.schema.json');
 const transcriptSchema = readJson<AnySchema>('schemas/governance/conversation-transcript.schema.json');
+const patchDraftSchema = readJson<AnySchema>('schemas/governance/conversation-patch-draft-report.schema.json');
+const upgradeProposalSchema = readJson<AnySchema>('schemas/upgrade/upgrade-proposal.schema.json');
 const ajv = createAjv();
+ajv.addSchema(upgradeProposalSchema);
 const validateReport = ajv.compile(schema);
 const validateTranscript = ajv.compile(transcriptSchema);
+const validatePatchDraftReport = ajv.compile(patchDraftSchema);
+const validateUpgradeProposal = ajv.getSchema('https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json');
+check(validateUpgradeProposal !== undefined, 'upgrade proposal schema must be registered for patch draft validation');
 const fixtureRoot = repoPath('fixtures', 'evolution', 'conversation-skill-review');
 const fixtureFiles = readdirSync(fixtureRoot)
   .filter((entry) => entry.endsWith('.json'))
@@ -25,14 +36,28 @@ const transcriptFixtureRoot = repoPath('fixtures', 'evolution', 'conversation-sk
 const transcriptFixtureFiles = existsSync(transcriptFixtureRoot)
   ? readdirSync(transcriptFixtureRoot).filter((entry) => entry.endsWith('.json')).sort()
   : [];
+const patchDraftFixtureRoot = repoPath('fixtures', 'evolution', 'conversation-skill-review', 'patch-draft-bridge');
+const patchDraftFixtureFiles = existsSync(patchDraftFixtureRoot)
+  ? readdirSync(patchDraftFixtureRoot).filter((entry) => entry.endsWith('.json')).sort()
+  : [];
 
 check(fixtureFiles.length >= 1, 'expected conversation skill review fixtures');
 check(transcriptFixtureFiles.length >= 1, 'expected conversation transcript reviewer fixtures');
+check(patchDraftFixtureFiles.length >= 1, 'expected conversation patch draft bridge fixtures');
 
 type TranscriptReviewFixture = {
   readonly description?: string;
   readonly input: ConversationTranscriptReviewInput;
   readonly expectedReport: ConversationReviewFindingsReport;
+};
+
+type PatchDraftBridgeFixture = {
+  readonly description?: string;
+  readonly input: Omit<ConversationPatchDraftBridgeInput, 'findingsReport'> & {
+    readonly findingsReport?: ConversationReviewFindingsReport;
+    readonly findingsReportPath?: string;
+  };
+  readonly expectedReport: ConversationPatchDraftReport;
 };
 
 const seenKinds = new Set<string>();
@@ -109,8 +134,90 @@ for (const fixtureFile of transcriptFixtureFiles) {
   validatedFindings += generatedReport.findings.length;
 }
 
+let validatedPatchDraftFixtures = 0;
+let validatedPatchDrafts = 0;
+
+for (const fixtureFile of patchDraftFixtureFiles) {
+  const relativePath = path.join('fixtures', 'evolution', 'conversation-skill-review', 'patch-draft-bridge', fixtureFile).replace(/\\/g, '/');
+  const fixture = readJson<PatchDraftBridgeFixture>(relativePath);
+  const findingsReport = fixture.input.findingsReport ?? (fixture.input.findingsReportPath ? readJson<ConversationReviewFindingsReport>(fixture.input.findingsReportPath) : undefined);
+  check(findingsReport !== undefined, `${fixtureFile} must provide findingsReport or findingsReportPath`);
+  check(validateReport(findingsReport) === true, `${fixtureFile} input findings report failed schema validation: ${JSON.stringify(validateReport.errors)}`);
+
+  const generatedReport = draftConversationPatches({
+    findingsReport,
+    generatedAt: fixture.input.generatedAt,
+    bridgeName: fixture.input.bridgeName,
+    sourceReportPath: fixture.input.sourceReportPath,
+    proposedBy: fixture.input.proposedBy,
+    atomVersionById: fixture.input.atomVersionById
+  });
+  check(validatePatchDraftReport(generatedReport) === true, `${fixtureFile} generated patch draft report failed schema validation: ${JSON.stringify(validatePatchDraftReport.errors)}`);
+  check(validatePatchDraftReport(fixture.expectedReport) === true, `${fixtureFile} expected patch draft report failed schema validation: ${JSON.stringify(validatePatchDraftReport.errors)}`);
+  assert.deepEqual(generatedReport, fixture.expectedReport, `${fixtureFile} generated patch draft report must match expectedReport`);
+  assertPatchDraftReportInvariants(generatedReport, fixtureFile);
+
+  validatedPatchDraftFixtures += 1;
+  validatedPatchDrafts += generatedReport.drafts.length;
+}
+
 for (const findingKind of conversationReviewFindingKinds) {
   check(seenKinds.has(findingKind), `conversation skill review fixtures must cover ${findingKind}`);
 }
 
-ok(`validated ${validatedReports} conversation skill review report(s), ${validatedFindings} finding(s), ${seenKinds.size} finding kinds, transcriptFixtures=${validatedTranscriptFixtures}`);
+ok(`validated ${validatedReports} conversation skill review report(s), ${validatedFindings} finding(s), ${seenKinds.size} finding kinds, transcriptFixtures=${validatedTranscriptFixtures}, patchDraftFixtures=${validatedPatchDraftFixtures}, patchDrafts=${validatedPatchDrafts}`);
+
+function assertPatchDraftReportInvariants(report: ConversationPatchDraftReport, label: string): void {
+  check(report.draftOnly.appliesAutomatically === false, `${label} patch drafts must not apply automatically`);
+  check(report.draftOnly.mutatesFiles === false, `${label} patch draft report must not mutate files`);
+  check(report.draftOnly.mutatesRegistry === false, `${label} patch draft report must not mutate registry`);
+  check(report.draftOnly.mutatesSkillFiles === false, `${label} patch draft report must not mutate skill files`);
+  check(report.draftOnly.requiresHumanReview === true, `${label} patch draft report must require human review`);
+  check(report.summary.totalDrafts === report.drafts.length, `${label} summary.totalDrafts must match drafts length`);
+  check(report.summary.totalFindings === report.sourceFindingsReport.findingIds.length, `${label} summary.totalFindings must match source finding ids`);
+  check(report.summary.hostLocalDraftCount === report.drafts.filter((draft) => draft.draftKind === 'host-local-overlay').length, `${label} host-local draft count mismatch`);
+  check(report.summary.skillDraftCount === report.drafts.filter((draft) => draft.draftKind === 'skill-patch').length, `${label} skill draft count mismatch`);
+  check(report.summary.atomDraftCount === report.drafts.filter((draft) => draft.draftKind === 'atom-patch').length, `${label} atom draft count mismatch`);
+  check(report.summary.atomMapDraftCount === report.drafts.filter((draft) => draft.draftKind === 'atom-map-patch').length, `${label} atom-map draft count mismatch`);
+  check(report.summary.observationCount === report.drafts.filter((draft) => draft.draftKind === 'observation').length, `${label} observation count mismatch`);
+  check(report.summary.humanReviewRequiredCount === report.drafts.filter((draft) => draft.requiresHumanReview).length, `${label} human review count mismatch`);
+
+  for (const draft of report.drafts) {
+    check(draft.patchMode === 'dry-run', `${label} ${draft.draftId} must stay dry-run`);
+    check(draft.appliesAutomatically === false, `${label} ${draft.draftId} must not apply automatically`);
+    check(draft.mutatesFiles === false, `${label} ${draft.draftId} must not mutate files`);
+    check(draft.mutatesRegistry === false, `${label} ${draft.draftId} must not mutate registry`);
+    check(draft.mutatesSkillFiles === false, `${label} ${draft.draftId} must not mutate skill files`);
+    check(draft.requiresHumanReview === true, `${label} ${draft.draftId} must require human review`);
+    check(draft.evidenceRefs.length > 0, `${label} ${draft.draftId} must cite evidence refs`);
+    check(draft.sourceTranscriptRefs.length > 0, `${label} ${draft.draftId} must cite transcript refs`);
+
+    if (draft.draftKind === 'host-local-overlay') {
+      check(draft.atomId === undefined, `${label} ${draft.draftId} host-local draft must not carry atomId`);
+      check(draft.atomMapId === undefined, `${label} ${draft.draftId} host-local draft must not carry atomMapId`);
+      check(draft.upgradeProposalDraft === undefined, `${label} ${draft.draftId} host-local draft must not produce upgrade proposal`);
+    }
+
+    if (draft.draftKind === 'atom-patch') {
+      check(draft.atomId !== undefined, `${label} ${draft.draftId} atom patch draft must cite atomId`);
+      check(draft.upgradeProposalDraft !== undefined, `${label} ${draft.draftId} atom patch draft must include upgrade proposal draft`);
+      check(validateUpgradeProposal(draft.upgradeProposalDraft) === true, `${label} ${draft.draftId} upgrade proposal draft failed schema validation: ${JSON.stringify(validateUpgradeProposal.errors)}`);
+      check(draft.upgradeProposalDraft?.humanReview === 'pending', `${label} ${draft.draftId} upgrade proposal draft must await human review`);
+      check(draft.upgradeProposalDraft?.targetSurface === 'atom-spec', `${label} ${draft.draftId} upgrade proposal draft must target atom-spec`);
+      check(draft.upgradeProposalDraft?.inputs.some((entry) => entry.kind === 'evolution-evidence'), `${label} ${draft.draftId} upgrade proposal draft must cite evolution evidence input`);
+      if (report.privacy.containsSensitiveInput) {
+        check(draft.upgradeProposalDraft?.inputs.some((entry) => entry.kind === 'redaction-report'), `${label} ${draft.draftId} sensitive atom patch must cite redaction report input`);
+      }
+    }
+
+    if (draft.findingKind === 'stale-or-wrong-skill') {
+      check(Boolean(draft.skillId), `${label} ${draft.draftId} stale skill repair draft must cite skillId`);
+      check(draft.draftKind === 'skill-patch', `${label} ${draft.draftId} stale skill repair must stay a skill patch draft`);
+    }
+
+    if (draft.draftKind === 'observation') {
+      check(draft.upgradeProposalDraft === undefined, `${label} ${draft.draftId} observation draft must not include upgrade proposal`);
+      check(draft.operation === 'observe-only', `${label} ${draft.draftId} observation draft must stay observe-only`);
+    }
+  }
+}
