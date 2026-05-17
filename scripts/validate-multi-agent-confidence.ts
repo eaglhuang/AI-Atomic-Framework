@@ -61,6 +61,21 @@ const matrixDoc = readFileSync(path.join(root, 'docs/multi-agent-compatibility-m
 const batch = readJson('tests/agents/results/latest-batch.json');
 assert(Array.isArray(batch.reports) && batch.reports.length === supportedAgentProfiles.length, 'latest-batch.json must cover all supported agent profiles');
 
+for (const marker of ['Integration Adapter', 'Charter Entry Status', 'First Command', 'Adapter Install + First Command', 'examples/agent-onboarding-flow/run.ts']) {
+  assert(matrixDoc.includes(marker) || resultsDoc.includes(marker), `multi-agent docs must include M9 marker: ${marker}`);
+}
+
+const adapterInstallReadyRows = [
+  'Claude Code | pass | true | pass | pass',
+  'Cursor | pass | true | pass | pass',
+  'GitHub Copilot Agent | pass | true | pass | pass'
+].filter((rowMarker) => resultsDoc.includes(rowMarker));
+assert(adapterInstallReadyRows.length >= 3, 'multi-agent results must show at least three agents with adapter install + first command pass');
+
+for (const integrationAdapterId of ['`claude-code`', '`cursor`', '`copilot`']) {
+  assert(matrixDoc.includes(integrationAdapterId), `multi-agent matrix must expose integration adapter ${integrationAdapterId}`);
+}
+
 for (const profile of supportedAgentProfiles) {
   const result = runAtm(['self-host-alpha', '--verify', '--agent', profile.id], root);
   assert(result.exitCode === 0, `self-host-alpha --verify --agent ${profile.id} must exit 0`);

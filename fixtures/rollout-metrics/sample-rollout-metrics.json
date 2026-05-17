@@ -66,6 +66,63 @@
     "privacyBlockedFindings": 2,
     "privacyBlockRate": 0.1
   },
+  "integrationMetrics": {
+    "adaptersTotal": 4,
+    "installSucceeded": 4,
+    "installFailed": 0,
+    "adapterInstallSuccessRate": 1,
+    "driftChecked": 4,
+    "drifted": 1,
+    "integrationDriftRate": 0.25,
+    "charterChecks": 4,
+    "charterViolations": 1,
+    "charterViolationRate": 0.25,
+    "charterConflictCounts": {
+      "hostOverridesCharter": 1
+    },
+    "adapterResults": [
+      {
+        "adapterId": "claude-code",
+        "agentLabel": "Claude Code",
+        "installed": true,
+        "verified": true,
+        "firstCommand": "node atm.mjs next --json",
+        "charterInjected": true,
+        "driftDetected": false,
+        "charterViolationDetected": false
+      },
+      {
+        "adapterId": "cursor",
+        "agentLabel": "Cursor",
+        "installed": true,
+        "verified": true,
+        "firstCommand": "node atm.mjs next --json",
+        "charterInjected": true,
+        "driftDetected": false,
+        "charterViolationDetected": false
+      },
+      {
+        "adapterId": "copilot",
+        "agentLabel": "GitHub Copilot Agent",
+        "installed": true,
+        "verified": false,
+        "firstCommand": "node atm.mjs next --json",
+        "charterInjected": true,
+        "driftDetected": true,
+        "charterViolationDetected": false
+      },
+      {
+        "adapterId": "gemini",
+        "agentLabel": "Gemini CLI",
+        "installed": true,
+        "verified": true,
+        "firstCommand": "node atm.mjs next --json",
+        "charterInjected": true,
+        "driftDetected": false,
+        "charterViolationDetected": true
+      }
+    ]
+  },
   "costBudgetMetrics": {
     "unit": "tokens",
     "budgetLimit": 250000,

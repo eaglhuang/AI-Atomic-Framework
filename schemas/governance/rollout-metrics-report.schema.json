@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.ai-atomic-framework.dev/governance/rollout-metrics-report.schema.json",
   "title": "ATM Rollout Metrics Report v0.1",
-  "description": "Tracks proposal precision, acceptance rates, stale rates, false-positive review results, blocked-reason distributions, curator merge accuracy, rollback rates, optional conversation learning metrics, optional cost/budget usage, and configuration parameters for the ATM atom evolution rollout.",
+  "description": "Tracks proposal precision, acceptance rates, stale rates, false-positive review results, blocked-reason distributions, curator merge accuracy, rollback rates, optional conversation learning metrics, optional framework integration metrics, optional cost/budget usage, and configuration parameters for the ATM atom evolution rollout.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -333,6 +333,135 @@
           "minimum": 0,
           "maximum": 1,
           "description": "privacyBlockedFindings / totalFindings."
+        }
+      }
+    },
+    "integrationMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adaptersTotal",
+        "installSucceeded",
+        "installFailed",
+        "adapterInstallSuccessRate",
+        "driftChecked",
+        "drifted",
+        "integrationDriftRate",
+        "charterChecks",
+        "charterViolations",
+        "charterViolationRate",
+        "charterConflictCounts",
+        "adapterResults"
+      ],
+      "properties": {
+        "adaptersTotal": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total integration adapters measured in this rollout window."
+        },
+        "installSucceeded": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Adapters that installed successfully."
+        },
+        "installFailed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Adapters that failed install or init."
+        },
+        "adapterInstallSuccessRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "installSucceeded / adaptersTotal — adapter-install-success rate."
+        },
+        "driftChecked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Installed adapters checked against their install manifests."
+        },
+        "drifted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Adapters whose generated files drifted from manifest hashes."
+        },
+        "integrationDriftRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "drifted / driftChecked — integration-drift rate."
+        },
+        "charterChecks": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Integration or host rule checks that evaluated AtomicCharter compatibility."
+        },
+        "charterViolations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Charter conflicts detected in the integration rollout window."
+        },
+        "charterViolationRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "charterViolations / charterChecks — charter-violation rate."
+        },
+        "charterConflictCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "Charter conflict category -> count."
+        },
+        "adapterResults": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "adapterId",
+              "agentLabel",
+              "installed",
+              "verified",
+              "firstCommand",
+              "charterInjected",
+              "driftDetected",
+              "charterViolationDetected"
+            ],
+            "properties": {
+              "adapterId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "agentLabel": {
+                "type": "string",
+                "minLength": 1
+              },
+              "installed": {
+                "type": "boolean"
+              },
+              "verified": {
+                "type": "boolean"
+              },
+              "firstCommand": {
+                "const": "node atm.mjs next --json"
+              },
+              "charterInjected": {
+                "type": "boolean"
+              },
+              "driftDetected": {
+                "type": "boolean"
+              },
+              "charterViolationDetected": {
+                "type": "boolean"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },

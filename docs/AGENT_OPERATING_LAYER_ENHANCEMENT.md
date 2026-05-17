@@ -160,6 +160,24 @@ same `node atm.mjs ...` route for each entry. The active platform only changes
 which directory is recommended in hints; it does not change the installed script
 surface.
 
+### Framework-neutral Onboarding Example
+
+`examples/agent-onboarding-flow/` is the framework smoke for adapter onboarding.
+It creates a temporary host repository, installs Claude Code, Cursor, and GitHub
+Copilot Agent adapters through `atm init --integration <id>`, verifies their
+manifests, checks `node atm.mjs next --json` preservation, and confirms the
+charter conflict fixture is detectable. The example intentionally avoids
+first-touch welcome prompts or host-specific onboarding text.
+
+### Integration Rollout Metrics
+
+Rollout reports can include `integrationMetrics` from
+`schemas/governance/rollout-metrics-report.schema.json`. These metrics measure
+adapter install success rate, integration drift rate, charter violation rate,
+and per-adapter first-command / charter injection evidence. The sample fixture
+`fixtures/rollout-metrics/integration-adapter-sample.json` anchors those fields
+for deterministic validation.
+
 ---
 
 ## Non-goals
@@ -185,6 +203,10 @@ M6 is delivered as the CLI lifecycle for those adapters. `atm integration list/a
 M7 is delivered as a framework-neutral entry template compiler. `templates/skills/*.skill.md` holds the seven ATM entry sources plus `skill.schema.json`; `packages/integrations-core` parses and compiles them for Claude Code, Copilot, Cursor, and Gemini; `validate:skill-templates` locks schema validity, charter injection, ATM CLI handoffs, and the rule that planning hints stay out of static templates.
 
 M8 is delivered as paired script wrapper parity. `templates/root-drop/.atm/scripts/sh/atm-*.sh` and `templates/root-drop/.atm/scripts/ps/atm-*.ps1` wrap the same node routes, `atm init` installs both sets, and `validate:script-parity` checks route parity, wrapper thinness, wrapper smoke, and hello-world compatibility.
+
+M9 is delivered as the framework-neutral multi-agent onboarding smoke. `examples/agent-onboarding-flow/` installs and verifies Claude Code, Cursor, and GitHub Copilot Agent adapters in a temporary host repository, checks first-command preservation and charter injection, and `validate:examples` keeps the flow under the five-minute smoke target. `docs/multi-agent-compatibility-matrix.md`, `docs/multi-agent-results.md`, and `validate:multi-agent-confidence` now record adapter install, first-command, and charter entry status.
+
+M10 is delivered as framework integration rollout metrics. `schemas/governance/rollout-metrics-report.schema.json` exposes `integrationMetrics`, `fixtures/rollout-metrics/integration-adapter-sample.json` covers adapter install success, integration drift, and charter violation rates, and `validate:rollout-metrics` checks those rates against deterministic counts.
 
 See [CHANGELOG.md](../CHANGELOG.md) for delivered milestone entries.
 

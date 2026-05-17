@@ -38,6 +38,7 @@ This is the single-file embedded runtime path (no sibling bundle directory requi
 ```bash
 npm --workspace @ai-atomic-framework/example-hello-world test
 npm --workspace @ai-atomic-framework/example-legacy-strangler-minimal test
+node --experimental-strip-types examples/agent-onboarding-flow/run.ts
 node atm.mjs validate --spec examples/hello-world/atoms/hello-world.atom.json
 ```
 

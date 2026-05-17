@@ -79,6 +79,10 @@ Adapter entry files are compiled from framework-neutral source templates under `
 
 Root-drop adoption also installs paired POSIX and PowerShell wrappers under `.atm/scripts/sh/` and `.atm/scripts/ps/`. These wrappers stay thin: each resolves the repository root and invokes the same `node atm.mjs ...` command route. The platform hint can prefer the native directory, but both script sets are written so Windows, Linux, and macOS entry surfaces remain in parity.
 
+The framework-neutral integration smoke lives in `examples/agent-onboarding-flow/`. It installs Claude Code, Cursor, and GitHub Copilot Agent adapters into a temporary host repository, verifies their per-adapter manifests, proves that generated entry files preserve `node atm.mjs next --json`, and checks that charter conflicts remain detectable through the charter invariant schema. This example deliberately excludes first-touch welcome or host-specific onboarding rules; those belong above the framework adapter layer.
+
+Integration rollout quality is reported through `integrationMetrics` in `schemas/governance/rollout-metrics-report.schema.json`. The metrics track adapter install success rate, manifest drift rate, charter violation rate, per-adapter first-command preservation, and per-adapter charter injection status without creating a second task or approval system.
+
 ### CAR Reporting Lens
 
 ATM can be described through the Harness Engineering CAR lens without changing its core layers:

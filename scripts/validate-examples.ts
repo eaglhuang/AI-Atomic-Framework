@@ -41,6 +41,13 @@ const conversationLearningLoopExample = {
   expectedOutput: '[example:conversation-learning-loop] ok'
 };
 
+const agentOnboardingFlowExample = {
+  directory: 'examples/agent-onboarding-flow',
+  runner: 'examples/agent-onboarding-flow/run.ts',
+  readme: 'examples/agent-onboarding-flow/README.md',
+  expectedOutput: '[example:agent-onboarding-flow] ok'
+};
+
 const bannedProtectedSurfaceTerms = [
   ['3K', 'Life'].join(''),
   ['Co', 'cos'].join(''),
@@ -135,6 +142,22 @@ assert(
   'conversation learning loop example output missing expected smoke marker'
 );
 
+for (const relativePath of [
+  agentOnboardingFlowExample.directory,
+  agentOnboardingFlowExample.runner,
+  agentOnboardingFlowExample.readme
+]) {
+  assert(existsSync(path.join(root, relativePath)), `missing agent onboarding flow example file: ${relativePath}`);
+}
+
+const agentOnboardingStartedAt = Date.now();
+const agentOnboardingResult = run(process.execPath, ['--experimental-strip-types', agentOnboardingFlowExample.runner]);
+assert(Date.now() - agentOnboardingStartedAt < 300000, 'agent onboarding flow example must finish within five minutes');
+assert(
+  (agentOnboardingResult.stdout || '').includes(agentOnboardingFlowExample.expectedOutput),
+  'agent onboarding flow example output missing expected smoke marker'
+);
+
 const tempRoot = createTempWorkspace('atm-examples-');
 try {
   const initResult = run(process.execPath, ['atm.mjs', 'init', '--cwd', tempRoot]);
@@ -155,6 +178,7 @@ for (const expectedCommand of [
   'npm install',
   'npm run packages:list',
   'npm run validate:examples',
+  'node --experimental-strip-types examples/agent-onboarding-flow/run.ts',
   'npm --workspace @ai-atomic-framework/example-hello-world test',
   'npm --workspace @ai-atomic-framework/example-legacy-strangler-minimal test'
 ]) {
@@ -167,6 +191,8 @@ const protectedFiles = [
   conversationLearningLoopExample.fixture,
   conversationLearningLoopExample.runner,
   conversationLearningLoopExample.readme,
+  agentOnboardingFlowExample.runner,
+  agentOnboardingFlowExample.readme,
   ...examples.flatMap((example) => [
     `${example.directory}/package.json`,
     `${example.directory}/README.md`,
@@ -183,5 +209,5 @@ for (const relativePath of protectedFiles) {
 }
 
 if (!process.exitCode) {
-  console.log(`[examples:${mode}] ok (${examples.length} examples, quick start verified)`);
+  console.log(`[examples:${mode}] ok (${examples.length} atom examples, conversation loop, agent onboarding flow, quick start verified)`);
 }
