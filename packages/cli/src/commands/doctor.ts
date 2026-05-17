@@ -103,7 +103,7 @@ export async function runDoctor(argv: any) {
     : failedChecks.includes('charter-integrity')
       ? [message('error', 'ATM_DOCTOR_CHARTER_MISSING', 'AtomicCharter files are missing or corrupt. Repair before continuing.', { failedChecks })]
     : failedChecks.includes('onboarding-lifecycle')
-      ? [message('error', 'ATM_DOCTOR_ONBOARDING_STALE', 'Onboarding constitution sources are missing or stale. Refresh the first-touch artifacts before continuing.', { failedChecks })]
+      ? [message('error', 'ATM_DOCTOR_ONBOARDING_STALE', 'Onboarding ATMChart sources are missing or stale. Refresh the first-touch artifacts before continuing.', { failedChecks })]
     : failedChecks.includes('git-head-evidence')
       ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
     : failedChecks.includes('integration-adapters')
@@ -135,15 +135,15 @@ export async function runDoctor(argv: any) {
 
 function checkOnboardingLifecycle(root: any, runtime: any) {
   const configPresent = existsSync(path.join(root, '.atm', 'config.json'));
-  const constitutionPath = path.join(root, '.atm', 'memory', 'constitution.md');
+  const atmChartPath = path.join(root, '.atm', 'memory', 'atm-chart.md');
   const welcomeLineagePath = path.join(root, '.atm', 'runtime', 'welcome.lineage.json');
   if (!configPresent) {
     return {
       ok: true,
       stage: 'uninstalled',
-      constitutionPath: relativePathFrom(root, constitutionPath),
+      atmChartPath: relativePathFrom(root, atmChartPath),
       welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
-      constitutionFreshness: 'not-applicable',
+      atmChartFreshness: 'not-applicable',
       welcomeRecorded: false,
       recommendedAction: 'node atm.mjs bootstrap --cwd . --task "Bootstrap ATM in this repository"'
     };
@@ -151,54 +151,54 @@ function checkOnboardingLifecycle(root: any, runtime: any) {
 
   const defaultGuardsPath = path.join(root, runtime.paths.defaultGuardsPath);
   const defaultGuardsPresent = existsSync(defaultGuardsPath);
-  const constitutionPresent = existsSync(constitutionPath);
+  const atmChartPresent = existsSync(atmChartPath);
   const welcomeLineage = readJsonIfExists(welcomeLineagePath);
   if (!defaultGuardsPresent) {
     return {
       ok: false,
       stage: 'installed',
       defaultGuardsPath: runtime.paths.defaultGuardsPath,
-      constitutionPath: relativePathFrom(root, constitutionPath),
+      atmChartPath: relativePathFrom(root, atmChartPath),
       welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
-      constitutionFreshness: 'guards-missing',
+      atmChartFreshness: 'guards-missing',
       welcomeRecorded: Boolean(welcomeLineage),
       recommendedAction: 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
     };
   }
 
-  if (!constitutionPresent) {
+  if (!atmChartPresent) {
     return {
       ok: false,
       stage: 'installed',
       defaultGuardsPath: runtime.paths.defaultGuardsPath,
-      constitutionPath: relativePathFrom(root, constitutionPath),
+      atmChartPath: relativePathFrom(root, atmChartPath),
       welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
-      constitutionFreshness: 'missing',
+      atmChartFreshness: 'missing',
       welcomeRecorded: Boolean(welcomeLineage),
-      recommendedAction: 'node atm.mjs constitution render --cwd .'
+      recommendedAction: 'node atm.mjs atm-chart render --cwd .'
     };
   }
 
-  const constitutionFrontmatter = readConstitutionFrontmatter(constitutionPath);
+  const atmChartFrontmatter = readATMChartFrontmatter(atmChartPath);
   const currentGuardsHash = computeSha256ForFile(defaultGuardsPath);
-  const constitutionFresh = constitutionFrontmatter?.source_guards_sha256 === currentGuardsHash;
+  const atmChartFresh = atmChartFrontmatter?.source_guards_sha256 === currentGuardsHash;
   const welcomeRecorded = Boolean(welcomeLineage && typeof welcomeLineage.firstWelcomedAt === 'string');
   return {
-    ok: constitutionFresh,
-    stage: welcomeRecorded ? 'welcomed' : 'constitution-rendered',
+    ok: atmChartFresh,
+    stage: welcomeRecorded ? 'welcomed' : 'atm-chart-rendered',
     defaultGuardsPath: runtime.paths.defaultGuardsPath,
-    constitutionPath: relativePathFrom(root, constitutionPath),
+    atmChartPath: relativePathFrom(root, atmChartPath),
     welcomeLineagePath: relativePathFrom(root, welcomeLineagePath),
-    constitutionFreshness: constitutionFresh ? 'fresh' : 'stale',
-    recordedSourceGuardsSha256: constitutionFrontmatter?.source_guards_sha256 ?? null,
+    atmChartFreshness: atmChartFresh ? 'fresh' : 'stale',
+    recordedSourceGuardsSha256: atmChartFrontmatter?.source_guards_sha256 ?? null,
     currentSourceGuardsSha256: currentGuardsHash,
     welcomeRecorded,
     welcomeCount: Number(welcomeLineage?.welcomeCount ?? 0),
-    recommendedAction: constitutionFresh ? 'node atm.mjs welcome --cwd .' : 'node atm.mjs constitution render --cwd .'
+    recommendedAction: atmChartFresh ? 'node atm.mjs welcome --cwd .' : 'node atm.mjs atm-chart render --cwd .'
   };
 }
 
-function readConstitutionFrontmatter(filePath: string): Record<string, any> | null {
+function readATMChartFrontmatter(filePath: string): Record<string, any> | null {
   try {
     const content = readFileSync(filePath, 'utf8');
     const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);

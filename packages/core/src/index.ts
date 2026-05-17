@@ -272,7 +272,7 @@ export interface RegistryVersionRecord {
 
 export type RegistryEntryStatus = 'draft' | 'validated' | 'active' | 'transitioning' | 'deprecated' | 'expired' | 'quarantined';
 
-export type RegistryGovernanceTier = 'constitutional' | 'governed' | 'standard' | 'experimental';
+export type RegistryGovernanceTier = 'foundation' | 'governed' | 'standard' | 'experimental';
 
 export interface RegistryGovernanceRecord {
   readonly tier: RegistryGovernanceTier;

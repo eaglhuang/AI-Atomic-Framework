@@ -27,8 +27,8 @@ jobs:
       - name: Verify ATM doctor
         run: node atm.mjs doctor --json
 
-      - name: Verify constitution freshness
-        run: node atm.mjs constitution verify --json
+      - name: Verify ATMChart freshness
+        run: node atm.mjs atm-chart verify --json
 
       - name: Verify installed integrations
         shell: bash

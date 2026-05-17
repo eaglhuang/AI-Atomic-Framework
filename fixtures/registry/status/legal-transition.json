@@ -9,7 +9,7 @@
     "quarantined"
   ],
   "governanceTiers": [
-    "constitutional",
+    "foundation",
     "governed",
     "standard",
     "experimental"
@@ -221,18 +221,18 @@
   ],
   "cases": [
     {
-      "name": "draft-atom-propose-constitutional",
+      "name": "draft-atom-propose-foundation",
       "input": {
         "entryType": "atom",
         "atomId": "ATM-LEGAL-0001",
         "status": "draft",
         "action": "transition.propose",
-        "governanceTier": "constitutional",
+        "governanceTier": "foundation",
         "mutabilityPolicy": "mutable"
       },
       "expect": {
         "toStatus": "validated",
-        "governanceTier": "constitutional",
+        "governanceTier": "foundation",
         "issues": []
       }
     },
@@ -376,13 +376,13 @@
       }
     },
     {
-      "name": "active-map-compose-constitutional",
+      "name": "active-map-compose-foundation",
       "input": {
         "entryType": "map",
         "mapId": "ATM-MAP-0003",
         "status": "active",
         "action": "behavior.compose",
-        "governanceTier": "constitutional",
+        "governanceTier": "foundation",
         "sourceStatuses": [
           "active",
           "active"
@@ -391,7 +391,7 @@
       },
       "expect": {
         "toStatus": "active",
-        "governanceTier": "constitutional",
+        "governanceTier": "foundation",
         "issues": []
       }
     }

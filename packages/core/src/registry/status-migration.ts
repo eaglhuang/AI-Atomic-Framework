@@ -2,7 +2,7 @@ import type { MapRegistryEntryRecord, RegistryEntryRecord, RegistryEntryStatus, 
 import { normalizeRegistryGovernanceTier, resolveRegistryDefaultGovernanceTier, isRegistryEntryStatus } from './status-machine.ts';
 
 export const legacyRegistryStatusMigrationMap: Readonly<Record<string, { readonly status: RegistryEntryStatus; readonly governanceTier: RegistryGovernanceTier }>> = {
-  seed: { status: 'active', governanceTier: 'constitutional' },
+  seed: { status: 'active', governanceTier: 'foundation' },
   active: { status: 'active', governanceTier: 'standard' },
   experimental: { status: 'validated', governanceTier: 'standard' },
   deprecated: { status: 'deprecated', governanceTier: 'standard' },

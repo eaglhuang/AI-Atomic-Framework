@@ -73,7 +73,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/constitution.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -140,67 +140,67 @@ try {
   assert(initDryRun.parsed.evidence.adoptedAt, 'init --adopt --dry-run must report adoptedAt');
   assert(initDryRun.parsed.evidence.dryRun === true, 'init --adopt --dry-run must report dryRun=true');
 
-  const constitutionRepo = path.join(tempRoot, 'constitution-repo');
-  mkdirSync(constitutionRepo, { recursive: true });
-  const constitutionBootstrap = runAtm(['bootstrap', '--cwd', constitutionRepo], constitutionRepo);
-  assert(constitutionBootstrap.exitCode === 0, 'bootstrap must exit 0 before constitution render');
+  const atmChartRepo = path.join(tempRoot, 'atm-chart-repo');
+  mkdirSync(atmChartRepo, { recursive: true });
+  const atmChartBootstrap = runAtm(['bootstrap', '--cwd', atmChartRepo], atmChartRepo);
+  assert(atmChartBootstrap.exitCode === 0, 'bootstrap must exit 0 before ATMChart render');
 
-  const constitutionRender = runAtm(['constitution', 'render', '--cwd', constitutionRepo], constitutionRepo);
-  assert(constitutionRender.exitCode === 0, 'constitution render must exit 0 after bootstrap');
-  assertReadable(constitutionRender, 'constitution');
-  assert(constitutionRender.parsed.ok === true, 'constitution render must report ok=true');
-  assert(constitutionRender.parsed.evidence.constitutionPath === '.atm/memory/constitution.md', 'constitution render must use the default memory path');
-  assert(existsSync(path.join(constitutionRepo, '.atm/memory/constitution.md')), 'constitution render must write .atm/memory/constitution.md');
-  assertMessageCode(constitutionRender, 'ATM_CONSTITUTION_RENDERED');
+  const atmChartRender = runAtm(['atm-chart', 'render', '--cwd', atmChartRepo], atmChartRepo);
+  assert(atmChartRender.exitCode === 0, 'atm-chart render must exit 0 after bootstrap');
+  assertReadable(atmChartRender, 'atm-chart');
+  assert(atmChartRender.parsed.ok === true, 'atm-chart render must report ok=true');
+  assert(atmChartRender.parsed.evidence.atmChartPath === '.atm/memory/atm-chart.md', 'atm-chart render must use the default memory path');
+  assert(existsSync(path.join(atmChartRepo, '.atm/memory/atm-chart.md')), 'atm-chart render must write .atm/memory/atm-chart.md');
+  assertMessageCode(atmChartRender, 'ATM_CHART_RENDERED');
 
-  const constitutionVerify = runAtm(['constitution', 'verify', '--cwd', constitutionRepo], constitutionRepo);
-  assert(constitutionVerify.exitCode === 0, 'constitution verify must exit 0 immediately after render');
-  assertReadable(constitutionVerify, 'constitution');
-  assert(constitutionVerify.parsed.ok === true, 'constitution verify must report ok=true when fresh');
-  assertMessageCode(constitutionVerify, 'ATM_CONSTITUTION_VERIFY_OK');
+  const atmChartVerify = runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
+  assert(atmChartVerify.exitCode === 0, 'atm-chart verify must exit 0 immediately after render');
+  assertReadable(atmChartVerify, 'atm-chart');
+  assert(atmChartVerify.parsed.ok === true, 'atm-chart verify must report ok=true when fresh');
+  assertMessageCode(atmChartVerify, 'ATM_CHART_VERIFY_OK');
 
-  const welcomeDryRun = runAtm(['welcome', '--cwd', constitutionRepo, '--dry-run'], constitutionRepo);
-  assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must exit 0 after constitution render');
+  const welcomeDryRun = runAtm(['welcome', '--cwd', atmChartRepo, '--dry-run'], atmChartRepo);
+  assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must exit 0 after ATMChart render');
   assertReadable(welcomeDryRun, 'welcome');
   assert(welcomeDryRun.parsed.ok === true, 'welcome --dry-run must report ok=true');
   assert(welcomeDryRun.parsed.evidence.dryRun === true, 'welcome --dry-run must report dryRun=true');
   assert(welcomeDryRun.parsed.evidence.lineagePath === null, 'welcome --dry-run must not report a persisted lineage path');
-  assert(!existsSync(path.join(constitutionRepo, '.atm/runtime/welcome.lineage.json')), 'welcome --dry-run must not write welcome lineage');
+  assert(!existsSync(path.join(atmChartRepo, '.atm/runtime/welcome.lineage.json')), 'welcome --dry-run must not write welcome lineage');
   assertMessageCode(welcomeDryRun, 'ATM_WELCOME_DRY_RUN');
 
-  const welcome = runAtm(['welcome', '--cwd', constitutionRepo], constitutionRepo);
-  assert(welcome.exitCode === 0, 'welcome must exit 0 after constitution render');
+  const welcome = runAtm(['welcome', '--cwd', atmChartRepo], atmChartRepo);
+  assert(welcome.exitCode === 0, 'welcome must exit 0 after ATMChart render');
   assertReadable(welcome, 'welcome');
   assert(welcome.parsed.ok === true, 'welcome must report ok=true');
   assert(welcome.parsed.evidence.lineagePath === '.atm/runtime/welcome.lineage.json', 'welcome must report the welcome lineage path');
-  assert(existsSync(path.join(constitutionRepo, '.atm/runtime/welcome.lineage.json')), 'welcome must write welcome lineage');
+  assert(existsSync(path.join(atmChartRepo, '.atm/runtime/welcome.lineage.json')), 'welcome must write welcome lineage');
   assert(welcome.parsed.evidence.welcomeLineage.welcomeCount === 1, 'welcome lineage must start with welcomeCount=1');
   assert(typeof welcome.parsed.evidence.nextAction?.command === 'string', 'welcome must surface the next action command');
   assertMessageCode(welcome, 'ATM_WELCOME_READY');
 
-  const welcomeDoctor = runAtm(['doctor', '--cwd', constitutionRepo], constitutionRepo);
+  const welcomeDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
   assertReadable(welcomeDoctor, 'doctor');
   const onboardingCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
-  assert(onboardingCheck.ok === true, 'doctor onboarding-lifecycle check must pass after constitution render and welcome');
+  assert(onboardingCheck.ok === true, 'doctor onboarding-lifecycle check must pass after ATMChart render and welcome');
   assert(onboardingCheck.details.stage === 'welcomed', 'doctor onboarding-lifecycle check must report welcomed stage');
-  assert(onboardingCheck.details.constitutionFreshness === 'fresh', 'doctor onboarding-lifecycle check must report fresh constitution');
+  assert(onboardingCheck.details.atmChartFreshness === 'fresh', 'doctor onboarding-lifecycle check must report fresh ATMChart');
 
-  const guardsPath = path.join(constitutionRepo, '.atm', 'runtime', 'default-guards.json');
+  const guardsPath = path.join(atmChartRepo, '.atm', 'runtime', 'default-guards.json');
   const guards = JSON.parse(readFileSync(guardsPath, 'utf8'));
   guards.guards[0].summary = `${guards.guards[0].summary} (drift)`;
   writeFileSync(guardsPath, `${JSON.stringify(guards, null, 2)}\n`, 'utf8');
 
-  const constitutionStale = runAtm(['constitution', 'verify', '--cwd', constitutionRepo], constitutionRepo);
-  assert(constitutionStale.exitCode === 2, 'constitution verify must exit 2 when source guards drift');
-  assert(constitutionStale.parsed.ok === false, 'constitution verify must report ok=false when stale');
-  assertMessageCode(constitutionStale, 'ATM_CONSTITUTION_STALE');
+  const atmChartStale = runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
+  assert(atmChartStale.exitCode === 2, 'atm-chart verify must exit 2 when source guards drift');
+  assert(atmChartStale.parsed.ok === false, 'atm-chart verify must report ok=false when stale');
+  assertMessageCode(atmChartStale, 'ATM_CHART_STALE');
 
-  const staleDoctor = runAtm(['doctor', '--cwd', constitutionRepo], constitutionRepo);
-  assert(staleDoctor.exitCode === 1, 'doctor must fail when onboarding constitution is stale');
+  const staleDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  assert(staleDoctor.exitCode === 1, 'doctor must fail when onboarding ATMChart is stale');
   assertReadable(staleDoctor, 'doctor');
   const staleOnboardingCheck = staleDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
-  assert(staleOnboardingCheck.ok === false, 'doctor onboarding-lifecycle check must fail when constitution is stale');
-  assert(staleOnboardingCheck.details.constitutionFreshness === 'stale', 'doctor onboarding-lifecycle check must report stale constitution');
+  assert(staleOnboardingCheck.ok === false, 'doctor onboarding-lifecycle check must fail when ATMChart is stale');
+  assert(staleOnboardingCheck.details.atmChartFreshness === 'stale', 'doctor onboarding-lifecycle check must report stale ATMChart');
   assertMessageCode(staleDoctor, 'ATM_DOCTOR_ONBOARDING_STALE');
 
   const status = runAtm(['status'], blankRepo);

@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
-import { loadConstitutionSummary } from './constitution.ts';
+import { loadATMChartSummary } from './atm-chart.ts';
 import { relativePathFrom } from './governance-runtime.ts';
 import { checkIntegrationHealth } from './integration.ts';
 import { runNext } from './next.ts';
@@ -21,7 +21,7 @@ interface WelcomeLineageRecord {
   readonly firstWelcomedAt: string;
   readonly lastWelcomedAt: string;
   readonly welcomeCount: number;
-  readonly constitutionPath: string;
+  readonly atmChartPath: string;
   readonly sourceGuardsSha256: string;
   readonly installedIntegrations: readonly string[];
   readonly integrationHealthOk: boolean;
@@ -33,7 +33,7 @@ export async function runWelcome(argv: string[]) {
   const parsed = parseArgsForCommand(spec, argv);
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
   const dryRun = parsed.options.dryRun === true;
-  const constitution = loadConstitutionSummary(cwd);
+  const atmChart = loadATMChartSummary(cwd);
   const integrationHealth = await checkIntegrationHealth(cwd);
   const nextResult = await runNext(['--cwd', cwd]);
   const nextAction = nextResult.evidence?.nextAction ?? null;
@@ -42,8 +42,8 @@ export async function runWelcome(argv: string[]) {
     ? null
     : writeWelcomeLineage(lineageAbsolutePath, {
       now: new Date().toISOString(),
-      constitutionPath: constitution.constitutionPath,
-      sourceGuardsSha256: constitution.frontmatter.source_guards_sha256,
+      atmChartPath: atmChart.atmChartPath,
+      sourceGuardsSha256: atmChart.frontmatter.source_guards_sha256,
       installedIntegrations: integrationHealth.installed,
       integrationHealthOk: integrationHealth.ok,
       nextAction
@@ -58,10 +58,10 @@ export async function runWelcome(argv: string[]) {
       : 'Welcome summary generated and lifecycle lineage recorded.')],
     evidence: {
       dryRun,
-      constitution: {
-        path: constitution.constitutionPath,
-        sourceGuardsSha256: constitution.frontmatter.source_guards_sha256,
-        guardSummary: constitution.guardSummary
+      atmChart: {
+        path: atmChart.atmChartPath,
+        sourceGuardsSha256: atmChart.frontmatter.source_guards_sha256,
+        guardSummary: atmChart.guardSummary
       },
       integrations: {
         ok: integrationHealth.ok,
@@ -81,7 +81,7 @@ export async function runWelcome(argv: string[]) {
 
 function writeWelcomeLineage(lineageAbsolutePath: string, input: {
   readonly now: string;
-  readonly constitutionPath: string;
+  readonly atmChartPath: string;
   readonly sourceGuardsSha256: string;
   readonly installedIntegrations: readonly string[];
   readonly integrationHealthOk: boolean;
@@ -99,7 +99,7 @@ function writeWelcomeLineage(lineageAbsolutePath: string, input: {
     firstWelcomedAt: existing?.firstWelcomedAt ?? input.now,
     lastWelcomedAt: input.now,
     welcomeCount: (existing?.welcomeCount ?? 0) + 1,
-    constitutionPath: input.constitutionPath,
+    atmChartPath: input.atmChartPath,
     sourceGuardsSha256: input.sourceGuardsSha256,
     installedIntegrations: [...input.installedIntegrations],
     integrationHealthOk: input.integrationHealthOk,

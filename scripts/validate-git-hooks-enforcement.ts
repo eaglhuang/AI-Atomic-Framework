@@ -72,9 +72,9 @@ try {
   const bootstrapPayload = JSON.parse((bootstrap.stdout || bootstrap.stderr || '').trim());
   assert(bootstrapPayload.ok === true, 'bootstrap must report ok=true');
 
-  const constitution = run(process.execPath, ['atm.mjs', 'constitution', 'render', '--cwd', repo, '--json'], repo);
-  const constitutionPayload = JSON.parse((constitution.stdout || constitution.stderr || '').trim());
-  assert(constitutionPayload.ok === true, 'constitution render must report ok=true');
+  const atmChart = run(process.execPath, ['atm.mjs', 'atm-chart', 'render', '--cwd', repo, '--json'], repo);
+  const atmChartPayload = JSON.parse((atmChart.stdout || atmChart.stderr || '').trim());
+  assert(atmChartPayload.ok === true, 'atm-chart render must report ok=true');
 
   const welcome = run(process.execPath, ['atm.mjs', 'welcome', '--cwd', repo, '--json'], repo);
   const welcomePayload = JSON.parse((welcome.stdout || welcome.stderr || '').trim());

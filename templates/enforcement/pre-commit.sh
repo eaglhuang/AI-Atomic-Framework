@@ -2,7 +2,7 @@
 set -eu
 
 node atm.mjs doctor --json
-node atm.mjs constitution verify --json
+node atm.mjs atm-chart verify --json
 
 if [ -d ".atm/integrations" ]; then
   for manifest in .atm/integrations/*.manifest.json; do
