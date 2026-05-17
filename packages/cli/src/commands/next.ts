@@ -19,6 +19,7 @@ export async function runNext(argv: any) {
       messages: [message('info', nextAction.status === 'blocked' ? 'ATM_GUIDANCE_NEXT_BLOCKED' : 'ATM_GUIDANCE_NEXT_ACTION', 'ATM guidance identified the next single action.', nextAction)],
       evidence: {
         nextAction,
+        agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         guidanceSession: {
           sessionId: activeGuidanceSession.sessionId,
           goal: activeGuidanceSession.goal,
@@ -40,6 +41,7 @@ export async function runNext(argv: any) {
     messages: [nextAction.status === 'ready' ? message('info', 'ATM_NEXT_READY', 'ATM is ready for the next governed task.', nextAction) : message('info', 'ATM_NEXT_ACTION', 'ATM identified the next single governed action.', nextAction)],
     evidence: {
       nextAction,
+      agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
       doctorSummary: doctor.evidence.checks.map((check: any) => ({ name: check.name, ok: check.ok })),
       layoutVersion: runtime.layoutVersion,
       currentTaskId: runtime.currentTaskId,
@@ -176,4 +178,29 @@ function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan, s
 
 function quoteCliValue(value: string): string {
   return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+function mapStatusToSlashCommandId(status: string): string {
+  if (status === 'needs-bootstrap' || status === 'needs-onboarding-refresh') {
+    return 'atm-next';
+  }
+  if (status === 'needs-guidance-start') {
+    return 'atm-orient';
+  }
+  if (status === 'needs-evidence' || status === 'needs-validation' || status === 'blocked') {
+    return 'atm-evidence';
+  }
+  if (status === 'needs-handoff') {
+    return 'atm-handoff';
+  }
+  return 'atm-next';
+}
+
+function buildAgentPackHint(status: string, command: string, reason: string) {
+  return {
+    slashCommandId: mapStatusToSlashCommandId(status),
+    route: status,
+    command,
+    reason
+  };
 }
