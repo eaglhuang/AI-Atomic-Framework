@@ -1,0 +1,41 @@
+{
+  "description": "M13 feedback loop fixture covering a high-severity override for a previously suppressed prompt.",
+  "input": {
+    "findingsReportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+    "generatedAt": "2026-05-17T02:10:00.000Z",
+    "sourceReportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+    "choiceStateByFindingId": {
+      "finding.conv-review.stale-skill.001": {
+        "choice": "X",
+        "chosenAt": "2026-05-17T02:00:03.000Z",
+        "reason": "User previously opted out of this stale-skill prompt."
+      }
+    },
+    "occurrenceCountByFindingId": {
+      "finding.conv-review.stale-skill.001": 4
+    },
+    "highSeverityFindingIds": ["finding.conv-review.stale-skill.001"],
+    "highSeverityOverrideReason": "The stale skill produced a repeated wrong command sequence after suppression."
+  },
+  "expected": {
+    "summary": {
+      "totalFindings": 4,
+      "totalEvents": 4,
+      "recordedEvidenceCount": 4,
+      "promptCount": 3,
+      "draftNowCount": 0,
+      "deferredCount": 0,
+      "suppressedCount": 0,
+      "overrideCount": 1
+    },
+    "events": {
+      "finding.conv-review.stale-skill.001": {
+        "promptAction": "override-review-advisory",
+        "userChoice": "X",
+        "shouldAskAgain": true,
+        "occurrenceCount": 4,
+        "overrideReason": "The stale skill produced a repeated wrong command sequence after suppression."
+      }
+    }
+  }
+}

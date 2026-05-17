@@ -12,6 +12,10 @@
  * - Curator merge accuracy 可由 human review 抽查 → curatorMetrics.humanReviewSampled + mergeAccuracyEstimate
  * - Promotion latency report 可量測          → proposalMetrics.promotionLatencyP50Ms + promotionLatencyP95Ms
  * - Rollback rate report 可量測              → curatorMetrics.rollbackRate
+ * - Conversation finding precision 可量測    → conversationMetrics.findingPrecision
+ * - Conversation patch acceptance 可量測      → conversationMetrics.patchDraftAcceptanceRate
+ * - Conversation skill repair rate 可量測     → conversationMetrics.skillRepairRate
+ * - Conversation privacy block rate 可量測    → conversationMetrics.privacyBlockRate
  * - Daily proposal cap 可配置                → configuration.dailyProposalCap
  * - Host usage data 可補 cost/budget report  → costBudgetMetrics
  */
@@ -78,6 +82,7 @@ const pmProps = (pm as Record<string, Record<string, unknown>>);
 const proposalMetricsProps = (pmProps.proposalMetrics as { properties?: Record<string, unknown> })?.properties;
 const curatorMetricsProps = (pmProps.curatorMetrics as { properties?: Record<string, unknown> })?.properties;
 const configProps = (pmProps.configuration as { properties?: Record<string, unknown> })?.properties;
+const conversationMetricsProps = (pmProps.conversationMetrics as { properties?: Record<string, unknown> })?.properties;
 
 check(proposalMetricsProps?.acceptanceRate, 'schema must expose acceptanceRate (proposal acceptance rate 可量測)');
 check(proposalMetricsProps?.precisionRate, 'schema must expose precisionRate (proposal precision report 可量測)');
@@ -89,6 +94,10 @@ check(proposalMetricsProps?.promotionLatencyP95Ms, 'schema must expose promotion
 check(curatorMetricsProps?.humanReviewSampled, 'schema must expose humanReviewSampled (curator merge accuracy 可由 human review 抽查)');
 check(curatorMetricsProps?.mergeAccuracyEstimate, 'schema must expose mergeAccuracyEstimate (curator merge accuracy 可量測)');
 check(curatorMetricsProps?.rollbackRate, 'schema must expose rollbackRate (rollback rate report 可量測)');
+check(conversationMetricsProps?.findingPrecision, 'schema must expose conversation findingPrecision (finding precision 可量測)');
+check(conversationMetricsProps?.patchDraftAcceptanceRate, 'schema must expose patchDraftAcceptanceRate (patch draft acceptance 可量測)');
+check(conversationMetricsProps?.skillRepairRate, 'schema must expose skillRepairRate (skill repair rate 可量測)');
+check(conversationMetricsProps?.privacyBlockRate, 'schema must expose privacyBlockRate (privacy block rate 可量測)');
 check(configProps?.dailyProposalCap, 'schema must expose dailyProposalCap (daily proposal cap 可配置)');
 check(pmProps.costBudgetMetrics, 'schema must expose costBudgetMetrics (host cost/budget report 可補)');
 
@@ -105,6 +114,7 @@ const sampleAny = sample as Record<string, unknown>;
 const propMetrics = asRecord(sampleAny.proposalMetrics, 'sample fixture must include proposalMetrics');
 const curMetrics = asRecord(sampleAny.curatorMetrics, 'sample fixture must include curatorMetrics');
 const config = asRecord(sampleAny.configuration, 'sample fixture must include configuration');
+const conversationMetrics = asRecord(sampleAny.conversationMetrics, 'sample fixture must include conversationMetrics');
 const costBudgetMetrics = asRecord(sampleAny.costBudgetMetrics, 'sample fixture must include costBudgetMetrics');
 
 const totalProposed = asNumber(propMetrics.totalProposed, 'sample fixture must record totalProposed');
@@ -153,6 +163,47 @@ checkInteger(rollbackCount, 'sample fixture rollbackCount must be an integer');
 check(rollbackCount <= mergeProposalsTotal, 'sample fixture rollbackCount must be <= mergeProposalsTotal');
 checkApprox(curMetrics.rollbackRate as number, expectedRate(rollbackCount, mergeProposalsTotal), 'sample fixture rollbackRate must equal rollbackCount / mergeProposalsTotal');
 
+const totalFindings = asNumber(conversationMetrics.totalFindings, 'sample fixture must record conversationMetrics.totalFindings');
+const acknowledgedFindings = asNumber(conversationMetrics.acknowledgedFindings, 'sample fixture must record conversationMetrics.acknowledgedFindings');
+const reviewedFindings = asNumber(conversationMetrics.reviewedFindings, 'sample fixture must record conversationMetrics.reviewedFindings');
+const confirmedFalsePositiveFindings = asNumber(conversationMetrics.confirmedFalsePositiveFindings, 'sample fixture must record conversationMetrics.confirmedFalsePositiveFindings');
+const patchDraftsCreated = asNumber(conversationMetrics.patchDraftsCreated, 'sample fixture must record conversationMetrics.patchDraftsCreated');
+const patchDraftsAccepted = asNumber(conversationMetrics.patchDraftsAccepted, 'sample fixture must record conversationMetrics.patchDraftsAccepted');
+const skillRepairDrafts = asNumber(conversationMetrics.skillRepairDrafts, 'sample fixture must record conversationMetrics.skillRepairDrafts');
+const skillRepairAccepted = asNumber(conversationMetrics.skillRepairAccepted, 'sample fixture must record conversationMetrics.skillRepairAccepted');
+const privacyBlockedFindings = asNumber(conversationMetrics.privacyBlockedFindings, 'sample fixture must record conversationMetrics.privacyBlockedFindings');
+for (const [label, value] of Object.entries({
+  totalFindings,
+  acknowledgedFindings,
+  reviewedFindings,
+  confirmedFalsePositiveFindings,
+  patchDraftsCreated,
+  patchDraftsAccepted,
+  skillRepairDrafts,
+  skillRepairAccepted,
+  privacyBlockedFindings
+})) {
+  checkInteger(value, `sample fixture conversationMetrics.${label} must be an integer`);
+}
+check(acknowledgedFindings === totalFindings, 'sample fixture must acknowledge every conversation finding');
+check(confirmedFalsePositiveFindings <= reviewedFindings, 'sample fixture confirmedFalsePositiveFindings must be <= reviewedFindings');
+check(patchDraftsAccepted <= patchDraftsCreated, 'sample fixture patchDraftsAccepted must be <= patchDraftsCreated');
+check(skillRepairAccepted <= skillRepairDrafts, 'sample fixture skillRepairAccepted must be <= skillRepairDrafts');
+check(privacyBlockedFindings <= totalFindings, 'sample fixture privacyBlockedFindings must be <= totalFindings');
+checkApprox(conversationMetrics.findingPrecision as number, expectedRate(reviewedFindings - confirmedFalsePositiveFindings, reviewedFindings), 'sample fixture findingPrecision must equal (reviewedFindings - confirmedFalsePositiveFindings) / reviewedFindings');
+checkApprox(conversationMetrics.patchDraftAcceptanceRate as number, expectedRate(patchDraftsAccepted, patchDraftsCreated), 'sample fixture patchDraftAcceptanceRate must equal patchDraftsAccepted / patchDraftsCreated');
+checkApprox(conversationMetrics.skillRepairRate as number, expectedRate(skillRepairAccepted, skillRepairDrafts), 'sample fixture skillRepairRate must equal skillRepairAccepted / skillRepairDrafts');
+checkApprox(conversationMetrics.privacyBlockRate as number, expectedRate(privacyBlockedFindings, totalFindings), 'sample fixture privacyBlockRate must equal privacyBlockedFindings / totalFindings');
+
+const userChoiceCounts = asRecord(conversationMetrics.userChoiceCounts, 'sample fixture must record conversationMetrics.userChoiceCounts');
+for (const choice of ['Y', 'N', 'X']) {
+  check(typeof userChoiceCounts[choice] === 'number', `sample fixture userChoiceCounts.${choice} must be a number`);
+}
+check(
+  sumCounts(userChoiceCounts, 'conversationMetrics.userChoiceCounts') === conversationMetrics.feedbackPromptCount,
+  'sample fixture userChoiceCounts must sum to feedbackPromptCount'
+);
+
 check(
   typeof config.dailyProposalCap === 'number' && (config.dailyProposalCap as number) >= 1,
   'sample fixture must configure dailyProposalCap >= 1'
@@ -164,4 +215,4 @@ const remainingBudget = asNumber(costBudgetMetrics.remainingBudget, 'sample fixt
 checkApprox(remainingBudget, Math.max(0, budgetLimit - actualUsage), 'sample fixture remainingBudget must equal max(0, budgetLimit - actualUsage)');
 check(costBudgetMetrics.overBudget === actualUsage > budgetLimit, 'sample fixture overBudget must match actualUsage > budgetLimit');
 
-console.log(`[rollout-metrics:${mode}] ok (schema and sample verified: precision, false-positive review, acceptance/stale rates, blocked reasons, latency, rollback, daily cap, cost/budget)`);
+console.log(`[rollout-metrics:${mode}] ok (schema and sample verified: precision, false-positive review, acceptance/stale rates, blocked reasons, latency, rollback, conversation metrics, daily cap, cost/budget)`);

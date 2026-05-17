@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.ai-atomic-framework.dev/governance/rollout-metrics-report.schema.json",
   "title": "ATM Rollout Metrics Report v0.1",
-  "description": "Tracks proposal precision, acceptance rates, stale rates, false-positive review results, blocked-reason distributions, curator merge accuracy, rollback rates, optional cost/budget usage, and configuration parameters for the ATM atom evolution rollout.",
+  "description": "Tracks proposal precision, acceptance rates, stale rates, false-positive review results, blocked-reason distributions, curator merge accuracy, rollback rates, optional conversation learning metrics, optional cost/budget usage, and configuration parameters for the ATM atom evolution rollout.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -217,6 +217,122 @@
           "minimum": 0,
           "maximum": 1,
           "description": "Minimum confidence score required to auto-propose."
+        }
+      }
+    },
+    "conversationMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalFindings",
+        "acknowledgedFindings",
+        "reviewedFindings",
+        "confirmedFalsePositiveFindings",
+        "findingPrecision",
+        "feedbackPromptCount",
+        "userChoiceCounts",
+        "patchDraftsCreated",
+        "patchDraftsAccepted",
+        "patchDraftAcceptanceRate",
+        "skillRepairDrafts",
+        "skillRepairAccepted",
+        "skillRepairRate",
+        "privacyBlockedFindings",
+        "privacyBlockRate"
+      ],
+      "properties": {
+        "totalFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total conversation review findings generated in the rollout window."
+        },
+        "acknowledgedFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Findings with immediate user-visible feedback events."
+        },
+        "reviewedFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Findings sampled for precision review."
+        },
+        "confirmedFalsePositiveFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Reviewed findings confirmed as false positives."
+        },
+        "findingPrecision": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "(reviewedFindings - confirmedFalsePositiveFindings) / reviewedFindings."
+        },
+        "feedbackPromptCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many immediate user-choice prompts were shown."
+        },
+        "userChoiceCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["Y", "N", "X"],
+          "properties": {
+            "Y": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "N": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "X": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "patchDraftsCreated": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation-derived patch drafts created after user choice or recurrence."
+        },
+        "patchDraftsAccepted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation-derived patch drafts accepted by review."
+        },
+        "patchDraftAcceptanceRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "patchDraftsAccepted / patchDraftsCreated."
+        },
+        "skillRepairDrafts": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation-derived skill repair drafts created."
+        },
+        "skillRepairAccepted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Skill repair drafts accepted by review."
+        },
+        "skillRepairRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "skillRepairAccepted / skillRepairDrafts."
+        },
+        "privacyBlockedFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation findings blocked because privacy/redaction requirements were not satisfied."
+        },
+        "privacyBlockRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "privacyBlockedFindings / totalFindings."
         }
       }
     },

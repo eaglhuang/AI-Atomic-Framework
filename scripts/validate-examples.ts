@@ -33,6 +33,14 @@ const examples = [
   }
 ];
 
+const conversationLearningLoopExample = {
+  directory: 'examples/conversation-learning-loop',
+  fixture: 'examples/conversation-learning-loop/fixtures/demo-transcript.json',
+  runner: 'examples/conversation-learning-loop/run.ts',
+  readme: 'examples/conversation-learning-loop/README.md',
+  expectedOutput: '[example:conversation-learning-loop] ok'
+};
+
 const bannedProtectedSurfaceTerms = [
   ['3K', 'Life'].join(''),
   ['Co', 'cos'].join(''),
@@ -112,6 +120,21 @@ for (const example of examples) {
   assert(spec.compatibility?.languageAdapter === 'language-js', `${example.atomSpec} must use language-js compatibility`);
 }
 
+for (const relativePath of [
+  conversationLearningLoopExample.directory,
+  conversationLearningLoopExample.fixture,
+  conversationLearningLoopExample.runner,
+  conversationLearningLoopExample.readme
+]) {
+  assert(existsSync(path.join(root, relativePath)), `missing conversation learning loop example file: ${relativePath}`);
+}
+
+const conversationLearningResult = run(process.execPath, ['--experimental-strip-types', conversationLearningLoopExample.runner]);
+assert(
+  (conversationLearningResult.stdout || '').includes(conversationLearningLoopExample.expectedOutput),
+  'conversation learning loop example output missing expected smoke marker'
+);
+
 const tempRoot = createTempWorkspace('atm-examples-');
 try {
   const initResult = run(process.execPath, ['atm.mjs', 'init', '--cwd', tempRoot]);
@@ -141,6 +164,9 @@ for (const expectedCommand of [
 const protectedFiles = [
   'docs/QUICK_START.md',
   'scripts/validate-examples.ts',
+  conversationLearningLoopExample.fixture,
+  conversationLearningLoopExample.runner,
+  conversationLearningLoopExample.readme,
   ...examples.flatMap((example) => [
     `${example.directory}/package.json`,
     `${example.directory}/README.md`,
