@@ -1,19 +1,22 @@
 import path from 'node:path';
 import { generateAtomicMap } from '../../../core/src/manager/map-generator.ts';
-import { CliError, makeResult, message } from './shared.ts';
+import { createAtomicMapRequestFromDecompositionPlan, readDecompositionPlan } from '../../../core/src/registry/decomposition-plan.ts';
+import { CliError, makeResult, message, readJsonFile, relativePathFrom } from './shared.ts';
 
 export function runCreateMap(argv: any) {
   const { options } = parseCreateMapOptions(argv);
-  const result = generateAtomicMap({
-    mapVersion: options.mapVersion,
-    members: options.members,
-    edges: options.edges,
-    entrypoints: options.entrypoints,
-    qualityTargets: options.qualityTargets
-  }, {
+  const input = resolveCreateMapInput(options);
+  const result = generateAtomicMap(input.request, {
     repositoryRoot: options.cwd,
-    dryRun: options.dryRun
+    dryRun: options.dryRun,
+    mapId: input.mapId
   });
+  const failureCode = input.sourceMode === 'spec'
+    ? 'ATM_MAP_SPEC_INVALID'
+    : (result.error?.code ?? 'ATM_CREATE_MAP_FAILED');
+  const failureText = input.sourceMode === 'spec'
+    ? `Atomic map spec input is invalid: ${result.error?.message ?? 'create-map --spec failed.'}`
+    : (result.error?.message ?? 'Atomic map creation failed.');
 
   return makeResult({
     ok: result.ok,
@@ -22,10 +25,13 @@ export function runCreateMap(argv: any) {
     messages: [
       result.ok
         ? message('info', options.dryRun ? 'ATM_CREATE_MAP_DRY_RUN_OK' : 'ATM_CREATE_MAP_OK', options.dryRun ? 'Atomic map create dry-run completed.' : 'Atomic map created and registered.', { mapId: result.mapId })
-        : message('error', result.error?.code ?? 'ATM_CREATE_MAP_FAILED', result.error?.message ?? 'Atomic map creation failed.', result.error?.details ?? {})
+        : message('error', failureCode, failureText, result.error?.details ?? {})
     ],
     evidence: {
       mapId: result.mapId,
+      sourceMode: input.sourceMode,
+      sourcePath: input.sourcePath,
+      defaultsUsed: input.defaultsUsed,
       dryRun: options.dryRun,
       idempotent: result.idempotent === true,
       workbenchPath: result.workbenchPath ?? null,
@@ -43,6 +49,8 @@ export function runCreateMap(argv: any) {
 type CreateMapOptions = {
   cwd: string;
   mapVersion: string;
+  specPath: string | null;
+  fromPlanPath: string | null;
   members: unknown[] | null;
   edges: unknown[];
   entrypoints: unknown[] | null;
@@ -54,6 +62,8 @@ function parseCreateMapOptions(argv: any) {
   const options: CreateMapOptions = {
     cwd: process.cwd(),
     mapVersion: '0.1.0',
+    specPath: null,
+    fromPlanPath: null,
     members: null,
     edges: [],
     entrypoints: null,
@@ -70,6 +80,16 @@ function parseCreateMapOptions(argv: any) {
     }
     if (arg === '--map-version') {
       options.mapVersion = requireOptionValue(argv, index, '--map-version');
+      index += 1;
+      continue;
+    }
+    if (arg === '--spec') {
+      options.specPath = requireOptionValue(argv, index, '--spec');
+      index += 1;
+      continue;
+    }
+    if (arg === '--from-plan') {
+      options.fromPlanPath = requireOptionValue(argv, index, '--from-plan');
       index += 1;
       continue;
     }
@@ -103,14 +123,25 @@ function parseCreateMapOptions(argv: any) {
     throw new CliError('ATM_CLI_USAGE', `create-map does not support option ${arg}`, { exitCode: 2 });
   }
 
-  if (options.members == null) {
-    throw new CliError('ATM_CLI_USAGE', 'create-map requires --members', { exitCode: 2 });
+  const activeModes = [
+    options.specPath ? 'spec' : null,
+    options.fromPlanPath ? 'from-plan' : null,
+    options.members != null || options.entrypoints != null || options.qualityTargets != null ? 'inline' : null
+  ].filter(Boolean);
+  if (activeModes.length !== 1) {
+    throw new CliError('ATM_CLI_USAGE', 'create-map requires exactly one input mode: inline JSON, --spec <path>, or --from-plan <path>.', { exitCode: 2 });
   }
-  if (options.entrypoints == null) {
-    throw new CliError('ATM_CLI_USAGE', 'create-map requires --entrypoints', { exitCode: 2 });
-  }
-  if (options.qualityTargets == null) {
-    throw new CliError('ATM_CLI_USAGE', 'create-map requires --quality-targets', { exitCode: 2 });
+
+  if (activeModes[0] === 'inline') {
+    if (options.members == null) {
+      throw new CliError('ATM_CLI_USAGE', 'create-map requires --members', { exitCode: 2 });
+    }
+    if (options.entrypoints == null) {
+      throw new CliError('ATM_CLI_USAGE', 'create-map requires --entrypoints', { exitCode: 2 });
+    }
+    if (options.qualityTargets == null) {
+      throw new CliError('ATM_CLI_USAGE', 'create-map requires --quality-targets', { exitCode: 2 });
+    }
   }
 
   return {
@@ -141,4 +172,85 @@ function parseJsonOption(rawValue: any, optionName: any) {
       }
     });
   }
+}
+
+function resolveCreateMapInput(options: CreateMapOptions) {
+  if (options.specPath) {
+    return loadCreateMapInputFromSpec(options.cwd, options.specPath);
+  }
+  if (options.fromPlanPath) {
+    let loaded;
+    try {
+      loaded = readDecompositionPlan(options.fromPlanPath, { cwd: options.cwd });
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error && (error as any).code === 'ATM_DECOMP_PLAN_INVALID') {
+        throw new CliError('ATM_DECOMP_PLAN_INVALID', error instanceof Error ? error.message : String(error), {
+          exitCode: 2,
+          details: (error as any).details ?? {}
+        });
+      }
+      throw error;
+    }
+    const converted = createAtomicMapRequestFromDecompositionPlan(loaded.plan);
+    return {
+      mapId: converted.mapId,
+      request: converted.request,
+      sourceMode: 'from-plan',
+      sourcePath: loaded.relativePlanPath,
+      defaultsUsed: converted.defaultsUsed
+    };
+  }
+
+  return {
+    mapId: null,
+    request: {
+      mapVersion: options.mapVersion,
+      members: options.members,
+      edges: options.edges,
+      entrypoints: options.entrypoints,
+      qualityTargets: options.qualityTargets
+    },
+    sourceMode: 'inline',
+    sourcePath: null,
+    defaultsUsed: []
+  };
+}
+
+function loadCreateMapInputFromSpec(cwd: string, specPath: string) {
+  const absoluteSpecPath = path.resolve(cwd, specPath);
+  const document = readJsonFile(absoluteSpecPath, 'ATM_MAP_SPEC_INVALID') as Record<string, any>;
+  if (document?.schemaId !== 'atm.atomicMap') {
+    throw new CliError('ATM_MAP_SPEC_INVALID', 'create-map --spec requires an atm.atomicMap document.', {
+      exitCode: 2,
+      details: {
+        specPath: relativePathFrom(cwd, absoluteSpecPath),
+        schemaId: document?.schemaId ?? null
+      }
+    });
+  }
+  if (typeof document?.mapId !== 'string' || document.mapId.trim().length === 0) {
+    throw new CliError('ATM_MAP_SPEC_INVALID', 'create-map --spec requires mapId on the source document.', {
+      exitCode: 2,
+      details: {
+        specPath: relativePathFrom(cwd, absoluteSpecPath)
+      }
+    });
+  }
+
+  return {
+    mapId: document.mapId,
+    request: {
+      mapVersion: document.mapVersion,
+      specVersion: document.specVersion,
+      members: document.members,
+      edges: document.edges,
+      entrypoints: document.entrypoints,
+      qualityTargets: document.qualityTargets,
+      replacement: document.replacement,
+      pendingSfCalculation: document.pendingSfCalculation === true
+    },
+    sourceMode: 'spec',
+    sourcePath: relativePathFrom(cwd, absoluteSpecPath),
+    defaultsUsed: []
+  };
 }
