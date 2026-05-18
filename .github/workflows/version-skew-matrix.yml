@@ -1,0 +1,85 @@
+name: Version skew matrix
+
+on:
+  pull_request:
+    paths:
+      - 'compatibility-matrix.json'
+      - 'scripts/skew-matrix.config.json'
+      - 'scripts/validate-skew-matrix.ts'
+      - 'fixtures/skew/**'
+      - 'tests/skew/**'
+      - 'packages/cli/**'
+      - 'packages/plugin-sdk/**'
+      - 'packages/adapter-local-git/**'
+      - 'packages/integration-*/**'
+      - '.github/workflows/version-skew-matrix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-skew:
+    name: Validate CLI x Plugin SDK x Adapter skew
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run skew matrix smoke tests
+        run: |
+          mkdir -p skew-output
+          node --experimental-strip-types scripts/validate-skew-matrix.ts --mode validate --summary skew-output/skew-summary.json
+
+      - name: Upload skew summary artefact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-skew-summary
+          path: skew-output/skew-summary.json
+          if-no-files-found: warn
+
+      - name: Append skew summary
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f skew-output/skew-summary.json ]]; then
+            echo '## Version skew matrix' >> "$GITHUB_STEP_SUMMARY"
+            node -e "const fs=require('fs'); const s=JSON.parse(fs.readFileSync('skew-output/skew-summary.json','utf8')); for (const c of s.cases || []) console.log('- '+c.id+': '+c.status);" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Comment failed skew combinations
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = 'Version skew matrix failed before summary generation. See workflow logs.';
+            if (fs.existsSync('skew-output/skew-summary.json')) {
+              const summary = JSON.parse(fs.readFileSync('skew-output/skew-summary.json', 'utf8'));
+              const failed = (summary.cases || []).filter((entry) => entry.status !== 'pass');
+              body = [
+                'Version skew matrix failed.',
+                '',
+                failed.length
+                  ? failed.map((entry) => `- ${entry.id}: ${entry.checks.filter((check) => check.status !== 'pass').map((check) => `${check.name} ${check.detail || ''}`.trim()).join('; ')}`).join('\n')
+                  : '- No case summary was available; check validator output.',
+                '',
+                `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+              ].join('\n');
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
