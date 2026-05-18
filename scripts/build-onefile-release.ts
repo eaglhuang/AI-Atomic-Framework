@@ -215,6 +215,7 @@ function run() {
       env: {
         ...process.env,
         ATM_ONEFILE_RUNTIME: '1',
+        ATM_ONEFILE_LAUNCHER_PATH: path.resolve(process.argv[1] || ''),
         ATM_ONEFILE_PAYLOAD_SHA256: payloadSha256,
         ATM_ONEFILE_EXTRACTED_ROOT: extractedRoot
       },

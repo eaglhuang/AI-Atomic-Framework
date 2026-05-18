@@ -1,5 +1,6 @@
 // Transitional alpha implementation: public contracts are checked while legacy loose runtime code is tightened.
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type {
@@ -49,6 +50,7 @@ export interface LocalGovernanceBootstrapOptions {
 export interface LocalGovernanceBootstrapResult {
   readonly created: readonly string[];
   readonly unchanged: readonly string[];
+  readonly pinnedRunner: LocalGovernancePinnedRunnerResult;
   readonly adoptedProfile: 'default';
   readonly bootstrapTaskPath: string;
   readonly bootstrapLockPath: string;
@@ -68,6 +70,22 @@ export interface LocalGovernanceBootstrapResult {
   readonly charterPath: string;
   readonly charterInvariantsPath: string;
   readonly scriptPaths: readonly string[];
+}
+
+export interface LocalGovernancePinnedRunnerResult {
+  readonly schemaVersion: 'atm.pinnedRunner.v0.1';
+  readonly runnerPath: 'atm.mjs';
+  readonly metadataPath: '.atm/runtime/pinned-runner.json';
+  readonly command: 'node atm.mjs next --json';
+  readonly status: 'installed' | 'replaced' | 'unchanged' | 'skipped-existing-different' | 'source-unavailable';
+  readonly sourceKind: 'explicit-env' | 'onefile-launcher' | 'release-onefile' | 'unavailable';
+  readonly sourcePath?: string;
+  readonly sha256?: string;
+  readonly existingSha256?: string;
+  readonly sizeBytes?: number;
+  readonly frameworkVersion: string;
+  readonly generatedAt: string;
+  readonly reason?: string;
 }
 
 export interface LocalGovernanceScriptInstallResult {
@@ -192,6 +210,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   for (const directoryPath of Object.values(paths.directories)) {
     ensureDirectory(directoryPath, cwd, created, unchanged);
   }
+  const pinnedRunner = installPinnedRunner(cwd, force, created, unchanged);
 
   stores.documentIndex.initialize?.();
   stores.shardStore.initialize?.();
@@ -248,6 +267,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   };
   const bootstrapEvidence = {
     ...createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths),
+    pinnedRunner,
     contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
     contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? null : normalizeRelativePath(contextBudgetSummaryPath),
     contextSummaryPath: normalizeRelativePath(contextSummaryPath),
@@ -351,6 +371,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   return {
     created,
     unchanged,
+    pinnedRunner,
     adoptedProfile: 'default',
     bootstrapTaskPath: relativePathFrom(cwd, paths.taskPath),
     bootstrapLockPath: relativePathFrom(cwd, paths.lockPath),
@@ -594,8 +615,10 @@ function createBootstrapTask(taskId: string, taskTitle: string, projectProbe: Re
     repositoryKind: projectProbe.repositoryKind,
     summary: 'Establish the default ATM bootstrap pack, verify the host workflow, and leave initial evidence for the next agent run.',
     scope: [
+      'atm.mjs',
       'README.md',
       'AGENTS.md',
+      '.atm/runtime/pinned-runner.json',
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.taskPath),
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.lockPath)
     ],
@@ -613,8 +636,10 @@ function createBootstrapLock(taskId: string, paths: ReturnType<typeof createBoot
     taskId,
     status: 'open',
     files: [
+      'atm.mjs',
       'README.md',
       'AGENTS.md',
+      '.atm/runtime/pinned-runner.json',
       '.atm/config.json',
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.profilePath),
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.currentTaskPath),
@@ -851,6 +876,145 @@ function ensureDirectory(directoryPath: string, cwd: string, created: string[], 
   }
   mkdirSync(directoryPath, { recursive: true });
   created.push(relativePathFrom(cwd, directoryPath));
+}
+
+function installPinnedRunner(cwd: string, force: boolean, created: string[], unchanged: string[]): LocalGovernancePinnedRunnerResult {
+  const runnerPath = path.join(cwd, 'atm.mjs');
+  const metadataPath = path.join(cwd, '.atm', 'runtime', 'pinned-runner.json');
+  const metadataRelativePath = '.atm/runtime/pinned-runner.json' as const;
+  const generatedAt = readPinnedRunnerGeneratedAt(metadataPath) ?? new Date().toISOString();
+  const source = resolvePinnedRunnerSource();
+  if (source === null) {
+    const metadata: LocalGovernancePinnedRunnerResult = {
+      schemaVersion: 'atm.pinnedRunner.v0.1',
+      runnerPath: 'atm.mjs',
+      metadataPath: metadataRelativePath,
+      command: 'node atm.mjs next --json',
+      status: 'source-unavailable',
+      sourceKind: 'unavailable',
+      frameworkVersion: pluginGovernanceLocalPackage.packageVersion,
+      generatedAt,
+      reason: 'No pinned onefile launcher source was available. Run bootstrap from release/atm-onefile/atm.mjs or set ATM_PINNED_RUNNER_SOURCE.'
+    };
+    writeJsonIfChanged(metadataPath, metadata, cwd, created, unchanged);
+    return metadata;
+  }
+
+  const sourceBytes = readFileSync(source.path);
+  const sourceSha256 = sha256Bytes(sourceBytes);
+  const sourceStats = statSync(source.path);
+  const existingSha256 = existsSync(runnerPath) ? sha256Bytes(readFileSync(runnerPath)) : undefined;
+  let status: LocalGovernancePinnedRunnerResult['status'];
+  if (existingSha256 === sourceSha256) {
+    status = 'unchanged';
+    unchanged.push('atm.mjs');
+  } else if (existingSha256 && !force) {
+    status = 'skipped-existing-different';
+    unchanged.push('atm.mjs');
+  } else {
+    mkdirSync(path.dirname(runnerPath), { recursive: true });
+    copyFileSync(source.path, runnerPath);
+    syncExecutableMode(source.path, runnerPath);
+    status = existingSha256 ? 'replaced' : 'installed';
+    created.push('atm.mjs');
+  }
+
+  const metadata: LocalGovernancePinnedRunnerResult = {
+    schemaVersion: 'atm.pinnedRunner.v0.1',
+    runnerPath: 'atm.mjs',
+    metadataPath: metadataRelativePath,
+    command: 'node atm.mjs next --json',
+    status,
+    sourceKind: source.kind,
+    sourcePath: describePinnedRunnerSource(source),
+    sha256: sourceSha256,
+    existingSha256,
+    sizeBytes: sourceStats.size,
+    frameworkVersion: pluginGovernanceLocalPackage.packageVersion,
+    generatedAt,
+    ...(status === 'skipped-existing-different'
+      ? { reason: 'A different root atm.mjs already exists. Re-run bootstrap with --force to replace it with the pinned runner.' }
+      : {})
+  };
+  writeJsonIfChanged(metadataPath, metadata, cwd, created, unchanged);
+  return metadata;
+}
+
+function resolvePinnedRunnerSource(): { readonly path: string; readonly kind: LocalGovernancePinnedRunnerResult['sourceKind'] } | null {
+  const explicit = resolveExistingFile(process.env.ATM_PINNED_RUNNER_SOURCE);
+  if (explicit) {
+    return { path: explicit, kind: 'explicit-env' };
+  }
+  const onefileLauncher = resolveExistingFile(process.env.ATM_ONEFILE_LAUNCHER_PATH);
+  if (onefileLauncher) {
+    return { path: onefileLauncher, kind: 'onefile-launcher' };
+  }
+  const releaseOnefile = resolveExistingFile(path.join(repoRoot, 'release', 'atm-onefile', 'atm.mjs'));
+  if (releaseOnefile) {
+    return { path: releaseOnefile, kind: 'release-onefile' };
+  }
+  return null;
+}
+
+function resolveExistingFile(filePath: string | undefined): string | null {
+  if (!filePath) {
+    return null;
+  }
+  const resolved = path.resolve(filePath);
+  if (!existsSync(resolved)) {
+    return null;
+  }
+  return statSync(resolved).isFile() ? resolved : null;
+}
+
+function sha256Bytes(value: Buffer): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function syncExecutableMode(sourcePath: string, targetPath: string) {
+  if (process.platform === 'win32') {
+    return;
+  }
+  try {
+    chmodSync(targetPath, statSync(sourcePath).mode & 0o777);
+  } catch {
+    // Ignore mode sync failures; the runner is still invokable through `node atm.mjs`.
+  }
+}
+
+function describePinnedRunnerSource(source: { readonly path: string; readonly kind: LocalGovernancePinnedRunnerResult['sourceKind'] }): string {
+  if (source.kind === 'onefile-launcher') {
+    return 'ATM_ONEFILE_LAUNCHER_PATH';
+  }
+  if (source.kind === 'explicit-env') {
+    return 'ATM_PINNED_RUNNER_SOURCE';
+  }
+  const relative = path.relative(repoRoot, source.path).replace(/\\/g, '/');
+  return relative.startsWith('..') ? source.path : relative;
+}
+
+function writeJsonIfChanged(targetPath: string, value: unknown, cwd: string, created: string[], unchanged: string[]) {
+  const next = `${JSON.stringify(value, null, 2)}\n`;
+  const relativePath = relativePathFrom(cwd, targetPath);
+  if (existsSync(targetPath) && readFileSync(targetPath, 'utf8') === next) {
+    unchanged.push(relativePath);
+    return;
+  }
+  mkdirSync(path.dirname(targetPath), { recursive: true });
+  writeFileSync(targetPath, next, 'utf8');
+  created.push(relativePath);
+}
+
+function readPinnedRunnerGeneratedAt(metadataPath: string): string | null {
+  if (!existsSync(metadataPath)) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(readFileSync(metadataPath, 'utf8'));
+    return typeof parsed?.generatedAt === 'string' && parsed.generatedAt.length > 0 ? parsed.generatedAt : null;
+  } catch {
+    return null;
+  }
 }
 
 function writeTemplate(sourcePath: string, targetPath: string, tokens: Record<string, string>, cwd: string, force: boolean, created: string[], unchanged: string[]) {

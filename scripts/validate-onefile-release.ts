@@ -92,6 +92,23 @@ try {
   assert(existsSync(path.join(rootDrop.releaseRoot, legacySkillRelativePath)), 'root-drop source for onefile must include legacy atomization skill');
   assert(existsSync(release.outputFilePath), 'onefile build must emit release/atm-onefile/atm.mjs');
 
+  const externalBootstrapRepo = path.join(tempRoot, 'external-bootstrap-repo');
+  mkdirSync(externalBootstrapRepo, { recursive: true });
+  initializeGitRepository(externalBootstrapRepo);
+  const externalBootstrap = runOnefile(release.outputFilePath, externalBootstrapRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
+  assert(externalBootstrap.exitCode === 0, 'external onefile bootstrap must exit 0');
+  assert(externalBootstrap.parsed.ok === true, 'external onefile bootstrap must report ok=true');
+  assert(existsSync(path.join(externalBootstrapRepo, 'atm.mjs')), 'external onefile bootstrap must install root atm.mjs into host repo');
+  assert(existsSync(path.join(externalBootstrapRepo, '.atm', 'runtime', 'pinned-runner.json')), 'external onefile bootstrap must write pinned runner metadata');
+  assert(externalBootstrap.parsed.evidence?.pinnedRunner?.status === 'installed', 'external onefile bootstrap must report pinned runner installed');
+  assert(externalBootstrap.parsed.evidence?.pinnedRunner?.sourceKind === 'onefile-launcher', 'external onefile bootstrap must source pinned runner from onefile launcher');
+  const externalNext = runOnefile(path.join(externalBootstrapRepo, 'atm.mjs'), externalBootstrapRepo, ['next', '--json']);
+  assert(externalNext.exitCode === 0 || externalNext.exitCode === 1, 'installed pinned onefile runner next must exit with ATM next status after external bootstrap');
+  assert(externalNext.parsed.evidence?.nextAction?.command, 'installed pinned onefile runner next must emit a governed next action after external bootstrap');
+  const externalSecondBootstrap = runOnefile(path.join(externalBootstrapRepo, 'atm.mjs'), externalBootstrapRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
+  assert(externalSecondBootstrap.exitCode === 0, 'installed pinned onefile second bootstrap must exit 0');
+  assert(externalSecondBootstrap.parsed.evidence?.unchanged?.includes('atm.mjs'), 'installed pinned onefile second bootstrap must keep atm.mjs unchanged');
+
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
   copyFileSync(release.outputFilePath, path.join(blankRepo, 'atm.mjs'));

@@ -3,11 +3,13 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createTempWorkspace } from './temp-root.ts';
+import { buildOnefileRelease } from './build-onefile-release.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+let pinnedRunnerSource: string | null = null;
 
 const requiredFiles = [
   'templates/root-drop/AGENTS.md',
@@ -67,7 +69,10 @@ function readText(absolutePath: string) {
 function runAtm(args: any, cwd: any) {
   const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: pinnedRunnerSource
+      ? { ...process.env, ATM_PINNED_RUNNER_SOURCE: pinnedRunnerSource }
+      : process.env
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;
@@ -90,6 +95,32 @@ function assertReadmeEntry(hostRepo: string) {
   assert(readme.includes('<!-- ATM README ENTRY:START -->'), 'README.md must include ATM README entry marker');
   assert(readme.includes('node atm.mjs next --json'), 'README.md must point directly to the ATM next command');
   assert(!readme.includes('Read AGENTS.md'), 'README.md must not point back to AGENTS.md');
+}
+
+function assertPinnedRunner(hostRepo: string) {
+  const runnerPath = path.join(hostRepo, 'atm.mjs');
+  const metadataPath = path.join(hostRepo, '.atm', 'runtime', 'pinned-runner.json');
+  assert(existsSync(runnerPath), 'bootstrap must install root atm.mjs pinned runner');
+  assert(existsSync(metadataPath), 'bootstrap must write pinned runner metadata');
+  const metadata = readJson(metadataPath);
+  assert(metadata.schemaVersion === 'atm.pinnedRunner.v0.1', 'pinned runner metadata schema mismatch');
+  assert(metadata.runnerPath === 'atm.mjs', 'pinned runner metadata must point to root atm.mjs');
+  assert(metadata.sha256 && metadata.sha256.length === 64, 'pinned runner metadata must include runner sha256');
+  assert(metadata.command === 'node atm.mjs next --json', 'pinned runner metadata must preserve first command');
+
+  const result = spawnSync(process.execPath, [runnerPath, 'next', '--cwd', hostRepo, '--json'], {
+    cwd: hostRepo,
+    encoding: 'utf8'
+  });
+  const payload = (result.stdout || result.stderr || '').trim();
+  let parsed: any = {};
+  try {
+    parsed = JSON.parse(payload);
+  } catch (error: any) {
+    fail(`installed pinned runner did not emit JSON: ${payload || error.message}`);
+  }
+  assert(result.status === 0 || result.status === 1, 'installed pinned runner next must exit with ATM next status after bootstrap');
+  assert(parsed.evidence?.nextAction?.command, 'installed pinned runner next must emit a governed next action after bootstrap');
 }
 
 function assertAgentsEntry(hostRepo: string, expectedOriginalText?: string) {
@@ -116,6 +147,7 @@ function verifyRootEntryScenario(tempRoot: string, scenarioName: string, options
   assert(bootstrap.exitCode === 0, `${scenarioName} bootstrap must exit 0`);
   assert(bootstrap.parsed.ok === true, `${scenarioName} bootstrap must report ok=true`);
   assert(existsSync(path.join(hostRepo, 'AGENTS.md')), `${scenarioName} bootstrap must leave AGENTS.md available`);
+  assertPinnedRunner(hostRepo);
 
   if (options.readme === true) {
     assertReadmeEntry(hostRepo);
@@ -129,6 +161,7 @@ function verifyRootEntryScenario(tempRoot: string, scenarioName: string, options
   assert(secondBootstrap.exitCode === 0, `${scenarioName} second bootstrap must exit 0`);
   assert(secondBootstrap.parsed.ok === true, `${scenarioName} second bootstrap must report ok=true`);
   assert(secondBootstrap.parsed.evidence.unchanged.includes('AGENTS.md'), `${scenarioName} second bootstrap must leave AGENTS.md unchanged`);
+  assert(secondBootstrap.parsed.evidence.unchanged.includes('atm.mjs'), `${scenarioName} second bootstrap must leave atm.mjs unchanged`);
   if (options.readme === true) {
     assert(secondBootstrap.parsed.evidence.unchanged.includes('README.md'), `${scenarioName} second bootstrap must leave README.md unchanged`);
   }
@@ -147,6 +180,12 @@ for (const relativePath of protectedSurfaceFiles) {
 
 const tempRoot = createTempWorkspace('atm-bootstrap-');
 try {
+  pinnedRunnerSource = buildOnefileRelease({
+    repositoryRoot: root,
+    rootDropRoot: path.join(tempRoot, 'release', 'atm-root-drop'),
+    outputRoot: path.join(tempRoot, 'release', 'atm-onefile')
+  }).outputFilePath;
+
   const hostRepo = path.join(tempRoot, 'static-site-host');
   mkdirSync(path.join(hostRepo, '.git'), { recursive: true });
   mkdirSync(path.join(hostRepo, 'articles'), { recursive: true });
@@ -160,15 +199,18 @@ try {
   assert(bootstrap.exitCode === 0, 'bootstrap must exit 0');
   assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true');
   assert(bootstrap.parsed.evidence.adoptedProfile === 'default', 'bootstrap must report adoptedProfile=default');
+  assert(bootstrap.parsed.evidence.pinnedRunner?.status === 'installed', 'bootstrap must report pinned runner installed');
 
   for (const relativePath of [
     'AGENTS.md',
+    'atm.mjs',
     '.atm/config.json',
     '.atm/runtime/profile/default.md',
     '.atm/runtime/current-task.json',
     '.atm/runtime/project-probe.json',
     '.atm/runtime/default-guards.json',
     '.atm/runtime/budget/default-policy.json',
+    '.atm/runtime/pinned-runner.json',
     '.atm/history/handoff/INITIAL_SUMMARY.md',
     '.atm/history/handoff/BOOTSTRAP-0001.json',
     '.atm/history/handoff/BOOTSTRAP-0001.md',
@@ -204,6 +246,7 @@ try {
   assert(!agents.includes('{{'), 'AGENTS.md must not leak unresolved template placeholders');
   assert(!agents.includes('ATM TEMPLATE'), 'AGENTS.md must not leak template headers');
   assertReadmeEntry(hostRepo);
+  assertPinnedRunner(hostRepo);
 
   const profile = readFileSync(path.join(hostRepo, '.atm', 'runtime', 'profile', 'default.md'), 'utf8');
   assert(!profile.includes('{{'), 'default profile must not leak unresolved template placeholders');
@@ -224,6 +267,7 @@ try {
   assert(secondBootstrap.parsed.ok === true, 'second bootstrap must report ok=true');
   assert(Array.isArray(secondBootstrap.parsed.evidence.unchanged), 'second bootstrap must report unchanged files');
   assert(secondBootstrap.parsed.evidence.unchanged.includes('AGENTS.md'), 'second bootstrap must leave AGENTS.md unchanged without --force');
+  assert(secondBootstrap.parsed.evidence.unchanged.includes('atm.mjs'), 'second bootstrap must leave atm.mjs unchanged without --force');
   assert(secondBootstrap.parsed.evidence.unchanged.includes('README.md'), 'second bootstrap must leave README.md unchanged without --force');
 
   verifyRootEntryScenario(tempRoot, 'root-entry-readme-only', { readme: true });

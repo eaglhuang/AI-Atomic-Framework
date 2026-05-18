@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { runInit } from './init.ts';
 import { message } from './shared.ts';
 
@@ -13,10 +15,22 @@ export async function runBootstrap(argv: any) {
   return {
     ...result,
     command: 'bootstrap',
+    evidence: {
+      ...result.evidence,
+      pinnedRunner: readPinnedRunnerMetadata(result.cwd)
+    },
     messages: [
       bootstrapCreated
         ? message('info', 'ATM_BOOTSTRAP_CREATED', 'ATM default bootstrap pack created.')
         : message('info', 'ATM_BOOTSTRAP_READY', 'ATM default bootstrap pack already exists; no files were changed.')
     ]
   };
+}
+
+function readPinnedRunnerMetadata(cwd: string) {
+  const metadataPath = path.join(cwd, '.atm', 'runtime', 'pinned-runner.json');
+  if (!existsSync(metadataPath)) {
+    return null;
+  }
+  return JSON.parse(readFileSync(metadataPath, 'utf8'));
 }
