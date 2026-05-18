@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import type { RegistryMapEdgeRecord, RegistryMapMemberRecord, RegistryMapQualityTargetValue, RegistryMapQualityTargetsRecord } from '../index';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const requireFromDecompositionPlan = createRequire(import.meta.url);
@@ -69,13 +70,19 @@ export function validateDecompositionPlanDocument(document: unknown, options: an
 
 export function createAtomicMapRequestFromDecompositionPlan(plan: any) {
   const qualityTargets = normalizeQualityTargets(plan?.qualityTargets);
+  const members: RegistryMapMemberRecord[] = Array.isArray(plan.proposedMembers)
+    ? plan.proposedMembers.map((entry: RegistryMapMemberRecord) => ({ ...entry }))
+    : [];
+  const edges: RegistryMapEdgeRecord[] = Array.isArray(plan.proposedEdges)
+    ? plan.proposedEdges.map((entry: RegistryMapEdgeRecord) => ({ ...entry }))
+    : [];
   return {
     mapId: String(plan.proposedMapId || '').trim(),
     request: {
       mapVersion: String(plan.mapVersion || '0.1.0').trim(),
       specVersion: '0.2.0',
-      members: Array.isArray(plan.proposedMembers) ? plan.proposedMembers.map((entry) => ({ ...entry })) : [],
-      edges: Array.isArray(plan.proposedEdges) ? plan.proposedEdges.map((entry) => ({ ...entry })) : [],
+      members,
+      edges,
       entrypoints: Array.isArray(plan.entrypoints) ? [...plan.entrypoints] : [],
       qualityTargets,
       replacement: {
@@ -88,17 +95,17 @@ export function createAtomicMapRequestFromDecompositionPlan(plan: any) {
   };
 }
 
-function normalizeQualityTargets(value: unknown) {
-  const source = value && typeof value === 'object' && !Array.isArray(value)
-    ? value as Record<string, string | number | boolean>
+function normalizeQualityTargets(value: unknown): RegistryMapQualityTargetsRecord {
+  const source: Record<string, RegistryMapQualityTargetValue> = value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, RegistryMapQualityTargetValue>
     : {
         promoteGateRequired: true,
         requiredChecks: 1
       };
+  const entries: Array<[string, RegistryMapQualityTargetValue]> = Object.entries(source)
+    .map(([key, entryValue]) => [String(key).trim(), typeof entryValue === 'string' ? entryValue.trim() : entryValue]);
 
-  return Object.fromEntries(Object.entries(source)
-    .map(([key, entryValue]) => [String(key).trim(), typeof entryValue === 'string' ? entryValue.trim() : entryValue])
-    .sort(([left], [right]) => left.localeCompare(right)));
+  return Object.fromEntries(entries.sort(([left], [right]) => left.localeCompare(right))) as RegistryMapQualityTargetsRecord;
 }
 
 function readJson(filePath: string) {

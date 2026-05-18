@@ -11,6 +11,45 @@ export const defaultMapEquivalenceReportMigration = Object.freeze({
   notes: 'Initial alpha0 map equivalence report.'
 });
 
+type MetricDirection = 'higher-is-better' | 'lower-is-better' | 'informational';
+
+interface FixtureCaseRecord {
+  readonly caseId: string;
+  readonly input: unknown;
+  readonly metric: unknown;
+  readonly evidenceRefs: unknown;
+  readonly knownDivergence: boolean;
+}
+
+interface KnownDivergenceRecord {
+  readonly caseId: string;
+  readonly reason: string;
+  readonly justification: string;
+  readonly reviewer: string;
+  readonly reviewRef: string;
+}
+
+interface CaseMetricRecord {
+  readonly name: string;
+  readonly baseline: number;
+  readonly current: number;
+  readonly delta: number;
+  readonly direction: MetricDirection;
+  readonly passed: boolean;
+  readonly tolerance?: number;
+}
+
+interface ReportCaseRecord {
+  readonly caseId: string;
+  readonly input: unknown;
+  readonly expected: unknown;
+  readonly actual: unknown;
+  readonly metric: CaseMetricRecord;
+  readonly evidenceRefs: string[];
+  readonly passed: boolean;
+  readonly knownDivergence: boolean;
+}
+
 export function resolveMapEquivalencePaths(mapId: string) {
   const canonical = resolveCanonicalMapPaths(mapId);
   return {
@@ -57,7 +96,7 @@ export async function runMapEquivalence(mapId: string, fixturePath: string, opti
   const documentedKnownDivergences = new Map(knownDivergences.map((entry) => [entry.caseId, entry]));
   const startedAt = Date.now();
 
-  const reportCases = [];
+  const reportCases: ReportCaseRecord[] = [];
   for (const fixtureCase of cases) {
     const executionContext = {
       mapId,
@@ -242,7 +281,7 @@ async function invokeExecutor(executor: any, input: any, context: any, fieldName
   }
 }
 
-function normalizeFixtureCases(value: any) {
+function normalizeFixtureCases(value: any): FixtureCaseRecord[] {
   if (!Array.isArray(value) || value.length === 0) {
     throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', 'Fixture set must define at least one case.', {});
   }
@@ -263,7 +302,7 @@ function normalizeFixtureCases(value: any) {
   });
 }
 
-function normalizeKnownDivergences(value: any) {
+function normalizeKnownDivergences(value: any): KnownDivergenceRecord[] {
   if (value == null) {
     return [];
   }
@@ -290,26 +329,29 @@ function normalizeKnownDivergences(value: any) {
   });
 }
 
-function createCaseMetric(metric: any, passed: boolean) {
+function createCaseMetric(metric: any, passed: boolean): CaseMetricRecord {
   const baseline = typeof metric?.baseline === 'number' ? metric.baseline : 1;
   const current = typeof metric?.current === 'number'
     ? metric.current
     : (passed ? baseline : 0);
-  const output = {
+  const output: CaseMetricRecord = {
     name: String(metric?.name || 'semanticMatch').trim(),
     baseline,
     current,
     delta: current - baseline,
     direction: normalizeMetricDirection(metric?.direction),
     passed
-  } as Record<string, unknown>;
+  };
   if (typeof metric?.tolerance === 'number' && metric.tolerance >= 0) {
-    output.tolerance = metric.tolerance;
+    return {
+      ...output,
+      tolerance: metric.tolerance
+    };
   }
   return output;
 }
 
-function normalizeEvidenceRefs(value: any, caseId: string) {
+function normalizeEvidenceRefs(value: any, caseId: string): string[] {
   if (!Array.isArray(value) || value.length === 0) {
     return [`equivalence-fixture:${caseId}`];
   }
@@ -317,7 +359,7 @@ function normalizeEvidenceRefs(value: any, caseId: string) {
   return normalized.length > 0 ? normalized : [`equivalence-fixture:${caseId}`];
 }
 
-function normalizeMetricDirection(value: any) {
+function normalizeMetricDirection(value: any): MetricDirection {
   const direction = String(value || 'higher-is-better').trim();
   if (direction === 'higher-is-better' || direction === 'lower-is-better' || direction === 'informational') {
     return direction;
@@ -325,7 +367,7 @@ function normalizeMetricDirection(value: any) {
   return 'higher-is-better';
 }
 
-function normalizeLegacyUris(value: any) {
+function normalizeLegacyUris(value: any): string[] {
   if (!Array.isArray(value)) {
     return [];
   }

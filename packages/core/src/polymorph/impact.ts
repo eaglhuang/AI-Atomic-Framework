@@ -3,13 +3,34 @@ import path from 'node:path';
 import { normalizeMapId } from '../upgrade/map-propose.ts';
 import { propagateTemplateUpgrade } from './template.ts';
 
+interface NormalizedMemberRecord {
+  readonly atomId: string;
+  readonly version: string;
+}
+
+interface PolymorphMetadataRecord {
+  readonly templateId: string;
+  readonly polymorphGroupId: string;
+}
+
+interface TemplateHitRecord extends PolymorphMetadataRecord {
+  readonly atomId: string;
+  readonly version: string;
+}
+
+interface ImpactedMapRecord {
+  readonly mapId: string;
+  readonly templateIds: string[];
+  readonly matchedMembers: TemplateHitRecord[];
+}
+
 export function analyzePolymorphImpact(options: any) {
   const repositoryRoot = path.resolve(options?.repositoryRoot ?? process.cwd());
   const targetMapId = normalizeMapId(options?.mapId ?? options?.targetMapId);
   const toVersion = normalizeSemver(options?.toVersion ?? options?.nextVersion ?? '');
   const targetMap = readTargetMap(repositoryRoot, targetMapId);
   const registry = readRegistry(repositoryRoot);
-  const specCache = new Map<string, any>();
+  const specCache = new Map<string, PolymorphMetadataRecord | null>();
   const templateHits = collectTemplateHits(repositoryRoot, registry.entries, targetMap.members, specCache);
   const impactedMaps = collectImpactedMaps(repositoryRoot, registry.entries, targetMapId, templateHits, specCache);
   const impactedMapIds = impactedMaps.map((entry) => entry.mapId);
@@ -118,7 +139,7 @@ function readRegistry(repositoryRoot: string) {
   };
 }
 
-function collectTemplateHits(repositoryRoot: string, registryEntries: any[], members: any[], specCache: Map<string, any>) {
+function collectTemplateHits(repositoryRoot: string, registryEntries: any[], members: any[], specCache: Map<string, PolymorphMetadataRecord | null>): TemplateHitRecord[] {
   return normalizeMembers(members)
     .map((member) => {
       const metadata = resolveAtomPolymorphMetadata(repositoryRoot, registryEntries, member.atomId, specCache);
@@ -132,11 +153,17 @@ function collectTemplateHits(repositoryRoot: string, registryEntries: any[], mem
         polymorphGroupId: metadata.polymorphGroupId
       };
     })
-    .filter(Boolean)
-    .sort((left: any, right: any) => left.atomId.localeCompare(right.atomId));
+    .filter((entry): entry is TemplateHitRecord => entry !== null)
+    .sort((left, right) => left.atomId.localeCompare(right.atomId));
 }
 
-function collectImpactedMaps(repositoryRoot: string, registryEntries: any[], targetMapId: string, templateHits: any[], specCache: Map<string, any>) {
+function collectImpactedMaps(
+  repositoryRoot: string,
+  registryEntries: any[],
+  targetMapId: string,
+  templateHits: TemplateHitRecord[],
+  specCache: Map<string, PolymorphMetadataRecord | null>
+): ImpactedMapRecord[] {
   const targetTemplateIds = new Set(templateHits.map((entry) => entry.templateId));
   if (targetTemplateIds.size === 0) {
     return [];
@@ -158,7 +185,7 @@ function collectImpactedMaps(repositoryRoot: string, registryEntries: any[], tar
             polymorphGroupId: metadata.polymorphGroupId
           };
         })
-        .filter(Boolean);
+        .filter((member): member is TemplateHitRecord => member !== null);
       if (matchedMembers.length === 0) {
         return null;
       }
@@ -168,13 +195,18 @@ function collectImpactedMaps(repositoryRoot: string, registryEntries: any[], tar
         matchedMembers
       };
     })
-    .filter(Boolean)
-    .sort((left: any, right: any) => left.mapId.localeCompare(right.mapId));
+    .filter((entry): entry is ImpactedMapRecord => entry !== null)
+    .sort((left, right) => left.mapId.localeCompare(right.mapId));
 }
 
-function resolveAtomPolymorphMetadata(repositoryRoot: string, registryEntries: any[], atomId: string, specCache: Map<string, any>) {
+function resolveAtomPolymorphMetadata(
+  repositoryRoot: string,
+  registryEntries: any[],
+  atomId: string,
+  specCache: Map<string, PolymorphMetadataRecord | null>
+): PolymorphMetadataRecord | null {
   if (specCache.has(atomId)) {
-    return specCache.get(atomId);
+    return specCache.get(atomId) ?? null;
   }
 
   const entry = registryEntries.find((candidate) => candidate?.atomId === atomId);
@@ -200,7 +232,7 @@ function resolveAtomPolymorphMetadata(repositoryRoot: string, registryEntries: a
   return metadata;
 }
 
-function normalizeMembers(members: any[]) {
+function normalizeMembers(members: any[]): NormalizedMemberRecord[] {
   return (Array.isArray(members) ? members : [])
     .map((member) => ({
       atomId: String(member?.atomId ?? '').trim(),

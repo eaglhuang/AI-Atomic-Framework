@@ -15,7 +15,18 @@ export const ReplacementMode = Object.freeze({
   LegacyRetired: 'legacy-retired'
 });
 
-const orderedReplacementModes = [
+type ReplacementModeValue = typeof ReplacementMode[keyof typeof ReplacementMode];
+type ReplacementModeWithEvidence = Exclude<ReplacementModeValue, 'draft'>;
+
+interface ReplacementTransitionInput {
+  readonly from: ReplacementModeValue;
+  readonly to: ReplacementModeValue;
+  readonly evidenceRefs: readonly string[];
+  readonly canonicalMapId: string;
+  readonly repositoryRoot: string;
+}
+
+const orderedReplacementModes: readonly ReplacementModeValue[] = [
   ReplacementMode.Draft,
   ReplacementMode.Shadow,
   ReplacementMode.Canary,
@@ -23,7 +34,7 @@ const orderedReplacementModes = [
   ReplacementMode.LegacyRetired
 ];
 
-const evidenceRequirementByTarget = Object.freeze({
+const evidenceRequirementByTarget: Readonly<Record<ReplacementModeWithEvidence, string>> = Object.freeze({
   [ReplacementMode.Shadow]: 'map integration evidence',
   [ReplacementMode.Canary]: 'map equivalence evidence',
   [ReplacementMode.Active]: 'map equivalence / propagation / review advisory / human review evidence',
@@ -192,7 +203,7 @@ function loadReplacementLaneTarget(repositoryRoot: string, mapId: string) {
   };
 }
 
-function validateTransition(input: any) {
+function validateTransition(input: ReplacementTransitionInput) {
   const currentIndex = orderedReplacementModes.indexOf(input.from);
   const nextIndex = orderedReplacementModes.indexOf(input.to);
   const isForwardSingleStep = currentIndex >= 0 && nextIndex === currentIndex + 1;
@@ -205,24 +216,25 @@ function validateTransition(input: any) {
     });
   }
 
-  if (input.evidenceRefs.length === 0) {
-    throw createReplacementLaneError('ATM_REPLACEMENT_TRANSITION_INVALID', `Transition to ${input.to} requires ${evidenceRequirementByTarget[input.to]}.`, {
+  if (input.evidenceRefs.length === 0 && requiresEvidence(input.to)) {
+    const requiredEvidence = evidenceRequirementByTarget[input.to];
+    throw createReplacementLaneError('ATM_REPLACEMENT_TRANSITION_INVALID', `Transition to ${input.to} requires ${requiredEvidence}.`, {
       from: input.from,
       to: input.to,
-      requiredEvidence: evidenceRequirementByTarget[input.to],
+      requiredEvidence,
       mapId: input.canonicalMapId
     });
   }
 
   if (input.to === ReplacementMode.Active) {
-    validateActiveTransitionEvidence(input);
+    validateActiveTransitionEvidence({ ...input, to: ReplacementMode.Active });
   }
   if (input.to === ReplacementMode.LegacyRetired) {
-    validateLegacyRetiredEvidence(input);
+    validateLegacyRetiredEvidence({ ...input, to: ReplacementMode.LegacyRetired });
   }
 }
 
-function validateActiveTransitionEvidence(input: any) {
+function validateActiveTransitionEvidence(input: ReplacementTransitionInput & { readonly to: typeof ReplacementMode.Active }) {
   const evidenceDocuments = loadEvidenceDocuments(input.repositoryRoot, input.evidenceRefs);
   const gateResults = {
     mapEquivalence: findMapEquivalenceEvidence(input.canonicalMapId, evidenceDocuments),
@@ -260,7 +272,7 @@ function validateActiveTransitionEvidence(input: any) {
   });
 }
 
-function validateLegacyRetiredEvidence(input: any) {
+function validateLegacyRetiredEvidence(input: ReplacementTransitionInput & { readonly to: typeof ReplacementMode.LegacyRetired }) {
   const evidenceDocuments = loadEvidenceDocuments(input.repositoryRoot, input.evidenceRefs);
   const rollbackProof = findRollbackProofEvidence(input.canonicalMapId, evidenceDocuments);
   const retirementProof = findRetirementProofEvidence(input.canonicalMapId, evidenceDocuments);
@@ -453,7 +465,7 @@ function mapGateNameToEvidenceKind(gateName: string) {
   }
 }
 
-function buildReplacementLaneNextActionHint(input: any, requiredEvidenceKinds: readonly string[]) {
+function buildReplacementLaneNextActionHint(input: ReplacementTransitionInput, requiredEvidenceKinds: readonly string[]) {
   const evidenceArgs = requiredEvidenceKinds
     .map((kind) => `--evidence <${kind}.json>`)
     .join(' ');
@@ -483,14 +495,22 @@ function appendTransitionRecord(existingLog: any, input: any) {
   };
 }
 
-function normalizeReplacementMode(value: string) {
+function normalizeReplacementMode(value: string): ReplacementModeValue {
   const mode = String(value || '').trim();
-  if (!orderedReplacementModes.includes(mode)) {
+  if (!isReplacementModeValue(mode)) {
     throw createReplacementLaneError('ATM_REPLACEMENT_TRANSITION_INVALID', `Unsupported replacement mode: ${mode}`, {
       mode
     });
   }
   return mode;
+}
+
+function isReplacementModeValue(value: string): value is ReplacementModeValue {
+  return (orderedReplacementModes as readonly string[]).includes(value);
+}
+
+function requiresEvidence(mode: ReplacementModeValue): mode is ReplacementModeWithEvidence {
+  return mode !== ReplacementMode.Draft;
 }
 
 function normalizeEvidenceRefs(value: any) {
