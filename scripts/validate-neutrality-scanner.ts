@@ -111,7 +111,7 @@ const inlineNeutralityFail = scanNeutralityText({
 check(inlineNeutralityFail.ok === false, 'scanNeutralityText must fail on adopter-private inline content');
 check(inlineNeutralityFail.violations.some((violation) => violation.kind === 'term'), 'scanNeutralityText must expose term violations');
 
-const verifyNeutrality = runAtm(['verify', '--neutrality', '--cwd', root], root);
+const verifyNeutrality = runAtm(['verify', '--neutrality', '--cwd', root, '--json'], root);
 check(verifyNeutrality.exitCode === 0, 'verify --neutrality must exit 0 in the framework repository root');
 check(verifyNeutrality.parsed.ok === true, 'verify --neutrality must report ok=true in the framework repository root');
 check(verifyNeutrality.parsed.messages.some((entry: any) => entry.code === 'ATM_VERIFY_NEUTRALITY_OK'), 'verify --neutrality must emit ATM_VERIFY_NEUTRALITY_OK');
