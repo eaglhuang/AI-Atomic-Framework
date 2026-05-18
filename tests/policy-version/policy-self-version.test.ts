@@ -7,6 +7,8 @@ import { createTempWorkspace } from '../../scripts/temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
+// --- TC-0: existing baseline checks ---
+
 const invalid = runNode(['scripts/validate-policy-self-version.ts', '--mode', 'test', '--policy', 'tests/policy-version/invalid-policy.md']);
 assert.equal(invalid.exitCode, 1, invalid.output);
 assert.match(invalid.output, /POLICY_VERSION_VALUE_INVALID|POLICY_VERSION_SEMVER_INVALID/);
@@ -33,6 +35,32 @@ assert.equal(diff.schemaVersion, 'atm.matrixPrDiff.v0.1');
 assert.equal(diff.releaseVersion, '0.1.0');
 assert.equal(diff.hasChanges, true);
 assert.equal(diff.changes.some((entry: any) => entry.path === 'releaseTrain.frameworkVersion' && entry.after === '0.1.0'), true);
+
+// --- TC-5: matrix PR diff — when frameworkVersion already matches the release,
+//           only lastUpdated appears in changes (no frameworkVersion entry) ---
+const matrixAlreadyAtVersionPath = path.join(tempRoot, 'already-at-version-matrix.json');
+// compatibility-matrix.fixture.json has frameworkVersion "0.0.0"; request the same version
+writeFileSync(matrixAlreadyAtVersionPath, readFileSync(path.join(root, 'tests/policy-version/compatibility-matrix.fixture.json'), 'utf8'), 'utf8');
+const diffNoVersionPath = path.join(tempRoot, 'no-version-change.diff.json');
+const noVersionChange = runNode([
+  'scripts/generate-matrix-pr.ts',
+  '--release-version', '0.0.0',
+  '--matrix', matrixAlreadyAtVersionPath,
+  '--diff-out', diffNoVersionPath
+]);
+assert.equal(noVersionChange.exitCode, 0, `TC-5: ${noVersionChange.output}`);
+const diffNoVersion = JSON.parse(readFileSync(diffNoVersionPath, 'utf8'));
+assert.equal(
+  diffNoVersion.changes.some((entry: any) => entry.path === 'releaseTrain.frameworkVersion'),
+  false,
+  'TC-5: frameworkVersion must NOT appear in changes when version already matches'
+);
+
+// --- TC-6: wrong framework_version_range is rejected with POLICY_FRAMEWORK_RANGE_VALUE_INVALID ---
+// Fixture has framework_version_range: ">=2.0.0 <3.0.0" which is outside the 0.x active train
+const wrongRange = runNode(['scripts/validate-policy-self-version.ts', '--mode', 'test', '--policy', 'tests/policy-version/wrong-range-policy.md']);
+assert.equal(wrongRange.exitCode, 1, `TC-6: ${wrongRange.output}`);
+assert.match(wrongRange.output, /POLICY_FRAMEWORK_RANGE_VALUE_INVALID/, 'TC-6: wrong range must report POLICY_FRAMEWORK_RANGE_VALUE_INVALID');
 
 console.log('[policy-self-version-test] ok');
 
