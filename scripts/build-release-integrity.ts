@@ -25,6 +25,7 @@ const dryRun = process.argv.includes('--dry-run');
 
 const TRACKED_ARTEFACTS = [
   'compatibility-matrix.json',
+  'compatibility-matrix.legacy.json',
   'known-bad-versions.json',
   'schemas/governance/default-guards.schema.json'
 ];

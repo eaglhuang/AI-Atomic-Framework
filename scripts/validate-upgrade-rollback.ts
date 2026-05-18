@@ -104,8 +104,11 @@ try {
   const unknownWelcome = runAtm(['welcome', '--cwd', unknownRepo, '--json'], unknownRepo);
   assert(unknownWelcome.exitCode !== 0, 'welcome must enter read-only diagnostic for unknown chart version');
   assert(readFileSync(unknownChartPath, 'utf8') === beforeUnknownWelcome, 'unknown chart welcome must not auto-modify chart');
-  const unknownPlan = runAtm(['upgrade', 'plan', '--cwd', unknownRepo, '--json'], unknownRepo);
-  assert(unknownPlan.exitCode === 0, 'explicit upgrade plan must be allowed for unknown chart version');
+  const unknownPlanDenied = runAtm(['upgrade', 'plan', '--cwd', unknownRepo, '--json'], unknownRepo);
+  assert(unknownPlanDenied.exitCode !== 0, 'unknown chart upgrade plan must fail closed without --allow-unknown-chart');
+  assert(unknownPlanDenied.parsed.messages?.some((entry: any) => entry.code === 'ATM_UPGRADE_UNKNOWN_CHART_REQUIRES_OVERRIDE'), 'unknown chart plan denial must use ATM_UPGRADE_UNKNOWN_CHART_REQUIRES_OVERRIDE');
+  const unknownPlan = runAtm(['upgrade', 'plan', '--cwd', unknownRepo, '--allow-unknown-chart', '--json'], unknownRepo);
+  assert(unknownPlan.exitCode === 0, 'explicit --allow-unknown-chart upgrade plan must be allowed for unknown chart version');
   assert(unknownPlan.parsed.evidence?.plan?.status === 'unknown', 'unknown chart plan must report unknown status');
   assert(readFileSync(unknownChartPath, 'utf8') === beforeUnknownWelcome, 'upgrade plan must remain dry-run and not modify chart');
 } finally {

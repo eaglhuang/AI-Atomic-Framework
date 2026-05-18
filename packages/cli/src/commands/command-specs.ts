@@ -380,6 +380,7 @@ export const commandSpecs = Object.freeze({
     options: [
       commonCwdOption,
       { flag: '--out', value: 'path', summary: 'Write a safe upgrade plan JSON file.' },
+      { flag: '--allow-unknown-chart', summary: 'Allow upgrade plan generation when the local ATMChart version is unknown.' },
       { flag: '--from-plan', value: 'path', summary: 'Apply a previously reviewed safe upgrade plan.' },
       { flag: '--backup', value: 'path', summary: 'Rollback from a backup directory created by upgrade apply.' },
       { flag: '--propose', summary: 'Generate an upgrade proposal.' },
@@ -414,6 +415,7 @@ export const commandSpecs = Object.freeze({
     ],
     examples: [
       'node atm.mjs upgrade plan --cwd . --out .atm/history/reports/upgrade-plan.json --json',
+      'node atm.mjs upgrade plan --cwd . --allow-unknown-chart --json',
       'node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --json',
       'node atm.mjs upgrade rollback --backup .atm/backups/<backup-id> --json',
       'node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json',

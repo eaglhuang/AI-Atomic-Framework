@@ -8,6 +8,7 @@ const releaseEntries = [
   'atm.mjs',
   'CHANGELOG.md',
   'compatibility-matrix.json',
+  'compatibility-matrix.legacy.json',
   'CONTRIBUTING.md',
   'LICENSE',
   'README.md',

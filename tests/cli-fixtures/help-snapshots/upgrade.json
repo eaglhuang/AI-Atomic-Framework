@@ -20,6 +20,10 @@
       "summary": "Write a safe upgrade plan JSON file."
     },
     {
+      "flag": "--allow-unknown-chart",
+      "summary": "Allow upgrade plan generation when the local ATMChart version is unknown."
+    },
+    {
       "flag": "--from-plan",
       "value": "path",
       "summary": "Apply a previously reviewed safe upgrade plan."
@@ -172,6 +176,7 @@
   ],
   "examples": [
     "node atm.mjs upgrade plan --cwd . --out .atm/history/reports/upgrade-plan.json --json",
+    "node atm.mjs upgrade plan --cwd . --allow-unknown-chart --json",
     "node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --json",
     "node atm.mjs upgrade rollback --backup .atm/backups/<backup-id> --json",
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json",

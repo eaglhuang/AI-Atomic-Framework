@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/governance/compatibility-matrix.schema.json",
+  "title": "ATM compatibility matrix",
+  "description": "Schema for active and legacy ATM compatibility matrix snapshots bundled with the CLI.",
+  "oneOf": [
+    { "$ref": "#/$defs/activeMatrix" },
+    { "$ref": "#/$defs/legacyMatrix" }
+  ],
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["supported", "deprecated", "unsupported", "unknown"]
+    },
+    "chartVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "status", "sourceSchemaVersion", "minFrameworkVersion", "maxFrameworkVersion", "migrationGuide"],
+      "properties": {
+        "version": { "$ref": "#/$defs/semver" },
+        "status": { "$ref": "#/$defs/status" },
+        "sourceSchemaVersion": { "type": "string", "minLength": 1 },
+        "minFrameworkVersion": { "$ref": "#/$defs/semver" },
+        "maxFrameworkVersion": {
+          "anyOf": [
+            { "$ref": "#/$defs/semver" },
+            { "type": "null" }
+          ]
+        },
+        "migrationGuide": {
+          "anyOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "removedFromActiveSupportAt": { "type": "string", "format": "date" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "templateVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "status", "minFrameworkVersion", "maxFrameworkVersion", "migrationGuide"],
+      "properties": {
+        "version": { "$ref": "#/$defs/semver" },
+        "status": { "$ref": "#/$defs/status" },
+        "minFrameworkVersion": { "$ref": "#/$defs/semver" },
+        "maxFrameworkVersion": {
+          "anyOf": [
+            { "$ref": "#/$defs/semver" },
+            { "type": "null" }
+          ]
+        },
+        "migrationGuide": {
+          "anyOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "removedFromActiveSupportAt": { "type": "string", "format": "date" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "releaseTrain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frameworkVersion", "defaultChartVersion", "defaultTemplateVersion"],
+      "properties": {
+        "frameworkVersion": { "$ref": "#/$defs/semver" },
+        "defaultChartVersion": { "$ref": "#/$defs/semver" },
+        "defaultTemplateVersion": { "$ref": "#/$defs/semver" },
+        "minimumSupportedChartVersion": { "$ref": "#/$defs/semver" },
+        "minimumSupportedTemplateVersion": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "activeMatrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "lastUpdated", "releaseTrain", "atmChartVersions", "agentTemplateVersions"],
+      "properties": {
+        "schemaVersion": { "const": "atm.compatibilityMatrix.v0.1" },
+        "lastUpdated": { "type": "string", "format": "date" },
+        "releaseTrain": { "$ref": "#/$defs/releaseTrain" },
+        "atmChartVersions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/chartVersion" }
+        },
+        "agentTemplateVersions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/templateVersion" }
+        }
+      }
+    },
+    "legacyMatrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "lastUpdated", "atmChartVersions", "agentTemplateVersions"],
+      "properties": {
+        "schemaVersion": { "const": "atm.compatibilityMatrixLegacy.v0.1" },
+        "lastUpdated": { "type": "string", "format": "date" },
+        "atmChartVersions": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/chartVersion" },
+              {
+                "type": "object",
+                "required": ["removedFromActiveSupportAt", "reason"],
+                "properties": {
+                  "status": { "const": "unsupported" }
+                }
+              }
+            ]
+          }
+        },
+        "agentTemplateVersions": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/templateVersion" },
+              {
+                "type": "object",
+                "required": ["removedFromActiveSupportAt", "reason"],
+                "properties": {
+                  "status": { "const": "unsupported" }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

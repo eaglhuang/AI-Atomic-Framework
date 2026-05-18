@@ -132,7 +132,8 @@ function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' | 'appl
     cwd: process.cwd(),
     out: null,
     fromPlan: null,
-    backup: null
+    backup: null,
+    allowUnknownChart: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -158,6 +159,13 @@ function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' | 'appl
       index += 1;
       continue;
     }
+    if (argument === '--allow-unknown-chart') {
+      if (action !== 'plan') {
+        throw new CliError('ATM_CLI_USAGE', '--allow-unknown-chart is only valid for upgrade plan', { exitCode: 2 });
+      }
+      options.allowUnknownChart = true;
+      continue;
+    }
     if (argument === '--json' || argument === '--pretty') continue;
     if (argument.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `upgrade ${action} does not support option ${argument}`, { exitCode: 2 });
@@ -172,6 +180,15 @@ function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' | 'appl
 
 function runSafeUpgradePlan(options: any) {
   const versionSummary = createATMVersionSummary(options.cwd);
+  if (versionSummary.compatibility.code === 'unknown-chart-version' && options.allowUnknownChart !== true) {
+    throw new CliError('ATM_UPGRADE_UNKNOWN_CHART_REQUIRES_OVERRIDE', 'ATMChart version is unknown. Safe upgrade plan is read-only but still requires --allow-unknown-chart before preparing write-oriented follow-up steps.', {
+      exitCode: 2,
+      details: {
+        versionSummary,
+        requiredFlag: '--allow-unknown-chart'
+      }
+    });
+  }
   const planId = `atm-upgrade-${new Date().toISOString().replace(/[:.]/g, '-')}`;
   const backupPath = `.atm/backups/${planId}`;
   const backupFiles = collectSafeUpgradeFiles(options.cwd);
@@ -206,7 +223,11 @@ function runSafeUpgradePlan(options: any) {
     ok: true,
     command: 'upgrade',
     cwd: options.cwd,
-    messages: [message('info', 'ATM_UPGRADE_PLAN_READY', 'Safe ATM onboarding upgrade plan generated as dry-run output.')],
+    messages: [
+      versionSummary.compatibility.code === 'unknown-chart-version'
+        ? message('warning', 'ATM_UPGRADE_UNKNOWN_CHART_ALLOWED', 'Unknown ATMChart version allowed by explicit --allow-unknown-chart override.', { readOnlyDiagnostic: true })
+        : message('info', 'ATM_UPGRADE_PLAN_READY', 'Safe ATM onboarding upgrade plan generated as dry-run output.')
+    ],
     evidence: {
       action: 'plan',
       planPath: outPath ? path.relative(options.cwd, outPath).replace(/\\/g, '/') : null,

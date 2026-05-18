@@ -51,6 +51,7 @@ export async function runDoctor(argv: any) {
   const integrationHealth = await checkIntegrationHealth(root);
   const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
   const versionSummary = createATMVersionSummary(root);
+  const versionWarnings = createVersionSummaryMessages(versionSummary);
   const trustIntegrity = trustMode ? checkStartupIntegrity(resolveBundledIntegrityRoot()) : null;
   const knownBadStatus = knownBadMode ? checkStartupKnownBadVersion() : null;
   const checks = [
@@ -116,29 +117,32 @@ export async function runDoctor(argv: any) {
     : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
       ? 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
       : 'npm run validate:full';
-  const messages = ok
-    ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
-    : failedChecks.includes('charter-integrity')
-      ? [message('error', 'ATM_DOCTOR_CHARTER_MISSING', 'AtomicCharter files are missing or corrupt. Repair before continuing.', { failedChecks })]
-    : failedChecks.includes('onboarding-lifecycle')
-      ? [message('error', 'ATM_DOCTOR_ONBOARDING_STALE', 'Onboarding ATMChart sources are missing or stale. Refresh the first-touch artifacts before continuing.', { failedChecks })]
-    : failedChecks.includes('version-compatibility')
-      ? [message('error', 'ATM_DOCTOR_UNSUPPORTED_CHART_VERSION', 'ATMChart/framework/template versions are outside the supported release train.', { failedChecks, versionStatus: versionSummary.compatibility.code })]
-    : failedChecks.includes('release-trust')
-      ? [message('error', 'ATM_DOCTOR_RELEASE_TRUST_FAILED', 'Bundled release integrity hashes do not match expected values.', { failedChecks, trustMode: trustIntegrity?.mode })]
-    : failedChecks.includes('known-bad-version')
-      ? [message('error', 'ATM_DOCTOR_KNOWN_BAD_VERSION', 'This ATM CLI version is listed in known-bad-versions.json.', {
+  const messages = [
+    ...versionWarnings,
+    ...(ok
+      ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
+      : failedChecks.includes('charter-integrity')
+        ? [message('error', 'ATM_DOCTOR_CHARTER_MISSING', 'AtomicCharter files are missing or corrupt. Repair before continuing.', { failedChecks })]
+      : failedChecks.includes('onboarding-lifecycle')
+        ? [message('error', 'ATM_DOCTOR_ONBOARDING_STALE', 'Onboarding ATMChart sources are missing or stale. Refresh the first-touch artifacts before continuing.', { failedChecks })]
+      : failedChecks.includes('version-compatibility')
+        ? [message('error', 'ATM_DOCTOR_UNSUPPORTED_CHART_VERSION', 'ATMChart/framework/template versions are outside the supported release train.', { failedChecks, versionStatus: versionSummary.compatibility.code })]
+      : failedChecks.includes('release-trust')
+        ? [message('error', 'ATM_DOCTOR_RELEASE_TRUST_FAILED', 'Bundled release integrity hashes do not match expected values.', { failedChecks, trustMode: trustIntegrity?.mode })]
+      : failedChecks.includes('known-bad-version')
+        ? [message('error', 'ATM_DOCTOR_KNOWN_BAD_VERSION', 'This ATM CLI version is listed in known-bad-versions.json.', {
         failedChecks,
         currentVersion: knownBadStatus?.currentVersion ?? null,
         replacementVersion: knownBadStatus?.match?.replacementVersion ?? null,
         reasonSummary: knownBadStatus?.match?.reasonSummary ?? null,
         severity: knownBadStatus?.match?.severity ?? null
       })]
-    : failedChecks.includes('git-head-evidence')
-      ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
-    : failedChecks.includes('integration-adapters')
-      ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', { failedChecks })]
-      : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })];
+      : failedChecks.includes('git-head-evidence')
+        ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
+      : failedChecks.includes('integration-adapters')
+        ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', { failedChecks })]
+        : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
+  ];
   return makeResult({
     ok,
     command: 'doctor',
@@ -229,6 +233,25 @@ function checkOnboardingLifecycle(root: any, runtime: any) {
     welcomeCount: Number(welcomeLineage?.welcomeCount ?? 0),
     recommendedAction: atmChartFresh ? 'node atm.mjs welcome --cwd .' : 'node atm.mjs atm-chart render --cwd .'
   };
+}
+
+function createVersionSummaryMessages(versionSummary: any) {
+  const messages = [];
+  for (const warning of versionSummary.compatibilityMatrix?.warnings ?? []) {
+    messages.push(message('warning', warning.code, warning.text, {
+      lastUpdated: warning.lastUpdated ?? null,
+      matrixSource: versionSummary.compatibilityMatrix?.source ?? null
+    }));
+  }
+  if (versionSummary.downgrade?.detected === true) {
+    messages.push(message('warning', 'ATM_FRAMEWORK_DOWNGRADE_DETECTED', versionSummary.downgrade.reason, {
+      currentFrameworkVersion: versionSummary.downgrade.currentFrameworkVersion,
+      lastSeenFrameworkVersion: versionSummary.downgrade.lastSeenFrameworkVersion,
+      readOnlyDiagnostic: true,
+      cachePath: versionSummary.downgrade.cachePath
+    }));
+  }
+  return messages;
 }
 
 function readATMChartFrontmatter(filePath: string): Record<string, any> | null {

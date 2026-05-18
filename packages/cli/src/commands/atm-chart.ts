@@ -19,6 +19,7 @@ export const atmChartSourceSchemas = Object.freeze({
 
 const fallbackCompatibilityMatrix = Object.freeze<CompatibilityMatrixDocument>({
   schemaVersion: 'atm.compatibilityMatrix.v0.1',
+  lastUpdated: '2026-05-18',
   releaseTrain: {
     frameworkVersion: '0.0.0',
     defaultChartVersion: '0.1.0',
@@ -34,14 +35,6 @@ const fallbackCompatibilityMatrix = Object.freeze<CompatibilityMatrixDocument>({
       minFrameworkVersion: '0.0.0',
       maxFrameworkVersion: null,
       migrationGuide: null
-    },
-    {
-      version: '0.0.1',
-      status: 'unsupported',
-      sourceSchemaVersion: 'atm.defaultGuards.v0.1',
-      minFrameworkVersion: '0.0.0',
-      maxFrameworkVersion: null,
-      migrationGuide: 'Run `node atm.mjs upgrade plan --json`, review the dry-run file list, then apply with an explicit backup/rollback path.'
     }
   ],
   agentTemplateVersions: [
@@ -54,6 +47,26 @@ const fallbackCompatibilityMatrix = Object.freeze<CompatibilityMatrixDocument>({
     }
   ]
 });
+
+const fallbackLegacyCompatibilityMatrix = Object.freeze<LegacyCompatibilityMatrixDocument>({
+  schemaVersion: 'atm.compatibilityMatrixLegacy.v0.1',
+  lastUpdated: '2026-05-18',
+  atmChartVersions: [
+    {
+      version: '0.0.1',
+      status: 'unsupported',
+      sourceSchemaVersion: 'atm.defaultGuards.v0.1',
+      minFrameworkVersion: '0.0.0',
+      maxFrameworkVersion: null,
+      removedFromActiveSupportAt: '2026-05-18',
+      migrationGuide: 'Run `node atm.mjs upgrade plan --allow-unknown-chart --json` only after reviewing the dry-run file list, then apply with an explicit backup/rollback path.',
+      reason: 'Pre-M9 chart baseline retained for offline self-diagnosis only.'
+    }
+  ],
+  agentTemplateVersions: []
+});
+
+const versionCacheRelativePath = path.join('.atm', 'runtime', 'version-cache.json');
 
 type ATMChartFrontmatter = {
   readonly atm_chart_version?: string;
@@ -69,6 +82,7 @@ export type VersionLagStatus = 'supported' | 'deprecated' | 'unsupported' | 'unk
 
 export interface CompatibilityMatrixDocument {
   readonly schemaVersion: 'atm.compatibilityMatrix.v0.1';
+  readonly lastUpdated?: string;
   readonly releaseTrain: {
     readonly frameworkVersion: string;
     readonly defaultChartVersion: string;
@@ -80,6 +94,13 @@ export interface CompatibilityMatrixDocument {
   readonly agentTemplateVersions: readonly CompatibilityMatrixTemplateVersion[];
 }
 
+export interface LegacyCompatibilityMatrixDocument {
+  readonly schemaVersion: 'atm.compatibilityMatrixLegacy.v0.1';
+  readonly lastUpdated: string;
+  readonly atmChartVersions: readonly LegacyCompatibilityMatrixChartVersion[];
+  readonly agentTemplateVersions: readonly LegacyCompatibilityMatrixTemplateVersion[];
+}
+
 export interface CompatibilityMatrixChartVersion {
   readonly version: string;
   readonly status: VersionLagStatus;
@@ -89,12 +110,50 @@ export interface CompatibilityMatrixChartVersion {
   readonly migrationGuide?: string | null;
 }
 
+export interface LegacyCompatibilityMatrixChartVersion extends CompatibilityMatrixChartVersion {
+  readonly status: 'unsupported';
+  readonly removedFromActiveSupportAt: string;
+  readonly reason: string;
+}
+
 export interface CompatibilityMatrixTemplateVersion {
   readonly version: string;
   readonly status: VersionLagStatus;
   readonly minFrameworkVersion: string;
   readonly maxFrameworkVersion?: string | null;
   readonly migrationGuide?: string | null;
+}
+
+export interface LegacyCompatibilityMatrixTemplateVersion extends CompatibilityMatrixTemplateVersion {
+  readonly status: 'unsupported';
+  readonly removedFromActiveSupportAt: string;
+  readonly reason: string;
+}
+
+export interface CompatibilityMatrixBundle {
+  readonly matrix: CompatibilityMatrixDocument;
+  readonly source: 'filesystem' | 'bundled-snapshot';
+  readonly matrixPath: string | null;
+  readonly legacyMatrixPath: string | null;
+  readonly lastUpdated: string | null;
+  readonly legacyEntriesLoaded: number;
+  readonly warnings: readonly CompatibilityMatrixWarning[];
+}
+
+export interface CompatibilityMatrixWarning {
+  readonly code: string;
+  readonly text: string;
+  readonly lastUpdated: string | null;
+}
+
+export interface FrameworkDowngradeReport {
+  readonly checked: boolean;
+  readonly detected: boolean;
+  readonly cachePath: string;
+  readonly currentFrameworkVersion: string;
+  readonly lastSeenFrameworkVersion: string | null;
+  readonly readOnlyDiagnostic: boolean;
+  readonly reason: string | null;
 }
 
 export interface VersionCompatibilityReport {
@@ -110,6 +169,9 @@ export interface VersionCompatibilityReport {
   readonly migrationGuide: string | null;
   readonly readOnlyDiagnostic: boolean;
   readonly reason: string;
+  readonly compatibilityBaseCode?: string | null;
+  readonly downgradeDetected?: boolean;
+  readonly lastSeenFrameworkVersion?: string | null;
 }
 
 export interface ATMChartSourceSnapshot {
@@ -445,15 +507,44 @@ export function loadATMChartSummary(cwd: string, outOption?: unknown): ATMChartS
 }
 
 export function loadCompatibilityMatrix(root = frameworkRoot): CompatibilityMatrixDocument {
+  return loadCompatibilityMatrixBundle(root).matrix;
+}
+
+export function loadCompatibilityMatrixBundle(root = frameworkRoot): CompatibilityMatrixBundle {
   const overridePath = process.env.ATM_COMPATIBILITY_MATRIX_PATH;
   const matrixPath = overridePath
     ? path.resolve(overridePath)
     : path.join(root, 'compatibility-matrix.json');
   if (!existsSync(matrixPath)) {
-    return fallbackCompatibilityMatrix;
+    const matrix = mergeCompatibilityMatrices(fallbackCompatibilityMatrix, fallbackLegacyCompatibilityMatrix);
+    const lastUpdated = matrix.lastUpdated ?? fallbackLegacyCompatibilityMatrix.lastUpdated ?? null;
+    return {
+      matrix,
+      source: 'bundled-snapshot',
+      matrixPath: null,
+      legacyMatrixPath: null,
+      lastUpdated,
+      legacyEntriesLoaded: fallbackLegacyCompatibilityMatrix.atmChartVersions.length + fallbackLegacyCompatibilityMatrix.agentTemplateVersions.length,
+      warnings: [{
+        code: 'ATM_COMPATIBILITY_BUNDLED_SNAPSHOT',
+        text: `Using bundled compatibility matrix snapshot, last updated ${lastUpdated ?? 'unknown'}.`,
+        lastUpdated
+      }]
+    };
   }
   const parsed = JSON.parse(readFileSync(matrixPath, 'utf8')) as CompatibilityMatrixDocument;
-  return normalizeCompatibilityMatrix(parsed);
+  const activeMatrix = normalizeCompatibilityMatrix(parsed);
+  const legacyMatrix = loadLegacyCompatibilityMatrix(root);
+  const matrix = mergeCompatibilityMatrices(activeMatrix, legacyMatrix.document);
+  return {
+    matrix,
+    source: 'filesystem',
+    matrixPath,
+    legacyMatrixPath: legacyMatrix.path,
+    lastUpdated: activeMatrix.lastUpdated ?? legacyMatrix.document?.lastUpdated ?? null,
+    legacyEntriesLoaded: legacyMatrix.entryCount,
+    warnings: []
+  };
 }
 
 export function readFrameworkPackageVersion(root = frameworkRoot) {
@@ -472,8 +563,10 @@ export function readFrameworkPackageVersion(root = frameworkRoot) {
 }
 
 export function createATMVersionSummary(cwd: string, outOption?: unknown) {
-  const matrix = loadCompatibilityMatrix();
+  const matrixBundle = loadCompatibilityMatrixBundle();
+  const matrix = matrixBundle.matrix;
   const frameworkVersion = readFrameworkPackageVersion();
+  const downgrade = detectFrameworkDowngrade(cwd, frameworkVersion);
   let chartSummary: ATMChartSummary | null = null;
   let versionCompatibility: VersionCompatibilityReport = {
     ok: false,
@@ -503,6 +596,10 @@ export function createATMVersionSummary(cwd: string, outOption?: unknown) {
     }
   }
 
+  if (downgrade.detected) {
+    versionCompatibility = createDowngradeCompatibilityReport(versionCompatibility, downgrade);
+  }
+
   return {
     frameworkVersion,
     chartVersion: versionCompatibility.chartVersion,
@@ -511,6 +608,15 @@ export function createATMVersionSummary(cwd: string, outOption?: unknown) {
     defaultTemplateVersion: matrix.releaseTrain.defaultTemplateVersion,
     releaseTrain: matrix.releaseTrain,
     compatibility: versionCompatibility,
+    compatibilityMatrix: {
+      source: matrixBundle.source,
+      matrixPath: matrixBundle.matrixPath,
+      legacyMatrixPath: matrixBundle.legacyMatrixPath,
+      lastUpdated: matrixBundle.lastUpdated,
+      legacyEntriesLoaded: matrixBundle.legacyEntriesLoaded,
+      warnings: matrixBundle.warnings
+    },
+    downgrade,
     atmChartPath: chartSummary?.atmChartPath ?? defaultATMChartRelativePath
   };
 }
@@ -580,6 +686,149 @@ function normalizeCompatibilityMatrix(candidate: CompatibilityMatrixDocument): C
     throw new CliError('ATM_COMPATIBILITY_MATRIX_INVALID', 'compatibility-matrix.json is missing required release train fields.', { exitCode: 2 });
   }
   return candidate;
+}
+
+function loadLegacyCompatibilityMatrix(root = frameworkRoot): { readonly document: LegacyCompatibilityMatrixDocument | null; readonly path: string | null; readonly entryCount: number } {
+  const overridePath = process.env.ATM_COMPATIBILITY_LEGACY_MATRIX_PATH;
+  const legacyPath = overridePath
+    ? path.resolve(overridePath)
+    : path.join(root, 'compatibility-matrix.legacy.json');
+  if (!existsSync(legacyPath)) {
+    return { document: null, path: null, entryCount: 0 };
+  }
+  const document = normalizeLegacyCompatibilityMatrix(JSON.parse(readFileSync(legacyPath, 'utf8')) as LegacyCompatibilityMatrixDocument);
+  return {
+    document,
+    path: legacyPath,
+    entryCount: document.atmChartVersions.length + document.agentTemplateVersions.length
+  };
+}
+
+function normalizeLegacyCompatibilityMatrix(candidate: LegacyCompatibilityMatrixDocument): LegacyCompatibilityMatrixDocument {
+  if (candidate?.schemaVersion !== 'atm.compatibilityMatrixLegacy.v0.1' || typeof candidate.lastUpdated !== 'string' || !Array.isArray(candidate.atmChartVersions) || !Array.isArray(candidate.agentTemplateVersions)) {
+    throw new CliError('ATM_COMPATIBILITY_LEGACY_MATRIX_INVALID', 'compatibility-matrix.legacy.json is missing required legacy fields.', { exitCode: 2 });
+  }
+  return candidate;
+}
+
+function mergeCompatibilityMatrices(activeMatrix: CompatibilityMatrixDocument, legacyMatrix: LegacyCompatibilityMatrixDocument | null): CompatibilityMatrixDocument {
+  if (!legacyMatrix) return activeMatrix;
+  return {
+    ...activeMatrix,
+    atmChartVersions: mergeVersionEntries(activeMatrix.atmChartVersions, legacyMatrix.atmChartVersions),
+    agentTemplateVersions: mergeVersionEntries(activeMatrix.agentTemplateVersions, legacyMatrix.agentTemplateVersions)
+  };
+}
+
+function mergeVersionEntries<T extends { readonly version: string }>(activeEntries: readonly T[], legacyEntries: readonly T[]): readonly T[] {
+  const seen = new Set(activeEntries.map((entry) => entry.version));
+  const merged = [...activeEntries];
+  for (const legacyEntry of legacyEntries) {
+    if (seen.has(legacyEntry.version)) continue;
+    merged.push(legacyEntry);
+    seen.add(legacyEntry.version);
+  }
+  return merged;
+}
+
+function detectFrameworkDowngrade(cwd: string, frameworkVersion: string): FrameworkDowngradeReport {
+  const cachePath = path.join(cwd, versionCacheRelativePath);
+  const relativeCachePath = relativePathFrom(cwd, cachePath);
+  const atmRoot = path.join(cwd, '.atm');
+  if (!existsSync(atmRoot) || isFrameworkRepositoryRoot(cwd)) {
+    return {
+      checked: false,
+      detected: false,
+      cachePath: relativeCachePath,
+      currentFrameworkVersion: frameworkVersion,
+      lastSeenFrameworkVersion: null,
+      readOnlyDiagnostic: false,
+      reason: isFrameworkRepositoryRoot(cwd) ? 'Framework repository roots do not persist adopter downgrade cache.' : null
+    };
+  }
+
+  const previous = readVersionCache(cachePath);
+  const cachedFrameworkVersion = typeof previous?.lastSeenFrameworkVersion === 'string'
+    ? previous.lastSeenFrameworkVersion
+    : null;
+  const lastSeenFrameworkVersion = cachedFrameworkVersion && isSemver(cachedFrameworkVersion)
+    ? cachedFrameworkVersion
+    : null;
+  const detected = Boolean(lastSeenFrameworkVersion && compareSemver(frameworkVersion, lastSeenFrameworkVersion) < 0);
+
+  if (!detected) {
+    writeVersionCache(cachePath, {
+      schemaId: 'atm.frameworkVersionCache',
+      specVersion: '0.1.0',
+      lastSeenFrameworkVersion: highestVersion(frameworkVersion, lastSeenFrameworkVersion),
+      lastSeenAt: new Date().toISOString()
+    });
+  }
+
+  return {
+    checked: true,
+    detected,
+    cachePath: relativeCachePath,
+    currentFrameworkVersion: frameworkVersion,
+    lastSeenFrameworkVersion,
+    readOnlyDiagnostic: detected,
+    reason: detected
+      ? `Framework downgrade detected: last seen ${lastSeenFrameworkVersion}, current ${frameworkVersion}. Write-oriented onboarding commands must stay read-only until the user reviews the downgrade.`
+      : null
+  };
+}
+
+function readVersionCache(cachePath: string): Record<string, unknown> | null {
+  if (!existsSync(cachePath)) return null;
+  try {
+    return JSON.parse(readFileSync(cachePath, 'utf8')) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function writeVersionCache(cachePath: string, cache: Record<string, unknown>) {
+  mkdirSync(path.dirname(cachePath), { recursive: true });
+  writeFileSync(cachePath, `${JSON.stringify(cache, null, 2)}\n`, 'utf8');
+}
+
+function createDowngradeCompatibilityReport(report: VersionCompatibilityReport, downgrade: FrameworkDowngradeReport): VersionCompatibilityReport {
+  return {
+    ...report,
+    ok: false,
+    status: 'unsupported',
+    code: 'framework-downgrade-detected',
+    compatibilityBaseCode: report.code,
+    readOnlyDiagnostic: true,
+    reason: downgrade.reason ?? report.reason,
+    downgradeDetected: true,
+    lastSeenFrameworkVersion: downgrade.lastSeenFrameworkVersion
+  };
+}
+
+function highestVersion(left: string, right: string | null) {
+  if (!right) return left;
+  return compareSemver(left, right) >= 0 ? left : right;
+}
+
+function isSemver(version: string) {
+  try {
+    parseSemver(version);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isFrameworkRepositoryRoot(cwd: string) {
+  const packagePath = path.join(cwd, 'package.json');
+  if (!existsSync(packagePath)) return false;
+  try {
+    const parsed = JSON.parse(readFileSync(packagePath, 'utf8')) as { name?: unknown };
+    return parsed.name === 'ai-atomic-framework';
+  } catch {
+    return false;
+  }
 }
 
 function findChartRecord(matrix: CompatibilityMatrixDocument, version: string) {
