@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { createClaudeCodeIntegrationAdapter } from '../../../integration-claude-code/src/index.ts';
 import { createCopilotIntegrationAdapter } from '../../../integration-copilot/src/index.ts';
+import { createCodexIntegrationAdapter } from '../../../integration-codex/src/index.ts';
 import { createCursorIntegrationAdapter } from '../../../integration-cursor/src/index.ts';
 import { createGeminiIntegrationAdapter } from '../../../integration-gemini/src/index.ts';
 import type { InstallManifest, IntegrationAdapter } from '../../../integrations-core/src/index.ts';
@@ -10,6 +11,7 @@ import { getCommandSpec } from './command-specs.ts';
 
 const integrationAdapterFactories = Object.freeze({
   'claude-code': createClaudeCodeIntegrationAdapter,
+  codex: createCodexIntegrationAdapter,
   copilot: createCopilotIntegrationAdapter,
   cursor: createCursorIntegrationAdapter,
   gemini: createGeminiIntegrationAdapter

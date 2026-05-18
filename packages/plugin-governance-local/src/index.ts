@@ -147,6 +147,11 @@ const rootDropScriptTemplateFiles = rootDropScriptNames.flatMap((scriptName) => 
   }
 ]);
 
+const rootAgentsEntryStart = '<!-- ATM ROOT ENTRY:START -->';
+const rootAgentsEntryEnd = '<!-- ATM ROOT ENTRY:END -->';
+const rootReadmeEntryStart = '<!-- ATM README ENTRY:START -->';
+const rootReadmeEntryEnd = '<!-- ATM README ENTRY:END -->';
+
 export function createLocalGovernanceAdapter(config: LocalGovernanceConfig): GovernanceAdapter {
   const layout = resolveLocalGovernanceLayout(config.layout);
   return {
@@ -294,6 +299,18 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
   };
 
   for (const templateFile of templateFiles) {
+    if (templateFile.target === 'AGENTS.md') {
+      writeAgentInstructionsTemplate(
+        path.join(templateRoot, templateFile.source),
+        path.join(cwd, templateFile.target),
+        templateTokens,
+        cwd,
+        force,
+        created,
+        unchanged
+      );
+      continue;
+    }
     writeTemplate(
       path.join(templateRoot, templateFile.source),
       path.join(cwd, templateFile.target),
@@ -304,6 +321,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
       unchanged
     );
   }
+  patchReadmeEntry(path.join(cwd, 'README.md'), cwd, force, created, unchanged);
 
   const now = projectProbe.generatedAt ? new Date(String(projectProbe.generatedAt)) : new Date();
   const lastAmendedDate = now.toISOString().slice(0, 10);
@@ -576,6 +594,7 @@ function createBootstrapTask(taskId: string, taskTitle: string, projectProbe: Re
     repositoryKind: projectProbe.repositoryKind,
     summary: 'Establish the default ATM bootstrap pack, verify the host workflow, and leave initial evidence for the next agent run.',
     scope: [
+      'README.md',
       'AGENTS.md',
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.taskPath),
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.lockPath)
@@ -594,6 +613,7 @@ function createBootstrapLock(taskId: string, paths: ReturnType<typeof createBoot
     taskId,
     status: 'open',
     files: [
+      'README.md',
       'AGENTS.md',
       '.atm/config.json',
       relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.profilePath),
@@ -836,6 +856,159 @@ function ensureDirectory(directoryPath: string, cwd: string, created: string[], 
 function writeTemplate(sourcePath: string, targetPath: string, tokens: Record<string, string>, cwd: string, force: boolean, created: string[], unchanged: string[]) {
   const rendered = renderTemplate(readFileSync(sourcePath, 'utf8'), tokens);
   writeText(targetPath, rendered, cwd, force, created, unchanged);
+}
+
+function writeAgentInstructionsTemplate(sourcePath: string, targetPath: string, tokens: Record<string, string>, cwd: string, force: boolean, created: string[], unchanged: string[]) {
+  const rendered = renderTemplate(readFileSync(sourcePath, 'utf8'), tokens);
+  if (!existsSync(targetPath)) {
+    writeText(targetPath, rendered, cwd, force, created, unchanged);
+    return;
+  }
+  patchManagedRootEntry({
+    targetPath,
+    cwd,
+    force,
+    created,
+    unchanged,
+    startMarker: rootAgentsEntryStart,
+    endMarker: rootAgentsEntryEnd,
+    block: createAgentsRootEntryBlock(tokens),
+    insertion: 'after-frontmatter'
+  });
+}
+
+function patchReadmeEntry(targetPath: string, cwd: string, force: boolean, created: string[], unchanged: string[]) {
+  if (!existsSync(targetPath)) {
+    return;
+  }
+  patchManagedRootEntry({
+    targetPath,
+    cwd,
+    force,
+    created,
+    unchanged,
+    startMarker: rootReadmeEntryStart,
+    endMarker: rootReadmeEntryEnd,
+    block: createReadmeRootEntryBlock(),
+    insertion: 'after-title'
+  });
+}
+
+function createAgentsRootEntryBlock(tokens: Record<string, string>): string {
+  return [
+    rootAgentsEntryStart,
+    '',
+    '## ATM Governance Entry',
+    '',
+    'Read the repository root README.md for project context, then run:',
+    '',
+    '```bash',
+    'node atm.mjs next --json',
+    '```',
+    '',
+    'Execute exactly the returned next action. Treat these ATM runtime files as supporting state only:',
+    '',
+    `- ${tokens.BOOTSTRAP_TASK_PATH}`,
+    `- ${tokens.BOOTSTRAP_PROFILE_PATH}`,
+    `- ${tokens.BOOTSTRAP_EVIDENCE_PATH}`,
+    '',
+    rootAgentsEntryEnd
+  ].join('\n');
+}
+
+function createReadmeRootEntryBlock(): string {
+  return [
+    rootReadmeEntryStart,
+    '',
+    '## AI Agent Entry',
+    '',
+    'After reading this repository overview, run:',
+    '',
+    '```bash',
+    'node atm.mjs next --json',
+    '```',
+    '',
+    'Execute exactly the returned next action.',
+    '',
+    rootReadmeEntryEnd
+  ].join('\n');
+}
+
+function patchManagedRootEntry(input: {
+  readonly targetPath: string;
+  readonly cwd: string;
+  readonly force: boolean;
+  readonly created: string[];
+  readonly unchanged: string[];
+  readonly startMarker: string;
+  readonly endMarker: string;
+  readonly block: string;
+  readonly insertion: 'after-frontmatter' | 'after-title';
+}) {
+  const current = readFileSync(input.targetPath, 'utf8');
+  const normalizedBlock = normalizeTextBlock(input.block);
+  const next = upsertManagedRootEntryBlock(current, normalizedBlock, input.startMarker, input.endMarker, input.insertion, input.force);
+  const relativePath = relativePathFrom(input.cwd, input.targetPath);
+  if (next === current) {
+    input.unchanged.push(relativePath);
+    return;
+  }
+  mkdirSync(path.dirname(input.targetPath), { recursive: true });
+  writeFileSync(input.targetPath, next, 'utf8');
+  input.created.push(relativePath);
+}
+
+function upsertManagedRootEntryBlock(
+  current: string,
+  block: string,
+  startMarker: string,
+  endMarker: string,
+  insertion: 'after-frontmatter' | 'after-title',
+  force: boolean
+) {
+  const existingPattern = new RegExp(`${escapeRegExp(startMarker)}[\\s\\S]*?${escapeRegExp(endMarker)}\\r?\\n?`, 'm');
+  const lineBreak = detectTrailingNewline(current);
+  const formattedBlock = block.replace(/\n/g, lineBreak);
+  if (existingPattern.test(current)) {
+    return current.replace(existingPattern, `${formattedBlock}${lineBreak}`);
+  }
+  if (current.includes('node atm.mjs next --json') && !force) {
+    return current;
+  }
+  const insertionIndex = findRootEntryInsertionIndex(current, insertion);
+  const prefix = current.slice(0, insertionIndex).replace(/[ \t]+$/u, '');
+  const suffix = current.slice(insertionIndex).replace(/^\r?\n/u, '');
+  if (prefix.length === 0) {
+    return `${formattedBlock}${lineBreak}${lineBreak}${suffix}`;
+  }
+  return `${prefix}${lineBreak}${lineBreak}${formattedBlock}${lineBreak}${lineBreak}${suffix}`;
+}
+
+function findRootEntryInsertionIndex(current: string, insertion: 'after-frontmatter' | 'after-title') {
+  if (insertion === 'after-frontmatter') {
+    const frontmatterMatch = current.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/);
+    if (frontmatterMatch) {
+      return frontmatterMatch[0].length;
+    }
+    return 0;
+  }
+  const titleMatch = current.match(/^# .*(?:\r?\n|$)/m);
+  if (titleMatch && typeof titleMatch.index === 'number') {
+    return titleMatch.index + titleMatch[0].length;
+  }
+  return 0;
+}
+
+function normalizeTextBlock(value: string) {
+  return value.trim().replace(/\r\n/g, '\n');
+}
+
+function detectTrailingNewline(value: string) {
+  return value.includes('\r\n') ? '\r\n' : '\n';
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function writeRootDropScripts(cwd: string, force: boolean, created: string[], unchanged: string[]) {

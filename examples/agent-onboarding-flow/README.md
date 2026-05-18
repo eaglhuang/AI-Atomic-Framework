@@ -2,9 +2,10 @@
 
 This example proves the framework-neutral integration path for ATM agent entry files.
 
-It installs and verifies three agent adapters in a temporary host repository:
+It installs and verifies four agent adapters in a temporary host repository:
 
 - Claude Code (`claude-code`)
+- Codex (`codex`)
 - Cursor (`cursor`)
 - GitHub Copilot Agent (`copilot`)
 

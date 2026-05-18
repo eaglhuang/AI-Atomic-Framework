@@ -38,6 +38,39 @@ const confidenceAdapterByProfileId: Record<string, string> = {
   'openai-assistants-api': 'n/a'
 };
 
+const officialIntegrationAdapters = [
+  {
+    adapterId: 'claude-code',
+    managedRoots: '`.claude/skills`',
+    fileFormats: 'SKILL.md',
+    firstCommand: '`node atm.mjs next --json`'
+  },
+  {
+    adapterId: 'codex',
+    managedRoots: '`integrations/codex-skills`',
+    fileFormats: 'SKILL.md',
+    firstCommand: '`node atm.mjs next --json`'
+  },
+  {
+    adapterId: 'copilot',
+    managedRoots: '`.github`, `.github/instructions`, `.github/prompts`',
+    fileFormats: 'Markdown',
+    firstCommand: '`node atm.mjs next --json`'
+  },
+  {
+    adapterId: 'cursor',
+    managedRoots: '`.cursor/rules/skills`',
+    fileFormats: 'Markdown',
+    firstCommand: '`node atm.mjs next --json`'
+  },
+  {
+    adapterId: 'gemini',
+    managedRoots: '`.gemini/commands`',
+    fileFormats: 'TOML',
+    firstCommand: '`node atm.mjs next --json`'
+  }
+] as const;
+
 interface AgentPackMatrixRow {
   readonly agent: string;
   readonly packId: string;
@@ -66,6 +99,7 @@ export function renderAgentMatrixMarkdown(): string {
   const packRows = collectAgentPackRows();
   const sourceHash = hashJson({
     packRows,
+    officialIntegrationAdapters,
     confidenceProfiles: supportedAgentProfiles.map((profile) => ({
       id: profile.id,
       label: profile.label,
@@ -89,6 +123,14 @@ export function renderAgentMatrixMarkdown(): string {
     ...packRows.map((row) => `| ${row.agent} | \`${row.packId}\` | \`${row.agentTarget}\` | ${row.managedRoots} | ${row.fileFormats} | ${row.managedFiles} | ${row.firstCommand} | ${row.sourceHash} |`),
     '',
     'Every generated agent entry routes the first operational action back to `node atm.mjs next --json`; agent packs are onboarding wrappers, not a second governance protocol.',
+    '',
+    '## Integration Adapter Registry Matrix',
+    '',
+    'Official integration adapters are installable through `atm integration list/add/verify/remove` and record per-adapter manifests under `.atm/integrations/`.',
+    '',
+    '| Adapter ID | Managed Target Roots | File Formats | First Command | CLI Lifecycle |',
+    '| --- | --- | --- | --- | --- |',
+    ...officialIntegrationAdapters.map((adapter) => `| \`${adapter.adapterId}\` | ${adapter.managedRoots} | ${adapter.fileFormats} | ${adapter.firstCommand} | list/add/verify/remove |`),
     '',
     '## Advisory Confidence Profiles',
     '',

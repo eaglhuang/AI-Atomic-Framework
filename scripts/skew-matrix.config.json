@@ -38,6 +38,13 @@
         "smoke": "validate-integration-adapter"
       },
       {
+        "id": "codex",
+        "kind": "integration-adapter",
+        "packagePath": "packages/integration-codex",
+        "version": "0.0.0",
+        "smoke": "validate-integration-adapter"
+      },
+      {
         "id": "copilot",
         "kind": "integration-adapter",
         "packagePath": "packages/integration-copilot",
@@ -73,6 +80,13 @@
       "cli": "cli-current",
       "pluginSdk": "plugin-sdk-current",
       "adapter": "claude-code",
+      "expected": "pass"
+    },
+    {
+      "id": "cli-plugin-sdk-codex-current",
+      "cli": "cli-current",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "codex",
       "expected": "pass"
     },
     {

@@ -69,7 +69,7 @@ export const minimumAtmEntrySkillDefinitions = [
 const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../');
 export const defaultSkillTemplateDirectory = path.join(integrationsCoreRepoRoot, 'templates', 'skills');
 
-export type SkillTemplateAdapterTarget = 'claude-code' | 'copilot' | 'cursor' | 'gemini';
+export type SkillTemplateAdapterTarget = 'claude-code' | 'copilot' | 'cursor' | 'gemini' | 'codex';
 
 export interface AtmSkillTemplateFrontmatter {
   readonly schemaId: 'atm.skillTemplate';
@@ -124,10 +124,10 @@ export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTem
 }
 
 export function compileSkillTemplatesForAdapter(adapterTarget: SkillTemplateAdapterTarget, templates: readonly AtmSkillTemplate[] = loadMinimumAtmSkillTemplates()): readonly IntegrationSourceFile[] {
-  if (adapterTarget === 'claude-code') {
+  if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
     return templates.map((template) => ({
       relativePath: `${template.frontmatter.id}/SKILL.md`,
-      content: compileSkillTemplate(template, 'claude-code'),
+      content: compileSkillTemplate(template, adapterTarget),
       fileFormat: 'skill',
       source: 'template'
     }));
@@ -175,7 +175,7 @@ export function compileSkillTemplatesForAdapter(adapterTarget: SkillTemplateAdap
 export function compileSkillTemplate(template: AtmSkillTemplate, adapterTarget: SkillTemplateAdapterTarget | 'copilot-instructions' | 'copilot-prompt'): string {
   const frontmatter = template.frontmatter;
   const body = renderSkillTemplateBody(template);
-  if (adapterTarget === 'claude-code') {
+  if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
     return `---
 name: ${frontmatter.id}
 description: ${frontmatter.summary}

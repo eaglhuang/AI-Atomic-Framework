@@ -81,7 +81,7 @@ for (const packId of ['claude-code', 'cursor', 'copilot', 'gemini', 'windsurf'])
   assert(agentPackRows.some((row) => row.packId === packId), `agent-pack matrix rows missing ${packId}`);
 }
 
-for (const integrationAdapterId of ['`claude-code`', '`cursor`', '`copilot`', '`gemini`', '`windsurf`']) {
+for (const integrationAdapterId of ['`claude-code`', '`codex`', '`cursor`', '`copilot`', '`gemini`', '`windsurf`']) {
   assert(matrixDoc.includes(integrationAdapterId), `multi-agent matrix must expose integration adapter ${integrationAdapterId}`);
 }
 

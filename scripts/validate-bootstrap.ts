@@ -60,6 +60,10 @@ function readJson(absolutePath: any) {
   return JSON.parse(readFileSync(absolutePath, 'utf8'));
 }
 
+function readText(absolutePath: string) {
+  return readFileSync(absolutePath, 'utf8');
+}
+
 function runAtm(args: any, cwd: any) {
   const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd,
@@ -79,6 +83,55 @@ function runAtm(args: any, cwd: any) {
     stdout: result.stdout,
     stderr: result.stderr
   };
+}
+
+function assertReadmeEntry(hostRepo: string) {
+  const readme = readText(path.join(hostRepo, 'README.md'));
+  assert(readme.includes('<!-- ATM README ENTRY:START -->'), 'README.md must include ATM README entry marker');
+  assert(readme.includes('node atm.mjs next --json'), 'README.md must point directly to the ATM next command');
+  assert(!readme.includes('Read AGENTS.md'), 'README.md must not point back to AGENTS.md');
+}
+
+function assertAgentsEntry(hostRepo: string, expectedOriginalText?: string) {
+  const agents = readText(path.join(hostRepo, 'AGENTS.md'));
+  if (expectedOriginalText) {
+    assert(agents.includes(expectedOriginalText), 'AGENTS.md must preserve existing host instructions');
+    assert(agents.includes('<!-- ATM ROOT ENTRY:START -->'), 'existing AGENTS.md must include managed ATM entry marker');
+  }
+  assert(agents.includes('node atm.mjs next --json'), 'AGENTS.md must point to the ATM next command');
+}
+
+function verifyRootEntryScenario(tempRoot: string, scenarioName: string, options: { readonly readme?: boolean; readonly agents?: boolean }) {
+  const hostRepo = path.join(tempRoot, scenarioName);
+  mkdirSync(hostRepo, { recursive: true });
+  const originalAgentsText = 'Original agent instructions stay here.';
+  if (options.readme === true) {
+    writeFileSync(path.join(hostRepo, 'README.md'), `# ${scenarioName}\n\nExisting repository overview.\n`, 'utf8');
+  }
+  if (options.agents === true) {
+    writeFileSync(path.join(hostRepo, 'AGENTS.md'), `# Agent Instructions\n\n${originalAgentsText}\n`, 'utf8');
+  }
+
+  const bootstrap = runAtm(['bootstrap', '--cwd', hostRepo], hostRepo);
+  assert(bootstrap.exitCode === 0, `${scenarioName} bootstrap must exit 0`);
+  assert(bootstrap.parsed.ok === true, `${scenarioName} bootstrap must report ok=true`);
+  assert(existsSync(path.join(hostRepo, 'AGENTS.md')), `${scenarioName} bootstrap must leave AGENTS.md available`);
+
+  if (options.readme === true) {
+    assertReadmeEntry(hostRepo);
+  } else {
+    assert(!existsSync(path.join(hostRepo, 'README.md')), `${scenarioName} must not create README.md when host had none`);
+  }
+
+  assertAgentsEntry(hostRepo, options.agents === true ? originalAgentsText : undefined);
+
+  const secondBootstrap = runAtm(['bootstrap', '--cwd', hostRepo], hostRepo);
+  assert(secondBootstrap.exitCode === 0, `${scenarioName} second bootstrap must exit 0`);
+  assert(secondBootstrap.parsed.ok === true, `${scenarioName} second bootstrap must report ok=true`);
+  assert(secondBootstrap.parsed.evidence.unchanged.includes('AGENTS.md'), `${scenarioName} second bootstrap must leave AGENTS.md unchanged`);
+  if (options.readme === true) {
+    assert(secondBootstrap.parsed.evidence.unchanged.includes('README.md'), `${scenarioName} second bootstrap must leave README.md unchanged`);
+  }
 }
 
 for (const relativePath of requiredFiles) {
@@ -150,6 +203,7 @@ try {
   assert(agents.includes('Read README.md if present'), 'AGENTS.md must contain the one-line kickoff prompt');
   assert(!agents.includes('{{'), 'AGENTS.md must not leak unresolved template placeholders');
   assert(!agents.includes('ATM TEMPLATE'), 'AGENTS.md must not leak template headers');
+  assertReadmeEntry(hostRepo);
 
   const profile = readFileSync(path.join(hostRepo, '.atm', 'runtime', 'profile', 'default.md'), 'utf8');
   assert(!profile.includes('{{'), 'default profile must not leak unresolved template placeholders');
@@ -170,6 +224,12 @@ try {
   assert(secondBootstrap.parsed.ok === true, 'second bootstrap must report ok=true');
   assert(Array.isArray(secondBootstrap.parsed.evidence.unchanged), 'second bootstrap must report unchanged files');
   assert(secondBootstrap.parsed.evidence.unchanged.includes('AGENTS.md'), 'second bootstrap must leave AGENTS.md unchanged without --force');
+  assert(secondBootstrap.parsed.evidence.unchanged.includes('README.md'), 'second bootstrap must leave README.md unchanged without --force');
+
+  verifyRootEntryScenario(tempRoot, 'root-entry-readme-only', { readme: true });
+  verifyRootEntryScenario(tempRoot, 'root-entry-agents-only', { agents: true });
+  verifyRootEntryScenario(tempRoot, 'root-entry-readme-and-agents', { readme: true, agents: true });
+  verifyRootEntryScenario(tempRoot, 'root-entry-none', {});
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -4,7 +4,7 @@
 
 This matrix is generated from built-in agent-pack metadata and advisory confidence profiles. It exists to prevent drift between the installed pack registry, the public compatibility table, and the multi-agent confidence workflow.
 
-Source metadata SHA-256: `b8625e98818b5940c62e2c216702f21735481f21e54cf45ebcb1908deff71d6e`
+Source metadata SHA-256: `071d75ecb96d899e8b768715907b2870bacaeb0ff3a7cb888f11e0e897773727`
 
 ## Agent Pack Registry Matrix
 
@@ -17,6 +17,18 @@ Source metadata SHA-256: `b8625e98818b5940c62e2c216702f21735481f21e54cf45ebcb190
 | Windsurf | `windsurf` | `windsurf` | `.windsurf/workflows` | Markdown | 7 | `node atm.mjs next --json` | `03a0b656deb7757b` |
 
 Every generated agent entry routes the first operational action back to `node atm.mjs next --json`; agent packs are onboarding wrappers, not a second governance protocol.
+
+## Integration Adapter Registry Matrix
+
+Official integration adapters are installable through `atm integration list/add/verify/remove` and record per-adapter manifests under `.atm/integrations/`.
+
+| Adapter ID | Managed Target Roots | File Formats | First Command | CLI Lifecycle |
+| --- | --- | --- | --- | --- |
+| `claude-code` | `.claude/skills` | SKILL.md | `node atm.mjs next --json` | list/add/verify/remove |
+| `codex` | `integrations/codex-skills` | SKILL.md | `node atm.mjs next --json` | list/add/verify/remove |
+| `copilot` | `.github`, `.github/instructions`, `.github/prompts` | Markdown | `node atm.mjs next --json` | list/add/verify/remove |
+| `cursor` | `.cursor/rules/skills` | Markdown | `node atm.mjs next --json` | list/add/verify/remove |
+| `gemini` | `.gemini/commands` | TOML | `node atm.mjs next --json` | list/add/verify/remove |
 
 ## Advisory Confidence Profiles
 

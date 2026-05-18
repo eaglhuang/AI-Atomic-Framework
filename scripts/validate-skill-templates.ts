@@ -72,24 +72,27 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
 }
 
 const claudeFiles = packageModule.compileSkillTemplatesForAdapter('claude-code', templates);
+const codexFiles = packageModule.compileSkillTemplatesForAdapter('codex', templates);
 const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', templates);
 const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates);
 const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates);
 
 assert(claudeFiles.length === 7, 'Claude compiler output must contain seven files');
+assert(codexFiles.length === 7, 'Codex compiler output must contain seven files');
 assert(copilotFiles.length === 15, 'Copilot compiler output must contain root instructions plus fourteen entry files');
 assert(cursorFiles.length === 7, 'Cursor compiler output must contain seven files');
 assert(geminiFiles.length === 7, 'Gemini compiler output must contain seven files');
 
-for (const compiledFile of [...claudeFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
+for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
   assert(compiledFile.content.includes(packageModule.atmFirstCommand), `${compiledFile.relativePath} missing first command`);
   assert(compiledFile.content.includes(packageModule.charterInvariantsPlaceholder), `${compiledFile.relativePath} missing charter placeholder`);
   assert(!/spec-kit|MRP|\/specify|\/plan|\/tasks/i.test(compiledFile.content), `${compiledFile.relativePath} must not bake planning hints into compiled output`);
 }
 
 assert(claudeFiles.every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Claude output must carry charter injection frontmatter');
+assert(codexFiles.every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Codex output must carry charter injection frontmatter');
 assert(geminiFiles.every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field');
 
 if (!process.exitCode) {
-  console.log(`[skill-templates:${mode}] ok (7 source templates, schema, and 4 adapter compilers)`);
+  console.log(`[skill-templates:${mode}] ok (7 source templates, schema, and 5 adapter compilers)`);
 }

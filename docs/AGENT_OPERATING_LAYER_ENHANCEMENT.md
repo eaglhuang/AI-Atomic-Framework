@@ -82,6 +82,7 @@ and follow the instructions. But different AI agent environments have different
 native entry formats:
 
 - Claude Code reads `.claude/skills/*/SKILL.md` files.
+- Codex can consume repo-local skills under `integrations/codex-skills/*/SKILL.md`, with `atm guide install-skill --target codex` kept as an optional global bridge.
 - GitHub Copilot reads `.github/copilot-instructions.md` and `.github/prompts/`.
 - Cursor reads `.cursor/rules/skills/`.
 - Gemini CLI reads `.gemini/commands/*.toml`.
@@ -149,8 +150,8 @@ The seven minimum ATM entry skills are authored once under `templates/skills/` a
 framework-neutral source templates. Each template declares
 `charter-invariants-injected: true`, records its ATM CLI handoff route, and keeps
 planning hints out of the static source. `packages/integrations-core` compiles
-those sources into Claude Code `SKILL.md`, GitHub Copilot instruction and prompt
-Markdown, Cursor skill Markdown, and Gemini TOML.
+those sources into Claude Code `SKILL.md`, Codex `SKILL.md`, GitHub Copilot
+instruction and prompt Markdown, Cursor skill Markdown, and Gemini TOML.
 
 ### Script Wrapper Parity
 
@@ -163,8 +164,8 @@ surface.
 ### Framework-neutral Onboarding Example
 
 `examples/agent-onboarding-flow/` is the framework smoke for adapter onboarding.
-It creates a temporary host repository, installs Claude Code, Cursor, and GitHub
-Copilot Agent adapters through `atm init --integration <id>`, verifies their
+It creates a temporary host repository, installs Claude Code, Codex, Cursor, and
+GitHub Copilot Agent adapters through `atm init --integration <id>`, verifies their
 manifests, checks `node atm.mjs next --json` preservation, and confirms the
 charter conflict fixture is detectable. The example intentionally avoids
 first-touch welcome prompts or host-specific onboarding text.
@@ -196,15 +197,15 @@ identity:
 
 M4 is delivered as the first concrete Integration Adapter Layer contract. `packages/integrations-core` now defines `IntegrationAdapter`, `InstallManifest`, SHA-256 helpers, and a Codex skills adapter factory. `schemas/integrations/install-manifest.schema.json` validates the hash-locked manifest, and `scripts/validate-integration-adapter.ts` exercises install, verify, drift detection, and hash-guarded uninstall for the existing Codex skill surface.
 
-M5 is delivered as four installable agent adapters: `integration-claude-code`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each adapter emits the seven minimum ATM entrypoints, includes the `{{CHARTER_INVARIANTS}}` placeholder, makes `node atm.mjs next --json` the required first command, and participates in the shared install/verify/uninstall manifest validation.
+M5 is delivered as five installable agent adapters: `integration-claude-code`, `integration-codex`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each adapter emits the seven minimum ATM entrypoints, includes the `{{CHARTER_INVARIANTS}}` placeholder, makes `node atm.mjs next --json` the required first command, and participates in the shared install/verify/uninstall manifest validation.
 
 M6 is delivered as the CLI lifecycle for those adapters. `atm integration list/add/verify/remove` exposes install, manifest verification, hash-guarded removal, and available/installed adapter listing. `atm init --integration <id>` installs an adapter during repository adoption, manifests are stored per adapter under `.atm/integrations/<id>.manifest.json`, and `atm doctor` reports integration drift or stale manifests through the `integration-adapters` check.
 
-M7 is delivered as a framework-neutral entry template compiler. `templates/skills/*.skill.md` holds the seven ATM entry sources plus `skill.schema.json`; `packages/integrations-core` parses and compiles them for Claude Code, Copilot, Cursor, and Gemini; `validate:skill-templates` locks schema validity, charter injection, ATM CLI handoffs, and the rule that planning hints stay out of static templates.
+M7 is delivered as a framework-neutral entry template compiler. `templates/skills/*.skill.md` holds the seven ATM entry sources plus `skill.schema.json`; `packages/integrations-core` parses and compiles them for Claude Code, Codex, Copilot, Cursor, and Gemini; `validate:skill-templates` locks schema validity, charter injection, ATM CLI handoffs, and the rule that planning hints stay out of static templates.
 
 M8 is delivered as paired script wrapper parity. `templates/root-drop/.atm/scripts/sh/atm-*.sh` and `templates/root-drop/.atm/scripts/ps/atm-*.ps1` wrap the same node routes, `atm init` installs both sets, and `validate:script-parity` checks route parity, wrapper thinness, wrapper smoke, and hello-world compatibility.
 
-M9 is delivered as the framework-neutral multi-agent onboarding smoke. `examples/agent-onboarding-flow/` installs and verifies Claude Code, Cursor, and GitHub Copilot Agent adapters in a temporary host repository, checks first-command preservation and charter injection, and `validate:examples` keeps the flow under the five-minute smoke target. `docs/multi-agent-compatibility-matrix.md`, `docs/multi-agent-results.md`, and `validate:multi-agent-confidence` now record adapter install, first-command, and charter entry status.
+M9 is delivered as the framework-neutral multi-agent onboarding smoke. `examples/agent-onboarding-flow/` installs and verifies Claude Code, Codex, Cursor, and GitHub Copilot Agent adapters in a temporary host repository, checks first-command preservation and charter injection, and `validate:examples` keeps the flow under the five-minute smoke target. `docs/multi-agent-compatibility-matrix.md`, `docs/multi-agent-results.md`, and `validate:multi-agent-confidence` now record adapter install, first-command, and charter entry status.
 
 M10 is delivered as framework integration rollout metrics. `schemas/governance/rollout-metrics-report.schema.json` exposes `integrationMetrics`, `fixtures/rollout-metrics/integration-adapter-sample.json` covers adapter install success, integration drift, and charter violation rates, and `validate:rollout-metrics` checks those rates against deterministic counts.
 

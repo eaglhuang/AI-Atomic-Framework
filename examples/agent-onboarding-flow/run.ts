@@ -11,6 +11,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
 const adapterPlans = [
   { agentLabel: 'Claude Code', adapterId: 'claude-code' },
+  { agentLabel: 'Codex', adapterId: 'codex' },
   { agentLabel: 'Cursor', adapterId: 'cursor' },
   { agentLabel: 'GitHub Copilot Agent', adapterId: 'copilot' }
 ] as const;

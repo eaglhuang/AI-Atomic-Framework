@@ -267,6 +267,7 @@ try {
   assertReadable(integrationList, 'integration');
   assert(integrationList.parsed.ok === true, 'integration list must report ok=true');
   assert(integrationList.parsed.evidence.available.includes('claude-code'), 'integration list must include claude-code');
+  assert(integrationList.parsed.evidence.available.includes('codex'), 'integration list must include codex');
   assert(integrationList.parsed.evidence.available.includes('copilot'), 'integration list must include copilot');
   assert(integrationList.parsed.evidence.available.includes('cursor'), 'integration list must include cursor');
   assert(integrationList.parsed.evidence.available.includes('gemini'), 'integration list must include gemini');
@@ -295,6 +296,30 @@ try {
   assert(!existsSync(path.join(integrationRepo, '.atm/integrations/claude-code.manifest.json')), 'integration remove must remove unchanged manifest');
   assert(!existsSync(path.join(integrationRepo, '.claude/skills/atm-next/SKILL.md')), 'integration remove must remove unchanged entry file');
   assertMessageCode(integrationRemove, 'ATM_INTEGRATION_REMOVED');
+
+  const codexIntegrationAdd = runAtm(['integration', 'add', 'codex', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
+  assert(codexIntegrationAdd.exitCode === 0, 'integration add codex must exit 0');
+  assertReadable(codexIntegrationAdd, 'integration');
+  assert(codexIntegrationAdd.parsed.ok === true, 'integration add codex must report ok=true');
+  assert(codexIntegrationAdd.parsed.evidence.manifestPath === '.atm/integrations/codex.manifest.json', 'codex integration add must use per-adapter manifest path');
+  assert(existsSync(path.join(integrationRepo, '.atm/integrations/codex.manifest.json')), 'codex integration add must write per-adapter manifest');
+  assert(existsSync(path.join(integrationRepo, 'integrations/codex-skills/atm-next/SKILL.md')), 'codex integration add must write Codex skill files');
+  assertMessageCode(codexIntegrationAdd, 'ATM_INTEGRATION_ADDED');
+
+  const codexIntegrationVerify = runAtm(['integration', 'verify', 'codex', '--cwd', integrationRepo], integrationRepo);
+  assert(codexIntegrationVerify.exitCode === 0, 'integration verify codex must exit 0 after install');
+  assertReadable(codexIntegrationVerify, 'integration');
+  assert(codexIntegrationVerify.parsed.ok === true, 'integration verify codex must report ok=true');
+  assert(codexIntegrationVerify.parsed.evidence.driftedFiles.length === 0, 'codex integration verify must report no drift after install');
+  assertMessageCode(codexIntegrationVerify, 'ATM_INTEGRATION_VERIFY_OK');
+
+  const codexIntegrationRemove = runAtm(['integration', 'remove', 'codex', '--cwd', integrationRepo], integrationRepo);
+  assert(codexIntegrationRemove.exitCode === 0, 'integration remove codex must exit 0');
+  assertReadable(codexIntegrationRemove, 'integration');
+  assert(codexIntegrationRemove.parsed.ok === true, 'integration remove codex must report ok=true');
+  assert(!existsSync(path.join(integrationRepo, '.atm/integrations/codex.manifest.json')), 'codex integration remove must remove unchanged manifest');
+  assert(!existsSync(path.join(integrationRepo, 'integrations/codex-skills/atm-next/SKILL.md')), 'codex integration remove must remove unchanged entry file');
+  assertMessageCode(codexIntegrationRemove, 'ATM_INTEGRATION_REMOVED');
 
   const initIntegrationRepo = path.join(tempRoot, 'init-integration-repo');
   mkdirSync(initIntegrationRepo, { recursive: true });

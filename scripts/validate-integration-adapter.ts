@@ -20,6 +20,9 @@ const requiredFiles = [
   'packages/integration-copilot/package.json',
   'packages/integration-copilot/README.md',
   'packages/integration-copilot/src/index.ts',
+  'packages/integration-codex/package.json',
+  'packages/integration-codex/README.md',
+  'packages/integration-codex/src/index.ts',
   'packages/integration-cursor/package.json',
   'packages/integration-cursor/README.md',
   'packages/integration-cursor/src/index.ts',
@@ -100,7 +103,7 @@ if (!process.exitCode) {
   assert(codexSkillDigest === fixtureManifest.files[0].sha256, 'fixture hash must match current Codex skill file');
   assert(codexSkillContent.byteLength === fixtureManifest.files[0].sizeBytes, 'fixture byte size must match current Codex skill file');
 
-  const codexAdapter = packageModule.createCodexSkillsAdapter([
+  const codexReferenceAdapter = packageModule.createCodexSkillsAdapter([
     {
       relativePath: 'atm-legacy-atomization-guidance/SKILL.md',
       content: codexSkillContent,
@@ -108,20 +111,12 @@ if (!process.exitCode) {
       source: 'template'
     }
   ]);
+  assert(codexReferenceAdapter.id === 'codex', 'Codex reference adapter id mismatch');
+  assert(codexReferenceAdapter.targetDir() === 'integrations/codex-skills', 'Codex reference adapter targetDir mismatch');
 
   const adapterSpecs = [
-    {
-      id: 'codex',
-      adapter: codexAdapter,
-      expectedTargetDir: 'integrations/codex-skills',
-      expectedFileFormat: 'skill',
-      expectedPlaceholderStyle: '$ARGUMENTS',
-      expectedMinimumFiles: 1,
-      requireMinimumEntrySet: false,
-      requireCharterPlaceholder: false,
-      requireFirstCommand: false
-    },
     await createAdapterSpec('claude-code', 'packages/integration-claude-code/src/index.ts', 'createClaudeCodeIntegrationAdapter', '.claude/skills', 'skill', '$ARGUMENTS'),
+    await createAdapterSpec('codex', 'packages/integration-codex/src/index.ts', 'createCodexIntegrationAdapter', 'integrations/codex-skills', 'skill', '$ARGUMENTS'),
     await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', 15),
     await createAdapterSpec('cursor', 'packages/integration-cursor/src/index.ts', 'createCursorIntegrationAdapter', '.cursor/rules/skills', 'markdown', '$ARGUMENTS'),
     await createAdapterSpec('gemini', 'packages/integration-gemini/src/index.ts', 'createGeminiIntegrationAdapter', '.gemini/commands', 'toml', 'toml-fields')
@@ -135,7 +130,7 @@ if (!process.exitCode) {
 }
 
 if (!process.exitCode) {
-  console.log(`[integration-adapter:${mode}] ok (interface, manifest schema, Codex + 4 agent adapters install/verify/uninstall)`);
+  console.log(`[integration-adapter:${mode}] ok (interface, manifest schema, Codex reference factory, and 5 installable adapters install/verify/uninstall)`);
 }
 
 async function createAdapterSpec(
@@ -193,10 +188,6 @@ function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifes
     assert(install.manifest.files.length >= adapterSpec.expectedMinimumFiles, `${adapterSpec.id} install manifest must record expected files`);
     assert(validateManifest(install.manifest) === true, `${adapterSpec.id} install manifest schema mismatch: ${formatErrors(validateManifest.errors)}`);
     assert(existsSync(path.join(repositoryRoot, '.atm/integrations/manifest.json')), `${adapterSpec.id} install must write manifest`);
-
-    if (adapterSpec.id === 'codex') {
-      assert(install.manifest.files[0].sha256 === fixtureManifest.files[0].sha256, 'Codex install manifest must record sha256 for injected file');
-    }
 
     const installedPaths = install.manifest.files.map((fileRecord: any) => fileRecord.path);
     if (adapterSpec.requireMinimumEntrySet) {
