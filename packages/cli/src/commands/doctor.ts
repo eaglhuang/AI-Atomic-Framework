@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { runHashPlaceholderAudit } from '../../../../scripts/audit-hash-placeholders.ts';
 import { computeSha256ForFile } from '../../../core/src/hash-lock/hash-lock.ts';
+import { checkStartupKnownBadVersion } from '../startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from '../startup-integrity.ts';
 import { createATMVersionSummary } from './atm-chart.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
@@ -25,7 +26,9 @@ const legacyBehaviorPackageNames = [
 
 export async function runDoctor(argv: any) {
   const trustMode = Array.isArray(argv) && argv.includes('--trust');
-  const { options } = parseOptions(trustMode ? argv.filter((arg: string) => arg !== '--trust') : argv, 'doctor');
+  const knownBadMode = Array.isArray(argv) && argv.includes('--known-bad');
+  const doctorModeFlags = new Set(['--trust', '--known-bad']);
+  const { options } = parseOptions((trustMode || knownBadMode) ? argv.filter((arg: string) => !doctorModeFlags.has(arg)) : argv, 'doctor');
   const root = options.cwd;
   const rootPackage = readJsonIfExists(path.join(root, 'package.json')) ?? {};
   const frameworkContractExpected = isFrameworkContractExpected(root, rootPackage);
@@ -49,6 +52,7 @@ export async function runDoctor(argv: any) {
   const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
   const versionSummary = createATMVersionSummary(root);
   const trustIntegrity = trustMode ? checkStartupIntegrity(resolveBundledIntegrityRoot()) : null;
+  const knownBadStatus = knownBadMode ? checkStartupKnownBadVersion() : null;
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -88,6 +92,7 @@ export async function runDoctor(argv: any) {
     createCheck('version-compatibility', versionSummary.compatibility.ok || versionSummary.compatibility.code === 'chart-missing', versionSummary),
     createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
     ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
+    ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
     createGitHeadEvidenceCheck(root, runtime)
   ];
   const ok = checks.every((check) => check.ok);
@@ -102,6 +107,8 @@ export async function runDoctor(argv: any) {
       ? 'node atm.mjs upgrade plan --json'
     : failedChecks.includes('release-trust')
       ? 'Reinstall the ATM CLI package from a trusted release or inspect release/integrity.json and compatibility-matrix.json for tampering.'
+    : failedChecks.includes('known-bad-version')
+      ? `Install ATM CLI ${knownBadStatus?.match?.replacementVersion ?? 'replacement version'} and avoid write-oriented commands with the current version.`
     : failedChecks.includes('git-head-evidence')
       ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
     : failedChecks.includes('integration-adapters')
@@ -119,6 +126,14 @@ export async function runDoctor(argv: any) {
       ? [message('error', 'ATM_DOCTOR_UNSUPPORTED_CHART_VERSION', 'ATMChart/framework/template versions are outside the supported release train.', { failedChecks, versionStatus: versionSummary.compatibility.code })]
     : failedChecks.includes('release-trust')
       ? [message('error', 'ATM_DOCTOR_RELEASE_TRUST_FAILED', 'Bundled release integrity hashes do not match expected values.', { failedChecks, trustMode: trustIntegrity?.mode })]
+    : failedChecks.includes('known-bad-version')
+      ? [message('error', 'ATM_DOCTOR_KNOWN_BAD_VERSION', 'This ATM CLI version is listed in known-bad-versions.json.', {
+        failedChecks,
+        currentVersion: knownBadStatus?.currentVersion ?? null,
+        replacementVersion: knownBadStatus?.match?.replacementVersion ?? null,
+        reasonSummary: knownBadStatus?.match?.reasonSummary ?? null,
+        severity: knownBadStatus?.match?.severity ?? null
+      })]
     : failedChecks.includes('git-head-evidence')
       ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
     : failedChecks.includes('integration-adapters')
@@ -145,6 +160,7 @@ export async function runDoctor(argv: any) {
       migrationNeeded: runtime.migrationNeeded,
       versionSummary,
       trustIntegrity: trustMode ? trustIntegrity : undefined,
+      knownBadStatus: knownBadMode ? knownBadStatus : undefined,
       recommendedAction
     }
   });

@@ -72,7 +72,8 @@
         "validate-breaking-changes",
         "validate-upgrade-rollback",
         "validate-migration-fixtures",
-        "validate-release-trust"
+        "validate-release-trust",
+        "validate-known-bad-versions"
       ]
     },
     "full": {
@@ -164,6 +165,7 @@
     { "name": "validate-onefile-release", "entry": "scripts/validate-onefile-release.ts", "tags": ["release"], "slow": true },
     { "name": "validate-self-hosting-alpha", "entry": "scripts/validate-self-hosting-alpha.ts", "tags": ["self-host"], "slow": true },
     { "name": "validate-migration-fixtures", "entry": "scripts/validate-migration-fixtures.ts", "tags": ["migration", "fixtures"], "slow": false },
-    { "name": "validate-release-trust", "entry": "scripts/validate-release-trust.ts", "tags": ["release", "trust"], "slow": false }
+    { "name": "validate-release-trust", "entry": "scripts/validate-release-trust.ts", "tags": ["release", "trust"], "slow": false },
+    { "name": "validate-known-bad-versions", "entry": "scripts/validate-known-bad-versions.ts", "tags": ["release", "incident-response"], "slow": false }
   ]
 }

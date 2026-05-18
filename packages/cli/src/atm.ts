@@ -34,6 +34,7 @@ import { runMigrate } from './commands/migrate.ts';
 import { runAgentPack } from './commands/agent-pack.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, writeResult } from './commands/shared.ts';
+import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
@@ -149,6 +150,25 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       writeResult(result, io.stderr, outputFormat);
       return 1;
     }
+  }
+
+  const knownBadStatus = checkStartupKnownBadVersion();
+  if (!knownBadStatus.ok && !isKnownBadReadOnlyCommand(commandName, commandArgs)) {
+    const result = makeResult({
+      ok: false,
+      command: commandName,
+      cwd: process.cwd(),
+      messages: [message('error', 'ATM_KNOWN_BAD_VERSION_BLOCKED', 'This ATM CLI version is marked known-bad; refusing to run write-oriented commands.', {
+        currentVersion: knownBadStatus.currentVersion,
+        replacementVersion: knownBadStatus.match?.replacementVersion ?? null,
+        reasonSummary: knownBadStatus.match?.reasonSummary ?? null,
+        severity: knownBadStatus.match?.severity ?? null,
+        mode: knownBadStatus.mode
+      })],
+      evidence: { knownBadStatus }
+    });
+    writeResult(result, io.stderr, outputFormat);
+    return 1;
   }
 
   try {
