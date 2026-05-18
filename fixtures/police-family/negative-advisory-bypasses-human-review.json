@@ -1,0 +1,20 @@
+{
+  "description": "Advisory finding cannot directly produce an approved human decision. Must route through HumanReviewDecision.",
+  "finding": {
+    "id": "finding.police.advisory.auto-approved",
+    "severity": "low",
+    "trigger": "machine-finding",
+    "scope": "registry",
+    "action": "none",
+    "message": "Advisory finding attempting direct approval bypass without human review"
+  },
+  "decision": {
+    "status": "approved",
+    "decidedBy": "machine-finding-auto",
+    "reason": "auto-approved by advisory finding"
+  },
+  "expected": {
+    "directApprovalMustBeRejected": true,
+    "reason": "Advisory findings must route through HumanReviewDecision; cannot auto-approve"
+  }
+}
