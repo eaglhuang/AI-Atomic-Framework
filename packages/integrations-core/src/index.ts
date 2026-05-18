@@ -16,6 +16,8 @@ export type IntegrationPlaceholderStyle = '$ARGUMENTS' | '{{vars}}' | 'toml-fiel
 export type InstallManifestFileSource = 'template' | 'generated' | 'copied';
 export type Sha256Digest = `sha256:${string}`;
 
+export const installManifestSchemaVersion = 'atm.installManifest.v0.1' as const;
+
 export const atmFirstCommand = 'node atm.mjs next --json';
 export const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
 
@@ -329,6 +331,7 @@ export interface InstallManifestFile {
 
 export interface InstallManifest {
   readonly schemaId: 'atm.integrationInstallManifest';
+  readonly schemaVersion: typeof installManifestSchemaVersion;
   readonly specVersion: '0.1.0';
   readonly migration: {
     readonly strategy: 'none' | 'additive' | 'breaking';
@@ -437,6 +440,7 @@ export function normalizeManifestPath(candidatePath: string): string {
 export function createInstallManifest(input: CreateInstallManifestInput): InstallManifest {
   return {
     schemaId: 'atm.integrationInstallManifest',
+    schemaVersion: installManifestSchemaVersion,
     specVersion: '0.1.0',
     migration: {
       strategy: 'none',

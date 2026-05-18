@@ -77,6 +77,8 @@
         "validate-skew-matrix",
         "validate-security-policy",
         "validate-dist-tag",
+        "validate-meta-schema",
+        "validate-bridge-minor",
         "adopter-sentinel"
       ]
     },
@@ -174,6 +176,8 @@
     { "name": "validate-skew-matrix", "entry": "scripts/validate-skew-matrix.ts", "tags": ["release", "skew", "matrix"], "slow": false },
     { "name": "validate-security-policy", "entry": "scripts/validate-security-policy.ts", "tags": ["security", "dependency-scan"], "slow": false },
     { "name": "validate-dist-tag", "entry": "scripts/validate-dist-tag.ts", "tags": ["release", "dist-tag"], "slow": false },
+    { "name": "validate-meta-schema", "entry": "scripts/validate-meta-schema.ts", "tags": ["schema", "versioning"], "slow": false },
+    { "name": "validate-bridge-minor", "entry": "scripts/validate-bridge-minor.ts", "tags": ["release", "versioning", "experimental"], "slow": false },
     { "name": "adopter-sentinel", "entry": "scripts/adopter-sentinel.ts", "tags": ["telemetry", "sentinel"], "slow": true }
   ]
 }

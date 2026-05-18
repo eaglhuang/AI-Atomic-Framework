@@ -8,6 +8,7 @@ import { runNext } from './next.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
 import { readTelemetryState, telemetryAllowedFields } from '../telemetry/index.ts';
+import { listExperimentalApis } from '../../../agent-pack-sdk/src/experimental/index.ts';
 
 const defaultWelcomeLineageRelativePath = path.join('.atm', 'runtime', 'welcome.lineage.json');
 
@@ -67,7 +68,8 @@ export async function runWelcome(argv: string[]) {
       message('info', dryRun ? 'ATM_WELCOME_DRY_RUN' : 'ATM_WELCOME_READY', dryRun
         ? 'Welcome summary generated without writing lifecycle lineage.'
         : 'Welcome summary generated and lifecycle lineage recorded.'),
-      message('info', 'ATM_TELEMETRY_NOTICE', 'ATM telemetry is opt-in only. Run `node atm.mjs telemetry --on --json` after reviewing docs/TELEMETRY.md.')
+      message('info', 'ATM_TELEMETRY_NOTICE', 'ATM telemetry is opt-in only. Run `node atm.mjs telemetry --on --json` after reviewing docs/TELEMETRY.md.'),
+      message('warning', 'ATM_EXPERIMENTAL_API_NOTICE', 'Experimental APIs are disabled unless a command is invoked with --allow-experimental.')
     ],
     evidence: {
       dryRun,
@@ -84,6 +86,17 @@ export async function runWelcome(argv: string[]) {
         docs: 'docs/TELEMETRY.md',
         allowedFields: telemetryAllowedFields,
         prompt: 'Telemetry is disabled until you explicitly opt in with `node atm.mjs telemetry --on`.'
+      },
+      experimental: {
+        channel: 'experimental',
+        enabledByDefault: false,
+        allowFlag: '--allow-experimental',
+        docs: 'docs/EXPERIMENTAL_API.md',
+        apis: listExperimentalApis().map((api) => ({
+          id: api.id,
+          stability: api.stability,
+          since: api.since
+        }))
       },
       integrations: {
         ok: integrationHealth.ok,

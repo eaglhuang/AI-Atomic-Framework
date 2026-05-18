@@ -5,10 +5,13 @@
   "description": "Machine-readable list of framework-level invariants that no host project rule may override without a governed charter waiver.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaId", "specVersion", "migration", "charterVersion", "lastAmendedAt", "invariants"],
+  "required": ["schemaId", "schemaVersion", "specVersion", "migration", "charterVersion", "lastAmendedAt", "invariants"],
   "properties": {
     "schemaId": {
       "const": "atm.charterInvariants"
+    },
+    "schemaVersion": {
+      "const": "atm.invariants.v0.1"
     },
     "specVersion": {
       "const": "0.1.0"

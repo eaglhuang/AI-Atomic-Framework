@@ -9,6 +9,7 @@ import { getCommandSpec } from './command-specs.ts';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 export const defaultATMChartRelativePath = path.join('.atm', 'memory', 'atm-chart.md');
+export const atmChartFrontmatterSchemaVersion = 'atm.atmChart.v0.1' as const;
 export const atmChartSourceSchemas = Object.freeze({
   'governance/default-guards': 'schemas/governance/default-guards.schema.json',
   'charter/charter-invariants': 'schemas/charter/charter-invariants.schema.json',
@@ -69,6 +70,7 @@ const fallbackLegacyCompatibilityMatrix = Object.freeze<LegacyCompatibilityMatri
 const versionCacheRelativePath = path.join('.atm', 'runtime', 'version-cache.json');
 
 type ATMChartFrontmatter = {
+  readonly schema_version?: typeof atmChartFrontmatterSchemaVersion | string;
   readonly atm_chart_version?: string;
   readonly framework_version?: string;
   readonly template_version?: string;
@@ -372,6 +374,7 @@ function createATMChartMarkdown(input: {
 
   return [
     '---',
+    `schema_version: ${atmChartFrontmatterSchemaVersion}`,
     `atm_chart_version: ${input.atmChartVersion}`,
     `framework_version: ${input.frameworkVersion}`,
     `template_version: ${input.templateVersion}`,

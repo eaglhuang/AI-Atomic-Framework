@@ -1,5 +1,19 @@
 import { createHash } from 'node:crypto';
 
+export * from './install-manifest.ts';
+export {
+  ExperimentalApiError,
+  experimentalApiSchemaVersion,
+  invokeExperimentalApi,
+  listExperimentalApis
+} from './experimental/index.ts';
+export type {
+  ExperimentalApiDescriptor,
+  ExperimentalApiId,
+  ExperimentalApiInvocationInput,
+  ExperimentalApiInvocationResult
+} from './experimental/index.ts';
+
 /** A single file managed by an agent pack. */
 export interface TargetFile {
   /** Destination path relative to host repo root. */

@@ -5,10 +5,13 @@
   "description": "Hash-locked manifest for files installed by an ATM IntegrationAdapter.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaId", "specVersion", "migration", "adapterId", "adapterVersion", "installedAt", "targetDir", "files"],
+  "required": ["schemaId", "schemaVersion", "specVersion", "migration", "adapterId", "adapterVersion", "installedAt", "targetDir", "files"],
   "properties": {
     "schemaId": {
       "const": "atm.integrationInstallManifest"
+    },
+    "schemaVersion": {
+      "const": "atm.installManifest.v0.1"
     },
     "specVersion": {
       "const": "0.1.0"

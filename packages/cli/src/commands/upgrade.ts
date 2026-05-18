@@ -23,8 +23,14 @@ import {
 import { runUpgradeMapPropose } from './upgrade-map-propose.ts';
 import { createATMVersionSummary, loadCompatibilityMatrix, runATMChart } from './atm-chart.ts';
 import { CliError, makeResult, message, quoteCliValue, readJsonFile, resolveValue, writeJsonFile } from './shared.ts';
+import { ExperimentalApiError, invokeExperimentalApi, listExperimentalApis } from '../../../agent-pack-sdk/src/experimental/index.ts';
 
 export async function runUpgrade(argv: any) {
+  const experimentalAction = firstExperimentalUpgradeAction(argv);
+  if (experimentalAction === 'experimental-api') {
+    return runUpgradeExperimentalApi(parseExperimentalApiOptions(argv));
+  }
+
   const safeAction = firstSafeUpgradeAction(argv);
   if (safeAction === 'plan') {
     return runSafeUpgradePlan(parseSafeUpgradeOptions(argv, 'plan'));
@@ -109,6 +115,92 @@ export async function runUpgrade(argv: any) {
       inputKinds: proposal.inputs.map((entry: any) => entry.kind)
     }
   });
+}
+
+function firstExperimentalUpgradeAction(argv: readonly string[]) {
+  const flagsWithValues = new Set(['--cwd', '--api']);
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (flagsWithValues.has(argument)) {
+      index += 1;
+      continue;
+    }
+    if (argument === 'experimental-api') {
+      return argument;
+    }
+  }
+  return null;
+}
+
+function parseExperimentalApiOptions(argv: readonly string[]) {
+  const options = {
+    cwd: process.cwd(),
+    apiId: 'agent-pack-preview',
+    allowExperimental: false
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+    if (argument === 'experimental-api') continue;
+    if (argument === '--cwd') {
+      options.cwd = requireOptionValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (argument === '--api') {
+      options.apiId = requireOptionValue(argv, index, '--api');
+      index += 1;
+      continue;
+    }
+    if (argument === '--allow-experimental') {
+      options.allowExperimental = true;
+      continue;
+    }
+    if (argument === '--json' || argument === '--pretty') continue;
+    if (argument.startsWith('--')) {
+      throw new CliError('ATM_CLI_USAGE', `upgrade experimental-api does not support option ${argument}`, { exitCode: 2 });
+    }
+  }
+
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd)
+  };
+}
+
+function runUpgradeExperimentalApi(options: { readonly cwd: string; readonly apiId: string; readonly allowExperimental: boolean }) {
+  try {
+    const result = invokeExperimentalApi({
+      apiId: options.apiId,
+      allowExperimental: options.allowExperimental,
+      caller: 'atm upgrade experimental-api'
+    });
+    return makeResult({
+      ok: true,
+      command: 'upgrade',
+      cwd: options.cwd,
+      messages: [message('warning', 'ATM_EXPERIMENTAL_API_ALLOWED', 'Experimental API call allowed by explicit --allow-experimental opt-in.', {
+        apiId: result.apiId,
+        docs: 'docs/EXPERIMENTAL_API.md'
+      })],
+      evidence: {
+        action: 'experimental-api',
+        experimental: result,
+        availableExperimentalApis: listExperimentalApis()
+      }
+    });
+  } catch (error) {
+    if (error instanceof ExperimentalApiError) {
+      throw new CliError(error.code, error.message, {
+        exitCode: 2,
+        details: {
+          ...error.details,
+          availableExperimentalApis: listExperimentalApis()
+        }
+      });
+    }
+    throw error;
+  }
 }
 
 function firstSafeUpgradeAction(argv: readonly string[]) {
