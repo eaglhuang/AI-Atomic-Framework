@@ -71,7 +71,8 @@
         "validate-version-compatibility",
         "validate-breaking-changes",
         "validate-upgrade-rollback",
-        "validate-migration-fixtures"
+        "validate-migration-fixtures",
+        "validate-release-trust"
       ]
     },
     "full": {
@@ -161,6 +162,8 @@
     { "name": "validate-external-golden", "entry": "scripts/validate-external-golden.ts", "tags": ["golden"], "slow": false },
     { "name": "validate-root-drop-release", "entry": "scripts/validate-root-drop-release.ts", "tags": ["release"], "slow": true },
     { "name": "validate-onefile-release", "entry": "scripts/validate-onefile-release.ts", "tags": ["release"], "slow": true },
-    { "name": "validate-self-hosting-alpha", "entry": "scripts/validate-self-hosting-alpha.ts", "tags": ["self-host"], "slow": true }
+    { "name": "validate-self-hosting-alpha", "entry": "scripts/validate-self-hosting-alpha.ts", "tags": ["self-host"], "slow": true },
+    { "name": "validate-migration-fixtures", "entry": "scripts/validate-migration-fixtures.ts", "tags": ["migration", "fixtures"], "slow": false },
+    { "name": "validate-release-trust", "entry": "scripts/validate-release-trust.ts", "tags": ["release", "trust"], "slow": false }
   ]
 }

@@ -34,6 +34,7 @@ import { runMigrate } from './commands/migrate.ts';
 import { runAgentPack } from './commands/agent-pack.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, writeResult } from './commands/shared.ts';
+import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
   'atm-chart': runATMChart,
@@ -133,6 +134,21 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
     }
     writeResult(makeHelpResult(spec, process.cwd()), io.stdout, outputFormat);
     return 0;
+  }
+
+  if (commandName !== 'doctor') {
+    const trustIntegrity = checkStartupIntegrity(resolveBundledIntegrityRoot());
+    if (!trustIntegrity.ok) {
+      const result = makeResult({
+        ok: false,
+        command: commandName,
+        cwd: process.cwd(),
+        messages: [message('error', 'ATM_RELEASE_INTEGRITY_FAILED', 'Bundled ATM release integrity check failed; refusing to run non-read-only commands.', { mode: trustIntegrity.mode })],
+        evidence: { trustIntegrity }
+      });
+      writeResult(result, io.stderr, outputFormat);
+      return 1;
+    }
   }
 
   try {

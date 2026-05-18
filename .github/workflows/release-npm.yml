@@ -4,20 +4,31 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run release trust workflow without publishing packages'
+        required: false
+        default: true
+        type: boolean
 
 permissions:
-  contents: read
+  contents: write
+  id-token: write
 
 jobs:
   publish:
     name: Publish npm packages
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
+    env:
+      RELEASE_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Validate release tag
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         shell: bash
         run: |
           tag="${GITHUB_REF_NAME}"
@@ -44,6 +55,12 @@ jobs:
           node --experimental-strip-types scripts/build-root-drop-release.ts
           node --experimental-strip-types scripts/build-onefile-release.ts
 
+      - name: Build release integrity manifest
+        run: node --experimental-strip-types scripts/build-release-integrity.ts
+
+      - name: Generate SBOM (CycloneDX)
+        run: npx --yes @cyclonedx/cdxgen --output release/sbom.json --spec-version 1.5 --no-recurse .
+
       - name: Verify portable release artifacts
         run: |
           npm run validate:root-drop-release
@@ -52,19 +69,44 @@ jobs:
       - name: Set npm package versions from tag
         shell: bash
         run: |
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            echo "Dry-run mode: keeping package versions unchanged"
+            exit 0
+          fi
           version="${GITHUB_REF_NAME#v}"
           npm version "$version" --workspaces --include-workspace-root --no-git-tag-version
 
       - name: Validate release version compatibility
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         shell: bash
         run: node --experimental-strip-types scripts/validate-version-compatibility.ts --mode validate --release-tag "$GITHUB_REF_NAME"
 
       - name: Publish ATM CLI
-        run: npm publish --workspace @ai-atomic-framework/cli --access public
+        shell: bash
+        run: |
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            npm publish --workspace @ai-atomic-framework/cli --access public --provenance --dry-run
+          else
+            npm publish --workspace @ai-atomic-framework/cli --access public --provenance
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish create-atm
-        run: npm publish --workspace create-atm --access public
+        shell: bash
+        run: |
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            npm publish --workspace create-atm --access public --provenance --dry-run
+          else
+            npm publish --workspace create-atm --access public --provenance
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Attach release artefacts to GitHub Release
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/integrity.json
+            release/sbom.json
