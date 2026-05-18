@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -15,7 +15,26 @@ interface CreateAtmOptions {
   readonly projectName: string;
   readonly cwd: string;
   readonly agent?: string;
+  readonly tag: CreateAtmDistTag;
   readonly json: boolean;
+}
+
+type CreateAtmDistTag = 'latest' | 'next' | 'beta' | 'lts';
+
+interface CreateAtmDistTagSelection {
+  readonly schemaVersion: 'atm.distTagSelection.v0.1';
+  readonly requestedTag: CreateAtmDistTag;
+  readonly tier: 'stable' | 'beta' | 'experimental' | 'lts';
+  readonly expectedCliPrerelease: 'beta' | 'alpha' | null;
+  readonly npmPackageSpec: string;
+  readonly source: 'create-atm';
+}
+
+interface AtmExecutionPlan {
+  readonly command: string;
+  readonly argsPrefix: readonly string[];
+  readonly display: string;
+  readonly source: 'source-tree' | 'packaged-dependency' | 'npm-dist-tag';
 }
 
 interface StepResult {
@@ -32,13 +51,15 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
   const targetRoot = path.resolve(options.cwd, options.projectName);
   ensureCreatableTarget(targetRoot);
   mkdirSync(targetRoot, { recursive: true });
+  const distTag = resolveCreateAtmDistTag(options.tag);
+  writeDistTagSelection(targetRoot, distTag);
 
-  const atmEntrypoint = resolveAtmEntrypoint();
+  const atmExecution = resolveAtmExecutionPlan(distTag.requestedTag);
   const steps: StepResult[] = [];
-  steps.push(runAtmStep('bootstrap', atmEntrypoint, ['bootstrap', '--cwd', targetRoot, '--json']));
-  steps.push(runAtmStep('atm-chart render', atmEntrypoint, ['atm-chart', 'render', '--cwd', targetRoot, '--json']));
+  steps.push(runAtmStep('bootstrap', atmExecution, ['bootstrap', '--cwd', targetRoot, '--json']));
+  steps.push(runAtmStep('atm-chart render', atmExecution, ['atm-chart', 'render', '--cwd', targetRoot, '--json']));
   if (options.agent) {
-    steps.push(runAtmStep(`agent-pack install ${options.agent}`, atmEntrypoint, ['agent-pack', 'install', '--id', options.agent, '--cwd', targetRoot, '--json']));
+    steps.push(runAtmStep(`agent-pack install ${options.agent}`, atmExecution, ['agent-pack', 'install', '--id', options.agent, '--cwd', targetRoot, '--json']));
   }
 
   const failedStep = steps.find((step) => step.exitCode !== 0);
@@ -54,7 +75,9 @@ export function runCreateAtm(argv = process.argv.slice(2)) {
     evidence: {
       projectRoot: targetRoot,
       agent: options.agent ?? null,
-      atmEntrypoint,
+      atmEntrypoint: atmExecution.display,
+      atmEntrypointSource: atmExecution.source,
+      distTag,
       durationMs: Date.now() - startedAt,
       steps: steps.map((step) => ({
         name: step.name,
@@ -78,6 +101,7 @@ function parseArgs(argv: readonly string[]): CreateAtmOptions {
     projectName,
     cwd: path.resolve(readOption(args, '--cwd') ?? process.cwd()),
     agent: readOption(args, '--agent'),
+    tag: parseDistTag(readOption(args, '--tag') ?? 'latest'),
     json: args.includes('--json') || !process.stdout.isTTY
   };
 }
@@ -90,6 +114,13 @@ function readOption(args: readonly string[], name: string): string | undefined {
     throwUsage(`${name} requires a value.`);
   }
   return value;
+}
+
+function parseDistTag(value: string): CreateAtmDistTag {
+  if (value === 'latest' || value === 'next' || value === 'beta' || value === 'lts') {
+    return value;
+  }
+  throwUsage(`--tag must be one of: latest, next, beta, lts. Got: ${value}`);
 }
 
 function throwUsage(message: string): never {
@@ -106,28 +137,74 @@ function ensureCreatableTarget(targetRoot: string): void {
   }
 }
 
-function resolveAtmEntrypoint(): string {
+function resolveCreateAtmDistTag(tag: CreateAtmDistTag): CreateAtmDistTagSelection {
+  const table: Record<CreateAtmDistTag, Omit<CreateAtmDistTagSelection, 'schemaVersion' | 'requestedTag' | 'npmPackageSpec' | 'source'>> = {
+    latest: { tier: 'stable', expectedCliPrerelease: null },
+    next: { tier: 'beta', expectedCliPrerelease: 'beta' },
+    beta: { tier: 'experimental', expectedCliPrerelease: 'alpha' },
+    lts: { tier: 'lts', expectedCliPrerelease: null }
+  };
+  return {
+    schemaVersion: 'atm.distTagSelection.v0.1',
+    requestedTag: tag,
+    ...table[tag],
+    npmPackageSpec: `@ai-atomic-framework/cli@${tag}`,
+    source: 'create-atm'
+  };
+}
+
+function writeDistTagSelection(targetRoot: string, selection: CreateAtmDistTagSelection): void {
+  const selectionPath = path.join(targetRoot, '.atm', 'runtime', 'dist-tag.json');
+  mkdirSync(path.dirname(selectionPath), { recursive: true });
+  writeFileSync(selectionPath, `${JSON.stringify(selection, null, 2)}\n`, 'utf8');
+}
+
+function resolveAtmExecutionPlan(tag: CreateAtmDistTag): AtmExecutionPlan {
   const require = createRequire(import.meta.url);
   try {
     const cliIndexPath = require.resolve('@ai-atomic-framework/cli');
     const packageRoot = path.resolve(path.dirname(cliIndexPath), '..');
     const packagedEntrypoint = path.join(packageRoot, 'dist', 'atm.mjs');
-    if (existsSync(packagedEntrypoint)) return packagedEntrypoint;
+    if (existsSync(packagedEntrypoint) && tag === 'latest') {
+      return {
+        command: process.execPath,
+        argsPrefix: [packagedEntrypoint],
+        display: packagedEntrypoint,
+        source: 'packaged-dependency'
+      };
+    }
   } catch {
     // Fall through to source-tree lookup.
   }
 
   const sourceTreeRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
   const sourceEntrypoint = path.join(sourceTreeRoot, 'atm.mjs');
-  if (existsSync(sourceEntrypoint)) return sourceEntrypoint;
+  if (existsSync(sourceEntrypoint)) {
+    return {
+      command: process.execPath,
+      argsPrefix: [sourceEntrypoint],
+      display: sourceEntrypoint,
+      source: 'source-tree'
+    };
+  }
+
+  if (tag !== 'latest') {
+    const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+    return {
+      command: npxCommand,
+      argsPrefix: ['--yes', `@ai-atomic-framework/cli@${tag}`, 'atm'],
+      display: `${npxCommand} --yes @ai-atomic-framework/cli@${tag} atm`,
+      source: 'npm-dist-tag'
+    };
+  }
 
   process.stderr.write('[create-atm] unable to locate ATM CLI entrypoint.\n');
   process.exit(1);
 }
 
-function runAtmStep(name: string, atmEntrypoint: string, args: readonly string[]): StepResult {
+function runAtmStep(name: string, atmExecution: AtmExecutionPlan, args: readonly string[]): StepResult {
   const startedAt = Date.now();
-  const child = spawnSync(process.execPath, [atmEntrypoint, ...args], {
+  const child = spawnSync(atmExecution.command, [...atmExecution.argsPrefix, ...args], {
     encoding: 'utf8',
     windowsHide: true
   });

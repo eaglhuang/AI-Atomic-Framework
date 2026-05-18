@@ -7,6 +7,7 @@ import { checkIntegrationHealth } from './integration.ts';
 import { runNext } from './next.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
+import { readTelemetryState, telemetryAllowedFields } from '../telemetry/index.ts';
 
 const defaultWelcomeLineageRelativePath = path.join('.atm', 'runtime', 'welcome.lineage.json');
 
@@ -35,6 +36,8 @@ export async function runWelcome(argv: string[]) {
   const dryRun = parsed.options.dryRun === true;
   const atmChart = loadATMChartSummary(cwd);
   const versionSummary = createATMVersionSummary(cwd);
+  const distTag = readDistTagSelection(cwd);
+  const telemetry = readTelemetryState(cwd);
   if (!versionSummary.compatibility.ok && !dryRun) {
     throw new CliError('ATM_WELCOME_READ_ONLY_DIAGNOSTIC', 'ATMChart version is unsupported or unknown; run `node atm.mjs welcome --dry-run --json` or `node atm.mjs upgrade plan --json` before writing lineage.', {
       exitCode: 2,
@@ -60,9 +63,12 @@ export async function runWelcome(argv: string[]) {
     ok: true,
     command: 'welcome',
     cwd,
-    messages: [message('info', dryRun ? 'ATM_WELCOME_DRY_RUN' : 'ATM_WELCOME_READY', dryRun
-      ? 'Welcome summary generated without writing lifecycle lineage.'
-      : 'Welcome summary generated and lifecycle lineage recorded.')],
+    messages: [
+      message('info', dryRun ? 'ATM_WELCOME_DRY_RUN' : 'ATM_WELCOME_READY', dryRun
+        ? 'Welcome summary generated without writing lifecycle lineage.'
+        : 'Welcome summary generated and lifecycle lineage recorded.'),
+      message('info', 'ATM_TELEMETRY_NOTICE', 'ATM telemetry is opt-in only. Run `node atm.mjs telemetry --on --json` after reviewing docs/TELEMETRY.md.')
+    ],
     evidence: {
       dryRun,
       atmChart: {
@@ -72,6 +78,13 @@ export async function runWelcome(argv: string[]) {
         guardSummary: atmChart.guardSummary
       },
       versions: versionSummary,
+      distTag,
+      telemetry: {
+        enabled: telemetry.enabled,
+        docs: 'docs/TELEMETRY.md',
+        allowedFields: telemetryAllowedFields,
+        prompt: 'Telemetry is disabled until you explicitly opt in with `node atm.mjs telemetry --on`.'
+      },
       integrations: {
         ok: integrationHealth.ok,
         manifestDir: integrationHealth.manifestDir,
@@ -86,6 +99,35 @@ export async function runWelcome(argv: string[]) {
       welcomeLineage
     }
   });
+}
+
+function readDistTagSelection(cwd: string) {
+  const selectionPath = path.join(cwd, '.atm', 'runtime', 'dist-tag.json');
+  if (!existsSync(selectionPath)) {
+    return {
+      requestedTag: 'latest',
+      tier: 'stable',
+      source: 'default',
+      selectionPath: null
+    };
+  }
+
+  try {
+    const parsed = JSON.parse(readFileSync(selectionPath, 'utf8'));
+    return {
+      requestedTag: parsed.requestedTag ?? 'latest',
+      tier: parsed.tier ?? 'stable',
+      source: parsed.source ?? 'create-atm',
+      selectionPath: '.atm/runtime/dist-tag.json'
+    };
+  } catch {
+    return {
+      requestedTag: 'latest',
+      tier: 'unknown',
+      source: 'unreadable',
+      selectionPath: '.atm/runtime/dist-tag.json'
+    };
+  }
 }
 
 function writeWelcomeLineage(lineageAbsolutePath: string, input: {

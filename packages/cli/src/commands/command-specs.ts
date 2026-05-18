@@ -446,6 +446,26 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs test --map ATM-MAP-0001 --equivalence-fixtures fixtures/equivalence/checkout-mini.json --json'
     ]
   }),
+  telemetry: defineCommandSpec({
+    name: 'telemetry',
+    summary: 'Manage opt-in ATM CLI telemetry for the current repository.',
+    positional: [],
+    options: [
+      commonCwdOption,
+      { flag: '--on', summary: 'Opt in to telemetry for this repository.' },
+      { flag: '--off', summary: 'Opt out of telemetry for this repository.' },
+      { flag: '--status', summary: 'Show telemetry status (default action).' },
+      { flag: '--endpoint', value: 'url', summary: 'Optional telemetry endpoint recorded with opt-in.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs telemetry --status --json',
+      'node atm.mjs telemetry --on --json',
+      'node atm.mjs telemetry --off --json'
+    ]
+  }),
   validate: defineCommandSpec({
     name: 'validate',
     summary: 'Run repository or atomic spec validation checks.',

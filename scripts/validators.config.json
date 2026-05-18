@@ -75,7 +75,9 @@
         "validate-release-trust",
         "validate-known-bad-versions",
         "validate-skew-matrix",
-        "validate-security-policy"
+        "validate-security-policy",
+        "validate-dist-tag",
+        "adopter-sentinel"
       ]
     },
     "full": {
@@ -170,6 +172,8 @@
     { "name": "validate-release-trust", "entry": "scripts/validate-release-trust.ts", "tags": ["release", "trust"], "slow": false },
     { "name": "validate-known-bad-versions", "entry": "scripts/validate-known-bad-versions.ts", "tags": ["release", "incident-response"], "slow": false },
     { "name": "validate-skew-matrix", "entry": "scripts/validate-skew-matrix.ts", "tags": ["release", "skew", "matrix"], "slow": false },
-    { "name": "validate-security-policy", "entry": "scripts/validate-security-policy.ts", "tags": ["security", "dependency-scan"], "slow": false }
+    { "name": "validate-security-policy", "entry": "scripts/validate-security-policy.ts", "tags": ["security", "dependency-scan"], "slow": false },
+    { "name": "validate-dist-tag", "entry": "scripts/validate-dist-tag.ts", "tags": ["release", "dist-tag"], "slow": false },
+    { "name": "adopter-sentinel", "entry": "scripts/adopter-sentinel.ts", "tags": ["telemetry", "sentinel"], "slow": true }
   ]
 }

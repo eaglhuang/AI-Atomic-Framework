@@ -11,6 +11,22 @@ on:
         required: false
         default: true
         type: boolean
+      release_version:
+        description: 'Version to simulate in dry-run mode, for example 0.1.0-beta.0'
+        required: false
+        default: '0.0.0-beta.0'
+        type: string
+      release_tier:
+        description: 'Release tier override for dist-tag selection'
+        required: false
+        default: auto
+        type: choice
+        options:
+          - auto
+          - stable
+          - beta
+          - experimental
+          - lts
 
 permissions:
   contents: write
@@ -23,6 +39,8 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.dry_run == true) }}
     env:
       RELEASE_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
+      RELEASE_VERSION_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.release_version || '' }}
+      RELEASE_TIER_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tier || 'auto' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +50,7 @@ jobs:
         shell: bash
         run: |
           tag="${GITHUB_REF_NAME}"
-          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-alpha\.[0-9]+)?$ ]]; then
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta|lts)\.[0-9]+)?$ ]]; then
             echo "Unsupported release tag: $tag"
             exit 1
           fi
@@ -69,11 +87,11 @@ jobs:
       - name: Set npm package versions from tag
         shell: bash
         run: |
-          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            echo "Dry-run mode: keeping package versions unchanged"
-            exit 0
-          fi
           version="${GITHUB_REF_NAME#v}"
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
+            echo "Dry-run mode: simulating package version $version"
+          fi
           npm version "$version" --workspaces --include-workspace-root --no-git-tag-version
 
       - name: Validate release version compatibility
@@ -81,13 +99,31 @@ jobs:
         shell: bash
         run: node --experimental-strip-types scripts/validate-version-compatibility.ts --mode validate --release-tag "$GITHUB_REF_NAME"
 
+      - name: Resolve npm dist-tag
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
+          fi
+          node --experimental-strip-types scripts/validate-dist-tag.ts --mode resolve --version "$version" --tier "${RELEASE_TIER_INPUT:-auto}" --github-env "$GITHUB_ENV"
+
+      - name: Refresh deprecations dashboard header
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
+            version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
+          fi
+          node -e "const fs=require('fs'); const p='docs/DEPRECATIONS.md'; let text=fs.readFileSync(p,'utf8'); text=text.replace(/^Last release audit: .*$/m, 'Last release audit: '+version+' ('+process.env.NPM_DIST_TAG+') at '+new Date().toISOString()); fs.writeFileSync(p, text);"
+
       - name: Publish ATM CLI
         shell: bash
         run: |
           if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            npm publish --workspace @ai-atomic-framework/cli --access public --provenance --dry-run
+            npm publish --workspace @ai-atomic-framework/cli --access public --provenance --tag "$NPM_DIST_TAG" --dry-run
           else
-            npm publish --workspace @ai-atomic-framework/cli --access public --provenance
+            npm publish --workspace @ai-atomic-framework/cli --access public --provenance --tag "$NPM_DIST_TAG"
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -96,9 +132,9 @@ jobs:
         shell: bash
         run: |
           if [[ "$RELEASE_DRY_RUN" == "true" ]]; then
-            npm publish --workspace create-atm --access public --provenance --dry-run
+            npm publish --workspace create-atm --access public --provenance --tag "$NPM_DIST_TAG" --dry-run
           else
-            npm publish --workspace create-atm --access public --provenance
+            npm publish --workspace create-atm --access public --provenance --tag "$NPM_DIST_TAG"
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

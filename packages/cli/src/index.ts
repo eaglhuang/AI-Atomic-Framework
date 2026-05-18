@@ -170,6 +170,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'telemetry',
+    summary: 'Manage opt-in ATM CLI telemetry for the current repository',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'test',
     summary: 'Run atom smoke tests',
     implemented: true,
