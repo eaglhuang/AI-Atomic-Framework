@@ -12,7 +12,7 @@ ATM is not an agent framework and not a workflow engine. It is the control layer
 
 ATM gives a repository a repeatable work envelope:
 
-- models AI-assisted work as atoms with explicit birth, scope, action, proof, memory, and replacement behavior;
+- models AI-assisted work as atoms that can split, merge, compose, evolve, expire, infect legacy code, and become reusable templates;
 - turns large goals into governed work items;
 - locks file, package, or capability scope before mutation;
 - runs guards, tests, and validation as evidence, not just as terminal noise;
@@ -42,41 +42,81 @@ The key idea is that `next` remains the deterministic router. README files, gene
 
 ## Atomic Behaviors
 
-The atom is the main ATM product idea. An atom is not just a task, ticket, command, or prompt. It is a governed unit of work with lifecycle behavior that humans can review and agents can repeat.
+The atom is the main ATM product idea. An atom is not just a task, ticket, command, or prompt. It behaves more like a governed cell in a living codebase: it can divide, fuse, form chains, evolve, go dormant, or attach itself to legacy tissue.
+
+Each behavior is itself a governed atom supplied by the reference behavior pack. Core defines the `AtomBehavior` interface and evidence schema; behavior plugins provide the actual moves. Every move should expose the same contract surface: trigger, evidence, gates, registry transition, and rollback.
 
 ```mermaid
 flowchart TB
-    Atom(("ATM Atom"))
-    Birth["Birth<br/>canonical ID, spec, registry"]
-    Scope["Scope<br/>declared files, packages, capabilities"]
-    Act["Act<br/>bounded code, doc, asset, or data change"]
-    Sense["Sense<br/>guards, tests, doctor, validators"]
-    Prove["Prove<br/>evidence, logs, artifacts, reports"]
-    Remember["Remember<br/>context summary and handoff"]
-    Replace["Replace<br/>map upgrade, migration, deprecation"]
+    Stage["Atom behavior theater"]
 
-    Atom --> Birth
-    Atom --> Scope
-    Atom --> Act
-    Atom --> Sense
-    Atom --> Prove
-    Atom --> Remember
-    Atom --> Replace
+    One(("atom"))
+    SplitA(("atom A"))
+    SplitB(("atom B"))
+    MergeA(("atom"))
+    MergeB(("atom"))
+    Merged(("merged atom"))
+    Chain["atom map"]
+    Legacy["legacy code"]
+    Patch["patch plan"]
+    Template(("template atom"))
+    VariantA(("variant A"))
+    VariantB(("variant B"))
+    Deprecated(("deprecated"))
+    Expired(("expired"))
 
-    Birth --> Scope --> Act --> Sense --> Prove --> Remember
-    Remember --> Scope
-    Replace --> Birth
+    Stage --> Split["split: one cell buds into focused atoms"]
+    Split --> One
+    One --> SplitA
+    One --> SplitB
+
+    Stage --> Merge["merge: related cells fuse"]
+    MergeA --> Merged
+    MergeB --> Merged
+    Merge --> Merged
+
+    Stage --> Compose["compose: active atoms perform as a map"]
+    SplitA --> Chain
+    SplitB --> Chain
+    Compose --> Chain
+
+    Stage --> Evolve["evolve / polymorphize: same identity, better shape"]
+    Evolve --> Template
+    Template --> VariantA
+    Template --> VariantB
+
+    Stage --> Infect["infect / atomize: legacy code joins the colony"]
+    Legacy --> Patch
+    Patch --> One
+    Infect --> Patch
+
+    Stage --> Sanitize["sweep / expire: unused cells leave the stage"]
+    One --> Deprecated
+    Deprecated --> Expired
+    Sanitize --> Deprecated
+
+    classDef atom fill:#e8f7ff,stroke:#4078a8,stroke-width:2px;
+    classDef action fill:#fff4cf,stroke:#a87720,stroke-width:1px;
+    classDef legacy fill:#f5f5f5,stroke:#777,stroke-dasharray:4 3;
+    class One,SplitA,SplitB,MergeA,MergeB,Merged,Template,VariantA,VariantB,Deprecated,Expired atom;
+    class Split,Merge,Compose,Evolve,Infect,Sanitize action;
+    class Legacy,Patch legacy;
 ```
 
-| Behavior | Human meaning | Framework signal |
+| Behavior | Cell-like performance | Framework signal |
 | --- | --- | --- |
-| Birth | Work starts from a named, inspectable unit instead of an ad hoc prompt. | Atomic ID, spec, registry entry, generator provenance. |
-| Scope | The mutation boundary is known before files change. | Scope lock, package boundary, path ownership, capability lock. |
-| Act | The agent performs the smallest useful change inside the boundary. | Atom run, map step, implementation command, host adapter action. |
-| Sense | The atom checks whether reality still matches the contract. | Guards, tests, `doctor`, validators, schema checks. |
-| Prove | Results become review material, not just terminal output. | Evidence records, artifacts, logs, validation reports. |
-| Remember | The next human or agent can continue without reconstructing everything. | Context summary, handoff note, continuation state. |
-| Replace | Existing atoms and maps can evolve without breaking their public meaning. | Replacement protocol, migration record, compatibility signal. |
+| `behavior.split` | One crowded atom divides into two or more focused active atoms. | `split-plan`, new semantic fingerprints, `bornBy: split`. |
+| `behavior.merge` | Several compatible atoms fuse into one clearer atom. | `merge-plan`, merged fingerprint, absorbed atoms marked deprecated. |
+| `behavior.compose` | Active atoms line up into a reusable map or tree. | Map composition with `members[]` and `edges[]`. |
+| `behavior.dedup-merge` | A duplicate atom is swallowed by the surviving atom. | Similarity report, dedup decision, caller refs redirected. |
+| `behavior.sweep` | An unused atom goes dormant when nobody calls it. | Unused-caller report, `active -> deprecated`. |
+| `behavior.evolve` | An atom keeps its identity while gaining a better version. | Upgrade proposal, quality comparison, automated gates. |
+| `behavior.expire` | A deprecated atom reaches TTL and leaves the system. | Expiry report, `deprecated -> expired`. |
+| `behavior.polymorphize` | One atom becomes a template with parameterized variants. | Polymorph template, dimension spec, lazy validated instances. |
+| `behavior.infect` | An existing atom attaches to matching legacy code and becomes its caller target. | Infect plan, dry-run patch, caller refs added. |
+| `behavior.atomize` | A legacy code region transforms into a new governed atom. | Atomize proposal, new atom spec, legacy mapping patch. |
+
+The public behavior naming guidance lives in [docs/governance/behavior-taxonomy.md](docs/governance/behavior-taxonomy.md). The consolidated reference implementation lives in [packages/plugin-behavior-pack](packages/plugin-behavior-pack).
 
 ## 60-Second Adoption
 
