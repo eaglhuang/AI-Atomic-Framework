@@ -116,6 +116,8 @@ node release/atm-root-drop/atm.mjs next --json
 node release/atm-onefile/atm.mjs next --json
 ```
 
+Versioning policy changes are self-versioned. Before changing release, compatibility matrix, deprecation, or migration policy text, update `policy_version` and confirm `framework_version_range` in [docs/ai_atomic_framework/upstream-versioning-policy.md](docs/ai_atomic_framework/upstream-versioning-policy.md), then run `node --experimental-strip-types scripts/validate-policy-self-version.ts --mode validate`.
+
 ## Recommended First Implementation
 
 The first implementation is expected to use TypeScript, Node.js, JSON schemas, and a small CLI because those tools make the alpha path easy to inspect and test. That toolchain is a recommendation, not a semantic requirement of ATM. Other language implementations should remain possible if they preserve the same contracts.

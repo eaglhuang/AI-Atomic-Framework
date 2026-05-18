@@ -31,6 +31,7 @@ on:
 permissions:
   contents: write
   id-token: write
+  issues: write
 
 jobs:
   publish:
@@ -119,6 +120,27 @@ jobs:
             version="${RELEASE_VERSION_INPUT:-0.0.0-beta.0}"
           fi
           node -e "const fs=require('fs'); const p='docs/DEPRECATIONS.md'; let text=fs.readFileSync(p,'utf8'); text=text.replace(/^Last release audit: .*$/m, 'Last release audit: '+version+' ('+process.env.NPM_DIST_TAG+') at '+new Date().toISOString()); fs.writeFileSync(p, text);"
+
+      - name: Prepare deprecation reminder
+        id: deprecation-reminder
+        shell: bash
+        run: node --experimental-strip-types scripts/validate-deprecation-policy.ts --mode reminders --github-output "$GITHUB_OUTPUT"
+
+      - name: Open deprecation reminder issue
+        if: ${{ steps.deprecation-reminder.outputs.has_reminders == 'true' }}
+        uses: actions/github-script@v7
+        env:
+          DEPRECATION_ISSUE_TITLE: ${{ steps.deprecation-reminder.outputs.issue_title }}
+          DEPRECATION_ISSUE_BODY: ${{ steps.deprecation-reminder.outputs.issue_body }}
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: process.env.DEPRECATION_ISSUE_TITLE,
+              body: process.env.DEPRECATION_ISSUE_BODY,
+              labels: ['release', 'deprecation']
+            });
 
       - name: Publish ATM CLI
         shell: bash

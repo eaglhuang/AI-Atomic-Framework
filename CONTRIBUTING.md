@@ -56,6 +56,8 @@ Documentation should explain decisions in terms of ATM concepts:
 
 Avoid examples that imply one host project or one AI model is required.
 
+Policy documentation is self-versioned. Any change that alters release, compatibility matrix, deprecation, or migration policy must first bump `policy_version` in `docs/ai_atomic_framework/upstream-versioning-policy.md`, keep `framework_version_range` overlapping the active framework train, and then update README, CONTRIBUTING, migration docs, or release notes that describe the changed contributor flow.
+
 ## Pull Request Checklist
 
 - The change has a focused scope.

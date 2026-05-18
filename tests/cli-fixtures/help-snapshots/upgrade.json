@@ -29,6 +29,11 @@
       "summary": "Apply a previously reviewed safe upgrade plan."
     },
     {
+      "flag": "--canary",
+      "value": "percent",
+      "summary": "Apply only a deterministic canary subset of a safe upgrade plan and record canary state."
+    },
+    {
       "flag": "--backup",
       "value": "path",
       "summary": "Rollback from a backup directory created by upgrade apply."
@@ -187,6 +192,7 @@
     "node atm.mjs upgrade plan --cwd . --out .atm/history/reports/upgrade-plan.json --json",
     "node atm.mjs upgrade plan --cwd . --allow-unknown-chart --json",
     "node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --json",
+    "node atm.mjs upgrade apply --from-plan .atm/history/reports/upgrade-plan.json --canary 25 --json",
     "node atm.mjs upgrade rollback --backup .atm/backups/<backup-id> --json",
     "node atm.mjs upgrade experimental-api --api agent-pack-preview --allow-experimental --json",
     "node atm.mjs upgrade --propose --atom ATM-CORE-0001 --to 1.1.0 --input fixtures/upgrade/hash-diff-report.json --json",

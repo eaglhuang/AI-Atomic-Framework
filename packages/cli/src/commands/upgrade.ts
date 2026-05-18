@@ -204,7 +204,7 @@ function runUpgradeExperimentalApi(options: { readonly cwd: string; readonly api
 }
 
 function firstSafeUpgradeAction(argv: readonly string[]) {
-  const flagsWithValues = new Set(['--cwd', '--out', '--from-plan', '--backup']);
+  const flagsWithValues = new Set(['--cwd', '--out', '--from-plan', '--backup', '--canary']);
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (flagsWithValues.has(argument)) {
@@ -225,6 +225,7 @@ function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' | 'appl
     out: null,
     fromPlan: null,
     backup: null,
+    canaryPercent: null,
     allowUnknownChart: false
   };
 
@@ -248,6 +249,14 @@ function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' | 'appl
     }
     if (argument === '--backup') {
       options.backup = requireOptionValue(argv, index, '--backup');
+      index += 1;
+      continue;
+    }
+    if (argument === '--canary') {
+      if (action !== 'apply') {
+        throw new CliError('ATM_CLI_USAGE', '--canary is only valid for upgrade apply', { exitCode: 2 });
+      }
+      options.canaryPercent = parseCanaryPercent(requireOptionValue(argv, index, '--canary'));
       index += 1;
       continue;
     }
@@ -338,6 +347,8 @@ async function runSafeUpgradeApply(options: any) {
     throw new CliError('ATM_UPGRADE_PLAN_INVALID', 'Safe upgrade apply requires an atm.safeUpgradePlan document.', { exitCode: 2 });
   }
   const cwd = path.resolve(String(plan.cwd ?? options.cwd));
+  const willModify = Array.isArray(plan.willModify) ? plan.willModify.map((entry: any) => normalizeRepositoryRelativePath(String(entry))) : [];
+  const canary = resolveCanarySelection(options.canaryPercent, willModify);
   const backupRoot = resolveRepositoryPath(cwd, String(plan.backupPath));
   const backupManifestPath = path.join(backupRoot, 'backup-manifest.json');
   const backedUpFiles = backupSafeUpgradeFiles(cwd, backupRoot, Array.isArray(plan.backupFiles) ? plan.backupFiles : []);
@@ -349,24 +360,59 @@ async function runSafeUpgradeApply(options: any) {
     createdAt: new Date().toISOString(),
     planId: plan.planId,
     plan,
-    backedUpFiles
+    backedUpFiles,
+    canary: canary.enabled ? {
+      percent: canary.percent,
+      selectedFiles: canary.selectedFiles,
+      deferredFiles: canary.deferredFiles
+    } : null
   });
 
-  await runATMChart(['render', '--cwd', cwd]);
-  writeJsonFile(resolveRepositoryPath(cwd, '.atm/runtime/compatibility-matrix.snapshot.json'), loadCompatibilityMatrix());
+  const modifiedFiles = [];
+  if (shouldApplyUpgradeFile(canary, '.atm/memory/atm-chart.md')) {
+    await runATMChart(['render', '--cwd', cwd]);
+    modifiedFiles.push('.atm/memory/atm-chart.md');
+  }
+  if (shouldApplyUpgradeFile(canary, '.atm/runtime/compatibility-matrix.snapshot.json')) {
+    writeJsonFile(resolveRepositoryPath(cwd, '.atm/runtime/compatibility-matrix.snapshot.json'), loadCompatibilityMatrix());
+    modifiedFiles.push('.atm/runtime/compatibility-matrix.snapshot.json');
+  }
+
+  const canaryStatePath = path.join(backupRoot, 'canary-state.json');
+  if (canary.enabled) {
+    writeJsonFile(canaryStatePath, {
+      schemaId: 'atm.safeUpgradeCanaryState',
+      specVersion: '0.1.0',
+      createdAt: new Date().toISOString(),
+      planId: plan.planId,
+      percent: canary.percent,
+      selectedFiles: canary.selectedFiles,
+      deferredFiles: canary.deferredFiles,
+      rollbackPath: path.relative(cwd, backupManifestPath).replace(/\\/g, '/'),
+      status: 'canary-applied'
+    });
+  }
 
   return makeResult({
     ok: true,
     command: 'upgrade',
     cwd,
-    messages: [message('info', 'ATM_UPGRADE_APPLIED', 'Safe ATM onboarding upgrade applied after backup.')],
+    messages: [canary.enabled
+      ? message('info', 'ATM_UPGRADE_CANARY_APPLIED', 'Safe ATM onboarding upgrade applied to the selected canary subset after backup.', { percent: canary.percent })
+      : message('info', 'ATM_UPGRADE_APPLIED', 'Safe ATM onboarding upgrade applied after backup.')],
     evidence: {
       action: 'apply',
       planPath: path.relative(cwd, planPath).replace(/\\/g, '/'),
       backupPath: path.relative(cwd, backupRoot).replace(/\\/g, '/'),
       rollbackPath: path.relative(cwd, backupManifestPath).replace(/\\/g, '/'),
+      canary: canary.enabled ? {
+        percent: canary.percent,
+        statePath: path.relative(cwd, canaryStatePath).replace(/\\/g, '/'),
+        selectedFiles: canary.selectedFiles,
+        deferredFiles: canary.deferredFiles
+      } : null,
       backedUpFiles,
-      modifiedFiles: ['.atm/memory/atm-chart.md', '.atm/runtime/compatibility-matrix.snapshot.json']
+      modifiedFiles
     }
   });
 }
@@ -408,10 +454,43 @@ function runSafeUpgradeRollback(options: any) {
     evidence: {
       action: 'rollback',
       backupPath: path.relative(options.cwd, backupRoot).replace(/\\/g, '/'),
+      canaryRollback: existsSync(path.join(backupRoot, 'canary-state.json')),
       restoredFiles,
       removedFiles
     }
   });
+}
+
+function parseCanaryPercent(value: string) {
+  const percent = Number(value);
+  if (!Number.isInteger(percent) || percent < 1 || percent > 100) {
+    throw new CliError('ATM_UPGRADE_CANARY_PERCENT_INVALID', '--canary must be an integer percent from 1 to 100', { exitCode: 2, details: { value } });
+  }
+  return percent;
+}
+
+function resolveCanarySelection(percent: number | null, willModify: readonly string[]) {
+  const selectedUniverse = [...new Set(willModify.map((entry) => normalizeRepositoryRelativePath(entry)))].sort((left, right) => left.localeCompare(right));
+  if (percent === null) {
+    return {
+      enabled: false,
+      percent: null,
+      selectedFiles: selectedUniverse,
+      deferredFiles: []
+    };
+  }
+  const selectedCount = selectedUniverse.length === 0 ? 0 : Math.max(1, Math.ceil(selectedUniverse.length * percent / 100));
+  return {
+    enabled: true,
+    percent,
+    selectedFiles: selectedUniverse.slice(0, selectedCount),
+    deferredFiles: selectedUniverse.slice(selectedCount)
+  };
+}
+
+function shouldApplyUpgradeFile(canary: ReturnType<typeof resolveCanarySelection>, filePath: string) {
+  if (!canary.enabled) return true;
+  return canary.selectedFiles.includes(normalizeRepositoryRelativePath(filePath));
 }
 
 function collectSafeUpgradeFiles(cwd: string) {

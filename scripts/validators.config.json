@@ -79,6 +79,8 @@
         "validate-dist-tag",
         "validate-meta-schema",
         "validate-bridge-minor",
+        "validate-policy-self-version",
+        "validate-deprecation-policy",
         "adopter-sentinel"
       ]
     },
@@ -178,6 +180,8 @@
     { "name": "validate-dist-tag", "entry": "scripts/validate-dist-tag.ts", "tags": ["release", "dist-tag"], "slow": false },
     { "name": "validate-meta-schema", "entry": "scripts/validate-meta-schema.ts", "tags": ["schema", "versioning"], "slow": false },
     { "name": "validate-bridge-minor", "entry": "scripts/validate-bridge-minor.ts", "tags": ["release", "versioning", "experimental"], "slow": false },
+    { "name": "validate-policy-self-version", "entry": "scripts/validate-policy-self-version.ts", "tags": ["release", "policy", "versioning"], "slow": false },
+    { "name": "validate-deprecation-policy", "entry": "scripts/validate-deprecation-policy.ts", "tags": ["release", "deprecation", "canary"], "slow": false },
     { "name": "adopter-sentinel", "entry": "scripts/adopter-sentinel.ts", "tags": ["telemetry", "sentinel"], "slow": true }
   ]
 }
