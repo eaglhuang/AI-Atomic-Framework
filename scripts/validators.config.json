@@ -74,7 +74,8 @@
         "validate-migration-fixtures",
         "validate-release-trust",
         "validate-known-bad-versions",
-        "validate-skew-matrix"
+        "validate-skew-matrix",
+        "validate-security-policy"
       ]
     },
     "full": {
@@ -168,6 +169,7 @@
     { "name": "validate-migration-fixtures", "entry": "scripts/validate-migration-fixtures.ts", "tags": ["migration", "fixtures"], "slow": false },
     { "name": "validate-release-trust", "entry": "scripts/validate-release-trust.ts", "tags": ["release", "trust"], "slow": false },
     { "name": "validate-known-bad-versions", "entry": "scripts/validate-known-bad-versions.ts", "tags": ["release", "incident-response"], "slow": false },
-    { "name": "validate-skew-matrix", "entry": "scripts/validate-skew-matrix.ts", "tags": ["release", "skew", "matrix"], "slow": false }
+    { "name": "validate-skew-matrix", "entry": "scripts/validate-skew-matrix.ts", "tags": ["release", "skew", "matrix"], "slow": false },
+    { "name": "validate-security-policy", "entry": "scripts/validate-security-policy.ts", "tags": ["security", "dependency-scan"], "slow": false }
   ]
 }
