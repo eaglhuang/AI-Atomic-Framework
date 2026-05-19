@@ -256,6 +256,7 @@ type ParsedCliOptions = {
   guards: boolean;
   evidence?: string;
   verify: boolean;
+  claim: boolean;
   dryRun: boolean;
   force: boolean;
   adopt?: string;
@@ -279,6 +280,7 @@ export function parseOptions(argv: string[], commandName: string) {
     guards: false,
     evidence: undefined,
     verify: false,
+    claim: false,
     dryRun: false,
     force: false,
     adopt: undefined,
@@ -359,6 +361,21 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agent`, { exitCode: 2 });
       }
       options.agent = requireOptionValue(argv, index, '--agent', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--claim') {
+      if (commandName !== 'next') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --claim`, { exitCode: 2 });
+      }
+      options.claim = true;
+      continue;
+    }
+    if (arg === '--actor') {
+      if (commandName !== 'next') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --actor`, { exitCode: 2 });
+      }
+      options.agent = requireOptionValue(argv, index, '--actor', commandName);
       index += 1;
       continue;
     }

@@ -8,7 +8,9 @@ import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
-import { makeResult, message, parseOptions } from './shared.ts';
+import { resolveActorId } from './actor-registry.ts';
+import { CliError, makeResult, message, parseOptions } from './shared.ts';
+import { runTasks } from './tasks.ts';
 
 export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
@@ -52,6 +54,66 @@ export async function runNext(argv: any) {
   const doctor = await runDoctor(['--cwd', options.cwd]);
   const runtime = detectGovernanceRuntime(options.cwd, bootstrapTaskId);
   const importedTaskQueue = inspectImportedTaskQueue(options.cwd);
+  if (options.claim) {
+    if (!importedTaskQueue.selectedTask) {
+      return makeResult({
+        ok: false,
+        command: 'next',
+        cwd: options.cwd,
+        messages: [message('error', 'ATM_NEXT_CLAIM_NO_TASK', 'No claimable imported task is ready at the moment.')],
+        evidence: {
+          importedTaskQueue
+        }
+      });
+    }
+    const resolvedActor = resolveActorId(options.agent ?? undefined);
+    if (!resolvedActor) {
+      throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+    }
+    const claimResult = await runTasks([
+      'claim',
+      '--cwd',
+      options.cwd,
+      '--task',
+      importedTaskQueue.selectedTask.workItemId,
+      '--actor',
+      resolvedActor.actorId,
+      '--files',
+      importedTaskQueue.selectedTask.taskPath,
+      '--json'
+    ]);
+    const nextAction = {
+      status: 'ready',
+      command: `node atm.mjs start --cwd . --goal ${quoteCliValue(importedTaskQueue.selectedTask.title)} --json`,
+      reason: `claimed imported work item ${importedTaskQueue.selectedTask.workItemId} for ${resolvedActor.actorId}`,
+      selectedTask: importedTaskQueue.selectedTask,
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: blockedMutationCommands()
+    };
+    const userNotice = buildFirstUseUserNotice(nextAction as any);
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: options.cwd,
+      messages: buildNextMessages(
+        nextAction as any,
+        userNotice,
+        integrationBootstrap,
+        runtimeAdapterReadiness,
+        message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
+          taskId: importedTaskQueue.selectedTask.workItemId,
+          actorId: resolvedActor.actorId
+        })
+      ),
+      evidence: {
+        nextAction,
+        claimResult: claimResult.evidence,
+        importedTaskQueue,
+        integrationBootstrap,
+        runtimeAdapterReadiness
+      }
+    });
+  }
   const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
   const failed = doctorChecks.find((check) => check.ok !== true);
   const nextAction = decideNextAction(runtime, failed?.name ?? null, importedTaskQueue);
@@ -247,7 +309,7 @@ function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
     });
 
   const tasks = allTasks
-    .filter((task) => task.status === 'open' || task.status === 'planned')
+    .filter((task) => task.status === 'ready' || task.status === 'open' || task.status === 'planned')
     .sort((left, right) => {
       const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
       return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
@@ -267,9 +329,10 @@ function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
 }
 
 function statusQueueWeight(status: string): number {
-  if (status === 'open') return 0;
-  if (status === 'planned') return 1;
-  return 2;
+  if (status === 'ready') return 0;
+  if (status === 'open') return 1;
+  if (status === 'planned') return 2;
+  return 3;
 }
 
 function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {

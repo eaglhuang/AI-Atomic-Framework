@@ -28,7 +28,17 @@ export interface TaskImportRecord {
   readonly importedAt: string;
 }
 
-export type TaskImportStatus = 'planned' | 'open' | 'in_progress' | 'blocked' | 'done';
+export type TaskImportStatus =
+  | 'planned'
+  | 'open'
+  | 'in_progress'
+  | 'reserved'
+  | 'ready'
+  | 'running'
+  | 'review'
+  | 'blocked'
+  | 'abandoned'
+  | 'done';
 
 export interface TaskImportManifest {
   readonly schemaId: 'atm.taskImportManifest';
@@ -60,7 +70,7 @@ export interface TaskVerifyReport {
   readonly ok: boolean;
 }
 
-const validStatuses = new Set<TaskImportStatus>(['planned', 'open', 'in_progress', 'blocked', 'done']);
+const validStatuses = new Set<TaskImportStatus>(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
 const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria'];
 const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes'];
 const dependenciesHeaders = ['dependencies', 'depends on', 'blocked by'];
@@ -71,6 +81,9 @@ const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 
 export async function runTasks(argv: string[]) {
   const action = (argv[0] ?? '').toLowerCase();
+  if (action === 'reserve' || action === 'promote') {
+    return await runTasksReservation(action, argv.slice(1));
+  }
   if (action === 'claim' || action === 'renew' || action === 'release' || action === 'handoff' || action === 'takeover') {
     return await runTasksClaimLifecycle(action, argv.slice(1));
   }
@@ -81,7 +94,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (import | verify).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (import | verify | reserve | promote | claim | renew | release | handoff | takeover).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -344,6 +357,96 @@ async function runTasksVerify(argv: string[]) {
   });
 }
 
+async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]) {
+  const options = parseReservationOptions(action, argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', `tasks ${action} requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const taskPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${options.taskId}.json`);
+  const nowIso = new Date().toISOString();
+  const taskDocument: Record<string, unknown> = existsSync(taskPath)
+    ? JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
+    : {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: options.taskId,
+      title: options.title ?? options.taskId,
+      status: 'planned',
+      dependencies: [],
+      acceptance: [],
+      deliverables: [],
+      tags: [],
+      source: {
+        planPath: 'manual',
+        sectionTitle: options.taskId,
+        headingLine: 1,
+        hash: createHash('sha256').update(`${options.taskId}|manual`).digest('hex').slice(0, 16)
+      },
+      importedAt: nowIso
+    };
+
+  if (action === 'reserve') {
+    taskDocument.status = 'reserved';
+    taskDocument.owner = actorId;
+    taskDocument.reservedAt = nowIso;
+    if (!taskDocument.title || String(taskDocument.title).trim().length === 0) {
+      taskDocument.title = options.title ?? options.taskId;
+    }
+    writeTaskDocument(taskPath, taskDocument);
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASKS_RESERVED', `Task ${options.taskId} reserved by ${actorId}.`, {
+        taskId: options.taskId,
+        actorId
+      })],
+      evidence: {
+        action,
+        taskId: options.taskId,
+        actorId,
+        status: taskDocument.status,
+        taskPath: relativePathFrom(options.cwd, taskPath)
+      }
+    });
+  }
+
+  const currentOwner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
+  if (currentOwner && currentOwner !== actorId) {
+    throw new CliError('ATM_TASKS_PROMOTE_OWNER_MISMATCH', `Task ${options.taskId} is reserved by ${currentOwner}, not ${actorId}.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId, owner: currentOwner, actorId }
+    });
+  }
+  if (String(taskDocument.status ?? '') !== 'reserved') {
+    throw new CliError('ATM_TASKS_PROMOTE_INVALID_STATE', `Task ${options.taskId} must be in reserved state before promote.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId, status: taskDocument.status ?? null }
+    });
+  }
+  taskDocument.status = 'ready';
+  taskDocument.owner = actorId;
+  taskDocument.promotedAt = nowIso;
+  writeTaskDocument(taskPath, taskDocument);
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASKS_PROMOTED', `Task ${options.taskId} promoted to ready by ${actorId}.`, {
+      taskId: options.taskId,
+      actorId
+    })],
+    evidence: {
+      action,
+      taskId: options.taskId,
+      actorId,
+      status: taskDocument.status,
+      taskPath: relativePathFrom(options.cwd, taskPath)
+    }
+  });
+}
+
 async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
   const options = parseClaimLifecycleOptions(action, argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined);
@@ -585,6 +688,50 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
   });
 }
 
+function parseReservationOptions(action: 'reserve' | 'promote', argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    title: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--title') {
+      options.title = requireValue(argv, index, '--title');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', `tasks ${action} requires --task <work-item-id>.`, { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
+}
+
 function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -714,16 +861,28 @@ function isClaimExpired(claim: TaskClaimRecord, nowIso: string) {
 }
 
 function writeTaskDocument(taskPath: string, document: Record<string, unknown>) {
+  mkdirSync(path.dirname(taskPath), { recursive: true });
   writeFileSync(taskPath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
 }
 
 function normalizeWorkItemStatus(value: unknown): WorkItemRef['status'] {
   const normalized = String(value ?? '').trim().toLowerCase();
-  if (normalized === 'planned' || normalized === 'locked' || normalized === 'running' || normalized === 'verified' || normalized === 'done' || normalized === 'blocked') {
+  if (
+    normalized === 'planned'
+    || normalized === 'reserved'
+    || normalized === 'ready'
+    || normalized === 'locked'
+    || normalized === 'running'
+    || normalized === 'review'
+    || normalized === 'verified'
+    || normalized === 'done'
+    || normalized === 'blocked'
+    || normalized === 'abandoned'
+  ) {
     return normalized as WorkItemRef['status'];
   }
   if (normalized === 'open' || normalized === 'in_progress') {
-    return 'running';
+    return 'ready';
   }
   return 'planned';
 }
@@ -1379,9 +1538,14 @@ function normalizeRelativePath(value: string): string {
 function coerceStatus(value: string): TaskImportStatus {
   const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_');
   if (normalized === 'todo' || normalized === 'planned') return 'planned';
+  if (normalized === 'reserved') return 'reserved';
+  if (normalized === 'ready') return 'ready';
   if (normalized === 'open' || normalized === 'pending') return 'open';
   if (normalized === 'in_progress' || normalized === 'wip' || normalized === 'doing') return 'in_progress';
+  if (normalized === 'running') return 'running';
+  if (normalized === 'review') return 'review';
   if (normalized === 'blocked' || normalized === 'waiting') return 'blocked';
+  if (normalized === 'abandoned') return 'abandoned';
   if (normalized === 'done' || normalized === 'completed' || normalized === 'closed') return 'done';
   if (validStatuses.has(normalized as TaskImportStatus)) return normalized as TaskImportStatus;
   return 'planned';

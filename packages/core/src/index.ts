@@ -1,4 +1,14 @@
-export type AtomLifecycleStatus = 'planned' | 'locked' | 'running' | 'verified' | 'done' | 'blocked';
+export type AtomLifecycleStatus =
+  | 'planned'
+  | 'reserved'
+  | 'ready'
+  | 'locked'
+  | 'running'
+  | 'review'
+  | 'verified'
+  | 'done'
+  | 'blocked'
+  | 'abandoned';
 
 export interface AtomicPackageDescriptor {
   readonly packageName: string;

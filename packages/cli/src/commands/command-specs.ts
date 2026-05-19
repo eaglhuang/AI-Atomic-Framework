@@ -414,13 +414,16 @@ export const commandSpecs = Object.freeze({
     summary: 'Recommend the next official ATM guidance action from current state.',
     options: [
       commonCwdOption,
+      { flag: '--claim', summary: 'Claim the selected imported task as part of next-action routing.' },
+      { flag: '--actor', value: 'id', summary: 'Actor id used for next --claim (or set ATM_ACTOR_ID).' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
     ],
     examples: [
       'node atm.mjs next --json',
-      'node atm.mjs next --cwd <host-repo> --json'
+      'node atm.mjs next --cwd <host-repo> --json',
+      'node atm.mjs next --claim --actor codex-main --json'
     ]
   }),
   'self-host-alpha': defineCommandSpec({
@@ -469,9 +472,9 @@ export const commandSpecs = Object.freeze({
   }),
   tasks: defineCommandSpec({
     name: 'tasks',
-    summary: 'Import/verify task plans and execute task claim lifecycle actions.',
+    summary: 'Import/verify task plans, manage reservation state, and execute task claim lifecycle actions.',
     positional: [
-      { name: 'action', summary: 'import | verify | claim | renew | release | handoff | takeover', required: true }
+      { name: 'action', summary: 'import | verify | reserve | promote | claim | renew | release | handoff | takeover', required: true }
     ],
     options: [
       commonCwdOption,
@@ -481,6 +484,7 @@ export const commandSpecs = Object.freeze({
       { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs.' },
       { flag: '--task', value: 'id', summary: 'Task id for claim/renew/release/handoff/takeover.' },
       { flag: '--actor', value: 'id', summary: 'Actor id for claim lifecycle actions (or set ATM_ACTOR_ID).' },
+      { flag: '--title', value: 'text', summary: 'Optional title for tasks reserve when creating a manual task entry.' },
       { flag: '--files', value: 'csv', summary: 'Comma-separated scope files for claim/takeover lock acquisition.' },
       { flag: '--ttl-seconds', value: 'number', summary: 'Lease ttl in seconds for claim/renew/takeover.' },
       { flag: '--to', value: 'id', summary: 'Target actor id for handoff.' },
@@ -493,6 +497,8 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs tasks import --from docs/plan.md --dry-run --json',
       'node atm.mjs tasks import --from docs/plan.md --write --json',
       'node atm.mjs tasks verify --json',
+      'node atm.mjs tasks reserve --task ATM-GOV-0101 --actor codex-main --title "Actor model" --json',
+      'node atm.mjs tasks promote --task ATM-GOV-0101 --actor codex-main --json',
       'node atm.mjs tasks claim --task ATM-GOV-0101 --actor codex-main --files packages/core/src/index.ts --json',
       'node atm.mjs tasks renew --task ATM-GOV-0101 --actor codex-main --ttl-seconds 3600 --json',
       'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reason "handoff complete" --json'

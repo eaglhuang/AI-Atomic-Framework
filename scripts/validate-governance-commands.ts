@@ -45,11 +45,13 @@ try {
   assert(missingLock.exitCode === 1, 'lock check on missing task must exit 1');
   assert(missingLock.parsed.ok === false, 'lock check on missing task must report ok=false');
 
-  const acquiredLock = runAtm(['lock', 'acquire', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--owner', 'fixture-agent', '--files', 'src/example.ts', '--json']);
+  const lockTaskId = 'ATM-FIXTURE-LOCK';
+
+  const acquiredLock = runAtm(['lock', 'acquire', '--cwd', repo, '--task', lockTaskId, '--owner', 'fixture-agent', '--files', 'src/example.ts', '--json']);
   assert(acquiredLock.exitCode === 0, 'lock acquire must exit 0');
   assert(acquiredLock.parsed.ok === true, 'lock acquire must report ok=true');
 
-  const checkedLock = runAtm(['lock', 'check', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--json']);
+  const checkedLock = runAtm(['lock', 'check', '--cwd', repo, '--task', lockTaskId, '--json']);
   assert(checkedLock.exitCode === 0, 'lock check must exit 0');
   assert(checkedLock.parsed.ok === true, 'lock check must report ok=true after acquire');
   assert((checkedLock.parsed.evidence?.lock?.lockedBy ?? checkedLock.parsed.evidence?.lock?.owner) === 'fixture-agent', 'lock check must preserve owner');
@@ -93,13 +95,38 @@ try {
   assert(guardFail.parsed.ok === false, 'guard encoding fail must report ok=false');
   assert(guardFail.parsed.evidence.findings.length >= 2, 'guard encoding fail must emit findings');
 
+  const reserveTask = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--title', 'Reservation test', '--json']);
+  assert(reserveTask.exitCode === 0, 'tasks reserve must exit 0');
+  assert(reserveTask.parsed.ok === true, 'tasks reserve must report ok=true');
+  assert(reserveTask.parsed.evidence.status === 'reserved', 'tasks reserve must set reserved status');
+
+  const promoteTask = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  assert(promoteTask.exitCode === 0, 'tasks promote must exit 0');
+  assert(promoteTask.parsed.ok === true, 'tasks promote must report ok=true');
+  assert(promoteTask.parsed.evidence.status === 'ready', 'tasks promote must set ready status');
+
+  const nextClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--json']);
+  assert(nextClaim.exitCode === 0, 'next --claim must exit 0');
+  assert(nextClaim.parsed.ok === true, 'next --claim must report ok=true');
+  assert(nextClaim.parsed.evidence.claimResult?.action === 'claim', 'next --claim must include claim evidence');
+  assert(nextClaim.parsed.evidence.claimResult?.taskId === 'ATM-GOV-0103', 'next --claim must claim selected task');
+
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0103.json');
+  const taskAfterClaim = JSON.parse(readFileSync(taskPath, 'utf8'));
+  assert(taskAfterClaim.status === 'running', 'tasks claim must update task status to running');
+
+  const conflictClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
+  assert(conflictClaim.exitCode === 1, 'tasks claim conflict must exit 1');
+  assert(conflictClaim.parsed.ok === false, 'tasks claim conflict must report ok=false');
+  assert(conflictClaim.parsed.messages?.[0]?.code === 'ATM_LOCK_CONFLICT', 'tasks claim conflict must return ATM_LOCK_CONFLICT');
+
   const handoff = runAtm(['handoff', 'summarize', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--json']);
   assert(handoff.exitCode === 0, 'handoff summarize must exit 0');
   assert(handoff.parsed.ok === true, 'handoff summarize must report ok=true');
   assert(existsSyncPortable(repo, handoff.parsed.evidence.summaryPath), 'handoff summary json must be written');
   assert(existsSyncPortable(repo, handoff.parsed.evidence.summaryMarkdownPath), 'handoff summary markdown must be written');
 
-  const releasedLock = runAtm(['lock', 'release', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--owner', 'fixture-agent', '--json']);
+  const releasedLock = runAtm(['lock', 'release', '--cwd', repo, '--task', lockTaskId, '--owner', 'fixture-agent', '--json']);
   assert(releasedLock.exitCode === 0, 'lock release must exit 0');
   assert(releasedLock.parsed.ok === true, 'lock release must report ok=true');
 } finally {
@@ -107,7 +134,7 @@ try {
 }
 
 if (!process.exitCode) {
-  console.log('[governance-commands:' + mode + '] ok (lock, budget, guard, and handoff commands verified)');
+  console.log('[governance-commands:' + mode + '] ok (lock, budget, guard, tasks lifecycle, and handoff commands verified)');
 }
 
 function existsSyncPortable(repositoryRoot: any, relativePath: any) {
