@@ -372,7 +372,9 @@ function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: Legac
     behaviorId: `behavior.${preferredSegment.recommendedBehavior}`
   });
   if (queueMatch) {
-    const command = `node atm.mjs review show ${quoteCliValue(queueMatch.proposalId)} --json`;
+    const command = queueMatch.status === 'approved'
+      ? `node atm.mjs review apply-ready ${quoteCliValue(queueMatch.proposalId)} --json`
+      : `node atm.mjs review show ${quoteCliValue(queueMatch.proposalId)} --json`;
     const waitingForReview = queueMatch.status === 'pending' || queueMatch.status === 'blocked';
     const missingEvidence = reconcileProposalMissingEvidence(base.missingEvidence, preferredSegment.recommendedBehavior, queueMatch.status);
     return {

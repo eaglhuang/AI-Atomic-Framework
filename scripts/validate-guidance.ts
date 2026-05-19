@@ -605,8 +605,8 @@ try {
     'next must exit 0 when matching guided legacy proposal is already approved');
   const approvedNextAction = nextAfterApproved.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
   const approvedNextCommand = String(approvedNextAction?.['command'] ?? '');
-  assert(approvedNextCommand.includes('review show'),
-    'next must keep routing to review show when a matching guided legacy proposal is already approved');
+  assert(approvedNextCommand.includes('review apply-ready'),
+    'next must route to review apply-ready when a matching guided legacy proposal is already approved');
   assert(approvedNextCommand.includes(approvedProposalId),
     'next approved route must point to the approved custom proposalId');
   assert(!approvedNextCommand.includes('upgrade --propose'),
@@ -619,6 +619,18 @@ try {
     'next approved route must expose nextRouteState=proposal-approved');
   assert(!String(approvedNextAction?.['missingEvidence'] ?? '').includes('human review before apply'),
     'next approved route must stop requiring human review before apply');
+  const applyReady = await runAtmJsonPortable([
+    'review', 'apply-ready', approvedProposalId,
+    '--cwd', downstreamCwd, '--json'
+  ]);
+  assert(applyReady.exitCode === 0,
+    'review apply-ready must exit 0 for approved guided legacy proposal');
+  assert(applyReady.parsed.evidence?.applyPacket?.proposalId === approvedProposalId,
+    'review apply-ready must return the approved proposalId');
+  assert(applyReady.parsed.evidence?.applyPacket?.targetSymbol != null,
+    'review apply-ready must expose targetSymbol for the approved leaf');
+  assert(Array.isArray(applyReady.parsed.evidence?.applyPacket?.mutationBoundary?.blocked),
+    'review apply-ready must expose blocked mutation boundary guidance');
 
   // ── E. blockedSegments still includes trunk functions ─────────────────────────────────────────
   assert(Array.isArray(configNextAction?.['blockedSegments']),

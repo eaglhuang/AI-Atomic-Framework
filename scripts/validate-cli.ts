@@ -633,6 +633,14 @@ try {
   assert(reviewApprove.parsed.evidence.decisionSnapshotHash === reviewQueueRecord.proposalSnapshotHash, 'review approve must preserve decision snapshot hash');
   assertMessageCode(reviewApprove, 'ATM_REVIEW_APPROVED');
 
+  const reviewApplyReady = runAtm(['review', 'apply-ready', reviewProposal.proposalId, '--cwd', reviewRepo], reviewRepo);
+  assert(reviewApplyReady.exitCode === 0, 'review apply-ready must exit 0 for approved proposals');
+  assertReadable(reviewApplyReady, 'review');
+  assert(reviewApplyReady.parsed.ok === true, 'review apply-ready must report ok=true');
+  assert(reviewApplyReady.parsed.evidence.applyPacket?.proposalId === reviewProposal.proposalId, 'review apply-ready must return the requested proposalId');
+  assert(Array.isArray(reviewApplyReady.parsed.evidence.applyPacket?.mutationBoundary?.blocked), 'review apply-ready must return blocked mutation guidance');
+  assertMessageCode(reviewApplyReady, 'ATM_REVIEW_APPLY_READY_OK');
+
   const reviewRejectFreshRepo = path.join(tempRoot, 'review-reject-repo');
   mkdirSync(reviewRejectFreshRepo, { recursive: true });
   writeJson(path.join(reviewRejectFreshRepo, '.atm', 'history', 'reports', 'upgrade-proposals.json'), {

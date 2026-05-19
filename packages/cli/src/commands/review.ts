@@ -22,7 +22,7 @@ export function runReview(argv: any) {
   const action = positional[0] ? String(positional[0]).trim().toLowerCase() : 'list';
   const proposalId = positional[1] ? String(positional[1]).trim() : '';
 
-  if (!['list', 'show', 'approve', 'reject'].includes(action)) {
+  if (!['list', 'show', 'approve', 'reject', 'apply-ready'].includes(action)) {
     throw new CliError('ATM_CLI_USAGE', `Unsupported review action: ${action}`, { exitCode: 2 });
   }
 
@@ -78,6 +78,38 @@ export function runReview(argv: any) {
         queuePath: relativePathFrom(options.cwd, queuePath),
         projectionPath: relativePathFrom(options.cwd, projectionPath),
         proposal: queueRecord,
+        markdown
+      }
+    });
+  }
+
+  if (action === 'apply-ready') {
+    if (queueRecord.status !== 'approved') {
+      throw new CliError('ATM_REVIEW_APPLY_READY_REQUIRES_APPROVAL', `Proposal ${proposalId} is not approved yet.`, {
+        exitCode: 2,
+        details: {
+          proposalId,
+          status: queueRecord.status
+        }
+      });
+    }
+    const markdown = renderHumanReviewQueueMarkdown(queueDocument);
+    writeTextFile(projectionPath, markdown);
+    const applyPacket = buildApplyReadyPacket(queueRecord);
+    return makeResult({
+      ok: true,
+      command: 'review',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_REVIEW_APPLY_READY_OK', `Approved proposal ${proposalId} is ready for actual patch planning within the governed leaf boundary.`, {
+        proposalId,
+        legacyTarget: applyPacket.legacyTarget
+      })],
+      evidence: {
+        action: 'apply-ready',
+        queuePath: relativePathFrom(options.cwd, queuePath),
+        projectionPath: relativePathFrom(options.cwd, projectionPath),
+        proposal: queueRecord,
+        applyPacket,
         markdown
       }
     });
@@ -212,6 +244,57 @@ function runReviewList(cwd: any, queuePath: any, projectionPath: any) {
       markdown
     }
   });
+}
+
+function buildApplyReadyPacket(queueRecord: any) {
+  const legacyTarget = typeof queueRecord.proposal?.legacyTarget === 'string' ? queueRecord.proposal.legacyTarget : null;
+  const [targetFile, targetSymbol] = splitLegacyTarget(legacyTarget);
+  const rollbackInstructions = Array.isArray(queueRecord.proposal?.rollbackInstructions)
+    ? queueRecord.proposal.rollbackInstructions.filter((entry: unknown): entry is string => typeof entry === 'string')
+    : [];
+  return {
+    proposalId: queueRecord.proposalId,
+    behaviorId: queueRecord.proposal?.behaviorId ?? null,
+    guidanceSession: queueRecord.proposal?.guidanceSession ?? null,
+    legacyTarget,
+    targetFile,
+    targetSymbol,
+    approvedBy: queueRecord.review?.decidedBy ?? null,
+    approvedAt: queueRecord.review?.decidedAt ?? null,
+    approvalReason: queueRecord.review?.reason ?? null,
+    rollbackInstructions,
+    mutationBoundary: {
+      allowed: targetSymbol
+        ? `Only modify the approved leaf ${targetSymbol} and any directly extracted helper module owned by that leaf.`
+        : 'Only modify the approved legacy leaf and any directly extracted helper module owned by that leaf.',
+      blocked: [
+        'Do not rewrite trunk functions.',
+        'Do not expand scope to unrelated callsites.',
+        'Do not mutate host files outside the approved legacy leaf boundary.'
+      ]
+    },
+    applyReadiness: {
+      approved: true,
+      reviewStatus: queueRecord.status,
+      dryRunProposalSatisfied: true,
+      rollbackInstructionsPresent: rollbackInstructions.length > 0
+    },
+    nextStep: 'Implement the actual patch inside the approved leaf boundary, then collect smoke evidence and rollback-ready proof before broader rollout.'
+  };
+}
+
+function splitLegacyTarget(legacyTarget: string | null) {
+  if (!legacyTarget) {
+    return [null, null] as const;
+  }
+  const separatorIndex = legacyTarget.lastIndexOf('#');
+  if (separatorIndex < 0) {
+    return [legacyTarget, null] as const;
+  }
+  return [
+    legacyTarget.slice(0, separatorIndex),
+    legacyTarget.slice(separatorIndex + 1) || null
+  ] as const;
 }
 
 function parseReviewOptions(argv: any) {
