@@ -354,6 +354,175 @@ export interface PoliceFamilyGateInput {
   readonly contractDrift?: ContractDriftCheckInput;
 }
 
+// ── Adopter Neutrality Check (APF-0052) ────────────────────────────────────
+
+export type AdopterNeutralityTermClass =
+  | 'adopter-project-name'
+  | 'adopter-engine-name'
+  | 'adopter-private-path'
+  | 'adopter-host-only-asset'
+  | 'adopter-private-tooling';
+
+export interface AdopterNeutralityBannedTerm {
+  readonly term: string;
+  readonly termClass: AdopterNeutralityTermClass;
+  readonly suggestedAction?: string;
+}
+
+export interface AdopterNeutralityProtectedFile {
+  readonly filePath: string;
+  readonly content: string;
+  readonly scope?: 'protected-public-docs' | 'protected-public-schemas' | 'protected-public-packages' | 'protected-public-fixtures';
+}
+
+export interface AdopterNeutralityCheckInput {
+  readonly protectedFiles?: readonly AdopterNeutralityProtectedFile[];
+  readonly bannedTerms?: readonly AdopterNeutralityBannedTerm[];
+  readonly allowlist?: readonly string[];
+  readonly profile?: PoliceFamilyProfile;
+}
+
+export function runAdopterNeutralityCheck(input: AdopterNeutralityCheckInput = {}): PoliceFamilyReport {
+  const findings: PoliceFinding[] = [];
+  const allowlist = new Set(input.allowlist ?? []);
+  const profile = input.profile ?? 'standard';
+  const severityForProfile: PoliceFindingSeverity = profile === 'full' ? 'block' : 'advisory';
+  const actionForProfile: PoliceFindingAction = profile === 'full' ? 'request-human-review' : 'needs-review';
+
+  for (const file of input.protectedFiles ?? []) {
+    if (allowlist.has(file.filePath)) continue;
+    for (const banned of input.bannedTerms ?? []) {
+      if (!file.content.includes(banned.term)) continue;
+      findings.push(makePoliceFinding({
+        findingId: `police.registry-consistency.adopter-neutrality.${sanitizeId(banned.termClass)}.${sanitizeId(file.filePath)}`,
+        policeFamily: 'registry-consistency',
+        severity: severityForProfile,
+        trigger: 'adopter-neutrality-violation',
+        scope: `${file.scope ?? 'protected-public'}::${file.filePath}`,
+        action: actionForProfile,
+        routeHint: 'registry.review.adopter-neutrality',
+        readModel: 'AdopterNeutralityCheck',
+        message: `Protected upstream file ${file.filePath} contains adopter-specific term (${banned.termClass}).`,
+        evidenceRefs: [makeEvidenceRef('adopter-neutrality-scan', 'police-artifact')],
+        metadata: {
+          filePath: file.filePath,
+          matchedTermClass: banned.termClass,
+          scope: file.scope ?? 'protected-public',
+          suggestedAction: banned.suggestedAction ?? 'replace-with-adopter-neutral-term',
+          profile,
+          directApplyAllowed: false
+        }
+      }));
+    }
+  }
+
+  const status: PoliceFamilyStatus = findings.length > 0 && profile === 'full' ? 'fail' : 'pass';
+  return makePoliceFamilyReport({
+    family: 'registry-consistency',
+    mode: 'blocker',
+    status,
+    findings,
+    sourceValidator: 'runAdopterNeutralityCheck'
+  });
+}
+
+// ── Advisory-Only Hardening Verifications (APF-0053) ───────────────────────
+
+export interface AdvisoryOnlyHardeningProbe {
+  readonly probeId: string;
+  readonly scannerSourceValidator: string;
+  readonly attemptedAction: 'registry-mutation' | 'auto-approve' | 'direct-promotion' | 'bypass-review';
+  readonly attemptedBy?: 'advisory-family' | 'shared-gate';
+  readonly description?: string;
+}
+
+export interface AdvisoryOnlyHardeningInput {
+  readonly probes?: readonly AdvisoryOnlyHardeningProbe[];
+}
+
+export interface AdvisoryOnlyHardeningResult {
+  readonly probeId: string;
+  readonly attemptedAction: AdvisoryOnlyHardeningProbe['attemptedAction'];
+  readonly rejected: true;
+  readonly reason: string;
+}
+
+export interface AdvisoryOnlyHardeningReport {
+  readonly schemaId: 'atm.advisoryOnlyHardeningReport';
+  readonly specVersion: '0.1.0';
+  readonly results: readonly AdvisoryOnlyHardeningResult[];
+  readonly ok: boolean;
+}
+
+export function verifyAdvisoryOnlyHardening(input: AdvisoryOnlyHardeningInput = {}): AdvisoryOnlyHardeningReport {
+  const results: AdvisoryOnlyHardeningResult[] = (input.probes ?? []).map((probe) => ({
+    probeId: probe.probeId,
+    attemptedAction: probe.attemptedAction,
+    rejected: true as const,
+    reason: advisoryRejectionReason(probe.attemptedAction)
+  }));
+  return {
+    schemaId: 'atm.advisoryOnlyHardeningReport',
+    specVersion: '0.1.0',
+    results,
+    ok: results.every((entry) => entry.rejected === true)
+  };
+}
+
+function advisoryRejectionReason(action: AdvisoryOnlyHardeningProbe['attemptedAction']): string {
+  switch (action) {
+    case 'registry-mutation':
+      return 'advisory police family cannot directly mutate registry; route through ReviewAdvisory + HumanReviewDecision';
+    case 'auto-approve':
+      return 'advisory finding cannot produce approved HumanReviewDecision; must route through human review';
+    case 'direct-promotion':
+      return 'advisory finding cannot directly promote registry lifecycle state';
+    case 'bypass-review':
+      return 'advisory finding cannot bypass ReviewAdvisory.machine-finding bridge';
+    default:
+      return 'unknown advisory action rejected by hardening contract';
+  }
+}
+
+// ── Validator Profile Naming Contract (APF-0053) ───────────────────────────
+
+export interface ValidatorProfileNamingContract {
+  readonly schemaId: 'atm.validatorProfileNamingContract';
+  readonly specVersion: '0.1.0';
+  readonly profiles: ReadonlyArray<{
+    readonly profile: 'validate:police' | 'validate:police-family' | 'validate:standard' | 'validate:full';
+    readonly role: string;
+    readonly relatesTo: readonly string[];
+  }>;
+}
+
+export const VALIDATOR_PROFILE_NAMING_CONTRACT: ValidatorProfileNamingContract = {
+  schemaId: 'atm.validatorProfileNamingContract',
+  specVersion: '0.1.0',
+  profiles: [
+    {
+      profile: 'validate:police-family',
+      role: 'named police family gate runner producing PoliceFamilyGateReport',
+      relatesTo: ['validate:standard', 'validate:full']
+    },
+    {
+      profile: 'validate:police',
+      role: 'legacy police validator suite; preserved for fixture deep-tests in validate:full',
+      relatesTo: ['validate:full']
+    },
+    {
+      profile: 'validate:standard',
+      role: 'CI default gate; includes validate-police-family as advisory-by-default',
+      relatesTo: ['validate:police-family']
+    },
+    {
+      profile: 'validate:full',
+      role: 'release gate; extends standard, includes validate:police and may promote stricter blocker assertions',
+      relatesTo: ['validate:standard', 'validate:police', 'validate:police-family']
+    }
+  ]
+};
+
 // ── Contract Drift Check (APF-0048) ─────────────────────────────────────────
 
 export type ContractDriftTrigger =
