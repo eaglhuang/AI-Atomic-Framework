@@ -1,0 +1,31 @@
+{
+  "description": "Decomposition Police: source file exceeds 1000 LOC threshold, produces oversized-source-surface advisory finding.",
+  "input": {
+    "inventory": {
+      "schemaId": "atm.sourceInventoryReport",
+      "specVersion": "0.1.0",
+      "generatedAt": "2026-05-19T00:00:00.000Z",
+      "maxFileLines": 1000,
+      "ignoredPathPatterns": ["node_modules/", "dist/"],
+      "entries": [
+        {
+          "filePath": "examples/legacy/oversized-trunk.ts",
+          "language": "typescript",
+          "lineCount": 2450,
+          "exportedSymbols": ["startApp", "renderLayout", "loadAssets"],
+          "entrypointHint": "startApp",
+          "legacyUri": "examples/legacy/oversized-trunk.ts"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "findingCount": 1,
+    "trigger": "oversized-source-surface",
+    "severity": "advisory",
+    "action": "proposal-draft",
+    "routeHint": "behavior.atomize",
+    "metadataKeys": ["lineCount", "threshold", "legacyUri", "decompositionPlanHint", "suggestedRoute"],
+    "directApplyAllowed": false
+  }
+}
