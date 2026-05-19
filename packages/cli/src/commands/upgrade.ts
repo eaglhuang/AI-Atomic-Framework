@@ -1,6 +1,5 @@
 import path from 'node:path';
-import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import {
   type ContinuationContractInput,
   createContinuationRunReport,
@@ -24,6 +23,12 @@ import { runUpgradeMapPropose } from './upgrade-map-propose.ts';
 import { createATMVersionSummary, loadCompatibilityMatrix, runATMChart } from './atm-chart.ts';
 import { CliError, makeResult, message, quoteCliValue, readJsonFile, resolveValue, writeJsonFile } from './shared.ts';
 import { ExperimentalApiError, invokeExperimentalApi, listExperimentalApis } from '../../../agent-pack-sdk/src/experimental/index.ts';
+import {
+  normalizeRepositoryRelativePath,
+  resolveRepositoryPath,
+  safeReadJson,
+  sha256File
+} from './upgrade/path-helpers.ts';
 
 export async function runUpgrade(argv: any) {
   const experimentalAction = firstExperimentalUpgradeAction(argv);
@@ -569,39 +574,6 @@ function backupSafeUpgradeFiles(cwd: string, backupRoot: string, backupFiles: re
     backedUpFiles.push({ path: relativeFilePath, present: true, backupPath: path.relative(cwd, backupFilePath).replace(/\\/g, '/') });
   }
   return backedUpFiles;
-}
-
-function safeReadJson(filePath: string) {
-  try {
-    return JSON.parse(readFileSync(filePath, 'utf8'));
-  } catch {
-    return null;
-  }
-}
-
-function sha256File(filePath: string) {
-  return createHash('sha256').update(readFileSync(filePath)).digest('hex');
-}
-
-function resolveRepositoryPath(cwd: string, relativePath: string) {
-  const absoluteRoot = path.resolve(cwd);
-  const resolvedPath = path.isAbsolute(relativePath)
-    ? path.resolve(relativePath)
-    : path.resolve(absoluteRoot, normalizeRepositoryRelativePath(relativePath));
-  const comparableRoot = absoluteRoot.toLowerCase();
-  const comparablePath = resolvedPath.toLowerCase();
-  if (comparablePath !== comparableRoot && !comparablePath.startsWith(`${comparableRoot}${path.sep}`)) {
-    throw new CliError('ATM_UPGRADE_UNSAFE_PATH', `Unsafe upgrade path: ${relativePath}`, { exitCode: 2 });
-  }
-  return resolvedPath;
-}
-
-function normalizeRepositoryRelativePath(filePath: string) {
-  const normalizedPath = String(filePath ?? '').replace(/\\/g, '/').replace(/^\.\/+/, '').replace(/\/+/g, '/');
-  if (!normalizedPath || normalizedPath.startsWith('/') || normalizedPath.includes(':') || normalizedPath === '..' || normalizedPath.startsWith('../') || normalizedPath.includes('/../')) {
-    throw new CliError('ATM_UPGRADE_UNSAFE_PATH', `Unsafe upgrade path: ${filePath}`, { exitCode: 2 });
-  }
-  return normalizedPath;
 }
 
 function buildUpgradeNextActionHint(cwd: string, proposal: any) {
