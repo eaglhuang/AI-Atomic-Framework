@@ -52,9 +52,8 @@ layer (faster) or accept it as a layer up (slower but higher coverage).
 
 ## Related documentation
 
-- [`scripts/lib/validator-harness.ts`](../scripts/lib/validator-harness.ts) —
-  shared scaffolding for validator-layer scripts.
+- [`scripts/lib/validator-harness.ts`](../scripts/lib/validator-harness.ts) — shared scaffolding for validator-layer scripts.
+- [`docs/portable-validator-runner-audit.md`](./portable-validator-runner-audit.md) — validator migration audit (portable runner candidates and status).
 - [`docs/SELF_HOSTING_ALPHA.md`](./SELF_HOSTING_ALPHA.md) — self-host smoke
   contract.
-- [`docs/HOST_GOVERNANCE_INTEGRATION.md`](./HOST_GOVERNANCE_INTEGRATION.md) —
-  what the framework enforces vs what hosts opt into.
+- [`docs/HOST_GOVERNANCE_INTEGRATION.md`](./HOST_GOVERNANCE_INTEGRATION.md) — what the framework enforces vs what hosts opt into.
