@@ -29,6 +29,7 @@ import {
   safeReadJson,
   sha256File
 } from './upgrade/path-helpers.ts';
+import { buildUpgradeNextActionHint } from './upgrade/next-action-hint.ts';
 
 export async function runUpgrade(argv: any) {
   const experimentalAction = firstExperimentalUpgradeAction(argv);
@@ -574,51 +575,6 @@ function backupSafeUpgradeFiles(cwd: string, backupRoot: string, backupFiles: re
     backedUpFiles.push({ path: relativeFilePath, present: true, backupPath: path.relative(cwd, backupFilePath).replace(/\\/g, '/') });
   }
   return backedUpFiles;
-}
-
-function buildUpgradeNextActionHint(cwd: string, proposal: any) {
-  if (proposal?.target?.kind !== 'map') {
-    return null;
-  }
-
-  const mapId = proposal.target.mapId;
-  const requiredJustification = proposal.requiredJustification;
-  if (proposal.status === 'blocked' && requiredJustification) {
-    if (requiredJustification.requiredEvidenceKinds?.length === 1 && requiredJustification.requiredEvidenceKinds?.includes('map-equivalence')) {
-      return {
-        status: 'blocked',
-        route: 'map-equivalence-required',
-        reason: requiredJustification.rationale,
-        command: `node atm.mjs test --cwd ${quoteCliValue(cwd)} --map ${quoteCliValue(mapId)} --equivalence-fixtures ${quoteCliValue('<fixtures.json>')} --json`,
-        commandTemplate: true,
-        requiredEvidenceKinds: requiredJustification.requiredEvidenceKinds,
-        requiredCliOptions: requiredJustification.requiredCliOptions,
-        missingInputs: ['equivalence-fixtures']
-      };
-    }
-    if (requiredJustification.requiredEvidenceKinds?.length === 1 && requiredJustification.requiredEvidenceKinds?.includes('polymorph-impact')) {
-      return {
-        status: 'blocked',
-        route: 'polymorph-impact-required',
-        reason: requiredJustification.rationale,
-        command: `node atm.mjs upgrade --cwd ${quoteCliValue(cwd)} --propose --target map --map ${quoteCliValue(mapId)} --replacement-mode active --polymorph-impact-report ${quoteCliValue('<polymorph-impact-report.json>')} --json`,
-        commandTemplate: true,
-        requiredEvidenceKinds: requiredJustification.requiredEvidenceKinds,
-        requiredCliOptions: requiredJustification.requiredCliOptions,
-        missingInputs: ['polymorph-impact-report']
-      };
-    }
-    return {
-      status: 'blocked',
-      route: 'governed-next',
-      reason: requiredJustification.rationale,
-      command: `node atm.mjs next --cwd ${quoteCliValue(cwd)} --json`,
-      requiredEvidenceKinds: requiredJustification.requiredEvidenceKinds,
-      requiredCliOptions: requiredJustification.requiredCliOptions
-    };
-  }
-
-  return null;
 }
 
 async function runUpgradeScan(options: any) {
