@@ -9,6 +9,7 @@ import {
   validateDecisionBehaviorPair,
   VALID_DECOMPOSITION_DECISIONS
 } from './decomposition-decision.ts';
+import { gateFailureSummary, qualityComparisonFailureReason } from './propose/failure-reason.ts';
 
 const VALID_BEHAVIOR_IDS = [
   'behavior.evolve',
@@ -792,30 +793,6 @@ function createInputSummary(kind: any) {
     default:
       return 'upgrade-input';
   }
-}
-
-function gateFailureSummary(gateName: any, report: any) {
-  switch (gateName) {
-    case 'nonRegression':
-      return 'baseline fixtures failed';
-    case 'qualityComparison':
-      return qualityComparisonFailureReason(report);
-    case 'registryCandidate':
-      return 'candidate cannot promote';
-    default:
-      return 'gate failed';
-  }
-}
-
-function qualityComparisonFailureReason(report: any) {
-  if (Array.isArray(report?.regressedMetrics) && report.regressedMetrics.length > 0) {
-    return `regressed metrics: ${report.regressedMetrics.join(', ')}`;
-  }
-  const failedMaps = report?.mapImpactScope?.propagationStatus?.filter((entry: any) => entry.integrationTestPassed === false) ?? [];
-  if (failedMaps.length > 0) {
-    return `failed map integrations: ${failedMaps.map((entry: any) => entry.mapId).join(', ')}`;
-  }
-  return 'quality metrics failed';
 }
 
 function normalizeTarget(target: any) {
