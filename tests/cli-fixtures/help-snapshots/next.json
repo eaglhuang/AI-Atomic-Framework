@@ -9,6 +9,15 @@
       "summary": "Run the command against a specific repository root."
     },
     {
+      "flag": "--claim",
+      "summary": "Claim the selected imported task as part of next-action routing."
+    },
+    {
+      "flag": "--actor",
+      "value": "id",
+      "summary": "Actor id used for next --claim (or set ATM_ACTOR_ID)."
+    },
+    {
       "flag": "--json",
       "summary": "Force machine-readable JSON output."
     },
@@ -24,6 +33,7 @@
   ],
   "examples": [
     "node atm.mjs next --json",
-    "node atm.mjs next --cwd <host-repo> --json"
+    "node atm.mjs next --cwd <host-repo> --json",
+    "node atm.mjs next --claim --actor codex-main --json"
   ]
 }

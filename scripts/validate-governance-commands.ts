@@ -118,6 +118,11 @@ try {
   assert(reserveTask.parsed.ok === true, 'tasks reserve must report ok=true');
   assert(reserveTask.parsed.evidence.status === 'reserved', 'tasks reserve must set reserved status');
 
+  const claimBeforeReady = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
+  assert(claimBeforeReady.exitCode === 1, 'tasks claim before ready must exit 1');
+  assert(claimBeforeReady.parsed.ok === false, 'tasks claim before ready must report ok=false');
+  assert(claimBeforeReady.parsed.messages?.[0]?.code === 'ATM_TASK_CLAIM_NOT_READY', 'tasks claim before ready must return ATM_TASK_CLAIM_NOT_READY');
+
   const promoteTask = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(promoteTask.exitCode === 0, 'tasks promote must exit 0');
   assert(promoteTask.parsed.ok === true, 'tasks promote must report ok=true');
@@ -134,6 +139,70 @@ try {
   assert(taskAfterClaim.status === 'running', 'tasks claim must update task status to running');
   const claimLeaseId = String(nextClaim.parsed.evidence.claimResult?.claim?.leaseId ?? '');
   assert(claimLeaseId.length > 0, 'next --claim must produce a lease id');
+
+  const renewTask = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--title', 'Renew release test', '--json']);
+  assert(renewTask.exitCode === 0, 'secondary tasks reserve must exit 0');
+  assert(renewTask.parsed.ok === true, 'secondary tasks reserve must report ok=true');
+  const renewPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--json']);
+  assert(renewPromote.exitCode === 0, 'secondary tasks promote must exit 0');
+  assert(renewPromote.parsed.ok === true, 'secondary tasks promote must report ok=true');
+  const renewClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0102.json', '--ttl-seconds', '30', '--json']);
+  assert(renewClaim.exitCode === 0, 'secondary tasks claim must exit 0');
+  assert(renewClaim.parsed.ok === true, 'secondary tasks claim must report ok=true');
+  const renewedClaim = runAtm(['tasks', 'renew', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--ttl-seconds', '60', '--json']);
+  assert(renewedClaim.exitCode === 0, 'tasks renew must exit 0');
+  assert(renewedClaim.parsed.ok === true, 'tasks renew must report ok=true');
+  assert(renewedClaim.parsed.evidence.claim?.ttlSeconds === 60, 'tasks renew must update ttlSeconds when provided');
+  const renewTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0102.json');
+  const taskAfterRenew = JSON.parse(readFileSync(renewTaskPath, 'utf8'));
+  assert(taskAfterRenew.claim?.state === 'active', 'tasks renew must preserve active claim state');
+  const releasedClaim = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--reason', 'yield to queue', '--json']);
+  assert(releasedClaim.exitCode === 0, 'tasks release must exit 0');
+  assert(releasedClaim.parsed.ok === true, 'tasks release must report ok=true');
+  const taskAfterRelease = JSON.parse(readFileSync(renewTaskPath, 'utf8'));
+  assert(taskAfterRelease.status === 'open', 'tasks release must move running task back to open');
+  assert(taskAfterRelease.claim?.state === 'released', 'tasks release must persist released claim state');
+
+  const handoffReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--title', 'Handoff test', '--json']);
+  assert(handoffReserve.exitCode === 0, 'handoff tasks reserve must exit 0');
+  const handoffPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--json']);
+  assert(handoffPromote.exitCode === 0, 'handoff tasks promote must exit 0');
+  const handoffClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0108.json', '--json']);
+  assert(handoffClaim.exitCode === 0, 'handoff tasks claim must exit 0');
+  const handoffTask = runAtm(['tasks', 'handoff', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--to', 'review-agent', '--reason', 'request review', '--json']);
+  assert(handoffTask.exitCode === 0, 'tasks handoff must exit 0');
+  assert(handoffTask.parsed.ok === true, 'tasks handoff must report ok=true');
+  const handoffTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0108.json');
+  const taskAfterHandoff = JSON.parse(readFileSync(handoffTaskPath, 'utf8'));
+  assert(taskAfterHandoff.owner === 'review-agent', 'tasks handoff must transfer owner');
+  assert(taskAfterHandoff.status === 'open', 'tasks handoff must reopen the task for the recipient');
+  assert(taskAfterHandoff.claim?.state === 'handoff', 'tasks handoff must persist handoff claim state');
+  assert(taskAfterHandoff.claim?.handoffTo === 'review-agent', 'tasks handoff must record handoff target');
+
+  const takeoverReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--title', 'Takeover test', '--json']);
+  assert(takeoverReserve.exitCode === 0, 'takeover tasks reserve must exit 0');
+  const takeoverPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--json']);
+  assert(takeoverPromote.exitCode === 0, 'takeover tasks promote must exit 0');
+  const takeoverClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--files', '.atm/history/tasks/ATM-GOV-0109.json', '--ttl-seconds', '30', '--json']);
+  assert(takeoverClaim.exitCode === 0, 'takeover tasks claim must exit 0');
+  const missingTakeoverReason = runAtm(['tasks', 'takeover', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'rescuer-agent', '--json']);
+  assert(missingTakeoverReason.exitCode === 2, 'tasks takeover without reason must exit 2');
+  assert(missingTakeoverReason.parsed.ok === false, 'tasks takeover without reason must report ok=false');
+  const takeoverTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0109.json');
+  const expiredTakeoverTask = JSON.parse(readFileSync(takeoverTaskPath, 'utf8'));
+  expiredTakeoverTask.claim.heartbeatAt = '2020-01-01T00:00:00.000Z';
+  expiredTakeoverTask.claim.ttlSeconds = 30;
+  writeFileSync(takeoverTaskPath, `${JSON.stringify(expiredTakeoverTask, null, 2)}\n`, 'utf8');
+  const takeoverTask = runAtm(['tasks', 'takeover', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'rescuer-agent', '--reason', 'ttl expired', '--json']);
+  assert(takeoverTask.exitCode === 0, 'tasks takeover must exit 0 for an expired claim');
+  assert(takeoverTask.parsed.ok === true, 'tasks takeover must report ok=true for an expired claim');
+  const taskAfterTakeover = JSON.parse(readFileSync(takeoverTaskPath, 'utf8'));
+  assert(taskAfterTakeover.owner === 'rescuer-agent', 'tasks takeover must transfer ownership');
+  assert(taskAfterTakeover.status === 'running', 'tasks takeover must move task back to running');
+  assert(taskAfterTakeover.claim?.state === 'taken_over', 'tasks takeover must persist taken_over claim state');
+  const takeoverEvidencePath = path.join(repo, '.atm', 'history', 'evidence', 'ATM-GOV-0109.json');
+  assert(existsSync(takeoverEvidencePath), 'tasks takeover must write takeover evidence');
+  assert(readFileSync(takeoverEvidencePath, 'utf8').includes('ttl expired'), 'tasks takeover evidence must preserve the explicit reason');
 
   const registerActor = runAtm([
     'actor',
@@ -208,6 +277,23 @@ try {
   assert(addEvidence.exitCode === 0, 'evidence add must exit 0');
   assert(addEvidence.parsed.ok === true, 'evidence add must report ok=true');
 
+  const verifyCommitEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'commit', '--json']);
+  assert(verifyCommitEvidence.exitCode === 0, 'evidence verify commit gate must exit 0');
+  assert(verifyCommitEvidence.parsed.ok === true, 'evidence verify commit gate must report ok=true');
+
+  const verifyPrEvidenceFail = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'pr', '--json']);
+  assert(verifyPrEvidenceFail.exitCode === 1, 'evidence verify pr gate without review must exit 1');
+  assert(verifyPrEvidenceFail.parsed.ok === false, 'evidence verify pr gate without review must report ok=false');
+  assert(verifyPrEvidenceFail.parsed.evidence.missing.includes('review-evidence'), 'evidence verify pr gate without review must name missing review evidence');
+
+  const addReviewEvidence = runAtm(['evidence', 'add', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--kind', 'review', '--summary', 'peer review acknowledged', '--artifacts', 'notes/governance.txt', '--json']);
+  assert(addReviewEvidence.exitCode === 0, 'review evidence add must exit 0');
+  assert(addReviewEvidence.parsed.ok === true, 'review evidence add must report ok=true');
+
+  const verifyPrEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'pr', '--json']);
+  assert(verifyPrEvidence.exitCode === 0, 'evidence verify pr gate must exit 0 after review evidence');
+  assert(verifyPrEvidence.parsed.ok === true, 'evidence verify pr gate must report ok=true after review evidence');
+
   const verifyEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'close', '--json']);
   assert(verifyEvidence.exitCode === 0, 'evidence verify close gate must exit 0');
   assert(verifyEvidence.parsed.ok === true, 'evidence verify close gate must report ok=true');
@@ -230,7 +316,7 @@ try {
 }
 
 if (!process.exitCode) {
-  console.log('[governance-commands:' + mode + '] ok (lock, budget, guard, evidence, git governance, tasks lifecycle, and handoff commands verified)');
+  console.log('[governance-commands:' + mode + '] ok (lock, budget, guard, evidence, git governance, and full claim lifecycle commands verified)');
 }
 
 function existsSyncPortable(repositoryRoot: any, relativePath: any) {

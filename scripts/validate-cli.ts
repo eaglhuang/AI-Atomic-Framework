@@ -439,7 +439,7 @@ try {
   assert(verifyNeutrality.parsed.ok === true, 'verify --neutrality must report ok=true');
   assertMessageCode(verifyNeutrality, 'ATM_VERIFY_NEUTRALITY_OK');
 
-  const verifyAgentsMd = runAtm(['verify', '--agents-md'], root);
+  const verifyAgentsMd = runAtm(['verify', '--agents-md', '--json'], root);
   assert(verifyAgentsMd.exitCode === 0, 'verify --agents-md must exit 0 in repository root');
   assertReadable(verifyAgentsMd, 'verify');
   assert(verifyAgentsMd.parsed.ok === true, 'verify --agents-md must report ok=true');
@@ -674,7 +674,7 @@ try {
   assert(testHelloWorld.parsed.evidence.total === 5, 'test --atom hello-world must report 5 total checks');
   assertMessageCode(testHelloWorld, 'ATM_TEST_HELLO_WORLD_OK');
 
-  const selfHostAlpha = runAtm(['self-host-alpha', '--verify'], root);
+  const selfHostAlpha = runAtm(['self-host-alpha', '--verify', '--json'], root);
   assert(selfHostAlpha.exitCode === 0, 'self-host-alpha --verify must exit 0 in repository root');
   assertReadable(selfHostAlpha, 'self-host-alpha');
   assert(selfHostAlpha.parsed.ok === true, 'self-host-alpha --verify must report ok=true');
@@ -684,7 +684,7 @@ try {
   assert(selfHostAlpha.parsed.criteria4 === true, 'self-host-alpha criteria4 must be true');
   assertMessageCode(selfHostAlpha, 'ATM_SELF_HOST_ALPHA_OK');
 
-  const selfHostAlphaClaude = runAtm(['self-host-alpha', '--verify', '--agent', 'claude-code'], root);
+  const selfHostAlphaClaude = runAtm(['self-host-alpha', '--verify', '--agent', 'claude-code', '--json'], root);
   assert(selfHostAlphaClaude.exitCode === 0, 'self-host-alpha --verify --agent claude-code must exit 0 in repository root');
   assertReadable(selfHostAlphaClaude, 'self-host-alpha');
   assert(selfHostAlphaClaude.parsed.ok === true, 'self-host-alpha --verify --agent claude-code must report ok=true');
@@ -697,10 +697,16 @@ try {
   assert(frameworkStatus.exitCode === 0, 'status in framework repository root must exit 0');
   assertReadable(frameworkStatus, 'status');
   assert(frameworkStatus.parsed.ok === true, 'status in framework repository root must report ok=true');
-  assert(frameworkStatus.parsed.evidence.frameworkPhase === 'B1-complete', 'status in framework repository root must surface frameworkPhase=B1-complete');
-  assert(frameworkStatus.parsed.evidence.atomStatus === 'active', 'status in framework repository root must surface atomStatus=active');
-  assert(frameworkStatus.parsed.evidence.governanceTier === 'governed', 'status in framework repository root must surface governanceTier=governed');
-  assertMessageCode(frameworkStatus, 'ATM_STATUS_PHASE_B1_COMPLETE');
+  if (frameworkStatus.parsed.evidence.initialized === true) {
+    assert(frameworkStatus.parsed.evidence.standaloneMode === true, 'status in bootstrapped framework root must report standaloneMode=true');
+    assert(frameworkStatus.parsed.evidence.repositoryKind === 'javascript-package', 'status in bootstrapped framework root must surface repositoryKind=javascript-package');
+    assertMessageCode(frameworkStatus, 'ATM_STATUS_READY');
+  } else {
+    assert(frameworkStatus.parsed.evidence.frameworkPhase === 'B1-complete', 'status in framework repository root must surface frameworkPhase=B1-complete');
+    assert(frameworkStatus.parsed.evidence.atomStatus === 'active', 'status in framework repository root must surface atomStatus=active');
+    assert(frameworkStatus.parsed.evidence.governanceTier === 'governed', 'status in framework repository root must surface governanceTier=governed');
+    assertMessageCode(frameworkStatus, 'ATM_STATUS_PHASE_B1_COMPLETE');
+  }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

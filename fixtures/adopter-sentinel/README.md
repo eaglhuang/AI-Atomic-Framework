@@ -10,8 +10,8 @@ real adopter identity into the open-source repository.
 Every fixture in this directory MUST satisfy:
 
 1. **No real adopter names.** Use generic placeholders like
-   `acme-game`, `example-service`, `demo-adopter`. Do not use 3KLife,
-   npc-brain, Cocos, or any other real project name.
+   `acme-game`, `example-service`, `demo-adopter`. Do not use any real
+   downstream project, product, or engine name.
 2. **No real proprietary identifiers.** No private package names, no real
    internal task IDs, no real branch names that map to a known project.
 3. **Shape-faithful only.** The fixture must reproduce the *structural*

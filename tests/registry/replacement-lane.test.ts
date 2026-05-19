@@ -83,7 +83,8 @@ async function run() {
       validatorMode: 'structural-only'
     });
     assert.equal(structuralValidation.ok, true);
-    assert.equal(structuralValidation.validationMode, 'structural');
+    const structuralValidationResult = structuralValidation as typeof structuralValidation & { validationMode?: string };
+    assert.equal(structuralValidationResult.validationMode, 'structural');
 
     const lineageLogPath = path.join(positiveWorkspace.repositoryRoot, positiveWorkspace.paths.workbenchPath, 'lineage-log.json');
     assert.equal(existsSync(lineageLogPath), true);
@@ -154,12 +155,18 @@ async function run() {
         '--at', '2026-01-01T04:00:00.000Z',
         '--json'
       ]);
+      const cliEvidence = cliPayload.evidence as {
+        readonly from?: string;
+        readonly to?: string;
+        readonly registryStatus?: string;
+        readonly transitionRecord?: { readonly actor?: string };
+      };
       assert.equal(cliPayload.ok, true);
       assert.equal(cliPayload.command, 'replacement-lane');
-      assert.equal(cliPayload.evidence.from, ReplacementMode.Draft);
-      assert.equal(cliPayload.evidence.to, ReplacementMode.Shadow);
-      assert.equal(cliPayload.evidence.registryStatus, 'validated');
-      assert.equal(cliPayload.evidence.transitionRecord.actor, 'cli.tester');
+      assert.equal(cliEvidence.from, ReplacementMode.Draft);
+      assert.equal(cliEvidence.to, ReplacementMode.Shadow);
+      assert.equal(cliEvidence.registryStatus, 'validated');
+      assert.equal(cliEvidence.transitionRecord?.actor, 'cli.tester');
 
       const helpSpec = getCommandSpec('replacement-lane');
       assert.equal(Boolean(helpSpec), true);

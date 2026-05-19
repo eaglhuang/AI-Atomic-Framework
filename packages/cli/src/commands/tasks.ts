@@ -566,6 +566,15 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         details: { taskId: options.taskId, actorId: currentClaim.actorId, leaseId: currentClaim.leaseId }
       });
     }
+    if (String(taskDocument.status ?? '') !== 'ready') {
+      throw new CliError('ATM_TASK_CLAIM_NOT_READY', `Task ${options.taskId} must be ready before it can be claimed.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          status: taskDocument.status ?? null
+        }
+      });
+    }
     const claim = createClaimRecord({
       taskId: options.taskId,
       actorId,
@@ -725,6 +734,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       exitCode: 2,
       details: { taskId: options.taskId, actorId }
     });
+  }
+  if (!options.reason || options.reason.trim().length === 0) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks takeover requires --reason <text>.', { exitCode: 2 });
   }
   if (!isClaimExpired(currentClaim, nowIso)) {
     throw new CliError('ATM_TASKS_TAKEOVER_NOT_ALLOWED', `Claim for ${options.taskId} is still active under ${currentClaim.actorId}.`, {
@@ -1212,6 +1224,7 @@ interface TaskTableMetadata {
   readonly workItemId: string;
   readonly title: string;
   readonly milestone: string | null;
+  readonly status: TaskImportStatus;
   readonly dependencies: readonly string[];
   readonly deliverables: readonly string[];
   readonly headingLine: number;
@@ -1220,29 +1233,50 @@ interface TaskTableMetadata {
 
 function parseTaskTableMetadata(lines: readonly string[]): Map<string, TaskTableMetadata> {
   const entries = new Map<string, TaskTableMetadata>();
-  for (let index = 0; index < lines.length; index += 1) {
-    const rawLine = lines[index];
-    const trimmed = rawLine.trim();
-    if (!trimmed.startsWith('|') || !trimmed.endsWith('|') || /^[-|\s:]+$/.test(trimmed.replace(/\|/g, ''))) {
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const headerLine = lines[index].trim();
+    const separatorLine = lines[index + 1].trim();
+    if (!isMarkdownTableRow(headerLine) || !isMarkdownTableSeparator(separatorLine)) {
       continue;
     }
-    const cells = trimmed
-      .slice(1, -1)
-      .split('|')
-      .map((cell) => cleanCellText(cell));
-    if (cells.length < 3) continue;
-    const idMatch = taskIdPattern.exec(cells[0]);
-    if (!idMatch) continue;
-    const workItemId = normalizeTaskId(idMatch[0]);
-    entries.set(workItemId, {
-      workItemId,
-      milestone: cells[1] || null,
-      title: cells[2] || workItemId,
-      dependencies: parseDependencyList(cells[3] ?? '', workItemId),
-      deliverables: cells[4] ? [cells[4]] : [],
-      headingLine: index + 1,
-      rowText: rawLine
-    });
+    const headerCells = parseMarkdownTableCells(headerLine).map((cell) => normalizeTableHeader(cell));
+    const taskIdIndex = findTableColumnIndex(headerCells, ['task id', 'task', 'work item id', 'workitemid', 'id']);
+    if (taskIdIndex < 0) {
+      continue;
+    }
+    const titleIndex = findTableColumnIndex(headerCells, ['title', 'name']);
+    const milestoneIndex = findTableColumnIndex(headerCells, ['milestone', 'phase']);
+    const statusIndex = findTableColumnIndex(headerCells, ['status', 'state']);
+    const dependenciesIndex = findTableColumnIndex(headerCells, ['blocked by', 'depends on', 'dependencies']);
+    const deliverablesIndex = findTableColumnIndex(headerCells, ['deliverables', 'outputs', 'outcomes']);
+
+    let rowIndex = index + 2;
+    while (rowIndex < lines.length) {
+      const rawLine = lines[rowIndex];
+      const trimmed = rawLine.trim();
+      if (!isMarkdownTableRow(trimmed) || isMarkdownTableSeparator(trimmed)) {
+        break;
+      }
+      const cells = parseMarkdownTableCells(trimmed);
+      const idCell = cellAt(cells, taskIdIndex);
+      const idMatch = taskIdPattern.exec(idCell);
+      if (idMatch) {
+        const workItemId = normalizeTaskId(idMatch[0]);
+        const deliverableCell = cellAt(cells, deliverablesIndex);
+        entries.set(workItemId, {
+          workItemId,
+          title: cellAt(cells, titleIndex) || workItemId,
+          milestone: cellAt(cells, milestoneIndex) || null,
+          status: coerceStatus(cellAt(cells, statusIndex) || 'planned'),
+          dependencies: parseDependencyList(cellAt(cells, dependenciesIndex), workItemId),
+          deliverables: deliverableCell ? [deliverableCell] : [],
+          headingLine: rowIndex + 1,
+          rowText: rawLine
+        });
+      }
+      rowIndex += 1;
+    }
+    index = rowIndex - 1;
   }
   return entries;
 }
@@ -1346,6 +1380,7 @@ function parseTaskSection(input: {
     ?? collectKeyValue(sectionsByHeading, 'state')
     ?? collectKeyValueFromLines(section.bodyLines, 'status')
     ?? collectKeyValueFromLines(section.bodyLines, 'state')
+    ?? input.tableMetadata?.status
     ?? 'planned';
   const milestone = collectKeyValue(sectionsByHeading, 'milestone')
     ?? collectKeyValueFromLines(section.bodyLines, 'milestone')
@@ -1395,7 +1430,7 @@ function createTaskFromTableMetadata(input: {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: input.metadata.workItemId,
     title: input.metadata.title,
-    status: 'planned',
+    status: input.metadata.status,
     milestone: input.metadata.milestone,
     dependencies: input.metadata.dependencies,
     acceptance: [],
@@ -1669,6 +1704,34 @@ function cleanCellText(value: string): string {
     .replace(/`/g, '')
     .replace(/<br\s*\/?>/gi, ', ')
     .trim();
+}
+
+function parseMarkdownTableCells(value: string): readonly string[] {
+  return value
+    .trim()
+    .slice(1, -1)
+    .split('|')
+    .map((cell) => cleanCellText(cell));
+}
+
+function isMarkdownTableRow(value: string): boolean {
+  return value.startsWith('|') && value.endsWith('|');
+}
+
+function isMarkdownTableSeparator(value: string): boolean {
+  return /^[-|\s:]+$/.test(value.replace(/\|/g, ''));
+}
+
+function normalizeTableHeader(value: string): string {
+  return cleanCellText(value).toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function findTableColumnIndex(headers: readonly string[], candidates: readonly string[]): number {
+  return headers.findIndex((header) => candidates.some((candidate) => header === candidate || header.includes(candidate)));
+}
+
+function cellAt(cells: readonly string[], index: number): string {
+  return index >= 0 && index < cells.length ? cells[index] : '';
 }
 
 function normalizeRelativePath(value: string): string {

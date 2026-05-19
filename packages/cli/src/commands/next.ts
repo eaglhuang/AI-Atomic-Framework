@@ -55,7 +55,7 @@ export async function runNext(argv: any) {
   const runtime = detectGovernanceRuntime(options.cwd, bootstrapTaskId);
   const importedTaskQueue = inspectImportedTaskQueue(options.cwd);
   if (options.claim) {
-    if (!importedTaskQueue.selectedTask) {
+    if (!importedTaskQueue.claimableTask) {
       return makeResult({
         ok: false,
         command: 'next',
@@ -75,18 +75,18 @@ export async function runNext(argv: any) {
       '--cwd',
       options.cwd,
       '--task',
-      importedTaskQueue.selectedTask.workItemId,
+      importedTaskQueue.claimableTask.workItemId,
       '--actor',
       resolvedActor.actorId,
       '--files',
-      importedTaskQueue.selectedTask.taskPath,
+      importedTaskQueue.claimableTask.taskPath,
       '--json'
     ]);
     const nextAction = {
       status: 'ready',
-      command: `node atm.mjs start --cwd . --goal ${quoteCliValue(importedTaskQueue.selectedTask.title)} --json`,
-      reason: `claimed imported work item ${importedTaskQueue.selectedTask.workItemId} for ${resolvedActor.actorId}`,
-      selectedTask: importedTaskQueue.selectedTask,
+      command: `node atm.mjs start --cwd . --goal ${quoteCliValue(importedTaskQueue.claimableTask.title)} --json`,
+      reason: `claimed imported work item ${importedTaskQueue.claimableTask.workItemId} for ${resolvedActor.actorId}`,
+      selectedTask: importedTaskQueue.claimableTask,
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
     };
@@ -101,7 +101,7 @@ export async function runNext(argv: any) {
         integrationBootstrap,
         runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
-          taskId: importedTaskQueue.selectedTask.workItemId,
+          taskId: importedTaskQueue.claimableTask.workItemId,
           actorId: resolvedActor.actorId
         })
       ),
@@ -262,6 +262,7 @@ interface ImportedTaskQueue {
   readonly taskStorePath: string;
   readonly openTaskCount: number;
   readonly selectedTask: ImportedTaskSummary | null;
+  readonly claimableTask: ImportedTaskSummary | null;
   readonly tasks: readonly ImportedTaskSummary[];
 }
 
@@ -272,6 +273,7 @@ function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
       taskStorePath: '.atm/history/tasks',
       openTaskCount: 0,
       selectedTask: null,
+      claimableTask: null,
       tasks: []
     };
   }
@@ -319,11 +321,16 @@ function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   })) ?? null;
+  const claimableTask = tasks.find((task) => task.status === 'ready' && task.dependencies.every((dependency) => {
+    const status = statusById.get(dependency);
+    return status === 'done' || status === 'verified';
+  })) ?? null;
 
   return {
     taskStorePath: path.relative(cwd, taskStorePath).replace(/\\/g, '/'),
     openTaskCount: tasks.length,
     selectedTask,
+    claimableTask,
     tasks
   };
 }

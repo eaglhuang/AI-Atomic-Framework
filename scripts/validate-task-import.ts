@@ -41,8 +41,9 @@ async function main() {
   const npcPlan = path.join(root, 'fixtures/task-plan-import/low-automation-plan.md');
   const singleCard = path.join(root, 'fixtures/task-plan-import/single-card.md');
   const duplicatePlan = path.join(root, 'fixtures/task-plan-import/duplicate-plan.md');
+  const governanceTablePlan = path.join(root, 'fixtures/task-plan-import/governance-table-plan.md');
 
-  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan]) {
+  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan, governanceTablePlan]) {
     if (!existsSync(fixturePath)) {
       fail(`missing fixture: ${path.relative(root, fixturePath)}`);
       return;
@@ -63,6 +64,32 @@ async function main() {
   }
   if (manifest.tasks.find((task) => task.workItemId === 'TASK-EXAMPLE-0002')?.['workItemId' as never] !== 'TASK-EXAMPLE-0002') {
     fail('sample-plan dry-run did not record TASK-EXAMPLE-0002.');
+  }
+
+  // Table-based plans should preserve title, milestone, status, and dependencies.
+  const governanceTableResult = await expectOk('import', ['--from', governanceTablePlan, '--dry-run', '--cwd', root]);
+  const governanceTasks = (governanceTableResult.evidence as {
+    manifest: {
+      tasks: ReadonlyArray<{
+        workItemId: string;
+        title: string;
+        milestone: string | null;
+        status: string;
+        dependencies: readonly string[];
+      }>;
+    };
+  }).manifest.tasks;
+  const gov0101 = governanceTasks.find((task) => task.workItemId === 'ATM-GOV-0101');
+  if (!gov0101 || gov0101.title !== 'Actor Identity Registry and Git Identity Contract' || gov0101.milestone !== 'M1' || gov0101.status !== 'open') {
+    fail(`governance-table plan parsed ATM-GOV-0101 incorrectly: ${JSON.stringify(gov0101)}.`);
+  }
+  const gov0105 = governanceTasks.find((task) => task.workItemId === 'ATM-GOV-0105');
+  if (!gov0105 || gov0105.dependencies.join(',') !== 'ATM-GOV-0101,ATM-GOV-0102') {
+    fail(`governance-table plan parsed ATM-GOV-0105 dependencies incorrectly: ${JSON.stringify(gov0105)}.`);
+  }
+  const gov0111 = governanceTasks.find((task) => task.workItemId === 'ATM-GOV-0111');
+  if (!gov0111 || gov0111.status !== 'done') {
+    fail(`governance-table plan should preserve done status for ATM-GOV-0111: ${JSON.stringify(gov0111)}.`);
   }
 
   // Single-card import via YAML front matter should yield one task.
@@ -110,6 +137,10 @@ async function main() {
     const nextQueue = (nextResult.evidence as { importedTaskQueue?: { openTaskCount: number; selectedTask?: { workItemId: string } | null } }).importedTaskQueue;
     if (!nextQueue || nextQueue.openTaskCount !== 2 || nextQueue.selectedTask?.workItemId !== 'SANGUO-AUTO-0001') {
       fail(`next must surface imported open tasks without runtime edits, got ${JSON.stringify(nextQueue)}.`);
+    }
+    const nextClaimResult = await runNext(['--cwd', tempWorkspace, '--claim', '--actor', 'fixture-agent']);
+    if (nextClaimResult.ok !== false || nextClaimResult.messages?.[0]?.code !== 'ATM_NEXT_CLAIM_NO_TASK') {
+      fail(`next --claim must refuse imported open/planned tasks until one is ready, got ${JSON.stringify(nextClaimResult)}.`);
     }
 
     // Re-importing without --force is idempotent (no errors emitted).

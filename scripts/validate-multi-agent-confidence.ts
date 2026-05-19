@@ -53,7 +53,7 @@ for (const relativePath of [
   assert(existsSync(path.join(root, relativePath)), `missing multi-agent confidence file: ${relativePath}`);
 }
 
-const verifyAgentsMd = runAtm(['verify', '--agents-md'], root);
+const verifyAgentsMd = runAtm(['verify', '--agents-md', '--json'], root);
 assert(verifyAgentsMd.exitCode === 0, 'verify --agents-md must exit 0 in framework root');
 assert(verifyAgentsMd.parsed.ok === true, 'verify --agents-md must report ok=true in framework root');
 
@@ -86,11 +86,11 @@ for (const integrationAdapterId of ['`claude-code`', '`codex`', '`cursor`', '`co
 }
 
 for (const profile of supportedAgentProfiles) {
-  const result = runAtm(['self-host-alpha', '--verify', '--agent', profile.id], root);
+  const result = runAtm(['self-host-alpha', '--verify', '--agent', profile.id, '--json'], root);
   assert(result.exitCode === 0, `self-host-alpha --verify --agent ${profile.id} must exit 0`);
   assert(result.parsed.ok === true, `self-host-alpha --verify --agent ${profile.id} must report ok=true`);
-  assert(result.parsed.evidence.confidence?.agentId === profile.id, `confidence report must preserve agentId=${profile.id}`);
-  assert(result.parsed.evidence.confidence?.blockingRelease === false, `${profile.id} confidence report must remain advisory`);
+  assert(result.parsed.evidence?.confidence?.agentId === profile.id, `confidence report must preserve agentId=${profile.id}`);
+  assert(result.parsed.evidence?.confidence?.blockingRelease === false, `${profile.id} confidence report must remain advisory`);
 
   const reportEntry = batch.reports.find((entry: any) => entry.agentId === profile.id);
   assert(Boolean(reportEntry), `latest-batch.json missing ${profile.id}`);
@@ -105,7 +105,7 @@ for (const profile of supportedAgentProfiles) {
   assert(matrixDoc.includes(profile.label), `multi-agent compatibility matrix must mention ${profile.label}`);
 }
 
-const openAiAssistant = runAtm(['self-host-alpha', '--verify', '--agent', 'openai-assistants-api'], root);
+const openAiAssistant = runAtm(['self-host-alpha', '--verify', '--agent', 'openai-assistants-api', '--json'], root);
 assert(openAiAssistant.exitCode === 0, 'openai-assistants-api confidence probe must exit 0');
 assert(openAiAssistant.parsed.ok === true, 'openai-assistants-api confidence probe must report ok=true');
 

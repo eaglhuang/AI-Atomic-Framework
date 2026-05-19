@@ -18,11 +18,11 @@ Editor integration self-check:
 1. If `.atm/config.json` exists, confirm this editor already has its repo-local ATM entry files before trusting ATM skill routing.
 2. If the current editor entry file is missing, install the matching adapter immediately with `node atm.mjs integration add <editor-id> --json`, then verify it with `node atm.mjs integration verify <editor-id> --json`.
 3. Expected primary entry files:
-   - Codex: `integrations/codex-skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add codex --json`
-   - Claude Code: `.claude/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add claude-code --json`
-   - Cursor: `.cursor/rules/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add cursor --json`
-   - GitHub Copilot: `.github/instructions/atm-governance-router.instructions.md` via `node atm.mjs integration add copilot --json`
-   - Gemini: `.gemini/commands/atm-governance-router.toml` via `node atm.mjs integration add gemini --json`
+   - `codex`: `integrations/codex-skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add codex --json`
+   - `claude-code`: `.claude/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add claude-code --json`
+   - `cursor`: `.cursor/rules/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add cursor --json`
+   - `copilot`: `.github/instructions/atm-governance-router.instructions.md` via `node atm.mjs integration add copilot --json`
+   - `gemini`: `.gemini/commands/atm-governance-router.toml` via `node atm.mjs integration add gemini --json`
 
 Python-only runtime self-check:
 
