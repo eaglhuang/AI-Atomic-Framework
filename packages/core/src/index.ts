@@ -10,6 +10,9 @@ export interface WorkItemRef {
   readonly workItemId: string;
   readonly title: string;
   readonly status: AtomLifecycleStatus;
+  readonly owner?: string;
+  readonly startedAt?: string;
+  readonly startedByActor?: string;
 }
 
 export type ActorKind = 'human' | 'ai-agent' | 'automation';
@@ -60,9 +63,25 @@ export interface ScopeLockRecord {
   readonly workItemId: string;
   readonly lockedBy: string;
   readonly lockedAt: string;
+  readonly actorId?: string;
+  readonly leaseId?: string;
+  readonly heartbeatAt?: string;
+  readonly ttlSeconds?: number;
   readonly files: readonly string[];
   readonly reason?: string;
   readonly selectors?: ScopeLockSelectorsRecord;
+}
+
+export interface TaskClaimRecord {
+  readonly actorId: string;
+  readonly leaseId: string;
+  readonly claimedAt: string;
+  readonly heartbeatAt: string;
+  readonly ttlSeconds: number;
+  readonly files: readonly string[];
+  readonly state: 'active' | 'released' | 'handoff' | 'taken_over';
+  readonly handoffTo?: string;
+  readonly reason?: string;
 }
 
 export interface ArtifactRecord {

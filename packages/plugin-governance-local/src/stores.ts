@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, unlinkSync, writeFileSync, writeSync } from 'node:fs';
 import path from 'node:path';
 import type {
   ArtifactRecord,
@@ -99,13 +99,48 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     healthCheck: () => capabilityResult(`Lock store is ready at ${layout.lockStorePath}.`),
     acquireLock(workItem, files, actor) {
       ensureAllDirectories();
+      const filePath = path.join(absoluteLayout.lockStorePath, `${workItem.workItemId}.lock.json`);
+      const timestamp = now();
       const record: ScopeLockRecord = {
+        schemaId: 'atm.governanceScopeLock',
+        specVersion: '0.1.0',
+        migration: {
+          strategy: 'none',
+          fromVersion: null,
+          notes: 'Scope lock baseline record.'
+        },
         workItemId: workItem.workItemId,
         lockedBy: actor,
-        lockedAt: now(),
+        lockedAt: timestamp,
+        actorId: actor,
+        leaseId: `lease-${timestamp.replace(/[:.]/g, '-')}`,
+        heartbeatAt: timestamp,
+        ttlSeconds: 1800,
         files: Array.from(new Set(files.map((filePath) => normalizeRelativePath(filePath)).filter(Boolean)))
       };
-      writeJsonFile(path.join(absoluteLayout.lockStorePath, `${workItem.workItemId}.lock.json`), record);
+      if (existsSync(filePath)) {
+        const existing = readJsonFile(filePath) as Record<string, unknown>;
+        if (isReleasedLockRecord(existing)) {
+          writeJsonFile(filePath, record);
+          return record;
+        }
+        throw createLockConflictError(workItem.workItemId, existing);
+      }
+      try {
+        const descriptor = openSync(filePath, 'wx');
+        try {
+          writeSync(descriptor, `${JSON.stringify(record, null, 2)}\n`, undefined, 'utf8');
+        } finally {
+          closeSync(descriptor);
+        }
+      } catch (error) {
+        const errorCode = extractFsErrorCode(error);
+        if (errorCode === 'EEXIST') {
+          const existing = existsSync(filePath) ? readJsonFile(filePath) as Record<string, unknown> : null;
+          throw createLockConflictError(workItem.workItemId, existing);
+        }
+        throw error;
+      }
       return record;
     },
     getLock(workItemId) {
@@ -115,11 +150,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     releaseLock(workItemId) {
       const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
       if (existsSync(filePath)) {
-        writeJsonFile(filePath, {
-          workItemId,
-          releasedAt: now(),
-          released: true
-        });
+        unlinkSync(filePath);
       }
       return capabilityResult(`Released scope lock for ${workItemId}.`);
     }
@@ -630,6 +661,37 @@ function renderContextSummaryMarkdown(summary: ContextSummaryRecord): string {
     '',
     summary.resumePrompt ? `Resume prompt: ${summary.resumePrompt}` : ''
   ].filter((entry) => entry !== '').join('\n');
+}
+
+function isReleasedLockRecord(value: Record<string, unknown>) {
+  if (value.released === true) {
+    return true;
+  }
+  if (value.claim && typeof value.claim === 'object') {
+    const claimState = String((value.claim as Record<string, unknown>).state ?? '');
+    return claimState === 'released';
+  }
+  return false;
+}
+
+function createLockConflictError(workItemId: string, existing: Record<string, unknown> | null) {
+  const lockedBy = existing && typeof existing.lockedBy === 'string' ? existing.lockedBy : null;
+  const error = new Error(`Active lock already exists for ${workItemId}${lockedBy ? ` (owner: ${lockedBy})` : ''}.`);
+  (error as Error & { code?: string; details?: Record<string, unknown> }).code = 'ATM_LOCK_CONFLICT';
+  (error as Error & { code?: string; details?: Record<string, unknown> }).details = {
+    workItemId,
+    lockedBy,
+    existing
+  };
+  return error;
+}
+
+function extractFsErrorCode(error: unknown): string | null {
+  if (!error || typeof error !== 'object') {
+    return null;
+  }
+  const code = (error as { code?: unknown }).code;
+  return typeof code === 'string' && code.trim().length > 0 ? code : null;
 }
 
 function sanitizeBudgetFileId(budgetId: string): string {

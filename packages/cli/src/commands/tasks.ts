@@ -1,7 +1,10 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
+import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
+import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
+import { resolveActorId } from './actor-registry.ts';
+import { CliError, makeResult, message, relativePathFrom, resolveValue } from './shared.ts';
 
 export interface TaskImportSource {
   readonly planPath: string;
@@ -68,6 +71,9 @@ const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 
 export async function runTasks(argv: string[]) {
   const action = (argv[0] ?? '').toLowerCase();
+  if (action === 'claim' || action === 'renew' || action === 'release' || action === 'handoff' || action === 'takeover') {
+    return await runTasksClaimLifecycle(action, argv.slice(1));
+  }
   if (action === 'import') {
     return await runTasksImport(argv.slice(1));
   }
@@ -336,6 +342,431 @@ async function runTasksVerify(argv: string[]) {
     ],
     evidence: { report }
   });
+}
+
+async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
+  const options = parseClaimLifecycleOptions(action, argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks claim lifecycle requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const taskPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${options.taskId}.json`);
+  if (!existsSync(taskPath)) {
+    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
+      exitCode: 2,
+      details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
+    });
+  }
+  const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+  const nowIso = new Date().toISOString();
+  const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+  const existingTask = await resolveValue(adapter.stores.taskStore.getTask(options.taskId));
+  const taskRef: WorkItemRef = existingTask ?? {
+    workItemId: options.taskId,
+    title: String(taskDocument.title ?? options.taskId),
+    status: normalizeWorkItemStatus(taskDocument.status)
+  };
+  const relativeTaskPath = relativePathFrom(options.cwd, taskPath);
+  const files = options.files.length > 0 ? options.files : [relativeTaskPath];
+  const currentClaim = parseClaimRecord(taskDocument.claim);
+  if (action === 'claim') {
+    if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId !== actorId) {
+      throw new CliError('ATM_LOCK_CONFLICT', `Task ${options.taskId} is already claimed by ${currentClaim.actorId}.`, {
+        exitCode: 1,
+        details: { taskId: options.taskId, actorId: currentClaim.actorId, leaseId: currentClaim.leaseId }
+      });
+    }
+    const claim = createClaimRecord({
+      taskId: options.taskId,
+      actorId,
+      files,
+      ttlSeconds: options.ttlSeconds,
+      timestamp: nowIso
+    });
+    try {
+      await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
+    } catch (error) {
+      const code = extractErrorCode(error);
+      if (code === 'ATM_LOCK_CONFLICT') {
+        throw new CliError('ATM_LOCK_CONFLICT', `Task ${options.taskId} has an active conflicting lock.`, {
+          exitCode: 1,
+          details: extractErrorDetails(error)
+        });
+      }
+      throw error;
+    }
+    taskDocument.claim = claim;
+    taskDocument.owner = actorId;
+    taskDocument.startedAt = String(taskDocument.startedAt ?? nowIso);
+    taskDocument.startedByActor = String(taskDocument.startedByActor ?? actorId);
+    taskDocument.status = 'running';
+    writeTaskDocument(taskPath, taskDocument);
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASKS_CLAIM_ACQUIRED', `Claim acquired for ${options.taskId}.`, {
+        taskId: options.taskId,
+        actorId
+      })],
+      evidence: {
+        action,
+        taskId: options.taskId,
+        actorId,
+        claim,
+        taskPath: relativeTaskPath
+      }
+    });
+  }
+
+  if (!currentClaim) {
+    throw new CliError('ATM_TASK_CLAIM_MISSING', `Task ${options.taskId} has no active claim record.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId }
+    });
+  }
+
+  if (action === 'renew') {
+    if (currentClaim.actorId !== actorId) {
+      throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', `Task ${options.taskId} is claimed by ${currentClaim.actorId}, not ${actorId}.`, {
+        exitCode: 1,
+        details: { taskId: options.taskId, currentActor: currentClaim.actorId, actorId }
+      });
+    }
+    const renewed: TaskClaimRecord = {
+      ...currentClaim,
+      heartbeatAt: nowIso,
+      ttlSeconds: options.ttlSeconds > 0 ? options.ttlSeconds : currentClaim.ttlSeconds,
+      state: 'active'
+    };
+    taskDocument.claim = renewed;
+    taskDocument.status = 'running';
+    writeTaskDocument(taskPath, taskDocument);
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASKS_CLAIM_RENEWED', `Claim renewed for ${options.taskId}.`, { taskId: options.taskId, actorId })],
+      evidence: {
+        action,
+        taskId: options.taskId,
+        actorId,
+        claim: renewed
+      }
+    });
+  }
+
+  if (action === 'release') {
+    if (currentClaim.actorId !== actorId) {
+      throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', `Task ${options.taskId} is claimed by ${currentClaim.actorId}, not ${actorId}.`, {
+        exitCode: 1,
+        details: { taskId: options.taskId, currentActor: currentClaim.actorId, actorId }
+      });
+    }
+    const releasedClaim: TaskClaimRecord = {
+      ...currentClaim,
+      heartbeatAt: nowIso,
+      state: 'released',
+      reason: options.reason ?? currentClaim.reason
+    };
+    await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+    taskDocument.claim = releasedClaim;
+    if (String(taskDocument.status ?? '') === 'running') {
+      taskDocument.status = 'open';
+    }
+    writeTaskDocument(taskPath, taskDocument);
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASKS_CLAIM_RELEASED', `Claim released for ${options.taskId}.`, { taskId: options.taskId, actorId })],
+      evidence: {
+        action,
+        taskId: options.taskId,
+        actorId,
+        claim: releasedClaim
+      }
+    });
+  }
+
+  if (action === 'handoff') {
+    if (!options.handoffTo) {
+      throw new CliError('ATM_CLI_USAGE', 'tasks handoff requires --to <actor-id>.', { exitCode: 2 });
+    }
+    if (currentClaim.actorId !== actorId) {
+      throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', `Task ${options.taskId} is claimed by ${currentClaim.actorId}, not ${actorId}.`, {
+        exitCode: 1,
+        details: { taskId: options.taskId, currentActor: currentClaim.actorId, actorId }
+      });
+    }
+    await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+    const handedOff: TaskClaimRecord = {
+      ...currentClaim,
+      heartbeatAt: nowIso,
+      state: 'handoff',
+      handoffTo: options.handoffTo,
+      reason: options.reason ?? 'handoff'
+    };
+    taskDocument.claim = handedOff;
+    taskDocument.owner = options.handoffTo;
+    taskDocument.status = 'open';
+    writeTaskDocument(taskPath, taskDocument);
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASKS_CLAIM_HANDOFF', `Claim for ${options.taskId} handed off to ${options.handoffTo}.`, {
+        taskId: options.taskId,
+        from: actorId,
+        to: options.handoffTo
+      })],
+      evidence: {
+        action,
+        taskId: options.taskId,
+        actorId,
+        handoffTo: options.handoffTo,
+        claim: handedOff
+      }
+    });
+  }
+
+  if (currentClaim.actorId === actorId) {
+    throw new CliError('ATM_TASKS_TAKEOVER_SELF', `tasks takeover is intended for a different actor; ${actorId} already owns ${options.taskId}.`, {
+      exitCode: 2,
+      details: { taskId: options.taskId, actorId }
+    });
+  }
+  if (!isClaimExpired(currentClaim, nowIso)) {
+    throw new CliError('ATM_TASKS_TAKEOVER_NOT_ALLOWED', `Claim for ${options.taskId} is still active under ${currentClaim.actorId}.`, {
+      exitCode: 1,
+      details: {
+        taskId: options.taskId,
+        currentActor: currentClaim.actorId,
+        heartbeatAt: currentClaim.heartbeatAt,
+        ttlSeconds: currentClaim.ttlSeconds
+      }
+    });
+  }
+  await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+  const takeoverClaim: TaskClaimRecord = {
+    ...createClaimRecord({
+      taskId: options.taskId,
+      actorId,
+      files,
+      ttlSeconds: options.ttlSeconds,
+      timestamp: nowIso
+    }),
+    reason: options.reason ?? `takeover from ${currentClaim.actorId}`
+  };
+  await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
+  taskDocument.claim = { ...takeoverClaim, state: 'taken_over' };
+  taskDocument.owner = actorId;
+  taskDocument.status = 'running';
+  writeTaskDocument(taskPath, taskDocument);
+  writeTakeoverEvidence(options.cwd, options.taskId, actorId, currentClaim, takeoverClaim);
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASKS_CLAIM_TAKEOVER', `Takeover completed for ${options.taskId}.`, {
+      taskId: options.taskId,
+      actorId,
+      previousActor: currentClaim.actorId
+    })],
+    evidence: {
+      action,
+      taskId: options.taskId,
+      actorId,
+      previousClaim: currentClaim,
+      claim: takeoverClaim,
+      evidencePath: `.atm/history/evidence/${options.taskId}.json`
+    }
+  });
+}
+
+function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    files: [] as string[],
+    ttlSeconds: 1800,
+    handoffTo: null as string | null,
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--files') {
+      options.files = requireValue(argv, index, '--files').split(',').map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--ttl-seconds') {
+      const raw = requireValue(argv, index, '--ttl-seconds');
+      const ttl = Number.parseInt(raw, 10);
+      if (!Number.isFinite(ttl) || ttl <= 0) {
+        throw new CliError('ATM_CLI_USAGE', 'tasks requires --ttl-seconds to be a positive integer.', { exitCode: 2 });
+      }
+      options.ttlSeconds = ttl;
+      index += 1;
+      continue;
+    }
+    if (arg === '--to') {
+      options.handoffTo = requireValue(argv, index, '--to');
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', `tasks ${action} requires --task <work-item-id>.`, { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
+}
+
+function parseClaimRecord(value: unknown): TaskClaimRecord | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+  const candidate = value as Record<string, unknown>;
+  const actorId = typeof candidate.actorId === 'string' ? candidate.actorId.trim() : '';
+  const leaseId = typeof candidate.leaseId === 'string' ? candidate.leaseId.trim() : '';
+  const claimedAt = typeof candidate.claimedAt === 'string' ? candidate.claimedAt.trim() : '';
+  const heartbeatAt = typeof candidate.heartbeatAt === 'string' ? candidate.heartbeatAt.trim() : claimedAt;
+  const ttlSeconds = Number.isFinite(candidate.ttlSeconds) ? Number(candidate.ttlSeconds) : 1800;
+  const files = Array.isArray(candidate.files)
+    ? candidate.files.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => normalizeRelativePath(entry))
+    : [];
+  const stateRaw = typeof candidate.state === 'string' ? candidate.state.trim() : 'active';
+  const state = stateRaw === 'released' || stateRaw === 'handoff' || stateRaw === 'taken_over' ? stateRaw : 'active';
+  if (!actorId || !leaseId || !claimedAt || files.length === 0) {
+    return null;
+  }
+  const handoffTo = typeof candidate.handoffTo === 'string' && candidate.handoffTo.trim().length > 0 ? candidate.handoffTo.trim() : undefined;
+  const reason = typeof candidate.reason === 'string' && candidate.reason.trim().length > 0 ? candidate.reason.trim() : undefined;
+  return {
+    actorId,
+    leaseId,
+    claimedAt,
+    heartbeatAt,
+    ttlSeconds: ttlSeconds > 0 ? ttlSeconds : 1800,
+    files,
+    state,
+    ...(handoffTo ? { handoffTo } : {}),
+    ...(reason ? { reason } : {})
+  };
+}
+
+function createClaimRecord(input: {
+  taskId: string;
+  actorId: string;
+  files: readonly string[];
+  ttlSeconds: number;
+  timestamp: string;
+}): TaskClaimRecord {
+  const leaseSeed = `${input.taskId}|${input.actorId}|${input.timestamp}|${input.files.join(',')}`;
+  return {
+    actorId: input.actorId,
+    leaseId: `lease-${createHash('sha256').update(leaseSeed).digest('hex').slice(0, 12)}`,
+    claimedAt: input.timestamp,
+    heartbeatAt: input.timestamp,
+    ttlSeconds: input.ttlSeconds > 0 ? input.ttlSeconds : 1800,
+    files: Array.from(new Set(input.files.map((entry) => normalizeRelativePath(entry)).filter(Boolean))),
+    state: 'active'
+  };
+}
+
+function isClaimExpired(claim: TaskClaimRecord, nowIso: string) {
+  const heartbeatEpoch = Date.parse(claim.heartbeatAt);
+  const nowEpoch = Date.parse(nowIso);
+  if (!Number.isFinite(heartbeatEpoch) || !Number.isFinite(nowEpoch)) {
+    return false;
+  }
+  return nowEpoch > heartbeatEpoch + claim.ttlSeconds * 1000;
+}
+
+function writeTaskDocument(taskPath: string, document: Record<string, unknown>) {
+  writeFileSync(taskPath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+}
+
+function normalizeWorkItemStatus(value: unknown): WorkItemRef['status'] {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  if (normalized === 'planned' || normalized === 'locked' || normalized === 'running' || normalized === 'verified' || normalized === 'done' || normalized === 'blocked') {
+    return normalized as WorkItemRef['status'];
+  }
+  if (normalized === 'open' || normalized === 'in_progress') {
+    return 'running';
+  }
+  return 'planned';
+}
+
+function writeTakeoverEvidence(cwd: string, taskId: string, actorId: string, previousClaim: TaskClaimRecord, newClaim: TaskClaimRecord) {
+  const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  const current = existsSync(evidencePath)
+    ? JSON.parse(readFileSync(evidencePath, 'utf8')) as Record<string, unknown>
+    : {};
+  const evidenceArray = Array.isArray(current.evidence) ? current.evidence as Record<string, unknown>[] : [];
+  evidenceArray.push({
+    evidenceKind: 'validation',
+    summary: `Takeover recorded for ${taskId}: ${previousClaim.actorId} -> ${actorId}.`,
+    artifactPaths: [`.atm/history/tasks/${taskId}.json`],
+    producedBy: actorId,
+    createdAt: new Date().toISOString(),
+    details: {
+      action: 'takeover',
+      previousClaim,
+      newClaim
+    }
+  });
+  const envelope = {
+    ...current,
+    taskId,
+    updatedAt: new Date().toISOString(),
+    evidence: evidenceArray
+  };
+  writeFileSync(evidencePath, `${JSON.stringify(envelope, null, 2)}\n`, 'utf8');
+}
+
+function extractErrorCode(error: unknown): string | null {
+  if (!error || typeof error !== 'object') return null;
+  const code = (error as { code?: unknown }).code;
+  return typeof code === 'string' && code.trim().length > 0 ? code : null;
+}
+
+function extractErrorDetails(error: unknown): Record<string, unknown> {
+  if (!error || typeof error !== 'object') return {};
+  const details = (error as { details?: unknown }).details;
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return {};
+  return details as Record<string, unknown>;
 }
 
 function parseImportOptions(argv: string[]) {
@@ -939,6 +1370,10 @@ function cleanCellText(value: string): string {
     .replace(/`/g, '')
     .replace(/<br\s*\/?>/gi, ', ')
     .trim();
+}
+
+function normalizeRelativePath(value: string): string {
+  return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
 function coerceStatus(value: string): TaskImportStatus {

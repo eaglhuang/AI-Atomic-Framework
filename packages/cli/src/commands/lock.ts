@@ -26,7 +26,20 @@ export async function runLock(argv: any) {
   }
 
   if (options.action === 'acquire') {
-    const lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, options.files.length > 0 ? options.files : [`.atm/history/tasks/${options.taskId}.json`], options.owner));
+    let lock;
+    try {
+      lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, options.files.length > 0 ? options.files : [`.atm/history/tasks/${options.taskId}.json`], options.owner));
+    } catch (error) {
+      const code = extractErrorCode(error);
+      if (code === 'ATM_LOCK_CONFLICT') {
+        const details = extractErrorDetails(error);
+        throw new CliError('ATM_LOCK_CONFLICT', `Scope lock conflict for ${options.taskId}.`, {
+          exitCode: 1,
+          details
+        });
+      }
+      throw error;
+    }
     return makeResult({
       ok: true,
       command: 'lock',
@@ -44,6 +57,19 @@ export async function runLock(argv: any) {
     messages: [message('info', 'ATM_LOCK_RELEASED', 'Scope lock released.', { taskId: options.taskId, owner: options.owner })],
     evidence: { taskId: options.taskId, result: released }
   });
+}
+
+function extractErrorCode(error: unknown): string | null {
+  if (!error || typeof error !== 'object') return null;
+  const candidate = (error as { code?: unknown }).code;
+  return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate : null;
+}
+
+function extractErrorDetails(error: unknown): Record<string, unknown> {
+  if (!error || typeof error !== 'object') return {};
+  const details = (error as { details?: unknown }).details;
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return {};
+  return details as Record<string, unknown>;
 }
 
 function parseLockArgs(argv: any) {

@@ -469,9 +469,9 @@ export const commandSpecs = Object.freeze({
   }),
   tasks: defineCommandSpec({
     name: 'tasks',
-    summary: 'Import a Markdown task plan into the canonical ATM task store and verify the result.',
+    summary: 'Import/verify task plans and execute task claim lifecycle actions.',
     positional: [
-      { name: 'action', summary: 'import | verify', required: true }
+      { name: 'action', summary: 'import | verify | claim | renew | release | handoff | takeover', required: true }
     ],
     options: [
       commonCwdOption,
@@ -479,6 +479,12 @@ export const commandSpecs = Object.freeze({
       { flag: '--dry-run', summary: 'Parse the plan and emit a manifest without writing task files.' },
       { flag: '--write', summary: 'Write canonical task JSON files to .atm/history/tasks/ and persist import evidence.' },
       { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs.' },
+      { flag: '--task', value: 'id', summary: 'Task id for claim/renew/release/handoff/takeover.' },
+      { flag: '--actor', value: 'id', summary: 'Actor id for claim lifecycle actions (or set ATM_ACTOR_ID).' },
+      { flag: '--files', value: 'csv', summary: 'Comma-separated scope files for claim/takeover lock acquisition.' },
+      { flag: '--ttl-seconds', value: 'number', summary: 'Lease ttl in seconds for claim/renew/takeover.' },
+      { flag: '--to', value: 'id', summary: 'Target actor id for handoff.' },
+      { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, or takeover.' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
@@ -486,7 +492,10 @@ export const commandSpecs = Object.freeze({
     examples: [
       'node atm.mjs tasks import --from docs/plan.md --dry-run --json',
       'node atm.mjs tasks import --from docs/plan.md --write --json',
-      'node atm.mjs tasks verify --json'
+      'node atm.mjs tasks verify --json',
+      'node atm.mjs tasks claim --task ATM-GOV-0101 --actor codex-main --files packages/core/src/index.ts --json',
+      'node atm.mjs tasks renew --task ATM-GOV-0101 --actor codex-main --ttl-seconds 3600 --json',
+      'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reason "handoff complete" --json'
     ]
   }),
   upgrade: defineCommandSpec({
