@@ -112,7 +112,7 @@ export interface GuidanceNextAction {
   readonly missingEvidence: readonly string[];
   readonly proposalId?: string;
   readonly proposalStatus?: string;
-  readonly nextRouteState?: 'proposal-required' | 'proposal-pending-review' | 'proposal-approved' | 'proposal-rejected';
+  readonly nextRouteState?: 'proposal-required' | 'proposal-pending-review' | 'proposal-approved' | 'proposal-rejected' | 'proposal-rollout-ready';
   readonly selectedSegment?: string;
   readonly blockedSegments?: readonly string[];
   readonly legacyTarget?: string;

@@ -14,7 +14,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.t
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { resolveActorId } from './actor-registry.ts';
-import { CliError, makeResult, message, parseOptions } from './shared.ts';
+import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
 import { runTasks } from './tasks.ts';
 
 export async function runNext(argv: any) {
@@ -288,7 +288,7 @@ function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
     .flatMap((entry): ImportedTaskSummary[] => {
       const filePath = path.join(taskStorePath, entry);
       try {
-        const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+        const parsed = parseJsonText(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
         const schemaVersion = typeof parsed.schemaVersion === 'string' ? parsed.schemaVersion : '';
         if (schemaVersion !== 'atm.workItem.v0.2' && parsed.source === undefined) {
           return [];
@@ -372,8 +372,13 @@ function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: Legac
     behaviorId: `behavior.${preferredSegment.recommendedBehavior}`
   });
   if (queueMatch) {
-    const command = queueMatch.status === 'approved'
-      ? `node atm.mjs review apply-ready ${quoteCliValue(queueMatch.proposalId)} --json`
+    const actualPatchEvidence = queueMatch.status === 'approved'
+      ? findGuidedLegacyActualPatchEvidence(cwd, queueMatch.proposalId)
+      : null;
+    const command = actualPatchEvidence
+      ? `node atm.mjs review rollout-ready ${quoteCliValue(queueMatch.proposalId)} --json`
+      : queueMatch.status === 'approved'
+        ? `node atm.mjs review apply-ready ${quoteCliValue(queueMatch.proposalId)} --json`
       : `node atm.mjs review show ${quoteCliValue(queueMatch.proposalId)} --json`;
     const waitingForReview = queueMatch.status === 'pending' || queueMatch.status === 'blocked';
     const missingEvidence = reconcileProposalMissingEvidence(base.missingEvidence, preferredSegment.recommendedBehavior, queueMatch.status);
@@ -381,7 +386,9 @@ function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: Legac
       ...base,
       status: 'action',
       command,
-      reason: queueMatch.status === 'approved'
+      reason: actualPatchEvidence
+        ? `Approved guided legacy proposal ${queueMatch.proposalId} already has actual patch, smoke evidence, and rollback-ready proof; inspect the rollout-ready packet before closing the governed rollout.`
+        : queueMatch.status === 'approved'
         ? `Approved guided legacy dry-run proposal ${queueMatch.proposalId} already covers ${legacyTarget}; inspect the approved boundary and proceed with actual patch planning inside that safe leaf.`
         : `Matching guided legacy dry-run proposal ${queueMatch.proposalId} already exists for ${legacyTarget}; inspect that proposal instead of generating a duplicate.`,
       allowedCommands: Array.from(new Set([...base.allowedCommands, command])),
@@ -392,12 +399,16 @@ function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: Legac
       blockedSegments,
       proposalId: queueMatch.proposalId,
       proposalStatus: queueMatch.status,
-      nextRouteState: queueMatch.status === 'approved'
+      nextRouteState: actualPatchEvidence
+        ? 'proposal-rollout-ready'
+        : queueMatch.status === 'approved'
         ? 'proposal-approved'
         : queueMatch.status === 'rejected'
           ? 'proposal-rejected'
           : 'proposal-pending-review',
-      missingEvidence: waitingForReview
+      missingEvidence: actualPatchEvidence
+        ? []
+        : waitingForReview
         ? dedupeStrings([...missingEvidence, 'human review before apply'])
         : missingEvidence
     };
@@ -422,6 +433,17 @@ function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: Legac
 interface MatchingGuidedLegacyProposal {
   readonly proposalId: string;
   readonly status: HumanReviewQueueStatus;
+}
+
+interface GuidedLegacyActualPatchEvidence {
+  readonly reportPath: string;
+  readonly proposalId: string;
+  readonly generatedAt?: string;
+  readonly smokeEvidence?: readonly unknown[];
+  readonly rollbackReadyProof?: {
+    readonly proofPath?: string;
+    readonly patchPath?: string;
+  } | null;
 }
 
 function findMatchingGuidedLegacyProposal(
@@ -472,6 +494,44 @@ function compareGuidedLegacyQueuePriority(left: HumanReviewQueueRecord, right: H
     return statusDelta;
   }
   return compareIsoDesc(left.review?.decidedAt ?? left.queuedAt ?? left.proposal.proposedAt, right.review?.decidedAt ?? right.queuedAt ?? right.proposal.proposedAt);
+}
+
+function findGuidedLegacyActualPatchEvidence(cwd: string, proposalId: string): GuidedLegacyActualPatchEvidence | null {
+  const reportsRoot = path.join(cwd, '.atm', 'history', 'reports');
+  if (!existsSync(reportsRoot)) {
+    return null;
+  }
+
+  const matches = readdirSync(reportsRoot)
+    .filter((entry) => entry.startsWith('actual-patch-evidence.') && entry.endsWith('.json'))
+    .flatMap((entry): GuidedLegacyActualPatchEvidence[] => {
+      const reportPath = path.join(reportsRoot, entry);
+      try {
+        const parsed = parseJsonText(readFileSync(reportPath, 'utf8')) as Record<string, unknown>;
+        if (parsed['proposalId'] !== proposalId) {
+          return [];
+        }
+        const smokeEvidence = Array.isArray(parsed['smokeEvidence']) ? parsed['smokeEvidence'] : [];
+        const rollbackReadyProof = parsed['rollbackReadyProof'] && typeof parsed['rollbackReadyProof'] === 'object'
+          ? parsed['rollbackReadyProof'] as { readonly proofPath?: string; readonly patchPath?: string; }
+          : null;
+        if (smokeEvidence.length === 0 || !rollbackReadyProof?.proofPath) {
+          return [];
+        }
+        return [{
+          reportPath: path.relative(cwd, reportPath).replace(/\\/g, '/'),
+          proposalId,
+          generatedAt: typeof parsed['generatedAt'] === 'string' ? parsed['generatedAt'] : undefined,
+          smokeEvidence,
+          rollbackReadyProof
+        }];
+      } catch {
+        return [];
+      }
+    })
+    .sort((left, right) => compareIsoDesc(left.generatedAt, right.generatedAt));
+
+  return matches[0] ?? null;
 }
 
 function humanReviewStatusWeight(status: HumanReviewQueueStatus) {

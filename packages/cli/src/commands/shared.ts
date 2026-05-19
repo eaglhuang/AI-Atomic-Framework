@@ -487,7 +487,7 @@ export function readJsonFile(filePath: string, missingCode = 'ATM_JSON_NOT_FOUND
     throw new CliError(missingCode, `JSON file not found: ${filePath}`, { details: { filePath } });
   }
   try {
-    return JSON.parse(readFileSync(filePath, 'utf8'));
+    return parseJsonText(readFileSync(filePath, 'utf8'));
   } catch (error) {
     throw new CliError('ATM_JSON_INVALID', `Invalid JSON file: ${filePath}`, {
       details: {
@@ -500,6 +500,14 @@ export function readJsonFile(filePath: string, missingCode = 'ATM_JSON_NOT_FOUND
 
 export function writeJsonFile(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+export function stripUtf8Bom(text: string) {
+  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+}
+
+export function parseJsonText(text: string) {
+  return JSON.parse(stripUtf8Bom(text));
 }
 
 function normalizeSpecArray(value: any) {

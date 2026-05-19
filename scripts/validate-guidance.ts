@@ -632,6 +632,48 @@ try {
   assert(Array.isArray(applyReady.parsed.evidence?.applyPacket?.mutationBoundary?.blocked),
     'review apply-ready must expose blocked mutation boundary guidance');
 
+  const rolloutProofPath = path.join(downstreamCwd, '.atm', 'history', 'reports', 'rollback-ready-proof.fixture.json');
+  writeFileSync(rolloutProofPath, `\uFEFF${JSON.stringify({
+    rollbackReady: true,
+    patchPath: '.atm/history/reports/rollback-ready.patch'
+  }, null, 2)}`);
+  const actualPatchEvidencePath = path.join(downstreamCwd, '.atm', 'history', 'reports', 'actual-patch-evidence.fixture.json');
+  writeFileSync(actualPatchEvidencePath, `\uFEFF${JSON.stringify({
+    generatedAt: '2026-01-02T00:00:00.000Z',
+    proposalId: approvedProposalId,
+    legacyTarget: String(configNextAction?.['legacyTarget']),
+    patchFiles: ['src/downstream-helper.js'],
+    smokeEvidence: [
+      { name: 'smoke', logPath: '.atm/history/reports/smoke.log' }
+    ],
+    rollbackReadyProof: {
+      proofPath: rolloutProofPath,
+      patchPath: '.atm/history/reports/rollback-ready.patch'
+    }
+  }, null, 2)}`);
+
+  const nextAfterRolloutEvidence = await runAtmJsonPortable(['next', '--cwd', downstreamCwd, '--json']);
+  assert(nextAfterRolloutEvidence.exitCode === 0,
+    'next must exit 0 when approved proposal also has actual patch evidence');
+  const rolloutNextAction = nextAfterRolloutEvidence.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
+  const rolloutNextCommand = String(rolloutNextAction?.['command'] ?? '');
+  assert(rolloutNextCommand.includes('review rollout-ready'),
+    'next must route to review rollout-ready when actual patch evidence and rollback proof are present');
+  assert(rolloutNextAction?.['nextRouteState'] === 'proposal-rollout-ready',
+    'next must expose nextRouteState=proposal-rollout-ready when rollout evidence exists');
+  const rolloutReady = await runAtmJsonPortable([
+    'review', 'rollout-ready', approvedProposalId,
+    '--cwd', downstreamCwd, '--json'
+  ]);
+  assert(rolloutReady.exitCode === 0,
+    'review rollout-ready must exit 0 for approved proposals with actual patch evidence');
+  assert(rolloutReady.parsed.evidence?.rolloutPacket?.proposalId === approvedProposalId,
+    'review rollout-ready must return the approved proposalId');
+  assert(rolloutReady.parsed.evidence?.rolloutPacket?.rolloutCloseout?.smokeEvidenceSatisfied === true,
+    'review rollout-ready must confirm smoke evidence');
+  assert(rolloutReady.parsed.evidence?.rolloutPacket?.rolloutCloseout?.rollbackReadySatisfied === true,
+    'review rollout-ready must confirm rollback-ready proof');
+
   // ── E. blockedSegments still includes trunk functions ─────────────────────────────────────────
   assert(Array.isArray(configNextAction?.['blockedSegments']),
     'next action must include blockedSegments array');

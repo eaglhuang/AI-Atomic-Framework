@@ -778,10 +778,10 @@ export const commandSpecs = Object.freeze({
   }),
   review: defineCommandSpec({
     name: 'review',
-    summary: 'List, inspect, approve, reject, or materialize apply-ready packets for upgrade proposals.',
+    summary: 'List, inspect, approve, reject, or materialize apply-ready / rollout-ready packets for upgrade proposals.',
     positional: [
-      { name: 'action', summary: 'list | show | approve | reject | apply-ready', required: false },
-      { name: 'proposal-id', summary: 'Proposal id for show/approve/reject/apply-ready.', required: false }
+      { name: 'action', summary: 'list | show | approve | reject | apply-ready | rollout-ready', required: false },
+      { name: 'proposal-id', summary: 'Proposal id for show/approve/reject/apply-ready/rollout-ready.', required: false }
     ],
     options: [
       commonCwdOption,
@@ -798,7 +798,8 @@ export const commandSpecs = Object.freeze({
     examples: [
       'node atm.mjs review list --json',
       'node atm.mjs review approve <proposal-id> --reason "approved" --json',
-      'node atm.mjs review apply-ready <proposal-id> --json'
+      'node atm.mjs review apply-ready <proposal-id> --json',
+      'node atm.mjs review rollout-ready <proposal-id> --json'
     ]
   }),
   'agent-pack': defineCommandSpec({

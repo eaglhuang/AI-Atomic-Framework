@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import {
@@ -15,14 +15,14 @@ import {
   validateHumanReviewQueueRecord,
   writeHumanReviewQueueDocument
 } from '../../../plugin-human-review/src/index.ts';
-import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
+import { CliError, makeResult, message, parseJsonText, relativePathFrom } from './shared.ts';
 
 export function runReview(argv: any) {
   const { options, positional } = parseReviewOptions(argv);
   const action = positional[0] ? String(positional[0]).trim().toLowerCase() : 'list';
   const proposalId = positional[1] ? String(positional[1]).trim() : '';
 
-  if (!['list', 'show', 'approve', 'reject', 'apply-ready'].includes(action)) {
+  if (!['list', 'show', 'approve', 'reject', 'apply-ready', 'rollout-ready'].includes(action)) {
     throw new CliError('ATM_CLI_USAGE', `Unsupported review action: ${action}`, { exitCode: 2 });
   }
 
@@ -110,6 +110,38 @@ export function runReview(argv: any) {
         projectionPath: relativePathFrom(options.cwd, projectionPath),
         proposal: queueRecord,
         applyPacket,
+        markdown
+      }
+    });
+  }
+
+  if (action === 'rollout-ready') {
+    if (queueRecord.status !== 'approved') {
+      throw new CliError('ATM_REVIEW_ROLLOUT_READY_REQUIRES_APPROVAL', `Proposal ${proposalId} is not approved yet.`, {
+        exitCode: 2,
+        details: {
+          proposalId,
+          status: queueRecord.status
+        }
+      });
+    }
+    const rolloutPacket = buildRolloutReadyPacket(options.cwd, queueRecord);
+    const markdown = renderHumanReviewQueueMarkdown(queueDocument);
+    writeTextFile(projectionPath, markdown);
+    return makeResult({
+      ok: true,
+      command: 'review',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_REVIEW_ROLLOUT_READY_OK', `Approved proposal ${proposalId} has actual patch evidence and rollback-ready proof; the governed rollout is ready for closeout review.`, {
+        proposalId,
+        legacyTarget: rolloutPacket.legacyTarget
+      })],
+      evidence: {
+        action: 'rollout-ready',
+        queuePath: relativePathFrom(options.cwd, queuePath),
+        projectionPath: relativePathFrom(options.cwd, projectionPath),
+        proposal: queueRecord,
+        rolloutPacket,
         markdown
       }
     });
@@ -283,6 +315,63 @@ function buildApplyReadyPacket(queueRecord: any) {
   };
 }
 
+function buildRolloutReadyPacket(cwd: string, queueRecord: any) {
+  const applyReadyPacket = buildApplyReadyPacket(queueRecord);
+  const actualPatchEvidence = loadActualPatchEvidence(cwd, queueRecord.proposalId);
+  if (!actualPatchEvidence) {
+    throw new CliError('ATM_REVIEW_ROLLOUT_READY_EVIDENCE_MISSING', `Actual patch evidence is missing for ${queueRecord.proposalId}.`, {
+      exitCode: 2,
+      details: { proposalId: queueRecord.proposalId }
+    });
+  }
+  const rollbackProofPath = typeof actualPatchEvidence.rollbackReadyProof?.proofPath === 'string'
+    ? actualPatchEvidence.rollbackReadyProof.proofPath
+    : null;
+  if (!rollbackProofPath) {
+    throw new CliError('ATM_REVIEW_ROLLOUT_READY_EVIDENCE_MISSING', `Rollback-ready proof is missing for ${queueRecord.proposalId}.`, {
+      exitCode: 2,
+      details: { proposalId: queueRecord.proposalId }
+    });
+  }
+  const rollbackProof = readJsonFileSafe(rollbackProofPath);
+  return {
+    ...applyReadyPacket,
+    actualPatchEvidence,
+    rollbackReadyProof: {
+      path: rollbackProofPath,
+      report: rollbackProof
+    },
+    rolloutCloseout: {
+      smokeEvidenceSatisfied: Array.isArray(actualPatchEvidence.smokeEvidence) && actualPatchEvidence.smokeEvidence.length > 0,
+      rollbackReadySatisfied: rollbackProof?.rollbackReady === true,
+      patchFiles: Array.isArray(actualPatchEvidence.patchFiles) ? actualPatchEvidence.patchFiles : []
+    },
+    nextStep: 'Use this rollout-ready packet to close out the governed leaf rollout, then decide whether to promote broader map-level evolution or queue the next approved leaf.'
+  };
+}
+
+function loadActualPatchEvidence(cwd: string, proposalId: string) {
+  const reportsRoot = path.join(cwd, '.atm', 'history', 'reports');
+  if (!existsSync(reportsRoot)) {
+    return null;
+  }
+  const matches = readdirSync(reportsRoot)
+    .filter((entry: string) => entry.startsWith('actual-patch-evidence.') && entry.endsWith('.json'))
+    .map((entry: string) => path.join(reportsRoot, entry))
+    .flatMap((reportPath: string) => {
+      const parsed = readJsonFileSafe(reportPath);
+      if (!parsed || parsed.proposalId !== proposalId) {
+        return [];
+      }
+      return [{
+        reportPath,
+        ...parsed
+      }];
+    })
+    .sort((left: any, right: any) => String(right.generatedAt ?? '').localeCompare(String(left.generatedAt ?? '')));
+  return matches[0] ?? null;
+}
+
 function splitLegacyTarget(legacyTarget: string | null) {
   if (!legacyTarget) {
     return [null, null] as const;
@@ -295,6 +384,14 @@ function splitLegacyTarget(legacyTarget: string | null) {
     legacyTarget.slice(0, separatorIndex),
     legacyTarget.slice(separatorIndex + 1) || null
   ] as const;
+}
+
+function readJsonFileSafe(filePath: string) {
+  try {
+    return parseJsonText(readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
 }
 
 function parseReviewOptions(argv: any) {
@@ -392,7 +489,7 @@ function readDecisionLogFile(filePath: any) {
     return [];
   }
   try {
-    const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+    const parsed = parseJsonText(readFileSync(filePath, 'utf8'));
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
