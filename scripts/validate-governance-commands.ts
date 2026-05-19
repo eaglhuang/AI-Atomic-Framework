@@ -159,6 +159,11 @@ try {
   assert(mutationGuard.exitCode === 0, 'guard mutation must pass for in-scope claimed file');
   assert(mutationGuard.parsed.ok === true, 'guard mutation must report ok=true for in-scope claimed file');
 
+  const mutationGuardFailOpen = runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', 'outside/scope.ts', '--fail-open', '--json']);
+  assert(mutationGuardFailOpen.exitCode === 0, 'guard mutation --fail-open must exit 0 when violations exist');
+  assert(mutationGuardFailOpen.parsed.ok === true, 'guard mutation --fail-open must report ok=true when violations exist');
+  assert(mutationGuardFailOpen.parsed.messages?.[0]?.code === 'ATM_GUARD_MUTATION_FAIL_OPEN', 'guard mutation --fail-open must return fail-open warning code');
+
   const conflictClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(conflictClaim.exitCode === 1, 'tasks claim conflict must exit 1');
   assert(conflictClaim.parsed.ok === false, 'tasks claim conflict must report ok=false');
@@ -193,6 +198,11 @@ try {
   const gitGuard = runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(gitGuard.exitCode === 0, 'guard git must exit 0 for matching trailers and identity');
   assert(gitGuard.parsed.ok === true, 'guard git must report ok=true for matching trailers and identity');
+
+  const gitGuardFailOpen = runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--fail-open', '--json']);
+  assert(gitGuardFailOpen.exitCode === 0, 'guard git --fail-open must exit 0 when violations exist');
+  assert(gitGuardFailOpen.parsed.ok === true, 'guard git --fail-open must report ok=true when violations exist');
+  assert(gitGuardFailOpen.parsed.messages?.[0]?.code === 'ATM_GUARD_GIT_FAIL_OPEN', 'guard git --fail-open must return fail-open warning code');
 
   const addEvidence = runAtm(['evidence', 'add', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--kind', 'test', '--summary', 'fixture governance command validation passed', '--artifacts', 'notes/governance.txt', '--json']);
   assert(addEvidence.exitCode === 0, 'evidence add must exit 0');

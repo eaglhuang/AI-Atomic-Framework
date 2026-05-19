@@ -115,17 +115,20 @@ function runMutationGuard(options: ParsedGuardArgs) {
   }
 
   return makeResult({
-    ok: violations.length === 0,
+    ok: violations.length === 0 || options.failOpen,
     command: 'guard',
     cwd: options.cwd,
     messages: [violations.length === 0
       ? message('info', 'ATM_GUARD_MUTATION_OK', 'Mutation guard passed for claimed task scope.')
-      : message('error', 'ATM_GUARD_MUTATION_FAILED', 'Mutation guard failed.', { violations })],
+      : options.failOpen
+        ? message('warning', 'ATM_GUARD_MUTATION_FAIL_OPEN', 'Mutation guard found violations but continued in fail-open mode.', { violations })
+        : message('error', 'ATM_GUARD_MUTATION_FAILED', 'Mutation guard failed.', { violations })],
     evidence: {
       guard: 'mutation',
       taskId: options.taskId,
       actorId,
       files: options.files,
+      failOpen: options.failOpen,
       violations
     }
   });
@@ -139,18 +142,21 @@ function runGitGuard(options: ParsedGuardArgs) {
     requireTrailers: true
   });
   return makeResult({
-    ok: check.ok,
+    ok: check.ok || options.failOpen,
     command: 'guard',
     cwd: options.cwd,
     messages: [check.ok
       ? message('info', 'ATM_GUARD_GIT_OK', 'Git governance guard passed.')
-      : message('error', 'ATM_GUARD_GIT_FAILED', 'Git governance guard failed.', { violations: check.violations })],
+      : options.failOpen
+        ? message('warning', 'ATM_GUARD_GIT_FAIL_OPEN', 'Git governance guard found violations but continued in fail-open mode.', { violations: check.violations })
+        : message('error', 'ATM_GUARD_GIT_FAILED', 'Git governance guard failed.', { violations: check.violations })],
     evidence: {
       guard: 'git',
       actorId: check.actorId,
       taskId: check.taskId,
       claimLeaseId: check.claimLeaseId,
       trailers: check.trailers,
+      failOpen: options.failOpen,
       violations: check.violations
     }
   });
@@ -162,6 +168,7 @@ interface ParsedGuardArgs {
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
+  readonly failOpen: boolean;
 }
 
 function parseGuardArgs(argv: string[]): ParsedGuardArgs {
@@ -170,7 +177,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     guardName: null as ParsedGuardArgs['guardName'] | null,
     files: [] as string[],
     taskId: null as string | null,
-    actorId: null as string | null
+    actorId: null as string | null,
+    failOpen: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -198,6 +206,10 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     if (arg === '--json' || arg === '--pretty') {
       continue;
     }
+    if (arg === '--fail-open') {
+      state.failOpen = true;
+      continue;
+    }
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `guard does not support option ${arg}`, { exitCode: 2 });
     }
@@ -222,7 +234,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     guardName: state.guardName,
     files: state.files,
     taskId: state.taskId,
-    actorId: state.actorId
+    actorId: state.actorId,
+    failOpen: state.failOpen
   };
 }
 

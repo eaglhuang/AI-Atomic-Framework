@@ -294,6 +294,7 @@ export const commandSpecs = Object.freeze({
       { flag: '--task', value: 'id', summary: 'Task id for mutation or git guard checks.' },
       { flag: '--actor', value: 'id', summary: 'Actor id for mutation or git guard checks.' },
       { flag: '--files', value: 'csv', summary: 'Comma-separated file paths for the guard.' },
+      { flag: '--fail-open', summary: 'Return ok=true with warnings when violations are detected.' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
