@@ -82,6 +82,7 @@ export interface EvidenceRecord {
   readonly atomId?: string;
   readonly atomMapId?: string;
   readonly patternTags?: readonly string[];
+  readonly recurringSignal?: boolean;
   readonly confidence?: number;
   readonly recurrence?: EvidenceRecurrence;
   readonly summary: string;

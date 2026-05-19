@@ -5,14 +5,16 @@ import { probeProject } from '../../../core/src/guidance/index.ts';
 
 export interface RuntimeAdapterReadinessSummary {
   readonly pythonOnlyHost: boolean;
+  readonly languageOnlyHost: boolean;
   readonly needsRuntimeAdapterHint: boolean;
   readonly detectedLanguages: readonly string[];
   readonly bundledLanguageAdapters: readonly string[];
   readonly bundledProjectAdapters: readonly string[];
   readonly pythonLanguageAdapterAvailable: boolean;
+  readonly missingLanguageAdapters: readonly string[];
   readonly candidateRankingAllowed: boolean;
   readonly atomBirthApplyDeferred: boolean;
-  readonly missingCapability: 'python-language-adapter' | null;
+  readonly missingCapability: string | null;
   readonly suggestedAction: string | null;
   readonly explanation: string | null;
 }
@@ -22,20 +24,30 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot: string): RuntimeA
   const pythonOnlyHost = orientation.detectedLanguages.includes('Python')
     && !orientation.detectedLanguages.includes('JavaScript')
     && !orientation.detectedLanguages.includes('TypeScript');
+  const languageOnlyHost = orientation.detectedLanguages.length > 0
+    && !orientation.detectedLanguages.includes('JavaScript')
+    && !orientation.detectedLanguages.includes('TypeScript');
   const bundledLanguageAdapters = listBundledPackageNames((packageDirName) => packageDirName.startsWith('language-'));
   const bundledProjectAdapters = listBundledPackageNames((packageDirName) =>
     packageDirName.startsWith('adapter-') || packageDirName === 'plugin-governance-local'
   );
-  const pythonLanguageAdapterAvailable = bundledLanguageAdapters.some((packageName) => /python/i.test(packageName));
+  const pythonLanguageAdapterAvailable =
+    bundledLanguageAdapters.some((packageName) => /python/i.test(packageName))
+    || hasLocalLanguagePythonPackage();
+  const missingLanguageAdapters = orientation.detectedLanguages.filter((language) =>
+    !hasBundledLanguageAdapter(language, bundledLanguageAdapters)
+  );
 
-  if (!pythonOnlyHost) {
+  if (!languageOnlyHost) {
     return {
       pythonOnlyHost: false,
+      languageOnlyHost: false,
       needsRuntimeAdapterHint: false,
       detectedLanguages: orientation.detectedLanguages,
       bundledLanguageAdapters,
       bundledProjectAdapters,
       pythonLanguageAdapterAvailable,
+      missingLanguageAdapters,
       candidateRankingAllowed: false,
       atomBirthApplyDeferred: false,
       missingCapability: null,
@@ -45,22 +57,35 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot: string): RuntimeA
   }
 
   return {
-    pythonOnlyHost: true,
-    needsRuntimeAdapterHint: true,
+    pythonOnlyHost,
+    languageOnlyHost: true,
+    needsRuntimeAdapterHint: missingLanguageAdapters.length > 0,
     detectedLanguages: orientation.detectedLanguages,
     bundledLanguageAdapters,
     bundledProjectAdapters,
     pythonLanguageAdapterAvailable,
+    missingLanguageAdapters,
     candidateRankingAllowed: true,
-    atomBirthApplyDeferred: true,
-    missingCapability: pythonLanguageAdapterAvailable ? null : 'python-language-adapter',
-    suggestedAction: pythonLanguageAdapterAvailable
-      ? 'Select and wire the Python runtime/language adapter for this repository before expecting ATM atom birth or apply routes to mutate Python surfaces.'
-      : 'This ATM release does not bundle a dedicated Python language adapter/plugin yet. Continue with candidate ranking, source inventory, and docs-first analysis, and treat atom birth/apply as deferred until a Python adapter/plugin is selected or implemented.',
-    explanation: pythonLanguageAdapterAvailable
-      ? 'Python entrypoints were detected. Candidate ranking can continue, but atom birth/apply should wait until the Python runtime adapter is selected for this host.'
-      : 'Python entrypoints were detected, but this ATM release currently ships editor integrations plus local governance/local-git support without a dedicated Python language adapter/plugin.'
+    atomBirthApplyDeferred: missingLanguageAdapters.length > 0,
+    missingCapability: missingLanguageAdapters.length > 0 ? 'language-adapter' : null,
+    suggestedAction: missingLanguageAdapters.length > 0
+      ? `ATM detected ${missingLanguageAdapters.join(', ')} source but no bundled language adapter for that language. Continue with guide/orient, candidate ranking, source inventory, police evidence, or docs-first work; defer atom birth/apply until a matching adapter is installed or implemented.`
+      : 'The bundled language adapter can drive source inventory and dry-run atomize/infect plans. Atom apply still requires evidence and review gates.',
+    explanation: missingLanguageAdapters.length > 0
+      ? 'A non-JavaScript host language was detected without a matching bundled language adapter. This is an expected adapter gap, not host-repo corruption; discovery routes stay available while apply routes remain deferred.'
+      : 'A non-JavaScript host language was detected and a matching bundled language adapter is available. Candidate ranking, dry-run atomize/infect, and source inventory are supported; apply still flows through review and police gates.'
   };
+}
+
+function hasLocalLanguagePythonPackage(): boolean {
+  const packagesRoot = resolveFrameworkPackagesRoot();
+  if (!existsSync(packagesRoot)) return false;
+  const candidateDir = path.join(packagesRoot, 'language-python');
+  if (!existsSync(candidateDir)) return false;
+  const packageJsonPath = path.join(candidateDir, 'package.json');
+  if (!existsSync(packageJsonPath)) return false;
+  const packageName = readPackageName(packageJsonPath);
+  return packageName === '@ai-atomic-framework/language-python';
 }
 
 function listBundledPackageNames(includePackageDir: (packageDirName: string) => boolean): readonly string[] {
@@ -72,6 +97,18 @@ function listBundledPackageNames(includePackageDir: (packageDirName: string) => 
     .filter((entry) => entry.isDirectory() && includePackageDir(entry.name))
     .map((entry) => readPackageName(path.join(packagesRoot, entry.name, 'package.json')) ?? `@ai-atomic-framework/${entry.name}`)
     .sort((left, right) => left.localeCompare(right));
+}
+
+function hasBundledLanguageAdapter(language: string, bundledLanguageAdapters: readonly string[]): boolean {
+  const normalizedLanguage = normalizeLanguageKey(language);
+  if (normalizedLanguage === 'javascript' || normalizedLanguage === 'typescript') {
+    return bundledLanguageAdapters.some((packageName) => /language-js/i.test(packageName));
+  }
+  return bundledLanguageAdapters.some((packageName) => packageName.toLowerCase().includes(`language-${normalizedLanguage}`));
+}
+
+function normalizeLanguageKey(language: string): string {
+  return language.toLowerCase().replace(/[^a-z0-9]+/g, '');
 }
 
 function resolveFrameworkPackagesRoot() {

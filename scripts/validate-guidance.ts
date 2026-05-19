@@ -176,9 +176,9 @@ try {
   assert(pythonOnlyOrientation.releaseAdvisories?.includes('package-json-missing:advisory'), 'Python-only repo must downgrade package-json-missing to advisory');
   const pythonRuntimeReadiness = inspectRuntimeAdapterReadiness(pythonOnlyRepo);
   assert(pythonRuntimeReadiness.pythonOnlyHost === true, 'Python-only repo must report pythonOnlyHost=true');
-  assert(pythonRuntimeReadiness.needsRuntimeAdapterHint === true, 'Python-only repo must recommend runtime adapter selection');
-  assert(pythonRuntimeReadiness.pythonLanguageAdapterAvailable === false, 'current ATM release must report no bundled Python language adapter');
-  assert(pythonRuntimeReadiness.atomBirthApplyDeferred === true, 'Python-only repo must defer atom birth/apply until runtime adapter selection');
+  assert(pythonRuntimeReadiness.pythonLanguageAdapterAvailable === true, 'bundled @ai-atomic-framework/language-python adapter must be detected');
+  assert(pythonRuntimeReadiness.needsRuntimeAdapterHint === false, 'Python-only repo must no longer require runtime adapter selection when language-python is bundled');
+  assert(pythonRuntimeReadiness.atomBirthApplyDeferred === false, 'atom birth/apply must no longer be deferred for Python-only repos once language-python is bundled');
   const pythonOnlyRoute = decideGuidanceRoute({
     goal: 'rank the messiest Python pipeline scripts',
     orientation: pythonOnlyOrientation,
@@ -186,6 +186,41 @@ try {
   });
   assert(pythonOnlyRoute.recommendedRoute === 'legacy-candidate-ranking', 'Python-only repo must allow candidate ranking route');
   assert(!pythonOnlyRoute.blockedBy.includes('package-json-missing'), 'Python-only candidate ranking must not be blocked by package-json-missing');
+
+  const javaOnlyRepo = path.join(tempRoot, 'java-only-repo');
+  mkdirSync(path.join(javaOnlyRepo, '.atm'), { recursive: true });
+  mkdirSync(path.join(javaOnlyRepo, 'src', 'main', 'java'), { recursive: true });
+  writeFileSync(path.join(javaOnlyRepo, '.atm', 'config.json'), JSON.stringify({
+    schemaVersion: '0.1.0',
+    adapter: { mode: 'standalone' }
+  }, null, 2));
+  writeFileSync(path.join(javaOnlyRepo, 'pom.xml'), '<project></project>\n', 'utf8');
+  writeFileSync(path.join(javaOnlyRepo, 'src', 'main', 'java', 'App.java'), 'class App {}\n', 'utf8');
+  const javaOnlyOrientation = probeProject(javaOnlyRepo);
+  assert(javaOnlyOrientation.detectedLanguages.includes('Java'), 'Java-only repo must detect Java');
+  assert(!javaOnlyOrientation.releaseBlockers.includes('package-json-missing'), 'Java-only repo must not treat missing package.json as release blocker');
+  assert(javaOnlyOrientation.releaseAdvisories?.includes('package-json-missing:advisory'), 'Java-only repo must downgrade package-json-missing to advisory');
+  const javaRuntimeReadiness = inspectRuntimeAdapterReadiness(javaOnlyRepo);
+  assert(javaRuntimeReadiness.languageOnlyHost === true, 'Java-only repo must report languageOnlyHost=true');
+  assert(javaRuntimeReadiness.needsRuntimeAdapterHint === true, 'Java-only repo must surface missing language adapter as advisory hint');
+  assert(javaRuntimeReadiness.missingLanguageAdapters.includes('Java'), 'Java-only repo must name Java as missing language adapter');
+  assert(javaRuntimeReadiness.atomBirthApplyDeferred === true, 'Java-only repo must defer atom birth/apply until language adapter selection');
+
+  const csharpOnlyRepo = path.join(tempRoot, 'csharp-only-repo');
+  mkdirSync(path.join(csharpOnlyRepo, '.atm'), { recursive: true });
+  writeFileSync(path.join(csharpOnlyRepo, '.atm', 'config.json'), JSON.stringify({
+    schemaVersion: '0.1.0',
+    adapter: { mode: 'standalone' }
+  }, null, 2));
+  writeFileSync(path.join(csharpOnlyRepo, 'App.csproj'), '<Project Sdk="Microsoft.NET.Sdk"></Project>\n', 'utf8');
+  const csharpOnlyOrientation = probeProject(csharpOnlyRepo);
+  assert(csharpOnlyOrientation.detectedLanguages.includes('C#'), 'C#-only repo must detect C#');
+  assert(!csharpOnlyOrientation.releaseBlockers.includes('package-json-missing'), 'C#-only repo must not treat missing package.json as release blocker');
+  const csharpRuntimeReadiness = inspectRuntimeAdapterReadiness(csharpOnlyRepo);
+  assert(csharpRuntimeReadiness.languageOnlyHost === true, 'C#-only repo must report languageOnlyHost=true');
+  assert(csharpRuntimeReadiness.needsRuntimeAdapterHint === true, 'C#-only repo must surface missing language adapter as advisory hint');
+  assert(csharpRuntimeReadiness.missingLanguageAdapters.includes('C#'), 'C#-only repo must name C# as missing language adapter');
+  assert(csharpRuntimeReadiness.atomBirthApplyDeferred === true, 'C#-only repo must defer atom birth/apply until language adapter selection');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

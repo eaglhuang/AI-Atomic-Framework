@@ -561,8 +561,8 @@ check(decompReplaced.findings.length === 0, 'Decomposition Police must skip entr
 const decompPlanDraft = buildDecompositionPlanHintDraft(decompPositiveFamily.findings[0]);
 check(decompPlanDraft.ok === true, 'buildDecompositionPlanHintDraft must succeed for positive finding');
 check(decompPlanDraft.draft?.mode === 'draft', 'decomposition plan draft mode must be draft');
-check(decompPlanDraft.draft?.legacyUris.length > 0, 'decomposition plan draft must have legacyUris');
-check(decompPlanDraft.draft?.entrypoints.length > 0, 'decomposition plan draft must have entrypoints');
+check((decompPlanDraft.draft?.legacyUris?.length ?? 0) > 0, 'decomposition plan draft must have legacyUris');
+check((decompPlanDraft.draft?.entrypoints?.length ?? 0) > 0, 'decomposition plan draft must have entrypoints');
 
 const draftMissingLegacy = buildDecompositionPlanHintDraft({
   ...decompPositiveFamily.findings[0],
@@ -657,14 +657,14 @@ const decompMachineFinding = toReviewAdvisoryMachineFinding(decompPositiveFamily
 const decompBridged = appendMachineFindings(stubReport, [decompMachineFinding]);
 const decompBridgedFinding = decompBridged.findings.find((finding: any) => finding.id === decompMachineFinding.id);
 check(decompBridgedFinding?.trigger === 'machine-finding', 'Decomposition finding must enter ReviewAdvisory as machine-finding');
-check(decompBridgedFinding?.metadata?.policeFinding?.policeFamily === 'decomposition', 'ReviewAdvisory must preserve decomposition policeFinding');
+check((decompBridgedFinding?.metadata?.policeFinding as any)?.policeFamily === 'decomposition', 'ReviewAdvisory must preserve decomposition policeFinding');
 check(decompBridgedFinding?.action !== 'none', 'Decomposition advisory cannot auto-approve');
 
 const evoMachineFinding = toReviewAdvisoryMachineFinding(evoPositiveFamily.findings[0]);
 const evoBridged = appendMachineFindings(stubReport, [evoMachineFinding]);
 const evoBridgedFinding = evoBridged.findings.find((finding: any) => finding.id === evoMachineFinding.id);
 check(evoBridgedFinding?.trigger === 'machine-finding', 'Evolution finding must enter ReviewAdvisory as machine-finding');
-check(evoBridgedFinding?.metadata?.policeFinding?.policeFamily === 'evolution', 'ReviewAdvisory must preserve evolution policeFinding');
+check((evoBridgedFinding?.metadata?.policeFinding as any)?.policeFamily === 'evolution', 'ReviewAdvisory must preserve evolution policeFinding');
 check(evoBridgedFinding?.action !== 'none', 'Evolution advisory cannot auto-approve');
 
 // ── Polymorph Police (APF-0040~0042) ───────────────────────────────────────
@@ -811,12 +811,12 @@ check(driftClean.findings.length === 0, 'Contract Drift Check must produce no fi
 const polymorphMachineFinding = toReviewAdvisoryMachineFinding(polymorphDriftFamily.findings[0]);
 const polymorphBridged = appendMachineFindings(stubReport, [polymorphMachineFinding]);
 const polymorphBridgedFinding = polymorphBridged.findings.find((finding: any) => finding.id === polymorphMachineFinding.id);
-check(polymorphBridgedFinding?.metadata?.policeFinding?.policeFamily === 'polymorph', 'ReviewAdvisory must preserve polymorph policeFinding');
+check((polymorphBridgedFinding?.metadata?.policeFinding as any)?.policeFamily === 'polymorph', 'ReviewAdvisory must preserve polymorph policeFinding');
 
 const rollbackMachineFinding = toReviewAdvisoryMachineFinding(rollbackIrreversibleFamily.findings[0]);
 const rollbackBridged = appendMachineFindings(stubReport, [rollbackMachineFinding]);
 const rollbackBridgedFinding = rollbackBridged.findings.find((finding: any) => finding.id === rollbackMachineFinding.id);
-check(rollbackBridgedFinding?.metadata?.policeFinding?.policeFamily === 'rollback', 'ReviewAdvisory must preserve rollback policeFinding');
+check((rollbackBridgedFinding?.metadata?.policeFinding as any)?.policeFamily === 'rollback', 'ReviewAdvisory must preserve rollback policeFinding');
 check(rollbackBridgedFinding?.action === 'request-human-review', 'Rollback blocker must route to request-human-review (not auto-approve)');
 
 // Required new fixture files

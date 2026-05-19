@@ -81,6 +81,22 @@ export interface ContextSummaryStore extends StoreLifecycle {
   readSummary(workItemId: string): Promise<ContextSummaryRecord | null> | ContextSummaryRecord | null;
 }
 
+export type MemoryScope = 'user' | 'session' | 'repo';
+
+export interface MemorySearchResult {
+  readonly scope: MemoryScope;
+  readonly key: string;
+  readonly content: string;
+  readonly score: number;
+  readonly metadata?: Readonly<Record<string, unknown>>;
+}
+
+export interface MemoryStoreAdapter extends StoreLifecycle {
+  writeMemory(scope: MemoryScope, key: string, content: string, metadata?: Readonly<Record<string, unknown>>): Promise<MemorySearchResult> | MemorySearchResult;
+  searchMemory(query: string, scope?: MemoryScope, limit?: number): Promise<readonly MemorySearchResult[]> | readonly MemorySearchResult[];
+  deleteMemory?(scope: MemoryScope, key: string): Promise<CapabilityResult> | CapabilityResult;
+}
+
 export type ContextBudgetDecision = 'pass' | 'summarize-before-continue' | 'hard-stop';
 
 export interface ContextBudgetPolicy {
@@ -134,4 +150,5 @@ export interface GovernanceStores {
   readonly registryStore?: RegistryStore;
   readonly contextBudgetGuard?: ContextBudgetGuard;
   readonly contextSummaryStore?: ContextSummaryStore;
+  readonly memoryStore?: MemoryStoreAdapter;
 }

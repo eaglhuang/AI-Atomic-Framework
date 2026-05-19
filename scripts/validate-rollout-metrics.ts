@@ -93,14 +93,15 @@ function checkIntegrationMetrics(report: Record<string, unknown>, label: string)
 
   const adapterResults = integrationMetrics.adapterResults;
   check(Array.isArray(adapterResults), `${label} integrationMetrics.adapterResults must be an array`);
-  check(adapterResults.length === adaptersTotal, `${label} adapterResults length must equal adaptersTotal`);
-  const installedCount = adapterResults.filter((entry: any) => entry.installed === true).length;
-  const driftCount = adapterResults.filter((entry: any) => entry.driftDetected === true).length;
-  const charterViolationCount = adapterResults.filter((entry: any) => entry.charterViolationDetected === true).length;
+  const adapterResultEntries = Array.isArray(adapterResults) ? adapterResults : [];
+  check(adapterResultEntries.length === adaptersTotal, `${label} adapterResults length must equal adaptersTotal`);
+  const installedCount = adapterResultEntries.filter((entry: any) => entry.installed === true).length;
+  const driftCount = adapterResultEntries.filter((entry: any) => entry.driftDetected === true).length;
+  const charterViolationCount = adapterResultEntries.filter((entry: any) => entry.charterViolationDetected === true).length;
   check(installedCount === installSucceeded, `${label} adapterResults installed count must equal installSucceeded`);
   check(driftCount === drifted, `${label} adapterResults drift count must equal drifted`);
   check(charterViolationCount === charterViolations, `${label} adapterResults charter violation count must equal charterViolations`);
-  for (const [index, adapterResult] of adapterResults.entries()) {
+  for (const [index, adapterResult] of adapterResultEntries.entries()) {
     const entry = asRecord(adapterResult, `${label} adapterResults[${index}] must be an object`);
     check(entry.firstCommand === 'node atm.mjs next --json', `${label} adapterResults[${index}] must preserve the first command`);
     check(entry.charterInjected === true, `${label} adapterResults[${index}] must inject charter invariants`);

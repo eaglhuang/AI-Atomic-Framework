@@ -64,6 +64,7 @@ for (const goal of [
 for (const [goal, expectedIntent] of [
   ['update README documentation', 'docs-spec'],
   ['create new atom for a greenfield capability', 'atom-create'],
+  ['import task cards from a markdown plan', 'task-plan-import'],
   ['clean up package whitespace', 'unknown']
 ] as const) {
   const classification = classifyGuidanceIntent(goal, { adapterStatus: 'available' });
@@ -200,8 +201,8 @@ try {
   assert(candidatesRank.parsed.evidence?.report?.policeReportPath, 'candidates rank must emit police report path');
   assert(candidatesRank.parsed.evidence?.report?.guidanceDriftReportPath, 'candidates rank must emit guidance drift police report path');
   assert(candidatesRank.parsed.evidence?.report?.pythonOnlyAdopterNeutrality?.candidateRankingAllowed === true, 'Python-only neutrality must allow candidate ranking');
-  assert(candidatesRank.parsed.evidence?.report?.pythonOnlyAdopterNeutrality?.runtimeAdapterReadiness?.needsRuntimeAdapterHint === true, 'candidates rank must surface Python runtime adapter hint');
-  assert(candidatesRank.parsed.evidence?.report?.pythonOnlyAdopterNeutrality?.runtimeAdapterReadiness?.pythonLanguageAdapterAvailable === false, 'candidates rank must report no bundled Python language adapter in current release');
+  assert(candidatesRank.parsed.evidence?.report?.pythonOnlyAdopterNeutrality?.runtimeAdapterReadiness?.pythonLanguageAdapterAvailable === true, 'candidates rank must report bundled @ai-atomic-framework/language-python as available');
+  assert(candidatesRank.parsed.evidence?.report?.pythonOnlyAdopterNeutrality?.runtimeAdapterReadiness?.needsRuntimeAdapterHint === false, 'candidates rank must clear the runtime adapter hint once language-python is bundled');
   assert(existsSync(path.join(adaptedRepo, candidatesRank.parsed.evidence?.outputPath)), 'candidates rank must write candidate report');
   assert(existsSync(path.join(adaptedRepo, candidatesRank.parsed.evidence?.sourceInventoryReportPath)), 'candidates rank must write source inventory report');
   assert(existsSync(path.join(adaptedRepo, candidatesRank.parsed.evidence?.policeReportPath)), 'candidates rank must write police report');

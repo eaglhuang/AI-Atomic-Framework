@@ -126,9 +126,22 @@ export async function runCandidates(argv: string[]) {
     pythonEntrypointsDetected: orientation.detectedLanguages.includes('Python'),
     candidateRankingAllowed: true,
     createAtomRoute: !existsSync(path.join(options.cwd, 'package.json')) && orientation.detectedLanguages.includes('Python')
-      ? 'deferred until package/runtime adapter is selected'
+      ? runtimeAdapterReadiness.pythonLanguageAdapterAvailable
+        ? 'available through language-python adapter (apply still requires evidence + review gates)'
+        : 'deferred until package/runtime adapter is selected'
       : 'available through normal ATM create route',
     runtimeAdapterReadiness
+  };
+  const languagePythonAdapter = {
+    bundled: runtimeAdapterReadiness.pythonLanguageAdapterAvailable,
+    adapterName: runtimeAdapterReadiness.pythonLanguageAdapterAvailable ? '@ai-atomic-framework/language-python' : null,
+    supports: runtimeAdapterReadiness.pythonLanguageAdapterAvailable
+      ? ['detect-python-project-profile', 'scan-python-entrypoints', 'scan-python-imports', 'plan-python-atomize-dry-run', 'delegated-test-commands'] as const
+      : [] as const,
+    appliesTo: includePatterns.filter((pattern) => /\.py\b/.test(pattern)),
+    note: runtimeAdapterReadiness.pythonLanguageAdapterAvailable
+      ? 'Candidate ranking metadata can be enriched with adapter-detected entrypoints; apply still requires evidence and review gates.'
+      : 'No bundled Python language adapter; candidate ranking remains advisory-only.'
   };
   const reportId = `candidate-ranking-${formatTimestampForPath(generatedAt)}`;
   const reportsDirectory = path.resolve(options.cwd, options.outDir);
@@ -152,7 +165,8 @@ export async function runCandidates(argv: string[]) {
     guidanceDriftReportPath: relativePathFrom(options.cwd, guidanceDriftReportPath),
     nextDryRunCommand: candidateRanking[0]?.nextDryRunCommand ?? null,
     guidedFallback: buildGuidedFallback(options.cwd),
-    pythonOnlyAdopterNeutrality
+    pythonOnlyAdopterNeutrality,
+    languagePythonAdapter
   };
 
   mkdirSync(reportsDirectory, { recursive: true });

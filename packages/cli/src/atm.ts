@@ -9,6 +9,7 @@ import { runCreate } from './commands/create.ts';
 import { runCreateMap } from './commands/create-map.ts';
 import { runDoctor } from './commands/doctor.ts';
 import { runExplain } from './commands/explain.ts';
+import { runExperience } from './commands/experience.ts';
 import { runGuard } from './commands/guard.ts';
 import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
@@ -50,6 +51,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   'create-map': runCreateMap,
   doctor: runDoctor,
   explain: runExplain,
+  experience: runExperience,
   guard: runGuard,
   guide: runGuide,
   handoff: runHandoff,

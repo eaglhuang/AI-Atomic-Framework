@@ -17,7 +17,10 @@ export const registryTransitionActions = [
   'behavior.polymorphize',
   'behavior.compose',
   'behavior.infect',
-  'behavior.atomize'
+  'behavior.atomize',
+  'experience.extract-skill',
+  'experience.amend-skill',
+  'experience.memory-nudge'
 ] as const;
 
 export const registryMutabilityPolicies = ['mutable', 'frozen-after-release', 'immutable'] as const;
@@ -132,6 +135,24 @@ export const registryTransitionRules: Readonly<Record<RegistryTransitionAction, 
     toStatus: 'active',
     secondaryStatuses: ['validated'],
     allowedMutabilityPolicies: ['mutable']
+  },
+  'experience.extract-skill': {
+    entryTypes: ['atom', 'map'],
+    fromStatuses: ['active'],
+    toStatus: 'active',
+    allowedMutabilityPolicies: ['mutable', 'frozen-after-release', 'immutable']
+  },
+  'experience.amend-skill': {
+    entryTypes: ['atom', 'map'],
+    fromStatuses: ['active'],
+    toStatus: 'active',
+    allowedMutabilityPolicies: ['mutable', 'frozen-after-release', 'immutable']
+  },
+  'experience.memory-nudge': {
+    entryTypes: ['atom', 'map'],
+    fromStatuses: ['active'],
+    toStatus: 'active',
+    allowedMutabilityPolicies: ['mutable', 'frozen-after-release', 'immutable']
   }
 };
 

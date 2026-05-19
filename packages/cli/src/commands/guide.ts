@@ -15,7 +15,7 @@ import { glossaryEntries } from './glossary-data.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 const supportedGuideIntents = ['overview', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
-const supportedLearnIntents: readonly GuidanceIntent[] = ['legacy-atomization', 'legacy-candidate-ranking'];
+const supportedLearnIntents: readonly GuidanceIntent[] = ['legacy-atomization', 'legacy-candidate-ranking', 'task-plan-import'];
 const supportedLearnStatuses: readonly GuidanceIntentStatus[] = ['suggested', 'active-host', 'promoted-framework'];
 const supportedSkillInstallTargets = ['host', 'codex'] as const;
 const governanceRouterSkillName = 'atm-governance-router';
@@ -225,6 +225,7 @@ function buildGoalGuide(cwd: string, goal: string) {
   });
   const governedLegacyIntent = classification.matchedIntent === 'legacy-atomization'
     || classification.matchedIntent === 'legacy-candidate-ranking'
+    || classification.matchedIntent === 'task-plan-import'
     || classification.matchedIntent === 'adapter-bootstrap';
   const routeIntent = governedLegacyIntent && orientation.adapterStatus.status === 'missing'
     ? 'adapter-bootstrap'

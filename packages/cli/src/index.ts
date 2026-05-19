@@ -58,6 +58,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'experience',
+    summary: 'Extract reviewable learning artifacts from ATM evidence',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'orient',
     summary: 'Inspect a repository and emit a guidance orientation report',
     implemented: true,

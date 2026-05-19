@@ -92,6 +92,12 @@ function detectLanguages(root: string, packageJson: Record<string, unknown> | nu
   if (existsSync(path.join(root, 'pyproject.toml')) || existsSync(path.join(root, 'requirements.txt'))) {
     languages.add('Python');
   }
+  if (existsSync(path.join(root, 'pom.xml')) || existsSync(path.join(root, 'build.gradle')) || existsSync(path.join(root, 'build.gradle.kts')) || hasFileWithExtension(root, '.java')) {
+    languages.add('Java');
+  }
+  if (hasFileWithExtension(root, '.csproj') || hasFileWithExtension(root, '.sln') || hasFileWithExtension(root, '.cs')) {
+    languages.add('C#');
+  }
   return [...languages].sort();
 }
 
@@ -100,6 +106,9 @@ function detectPackageManager(root: string): string | null {
   if (existsSync(path.join(root, 'yarn.lock'))) return 'yarn';
   if (existsSync(path.join(root, 'package-lock.json'))) return 'npm';
   if (existsSync(path.join(root, 'bun.lockb'))) return 'bun';
+  if (existsSync(path.join(root, 'pom.xml'))) return 'maven';
+  if (existsSync(path.join(root, 'build.gradle')) || existsSync(path.join(root, 'build.gradle.kts'))) return 'gradle';
+  if (hasFileWithExtension(root, '.csproj') || hasFileWithExtension(root, '.sln')) return 'dotnet';
   return null;
 }
 
@@ -137,6 +146,12 @@ function detectAvailableAdapters(root: string, packageJson: Record<string, unkno
   }
   if (existsSync(path.join(root, 'packages', 'adapter-local-git'))) {
     adapters.add('@ai-atomic-framework/adapter-local-git');
+  }
+  if (existsSync(path.join(root, 'packages', 'language-js'))) {
+    adapters.add('@ai-atomic-framework/language-js');
+  }
+  if (existsSync(path.join(root, 'packages', 'language-python'))) {
+    adapters.add('@ai-atomic-framework/language-python');
   }
   return [...adapters].sort();
 }
@@ -211,9 +226,9 @@ function buildUnknowns(
   detectedLanguages: readonly string[]
 ): readonly string[] {
   const unknowns: string[] = [];
-  const pythonOnly = isPythonOnlyAdopter(packageJson, detectedLanguages);
-  if (!packageJson && !pythonOnly) unknowns.push('package.json');
-  if (!packageManager && !pythonOnly) unknowns.push('packageManager');
+  const nonJavaScriptHost = isNonJavaScriptHostWithoutPackageJson(packageJson, detectedLanguages);
+  if (!packageJson && !nonJavaScriptHost) unknowns.push('package.json');
+  if (!packageManager && !nonJavaScriptHost) unknowns.push('packageManager');
   if (testEntrypoints.length === 0) unknowns.push('testEntrypoints');
   if (!governanceFiles.includes('.atm/config.json')) unknowns.push('atmConfig');
   if (!existsSync(path.join(root, '.git'))) unknowns.push('gitRepository');
@@ -222,20 +237,27 @@ function buildUnknowns(
 
 function buildReleaseBlockers(root: string, packageJson: Record<string, unknown> | null, detectedLanguages: readonly string[]): readonly string[] {
   const blockers: string[] = [];
-  if (!packageJson && !isPythonOnlyAdopter(packageJson, detectedLanguages)) blockers.push('package-json-missing');
+  if (!packageJson && !isNonJavaScriptHostWithoutPackageJson(packageJson, detectedLanguages)) blockers.push('package-json-missing');
   if (!existsSync(path.join(root, '.git'))) blockers.push('git-repository-missing');
   return blockers;
 }
 
 function buildReleaseAdvisories(root: string, packageJson: Record<string, unknown> | null, detectedLanguages: readonly string[]): readonly string[] {
   const advisories: string[] = [];
-  if (!packageJson && isPythonOnlyAdopter(packageJson, detectedLanguages)) {
+  if (!packageJson && isNonJavaScriptHostWithoutPackageJson(packageJson, detectedLanguages)) {
     advisories.push('package-json-missing:advisory');
-    advisories.push('python-entrypoints-detected');
+    advisories.push(`${detectedLanguages.join('+').toLowerCase()}-entrypoints-detected`);
     advisories.push('candidate-ranking-allowed');
-    advisories.push('create-atom-route-deferred-until-runtime-adapter-selected');
+    advisories.push('create-atom-route-deferred-until-language-adapter-selected');
   }
   return advisories;
+}
+
+function isNonJavaScriptHostWithoutPackageJson(packageJson: Record<string, unknown> | null, detectedLanguages: readonly string[]): boolean {
+  return !packageJson
+    && detectedLanguages.length > 0
+    && !detectedLanguages.includes('JavaScript')
+    && !detectedLanguages.includes('TypeScript');
 }
 
 function isPythonOnlyAdopter(packageJson: Record<string, unknown> | null, detectedLanguages: readonly string[]): boolean {
@@ -243,6 +265,27 @@ function isPythonOnlyAdopter(packageJson: Record<string, unknown> | null, detect
     && detectedLanguages.includes('Python')
     && !detectedLanguages.includes('JavaScript')
     && !detectedLanguages.includes('TypeScript');
+}
+
+function hasFileWithExtension(root: string, extension: string): boolean {
+  for (const relativePath of ['', 'src']) {
+    const absolutePath = path.join(root, relativePath);
+    if (!existsSync(absolutePath)) continue;
+    for (const entry of readdirSync(absolutePath, { withFileTypes: true })) {
+      if (entry.isFile() && entry.name.endsWith(extension)) return true;
+      if (entry.isDirectory() && relativePath === '') {
+        const nestedPath = path.join(absolutePath, entry.name);
+        try {
+          if (readdirSync(nestedPath, { withFileTypes: true }).some((nestedEntry) => nestedEntry.isFile() && nestedEntry.name.endsWith(extension))) {
+            return true;
+          }
+        } catch {
+          continue;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 function readJsonIfExists(filePath: string): unknown | null {

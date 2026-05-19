@@ -83,7 +83,9 @@ function validateKnownBadFile(relativePath: string) {
     return;
   }
 
-  for (const [index, entry] of payload.entries.entries()) {
+  const knownBadPayload = payload as { entries: Array<{ versionRange: string; replacementVersion: string }> };
+  const knownBadEntries = knownBadPayload.entries;
+  for (const [index, entry] of knownBadEntries.entries()) {
     assert(
       isSupportedKnownBadRange(entry.versionRange),
       'KNOWN_BAD_RANGE_INVALID',

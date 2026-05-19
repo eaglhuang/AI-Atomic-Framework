@@ -1,0 +1,29 @@
+{
+  "name": "@ai-atomic-framework/language-python",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Python reference language adapter for ATM.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@ai-atomic-framework/core": "0.0.0",
+    "@ai-atomic-framework/plugin-sdk": "0.0.0"
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/language-python",
+    "test": "node --experimental-strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
+}

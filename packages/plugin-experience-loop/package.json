@@ -1,0 +1,30 @@
+{
+  "name": "@ai-atomic-framework/plugin-experience-loop",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Experience-loop plugin for extracting reviewable learning artifacts from ATM evidence.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "schemas"
+  ],
+  "dependencies": {
+    "@ai-atomic-framework/core": "0.0.0",
+    "@ai-atomic-framework/plugin-sdk": "0.0.0"
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/plugin-experience-loop",
+    "test": "node --experimental-strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "types": "./dist/index.d.ts"
+}
