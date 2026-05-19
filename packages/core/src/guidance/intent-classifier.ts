@@ -3,6 +3,7 @@ import path from 'node:path';
 
 export type GuidanceIntent =
   | 'legacy-atomization'
+  | 'legacy-candidate-ranking'
   | 'adapter-bootstrap'
   | 'docs-spec'
   | 'atom-create'
@@ -122,6 +123,45 @@ const defaultLegacyVerbTerms = [
   '抽出'
 ];
 
+const defaultLegacyCandidateRankingTerms = [
+  'rank source',
+  'rank sources',
+  'rank scripts',
+  'rank pipelines',
+  'rank the messiest',
+  'prioritize refactor',
+  'prioritize refactoring',
+  'prioritize cleanup',
+  'refactor candidates',
+  'cleanup candidates',
+  'candidate ranking',
+  'source inventory',
+  'pipeline inventory',
+  'python pipeline',
+  'pipeline scripts',
+  'messy pipeline',
+  'messiest pipeline',
+  'messy script',
+  'messiest script',
+  'worst scripts',
+  'largest scripts',
+  'legacy hotspot',
+  'source hotspot',
+  'hotspot ranking',
+  'technical debt ranking',
+  '資料管線',
+  'python 資料管線',
+  '資料管線最亂',
+  '最亂',
+  '最值得先整理',
+  '排一下優先順序',
+  '優先順序',
+  '候選排序',
+  '候選盤點',
+  '清理候選',
+  '重構候選'
+];
+
 const docsTerms = [
   'docs',
   'documentation',
@@ -193,13 +233,40 @@ export function classifyGuidanceIntent(
   const learnedLegacyTerms = activeHostEntries
     .filter((entry) => entry.intent === 'legacy-atomization')
     .map((entry) => entry.normalizedPhrase);
+  const learnedCandidateRankingTerms = activeHostEntries
+    .filter((entry) => entry.intent === 'legacy-candidate-ranking')
+    .map((entry) => entry.normalizedPhrase);
 
   const legacyActionMatches = matchTerms(normalizedGoal, [...defaultLegacyActionTerms, ...learnedLegacyTerms]);
+  const legacyCandidateRankingMatches = matchTerms(normalizedGoal, [...defaultLegacyCandidateRankingTerms, ...learnedCandidateRankingTerms]);
   const legacyContextMatches = matchTerms(normalizedGoal, defaultLegacyContextTerms);
   const legacyVerbMatches = matchTerms(normalizedGoal, defaultLegacyVerbTerms);
   const docMatches = matchTerms(normalizedGoal, docsTerms);
   const atomCreateMatches = matchTerms(normalizedGoal, atomCreateTerms);
   const upgradeMatches = matchTerms(normalizedGoal, upgradeTerms);
+
+  if (legacyCandidateRankingMatches.length > 0) {
+    return buildClassification({
+      goal,
+      matchedIntent: 'legacy-candidate-ranking',
+      confidence: confidenceFromMatches(0.88, legacyCandidateRankingMatches.length),
+      matchedTerms: legacyCandidateRankingMatches,
+      requiredFlow: [
+        'atm guide --goal',
+        'atm candidates rank',
+        'source inventory report',
+        'police family report',
+        'human review before mutation'
+      ],
+      nextCommand: 'node atm.mjs candidates rank --include "pipelines/**/*.py" --goal "<goal>" --json',
+      blockedAntiPatterns: [
+        'rank legacy scripts with ad-hoc shell-only heuristics',
+        'choose split/atomize/infect without candidate ranking artifact',
+        'mutate host files before source inventory and police evidence exist'
+      ],
+      lexiconSources: activeHostEntries.length > 0 ? ['framework-default', 'host-local'] : ['framework-default']
+    });
+  }
 
   if (legacyActionMatches.length > 0 || (legacyContextMatches.length > 0 && legacyVerbMatches.length > 0)) {
     const matchedTerms = uniqueStrings([...legacyActionMatches, ...legacyContextMatches, ...legacyVerbMatches]);
@@ -303,8 +370,8 @@ export function recordGuidanceIntentPhrase(options: RecordGuidanceIntentPhraseOp
   if (!reason) {
     throw new Error('guide learn requires a reason.');
   }
-  if (options.intent !== 'legacy-atomization') {
-    throw new Error('guide learn currently supports intent legacy-atomization only.');
+  if (!['legacy-atomization', 'legacy-candidate-ranking'].includes(options.intent)) {
+    throw new Error('guide learn currently supports intent legacy-atomization and legacy-candidate-ranking only.');
   }
   const status = options.status ?? 'suggested';
   if (status === 'promoted-framework') {
@@ -369,7 +436,7 @@ function normalizeLexiconEntry(entry: unknown): GuidanceIntentLexiconEntry[] {
   if (typeof entry !== 'object' || entry === null) return [];
   const candidate = entry as Record<string, unknown>;
   if (typeof candidate.phrase !== 'string') return [];
-  if (candidate.intent !== 'legacy-atomization') return [];
+  if (candidate.intent !== 'legacy-atomization' && candidate.intent !== 'legacy-candidate-ranking') return [];
   const status = candidate.status === 'active-host' || candidate.status === 'promoted-framework'
     ? candidate.status
     : 'suggested';

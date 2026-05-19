@@ -3,7 +3,8 @@ import path from 'node:path';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
 import { createATMVersionSummary, loadATMChartSummary } from './atm-chart.ts';
 import { relativePathFrom } from './governance-runtime.ts';
-import { checkIntegrationHealth } from './integration.ts';
+import { checkIntegrationHealth, inspectIntegrationBootstrap } from './integration.ts';
+import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { runNext } from './next.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
@@ -46,6 +47,8 @@ export async function runWelcome(argv: string[]) {
     });
   }
   const integrationHealth = await checkIntegrationHealth(cwd);
+  const integrationBootstrap = inspectIntegrationBootstrap(cwd);
+  const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(cwd);
   const nextResult = await runNext(['--cwd', cwd]);
   const nextAction = (nextResult.evidence?.nextAction as GuidanceNextAction | null) ?? null;
   const userNotice = nextResult.evidence?.userNotice ?? null;
@@ -69,6 +72,38 @@ export async function runWelcome(argv: string[]) {
       message('info', dryRun ? 'ATM_WELCOME_DRY_RUN' : 'ATM_WELCOME_READY', dryRun
         ? 'Welcome summary generated without writing lifecycle lineage.'
         : 'Welcome summary generated and lifecycle lineage recorded.'),
+      ...(integrationBootstrap.needsInstallHint
+        ? [message(
+          'warning',
+          'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED',
+          'ATM runtime is ready, but no repo-local editor integration is installed yet. Install the adapter for the editor you are using before switching tools.',
+          {
+            suggestedAction: integrationBootstrap.suggestedAction,
+            adapters: integrationBootstrap.adapters.map((adapter) => ({
+              id: adapter.id,
+              primaryEntryPath: adapter.primaryEntryPath,
+              installCommand: adapter.installCommand,
+              verifyCommand: adapter.verifyCommand
+            }))
+          }
+        )]
+        : []),
+      ...(runtimeAdapterReadiness.needsRuntimeAdapterHint
+        ? [message(
+          'warning',
+          'ATM_PYTHON_RUNTIME_ADAPTER_RECOMMENDED',
+          runtimeAdapterReadiness.suggestedAction ?? 'Python entrypoints were detected. Select a Python runtime adapter/plugin before expecting ATM atom birth or apply routes to mutate Python surfaces.',
+          {
+            detectedLanguages: runtimeAdapterReadiness.detectedLanguages,
+            bundledLanguageAdapters: runtimeAdapterReadiness.bundledLanguageAdapters,
+            bundledProjectAdapters: runtimeAdapterReadiness.bundledProjectAdapters,
+            pythonLanguageAdapterAvailable: runtimeAdapterReadiness.pythonLanguageAdapterAvailable,
+            candidateRankingAllowed: runtimeAdapterReadiness.candidateRankingAllowed,
+            atomBirthApplyDeferred: runtimeAdapterReadiness.atomBirthApplyDeferred,
+            missingCapability: runtimeAdapterReadiness.missingCapability
+          }
+        )]
+        : []),
       message('info', 'ATM_TELEMETRY_NOTICE', 'ATM telemetry is opt-in only. Run `node atm.mjs telemetry --on --json` after reviewing docs/TELEMETRY.md.'),
       message('warning', 'ATM_EXPERIMENTAL_API_NOTICE', 'Experimental APIs are disabled unless a command is invoked with --allow-experimental.')
     ],
@@ -108,6 +143,8 @@ export async function runWelcome(argv: string[]) {
           driftedFiles: report.driftedFiles
         }))
       },
+      integrationBootstrap,
+      runtimeAdapterReadiness,
       nextAction,
       userNotice,
       lineagePath: dryRun ? null : relativePathFrom(cwd, lineageAbsolutePath),

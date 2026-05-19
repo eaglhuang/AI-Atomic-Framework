@@ -32,7 +32,7 @@
     {
       "flag": "--intent",
       "value": "id",
-      "summary": "Intent id for guide learn, currently legacy-atomization."
+      "summary": "Intent id for guide learn: legacy-atomization | legacy-candidate-ranking."
     },
     {
       "flag": "--reason",
@@ -74,6 +74,7 @@
   ],
   "examples": [
     "node atm.mjs guide --goal \"Atomize a legacy helper\" --json",
+    "node atm.mjs guide --goal \"Rank the messiest Python pipeline scripts\" --json",
     "node atm.mjs guide learn --phrase \"brown path washing\" --intent legacy-atomization --reason \"host phrasing for legacy atomization\" --status active-host --json",
     "node atm.mjs guide install-skill --target host --json",
     "node atm.mjs guide overview --json",

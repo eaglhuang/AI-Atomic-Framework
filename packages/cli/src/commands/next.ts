@@ -1,13 +1,15 @@
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
 import type { LegacyRoutePlan, LegacyRoutePlanSegment } from '../../../core/src/guidance/legacy-route-plan.ts';
-import { buildFirstUseUserNotice } from './first-use-notice.ts';
+import { buildFirstUseUserNotice, type AtmUserNotice } from './first-use-notice.ts';
 import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
+import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { makeResult, message, parseOptions } from './shared.ts';
 
 export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
+  const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
   if (activeGuidanceSession) {
     const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
@@ -18,11 +20,19 @@ export async function runNext(argv: any) {
       ok: nextAction.status !== 'blocked',
       command: 'next',
       cwd: options.cwd,
-      messages: [message('info', nextAction.status === 'blocked' ? 'ATM_GUIDANCE_NEXT_BLOCKED' : 'ATM_GUIDANCE_NEXT_ACTION', 'ATM guidance identified the next single action.', nextAction)],
+      messages: buildNextMessages(
+        nextAction,
+        userNotice,
+        runtimeAdapterReadiness,
+        nextAction.status === 'blocked'
+          ? message('info', 'ATM_GUIDANCE_NEXT_BLOCKED', 'ATM guidance identified the next single action.', nextAction)
+          : message('info', 'ATM_GUIDANCE_NEXT_ACTION', 'ATM guidance identified the next single action.', nextAction)
+      ),
       evidence: {
         nextAction,
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         ...(userNotice ? { userNotice } : {}),
+        runtimeAdapterReadiness,
         guidanceSession: {
           sessionId: activeGuidanceSession.sessionId,
           goal: activeGuidanceSession.goal,
@@ -43,11 +53,19 @@ export async function runNext(argv: any) {
     ok: nextAction.status === 'ready',
     command: 'next',
     cwd: options.cwd,
-    messages: [nextAction.status === 'ready' ? message('info', 'ATM_NEXT_READY', 'ATM is ready for the next governed task.', nextAction) : message('info', 'ATM_NEXT_ACTION', 'ATM identified the next single governed action.', nextAction)],
+    messages: buildNextMessages(
+      nextAction,
+      userNotice,
+      runtimeAdapterReadiness,
+      nextAction.status === 'ready'
+        ? message('info', 'ATM_NEXT_READY', 'ATM is ready for the next governed task.', nextAction)
+        : message('info', 'ATM_NEXT_ACTION', 'ATM identified the next single governed action.', nextAction)
+    ),
     evidence: {
       nextAction,
       agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
       ...(userNotice ? { userNotice } : {}),
+      runtimeAdapterReadiness,
       doctorSummary: doctorChecks.map((check) => ({ name: check.name, ok: check.ok })),
       layoutVersion: runtime.layoutVersion,
       currentTaskId: runtime.currentTaskId,
@@ -73,6 +91,7 @@ function decideNextAction(runtime: any, failedCheckName: any) {
       status: 'needs-onboarding-refresh',
       command: 'node atm.mjs atm-chart render --cwd . --json',
       reason: 'onboarding ATMChart sources are missing or stale',
+      afterNextAction: 'After this onboarding refresh succeeds, return to the user original request and continue the actual work.',
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
     };
@@ -209,4 +228,40 @@ function buildAgentPackHint(status: string, command: string, reason: string) {
     command,
     reason
   };
+}
+
+function buildNextMessages(
+  nextAction: { readonly status: string },
+  userNotice: AtmUserNotice | null,
+  runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>,
+  routeMessage: ReturnType<typeof message>
+) {
+  const messages = [];
+  if (userNotice) {
+    messages.push(message('info', 'ATM_USER_NOTICE', userNotice.spokenLine, {
+      displayPolicy: userNotice.displayPolicy,
+      mustShowBeforeAction: userNotice.mustShowBeforeAction,
+      agentInstruction: userNotice.agentInstruction,
+      afterNextActionInstruction: userNotice.afterNextActionInstruction,
+      route: nextAction.status
+    }));
+  }
+  if (runtimeAdapterReadiness.needsRuntimeAdapterHint) {
+    messages.push(message(
+      'warning',
+      'ATM_PYTHON_RUNTIME_ADAPTER_RECOMMENDED',
+      runtimeAdapterReadiness.suggestedAction ?? 'Python entrypoints were detected. Select a Python runtime adapter/plugin before expecting ATM atom birth or apply routes to mutate Python surfaces.',
+      {
+        detectedLanguages: runtimeAdapterReadiness.detectedLanguages,
+        bundledLanguageAdapters: runtimeAdapterReadiness.bundledLanguageAdapters,
+        bundledProjectAdapters: runtimeAdapterReadiness.bundledProjectAdapters,
+        pythonLanguageAdapterAvailable: runtimeAdapterReadiness.pythonLanguageAdapterAvailable,
+        candidateRankingAllowed: runtimeAdapterReadiness.candidateRankingAllowed,
+        atomBirthApplyDeferred: runtimeAdapterReadiness.atomBirthApplyDeferred,
+        missingCapability: runtimeAdapterReadiness.missingCapability
+      }
+    ));
+  }
+  messages.push(routeMessage);
+  return messages;
 }

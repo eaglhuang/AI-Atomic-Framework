@@ -15,10 +15,10 @@ import { glossaryEntries } from './glossary-data.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 const supportedGuideIntents = ['overview', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
-const supportedLearnIntents: readonly GuidanceIntent[] = ['legacy-atomization'];
+const supportedLearnIntents: readonly GuidanceIntent[] = ['legacy-atomization', 'legacy-candidate-ranking'];
 const supportedLearnStatuses: readonly GuidanceIntentStatus[] = ['suggested', 'active-host', 'promoted-framework'];
 const supportedSkillInstallTargets = ['host', 'codex'] as const;
-const legacySkillName = 'atm-legacy-atomization-guidance';
+const governanceRouterSkillName = 'atm-governance-router';
 
 const commandTemplates = Object.freeze({
   createAtom: [
@@ -194,7 +194,7 @@ function buildOverviewGuide() {
     channels: [
       {
         channel: 'free-text-intent',
-        when: 'An agent receives a natural-language goal that may involve legacy atomization, infection, transformation, or split.',
+        when: 'An agent receives a natural-language goal that may involve legacy atomization, infection, transformation, split, cleanup, refactor ranking, or source inventory.',
         action: 'Run `node atm.mjs guide --goal "<goal>" --cwd . --json` before searching host docs or choosing a behavior manually.'
       },
       {
@@ -223,9 +223,10 @@ function buildGoalGuide(cwd: string, goal: string) {
     repositoryRoot: cwd,
     adapterStatus: orientation.adapterStatus.status
   });
-  const legacyIntent = classification.matchedIntent === 'legacy-atomization'
+  const governedLegacyIntent = classification.matchedIntent === 'legacy-atomization'
+    || classification.matchedIntent === 'legacy-candidate-ranking'
     || classification.matchedIntent === 'adapter-bootstrap';
-  const routeIntent = legacyIntent && orientation.adapterStatus.status === 'missing'
+  const routeIntent = governedLegacyIntent && orientation.adapterStatus.status === 'missing'
     ? 'adapter-bootstrap'
     : classification.matchedIntent;
   const hasConfigHotspot = orientation.configLegacyHotspots.length > 0;
@@ -235,6 +236,12 @@ function buildGoalGuide(cwd: string, goal: string) {
   const nextCommand = routeIntent === 'legacy-atomization'
     ? legacyStartCommand
     : classification.nextCommand.replace('"<goal>"', quoteCliValue(goal));
+  const readFirst = routeIntent === 'legacy-atomization'
+    ? ['README.md', 'docs/ATOM_GENERATOR.md', 'docs/LIFECYCLE.md']
+    : routeIntent === 'legacy-candidate-ranking'
+      ? ['README.md', 'docs/QUICK_START.md']
+      : ['README.md'];
+  const missingDocs = readFirst.filter((relativePath) => !existsSync(path.join(cwd, relativePath)));
 
   return {
     intent: 'goal',
@@ -249,9 +256,14 @@ function buildGoalGuide(cwd: string, goal: string) {
       ? ['node atm.mjs orient --cwd . --json']
       : [],
     nextCommand,
-    readFirst: routeIntent === 'legacy-atomization'
-      ? ['README.md', 'docs/ATOM_GENERATOR.md', 'docs/LIFECYCLE.md']
-      : ['README.md'],
+    readFirst,
+    guidedFallback: {
+      missingDocs,
+      fallbackSources: missingDocs.length > 0
+        ? ['README.md', '.atm/runtime/project-probe.json', 'source inventory scan']
+        : [],
+      continuedOriginalRequest: true
+    },
     targetSelectionHint: routeIntent === 'legacy-atomization' && !hasConfigHotspot
       ? 'No config legacy hotspot was found; add --target-file and --release-blocker before running start --legacy-flow.'
       : null,
@@ -264,7 +276,9 @@ function buildGoalGuide(cwd: string, goal: string) {
     orientationSummary: {
       adapterStatus: orientation.adapterStatus.status,
       configLegacyHotspotCount: orientation.configLegacyHotspots.length,
-      detectedLanguages: orientation.detectedLanguages
+      detectedLanguages: orientation.detectedLanguages,
+      releaseBlockers: orientation.releaseBlockers,
+      releaseAdvisories: orientation.releaseAdvisories ?? []
     }
   };
 }
@@ -366,7 +380,7 @@ function buildLearnGuide(cwd: string, phrase: string, learnedIntent: GuidanceInt
 
 function buildInstallSkillGuide(cwd: string, target: 'host' | 'codex', skillsRoot: string | null, force: boolean) {
   const frameworkRoot = resolveFrameworkRoot();
-  const sourcePath = path.join(frameworkRoot, 'integrations', 'codex-skills', legacySkillName);
+  const sourcePath = path.join(frameworkRoot, 'integrations', 'codex-skills', governanceRouterSkillName);
   if (!existsSync(path.join(sourcePath, 'SKILL.md'))) {
     throw new CliError('ATM_GUIDE_SKILL_NOT_FOUND', `Bundled skill was not found: ${sourcePath}`, {
       exitCode: 2,
@@ -377,13 +391,13 @@ function buildInstallSkillGuide(cwd: string, target: 'host' | 'codex', skillsRoo
   const targetRoot = target === 'host'
     ? path.join(cwd, '.agents', 'skills')
     : path.resolve(skillsRoot ?? defaultCodexSkillsRoot());
-  const targetPath = path.join(targetRoot, legacySkillName);
+  const targetPath = path.join(targetRoot, governanceRouterSkillName);
   const existed = existsSync(targetPath);
   if (existed && !force) {
     return {
       intent: 'install-skill',
-      summary: 'ATM legacy atomization skill is already installed.',
-      skillName: legacySkillName,
+      summary: 'ATM governance router skill is already installed.',
+      skillName: governanceRouterSkillName,
       target,
       installed: false,
       overwritten: false,
@@ -402,8 +416,8 @@ function buildInstallSkillGuide(cwd: string, target: 'host' | 'codex', skillsRoo
   cpSync(sourcePath, targetPath, { recursive: true });
   return {
     intent: 'install-skill',
-    summary: 'ATM legacy atomization skill installed.',
-    skillName: legacySkillName,
+    summary: 'ATM governance router skill installed.',
+    skillName: governanceRouterSkillName,
     target,
     installed: true,
     overwritten: existed && force,

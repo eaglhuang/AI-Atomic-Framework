@@ -73,7 +73,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/police.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json', 'fixtures/verify/guard-evidence-pass.json', 'fixtures/verify/guard-evidence-missing-justification.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/candidates.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/police.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json', 'fixtures/verify/guard-evidence-pass.json', 'fixtures/verify/guard-evidence-missing-justification.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -196,6 +196,8 @@ try {
   assert(welcomeDryRun.parsed.evidence.lineagePath === null, 'welcome --dry-run must not report a persisted lineage path');
   assert(!existsSync(path.join(atmChartRepo, '.atm/runtime/welcome.lineage.json')), 'welcome --dry-run must not write welcome lineage');
   assertMessageCode(welcomeDryRun, 'ATM_WELCOME_DRY_RUN');
+  assertMessageCode(welcomeDryRun, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
+  assert(welcomeDryRun.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'welcome --dry-run must recommend editor integration install when none are present');
 
   const welcome = runAtm(['welcome', '--cwd', atmChartRepo], atmChartRepo);
   assert(welcome.exitCode === 0, 'welcome must exit 0 after ATMChart render');
@@ -206,6 +208,7 @@ try {
   assert(welcome.parsed.evidence.welcomeLineage.welcomeCount === 1, 'welcome lineage must start with welcomeCount=1');
   assert(typeof welcome.parsed.evidence.nextAction?.command === 'string', 'welcome must surface the next action command');
   assertMessageCode(welcome, 'ATM_WELCOME_READY');
+  assertMessageCode(welcome, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
 
   const nextAfterWelcome = runAtm(['next', '--cwd', atmChartRepo], atmChartRepo);
   assertReadable(nextAfterWelcome, 'next');
@@ -224,6 +227,8 @@ try {
   assert(versionCheck.details.compatibility.status === 'supported', 'doctor version-compatibility check must report supported status');
   assert(onboardingCheck.details.stage === 'welcomed', 'doctor onboarding-lifecycle check must report welcomed stage');
   assert(onboardingCheck.details.atmChartFreshness === 'fresh', 'doctor onboarding-lifecycle check must report fresh ATMChart');
+  assertMessageCode(welcomeDoctor, 'ATM_DOCTOR_INTEGRATION_INSTALL_RECOMMENDED');
+  assert(welcomeDoctor.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'doctor must recommend editor integration install when none are present');
 
   const guardsPath = path.join(atmChartRepo, '.atm', 'runtime', 'default-guards.json');
   const guards = JSON.parse(readFileSync(guardsPath, 'utf8'));

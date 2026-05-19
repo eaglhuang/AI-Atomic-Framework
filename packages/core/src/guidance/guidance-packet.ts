@@ -2,6 +2,7 @@ import type { LegacyRoutePlan } from './legacy-route-plan.ts';
 
 export type GuidanceRoute =
   | 'create-atom'
+  | 'legacy-candidate-ranking'
   | 'atomize'
   | 'infect'
   | 'split'
@@ -60,6 +61,7 @@ export interface ProjectOrientationReport {
   readonly legacyHotspots: readonly LegacyHotspot[];
   readonly configLegacyHotspots: readonly LegacyHotspotConfig[];
   readonly releaseBlockers: readonly string[];
+  readonly releaseAdvisories?: readonly string[];
   readonly defaultLegacyFlow?: 'shadow' | 'dry-run';
   readonly unknowns: readonly string[];
 }
@@ -214,6 +216,8 @@ function buildReadFirst(route: GuidanceRoute): readonly string[] {
   switch (route) {
     case 'adapter-bootstrap':
       return ['README.md', 'docs/SELF_HOSTING_ALPHA.md'];
+    case 'legacy-candidate-ranking':
+      return ['README.md', 'docs/QUICK_START.md'];
     case 'docs-first':
       return ['README.md', 'docs/ARCHITECTURE.md'];
     case 'atomize':

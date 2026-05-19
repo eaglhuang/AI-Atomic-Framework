@@ -4,7 +4,7 @@ This repository uses the default ATM bootstrap pack.
 
 Start with this line:
 
-Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
+Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
 
 Bootstrap files:
 
@@ -21,6 +21,23 @@ Operating rules:
 2. Treat the repository kind as framework-repository.
 3. Do not invent a package manager or build step when the probe reports npm.
 4. Write a short evidence update before finishing the bootstrap task.
+
+Editor integration self-check:
+
+1. If `.atm/config.json` exists, confirm this editor already has its repo-local ATM entry files before trusting ATM skill routing.
+2. If the current editor entry file is missing, install the matching adapter immediately with `node atm.mjs integration add <editor-id> --json`, then verify it with `node atm.mjs integration verify <editor-id> --json`.
+3. Expected primary entry files:
+   - Codex: `integrations/codex-skills/atm-governance-router/SKILL.md`
+   - Claude Code: `.claude/skills/atm-governance-router/SKILL.md`
+   - Cursor: `.cursor/rules/skills/atm-governance-router/SKILL.md`
+   - GitHub Copilot: `.github/instructions/atm-governance-router.instructions.md`
+   - Gemini: `.gemini/commands/atm-governance-router.toml`
+
+Python-only runtime self-check:
+
+1. If the project probe reports Python without JavaScript or TypeScript, candidate ranking and source inventory can continue, but atom birth/apply must not be described as ready until a Python runtime/language adapter or plugin has been selected.
+2. If this ATM release does not bundle a dedicated Python language adapter/plugin, say that explicitly. Treat it as an expected product gap, not as host-repo corruption.
+3. In that case, continue with ATM discovery routes such as candidate ranking, source inventory, police evidence, or docs-first work, and tell the user that Python atom birth/apply remains deferred until a Python adapter/plugin is installed or implemented.
 
 ---
 

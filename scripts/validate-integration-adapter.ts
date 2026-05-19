@@ -32,6 +32,7 @@ const requiredFiles = [
   'templates/skills/skill.schema.json',
   'templates/skills/atm-next.skill.md',
   'templates/skills/atm-orient.skill.md',
+  'templates/skills/atm-governance-router.skill.md',
   'templates/skills/atm-create.skill.md',
   'templates/skills/atm-lock.skill.md',
   'templates/skills/atm-evidence.skill.md',
@@ -39,7 +40,7 @@ const requiredFiles = [
   'templates/skills/atm-handoff.skill.md',
   'schemas/integrations/install-manifest.schema.json',
   'tests/schema-fixtures/positive/integration-install-manifest.json',
-  'integrations/codex-skills/atm-legacy-atomization-guidance/SKILL.md'
+  'integrations/codex-skills/atm-governance-router/SKILL.md'
 ];
 
 const requestedAdapterFilter = process.argv.includes('--filter')
@@ -95,9 +96,9 @@ if (!process.exitCode) {
   assert(typeof packageModule.createCodexSkillsAdapter === 'function', 'missing createCodexSkillsAdapter reference factory');
   assert(packageModule.atmFirstCommand === 'node atm.mjs next --json', 'first command constant mismatch');
   assert(packageModule.charterInvariantsPlaceholder === '{{CHARTER_INVARIANTS}}', 'charter invariants placeholder mismatch');
-  assert(packageModule.minimumAtmEntrySkillDefinitions.length === 7, 'minimum ATM entry skill set must contain seven entries');
+  assert(packageModule.minimumAtmEntrySkillDefinitions.length === 8, 'minimum ATM entry skill set must contain eight entries');
 
-  const codexSkillPath = 'integrations/codex-skills/atm-legacy-atomization-guidance/SKILL.md';
+  const codexSkillPath = 'integrations/codex-skills/atm-governance-router/SKILL.md';
   const codexSkillContent = readFileSync(path.join(root, codexSkillPath));
   const codexSkillDigest = packageModule.sha256Bytes(codexSkillContent);
   assert(codexSkillDigest === fixtureManifest.files[0].sha256, 'fixture hash must match current Codex skill file');
@@ -105,7 +106,7 @@ if (!process.exitCode) {
 
   const codexReferenceAdapter = packageModule.createCodexSkillsAdapter([
     {
-      relativePath: 'atm-legacy-atomization-guidance/SKILL.md',
+      relativePath: 'atm-governance-router/SKILL.md',
       content: codexSkillContent,
       fileFormat: 'skill',
       source: 'template'
@@ -117,7 +118,7 @@ if (!process.exitCode) {
   const adapterSpecs = [
     await createAdapterSpec('claude-code', 'packages/integration-claude-code/src/index.ts', 'createClaudeCodeIntegrationAdapter', '.claude/skills', 'skill', '$ARGUMENTS'),
     await createAdapterSpec('codex', 'packages/integration-codex/src/index.ts', 'createCodexIntegrationAdapter', 'integrations/codex-skills', 'skill', '$ARGUMENTS'),
-    await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', 15),
+    await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', 17),
     await createAdapterSpec('cursor', 'packages/integration-cursor/src/index.ts', 'createCursorIntegrationAdapter', '.cursor/rules/skills', 'markdown', '$ARGUMENTS'),
     await createAdapterSpec('gemini', 'packages/integration-gemini/src/index.ts', 'createGeminiIntegrationAdapter', '.gemini/commands', 'toml', 'toml-fields')
   ].filter((adapterSpec: any) => requestedAdapterFilter ? adapterSpec.id === requestedAdapterFilter : true);
@@ -140,7 +141,7 @@ async function createAdapterSpec(
   expectedTargetDir: string,
   expectedFileFormat: string,
   expectedPlaceholderStyle: string,
-  expectedMinimumFiles = 7
+  expectedMinimumFiles = 8
 ) {
   const adapterModule = await import(pathToFileURL(path.join(root, modulePath)).href);
   assert(typeof adapterModule[factoryName] === 'function', `${adapterId} package missing factory: ${factoryName}`);
@@ -191,7 +192,7 @@ function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifes
 
     const installedPaths = install.manifest.files.map((fileRecord: any) => fileRecord.path);
     if (adapterSpec.requireMinimumEntrySet) {
-      for (const entryId of ['atm-next', 'atm-orient', 'atm-create', 'atm-lock', 'atm-evidence', 'atm-upgrade-scan', 'atm-handoff']) {
+      for (const entryId of ['atm-next', 'atm-orient', 'atm-governance-router', 'atm-create', 'atm-lock', 'atm-evidence', 'atm-upgrade-scan', 'atm-handoff']) {
         assert(installedPaths.some((installedPath: string) => installedPath.includes(entryId)), `${adapterSpec.id} missing entry file for ${entryId}`);
       }
     }

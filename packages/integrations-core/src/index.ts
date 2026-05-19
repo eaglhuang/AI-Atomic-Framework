@@ -35,6 +35,12 @@ export const minimumAtmEntrySkillDefinitions = [
     command: 'node atm.mjs orient --cwd . --json'
   },
   {
+    id: 'atm-governance-router',
+    title: 'ATM Governance Router',
+    summary: 'Route natural-language cleanup, refactor, migration, and candidate ranking goals through ATM before local analysis.',
+    command: 'node atm.mjs guide --goal "$ARGUMENTS" --cwd . --json'
+  },
+  {
     id: 'atm-create',
     title: 'ATM Create',
     summary: 'Create and register an atom through the provisioning facade.',
@@ -297,7 +303,7 @@ ${entryList}
 ## Operating Rules
 
 - Route governed work through ATM before editing files.
-- Use the ATM prompt and instruction files for specific next, orient, create, lock, evidence, upgrade-scan, and handoff flows.
+- Use the ATM prompt and instruction files for specific next, orient, governance-router, create, lock, evidence, upgrade-scan, and handoff flows.
 - Do not create a parallel task model, registry, or approval workflow.
 `;
 }

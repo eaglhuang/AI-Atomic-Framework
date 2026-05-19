@@ -30,6 +30,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'candidates',
+    summary: 'Rank legacy source candidates and emit inventory plus police evidence',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'create',
     summary: 'Create and register a new atom through the provisioning facade',
     implemented: true,

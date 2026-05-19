@@ -12,6 +12,7 @@ const mode = process.argv.includes('--mode')
 const requiredTemplateIds = [
   'atm-next',
   'atm-orient',
+  'atm-governance-router',
   'atm-create',
   'atm-lock',
   'atm-evidence',
@@ -70,6 +71,9 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   assert(template.body.includes('{{CHARTER_INVARIANTS}}'), `${entryDefinition.id} template body must include charter placeholder`);
   if (entryDefinition.id === 'atm-next') {
     assert(template.body.includes('evidence.userNotice'), 'atm-next template must tell agents to surface first-use user notices');
+    assert(template.body.includes('ATM_USER_NOTICE'), 'atm-next template must also watch top-level user notice messages');
+    assert(template.body.includes('before executing the returned next action'), 'atm-next template must show notices before executing next action');
+    assert(template.body.includes('return to the user original request'), 'atm-next template must tell agents to resume the original request after onboarding');
   }
   assert(!/spec-kit|MRP|\/specify|\/plan|\/tasks/i.test(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }
@@ -80,11 +84,11 @@ const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', te
 const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates);
 const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates);
 
-assert(claudeFiles.length === 7, 'Claude compiler output must contain seven files');
-assert(codexFiles.length === 7, 'Codex compiler output must contain seven files');
-assert(copilotFiles.length === 15, 'Copilot compiler output must contain root instructions plus fourteen entry files');
-assert(cursorFiles.length === 7, 'Cursor compiler output must contain seven files');
-assert(geminiFiles.length === 7, 'Gemini compiler output must contain seven files');
+assert(claudeFiles.length === 8, 'Claude compiler output must contain eight files');
+assert(codexFiles.length === 8, 'Codex compiler output must contain eight files');
+assert(copilotFiles.length === 17, 'Copilot compiler output must contain root instructions plus sixteen entry files');
+assert(cursorFiles.length === 8, 'Cursor compiler output must contain eight files');
+assert(geminiFiles.length === 8, 'Gemini compiler output must contain eight files');
 
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
   assert(compiledFile.content.includes(packageModule.atmFirstCommand), `${compiledFile.relativePath} missing first command`);
@@ -97,5 +101,5 @@ assert(codexFiles.every((compiledFile: any) => compiledFile.content.includes('ch
 assert(geminiFiles.every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field');
 
 if (!process.exitCode) {
-  console.log(`[skill-templates:${mode}] ok (7 source templates, schema, and 5 adapter compilers)`);
+  console.log(`[skill-templates:${mode}] ok (8 source templates, schema, and 5 adapter compilers)`);
 }

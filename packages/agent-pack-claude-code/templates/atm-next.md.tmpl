@@ -4,6 +4,8 @@ description: Route through ATM next and execute the returned governed action.
 
 1. Read `README.md` if present.
 2. Run `node atm.mjs next --json` from the repository root.
-3. Parse the JSON result and execute exactly the returned `evidence.nextAction.command`.
-4. If `evidence.agent_pack_hint` is present, use `evidence.agent_pack_hint.slashCommandId` to determine which slash command to invoke after completing the current action.
-5. Preserve the returned evidence in your final summary.
+3. If the JSON result includes an `ATM_USER_NOTICE` message or `evidence.userNotice`, show it to the user in natural language before executing the returned command.
+4. Parse the JSON result and execute exactly the returned `evidence.nextAction.command`.
+5. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
+6. If `evidence.agent_pack_hint` is present, use `evidence.agent_pack_hint.slashCommandId` to determine which slash command to invoke after completing the current action.
+7. Preserve the returned evidence in your final summary.

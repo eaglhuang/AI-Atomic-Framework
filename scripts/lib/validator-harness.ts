@@ -1,3 +1,20 @@
+/**
+ * Shared scaffolding for `scripts/validate-*.ts` and `tests/**` validators.
+ *
+ * Use `createValidator(name)` to get a consistent surface:
+ *   - `assert / fail / ok` — uniform error and success reporting
+ *   - `readText / readJson / requireFile` — repo-rooted file IO
+ *   - `createAjv()` — AJV 2020 instance with `addFormats` pre-registered
+ *   - `runAtmJson(args)` — spawn `node atm.mjs <args>` and parse JSON output
+ *
+ * Migration target: the ~60 `scripts/validate-*.ts` files that still build
+ * their own scaffolding should adopt this harness incrementally. Look for
+ * duplicated patterns (manual AJV setup, manual spawnSync wrappers, manual
+ * file-existence checks) and replace with the harness helpers below.
+ *
+ * See `docs/testing-strategy.md` for the four-layer test taxonomy this
+ * harness belongs to (the "validator" layer).
+ */
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -18,6 +35,12 @@ export interface ValidatorHarness {
   readonly readJson: <T = unknown>(relativePath: string) => T;
   readonly requireFile: (relativePath: string, message?: string) => string;
   readonly createAjv: () => Ajv2020;
+  /**
+   * Load a JSON schema from a repo-relative path and return a compiled AJV
+   * validator. Combines `readJson + createAjv + ajv.compile` — the common
+   * three-line pattern repeated across most schema validators.
+   */
+  readonly loadSchemaValidator: <T = unknown>(relativeSchemaPath: string) => (value: unknown) => value is T;
   readonly runAtmJson: (args: string[], cwd?: string) => { exitCode: number; parsed: any };
   readonly ok: (summary: string) => void;
 }
@@ -71,6 +94,13 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
     return ajv;
   }
 
+  function loadSchemaValidator<T = unknown>(relativeSchemaPath: string): (value: unknown) => value is T {
+    const schema = readJson(relativeSchemaPath);
+    const ajv = createAjv();
+    const compiled = ajv.compile(schema as object);
+    return (value: unknown): value is T => compiled(value) as boolean;
+  }
+
   function runAtmJson(args: string[], cwd = root): { exitCode: number; parsed: any } {
     const result = spawnSync(process.execPath, [repoPath('atm.mjs'), ...args], {
       cwd,
@@ -105,6 +135,7 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
     readJson,
     requireFile,
     createAjv,
+    loadSchemaValidator,
     runAtmJson,
     ok
   };

@@ -6,6 +6,7 @@ import type { DefaultGuardsDocument } from '../../../plugin-governance-local/src
 import { detectGovernanceRuntime, relativePathFrom } from './governance-runtime.ts';
 import { CliError, makeResult, message, parseArgsForCommand, readFrameworkVersion } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
+import { asOptionalVersion, compareSemver, higherVersion, highestVersion, isSemver, parseSemver } from './atm-chart/semver.ts';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 export const defaultATMChartRelativePath = path.join('.atm', 'memory', 'atm-chart.md');
@@ -798,20 +799,6 @@ function createDowngradeCompatibilityReport(report: VersionCompatibilityReport, 
   };
 }
 
-function highestVersion(left: string, right: string | null) {
-  if (!right) return left;
-  return compareSemver(left, right) >= 0 ? left : right;
-}
-
-function isSemver(version: string) {
-  try {
-    parseSemver(version);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 function isFrameworkRepositoryRoot(cwd: string) {
   const packagePath = path.join(cwd, 'package.json');
   if (!existsSync(packagePath)) return false;
@@ -827,41 +814,9 @@ function findChartRecord(matrix: CompatibilityMatrixDocument, version: string) {
   return matrix.atmChartVersions.find((entry) => entry.version === version) ?? null;
 }
 
-function asOptionalVersion(value: unknown) {
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
-}
-
-function higherVersion(left: string, right: string | null) {
-  if (!right) return left;
-  return compareSemver(left, right) >= 0 ? left : right;
-}
-
-export function compareSemver(left: string, right: string) {
-  const parsedLeft = parseSemver(left);
-  const parsedRight = parseSemver(right);
-  for (const key of ['major', 'minor', 'patch'] as const) {
-    if (parsedLeft[key] !== parsedRight[key]) {
-      return parsedLeft[key] > parsedRight[key] ? 1 : -1;
-    }
-  }
-  if (parsedLeft.prerelease === parsedRight.prerelease) return 0;
-  if (!parsedLeft.prerelease) return 1;
-  if (!parsedRight.prerelease) return -1;
-  return parsedLeft.prerelease.localeCompare(parsedRight.prerelease);
-}
-
-function parseSemver(version: string) {
-  const match = String(version).trim().match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/);
-  if (!match) {
-    throw new CliError('ATM_VERSION_INVALID', `Invalid semver version: ${version}`, { exitCode: 2 });
-  }
-  return {
-    major: Number(match[1]),
-    minor: Number(match[2]),
-    patch: Number(match[3]),
-    prerelease: match[4] ?? ''
-  };
-}
+// Semver helpers extracted to ./atm-chart/semver.ts (see imports at top).
+// `compareSemver` is re-exported for backward compatibility with any external caller.
+export { compareSemver } from './atm-chart/semver.ts';
 
 function extractGuardSummary(body: string) {
   const sectionMatch = body.match(/## Core Guard Summary\r?\n([\s\S]*?)(?:\r?\n## |$)/);

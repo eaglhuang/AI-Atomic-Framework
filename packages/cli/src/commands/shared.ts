@@ -39,6 +39,31 @@ export function readFrameworkVersion(root: string = defaultFrameworkRoot): strin
   return frameworkVersion;
 }
 
+/**
+ * Public error policy for ATM CLI commands.
+ *
+ * Every command that fails MUST throw a `CliError` (not a raw `Error`).
+ * The CLI runtime catches it and translates it into a deterministic JSON
+ * envelope: `{ ok: false, messages: [{ level: 'error', code, text, data }] }`
+ * with the process exit code set to `error.exitCode`.
+ *
+ * Exit code policy:
+ *   - `1` (default) — runtime failure, environment problem, validator failure.
+ *     Reserved for "something went wrong while doing the work".
+ *   - `2` — usage error: bad CLI arguments, unknown subcommand, missing
+ *     required `--flag`, attempted action on uninitialized repo (where the
+ *     fix is "run the right command first"). Reserved for "the invocation
+ *     itself was wrong".
+ *
+ * Code policy: `code` is a stable `SCREAMING_SNAKE_CASE` token prefixed with
+ * `ATM_`. Codes are part of the public CLI contract (I1) — release-smoke
+ * fixtures pin them, downstream automation may switch on them. Renaming a
+ * code is a breaking change.
+ *
+ * Details policy: `details` is a plain object that becomes the message
+ * `data` field. Keys should be camelCase. Values should be JSON-serializable.
+ * Do not put `Error` instances or class instances in details.
+ */
 export class CliError extends Error {
   code: string;
   exitCode: number;

@@ -17,6 +17,14 @@ const integrationAdapterFactories = Object.freeze({
   gemini: createGeminiIntegrationAdapter
 });
 
+const primaryEntryPathByAdapterId = Object.freeze({
+  'claude-code': '.claude/skills/atm-governance-router/SKILL.md',
+  codex: 'integrations/codex-skills/atm-governance-router/SKILL.md',
+  copilot: '.github/instructions/atm-governance-router.instructions.md',
+  cursor: '.cursor/rules/skills/atm-governance-router/SKILL.md',
+  gemini: '.gemini/commands/atm-governance-router.toml'
+} satisfies Record<KnownCliIntegrationId, string>);
+
 type KnownCliIntegrationId = keyof typeof integrationAdapterFactories;
 
 export interface InstallIntegrationOptions {
@@ -49,6 +57,44 @@ export async function checkIntegrationHealth(repositoryRoot: string) {
     installed: manifestReports.filter((report) => report.adapterId).map((report) => report.adapterId),
     manifests: manifestReports,
     failed: manifestReports.filter((report) => !report.ok)
+  };
+}
+
+export function inspectIntegrationBootstrap(repositoryRoot: string) {
+  const repoBootstrapped = existsSync(path.join(repositoryRoot, '.atm', 'config.json'));
+  const adapters = availableAdapters(repositoryRoot).map((adapter) => {
+    const primaryEntryPath = primaryEntryPathByAdapterId[adapter.id as KnownCliIntegrationId];
+    const primaryEntryPresent = existsSync(path.join(repositoryRoot, primaryEntryPath));
+    const installCommand = `node atm.mjs integration add ${adapter.id} --json`;
+    const verifyCommand = `node atm.mjs integration verify ${adapter.id} --json`;
+    let status: 'installed' | 'manifest-only' | 'entry-only' | 'missing' = 'missing';
+    if (adapter.installed && primaryEntryPresent) {
+      status = 'installed';
+    } else if (adapter.installed) {
+      status = 'manifest-only';
+    } else if (primaryEntryPresent) {
+      status = 'entry-only';
+    }
+    return {
+      ...adapter,
+      primaryEntryPath,
+      primaryEntryPresent,
+      installCommand,
+      verifyCommand,
+      status
+    };
+  });
+  const installedAdapters = adapters.filter((adapter) => adapter.status === 'installed').map((adapter) => adapter.id);
+  const missingAdapters = adapters.filter((adapter) => adapter.status === 'missing').map((adapter) => adapter.id);
+  return {
+    repoBootstrapped,
+    needsInstallHint: repoBootstrapped && installedAdapters.length === 0,
+    installedAdapters,
+    missingAdapters,
+    adapters,
+    suggestedAction: repoBootstrapped && installedAdapters.length === 0
+      ? 'Run `node atm.mjs integration add <editor-id> --json` for the editor you are using, then `node atm.mjs integration verify <editor-id> --json`.'
+      : null
   };
 }
 

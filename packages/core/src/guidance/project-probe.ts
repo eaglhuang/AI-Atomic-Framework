@@ -29,7 +29,7 @@ export function probeProject(repositoryRoot: string, options: ProjectProbeOption
     path.join('atomic_workbench', 'atoms'),
     path.join('packages', 'core', 'src')
   ]);
-  const unknowns = buildUnknowns(root, packageJson, packageManager, testEntrypoints, governanceFiles);
+  const unknowns = buildUnknowns(root, packageJson, packageManager, testEntrypoints, governanceFiles, detectedLanguages);
   const hostGates = options.hostGates ?? [];
   const noTouchZones = options.noTouchZones ?? [];
   const mutationPolicy = {
@@ -74,7 +74,8 @@ export function probeProject(repositoryRoot: string, options: ProjectProbeOption
     mutationPolicy,
     legacyHotspots: detectLegacyHotspots(root),
     configLegacyHotspots: configHotspots,
-    releaseBlockers: buildReleaseBlockers(root, packageJson),
+    releaseBlockers: buildReleaseBlockers(root, packageJson, detectedLanguages),
+    releaseAdvisories: buildReleaseAdvisories(root, packageJson, detectedLanguages),
     defaultLegacyFlow: configDefaultLegacyFlow,
     unknowns
   };
@@ -201,21 +202,47 @@ function listSourceFiles(directoryPath: string, limit: number): readonly string[
   return output;
 }
 
-function buildUnknowns(root: string, packageJson: Record<string, unknown> | null, packageManager: string | null, testEntrypoints: readonly string[], governanceFiles: readonly string[]): readonly string[] {
+function buildUnknowns(
+  root: string,
+  packageJson: Record<string, unknown> | null,
+  packageManager: string | null,
+  testEntrypoints: readonly string[],
+  governanceFiles: readonly string[],
+  detectedLanguages: readonly string[]
+): readonly string[] {
   const unknowns: string[] = [];
-  if (!packageJson) unknowns.push('package.json');
-  if (!packageManager) unknowns.push('packageManager');
+  const pythonOnly = isPythonOnlyAdopter(packageJson, detectedLanguages);
+  if (!packageJson && !pythonOnly) unknowns.push('package.json');
+  if (!packageManager && !pythonOnly) unknowns.push('packageManager');
   if (testEntrypoints.length === 0) unknowns.push('testEntrypoints');
   if (!governanceFiles.includes('.atm/config.json')) unknowns.push('atmConfig');
   if (!existsSync(path.join(root, '.git'))) unknowns.push('gitRepository');
   return unknowns;
 }
 
-function buildReleaseBlockers(root: string, packageJson: Record<string, unknown> | null): readonly string[] {
+function buildReleaseBlockers(root: string, packageJson: Record<string, unknown> | null, detectedLanguages: readonly string[]): readonly string[] {
   const blockers: string[] = [];
-  if (!packageJson) blockers.push('package-json-missing');
+  if (!packageJson && !isPythonOnlyAdopter(packageJson, detectedLanguages)) blockers.push('package-json-missing');
   if (!existsSync(path.join(root, '.git'))) blockers.push('git-repository-missing');
   return blockers;
+}
+
+function buildReleaseAdvisories(root: string, packageJson: Record<string, unknown> | null, detectedLanguages: readonly string[]): readonly string[] {
+  const advisories: string[] = [];
+  if (!packageJson && isPythonOnlyAdopter(packageJson, detectedLanguages)) {
+    advisories.push('package-json-missing:advisory');
+    advisories.push('python-entrypoints-detected');
+    advisories.push('candidate-ranking-allowed');
+    advisories.push('create-atom-route-deferred-until-runtime-adapter-selected');
+  }
+  return advisories;
+}
+
+function isPythonOnlyAdopter(packageJson: Record<string, unknown> | null, detectedLanguages: readonly string[]): boolean {
+  return !packageJson
+    && detectedLanguages.includes('Python')
+    && !detectedLanguages.includes('JavaScript')
+    && !detectedLanguages.includes('TypeScript');
 }
 
 function readJsonIfExists(filePath: string): unknown | null {

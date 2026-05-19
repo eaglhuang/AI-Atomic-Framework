@@ -113,10 +113,11 @@ supported as an installable adapter. Adapters:
 
 ### Minimum Entry Skill Set
 
-Every adapter must expose at least these seven ATM entry skills:
+Every adapter must expose at least these eight ATM entry skills:
 
 - `atm-next` — governed next action routing
 - `atm-orient` — start a guidance session with a goal
+- `atm-governance-router` — route natural-language cleanup, refactor, migration, and candidate ranking goals through ATM before local analysis
 - `atm-create` — create a new governed work item
 - `atm-lock` — acquire a scope lock
 - `atm-evidence` — record execution evidence
@@ -146,7 +147,7 @@ misplaced manifests as stale integration state.
 
 ### Entry Template Compiler
 
-The seven minimum ATM entry skills are authored once under `templates/skills/` as
+The eight minimum ATM entry skills are authored once under `templates/skills/` as
 framework-neutral source templates. Each template declares
 `charter-invariants-injected: true`, records its ATM CLI handoff route, and keeps
 planning hints out of the static source. `packages/integrations-core` compiles
@@ -197,11 +198,11 @@ identity:
 
 M4 is delivered as the first concrete Integration Adapter Layer contract. `packages/integrations-core` now defines `IntegrationAdapter`, `InstallManifest`, SHA-256 helpers, and a Codex skills adapter factory. `schemas/integrations/install-manifest.schema.json` validates the hash-locked manifest, and `scripts/validate-integration-adapter.ts` exercises install, verify, drift detection, and hash-guarded uninstall for the existing Codex skill surface.
 
-M5 is delivered as five installable agent adapters: `integration-claude-code`, `integration-codex`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each adapter emits the seven minimum ATM entrypoints, includes the `{{CHARTER_INVARIANTS}}` placeholder, makes `node atm.mjs next --json` the required first command, and participates in the shared install/verify/uninstall manifest validation.
+M5 is delivered as five installable agent adapters: `integration-claude-code`, `integration-codex`, `integration-copilot`, `integration-cursor`, and `integration-gemini`. Each adapter emits the eight minimum ATM entrypoints, includes the `{{CHARTER_INVARIANTS}}` placeholder, makes `node atm.mjs next --json` the required first command, and participates in the shared install/verify/uninstall manifest validation.
 
 M6 is delivered as the CLI lifecycle for those adapters. `atm integration list/add/verify/remove` exposes install, manifest verification, hash-guarded removal, and available/installed adapter listing. `atm init --integration <id>` installs an adapter during repository adoption, manifests are stored per adapter under `.atm/integrations/<id>.manifest.json`, and `atm doctor` reports integration drift or stale manifests through the `integration-adapters` check.
 
-M7 is delivered as a framework-neutral entry template compiler. `templates/skills/*.skill.md` holds the seven ATM entry sources plus `skill.schema.json`; `packages/integrations-core` parses and compiles them for Claude Code, Codex, Copilot, Cursor, and Gemini; `validate:skill-templates` locks schema validity, charter injection, ATM CLI handoffs, and the rule that planning hints stay out of static templates.
+M7 is delivered as a framework-neutral entry template compiler. `templates/skills/*.skill.md` holds the eight ATM entry sources plus `skill.schema.json`; `packages/integrations-core` parses and compiles them for Claude Code, Codex, Copilot, Cursor, and Gemini; `validate:skill-templates` locks schema validity, charter injection, ATM CLI handoffs, and the rule that planning hints stay out of static templates.
 
 M8 is delivered as paired script wrapper parity. `templates/root-drop/.atm/scripts/sh/atm-*.sh` and `templates/root-drop/.atm/scripts/ps/atm-*.ps1` wrap the same node routes, `atm init` installs both sets, and `validate:script-parity` checks route parity, wrapper thinness, wrapper smoke, and hello-world compatibility.
 

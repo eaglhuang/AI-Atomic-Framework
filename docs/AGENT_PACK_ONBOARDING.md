@@ -34,7 +34,8 @@ A typical adopter flow is:
 2. Ask the agent to read the repository entry guidance.
 3. Run `node atm.mjs welcome --json` or the plain text `welcome` command for orientation.
 4. Run `node atm.mjs atm-chart render` when the chart is missing or stale.
-5. Run `node atm.mjs next --json` and execute exactly the returned command.
+5. Run `node atm.mjs next --json`, show `ATM_USER_NOTICE` or `evidence.userNotice` if present, then execute the returned command.
+6. After onboarding or refresh commands finish, return to the user original request and continue the actual work.
 
 The welcome command may summarize state, but the deterministic router remains `next`.
 

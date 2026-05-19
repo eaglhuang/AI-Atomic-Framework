@@ -94,6 +94,8 @@ function assertReadmeEntry(hostRepo: string) {
   const readme = readText(path.join(hostRepo, 'README.md'));
   assert(readme.includes('<!-- ATM README ENTRY:START -->'), 'README.md must include ATM README entry marker');
   assert(readme.includes('node atm.mjs next --json'), 'README.md must point directly to the ATM next command');
+  assert(readme.includes('ATM_USER_NOTICE'), 'README.md must tell agents to surface ATM user notices');
+  assert(readme.includes('return to the user original request'), 'README.md must tell agents to resume the original request after onboarding');
   assert(!readme.includes('Read AGENTS.md'), 'README.md must not point back to AGENTS.md');
 }
 
@@ -129,11 +131,15 @@ function assertFirstUseNotice(nextResult: any) {
   assert(userNotice?.schemaVersion === 'atm.userNotice.v0.1', 'next must emit first-use userNotice schema');
   assert(userNotice.id === 'atm.first-use.governance-available', 'next must emit stable first-use notice id');
   assert(userNotice.displayPolicy === 'show-on-first-contact', 'first-use notice must be marked for first-contact display');
-  assert(userNotice.agentInstruction.includes('briefly tell the user'), 'first-use notice must tell agents to surface it naturally');
+  assert(userNotice.mustShowBeforeAction === true, 'first-use notice must require display before next action');
+  assert(userNotice.spokenLine.includes('ATM governance'), 'first-use notice must include a human-readable spoken line');
+  assert(userNotice.agentInstruction.includes('MUST briefly tell the user'), 'first-use notice must tell agents to surface it naturally');
+  assert(userNotice.afterNextActionInstruction.includes('original request'), 'first-use notice must tell agents to resume the original user request');
   assert(Array.isArray(userNotice.suggestedPrompts) && userNotice.suggestedPrompts.length >= 2, 'first-use notice must include natural-language prompt suggestions');
   assert(userNotice.suggestedPrompts.some((prompt: string) => prompt.includes('ATM features')), 'first-use notice must suggest discovering available ATM features');
   assert(Array.isArray(userNotice.suggestedActions) && userNotice.suggestedActions.length >= 2, 'first-use notice must include suggested actions');
   assert(userNotice.suggestedActions[0].value === nextAction.command, 'first-use primary action must match deterministic next action command');
+  assert(nextResult.parsed.messages.some((entry: any) => entry.code === 'ATM_USER_NOTICE'), 'next must emit ATM_USER_NOTICE as a top-level message');
 }
 
 function assertAgentsEntry(hostRepo: string, expectedOriginalText?: string) {
@@ -143,6 +149,14 @@ function assertAgentsEntry(hostRepo: string, expectedOriginalText?: string) {
     assert(agents.includes('<!-- ATM ROOT ENTRY:START -->'), 'existing AGENTS.md must include managed ATM entry marker');
   }
   assert(agents.includes('node atm.mjs next --json'), 'AGENTS.md must point to the ATM next command');
+  assert(agents.includes('ATM_USER_NOTICE'), 'AGENTS.md must tell agents to surface ATM user notices');
+  assert(agents.includes('missing local document'), 'AGENTS.md must define missing-document fallback behavior');
+  assert(agents.includes('return to the user original request'), 'AGENTS.md must tell agents to resume the original request after onboarding');
+  assert(agents.includes('Editor integration self-check'), 'AGENTS.md must define editor integration self-check guidance');
+  assert(agents.includes('node atm.mjs integration add codex --json'), 'AGENTS.md must include repo-local Codex integration install guidance');
+  assert(agents.includes('.claude/skills/atm-governance-router/SKILL.md'), 'AGENTS.md must include Claude Code entry-file guidance');
+  assert(agents.includes('Python-only runtime self-check'), 'AGENTS.md must define Python-only runtime self-check guidance');
+  assert(agents.includes('atom birth/apply remains deferred'), 'AGENTS.md must explain that Python atom birth/apply stays deferred without a Python adapter/plugin');
 }
 
 function verifyRootEntryScenario(tempRoot: string, scenarioName: string, options: { readonly readme?: boolean; readonly agents?: boolean }) {
@@ -263,6 +277,7 @@ try {
   const firstNext = runAtm(['next', '--cwd', hostRepo], hostRepo);
   assert(firstNext.exitCode === 1, 'next before ATMChart render must exit with non-ready status');
   assert(firstNext.parsed.evidence.nextAction.status === 'needs-onboarding-refresh', 'next before ATMChart render must request onboarding refresh');
+  assert(firstNext.parsed.evidence.nextAction.afterNextAction.includes('original request'), 'onboarding refresh next action must tell agents to resume the original request');
   assertFirstUseNotice(firstNext);
 
   const profile = readFileSync(path.join(hostRepo, '.atm', 'runtime', 'profile', 'default.md'), 'utf8');

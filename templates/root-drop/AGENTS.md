@@ -7,6 +7,29 @@ Start with this line:
 
 {{RECOMMENDED_PROMPT}}
 
+First-contact behavior:
+
+1. If `node atm.mjs next --json` returns an `ATM_USER_NOTICE` message or `evidence.userNotice`, show that notice to the user in natural language before running the returned next action.
+2. If an existing host instruction references a missing local document, mention the missing file once and continue with the ATM route.
+3. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
+
+Editor integration self-check:
+
+1. If `.atm/config.json` exists, confirm this editor already has its repo-local ATM entry files before trusting ATM skill routing.
+2. If the current editor entry file is missing, install the matching adapter immediately with `node atm.mjs integration add <editor-id> --json`, then verify it with `node atm.mjs integration verify <editor-id> --json`.
+3. Expected primary entry files:
+   - Codex: `integrations/codex-skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add codex --json`
+   - Claude Code: `.claude/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add claude-code --json`
+   - Cursor: `.cursor/rules/skills/atm-governance-router/SKILL.md` via `node atm.mjs integration add cursor --json`
+   - GitHub Copilot: `.github/instructions/atm-governance-router.instructions.md` via `node atm.mjs integration add copilot --json`
+   - Gemini: `.gemini/commands/atm-governance-router.toml` via `node atm.mjs integration add gemini --json`
+
+Python-only runtime self-check:
+
+1. If the project probe reports Python without JavaScript or TypeScript, candidate ranking and source inventory can continue, but atom birth/apply must not be described as ready until a Python runtime/language adapter or plugin has been selected.
+2. If this ATM release does not bundle a dedicated Python language adapter/plugin, say that explicitly. Treat it as an expected product gap, not as host-repo corruption.
+3. In that case, continue with ATM discovery routes such as candidate ranking, source inventory, police evidence, or docs-first work, and tell the user that Python atom birth/apply remains deferred until a Python adapter/plugin is installed or implemented.
+
 Bootstrap files:
 
 - Task: {{BOOTSTRAP_TASK_PATH}}

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { runATMChart } from './commands/atm-chart.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runBudget } from './commands/budget.ts';
+import { runCandidates } from './commands/candidates.ts';
 import { runCreate } from './commands/create.ts';
 import { runCreateMap } from './commands/create-map.ts';
 import { runDoctor } from './commands/doctor.ts';
@@ -43,6 +44,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   'atm-chart': runATMChart,
   bootstrap: runBootstrap,
   budget: runBudget,
+  candidates: runCandidates,
   create: runCreate,
   'create-map': runCreateMap,
   doctor: runDoctor,

@@ -12,6 +12,7 @@ import {
   evaluateMutationGate,
   probeProject
 } from '../packages/core/src/guidance/index.ts';
+import { inspectRuntimeAdapterReadiness } from '../packages/cli/src/commands/runtime-adapter-readiness.ts';
 
 const validator = createValidator('guidance');
 const { assert, requireFile, runAtmJson, ok, root } = validator;
@@ -57,6 +58,15 @@ const splitRoute = decideGuidanceRoute({
 });
 assert(splitRoute.recommendedRoute === 'split', 'demand finding must route to split');
 assert(splitRoute.nextCommand.includes('behavior.split'), 'split route must recommend split proposal command');
+
+const candidateRoute = decideGuidanceRoute({
+  goal: 'rank the messiest Python pipeline scripts',
+  orientation,
+  evidence: {}
+});
+assert(candidateRoute.recommendedRoute === 'legacy-candidate-ranking', 'candidate ranking goal must route to legacy-candidate-ranking');
+assert(candidateRoute.nextCommand.includes('candidates rank'), 'candidate ranking route must recommend candidates rank');
+assert(candidateRoute.requiredEvidence.includes('source inventory report'), 'candidate ranking route must require source inventory evidence');
 
 const referenceFixturePath = path.join(root, 'tests/guidance-fixtures/reference-legacy-dom-builder.js');
 const referenceSource = readFileSync(referenceFixturePath, 'utf8');
@@ -150,6 +160,32 @@ try {
   const explain = runAtmJson(['explain', '--cwd', blankRepo, '--why', 'blocked', '--json'], root);
   assert(explain.exitCode === 0, 'explain blocked must exit 0 with active session');
   assert(explain.parsed.evidence?.sessionId === start.parsed.evidence?.sessionId, 'explain must use active session');
+
+  const pythonOnlyRepo = path.join(tempRoot, 'python-only-repo');
+  mkdirSync(path.join(pythonOnlyRepo, '.atm'), { recursive: true });
+  mkdirSync(path.join(pythonOnlyRepo, 'pipelines'), { recursive: true });
+  writeFileSync(path.join(pythonOnlyRepo, '.atm', 'config.json'), JSON.stringify({
+    schemaVersion: '0.1.0',
+    adapter: { mode: 'standalone' }
+  }, null, 2));
+  writeFileSync(path.join(pythonOnlyRepo, 'requirements.txt'), 'pytest\n', 'utf8');
+  writeFileSync(path.join(pythonOnlyRepo, 'pipelines', 'legacy_pipeline.py'), 'def main():\n    return None\n', 'utf8');
+  const pythonOnlyOrientation = probeProject(pythonOnlyRepo);
+  assert(pythonOnlyOrientation.detectedLanguages.includes('Python'), 'Python-only repo must detect Python');
+  assert(!pythonOnlyOrientation.releaseBlockers.includes('package-json-missing'), 'Python-only repo must not treat missing package.json as release blocker');
+  assert(pythonOnlyOrientation.releaseAdvisories?.includes('package-json-missing:advisory'), 'Python-only repo must downgrade package-json-missing to advisory');
+  const pythonRuntimeReadiness = inspectRuntimeAdapterReadiness(pythonOnlyRepo);
+  assert(pythonRuntimeReadiness.pythonOnlyHost === true, 'Python-only repo must report pythonOnlyHost=true');
+  assert(pythonRuntimeReadiness.needsRuntimeAdapterHint === true, 'Python-only repo must recommend runtime adapter selection');
+  assert(pythonRuntimeReadiness.pythonLanguageAdapterAvailable === false, 'current ATM release must report no bundled Python language adapter');
+  assert(pythonRuntimeReadiness.atomBirthApplyDeferred === true, 'Python-only repo must defer atom birth/apply until runtime adapter selection');
+  const pythonOnlyRoute = decideGuidanceRoute({
+    goal: 'rank the messiest Python pipeline scripts',
+    orientation: pythonOnlyOrientation,
+    evidence: {}
+  });
+  assert(pythonOnlyRoute.recommendedRoute === 'legacy-candidate-ranking', 'Python-only repo must allow candidate ranking route');
+  assert(!pythonOnlyRoute.blockedBy.includes('package-json-missing'), 'Python-only candidate ranking must not be blocked by package-json-missing');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
@@ -430,4 +466,4 @@ try {
   rmSync(downstreamTemp, { recursive: true, force: true });
 }
 
-ok('orientation, reference legacy route plans, CLI session flow, mutation gate, proposal pairing, and host-local shadow+evidence wiring verified');
+ok('orientation, candidate ranking route, Python-only neutrality, reference legacy route plans, CLI session flow, mutation gate, proposal pairing, and host-local shadow+evidence wiring verified');

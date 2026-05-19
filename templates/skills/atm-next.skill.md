@@ -41,4 +41,5 @@ Use this ATM command only after the first command confirms it is the current gov
 - Stay inside ATM CLI routing and evidence contracts.
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
-- If `evidence.userNotice` is present, briefly show it to the user in natural language before continuing.
+- If an `ATM_USER_NOTICE` message or `evidence.userNotice` is present, show it to the user in natural language before executing the returned next action.
+- After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.

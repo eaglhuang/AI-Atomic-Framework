@@ -247,7 +247,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     summary: 'Default ATM bootstrap pack created and linked to evidence, context budget, and the next continuation prompt.',
     nextActions: [
       `Read .atm/history/tasks/${taskId}.json and .atm/runtime/profile/default.md.`,
-      'Run node atm.mjs next --json and execute exactly the returned next action.',
+      'Run node atm.mjs next --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.',
       'Record the first smoke artifact, log, evidence, and handoff before closing the work item.'
     ],
     artifactPaths: ['.atm/history/artifacts', '.atm/history/logs', '.atm/history/reports'],
@@ -399,11 +399,11 @@ export function createOfficialBootstrapCommand(commandCwd = '.'): string {
 }
 
 export function createRecommendedPrompt(taskId = defaultBootstrapTaskId): string {
-  return `Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
+  return `Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
 }
 
 export function createSelfHostingAlphaPrompt(): string {
-  return 'Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action.';
+  return 'Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.';
 }
 
 export function estimateContextBudgetTokens(...values: readonly unknown[]): number {
@@ -1070,7 +1070,13 @@ function createAgentsRootEntryBlock(tokens: Record<string, string>): string {
     'node atm.mjs next --json',
     '```',
     '',
-    'Execute exactly the returned next action. Treat these ATM runtime files as supporting state only:',
+    'If the result includes an `ATM_USER_NOTICE` message or `evidence.userNotice`, show it to the user in natural language before running the returned next action.',
+    '',
+    'If existing host instructions reference a missing local document, mention the missing file once and continue with the ATM route.',
+    '',
+    'After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.',
+    '',
+    'Treat these ATM runtime files as supporting state only:',
     '',
     `- ${tokens.BOOTSTRAP_TASK_PATH}`,
     `- ${tokens.BOOTSTRAP_PROFILE_PATH}`,
@@ -1092,7 +1098,9 @@ function createReadmeRootEntryBlock(): string {
     'node atm.mjs next --json',
     '```',
     '',
-    'Execute exactly the returned next action.',
+    'If the result includes an `ATM_USER_NOTICE` message or `evidence.userNotice`, show it to the user in natural language before running the returned next action.',
+    '',
+    'After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.',
     '',
     rootReadmeEntryEnd
   ].join('\n');

@@ -42,6 +42,17 @@ export function decideGuidanceRoute(input: RouteEngineInput): RouteDecision {
     });
   }
 
+  if (/rank|prioriti[sz]e|hotspot|messy|cleanup|clean up|candidate|inventory|pipeline|script|source surface|refactor target|資料管線|python 資料管線|資料管線最亂|最亂|最值得先整理|排一下優先順序|優先順序|候選排序|候選盤點|清理候選|重構候選/.test(lowerGoal)) {
+    return buildDecision({
+      route: 'legacy-candidate-ranking',
+      confidence: 0.88,
+      reasons: ['The goal asks to inspect or prioritize existing source surfaces, so ATM should rank legacy candidates before choosing split, atomize, or infect.'],
+      requiredEvidence: ['source inventory report', 'candidate ranking report', 'police family report'],
+      blockedBy: releaseBlockers.filter((blocker) => blocker !== 'package-json-missing'),
+      nextCommand: `node atm.mjs candidates rank --include "pipelines/**/*.py" --goal "${quoteCliValue(goal)}" --json`
+    });
+  }
+
   if (evidence.legacyRoutePlan) {
     return decideLegacyRoute(input.orientation, evidence.legacyRoutePlan);
   }
@@ -171,4 +182,8 @@ function buildDecision(input: {
     blockedBy: input.blockedBy,
     nextCommand: input.nextCommand
   };
+}
+
+function quoteCliValue(value: string): string {
+  return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }

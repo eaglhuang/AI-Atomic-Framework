@@ -7,7 +7,8 @@ import { checkStartupIntegrity, resolveBundledIntegrityRoot } from '../startup-i
 import { createATMVersionSummary } from './atm-chart.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
-import { checkIntegrationHealth } from './integration.ts';
+import { checkIntegrationHealth, inspectIntegrationBootstrap } from './integration.ts';
+import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 
 const legacyBehaviorPackageNames = [
@@ -49,6 +50,8 @@ export async function runDoctor(argv: any) {
     .map((entry) => packageDirLabel(root, entry.packageDir));
   const charterIntegrity = checkCharterIntegrity(root);
   const integrationHealth = await checkIntegrationHealth(root);
+  const integrationBootstrap = inspectIntegrationBootstrap(root);
+  const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(root);
   const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
   const versionSummary = createATMVersionSummary(root);
   const versionWarnings = createVersionSummaryMessages(versionSummary);
@@ -119,6 +122,38 @@ export async function runDoctor(argv: any) {
       : 'npm run validate:full';
   const messages = [
     ...versionWarnings,
+    ...(integrationBootstrap.needsInstallHint
+      ? [message(
+        'warning',
+        'ATM_DOCTOR_INTEGRATION_INSTALL_RECOMMENDED',
+        'ATM runtime exists, but no repo-local editor integration is installed yet. Install the adapter for the editor you are using before relying on ATM entry skills.',
+        {
+          suggestedAction: integrationBootstrap.suggestedAction,
+          adapters: integrationBootstrap.adapters.map((adapter) => ({
+            id: adapter.id,
+            primaryEntryPath: adapter.primaryEntryPath,
+            installCommand: adapter.installCommand,
+            verifyCommand: adapter.verifyCommand
+          }))
+        }
+      )]
+      : []),
+    ...(runtimeAdapterReadiness.needsRuntimeAdapterHint
+      ? [message(
+        'warning',
+        'ATM_PYTHON_RUNTIME_ADAPTER_RECOMMENDED',
+        runtimeAdapterReadiness.suggestedAction ?? 'Python entrypoints were detected. Select a Python runtime adapter/plugin before expecting ATM atom birth or apply routes to mutate Python surfaces.',
+        {
+          detectedLanguages: runtimeAdapterReadiness.detectedLanguages,
+          bundledLanguageAdapters: runtimeAdapterReadiness.bundledLanguageAdapters,
+          bundledProjectAdapters: runtimeAdapterReadiness.bundledProjectAdapters,
+          pythonLanguageAdapterAvailable: runtimeAdapterReadiness.pythonLanguageAdapterAvailable,
+          candidateRankingAllowed: runtimeAdapterReadiness.candidateRankingAllowed,
+          atomBirthApplyDeferred: runtimeAdapterReadiness.atomBirthApplyDeferred,
+          missingCapability: runtimeAdapterReadiness.missingCapability
+        }
+      )]
+      : []),
     ...(ok
       ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
       : failedChecks.includes('charter-integrity')
@@ -163,6 +198,8 @@ export async function runDoctor(argv: any) {
       missingPaths: runtime.missingPaths,
       migrationNeeded: runtime.migrationNeeded,
       versionSummary,
+      integrationBootstrap,
+      runtimeAdapterReadiness,
       trustIntegrity: trustMode ? trustIntegrity : undefined,
       knownBadStatus: knownBadMode ? knownBadStatus : undefined,
       recommendedAction

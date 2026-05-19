@@ -7,7 +7,7 @@ import { buildOnefileRelease } from './build-onefile-release.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const legacySkillRelativePath = path.join('integrations', 'codex-skills', 'atm-legacy-atomization-guidance', 'SKILL.md');
+const governanceRouterSkillRelativePath = path.join('integrations', 'codex-skills', 'atm-governance-router', 'SKILL.md');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
@@ -89,7 +89,7 @@ try {
     rootDropRoot: rootDrop.releaseRoot,
     outputRoot: path.join(tempRoot, 'release', 'atm-onefile')
   });
-  assert(existsSync(path.join(rootDrop.releaseRoot, legacySkillRelativePath)), 'root-drop source for onefile must include legacy atomization skill');
+  assert(existsSync(path.join(rootDrop.releaseRoot, governanceRouterSkillRelativePath)), 'root-drop source for onefile must include governance router skill');
   assert(existsSync(release.outputFilePath), 'onefile build must emit release/atm-onefile/atm.mjs');
 
   const externalBootstrapRepo = path.join(tempRoot, 'external-bootstrap-repo');
@@ -143,8 +143,8 @@ try {
   const installSkill = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['guide', 'install-skill', '--cwd', '.', '--target', 'host', '--json']);
   assert(installSkill.exitCode === 0, 'onefile guide install-skill must exit 0');
   assert(installSkill.parsed.ok === true, 'onefile guide install-skill must report ok=true');
-  assert(existsSync(path.join(blankRepo, '.agents', 'skills', 'atm-legacy-atomization-guidance', 'SKILL.md')),
-    'onefile guide install-skill must install the legacy atomization skill into the host repo');
+  assert(existsSync(path.join(blankRepo, '.agents', 'skills', 'atm-governance-router', 'SKILL.md')),
+    'onefile guide install-skill must install the governance router skill into the host repo');
 
   const doctor = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['doctor', '--json']);
   assert(doctor.exitCode === 0, 'onefile doctor must exit 0 after bootstrap');

@@ -6,7 +6,7 @@ AI-Atomic-Framework, also called ATM in this repository, is a governance framewo
 
 ATM is not an agent framework and not a workflow engine. It is the control layer around AI-assisted work: the part that keeps scope, rules, validation, artifacts, evidence, and handoff state explicit.
 
-> Agent first action: read this README, then run `node atm.mjs next --json` from the repository root, and execute the returned command.
+> Agent first action: read this README, then run `node atm.mjs next --json` from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
 
 ## What ATM Does
 
@@ -141,7 +141,7 @@ This is the release-bundle root-drop bootstrap workflow: place an official ATM d
 Then give your AI agent one instruction:
 
 ```text
-Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute the returned command.
+Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
 ```
 
 The first `next` call will route to bootstrap or orientation when the repository is not ready yet. After that, governed work keeps returning through `next`.
