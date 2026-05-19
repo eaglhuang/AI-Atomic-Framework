@@ -6,8 +6,10 @@ This document defines how upstream protected-surface documentation stays adopter
 
 - Product charter files explain ATM using ATM concepts, not one downstream repository.
 - Protected docs do not require a private engine, local script, repository path, or task format.
+- Protected contributor-facing docs remain English-only.
 - Examples and templates remain suitable for a clean standalone repository.
 - Prompt assets stay model-neutral and host-neutral.
+- Coordinating implementation task cards, planning queues, and downstream operating notes do not live in the framework protected surface.
 - If host-specific behavior is needed, the protected surface points to an adapter or plugin boundary instead of embedding the downstream detail.
 
 ## Banned-Term Scan Scope
@@ -29,6 +31,8 @@ The machine-readable policy lives in `docs/governance/docs-neutrality-policy.jso
 | Engine-specific workflow | Replace with neutral contract language | Adapter package or downstream implementation notes |
 | Local governance script or repo path | Replace with ATM concept or CLI contract | Plugin docs, adapter docs, or internal runbooks |
 | Private task schema or shard layout | Replace with core contract vocabulary | Default Governance Bundle docs or downstream task tooling docs |
+| Coordinating implementation task cards or planning queues | Remove from protected surface | Coordinating host workspace or downstream transfer workspace |
+| Non-English contributor-facing notes | Translate into neutral English or remove from protected surface | Coordinating host workspace or localized downstream docs |
 | Host-specific UI/game feature example | Replace with neutral example | Example package under a clearly named downstream adapter |
 
 ## Self-Hosting Alpha Alignment

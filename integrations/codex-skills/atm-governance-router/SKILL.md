@@ -1,29 +1,57 @@
 ---
 name: atm-governance-router
-description: Use when a user asks to inspect, rank, clean up, refactor, split, atomize, infect, migrate, modernize, prioritize existing source code, or open/import task cards from a plan before editing.
-argument-hint: "<natural language goal>"
+description: Route natural-language cleanup, refactor, migration, and candidate ranking goals through ATM before local analysis.
+argument-hint: "<ATM context>"
+charter-invariants-injected: true
 ---
+
 
 # ATM Governance Router
 
-This skill is the semantic front door for natural-language governance routing in
-any ATM adopter repository. It is intentionally adopter-neutral and English-only.
+Use this skill when a user asks in natural language to inspect, rank, clean up,
+refactor, split, atomize, infect, migrate, or modernize existing source code.
 
-## Required First Step
+The goal is to keep the user request natural while still routing the work
+through ATM evidence before choosing a local implementation path.
 
-Before reading host files to choose a behavior, run:
+## First Command
 
 ```bash
-node atm.mjs guide --goal "<natural language goal>" --cwd . --json
+node atm.mjs next --json
 ```
 
-If the host exposes an `atm` wrapper, the equivalent entrypoint is
-`atm guide --goal "<natural language goal>"`.
+If the first command returns a user notice, surface it briefly, then continue the
+original user request.
 
-## Candidate Ranking Route
+## Route Command
 
-If the result reports `matchedIntent: "legacy-candidate-ranking"`, follow the
-returned `nextCommand`. It should create or cite:
+```bash
+node atm.mjs guide --goal "$ARGUMENTS" --cwd . --json
+```
+
+Follow the returned `nextCommand`. If the matched intent is
+`legacy-candidate-ranking`, run the candidate ranking command before doing local
+source analysis by hand. If the matched intent is `task-plan-import`, run the
+task import dry run before creating or editing any task files.
+
+Before mutating repository files for implementation work, claim the task:
+
+```bash
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
+```
+
+If the editor provides pre-write hooks, keep them thin and run only:
+
+```bash
+node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <csv> --json
+```
+
+If no hook is available, continue with task claim + `git prepare/check` +
+`evidence verify` gates as the fallback safety boundary.
+
+## Required Evidence
+
+For legacy candidate ranking, final reasoning should cite or create:
 
 - ATM guidance result
 - candidate ranking artifact
@@ -31,93 +59,80 @@ returned `nextCommand`. It should create or cite:
 - police artifact
 - recommended split, atomize, infect, or compose route
 
-The canonical command shape is:
+For task plan import, final reasoning should cite or create:
 
-```bash
-node atm.mjs candidates rank --include "pipelines/**/*.py" --goal "<natural language goal>" --json
-```
-
-With a host wrapper, use `atm candidates rank` with the same flags.
-
-Do not rank the host source tree with ad-hoc shell-only heuristics when ATM can
-produce evidence.
+- ATM guidance result
+- task import dry-run manifest
+- written `.atm/history/tasks/*.json` paths, when `--write` is used
+- task import evidence report path
+- `tasks verify` report
+- `next` result showing imported open work items, when available
 
 ## Task Plan Import Route
 
-If the result reports `matchedIntent: "task-plan-import"`, do not hand-write
-`.atm/history/tasks/*.json` and do not use `atm create`. Task-plan import is a
-work-item import flow; `atm create` is for atom birth.
-
-Run the dry-run import first:
+If the matched intent is `task-plan-import`, run the dry-run import first:
 
 ```bash
 node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json
 ```
 
-After the parsed manifest is reviewed, persist and verify it:
+Confirm the parsed manifest before persisting. When the manifest looks correct,
+run the write phase and verify:
 
 ```bash
 node atm.mjs tasks import --from <plan.md> --write --cwd . --json
 node atm.mjs tasks verify --cwd . --json
-node atm.mjs next --cwd . --json
 ```
 
-Final reasoning should cite the guidance result, dry-run manifest, written task
-paths, task-import evidence report, verify report, and the `next` result when it
-surfaces imported open work items.
+Do not hand-write `.atm/history/tasks/*.json` and do not reuse `atm create` for
+work-item import; `atm create` is for atom birth.
 
-Do not acquire runtime locks for import-only task-plan operations. Keep
-`.atm/history/tasks` as the canonical imported work-item store; host Markdown
-views are optional secondary projections.
+## Guided Fallback
 
-## Legacy Atomization Route
-
-If the result reports `matchedIntent: "legacy-atomization"`, follow only the
-guided route:
-
-1. Run `node atm.mjs orient --cwd . --json`.
-2. Run the `nextCommand` returned by `guide`.
-3. Run `node atm.mjs next --cwd . --json`.
-4. Execute exactly the single dry-run proposal command returned by `next`.
-5. Stop for human review before any apply or host mutation.
-6. Keep rollback proof or rollback instructions attached to the proposal evidence.
-
-The canonical start command shape is `node atm.mjs start --legacy-flow` with the
-goal and target details supplied by the guide output.
-
-With a host wrapper, use `atm start --legacy-flow` with the same details.
-Then use `atm next` as the wrapper form of `node atm.mjs next --cwd . --json`.
-
-## Guided Fallback Contract
-
-If ATM reports missing preferred documents, do not stop and do not silently
-improvise. Preserve these fields in the evidence:
+If preferred documents are missing, do not stop and do not silently improvise.
+Preserve the fallback contract from ATM output:
 
 - `missingDocs[]`
 - `fallbackSources[]`
 - `continuedOriginalRequest: true`
 
-Then continue the original user request with the fallback sources.
+Then continue the user's original request with the fallback sources.
 
-## Learning Route
+## Guardrails
 
-If the user entered this flow with a phrase that the current classifier missed,
-record it as host-local learning:
+- Do not rank legacy scripts with ad-hoc shell-only heuristics when ATM can
+  produce candidate ranking evidence.
+- Do not choose split, atomize, or infect before candidate ranking and police
+  evidence exist.
+- Do not mutate host files during candidate ranking; ranking is advisory until
+  a later governed dry run is selected.
+- Do not start implementation edits before a task is in `ready` and has an
+  active claim.
+- Do not move heavy checks (build/lint/network) into hooks; hooks should only
+  call thin ATM guard commands.
+- Do not treat task-card import as atom birth; task-card import uses `tasks
+  import`, while atom birth uses `create` or a governed atomize flow.
+- Do not acquire runtime locks during import-only task-plan operations.
+- Keep `.atm/history/tasks` as the canonical imported work-item store; host
+  Markdown projections are optional secondary views.
+- Keep host-local language and phrasing in evidence or host lexicons, not in
+  this canonical skill.
+
+## Handoff
 
 ```bash
-node atm.mjs guide learn --phrase "<missed phrase>" --intent legacy-candidate-ranking --reason "<why it means candidate ranking>" --status suggested --cwd . --json
+node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ```
 
-Use `--status active-host` only after review. Do not promote host-specific
-wording into framework defaults.
+## Charter Invariants
 
-## Hard Stops
-
-- Do not directly rewrite trunk or release-blocker functions.
-- Do not manually choose `behavior.atomize`, `behavior.infect`, or
-  `behavior.split`.
-- Do not skip source inventory, police evidence, or a dry-run proposal when
-  moving from ranking to mutation.
-- Do not apply without human review.
-- Do not add adopter-specific project terms to framework fixtures, skill text,
-  or default lexicons.
+- `INV-ATM-001` — **No second registry** (enforcement: `gate`, breaking change: yes)
+  Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
+- `INV-ATM-002` — **Lock before edit** (enforcement: `doctor`, breaking change: no)
+  Rule: No governed file mutation may occur without a valid ScopeLock recorded in .atm/locks/ for the current WorkItem. Agents must call atm lock before editing files.
+- `INV-ATM-003` — **Schema-validated promotion only** (enforcement: `gate`, breaking change: yes)
+  Rule: An UpgradeProposal must pass all automatedGates (including JSON Schema validation) before promotion. Direct registry mutation that bypasses the UpgradeProposal path is forbidden.
+- `INV-ATM-004` — **No competing highest authority** (enforcement: `doctor`, breaking change: yes)
+  Rule: No host project rule, profile, or configuration may declare itself to have authority equal to or higher than the AtomicCharter. Any rule that contradicts an invariant must go through a charter waiver proposal.
+- `INV-ATM-005` — **Host rule amendments require waiver flow** (enforcement: `waiver-required`, breaking change: no)
+  Rule: When a host project rule conflicts with a charter invariant, the host must submit a behavior.evolve UpgradeProposal with a charterWaiver field and a linked HumanReviewDecision. Silent override is not permitted.

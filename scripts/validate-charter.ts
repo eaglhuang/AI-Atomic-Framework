@@ -123,9 +123,9 @@ if (!process.exitCode && invariantsSchema) {
       fail(`fixtures/charter/default-charter.json failed schema validation: ${formatErrors(validate.errors)}`);
     }
     if (defaultCharter) {
-      // Verify all 5 seed invariants are present
+      // Verify all seed invariants are present
       const ids: string[] = (defaultCharter as any).invariants?.map((inv: any) => inv.id) ?? [];
-      for (const expected of ['INV-ATM-001', 'INV-ATM-002', 'INV-ATM-003', 'INV-ATM-004', 'INV-ATM-005']) {
+      for (const expected of ['INV-ATM-001', 'INV-ATM-002', 'INV-ATM-003', 'INV-ATM-004', 'INV-ATM-005', 'INV-ATM-006', 'INV-ATM-007']) {
         if (!ids.includes(expected)) {
           fail(`fixtures/charter/default-charter.json missing seed invariant: ${expected}`);
         }

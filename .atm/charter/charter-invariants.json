@@ -3,9 +3,9 @@
   "schemaVersion": "atm.invariants.v0.1",
   "specVersion": "0.1.0",
   "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial installation by atm init." },
-  "charterVersion": "1.0.0",
+  "charterVersion": "2.0.0",
   "projectName": "ai-atomic-framework",
-  "lastAmendedAt": "2026-05-18T00:00:00.000Z",
+  "lastAmendedAt": "2026-05-19T00:00:00.000Z",
   "invariants": [
     {
       "id": "INV-ATM-001",
@@ -51,6 +51,24 @@
       "breakingChange": false,
       "tags": ["charter", "host-rules", "waiver"],
       "rationale": "Making conflict resolution explicit and auditable prevents silent governance drift across projects that adopt ATM."
+    },
+    {
+      "id": "INV-ATM-006",
+      "title": "Framework work tracking stays downstream",
+      "rule": "The framework repository must not host coordinating implementation task cards, planning queues, or project-specific work tracking artifacts beyond ATM's own bootstrap/runtime-managed files. Upstream planning cards belong in the coordinating host workspace and may feed evidence back upstream without becoming framework-resident work tracking.",
+      "enforcement": "doctor",
+      "breakingChange": true,
+      "tags": ["framework-boundary", "work-tracking", "downstream-coordination"],
+      "rationale": "ATM is an open-source governance framework, not the coordinating project workspace. Keeping implementation task tracking downstream prevents the framework repository from becoming host-specific or duplicating a second planning system."
+    },
+    {
+      "id": "INV-ATM-007",
+      "title": "Public framework docs remain English-only",
+      "rule": "Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.",
+      "enforcement": "doctor",
+      "breakingChange": true,
+      "tags": ["documentation", "open-source", "public-surface", "neutrality"],
+      "rationale": "ATM's framework repository is a public open-source surface. Keeping its contributor-facing documentation English-only and neutral preserves accessibility, reviewability, and downstream portability."
     }
   ]
 }

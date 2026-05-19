@@ -39,6 +39,8 @@ See `charter-invariants.json` for the machine-readable form used by ATM guards.
 | INV-ATM-003 | Schema-validated promotion only | gate |
 | INV-ATM-004 | No competing highest authority | doctor |
 | INV-ATM-005 | Host rule amendments require waiver flow | waiver-required |
+| INV-ATM-006 | Framework work tracking stays downstream | doctor |
+| INV-ATM-007 | Public framework docs remain English-only | doctor |
 
 ---
 

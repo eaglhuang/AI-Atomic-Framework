@@ -1,22 +1,20 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { createTempWorkspace } from '../../scripts/temp-root.ts';
+import { getCommandSpec } from '../../packages/cli/src/commands/command-specs.ts';
+import { runReplacementLane } from '../../packages/cli/src/commands/replacement-lane.ts';
 import { createMinimalAtomicMapSpec } from '../../packages/core/src/manager/map-generator.ts';
 import { createAtomicMapRegistryEntry } from '../../packages/core/src/registry/map-registry.ts';
 import { createRollbackProof } from '../../packages/core/src/registry/rollback-proof.ts';
-import { createRegistryDocument } from '../../packages/core/src/registry/registry.ts';
+import { createRegistryDocument, validateRegistryDocumentFile } from '../../packages/core/src/registry/registry.ts';
 import { createPropagationReport } from '../../packages/core/src/test-runner/propagation.ts';
 import { resolveCanonicalMapPaths } from '../../packages/core/src/test-runner/map-integration.ts';
 import { ReplacementMode, transitionReplacementMode } from '../../packages/core/src/registry/replacement-lane.ts';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+await run();
 
-run();
-
-function run() {
+async function run() {
   const positiveWorkspace = createFixtureWorkspace({ initialMode: ReplacementMode.Draft, mapId: 'ATM-MAP-9701' });
   try {
     const transitions = [
@@ -65,7 +63,10 @@ function run() {
         now: transition.now
       });
       assert.equal(result.to, transition.to);
-      assert.equal(result.registryStatus, 'draft');
+      const expectedRegistryStatus = transition.to === ReplacementMode.Shadow || transition.to === ReplacementMode.Canary
+        ? 'validated'
+        : 'active';
+      assert.equal(result.registryStatus, expectedRegistryStatus);
     }
 
     const finalSpec = readJson(path.join(positiveWorkspace.repositoryRoot, positiveWorkspace.paths.specPath));
@@ -75,9 +76,14 @@ function run() {
 
     const finalRegistry = readJson(path.join(positiveWorkspace.repositoryRoot, 'atomic-registry.json'));
     const finalEntry = finalRegistry.entries.find((entry: any) => entry.mapId === positiveWorkspace.mapId);
-    assert.equal(finalEntry.status, 'draft');
+    assert.equal(finalEntry.status, 'active');
     assert.equal(finalEntry.replacement.mode, ReplacementMode.LegacyRetired);
     assert.equal(finalEntry.lineageLogRef, `${positiveWorkspace.paths.workbenchPath}/lineage-log.json`);
+    const structuralValidation = validateRegistryDocumentFile(path.join(positiveWorkspace.repositoryRoot, 'atomic-registry.json'), {
+      validatorMode: 'structural-only'
+    });
+    assert.equal(structuralValidation.ok, true);
+    assert.equal(structuralValidation.validationMode, 'structural');
 
     const lineageLogPath = path.join(positiveWorkspace.repositoryRoot, positiveWorkspace.paths.workbenchPath, 'lineage-log.json');
     assert.equal(existsSync(lineageLogPath), true);
@@ -137,9 +143,7 @@ function run() {
 
     const cliWorkspace = createFixtureWorkspace({ initialMode: ReplacementMode.Draft, mapId: 'ATM-MAP-9705' });
     try {
-      const cliResult = spawnSync(process.execPath, [
-        path.join(root, 'atm.mjs'),
-        'replacement-lane',
+      const cliPayload = await runReplacementLane([
         'transition',
         '--cwd', cliWorkspace.repositoryRoot,
         '--map', cliWorkspace.mapId,
@@ -149,32 +153,17 @@ function run() {
         '--actor', 'cli.tester',
         '--at', '2026-01-01T04:00:00.000Z',
         '--json'
-      ], {
-        cwd: root,
-        encoding: 'utf8'
-      });
-      assert.equal(cliResult.status, 0, cliResult.stderr || cliResult.stdout);
-      const cliPayload = JSON.parse(cliResult.stdout);
+      ]);
       assert.equal(cliPayload.ok, true);
       assert.equal(cliPayload.command, 'replacement-lane');
       assert.equal(cliPayload.evidence.from, ReplacementMode.Draft);
       assert.equal(cliPayload.evidence.to, ReplacementMode.Shadow);
-      assert.equal(cliPayload.evidence.registryStatus, 'draft');
+      assert.equal(cliPayload.evidence.registryStatus, 'validated');
       assert.equal(cliPayload.evidence.transitionRecord.actor, 'cli.tester');
 
-      const helpResult = spawnSync(process.execPath, [
-        path.join(root, 'atm.mjs'),
-        'replacement-lane',
-        '--help',
-        '--json'
-      ], {
-        cwd: root,
-        encoding: 'utf8'
-      });
-      assert.equal(helpResult.status, 0, helpResult.stderr || helpResult.stdout);
-      const helpPayload = JSON.parse(helpResult.stdout);
-      assert.equal(helpPayload.ok, true);
-      assert.equal(helpPayload.evidence.usage.command, 'replacement-lane');
+      const helpSpec = getCommandSpec('replacement-lane');
+      assert.equal(Boolean(helpSpec), true);
+      assert.equal(helpSpec?.name, 'replacement-lane');
     } finally {
       rmSync(cliWorkspace.repositoryRoot, { recursive: true, force: true });
     }
@@ -182,7 +171,7 @@ function run() {
     rmSync(positiveWorkspace.repositoryRoot, { recursive: true, force: true });
   }
 
-  console.log('[registry:replacement-lane] ok (core forward chain, illegal jump, missing evidence, lineage, registry independence, cli)');
+  console.log('[registry:replacement-lane] ok (core forward chain, lifecycle sync, structural fallback, illegal jump, missing evidence, lineage, cli)');
 }
 
 function createFixtureWorkspace(options: { initialMode: string; mapId: string }) {

@@ -61,7 +61,13 @@ Suggested replacement modes:
 
 Registry states such as `draft`, `validated`, `active`, `deprecated`, or `expired` must not be reused as replacement rollout states. The two lanes may influence each other, but they are different contracts.
 
-The current M6 implementation exposes that separation explicitly: `atm replacement-lane transition` advances only the replacement lane, appends a transition record into `atomic_workbench/maps/<mapId>/lineage-log.json`, and leaves registry lifecycle status unchanged unless another workflow updates it.
+The current implementation keeps the replacement lane and registry lifecycle as separate fields, while still deriving a coarse lifecycle snapshot during replacement promotion so downstream tooling can observe readiness without reusing rollout labels as registry labels:
+
+- `draft` replacement keeps registry status `draft`
+- `shadow` and `canary` replacement promote registry status to `validated`
+- `active` and `legacy-retired` keep registry status `active`
+
+`atm replacement-lane transition` still records rollout history in `atomic_workbench/maps/<mapId>/lineage-log.json`; it simply keeps the registry entry in sync with that promotion boundary instead of leaving a stale lifecycle snapshot behind.
 
 ## Evidence Gates
 

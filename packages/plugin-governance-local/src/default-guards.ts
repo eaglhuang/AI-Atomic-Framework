@@ -33,6 +33,14 @@ export const defaultGuardCatalog = Object.freeze<readonly DefaultGuardRecord[]>(
   {
     id: 'protect-context-budget',
     summary: 'When estimated context load exceeds the repository policy, summarize or offload before continuing.'
+  },
+  {
+    id: 'framework-work-tracking-stays-downstream',
+    summary: 'Do not keep coordinating implementation task cards or project planning queues inside the framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.'
+  },
+  {
+    id: 'public-framework-docs-remain-english-only',
+    summary: 'Keep contributor-facing framework documentation English-only and repository-neutral; move non-English notes or local planning guidance to the coordinating host workspace.'
   }
 ]);
 

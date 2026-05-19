@@ -39,7 +39,7 @@ All promotion decisions remain owned by the existing JSON Schema validators, `Re
 
 Atomic maps may also serve as the governed replacement surface for a larger feature. In that role, a map is more than an atom relationship graph: it carries member roles, edge semantics, feature or legacy entrypoints, equivalence evidence, rollout state, and rollback requirements for the larger capability it represents.
 
-Replacement rollout is tracked separately from registry lifecycle state. The public lane is `draft -> shadow -> canary -> active -> legacy-retired`; registry states such as `validated` or `deprecated` must not be reused as rollout modes.
+Replacement rollout is tracked separately from registry lifecycle state. The public lane is `draft -> shadow -> canary -> active -> legacy-retired`; registry states such as `validated` or `deprecated` must not be reused as rollout modes. Replacement promotion may still update the registry entry's coarse lifecycle snapshot (`draft` / `validated` / `active`) so downstream tooling does not read a stale status while rollout evidence advances.
 
 The public protocol is documented in `docs/MAP_REPLACEMENT_PROTOCOL.md`. Internal implementation task cards should stay in the host workspace that coordinates the work, not in the framework core repository.
 

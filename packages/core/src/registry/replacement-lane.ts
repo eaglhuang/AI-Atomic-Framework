@@ -85,13 +85,14 @@ export function transitionReplacementMode(mapId: string, to: string, evidence: a
     generatedAt: now,
     transitionRecord
   });
+  const updatedRegistryStatus = resolveRegistryLifecycleStatus(targetMode, target.registryEntry.status);
   const updatedRegistryEntry = createAtomicMapRegistryEntry(updatedMapSpec, {
     schemaPath: target.registryEntry.schemaPath,
     semanticFingerprint: target.registryEntry.semanticFingerprint,
     lineageLogRef: lineageLogPath,
     ttl: target.registryEntry.ttl,
     pendingSfCalculation: target.registryEntry.pendingSfCalculation === true,
-    status: target.registryEntry.status,
+    status: updatedRegistryStatus,
     governanceTier: target.registryEntry.governance?.tier,
     location: target.registryEntry.location,
     evidence: mergeStringArrays(target.registryEntry.evidence ?? [], [lineageLogPath])
@@ -126,7 +127,7 @@ export function transitionReplacementMode(mapId: string, to: string, evidence: a
     mapId: target.mapId,
     from: fromMode,
     to: targetMode,
-    registryStatus: target.registryEntry.status,
+    registryStatus: updatedRegistryEntry.status,
     reason,
     evidenceRefs: [...evidenceRefs],
     actor,
@@ -544,6 +545,21 @@ function normalizeTimestamp(value: any) {
 
 function defaultTransitionReason(from: string, to: string) {
   return `Replacement lane transition ${from} -> ${to}.`;
+}
+
+function resolveRegistryLifecycleStatus(targetMode: ReplacementModeValue, currentStatus: string) {
+  switch (targetMode) {
+    case ReplacementMode.Draft:
+      return 'draft';
+    case ReplacementMode.Shadow:
+    case ReplacementMode.Canary:
+      return currentStatus === 'active' ? 'active' : 'validated';
+    case ReplacementMode.Active:
+    case ReplacementMode.LegacyRetired:
+      return 'active';
+    default:
+      return currentStatus;
+  }
 }
 
 function readJson(filePath: string) {

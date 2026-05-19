@@ -47,6 +47,7 @@ try {
     now: '2026-01-01T00:01:00.000Z'
   });
   assert.equal(result.to, ReplacementMode.Active);
+  assert.equal(result.registryStatus, 'active');
 } finally {
   rmSync(activeReadyWorkspace.repositoryRoot, { recursive: true, force: true });
 }
@@ -61,6 +62,7 @@ try {
     now: '2026-01-01T00:02:00.000Z'
   });
   assert.equal(result.to, ReplacementMode.LegacyRetired);
+  assert.equal(result.registryStatus, 'active');
 } finally {
   rmSync(retireReadyWorkspace.repositoryRoot, { recursive: true, force: true });
 }

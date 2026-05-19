@@ -179,6 +179,14 @@ ATM is organized around contracts first. Implementations may vary, but the seman
 | Default Governance Bundle | Replaceable starter plugins for tasks, locks, rules, context budgets, logs, artifacts, and evidence. | Become a hard dependency of `packages/core`. |
 | Plugins and Host Adapters | Optional governance capabilities and host-specific storage, Git, CI, issue tracker, language, or runtime integrations. | Push host-specific rules back into core contracts. |
 
+## Public Repository Boundary
+
+This repository keeps the public framework contract, not the coordinating project workspace.
+
+- Public contributor-facing framework documentation stays English-only.
+- Coordinating implementation task cards, planning queues, and downstream operating notes stay in the host workspace, not in this framework repository.
+- Downstream experiments may feed evidence upstream only after they have been converted into neutral framework artifacts such as docs, schemas, fixtures, validators, adapters, or plugins.
+
 The Default Governance Bundle is the official default experience, but it is not a `packages/core` hard dependency. Core defines contracts; the default bundle is a reference implementation of those contracts.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full layer model.

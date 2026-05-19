@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { isRegistryEntryStatus, isRegistryGovernanceTier, registryGovernanceTiers } from './status-machine.ts';
 import { createSourceHashSnapshot, normalizeSourcePathList } from '../hash-lock/hash-lock.ts';
 import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
 import { migrateRegistryStatus } from './status-migration.ts';
@@ -133,6 +134,7 @@ export function writeRegistryArtifacts(registryDocument: any, options: any = {})
 
 export function validateRegistryDocument(registryDocument: any, options: any = {}) {
   const schemaPath = path.resolve(options.schemaPath ?? defaultRegistrySchemaPath);
+  const validatorMode = normalizeValidatorMode(options.validatorMode);
   if (!existsSync(schemaPath)) {
     return createFailure(schemaPath, 'ATM_REGISTRY_SCHEMA_NOT_FOUND', [
       {
@@ -145,47 +147,58 @@ export function validateRegistryDocument(registryDocument: any, options: any = {
     ]);
   }
 
-  let ajv;
-  try {
-    const Ajv2020 = require('ajv/dist/2020.js');
-    const addFormats = require('ajv-formats');
-    const AjvConstructor = Ajv2020.default ?? Ajv2020;
-    const addFormatsPlugin = addFormats.default ?? addFormats;
-    ajv = new AjvConstructor({ allErrors: true, strict: false });
-    addFormatsPlugin(ajv);
-  } catch (error) {
-    return createFailure(schemaPath, 'ATM_REGISTRY_VALIDATOR_UNAVAILABLE', [
-      {
-        code: 'ATM_REGISTRY_VALIDATOR_UNAVAILABLE',
-        keyword: 'runtime',
-        path: toPortablePath(schemaPath),
-        text: 'AJV validator is not available in this environment.',
-        prompt: `Install the validator dependency or restore the AJV runtime. Reason: ${error instanceof Error ? error.message : String(error)}`
+  if (validatorMode !== 'structural-only') {
+    let ajv;
+    try {
+      const Ajv2020 = require('ajv/dist/2020.js');
+      const addFormats = require('ajv-formats');
+      const AjvConstructor = Ajv2020.default ?? Ajv2020;
+      const addFormatsPlugin = addFormats.default ?? addFormats;
+      ajv = new AjvConstructor({ allErrors: true, strict: false });
+      addFormatsPlugin(ajv);
+    } catch (error) {
+      if (validatorMode === 'schema') {
+        return createFailure(schemaPath, 'ATM_REGISTRY_VALIDATOR_UNAVAILABLE', [
+          {
+            code: 'ATM_REGISTRY_VALIDATOR_UNAVAILABLE',
+            keyword: 'runtime',
+            path: toPortablePath(schemaPath),
+            text: 'AJV validator is not available in this environment.',
+            prompt: `Install the validator dependency or restore the AJV runtime. Reason: ${error instanceof Error ? error.message : String(error)}`
+          }
+        ]);
       }
-    ]);
-  }
-
-  const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')));
-  const valid = validate(registryDocument);
-  if (!valid) {
-    return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', (validate.errors || []).map((error: any) => ({
-      code: 'ATM_REGISTRY_INVALID',
-      keyword: error.keyword,
-      path: error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/',
-      text: error.message ?? 'Invalid registry document.',
-      prompt: `Fix the registry document field at ${error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/'} (${error.keyword}).`
-    })));
-  }
-
-  return {
-    ok: true,
-    schemaPath: toPortablePath(schemaPath),
-    promptReport: {
-      code: 'ATM_REGISTRY_OK',
-      summary: `Registry document ${registryDocument.registryId} validated successfully.`,
-      issues: []
+      return validateRegistryDocumentStructurally(registryDocument, {
+        schemaPath,
+        validatorReason: error instanceof Error ? error.message : String(error)
+      });
     }
-  };
+
+    const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')));
+    const valid = validate(registryDocument);
+    if (!valid) {
+      return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', (validate.errors || []).map((error: any) => ({
+        code: 'ATM_REGISTRY_INVALID',
+        keyword: error.keyword,
+        path: error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/',
+        text: error.message ?? 'Invalid registry document.',
+        prompt: `Fix the registry document field at ${error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/'} (${error.keyword}).`
+      })));
+    }
+
+    return {
+      ok: true,
+      schemaPath: toPortablePath(schemaPath),
+      validationMode: 'schema',
+      promptReport: {
+        code: 'ATM_REGISTRY_OK',
+        summary: `Registry document ${registryDocument.registryId} validated successfully.`,
+        issues: []
+      }
+    };
+  }
+
+  return validateRegistryDocumentStructurally(registryDocument, { schemaPath });
 }
 
 export function validateRegistryDocumentFile(registryPath: any, options: any = {}) {
@@ -446,6 +459,272 @@ function toProjectPath(repositoryRoot: any, filePath: any) {
 
 function normalizeStringArray(values: any) {
   return Array.from(new Set(values.filter(Boolean)));
+}
+
+function normalizeValidatorMode(value: any) {
+  const mode = String(value ?? 'auto').trim();
+  if (mode === 'auto' || mode === 'schema' || mode === 'structural-only') {
+    return mode;
+  }
+  throw new Error(`Unsupported registry validator mode: ${mode || '<empty>'}`);
+}
+
+function validateRegistryDocumentStructurally(registryDocument: any, options: any = {}) {
+  const schemaPath = toPortablePath(options.schemaPath ?? defaultRegistrySchemaPath);
+  const issues: any[] = [];
+  const registryId = typeof registryDocument?.registryId === 'string' ? registryDocument.registryId : '<unknown>';
+  const issue = (pathValue: string, keyword: string, text: string) => {
+    issues.push({
+      code: 'ATM_REGISTRY_INVALID',
+      keyword,
+      path: pathValue,
+      text,
+      prompt: `Fix the registry document field at ${pathValue} (${keyword}).`
+    });
+  };
+
+  if (!isPlainObject(registryDocument)) {
+    issue('/', 'type', 'Registry document must be an object.');
+    return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', issues);
+  }
+
+  if (registryDocument.schemaId !== 'atm.registry') {
+    issue('/schemaId', 'const', 'Registry document schemaId must equal atm.registry.');
+  }
+  if (!isNonEmptyString(registryDocument.specVersion)) {
+    issue('/specVersion', 'type', 'Registry document specVersion must be a non-empty string.');
+  }
+  if (!isNonEmptyString(registryDocument.registryId)) {
+    issue('/registryId', 'type', 'Registry document registryId must be a non-empty string.');
+  }
+  if (!isNonEmptyString(registryDocument.generatedAt)) {
+    issue('/generatedAt', 'type', 'Registry document generatedAt must be a non-empty string.');
+  }
+  if (!Array.isArray(registryDocument.entries)) {
+    issue('/entries', 'type', 'Registry document entries must be an array.');
+  } else {
+    registryDocument.entries.forEach((entry: any, index: number) => validateRegistryEntryStructurally(entry, `/entries/${index}`, issue));
+  }
+
+  if (isPlainObject(registryDocument.sharding)) {
+    if (!['single-document', 'external-parts'].includes(String(registryDocument.sharding.strategy ?? '').trim())) {
+      issue('/sharding/strategy', 'enum', 'Registry sharding strategy must be single-document or external-parts.');
+    }
+    if (!Array.isArray(registryDocument.sharding.partPaths)) {
+      issue('/sharding/partPaths', 'type', 'Registry sharding partPaths must be an array.');
+    }
+  }
+
+  if (issues.length > 0) {
+    return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', issues);
+  }
+
+  const summarySuffix = options.validatorReason
+    ? ` using structural fallback (${options.validatorReason}).`
+    : ' using structural fallback.';
+  return {
+    ok: true,
+    schemaPath,
+    validationMode: 'structural',
+    promptReport: {
+      code: 'ATM_REGISTRY_OK',
+      summary: `Registry document ${registryId} validated successfully${summarySuffix}`,
+      issues: []
+    }
+  };
+}
+
+function validateRegistryEntryStructurally(entry: any, basePath: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!isPlainObject(entry)) {
+    issue(basePath, 'type', 'Registry entry must be an object.');
+    return;
+  }
+
+  if (entry.schemaId === 'atm.atomicMap') {
+    validateAtomicMapRegistryEntryStructurally(entry, basePath, issue);
+    return;
+  }
+  if (entry.schemaId === 'atm.atomicSpec') {
+    validateAtomicSpecRegistryEntryStructurally(entry, basePath, issue);
+    return;
+  }
+  issue(`${basePath}/schemaId`, 'enum', 'Registry entry schemaId must be atm.atomicSpec or atm.atomicMap.');
+}
+
+function validateAtomicMapRegistryEntryStructurally(entry: any, basePath: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  requireString(entry.mapId, `${basePath}/mapId`, issue);
+  requireString(entry.mapVersion, `${basePath}/mapVersion`, issue);
+  requireString(entry.specVersion, `${basePath}/specVersion`, issue);
+  requireString(entry.schemaPath, `${basePath}/schemaPath`, issue);
+  requireString(entry.mapHash, `${basePath}/mapHash`, issue);
+  requireRegistryStatus(entry.status, `${basePath}/status`, issue);
+  requireGovernance(entry.governance, `${basePath}/governance`, issue);
+  requireStringArray(entry.entrypoints, `${basePath}/entrypoints`, issue);
+  requireMembers(entry.members, `${basePath}/members`, issue);
+  requireEdges(entry.edges, `${basePath}/edges`, issue);
+  requireQualityTargets(entry.qualityTargets, `${basePath}/qualityTargets`, issue);
+  requireOptionalLocation(entry.location, `${basePath}/location`, issue);
+  requireOptionalEvidence(entry.evidence, `${basePath}/evidence`, issue);
+
+  if (entry.replacement !== undefined) {
+    if (!isPlainObject(entry.replacement)) {
+      issue(`${basePath}/replacement`, 'type', 'Atomic map replacement must be an object.');
+    } else {
+      requireStringArray(entry.replacement.legacyUris, `${basePath}/replacement/legacyUris`, issue);
+      requireStringArray(entry.replacement.evidenceRefs, `${basePath}/replacement/evidenceRefs`, issue);
+      const mode = String(entry.replacement.mode ?? '').trim();
+      if (!['draft', 'shadow', 'canary', 'active', 'legacy-retired'].includes(mode)) {
+        issue(`${basePath}/replacement/mode`, 'enum', 'Atomic map replacement mode must be draft, shadow, canary, active, or legacy-retired.');
+      }
+    }
+  }
+}
+
+function validateAtomicSpecRegistryEntryStructurally(entry: any, basePath: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  requireString(entry.atomId, `${basePath}/atomId`, issue);
+  requireString(entry.specVersion, `${basePath}/specVersion`, issue);
+  requireString(entry.schemaPath, `${basePath}/schemaPath`, issue);
+  requireString(entry.specPath, `${basePath}/specPath`, issue);
+  requireRegistryStatus(entry.status, `${basePath}/status`, issue);
+  requireGovernance(entry.governance, `${basePath}/governance`, issue);
+  requireOptionalLocation(entry.location, `${basePath}/location`, issue);
+  requireOptionalEvidence(entry.evidence, `${basePath}/evidence`, issue);
+
+  if (!isPlainObject(entry.hashLock) || !isNonEmptyString(entry.hashLock.digest)) {
+    issue(`${basePath}/hashLock`, 'type', 'Atomic spec registry entry hashLock must include a digest.');
+  }
+  if (!isPlainObject(entry.owner) || !isNonEmptyString(entry.owner.name) || !isNonEmptyString(entry.owner.contact)) {
+    issue(`${basePath}/owner`, 'type', 'Atomic spec registry entry owner must include name and contact.');
+  }
+  if (!isPlainObject(entry.compatibility) || !isNonEmptyString(entry.compatibility.coreVersion) || !isNonEmptyString(entry.compatibility.registryVersion)) {
+    issue(`${basePath}/compatibility`, 'type', 'Atomic spec registry entry compatibility must include coreVersion and registryVersion.');
+  }
+  if (!isPlainObject(entry.selfVerification)) {
+    issue(`${basePath}/selfVerification`, 'type', 'Atomic spec registry entry selfVerification must be an object.');
+    return;
+  }
+  requireString(entry.selfVerification.specHash, `${basePath}/selfVerification/specHash`, issue);
+  requireString(entry.selfVerification.codeHash, `${basePath}/selfVerification/codeHash`, issue);
+  requireString(entry.selfVerification.testHash, `${basePath}/selfVerification/testHash`, issue);
+  if (!isPlainObject(entry.selfVerification.sourcePaths)) {
+    issue(`${basePath}/selfVerification/sourcePaths`, 'type', 'Atomic spec registry entry selfVerification.sourcePaths must be an object.');
+  } else {
+    requireString(entry.selfVerification.sourcePaths.spec, `${basePath}/selfVerification/sourcePaths/spec`, issue);
+    const code = entry.selfVerification.sourcePaths.code;
+    if (!(isNonEmptyString(code) || Array.isArray(code))) {
+      issue(`${basePath}/selfVerification/sourcePaths/code`, 'type', 'Atomic spec registry entry selfVerification.sourcePaths.code must be a string or array.');
+    }
+    requireStringArray(entry.selfVerification.sourcePaths.tests, `${basePath}/selfVerification/sourcePaths/tests`, issue);
+  }
+}
+
+function requireString(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!isNonEmptyString(value)) {
+    issue(pathValue, 'type', 'Field must be a non-empty string.');
+  }
+}
+
+function requireStringArray(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!Array.isArray(value)) {
+    issue(pathValue, 'type', 'Field must be an array of non-empty strings.');
+    return;
+  }
+  value.forEach((entry: any, index: number) => {
+    if (!isNonEmptyString(entry)) {
+      issue(`${pathValue}/${index}`, 'type', 'Array item must be a non-empty string.');
+    }
+  });
+}
+
+function requireMembers(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!Array.isArray(value)) {
+    issue(pathValue, 'type', 'Atomic map members must be an array.');
+    return;
+  }
+  value.forEach((member: any, index: number) => {
+    if (!isPlainObject(member)) {
+      issue(`${pathValue}/${index}`, 'type', 'Atomic map member must be an object.');
+      return;
+    }
+    requireString(member.atomId, `${pathValue}/${index}/atomId`, issue);
+    requireString(member.version, `${pathValue}/${index}/version`, issue);
+  });
+}
+
+function requireEdges(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!Array.isArray(value)) {
+    issue(pathValue, 'type', 'Atomic map edges must be an array.');
+    return;
+  }
+  value.forEach((edge: any, index: number) => {
+    if (!isPlainObject(edge)) {
+      issue(`${pathValue}/${index}`, 'type', 'Atomic map edge must be an object.');
+      return;
+    }
+    requireString(edge.from, `${pathValue}/${index}/from`, issue);
+    requireString(edge.to, `${pathValue}/${index}/to`, issue);
+    requireString(edge.binding, `${pathValue}/${index}/binding`, issue);
+  });
+}
+
+function requireQualityTargets(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!isPlainObject(value)) {
+    issue(pathValue, 'type', 'Atomic map qualityTargets must be an object.');
+    return;
+  }
+  for (const [key, targetValue] of Object.entries(value)) {
+    if (!['string', 'number', 'boolean'].includes(typeof targetValue)) {
+      issue(`${pathValue}/${key}`, 'type', 'Atomic map quality target values must be string, number, or boolean.');
+    }
+  }
+}
+
+function requireRegistryStatus(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!isRegistryEntryStatus(value)) {
+    issue(pathValue, 'enum', 'Registry status must be one of the supported registry entry statuses.');
+  }
+}
+
+function requireGovernance(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (!isPlainObject(value)) {
+    issue(pathValue, 'type', 'Governance must be an object.');
+    return;
+  }
+  if (!isRegistryGovernanceTier(value.tier)) {
+    issue(`${pathValue}/tier`, 'enum', `Governance tier must be one of ${registryGovernanceTiers.join(', ')}.`);
+  }
+}
+
+function requireOptionalLocation(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (value === undefined) {
+    return;
+  }
+  if (!isPlainObject(value)) {
+    issue(pathValue, 'type', 'Location must be an object.');
+    return;
+  }
+  requireString(value.specPath, `${pathValue}/specPath`, issue);
+  if (!Array.isArray(value.codePaths)) {
+    issue(`${pathValue}/codePaths`, 'type', 'Location codePaths must be an array.');
+  }
+  if (!Array.isArray(value.testPaths)) {
+    issue(`${pathValue}/testPaths`, 'type', 'Location testPaths must be an array.');
+  }
+}
+
+function requireOptionalEvidence(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+  if (value === undefined) {
+    return;
+  }
+  requireStringArray(value, pathValue, issue);
+}
+
+function isPlainObject(value: any) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function isNonEmptyString(value: any) {
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 function createFailure(schemaPath: any, code: any, issues: any) {
