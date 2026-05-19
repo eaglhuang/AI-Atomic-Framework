@@ -68,6 +68,9 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   assert(template.frontmatter['charter-invariants-injected'] === true, `${entryDefinition.id} must declare charter invariant injection`);
   assert(template.frontmatter.handoffs.startsWith('node atm.mjs '), `${entryDefinition.id} handoff must route back through ATM CLI`);
   assert(template.body.includes('{{CHARTER_INVARIANTS}}'), `${entryDefinition.id} template body must include charter placeholder`);
+  if (entryDefinition.id === 'atm-next') {
+    assert(template.body.includes('evidence.userNotice'), 'atm-next template must tell agents to surface first-use user notices');
+  }
   assert(!/spec-kit|MRP|\/specify|\/plan|\/tasks/i.test(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }
 

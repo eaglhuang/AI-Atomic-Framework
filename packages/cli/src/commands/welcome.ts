@@ -47,7 +47,8 @@ export async function runWelcome(argv: string[]) {
   }
   const integrationHealth = await checkIntegrationHealth(cwd);
   const nextResult = await runNext(['--cwd', cwd]);
-  const nextAction = nextResult.evidence?.nextAction ?? null;
+  const nextAction = (nextResult.evidence?.nextAction as GuidanceNextAction | null) ?? null;
+  const userNotice = nextResult.evidence?.userNotice ?? null;
   const lineageAbsolutePath = path.join(cwd, defaultWelcomeLineageRelativePath);
   const welcomeLineage = dryRun
     ? null
@@ -108,6 +109,7 @@ export async function runWelcome(argv: string[]) {
         }))
       },
       nextAction,
+      userNotice,
       lineagePath: dryRun ? null : relativePathFrom(cwd, lineageAbsolutePath),
       welcomeLineage
     }

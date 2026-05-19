@@ -123,6 +123,19 @@ function assertPinnedRunner(hostRepo: string) {
   assert(parsed.evidence?.nextAction?.command, 'installed pinned runner next must emit a governed next action after bootstrap');
 }
 
+function assertFirstUseNotice(nextResult: any) {
+  const userNotice = nextResult.parsed.evidence?.userNotice;
+  const nextAction = nextResult.parsed.evidence?.nextAction;
+  assert(userNotice?.schemaVersion === 'atm.userNotice.v0.1', 'next must emit first-use userNotice schema');
+  assert(userNotice.id === 'atm.first-use.governance-available', 'next must emit stable first-use notice id');
+  assert(userNotice.displayPolicy === 'show-on-first-contact', 'first-use notice must be marked for first-contact display');
+  assert(userNotice.agentInstruction.includes('briefly tell the user'), 'first-use notice must tell agents to surface it naturally');
+  assert(Array.isArray(userNotice.suggestedPrompts) && userNotice.suggestedPrompts.length >= 2, 'first-use notice must include natural-language prompt suggestions');
+  assert(userNotice.suggestedPrompts.some((prompt: string) => prompt.includes('ATM features')), 'first-use notice must suggest discovering available ATM features');
+  assert(Array.isArray(userNotice.suggestedActions) && userNotice.suggestedActions.length >= 2, 'first-use notice must include suggested actions');
+  assert(userNotice.suggestedActions[0].value === nextAction.command, 'first-use primary action must match deterministic next action command');
+}
+
 function assertAgentsEntry(hostRepo: string, expectedOriginalText?: string) {
   const agents = readText(path.join(hostRepo, 'AGENTS.md'));
   if (expectedOriginalText) {
@@ -247,6 +260,10 @@ try {
   assert(!agents.includes('ATM TEMPLATE'), 'AGENTS.md must not leak template headers');
   assertReadmeEntry(hostRepo);
   assertPinnedRunner(hostRepo);
+  const firstNext = runAtm(['next', '--cwd', hostRepo], hostRepo);
+  assert(firstNext.exitCode === 1, 'next before ATMChart render must exit with non-ready status');
+  assert(firstNext.parsed.evidence.nextAction.status === 'needs-onboarding-refresh', 'next before ATMChart render must request onboarding refresh');
+  assertFirstUseNotice(firstNext);
 
   const profile = readFileSync(path.join(hostRepo, '.atm', 'runtime', 'profile', 'default.md'), 'utf8');
   assert(!profile.includes('{{'), 'default profile must not leak unresolved template placeholders');

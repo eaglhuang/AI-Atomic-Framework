@@ -41,3 +41,4 @@ Use this ATM command only after the first command confirms it is the current gov
 - Stay inside ATM CLI routing and evidence contracts.
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
+- If `evidence.userNotice` is present, briefly show it to the user in natural language before continuing.

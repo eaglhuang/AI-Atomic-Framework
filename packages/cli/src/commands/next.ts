@@ -1,6 +1,7 @@
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
 import type { LegacyRoutePlan, LegacyRoutePlanSegment } from '../../../core/src/guidance/legacy-route-plan.ts';
+import { buildFirstUseUserNotice } from './first-use-notice.ts';
 import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { makeResult, message, parseOptions } from './shared.ts';
@@ -12,6 +13,7 @@ export async function runNext(argv: any) {
     const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
     const legacyPlan = activeGuidanceSession.legacyRoutePlan ?? null;
     const nextAction = legacyPlan ? enrichWithLegacyPlan(baseAction, legacyPlan, activeGuidanceSession.sessionId) : baseAction;
+    const userNotice = buildFirstUseUserNotice(nextAction);
     return makeResult({
       ok: nextAction.status !== 'blocked',
       command: 'next',
@@ -20,6 +22,7 @@ export async function runNext(argv: any) {
       evidence: {
         nextAction,
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
+        ...(userNotice ? { userNotice } : {}),
         guidanceSession: {
           sessionId: activeGuidanceSession.sessionId,
           goal: activeGuidanceSession.goal,
@@ -32,8 +35,10 @@ export async function runNext(argv: any) {
 
   const doctor = await runDoctor(['--cwd', options.cwd]);
   const runtime = detectGovernanceRuntime(options.cwd, bootstrapTaskId);
-  const failed = doctor.evidence.checks.find((check: any) => check.ok !== true);
+  const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
+  const failed = doctorChecks.find((check) => check.ok !== true);
   const nextAction = decideNextAction(runtime, failed?.name ?? null);
+  const userNotice = buildFirstUseUserNotice(nextAction);
   return makeResult({
     ok: nextAction.status === 'ready',
     command: 'next',
@@ -42,7 +47,8 @@ export async function runNext(argv: any) {
     evidence: {
       nextAction,
       agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
-      doctorSummary: doctor.evidence.checks.map((check: any) => ({ name: check.name, ok: check.ok })),
+      ...(userNotice ? { userNotice } : {}),
+      doctorSummary: doctorChecks.map((check) => ({ name: check.name, ok: check.ok })),
       layoutVersion: runtime.layoutVersion,
       currentTaskId: runtime.currentTaskId,
       lockOwner: runtime.activeLock?.owner ?? null,
