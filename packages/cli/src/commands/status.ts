@@ -6,45 +6,46 @@ import { evaluateSeedGovernance, frameworkRepoRoot, registryFilePath, validateRe
 export function runStatus(argv: any) {
   const { options } = parseOptions(argv, 'status');
   const configPath = configPathFor(options.cwd);
+  const frameworkRepository = path.resolve(options.cwd) === frameworkRepoRoot && existsSync(registryFilePath);
 
-  if (!existsSync(configPath)) {
-    if (path.resolve(options.cwd) === frameworkRepoRoot && existsSync(registryFilePath)) {
-      const registryValidation = validateRegistryDocumentAgainstSchema(options.cwd, registryFilePath, {
-        commandName: 'status',
-        successCode: 'ATM_STATUS_REGISTRY_OK',
-        successText: 'Framework registry is valid.'
-      });
-      if (!registryValidation.ok) {
-        return registryValidation;
-      }
-
-      const governance = evaluateSeedGovernance();
-      return makeResult({
-        ok: governance.ok,
-        command: 'status',
-        cwd: options.cwd,
-        messages: [
-          ...registryValidation.messages,
-          governance.ok
-            ? message('info', 'ATM_STATUS_PHASE_B1_COMPLETE', 'ATM framework Phase B1 is complete.')
-            : message('error', 'ATM_STATUS_PHASE_B1_INCOMPLETE', 'ATM framework Phase B1 is not complete yet.', { issues: governance.verificationIssues })
-        ],
-        evidence: {
-          configPath: relativePathFrom(options.cwd, configPath),
-          initialized: false,
-          frameworkRepository: true,
-          frameworkPhase: governance.frameworkPhase,
-          registryPath: relativePathFrom(options.cwd, registryFilePath),
-          atomId: governance.atomId,
-          atomStatus: governance.atomStatus,
-          governanceTier: governance.governanceTier,
-          legacyPlanningId: governance.legacyPlanningId,
-          governedByLegacyPlanningId: governance.governedByLegacyPlanningId,
-          selfVerificationOk: governance.selfVerificationOk
-        }
-      });
+  if (frameworkRepository) {
+    const registryValidation = validateRegistryDocumentAgainstSchema(options.cwd, registryFilePath, {
+      commandName: 'status',
+      successCode: 'ATM_STATUS_REGISTRY_OK',
+      successText: 'Framework registry is valid.'
+    });
+    if (!registryValidation.ok) {
+      return registryValidation;
     }
 
+    const governance = evaluateSeedGovernance();
+    return makeResult({
+      ok: governance.ok,
+      command: 'status',
+      cwd: options.cwd,
+      messages: [
+        ...registryValidation.messages,
+        governance.ok
+          ? message('info', 'ATM_STATUS_PHASE_B1_COMPLETE', 'ATM framework Phase B1 is complete.')
+          : message('error', 'ATM_STATUS_PHASE_B1_INCOMPLETE', 'ATM framework Phase B1 is not complete yet.', { issues: governance.verificationIssues })
+      ],
+      evidence: {
+        configPath: relativePathFrom(options.cwd, configPath),
+        initialized: false,
+        frameworkRepository: true,
+        frameworkPhase: governance.frameworkPhase,
+        registryPath: relativePathFrom(options.cwd, registryFilePath),
+        atomId: governance.atomId,
+        atomStatus: governance.atomStatus,
+        governanceTier: governance.governanceTier,
+        legacyPlanningId: governance.legacyPlanningId,
+        governedByLegacyPlanningId: governance.governedByLegacyPlanningId,
+        selfVerificationOk: governance.selfVerificationOk
+      }
+    });
+  }
+
+  if (!existsSync(configPath)) {
     return makeResult({
       ok: false,
       command: 'status',

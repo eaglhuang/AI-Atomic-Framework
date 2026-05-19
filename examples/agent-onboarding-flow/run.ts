@@ -8,6 +8,7 @@ import addFormats from 'ajv-formats';
 import { atmFirstCommand, charterInvariantsPlaceholder } from '../../packages/integrations-core/src/index.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const charterInvariantMarker = 'INV-ATM-001';
 
 const adapterPlans = [
   { agentLabel: 'Claude Code', adapterId: 'claude-code' },
@@ -94,7 +95,8 @@ try {
 
     const installedContents = manifest.files.map((fileRecord: any) => readInstalledFile(hostRoot, fileRecord.path));
     assert(installedContents.some((content: string) => content.includes(atmFirstCommand)), `${plan.adapterId} installed files must include the first command`);
-    assert(installedContents.some((content: string) => content.includes(charterInvariantsPlaceholder)), `${plan.adapterId} installed files must include charter invariants placeholder`);
+    assert(installedContents.some((content: string) => content.includes(charterInvariantMarker)), `${plan.adapterId} installed files must include rendered charter invariants`);
+    assert(installedContents.every((content: string) => !content.includes(charterInvariantsPlaceholder)), `${plan.adapterId} installed files must not leak charter invariants placeholder`);
 
     const firstCommand = runAtm(['next', '--cwd', hostRoot, '--json'], root, { allowNonZero: true });
     assert(firstCommand.command === 'next', `${plan.adapterId} first command route must return a next report`);
