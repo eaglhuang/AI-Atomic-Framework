@@ -18,7 +18,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
@@ -41,8 +41,15 @@ export interface ValidatorHarness {
    * three-line pattern repeated across most schema validators.
    */
   readonly loadSchemaValidator: <T = unknown>(relativeSchemaPath: string) => (value: unknown) => value is T;
-  readonly runAtmJson: (args: string[], cwd?: string) => { exitCode: number; parsed: any };
+  readonly runAtmJson: (args: string[], cwd?: string) => { exitCode: number; parsed: any; launcher: 'atm.mjs' | 'source-cli' };
+  readonly runAtmJsonPortable: (args: string[], cwd?: string) => Promise<{ exitCode: number; parsed: any; launcher: 'atm.mjs' | 'source-cli' }>;
   readonly ok: (summary: string) => void;
+}
+
+interface AtmJsonExecutionResult {
+  readonly exitCode: number;
+  readonly parsed: any;
+  readonly launcher: 'atm.mjs' | 'source-cli';
 }
 
 function resolveRoot(): string {
@@ -101,22 +108,98 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
     return (value: unknown): value is T => compiled(value) as boolean;
   }
 
-  function runAtmJson(args: string[], cwd = root): { exitCode: number; parsed: any } {
-    const result = spawnSync(process.execPath, [repoPath('atm.mjs'), ...args], {
+  function runAtmJson(args: string[], cwd = root): AtmJsonExecutionResult {
+    const primary = runAtmJsonAttempt(args, cwd, 'atm.mjs');
+    if (shouldFallbackToSourceCli(primary.exitCode, primary.payload)) {
+      return finalizeAtmJsonResult(runAtmJsonAttempt(args, cwd, 'source-cli'), args);
+    }
+    return finalizeAtmJsonResult(primary, args);
+  }
+
+  async function runAtmJsonPortable(args: string[], cwd = root): Promise<AtmJsonExecutionResult> {
+    const primary = runAtmJsonAttempt(args, cwd, 'atm.mjs');
+    if (!shouldFallbackToSourceCli(primary.exitCode, primary.payload)) {
+      return finalizeAtmJsonResult(primary, args);
+    }
+    return await runAtmJsonInProcess(args, cwd);
+  }
+
+  function runAtmJsonAttempt(
+    args: string[],
+    cwd: string,
+    launcher: 'atm.mjs' | 'source-cli'
+  ): { exitCode: number; payload: string; launcher: 'atm.mjs' | 'source-cli' } {
+    const commandArgs = launcher === 'atm.mjs'
+      ? [repoPath('atm.mjs'), ...args]
+      : ['--experimental-strip-types', repoPath('packages', 'cli', 'src', 'atm.ts'), ...args];
+    const result = spawnSync(process.execPath, commandArgs, {
       cwd,
       encoding: 'utf8'
     });
-    const payload = (result.stdout || result.stderr || '').trim();
+    const errorPayload = result.error
+      ? `${result.error.name}: ${result.error.message}${'code' in result.error && result.error.code ? ` (${String(result.error.code)})` : ''}`
+      : '';
+    return {
+      exitCode: result.status ?? (result.error ? 1 : 0),
+      payload: (result.stdout || result.stderr || errorPayload || '').trim(),
+      launcher
+    };
+  }
+
+  function finalizeAtmJsonResult(
+    result: { exitCode: number; payload: string; launcher: 'atm.mjs' | 'source-cli' },
+    args: string[]
+  ): AtmJsonExecutionResult {
+    const payload = result.payload;
     if (!payload) {
-      return { exitCode: result.status ?? 0, parsed: {} };
+      return { exitCode: result.exitCode, parsed: {}, launcher: result.launcher };
     }
     try {
       return {
-        exitCode: result.status ?? 0,
-        parsed: JSON.parse(payload)
+        exitCode: result.exitCode,
+        parsed: JSON.parse(payload),
+        launcher: result.launcher
       };
     } catch (error) {
       fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || (error instanceof Error ? error.message : String(error))}`);
+    }
+  }
+
+  function shouldFallbackToSourceCli(exitCode: number, payload: string): boolean {
+    if (exitCode === 0) return false;
+    return /spawnSync .*node(?:\.exe)? (?:EPERM|EACCES)/i.test(payload)
+      || /Error:\s+spawnSync .*node(?:\.exe)? (?:EPERM|EACCES)/i.test(payload);
+  }
+
+  async function runAtmJsonInProcess(args: string[], cwd: string): Promise<AtmJsonExecutionResult> {
+    const { runCli } = await import(pathToFileURL(repoPath('packages', 'cli', 'src', 'atm.ts')).href);
+    let stdout = '';
+    let stderr = '';
+    const io = {
+      stdout: {
+        isTTY: false,
+        write(chunk: string) {
+          stdout += String(chunk);
+        }
+      },
+      stderr: {
+        isTTY: false,
+        write(chunk: string) {
+          stderr += String(chunk);
+        }
+      }
+    };
+    const previousCwd = process.cwd();
+    try {
+      process.chdir(cwd);
+      const exitCode = await runCli(args, io);
+      return finalizeAtmJsonResult({
+        exitCode,
+        payload: (stdout || stderr).trim(),
+        launcher: 'source-cli'
+      }, args);
+    } finally {
+      process.chdir(previousCwd);
     }
   }
 
@@ -137,6 +220,7 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
     createAjv,
     loadSchemaValidator,
     runAtmJson,
+    runAtmJsonPortable,
     ok
   };
 }

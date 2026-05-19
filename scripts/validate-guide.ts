@@ -5,7 +5,7 @@ import { createTempWorkspace } from './temp-root.ts';
 import { classifyGuidanceIntent } from '../packages/core/src/guidance/index.ts';
 
 const validator = createValidator('guide');
-const { assert, requireFile, runAtmJson, ok, readText, root } = validator;
+const { assert, requireFile, runAtmJsonPortable, ok, readText, root } = validator;
 
 for (const relativePath of [
   'atm.mjs',
@@ -19,18 +19,18 @@ for (const relativePath of [
   requireFile(relativePath, `missing guide dependency: ${relativePath}`);
 }
 
-const glossary = runAtmJson(['guide', 'glossary', '--json']);
+const glossary = await runAtmJsonPortable(['guide', 'glossary', '--json']);
 assert(glossary.exitCode === 0, 'guide glossary must exit 0');
 assert(glossary.parsed.ok === true, 'guide glossary must report ok=true');
 assert(Array.isArray(glossary.parsed.evidence?.terms), 'guide glossary must return evidence.terms array');
 assert((glossary.parsed.evidence?.terms as unknown[]).length >= 10, 'guide glossary must expose at least 10 terms');
 
-const guideHelp = runAtmJson(['guide', 'help', 'next', '--json']);
+const guideHelp = await runAtmJsonPortable(['guide', 'help', 'next', '--json']);
 assert(guideHelp.exitCode === 0, 'guide help next must exit 0');
 assert(guideHelp.parsed.ok === true, 'guide help next must report ok=true');
 assert(guideHelp.parsed.evidence?.usage?.command === 'next', 'guide help next must target next command');
 
-const commandHelp = runAtmJson(['next', '--help', '--json']);
+const commandHelp = await runAtmJsonPortable(['next', '--help', '--json']);
 assert(commandHelp.exitCode === 0, 'next --help must exit 0');
 assert(commandHelp.parsed.ok === true, 'next --help must report ok=true');
 assert(
@@ -97,7 +97,7 @@ const tempRoot = createTempWorkspace('atm-guide-');
 try {
   const blankRepo = path.join(tempRoot, 'blank');
   mkdirSync(blankRepo, { recursive: true });
-  const blankGuide = runAtmJson(['guide', '--cwd', blankRepo, '--goal', 'atomize a legacy parser', '--json'], root);
+  const blankGuide = await runAtmJsonPortable(['guide', '--cwd', blankRepo, '--goal', 'atomize a legacy parser', '--json'], root);
   assert(blankGuide.exitCode === 0, 'guide --goal must exit 0 in a blank repo');
   assert(blankGuide.parsed.evidence?.matchedIntent === 'legacy-atomization', 'blank guide must preserve semantic legacy intent');
   assert(blankGuide.parsed.evidence?.routeIntent === 'adapter-bootstrap', 'blank guide must route to adapter-bootstrap');
@@ -114,7 +114,7 @@ try {
       ]
     }
   }, null, 2));
-  const adaptedGuide = runAtmJson(['guide', '--cwd', adaptedRepo, '--goal', 'extract an old helper into an atom', '--json'], root);
+  const adaptedGuide = await runAtmJsonPortable(['guide', '--cwd', adaptedRepo, '--goal', 'extract an old helper into an atom', '--json'], root);
   assert(adaptedGuide.exitCode === 0, 'guide --goal must exit 0 in an adapted repo');
   assert(adaptedGuide.parsed.evidence?.matchedIntent === 'legacy-atomization', 'adapted guide must classify legacy atomization');
   assert(adaptedGuide.parsed.evidence?.routeIntent === 'legacy-atomization', 'adapted guide must route to legacy atomization');
@@ -125,7 +125,7 @@ try {
     'adapted guide must block manual behavior selection'
   );
 
-  const candidateGuide = runAtmJson(['guide', '--cwd', adaptedRepo, '--goal', 'rank the messiest Python pipeline scripts', '--json'], root);
+  const candidateGuide = await runAtmJsonPortable(['guide', '--cwd', adaptedRepo, '--goal', 'rank the messiest Python pipeline scripts', '--json'], root);
   assert(candidateGuide.exitCode === 0, 'guide --goal candidate ranking must exit 0');
   assert(candidateGuide.parsed.evidence?.matchedIntent === 'legacy-candidate-ranking', 'candidate guide must classify candidate ranking');
   assert(candidateGuide.parsed.evidence?.routeIntent === 'legacy-candidate-ranking', 'candidate guide must route to candidate ranking');
@@ -133,7 +133,7 @@ try {
   assert(candidateGuide.parsed.evidence?.guidedFallback?.continuedOriginalRequest === true, 'candidate guide must expose continuedOriginalRequest fallback contract');
   assert(Array.isArray(candidateGuide.parsed.evidence?.guidedFallback?.missingDocs), 'candidate guide must expose missingDocs array');
 
-  const chineseCandidateGuide = runAtmJson([
+  const chineseCandidateGuide = await runAtmJsonPortable([
     'guide',
     '--cwd',
     adaptedRepo,
@@ -146,7 +146,7 @@ try {
   assert(chineseCandidateGuide.parsed.evidence?.routeIntent === 'legacy-candidate-ranking', 'Chinese candidate guide must route to candidate ranking');
   assert(String(chineseCandidateGuide.parsed.evidence?.nextCommand ?? '').includes('candidates rank'), 'Chinese candidate guide must recommend candidates rank');
 
-  const chineseStart = runAtmJson([
+  const chineseStart = await runAtmJsonPortable([
     'start',
     '--cwd',
     adaptedRepo,
@@ -187,7 +187,7 @@ try {
     ''
   ].join('\n'), 'utf8');
 
-  const candidatesRank = runAtmJson([
+  const candidatesRank = await runAtmJsonPortable([
     'candidates', 'rank',
     '--cwd', adaptedRepo,
     '--include', 'pipelines/**/*.py',
@@ -208,7 +208,7 @@ try {
   assert(existsSync(path.join(adaptedRepo, candidatesRank.parsed.evidence?.policeReportPath)), 'candidates rank must write police report');
   assert(existsSync(path.join(adaptedRepo, candidatesRank.parsed.evidence?.guidanceDriftReportPath)), 'candidates rank must write guidance drift police report');
 
-  const learnOne = runAtmJson([
+  const learnOne = await runAtmJsonPortable([
     'guide', 'learn',
     '--cwd', adaptedRepo,
     '--phrase', 'brown path washing',
@@ -221,7 +221,7 @@ try {
   assert(learnOne.parsed.evidence?.status === 'active-host', 'guide learn must persist active-host status');
   assert(learnOne.parsed.evidence?.entryCount === 1, 'guide learn must create one lexicon entry');
 
-  const learnDuplicate = runAtmJson([
+  const learnDuplicate = await runAtmJsonPortable([
     'guide', 'learn',
     '--cwd', adaptedRepo,
     '--phrase', 'brown path washing',
@@ -234,12 +234,12 @@ try {
   assert(learnDuplicate.parsed.evidence?.duplicate === true, 'duplicate guide learn must report duplicate=true');
   assert(learnDuplicate.parsed.evidence?.entryCount === 1, 'duplicate guide learn must dedupe lexicon entries');
 
-  const learnedGuide = runAtmJson(['guide', '--cwd', adaptedRepo, '--goal', 'brown path washing the formatter', '--json'], root);
+  const learnedGuide = await runAtmJsonPortable(['guide', '--cwd', adaptedRepo, '--goal', 'brown path washing the formatter', '--json'], root);
   assert(learnedGuide.exitCode === 0, 'learned phrase guide must exit 0');
   assert(learnedGuide.parsed.evidence?.matchedIntent === 'legacy-atomization', 'active host phrase must classify as legacy atomization');
   assert((learnedGuide.parsed.evidence?.lexiconSources ?? []).includes('host-local'), 'learned classification must expose host-local lexicon source');
 
-  const hostSkillInstall = runAtmJson(['guide', 'install-skill', '--cwd', adaptedRepo, '--target', 'host', '--json'], root);
+  const hostSkillInstall = await runAtmJsonPortable(['guide', 'install-skill', '--cwd', adaptedRepo, '--target', 'host', '--json'], root);
   assert(hostSkillInstall.exitCode === 0, 'guide install-skill --target host must exit 0');
   assert(hostSkillInstall.parsed.evidence?.installed === true, 'host skill install must report installed=true');
   assert(
@@ -248,7 +248,7 @@ try {
   );
 
   const codexSkillsRoot = path.join(tempRoot, 'codex-skills');
-  const codexSkillInstall = runAtmJson([
+  const codexSkillInstall = await runAtmJsonPortable([
     'guide', 'install-skill',
     '--cwd', adaptedRepo,
     '--target', 'codex',
@@ -261,7 +261,7 @@ try {
     'codex skill install must write skill under the configured skills root'
   );
 
-  const blockedPromotion = runAtmJson([
+  const blockedPromotion = await runAtmJsonPortable([
     'guide', 'learn',
     '--cwd', adaptedRepo,
     '--phrase', 'TEAM42 parser migration',

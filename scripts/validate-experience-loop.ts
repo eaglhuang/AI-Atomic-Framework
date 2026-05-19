@@ -1,8 +1,6 @@
 import { existsSync, readFileSync, rmSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { BehaviorRegistry } from '../packages/plugin-sdk/src/behavior-registry.ts';
@@ -15,30 +13,10 @@ import {
   pluginExperienceLoopPackage,
   registerExperienceLoopBehaviors
 } from '../packages/plugin-experience-loop/src/index.ts';
+import { createValidator } from './lib/validator-harness.ts';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const mode = process.argv.includes('--mode')
-  ? process.argv[process.argv.indexOf('--mode') + 1]
-  : 'validate';
-
-let failed = false;
-
-function fail(message: string) {
-  console.error(`[experience-loop:${mode}] ${message}`);
-  failed = true;
-}
-
-function assert(condition: unknown, message: string) {
-  if (!condition) fail(message);
-}
-
-function readJson(relativePath: string) {
-  return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
-}
-
-function readText(relativePath: string) {
-  return readFileSync(path.join(root, relativePath), 'utf8');
-}
+const validator = createValidator('experience-loop');
+const { assert, ok, readJson, readText, root, runAtmJsonPortable } = validator;
 
 for (const relativePath of [
   'docs/EXPERIENCE_LOOP.md',
@@ -119,19 +97,15 @@ const behaviorOutput = await registry.executeGuarded({ repositoryRoot: root }, {
 assert(behaviorOutput.ok === true, 'experience.extract-skill behavior must pass for fixture');
 assert(behaviorOutput.evidence[0]?.details?.proposalSnapshot, 'experience behavior evidence must include proposal snapshot');
 
-const cliResult = spawnSync(process.execPath, [
-  path.join(root, 'atm.mjs'),
+const cliResult = await runAtmJsonPortable([
   'experience',
   'extract',
   '--input',
   'fixtures/experience-loop/task-evidence.json',
   '--json'
-], {
-  cwd: root,
-  encoding: 'utf8'
-});
-assert(cliResult.status === 0, `experience CLI must exit 0: ${cliResult.stderr || cliResult.stdout}`);
-const cliPayload = JSON.parse(cliResult.stdout);
+], root);
+assert(cliResult.exitCode === 0, `experience CLI must exit 0 when launched via ${cliResult.launcher}`);
+const cliPayload = cliResult.parsed;
 assert(cliPayload.ok === true, 'experience CLI must report ok=true');
 assert(cliPayload.evidence?.report?.candidate?.schemaVersion === 'atm.skillCandidate.v0.1', 'experience CLI must emit candidate report');
 assert(validateReviewAdvisory(cliPayload.evidence?.advisoryReport) === true, `CLI advisory report schema validation failed: ${JSON.stringify(validateReviewAdvisory.errors)}`);
@@ -142,8 +116,7 @@ const candidateOut = path.join(outputRoot, 'candidate.json');
 const advisoryOut = path.join(outputRoot, 'advisory.json');
 const queueOut = path.join(outputRoot, 'experience-proposals.json');
 const projectionOut = path.join(outputRoot, 'experience-proposals.md');
-const cliWriteResult = spawnSync(process.execPath, [
-  path.join(root, 'atm.mjs'),
+const cliWriteResult = await runAtmJsonPortable([
   'experience',
   'extract',
   '--input',
@@ -157,11 +130,8 @@ const cliWriteResult = spawnSync(process.execPath, [
   '--projection',
   projectionOut,
   '--json'
-], {
-  cwd: root,
-  encoding: 'utf8'
-});
-assert(cliWriteResult.status === 0, `experience CLI with --out must exit 0: ${cliWriteResult.stderr || cliWriteResult.stdout}`);
+], root);
+assert(cliWriteResult.exitCode === 0, `experience CLI with --out must exit 0 when launched via ${cliWriteResult.launcher}`);
 assert(existsSync(candidateOut), 'experience CLI must write output candidate');
 assert(existsSync(advisoryOut), 'experience CLI must write advisory output');
 assert(existsSync(queueOut), 'experience CLI must write human-review queue output');
@@ -170,9 +140,4 @@ const queuePayload = JSON.parse(readFileSync(queueOut, 'utf8'));
 assert(queuePayload.entries?.[0]?.proposal?.experienceKind === 'skill-candidate', 'queue proposal must preserve experienceKind');
 assert(queuePayload.entries?.[0]?.proposal?.reviewRoute?.includes('plugin-human-review'), 'queue proposal must preserve human-review route');
 rmSync(outputRoot, { recursive: true, force: true });
-
-if (failed) {
-  process.exit(1);
-}
-
-console.log(`[experience-loop:${mode}] ok (candidate extraction, amendment proposal, memory nudge, and CLI smoke verified)`);
+ok('candidate extraction, amendment proposal, memory nudge, and CLI smoke verified');

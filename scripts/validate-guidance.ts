@@ -15,7 +15,7 @@ import {
 import { inspectRuntimeAdapterReadiness } from '../packages/cli/src/commands/runtime-adapter-readiness.ts';
 
 const validator = createValidator('guidance');
-const { assert, requireFile, runAtmJson, ok, root } = validator;
+const { assert, requireFile, runAtmJsonPortable, ok, root } = validator;
 
 for (const relativePath of [
   'packages/core/src/guidance/index.ts',
@@ -33,7 +33,7 @@ for (const relativePath of [
 }
 
 for (const commandName of ['orient', 'start', 'next', 'explain']) {
-  const help = runAtmJson([commandName, '--help', '--json']);
+  const help = await runAtmJsonPortable([commandName, '--help', '--json']);
   assert(help.exitCode === 0, `${commandName} --help must exit 0`);
   assert(help.parsed.ok === true, `${commandName} --help must report ok=true`);
   assert(help.parsed.evidence?.usage?.command === commandName, `${commandName} --help must report usage.command`);
@@ -141,23 +141,23 @@ const tempRoot = createTempWorkspace('atm-guidance-');
 try {
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
-  const orient = runAtmJson(['orient', '--cwd', blankRepo, '--json'], root);
+  const orient = await runAtmJsonPortable(['orient', '--cwd', blankRepo, '--json'], root);
   assert(orient.exitCode === 0, 'orient must exit 0 for blank repo');
   assert(orient.parsed.evidence?.orientation?.adapterStatus?.status === 'missing', 'blank repo must report missing adapter');
 
-  const start = runAtmJson(['start', '--cwd', blankRepo, '--goal', 'Bootstrap unknown repo', '--json'], root);
+  const start = await runAtmJsonPortable(['start', '--cwd', blankRepo, '--goal', 'Bootstrap unknown repo', '--json'], root);
   assert(start.exitCode === 0, 'start must exit 0 for blank repo');
   assert(start.parsed.evidence?.sessionId, 'start must create sessionId');
   assert(start.parsed.evidence?.routeDecision?.recommendedRoute === 'adapter-bootstrap', 'blank repo route must be adapter-bootstrap');
   assert(start.parsed.evidence?.guidancePacket?.nextCommand.includes('bootstrap'), 'guidance packet must recommend bootstrap');
 
-  const next = runAtmJson(['next', '--cwd', blankRepo, '--json'], root);
+  const next = await runAtmJsonPortable(['next', '--cwd', blankRepo, '--json'], root);
   assert(next.exitCode === 0, 'guidance-aware next must exit 0 with active session');
   assert(typeof next.parsed.evidence?.nextAction?.command === 'string', 'next must return nextAction.command');
   assert(Array.isArray(next.parsed.evidence?.nextAction?.allowedCommands), 'next must return allowedCommands');
   assert(Array.isArray(next.parsed.evidence?.nextAction?.blockedCommands), 'next must return blockedCommands');
 
-  const explain = runAtmJson(['explain', '--cwd', blankRepo, '--why', 'blocked', '--json'], root);
+  const explain = await runAtmJsonPortable(['explain', '--cwd', blankRepo, '--why', 'blocked', '--json'], root);
   assert(explain.exitCode === 0, 'explain blocked must exit 0 with active session');
   assert(explain.parsed.evidence?.sessionId === start.parsed.evidence?.sessionId, 'explain must use active session');
 
@@ -371,7 +371,7 @@ try {
   );
 
   // start --target-file --release-blocker --legacy-flow
-  const startLegacy = runAtmJson([
+  const startLegacy = await runAtmJsonPortable([
     'start', '--cwd', downstreamCwd,
     '--goal', 'extract leaf helper from downstream legacy',
     '--target-file', 'src/downstream-helper.js',
@@ -389,7 +389,7 @@ try {
     'fixture must have at least one safe leaf atom');
 
   // next -- active session with legacyRoutePlan must return selectedSegment / blockedSegments
-  const nextLegacy = runAtmJson(['next', '--cwd', downstreamCwd, '--json']);
+  const nextLegacy = await runAtmJsonPortable(['next', '--cwd', downstreamCwd, '--json']);
   assert(nextLegacy.exitCode === 0, 'next with active legacy session must exit 0');
   const nextAction = nextLegacy.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
   assert(typeof nextAction?.selectedSegment === 'string',
@@ -402,7 +402,7 @@ try {
     'selectedSegment must not be the trunk function');
 
   // start --legacy-flow with config hotspot (no --target-file)
-  const startConfigFlow = runAtmJson([
+  const startConfigFlow = await runAtmJsonPortable([
     'start', '--cwd', downstreamCwd,
     '--goal', 'refactor first config hotspot via legacy flow',
     '--legacy-flow', '--json'
@@ -438,7 +438,7 @@ try {
     'applyTransform with callerDemand > threshold must route to split');
 
   // ── D. next command contains --legacy-target, --guidance-session, --dry-run ─────────────────────
-  const nextConfigFlow = runAtmJson(['next', '--cwd', downstreamCwd, '--json']);
+  const nextConfigFlow = await runAtmJsonPortable(['next', '--cwd', downstreamCwd, '--json']);
   assert(nextConfigFlow.exitCode === 0, 'next after config-flow start must exit 0');
   const configNextAction = nextConfigFlow.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
   assert(typeof configNextAction?.['command'] === 'string',
@@ -459,7 +459,7 @@ try {
   assert(typeof configNextAction?.['selectedBehavior'] === 'string',
     'next action must expose selectedBehavior field');
 
-  const guidedProposal = runAtmJson([
+  const guidedProposal = await runAtmJsonPortable([
     'upgrade', '--cwd', downstreamCwd,
     '--propose',
     '--behavior', `behavior.${String(configNextAction?.['selectedBehavior'])}`,
@@ -478,12 +478,12 @@ try {
   assert(guidedProposal.parsed.evidence?.queued === true,
     'guided legacy dry-run proposal must be enqueued for human review');
 
-  const reviewList = runAtmJson(['review', 'list', '--cwd', downstreamCwd, '--json']);
+  const reviewList = await runAtmJsonPortable(['review', 'list', '--cwd', downstreamCwd, '--json']);
   assert(reviewList.exitCode === 0,
     'review list must exit 0 after guided legacy dry-run proposal');
   assert((reviewList.parsed.evidence?.proposals as unknown[] | undefined)?.length === 1,
     'review list must include the guided legacy dry-run proposal');
-  const reviewShow = runAtmJson([
+  const reviewShow = await runAtmJsonPortable([
     'review', 'show', String(guidedProposal.parsed.evidence?.proposalId),
     '--cwd', downstreamCwd, '--json'
   ]);
