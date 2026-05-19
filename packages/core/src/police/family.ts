@@ -35,7 +35,14 @@ export type PoliceFamilyName =
   | 'map-integration'
   | 'atomization'
   | 'decomposition'
-  | 'evolution';
+  | 'evolution'
+  | 'polymorph'
+  | 'rollback';
+
+export type SharedGateName =
+  | 'evidence-integrity'
+  | 'reversibility'
+  | 'noise-control';
 
 export type PoliceFindingSeverity = 'info' | 'advisory' | 'warning' | 'block' | 'error';
 
@@ -103,6 +110,7 @@ export interface PoliceFamilyGateReport {
   readonly blockingFindings: readonly PoliceFinding[];
   readonly ok: boolean;
   readonly canPromote: boolean;
+  readonly sharedGates?: readonly SharedGateReport[];
 }
 
 export interface CorePoliceFacadeInput {
@@ -186,6 +194,147 @@ export interface EvolutionPoliceInput {
   readonly dailyCap?: number;
 }
 
+// ── Polymorph Police (APF-0041 / 0042) ─────────────────────────────────────
+
+export type PolymorphPoliceSignalKind =
+  | 'template-drift'
+  | 'instance-propagation-missing'
+  | 'variant-explosion'
+  | 'polymorph-dimension-drift';
+
+export interface PolymorphTemplateRecord {
+  readonly templateId: string;
+  readonly templateVersion: string;
+  readonly dimensionSpecId?: string;
+  readonly templateSemanticFingerprint?: string;
+  readonly templateAtomId?: string;
+}
+
+export interface PolymorphInstanceRecord {
+  readonly instanceId: string;
+  readonly instanceVersion?: string;
+  readonly templateId: string;
+  readonly parentTemplateVersion?: string;
+  readonly inheritedTemplateVersion?: string;
+  readonly instanceSemanticFingerprint?: string;
+  readonly variantKey?: string;
+  readonly dimensionDriftTags?: readonly string[];
+}
+
+export interface PolymorphPoliceInput {
+  readonly template?: PolymorphTemplateRecord;
+  readonly instances?: readonly PolymorphInstanceRecord[];
+  readonly variantThreshold?: number;
+  readonly suppressedKeys?: readonly string[];
+}
+
+export const DEFAULT_POLYMORPH_VARIANT_THRESHOLD = 12;
+
+export function buildPolymorphSuppressionKey(input: {
+  readonly templateId: string;
+  readonly signalKind: PolymorphPoliceSignalKind;
+  readonly instanceId?: string;
+  readonly templateVersion?: string;
+}): string {
+  return [
+    'polymorph',
+    input.templateId,
+    input.signalKind,
+    input.instanceId ?? '*',
+    input.templateVersion ?? 'no-base'
+  ].join('::');
+}
+
+// ── Rollback Police (APF-0043 / 0044) ──────────────────────────────────────
+
+export type RollbackPoliceSignalKind =
+  | 'rollback-proof-missing'
+  | 'rollback-scope-drift'
+  | 'irreversible-proposal'
+  | 'equivalence-proof-missing'
+  | 'retirement-proof-missing';
+
+export type RollbackProposalRiskClass =
+  | 'atom-evolve'
+  | 'map-replacement'
+  | 'legacy-retired'
+  | 'atomize'
+  | 'infect'
+  | 'polymorph';
+
+export interface RollbackPoliceProposal {
+  readonly proposalId: string;
+  readonly riskClass: RollbackProposalRiskClass;
+  readonly hasRollbackProof?: boolean;
+  readonly hasEquivalenceProof?: boolean;
+  readonly hasRetirementProof?: boolean;
+  readonly hasReversiblePatchEnvelope?: boolean;
+  readonly rollbackScope?: readonly string[];
+  readonly touchedSurfaces?: readonly string[];
+  readonly baseVersion?: string;
+  readonly evidenceWatermark?: string;
+}
+
+export interface RollbackPoliceInput {
+  readonly proposals?: readonly RollbackPoliceProposal[];
+  readonly suppressedKeys?: readonly string[];
+}
+
+export function buildRollbackSuppressionKey(input: {
+  readonly proposalId: string;
+  readonly signalKind: RollbackPoliceSignalKind;
+  readonly baseVersion?: string;
+}): string {
+  return ['rollback', input.proposalId, input.signalKind, input.baseVersion ?? 'no-base'].join('::');
+}
+
+// ── Shared Gates (APF-0045 / 0046 / 0047) ───────────────────────────────────
+
+export type SharedGateStatus = 'pass' | 'fail' | 'advisory' | 'skipped';
+
+export interface SharedGateReport {
+  readonly gate: SharedGateName;
+  readonly status: SharedGateStatus;
+  readonly findings: readonly PoliceFinding[];
+  readonly summary: {
+    readonly total: number;
+    readonly suppressed?: number;
+    readonly bypassed?: number;
+    readonly blocked?: number;
+  };
+  readonly sourceValidator: string;
+}
+
+export interface EvidenceCatalogEntry {
+  readonly evidenceId: string;
+  readonly schemaId?: string;
+  readonly generatedAt?: string;
+  readonly trustLevel?: 'trusted' | 'untrusted';
+  readonly evidenceType?: EvidenceRef['evidenceType'];
+}
+
+export interface EvidenceIntegrityGateInput {
+  readonly findings?: readonly PoliceFinding[];
+  readonly catalog?: readonly EvidenceCatalogEntry[];
+  readonly maxAgeMs?: number;
+  readonly nowIso?: string;
+  readonly proposalEvidenceRefs?: ReadonlyArray<{ proposalId: string; refIds: readonly string[] }>;
+}
+
+export const DEFAULT_EVIDENCE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
+export interface ReversibilityGateInput {
+  readonly proposals?: readonly RollbackPoliceProposal[];
+  readonly suppressedKeys?: readonly string[];
+}
+
+export interface NoiseControlGateInput {
+  readonly findings?: readonly PoliceFinding[];
+  readonly suppressedKeys?: readonly string[];
+  readonly dailyCap?: number;
+  readonly confidenceThreshold?: number;
+}
+
 export interface PoliceFamilyGateInput {
   readonly profile?: PoliceFamilyProfile;
   readonly generatedAt?: string;
@@ -197,6 +346,36 @@ export interface PoliceFamilyGateInput {
   readonly atomization?: AtomizationPoliceInput;
   readonly decomposition?: DecompositionPoliceInput;
   readonly evolution?: EvolutionPoliceInput;
+  readonly polymorph?: PolymorphPoliceInput;
+  readonly rollback?: RollbackPoliceInput;
+  readonly evidenceIntegrity?: EvidenceIntegrityGateInput;
+  readonly reversibility?: ReversibilityGateInput;
+  readonly noiseControl?: NoiseControlGateInput;
+  readonly contractDrift?: ContractDriftCheckInput;
+}
+
+// ── Contract Drift Check (APF-0048) ─────────────────────────────────────────
+
+export type ContractDriftTrigger =
+  | 'spec-implementation-drift'
+  | 'spec-test-drift'
+  | 'registry-metadata-drift'
+  | 'map-member-contract-drift';
+
+export interface ContractDriftEntry {
+  readonly atomId?: string;
+  readonly mapId?: string;
+  readonly trigger: ContractDriftTrigger;
+  readonly specHash?: string;
+  readonly implementationHash?: string;
+  readonly testHash?: string;
+  readonly registryMetadataHash?: string;
+  readonly mapMemberHash?: string;
+  readonly message?: string;
+}
+
+export interface ContractDriftCheckInput {
+  readonly entries?: readonly ContractDriftEntry[];
 }
 
 export const DEFAULT_EVOLUTION_RECURRENCE_THRESHOLD = 2;
@@ -958,6 +1137,515 @@ export function runEvolutionPolice(input: EvolutionPoliceInput = {}): PoliceFami
   });
 }
 
+export function runPolymorphPolice(input: PolymorphPoliceInput = {}): PoliceFamilyReport {
+  const template = input.template;
+  const instances = input.instances ?? [];
+  const threshold = input.variantThreshold ?? DEFAULT_POLYMORPH_VARIANT_THRESHOLD;
+  const suppressed = new Set(input.suppressedKeys ?? []);
+  const findings: PoliceFinding[] = [];
+
+  if (template) {
+    for (const instance of instances) {
+      if (instance.templateId !== template.templateId) continue;
+      const inheritedVersion = instance.inheritedTemplateVersion ?? instance.parentTemplateVersion;
+      if (inheritedVersion && inheritedVersion !== template.templateVersion) {
+        const key = buildPolymorphSuppressionKey({
+          templateId: template.templateId,
+          signalKind: 'template-drift',
+          instanceId: instance.instanceId,
+          templateVersion: template.templateVersion
+        });
+        if (!suppressed.has(key)) {
+          findings.push(makePoliceFinding({
+            findingId: `police.polymorph.template-drift.${sanitizeId(instance.instanceId)}`,
+            policeFamily: 'polymorph',
+            severity: 'advisory',
+            trigger: 'template-drift',
+            scope: `${template.templateId}@${template.templateVersion}->${instance.instanceId}`,
+            action: 'needs-review',
+            routeHint: 'behavior.polymorphize',
+            readModel: 'PolymorphTemplate.instances',
+            message: `Instance ${instance.instanceId} parent template ${inheritedVersion} drifted from template ${template.templateVersion}.`,
+            evidenceRefs: [makeEvidenceRef('polymorph-template-record', 'police-artifact')],
+            metadata: {
+              templateId: template.templateId,
+              templateVersion: template.templateVersion,
+              instanceId: instance.instanceId,
+              inheritedVersion,
+              suppressionKey: key,
+              directApplyAllowed: false
+            }
+          }));
+        }
+      }
+
+      if (instance.dimensionDriftTags && instance.dimensionDriftTags.length > 0) {
+        const key = buildPolymorphSuppressionKey({
+          templateId: template.templateId,
+          signalKind: 'polymorph-dimension-drift',
+          instanceId: instance.instanceId,
+          templateVersion: template.templateVersion
+        });
+        if (!suppressed.has(key)) {
+          findings.push(makePoliceFinding({
+            findingId: `police.polymorph.dimension-drift.${sanitizeId(instance.instanceId)}`,
+            policeFamily: 'polymorph',
+            severity: 'advisory',
+            trigger: 'polymorph-dimension-drift',
+            scope: `${template.templateId}->${instance.instanceId}`,
+            action: 'needs-review',
+            routeHint: 'behavior.polymorphize',
+            readModel: 'PolymorphTemplate.dimensionSpec',
+            message: `Instance ${instance.instanceId} reports dimension drift tags: ${[...instance.dimensionDriftTags].join(', ')}.`,
+            evidenceRefs: [makeEvidenceRef('polymorph-dimension-record', 'police-artifact')],
+            metadata: {
+              templateId: template.templateId,
+              instanceId: instance.instanceId,
+              dimensionDriftTags: [...instance.dimensionDriftTags],
+              suppressionKey: key,
+              directApplyAllowed: false
+            }
+          }));
+        }
+      }
+    }
+
+    const propagatedInstances = instances.filter((instance) => instance.templateId === template.templateId);
+    const missingPropagation = propagatedInstances.filter((instance) => {
+      const inheritedVersion = instance.inheritedTemplateVersion ?? instance.parentTemplateVersion;
+      return !inheritedVersion || inheritedVersion !== template.templateVersion;
+    });
+    if (missingPropagation.length > 0 && propagatedInstances.length > 0) {
+      const propagationKey = buildPolymorphSuppressionKey({
+        templateId: template.templateId,
+        signalKind: 'instance-propagation-missing',
+        templateVersion: template.templateVersion
+      });
+      if (!suppressed.has(propagationKey)) {
+        findings.push(makePoliceFinding({
+          findingId: `police.polymorph.instance-propagation-missing.${sanitizeId(template.templateId)}.${sanitizeId(template.templateVersion)}`,
+          policeFamily: 'polymorph',
+          severity: 'warning',
+          trigger: 'instance-propagation-missing',
+          scope: `${template.templateId}@${template.templateVersion}`,
+          action: 'request-human-review',
+          routeHint: 'behavior.polymorphize',
+          readModel: 'PolymorphTemplate.instances',
+          message: `${missingPropagation.length}/${propagatedInstances.length} polymorph instances missing propagation to template ${template.templateVersion}.`,
+          evidenceRefs: [makeEvidenceRef('polymorph-propagation-log', 'police-artifact')],
+          metadata: {
+            templateId: template.templateId,
+            templateVersion: template.templateVersion,
+            missingInstanceIds: missingPropagation.map((entry) => entry.instanceId),
+            suppressionKey: propagationKey,
+            directApplyAllowed: false
+          }
+        }));
+      }
+    }
+
+    if (propagatedInstances.length > threshold) {
+      const variantKey = buildPolymorphSuppressionKey({
+        templateId: template.templateId,
+        signalKind: 'variant-explosion',
+        templateVersion: template.templateVersion
+      });
+      if (!suppressed.has(variantKey)) {
+        findings.push(makePoliceFinding({
+          findingId: `police.polymorph.variant-explosion.${sanitizeId(template.templateId)}`,
+          policeFamily: 'polymorph',
+          severity: 'warning',
+          trigger: 'variant-explosion',
+          scope: template.templateId,
+          action: 'request-human-review',
+          routeHint: 'behavior.evolve',
+          readModel: 'PolymorphTemplate.instances',
+          message: `Polymorph template ${template.templateId} has ${propagatedInstances.length} instances (threshold ${threshold}).`,
+          evidenceRefs: [makeEvidenceRef('polymorph-template-record', 'police-artifact')],
+          metadata: {
+            templateId: template.templateId,
+            instanceCount: propagatedInstances.length,
+            variantThreshold: threshold,
+            suppressionKey: variantKey,
+            directApplyAllowed: false
+          }
+        }));
+      }
+    }
+  }
+
+  return makePoliceFamilyReport({
+    family: 'polymorph',
+    mode: 'advisory',
+    status: 'pass',
+    findings,
+    sourceValidator: 'runPolymorphPolice'
+  });
+}
+
+export function runRollbackPolice(input: RollbackPoliceInput = {}): PoliceFamilyReport {
+  const suppressed = new Set(input.suppressedKeys ?? []);
+  const findings: PoliceFinding[] = [];
+
+  for (const proposal of input.proposals ?? []) {
+    const issues = evaluateRollbackProposal(proposal);
+    for (const issue of issues) {
+      const key = buildRollbackSuppressionKey({
+        proposalId: proposal.proposalId,
+        signalKind: issue.trigger,
+        baseVersion: proposal.baseVersion
+      });
+      if (suppressed.has(key)) continue;
+      findings.push(makePoliceFinding({
+        findingId: `police.rollback.${issue.trigger}.${sanitizeId(proposal.proposalId)}`,
+        policeFamily: 'rollback',
+        severity: issue.severity,
+        trigger: issue.trigger,
+        scope: proposal.proposalId,
+        action: issue.severity === 'block' ? 'request-human-review' : 'needs-review',
+        routeHint: 'review.rollback',
+        readModel: 'RollbackProposal.reversibility',
+        message: issue.message,
+        evidenceRefs: [makeEvidenceRef('rollback-proof', 'police-artifact')],
+        metadata: {
+          proposalId: proposal.proposalId,
+          riskClass: proposal.riskClass,
+          baseVersion: proposal.baseVersion,
+          rollbackScope: proposal.rollbackScope ? [...proposal.rollbackScope] : [],
+          touchedSurfaces: proposal.touchedSurfaces ? [...proposal.touchedSurfaces] : [],
+          suppressionKey: key,
+          directApplyAllowed: false
+        }
+      }));
+    }
+  }
+
+  const status = findings.some((finding) => finding.severity === 'block' || finding.severity === 'error') ? 'fail' : 'pass';
+  return makePoliceFamilyReport({
+    family: 'rollback',
+    mode: 'advisory',
+    status,
+    findings,
+    sourceValidator: 'runRollbackPolice'
+  });
+}
+
+function evaluateRollbackProposal(proposal: RollbackPoliceProposal): Array<{
+  readonly trigger: RollbackPoliceSignalKind;
+  readonly severity: PoliceFindingSeverity;
+  readonly message: string;
+}> {
+  const issues: Array<{ trigger: RollbackPoliceSignalKind; severity: PoliceFindingSeverity; message: string }> = [];
+  const hasAnyEvidence = Boolean(proposal.hasRollbackProof || proposal.hasEquivalenceProof || proposal.hasRetirementProof || proposal.hasReversiblePatchEnvelope);
+
+  if (!hasAnyEvidence) {
+    issues.push({
+      trigger: 'irreversible-proposal',
+      severity: 'block',
+      message: `Proposal ${proposal.proposalId} (${proposal.riskClass}) has no rollback/equivalence/retirement/reversible-patch evidence.`
+    });
+  }
+
+  if (proposal.riskClass === 'atom-evolve' && !proposal.hasRollbackProof && !proposal.hasReversiblePatchEnvelope) {
+    issues.push({
+      trigger: 'rollback-proof-missing',
+      severity: 'block',
+      message: `Atom evolve proposal ${proposal.proposalId} requires rollback proof or reversible patch envelope.`
+    });
+  }
+  if (proposal.riskClass === 'map-replacement' && !proposal.hasEquivalenceProof) {
+    issues.push({
+      trigger: 'equivalence-proof-missing',
+      severity: 'block',
+      message: `Map replacement proposal ${proposal.proposalId} requires map equivalence proof.`
+    });
+  }
+  if (proposal.riskClass === 'legacy-retired' && !proposal.hasRetirementProof && !proposal.hasRollbackProof) {
+    issues.push({
+      trigger: 'retirement-proof-missing',
+      severity: 'block',
+      message: `Legacy retired proposal ${proposal.proposalId} requires retirement proof or rollback proof.`
+    });
+  }
+  if ((proposal.riskClass === 'atomize' || proposal.riskClass === 'infect') && !proposal.hasReversiblePatchEnvelope) {
+    issues.push({
+      trigger: 'rollback-proof-missing',
+      severity: 'block',
+      message: `${proposal.riskClass} proposal ${proposal.proposalId} requires dry-run reversible patch envelope.`
+    });
+  }
+  if (proposal.touchedSurfaces && proposal.rollbackScope) {
+    const scopeSet = new Set(proposal.rollbackScope);
+    const drifted = proposal.touchedSurfaces.filter((surface) => !scopeSet.has(surface));
+    if (drifted.length > 0) {
+      issues.push({
+        trigger: 'rollback-scope-drift',
+        severity: 'warning',
+        message: `Proposal ${proposal.proposalId} touches surfaces outside rollback scope: ${drifted.join(', ')}.`
+      });
+    }
+  }
+  return issues;
+}
+
+// ── Shared Gates (APF-0045 / 0046 / 0047) ──────────────────────────────────
+
+export function runEvidenceIntegrityGate(input: EvidenceIntegrityGateInput = {}): SharedGateReport {
+  const findings: PoliceFinding[] = [];
+  const catalog = input.catalog ?? [];
+  const catalogIndex = new Map<string, EvidenceCatalogEntry>();
+  for (const entry of catalog) {
+    catalogIndex.set(entry.evidenceId, entry);
+  }
+  const now = input.nowIso ? Date.parse(input.nowIso) : Date.now();
+  const maxAgeMs = input.maxAgeMs ?? DEFAULT_EVIDENCE_MAX_AGE_MS;
+
+  for (const proposalRef of input.proposalEvidenceRefs ?? []) {
+    if (proposalRef.refIds.length === 0) {
+      findings.push(makePoliceFinding({
+        findingId: `gate.evidence-integrity.missing.${sanitizeId(proposalRef.proposalId)}`,
+        policeFamily: 'registry-consistency',
+        severity: 'warning',
+        trigger: 'evidence-missing',
+        scope: proposalRef.proposalId,
+        action: 'needs-review',
+        routeHint: 'review.evidence-missing',
+        readModel: 'EvidenceCatalog',
+        message: `Proposal ${proposalRef.proposalId} has no evidence references.`,
+        metadata: { proposalId: proposalRef.proposalId, gate: 'evidence-integrity', directApplyAllowed: false }
+      }));
+    }
+  }
+
+  for (const finding of input.findings ?? []) {
+    const refs = finding.evidenceRefs ?? [];
+    if (refs.length === 0) continue;
+    const seenIds = new Set<string>();
+    for (const ref of refs) {
+      if (seenIds.has(ref.refId)) {
+        findings.push(makePoliceFinding({
+          findingId: `gate.evidence-integrity.duplicate.${sanitizeId(finding.findingId)}.${sanitizeId(ref.refId)}`,
+          policeFamily: finding.policeFamily,
+          severity: 'info',
+          trigger: 'evidence-duplicate',
+          scope: ref.refId,
+          action: 'monitor',
+          routeHint: 'monitor.evidence-duplicate',
+          readModel: 'EvidenceCatalog',
+          message: `Duplicate evidence ref ${ref.refId} on finding ${finding.findingId}.`,
+          metadata: { sourceFindingId: finding.findingId, refId: ref.refId, gate: 'evidence-integrity', directApplyAllowed: false }
+        }));
+        continue;
+      }
+      seenIds.add(ref.refId);
+
+      const catalogEntry = catalogIndex.get(ref.refId);
+      if (!catalogEntry) continue;
+      if (catalogEntry.trustLevel === 'untrusted') {
+        findings.push(makePoliceFinding({
+          findingId: `gate.evidence-integrity.untrusted.${sanitizeId(ref.refId)}`,
+          policeFamily: finding.policeFamily,
+          severity: 'warning',
+          trigger: 'evidence-untrusted',
+          scope: ref.refId,
+          action: 'request-human-review',
+          routeHint: 'review.evidence-untrusted',
+          readModel: 'EvidenceCatalog',
+          message: `Evidence ${ref.refId} marked untrusted.`,
+          metadata: { sourceFindingId: finding.findingId, refId: ref.refId, gate: 'evidence-integrity', directApplyAllowed: false }
+        }));
+      }
+      if (ref.evidenceType && catalogEntry.evidenceType && ref.evidenceType !== catalogEntry.evidenceType) {
+        findings.push(makePoliceFinding({
+          findingId: `gate.evidence-integrity.schema-mismatch.${sanitizeId(ref.refId)}`,
+          policeFamily: finding.policeFamily,
+          severity: 'warning',
+          trigger: 'evidence-schema-mismatch',
+          scope: ref.refId,
+          action: 'request-human-review',
+          routeHint: 'review.evidence-schema-mismatch',
+          readModel: 'EvidenceCatalog',
+          message: `Evidence ${ref.refId} schema mismatch: expected ${ref.evidenceType}, catalog says ${catalogEntry.evidenceType}.`,
+          metadata: { sourceFindingId: finding.findingId, refId: ref.refId, gate: 'evidence-integrity', directApplyAllowed: false }
+        }));
+      }
+      if (catalogEntry.generatedAt) {
+        const ageMs = now - Date.parse(catalogEntry.generatedAt);
+        if (ageMs > maxAgeMs) {
+          findings.push(makePoliceFinding({
+            findingId: `gate.evidence-integrity.stale.${sanitizeId(ref.refId)}`,
+            policeFamily: finding.policeFamily,
+            severity: 'warning',
+            trigger: 'evidence-stale',
+            scope: ref.refId,
+            action: 'request-human-review',
+            routeHint: 'review.evidence-stale',
+            readModel: 'EvidenceCatalog',
+            message: `Evidence ${ref.refId} is stale (age ${Math.round(ageMs / (24 * 60 * 60 * 1000))} days > max ${Math.round(maxAgeMs / (24 * 60 * 60 * 1000))}).`,
+            metadata: { sourceFindingId: finding.findingId, refId: ref.refId, gate: 'evidence-integrity', directApplyAllowed: false }
+          }));
+        }
+      }
+    }
+  }
+
+  return {
+    gate: 'evidence-integrity',
+    status: findings.some((f) => f.severity === 'warning' || f.severity === 'block' || f.severity === 'error') ? 'advisory' : 'pass',
+    findings,
+    summary: { total: findings.length },
+    sourceValidator: 'runEvidenceIntegrityGate'
+  };
+}
+
+export function runReversibilityGate(input: ReversibilityGateInput = {}): SharedGateReport {
+  const suppressed = new Set(input.suppressedKeys ?? []);
+  const findings: PoliceFinding[] = [];
+  let blocked = 0;
+
+  for (const proposal of input.proposals ?? []) {
+    const issues = evaluateRollbackProposal(proposal);
+    for (const issue of issues) {
+      const key = buildRollbackSuppressionKey({
+        proposalId: proposal.proposalId,
+        signalKind: issue.trigger,
+        baseVersion: proposal.baseVersion
+      });
+      if (suppressed.has(key)) continue;
+      if (issue.severity === 'block') blocked += 1;
+      findings.push(makePoliceFinding({
+        findingId: `gate.reversibility.${issue.trigger}.${sanitizeId(proposal.proposalId)}`,
+        policeFamily: 'rollback',
+        severity: issue.severity,
+        trigger: issue.trigger,
+        scope: proposal.proposalId,
+        action: issue.severity === 'block' ? 'request-human-review' : 'needs-review',
+        routeHint: 'gate.reversibility',
+        readModel: 'ReversibilityGate',
+        message: issue.message,
+        evidenceRefs: [makeEvidenceRef('reversibility-gate', 'police-artifact')],
+        metadata: {
+          proposalId: proposal.proposalId,
+          riskClass: proposal.riskClass,
+          suppressionKey: key,
+          gate: 'reversibility',
+          directApplyAllowed: false
+        }
+      }));
+    }
+  }
+
+  return {
+    gate: 'reversibility',
+    status: blocked > 0 ? 'fail' : findings.length > 0 ? 'advisory' : 'pass',
+    findings,
+    summary: { total: findings.length, blocked },
+    sourceValidator: 'runReversibilityGate'
+  };
+}
+
+export function runNoiseControlGate(input: NoiseControlGateInput = {}): SharedGateReport {
+  const dailyCap = input.dailyCap ?? DEFAULT_POLICE_DAILY_CAP;
+  const confidenceThreshold = input.confidenceThreshold ?? 0;
+  const suppressed = new Set(input.suppressedKeys ?? []);
+  const findings: PoliceFinding[] = [];
+  const filteredOut: PoliceFinding[] = [];
+  let suppressedCount = 0;
+  let bypassedCount = 0;
+  let admitted = 0;
+
+  for (const finding of input.findings ?? []) {
+    const key = (finding.metadata as any)?.suppressionKey;
+    const isHighSeverity = finding.severity === 'block' || finding.severity === 'error';
+
+    if (typeof key === 'string' && suppressed.has(key)) {
+      if (isHighSeverity) {
+        bypassedCount += 1;
+        findings.push(finding);
+        continue;
+      }
+      suppressedCount += 1;
+      filteredOut.push(finding);
+      continue;
+    }
+    const confidence = Number((finding.metadata as any)?.confidence ?? 1);
+    if (Number.isFinite(confidence) && confidence < confidenceThreshold && !isHighSeverity) {
+      suppressedCount += 1;
+      filteredOut.push(finding);
+      continue;
+    }
+    if (admitted >= dailyCap && !isHighSeverity) {
+      suppressedCount += 1;
+      filteredOut.push(finding);
+      continue;
+    }
+    admitted += 1;
+    findings.push(finding);
+  }
+
+  return {
+    gate: 'noise-control',
+    status: suppressedCount > 0 || bypassedCount > 0 ? 'advisory' : 'pass',
+    findings,
+    summary: { total: findings.length, suppressed: suppressedCount, bypassed: bypassedCount },
+    sourceValidator: 'runNoiseControlGate'
+  };
+}
+
+// ── Contract Drift Check inside Registry Consistency (APF-0048) ────────────
+
+export function runRegistryContractDriftCheck(input: ContractDriftCheckInput = {}): PoliceFamilyReport {
+  const findings: PoliceFinding[] = [];
+  for (const entry of input.entries ?? []) {
+    const drifted = detectContractDrift(entry);
+    if (!drifted) continue;
+    findings.push(makePoliceFinding({
+      findingId: `police.registry-consistency.${entry.trigger}.${sanitizeId(entry.atomId ?? entry.mapId ?? 'unknown')}`,
+      policeFamily: 'registry-consistency',
+      severity: 'warning',
+      trigger: entry.trigger,
+      scope: entry.atomId ?? entry.mapId ?? 'registry',
+      action: 'request-human-review',
+      routeHint: 'registry.review',
+      readModel: 'RegistryConsistency.contractDrift',
+      message: entry.message ?? `Contract drift detected: ${entry.trigger} for ${entry.atomId ?? entry.mapId ?? 'unknown'}.`,
+      evidenceRefs: [makeEvidenceRef('contract-drift-record', 'police-artifact')],
+      metadata: {
+        atomId: entry.atomId,
+        mapId: entry.mapId,
+        specHash: entry.specHash,
+        implementationHash: entry.implementationHash,
+        testHash: entry.testHash,
+        registryMetadataHash: entry.registryMetadataHash,
+        mapMemberHash: entry.mapMemberHash,
+        directApplyAllowed: false
+      }
+    }));
+  }
+  return makePoliceFamilyReport({
+    family: 'registry-consistency',
+    mode: 'blocker',
+    status: findings.length > 0 ? 'fail' : 'pass',
+    findings,
+    sourceValidator: 'runRegistryContractDriftCheck'
+  });
+}
+
+function detectContractDrift(entry: ContractDriftEntry): boolean {
+  switch (entry.trigger) {
+    case 'spec-implementation-drift':
+      return Boolean(entry.specHash && entry.implementationHash && entry.specHash !== entry.implementationHash);
+    case 'spec-test-drift':
+      return Boolean(entry.specHash && entry.testHash && entry.specHash !== entry.testHash);
+    case 'registry-metadata-drift':
+      return Boolean(entry.registryMetadataHash && entry.specHash && entry.registryMetadataHash !== entry.specHash);
+    case 'map-member-contract-drift':
+      return Boolean(entry.mapMemberHash && entry.specHash && entry.mapMemberHash !== entry.specHash);
+    default:
+      return false;
+  }
+}
+
 export async function runPoliceFamilyGate(input: PoliceFamilyGateInput = {}): Promise<PoliceFamilyGateReport> {
   const profile = input.profile ?? 'standard';
   const families = [
@@ -968,12 +1656,39 @@ export async function runPoliceFamilyGate(input: PoliceFamilyGateInput = {}): Pr
     runMapIntegrationPolice(input.mapIntegration ?? {}),
     runAtomizationPolice(input.atomization ?? {}),
     runDecompositionPolice(input.decomposition ?? {}),
-    runEvolutionPolice(input.evolution ?? {})
+    runEvolutionPolice(input.evolution ?? {}),
+    runPolymorphPolice(input.polymorph ?? {}),
+    runRollbackPolice(input.rollback ?? {})
   ];
+  const sharedGates: SharedGateReport[] = [
+    runEvidenceIntegrityGate(input.evidenceIntegrity ?? {}),
+    runReversibilityGate(input.reversibility ?? {}),
+    runNoiseControlGate(input.noiseControl ?? {})
+  ];
+  if (input.contractDrift) {
+    const driftReport = runRegistryContractDriftCheck(input.contractDrift);
+    const existingRegistryFamily = families.find((family) => family.family === 'registry-consistency');
+    if (existingRegistryFamily) {
+      const mergedFindings = [...existingRegistryFamily.findings, ...driftReport.findings];
+      const mergedStatus: PoliceFamilyStatus = mergedFindings.some((finding) => finding.severity === 'block' || finding.severity === 'error') ? 'fail' : driftReport.findings.length > 0 ? 'fail' : existingRegistryFamily.status;
+      const merged = makePoliceFamilyReport({
+        family: 'registry-consistency',
+        mode: 'blocker',
+        status: mergedStatus,
+        findings: mergedFindings,
+        sourceValidator: `${existingRegistryFamily.sourceValidator}+runRegistryContractDriftCheck`
+      });
+      const index = families.indexOf(existingRegistryFamily);
+      families.splice(index, 1, merged);
+    } else {
+      families.push(driftReport);
+    }
+  }
   return buildPoliceFamilyGateReport({
     profile,
     generatedAt: input.generatedAt,
-    families
+    families,
+    sharedGates
   });
 }
 
@@ -981,6 +1696,7 @@ export function buildPoliceFamilyGateReport(input: {
   readonly profile?: PoliceFamilyProfile;
   readonly generatedAt?: string;
   readonly families: readonly PoliceFamilyReport[];
+  readonly sharedGates?: readonly SharedGateReport[];
 }): PoliceFamilyGateReport {
   const profile = input.profile ?? 'standard';
   const findings = input.families.flatMap((family) => [...family.findings]);
@@ -1005,7 +1721,8 @@ export function buildPoliceFamilyGateReport(input: {
     ok: blockingFindings.length === 0 && !blockerFamilyFailed,
     canPromote: profile === 'full'
       ? blockingFindings.length === 0 && !blockerFamilyFailed
-      : blockingFindings.length === 0 && !blockerFamilyFailed
+      : blockingFindings.length === 0 && !blockerFamilyFailed,
+    sharedGates: input.sharedGates ? [...input.sharedGates] : undefined
   };
 }
 

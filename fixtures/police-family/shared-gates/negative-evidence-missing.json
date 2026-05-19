@@ -1,0 +1,12 @@
+{
+  "description": "Evidence Integrity Gate: proposal with no evidence refs produces evidence-missing finding.",
+  "input": {
+    "proposalEvidenceRefs": [
+      { "proposalId": "proposal.no-evidence.001", "refIds": [] }
+    ],
+    "nowIso": "2026-05-19T00:00:00.000Z"
+  },
+  "expected": {
+    "containsTrigger": "evidence-missing"
+  }
+}

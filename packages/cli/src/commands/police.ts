@@ -32,7 +32,12 @@ export async function runPolice(argv: any) {
     decomposition: {
       maxFileLines: options.maxFileLines
     },
-    evolution: {}
+    evolution: {},
+    polymorph: {},
+    rollback: {},
+    evidenceIntegrity: {},
+    reversibility: {},
+    noiseControl: {}
   });
 
   const outPath = options.outputPath ? resolvePath(options.cwd, options.outputPath) : null;
@@ -57,7 +62,8 @@ export async function runPolice(argv: any) {
     ],
     evidence: {
       report,
-      outputPath: outPath ? relativePathFrom(options.cwd, outPath) : null
+      outputPath: outPath ? relativePathFrom(options.cwd, outPath) : null,
+      sharedGates: report.sharedGates ?? []
     }
   });
 }

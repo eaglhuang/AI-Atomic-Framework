@@ -1,0 +1,19 @@
+{
+  "description": "Rollback Police: map-replacement proposal lacking equivalence proof must be blocked.",
+  "input": {
+    "proposals": [
+      {
+        "proposalId": "proposal.map-replacement.001",
+        "riskClass": "map-replacement",
+        "hasRollbackProof": true,
+        "rollbackScope": ["ATM-MAP-0001"],
+        "touchedSurfaces": ["ATM-MAP-0001"],
+        "baseVersion": "1.0.0"
+      }
+    ]
+  },
+  "expected": {
+    "containsTrigger": "equivalence-proof-missing",
+    "severity": "block"
+  }
+}
