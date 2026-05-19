@@ -6,16 +6,22 @@ import { createAtomicMapSemanticFingerprint, normalizeSemanticFingerprint } from
 import { createAtomicMapRegistryEntry } from '../registry/map-registry.ts';
 import { createRegistryDocument, validateRegistryDocumentFile, writeRegistryArtifacts } from '../registry/registry.ts';
 import { allocateMapId, MapIdAllocationError, parseMapId } from './map-id-allocator.ts';
+import { createGeneratorError, type GeneratorError } from './map-generator/errors.ts';
+import {
+  assertSpecVersionSupportsMapSurface,
+  inferSpecVersion,
+  normalizeAtomId,
+  normalizeMapId,
+  normalizeRequiredText,
+  normalizeSemver,
+  normalizeSpecVersion
+} from './map-generator/normalize-fields.ts';
 
 const defaultRegistryPath = 'atomic-registry.json';
 const defaultCatalogPath = 'atomic_workbench/registry-catalog.md';
 const memberRoles = new Set(['entry-adapter', 'domain-step', 'validator', 'side-effect', 'rollback-adapter']);
 const edgeKinds = new Set(['data-flow', 'control-flow', 'event-flow', 'validation', 'fallback', 'side-effect', 'rollback']);
 const replacementModes = new Set(['draft', 'shadow', 'canary', 'active', 'legacy-retired']);
-type GeneratorError = Error & {
-  code: string;
-  details: Record<string, unknown>;
-};
 
 export function generateAtomicMap(request: any, options: any = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
@@ -277,68 +283,6 @@ function normalizeQualityTargets(qualityTargets: any) {
   }
 
   return Object.fromEntries((entries as Array<[string, string | number | boolean]>).sort(([left], [right]) => left.localeCompare(right)));
-}
-
-function normalizeAtomId(value: any, fieldName: any) {
-  const atomId = String(value || '').trim();
-  if (!/^ATM-[A-Z][A-Z0-9]*-\d{4}$/.test(atomId)) {
-    throw createGeneratorError('ATM_MAP_GENERATOR_ATOM_ID_INVALID', `${fieldName} must match ATM-{BUCKET}-{NNNN}.`, {
-      fieldName,
-      atomId: value
-    });
-  }
-  return atomId;
-}
-
-function normalizeMapId(value: any) {
-  const parsed = parseMapId(value);
-  if (!parsed) {
-    throw createGeneratorError('ATM_MAP_GENERATOR_MAP_ID_INVALID', 'mapId must match ATM-MAP-{NNNN}.', { mapId: value });
-  }
-  return parsed.mapId;
-}
-
-function normalizeSemver(value: any, fieldName: any) {
-  const version = String(value || '').trim();
-  if (!/^\d+\.\d+\.\d+$/.test(version)) {
-    throw createGeneratorError('ATM_MAP_GENERATOR_VERSION_INVALID', `${fieldName} must match semver x.y.z.`, {
-      fieldName,
-      version: value
-    });
-  }
-  return version;
-}
-
-function normalizeRequiredText(value: any, fieldName: any) {
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    throw createGeneratorError('ATM_MAP_GENERATOR_REQUEST_INVALID', `Atomic map generator requires ${fieldName}.`, { fieldName });
-  }
-  return value.trim();
-}
-
-function normalizeSpecVersion(value: any) {
-  const specVersion = String(value || '').trim();
-  if (!['0.1.0', '0.2.0'].includes(specVersion)) {
-    throw createGeneratorError('ATM_MAP_GENERATOR_SPEC_VERSION_INVALID', 'Atomic map specVersion must be 0.1.0 or 0.2.0.', { specVersion: value });
-  }
-  return specVersion;
-}
-
-function inferSpecVersion(input: any) {
-  const hasMemberRoles = input.members.some((member: any) => Boolean(member.role));
-  const hasEdgeKinds = input.edges.some((edge: any) => Boolean(edge.edgeKind));
-  return hasMemberRoles || hasEdgeKinds || input.replacement ? '0.2.0' : '0.1.0';
-}
-
-function assertSpecVersionSupportsMapSurface(specVersion: any, input: any) {
-  if (specVersion !== '0.1.0') {
-    return;
-  }
-  const hasMemberRoles = input.members.some((member: any) => Boolean(member.role));
-  const hasEdgeKinds = input.edges.some((edge: any) => Boolean(edge.edgeKind));
-  if (hasMemberRoles || hasEdgeKinds || input.replacement) {
-    throw createGeneratorError('ATM_MAP_GENERATOR_SPEC_VERSION_INVALID', 'Atomic map replacement surface fields require specVersion 0.2.0.', { specVersion });
-  }
 }
 
 function normalizeOptionalMemberRole(value: any) {
@@ -628,14 +572,6 @@ function createFailure(error: any, phases: any) {
     error: normalizedError,
     phases
   };
-}
-
-function createGeneratorError(code: any, text: any, details: Record<string, unknown> = {}): GeneratorError {
-  const error = new Error(text) as GeneratorError;
-  error.name = 'AtomicMapGeneratorError';
-  error.code = code;
-  error.details = details;
-  return error;
 }
 
 function normalizeError(error: any) {
