@@ -186,6 +186,10 @@ try {
   assert(gitCheck.exitCode === 0, 'git check must exit 0 for matching trailers and identity');
   assert(gitCheck.parsed.ok === true, 'git check must report ok=true for matching trailers and identity');
 
+  const gitCheckNoTrailers = runAtm(['git', 'check', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--no-trailers', '--json']);
+  assert(gitCheckNoTrailers.exitCode === 0, 'git check --no-trailers must exit 0 when identity and ownership are valid');
+  assert(gitCheckNoTrailers.parsed.ok === true, 'git check --no-trailers must report ok=true when identity and ownership are valid');
+
   const gitGuard = runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(gitGuard.exitCode === 0, 'guard git must exit 0 for matching trailers and identity');
   assert(gitGuard.parsed.ok === true, 'guard git must report ok=true for matching trailers and identity');

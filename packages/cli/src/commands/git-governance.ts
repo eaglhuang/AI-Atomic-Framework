@@ -35,7 +35,7 @@ export async function runAtmGit(argv: string[]) {
     cwd: options.cwd,
     actorInput: options.actorId,
     taskId: options.taskId,
-    requireTrailers: true
+    requireTrailers: options.checkTrailers
   });
   return makeResult({
     ok: check.ok,
@@ -48,6 +48,7 @@ export async function runAtmGit(argv: string[]) {
       })],
     evidence: {
       action: 'check',
+      requiredTrailers: options.checkTrailers,
       actorId: check.actorId,
       taskId: check.taskId,
       claimLeaseId: check.claimLeaseId,
@@ -217,7 +218,8 @@ function parseGitOptions(argv: string[]) {
     actorId: null as string | null,
     taskId: null as string | null,
     gitName: null as string | null,
-    gitEmail: null as string | null
+    gitEmail: null as string | null,
+    checkTrailers: true
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -244,6 +246,10 @@ function parseGitOptions(argv: string[]) {
     if (arg === '--email') {
       options.gitEmail = requireValue(argv, index, '--email');
       index += 1;
+      continue;
+    }
+    if (arg === '--no-trailers') {
+      options.checkTrailers = false;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {

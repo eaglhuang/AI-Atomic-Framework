@@ -316,6 +316,7 @@ export const commandSpecs = Object.freeze({
       { flag: '--task', value: 'id', summary: 'Optional task id to enforce owner/claim/trailer consistency.' },
       { flag: '--name', value: 'text', summary: 'Override git user.name during prepare.' },
       { flag: '--email', value: 'text', summary: 'Override git user.email during prepare.' },
+      { flag: '--no-trailers', summary: 'Skip trailer checks in git check (identity/owner checks still run).' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
