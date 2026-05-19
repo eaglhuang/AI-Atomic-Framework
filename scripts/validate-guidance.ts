@@ -560,6 +560,66 @@ try {
   assert(reviewShow.parsed.evidence?.proposal?.proposalId === guidedProposal.parsed.evidence?.proposalId,
     'review show must return the guided legacy dry-run proposal');
 
+  const nextAfterPending = await runAtmJsonPortable(['next', '--cwd', downstreamCwd, '--json']);
+  assert(nextAfterPending.exitCode === 0,
+    'next must exit 0 when matching guided legacy proposal is already pending');
+  const pendingNextAction = nextAfterPending.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
+  const pendingNextCommand = String(pendingNextAction?.['command'] ?? '');
+  assert(pendingNextCommand.includes('review show'),
+    'next must route to review show when matching guided legacy proposal is already pending');
+  assert(pendingNextCommand.includes(String(guidedProposal.parsed.evidence?.proposalId)),
+    'next pending-review route must reference the queued proposalId');
+  assert(pendingNextAction?.['proposalId'] === guidedProposal.parsed.evidence?.proposalId,
+    'next pending-review route must expose proposalId');
+  assert(pendingNextAction?.['proposalStatus'] === 'pending',
+    'next pending-review route must expose proposalStatus=pending');
+  assert(pendingNextAction?.['nextRouteState'] === 'proposal-pending-review',
+    'next pending-review route must expose nextRouteState=proposal-pending-review');
+
+  const approvedProposalId = 'guided-legacy-atomize-custom-approved';
+  const approvedProposal = await runAtmJsonPortable([
+    'upgrade', '--cwd', downstreamCwd,
+    '--propose',
+    '--behavior', `behavior.${String(configNextAction?.['selectedBehavior'])}`,
+    '--legacy-target', String(configNextAction?.['legacyTarget']),
+    '--guidance-session', String(nextConfigFlow.parsed.evidence?.guidanceSession?.sessionId),
+    '--proposal-id', approvedProposalId,
+    '--dry-run', '--json'
+  ]);
+  assert(approvedProposal.exitCode === 0,
+    'custom guided legacy dry-run proposal must execute successfully');
+  const reviewApprove = await runAtmJsonPortable([
+    'review', 'approve', approvedProposalId,
+    '--cwd', downstreamCwd,
+    '--reason', 'validator fixture approval',
+    '--by', 'guidance-validator',
+    '--json'
+  ]);
+  assert(reviewApprove.exitCode === 0,
+    'review approve must exit 0 for custom guided legacy proposal');
+  assert(reviewApprove.parsed.evidence?.status === 'approved',
+    'review approve must mark custom guided legacy proposal as approved');
+
+  const nextAfterApproved = await runAtmJsonPortable(['next', '--cwd', downstreamCwd, '--json']);
+  assert(nextAfterApproved.exitCode === 0,
+    'next must exit 0 when matching guided legacy proposal is already approved');
+  const approvedNextAction = nextAfterApproved.parsed.evidence?.nextAction as Record<string, unknown> | undefined;
+  const approvedNextCommand = String(approvedNextAction?.['command'] ?? '');
+  assert(approvedNextCommand.includes('review show'),
+    'next must keep routing to review show when a matching guided legacy proposal is already approved');
+  assert(approvedNextCommand.includes(approvedProposalId),
+    'next approved route must point to the approved custom proposalId');
+  assert(!approvedNextCommand.includes('upgrade --propose'),
+    'next approved route must not ask for another duplicate dry-run proposal');
+  assert(approvedNextAction?.['proposalId'] === approvedProposalId,
+    'next approved route must expose the approved custom proposalId');
+  assert(approvedNextAction?.['proposalStatus'] === 'approved',
+    'next approved route must expose proposalStatus=approved');
+  assert(approvedNextAction?.['nextRouteState'] === 'proposal-approved',
+    'next approved route must expose nextRouteState=proposal-approved');
+  assert(!String(approvedNextAction?.['missingEvidence'] ?? '').includes('human review before apply'),
+    'next approved route must stop requiring human review before apply');
+
   // ── E. blockedSegments still includes trunk functions ─────────────────────────────────────────
   assert(Array.isArray(configNextAction?.['blockedSegments']),
     'next action must include blockedSegments array');

@@ -3,6 +3,11 @@ import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
 import type { LegacyRoutePlan, LegacyRoutePlanSegment } from '../../../core/src/guidance/legacy-route-plan.ts';
+import {
+  loadHumanReviewQueueDocument,
+  type HumanReviewQueueRecord,
+  type HumanReviewQueueStatus
+} from '../../../plugin-human-review/src/index.ts';
 import { buildFirstUseUserNotice, type AtmUserNotice } from './first-use-notice.ts';
 import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
@@ -20,7 +25,7 @@ export async function runNext(argv: any) {
   if (activeGuidanceSession) {
     const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
     const legacyPlan = activeGuidanceSession.legacyRoutePlan ?? null;
-    const nextAction = legacyPlan ? enrichWithLegacyPlan(baseAction, legacyPlan, activeGuidanceSession.sessionId) : baseAction;
+    const nextAction = legacyPlan ? enrichWithLegacyPlan(options.cwd, baseAction, legacyPlan, activeGuidanceSession.sessionId) : baseAction;
     const userNotice = buildFirstUseUserNotice(nextAction);
     return makeResult({
       ok: nextAction.status !== 'blocked',
@@ -342,7 +347,7 @@ function statusQueueWeight(status: string): number {
   return 3;
 }
 
-function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {
+function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {
   const safeSegments = plan.segments.filter((s: LegacyRoutePlanSegment) => plan.safeFirstAtoms.includes(s.symbolName));
   const preferredSegment: LegacyRoutePlanSegment | null =
     safeSegments.find((s: LegacyRoutePlanSegment) => s.recommendedBehavior === 'split')
@@ -361,6 +366,41 @@ function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan, s
   }
 
   const legacyTarget = `${plan.targetFile}#${preferredSegment.symbolName}`;
+  const queueMatch = findMatchingGuidedLegacyProposal(cwd, {
+    guidanceSession: sessionId,
+    legacyTarget,
+    behaviorId: `behavior.${preferredSegment.recommendedBehavior}`
+  });
+  if (queueMatch) {
+    const command = `node atm.mjs review show ${quoteCliValue(queueMatch.proposalId)} --json`;
+    const waitingForReview = queueMatch.status === 'pending' || queueMatch.status === 'blocked';
+    const missingEvidence = reconcileProposalMissingEvidence(base.missingEvidence, preferredSegment.recommendedBehavior, queueMatch.status);
+    return {
+      ...base,
+      status: 'action',
+      command,
+      reason: queueMatch.status === 'approved'
+        ? `Approved guided legacy dry-run proposal ${queueMatch.proposalId} already covers ${legacyTarget}; inspect the approved boundary and proceed with actual patch planning inside that safe leaf.`
+        : `Matching guided legacy dry-run proposal ${queueMatch.proposalId} already exists for ${legacyTarget}; inspect that proposal instead of generating a duplicate.`,
+      allowedCommands: Array.from(new Set([...base.allowedCommands, command])),
+      selectedSegment: preferredSegment.symbolName,
+      legacyTarget,
+      targetFile: plan.targetFile,
+      selectedBehavior: preferredSegment.recommendedBehavior,
+      blockedSegments,
+      proposalId: queueMatch.proposalId,
+      proposalStatus: queueMatch.status,
+      nextRouteState: queueMatch.status === 'approved'
+        ? 'proposal-approved'
+        : queueMatch.status === 'rejected'
+          ? 'proposal-rejected'
+          : 'proposal-pending-review',
+      missingEvidence: waitingForReview
+        ? dedupeStrings([...missingEvidence, 'human review before apply'])
+        : missingEvidence
+    };
+  }
+
   const command = `node atm.mjs upgrade --propose --behavior behavior.${preferredSegment.recommendedBehavior} --legacy-target ${quoteCliValue(legacyTarget)} --guidance-session ${quoteCliValue(sessionId)} --dry-run --json`;
 
   return {
@@ -372,8 +412,96 @@ function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan, s
     legacyTarget,
     targetFile: plan.targetFile,
     selectedBehavior: preferredSegment.recommendedBehavior,
-    blockedSegments
+    blockedSegments,
+    nextRouteState: 'proposal-required'
   };
+}
+
+interface MatchingGuidedLegacyProposal {
+  readonly proposalId: string;
+  readonly status: HumanReviewQueueStatus;
+}
+
+function findMatchingGuidedLegacyProposal(
+  cwd: string,
+  criteria: {
+    readonly guidanceSession: string;
+    readonly legacyTarget: string;
+    readonly behaviorId: string;
+  }
+): MatchingGuidedLegacyProposal | null {
+  const queuePath = path.join(cwd, '.atm', 'history', 'reports', 'upgrade-proposals.json');
+  const queue = loadHumanReviewQueueDocument(queuePath);
+  if (!queue) {
+    return null;
+  }
+
+  const matches = queue.entries
+    .filter((entry) => isMatchingGuidedLegacyProposal(entry, criteria))
+    .sort(compareGuidedLegacyQueuePriority);
+
+  const selected = matches[0];
+  if (!selected) {
+    return null;
+  }
+
+  return {
+    proposalId: selected.proposalId,
+    status: selected.status
+  };
+}
+
+function isMatchingGuidedLegacyProposal(
+  entry: HumanReviewQueueRecord,
+  criteria: {
+    readonly guidanceSession: string;
+    readonly legacyTarget: string;
+    readonly behaviorId: string;
+  }
+) {
+  return entry.proposal.guidanceSession === criteria.guidanceSession
+    && entry.proposal.legacyTarget === criteria.legacyTarget
+    && entry.proposal.behaviorId === criteria.behaviorId;
+}
+
+function compareGuidedLegacyQueuePriority(left: HumanReviewQueueRecord, right: HumanReviewQueueRecord) {
+  const statusDelta = humanReviewStatusWeight(left.status) - humanReviewStatusWeight(right.status);
+  if (statusDelta !== 0) {
+    return statusDelta;
+  }
+  return compareIsoDesc(left.review?.decidedAt ?? left.queuedAt ?? left.proposal.proposedAt, right.review?.decidedAt ?? right.queuedAt ?? right.proposal.proposedAt);
+}
+
+function humanReviewStatusWeight(status: HumanReviewQueueStatus) {
+  if (status === 'approved') return 0;
+  if (status === 'pending') return 1;
+  if (status === 'blocked') return 2;
+  return 3;
+}
+
+function compareIsoDesc(left: string | undefined, right: string | undefined) {
+  const leftValue = left ?? '';
+  const rightValue = right ?? '';
+  if (leftValue === rightValue) {
+    return 0;
+  }
+  return leftValue > rightValue ? -1 : 1;
+}
+
+function dedupeStrings(values: readonly string[]) {
+  return Array.from(new Set(values));
+}
+
+function reconcileProposalMissingEvidence(
+  missingEvidence: readonly string[],
+  behavior: string,
+  proposalStatus: HumanReviewQueueStatus
+) {
+  const filtered = missingEvidence.filter((entry) => entry !== `${behavior} dry-run proposal`);
+  if (proposalStatus === 'approved' || proposalStatus === 'rejected') {
+    return filtered.filter((entry) => entry !== 'human review before apply');
+  }
+  return filtered;
 }
 
 function quoteCliValue(value: string): string {

@@ -110,6 +110,9 @@ export interface GuidanceNextAction {
   readonly allowedCommands: readonly string[];
   readonly blockedCommands: readonly string[];
   readonly missingEvidence: readonly string[];
+  readonly proposalId?: string;
+  readonly proposalStatus?: string;
+  readonly nextRouteState?: 'proposal-required' | 'proposal-pending-review' | 'proposal-approved' | 'proposal-rejected';
   readonly selectedSegment?: string;
   readonly blockedSegments?: readonly string[];
   readonly legacyTarget?: string;
