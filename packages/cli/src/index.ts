@@ -86,8 +86,22 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'evidence',
+    summary: 'Add and verify governance evidence gates for task closure and git workflow',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'guard',
-    summary: 'Run small governance guards such as encoding checks',
+    summary: 'Run governance guards for encoding, mutation scope, and git metadata',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
+    commandName: 'git',
+    summary: 'Prepare repo-local git identity and enforce ATM trailers',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'

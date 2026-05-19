@@ -260,21 +260,69 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs explain --why blocked --session <session-id> --json'
     ]
   }),
-  guard: defineCommandSpec({
-    name: 'guard',
-    summary: 'Run small governance guards such as encoding checks.',
+  evidence: defineCommandSpec({
+    name: 'evidence',
+    summary: 'Add or verify task evidence for close/commit/PR governance gates.',
     positional: [
-      { name: 'guard-name', summary: 'Currently supports: encoding', required: true }
+      { name: 'action', summary: 'add | verify', required: true }
     ],
     options: [
       commonCwdOption,
+      { flag: '--task', value: 'id', summary: 'Task id to append or verify evidence.' },
+      { flag: '--actor', value: 'id', summary: 'Actor id for evidence add (or set ATM_ACTOR_ID).' },
+      { flag: '--kind', value: 'type', summary: 'Evidence kind for add: test|artifact|attestation|review|commit|waiver.' },
+      { flag: '--summary', value: 'text', summary: 'Optional short evidence summary for add.' },
+      { flag: '--artifacts', value: 'csv', summary: 'Optional artifact path list for add.' },
+      { flag: '--gate', value: 'type', summary: 'Evidence gate for verify: close|commit|pr.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --summary "governance validator passed" --artifacts reports/governance.json --json',
+      'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json'
+    ]
+  }),
+  guard: defineCommandSpec({
+    name: 'guard',
+    summary: 'Run governance guards for encoding, mutation scope, and git metadata.',
+    positional: [
+      { name: 'guard-name', summary: 'encoding | mutation | git', required: true }
+    ],
+    options: [
+      commonCwdOption,
+      { flag: '--task', value: 'id', summary: 'Task id for mutation or git guard checks.' },
+      { flag: '--actor', value: 'id', summary: 'Actor id for mutation or git guard checks.' },
       { flag: '--files', value: 'csv', summary: 'Comma-separated file paths for the guard.' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
     ],
     examples: [
-      'node atm.mjs guard encoding --files README.md,package.json --json'
+      'node atm.mjs guard encoding --files README.md,package.json --json',
+      'node atm.mjs guard mutation --task ATM-GOV-0106 --actor codex-main --files packages/cli/src/commands/guard.ts --json',
+      'node atm.mjs guard git --task ATM-GOV-0106 --actor codex-main --json'
+    ]
+  }),
+  git: defineCommandSpec({
+    name: 'git',
+    summary: 'Prepare repo-local git identity and verify ATM git-governance trailers.',
+    positional: [
+      { name: 'action', summary: 'prepare | check', required: true }
+    ],
+    options: [
+      commonCwdOption,
+      { flag: '--actor', value: 'id', summary: 'Actor id used for git identity and trailer checks.' },
+      { flag: '--task', value: 'id', summary: 'Optional task id to enforce owner/claim/trailer consistency.' },
+      { flag: '--name', value: 'text', summary: 'Override git user.name during prepare.' },
+      { flag: '--email', value: 'text', summary: 'Override git user.email during prepare.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs git prepare --task ATM-GOV-0105 --actor codex-main --json',
+      'node atm.mjs git check --task ATM-GOV-0105 --actor codex-main --json'
     ]
   }),
   guide: defineCommandSpec({
@@ -472,9 +520,9 @@ export const commandSpecs = Object.freeze({
   }),
   tasks: defineCommandSpec({
     name: 'tasks',
-    summary: 'Import/verify task plans, manage reservation state, and execute task claim lifecycle actions.',
+    summary: 'Import/verify task plans, manage reservation/claim lifecycle, and close tasks with evidence gates.',
     positional: [
-      { name: 'action', summary: 'import | verify | reserve | promote | claim | renew | release | handoff | takeover', required: true }
+      { name: 'action', summary: 'import | verify | reserve | promote | claim | renew | release | handoff | takeover | close', required: true }
     ],
     options: [
       commonCwdOption,
@@ -482,13 +530,14 @@ export const commandSpecs = Object.freeze({
       { flag: '--dry-run', summary: 'Parse the plan and emit a manifest without writing task files.' },
       { flag: '--write', summary: 'Write canonical task JSON files to .atm/history/tasks/ and persist import evidence.' },
       { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs.' },
-      { flag: '--task', value: 'id', summary: 'Task id for claim/renew/release/handoff/takeover.' },
-      { flag: '--actor', value: 'id', summary: 'Actor id for claim lifecycle actions (or set ATM_ACTOR_ID).' },
+      { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close.' },
+      { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close lifecycle actions (or set ATM_ACTOR_ID).' },
       { flag: '--title', value: 'text', summary: 'Optional title for tasks reserve when creating a manual task entry.' },
       { flag: '--files', value: 'csv', summary: 'Comma-separated scope files for claim/takeover lock acquisition.' },
       { flag: '--ttl-seconds', value: 'number', summary: 'Lease ttl in seconds for claim/renew/takeover.' },
       { flag: '--to', value: 'id', summary: 'Target actor id for handoff.' },
-      { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, or takeover.' },
+      { flag: '--status', value: 'state', summary: 'Target status for tasks close: done|review|blocked|abandoned.' },
+      { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, takeover, or close.' },
       commonJsonOption,
       commonPrettyOption,
       commonHelpOption
@@ -501,7 +550,8 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs tasks promote --task ATM-GOV-0101 --actor codex-main --json',
       'node atm.mjs tasks claim --task ATM-GOV-0101 --actor codex-main --files packages/core/src/index.ts --json',
       'node atm.mjs tasks renew --task ATM-GOV-0101 --actor codex-main --ttl-seconds 3600 --json',
-      'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reason "handoff complete" --json'
+      'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reason "handoff complete" --json',
+      'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --json'
     ]
   }),
   upgrade: defineCommandSpec({

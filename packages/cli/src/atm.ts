@@ -10,7 +10,9 @@ import { runCreateMap } from './commands/create-map.ts';
 import { runDoctor } from './commands/doctor.ts';
 import { runExplain } from './commands/explain.ts';
 import { runExperience } from './commands/experience.ts';
+import { runEvidence } from './commands/evidence.ts';
 import { runGuard } from './commands/guard.ts';
+import { runAtmGit } from './commands/git-governance.ts';
 import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
 import { runInit } from './commands/init.ts';
@@ -53,6 +55,8 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   doctor: runDoctor,
   explain: runExplain,
   experience: runExperience,
+  evidence: runEvidence,
+  git: runAtmGit,
   guard: runGuard,
   guide: runGuide,
   handoff: runHandoff,

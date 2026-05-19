@@ -4,6 +4,7 @@ import path from 'node:path';
 import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import { resolveActorId } from './actor-registry.ts';
+import { verifyTaskEvidence } from './evidence.ts';
 import { CliError, makeResult, message, relativePathFrom, resolveValue } from './shared.ts';
 
 export interface TaskImportSource {
@@ -81,6 +82,9 @@ const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 
 export async function runTasks(argv: string[]) {
   const action = (argv[0] ?? '').toLowerCase();
+  if (action === 'close') {
+    return await runTasksClose(argv.slice(1));
+  }
   if (action === 'reserve' || action === 'promote') {
     return await runTasksReservation(action, argv.slice(1));
   }
@@ -94,7 +98,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (import | verify | reserve | promote | claim | renew | release | handoff | takeover).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (import | verify | reserve | promote | claim | renew | release | handoff | takeover | close).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -447,6 +451,88 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
   });
 }
 
+async function runTasksClose(argv: string[]) {
+  const options = parseCloseOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks close requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const taskPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${options.taskId}.json`);
+  if (!existsSync(taskPath)) {
+    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
+      exitCode: 2,
+      details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
+    });
+  }
+  const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+  const currentOwner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
+  if (currentOwner && currentOwner !== actorId) {
+    throw new CliError('ATM_TASK_CLOSE_OWNER_MISMATCH', `Task ${options.taskId} owner is ${currentOwner}, not ${actorId}.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId, owner: currentOwner, actorId }
+    });
+  }
+
+  const evidenceGate = options.status === 'done'
+    ? verifyTaskEvidence({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      gate: 'close'
+    })
+    : null;
+  if (evidenceGate && !evidenceGate.ok) {
+    throw new CliError('ATM_TASK_CLOSE_EVIDENCE_REQUIRED', `Task ${options.taskId} cannot be closed as done without required evidence.`, {
+      exitCode: 1,
+      details: {
+        taskId: options.taskId,
+        gate: evidenceGate.gate,
+        missing: evidenceGate.missing,
+        evidenceCount: evidenceGate.total
+      }
+    });
+  }
+
+  const claim = parseClaimRecord(taskDocument.claim);
+  if (claim && claim.state === 'active' && claim.actorId === actorId) {
+    const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+    await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+    taskDocument.claim = {
+      ...claim,
+      heartbeatAt: new Date().toISOString(),
+      state: 'released',
+      reason: options.reason ?? 'closed'
+    };
+  }
+
+  taskDocument.status = options.status;
+  taskDocument.owner = actorId;
+  taskDocument.closedAt = new Date().toISOString();
+  taskDocument.closedByActor = actorId;
+  if (options.reason) {
+    taskDocument.closeReason = options.reason;
+  }
+  writeTaskDocument(taskPath, taskDocument);
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASKS_CLOSED', `Task ${options.taskId} moved to ${options.status}.`, {
+      taskId: options.taskId,
+      actorId,
+      status: options.status
+    })],
+    evidence: {
+      action: 'close',
+      taskId: options.taskId,
+      actorId,
+      status: options.status,
+      taskPath: relativePathFrom(options.cwd, taskPath),
+      evidenceGate
+    }
+  });
+}
+
 async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
   const options = parseClaimLifecycleOptions(action, argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined);
@@ -724,6 +810,60 @@ function parseReservationOptions(action: 'reserve' | 'promote', argv: string[]) 
   }
   if (!options.taskId) {
     throw new CliError('ATM_CLI_USAGE', `tasks ${action} requires --task <work-item-id>.`, { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
+}
+
+function parseCloseOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    status: 'done' as 'done' | 'review' | 'blocked' | 'abandoned',
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--status') {
+      const nextStatus = requireValue(argv, index, '--status').trim().toLowerCase();
+      if (nextStatus !== 'done' && nextStatus !== 'review' && nextStatus !== 'blocked' && nextStatus !== 'abandoned') {
+        throw new CliError('ATM_CLI_USAGE', 'tasks close --status supports only: done, review, blocked, abandoned.', { exitCode: 2 });
+      }
+      options.status = nextStatus;
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks close does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks close requires --task <work-item-id>.', { exitCode: 2 });
   }
   return {
     ...options,

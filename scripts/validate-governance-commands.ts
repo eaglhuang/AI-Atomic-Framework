@@ -32,14 +32,32 @@ function runAtm(args: any) {
   };
 }
 
+function runGit(cwd: string, args: string[]) {
+  const result = spawnSync('git', args, {
+    cwd,
+    encoding: 'utf8'
+  });
+  return {
+    exitCode: result.status ?? 0,
+    stdout: (result.stdout ?? '').trim(),
+    stderr: (result.stderr ?? '').trim()
+  };
+}
+
 const tempRoot = createTempWorkspace('atm-governance-commands-');
 try {
   const repo = path.join(tempRoot, 'repo');
   mkdirSync(repo, { recursive: true });
+  const gitInit = runGit(repo, ['init']);
+  assert(gitInit.exitCode === 0, 'git init must succeed for governance command validation');
+  assert(runGit(repo, ['config', 'user.name', 'bootstrap']).exitCode === 0, 'fixture git user.name must be configured');
+  assert(runGit(repo, ['config', 'user.email', 'bootstrap@example.com']).exitCode === 0, 'fixture git user.email must be configured');
 
   const bootstrap = runAtm(['bootstrap', '--cwd', repo, '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'bootstrap must exit 0 for governance command validation');
   assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true for governance command validation');
+  assert(runGit(repo, ['add', '.']).exitCode === 0, 'fixture bootstrap files must be stageable');
+  assert(runGit(repo, ['commit', '-m', 'chore: bootstrap fixture']).exitCode === 0, 'fixture bootstrap commit must succeed');
 
   const missingLock = runAtm(['lock', 'check', '--cwd', repo, '--task', 'ATM-FIXTURE-0099', '--json']);
   assert(missingLock.exitCode === 1, 'lock check on missing task must exit 1');
@@ -114,11 +132,75 @@ try {
   const taskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0103.json');
   const taskAfterClaim = JSON.parse(readFileSync(taskPath, 'utf8'));
   assert(taskAfterClaim.status === 'running', 'tasks claim must update task status to running');
+  const claimLeaseId = String(nextClaim.parsed.evidence.claimResult?.claim?.leaseId ?? '');
+  assert(claimLeaseId.length > 0, 'next --claim must produce a lease id');
+
+  const registerActor = runAtm([
+    'actor',
+    'register',
+    '--cwd',
+    repo,
+    '--id',
+    'fixture-agent',
+    '--kind',
+    'ai-agent',
+    '--name',
+    'Fixture Agent',
+    '--git-name',
+    'fixture-agent',
+    '--git-email',
+    'fixture-agent@example.com',
+    '--json'
+  ]);
+  assert(registerActor.exitCode === 0, 'actor register must exit 0');
+  assert(registerActor.parsed.ok === true, 'actor register must report ok=true');
+
+  const mutationGuard = runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
+  assert(mutationGuard.exitCode === 0, 'guard mutation must pass for in-scope claimed file');
+  assert(mutationGuard.parsed.ok === true, 'guard mutation must report ok=true for in-scope claimed file');
 
   const conflictClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(conflictClaim.exitCode === 1, 'tasks claim conflict must exit 1');
   assert(conflictClaim.parsed.ok === false, 'tasks claim conflict must report ok=false');
   assert(conflictClaim.parsed.messages?.[0]?.code === 'ATM_LOCK_CONFLICT', 'tasks claim conflict must return ATM_LOCK_CONFLICT');
+
+  const gitPrepare = runAtm(['git', 'prepare', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  assert(gitPrepare.exitCode === 0, 'git prepare must exit 0');
+  assert(gitPrepare.parsed.ok === true, 'git prepare must report ok=true');
+
+  const governedFile = path.join(repo, 'notes', 'governance.txt');
+  mkdirSync(path.dirname(governedFile), { recursive: true });
+  writeFileSync(governedFile, 'governance fixture\n', 'utf8');
+  assert(runGit(repo, ['add', '.']).exitCode === 0, 'governance fixture commit staging must succeed');
+  const commitMessage = [
+    'feat: governed fixture commit',
+    '',
+    'ATM-Actor: fixture-agent',
+    'ATM-Task: ATM-GOV-0103',
+    `ATM-Claim: ${claimLeaseId}`,
+    'ATM-Evidence: .atm/history/evidence/ATM-GOV-0103.json'
+  ].join('\n');
+  assert(runGit(repo, ['commit', '-m', commitMessage]).exitCode === 0, 'governance fixture commit must succeed');
+
+  const gitCheck = runAtm(['git', 'check', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  assert(gitCheck.exitCode === 0, 'git check must exit 0 for matching trailers and identity');
+  assert(gitCheck.parsed.ok === true, 'git check must report ok=true for matching trailers and identity');
+
+  const gitGuard = runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  assert(gitGuard.exitCode === 0, 'guard git must exit 0 for matching trailers and identity');
+  assert(gitGuard.parsed.ok === true, 'guard git must report ok=true for matching trailers and identity');
+
+  const addEvidence = runAtm(['evidence', 'add', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--kind', 'test', '--summary', 'fixture governance command validation passed', '--artifacts', 'notes/governance.txt', '--json']);
+  assert(addEvidence.exitCode === 0, 'evidence add must exit 0');
+  assert(addEvidence.parsed.ok === true, 'evidence add must report ok=true');
+
+  const verifyEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'close', '--json']);
+  assert(verifyEvidence.exitCode === 0, 'evidence verify close gate must exit 0');
+  assert(verifyEvidence.parsed.ok === true, 'evidence verify close gate must report ok=true');
+
+  const closeTask = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--status', 'done', '--json']);
+  assert(closeTask.exitCode === 0, 'tasks close done must exit 0 with evidence');
+  assert(closeTask.parsed.ok === true, 'tasks close done must report ok=true with evidence');
 
   const handoff = runAtm(['handoff', 'summarize', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--json']);
   assert(handoff.exitCode === 0, 'handoff summarize must exit 0');
@@ -134,7 +216,7 @@ try {
 }
 
 if (!process.exitCode) {
-  console.log('[governance-commands:' + mode + '] ok (lock, budget, guard, tasks lifecycle, and handoff commands verified)');
+  console.log('[governance-commands:' + mode + '] ok (lock, budget, guard, evidence, git governance, tasks lifecycle, and handoff commands verified)');
 }
 
 function existsSyncPortable(repositoryRoot: any, relativePath: any) {
