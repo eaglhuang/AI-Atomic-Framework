@@ -26,6 +26,12 @@ Use this ATM command only after the first command confirms it is the current gov
 {{command}}
 ```
 
+For collaboration workflows, claim the selected imported task before edits:
+
+```bash
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
+```
+
 ## Handoff
 
 ```bash
@@ -43,3 +49,5 @@ Use this ATM command only after the first command confirms it is the current gov
 - Treat any planning hint as CLI output, not as template authority.
 - If an `ATM_USER_NOTICE` message or `evidence.userNotice` is present, show it to the user in natural language before executing the returned next action.
 - After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
+- Treat `ATM_ACTOR_ID` as the default actor identity variable. `AGENT_IDENTITY`
+  is legacy-compatible only.

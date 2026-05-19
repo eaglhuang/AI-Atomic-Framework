@@ -38,6 +38,21 @@ Follow the returned `nextCommand`. If the matched intent is
 source analysis by hand. If the matched intent is `task-plan-import`, run the
 task import dry run before creating or editing any task files.
 
+Before mutating repository files for implementation work, claim the task:
+
+```bash
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
+```
+
+If the editor provides pre-write hooks, keep them thin and run only:
+
+```bash
+node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <csv> --json
+```
+
+If no hook is available, continue with task claim + `git prepare/check` +
+`evidence verify` gates as the fallback safety boundary.
+
 ## Required Evidence
 
 For legacy candidate ranking, final reasoning should cite or create:
@@ -95,6 +110,10 @@ Then continue the user's original request with the fallback sources.
   evidence exist.
 - Do not mutate host files during candidate ranking; ranking is advisory until
   a later governed dry run is selected.
+- Do not start implementation edits before a task is in `ready` and has an
+  active claim.
+- Do not move heavy checks (build/lint/network) into hooks; hooks should only
+  call thin ATM guard commands.
 - Do not treat task-card import as atom birth; task-card import uses `tasks
   import`, while atom birth uses `create` or a governed atomize flow.
 - Do not acquire runtime locks during import-only task-plan operations.
