@@ -12,6 +12,29 @@ export interface WorkItemRef {
   readonly status: AtomLifecycleStatus;
 }
 
+export type ActorKind = 'human' | 'ai-agent' | 'automation';
+
+export interface ActorRecord {
+  readonly actorId: string;
+  readonly actorKind: ActorKind;
+  readonly displayName: string;
+  readonly provider?: string;
+  readonly editor?: string;
+  readonly gitName?: string;
+  readonly gitEmail?: string;
+  readonly contact?: string;
+  readonly capabilities?: readonly string[];
+  readonly createdAt?: string;
+  readonly updatedAt?: string;
+}
+
+export interface ActorRegistryDocument {
+  readonly schemaId: 'atm.actorRegistry';
+  readonly specVersion: '0.1.0';
+  readonly generatedAt: string;
+  readonly actors: readonly ActorRecord[];
+}
+
 export interface ScopeLockMapEdgeSelectorRecord {
   readonly from: string;
   readonly to: string;

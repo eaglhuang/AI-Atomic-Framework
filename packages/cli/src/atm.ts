@@ -37,6 +37,7 @@ import { runReview } from './commands/review.ts';
 import { runReviewAdvisory } from './commands/review-advisory.ts';
 import { runMigrate } from './commands/migrate.ts';
 import { runAgentPack } from './commands/agent-pack.ts';
+import { runActor } from './commands/actor.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, writeResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
@@ -78,7 +79,8 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   review: runReview,
   'review-advisory': runReviewAdvisory,
   migrate: runMigrate,
-  'agent-pack': runAgentPack
+  'agent-pack': runAgentPack,
+  actor: runActor
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
