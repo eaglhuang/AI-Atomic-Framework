@@ -22,6 +22,7 @@ import { runSelfHostAlphaAsync } from './commands/self-host-alpha.ts';
 import { runSpec } from './commands/spec.ts';
 import { runStart } from './commands/start.ts';
 import { runStatus } from './commands/status.ts';
+import { runTasks } from './commands/tasks.ts';
 import { runUpgrade } from './commands/upgrade.ts';
 import { runTestAsync } from './commands/test.ts';
 import { runTelemetry } from './commands/telemetry.ts';
@@ -62,6 +63,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   spec: runSpec,
   start: runStart,
   status: runStatus,
+  tasks: runTasks,
   upgrade: runUpgrade,
   telemetry: runTelemetry,
   test: runTestAsync,

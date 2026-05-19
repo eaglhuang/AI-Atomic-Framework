@@ -3,6 +3,7 @@ import type { LegacyRoutePlan } from './legacy-route-plan.ts';
 export type GuidanceRoute =
   | 'create-atom'
   | 'legacy-candidate-ranking'
+  | 'task-plan-import'
   | 'atomize'
   | 'infect'
   | 'split'
@@ -218,6 +219,8 @@ function buildReadFirst(route: GuidanceRoute): readonly string[] {
       return ['README.md', 'docs/SELF_HOSTING_ALPHA.md'];
     case 'legacy-candidate-ranking':
       return ['README.md', 'docs/QUICK_START.md'];
+    case 'task-plan-import':
+      return ['README.md', 'docs/QUICK_START.md', 'docs/LIFECYCLE.md'];
     case 'docs-first':
       return ['README.md', 'docs/ARCHITECTURE.md'];
     case 'atomize':

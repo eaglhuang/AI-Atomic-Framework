@@ -31,6 +31,10 @@ function assert(condition: unknown, message: string) {
   }
 }
 
+function hasForbiddenPlanningHint(content: string): boolean {
+  return /spec-kit|MRP|\/specify|\/plan\b|(?:^|\s)\/tasks\b/i.test(content);
+}
+
 function readJson(relativePath: string) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
@@ -75,7 +79,7 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
     assert(template.body.includes('before executing the returned next action'), 'atm-next template must show notices before executing next action');
     assert(template.body.includes('return to the user original request'), 'atm-next template must tell agents to resume the original request after onboarding');
   }
-  assert(!/spec-kit|MRP|\/specify|\/plan|\/tasks/i.test(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
+  assert(!hasForbiddenPlanningHint(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }
 
 const claudeFiles = packageModule.compileSkillTemplatesForAdapter('claude-code', templates);
@@ -93,7 +97,7 @@ assert(geminiFiles.length === 8, 'Gemini compiler output must contain eight file
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
   assert(compiledFile.content.includes(packageModule.atmFirstCommand), `${compiledFile.relativePath} missing first command`);
   assert(compiledFile.content.includes(packageModule.charterInvariantsPlaceholder), `${compiledFile.relativePath} missing charter placeholder`);
-  assert(!/spec-kit|MRP|\/specify|\/plan|\/tasks/i.test(compiledFile.content), `${compiledFile.relativePath} must not bake planning hints into compiled output`);
+  assert(!hasForbiddenPlanningHint(compiledFile.content), `${compiledFile.relativePath} must not bake planning hints into compiled output`);
 }
 
 assert(claudeFiles.every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Claude output must carry charter injection frontmatter');

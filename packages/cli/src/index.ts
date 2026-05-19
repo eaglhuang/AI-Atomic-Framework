@@ -142,6 +142,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'tasks',
+    summary: 'Import and verify Markdown task plans in the canonical ATM task store',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'upgrade',
     summary: 'Propose an evolution upgrade from report inputs',
     implemented: true,

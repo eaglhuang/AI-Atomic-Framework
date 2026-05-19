@@ -20,6 +20,17 @@ export function decideGuidanceRoute(input: RouteEngineInput): RouteDecision {
   const evidence = input.evidence ?? {};
   const releaseBlockers = input.orientation.releaseBlockers;
 
+  if (/import task plan|open task cards|load roadmap|task plan import|bulk task import|匯入任務|匯入計畫|匯入路線圖|從計畫.*?開卡|批次開卡|批次匯入任務/.test(lowerGoal)) {
+    return buildDecision({
+      route: 'task-plan-import',
+      confidence: 0.9,
+      reasons: ['Goal asks ATM to ingest an external plan into the canonical task store, so the dry-run import flow is the safest next action.'],
+      requiredEvidence: ['plan markdown source', 'task import dry-run manifest', 'task import write evidence'],
+      blockedBy: releaseBlockers.filter((blocker) => blocker !== 'package-json-missing'),
+      nextCommand: 'node atm.mjs tasks import --from <plan.md> --dry-run --json'
+    });
+  }
+
   if (input.orientation.adapterStatus.status === 'missing') {
     return buildDecision({
       route: 'adapter-bootstrap',

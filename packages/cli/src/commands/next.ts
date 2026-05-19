@@ -1,3 +1,5 @@
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
 import type { LegacyRoutePlan, LegacyRoutePlanSegment } from '../../../core/src/guidance/legacy-route-plan.ts';
@@ -45,9 +47,10 @@ export async function runNext(argv: any) {
 
   const doctor = await runDoctor(['--cwd', options.cwd]);
   const runtime = detectGovernanceRuntime(options.cwd, bootstrapTaskId);
+  const importedTaskQueue = inspectImportedTaskQueue(options.cwd);
   const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
   const failed = doctorChecks.find((check) => check.ok !== true);
-  const nextAction = decideNextAction(runtime, failed?.name ?? null);
+  const nextAction = decideNextAction(runtime, failed?.name ?? null, importedTaskQueue);
   const userNotice = buildFirstUseUserNotice(nextAction);
   return makeResult({
     ok: nextAction.status === 'ready',
@@ -66,6 +69,7 @@ export async function runNext(argv: any) {
       agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
       ...(userNotice ? { userNotice } : {}),
       runtimeAdapterReadiness,
+      importedTaskQueue,
       doctorSummary: doctorChecks.map((check) => ({ name: check.name, ok: check.ok })),
       layoutVersion: runtime.layoutVersion,
       currentTaskId: runtime.currentTaskId,
@@ -76,7 +80,7 @@ export async function runNext(argv: any) {
   });
 }
 
-function decideNextAction(runtime: any, failedCheckName: any) {
+function decideNextAction(runtime: any, failedCheckName: any, importedTaskQueue: ImportedTaskQueue) {
   if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
     return {
       status: 'needs-bootstrap',
@@ -106,6 +110,16 @@ function decideNextAction(runtime: any, failedCheckName: any) {
     };
   }
   if (!runtime.currentTaskId) {
+    if (importedTaskQueue.selectedTask) {
+      return {
+        status: 'ready',
+        command: `node atm.mjs start --cwd . --goal ${quoteCliValue(importedTaskQueue.selectedTask.title)} --json`,
+        reason: `imported work item ${importedTaskQueue.selectedTask.workItemId} is ready to start`,
+        selectedTask: importedTaskQueue.selectedTask,
+        allowedCommands: allowedGuidanceBootstrapCommands(),
+        blockedCommands: blockedMutationCommands()
+      };
+    }
     return {
       status: 'needs-guidance-start',
       command: 'node atm.mjs orient --cwd . --json',
@@ -165,6 +179,91 @@ function blockedMutationCommands() {
     'atomize/infect/split apply without dry-run proposal',
     'apply without human review approval'
   ];
+}
+
+interface ImportedTaskSummary {
+  readonly workItemId: string;
+  readonly title: string;
+  readonly status: string;
+  readonly milestone: string | null;
+  readonly dependencies: readonly string[];
+  readonly taskPath: string;
+}
+
+interface ImportedTaskQueue {
+  readonly taskStorePath: string;
+  readonly openTaskCount: number;
+  readonly selectedTask: ImportedTaskSummary | null;
+  readonly tasks: readonly ImportedTaskSummary[];
+}
+
+function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
+  const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
+  if (!existsSync(taskStorePath)) {
+    return {
+      taskStorePath: '.atm/history/tasks',
+      openTaskCount: 0,
+      selectedTask: null,
+      tasks: []
+    };
+  }
+
+  const allTasks = readdirSync(taskStorePath)
+    .filter((entry) => entry.endsWith('.json'))
+    .flatMap((entry): ImportedTaskSummary[] => {
+      const filePath = path.join(taskStorePath, entry);
+      try {
+        const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+        const schemaVersion = typeof parsed.schemaVersion === 'string' ? parsed.schemaVersion : '';
+        if (schemaVersion !== 'atm.workItem.v0.2' && parsed.source === undefined) {
+          return [];
+        }
+        const workItemId = typeof parsed.workItemId === 'string'
+          ? parsed.workItemId
+          : typeof parsed.id === 'string'
+            ? parsed.id
+            : '';
+        if (!workItemId) return [];
+        const dependencies = Array.isArray(parsed.dependencies)
+          ? parsed.dependencies.filter((entry): entry is string => typeof entry === 'string')
+          : [];
+        return [{
+          workItemId,
+          title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim() : workItemId,
+          status: typeof parsed.status === 'string' ? parsed.status : 'planned',
+          milestone: typeof parsed.milestone === 'string' ? parsed.milestone : null,
+          dependencies,
+          taskPath: path.relative(cwd, filePath).replace(/\\/g, '/')
+        }];
+      } catch {
+        return [];
+      }
+    });
+
+  const tasks = allTasks
+    .filter((task) => task.status === 'open' || task.status === 'planned')
+    .sort((left, right) => {
+      const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
+      return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
+    });
+  const statusById = new Map(allTasks.map((task) => [task.workItemId, task.status]));
+  const selectedTask = tasks.find((task) => task.dependencies.every((dependency) => {
+    const status = statusById.get(dependency);
+    return status === 'done' || status === 'verified';
+  })) ?? null;
+
+  return {
+    taskStorePath: path.relative(cwd, taskStorePath).replace(/\\/g, '/'),
+    openTaskCount: tasks.length,
+    selectedTask,
+    tasks
+  };
+}
+
+function statusQueueWeight(status: string): number {
+  if (status === 'open') return 0;
+  if (status === 'planned') return 1;
+  return 2;
 }
 
 function enrichWithLegacyPlan(base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {

@@ -415,6 +415,28 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs status --json'
     ]
   }),
+  tasks: defineCommandSpec({
+    name: 'tasks',
+    summary: 'Import a Markdown task plan into the canonical ATM task store and verify the result.',
+    positional: [
+      { name: 'action', summary: 'import | verify', required: true }
+    ],
+    options: [
+      commonCwdOption,
+      { flag: '--from', value: 'path', summary: 'Markdown plan path for tasks import.' },
+      { flag: '--dry-run', summary: 'Parse the plan and emit a manifest without writing task files.' },
+      { flag: '--write', summary: 'Write canonical task JSON files to .atm/history/tasks/ and persist import evidence.' },
+      { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs tasks import --from docs/plan.md --dry-run --json',
+      'node atm.mjs tasks import --from docs/plan.md --write --json',
+      'node atm.mjs tasks verify --json'
+    ]
+  }),
   upgrade: defineCommandSpec({
     name: 'upgrade',
     summary: 'Propose upgrade evolution from report evidence inputs or plan safe ATM onboarding upgrades.',

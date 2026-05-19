@@ -1,6 +1,6 @@
 ---
 name: atm-governance-router
-description: Use when a user asks to inspect, rank, clean up, refactor, split, atomize, infect, migrate, modernize, or prioritize existing source code before editing.
+description: Use when a user asks to inspect, rank, clean up, refactor, split, atomize, infect, migrate, modernize, prioritize existing source code, or open/import task cards from a plan before editing.
 argument-hint: "<natural language goal>"
 ---
 
@@ -41,6 +41,34 @@ With a host wrapper, use `atm candidates rank` with the same flags.
 
 Do not rank the host source tree with ad-hoc shell-only heuristics when ATM can
 produce evidence.
+
+## Task Plan Import Route
+
+If the result reports `matchedIntent: "task-plan-import"`, do not hand-write
+`.atm/history/tasks/*.json` and do not use `atm create`. Task-plan import is a
+work-item import flow; `atm create` is for atom birth.
+
+Run the dry-run import first:
+
+```bash
+node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json
+```
+
+After the parsed manifest is reviewed, persist and verify it:
+
+```bash
+node atm.mjs tasks import --from <plan.md> --write --cwd . --json
+node atm.mjs tasks verify --cwd . --json
+node atm.mjs next --cwd . --json
+```
+
+Final reasoning should cite the guidance result, dry-run manifest, written task
+paths, task-import evidence report, verify report, and the `next` result when it
+surfaces imported open work items.
+
+Do not acquire runtime locks for import-only task-plan operations. Keep
+`.atm/history/tasks` as the canonical imported work-item store; host Markdown
+views are optional secondary projections.
 
 ## Legacy Atomization Route
 

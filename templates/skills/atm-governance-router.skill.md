@@ -35,7 +35,8 @@ original user request.
 
 Follow the returned `nextCommand`. If the matched intent is
 `legacy-candidate-ranking`, run the candidate ranking command before doing local
-source analysis by hand.
+source analysis by hand. If the matched intent is `task-plan-import`, run the
+task import dry run before creating or editing any task files.
 
 ## Required Evidence
 
@@ -46,6 +47,34 @@ For legacy candidate ranking, final reasoning should cite or create:
 - source inventory artifact
 - police artifact
 - recommended split, atomize, infect, or compose route
+
+For task plan import, final reasoning should cite or create:
+
+- ATM guidance result
+- task import dry-run manifest
+- written `.atm/history/tasks/*.json` paths, when `--write` is used
+- task import evidence report path
+- `tasks verify` report
+- `next` result showing imported open work items, when available
+
+## Task Plan Import Route
+
+If the matched intent is `task-plan-import`, run the dry-run import first:
+
+```bash
+node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json
+```
+
+Confirm the parsed manifest before persisting. When the manifest looks correct,
+run the write phase and verify:
+
+```bash
+node atm.mjs tasks import --from <plan.md> --write --cwd . --json
+node atm.mjs tasks verify --cwd . --json
+```
+
+Do not hand-write `.atm/history/tasks/*.json` and do not reuse `atm create` for
+work-item import; `atm create` is for atom birth.
 
 ## Guided Fallback
 
@@ -66,6 +95,11 @@ Then continue the user's original request with the fallback sources.
   evidence exist.
 - Do not mutate host files during candidate ranking; ranking is advisory until
   a later governed dry run is selected.
+- Do not treat task-card import as atom birth; task-card import uses `tasks
+  import`, while atom birth uses `create` or a governed atomize flow.
+- Do not acquire runtime locks during import-only task-plan operations.
+- Keep `.atm/history/tasks` as the canonical imported work-item store; host
+  Markdown projections are optional secondary views.
 - Keep host-local language and phrasing in evidence or host lexicons, not in
   this canonical skill.
 

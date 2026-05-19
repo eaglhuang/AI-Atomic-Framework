@@ -4,6 +4,7 @@ import path from 'node:path';
 export type GuidanceIntent =
   | 'legacy-atomization'
   | 'legacy-candidate-ranking'
+  | 'task-plan-import'
   | 'adapter-bootstrap'
   | 'docs-spec'
   | 'atom-create'
@@ -162,6 +163,44 @@ const defaultLegacyCandidateRankingTerms = [
   '重構候選'
 ];
 
+const taskPlanImportTerms = [
+  'import task plan',
+  'import tasks',
+  'import roadmap',
+  'open task cards from this plan',
+  'open task cards from plan',
+  'open task cards',
+  'task card',
+  'task cards',
+  'markdown plan',
+  'load task plan',
+  'load roadmap',
+  'bulk task import',
+  'bulk import tasks',
+  'task plan import',
+  'plan import',
+  'plan ingest',
+  'ingest task plan',
+  'ingest roadmap',
+  'register tasks from plan',
+  'register tasks from roadmap',
+  '匯入任務',
+  '匯入任務卡',
+  '匯入計畫書',
+  '匯入計畫',
+  '匯入路線圖',
+  '從計畫開卡',
+  '從計畫書開卡',
+  '從計畫書批次開卡',
+  '從規劃文件開卡',
+  '批次開卡',
+  '批次匯入任務',
+  '開任務卡',
+  '開卡',
+  '把計畫書登錄到 atm',
+  '把計畫書登錄'
+];
+
 const docsTerms = [
   'docs',
   'documentation',
@@ -241,6 +280,7 @@ export function classifyGuidanceIntent(
   const legacyCandidateRankingMatches = matchTerms(normalizedGoal, [...defaultLegacyCandidateRankingTerms, ...learnedCandidateRankingTerms]);
   const legacyContextMatches = matchTerms(normalizedGoal, defaultLegacyContextTerms);
   const legacyVerbMatches = matchTerms(normalizedGoal, defaultLegacyVerbTerms);
+  const taskPlanImportMatches = matchTerms(normalizedGoal, taskPlanImportTerms);
   const docMatches = matchTerms(normalizedGoal, docsTerms);
   const atomCreateMatches = matchTerms(normalizedGoal, atomCreateTerms);
   const upgradeMatches = matchTerms(normalizedGoal, upgradeTerms);
@@ -263,6 +303,30 @@ export function classifyGuidanceIntent(
         'rank legacy scripts with ad-hoc shell-only heuristics',
         'choose split/atomize/infect without candidate ranking artifact',
         'mutate host files before source inventory and police evidence exist'
+      ],
+      lexiconSources: activeHostEntries.length > 0 ? ['framework-default', 'host-local'] : ['framework-default']
+    });
+  }
+
+  if (taskPlanImportMatches.length > 0) {
+    return buildClassification({
+      goal,
+      matchedIntent: 'task-plan-import',
+      confidence: confidenceFromMatches(0.9, taskPlanImportMatches.length),
+      matchedTerms: taskPlanImportMatches,
+      requiredFlow: [
+        'atm guide --goal',
+        'atm tasks import --dry-run',
+        'manifest review',
+        'atm tasks import --write',
+        'atm tasks verify',
+        'atm next'
+      ],
+      nextCommand: 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json',
+      blockedAntiPatterns: [
+        'hand-write .atm/history/tasks/*.json',
+        'use atm create for task-card import',
+        'acquire runtime locks for import-only task-plan operations'
       ],
       lexiconSources: activeHostEntries.length > 0 ? ['framework-default', 'host-local'] : ['framework-default']
     });
