@@ -99,12 +99,12 @@ export interface CompileSkillTemplateOptions {
   readonly repositoryRoot?: string;
 }
 
-export interface RenderedCharterInvariants {
-  readonly text: string;
-  readonly sourcePath: string | null;
-  readonly invariantCount: number;
-  readonly fallbackReason: 'missing' | 'unreadable' | 'invalid' | null;
-}
+import {
+  type RenderedCharterInvariants,
+  renderCharterInvariantsBlock as renderCharterInvariantsBlockCore
+} from './compiler/charter-block.ts';
+
+export type { RenderedCharterInvariants };
 
 export function parseSkillTemplate(content: string, sourcePath = '<inline>'): AtmSkillTemplate {
   const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
@@ -331,69 +331,7 @@ ${entryList}
 }
 
 export function renderCharterInvariantsBlock(repositoryRoot = integrationsCoreRepoRoot): RenderedCharterInvariants {
-  const invariantsPath = path.join(repositoryRoot, '.atm', 'charter', 'charter-invariants.json');
-  if (!existsSync(invariantsPath)) {
-    return {
-      text: 'Charter invariants are unavailable in this repository yet. Restore `.atm/charter/charter-invariants.json` and rerun `node atm.mjs integration add <editor-id> --force --json` to inject the current repo charter.',
-      sourcePath: null,
-      invariantCount: 0,
-      fallbackReason: 'missing'
-    };
-  }
-  try {
-    const parsed = JSON.parse(readFileSync(invariantsPath, 'utf8')) as {
-      invariants?: Array<{
-        id?: unknown;
-        title?: unknown;
-        rule?: unknown;
-        enforcement?: unknown;
-        breakingChange?: unknown;
-      }>;
-    };
-    const invariants = Array.isArray(parsed.invariants)
-      ? parsed.invariants
-        .filter((entry) => typeof entry?.id === 'string' && typeof entry?.title === 'string' && typeof entry?.rule === 'string')
-        .map((entry) => ({
-          id: entry.id as string,
-          title: entry.title as string,
-          rule: entry.rule as string,
-          enforcement: typeof entry.enforcement === 'string' ? entry.enforcement : 'unknown',
-          breakingChange: entry.breakingChange === true
-        }))
-      : [];
-    if (invariants.length === 0) {
-      return {
-        text: 'Charter invariants are unreadable in this repository. Repair `.atm/charter/charter-invariants.json` and rerun `node atm.mjs integration add <editor-id> --force --json`.',
-        sourcePath: path.relative(repositoryRoot, invariantsPath).replace(/\\/g, '/'),
-        invariantCount: 0,
-        fallbackReason: 'invalid'
-      };
-    }
-    return {
-      text: invariants.map((entry) => renderCharterInvariantLine(entry)).join('\n'),
-      sourcePath: path.relative(repositoryRoot, invariantsPath).replace(/\\/g, '/'),
-      invariantCount: invariants.length,
-      fallbackReason: null
-    };
-  } catch {
-    return {
-      text: 'Charter invariants could not be read in this repository. Repair `.atm/charter/charter-invariants.json` and rerun `node atm.mjs integration add <editor-id> --force --json`.',
-      sourcePath: path.relative(repositoryRoot, invariantsPath).replace(/\\/g, '/'),
-      invariantCount: 0,
-      fallbackReason: 'unreadable'
-    };
-  }
-}
-
-function renderCharterInvariantLine(entry: {
-  readonly id: string;
-  readonly title: string;
-  readonly rule: string;
-  readonly enforcement: string;
-  readonly breakingChange: boolean;
-}) {
-  const breakingChange = entry.breakingChange ? 'yes' : 'no';
-  return `- \`${entry.id}\` — **${entry.title}** (enforcement: \`${entry.enforcement}\`, breaking change: ${breakingChange})\n  Rule: ${entry.rule}`;
+  return renderCharterInvariantsBlockCore(repositoryRoot);
 }
 
 function escapeTomlBasicString(value: string) {
