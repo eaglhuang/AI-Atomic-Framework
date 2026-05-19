@@ -24,10 +24,10 @@ export function createCopilotIntegrationAdapter(options: CopilotIntegrationAdapt
     targetDir: options.targetDir ?? '.github',
     fileFormat: 'instructions-md',
     placeholderStyle: '{{vars}}',
-    sourceFiles: createCopilotSourceFiles()
+    sourceFiles: (context) => createCopilotSourceFiles(context.repositoryRoot)
   });
 }
 
-export function createCopilotSourceFiles(): readonly IntegrationSourceFile[] {
-  return compileSkillTemplatesForAdapter('copilot');
+export function createCopilotSourceFiles(repositoryRoot = process.cwd()): readonly IntegrationSourceFile[] {
+  return compileSkillTemplatesForAdapter('copilot', undefined, { repositoryRoot });
 }

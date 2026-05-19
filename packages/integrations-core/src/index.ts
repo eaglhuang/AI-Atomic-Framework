@@ -95,6 +95,17 @@ export interface AtmSkillTemplate {
   readonly sourcePath: string;
 }
 
+export interface CompileSkillTemplateOptions {
+  readonly repositoryRoot?: string;
+}
+
+export interface RenderedCharterInvariants {
+  readonly text: string;
+  readonly sourcePath: string | null;
+  readonly invariantCount: number;
+  readonly fallbackReason: 'missing' | 'unreadable' | 'invalid' | null;
+}
+
 export function parseSkillTemplate(content: string, sourcePath = '<inline>'): AtmSkillTemplate {
   const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!frontmatterMatch) {
@@ -129,27 +140,32 @@ export function loadMinimumAtmSkillTemplates(templateDirectory = defaultSkillTem
   });
 }
 
-export function compileSkillTemplatesForAdapter(adapterTarget: SkillTemplateAdapterTarget, templates: readonly AtmSkillTemplate[] = loadMinimumAtmSkillTemplates()): readonly IntegrationSourceFile[] {
+export function compileSkillTemplatesForAdapter(
+  adapterTarget: SkillTemplateAdapterTarget,
+  templates: readonly AtmSkillTemplate[] | undefined = loadMinimumAtmSkillTemplates(),
+  options: CompileSkillTemplateOptions = {}
+): readonly IntegrationSourceFile[] {
+  const resolvedTemplates = templates ?? loadMinimumAtmSkillTemplates();
   if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
-    return templates.map((template) => ({
+    return resolvedTemplates.map((template) => ({
       relativePath: `${template.frontmatter.id}/SKILL.md`,
-      content: compileSkillTemplate(template, adapterTarget),
+      content: compileSkillTemplate(template, adapterTarget, options),
       fileFormat: 'skill',
       source: 'template'
     }));
   }
   if (adapterTarget === 'cursor') {
-    return templates.map((template) => ({
+    return resolvedTemplates.map((template) => ({
       relativePath: `${template.frontmatter.id}/SKILL.md`,
-      content: compileSkillTemplate(template, 'cursor'),
+      content: compileSkillTemplate(template, 'cursor', options),
       fileFormat: 'markdown',
       source: 'template'
     }));
   }
   if (adapterTarget === 'gemini') {
-    return templates.map((template) => ({
+    return resolvedTemplates.map((template) => ({
       relativePath: `${template.frontmatter.id}.toml`,
-      content: compileSkillTemplate(template, 'gemini'),
+      content: compileSkillTemplate(template, 'gemini', options),
       fileFormat: 'toml',
       source: 'template'
     }));
@@ -157,20 +173,20 @@ export function compileSkillTemplatesForAdapter(adapterTarget: SkillTemplateAdap
   return [
     {
       relativePath: 'copilot-instructions.md',
-      content: compileCopilotRootInstructions(templates),
+      content: compileCopilotRootInstructions(resolvedTemplates, options),
       fileFormat: 'instructions-md',
       source: 'template'
     },
-    ...templates.flatMap((template) => [
+    ...resolvedTemplates.flatMap((template) => [
       {
         relativePath: `instructions/${template.frontmatter.id}.instructions.md`,
-        content: compileSkillTemplate(template, 'copilot-instructions'),
+        content: compileSkillTemplate(template, 'copilot-instructions', options),
         fileFormat: 'instructions-md' as const,
         source: 'template' as const
       },
       {
         relativePath: `prompts/${template.frontmatter.id}.prompt.md`,
-        content: compileSkillTemplate(template, 'copilot-prompt'),
+        content: compileSkillTemplate(template, 'copilot-prompt', options),
         fileFormat: 'prompt-md' as const,
         source: 'template' as const
       }
@@ -178,9 +194,13 @@ export function compileSkillTemplatesForAdapter(adapterTarget: SkillTemplateAdap
   ];
 }
 
-export function compileSkillTemplate(template: AtmSkillTemplate, adapterTarget: SkillTemplateAdapterTarget | 'copilot-instructions' | 'copilot-prompt'): string {
+export function compileSkillTemplate(
+  template: AtmSkillTemplate,
+  adapterTarget: SkillTemplateAdapterTarget | 'copilot-instructions' | 'copilot-prompt',
+  options: CompileSkillTemplateOptions = {}
+): string {
   const frontmatter = template.frontmatter;
-  const body = renderSkillTemplateBody(template);
+  const body = renderSkillTemplateBody(template, options);
   if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
     return `---
 name: ${frontmatter.id}
@@ -242,7 +262,7 @@ no_parallel_task_model = true
 hash_guarded_uninstall = true
 
 charter_invariants = """
-${charterInvariantsPlaceholder}
+${renderCharterInvariantsBlock(options.repositoryRoot).text}
 """
 `;
 }
@@ -270,8 +290,9 @@ function parseFrontmatterScalar(value: string): string | boolean {
   return value.replace(/^['"]|['"]$/g, '');
 }
 
-function renderSkillTemplateBody(template: AtmSkillTemplate): string {
+function renderSkillTemplateBody(template: AtmSkillTemplate, options: CompileSkillTemplateOptions = {}): string {
   const frontmatter = template.frontmatter;
+  const charterInvariants = renderCharterInvariantsBlock(options.repositoryRoot);
   return template.body
     .replaceAll('{{id}}', frontmatter.id)
     .replaceAll('{{title}}', frontmatter.title)
@@ -279,10 +300,11 @@ function renderSkillTemplateBody(template: AtmSkillTemplate): string {
     .replaceAll('{{firstCommand}}', frontmatter.firstCommand)
     .replaceAll('{{command}}', frontmatter.command)
     .replaceAll('{{handoffs}}', frontmatter.handoffs)
+    .replaceAll(charterInvariantsPlaceholder, charterInvariants.text)
     .trimEnd();
 }
 
-function compileCopilotRootInstructions(templates: readonly AtmSkillTemplate[]): string {
+function compileCopilotRootInstructions(templates: readonly AtmSkillTemplate[], options: CompileSkillTemplateOptions = {}): string {
   const entryList = templates.map((template) => `- ${template.frontmatter.id}: ${template.frontmatter.summary}`).join('\n');
   return `# ATM Copilot Instructions
 
@@ -294,7 +316,7 @@ ${atmFirstCommand}
 
 ## Charter Invariants
 
-${charterInvariantsPlaceholder}
+${renderCharterInvariantsBlock(options.repositoryRoot).text}
 
 ## Entry Skills
 
@@ -306,6 +328,72 @@ ${entryList}
 - Use the ATM prompt and instruction files for specific next, orient, governance-router, create, lock, evidence, upgrade-scan, and handoff flows.
 - Do not create a parallel task model, registry, or approval workflow.
 `;
+}
+
+export function renderCharterInvariantsBlock(repositoryRoot = integrationsCoreRepoRoot): RenderedCharterInvariants {
+  const invariantsPath = path.join(repositoryRoot, '.atm', 'charter', 'charter-invariants.json');
+  if (!existsSync(invariantsPath)) {
+    return {
+      text: 'Charter invariants are unavailable in this repository yet. Restore `.atm/charter/charter-invariants.json` and rerun `node atm.mjs integration add <editor-id> --force --json` to inject the current repo charter.',
+      sourcePath: null,
+      invariantCount: 0,
+      fallbackReason: 'missing'
+    };
+  }
+  try {
+    const parsed = JSON.parse(readFileSync(invariantsPath, 'utf8')) as {
+      invariants?: Array<{
+        id?: unknown;
+        title?: unknown;
+        rule?: unknown;
+        enforcement?: unknown;
+        breakingChange?: unknown;
+      }>;
+    };
+    const invariants = Array.isArray(parsed.invariants)
+      ? parsed.invariants
+        .filter((entry) => typeof entry?.id === 'string' && typeof entry?.title === 'string' && typeof entry?.rule === 'string')
+        .map((entry) => ({
+          id: entry.id as string,
+          title: entry.title as string,
+          rule: entry.rule as string,
+          enforcement: typeof entry.enforcement === 'string' ? entry.enforcement : 'unknown',
+          breakingChange: entry.breakingChange === true
+        }))
+      : [];
+    if (invariants.length === 0) {
+      return {
+        text: 'Charter invariants are unreadable in this repository. Repair `.atm/charter/charter-invariants.json` and rerun `node atm.mjs integration add <editor-id> --force --json`.',
+        sourcePath: path.relative(repositoryRoot, invariantsPath).replace(/\\/g, '/'),
+        invariantCount: 0,
+        fallbackReason: 'invalid'
+      };
+    }
+    return {
+      text: invariants.map((entry) => renderCharterInvariantLine(entry)).join('\n'),
+      sourcePath: path.relative(repositoryRoot, invariantsPath).replace(/\\/g, '/'),
+      invariantCount: invariants.length,
+      fallbackReason: null
+    };
+  } catch {
+    return {
+      text: 'Charter invariants could not be read in this repository. Repair `.atm/charter/charter-invariants.json` and rerun `node atm.mjs integration add <editor-id> --force --json`.',
+      sourcePath: path.relative(repositoryRoot, invariantsPath).replace(/\\/g, '/'),
+      invariantCount: 0,
+      fallbackReason: 'unreadable'
+    };
+  }
+}
+
+function renderCharterInvariantLine(entry: {
+  readonly id: string;
+  readonly title: string;
+  readonly rule: string;
+  readonly enforcement: string;
+  readonly breakingChange: boolean;
+}) {
+  const breakingChange = entry.breakingChange ? 'yes' : 'no';
+  return `- \`${entry.id}\` — **${entry.title}** (enforcement: \`${entry.enforcement}\`, breaking change: ${breakingChange})\n  Rule: ${entry.rule}`;
 }
 
 function escapeTomlBasicString(value: string) {
@@ -416,7 +504,7 @@ export interface StaticIntegrationAdapterInput {
   readonly targetDir: string;
   readonly fileFormat: IntegrationFileFormat;
   readonly placeholderStyle: IntegrationPlaceholderStyle;
-  readonly sourceFiles: readonly IntegrationSourceFile[];
+  readonly sourceFiles: readonly IntegrationSourceFile[] | ((context: IntegrationInstallContext) => readonly IntegrationSourceFile[]);
 }
 
 export interface CodexSkillsAdapterOptions {
@@ -514,12 +602,19 @@ export function createStaticIntegrationAdapter(input: StaticIntegrationAdapterIn
       adapterVersion: input.adapterVersion,
       context,
       defaultFileFormat: input.fileFormat,
-      sourceFiles: input.sourceFiles,
+      sourceFiles: resolveIntegrationSourceFiles(input.sourceFiles, context),
       targetDirectory
     }),
     verify: (context, manifest) => verifyManifestFiles(input.id, context, manifest),
     uninstall: (context, manifest) => uninstallManifestFiles(input.id, context, manifest)
   };
+}
+
+function resolveIntegrationSourceFiles(
+  sourceFiles: readonly IntegrationSourceFile[] | ((context: IntegrationInstallContext) => readonly IntegrationSourceFile[]),
+  context: IntegrationInstallContext
+) {
+  return typeof sourceFiles === 'function' ? sourceFiles(context) : sourceFiles;
 }
 
 function installSourceFiles(input: {

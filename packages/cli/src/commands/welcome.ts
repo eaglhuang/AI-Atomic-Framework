@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
 import { createATMVersionSummary, loadATMChartSummary } from './atm-chart.ts';
 import { relativePathFrom } from './governance-runtime.ts';
-import { checkIntegrationHealth, inspectIntegrationBootstrap } from './integration.ts';
+import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { runNext } from './next.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
@@ -48,6 +48,7 @@ export async function runWelcome(argv: string[]) {
   }
   const integrationHealth = await checkIntegrationHealth(cwd);
   const integrationBootstrap = inspectIntegrationBootstrap(cwd);
+  const integrationInstallHint = describeIntegrationInstallHint(integrationBootstrap);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(cwd);
   const nextResult = await runNext(['--cwd', cwd]);
   const nextAction = (nextResult.evidence?.nextAction as GuidanceNextAction | null) ?? null;
@@ -72,20 +73,12 @@ export async function runWelcome(argv: string[]) {
       message('info', dryRun ? 'ATM_WELCOME_DRY_RUN' : 'ATM_WELCOME_READY', dryRun
         ? 'Welcome summary generated without writing lifecycle lineage.'
         : 'Welcome summary generated and lifecycle lineage recorded.'),
-      ...(integrationBootstrap.needsInstallHint
+      ...(integrationInstallHint
         ? [message(
           'warning',
           'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED',
-          'ATM runtime is ready, but no repo-local editor integration is installed yet. Install the adapter for the editor you are using before switching tools.',
-          {
-            suggestedAction: integrationBootstrap.suggestedAction,
-            adapters: integrationBootstrap.adapters.map((adapter) => ({
-              id: adapter.id,
-              primaryEntryPath: adapter.primaryEntryPath,
-              installCommand: adapter.installCommand,
-              verifyCommand: adapter.verifyCommand
-            }))
-          }
+          integrationInstallHint.text,
+          integrationInstallHint.data
         )]
         : []),
       ...(runtimeAdapterReadiness.needsRuntimeAdapterHint

@@ -24,10 +24,10 @@ export function createGeminiIntegrationAdapter(options: GeminiIntegrationAdapter
     targetDir: options.targetDir ?? '.gemini/commands',
     fileFormat: 'toml',
     placeholderStyle: 'toml-fields',
-    sourceFiles: createGeminiSourceFiles()
+    sourceFiles: (context) => createGeminiSourceFiles(context.repositoryRoot)
   });
 }
 
-export function createGeminiSourceFiles(): readonly IntegrationSourceFile[] {
-  return compileSkillTemplatesForAdapter('gemini');
+export function createGeminiSourceFiles(repositoryRoot = process.cwd()): readonly IntegrationSourceFile[] {
+  return compileSkillTemplatesForAdapter('gemini', undefined, { repositoryRoot });
 }

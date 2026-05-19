@@ -59,7 +59,10 @@ const schema = readJson(schemaPath);
 assert(ajv.validateSchema(schema) === true, `skill template schema is invalid: ${formatErrors(ajv.errors)}`);
 const validateFrontmatter = ajv.compile(schema);
 const templates = packageModule.loadMinimumAtmSkillTemplates(path.join(root, 'templates', 'skills'));
+const renderedCharter = packageModule.renderCharterInvariantsBlock(root);
 assert(templates.length === requiredTemplateIds.length, 'minimum ATM skill template count mismatch');
+assert(renderedCharter.fallbackReason === null, 'validator fixture repo must have readable charter invariants');
+assert(renderedCharter.text.includes('INV-ATM-001'), 'rendered charter invariants must include seeded invariant text');
 
 const templatesById = new Map(templates.map((template: any) => [template.frontmatter.id, template]));
 for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
@@ -82,11 +85,11 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   assert(!hasForbiddenPlanningHint(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }
 
-const claudeFiles = packageModule.compileSkillTemplatesForAdapter('claude-code', templates);
-const codexFiles = packageModule.compileSkillTemplatesForAdapter('codex', templates);
-const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', templates);
-const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates);
-const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates);
+const claudeFiles = packageModule.compileSkillTemplatesForAdapter('claude-code', templates, { repositoryRoot: root });
+const codexFiles = packageModule.compileSkillTemplatesForAdapter('codex', templates, { repositoryRoot: root });
+const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', templates, { repositoryRoot: root });
+const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates, { repositoryRoot: root });
+const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates, { repositoryRoot: root });
 
 assert(claudeFiles.length === 8, 'Claude compiler output must contain eight files');
 assert(codexFiles.length === 8, 'Codex compiler output must contain eight files');
@@ -96,7 +99,8 @@ assert(geminiFiles.length === 8, 'Gemini compiler output must contain eight file
 
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
   assert(compiledFile.content.includes(packageModule.atmFirstCommand), `${compiledFile.relativePath} missing first command`);
-  assert(compiledFile.content.includes(packageModule.charterInvariantsPlaceholder), `${compiledFile.relativePath} missing charter placeholder`);
+  assert(!compiledFile.content.includes(packageModule.charterInvariantsPlaceholder), `${compiledFile.relativePath} must not leak charter placeholder after compile`);
+  assert(compiledFile.content.includes(renderedCharter.text), `${compiledFile.relativePath} missing rendered charter invariants`);
   assert(!hasForbiddenPlanningHint(compiledFile.content), `${compiledFile.relativePath} must not bake planning hints into compiled output`);
 }
 

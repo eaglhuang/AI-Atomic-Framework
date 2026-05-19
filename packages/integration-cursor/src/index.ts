@@ -24,10 +24,10 @@ export function createCursorIntegrationAdapter(options: CursorIntegrationAdapter
     targetDir: options.targetDir ?? '.cursor/rules/skills',
     fileFormat: 'markdown',
     placeholderStyle: '$ARGUMENTS',
-    sourceFiles: createCursorSourceFiles()
+    sourceFiles: (context) => createCursorSourceFiles(context.repositoryRoot)
   });
 }
 
-export function createCursorSourceFiles(): readonly IntegrationSourceFile[] {
-  return compileSkillTemplatesForAdapter('cursor');
+export function createCursorSourceFiles(repositoryRoot = process.cwd()): readonly IntegrationSourceFile[] {
+  return compileSkillTemplatesForAdapter('cursor', undefined, { repositoryRoot });
 }

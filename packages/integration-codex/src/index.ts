@@ -24,10 +24,10 @@ export function createCodexIntegrationAdapter(options: CodexIntegrationAdapterOp
     targetDir: options.targetDir ?? 'integrations/codex-skills',
     fileFormat: 'skill',
     placeholderStyle: '$ARGUMENTS',
-    sourceFiles: createCodexSourceFiles()
+    sourceFiles: (context) => createCodexSourceFiles(context.repositoryRoot)
   });
 }
 
-export function createCodexSourceFiles(): readonly IntegrationSourceFile[] {
-  return compileSkillTemplatesForAdapter('codex');
+export function createCodexSourceFiles(repositoryRoot = process.cwd()): readonly IntegrationSourceFile[] {
+  return compileSkillTemplatesForAdapter('codex', undefined, { repositoryRoot });
 }

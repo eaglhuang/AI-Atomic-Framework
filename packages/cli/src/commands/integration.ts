@@ -26,6 +26,13 @@ const primaryEntryPathByAdapterId = Object.freeze({
 } satisfies Record<KnownCliIntegrationId, string>);
 
 type KnownCliIntegrationId = keyof typeof integrationAdapterFactories;
+type EditorDetectionSource = 'ATM_EDITOR_ID' | 'ATM_ACTOR_ID' | 'AGENT_IDENTITY' | 'CODEX_HOME';
+
+interface DetectedCurrentEditor {
+  readonly id: KnownCliIntegrationId | null;
+  readonly source: EditorDetectionSource | null;
+  readonly rawValue: string | null;
+}
 
 export interface InstallIntegrationOptions {
   readonly actor?: string;
@@ -62,6 +69,7 @@ export async function checkIntegrationHealth(repositoryRoot: string) {
 
 export function inspectIntegrationBootstrap(repositoryRoot: string) {
   const repoBootstrapped = existsSync(path.join(repositoryRoot, '.atm', 'config.json'));
+  const detectedEditor = detectCurrentEditorIntegrationId();
   const adapters = availableAdapters(repositoryRoot).map((adapter) => {
     const primaryEntryPath = primaryEntryPathByAdapterId[adapter.id as KnownCliIntegrationId];
     const primaryEntryPresent = existsSync(path.join(repositoryRoot, primaryEntryPath));
@@ -86,15 +94,72 @@ export function inspectIntegrationBootstrap(repositoryRoot: string) {
   });
   const installedAdapters = adapters.filter((adapter) => adapter.status === 'installed').map((adapter) => adapter.id);
   const missingAdapters = adapters.filter((adapter) => adapter.status === 'missing').map((adapter) => adapter.id);
+  const currentEditorAdapter = detectedEditor.id
+    ? adapters.find((adapter) => adapter.id === detectedEditor.id) ?? null
+    : null;
+  const currentEditorAdapterMissing = Boolean(currentEditorAdapter && currentEditorAdapter.status !== 'installed');
+  const reason = repoBootstrapped
+    ? currentEditorAdapterMissing
+      ? 'current-editor-missing'
+      : installedAdapters.length === 0
+        ? 'none-installed'
+        : null
+    : null;
   return {
     repoBootstrapped,
-    needsInstallHint: repoBootstrapped && installedAdapters.length === 0,
+    currentEditorId: detectedEditor.id,
+    currentEditorDetectedFrom: detectedEditor.source,
+    currentEditorRawValue: detectedEditor.rawValue,
+    currentEditorAdapter,
+    currentEditorAdapterMissing,
+    needsInstallHint: reason !== null,
+    reason,
     installedAdapters,
     missingAdapters,
     adapters,
-    suggestedAction: repoBootstrapped && installedAdapters.length === 0
-      ? 'Run `node atm.mjs integration add <editor-id> --json` for the editor you are using, then `node atm.mjs integration verify <editor-id> --json`.'
-      : null
+    suggestedAction: reason === 'current-editor-missing' && currentEditorAdapter
+      ? `Run \`node atm.mjs integration add ${currentEditorAdapter.id} --json\`, then \`node atm.mjs integration verify ${currentEditorAdapter.id} --json\`.`
+      : reason === 'none-installed'
+        ? 'Run `node atm.mjs integration add <editor-id> --json` for the editor you are using, then `node atm.mjs integration verify <editor-id> --json`.'
+        : null
+  };
+}
+
+export function describeIntegrationInstallHint(bootstrap: ReturnType<typeof inspectIntegrationBootstrap>) {
+  if (!bootstrap.needsInstallHint) {
+    return null;
+  }
+  const adapters = bootstrap.adapters.map((adapter) => ({
+    id: adapter.id,
+    displayName: adapter.displayName,
+    status: adapter.status,
+    primaryEntryPath: adapter.primaryEntryPath,
+    installCommand: adapter.installCommand,
+    verifyCommand: adapter.verifyCommand
+  }));
+  if (bootstrap.reason === 'current-editor-missing' && bootstrap.currentEditorAdapter) {
+    return {
+      text: `ATM runtime is ready, but the current editor (${bootstrap.currentEditorAdapter.displayName}) is missing its repo-local ATM integration. Install it before relying on ATM entry skills.`,
+      data: {
+        reason: bootstrap.reason,
+        currentEditorId: bootstrap.currentEditorId,
+        currentEditorDetectedFrom: bootstrap.currentEditorDetectedFrom,
+        currentEditorRawValue: bootstrap.currentEditorRawValue,
+        suggestedAction: bootstrap.suggestedAction,
+        adapters
+      }
+    };
+  }
+  return {
+    text: 'ATM runtime is ready, but no repo-local editor integration is installed yet. Install the adapter for the editor you are using before relying on ATM entry skills.',
+    data: {
+      reason: bootstrap.reason,
+      currentEditorId: bootstrap.currentEditorId,
+      currentEditorDetectedFrom: bootstrap.currentEditorDetectedFrom,
+      currentEditorRawValue: bootstrap.currentEditorRawValue,
+      suggestedAction: bootstrap.suggestedAction,
+      adapters
+    }
   };
 }
 
@@ -252,6 +317,36 @@ function availableAdapters(repositoryRoot: string) {
   return Object.keys(integrationAdapterFactories).map((adapterId) => describeAdapter(createIntegrationAdapter(adapterId), repositoryRoot));
 }
 
+export function detectCurrentEditorIntegrationId(env: NodeJS.ProcessEnv = process.env): DetectedCurrentEditor {
+  const explicitCandidates: Array<{ readonly source: EditorDetectionSource; readonly value: string | undefined }> = [
+    { source: 'ATM_EDITOR_ID', value: env.ATM_EDITOR_ID },
+    { source: 'ATM_ACTOR_ID', value: env.ATM_ACTOR_ID },
+    { source: 'AGENT_IDENTITY', value: env.AGENT_IDENTITY }
+  ];
+  for (const candidate of explicitCandidates) {
+    const normalizedId = normalizeDetectedEditorId(candidate.value);
+    if (normalizedId) {
+      return {
+        id: normalizedId,
+        source: candidate.source,
+        rawValue: candidate.value ?? null
+      };
+    }
+  }
+  if (typeof env.CODEX_HOME === 'string' && env.CODEX_HOME.trim().length > 0) {
+    return {
+      id: 'codex',
+      source: 'CODEX_HOME',
+      rawValue: env.CODEX_HOME
+    };
+  }
+  return {
+    id: null,
+    source: null,
+    rawValue: null
+  };
+}
+
 function describeAdapter(adapter: IntegrationAdapter, repositoryRoot: string) {
   const manifestPath = manifestPathForIntegration(adapter.id);
   return {
@@ -264,6 +359,22 @@ function describeAdapter(adapter: IntegrationAdapter, repositoryRoot: string) {
     manifestPath,
     installed: existsSync(path.join(repositoryRoot, manifestPath))
   };
+}
+
+function normalizeDetectedEditorId(value: string | undefined): KnownCliIntegrationId | null {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const normalized = value.trim().toLowerCase().replace(/[_\s]+/g, '-');
+  if (Object.hasOwn(integrationAdapterFactories, normalized)) {
+    return normalized as KnownCliIntegrationId;
+  }
+  if (normalized.includes('copilot')) return 'copilot';
+  if (normalized.includes('claude')) return 'claude-code';
+  if (normalized.includes('codex')) return 'codex';
+  if (normalized.includes('cursor')) return 'cursor';
+  if (normalized.includes('gemini')) return 'gemini';
+  return null;
 }
 
 function createIntegrationContext(repositoryRoot: string, adapter: IntegrationAdapter, options: InstallIntegrationOptions) {

@@ -24,10 +24,10 @@ export function createClaudeCodeIntegrationAdapter(options: ClaudeCodeIntegratio
     targetDir: options.targetDir ?? '.claude/skills',
     fileFormat: 'skill',
     placeholderStyle: '$ARGUMENTS',
-    sourceFiles: createClaudeCodeSourceFiles()
+    sourceFiles: (context) => createClaudeCodeSourceFiles(context.repositoryRoot)
   });
 }
 
-export function createClaudeCodeSourceFiles(): readonly IntegrationSourceFile[] {
-  return compileSkillTemplatesForAdapter('claude-code');
+export function createClaudeCodeSourceFiles(repositoryRoot = process.cwd()): readonly IntegrationSourceFile[] {
+  return compileSkillTemplatesForAdapter('claude-code', undefined, { repositoryRoot });
 }

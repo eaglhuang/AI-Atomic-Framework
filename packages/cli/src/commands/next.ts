@@ -6,11 +6,13 @@ import type { LegacyRoutePlan, LegacyRoutePlanSegment } from '../../../core/src/
 import { buildFirstUseUserNotice, type AtmUserNotice } from './first-use-notice.ts';
 import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
+import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { makeResult, message, parseOptions } from './shared.ts';
 
 export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
+  const integrationBootstrap = inspectIntegrationBootstrap(options.cwd);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
   if (activeGuidanceSession) {
@@ -25,6 +27,7 @@ export async function runNext(argv: any) {
       messages: buildNextMessages(
         nextAction,
         userNotice,
+        integrationBootstrap,
         runtimeAdapterReadiness,
         nextAction.status === 'blocked'
           ? message('info', 'ATM_GUIDANCE_NEXT_BLOCKED', 'ATM guidance identified the next single action.', nextAction)
@@ -34,6 +37,7 @@ export async function runNext(argv: any) {
         nextAction,
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         ...(userNotice ? { userNotice } : {}),
+        integrationBootstrap,
         runtimeAdapterReadiness,
         guidanceSession: {
           sessionId: activeGuidanceSession.sessionId,
@@ -59,6 +63,7 @@ export async function runNext(argv: any) {
     messages: buildNextMessages(
       nextAction,
       userNotice,
+      integrationBootstrap,
       runtimeAdapterReadiness,
       nextAction.status === 'ready'
         ? message('info', 'ATM_NEXT_READY', 'ATM is ready for the next governed task.', nextAction)
@@ -68,6 +73,7 @@ export async function runNext(argv: any) {
       nextAction,
       agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
       ...(userNotice ? { userNotice } : {}),
+      integrationBootstrap,
       runtimeAdapterReadiness,
       importedTaskQueue,
       doctorSummary: doctorChecks.map((check) => ({ name: check.name, ok: check.ok })),
@@ -332,6 +338,7 @@ function buildAgentPackHint(status: string, command: string, reason: string) {
 function buildNextMessages(
   nextAction: { readonly status: string },
   userNotice: AtmUserNotice | null,
+  integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>,
   runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>,
   routeMessage: ReturnType<typeof message>
 ) {
@@ -344,6 +351,15 @@ function buildNextMessages(
       afterNextActionInstruction: userNotice.afterNextActionInstruction,
       route: nextAction.status
     }));
+  }
+  const integrationInstallHint = describeIntegrationInstallHint(integrationBootstrap);
+  if (integrationInstallHint) {
+    messages.push(message(
+      'warning',
+      'ATM_NEXT_INTEGRATION_INSTALL_RECOMMENDED',
+      integrationInstallHint.text,
+      integrationInstallHint.data
+    ));
   }
   if (runtimeAdapterReadiness.needsRuntimeAdapterHint) {
     messages.push(message(

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0109",
+  "title": "Current Editor Missing Integration Hint",
+  "status": "done",
+  "milestone": "M6",
+  "dependencies": [],
+  "acceptance": [
+    "inspectIntegrationBootstrap detects the active editor from supported runtime hints and flags when that editor's repo-local ATM integration is missing, even if other adapters are already installed.",
+    "ATM welcome, next, and doctor surface a concrete add/verify recommendation for the detected editor instead of only warning when zero adapters are installed.",
+    "The install hint remains silent when the detected editor already has a healthy installed adapter.",
+    "Validator coverage proves the current-editor-missing path and keeps the warning contract stable."
+  ],
+  "deliverables": [
+    "editor detection logic for integration bootstrap",
+    "current-editor integration recommendation messages",
+    "validator coverage for current-editor-missing hint"
+  ],
+  "tags": [
+    "P1",
+    "integration",
+    "editor-detection",
+    "copilot",
+    "codex",
+    "onboarding"
+  ],
+  "notes": "Owner: `integration-pack`\nPriority: `P1`\nAllocation: Follow-up to cross-editor onboarding smoke where Copilot did not receive a missing-integration prompt because another adapter was already installed.\nCoordination: Keep detection heuristics centralized in CLI integration bootstrap logic so welcome/next/doctor stay in sync.\nStatus: `done`\nValidation: `node --experimental-strip-types scripts/validate-skill-templates.ts`; `node --experimental-strip-types scripts/validate-integration-adapter.ts`; `ATM_EDITOR_ID=copilot` smoke on `doctor`, `next`, and `welcome --dry-run`.\nChange: Added current-editor detection plus precise add/verify recommendations across integration bootstrap surfaces.",
+  "source": {
+    "planPath": "docs/AGENT_OPERATING_LAYER_ENHANCEMENT.md",
+    "sectionTitle": "Integration Adapter Layer",
+    "headingLine": 76,
+    "hash": "1c7e2a6d91b8e041"
+  },
+  "importedAt": "2026-05-19T14:45:00.000Z"
+}

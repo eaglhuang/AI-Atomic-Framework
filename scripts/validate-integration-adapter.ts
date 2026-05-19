@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -97,6 +97,9 @@ if (!process.exitCode) {
   assert(packageModule.atmFirstCommand === 'node atm.mjs next --json', 'first command constant mismatch');
   assert(packageModule.charterInvariantsPlaceholder === '{{CHARTER_INVARIANTS}}', 'charter invariants placeholder mismatch');
   assert(packageModule.minimumAtmEntrySkillDefinitions.length === 8, 'minimum ATM entry skill set must contain eight entries');
+  const renderedCharter = packageModule.renderCharterInvariantsBlock(root);
+  assert(renderedCharter.fallbackReason === null, 'validator fixture repo must have readable charter invariants');
+  assert(renderedCharter.text.includes('INV-ATM-001'), 'rendered charter invariants must include seeded invariant text');
 
   const codexSkillPath = 'integrations/codex-skills/atm-governance-router/SKILL.md';
   const codexSkillContent = readFileSync(path.join(root, codexSkillPath));
@@ -153,7 +156,7 @@ async function createAdapterSpec(
     expectedPlaceholderStyle,
     expectedMinimumFiles,
     requireMinimumEntrySet: true,
-    requireCharterPlaceholder: true,
+    requireRenderedCharter: true,
     requireFirstCommand: true
   };
 }
@@ -171,6 +174,7 @@ function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifes
   const tempRoot = createTempWorkspace(`atm-integration-${adapterSpec.id}-`);
   try {
     const repositoryRoot = path.join(tempRoot, 'repo');
+    seedCharterFiles(repositoryRoot);
     const context = {
       repositoryRoot,
       actor: 'fixture-agent',
@@ -202,8 +206,9 @@ function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifes
       assert(existsSync(installedPath), `${adapterSpec.id} must write ${fileRecord.path}`);
       const installedContent = readFileSync(installedPath, 'utf8');
       assert(sha256Bytes(readFileSync(installedPath)) === fileRecord.sha256, `${adapterSpec.id} manifest hash mismatch for ${fileRecord.path}`);
-      if (adapterSpec.requireCharterPlaceholder) {
-        assert(installedContent.includes('{{CHARTER_INVARIANTS}}'), `${adapterSpec.id} file missing charter invariants placeholder: ${fileRecord.path}`);
+      if (adapterSpec.requireRenderedCharter) {
+        assert(!installedContent.includes('{{CHARTER_INVARIANTS}}'), `${adapterSpec.id} file leaked charter invariants placeholder: ${fileRecord.path}`);
+        assert(installedContent.includes('INV-ATM-001'), `${adapterSpec.id} file missing rendered charter invariants: ${fileRecord.path}`);
       }
       if (adapterSpec.requireFirstCommand) {
         assert(installedContent.includes('node atm.mjs next --json'), `${adapterSpec.id} file missing first command: ${fileRecord.path}`);
@@ -236,4 +241,17 @@ function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifes
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
+}
+
+function seedCharterFiles(repositoryRoot: string) {
+  const targetCharterDir = path.join(repositoryRoot, '.atm', 'charter');
+  mkdirSync(targetCharterDir, { recursive: true });
+  writeFileSync(
+    path.join(targetCharterDir, 'atomic-charter.md'),
+    readFileSync(path.join(root, '.atm', 'charter', 'atomic-charter.md'))
+  );
+  writeFileSync(
+    path.join(targetCharterDir, 'charter-invariants.json'),
+    readFileSync(path.join(root, '.atm', 'charter', 'charter-invariants.json'))
+  );
 }

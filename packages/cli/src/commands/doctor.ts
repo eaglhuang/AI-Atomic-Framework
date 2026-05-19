@@ -7,7 +7,7 @@ import { checkStartupIntegrity, resolveBundledIntegrityRoot } from '../startup-i
 import { createATMVersionSummary } from './atm-chart.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
-import { checkIntegrationHealth, inspectIntegrationBootstrap } from './integration.ts';
+import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 
@@ -51,6 +51,7 @@ export async function runDoctor(argv: any) {
   const charterIntegrity = checkCharterIntegrity(root);
   const integrationHealth = await checkIntegrationHealth(root);
   const integrationBootstrap = inspectIntegrationBootstrap(root);
+  const integrationInstallHint = describeIntegrationInstallHint(integrationBootstrap);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(root);
   const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
   const versionSummary = createATMVersionSummary(root);
@@ -122,20 +123,12 @@ export async function runDoctor(argv: any) {
       : 'npm run validate:full';
   const messages = [
     ...versionWarnings,
-    ...(integrationBootstrap.needsInstallHint
+    ...(integrationInstallHint
       ? [message(
         'warning',
         'ATM_DOCTOR_INTEGRATION_INSTALL_RECOMMENDED',
-        'ATM runtime exists, but no repo-local editor integration is installed yet. Install the adapter for the editor you are using before relying on ATM entry skills.',
-        {
-          suggestedAction: integrationBootstrap.suggestedAction,
-          adapters: integrationBootstrap.adapters.map((adapter) => ({
-            id: adapter.id,
-            primaryEntryPath: adapter.primaryEntryPath,
-            installCommand: adapter.installCommand,
-            verifyCommand: adapter.verifyCommand
-          }))
-        }
+        integrationInstallHint.text,
+        integrationInstallHint.data
       )]
       : []),
     ...(runtimeAdapterReadiness.needsRuntimeAdapterHint
