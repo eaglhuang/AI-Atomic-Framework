@@ -243,7 +243,15 @@ export function createStubReviewAdvisoryReport(input: {
 
 export function appendMachineFindings(
   report: ReviewAdvisoryReport,
-  machineFindings: Array<{ id: string; severity?: AdvisorySeverity; message: string; routeHint?: string; evidenceRef?: string }>
+  machineFindings: Array<{
+    id: string;
+    severity?: AdvisorySeverity;
+    message: string;
+    routeHint?: string;
+    evidenceRef?: string;
+    evidenceRefs?: string[];
+    metadata?: Record<string, unknown>;
+  }>
 ): ReviewAdvisoryReport {
   if (!Array.isArray(machineFindings) || machineFindings.length === 0) {
     return report;
@@ -257,9 +265,10 @@ export function appendMachineFindings(
     action: finding.severity === 'high' ? 'request-human-review' : 'needs-review',
     routeHint: finding.routeHint ?? 'human-review.supplemental',
     message: finding.message,
-    evidenceRefs: finding.evidenceRef ? [finding.evidenceRef] : undefined,
+    evidenceRefs: normalizeEvidenceRefs(finding.evidenceRefs, finding.evidenceRef),
     metadata: {
-      source: 'machine-finding-ingest'
+      source: 'machine-finding-ingest',
+      ...(finding.metadata ?? {})
     }
   }));
 
@@ -362,6 +371,14 @@ function summarizeFindings(findings: ReviewAdvisoryFinding[]): Record<AdvisorySe
 
 function dedupeStrings(input: string[]): string[] {
   return Array.from(new Set(input.filter((item) => typeof item === 'string' && item.length > 0)));
+}
+
+function normalizeEvidenceRefs(evidenceRefs: string[] | undefined, evidenceRef: string | undefined): string[] | undefined {
+  const refs = dedupeStrings([
+    ...(Array.isArray(evidenceRefs) ? evidenceRefs : []),
+    ...(evidenceRef ? [evidenceRef] : [])
+  ]);
+  return refs.length > 0 ? refs : undefined;
 }
 
 export default {

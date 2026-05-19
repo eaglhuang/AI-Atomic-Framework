@@ -1,8 +1,43 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export const configRelativePath = path.join('.atm', 'config.json');
+
+/**
+ * Fallback framework version returned when no package.json is reachable from
+ * `readFrameworkVersion`. Kept as a const so historical imports continue to
+ * resolve; new code should call `readFrameworkVersion()` instead.
+ */
 export const frameworkVersion = '0.0.0';
+
+/**
+ * Default framework root used by `readFrameworkVersion` when no override
+ * is supplied. Resolves four levels up from this module (packages/cli/src/commands).
+ */
+const defaultFrameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
+
+/**
+ * Centralized framework version reader. Reads `version` from the framework
+ * package.json so the CLI and downstream consumers stay in sync with the
+ * published manifest. Falls back to the bundled `frameworkVersion` constant
+ * when package.json is missing or malformed.
+ */
+export function readFrameworkVersion(root: string = defaultFrameworkRoot): string {
+  const packagePath = path.join(root, 'package.json');
+  if (!existsSync(packagePath)) {
+    return frameworkVersion;
+  }
+  try {
+    const parsed = JSON.parse(readFileSync(packagePath, 'utf8')) as { version?: unknown };
+    if (typeof parsed.version === 'string' && parsed.version.trim().length > 0) {
+      return parsed.version;
+    }
+  } catch {
+    // fall through to bundled fallback
+  }
+  return frameworkVersion;
+}
 
 export class CliError extends Error {
   code: string;
@@ -18,23 +53,41 @@ export class CliError extends Error {
   }
 }
 
-export function message(level: any, code: any, text: any, data = {}) {
-  return { level, code, text, data };
+export type MessageLevel = 'info' | 'warn' | 'error';
+
+export interface CommandMessage {
+  level: MessageLevel | string;
+  code: string;
+  text: string;
+  data: Record<string, unknown>;
+}
+
+export interface CommandResult {
+  ok: boolean;
+  command: string;
+  mode: string;
+  cwd: string;
+  messages: CommandMessage[];
+  evidence: Record<string, unknown>;
+}
+
+export function message(level: MessageLevel | string, code: string, text: string, data: unknown = {}): CommandMessage {
+  return { level, code, text, data: data as Record<string, unknown> };
 }
 
 export async function resolveValue<T>(value: T | Promise<T>): Promise<T> {
   return await Promise.resolve(value);
 }
 
-export function makeResult({ ok, command, cwd, mode = 'standalone', messages = [], evidence = {} }: any) {
-  return {
-    ok,
-    command,
-    mode,
-    cwd,
-    messages,
-    evidence
-  };
+export function makeResult({ ok, command, cwd, mode = 'standalone', messages = [], evidence = {} }: {
+  ok: boolean;
+  command: string;
+  cwd: string;
+  mode?: string;
+  messages?: CommandMessage[];
+  evidence?: unknown;
+}): CommandResult {
+  return { ok, command, mode, cwd, messages, evidence: evidence as Record<string, unknown> };
 }
 
 export function defineCommandSpec(spec: any) {
@@ -143,7 +196,7 @@ export function makeHelpResult(spec: any, cwd = process.cwd()) {
   });
 }
 
-export function writeResult(result: any, stream: any, outputFormat = 'json') {
+export function writeResult(result: CommandResult, stream: { write(s: string): void }, outputFormat = 'json') {
   if (outputFormat === 'pretty') {
     stream.write(formatPrettyResult(result));
     return;
@@ -151,7 +204,7 @@ export function writeResult(result: any, stream: any, outputFormat = 'json') {
   stream.write(`${JSON.stringify(result, null, 2)}\n`);
 }
 
-export function formatPrettyResult(result: any) {
+export function formatPrettyResult(result: CommandResult) {
   const statusText = result.ok ? 'OK' : 'FAIL';
   const lines = [`[${statusText}] ${result.command} (${result.cwd})`];
   for (const entry of result.messages ?? []) {
@@ -373,21 +426,21 @@ export function parseOptions(argv: string[], commandName: string) {
   };
 }
 
-export function configPathFor(cwd: any) {
+export function configPathFor(cwd: string) {
   return path.join(cwd, configRelativePath);
 }
 
-export function relativePathFrom(cwd: any, absolutePath: any) {
+export function relativePathFrom(cwd: string, absolutePath: string) {
   return path.relative(cwd, absolutePath).replace(/\\/g, '/');
 }
 
-export function ensureAtmDirectory(cwd: any) {
+export function ensureAtmDirectory(cwd: string) {
   const directory = path.join(cwd, '.atm');
   mkdirSync(directory, { recursive: true });
   return directory;
 }
 
-export function readJsonFile(filePath: any, missingCode = 'ATM_JSON_NOT_FOUND') {
+export function readJsonFile(filePath: string, missingCode = 'ATM_JSON_NOT_FOUND') {
   if (!existsSync(filePath)) {
     throw new CliError(missingCode, `JSON file not found: ${filePath}`, { details: { filePath } });
   }
@@ -403,7 +456,7 @@ export function readJsonFile(filePath: any, missingCode = 'ATM_JSON_NOT_FOUND') 
   }
 }
 
-export function writeJsonFile(filePath: any, value: any) {
+export function writeJsonFile(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 

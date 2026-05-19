@@ -50,3 +50,45 @@ node atm.mjs self-host-alpha --verify --agent claude-code --json
 ```
 
 Supported profiles and the latest advisory results are tracked in [docs/multi-agent-compatibility-matrix.md](docs/multi-agent-compatibility-matrix.md) and [docs/multi-agent-results.md](docs/multi-agent-results.md). These reports do not block alpha0 release.
+
+## Repository State Semantics for `atm next --json`
+
+`node atm.mjs next --json` behaves differently depending on whether the current directory is a **framework repository**, an **adopter repository**, or an **unbootstrapped repository**. Understanding this distinction prevents misinterpreting `needs-bootstrap` as a bug.
+
+| State | `.atm/config.json` | `next --json` result | exit code | Meaning |
+|---|---|---|---|---|
+| Framework repo (bare checkout) | absent | `needs-bootstrap` | 1 | Expected: the framework repo is not self-adopted. Maintainers run `self-host-alpha --verify --json` in a temp workspace instead of bootstrapping in place. |
+| Adopter repo (bootstrapped) | present | `ready` or `no-work` | 0 | Normal operating state. Execute the returned command. |
+| Adopter repo (not yet bootstrapped) | absent | `needs-bootstrap` | 1 | Expected: run `node atm.mjs bootstrap --cwd . --task "Bootstrap ATM"` to initialize. |
+
+### Why `needs-bootstrap` Is Not a Bug in a Framework Checkout
+
+The framework repository is the source of the ATM distribution. Framework maintainers do not commit `.atm/config.json` or other runtime state to the framework repository. Instead:
+
+- Validation of the framework's own self-hosting is done via `node atm.mjs self-host-alpha --verify --json`, which creates a temporary adopter workspace, runs the full bootstrap sequence, and tears it down.
+- The `needs-bootstrap` result in a framework checkout is a correct `self-governance diagnosis`, not a silent failure.
+- The `reason` field in the JSON output (`".atm/config.json is missing"`) is the authoritative machine-readable explanation.
+
+### M0 Exit Condition
+
+This document satisfies the M0 requirement: `node atm.mjs next --json` returning `needs-bootstrap` in the framework repo is explicitly documented as expected behavior with a clear `reason` field, not a silent failure.
+
+## Self-Governance Example Location Decision
+
+**Decision (TASK-ATD-0003): diagnostic-only — no `.atm.example/` directory and no `examples/self-host/` are created.**
+
+Rationale:
+
+1. The framework repo is not an adopter repo. Committing `.atm/` runtime state to the upstream repository would conflate framework maintenance with adopter adoption. Maintainers who need to run the full bootstrap loop use `self-host-alpha --verify --json` in a temporary workspace.
+2. A `.atm.example/` directory would need to be kept manually in sync with CLI and schema changes. The `self-host-alpha --verify --json` command already provides a live, deterministic proof that requires no manual maintenance.
+3. Adopter examples live in the `examples/` directory (e.g., `examples/hello-world/`, `examples/agent-bootstrap/`). These are sufficient for downstream adopters to understand the adoption pattern.
+
+### Release Parity Evidence
+
+Release artifact parity (source / root-drop / onefile / npm route) is verified by the standard validator suite:
+
+- `npm run validate:root-drop-release` — verifies `release/atm-root-drop/` layout and smoke behavior
+- `npm run validate:onefile-release` — verifies `release/atm-onefile/atm.mjs` layout and smoke behavior
+- `npm run validate:self-hosting-alpha` — verifies the self-host-alpha proof in a temp workspace
+
+Release artifacts do not contain maintainer-local runtime state (`.atm/`, `.atm-temp/`, local lock files). This is enforced by the release build process and verified by the release validators.

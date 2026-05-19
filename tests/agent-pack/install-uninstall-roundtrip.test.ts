@@ -3,8 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createTempWorkspace } from '../../scripts/temp-root.ts';
-import { renderManifest, hashFiles } from '../../packages/agent-pack-sdk/src/index.ts';
-import type { AgentPack } from '../../packages/agent-pack-sdk/src/index.ts';
+import { renderManifest, hashFiles, type AgentPack } from '../../packages/agent-pack-sdk/src/index.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempRoot = createTempWorkspace('atm-agent-pack-');

@@ -16,6 +16,7 @@ import { runIntegration } from './commands/integration.ts';
 import { runLock } from './commands/lock.ts';
 import { runNext } from './commands/next.ts';
 import { runOrient } from './commands/orient.ts';
+import { runPolice } from './commands/police.ts';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.ts';
 import { runSpec } from './commands/spec.ts';
 import { runStart } from './commands/start.ts';
@@ -54,6 +55,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   lock: runLock,
   next: runNext,
   orient: runOrient,
+  police: runPolice,
   'self-host-alpha': runSelfHostAlphaAsync,
   spec: runSpec,
   start: runStart,

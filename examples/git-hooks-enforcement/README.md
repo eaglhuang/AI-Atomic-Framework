@@ -1,10 +1,17 @@
-# Git Hooks Enforcement Example
+# Git Hooks Enforcement — Opt-in Host Recipe
 
-This example shows how a host repository can turn ATM guidance into a local Git gate.
+This is an **opt-in host recipe**, not framework-managed behavior.
 
-ATM itself stays advisory and host-neutral. These hooks are opt-in host governance: install them only in repositories where commits should be blocked when the current Git history is not covered by ATM evidence.
+ATM itself stays advisory and host-neutral. The framework never installs these
+hooks, never modifies `.git/hooks/`, and never assumes a host has adopted them.
+Install them only in repositories where commits should be blocked when the
+current Git history is not covered by ATM evidence.
 
-## Install
+The recipe is portable: host repositories may copy, adapt, or replace it as
+long as they stay aligned with the contract documented in
+[`docs/HOST_GOVERNANCE_INTEGRATION.md`](../../docs/HOST_GOVERNANCE_INTEGRATION.md).
+
+## Install (manual, host-driven)
 
 Run this from the repository root after ATM bootstrap has created `.atm/config.json`:
 
@@ -13,6 +20,10 @@ cp examples/git-hooks-enforcement/hooks/pre-commit .git/hooks/pre-commit
 cp examples/git-hooks-enforcement/hooks/post-commit .git/hooks/post-commit
 chmod +x .git/hooks/pre-commit .git/hooks/post-commit
 ```
+
+There is intentionally no `atm install-hooks` command. Hook installation must
+be an explicit host action so the host repository remains in control of which
+gates run on developer machines.
 
 ## Behavior
 

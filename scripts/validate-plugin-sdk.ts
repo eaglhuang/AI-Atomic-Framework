@@ -18,6 +18,8 @@ const requiredFiles = [
   'packages/plugin-sdk/src/injector-plugin.ts',
   'packages/plugin-sdk/src/language-adapter.ts',
   'packages/plugin-sdk/src/lifecycle.ts',
+  'packages/plugin-sdk/src/police.ts',
+  'packages/core/src/police/family.ts',
   'packages/plugin-sdk/src/project-adapter.ts',
   'docs/ADAPTER_GUIDE.md',
   'docs/LIFECYCLE.md'
@@ -70,7 +72,10 @@ if (!process.exitCode) {
       'RunReportStore',
     'MarkdownJsonStateStore',
     'RuleGuard',
-    'EvidenceStore'
+    'EvidenceStore',
+    'PoliceFinding',
+    'PoliceFamilyGateReport',
+    'EvidenceRef'
   ]) {
     if (!indexSource.includes(exportName)) {
       fail(`packages/plugin-sdk/src/index.ts must export ${exportName}`);
@@ -126,6 +131,37 @@ if (!process.exitCode) {
   for (const phrase of ['interface EffectNode', 'defaultMode', "'dry-run'", "'--apply'", 'ExecuteAgentTaskEffectNode']) {
     if (!effectNodeSource.includes(phrase)) {
       fail(`effect-node.ts missing ${phrase}`);
+    }
+  }
+
+  const policeSource = readText('packages/plugin-sdk/src/police.ts');
+  for (const phrase of [
+    'PoliceCheckKind',
+    'dependency-graph',
+    'PoliceFinding',
+    'PoliceFamilyGateReport',
+    'EvidenceRef'
+  ]) {
+    if (!policeSource.includes(phrase)) {
+      fail(`police.ts missing ${phrase}`);
+    }
+  }
+
+  const policeFamilySource = readText('packages/core/src/police/family.ts');
+  for (const phrase of [
+    'interface PoliceFinding',
+    'interface PoliceFamilyGateReport',
+    'runDedupPolice',
+    'runDemandPolice',
+    'runQualityPolice',
+    'runMapIntegrationPolice',
+    'runAtomizationPolice',
+    'runPoliceFamilyGate',
+    'metadata: {',
+    'policeFinding'
+  ]) {
+    if (!policeFamilySource.includes(phrase)) {
+      fail(`core police family contract missing ${phrase}`);
     }
   }
 

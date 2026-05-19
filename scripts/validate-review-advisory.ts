@@ -120,12 +120,27 @@ const mergedWithMachineFindings = appendMachineFindings(stubPassGenerated, [
     severity: 'high',
     message: 'Machine finding indicates high-risk behavior delta.',
     routeHint: 'human-review.required',
-    evidenceRef: 'machine.finding.delta'
+    evidenceRef: 'machine.finding.delta',
+    evidenceRefs: ['machine.finding.delta.secondary'],
+    metadata: {
+      policeFinding: {
+        findingId: 'police.quality.regression.sample',
+        policeFamily: 'quality',
+        severity: 'block'
+      }
+    }
   }
 ]);
 check(validateReport(mergedWithMachineFindings) === true, `appendMachineFindings output schema validation failed: ${JSON.stringify(validateReport.errors)}`);
 check(mergedWithMachineFindings.status === 'warn', 'high severity machine finding must escalate report status to warn');
 check(mergedWithMachineFindings.needsReview === true, 'machine finding merge must keep needsReview=true when severity is high');
+const mergedPoliceFinding = mergedWithMachineFindings.findings.find((finding) => finding.id === 'machine.high-risk.delta');
+check(mergedPoliceFinding?.metadata?.source === 'machine-finding-ingest', 'machine finding metadata must retain source marker');
+check(mergedPoliceFinding?.metadata?.policeFinding !== undefined, 'machine finding metadata must preserve metadata.policeFinding');
+check(
+  mergedPoliceFinding?.evidenceRefs?.includes('machine.finding.delta') && mergedPoliceFinding?.evidenceRefs?.includes('machine.finding.delta.secondary'),
+  'machine finding must preserve evidenceRef and evidenceRefs'
+);
 
 const conversationAdvisoryFixturePaths = [
   'fixtures/review-advisory/conversation-machine-findings.json',

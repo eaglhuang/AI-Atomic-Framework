@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync } from 'node:fs';
-import { CliError, configPathFor, ensureAtmDirectory, frameworkVersion, makeResult, message, parseOptions, relativePathFrom, writeJsonFile } from './shared.ts';
+import { CliError, configPathFor, ensureAtmDirectory, makeResult, message, parseOptions, readFrameworkVersion, relativePathFrom, writeJsonFile } from './shared.ts';
 import { adoptDefaultBootstrap, installDefaultRootDropScripts } from './bootstrap.ts';
 import type { LocalGovernanceBootstrapResult } from '../../../plugin-governance-local/src/index.ts';
 import { installIntegrationAdapter } from './integration.ts';
@@ -178,7 +178,7 @@ function createDefaultConfig(options: any) {
   const config: Record<string, any> = {
     schemaVersion: 'atm.config.v0.1',
     layoutVersion: 2,
-    frameworkVersion,
+    frameworkVersion: readFrameworkVersion(),
     createdBy: '@ai-atomic-framework/cli',
     adapter: {
       mode: 'standalone',

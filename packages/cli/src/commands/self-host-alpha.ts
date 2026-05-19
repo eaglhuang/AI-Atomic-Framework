@@ -6,7 +6,7 @@ import {
   createLocalGovernanceAdapter,
   estimateContextBudgetTokens
 } from '../../../plugin-governance-local/src/index.ts';
-import { createTempWorkspace } from '../../../../scripts/temp-root.ts';
+import { createTempWorkspace } from '../temp-workspace.ts';
 import { runBootstrap } from './bootstrap-entry.ts';
 import { createAgentConfidenceEvidence, resolveAgentProfile, verifyAgentsMarkdown } from './agent-confidence.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
@@ -109,7 +109,7 @@ export async function runSelfHostAlphaAsync(argv: any) {
           selfHostingArtifacts,
           neutrality: {
             exitCode: neutrality.ok ? 0 : 1,
-            violationCount: (neutrality.evidence?.termViolations ?? 0) + (neutrality.evidence?.pathViolations ?? 0)
+            violationCount: (Number(neutrality.evidence?.termViolations) || 0) + (Number(neutrality.evidence?.pathViolations) || 0)
           },
           agentsMd,
           confidence,

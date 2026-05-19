@@ -1,8 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { hashFiles, renderManifest } from '../../../agent-pack-sdk/src/index.ts';
-import type { AgentPack, RenderContext } from '../../../agent-pack-sdk/src/index.ts';
+import { hashFiles, renderManifest, type AgentPack, type RenderContext } from '../../../agent-pack-sdk/src/index.ts';
 import { claudeCodePack } from '../../../agent-pack-claude-code/src/index.ts';
 import { copilotPack } from '../../../agent-pack-copilot/src/index.ts';
 import { cursorPack } from '../../../agent-pack-cursor/src/index.ts';

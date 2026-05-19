@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { runHashPlaceholderAudit } from '../../../../scripts/audit-hash-placeholders.ts';
+import { runHashPlaceholderAudit } from './hash-placeholder-audit.ts';
 import { computeSha256ForFile } from '../../../core/src/hash-lock/hash-lock.ts';
 import { checkStartupKnownBadVersion } from '../startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from '../startup-integrity.ts';

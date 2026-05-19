@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { computeSha256ForContent, computeSha256ForFile } from '../../../core/src/hash-lock/hash-lock.ts';
 import type { DefaultGuardsDocument } from '../../../plugin-governance-local/src/default-guards.ts';
 import { detectGovernanceRuntime, relativePathFrom } from './governance-runtime.ts';
-import { CliError, frameworkVersion as bundledFrameworkVersion, makeResult, message, parseArgsForCommand } from './shared.ts';
+import { CliError, makeResult, message, parseArgsForCommand, readFrameworkVersion } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
@@ -551,18 +551,7 @@ export function loadCompatibilityMatrixBundle(root = frameworkRoot): Compatibili
 }
 
 export function readFrameworkPackageVersion(root = frameworkRoot) {
-  const packagePath = path.join(root, 'package.json');
-  if (!existsSync(packagePath)) {
-    return bundledFrameworkVersion;
-  }
-  try {
-    const parsed = JSON.parse(readFileSync(packagePath, 'utf8')) as { version?: unknown };
-    return typeof parsed.version === 'string' && parsed.version.trim().length > 0
-      ? parsed.version
-      : bundledFrameworkVersion;
-  } catch {
-    return bundledFrameworkVersion;
-  }
+  return readFrameworkVersion(root);
 }
 
 export function createATMVersionSummary(cwd: string, outOption?: unknown) {

@@ -1,6 +1,20 @@
 import type { ArtifactRecord, EvidenceRecord } from '@ai-atomic-framework/core';
 import type { AtomLifecycleModeValue } from './lifecycle';
 
+export type {
+  EvidenceRef,
+  PoliceFamilyGateReport,
+  PoliceFamilyMode,
+  PoliceFamilyName,
+  PoliceFamilyProfile,
+  PoliceFamilyReport,
+  PoliceFamilyStatus,
+  PoliceFinding,
+  PoliceFindingAction,
+  PoliceFindingMode,
+  PoliceFindingSeverity
+} from '@ai-atomic-framework/core';
+
 export type PoliceLifecycleMode = AtomLifecycleModeValue;
 
 export type PoliceSeverity = 'info' | 'warning' | 'error';

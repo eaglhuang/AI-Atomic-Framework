@@ -355,3 +355,4 @@ export * from './registry/rollback.ts';
 export * from './registry/registry-migration.ts';
 export * from './guidance/index.ts';
 export * from './upgrade/evolution-draft.ts';
+export * from './police/family.ts';

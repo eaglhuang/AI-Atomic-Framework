@@ -76,14 +76,29 @@ hooks, CI, and review policy.
 
 Use these layers in increasing strength:
 
-| Layer | Purpose |
-| --- | --- |
-| `AGENTS.md` / README entry | Make `node atm.mjs next --json` the first instruction an agent sees. |
-| `atm doctor` | Detect missing runtime state, layout drift, and Git commits without matching ATM evidence. |
-| Git hooks | Block local commits when the previous HEAD already bypassed ATM, and record staged-tree evidence for the new commit. |
-| CI | Run the same `atm doctor --json` gate on pushed commits. |
-| Branch protection | Require the CI gate before merging protected branches. |
-| Review policy | Ask reviewers to inspect the ATM evidence paths linked by `doctor`, handoff summaries, and reports. |
+| Layer | Purpose | Provided by |
+| --- | --- | --- |
+| `AGENTS.md` / README entry | Make `node atm.mjs next --json` the first instruction an agent sees. | ATM core (rendered by `atm init`) |
+| `atm doctor` | Detect missing runtime state, layout drift, and Git commits without matching ATM evidence. | ATM core (always available) |
+| Git hooks | Block local commits when the previous HEAD already bypassed ATM, and record staged-tree evidence for the new commit. | **Host opt-in recipe** ([example](../examples/git-hooks-enforcement/README.md)) |
+| CI | Run the same `atm doctor --json` gate on pushed commits. | **Host opt-in recipe** |
+| Branch protection | Require the CI gate before merging protected branches. | Host policy |
+| Review policy | Ask reviewers to inspect the ATM evidence paths linked by `doctor`, handoff summaries, and reports. | Host policy |
+
+### What ATM core does NOT do
+
+The framework intentionally does not:
+
+- install Git hooks into `.git/hooks/` on `atm init` or any other command;
+- write to CI configuration files (`.github/workflows/`, `.gitlab-ci.yml`, etc.);
+- assume a specific CI provider, host platform, or branch-protection model;
+- enforce that hooks are present — `atm doctor` reports evidence gaps but never
+  inspects whether hooks are installed.
+
+These are deliberate boundaries. Hooks, CI integration, and branch protection
+are **opt-in host recipes**: the framework ships examples and documents the
+shared `atm doctor` contract, but the host repository decides which gates to
+adopt, how strict they are, and when to update them.
 
 ## Git Evidence Boundary
 

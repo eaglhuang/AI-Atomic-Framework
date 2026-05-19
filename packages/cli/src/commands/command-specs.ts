@@ -130,6 +130,26 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs orient --cwd . --json'
     ]
   }),
+  police: defineCommandSpec({
+    name: 'police',
+    summary: 'Run the ATM police family gate and emit a PoliceFamilyGateReport.',
+    positional: [
+      { name: 'action', summary: 'Currently supports: run', required: false }
+    ],
+    options: [
+      commonCwdOption,
+      { flag: '--profile', value: 'standard|full', summary: 'Police family profile to run (default: standard).' },
+      { flag: '--registry', value: 'path', summary: 'Registry document path for Dedup Police (default: atomic-registry.json).' },
+      { flag: '--out', value: 'path', summary: 'Optional JSON report output path. Defaults to stdout evidence only.' },
+      commonJsonOption,
+      commonPrettyOption,
+      commonHelpOption
+    ],
+    examples: [
+      'node atm.mjs police run --profile standard --json',
+      'node atm.mjs police run --profile full --out .atm/history/reports/police-family-gate.json --json'
+    ]
+  }),
   start: defineCommandSpec({
     name: 'start',
     summary: 'Start an ATM guidance session for a concrete goal.',
