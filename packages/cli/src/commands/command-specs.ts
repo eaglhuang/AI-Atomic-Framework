@@ -1,9 +1,10 @@
 import { defineCommandSpec } from './shared.ts';
-
-const commonJsonOption = { flag: '--json', summary: 'Force machine-readable JSON output.' };
-const commonPrettyOption = { flag: '--pretty', summary: 'Force human-readable pretty output.' };
-const commonHelpOption = { flag: '--help', alias: '-h', summary: 'Show command help.' };
-const commonCwdOption = { flag: '--cwd', value: 'path', summary: 'Run the command against a specific repository root.' };
+import {
+  commonCwdOption,
+  commonHelpOption,
+  commonJsonOption,
+  commonPrettyOption
+} from './command-specs/_common.ts';
 
 export const commandSpecs = Object.freeze({
   actor: defineCommandSpec({
