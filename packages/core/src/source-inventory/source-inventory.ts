@@ -30,7 +30,7 @@ export interface SourceInventoryReport {
 }
 
 export interface BuildSourceInventoryInput {
-  readonly entries: readonly Partial<SourceInventoryEntry> & { filePath: string; lineCount: number }[];
+  readonly entries: readonly (Partial<SourceInventoryEntry> & { filePath: string; lineCount: number })[];
   readonly maxFileLines?: number;
   readonly generatedAt?: string;
   readonly ignoredPathPatterns?: readonly string[];
@@ -48,7 +48,7 @@ const DEFAULT_IGNORED_PATTERNS: readonly string[] = [
 export function buildSourceInventoryReport(input: BuildSourceInventoryInput): SourceInventoryReport {
   const maxFileLines = input.maxFileLines ?? DEFAULT_MAX_FILE_LINES;
   const ignoredPathPatterns = input.ignoredPathPatterns ?? DEFAULT_IGNORED_PATTERNS;
-  const normalized = (input.entries as readonly Partial<SourceInventoryEntry>[]).map((entry) => normalizeEntry(entry, ignoredPathPatterns));
+  const normalized = input.entries.map((entry) => normalizeEntry(entry, ignoredPathPatterns));
   return {
     schemaId: 'atm.sourceInventoryReport',
     specVersion: '0.1.0',
