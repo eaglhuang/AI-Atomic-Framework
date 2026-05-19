@@ -415,6 +415,7 @@ export const commandSpecs = Object.freeze({
       'node atm.mjs integration list --json',
       'node atm.mjs integration add claude-code --json',
       'node atm.mjs integration add codex --json',
+      'node atm.mjs integration add antigravity --json',
       'node atm.mjs integration verify claude-code --json',
       'node atm.mjs integration remove claude-code --json'
     ]

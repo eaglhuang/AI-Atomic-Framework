@@ -32,5 +32,8 @@ Hook logic must stay thin:
 - Gemini:
   - command template route + optional thin hook recipe.
   - fallback to claim + git/evidence gates when hooks are unavailable.
+- Antigravity:
+  - root discovery in `GEMINI.md` plus ATM command skills under `.agents/skills`.
+  - fallback to claim + git/evidence gates when hooks are unavailable.
 
 All integrations must call the same core commands and must not fork governance logic.

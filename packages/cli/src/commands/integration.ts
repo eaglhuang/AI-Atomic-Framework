@@ -4,7 +4,7 @@ import { createClaudeCodeIntegrationAdapter } from '../../../integration-claude-
 import { createCopilotIntegrationAdapter } from '../../../integration-copilot/src/index.ts';
 import { createCodexIntegrationAdapter } from '../../../integration-codex/src/index.ts';
 import { createCursorIntegrationAdapter } from '../../../integration-cursor/src/index.ts';
-import { createGeminiIntegrationAdapter } from '../../../integration-gemini/src/index.ts';
+import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } from '../../../integration-gemini/src/index.ts';
 import type { InstallManifest, IntegrationAdapter } from '../../../integrations-core/src/index.ts';
 import { CliError, ensureAtmDirectory, makeResult, message, parseArgsForCommand, readJsonFile, relativePathFrom, resolveValue } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
@@ -14,7 +14,8 @@ const integrationAdapterFactories = Object.freeze({
   codex: createCodexIntegrationAdapter,
   copilot: createCopilotIntegrationAdapter,
   cursor: createCursorIntegrationAdapter,
-  gemini: createGeminiIntegrationAdapter
+  gemini: createGeminiIntegrationAdapter,
+  antigravity: createAntigravityIntegrationAdapter
 });
 
 const primaryEntryPathByAdapterId = Object.freeze({
@@ -22,7 +23,8 @@ const primaryEntryPathByAdapterId = Object.freeze({
   codex: 'integrations/codex-skills/atm-governance-router/SKILL.md',
   copilot: '.github/instructions/atm-governance-router.instructions.md',
   cursor: '.cursor/rules/skills/atm-governance-router/SKILL.md',
-  gemini: '.gemini/commands/atm-governance-router.toml'
+  gemini: '.gemini/commands/atm-governance-router.toml',
+  antigravity: 'GEMINI.md'
 } satisfies Record<KnownCliIntegrationId, string>);
 
 type KnownCliIntegrationId = keyof typeof integrationAdapterFactories;
@@ -374,6 +376,7 @@ function normalizeDetectedEditorId(value: string | undefined): KnownCliIntegrati
   if (normalized.includes('codex')) return 'codex';
   if (normalized.includes('cursor')) return 'cursor';
   if (normalized.includes('gemini')) return 'gemini';
+  if (normalized.includes('antigravity')) return 'antigravity';
   return null;
 }
 

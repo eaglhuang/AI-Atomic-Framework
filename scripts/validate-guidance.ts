@@ -123,6 +123,45 @@ const newHelperRoute = decideGuidanceRoute({
 assert(newHelperRoute.recommendedRoute === 'atomize', 'new helper fixture must route to atomize');
 assert(newHelperRoute.nextCommand.includes('behavior.atomize'), 'new helper route must recommend atomize dry-run proposal');
 
+const pythonHelperPlan = await buildLegacyRoutePlan({
+  sourceText: [
+    'def pipeline_entry(value):',
+    '    normalized = normalize_payload(value)',
+    '    return emit_payload(normalized)',
+    '',
+    'def normalize_payload(value):',
+    '    return value.strip().lower()',
+    '',
+    'def emit_payload(value):',
+    '    return value'
+  ].join('\n'),
+  targetFile: 'tests/guidance-fixtures/python-helper.py',
+  releaseBlockerSymbols: ['pipeline_entry'],
+  callerDistribution: { normalize_payload: 2, emit_payload: 1 }
+});
+assert(pythonHelperPlan.trunkFunctions.includes('pipeline_entry'), 'Python helper fixture must classify release blocker as trunk');
+assert(pythonHelperPlan.safeFirstAtoms.includes('normalize_payload'), 'Python helper fixture must expose normalize_payload as safe leaf');
+const emitPayloadSegment = pythonHelperPlan.segments.find((segment) => segment.symbolName === 'emit_payload');
+assert(emitPayloadSegment?.role === 'adapter-boundary', 'Python emit_payload helper must remain adapter-boundary');
+
+const javaHelperPlan = await buildLegacyRoutePlan({
+  sourceText: [
+    'public final class PipelineHelper {',
+    '  public String pipelineEntry(String value) {',
+    '    return normalizePayload(value);',
+    '  }',
+    '',
+    '  private String normalizePayload(String value) {',
+    '    return value.trim().toLowerCase();',
+    '  }',
+    '}'
+  ].join('\n'),
+  targetFile: 'tests/guidance-fixtures/PipelineHelper.java',
+  releaseBlockerSymbols: ['pipelineEntry']
+});
+assert(javaHelperPlan.trunkFunctions.includes('pipelineEntry'), 'Java helper fixture must classify release blocker as trunk');
+assert(javaHelperPlan.safeFirstAtoms.includes('normalizePayload'), 'Java helper fixture must expose normalizePayload as safe leaf');
+
 const demandPlan = await buildLegacyRoutePlan({
   sourceText: 'export function normalizeFragmentDemand(value) { return String(value || "").trim(); }',
   targetFile: 'tests/guidance-fixtures/demand-helper.js',
@@ -169,7 +208,17 @@ try {
     adapter: { mode: 'standalone' }
   }, null, 2));
   writeFileSync(path.join(pythonOnlyRepo, 'requirements.txt'), 'pytest\n', 'utf8');
-  writeFileSync(path.join(pythonOnlyRepo, 'pipelines', 'legacy_pipeline.py'), 'def main():\n    return None\n', 'utf8');
+  writeFileSync(path.join(pythonOnlyRepo, 'pipelines', 'legacy_pipeline.py'), [
+    'def main(raw_value):',
+    '    normalized = normalize_payload(raw_value)',
+    '    return emit_payload(normalized)',
+    '',
+    'def normalize_payload(raw_value):',
+    '    return raw_value.strip().lower()',
+    '',
+    'def emit_payload(value):',
+    '    return value'
+  ].join('\n'), 'utf8');
   const pythonOnlyOrientation = probeProject(pythonOnlyRepo);
   assert(pythonOnlyOrientation.detectedLanguages.includes('Python'), 'Python-only repo must detect Python');
   assert(!pythonOnlyOrientation.releaseBlockers.includes('package-json-missing'), 'Python-only repo must not treat missing package.json as release blocker');
@@ -186,6 +235,25 @@ try {
   });
   assert(pythonOnlyRoute.recommendedRoute === 'legacy-candidate-ranking', 'Python-only repo must allow candidate ranking route');
   assert(!pythonOnlyRoute.blockedBy.includes('package-json-missing'), 'Python-only candidate ranking must not be blocked by package-json-missing');
+  const pythonLegacyStart = await runAtmJsonPortable([
+    'start', '--cwd', pythonOnlyRepo,
+    '--goal', 'extract helper from Python legacy pipeline',
+    '--target-file', 'pipelines/legacy_pipeline.py',
+    '--release-blocker', 'main',
+    '--legacy-flow', '--json'
+  ], root);
+  assert(pythonLegacyStart.exitCode === 0, 'Python-only start --legacy-flow must exit 0');
+  const pythonStoredPlan = pythonLegacyStart.parsed.evidence?.legacyRoutePlan
+    ?? pythonLegacyStart.parsed.evidence?.session?.legacyRoutePlan;
+  assert(pythonStoredPlan?.schemaId === 'atm.legacyRoutePlan', 'Python-only start --legacy-flow must produce LegacyRoutePlan');
+  assert(Array.isArray(pythonStoredPlan?.trunkFunctions) && pythonStoredPlan.trunkFunctions.includes('main'),
+    'Python-only legacy route plan must classify main as trunk');
+  assert(Array.isArray(pythonStoredPlan?.safeFirstAtoms) && pythonStoredPlan.safeFirstAtoms.includes('normalize_payload'),
+    'Python-only legacy route plan must expose normalize_payload as safe leaf');
+  const pythonEmitSegment = (pythonStoredPlan?.segments as Array<Record<string, unknown>> | undefined)
+    ?.find((segment) => segment['symbolName'] === 'emit_payload');
+  assert(pythonEmitSegment?.['role'] === 'adapter-boundary',
+    'Python-only legacy route plan must keep emit_payload as adapter-boundary');
 
   const javaOnlyRepo = path.join(tempRoot, 'java-only-repo');
   mkdirSync(path.join(javaOnlyRepo, '.atm'), { recursive: true });

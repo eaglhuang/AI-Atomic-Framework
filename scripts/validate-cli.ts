@@ -276,6 +276,7 @@ try {
   assert(integrationList.parsed.evidence.available.includes('copilot'), 'integration list must include copilot');
   assert(integrationList.parsed.evidence.available.includes('cursor'), 'integration list must include cursor');
   assert(integrationList.parsed.evidence.available.includes('gemini'), 'integration list must include gemini');
+  assert(integrationList.parsed.evidence.available.includes('antigravity'), 'integration list must include antigravity');
   assertMessageCode(integrationList, 'ATM_INTEGRATION_LIST_OK');
 
   const integrationAdd = runAtm(['integration', 'add', 'claude-code', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
@@ -325,6 +326,32 @@ try {
   assert(!existsSync(path.join(integrationRepo, '.atm/integrations/codex.manifest.json')), 'codex integration remove must remove unchanged manifest');
   assert(!existsSync(path.join(integrationRepo, 'integrations/codex-skills/atm-next/SKILL.md')), 'codex integration remove must remove unchanged entry file');
   assertMessageCode(codexIntegrationRemove, 'ATM_INTEGRATION_REMOVED');
+
+  const antigravityIntegrationAdd = runAtm(['integration', 'add', 'antigravity', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
+  assert(antigravityIntegrationAdd.exitCode === 0, 'integration add antigravity must exit 0');
+  assertReadable(antigravityIntegrationAdd, 'integration');
+  assert(antigravityIntegrationAdd.parsed.ok === true, 'integration add antigravity must report ok=true');
+  assert(antigravityIntegrationAdd.parsed.evidence.manifestPath === '.atm/integrations/antigravity.manifest.json', 'antigravity integration add must use per-adapter manifest path');
+  assert(existsSync(path.join(integrationRepo, '.atm/integrations/antigravity.manifest.json')), 'antigravity integration add must write per-adapter manifest');
+  assert(existsSync(path.join(integrationRepo, 'GEMINI.md')), 'antigravity integration add must write GEMINI.md');
+  assert(existsSync(path.join(integrationRepo, '.agents/skills/atm-next/SKILL.md')), 'antigravity integration add must write .agents skill files');
+  assertMessageCode(antigravityIntegrationAdd, 'ATM_INTEGRATION_ADDED');
+
+  const antigravityIntegrationVerify = runAtm(['integration', 'verify', 'antigravity', '--cwd', integrationRepo], integrationRepo);
+  assert(antigravityIntegrationVerify.exitCode === 0, 'integration verify antigravity must exit 0 after install');
+  assertReadable(antigravityIntegrationVerify, 'integration');
+  assert(antigravityIntegrationVerify.parsed.ok === true, 'integration verify antigravity must report ok=true');
+  assert(antigravityIntegrationVerify.parsed.evidence.driftedFiles.length === 0, 'antigravity integration verify must report no drift after install');
+  assertMessageCode(antigravityIntegrationVerify, 'ATM_INTEGRATION_VERIFY_OK');
+
+  const antigravityIntegrationRemove = runAtm(['integration', 'remove', 'antigravity', '--cwd', integrationRepo], integrationRepo);
+  assert(antigravityIntegrationRemove.exitCode === 0, 'integration remove antigravity must exit 0');
+  assertReadable(antigravityIntegrationRemove, 'integration');
+  assert(antigravityIntegrationRemove.parsed.ok === true, 'integration remove antigravity must report ok=true');
+  assert(!existsSync(path.join(integrationRepo, '.atm/integrations/antigravity.manifest.json')), 'antigravity integration remove must remove unchanged manifest');
+  assert(!existsSync(path.join(integrationRepo, 'GEMINI.md')), 'antigravity integration remove must remove unchanged GEMINI.md');
+  assert(!existsSync(path.join(integrationRepo, '.agents/skills/atm-next/SKILL.md')), 'antigravity integration remove must remove unchanged .agents skill file');
+  assertMessageCode(antigravityIntegrationRemove, 'ATM_INTEGRATION_REMOVED');
 
   const initIntegrationRepo = path.join(tempRoot, 'init-integration-repo');
   mkdirSync(initIntegrationRepo, { recursive: true });

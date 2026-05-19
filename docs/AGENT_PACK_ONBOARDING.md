@@ -12,7 +12,7 @@ Agent pack onboarding is made of four cooperating surfaces:
 | --- | --- | --- |
 | `atm welcome` | Print a first-touch orientation, installed integration status, ATMChart summary, and the next command to run. | Replace `atm next` or mark work complete by itself. |
 | `atm-chart` | Render and verify `.atm/memory/atm-chart.md` from default guards and schema hashes. | Become a new authority above AtomicCharter or host governance. |
-| Agent entry files | Provide host-native shortcuts for Claude Code, GitHub Copilot, Cursor, Gemini, Windsurf, or similar environments. | Introduce a parallel task store, approval workflow, or rule system. |
+| Agent entry files | Provide host-native shortcuts for Claude Code, GitHub Copilot, Cursor, Gemini, Antigravity, Windsurf, or similar environments. | Introduce a parallel task store, approval workflow, or rule system. |
 | Integration manifests | Record generated file hashes so install, verify, and uninstall remain deterministic. | Delete user-modified files without a hash match. |
 
 ## ATMChart
@@ -42,6 +42,11 @@ The welcome command may summarize state, but the deterministic router remains `n
 ## Agent Packs And Integrations
 
 Agent packs are host-native entry files generated from framework-neutral templates. They make ATM visible in environments with different instruction or command formats, while keeping the same command route underneath.
+
+Adapter-specific discovery differences are documented in:
+
+- `docs/ANTIGRAVITY_INTEGRATION.md` for Antigravity (`GEMINI.md` + `.agents/skills`)
+- integration package READMEs for Codex, Claude Code, Copilot, Cursor, and Gemini
 
 Expected pack behavior:
 

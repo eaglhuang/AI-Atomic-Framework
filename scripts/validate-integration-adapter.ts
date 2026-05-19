@@ -29,6 +29,7 @@ const requiredFiles = [
   'packages/integration-gemini/package.json',
   'packages/integration-gemini/README.md',
   'packages/integration-gemini/src/index.ts',
+  'docs/ANTIGRAVITY_INTEGRATION.md',
   'templates/skills/skill.schema.json',
   'templates/skills/atm-next.skill.md',
   'templates/skills/atm-orient.skill.md',
@@ -123,7 +124,8 @@ if (!process.exitCode) {
     await createAdapterSpec('codex', 'packages/integration-codex/src/index.ts', 'createCodexIntegrationAdapter', 'integrations/codex-skills', 'skill', '$ARGUMENTS'),
     await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', 17),
     await createAdapterSpec('cursor', 'packages/integration-cursor/src/index.ts', 'createCursorIntegrationAdapter', '.cursor/rules/skills', 'markdown', '$ARGUMENTS'),
-    await createAdapterSpec('gemini', 'packages/integration-gemini/src/index.ts', 'createGeminiIntegrationAdapter', '.gemini/commands', 'toml', 'toml-fields')
+    await createAdapterSpec('gemini', 'packages/integration-gemini/src/index.ts', 'createGeminiIntegrationAdapter', '.gemini/commands', 'toml', 'toml-fields'),
+    await createAdapterSpec('antigravity', 'packages/integration-gemini/src/index.ts', 'createAntigravityIntegrationAdapter', '.', 'markdown', '$ARGUMENTS', 9)
   ].filter((adapterSpec: any) => requestedAdapterFilter ? adapterSpec.id === requestedAdapterFilter : true);
 
   assert(adapterSpecs.length > 0, `no integration adapter matched filter: ${requestedAdapterFilter}`);
@@ -134,7 +136,7 @@ if (!process.exitCode) {
 }
 
 if (!process.exitCode) {
-  console.log(`[integration-adapter:${mode}] ok (interface, manifest schema, Codex reference factory, and 5 installable adapters install/verify/uninstall)`);
+  console.log(`[integration-adapter:${mode}] ok (interface, manifest schema, Codex reference factory, and 6 installable adapters install/verify/uninstall)`);
 }
 
 async function createAdapterSpec(
@@ -199,6 +201,10 @@ function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifes
       for (const entryId of ['atm-next', 'atm-orient', 'atm-governance-router', 'atm-create', 'atm-lock', 'atm-evidence', 'atm-upgrade-scan', 'atm-handoff']) {
         assert(installedPaths.some((installedPath: string) => installedPath.includes(entryId)), `${adapterSpec.id} missing entry file for ${entryId}`);
       }
+    }
+    if (adapterSpec.id === 'antigravity') {
+      assert(installedPaths.includes('GEMINI.md'), 'antigravity install must include GEMINI.md');
+      assert(installedPaths.some((installedPath: string) => installedPath.startsWith('.agents/skills/atm-next/')), 'antigravity install must include .agents/skills ATM entry skill');
     }
 
     for (const fileRecord of install.manifest.files) {

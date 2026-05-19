@@ -68,13 +68,12 @@ interface ParsedFunctionSymbol {
 }
 
 export async function buildLegacyRoutePlan(input: BuildLegacyRoutePlanInput): Promise<LegacyRoutePlan> {
-  const ts = await import('typescript');
   const releaseBlockerSymbols = new Set(input.releaseBlockerSymbols ?? []);
   const existingAtomMatches = new Map((input.existingAtomMatches ?? []).map((entry) => [entry.symbolName, entry.atomId]));
   const callerDistribution = normalizeCallerDistribution(input.callerDistribution ?? {});
   const demandThreshold = input.demandThreshold ?? 6;
   const fanOutThreshold = input.fanOutThreshold ?? 5;
-  const parsedFunctions = parseFunctionSymbols(ts, input.sourceText, input.targetFile);
+  const parsedFunctions = await parseFunctionSymbols(input.sourceText, input.targetFile);
   const segments = parsedFunctions.map((entry) => {
     const callerDemand = callerDistribution.get(entry.symbolName) ?? 0;
     const role = classifyRole(entry, releaseBlockerSymbols, fanOutThreshold);
@@ -129,7 +128,44 @@ function normalizeCallerDistribution(input: Readonly<Record<string, number>> | r
   return new Map(Object.entries(input).map(([symbolName, callerCount]) => [symbolName, Number(callerCount) || 0]));
 }
 
-function parseFunctionSymbols(ts: typeof import('typescript'), sourceText: string, targetFile: string): readonly ParsedFunctionSymbol[] {
+async function parseFunctionSymbols(sourceText: string, targetFile: string): Promise<readonly ParsedFunctionSymbol[]> {
+  if (isPythonLikeFile(targetFile)) {
+    return parsePythonFunctionSymbols(sourceText);
+  }
+  if (prefersTypescriptParser(targetFile)) {
+    const ts = await tryLoadTypescript();
+    if (ts) {
+      return parseTypescriptFunctionSymbols(ts, sourceText, targetFile);
+    }
+    return parseBraceFunctionSymbols(sourceText);
+  }
+  if (isBraceLanguageFile(targetFile)) {
+    return parseBraceFunctionSymbols(sourceText);
+  }
+  return parseGenericFunctionSymbols(sourceText);
+}
+
+async function tryLoadTypescript(): Promise<typeof import('typescript') | null> {
+  try {
+    return await import('typescript');
+  } catch {
+    return null;
+  }
+}
+
+function prefersTypescriptParser(targetFile: string): boolean {
+  return /\.(?:[cm]?js|[cm]?ts|tsx|jsx)$/i.test(targetFile);
+}
+
+function isPythonLikeFile(targetFile: string): boolean {
+  return /\.py(?:i)?$/i.test(targetFile);
+}
+
+function isBraceLanguageFile(targetFile: string): boolean {
+  return /\.(?:java|kt|kts|scala|groovy|go|rs|cs|php|swift|c|cc|cpp|cxx|h|hpp|m|mm)$/i.test(targetFile);
+}
+
+function parseTypescriptFunctionSymbols(ts: typeof import('typescript'), sourceText: string, targetFile: string): readonly ParsedFunctionSymbol[] {
   const scriptKind = targetFile.endsWith('.js') || targetFile.endsWith('.mjs') || targetFile.endsWith('.cjs')
     ? ts.ScriptKind.JS
     : ts.ScriptKind.TS;
@@ -138,12 +174,12 @@ function parseFunctionSymbols(ts: typeof import('typescript'), sourceText: strin
 
   function visit(node: import('typescript').Node): void {
     if (ts.isFunctionDeclaration(node) && node.name && node.body) {
-      symbols.push({ symbolName: node.name.text, fanOut: countFanOut(ts, node.body) });
+      symbols.push({ symbolName: node.name.text, fanOut: countTypescriptFanOut(ts, node.body) });
       return;
     }
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
       if (ts.isFunctionExpression(node.initializer) || ts.isArrowFunction(node.initializer)) {
-        symbols.push({ symbolName: node.name.text, fanOut: countFanOut(ts, node.initializer.body) });
+        symbols.push({ symbolName: node.name.text, fanOut: countTypescriptFanOut(ts, node.initializer.body) });
         return;
       }
     }
@@ -154,7 +190,7 @@ function parseFunctionSymbols(ts: typeof import('typescript'), sourceText: strin
   return symbols;
 }
 
-function countFanOut(ts: typeof import('typescript'), node: import('typescript').Node): number {
+function countTypescriptFanOut(ts: typeof import('typescript'), node: import('typescript').Node): number {
   const callees = new Set<string>();
   function visit(child: import('typescript').Node): void {
     if (ts.isCallExpression(child)) {
@@ -168,6 +204,159 @@ function countFanOut(ts: typeof import('typescript'), node: import('typescript')
     ts.forEachChild(child, visit);
   }
   visit(node);
+  return callees.size;
+}
+
+function parsePythonFunctionSymbols(sourceText: string): readonly ParsedFunctionSymbol[] {
+  const lines = sourceText.split(/\r?\n/);
+  const symbols: ParsedFunctionSymbol[] = [];
+  const seen = new Set<string>();
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const match = /^(\s*)(?:async\s+def|def)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/.exec(line);
+    if (!match) {
+      continue;
+    }
+    const symbolName = match[2];
+    if (seen.has(symbolName)) {
+      continue;
+    }
+    seen.add(symbolName);
+    const indent = match[1].length;
+    const bodyLines = collectIndentedBody(lines, index + 1, indent);
+    symbols.push({ symbolName, fanOut: countTextFanOut(bodyLines.join('\n')) });
+  }
+  return symbols;
+}
+
+function parseBraceFunctionSymbols(sourceText: string): readonly ParsedFunctionSymbol[] {
+  const lines = sourceText.split(/\r?\n/);
+  const symbols: ParsedFunctionSymbol[] = [];
+  const seen = new Set<string>();
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const declarationMatch = matchBraceFunctionDeclaration(line);
+    if (!declarationMatch) {
+      continue;
+    }
+    const symbolName = declarationMatch[1];
+    if (seen.has(symbolName)) {
+      continue;
+    }
+    seen.add(symbolName);
+    const bodyText = collectBraceBody(lines, index);
+    symbols.push({ symbolName, fanOut: countTextFanOut(bodyText) });
+  }
+  return symbols;
+}
+
+function matchBraceFunctionDeclaration(line: string): RegExpExecArray | null {
+  const jsStyleDeclaration = /^\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/.exec(line)
+    ?? /^\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*=\s*(?:async\s*)?(?:function\b|\([^)]*\)\s*=>|[A-Za-z_$][A-Za-z0-9_$]*\s*=>)/.exec(line)
+    ?? /^\s*(?:pub\s+)?fn\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/.exec(line)
+    ?? /^\s*func(?:\s*\([^)]*\))?\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/.exec(line)
+    ?? /^\s*(?:public|private|protected|internal|override|open|final|abstract|suspend|async|\s)*fun\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/.exec(line);
+  if (jsStyleDeclaration) {
+    return jsStyleDeclaration;
+  }
+  const javaLikeDeclaration = /^\s*(?:(?:public|private|protected|internal|static|final|abstract|async|synchronized|virtual|override|sealed|readonly|native|extern|open|inline|unsafe|friend|constexpr)\s+)*(?:<[^>]+>\s*)?(?:[A-Za-z_$][A-Za-z0-9_$<>\[\],.?]*\s+)+([A-Za-z_$][A-Za-z0-9_$]*)\s*\([^;{}]*\)\s*(?:\{|$)/.exec(line);
+  if (!javaLikeDeclaration) {
+    return null;
+  }
+  const symbolName = javaLikeDeclaration[1];
+  if (new Set(['if', 'for', 'while', 'switch', 'catch', 'return', 'throw', 'new', 'class', 'interface']).has(symbolName)) {
+    return null;
+  }
+  return javaLikeDeclaration;
+}
+
+function parseGenericFunctionSymbols(sourceText: string): readonly ParsedFunctionSymbol[] {
+  const merged = [...parsePythonFunctionSymbols(sourceText), ...parseBraceFunctionSymbols(sourceText)];
+  const seen = new Set<string>();
+  return merged.filter((entry) => {
+    if (seen.has(entry.symbolName)) {
+      return false;
+    }
+    seen.add(entry.symbolName);
+    return true;
+  });
+}
+
+function collectIndentedBody(lines: readonly string[], startIndex: number, parentIndent: number): readonly string[] {
+  const body: string[] = [];
+  for (let index = startIndex; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line.trim().length === 0) {
+      body.push(line);
+      continue;
+    }
+    const indent = line.match(/^\s*/)?.[0].length ?? 0;
+    if (indent <= parentIndent) {
+      break;
+    }
+    body.push(line);
+  }
+  return body;
+}
+
+function collectBraceBody(lines: readonly string[], startIndex: number): string {
+  let braceDepth = 0;
+  let sawOpeningBrace = false;
+  const body: string[] = [];
+  for (let index = startIndex; index < lines.length; index += 1) {
+    const line = lines[index];
+    body.push(line);
+    for (const char of line) {
+      if (char === '{') {
+        braceDepth += 1;
+        sawOpeningBrace = true;
+      } else if (char === '}') {
+        braceDepth = Math.max(0, braceDepth - 1);
+      }
+    }
+    if (!sawOpeningBrace && line.includes('=>')) {
+      break;
+    }
+    if (sawOpeningBrace && braceDepth === 0) {
+      break;
+    }
+  }
+  return body.join('\n');
+}
+
+function countTextFanOut(sourceText: string): number {
+  const keywords = new Set([
+    'if',
+    'for',
+    'while',
+    'switch',
+    'catch',
+    'return',
+    'function',
+    'def',
+    'class',
+    'new',
+    'await',
+    'typeof',
+    'elif',
+    'print'
+  ]);
+  const callees = new Set<string>();
+  const identifierCallPattern = /\b([A-Za-z_][A-Za-z0-9_]*)\s*\(/g;
+  const propertyCallPattern = /\.([A-Za-z_][A-Za-z0-9_]*)\s*\(/g;
+  let match: RegExpExecArray | null;
+  while ((match = identifierCallPattern.exec(sourceText)) !== null) {
+    const callee = match[1];
+    if (!keywords.has(callee)) {
+      callees.add(callee);
+    }
+  }
+  while ((match = propertyCallPattern.exec(sourceText)) !== null) {
+    const callee = match[1];
+    if (!keywords.has(callee)) {
+      callees.add(callee);
+    }
+  }
   return callees.size;
 }
 
