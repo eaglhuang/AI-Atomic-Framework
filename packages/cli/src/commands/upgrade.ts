@@ -30,6 +30,7 @@ import {
   sha256File
 } from './upgrade/path-helpers.ts';
 import { buildUpgradeNextActionHint } from './upgrade/next-action-hint.ts';
+import { parseCanaryPercent, resolveCanarySelection, shouldApplyUpgradeFile } from './upgrade/canary.ts';
 
 export async function runUpgrade(argv: any) {
   const experimentalAction = firstExperimentalUpgradeAction(argv);
@@ -465,38 +466,6 @@ function runSafeUpgradeRollback(options: any) {
       removedFiles
     }
   });
-}
-
-function parseCanaryPercent(value: string) {
-  const percent = Number(value);
-  if (!Number.isInteger(percent) || percent < 1 || percent > 100) {
-    throw new CliError('ATM_UPGRADE_CANARY_PERCENT_INVALID', '--canary must be an integer percent from 1 to 100', { exitCode: 2, details: { value } });
-  }
-  return percent;
-}
-
-function resolveCanarySelection(percent: number | null, willModify: readonly string[]) {
-  const selectedUniverse = [...new Set(willModify.map((entry) => normalizeRepositoryRelativePath(entry)))].sort((left, right) => left.localeCompare(right));
-  if (percent === null) {
-    return {
-      enabled: false,
-      percent: null,
-      selectedFiles: selectedUniverse,
-      deferredFiles: []
-    };
-  }
-  const selectedCount = selectedUniverse.length === 0 ? 0 : Math.max(1, Math.ceil(selectedUniverse.length * percent / 100));
-  return {
-    enabled: true,
-    percent,
-    selectedFiles: selectedUniverse.slice(0, selectedCount),
-    deferredFiles: selectedUniverse.slice(selectedCount)
-  };
-}
-
-function shouldApplyUpgradeFile(canary: ReturnType<typeof resolveCanarySelection>, filePath: string) {
-  if (!canary.enabled) return true;
-  return canary.selectedFiles.includes(normalizeRepositoryRelativePath(filePath));
 }
 
 function collectSafeUpgradeFiles(cwd: string) {
