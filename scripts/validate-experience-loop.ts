@@ -10,6 +10,7 @@ import {
   createSkillAmendmentProposal,
   defaultExperienceLoopThresholds,
   extractSkillCandidate,
+  type ExperienceExtractionInput,
   pluginExperienceLoopPackage,
   registerExperienceLoopBehaviors
 } from '../packages/plugin-experience-loop/src/index.ts';
@@ -46,7 +47,8 @@ const validateReviewAdvisory = ajv.compile(readJson('schemas/review-advisory/rev
 assert(pluginExperienceLoopPackage.packageName === '@ai-atomic-framework/plugin-experience-loop', 'package descriptor name mismatch');
 assert(defaultExperienceLoopThresholds.extractSkillConfidenceThreshold === 0.6, 'default extraction threshold must stay conservative');
 
-const fixture = readJson('fixtures/experience-loop/task-evidence.json');
+const fixturePayload = readJson<Readonly<Record<string, unknown>>>('fixtures/experience-loop/task-evidence.json');
+const fixture = normalizeExperienceFixture(fixturePayload);
 const report = extractSkillCandidate(fixture);
 assert(report.ok === true, 'fixture skill candidate must cross threshold');
 assert(report.candidate.schemaVersion === 'atm.skillCandidate.v0.1', 'candidate schema version mismatch');
@@ -92,7 +94,7 @@ const behaviorOutput = await registry.executeGuarded({ repositoryRoot: root }, {
   atomId: 'ATM-EXP-0001',
   action: 'experience.extract-skill',
   requestedBy: 'experience-loop-validator',
-  payload: fixture
+  payload: fixturePayload
 });
 assert(behaviorOutput.ok === true, 'experience.extract-skill behavior must pass for fixture');
 assert(behaviorOutput.evidence[0]?.details?.proposalSnapshot, 'experience behavior evidence must include proposal snapshot');
@@ -141,3 +143,24 @@ assert(queuePayload.entries?.[0]?.proposal?.experienceKind === 'skill-candidate'
 assert(queuePayload.entries?.[0]?.proposal?.reviewRoute?.includes('plugin-human-review'), 'queue proposal must preserve human-review route');
 rmSync(outputRoot, { recursive: true, force: true });
 ok('candidate extraction, amendment proposal, memory nudge, and CLI smoke verified');
+
+function normalizeExperienceFixture(value: Readonly<Record<string, unknown>>): ExperienceExtractionInput {
+  const sourceTaskId = typeof value.sourceTaskId === 'string' ? value.sourceTaskId.trim() : '';
+  assert(sourceTaskId.length > 0, 'experience fixture sourceTaskId must be a non-empty string');
+  const evidence = Array.isArray(value.evidence) ? value.evidence : [];
+  assert(evidence.length > 0, 'experience fixture evidence must contain at least one entry');
+
+  return {
+    sourceTaskId,
+    evidence: evidence as ExperienceExtractionInput['evidence'],
+    contextSummary: typeof value.contextSummary === 'string' || (value.contextSummary !== null && typeof value.contextSummary === 'object')
+      ? value.contextSummary as ExperienceExtractionInput['contextSummary']
+      : undefined,
+    diffSummary: typeof value.diffSummary === 'string' ? value.diffSummary : undefined,
+    proposedName: typeof value.proposedName === 'string' ? value.proposedName : undefined,
+    proposedApplyTo: Array.isArray(value.proposedApplyTo)
+      ? value.proposedApplyTo.map((entry) => String(entry))
+      : undefined,
+    now: typeof value.now === 'string' ? value.now : undefined
+  };
+}
