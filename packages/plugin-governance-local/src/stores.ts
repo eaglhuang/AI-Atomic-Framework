@@ -1,4 +1,4 @@
-import { closeSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, unlinkSync, writeFileSync, writeSync } from 'node:fs';
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, writeFileSync, writeSync } from 'node:fs';
 import path from 'node:path';
 import type {
   ArtifactRecord,
@@ -147,11 +147,29 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
       return existsSync(filePath) ? readJsonFile(filePath) as ScopeLockRecord : null;
     },
-    releaseLock(workItemId) {
+    releaseLock(workItemId, actor) {
       const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
-      if (existsSync(filePath)) {
-        unlinkSync(filePath);
-      }
+      const timestamp = now();
+      const current = existsSync(filePath)
+        ? readJsonFile(filePath) as Record<string, unknown>
+        : {
+          schemaId: 'atm.governanceScopeLock',
+          specVersion: '0.1.0',
+          migration: {
+            strategy: 'none',
+            fromVersion: null,
+            notes: 'Scope lock release marker.'
+          },
+          workItemId
+        };
+      writeJsonFile(filePath, {
+        ...current,
+        workItemId,
+        released: true,
+        status: 'released',
+        releasedAt: timestamp,
+        releasedBy: actor
+      });
       return capabilityResult(`Released scope lock for ${workItemId}.`);
     }
   };

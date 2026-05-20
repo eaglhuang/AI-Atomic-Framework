@@ -36,7 +36,7 @@ export const defaultGuardCatalog = Object.freeze<readonly DefaultGuardRecord[]>(
   },
   {
     id: 'framework-work-tracking-stays-downstream',
-    summary: 'Do not keep coordinating implementation task cards or project planning queues inside the framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.'
+    summary: 'Do not create or keep coordinating implementation task cards or project planning queues inside the framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.'
   },
   {
     id: 'public-framework-docs-remain-english-only',

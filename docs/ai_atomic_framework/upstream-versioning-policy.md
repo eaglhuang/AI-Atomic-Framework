@@ -15,6 +15,28 @@ This policy is the upstream framework contract for release versioning, compatibi
 
 When these layers disagree, release validation must fail until the machine-readable and written contracts are aligned.
 
+## 1.5 Open Source Release Train
+
+ATM uses standard SemVer and a fixed framework release train for official public packages during the early open-source phase. Do not encode subsystem meaning into version numbers; package group, public API impact, core impact, migration risk, and release-note requirements are recorded as release impact metadata.
+
+The detailed policy lives in:
+
+- `docs/ai_atomic_framework/open-source-versioning-policy.md`
+- `docs/ai_atomic_framework/contributor-release-impact.md`
+- `docs/ai_atomic_framework/release-version-upgrade-rules.md`
+- `docs/ai_atomic_framework/release_version_flow/OPEN_SOURCE_VERSIONING_POLICY.md`
+
+Required release intent metadata:
+
+```yaml
+package_group: core | cli | plugin-sdk | adapter | agent-pack | docs | tooling | example
+public_api: true | false
+release_impact: none | patch | minor | major
+core_impact: none | patch | minor | major
+requires_migration: true | false
+requires_release_note: true | false
+```
+
 ## 2. Release Tiers
 
 | Tier | Version shape | Compatibility promise |

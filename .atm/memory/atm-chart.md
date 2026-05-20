@@ -15,7 +15,7 @@ source_schema_sha256s: {"governance/default-guards":"sha256:8d3a6d2b99a51890653a
 - `lock-before-edit`: Create or respect a scope lock before editing files outside the bootstrap pack.
 - `evidence-after-change`: Record validation evidence and a short context summary before declaring the task done.
 - `protect-context-budget`: When estimated context load exceeds the repository policy, summarize or offload before continuing.
-- `framework-work-tracking-stays-downstream`: Do not keep coordinating implementation task cards or project planning queues inside the framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.
+- `framework-work-tracking-stays-downstream`: Do not create or keep coordinating implementation task cards or project planning queues inside the framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.
 - `public-framework-docs-remain-english-only`: Keep contributor-facing framework documentation English-only and repository-neutral; move non-English notes or local planning guidance to the coordinating host workspace.
 
 ## Source of Truth

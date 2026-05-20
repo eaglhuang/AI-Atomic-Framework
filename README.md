@@ -184,7 +184,7 @@ ATM is organized around contracts first. Implementations may vary, but the seman
 This repository keeps the public framework contract, not the coordinating project workspace.
 
 - Public contributor-facing framework documentation stays English-only.
-- Coordinating implementation task cards, planning queues, and downstream operating notes stay in the host workspace, not in this framework repository.
+- Do not create or keep coordinating implementation task cards, planning queues, or downstream operating notes inside this framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.
 - Downstream experiments may feed evidence upstream only after they have been converted into neutral framework artifacts such as docs, schemas, fixtures, validators, adapters, or plugins.
 
 The Default Governance Bundle is the official default experience, but it is not a `packages/core` hard dependency. Core defines contracts; the default bundle is a reference implementation of those contracts.

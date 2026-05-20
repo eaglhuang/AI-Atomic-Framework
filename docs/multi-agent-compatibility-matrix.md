@@ -4,15 +4,15 @@
 
 This matrix is generated from built-in agent-pack metadata and advisory confidence profiles. It exists to prevent drift between the installed pack registry, the public compatibility table, and the multi-agent confidence workflow.
 
-Source metadata SHA-256: `bc7f106fa3921f5cffa3bdc172b650e71d0da8188f9974690feae306681e979e`
+Source metadata SHA-256: `cefdde98ea75222a18e6836b5813c150fac0b35aafd68672c645181900d4f078`
 
 ## Agent Pack Registry Matrix
 
 | Agent | Pack ID | Agent Target | Managed Target Roots | File Formats | Managed Files | First Command | Source Hash |
 | --- | --- | --- | --- | --- | ---: | --- | --- |
 | Claude Code | `claude-code` | `claude-code` | `.claude/commands` | Markdown | 6 | `node atm.mjs next --json` | `1d4354afc8e888fd` |
-| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 8 | `node atm.mjs next --json` | `8a3ece6ba14656cf` |
-| GitHub Copilot Agent | `copilot` | `copilot` | `.github`, `.github/instructions`, `.github/prompts` | Markdown | 17 | `node atm.mjs next --json` | `413dc27990f4b9f8` |
+| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 8 | `node atm.mjs next --json` | `8f9e9168ffff4bf2` |
+| GitHub Copilot Agent | `copilot` | `copilot` | `.github`, `.github/instructions`, `.github/prompts` | Markdown | 17 | `node atm.mjs next --json` | `a461b1f280321c43` |
 | Gemini | `gemini` | `gemini` | `.gemini/commands` | TOML | 8 | `node atm.mjs next --json` | `cf1d6b06d4daf94e` |
 | Windsurf | `windsurf` | `windsurf` | `.windsurf/workflows` | Markdown | 8 | `node atm.mjs next --json` | `bd8098e0d5b96d67` |
 

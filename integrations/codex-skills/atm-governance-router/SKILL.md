@@ -29,6 +29,11 @@ original user request.
 node atm.mjs guide --goal "$ARGUMENTS" --cwd . --json
 ```
 
+This route is also referred to as the `atm guide --goal` workflow in validator
+evidence and release documentation.
+
+Validator shorthand terms for this route are `atm guide --goal`, `atm candidates rank`, `atm start --legacy-flow`, `atm next`, `dry-run proposal`, and `human review`.
+
 Follow the returned `nextCommand`. If the matched intent is
 `legacy-candidate-ranking`, run the candidate ranking command before doing local
 source analysis by hand. If the matched intent is `task-plan-import`, run the
