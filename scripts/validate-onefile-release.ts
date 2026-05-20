@@ -79,6 +79,19 @@ function writeGitHeadEvidence(cwd: any) {
   }, null, 2)}\n`, 'utf8');
 }
 
+function writeAdopterBackfillFixture(cwd: any) {
+  const lineageLogPath = path.join(cwd, 'atomic_workbench', 'maps', 'ATM-MAP-0001', 'lineage-log.json');
+  mkdirSync(path.dirname(lineageLogPath), { recursive: true });
+  writeFileSync(path.join(cwd, 'atomic-registry-backfill.json'), `${JSON.stringify(adopterLineageFixture.missingLineageRegistryDocument, null, 2)}\n`, 'utf8');
+  writeFileSync(lineageLogPath, `${JSON.stringify({
+    schemaId: 'atm.mapLineageLog',
+    specVersion: '0.1.0',
+    canonicalMapId: 'ATM-MAP-0001',
+    generatedAt: '2026-05-20T00:00:00.000Z',
+    versionLineage: adopterLineageFixture.registryDocument.entries[0].members[0].versionLineage
+  }, null, 2)}\n`, 'utf8');
+}
+
 const tempRoot = createTempWorkspace('atm-onefile-release-');
 try {
   const rootDrop = buildRootDropRelease({
@@ -161,6 +174,31 @@ try {
   assert(registryDiff.parsed.ok === true, 'onefile registry-diff must report ok=true');
   assert(registryDiff.parsed.evidence?.sourceKind === 'member-version-lineage', 'onefile registry-diff must resolve via member lineage');
   assert(registryDiff.parsed.evidence?.report?.driftSummary?.totalChanged === 3, 'onefile registry-diff must preserve the diff report');
+
+  writeAdopterBackfillFixture(registrySmokeRepo);
+  const registryBackfill = runOnefile(path.join(registrySmokeRepo, 'atm.mjs'), registrySmokeRepo, [
+    'registry',
+    'lineage',
+    'backfill',
+    '--atom',
+    adopterLineageFixture.atomId,
+    '--from',
+    adopterLineageFixture.fromVersion,
+    '--to',
+    adopterLineageFixture.toVersion,
+    '--map',
+    'ATM-MAP-0001',
+    '--registry',
+    'atomic-registry-backfill.json',
+    '--lineage-log',
+    'atomic_workbench/maps/ATM-MAP-0001/lineage-log.json',
+    '--dry-run',
+    '--json'
+  ]);
+  assert(registryBackfill.exitCode === 0, 'onefile registry lineage backfill dry-run must exit 0');
+  assert(registryBackfill.parsed.ok === true, 'onefile registry lineage backfill dry-run must report ok=true');
+  assert(registryBackfill.parsed.evidence?.patch?.registry?.operations?.[0]?.op === 'add', 'onefile registry lineage backfill must emit an add patch');
+  assert(registryBackfill.parsed.evidence?.registryDiff?.driftSummary?.totalChanged === 3, 'onefile registry lineage backfill must trigger registry-diff output');
 
   const installSkill = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['guide', 'install-skill', '--cwd', '.', '--target', 'host', '--json']);
   assert(installSkill.exitCode === 0, 'onefile guide install-skill must exit 0');

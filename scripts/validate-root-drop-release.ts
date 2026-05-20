@@ -10,6 +10,7 @@ const governanceRouterSkillRelativePath = path.join('integrations', 'codex-skill
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+const adopterLineageFixture = JSON.parse(readFileSync(path.join(root, 'tests/registry-fixtures/adopter-lineage.fixture.json'), 'utf8'));
 
 function fail(message: any) {
   console.error(`[root-drop-release:${mode}] ${message}`);
@@ -77,6 +78,19 @@ function writeGitHeadEvidence(cwd: any) {
   }, null, 2)}\n`, 'utf8');
 }
 
+function writeAdopterBackfillFixture(cwd: any) {
+  const lineageLogPath = path.join(cwd, 'atomic_workbench', 'maps', 'ATM-MAP-0001', 'lineage-log.json');
+  mkdirSync(path.dirname(lineageLogPath), { recursive: true });
+  writeFileSync(path.join(cwd, 'atomic-registry.json'), `${JSON.stringify(adopterLineageFixture.missingLineageRegistryDocument, null, 2)}\n`, 'utf8');
+  writeFileSync(lineageLogPath, `${JSON.stringify({
+    schemaId: 'atm.mapLineageLog',
+    specVersion: '0.1.0',
+    canonicalMapId: 'ATM-MAP-0001',
+    generatedAt: '2026-05-20T00:00:00.000Z',
+    versionLineage: adopterLineageFixture.registryDocument.entries[0].members[0].versionLineage
+  }, null, 2)}\n`, 'utf8');
+}
+
 const tempRoot = createTempWorkspace('atm-root-drop-release-');
 try {
   const release = buildRootDropRelease({
@@ -102,6 +116,35 @@ try {
   const bundleSelfHost = runAtm(bundleRepo, ['self-host-alpha', '--verify', '--json']);
   assert(bundleSelfHost.exitCode === 0, 'release bundle self-host-alpha must exit 0');
   assert(bundleSelfHost.parsed.ok === true, 'release bundle self-host-alpha must report ok=true');
+
+  const registrySmokeRepo = path.join(tempRoot, 'registry-backfill-smoke');
+  mkdirSync(registrySmokeRepo, { recursive: true });
+  cpSync(release.releaseRoot, registrySmokeRepo, { recursive: true });
+  initializeGitRepository(registrySmokeRepo);
+  writeAdopterBackfillFixture(registrySmokeRepo);
+  const registryBackfill = runAtm(registrySmokeRepo, [
+    'registry',
+    'lineage',
+    'backfill',
+    '--atom',
+    adopterLineageFixture.atomId,
+    '--from',
+    adopterLineageFixture.fromVersion,
+    '--to',
+    adopterLineageFixture.toVersion,
+    '--map',
+    'ATM-MAP-0001',
+    '--registry',
+    'atomic-registry.json',
+    '--lineage-log',
+    'atomic_workbench/maps/ATM-MAP-0001/lineage-log.json',
+    '--dry-run',
+    '--json'
+  ]);
+  assert(registryBackfill.exitCode === 0, 'root-drop registry lineage backfill dry-run must exit 0');
+  assert(registryBackfill.parsed.ok === true, 'root-drop registry lineage backfill dry-run must report ok=true');
+  assert(registryBackfill.parsed.evidence?.patch?.registry?.operations?.[0]?.op === 'add', 'root-drop registry lineage backfill must emit an add patch');
+  assert(registryBackfill.parsed.evidence?.registryDiff?.driftSummary?.totalChanged === 3, 'root-drop registry lineage backfill must trigger registry-diff output');
 
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
