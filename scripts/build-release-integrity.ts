@@ -6,8 +6,8 @@
  * CI after the build step and before `npm publish`.
  *
  * Usage:
- *   node --experimental-strip-types scripts/build-release-integrity.ts
- *   node --experimental-strip-types scripts/build-release-integrity.ts --dry-run
+ *   node --strip-types scripts/build-release-integrity.ts
+ *   node --strip-types scripts/build-release-integrity.ts --dry-run
  */
 
 import { createHash } from 'node:crypto';

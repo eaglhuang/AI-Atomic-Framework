@@ -28,7 +28,7 @@ try {
 console.log('[skew-matrix:test] ok (summary artefact + incompatible combo failure)');
 
 function runValidator(args: readonly string[]) {
-  const result = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'scripts', 'validate-skew-matrix.ts'), ...args], {
+  const result = spawnSync(process.execPath, ['--strip-types', path.join(root, 'scripts', 'validate-skew-matrix.ts'), ...args], {
     cwd: root,
     encoding: 'utf8'
   });

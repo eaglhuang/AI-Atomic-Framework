@@ -136,7 +136,7 @@ for (const relativePath of [
   assert(existsSync(path.join(root, relativePath)), `missing conversation learning loop example file: ${relativePath}`);
 }
 
-const conversationLearningResult = run(process.execPath, ['--experimental-strip-types', conversationLearningLoopExample.runner]);
+const conversationLearningResult = run(process.execPath, ['--strip-types', conversationLearningLoopExample.runner]);
 assert(
   (conversationLearningResult.stdout || '').includes(conversationLearningLoopExample.expectedOutput),
   'conversation learning loop example output missing expected smoke marker'
@@ -151,7 +151,7 @@ for (const relativePath of [
 }
 
 const agentOnboardingStartedAt = Date.now();
-const agentOnboardingResult = run(process.execPath, ['--experimental-strip-types', agentOnboardingFlowExample.runner]);
+const agentOnboardingResult = run(process.execPath, ['--strip-types', agentOnboardingFlowExample.runner]);
 assert(Date.now() - agentOnboardingStartedAt < 300000, 'agent onboarding flow example must finish within five minutes');
 assert(
   (agentOnboardingResult.stdout || '').includes(agentOnboardingFlowExample.expectedOutput),
@@ -178,7 +178,7 @@ for (const expectedCommand of [
   'npm install',
   'npm run packages:list',
   'npm run validate:examples',
-  'node --experimental-strip-types examples/agent-onboarding-flow/run.ts',
+  'node --strip-types examples/agent-onboarding-flow/run.ts',
   'npm --workspace @ai-atomic-framework/example-hello-world test',
   'npm --workspace @ai-atomic-framework/example-legacy-strangler-minimal test'
 ]) {

@@ -89,7 +89,7 @@ const validatorEntry = validatorsConfig.validators?.find((entry: any) => entry?.
 assert(validatorEntry?.entry === 'scripts/validate-meta-schema.ts', 'META_SCHEMA_VALIDATOR_ENTRY_MISSING', 'validators.config.json must register scripts/validate-meta-schema.ts');
 
 if (!process.exitCode && mode !== 'test') {
-  const testResult = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'tests/meta-schema/meta-schema.test.ts')], {
+  const testResult = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/meta-schema/meta-schema.test.ts')], {
     cwd: root,
     encoding: 'utf8'
   });

@@ -19,8 +19,8 @@
     "@ai-atomic-framework/integrations-core": "0.1.0"
   },
   "scripts": {
-    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/integration-gemini",
-    "test": "node --experimental-strip-types ../../scripts/validate-integration-adapter.ts --mode test --filter gemini",
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/integration-gemini",
+    "test": "node --strip-types ../../scripts/validate-integration-adapter.ts --mode test --filter gemini",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },

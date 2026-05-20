@@ -192,7 +192,7 @@ function checkMatrix(): void {
   const expected = renderAgentMatrixMarkdown();
   const actual = existsSync(outputPath) ? readFileSync(outputPath, 'utf8') : '';
   if (actual !== expected) {
-    console.error(`[agent-matrix] ${agentMatrixOutputPath} is stale. Run: node --experimental-strip-types scripts/render-agent-matrix.ts`);
+    console.error(`[agent-matrix] ${agentMatrixOutputPath} is stale. Run: node --strip-types scripts/render-agent-matrix.ts`);
     process.exitCode = 1;
     return;
   }

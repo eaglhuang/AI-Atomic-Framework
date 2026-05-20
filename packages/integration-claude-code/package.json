@@ -19,8 +19,8 @@
     "@ai-atomic-framework/integrations-core": "0.1.0"
   },
   "scripts": {
-    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/integration-claude-code",
-    "test": "node --experimental-strip-types ../../scripts/validate-integration-adapter.ts --mode test --filter claude-code",
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/integration-claude-code",
+    "test": "node --strip-types ../../scripts/validate-integration-adapter.ts --mode test --filter claude-code",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },

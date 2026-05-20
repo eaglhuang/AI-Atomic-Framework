@@ -65,7 +65,7 @@ assert.match(wrongRange.output, /POLICY_FRAMEWORK_RANGE_VALUE_INVALID/, 'TC-6: w
 console.log('[policy-self-version-test] ok');
 
 function runNode(args: readonly string[]) {
-  const result = spawnSync(process.execPath, ['--experimental-strip-types', ...args.map((arg, index) => index === 0 ? path.join(root, arg) : arg)], {
+  const result = spawnSync(process.execPath, ['--strip-types', ...args.map((arg, index) => index === 0 ? path.join(root, arg) : arg)], {
     cwd: root,
     encoding: 'utf8'
   });

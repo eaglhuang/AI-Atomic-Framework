@@ -219,7 +219,7 @@ function runSmokeCase(input: SkewConfig, entry: SkewCase): SkewSummaryCase {
 
 function runCheck(name: string, args: string[]) {
   const [scriptPath, ...scriptArgs] = args;
-  const result = spawnSync(process.execPath, ['--experimental-strip-types', scriptPath, ...scriptArgs], {
+  const result = spawnSync(process.execPath, ['--strip-types', scriptPath, ...scriptArgs], {
     cwd: root,
     encoding: 'utf8'
   });
@@ -234,7 +234,7 @@ function runCheck(name: string, args: string[]) {
 }
 
 function runDoctorCheck() {
-  const result = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'atm.mjs'), 'doctor', '--json'], {
+  const result = spawnSync(process.execPath, ['--strip-types', path.join(root, 'atm.mjs'), 'doctor', '--json'], {
     cwd: root,
     encoding: 'utf8'
   });

@@ -16,13 +16,13 @@
     "src"
   ],
   "scripts": {
-    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/agent-pack-sdk",
-    "test": "node --experimental-strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/agent-pack-sdk",
+    "test": "node --strip-types ../../scripts/validate-package-skeleton.ts --mode test",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },
-  "dependencies": {
+  "types": "./dist/index.d.ts",
+  "devDependencies": {
     "typescript": "^5.9.3"
-  },
-  "types": "./dist/index.d.ts"
+  }
 }

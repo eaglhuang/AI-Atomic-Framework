@@ -15,7 +15,7 @@
  *      (schemaVersion / version / artefacts[] / sha256 format).
  *
  * Usage:
- *   node --experimental-strip-types scripts/validate-release-trust.ts --mode validate
+ *   node --strip-types scripts/validate-release-trust.ts --mode validate
  */
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -141,7 +141,7 @@ if (existsSync(manifestPath)) {
 // ---------------------------------------------------------------------------
 
 if (!process.exitCode) {
-  const testResult = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'tests', 'release', 'release-trust.test.ts')], {
+  const testResult = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests', 'release', 'release-trust.test.ts')], {
     cwd: root,
     encoding: 'utf8'
   });

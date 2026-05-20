@@ -158,7 +158,7 @@ async function runValidatorsSequential(validators: any, mode: any, options: any)
 function runValidator(validator: any, mode: any, options: any): Promise<any> {
   return new Promise<any>((resolve) => {
     const startedAt = Date.now();
-    const child = spawn(process.execPath, ['--experimental-strip-types', path.join(root, validator.entry), '--mode', mode], {
+    const child = spawn(process.execPath, ['--strip-types', path.join(root, validator.entry), '--mode', mode], {
       cwd: root,
       stdio: ['ignore', 'pipe', 'pipe']
     });

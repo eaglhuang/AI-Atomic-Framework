@@ -18,7 +18,7 @@ const current = readInstallManifestSchemaVersion(currentManifest);
 assert.equal(current.schemaVersion, installManifestSchemaVersion);
 assert.equal(current.warnings.length, 0);
 
-const validator = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'scripts/validate-meta-schema.ts'), '--mode', 'test'], {
+const validator = spawnSync(process.execPath, ['--strip-types', path.join(root, 'scripts/validate-meta-schema.ts'), '--mode', 'test'], {
   cwd: root,
   encoding: 'utf8'
 });

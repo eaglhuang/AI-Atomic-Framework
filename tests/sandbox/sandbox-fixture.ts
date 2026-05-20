@@ -130,7 +130,7 @@ function verifySandbox(sandboxRoot: any, expectedPath: any) {
   }
 
   const result = spawnSync(process.execPath, [
-    ...(selectedEntrypoint.useStripTypes ? ['--experimental-strip-types'] : []),
+    ...(selectedEntrypoint.useStripTypes ? ['--strip-types'] : []),
     selectedEntrypoint.path,
     'self-host-alpha',
     '--verify',

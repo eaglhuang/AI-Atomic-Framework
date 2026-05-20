@@ -20,8 +20,8 @@
     "@ai-atomic-framework/plugin-sdk": "0.1.0"
   },
   "scripts": {
-    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/plugin-behavior-pack",
-    "test": "node --experimental-strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/plugin-behavior-pack",
+    "test": "node --strip-types ../../scripts/validate-package-skeleton.ts --mode test",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   }

@@ -70,7 +70,7 @@ const validatorEntry = validatorsConfig.validators?.find((entry: any) => entry?.
 assert(validatorEntry?.entry === 'scripts/validate-deprecation-policy.ts', 'DEPRECATION_VALIDATOR_ENTRY_MISSING', 'validators.config.json must register scripts/validate-deprecation-policy.ts');
 
 if (!process.exitCode && mode !== 'test' && !fixturePath) {
-  const testResult = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'tests/deprecation/deprecation-policy.test.ts')], {
+  const testResult = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/deprecation/deprecation-policy.test.ts')], {
     cwd: root,
     encoding: 'utf8'
   });

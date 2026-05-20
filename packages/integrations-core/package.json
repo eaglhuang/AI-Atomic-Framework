@@ -16,8 +16,8 @@
     "src"
   ],
   "scripts": {
-    "build": "node --experimental-strip-types ../../scripts/build-package-dist.ts --package packages/integrations-core",
-    "test": "node --experimental-strip-types ../../scripts/validate-integration-adapter.ts --mode test",
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/integrations-core",
+    "test": "node --strip-types ../../scripts/validate-integration-adapter.ts --mode test",
     "typecheck": "tsc -p ../../tsconfig.json --noEmit",
     "lint": "eslint ."
   },

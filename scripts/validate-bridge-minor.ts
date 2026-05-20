@@ -85,7 +85,7 @@ const validatorEntry = validatorsConfig.validators?.find((entry: any) => entry?.
 assert(validatorEntry?.entry === 'scripts/validate-bridge-minor.ts', 'BRIDGE_MINOR_VALIDATOR_ENTRY_MISSING', 'validators.config.json must register scripts/validate-bridge-minor.ts');
 
 if (!process.exitCode && mode !== 'test') {
-  const testResult = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'tests/bridge-minor/bridge-minor.test.ts')], {
+  const testResult = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/bridge-minor/bridge-minor.test.ts')], {
     cwd: root,
     encoding: 'utf8'
   });

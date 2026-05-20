@@ -16,7 +16,7 @@ assert.notEqual(resolveNpmDistTag('1.2.3-beta.0').distTag, 'latest');
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-create-tag-'));
 const createResult = spawnSync(process.execPath, [
-  '--experimental-strip-types',
+  '--strip-types',
   path.join(root, 'packages', 'create-atm', 'src', 'index.ts'),
   'tag-next-fixture',
   '--cwd', tempRoot,

@@ -36,11 +36,11 @@ const reportText = `${JSON.stringify(report, null, 2)}\n`;
 if (writeReport) {
   writeFileSync(reportPath, reportText, 'utf8');
 } else if (!existsSync(reportPath)) {
-  fail('generator provenance audit report is missing; run node --experimental-strip-types scripts/validate-generator-provenance.ts --write');
+  fail('generator provenance audit report is missing; run node --strip-types scripts/validate-generator-provenance.ts --write');
 } else {
   const currentReportText = readFileSync(reportPath, 'utf8');
   if (currentReportText !== reportText) {
-    fail('generator provenance audit report is stale; run node --experimental-strip-types scripts/validate-generator-provenance.ts --write');
+    fail('generator provenance audit report is stale; run node --strip-types scripts/validate-generator-provenance.ts --write');
   }
 }
 

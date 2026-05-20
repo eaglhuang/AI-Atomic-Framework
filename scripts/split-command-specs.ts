@@ -7,7 +7,7 @@
  * 把 38 個 defineCommandSpec(...) 逐一拆到各自的 .spec.ts 檔案，
  * 並重新生成精簡版的 command-specs.ts（import + assemble + accessors）。
  *
- * 用法：node --experimental-strip-types scripts/split-command-specs.ts
+ * 用法：node --strip-types scripts/split-command-specs.ts
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';

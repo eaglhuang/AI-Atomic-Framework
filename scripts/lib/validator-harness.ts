@@ -131,7 +131,7 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
   ): { exitCode: number; payload: string; launcher: 'atm.mjs' | 'source-cli' } {
     const commandArgs = launcher === 'atm.mjs'
       ? [repoPath('atm.mjs'), ...args]
-      : ['--experimental-strip-types', repoPath('packages', 'cli', 'src', 'atm.ts'), ...args];
+      : ['--strip-types', repoPath('packages', 'cli', 'src', 'atm.ts'), ...args];
     const result = spawnSync(process.execPath, commandArgs, {
       cwd,
       encoding: 'utf8'

@@ -50,7 +50,7 @@ const validatorEntry = validatorsConfig.validators?.find((entry: any) => entry?.
 assert(validatorEntry?.entry === 'scripts/validate-policy-self-version.ts', 'POLICY_VALIDATOR_ENTRY_MISSING', 'validators.config.json must register scripts/validate-policy-self-version.ts');
 
 if (!process.exitCode && mode !== 'test' && !readArg('--policy')) {
-  const testResult = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'tests/policy-version/policy-self-version.test.ts')], {
+  const testResult = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests/policy-version/policy-self-version.test.ts')], {
     cwd: root,
     encoding: 'utf8'
   });

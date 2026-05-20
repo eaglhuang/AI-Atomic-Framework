@@ -87,7 +87,7 @@ try {
 console.log('[deprecation-policy-test] ok');
 
 function runNode(args: readonly string[]) {
-  const result = spawnSync(process.execPath, ['--experimental-strip-types', ...args.map((arg, index) => index === 0 ? path.join(root, arg) : arg)], {
+  const result = spawnSync(process.execPath, ['--strip-types', ...args.map((arg, index) => index === 0 ? path.join(root, arg) : arg)], {
     cwd: root,
     encoding: 'utf8'
   });

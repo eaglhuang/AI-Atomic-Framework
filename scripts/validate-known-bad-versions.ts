@@ -55,7 +55,7 @@ if (!process.exitCode) {
   const testPath = path.join(root, 'tests', 'known-bad', 'known-bad-version.test.ts');
   assert(existsSync(testPath), 'KNOWN_BAD_TEST_MISSING', 'tests/known-bad/known-bad-version.test.ts must exist');
   if (existsSync(testPath)) {
-    const testResult = spawnSync(process.execPath, ['--experimental-strip-types', testPath], {
+    const testResult = spawnSync(process.execPath, ['--strip-types', testPath], {
       cwd: root,
       encoding: 'utf8'
     });

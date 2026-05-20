@@ -21,7 +21,7 @@ assert.equal(allowed.exitCode, 0, allowed.output);
 assert.equal(allowed.parsed.evidence.experimental.accepted, true);
 assert.equal(allowed.parsed.evidence.experimental.stability, 'experimental');
 
-const validator = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'scripts/validate-bridge-minor.ts'), '--mode', 'test'], {
+const validator = spawnSync(process.execPath, ['--strip-types', path.join(root, 'scripts/validate-bridge-minor.ts'), '--mode', 'test'], {
   cwd: root,
   encoding: 'utf8'
 });

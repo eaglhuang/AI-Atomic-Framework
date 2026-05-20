@@ -92,7 +92,7 @@ function validateDistTagPolicy() {
   validateStandardProfile(JSON.parse(readText('scripts/validators.config.json')));
 
   if (!process.exitCode) {
-    const testResult = spawnSync(process.execPath, ['--experimental-strip-types', path.join(root, 'tests', 'dist-tag', 'dist-tag-policy.test.ts')], {
+    const testResult = spawnSync(process.execPath, ['--strip-types', path.join(root, 'tests', 'dist-tag', 'dist-tag-policy.test.ts')], {
       cwd: root,
       encoding: 'utf8'
     });
