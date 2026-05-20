@@ -143,6 +143,7 @@ export function isKnownBadReadOnlyCommand(commandName: string, commandArgs: read
   if (readOnlyCommands.has(commandName)) return true;
 
   const subcommand = commandArgs.find((arg) => !arg.startsWith('-'));
+  if (commandName === 'registry') return commandArgs.includes('--dry-run');
   if (commandName === 'migrate') return subcommand === 'plan' || subcommand === 'verify';
   if (commandName === 'upgrade') return subcommand === 'plan' || commandArgs.includes('--scan');
   if (commandName === 'integration') return subcommand === 'verify';

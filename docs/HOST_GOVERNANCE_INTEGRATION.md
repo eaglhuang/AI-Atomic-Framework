@@ -157,7 +157,10 @@ In practice, these patterns are the most useful:
 `atm registry-diff` can still help investigate a specific atom's version drift.
 For adopter-managed map members, it resolves `members[].versionLineage` when no
 standalone atom entry exists, and returns `ATM_DIFF_LINEAGE_MISSING` if that
-lineage contract has not been backfilled yet.
+lineage contract has not been backfilled yet. Hosts should resolve that condition
+through `node atm.mjs registry lineage backfill`: use `--dry-run` for the
+deterministic patch preview, then `--apply` only with passing equivalence,
+propagation, review advisory, and approved human review evidence.
 
 ## Recommended Host Setup
 

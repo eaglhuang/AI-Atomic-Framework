@@ -50,6 +50,8 @@ The structural fields that define map semantics should be part of the map hash b
 
 When a map member is owned by an adopter and there is no standalone atom entry, `members[].versionLineage` becomes the source of truth for `registry-diff`. The lineage record must carry a `currentVersion` plus a full `versions[]` history backed by real adopter evidence. If a map member is found without that contract, `registry-diff` returns `ATM_DIFF_LINEAGE_MISSING` instead of pretending the atom never existed.
 
+The normal backfill path is the governed CLI command, not hand-editing registry JSON. Use `node atm.mjs registry lineage backfill --dry-run` to inspect the deterministic patch, then rerun with `--apply` plus passing map equivalence, propagation, review advisory, and approved human review evidence. Successful apply writes the member lineage, records a lineage-log backfill event, triggers `registry-diff`, and emits a closeout report under `.atm/history/reports/registry-lineage-backfill/`.
+
 ## Rollout Lane
 
 Replacement rollout state is separate from registry lifecycle state.
@@ -95,6 +97,8 @@ node atm.mjs replacement-lane transition --map <mapId> --to shadow --evidence at
 node atm.mjs test --map <mapId> --equivalence-fixtures <fixtures.json> --json
 node atm.mjs replacement-lane transition --map <mapId> --to canary --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --json
 node atm.mjs test --propagate <atomId> --json
+node atm.mjs registry lineage backfill --atom <atomId> --from <oldVersion> --to <newVersion> --map <mapId> --lineage-log atomic_workbench/maps/<mapId>/lineage-log.json --equivalence atomic_workbench/maps/<mapId>/map.equivalence.report.json --propagation .atm/history/reports/propagation-report.json --review .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --dry-run --json
+node atm.mjs registry lineage backfill --atom <atomId> --from <oldVersion> --to <newVersion> --map <mapId> --lineage-log atomic_workbench/maps/<mapId>/lineage-log.json --equivalence atomic_workbench/maps/<mapId>/map.equivalence.report.json --propagation .atm/history/reports/propagation-report.json --review .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --apply --json
 node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode active --equivalence-report atomic_workbench/maps/<mapId>/map.equivalence.report.json --polymorph-impact-report atomic_workbench/maps/<mapId>/polymorph-impact-report.json --propagation-report .atm/history/reports/propagation-report.json --review-advisory .atm/history/reports/review-advisory.json --human-review .atm/history/reports/human-review-approve.json --json
 node atm.mjs replacement-lane transition --map <mapId> --to active --evidence atomic_workbench/maps/<mapId>/map.equivalence.report.json --evidence .atm/history/reports/propagation-report.json --evidence .atm/history/reports/review-advisory.json --evidence .atm/history/reports/human-review-approve.json --json
 node atm.mjs upgrade --propose --target map --map <mapId> --replacement-mode legacy-retired --retirement-proof .atm/history/reports/retirement-proof.json --json

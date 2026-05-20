@@ -212,6 +212,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'registry',
+    summary: 'Backfill adopter-owned registry lineage from verified evidence',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'telemetry',
     summary: 'Manage opt-in ATM CLI telemetry for the current repository',
     implemented: true,

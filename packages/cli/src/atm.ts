@@ -33,6 +33,7 @@ import { runValidate } from './commands/validate.ts';
 import { runVerify } from './commands/verify.ts';
 import { runWelcome } from './commands/welcome.ts';
 import { runRegistryDiff } from './commands/registry-diff.ts';
+import { runRegistry } from './commands/registry.ts';
 import { runReplacementLane } from './commands/replacement-lane.ts';
 import { runRollback } from './commands/rollback.ts';
 import { runReview } from './commands/review.ts';
@@ -77,6 +78,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   validate: runValidate,
   verify: runVerify,
   welcome: runWelcome,
+  registry: runRegistry,
   'registry-diff': runRegistryDiff,
   'replacement-lane': runReplacementLane,
   rollback: runRollback,

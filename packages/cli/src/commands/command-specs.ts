@@ -39,6 +39,7 @@ import telemetrySpec from './command-specs/telemetry.spec.ts';
 import validateSpec from './command-specs/validate.spec.ts';
 import welcomeSpec from './command-specs/welcome.spec.ts';
 import verifySpec from './command-specs/verify.spec.ts';
+import registrySpec from './command-specs/registry.spec.ts';
 import registryDiffSpec from './command-specs/registry-diff.spec.ts';
 import replacementLaneSpec from './command-specs/replacement-lane.spec.ts';
 import rollbackSpec from './command-specs/rollback.spec.ts';
@@ -80,6 +81,7 @@ export const commandSpecs = Object.freeze({
   validate: validateSpec,
   welcome: welcomeSpec,
   verify: verifySpec,
+  registry: registrySpec,
   'registry-diff': registryDiffSpec,
   'replacement-lane': replacementLaneSpec,
   rollback: rollbackSpec,

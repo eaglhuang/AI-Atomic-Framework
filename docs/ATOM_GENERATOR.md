@@ -162,6 +162,8 @@ The current registry classifies entries as:
 
 Legacy maps follow the same rule after migration. The backfill path allocates a fresh canonical `ATM-MAP-{NNNN}` identifier, writes the canonical trio under `atomic_workbench/maps/<mapId>/`, preserves the old local map as archived lineage evidence, and marks the registry entry with `generator-provenance:backfilled`.
 
+This generator-provenance backfill is separate from adopter version-lineage backfill. When a migrated map member needs `members[].versionLineage` for `registry-diff`, use `node atm.mjs registry lineage backfill` with dry-run/apply evidence gates instead of editing the registry projection directly.
+
 The catalog shows this in its `provenance` column.
 
 ## Provenance Audit
