@@ -11,7 +11,7 @@
  */
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { CliError } from '../shared.ts';
 
 export function safeReadJson(filePath: string) {
@@ -45,4 +45,27 @@ export function normalizeRepositoryRelativePath(filePath: string) {
     throw new CliError('ATM_UPGRADE_UNSAFE_PATH', `Unsafe upgrade path: ${filePath}`, { exitCode: 2 });
   }
   return normalizedPath;
+}
+
+export function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+  const value = argv[optionIndex + 1];
+  if (!value || value.startsWith('--')) {
+    throw new CliError('ATM_CLI_USAGE', `upgrade requires a value for ${optionName}`, { exitCode: 2 });
+  }
+  return value;
+}
+
+export function collectJsonFiles(rootDir: any): string[] {
+  const entries = [];
+  for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
+    const entryPath = path.join(rootDir, entry.name);
+    if (entry.isDirectory()) {
+      entries.push(...collectJsonFiles(entryPath));
+      continue;
+    }
+    if (entry.isFile() && entry.name.endsWith('.json')) {
+      entries.push(entryPath);
+    }
+  }
+  return entries;
 }
