@@ -42,7 +42,7 @@ import { runMigrate } from './commands/migrate.ts';
 import { runAgentPack } from './commands/agent-pack.ts';
 import { runActor } from './commands/actor.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
-import { CliError, makeHelpResult, makeResult, message, writeResult } from './commands/shared.ts';
+import { CliError, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 
@@ -96,6 +96,11 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
 
   if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
     writeResult(createGlobalHelpResult(process.cwd()), io.stdout, outputFormat);
+    return 0;
+  }
+
+  if (commandName === '--version' || commandName === '-v') {
+    writeResult(createVersionResult(process.cwd()), io.stdout, outputFormat);
     return 0;
   }
 
@@ -221,6 +226,19 @@ function createGlobalHelpResult(cwd: any) {
     evidence: {
       commands,
       outputModes: ['json', 'pretty']
+    }
+  });
+}
+
+function createVersionResult(cwd: any) {
+  const version = readFrameworkVersion();
+  return makeResult({
+    ok: true,
+    command: 'version',
+    cwd,
+    messages: [message('info', 'ATM_CLI_VERSION', `ATM framework version ${version}.`)],
+    evidence: {
+      frameworkVersion: version
     }
   });
 }

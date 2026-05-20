@@ -83,6 +83,15 @@ for (const commandName of fixture.commands) {
   assert(cliIndex.includes(`commandName: '${commandName}'`), `index.ts missing command descriptor: ${commandName}`);
 }
 
+const packageManifest = readJson('package.json');
+const version = runAtm(['--version'], root);
+assert(version.exitCode === 0, '--version must exit 0');
+assertReadable(version, '--version');
+assert(version.parsed.ok === true, '--version must report ok=true');
+assert(version.parsed.command === 'version', '--version must report version command identity');
+assert(version.parsed.evidence?.frameworkVersion === packageManifest.version, '--version must report package.json version');
+assertMessageCode(version, 'ATM_CLI_VERSION');
+
 const globalHelp = runAtm(['--help'], root);
 assert(globalHelp.exitCode === 0, '--help must exit 0');
 assertReadable(globalHelp, '--help');

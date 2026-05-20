@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-05-20
+
+- Added root `node atm.mjs --version` support with a deterministic JSON result envelope and CLI validation coverage, keeping the README quick reference aligned with release artifacts.
+
 ## 2026-05-17
 
 - Closed replacement evidence gating for M10: added `atm.propagationReport` and `atm.retirementProof`, required propagation/review/human approval before `canary -> active`, and allowed `legacy-retired` promotion through rollback proof or caller/entrypoint-cleared retirement proof.
