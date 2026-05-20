@@ -44,8 +44,11 @@ A future `0.2.0` map schema is expected to add:
 - `replacement.legacyUris[]`
 - `replacement.mode`
 - `replacement.evidenceRefs[]`
+- `members[].versionLineage` for adopter-managed members that do not have a standalone atom registry entry
 
 The structural fields that define map semantics should be part of the map hash boundary. Operational rollout state and evidence references should remain outside the stable hash boundary so that evidence can accumulate without changing the map identity.
+
+When a map member is owned by an adopter and there is no standalone atom entry, `members[].versionLineage` becomes the source of truth for `registry-diff`. The lineage record must carry a `currentVersion` plus a full `versions[]` history backed by real adopter evidence. If a map member is found without that contract, `registry-diff` returns `ATM_DIFF_LINEAGE_MISSING` instead of pretending the atom never existed.
 
 ## Rollout Lane
 

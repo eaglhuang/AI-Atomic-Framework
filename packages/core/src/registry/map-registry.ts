@@ -34,7 +34,8 @@ export function createAtomicMapRegistryEntry(
     members: atomicMap.members.map((member) => ({
       atomId: String(member.atomId).trim(),
       version: String(member.version).trim(),
-      ...(member.role ? { role: String(member.role).trim() as typeof member.role } : {})
+      ...(member.role ? { role: String(member.role).trim() as typeof member.role } : {}),
+      ...(member.versionLineage ? { versionLineage: member.versionLineage } : {})
     })),
     edges: atomicMap.edges.map((edge) => ({
       from: String(edge.from).trim(),

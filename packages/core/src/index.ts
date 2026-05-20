@@ -273,6 +273,15 @@ export interface RegistryMapMemberRecord {
   readonly atomId: string;
   readonly version: string;
   readonly role?: 'entry-adapter' | 'domain-step' | 'validator' | 'side-effect' | 'rollback-adapter';
+  readonly versionLineage?: RegistryVersionLineageRecord;
+}
+
+export interface RegistryVersionLineageRecord {
+  readonly currentVersion: string;
+  readonly versions: readonly RegistryVersionRecord[];
+  readonly sourceRef?: string;
+  readonly advisory?: string;
+  readonly updatedAt?: string;
 }
 
 export interface RegistryMapEdgeRecord {

@@ -154,9 +154,10 @@ In practice, these patterns are the most useful:
 - `ATM_DOCTOR_GIT_EVIDENCE_MISSING` means the current applicable HEAD is not
   covered by ATM evidence.
 
-`atm registry-diff` can still help investigate a specific atom's version drift,
-but it is an atom-to-atom comparison tool, not a repository-wide bypass audit by
-itself.
+`atm registry-diff` can still help investigate a specific atom's version drift.
+For adopter-managed map members, it resolves `members[].versionLineage` when no
+standalone atom entry exists, and returns `ATM_DIFF_LINEAGE_MISSING` if that
+lineage contract has not been backfilled yet.
 
 ## Recommended Host Setup
 

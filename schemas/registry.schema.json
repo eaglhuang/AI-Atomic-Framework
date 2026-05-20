@@ -341,6 +341,38 @@
         },
         "role": {
           "enum": ["entry-adapter", "domain-step", "validator", "side-effect", "rollback-adapter"]
+        },
+        "versionLineage": {
+          "$ref": "#/$defs/versionLineage"
+        }
+      }
+    },
+    "versionLineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currentVersion", "versions"],
+      "properties": {
+        "currentVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "versions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/registryVersion"
+          }
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "advisory": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

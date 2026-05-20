@@ -1,21 +1,43 @@
-/**
- * ATM-2-0015: Hash Drift / Version Diff Report
- *
- * 比對 registry 中同一 atom 任兩個版本的 spec/code/test hash 差異，
- * 產出符合 hash-diff-report.schema.json 的報告。
- */
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 
-/**
- * 從 registry document 中找到指定 atomId 的 entry。
- * @param {object} registryDoc - 完整 registry JSON document
- * @param {string} atomId - 要查找的 Atomic ID
- * @returns {object|null} registry entry 或 null
- */
+export interface RegistryDiffResolvedEntry {
+  readonly atomId: string;
+  readonly versions: readonly any[];
+  readonly sourceKind: 'atom-entry' | 'member-version-lineage';
+  readonly sourceRef?: string;
+  readonly registryEntry?: any;
+  readonly memberIndex?: number;
+  readonly mapId?: string;
+}
+
+export interface RegistryDiffResolutionSuccess {
+  readonly ok: true;
+  readonly entry: RegistryDiffResolvedEntry;
+}
+
+export interface RegistryDiffResolutionFailure {
+  readonly ok: false;
+  readonly code: 'ATM_DIFF_ATOM_NOT_FOUND' | 'ATM_DIFF_LINEAGE_MISSING';
+  readonly summary: string;
+  readonly advisory: string;
+  readonly details: {
+    readonly atomId: string;
+    readonly candidateMapIds: readonly string[];
+    readonly candidateMemberPaths: readonly string[];
+    readonly requiredContract: {
+      readonly field: string;
+      readonly requiredProperties: readonly string[];
+      readonly note: string;
+    };
+  };
+}
+
+export type RegistryDiffResolution = RegistryDiffResolutionSuccess | RegistryDiffResolutionFailure;
+
 export function findRegistryEntry(registryDoc: any, atomId: any) {
   if (!registryDoc?.entries || !Array.isArray(registryDoc.entries)) {
     return null;
@@ -25,12 +47,6 @@ export function findRegistryEntry(registryDoc: any, atomId: any) {
   ) ?? null;
 }
 
-/**
- * 從 registry entry 的 versions[] 中取出指定版本的 hash 記錄。
- * @param {object} entry - registry entry（含 versions[]）
- * @param {string} version - 版本字串（如 "1.0.0"）
- * @returns {object|null} { version, specHash, codeHash, testHash, timestamp } 或 null
- */
 export function findVersionRecord(entry: any, version: any) {
   if (!entry?.versions || !Array.isArray(entry.versions)) {
     return null;
@@ -38,15 +54,93 @@ export function findVersionRecord(entry: any, version: any) {
   return entry.versions.find((v: any) => v.version === version) ?? null;
 }
 
-/**
- * 計算兩個版本之間的 hash diff report。
- * @param {object} options
- * @param {object} options.entry - registry entry（含 versions[]）
- * @param {string} options.fromVersion - 基線版本
- * @param {string} options.toVersion - 目標版本
- * @param {string} [options.driftReason] - 漂移原因說明
- * @returns {object} 符合 hash-diff-report.schema.json 的報告
- */
+export function resolveRegistryDiffTarget(registryDoc: any, atomId: any): RegistryDiffResolution {
+  const normalizedAtomId = String(atomId ?? '').trim();
+  const candidateMemberPaths: string[] = [];
+  const candidateMapIds: string[] = [];
+
+  if (!normalizedAtomId) {
+    return buildAtomNotFoundResolution('<empty>', candidateMapIds, candidateMemberPaths);
+  }
+
+  if (!registryDoc?.entries || !Array.isArray(registryDoc.entries)) {
+    return buildAtomNotFoundResolution(normalizedAtomId, candidateMapIds, candidateMemberPaths);
+  }
+
+  const atomEntry = findRegistryEntry(registryDoc, normalizedAtomId);
+  const atomEntryVersions = extractVersionHistory(atomEntry);
+  if (atomEntry && atomEntryVersions.length > 0) {
+    return {
+      ok: true,
+      entry: {
+        atomId: normalizedAtomId,
+        versions: atomEntryVersions,
+        sourceKind: 'atom-entry',
+        sourceRef: atomEntry.lineageLogRef ?? atomEntry.versionLineage?.sourceRef ?? undefined,
+        registryEntry: atomEntry
+      }
+    };
+  }
+
+  const atomEntryExistsWithoutHistory = Boolean(atomEntry);
+
+  for (const entry of registryDoc.entries) {
+    if (entry?.schemaId !== 'atm.atomicMap' || !Array.isArray(entry.members)) {
+      continue;
+    }
+
+    const memberIndex = entry.members.findIndex((member: any) => member?.atomId === normalizedAtomId);
+    if (memberIndex === -1) {
+      continue;
+    }
+
+    candidateMapIds.push(String(entry.mapId ?? entry.id ?? '').trim() || '<unknown>');
+    const member = entry.members[memberIndex];
+    const lineageVersions = extractVersionLineageVersions(member?.versionLineage);
+    if (lineageVersions.length > 0) {
+      return {
+        ok: true,
+        entry: {
+          atomId: normalizedAtomId,
+          versions: lineageVersions,
+          sourceKind: 'member-version-lineage',
+          sourceRef: member.versionLineage?.sourceRef ?? entry.lineageLogRef ?? undefined,
+          registryEntry: entry,
+          memberIndex,
+          mapId: entry.mapId ?? entry.id ?? undefined
+        }
+      };
+    }
+
+    candidateMemberPaths.push(buildMemberPath(entry.mapId ?? entry.id ?? '<unknown>', memberIndex));
+  }
+
+  if (candidateMemberPaths.length > 0 || candidateMapIds.length > 0) {
+    return buildLineageMissingResolution(normalizedAtomId, candidateMapIds, candidateMemberPaths);
+  }
+
+  if (atomEntryExistsWithoutHistory) {
+    return {
+      ok: false,
+      code: 'ATM_DIFF_LINEAGE_MISSING',
+      summary: `Atom ${normalizedAtomId} exists in the registry, but no version history was available.`,
+      advisory: `Backfill versions[] or member.versionLineage for ${normalizedAtomId} before running registry-diff.`,
+      details: {
+        atomId: normalizedAtomId,
+        candidateMapIds: [],
+        candidateMemberPaths: [],
+        requiredContract: {
+          field: 'members[].versionLineage',
+          requiredProperties: ['currentVersion', 'versions'],
+          note: 'Use real adopter lineage evidence; do not invent placeholder hash records.'
+        }
+      }
+    };
+  }
+
+  return buildAtomNotFoundResolution(normalizedAtomId, candidateMapIds, candidateMemberPaths);
+}
+
 export function computeHashDiffReport(options: any) {
   const { entry, fromVersion, toVersion, driftReason } = options;
   const atomId = entry.atomId ?? entry.id;
@@ -61,24 +155,17 @@ export function computeHashDiffReport(options: any) {
     throw new Error(`Version ${toVersion} not found in versions[] for ${atomId}`);
   }
 
-  // 計算三段 hash delta
   const specDelta = createHashDelta(fromRecord.specHash, toRecord.specHash);
   const codeDelta = createHashDelta(fromRecord.codeHash, toRecord.codeHash);
   const testDelta = createHashDelta(fromRecord.testHash, toRecord.testHash);
 
-  // 計算 drift summary
   const changedFields = [];
   if (specDelta.changed) changedFields.push('specHash');
   if (codeDelta.changed) changedFields.push('codeHash');
   if (testDelta.changed) changedFields.push('testHash');
 
-  // 計算 lineage continuity（所有中間版本是否存在）
   const lineageContinuity = checkLineageContinuity(entry, fromVersion, toVersion);
-
-  // 計算 semantic fingerprint delta（如果有的話）
   const sfDelta = computeSemanticFingerprintDelta(fromRecord, toRecord);
-
-  // 自動生成 driftReason（如果未提供）
   const resolvedDriftReason = driftReason ?? generateDefaultDriftReason(changedFields, fromVersion, toVersion);
 
   const report: any = {
@@ -100,7 +187,6 @@ export function computeHashDiffReport(options: any) {
     }
   };
 
-  // 附加 optional 欄位
   if (sfDelta) {
     report.semanticFingerprintDelta = sfDelta;
   }
@@ -110,9 +196,102 @@ export function computeHashDiffReport(options: any) {
   return report;
 }
 
-/**
- * 建立單一 hash field 的 delta 物件。
- */
+export function loadRegistryDocument(registryPath: any) {
+  const resolvedPath = registryPath
+    ? path.resolve(registryPath)
+    : path.join(repoRoot, 'atomic-registry.json');
+
+  if (!existsSync(resolvedPath)) {
+    throw new Error(`Registry file not found: ${resolvedPath}`);
+  }
+
+  return JSON.parse(readFileSync(resolvedPath, 'utf8'));
+}
+
+function extractVersionHistory(entry: any) {
+  if (!entry || typeof entry !== 'object') {
+    return [];
+  }
+
+  if (Array.isArray(entry.versions) && entry.versions.length > 0) {
+    return entry.versions.map((versionRecord: any) => normalizeVersionRecord(versionRecord)).filter((record: any) => record.version.length > 0);
+  }
+
+  if (entry.versionLineage && Array.isArray(entry.versionLineage.versions) && entry.versionLineage.versions.length > 0) {
+    return entry.versionLineage.versions.map((versionRecord: any) => normalizeVersionRecord(versionRecord)).filter((record: any) => record.version.length > 0);
+  }
+
+  return [];
+}
+
+function extractVersionLineageVersions(versionLineage: any) {
+  if (!versionLineage || typeof versionLineage !== 'object' || Array.isArray(versionLineage)) {
+    return [];
+  }
+  if (!Array.isArray(versionLineage.versions) || versionLineage.versions.length === 0) {
+    return [];
+  }
+  return versionLineage.versions.map((versionRecord: any) => normalizeVersionRecord(versionRecord)).filter((record: any) => record.version.length > 0);
+}
+
+function normalizeVersionRecord(versionRecord: any) {
+  const normalized: any = {
+    version: String(versionRecord?.version ?? '').trim(),
+    specHash: String(versionRecord?.specHash ?? '').trim(),
+    codeHash: String(versionRecord?.codeHash ?? '').trim(),
+    testHash: String(versionRecord?.testHash ?? '').trim(),
+    timestamp: String(versionRecord?.timestamp ?? '').trim()
+  };
+
+  if (versionRecord?.semanticFingerprint === null) {
+    normalized.semanticFingerprint = null;
+  } else if (typeof versionRecord?.semanticFingerprint === 'string' && versionRecord.semanticFingerprint.trim().length > 0) {
+    normalized.semanticFingerprint = String(versionRecord.semanticFingerprint).trim();
+  }
+
+  return normalized;
+}
+
+function buildAtomNotFoundResolution(atomId: string, candidateMapIds: readonly string[], candidateMemberPaths: readonly string[]): RegistryDiffResolutionFailure {
+  return {
+    ok: false,
+    code: 'ATM_DIFF_ATOM_NOT_FOUND',
+    summary: `Atom ${atomId} not found in registry.`,
+    advisory: `Add the atom as a registry entry or backfill member.versionLineage for the map member that owns ${atomId}.`,
+    details: {
+      atomId,
+      candidateMapIds: [...new Set(candidateMapIds)],
+      candidateMemberPaths: [...new Set(candidateMemberPaths)],
+      requiredContract: {
+        field: 'members[].versionLineage',
+        requiredProperties: ['currentVersion', 'versions'],
+        note: 'Backfill from real adopter lineage evidence; do not fabricate hash records.'
+      }
+    }
+  };
+}
+
+function buildLineageMissingResolution(atomId: string, candidateMapIds: readonly string[], candidateMemberPaths: readonly string[]): RegistryDiffResolutionFailure {
+  const uniqueMapIds = [...new Set(candidateMapIds)];
+  const uniqueMemberPaths = [...new Set(candidateMemberPaths)];
+  return {
+    ok: false,
+    code: 'ATM_DIFF_LINEAGE_MISSING',
+    summary: `Atom ${atomId} was found through a map member, but no version lineage was available.`,
+    advisory: `Backfill members[].versionLineage with the real currentVersion and versions history before running registry-diff for ${atomId}.`,
+    details: {
+      atomId,
+      candidateMapIds: uniqueMapIds,
+      candidateMemberPaths: uniqueMemberPaths,
+      requiredContract: {
+        field: 'members[].versionLineage',
+        requiredProperties: ['currentVersion', 'versions'],
+        note: 'Use adopter evidence to populate the lineage history, not synthetic placeholder hashes.'
+      }
+    }
+  };
+}
+
 function createHashDelta(fromHash: any, toHash: any) {
   return {
     from: fromHash,
@@ -121,10 +300,6 @@ function createHashDelta(fromHash: any, toHash: any) {
   };
 }
 
-/**
- * 檢查 fromVersion 到 toVersion 之間的 lineage 是否連續。
- * 所有中間版本都必須存在於 versions[] 中。
- */
 function checkLineageContinuity(entry: any, fromVersion: any, toVersion: any) {
   if (!entry.versions || entry.versions.length < 2) {
     return true;
@@ -141,14 +316,9 @@ function checkLineageContinuity(entry: any, fromVersion: any, toVersion: any) {
     return false;
   }
 
-  // 確認從 fromIndex 到 toIndex 之間沒有缺口
-  // （在目前的實作中，只要兩個版本都在 versions[] 中即視為連續）
   return true;
 }
 
-/**
- * 計算 semantic fingerprint delta（如果版本記錄中有 sf 資訊）。
- */
 function computeSemanticFingerprintDelta(fromRecord: any, toRecord: any) {
   const fromSf = fromRecord.semanticFingerprint ?? null;
   const toSf = toRecord.semanticFingerprint ?? null;
@@ -164,9 +334,6 @@ function computeSemanticFingerprintDelta(fromRecord: any, toRecord: any) {
   };
 }
 
-/**
- * 當 driftReason 未提供時，自動生成預設說明。
- */
 function generateDefaultDriftReason(changedFields: any, fromVersion: any, toVersion: any) {
   if (changedFields.length === 0) {
     return `No hash changes detected between ${fromVersion} and ${toVersion}.`;
@@ -175,31 +342,15 @@ function generateDefaultDriftReason(changedFields: any, fromVersion: any, toVers
   return `Hash drift detected in ${fieldList} between ${fromVersion} and ${toVersion}.`;
 }
 
-/**
- * 簡易 semver 比較函式。
- */
 function compareSemver(a: any, b: any) {
-  const pa = a.split('.').map(Number);
-  const pb = b.split('.').map(Number);
+  const pa = String(a ?? '').split('.').map(Number);
+  const pb = String(b ?? '').split('.').map(Number);
   for (let i = 0; i < 3; i++) {
     if (pa[i] !== pb[i]) return pa[i] - pb[i];
   }
   return 0;
 }
 
-/**
- * 從檔案讀取 registry document。
- * @param {string} [registryPath] - 可選的 registry 檔路徑
- * @returns {object} parsed registry document
- */
-export function loadRegistryDocument(registryPath: any) {
-  const resolvedPath = registryPath
-    ? path.resolve(registryPath)
-    : path.join(repoRoot, 'atomic-registry.json');
-
-  if (!existsSync(resolvedPath)) {
-    throw new Error(`Registry file not found: ${resolvedPath}`);
-  }
-
-  return JSON.parse(readFileSync(resolvedPath, 'utf8'));
+function buildMemberPath(mapId: string, memberIndex: number) {
+  return `${mapId}#members[${memberIndex}]`;
 }

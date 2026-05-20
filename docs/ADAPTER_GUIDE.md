@@ -16,6 +16,8 @@ For legacy strangler flows, `ProjectAdapter` also owns `resolveLegacyUri`, `runA
 
 `LanguageAdapter` is the language-facing boundary. It detects a project profile and validates compute atoms from source files plus policy. Language-specific packages may add richer request and report types, but should remain assignable to the SDK shape.
 
+When an adapter adopts a map-managed atom, it should backfill `members[].versionLineage` on the owning map record. That lineage contract lets `registry-diff` and onefile smoke checks resolve adopter-owned atoms even when there is no standalone atom entry.
+
 ## Governance Stores
 
 The SDK defines interface-only stores for tasks, locks, document indexes, shards, artifacts, logs, run reports, markdown/json state, rule guards, evidence, registries, context summaries, and `ContextBudgetGuard`. Implementations can use files, databases, or hosted services, but Plugin SDK does not prescribe storage.

@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -11,6 +11,7 @@ const governanceRouterSkillRelativePath = path.join('integrations', 'codex-skill
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+const adopterLineageFixture = JSON.parse(readFileSync(path.join(root, 'tests/registry-fixtures/adopter-lineage.fixture.json'), 'utf8'));
 
 function fail(message: any) {
   console.error(`[onefile-release:${mode}] ${message}`);
@@ -139,6 +140,27 @@ try {
   assert(bootstrap.parsed.ok === true, 'onefile bootstrap must report ok=true');
   refreshOnboarding(path.join(blankRepo, 'atm.mjs'), blankRepo);
   writeGitHeadEvidence(blankRepo);
+
+  const registrySmokeRepo = path.join(tempRoot, 'registry-diff-smoke');
+  mkdirSync(registrySmokeRepo, { recursive: true });
+  initializeGitRepository(registrySmokeRepo);
+  copyFileSync(release.outputFilePath, path.join(registrySmokeRepo, 'atm.mjs'));
+  writeFileSync(path.join(registrySmokeRepo, 'atomic-registry.json'), `${JSON.stringify(adopterLineageFixture.registryDocument, null, 2)}\n`, 'utf8');
+  const registryDiff = runOnefile(path.join(registrySmokeRepo, 'atm.mjs'), registrySmokeRepo, [
+    'registry-diff',
+    adopterLineageFixture.atomId,
+    '--from',
+    adopterLineageFixture.fromVersion,
+    '--to',
+    adopterLineageFixture.toVersion,
+    '--registry',
+    'atomic-registry.json',
+    '--json'
+  ]);
+  assert(registryDiff.exitCode === 0, 'onefile registry-diff must exit 0 on adopter lineage fixtures');
+  assert(registryDiff.parsed.ok === true, 'onefile registry-diff must report ok=true');
+  assert(registryDiff.parsed.evidence?.sourceKind === 'member-version-lineage', 'onefile registry-diff must resolve via member lineage');
+  assert(registryDiff.parsed.evidence?.report?.driftSummary?.totalChanged === 3, 'onefile registry-diff must preserve the diff report');
 
   const installSkill = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['guide', 'install-skill', '--cwd', '.', '--target', 'host', '--json']);
   assert(installSkill.exitCode === 0, 'onefile guide install-skill must exit 0');

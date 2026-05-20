@@ -217,7 +217,8 @@ function normalizeMembers(members: any) {
   return members.map((member) => ({
     atomId: normalizeAtomId(member?.atomId, 'members[].atomId'),
     version: normalizeSemver(member?.version, 'members[].version'),
-    ...normalizeOptionalMemberRole(member?.role)
+    ...normalizeOptionalMemberRole(member?.role),
+    ...(member?.versionLineage ? { versionLineage: member.versionLineage } : {})
   }));
 }
 

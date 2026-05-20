@@ -1,24 +1,15 @@
 /**
- * ATM CLI: registry diff 命令
+ * ATM CLI: registry-diff
  *
- * 用法: atm registry-diff <atomId> --from <v1> --to <v2> [--json] [--registry <path>] [--reason <text>]
- *
- * 產出符合 hash-diff-report.schema.json 的版本 hash 差異報告。
+ * Usage: atm registry-diff <atomId> --from <v1> --to <v2> [--json] [--registry <path>] [--reason <text>]
  */
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import {
   computeHashDiffReport,
-  findRegistryEntry,
-  loadRegistryDocument
+  loadRegistryDocument,
+  resolveRegistryDiffTarget
 } from '../../../core/src/registry/diff.ts';
 import { makeResult, message } from './shared.ts';
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
-
-/**
- * 解析 CLI 參數。
- */
 function parseArgs(args: any) {
   const parsed = {
     atomId: null,
@@ -51,14 +42,10 @@ function parseArgs(args: any) {
   return parsed;
 }
 
-/**
- * CLI 命令入口。
- */
 export function runRegistryDiff(args: any) {
   const cwd = process.cwd();
   const parsed = parseArgs(args);
 
-  // 驗證必要參數
   if (!parsed.atomId) {
     return makeResult({
       ok: false,
@@ -79,7 +66,6 @@ export function runRegistryDiff(args: any) {
     });
   }
 
-  // 載入 registry
   let registryDoc;
   try {
     registryDoc = loadRegistryDocument(parsed.registryPath);
@@ -93,30 +79,30 @@ export function runRegistryDiff(args: any) {
     });
   }
 
-  // 找到對應的 entry
-  const entry = findRegistryEntry(registryDoc, parsed.atomId);
-  if (!entry) {
+  const resolution = resolveRegistryDiffTarget(registryDoc, parsed.atomId);
+  if (!resolution.ok) {
     return makeResult({
       ok: false,
       command: 'registry-diff',
       cwd,
-      messages: [message('error', 'ATM_DIFF_ATOM_NOT_FOUND', `Atom ${parsed.atomId} not found in registry.`)],
-      evidence: {}
+      messages: [message('error', resolution.code, resolution.summary, {
+        advisory: resolution.advisory,
+        atomId: parsed.atomId,
+        candidateMapIds: resolution.details.candidateMapIds,
+        candidateMemberPaths: resolution.details.candidateMemberPaths,
+        requiredContract: resolution.details.requiredContract
+      })],
+      evidence: {
+        atomId: parsed.atomId,
+        fromVersion: parsed.fromVersion,
+        toVersion: parsed.toVersion,
+        resolution,
+        registryPath: parsed.registryPath ?? null
+      }
     });
   }
 
-  // 確認 entry 有 versions[]
-  if (!entry.versions || entry.versions.length === 0) {
-    return makeResult({
-      ok: false,
-      command: 'registry-diff',
-      cwd,
-      messages: [message('error', 'ATM_DIFF_NO_VERSIONS', `Atom ${parsed.atomId} has no version history. Ensure ATM-2-0014 registry version history is populated.`)],
-      evidence: {}
-    });
-  }
-
-  // 計算 diff report
+  const entry = resolution.entry;
   let report;
   try {
     report = computeHashDiffReport({
@@ -131,11 +117,15 @@ export function runRegistryDiff(args: any) {
       command: 'registry-diff',
       cwd,
       messages: [message('error', 'ATM_DIFF_COMPUTE_FAILED', error.message)],
-      evidence: {}
+      evidence: {
+        atomId: parsed.atomId,
+        fromVersion: parsed.fromVersion,
+        toVersion: parsed.toVersion,
+        resolution
+      }
     });
   }
 
-  // 成功：產出報告
   const summaryText = report.driftSummary.totalChanged === 0
     ? `No hash drift between ${parsed.fromVersion} and ${parsed.toVersion}.`
     : `Hash drift detected: ${report.driftSummary.changedFields.join(', ')} changed between ${parsed.fromVersion} and ${parsed.toVersion}.`;
@@ -150,7 +140,11 @@ export function runRegistryDiff(args: any) {
       atomId: parsed.atomId,
       fromVersion: parsed.fromVersion,
       toVersion: parsed.toVersion,
-      totalChanged: report.driftSummary.totalChanged
+      totalChanged: report.driftSummary.totalChanged,
+      sourceKind: entry.sourceKind,
+      sourceRef: entry.sourceRef ?? null,
+      mapId: entry.mapId ?? null,
+      memberIndex: entry.memberIndex ?? null
     }
   });
 }

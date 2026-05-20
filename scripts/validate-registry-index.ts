@@ -63,6 +63,9 @@ check(index.getByUrn(formattedMap)?.canonicalId === 'ATM-MAP-0001', 'RegistryInd
 check(index.findByLogicalName('atom.core-seed').length === 1, 'RegistryIndex must lookup logicalName via O(1) map');
 check(index.findByLogicalName('atom.legacy-no-sf').length === 1, 'RegistryIndex must keep legacy entries without semantic fingerprint');
 check(index.getVersions('ATM-CORE-0001').versions.join(',') === '1.2.0,1.0.0', 'RegistryIndex must preserve current and historical versions');
+check(index.getByCanonicalId('ATM-NPCBRAIN-0002') === null, 'RegistryIndex must not create standalone atom refs for map members without atom entries');
+check(index.getVersions('ATM-NPCBRAIN-0002').current === '0.1.1', 'RegistryIndex must derive current version from member lineage');
+check(index.getVersions('ATM-NPCBRAIN-0002').versions.join(',') === '0.1.0,0.1.1', 'RegistryIndex must preserve member lineage versions');
 
 const atomPrefix = semanticFingerprintPrefix('sha256:1111111111111111111111111111111111111111111111111111111111111111');
 check(atomPrefix === '1111111111111111', 'semanticFingerprintPrefix must derive 16-char hash bucket keys');

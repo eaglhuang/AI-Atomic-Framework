@@ -196,6 +196,15 @@ if (atomicMapSchema?.properties?.semanticFingerprint?.oneOf?.length !== 2) {
 if (atomicMapSchema?.properties?.pendingSfCalculation?.type !== 'boolean') {
   fail('atomic-map pendingSfCalculation must be boolean');
 }
+if (!atomicMapSchema?.$defs?.member?.properties?.versionLineage) {
+  fail('atomic-map member must expose versionLineage');
+}
+if (atomicMapSchema?.$defs?.versionLineage?.required?.join(',') !== 'currentVersion,versions') {
+  fail('atomic-map versionLineage must require currentVersion and versions');
+}
+if (!atomicMapSchema?.$defs?.versionRecord?.properties?.semanticFingerprint) {
+  fail('atomic-map versionRecord must expose semanticFingerprint');
+}
 
 const registrySchema = schemas.get('registry');
 if (!registrySchema?.$defs?.registryEntry?.properties?.currentVersion) {

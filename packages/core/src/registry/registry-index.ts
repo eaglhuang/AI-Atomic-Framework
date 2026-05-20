@@ -45,6 +45,9 @@ export function createRegistryIndex(registryDocument: any, options: any = {}) {
     }
 
     addVersions(versionIndex, nodeRef, entry);
+    if (nodeRef.nodeKind === 'map' && Array.isArray(entry.members)) {
+      addMemberVersions(versionIndex, atomIdIndex, entry.members);
+    }
   }
 
   return Object.freeze({
@@ -165,4 +168,35 @@ function addVersions(index: any, nodeRef: any, entry: any) {
     }
   }
   index.set(nodeRef.canonicalId, record);
+}
+
+function addMemberVersions(index: any, atomIdIndex: any, members: any) {
+  for (const member of members) {
+    const atomId = String(member?.atomId ?? '').trim();
+    if (!atomId || atomIdIndex.has(atomId)) {
+      continue;
+    }
+
+    const lineage = member?.versionLineage;
+    const versions = Array.isArray(lineage?.versions) && lineage.versions.length > 0
+      ? lineage.versions
+      : member?.version
+        ? [{ version: String(member.version).trim() }]
+        : [];
+    if (versions.length === 0) {
+      continue;
+    }
+
+    const currentVersion = String(lineage?.currentVersion ?? member?.version ?? versions[versions.length - 1]?.version ?? '').trim();
+    const record = index.get(atomId) ?? { current: null, versions: new Set() };
+    if (currentVersion) {
+      record.current = currentVersion;
+    }
+    for (const versionRecord of versions) {
+      if (versionRecord?.version) {
+        record.versions.add(String(versionRecord.version).trim());
+      }
+    }
+    index.set(atomId, record);
+  }
 }
