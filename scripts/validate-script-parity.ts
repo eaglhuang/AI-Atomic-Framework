@@ -10,15 +10,31 @@ const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
 
-const scriptRoutes: Record<string, readonly string[]> = {
-  'atm-next': ['next', '--json'],
-  'atm-orient': ['orient', '--cwd', '.', '--json'],
-  'atm-create': ['create', '--bucket', 'CORE', '--dry-run', '--json'],
-  'atm-lock': ['lock', 'check', '--json'],
-  'atm-evidence': ['explain', '--why', 'blocked', '--json'],
-  'atm-upgrade-scan': ['upgrade', '--scan', '--json'],
-  'atm-handoff': ['handoff', 'summarize', '--json']
-};
+// TASK-ASR-0010: scriptRoutes 從 wrappers.json SSoT 動態讀取，不再硬編碼
+interface WrapperEntry {
+  name: string;
+  subcommand: string;
+  extraArgs: string[];
+  alwaysJson: boolean;
+}
+interface WrappersManifest {
+  wrappers: WrapperEntry[];
+}
+const manifestPath = path.join(
+  root,
+  'templates',
+  'root-drop',
+  '.atm',
+  'scripts',
+  'wrappers.json'
+);
+const wrappersManifest: WrappersManifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+const scriptRoutes: Record<string, readonly string[]> = Object.fromEntries(
+  wrappersManifest.wrappers.map((w) => [
+    w.name,
+    [w.subcommand, ...w.extraArgs, ...(w.alwaysJson ? ['--json'] : [])],
+  ])
+);
 
 function fail(message: string) {
   console.error(`[script-parity:${mode}] ${message}`);
