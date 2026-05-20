@@ -1,22 +1,22 @@
-# ATM 版本升級規則書
+# ATM Version Upgrade Rules
 
-本規則書整合 ATM 版本升級主線、QA gates、release notes、tag、rollback 與開源 PR 政策。
+This rulebook combines ATM's version upgrade path, QA gates, release notes, tagging, rollback, and open-source PR policy.
 
 ## A. Discover
 
-升級前先讀：
+Before an upgrade, read:
 
 - `docs/ai_atomic_framework/upstream-versioning-policy.md`
 - `docs/ai_atomic_framework/release_version_flow/OPEN_SOURCE_VERSIONING_POLICY.md`
 - `docs/ai_atomic_framework/release_version_flow/PACKAGE_GROUPS.md`
 - `.github/CODEOWNERS`
-- `.atm/release-intents/*.md` 或 Changesets
+- `.atm/release-intents/*.md` or Changesets
 
-Automation 應提供 classify command，讀取 ATM repository 的 touched files 並輸出 package group、public API、release surface 與 impact metadata。
+Automation should provide a classify command that reads touched files and outputs package group, public API, release surface, and impact metadata.
 
 ## B. Classify
 
-掃描 touched files 並分類：
+Classify touched files into:
 
 - `core`
 - `public`
@@ -26,11 +26,11 @@ Automation 應提供 classify command，讀取 ATM repository 的 touched files 
 - `peripheral`
 - `release surface`
 
-分類結果必須能映射到 `package_group` 與 `public_api`。
+The classification must map to `package_group` and `public_api`.
 
 ## C. Impact
 
-要求或產生 release impact metadata：
+Require or generate release impact metadata:
 
 ```yaml
 package_group: core
@@ -41,68 +41,68 @@ requires_migration: false
 requires_release_note: true
 ```
 
-若 PR 沒有 release intent，但 touched paths 命中 release-relevant scope，升級流程必須阻擋。
+If a PR lacks release intent while touched paths match release-relevant scope, the upgrade flow must block.
 
-## D. Version Decide
+## D. Version Decision
 
-以最高 `release_impact` 決定下一版：
+The highest `release_impact` determines the next version:
 
-- all `none`：不升版。
-- max `patch`：`PATCH + 1`。
-- max `minor`：`MINOR + 1`，`PATCH = 0`。
-- max `major`：`MAJOR + 1`，`MINOR/PATCH = 0`。
-- prerelease：用 `alpha.N`、`beta.N`、`rc.N` 或 `canary.<date>.<sha>`。
+- all `none`: no version bump.
+- max `patch`: increment `PATCH`.
+- max `minor`: increment `MINOR` and reset `PATCH` to `0`.
+- max `major`: increment `MAJOR` and reset `MINOR` and `PATCH` to `0`.
+- prerelease: use `alpha.N`, `beta.N`, `rc.N`, or `canary.<date>.<sha>`.
 
-在 `0.x` 階段，`MINOR` 必須附 migration note。
+During `0.x`, `MINOR` requires migration notes when adopter-visible behavior changes.
 
 ## E. Validate Contributor Rules
 
-外部 PR 需要檢查：
+External PRs must be checked for:
 
-- Core PR 有 issue/RFC。
-- Core PR 有 CODEOWNERS review。
-- Core PR 有 migration 判斷。
-- Public behavior 有 tests。
-- Release surface 有 Release Owner review。
-- 外部 contributor 未建立 official tag、release commit 或 dist-tag。
+- issue or RFC links on core PRs;
+- CODEOWNERS review on core PRs;
+- migration assessment on core PRs;
+- tests for public behavior;
+- Release Owner review for release surface changes;
+- no official tags, release commits, or dist-tags created by external contributors.
 
-Automation 應提供 contributor-impact 與 CODEOWNERS validation command，並在 release-relevant PR 缺少 release intent 時阻擋或至少輸出 blocking warning。
+Automation should provide contributor-impact and CODEOWNERS validation commands. It should block, or at least emit a blocking warning, when release-relevant PRs lack release intent.
 
 ## F. Freeze
 
-Freeze 只鎖 release surface，不鎖 unrelated feature branches。
+Freeze release surface only. Do not freeze unrelated feature branches.
 
-必 freeze：
+Freeze:
 
 - package version fields
 - `compatibility-matrix.json`
 - release notes
-- root-drop / onefile artifacts
+- root-drop and onefile artifacts
 - release workflow
-- dist-tag decision
+- dist-tag decisions
 - known-bad readiness
 
-不應 freeze：
+Do not freeze:
 
-- 與 release 無關的 feature branches
-- docs draft branch
+- unrelated feature branches
+- documentation draft branches
 - downstream adopter experiments
 
 ## G. Prepare Release
 
-Release Owner 準備：
+The Release Owner prepares:
 
-- 同步 package versions。
-- 同步 compatibility matrix。
-- 更新 lockfile。
-- 產生 skew matrix。
-- 產生 release notes。
-- 產生 release manifest。
-- 準備 rollback route。
+- package version synchronization;
+- compatibility matrix synchronization;
+- lockfile updates;
+- skew matrix generation;
+- release notes;
+- release manifest;
+- rollback route.
 
 ## H. QA Gates
 
-標準 gate：
+Standard gates:
 
 ```bash
 node --experimental-strip-types scripts/validate-version-compatibility.ts --mode validate
@@ -111,44 +111,44 @@ node --experimental-strip-types scripts/validate-skew-matrix.ts --mode validate
 npm run validate:standard
 ```
 
-Release artifact gate：
+Release artifact gates:
 
-- root-drop validation。
-- onefile validation。
-- adapter install smoke。
-- fresh adopter smoke。
-- known-bad readiness。
+- root-drop validation;
+- onefile validation;
+- adapter install smoke;
+- fresh adopter smoke;
+- known-bad readiness.
 
 ## I. Tag
 
-正式 release tag 只能由 Release Owner 或授權 maintainer 建立。
+Official release tags can be created only by a Release Owner or an explicitly authorized maintainer.
 
-- 使用 annotated tag。
-- tag 必須符合 `v<frameworkVersion>`。
-- tag version 必須與 root package、workspace packages、compatibility matrix 一致。
-- prerelease tag 必須對應正確 npm dist-tag。
+- Use annotated tags.
+- Tags must match `v<frameworkVersion>`.
+- Tag version must match the root package, workspace packages, and compatibility matrix.
+- Prerelease tags must map to the correct npm dist-tag.
 
 ## J. Post-release
 
-Release 後記錄：
+After release, record:
 
-- artifact paths。
-- integrity manifest。
-- SBOM。
-- dist-tag。
-- release notes。
-- rollback route。
-- known-bad update path。
-- compatibility matrix diff PR。
+- artifact paths;
+- integrity manifest;
+- SBOM;
+- dist-tag;
+- release notes;
+- rollback route;
+- known-bad update path;
+- compatibility matrix diff PR.
 
-## K. Rollback / Known-bad
+## K. Rollback and Known-bad
 
-若 release 出問題：
+If a release has an incident:
 
-- 先標記 known-bad。
-- 撤回或調整 dist-tag。
-- 發布 patch rollback 或 forward fix。
-- 保留 incident evidence。
-- 更新 release trust docs。
+- mark the version as known-bad first;
+- retract or adjust dist-tags;
+- publish a patch rollback or forward fix;
+- preserve incident evidence;
+- update release trust docs.
 
-Rollback 不得用非標準版號偽裝；仍走 SemVer patch 或 hotfix prerelease。
+Rollback must not use a non-standard version number. It still follows SemVer patch or hotfix prerelease rules.

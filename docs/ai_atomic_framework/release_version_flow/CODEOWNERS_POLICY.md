@@ -1,15 +1,15 @@
 # CODEOWNERS Policy
 
-本文件定義 ATM 開源 PR 的 review ownership 與 branch protection 建議。
+This document defines review ownership and branch protection recommendations for open-source ATM PRs.
 
-## 1. Owner 分層
+## 1. Ownership Layers
 
 | Scope | Required owner |
 | --- | --- |
 | `packages/core/**` | core maintainers |
 | `schemas/**` | core maintainers |
 | `compatibility-matrix.json` | core maintainers + release owners |
-| `packages/cli/**`, `atm.mjs` | cli maintainers |
+| `packages/cli/**`, `atm.mjs` | CLI maintainers |
 | `packages/integration-*`, `packages/adapter-*`, `packages/language-*` | adapter maintainers |
 | `packages/agent-pack-*` | agent-pack maintainers |
 | `release/**`, `.github/workflows/release-*`, `known-bad-versions.json` | release owners |
@@ -17,7 +17,7 @@
 
 ## 2. Suggested CODEOWNERS
 
-`.github/CODEOWNERS` 應至少包含：
+`.github/CODEOWNERS` should include at least:
 
 ```text
 /packages/core/** @eaglhuang
@@ -37,30 +37,30 @@
 /known-bad-versions.json @eaglhuang
 ```
 
-專案有 GitHub team 後，可把 `@eaglhuang` 拆成 `@org/core-maintainers`、`@org/adapter-maintainers`、`@org/release-owners`。
+After the project has GitHub teams, `@eaglhuang` can be split into team aliases such as `@org/core-maintainers`, `@org/adapter-maintainers`, and `@org/release-owners`.
 
 ## 3. Branch Protection
 
-建議 main branch 啟用：
+Recommended main branch protections:
 
-- Require pull request before merging。
-- Require approvals from CODEOWNERS。
-- Require status checks：standard validators、release trust、version compatibility、skew matrix。
-- Restrict who can push official release tags。
-- Require signed or annotated tags for releases。
+- Require pull requests before merging.
+- Require approvals from CODEOWNERS.
+- Require status checks such as standard validators, release trust, version compatibility, and skew matrix.
+- Restrict who can push official release tags.
+- Require signed or annotated tags for releases.
 
-## 4. Release Owner 權限
+## 4. Release Owner Authority
 
-Release Owner 負責：
+Release Owners are responsible for:
 
-- 核准 release surface 變更。
-- 執行正式 release workflow。
-- 建立 annotated tag。
-- 管理 dist-tag。
-- 啟動 rollback 或 known-bad 標記。
+- approving release surface changes;
+- running the official release workflow;
+- creating annotated tags;
+- managing dist-tags;
+- starting rollback or known-bad marking.
 
-外部 contributor 不可直接執行上述權限。
+External contributors may not perform those actions directly.
 
 ## 5. Review Escalation
 
-任何 PR 若同時碰 core 與 release surface，必須同時取得 core maintainer 與 Release Owner review。若 release intent 宣稱 `none` 但 touched paths 命中 release surface，CI 應阻擋。
+Any PR that touches both core and release surface must receive both core maintainer review and Release Owner review. If a release intent claims `none` while touched paths match release surface, CI should block.

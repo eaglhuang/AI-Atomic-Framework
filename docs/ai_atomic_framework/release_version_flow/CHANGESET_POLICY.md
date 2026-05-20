@@ -1,8 +1,8 @@
 # Changeset Policy
 
-ATM 的 release intent 可以由 Changesets 承載，也可以先用 `.atm/release-intents/*.md` 承載。無論使用哪種格式，都必須保留可機械化轉換的 release impact metadata。
+ATM release intent can be represented by Changesets or, during the early flow, by `.atm/release-intents/*.md`. Either representation must preserve mechanically convertible release impact metadata.
 
-## 1. 必填欄位
+## 1. Required Fields
 
 ```yaml
 package_group: core | cli | plugin-sdk | adapter | agent-pack | docs | tooling | example
@@ -13,7 +13,7 @@ requires_migration: true | false
 requires_release_note: true | false
 ```
 
-建議欄位：
+Recommended fields:
 
 ```yaml
 issue_or_rfc: "<url-or-id>"
@@ -24,60 +24,60 @@ validators:
 release_surface: true | false
 ```
 
-## 2. 何時可用 `none`
+## 2. When `none` Is Allowed
 
-可用 `release_impact: none`：
+`release_impact: none` is allowed for:
 
-- docs typo。
-- tests-only，不改 public fixtures。
-- internal refactor，public API 與 behavior 不變。
-- build script cleanup，不影響 release artifact。
+- docs typo fixes;
+- tests-only changes that do not change public fixtures;
+- internal refactors that do not change public API or behavior;
+- build script cleanup that does not affect release artifacts.
 
-不可用 `none`：
+`none` is not allowed for:
 
-- CLI output 或 exit code 改變。
-- schema 或 compatibility matrix 改變。
-- adapter public behavior 改變。
-- release workflow、dist-tag、known-bad、root-drop 改變。
-- public docs 改變相容承諾或 migration promise。
+- CLI output or exit code changes;
+- schema or compatibility matrix changes;
+- adapter public behavior changes;
+- release workflow, dist-tag, known-bad, or root-drop changes;
+- public docs that change compatibility promises or migration guarantees.
 
-## 3. Patch / Minor / Major
+## 3. Patch, Minor, Major
 
-`patch`：
+`patch`:
 
-- backward-compatible bugfix。
-- release tooling 修補。
-- adapter public behavior bugfix。
+- backward-compatible bug fixes;
+- release tooling fixes;
+- adapter public behavior bug fixes.
 
-`minor`：
+`minor`:
 
-- backward-compatible feature。
-- 新 adapter capability。
-- core compatible feature；`0.x` 階段需 migration note。
+- backward-compatible features;
+- new adapter capability;
+- core compatible features. During `0.x`, include migration notes when needed.
 
-`major`：
+`major`:
 
-- breaking public API。
-- schema/CLI/release artifact 不相容變更。
-- 需要 adopter 手動 migration 的 release。
+- breaking public API changes;
+- incompatible schema, CLI, or release artifact changes;
+- releases that require manual adopter migration.
 
-## 4. Changelog 生成
+## 4. Changelog Generation
 
-Release note 必須由 release intent 聚合：
+Release notes must be generated from release intent:
 
-- Group by `package_group`。
-- 標示 `release_impact` 與 `core_impact`。
-- 列出 migration。
-- 列出 release owner 與 code owner review。
-- 列出 validator evidence。
+- group entries by `package_group`;
+- show `release_impact` and `core_impact`;
+- list migration requirements;
+- list Release Owner and code owner review;
+- list validator evidence.
 
 ## 5. Validation
 
-CI 應檢查：
+CI should verify:
 
-- 有 release-relevant path 時必須有 release intent。
-- release intent 欄位合法。
-- touched path 與 `package_group` 一致。
-- 最高 impact 與 proposed next version 一致。
-- core impact 需要 core review。
-- release surface 需要 Release Owner review。
+- release-relevant paths have release intent;
+- release intent fields are valid;
+- touched paths match `package_group`;
+- the highest impact matches the proposed next version;
+- core impact has core review;
+- release surface has Release Owner review.

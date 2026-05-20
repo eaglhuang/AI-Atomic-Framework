@@ -1,25 +1,26 @@
 # Contributor Release Impact Guide
 
-本文件說明外部 contributor 如何填寫 release intent，以及 maintainer 如何判斷 `release_impact`。
+This guide explains how external contributors describe release impact and how maintainers evaluate `release_impact`.
 
-## 1. 何時需要 Release Intent
+## 1. When Release Intent Is Required
 
-需要 release intent 的情境：
+Release intent is required when a PR changes:
 
-- 修改 `packages/core/**`、`schemas/**` 或 `compatibility-matrix.json`。
-- 修改 CLI 指令、輸出格式、exit code 或 public docs 承諾。
-- 修改 adapter、plugin、agent-pack 的公開行為。
-- 修改 release workflow、known-bad list、dist-tag、root-drop 或 onefile artifact。
+- `packages/core/**`, `schemas/**`, or `compatibility-matrix.json`;
+- CLI commands, output format, exit codes, or public behavior;
+- adapter, plugin, language adapter, or agent-pack public behavior;
+- release workflows, known-bad lists, dist-tags, root-drop, or onefile artifacts;
+- public documentation that changes compatibility, migration, or support promises.
 
-可標記 `release_impact: none` 的情境：
+`release_impact: none` can be used for:
 
-- 純文件修字，不改承諾。
-- 測試 fixture、內部 refactor，不改 public behavior。
-- repo housekeeping，不影響 install、CLI、schema 或 adopter flow。
+- typo-only documentation changes that do not change the public contract;
+- test fixtures or internal refactors that do not change public behavior;
+- repository housekeeping that does not affect install, CLI, schemas, or adopter flow.
 
-## 2. Release Intent 格式
+## 2. Release Intent Format
 
-ATM 初期可使用 `.atm/release-intents/<slug>.md`，格式如下：
+During the early ATM release flow, `.atm/release-intents/<slug>.md` can use this format:
 
 ```markdown
 ---
@@ -49,36 +50,36 @@ Explain required migration or state "none".
 List validators, integration tests, and adopter smoke checks.
 ```
 
-如果導入 Changesets，欄位必須能一對一轉換到 changelog 與版本判斷。
+If Changesets are introduced, their fields must map one-to-one to changelog and versioning decisions.
 
-## 3. Impact 判斷表
+## 3. Impact Matrix
 
-| 變更類型 | release_impact | core_impact | 備註 |
+| Change type | release_impact | core_impact | Notes |
 | --- | --- | --- | --- |
-| docs typo | none | none | 不進 release note。 |
-| docs policy contract | patch | none | 若改 release contract，需 release note。 |
-| adapter bugfix | patch | none | 公開行為修補。 |
-| adapter new feature | minor | none | 相容新增。 |
-| core non-public refactor | none | none | 需測試證明 public surface 不變。 |
-| core bugfix | patch | patch | 需 core owner review。 |
-| core compatible feature | minor | minor | `0.x` 階段附 migration note。 |
-| core breaking change | major | major | 需 RFC、migration、rollback。 |
-| release workflow change | patch | none | Release Owner review。 |
+| Docs typo | none | none | Does not enter release notes. |
+| Docs policy contract | patch | none | Requires release notes when the contract changes. |
+| Adapter bug fix | patch | none | Public behavior fix. |
+| Adapter feature | minor | none | Backward-compatible addition. |
+| Core non-public refactor | none | none | Requires tests proving public behavior is unchanged. |
+| Core bug fix | patch | patch | Requires core owner review. |
+| Core compatible feature | minor | minor | During `0.x`, include migration notes when needed. |
+| Core breaking change | major | major | Requires RFC, migration, and rollback. |
+| Release workflow change | patch | none | Requires Release Owner review. |
 
-## 4. 外部 PR Checklist
+## 4. External PR Checklist
 
-- 填 release intent 或 changeset。
-- 若碰 core，連結 issue/RFC。
-- 標明 migration 是否需要。
-- 列出測試與 validator。
-- 不建立 release commit、不推 tag、不發布 npm。
-- 等 CODEOWNERS 與 Release Owner review。
+- Provide release intent or a changeset.
+- Link an issue or RFC when touching core.
+- State whether migration is required.
+- List tests and validators.
+- Do not create release commits, push tags, or publish npm packages.
+- Wait for CODEOWNERS and Release Owner review when required.
 
 ## 5. Maintainer Review Checklist
 
-- release intent 欄位完整。
-- package group 與 touched paths 一致。
-- 最高 impact 可機械化推導下一版。
-- core PR 已補 migration/test。
-- release surface PR 已經 Release Owner review。
-- release note 與 changelog 不遺漏 public behavior。
+- Release intent fields are complete.
+- Package group matches touched paths.
+- The highest impact can mechanically derive the next version level.
+- Core PRs include migration and test evidence.
+- Release surface PRs have Release Owner review.
+- Release notes and changelog do not omit public behavior changes.
