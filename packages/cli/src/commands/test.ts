@@ -6,6 +6,7 @@ import { runAtomicTestRunner } from '../../../core/src/manager/test-runner.ts';
 import { runMapEquivalence } from '../../../core/src/equivalence/run-map-equivalence.ts';
 import { runMapIntegrationTest } from '../../../core/src/test-runner/map-integration.ts';
 import { createPropagationReport, runPropagationIntegration } from '../../../core/src/test-runner/propagation.ts';
+import { checkMapFingerprint, recordFingerprintCheck } from '../../../core/src/maps/fingerprint-checker.ts';
 import { CliError, makeResult, message, parseOptions, quoteCliValue, relativePathFrom } from './shared.ts';
 import { runValidate } from './validate.ts';
 
@@ -51,11 +52,14 @@ export async function runTestAsync(argv: any) {
   if (options.equivalenceFixtures && !options.map) {
     throw new CliError('ATM_CLI_USAGE', 'test option --equivalence-fixtures must be paired with --map.', { exitCode: 2 });
   }
+  if (options.fingerprintCheck && !options.map) {
+    throw new CliError('ATM_CLI_USAGE', 'test option --fingerprint-check must be paired with --map.', { exitCode: 2 });
+  }
   if (options.spec) {
     return runSpecTest(options.cwd, options.spec);
   }
   if (options.map) {
-    return runMapTest(options.cwd, options.map, options.equivalenceFixtures);
+    return runMapTest(options.cwd, options.map, options.equivalenceFixtures, options.fingerprintCheck);
   }
   if (options.propagate) {
     return runPropagateTest(options.cwd, options.propagate);
@@ -84,7 +88,35 @@ export async function runTestAsync(argv: any) {
   });
 }
 
-async function runMapTest(cwd: any, mapId: any, equivalenceFixtures?: any) {
+async function runMapTest(cwd: any, mapId: any, equivalenceFixtures?: any, fingerprintCheck?: boolean) {
+  if (fingerprintCheck) {
+    const mapSpecPath = path.join(cwd, 'atomic_workbench', 'maps', mapId, 'map.spec.json');
+    const lineageLogPath = path.join(cwd, 'atomic_workbench', 'maps', mapId, 'lineage-log.json');
+
+    const checkResult = await checkMapFingerprint(mapId, mapSpecPath);
+    await recordFingerprintCheck(mapId, lineageLogPath, checkResult);
+
+    return makeResult({
+      ok: !checkResult.driftDetected,
+      command: 'test',
+      cwd,
+      messages: [
+        checkResult.driftDetected
+          ? message('error', 'ATM_TEST_FINGERPRINT_DRIFT_DETECTED', 'Semantic fingerprint drift detected for atomic map.', { mapId, drift: checkResult.delta })
+          : message('info', 'ATM_TEST_FINGERPRINT_OK', 'Atomic map semantic fingerprint check passed.', { mapId })
+      ],
+      evidence: {
+        mapId,
+        currentFingerprint: checkResult.currentFingerprint,
+        recordedFingerprint: checkResult.recordedFingerprint,
+        driftDetected: checkResult.driftDetected,
+        delta: checkResult.delta,
+        checkTime: checkResult.checkTime,
+        lineageLogPath: relativePathFrom(cwd, lineageLogPath)
+      }
+    });
+  }
+
   if (equivalenceFixtures) {
     const testRun = await executeMapRunner(() => runMapEquivalence(mapId, equivalenceFixtures, { repositoryRoot: cwd }));
     return makeResult({

@@ -1,0 +1,43 @@
+name: atm-map-ci
+
+on:
+  pull_request:
+    paths:
+      - 'atomic_workbench/maps/**'
+      - 'packages/core/src/maps/**'
+      - '.github/workflows/atm-map-ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'atomic_workbench/maps/**'
+      - 'packages/core/src/maps/**'
+
+jobs:
+  map-checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fingerprint Check
+        run: |
+          for mapDir in atomic_workbench/maps/*/; do
+            mapId=$(basename "$mapDir")
+            echo "Checking fingerprint for $mapId..."
+            npm run --silent -- node packages/cli/src/commands/test.ts --cwd . --map "$mapId" --fingerprint-check --json || {
+              echo "Fingerprint check failed for $mapId"
+              exit 1
+            }
+          done

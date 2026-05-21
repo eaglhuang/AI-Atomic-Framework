@@ -265,6 +265,7 @@ type ParsedCliOptions = {
   atom?: string;
   map?: string;
   equivalenceFixtures?: string;
+  fingerprintCheck?: boolean;
   propagate?: string;
   agent?: string;
 };
@@ -289,6 +290,7 @@ export function parseOptions(argv: string[], commandName: string) {
     atom: undefined,
     map: undefined,
     propagate: undefined,
+    fingerprintCheck: false,
     agent: undefined
   };
   const positional = [];
@@ -432,6 +434,13 @@ export function parseOptions(argv: string[], commandName: string) {
       }
       options.equivalenceFixtures = requireOptionValue(argv, index, '--equivalence-fixtures', commandName);
       index += 1;
+      continue;
+    }
+    if (arg === '--fingerprint-check') {
+      if (commandName !== 'test') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --fingerprint-check`, { exitCode: 2 });
+      }
+      options.fingerprintCheck = true;
       continue;
     }
     if (arg === '--propagate') {
