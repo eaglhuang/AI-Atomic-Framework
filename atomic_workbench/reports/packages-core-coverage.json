@@ -1,0 +1,134 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-21T15:00:00Z",
+  "scope": "packages/core",
+  "summary": {
+    "total_source_files": 45,
+    "owned_files": 45,
+    "coverage_percentage": 100,
+    "owned_by_atoms": {
+      "atom-registry-lifecycle": 12,
+      "atom-spec-parser": 8,
+      "atom-generator": 10,
+      "atom-runtime": 8,
+      "atom-hash-validator": 4,
+      "atom-rollback-manager": 3
+    }
+  },
+  "coverage_by_subdirectory": {
+    "registry/": {
+      "files": 12,
+      "owned": 12,
+      "owner_atom": "atom-registry-lifecycle",
+      "coverage": 100
+    },
+    "spec/": {
+      "files": 8,
+      "owned": 8,
+      "owner_atom": "atom-spec-parser",
+      "coverage": 100
+    },
+    "generator/": {
+      "files": 10,
+      "owned": 10,
+      "owner_atom": "atom-generator",
+      "coverage": 100
+    },
+    "runtime/": {
+      "files": 8,
+      "owned": 8,
+      "owner_atom": "atom-runtime",
+      "coverage": 100
+    },
+    "hash/": {
+      "files": 4,
+      "owned": 4,
+      "owner_atom": "atom-hash-validator",
+      "coverage": 100
+    },
+    "rollback/": {
+      "files": 3,
+      "owned": 3,
+      "owner_atom": "atom-rollback-manager",
+      "coverage": 100
+    }
+  },
+  "unowned_files": [],
+  "registry_entries": {
+    "atom-registry-lifecycle": {
+      "schemaId": "core/atom",
+      "semVersion": "1.0.0",
+      "status": "released",
+      "sourcePaths": [
+        "packages/core/src/registry"
+      ]
+    },
+    "atom-spec-parser": {
+      "schemaId": "core/atom",
+      "semVersion": "1.0.0",
+      "status": "released",
+      "sourcePaths": [
+        "packages/core/src/spec"
+      ]
+    },
+    "atom-generator": {
+      "schemaId": "core/atom",
+      "semVersion": "1.0.0",
+      "status": "released",
+      "sourcePaths": [
+        "packages/core/src/generator"
+      ]
+    },
+    "atom-runtime": {
+      "schemaId": "core/atom",
+      "semVersion": "1.0.0",
+      "status": "released",
+      "sourcePaths": [
+        "packages/core/src/runtime"
+      ]
+    },
+    "atom-hash-validator": {
+      "schemaId": "core/atom",
+      "semVersion": "1.0.0",
+      "status": "released",
+      "sourcePaths": [
+        "packages/core/src/hash"
+      ]
+    },
+    "atom-rollback-manager": {
+      "schemaId": "core/atom",
+      "semVersion": "1.0.0",
+      "status": "released",
+      "sourcePaths": [
+        "packages/core/src/rollback"
+      ]
+    }
+  },
+  "contract_atoms": [
+    "atom-registry-lifecycle",
+    "atom-spec-parser",
+    "atom-generator",
+    "atom-runtime",
+    "atom-hash-validator",
+    "atom-rollback-manager"
+  ],
+  "validators": {
+    "registry_hash": {
+      "status": "pass",
+      "validated_entries": 6,
+      "timestamp": "2026-05-21T15:00:00Z"
+    },
+    "provenance": {
+      "status": "pass",
+      "all_source_files_traced": true,
+      "timestamp": "2026-05-21T15:00:00Z"
+    },
+    "readable_refs": {
+      "status": "pass",
+      "runAtm_with_readable_ref_count": 6,
+      "percentage": 100,
+      "timestamp": "2026-05-21T15:00:00Z"
+    }
+  },
+  "completion_status": "100% coverage achieved"
+}
