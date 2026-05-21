@@ -200,6 +200,29 @@ export async function runATMChart(argv: string[]) {
   const parsed = parseArgsForCommand(spec, argv);
   const [action = 'render'] = parsed.positional;
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
+
+  // M19: Mermaid auto-gen from map.spec.json
+  if (parsed.options.mermaid === true || action === 'mermaid') {
+    const mapId = String(parsed.options.map ?? '');
+    if (!mapId) {
+      throw new CliError('ATM_CLI_USAGE', 'atm-chart --mermaid requires --map <mapId>', { exitCode: 2 });
+    }
+    const { generateMermaidFromMapSpec } = await import('../../../core/src/maps/mermaid-gen.ts');
+    const result = generateMermaidFromMapSpec(cwd, mapId);
+    return makeResult({
+      ok: true,
+      command: 'atm-chart',
+      cwd,
+      messages: [
+        message('info', 'ATM_CHART_MERMAID_GENERATED',
+          `Mermaid diagram generated for map ${mapId}: ${result.nodeCount} nodes, ${result.edgeCount} edges.`,
+          { mapId, nodeCount: result.nodeCount, edgeCount: result.edgeCount }
+        )
+      ],
+      evidence: { mermaidSource: result.mermaidSource, result }
+    });
+  }
+
   const atmChartAbsolutePath = resolveATMChartPath(cwd, parsed.options.out);
   const versionCheck = parsed.options.versionCheck === true;
 
@@ -214,7 +237,7 @@ export async function runATMChart(argv: string[]) {
   throw new CliError('ATM_CLI_USAGE', `atm-chart does not support action ${action}`, {
     exitCode: 2,
     details: {
-      supportedActions: ['render', 'verify']
+      supportedActions: ['render', 'verify', 'mermaid']
     }
   });
 }
