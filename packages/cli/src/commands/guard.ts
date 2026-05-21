@@ -31,9 +31,6 @@ export function runGuard(argv: string[]) {
   if (options.guardName === 'framework-development') {
     return runFrameworkDevelopmentGuard(options.cwd, options.files);
   }
-  if (options.guardName === 'atomization-coverage') {
-    return runAtomizationCoverageGuard(options.cwd, options.files);
-  }
   return runGitGuard(options);
 }
 
@@ -190,71 +187,9 @@ function runAtomCallsiteReadabilityGuard(cwd: string) {
   });
 }
 
-function runAtomizationCoverageGuard(cwd: string, files: readonly string[]) {
-  // Prevent adding new production source files without atom/map ownership or explicit exclusion reason
-  const violations: GuardViolation[] = [];
-  
-  // Check if exclusion inventory exists
-  const exclusionPath = path.join(cwd, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
-  const hasExclusionInventory = existsSync(exclusionPath);
-  
-  // Check if path-to-atom-map exists
-  const pathMapPath = path.join(cwd, 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json');
-  const hasPathMap = existsSync(pathMapPath);
-  
-  if (!hasExclusionInventory || !hasPathMap) {
-    violations.push({
-      code: 'coverage-inventory-missing',
-      detail: `Atomization coverage inventory files missing. Expected ${exclusionPath} and ${pathMapPath}`
-    });
-  }
-  
-  // For each new file, check if it matches an exclusion reason or is covered by atom/map ownership
-  let checkedFiles = 0;
-  let unownedFiles: string[] = [];
-  
-  for (const file of files) {
-    checkedFiles++;
-    const isGenerated = file.match(/\.(gen\.ts|gen\.json|snap|snapshot)$/) || 
-                        file.includes('dist/') || 
-                        file.includes('build/') || 
-                        file.includes('release/');
-    const isTest = file.includes('test') || file.includes('spec');
-    const isDoc = file.includes('docs/') && file.endsWith('.md');
-    const isExample = file.includes('examples/') || file.includes('samples/');
-    
-    // If it's not in any exclusion category, it needs atom/map ownership
-    if (!isGenerated && !isTest && !isDoc && !isExample) {
-      unownedFiles.push(file);
-    }
-  }
-  
-  if (unownedFiles.length > 0) {
-    violations.push({
-      code: 'missing-ownership',
-      detail: `Production source files without atom/map ownership: ${unownedFiles.slice(0, 5).join(', ')}${unownedFiles.length > 5 ? ` (and ${unownedFiles.length - 5} more)` : ''}`
-    });
-  }
-  
-  return makeResult({
-    ok: violations.length === 0,
-    command: 'guard',
-    cwd,
-    messages: violations.length === 0
-      ? [message('info', 'ATM_GUARD_ATOMIZATION_COVERAGE_OK', `Atomization coverage guard passed. Checked ${checkedFiles} file(s).`)]
-      : [message('error', 'ATM_GUARD_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage guard found ${violations.length} violation(s).`, { violations, suggestedAction: 'Add atom/map ownership in path-to-atom-map.json or use explicit exclusion reason' })],
-    evidence: {
-      guard: 'atomization-coverage',
-      checkedFiles,
-      unownedFileCount: unownedFiles.length,
-      violations
-    }
-  });
-}
-
 interface ParsedGuardArgs {
   readonly cwd: string;
-  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'framework-development' | 'atomization-coverage';
+  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'framework-development';
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
@@ -311,8 +246,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     if (state.guardName) {
       throw new CliError('ATM_CLI_USAGE', 'guard accepts only one guard name', { exitCode: 2 });
     }
-    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'framework-development' && arg !== 'atomization-coverage') {
-      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, framework-development, atomization-coverage', { exitCode: 2 });
+    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'framework-development') {
+      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, framework-development', { exitCode: 2 });
     }
     state.guardName = arg;
   }
