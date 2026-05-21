@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
-import { createTempWorkspace } from './temp-root.ts';
+import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -60,6 +60,22 @@ function runAtm(args: any, cwd = root) {
 function writeJson(filePath: any, value: any) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function writeHostPackageLockSignals(cwd: any) {
+  writeJson(path.join(cwd, 'package.json'), {
+    name: 'host-with-package-lock',
+    version: '0.0.0'
+  });
+  writeJson(path.join(cwd, 'package-lock.json'), {
+    name: 'host-with-package-lock',
+    lockfileVersion: 3
+  });
+  writeJson(path.join(cwd, 'atomic-registry.json'), {
+    schemaId: 'atm.registry.v1',
+    specVersion: '0.1.0',
+    entries: []
+  });
 }
 
 function assertReadable(result: any, commandName: any) {
@@ -152,6 +168,7 @@ try {
 
   const atmChartRepo = path.join(tempRoot, 'atm-chart-repo');
   mkdirSync(atmChartRepo, { recursive: true });
+  initializeGitRepository(atmChartRepo);
   const atmChartBootstrap = runAtm(['bootstrap', '--cwd', atmChartRepo], atmChartRepo);
   assert(atmChartBootstrap.exitCode === 0, 'bootstrap must exit 0 before ATMChart render');
 
@@ -239,6 +256,17 @@ try {
   assert(onboardingCheck.details.atmChartFreshness === 'fresh', 'doctor onboarding-lifecycle check must report fresh ATMChart');
   assertMessageCode(welcomeDoctor, 'ATM_DOCTOR_INTEGRATION_INSTALL_RECOMMENDED');
   assert(welcomeDoctor.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'doctor must recommend editor integration install when none are present');
+
+  writeHostPackageLockSignals(atmChartRepo);
+  const packageLockHostDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  assert(packageLockHostDoctor.exitCode === 0, 'doctor must stay green for host repos that happen to use package-lock');
+  assertReadable(packageLockHostDoctor, 'doctor');
+  assert(packageLockHostDoctor.parsed.ok === true, 'doctor must report ok=true for package-lock host repos');
+  assert(packageLockHostDoctor.parsed.evidence.projectRole === 'host', 'doctor must classify package-lock host repos as host');
+  assert(packageLockHostDoctor.parsed.evidence.checks.find((check: any) => check.name === 'public-script-contract')?.ok === true,
+    'doctor must not require framework public scripts from package-lock host repos');
+  assert(packageLockHostDoctor.parsed.evidence.checks.find((check: any) => check.name === 'self-host-alpha-entry')?.ok === true,
+    'doctor must not require framework self-host-alpha entry from package-lock host repos');
 
   const guardsPath = path.join(atmChartRepo, '.atm', 'runtime', 'default-guards.json');
   const guards = JSON.parse(readFileSync(guardsPath, 'utf8'));

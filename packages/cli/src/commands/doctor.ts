@@ -5,6 +5,7 @@ import { computeSha256ForFile } from '../../../core/src/hash-lock/hash-lock.ts';
 import { checkStartupKnownBadVersion } from '../startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from '../startup-integrity.ts';
 import { createATMVersionSummary } from './atm-chart.ts';
+import { detectFrameworkRepoIdentity } from './framework-development.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
@@ -33,7 +34,8 @@ export async function runDoctor(argv: any) {
   const { options } = parseOptions((trustMode || knownBadMode) ? argv.filter((arg: string) => !doctorModeFlags.has(arg)) : argv, 'doctor');
   const root = options.cwd;
   const rootPackage = readJsonIfExists(path.join(root, 'package.json')) ?? {};
-  const frameworkContractExpected = isFrameworkContractExpected(root, rootPackage);
+  const repoIdentity = detectFrameworkRepoIdentity(root);
+  const frameworkContractExpected = isFrameworkContractExpected(repoIdentity);
   const packageDirs = listPackageDirs(root);
   const hashAudit = runHashPlaceholderAudit({ root });
   const runtime = detectGovernanceRuntime(root, bootstrapTaskId);
@@ -188,7 +190,8 @@ export async function runDoctor(argv: any) {
       packageManager: 'npm',
       packageCount: packageDirs.length,
       repository: relativePathFrom(root, root) || '.',
-      projectRole: frameworkContractExpected ? 'framework' : 'host',
+      projectRole: repoIdentity.isFrameworkRepo ? 'framework' : 'host',
+      repoIdentity,
       layoutVersion: runtime.layoutVersion,
       currentTaskId: runtime.currentTaskId,
       lockOwner: runtime.activeLock?.owner ?? null,
@@ -320,10 +323,8 @@ function hasRequiredScripts(scripts: Record<string, string> = {}) {
   const required = ['build', 'typecheck', 'lint', 'test', 'validate:quick', 'validate:standard', 'validate:full'];
   return required.every((name) => typeof scripts[name] === 'string' && scripts[name].length > 0);
 }
-function isFrameworkContractExpected(root: any, rootPackage: any) {
-  return rootPackage.name === 'ai-atomic-framework'
-    || hasRequiredScripts(rootPackage.scripts)
-    || existsSync(path.join(root, 'package-lock.json'));
+function isFrameworkContractExpected(repoIdentity: { isFrameworkRepo: boolean }) {
+  return repoIdentity.isFrameworkRepo === true;
 }
 function listPackageDirs(root: any): string[] {
   const packagesRoot = path.join(root, 'packages');

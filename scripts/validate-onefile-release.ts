@@ -79,6 +79,22 @@ function writeGitHeadEvidence(cwd: any) {
   }, null, 2)}\n`, 'utf8');
 }
 
+function writeHostPackageLockSignals(cwd: any) {
+  writeFileSync(path.join(cwd, 'package.json'), `${JSON.stringify({
+    name: 'host-with-package-lock',
+    version: '0.0.0'
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(path.join(cwd, 'package-lock.json'), `${JSON.stringify({
+    name: 'host-with-package-lock',
+    lockfileVersion: 3
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(path.join(cwd, 'atomic-registry.json'), `${JSON.stringify({
+    schemaId: 'atm.registry.v1',
+    specVersion: '0.1.0',
+    entries: []
+  }, null, 2)}\n`, 'utf8');
+}
+
 function writeAdopterBackfillFixture(cwd: any) {
   const lineageLogPath = path.join(cwd, 'atomic_workbench', 'maps', 'ATM-MAP-0001', 'lineage-log.json');
   mkdirSync(path.dirname(lineageLogPath), { recursive: true });
@@ -153,6 +169,7 @@ try {
   assert(bootstrap.parsed.ok === true, 'onefile bootstrap must report ok=true');
   refreshOnboarding(path.join(blankRepo, 'atm.mjs'), blankRepo);
   writeGitHeadEvidence(blankRepo);
+  writeHostPackageLockSignals(blankRepo);
 
   const registrySmokeRepo = path.join(tempRoot, 'registry-diff-smoke');
   mkdirSync(registrySmokeRepo, { recursive: true });
@@ -210,6 +227,11 @@ try {
   assert(doctor.exitCode === 0, 'onefile doctor must exit 0 after bootstrap');
   assert(doctor.parsed.ok === true, 'onefile doctor must report ok=true after bootstrap');
   assert(doctor.parsed.evidence.layoutVersion === 2, 'onefile doctor must report layoutVersion=2');
+  assert(doctor.parsed.evidence.projectRole === 'host', 'onefile doctor must keep package-lock host repos in host mode');
+  assert(doctor.parsed.evidence.checks.find((check: any) => check.name === 'public-script-contract')?.ok === true,
+    'onefile doctor must not require framework public scripts from package-lock host repos');
+  assert(doctor.parsed.evidence.checks.find((check: any) => check.name === 'self-host-alpha-entry')?.ok === true,
+    'onefile doctor must not require framework self-host-alpha entry from package-lock host repos');
 
   const selfHostAlpha = runOnefile(path.join(blankRepo, 'atm.mjs'), blankRepo, ['self-host-alpha', '--verify', '--json']);
   assert(selfHostAlpha.exitCode === 0, 'onefile self-host-alpha must exit 0');
