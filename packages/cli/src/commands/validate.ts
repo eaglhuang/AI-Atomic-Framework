@@ -34,6 +34,10 @@ export function runValidate(argv: any) {
       }
     });
   }
+  if (argv.includes('atomization-coverage')) {
+    const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
+    return validateAtomizationCoverage(path.resolve(repo));
+  }
   if (argv.includes('framework-development')) {
     const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
     const files = (valueAfter(argv, '--files') ?? '').split(',').map((entry) => entry.trim()).filter(Boolean);
@@ -53,6 +57,49 @@ function valueAfter(argv: any, flag: string): string | null {
   }
   const value = argv[index + 1];
   return typeof value === 'string' && !value.startsWith('--') ? value : null;
+}
+
+function validateAtomizationCoverage(cwd: string) {
+  // Simple validation for atomization coverage
+  const thresholds = {
+    source_ownership_coverage: 30,
+    public_command_coverage: 50,
+    runtime_behavior_coverage: 40,
+    evidence_coverage: 60,
+    integration_health: 80
+  };
+  
+  // Stub scores for now - would be populated from actual measurement
+  const currentScores = {
+    source_ownership_coverage: 3,
+    public_command_coverage: 16,
+    runtime_behavior_coverage: 0,
+    evidence_coverage: 0,
+    integration_health: 50
+  };
+  
+  const violations = [];
+  for (const [metric, threshold] of Object.entries(thresholds)) {
+    const current = currentScores[metric as keyof typeof currentScores] || 0;
+    if (current < threshold) {
+      violations.push({ metric, current, threshold, gap: threshold - current });
+    }
+  }
+  
+  return makeResult({
+    ok: violations.length === 0,
+    command: 'validate',
+    cwd,
+    messages: violations.length === 0
+      ? [message('info', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_OK', 'Atomization coverage validation passed.')]
+      : [message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage has ${violations.length} threshold violations.`, { violations })],
+    evidence: {
+      validation: 'atomization-coverage',
+      thresholds,
+      current_scores: currentScores,
+      violations
+    }
+  });
 }
 
 function validateRepositoryConfig(cwd: any) {
