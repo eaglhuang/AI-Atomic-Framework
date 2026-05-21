@@ -1,0 +1,87 @@
+{
+  "$schema": "./path-to-atom-map.schema.json",
+  "version": "1.0",
+  "timestamp": "2026-05-21T00:00:00Z",
+  "mappings": [
+    {
+      "path_pattern": "packages/core/src/**",
+      "atom_id": "atom-core-registry",
+      "capability": "registry management, atom ownership tracking",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/cli/src/**",
+      "atom_id": "atom-cli-router",
+      "capability": "CLI dispatch, command routing",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/adapters/*/src/**",
+      "atom_id": "atom-integration-adapters",
+      "capability": "editor/platform integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/language-bindings/*/src/**",
+      "atom_id": "atom-language-bindings",
+      "capability": "Python/JavaScript language support",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugins/*/src/**",
+      "atom_id": "atom-plugin-framework",
+      "capability": "plugin loading and execution",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "scripts/src/build/**",
+      "atom_id": "atom-build-system",
+      "capability": "build orchestration, package dist",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "scripts/src/validate/**",
+      "atom_id": "atom-validator-framework",
+      "capability": "validation, guard enforcement",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "scripts/src/evidence/**",
+      "atom_id": "atom-evidence-tracking",
+      "capability": "evidence collection, provenance",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "integrations/codex/**",
+      "atom_id": "atom-codex-adapter",
+      "capability": "Codex editor integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "integrations/claude/**",
+      "atom_id": "atom-claude-adapter",
+      "capability": "Claude editor integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "integrations/cursor/**",
+      "atom_id": "atom-cursor-adapter",
+      "capability": "Cursor editor integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "integrations/copilot/**",
+      "atom_id": "atom-copilot-adapter",
+      "capability": "GitHub Copilot integration",
+      "coverage_status": "partial"
+    }
+  ],
+  "summary": {
+    "total_production_paths": 12,
+    "mapped_paths": 12,
+    "coverage_percentage": 100,
+    "atoms_defined": 12,
+    "atoms_with_evidence": 0,
+    "debt_items": 12
+  }
+}

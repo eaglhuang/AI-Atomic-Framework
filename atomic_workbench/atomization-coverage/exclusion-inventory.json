@@ -1,0 +1,111 @@
+[
+  {
+    "path": "dist/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-build-release",
+    "provenance": "npm run build typescript compiler output",
+    "notes": "編譯輸出，自動生成"
+  },
+  {
+    "path": "build/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-build-release",
+    "provenance": "npm run build intermediate files",
+    "notes": "構建臨時檔"
+  },
+  {
+    "path": "release/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-build-release",
+    "provenance": "npm run build --filter release onefile/dist-tag builders",
+    "notes": "發布產物"
+  },
+  {
+    "path": "**/*.gen.ts",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "atom generator or TypeScript codegen",
+    "notes": "自動生成的型別定義"
+  },
+  {
+    "path": "**/*.gen.json",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "configuration/registry generators",
+    "notes": "自動生成的配置"
+  },
+  {
+    "path": "fixtures/**",
+    "reason": "fixture",
+    "provenance": "test fixture data and mocks",
+    "notes": "測試 fixture"
+  },
+  {
+    "path": "specs/samples/**",
+    "reason": "example",
+    "provenance": "specification examples and reference implementations",
+    "notes": "規範範例"
+  },
+  {
+    "path": "tests/**/*.snapshot",
+    "reason": "snapshot",
+    "provenance": "jest snapshot or regression test output",
+    "notes": "快照測試結果"
+  },
+  {
+    "path": "tests/**/*.snap",
+    "reason": "snapshot",
+    "provenance": "vitest snapshot",
+    "notes": "vitest 快照"
+  },
+  {
+    "path": "atomic_workbench/generators/**/outputs/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "atomic workbench generator tool outputs",
+    "notes": "Generator 工作台輸出"
+  },
+  {
+    "path": "atomic_workbench/generators/**/artifacts/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "atomic workbench generator tool artifacts",
+    "notes": "Generator 工作台產出"
+  },
+  {
+    "path": "examples/**",
+    "reason": "example",
+    "provenance": "example implementations",
+    "notes": "示例代碼"
+  },
+  {
+    "path": "samples/**",
+    "reason": "example",
+    "provenance": "sample applications",
+    "notes": "示例應用"
+  },
+  {
+    "path": "docs/**/*.md",
+    "reason": "doc",
+    "provenance": "documentation",
+    "notes": "文檔（high-level architecture 除外）"
+  },
+  {
+    "path": "tests/**/*.test.ts",
+    "reason": "test-only",
+    "provenance": "unit test source",
+    "notes": "測試程式碼"
+  },
+  {
+    "path": "tests/**/*.spec.ts",
+    "reason": "test-only",
+    "provenance": "test specification source",
+    "notes": "測試規範"
+  },
+  {
+    "path": "scripts/internal/**",
+    "reason": "internal-only",
+    "provenance": "internal utilities not part of public contract",
+    "notes": "內部工具"
+  }
+]
