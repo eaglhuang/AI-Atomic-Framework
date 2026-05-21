@@ -29,6 +29,10 @@ function readJson(filePath: string): Record<string, any> {
   return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, any>;
 }
 
+function evidenceReport(result: Awaited<ReturnType<typeof runTasks>>): Record<string, any> {
+  return (result.evidence as Record<string, any> | undefined)?.report as Record<string, any>;
+}
+
 function makeHostRepo(parent: string, name: string, config: Record<string, unknown> = {}) {
   const repo = path.join(parent, name);
   mkdirSync(repo, { recursive: true });
@@ -175,8 +179,45 @@ try {
   assert(manualMirrorAudit.ok === false, 'hand-edited mirror done task must fail audit');
   assert(manualMirrorAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_TRANSITION_EVIDENCE_MISSING'), 'missing transition evidence must be reported');
 
+  const legacyRepo = makeHostRepo(tempRoot, 'legacy-ledger');
+  writeJson(path.join(legacyRepo, '.atm', 'history', 'tasks', 'TASK-LEGACY-0001.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-LEGACY-0001',
+    title: 'Legacy JSON done task',
+    status: 'done'
+  });
+  const legacyMarkdownPath = path.join(legacyRepo, 'docs', 'tasks', 'TASK-LEGACY-0002.task.md');
+  mkdirSync(path.dirname(legacyMarkdownPath), { recursive: true });
+  writeFileSync(legacyMarkdownPath, [
+    '---',
+    'task_id: TASK-LEGACY-0002',
+    'title: Legacy Markdown done task',
+    'status: done',
+    '---',
+    '',
+    '# Legacy Markdown done task',
+    ''
+  ].join('\n'), 'utf8');
+  const legacyAuditBefore = auditTasks(legacyRepo);
+  assert(legacyAuditBefore.ok === false, 'legacy done tasks without transition evidence must fail audit before migration');
+  assert(legacyAuditBefore.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_MANUAL_DONE'), 'legacy done tasks must be reported as manual done before migration');
+  const legacyDryRun = await runTasks(['migrate-legacy-ledger', '--cwd', legacyRepo, '--actor', 'validator', '--dry-run']);
+  assert(legacyDryRun.ok === true, 'legacy ledger dry-run must succeed');
+  assert(evidenceReport(legacyDryRun).migratableTaskCount === 2, 'legacy ledger dry-run must find both JSON and Markdown legacy tasks');
+  const legacyApply = await runTasks(['migrate-legacy-ledger', '--cwd', legacyRepo, '--actor', 'validator', '--apply']);
+  assert(legacyApply.ok === true, 'legacy ledger apply must succeed');
+  const migratedJsonTask = readJson(path.join(legacyRepo, '.atm', 'history', 'tasks', 'TASK-LEGACY-0001.json'));
+  assert(migratedJsonTask.ledgerBaselineKind === 'legacy-transition-backfill', 'JSON task must record legacy baseline kind');
+  assert(typeof migratedJsonTask.lastTransitionId === 'string', 'JSON task must record migrated lastTransitionId');
+  const migratedMarkdownText = readFileSync(legacyMarkdownPath, 'utf8');
+  assert(migratedMarkdownText.includes('ledgerBaselineKind: legacy-transition-backfill'), 'Markdown task must record legacy baseline kind');
+  assert(migratedMarkdownText.includes('lastTransitionId:'), 'Markdown task must record migrated lastTransitionId');
+  const legacyAuditAfter = auditTasks(legacyRepo);
+  assert(legacyAuditAfter.ok === true, 'legacy tasks with baseline transition evidence must pass audit');
+  assert(legacyAuditAfter.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_LEGACY_BASELINE_DONE'), 'legacy baseline done warning must remain visible');
+
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, and disabled ledger verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, and legacy baseline migration verified)`);
   }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

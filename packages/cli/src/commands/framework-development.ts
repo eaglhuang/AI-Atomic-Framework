@@ -372,6 +372,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
     }
 
     const lastTransitionId = normalizeOptionalString(task.document.lastTransitionId ?? task.document.last_transition_id);
+    const hasTransitionEvent = Boolean(lastTransitionId && transitionEventExists(root, task.taskId, lastTransitionId));
     const transitionRequired = taskLedger.enabled
       && taskLedger.provider === 'atm-local'
       && taskLedger.requireCliTransitions
@@ -384,7 +385,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
         taskId: task.taskId,
         detail: `Task ${task.taskId} is missing lastTransitionId; status transitions must use ATM CLI.`
       });
-    } else if (lastTransitionId && !transitionEventExists(root, task.taskId, lastTransitionId)) {
+    } else if (lastTransitionId && !hasTransitionEvent) {
       findings.push({
         level: 'error',
         code: 'ATM_TASK_AUDIT_TRANSITION_EVENT_MISSING',
@@ -399,6 +400,8 @@ export function auditTasks(cwd: string): TaskAuditReport {
     const targetRepo = normalizeOptionalString(task.document.target_repo ?? task.document.targetRepo ?? task.document.upstream_repo ?? task.document.upstreamRepo);
     const closurePacketRef = normalizeOptionalString(task.document.closure_packet ?? task.document.closurePacket);
     const hasCliClosure = Boolean(task.document.closedByActor || task.document.closedByCommand === 'atm tasks close');
+    const hasLegacyBaseline = normalizeOptionalString(task.document.ledgerBaselineKind ?? task.document.ledger_baseline_kind) === 'legacy-transition-backfill'
+      && hasTransitionEvent;
 
     if (closureAuthority === 'target_repo' && targetRepo && !matchesCurrentRepoIdentity(root, targetRepo)) {
       if (!closurePacketRef) {
@@ -413,13 +416,21 @@ export function auditTasks(cwd: string): TaskAuditReport {
       continue;
     }
 
-    if (!hasCliClosure && !closurePacketRef) {
+    if (!hasCliClosure && !closurePacketRef && !hasLegacyBaseline) {
       findings.push({
         level: 'error',
         code: 'ATM_TASK_AUDIT_MANUAL_DONE',
         path: task.relativePath,
         taskId: task.taskId,
         detail: `Task ${task.taskId} is marked done without ATM CLI closure metadata.`
+      });
+    } else if (hasLegacyBaseline && !hasCliClosure && !closurePacketRef) {
+      findings.push({
+        level: 'warning',
+        code: 'ATM_TASK_AUDIT_LEGACY_BASELINE_DONE',
+        path: task.relativePath,
+        taskId: task.taskId,
+        detail: `Task ${task.taskId} is done via a legacy baseline transition; it is traceable but not equivalent to a fresh ATM CLI close.`
       });
     }
   }

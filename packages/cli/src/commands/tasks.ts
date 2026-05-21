@@ -17,7 +17,8 @@ import { CliError, makeResult, message, relativePathFrom, resolveValue } from '.
 import {
   appendTaskTransitionEvent,
   defaultMirrorTaskId,
-  readTaskLedgerPolicy
+  readTaskLedgerPolicy,
+  transitionEventExists
 } from './task-ledger.ts';
 
 export interface TaskImportSource {
@@ -84,6 +85,37 @@ export interface TaskVerifyReport {
   readonly ok: boolean;
 }
 
+export interface TaskLegacyLedgerMigrationReport {
+  readonly schemaId: 'atm.taskLegacyLedgerMigrationReport';
+  readonly specVersion: '0.1.0';
+  readonly generatedAt: string;
+  readonly mode: 'dry-run' | 'apply';
+  readonly taskRoot: string;
+  readonly eventRoot: string;
+  readonly inspectedTaskCount: number;
+  readonly migratableTaskCount: number;
+  readonly migratedTaskCount: number;
+  readonly skippedTaskCount: number;
+  readonly migratedTasks: readonly TaskLegacyLedgerMigrationEntry[];
+  readonly skippedTasks: readonly TaskLegacyLedgerMigrationSkip[];
+}
+
+export interface TaskLegacyLedgerMigrationEntry {
+  readonly taskId: string;
+  readonly taskPath: string;
+  readonly taskFormat: 'json' | 'markdown';
+  readonly status: string;
+  readonly reason: 'missing-transition-id' | 'missing-transition-event';
+  readonly transitionPath: string | null;
+}
+
+export interface TaskLegacyLedgerMigrationSkip {
+  readonly taskId: string;
+  readonly taskPath: string;
+  readonly taskFormat: 'json' | 'markdown';
+  readonly reason: string;
+}
+
 const validStatuses = new Set<TaskImportStatus>(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
 const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria'];
 const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes'];
@@ -113,6 +145,9 @@ export async function runTasks(argv: string[]) {
   if (action === 'audit') {
     return runTasksAudit(argv.slice(1));
   }
+  if (action === 'migrate-legacy-ledger') {
+    return runTasksMigrateLegacyLedger(argv.slice(1));
+  }
   if (action === 'reserve' || action === 'promote') {
     return await runTasksReservation(action, argv.slice(1));
   }
@@ -126,7 +161,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -806,6 +841,93 @@ function runTasksAudit(argv: string[]) {
   });
 }
 
+async function runTasksMigrateLegacyLedger(argv: string[]) {
+  const options = parseLegacyLedgerMigrationOptions(argv);
+  assertLocalTaskLedgerEnabled(options.cwd, 'migrate-legacy-ledger');
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks migrate-legacy-ledger requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const taskLedger = readTaskLedgerPolicy(options.cwd);
+  const tasks = readLegacyLedgerTaskFiles(options.cwd);
+  const migratedTasks: TaskLegacyLedgerMigrationEntry[] = [];
+  const skippedTasks: TaskLegacyLedgerMigrationSkip[] = [];
+
+  for (const task of tasks) {
+    if (!legacyTaskRequiresBaseline(options.cwd, task)) {
+      skippedTasks.push({
+        taskId: task.taskId,
+        taskPath: task.relativePath,
+        taskFormat: task.format,
+        reason: 'already-has-transition-evidence-or-not-required'
+      });
+      continue;
+    }
+    const migrationReason = normalizeStringValue(task.document.lastTransitionId ?? task.document.last_transition_id)
+      ? 'missing-transition-event'
+      : 'missing-transition-id';
+    const reportEntry: TaskLegacyLedgerMigrationEntry = {
+      taskId: task.taskId,
+      taskPath: task.relativePath,
+      taskFormat: task.format,
+      status: task.status,
+      reason: migrationReason,
+      transitionPath: null
+    };
+    if (options.apply) {
+      const transitionPath = writeLegacyBaselineTransition({
+        cwd: options.cwd,
+        task,
+        actorId,
+        reason: options.reason
+      });
+      migratedTasks.push({
+        ...reportEntry,
+        transitionPath
+      });
+    } else {
+      migratedTasks.push(reportEntry);
+    }
+  }
+
+  const report: TaskLegacyLedgerMigrationReport = {
+    schemaId: 'atm.taskLegacyLedgerMigrationReport',
+    specVersion: '0.1.0',
+    generatedAt: new Date().toISOString(),
+    mode: options.apply ? 'apply' : 'dry-run',
+    taskRoot: taskLedger.taskRoot,
+    eventRoot: taskLedger.eventRoot,
+    inspectedTaskCount: tasks.length,
+    migratableTaskCount: migratedTasks.length,
+    migratedTaskCount: options.apply ? migratedTasks.length : 0,
+    skippedTaskCount: skippedTasks.length,
+    migratedTasks,
+    skippedTasks
+  };
+
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [
+      message('info', 'ATM_TASKS_LEGACY_LEDGER_MIGRATION', options.apply
+        ? `Backfilled baseline transition evidence for ${migratedTasks.length} legacy task(s).`
+        : `Legacy ledger migration dry-run found ${migratedTasks.length} task(s) to backfill.`, {
+        mode: report.mode,
+        inspectedTaskCount: report.inspectedTaskCount,
+        migratableTaskCount: report.migratableTaskCount,
+        migratedTaskCount: report.migratedTaskCount
+      })
+    ],
+    evidence: {
+      action: 'migrate-legacy-ledger',
+      actorId,
+      report
+    }
+  });
+}
+
 async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
   const options = parseClaimLifecycleOptions(action, argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined);
@@ -1356,6 +1478,53 @@ function parseAuditOptions(argv: string[]) {
   };
 }
 
+function parseLegacyLedgerMigrationOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    actorId: null as string | null,
+    dryRun: false,
+    apply: false,
+    reason: 'Backfilled task-ledger/v1 baseline transition for legacy task state that predates CLI-controlled task transitions.'
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      options.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      options.dryRun = true;
+      continue;
+    }
+    if (arg === '--apply') {
+      options.apply = true;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks migrate-legacy-ledger does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (options.apply === options.dryRun) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks migrate-legacy-ledger requires exactly one of --dry-run or --apply.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd)
+  };
+}
+
 function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -1519,6 +1688,203 @@ function writeTaskDocument(taskPath: string, document: Record<string, unknown>) 
 function taskPathFor(cwd: string, taskId: string): string {
   const taskLedger = readTaskLedgerPolicy(cwd);
   return path.join(cwd, taskLedger.taskRoot, `${taskId}.json`);
+}
+
+interface LegacyLedgerTaskFile {
+  readonly absolutePath: string;
+  readonly relativePath: string;
+  readonly taskId: string;
+  readonly status: string;
+  readonly format: 'json' | 'markdown';
+  readonly document: Record<string, unknown>;
+  readonly rawText?: string;
+}
+
+function readLegacyLedgerTaskFiles(cwd: string): readonly LegacyLedgerTaskFile[] {
+  const root = path.resolve(cwd);
+  const taskLedger = readTaskLedgerPolicy(root);
+  const jsonTasks = listTaskFiles(path.join(root, taskLedger.taskRoot), (filePath) => filePath.endsWith('.json'))
+    .map((absolutePath) => {
+      const document = readJsonRecord(absolutePath);
+      const taskId = normalizeTaskDocumentId(document, path.basename(absolutePath, '.json'));
+      return {
+        absolutePath,
+        relativePath: relativePathFrom(root, absolutePath),
+        taskId,
+        status: normalizeTaskStatus(document.status),
+        format: 'json' as const,
+        document
+      };
+    });
+  const markdownTasks = listTaskFiles(root, (filePath) => filePath.endsWith('.task.md'))
+    .map((absolutePath) => {
+      const rawText = readFileSync(absolutePath, 'utf8');
+      const document = parseTaskMarkdownFrontmatter(rawText);
+      const taskId = normalizeTaskDocumentId(document, path.basename(absolutePath).replace(/\.task\.md$/, ''));
+      return {
+        absolutePath,
+        relativePath: relativePathFrom(root, absolutePath),
+        taskId,
+        status: normalizeTaskStatus(document.status),
+        format: 'markdown' as const,
+        document,
+        rawText
+      };
+    });
+  return [...jsonTasks, ...markdownTasks].sort((left, right) => left.relativePath.localeCompare(right.relativePath));
+}
+
+function legacyTaskRequiresBaseline(cwd: string, task: LegacyLedgerTaskFile): boolean {
+  const originProvider = normalizeStringValue(task.document.originProvider ?? task.document.origin_provider);
+  const originTaskId = normalizeStringValue(task.document.originTaskId ?? task.document.origin_task_id);
+  const transitionRequired = task.status === 'done' || Boolean(originProvider || originTaskId);
+  if (!transitionRequired) return false;
+  const lastTransitionId = normalizeStringValue(task.document.lastTransitionId ?? task.document.last_transition_id);
+  if (!lastTransitionId) return true;
+  return !transitionEventExists(cwd, task.taskId, lastTransitionId);
+}
+
+function writeLegacyBaselineTransition(input: {
+  readonly cwd: string;
+  readonly task: LegacyLedgerTaskFile;
+  readonly actorId: string;
+  readonly reason: string;
+}): string {
+  const updatedDocument: Record<string, unknown> = {
+    ...input.task.document,
+    ledgerContractVersion: 'task-ledger/v1',
+    ledgerBaselineKind: 'legacy-transition-backfill',
+    ledgerBaselineByActor: input.actorId,
+    ledgerBaselineReason: input.reason,
+    ledgerBaselineSourceSha256: sha256(input.task.rawText ?? `${JSON.stringify(input.task.document, null, 2)}\n`)
+  };
+  const transition = appendTaskTransitionEvent({
+    cwd: input.cwd,
+    taskId: input.task.taskId,
+    action: 'migrate-legacy-ledger',
+    actorId: input.actorId,
+    fromStatus: input.task.status || null,
+    toStatus: input.task.status || null,
+    taskPath: input.task.absolutePath,
+    taskDocument: updatedDocument,
+    command: 'node atm.mjs tasks migrate-legacy-ledger'
+  });
+  updatedDocument.lastTransitionId = transition.transitionId;
+  updatedDocument.lastTransitionAt = transition.event.createdAt;
+  updatedDocument.ledgerBaselineAt = transition.event.createdAt;
+  if (input.task.format === 'json') {
+    updatedDocument.legacyLedgerBaseline = {
+      schemaId: 'atm.legacyTaskLedgerBaseline.v1',
+      migratedAt: transition.event.createdAt,
+      migratedByActor: input.actorId,
+      previousStatus: input.task.status || null,
+      reason: input.reason,
+      sourceTaskSha256: updatedDocument.ledgerBaselineSourceSha256,
+      transitionId: transition.transitionId
+    };
+    writeTaskDocument(input.task.absolutePath, updatedDocument);
+  } else {
+    writeTaskMarkdownFrontmatter(input.task.absolutePath, input.task.rawText ?? '', updatedDocument);
+  }
+  return transition.eventPath;
+}
+
+function listTaskFiles(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
+  if (!existsSync(directoryPath)) return [];
+  const stats = statSync(directoryPath);
+  if (stats.isFile()) return predicate(directoryPath) ? [directoryPath] : [];
+  const ignoredDirs = new Set(['.git', 'node_modules', 'dist', 'build', 'release', '.atm-temp']);
+  const output: string[] = [];
+  for (const entry of readdirSync(directoryPath, { withFileTypes: true })) {
+    if (entry.isDirectory() && ignoredDirs.has(entry.name)) continue;
+    const absolutePath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory()) {
+      output.push(...listTaskFiles(absolutePath, predicate));
+    } else if (entry.isFile() && predicate(absolutePath)) {
+      output.push(absolutePath);
+    }
+  }
+  return output;
+}
+
+function readJsonRecord(filePath: string): Record<string, unknown> {
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as unknown;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
+  } catch {
+    return {};
+  }
+}
+
+function parseTaskMarkdownFrontmatter(text: string): Record<string, unknown> {
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return {};
+  const result: Record<string, unknown> = {};
+  for (const rawLine of match[1].split(/\r?\n/)) {
+    const separatorIndex = rawLine.indexOf(':');
+    if (separatorIndex === -1) continue;
+    const key = rawLine.slice(0, separatorIndex).trim();
+    const value = rawLine.slice(separatorIndex + 1).trim();
+    if (key) result[key] = value;
+  }
+  return result;
+}
+
+function writeTaskMarkdownFrontmatter(filePath: string, text: string, document: Record<string, unknown>) {
+  const upsertKeys = [
+    'lastTransitionId',
+    'lastTransitionAt',
+    'ledgerContractVersion',
+    'ledgerBaselineKind',
+    'ledgerBaselineByActor',
+    'ledgerBaselineAt',
+    'ledgerBaselineReason',
+    'ledgerBaselineSourceSha256'
+  ];
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
+  const frontmatterLines = match ? match[1].split(/\r?\n/) : [];
+  const body = match ? text.slice(match[0].length) : text;
+  const seenKeys = new Set<string>();
+  const rewritten = frontmatterLines.map((line) => {
+    const separatorIndex = line.indexOf(':');
+    if (separatorIndex === -1) return line;
+    const key = line.slice(0, separatorIndex).trim();
+    if (!upsertKeys.includes(key)) return line;
+    seenKeys.add(key);
+    return `${key}: ${formatFrontmatterValue(document[key])}`;
+  });
+  for (const key of upsertKeys) {
+    if (!seenKeys.has(key) && document[key] !== undefined && isFrontmatterScalar(document[key])) {
+      rewritten.push(`${key}: ${formatFrontmatterValue(document[key])}`);
+    }
+  }
+  writeFileSync(filePath, `---\n${rewritten.join('\n')}\n---\n${body}`, 'utf8');
+}
+
+function isFrontmatterScalar(value: unknown): value is string | number | boolean {
+  return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+}
+
+function formatFrontmatterValue(value: unknown): string {
+  if (typeof value === 'string') return value.replace(/\r?\n/g, ' ').trim();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return '';
+}
+
+function normalizeTaskDocumentId(document: Record<string, unknown>, fallback: string): string {
+  return normalizeStringValue(document.workItemId ?? document.id ?? document.task_id ?? document.taskId) ?? fallback;
+}
+
+function normalizeTaskStatus(value: unknown): string {
+  return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+}
+
+function normalizeStringValue(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function sha256(value: string): string {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
 function assertLocalTaskLedgerEnabled(cwd: string, action: string) {
