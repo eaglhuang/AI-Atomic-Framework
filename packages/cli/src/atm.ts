@@ -48,6 +48,7 @@ import { runRescue } from './commands/rescue.ts';
 import { runDo } from './commands/do.ts';
 import { runDaemon } from './commands/daemon.ts';
 import { runCache } from './commands/cache.ts';
+import { runHealthReport } from './commands/health-report.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
@@ -100,7 +101,8 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   rescue: runRescue,
   do: runDo,
   daemon: runDaemon,
-  cache: runCache
+  cache: runCache,
+  'health-report': runHealthReport
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
