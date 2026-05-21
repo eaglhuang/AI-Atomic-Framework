@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runAtomize } from './commands/atomize.ts';
 import { runATMChart } from './commands/atm-chart.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runBudget } from './commands/budget.ts';
@@ -57,6 +58,7 @@ import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startu
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
+  atomize: runAtomize,
   'atm-chart': runATMChart,
   bootstrap: runBootstrap,
   budget: runBudget,
