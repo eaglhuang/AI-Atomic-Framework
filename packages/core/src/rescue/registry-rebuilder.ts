@@ -8,8 +8,8 @@ import {
   upsertCapsuleEntry
 } from '../registry/capsule-registry.ts';
 import { verifyMapPayloadHash, mapCidToShortId } from '../registry/map-capsule.ts';
-import type { MapRegistry } from '../registry/map-capsule-registry.ts';
 import {
+  type MapRegistry,
   loadMapRegistry,
   saveMapRegistry,
   getRepoMapRegistryPath,

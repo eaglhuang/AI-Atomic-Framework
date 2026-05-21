@@ -55,9 +55,12 @@ assert(/@experimental/.test(sdkExperimental), 'EXPERIMENTAL_API_MARKER_MISSING',
 assert(/ATM_EXPERIMENTAL_API_REQUIRES_OPT_IN/.test(sdkExperimental), 'EXPERIMENTAL_API_OPT_IN_ERROR_MISSING', 'experimental SDK must expose opt-in denial');
 assert(/invokeExperimentalApi/.test(readText('packages/agent-pack-sdk/src/index.ts')), 'EXPERIMENTAL_API_SDK_EXPORT_MISSING', 'agent-pack-sdk index must export experimental API surface');
 
-const upgradeSource = readText('packages/cli/src/commands/upgrade.ts');
-assert(/--allow-experimental/.test(upgradeSource), 'EXPERIMENTAL_API_CLI_FLAG_MISSING', 'upgrade command must parse --allow-experimental');
-assert(/invokeExperimentalApi/.test(upgradeSource), 'EXPERIMENTAL_API_CLI_INVOKE_MISSING', 'upgrade command must route through experimental SDK helper');
+const upgradeSources = [
+  readText('packages/cli/src/commands/upgrade.ts'),
+  readText('packages/cli/src/commands/upgrade/experimental.ts')
+].join('\n');
+assert(/--allow-experimental/.test(upgradeSources), 'EXPERIMENTAL_API_CLI_FLAG_MISSING', 'upgrade command must parse --allow-experimental');
+assert(/invokeExperimentalApi/.test(upgradeSources), 'EXPERIMENTAL_API_CLI_INVOKE_MISSING', 'upgrade command must route through experimental SDK helper');
 
 const welcomeSource = readText('packages/cli/src/commands/welcome.ts');
 assert(/ATM_EXPERIMENTAL_API_NOTICE/.test(welcomeSource), 'EXPERIMENTAL_API_WELCOME_NOTICE_MISSING', 'welcome must display experimental channel notice');

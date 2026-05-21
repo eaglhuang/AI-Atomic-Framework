@@ -27,6 +27,18 @@ through ATM evidence before choosing a local implementation path.
 If the first command returns a user notice, surface it briefly, then continue the
 original user request.
 
+Before editing implementation files, inspect framework mode:
+
+```bash
+node atm.mjs framework-mode status --json
+```
+
+If the result mode is `required` or `cross-repo-target-required`, do not hand-edit
+task status to `done`, do not bulk-close task cards, and do not treat static
+`atomic_workbench/evidence/*.json` files as completion evidence. Claim/lock the
+task, run `guard framework-development`, `tasks audit`, `doctor`, and the
+required validators before closing with `tasks close`.
+
 ## Route Command
 
 ```bash
@@ -117,6 +129,12 @@ Then continue the user's original request with the fallback sources.
   a later governed dry run is selected.
 - Do not start implementation edits before a task is in `ready` and has an
   active claim.
+- Do not mark task cards `done` by editing Markdown or JSON directly; use
+  `node atm.mjs tasks close --status done` so closure evidence is checked.
+- Do not bulk-complete multiple tasks without a bulk closure manifest and one
+  closure packet per task.
+- Do not use static JSON evidence files as proof of completion unless they carry
+  command runs with exit codes and output hashes.
 - Do not move heavy checks (build/lint/network) into hooks; hooks should only
   call thin ATM guard commands.
 - Do not treat task-card import as atom birth; task-card import uses `tasks

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
+import { runFrameworkDevelopmentValidation } from './framework-development.ts';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.ts';
 
 const requiredAtomicSpecFields = [
@@ -32,6 +33,11 @@ export function runValidate(argv: any) {
         report
       }
     });
+  }
+  if (argv.includes('framework-development')) {
+    const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
+    const files = (valueAfter(argv, '--files') ?? '').split(',').map((entry) => entry.trim()).filter(Boolean);
+    return runFrameworkDevelopmentValidation(path.resolve(repo), files);
   }
   const { options } = parseOptions(argv, 'validate');
   if (options.spec) {

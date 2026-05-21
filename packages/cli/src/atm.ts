@@ -11,6 +11,7 @@ import { runDoctor } from './commands/doctor.ts';
 import { runExplain } from './commands/explain.ts';
 import { runExperience } from './commands/experience.ts';
 import { runEvidence } from './commands/evidence.ts';
+import { runFrameworkMode } from './commands/framework-development.ts';
 import { runGuard } from './commands/guard.ts';
 import { runAtmGit } from './commands/git-governance.ts';
 import { runGuide } from './commands/guide.ts';
@@ -65,6 +66,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   explain: runExplain,
   experience: runExperience,
   evidence: runEvidence,
+  'framework-mode': runFrameworkMode,
   git: runAtmGit,
   guard: runGuard,
   guide: runGuide,

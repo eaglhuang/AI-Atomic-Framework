@@ -28,6 +28,8 @@ gates run on developer machines.
 ## Behavior
 
 - `pre-commit` runs `node atm.mjs doctor --json` first.
+- If staged files touch ATM framework critical source surfaces, the hook runs `node atm.mjs guard framework-development --files ... --json`.
+- The hook runs `node atm.mjs tasks audit --json` so hand-edited `status: done`, missing closure packets, and static draft evidence cannot be committed as completion.
 - If the current HEAD already lacks matching ATM evidence, the hook blocks the next commit.
 - If HEAD is healthy, the hook records staged-tree evidence at `.atm/history/evidence/git-head.json` and stages that evidence file.
 - `post-commit` runs `node atm.mjs doctor --json` again so the new HEAD is checked immediately.
@@ -40,6 +42,8 @@ Use the same shared gate in CI:
 
 ```bash
 node atm.mjs doctor --json
+node atm.mjs tasks audit --json
+node atm.mjs guard framework-development --json
 ```
 
 CI can fail on `ATM_DOCTOR_GIT_EVIDENCE_MISSING` to catch commits that bypassed local hooks.

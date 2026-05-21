@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/governance/closure-packet.schema.json",
+  "title": "ATM Closure Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "taskId",
+    "targetRepoIdentity",
+    "closedByCommand",
+    "commandRuns",
+    "requiredGates",
+    "evidencePath",
+    "closedAt",
+    "closedByActor"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.closurePacket.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "taskId": { "type": "string", "minLength": 1 },
+    "targetRepoIdentity": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["isFrameworkRepo", "score", "root", "signals"],
+      "properties": {
+        "isFrameworkRepo": { "const": true },
+        "score": { "type": "integer", "minimum": 2 },
+        "root": { "type": "string", "minLength": 1 },
+        "name": { "type": ["string", "null"] },
+        "signals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "targetCommit": { "type": ["string", "null"] },
+    "governedTreeSha": { "type": ["string", "null"] },
+    "closedByCommand": { "const": "atm tasks close" },
+    "commandRuns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "cwd", "exitCode", "stdoutSha256", "stderrSha256", "runnerVersion"],
+        "properties": {
+          "command": { "type": "string", "minLength": 1 },
+          "cwd": { "type": "string", "minLength": 1 },
+          "exitCode": { "type": "integer" },
+          "stdoutSha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "stderrSha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "runnerVersion": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "requiredGates": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidencePath": { "type": "string", "minLength": 1 },
+    "closedAt": { "type": "string", "minLength": 1 },
+    "closedByActor": { "type": "string", "minLength": 1 }
+  }
+}

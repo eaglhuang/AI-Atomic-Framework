@@ -43,7 +43,7 @@ export function createSeedAtomSpec() {
     },
     hashLock: {
       algorithm: 'sha256',
-      digest: 'sha256:0f1f2ec20d8d985b437b281a804d4f5d25803a6bf078e600eecb1e1ddd2bf3d4',
+      digest: 'sha256:aac4866b76206c5f16da8902cf93d51c3b41cc263118d60c3950a4e2f5226cf4',
       canonicalization: 'json-stable-v1'
     },
     dependencyPolicy: {

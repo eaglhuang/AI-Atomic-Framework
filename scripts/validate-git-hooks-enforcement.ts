@@ -61,10 +61,14 @@ function installHooks(repo: any) {
 
 const preCommitTemplate = readFileSync(path.join(root, 'templates', 'enforcement', 'pre-commit.sh'), 'utf8');
 assert(preCommitTemplate.includes('node atm.mjs atm-chart verify --json'), 'pre-commit enforcement template must verify ATMChart freshness');
+assert(preCommitTemplate.includes('node atm.mjs guard framework-development'), 'pre-commit enforcement template must run the framework-development guard');
+assert(preCommitTemplate.includes('node atm.mjs tasks audit --json'), 'pre-commit enforcement template must audit task closure integrity');
 assert(preCommitTemplate.includes('node atm.mjs agent-pack verify-fresh --id "$pack_id" --json'), 'pre-commit enforcement template must verify installed agent-pack freshness');
 
 const ciTemplate = readFileSync(path.join(root, 'templates', 'enforcement', 'ci-atm-onboarding.yml'), 'utf8');
 assert(ciTemplate.includes('node atm.mjs atm-chart verify --json'), 'CI enforcement template must verify ATMChart freshness');
+assert(ciTemplate.includes('node atm.mjs guard framework-development'), 'CI enforcement template must run the framework-development guard');
+assert(ciTemplate.includes('node atm.mjs tasks audit --json'), 'CI enforcement template must audit task closure integrity');
 assert(ciTemplate.includes('node atm.mjs agent-pack verify-fresh --id "$pack_id" --json'), 'CI enforcement template must verify installed agent-pack freshness');
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-hooks-'));

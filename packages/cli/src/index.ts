@@ -100,6 +100,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'framework-mode',
+    summary: 'Detect ATM framework-development hard gates for critical source changes',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'guard',
     summary: 'Run governance guards for encoding, mutation scope, and git metadata',
     implemented: true,

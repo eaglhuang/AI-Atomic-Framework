@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -23,6 +25,29 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: ATM Doctor
+        run: node atm.mjs doctor --json
+
+      - name: ATM Task Audit
+        run: node atm.mjs tasks audit --json
+
+      - name: ATM Framework Development Gate
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}"...HEAD)"
+          elif [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            changed_files="$(git diff --name-only "${{ github.event.before }}"...HEAD)"
+          else
+            changed_files="$(git diff --name-only HEAD 2>/dev/null || true)"
+          fi
+          if [ -n "$changed_files" ]; then
+            changed_csv="$(printf '%s\n' "$changed_files" | paste -sd, -)"
+            node atm.mjs guard framework-development --files "$changed_csv" --json
+          else
+            node atm.mjs guard framework-development --json
+          fi
 
       - name: Typecheck
         run: npm run typecheck

@@ -4,6 +4,12 @@ set -eu
 node atm.mjs doctor --json
 node atm.mjs atm-chart verify --json
 
+staged_paths="$(git diff --cached --name-only | grep -v '^\.atm/history/evidence/git-head\.json$' || true)"
+if [ -n "$staged_paths" ]; then
+  node atm.mjs guard framework-development --json
+fi
+node atm.mjs tasks audit --json
+
 if [ -d ".atm/agent-pack" ]; then
   for manifest in .atm/agent-pack/*.manifest.json; do
     [ -e "$manifest" ] || continue

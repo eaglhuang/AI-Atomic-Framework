@@ -21,6 +21,7 @@ import policeSpec from './command-specs/police.spec.ts';
 import startSpec from './command-specs/start.spec.ts';
 import explainSpec from './command-specs/explain.spec.ts';
 import evidenceSpec from './command-specs/evidence.spec.ts';
+import frameworkModeSpec from './command-specs/framework-mode.spec.ts';
 import guardSpec from './command-specs/guard.spec.ts';
 import gitSpec from './command-specs/git.spec.ts';
 import guideSpec from './command-specs/guide.spec.ts';
@@ -64,6 +65,7 @@ export const commandSpecs = Object.freeze({
   start: startSpec,
   explain: explainSpec,
   evidence: evidenceSpec,
+  'framework-mode': frameworkModeSpec,
   guard: guardSpec,
   git: gitSpec,
   guide: guideSpec,

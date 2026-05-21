@@ -56,7 +56,10 @@ assert(/stable \| 180 days \| 3 minors/.test(policy), 'DEPRECATION_POLICY_STABLE
 assert(/lts \| 365 days \| 4 minors/.test(policy), 'DEPRECATION_POLICY_LTS_GATE_MISSING', 'policy must document lts 365d + 4 minors gate');
 assert(/--canary <percent>/.test(policy), 'DEPRECATION_POLICY_CANARY_MISSING', 'policy must document upgrade apply --canary <percent>');
 
-const upgradeSource = readText('packages/cli/src/commands/upgrade.ts');
+const upgradeSource = [
+  readText('packages/cli/src/commands/upgrade.ts'),
+  readText('packages/cli/src/commands/upgrade/safe-upgrade.ts')
+].join('\n');
 assert(/--canary/.test(upgradeSource), 'DEPRECATION_CANARY_CLI_FLAG_MISSING', 'upgrade command must parse --canary');
 assert(/atm\.safeUpgradeCanaryState/.test(upgradeSource), 'DEPRECATION_CANARY_STATE_MISSING', 'upgrade apply must write canary state');
 

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
 import { resolveActorId } from './actor-registry.ts';
+import { runFrameworkDevelopmentGuard } from './framework-development.ts';
 import { evaluateGitGovernanceCheck } from './git-governance.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
@@ -26,6 +27,9 @@ export function runGuard(argv: string[]) {
   }
   if (options.guardName === 'atom-callsite-readability') {
     return runAtomCallsiteReadabilityGuard(options.cwd);
+  }
+  if (options.guardName === 'framework-development') {
+    return runFrameworkDevelopmentGuard(options.cwd, options.files);
   }
   return runGitGuard(options);
 }
@@ -185,7 +189,7 @@ function runAtomCallsiteReadabilityGuard(cwd: string) {
 
 interface ParsedGuardArgs {
   readonly cwd: string;
-  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability';
+  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'framework-development';
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
@@ -242,8 +246,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     if (state.guardName) {
       throw new CliError('ATM_CLI_USAGE', 'guard accepts only one guard name', { exitCode: 2 });
     }
-    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability') {
-      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability', { exitCode: 2 });
+    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'framework-development') {
+      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, framework-development', { exitCode: 2 });
     }
     state.guardName = arg;
   }

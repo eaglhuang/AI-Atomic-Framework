@@ -35,6 +35,22 @@ if (stagedPaths.length === 0) {
   process.exit(0);
 }
 
+const frameworkGuard = runNode(['atm.mjs', 'guard', 'framework-development', '--json']);
+const frameworkGuardPayload = parseJson(frameworkGuard.stdout || frameworkGuard.stderr || '{}');
+if (frameworkGuard.status !== 0 || frameworkGuardPayload.ok !== true) {
+  console.error('[atm-hooks] ATM framework-development guard blocked this commit.');
+  console.error(JSON.stringify(frameworkGuardPayload, null, 2));
+  process.exit(1);
+}
+
+const taskAudit = runNode(['atm.mjs', 'tasks', 'audit', '--json']);
+const taskAuditPayload = parseJson(taskAudit.stdout || taskAudit.stderr || '{}');
+if (taskAudit.status !== 0 || taskAuditPayload.ok !== true) {
+  console.error('[atm-hooks] ATM task audit blocked this commit.');
+  console.error(JSON.stringify(taskAuditPayload, null, 2));
+  process.exit(1);
+}
+
 const parentCommitShas = readParentCommitShas();
 const treeSha = readStagedTreeWithoutEvidence();
 const generatedAt = new Date().toISOString();

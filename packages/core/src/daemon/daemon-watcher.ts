@@ -11,16 +11,14 @@
  * - Kill switch respected on every tick
  */
 
-import { watch } from 'node:fs';
+import { existsSync, mkdirSync, watch } from 'node:fs';
 import path from 'node:path';
-import { existsSync } from 'node:fs';
 import {
   isDaemonEnabled,
   appendDaemonNotification,
   writeDaemonPid,
   getDaemonDir
 } from './daemon-config.ts';
-import { mkdirSync } from 'node:fs';
 
 export interface DaemonWatcherConfig {
   repositoryRoot: string;

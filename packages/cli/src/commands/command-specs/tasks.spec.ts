@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'tasks',
-  summary: 'Import/verify task plans, manage reservation/claim lifecycle, and close tasks with evidence gates.',
+  summary: 'Import/verify/audit task plans, manage reservation/claim lifecycle, and close tasks with evidence gates.',
   positional: [
-    { name: 'action', summary: 'import | verify | reserve | promote | claim | renew | release | handoff | takeover | close', required: true }
+    { name: 'action', summary: 'import | verify | audit | reserve | promote | claim | renew | release | handoff | takeover | close', required: true }
   ],
   options: [
     commonCwdOption,
@@ -34,6 +34,7 @@ export default defineCommandSpec({
     'node atm.mjs tasks import --from docs/plan.md --dry-run --json',
     'node atm.mjs tasks import --from docs/plan.md --write --json',
     'node atm.mjs tasks verify --json',
+    'node atm.mjs tasks audit --json',
     'node atm.mjs tasks reserve --task ATM-GOV-0101 --actor codex-main --title "Actor model" --json',
     'node atm.mjs tasks promote --task ATM-GOV-0101 --actor codex-main --json',
     'node atm.mjs tasks claim --task ATM-GOV-0101 --actor codex-main --files packages/core/src/index.ts --json',

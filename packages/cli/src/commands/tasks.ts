@@ -5,6 +5,14 @@ import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { verifyTaskEvidence } from './evidence.ts';
+import {
+  auditTasks,
+  createClosurePacket,
+  createFrameworkModeStatus,
+  requireTargetRepoClosureAuthority,
+  validateClosurePacket,
+  writeClosurePacket
+} from './framework-development.ts';
 import { CliError, makeResult, message, relativePathFrom, resolveValue } from './shared.ts';
 
 export interface TaskImportSource {
@@ -85,6 +93,9 @@ export async function runTasks(argv: string[]) {
   if (action === 'close') {
     return await runTasksClose(argv.slice(1));
   }
+  if (action === 'audit') {
+    return runTasksAudit(argv.slice(1));
+  }
   if (action === 'reserve' || action === 'promote') {
     return await runTasksReservation(action, argv.slice(1));
   }
@@ -98,7 +109,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (import | verify | reserve | promote | claim | renew | release | handoff | takeover | close).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (import | verify | reserve | promote | claim | renew | release | handoff | takeover | close | audit).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -473,6 +484,43 @@ async function runTasksClose(argv: string[]) {
       details: { taskId: options.taskId, owner: currentOwner, actorId }
     });
   }
+  requireTargetRepoClosureAuthority({
+    cwd: options.cwd,
+    taskDocument,
+    taskId: options.taskId,
+    status: options.status
+  });
+
+  const taskDeclaredFiles = extractTaskDeclaredFiles(taskDocument);
+  const activeFrameworkStatus = options.status === 'done'
+    ? createFrameworkModeStatus({ cwd: options.cwd })
+    : null;
+  const frameworkStatus = options.status === 'done'
+    ? createFrameworkModeStatus({
+      cwd: options.cwd,
+      files: taskDeclaredFiles.length > 0 ? taskDeclaredFiles : undefined
+    })
+    : null;
+  if (frameworkStatus?.repoRole === 'framework') {
+    if ((activeFrameworkStatus?.criticalChangedFiles.length ?? 0) > 0) {
+      throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE', `Task ${options.taskId} cannot be closed while ATM framework critical files are still modified.`, {
+        details: {
+          taskId: options.taskId,
+          criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? []
+        }
+      });
+    }
+    if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && frameworkStatus.blockers.length > 0) {
+      throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED', `Task ${options.taskId} cannot be closed until framework-development blockers are resolved.`, {
+        details: {
+          taskId: options.taskId,
+          blockers: frameworkStatus.blockers,
+          criticalChangedFiles: frameworkStatus.criticalChangedFiles,
+          requiredGates: frameworkStatus.requiredGates
+        }
+      });
+    }
+  }
 
   const evidenceGate = options.status === 'done'
     ? verifyTaskEvidence({
@@ -491,6 +539,38 @@ async function runTasksClose(argv: string[]) {
         evidenceCount: evidenceGate.total
       }
     });
+  }
+
+  let closurePacketPath: string | null = null;
+  const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
+    ? taskDocument.closurePacket
+    : typeof taskDocument.closure_packet === 'string'
+      ? taskDocument.closure_packet
+      : null;
+  if (options.status === 'done' && existingClosurePacketPath) {
+    const packetPath = path.resolve(options.cwd, existingClosurePacketPath);
+    if (!existsSync(packetPath)) {
+      throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_MISSING', `Task ${options.taskId} references a missing closure packet.`, {
+        details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath }
+      });
+    }
+    const validation = validateClosurePacket(JSON.parse(readFileSync(packetPath, 'utf8')));
+    if (!validation.ok) {
+      throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet is invalid.`, {
+        details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath, missing: validation.missing }
+      });
+    }
+    closurePacketPath = existingClosurePacketPath;
+  } else if (options.status === 'done' && frameworkStatus?.repoRole === 'framework') {
+    const packet = createClosurePacket({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId,
+      evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+      requiredGates: frameworkStatus.requiredGates
+    });
+    closurePacketPath = writeClosurePacket(options.cwd, options.taskId, packet);
+    taskDocument.closurePacket = closurePacketPath;
   }
 
   const claim = parseClaimRecord(taskDocument.claim);
@@ -528,7 +608,33 @@ async function runTasksClose(argv: string[]) {
       actorId,
       status: options.status,
       taskPath: relativePathFrom(options.cwd, taskPath),
-      evidenceGate
+      evidenceGate,
+      closurePacketPath
+    }
+  });
+}
+
+function runTasksAudit(argv: string[]) {
+  const options = parseAuditOptions(argv);
+  const report = auditTasks(options.cwd);
+  return makeResult({
+    ok: report.ok,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [
+      report.ok
+        ? message('info', 'ATM_TASKS_AUDIT_OK', 'Task audit passed.', {
+          inspectedTaskCount: report.inspectedTaskCount,
+          inspectedEvidenceCount: report.inspectedEvidenceCount
+        })
+        : message('error', 'ATM_TASKS_AUDIT_FAILED', 'Task audit found invalid task closure evidence.', {
+          findingCount: report.findings.length,
+          errorCount: report.findings.filter((finding) => finding.level === 'error').length
+        })
+    ],
+    evidence: {
+      action: 'audit',
+      report
     }
   });
 }
@@ -884,6 +990,27 @@ function parseCloseOptions(argv: string[]) {
   };
 }
 
+function parseAuditOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd()
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      options.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks audit does not support option ${arg}`, { exitCode: 2 });
+  }
+  return {
+    cwd: path.resolve(options.cwd)
+  };
+}
+
 function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -949,6 +1076,33 @@ function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'han
     cwd: path.resolve(options.cwd),
     taskId: options.taskId.trim()
   };
+}
+
+function extractTaskDeclaredFiles(taskDocument: Record<string, unknown>) {
+  const files = new Set<string>();
+  for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles']) {
+    collectTaskFileValues(taskDocument[key], files);
+  }
+  const source = taskDocument.source;
+  if (source && typeof source === 'object' && !Array.isArray(source)) {
+    const sourceRecord = source as Record<string, unknown>;
+    collectTaskFileValues(sourceRecord.path, files);
+    collectTaskFileValues(sourceRecord.planPath, files);
+  }
+  return [...files].sort((left, right) => left.localeCompare(right));
+}
+
+function collectTaskFileValues(value: unknown, files: Set<string>) {
+  if (typeof value === 'string') {
+    const normalized = normalizeRelativePath(value);
+    if (normalized) files.add(normalized);
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      collectTaskFileValues(entry, files);
+    }
+  }
 }
 
 function parseClaimRecord(value: unknown): TaskClaimRecord | null {

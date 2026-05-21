@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import type { AtomBundle } from '../../../core/src/registry/atom-capsule.ts';
 import {
+  type AtomBundle,
   exportAtomCapsule,
   importAtomCapsule,
   validateCidFormat,
