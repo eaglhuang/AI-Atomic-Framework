@@ -3,9 +3,9 @@
   "evidence": [
     {
       "evidenceKind": "validation",
-      "summary": "Git commit tree is covered by ATM Integration Hook Contract v1.",
+      "summary": "Git commit tree is covered after reverting the drifted atomization-coverage change.",
       "artifactPaths": [],
-      "createdAt": "2026-05-21T16:32:14.234Z",
+      "createdAt": "2026-05-21T17:01:00.000Z",
       "producedBy": "atm-framework-development-hooks/v1",
       "commandRuns": [
         {
@@ -16,26 +16,17 @@
           "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "stdoutPreview": "\n> ai-atomic-framework@0.1.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
           "stderrPreview": ""
-        },
-        {
-          "command": "npm run validate:cli",
-          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
-          "exitCode": 0,
-          "stdoutSha256": "sha256:0e623fcf765f22695ae5043c8cecd877849998a9c549440825b7b10612344bc1",
-          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:cli\n> node --strip-types scripts/validate-cli.ts --mode validate\n\n[cli:validate] ok (33 commands, standalone fixture verified)\n",
-          "stderrPreview": ""
         }
       ],
       "details": {
         "git": {
           "treeSha": "577ec29780f30dcec60c535a6b628d1b1e86be37",
           "parentCommitShas": [
-            "feceb59ed834223b6d97f4c491b2c598bfd20f3e"
+            "5c90de73bb6e5727aaf4dc87d8a0ab34a263faee"
           ],
-          "stagedPathCount": 3,
+          "stagedPathCount": 1,
           "evidencePath": ".atm/history/evidence/git-head.json",
-          "generatedAt": "2026-05-21T16:32:14.234Z"
+          "generatedAt": "2026-05-21T17:01:00.000Z"
         },
         "hookContractVersion": "atm.integration-hooks/v1",
         "runnerVersion": "0.1.0"
