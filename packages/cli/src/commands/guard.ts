@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { validateAtomRefReadability } from '@ai-atomic-framework/core';
+import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { evaluateGitGovernanceCheck } from './git-governance.ts';
 import { CliError, makeResult, message } from './shared.ts';

@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { validateAtomRefReadability } from '@ai-atomic-framework/core';
+import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.ts';
 
 const requiredAtomicSpecFields = [

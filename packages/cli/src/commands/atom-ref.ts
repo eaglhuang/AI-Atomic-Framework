@@ -1,4 +1,4 @@
-import { sweepAtomRefReadability } from '@ai-atomic-framework/core';
+import { sweepAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 interface ParsedAtomRefArgs {
