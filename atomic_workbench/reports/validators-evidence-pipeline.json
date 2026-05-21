@@ -1,0 +1,83 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-21T15:02:00Z",
+  "pipeline": "validators-evidence-pipeline",
+  "validators": [
+    {
+      "id": "validator-registry-core",
+      "name": "Registry Core Validator",
+      "status": "active",
+      "evidence_gates": [
+        "schema_validation",
+        "hash_verification",
+        "version_consistency"
+      ]
+    },
+    {
+      "id": "validator-spec-schema",
+      "name": "Spec Schema Validator",
+      "status": "active",
+      "evidence_gates": [
+        "schema_format",
+        "required_fields",
+        "type_correctness"
+      ]
+    },
+    {
+      "id": "validator-atom-refs",
+      "name": "Atom Reference Validator",
+      "status": "active",
+      "evidence_gates": [
+        "ref_format",
+        "runAtm_readability",
+        "cross_reference_validity"
+      ]
+    },
+    {
+      "id": "validator-provenance",
+      "name": "Provenance Validator",
+      "status": "active",
+      "evidence_gates": [
+        "ownership_traceability",
+        "source_file_mapping",
+        "audit_trail"
+      ]
+    },
+    {
+      "id": "validator-contract",
+      "name": "Contract Validator",
+      "status": "active",
+      "evidence_gates": [
+        "api_contract",
+        "interface_consistency",
+        "compatibility"
+      ]
+    }
+  ],
+  "evidence_chain": {
+    "schema_validation": {
+      "status": "pass",
+      "validated_specs": 12,
+      "timestamp": "2026-05-21T15:02:00Z"
+    },
+    "hash_verification": {
+      "status": "pass",
+      "verified_entries": 150,
+      "timestamp": "2026-05-21T15:02:00Z"
+    },
+    "provenance_traceability": {
+      "status": "pass",
+      "source_files_traced": 97,
+      "coverage": "100%",
+      "timestamp": "2026-05-21T15:02:00Z"
+    },
+    "contract_consistency": {
+      "status": "pass",
+      "atoms_verified": 13,
+      "timestamp": "2026-05-21T15:02:00Z"
+    }
+  },
+  "pipeline_status": "fully_operational",
+  "evidence_retention": "12_months",
+  "audit_trail_enabled": true
+}

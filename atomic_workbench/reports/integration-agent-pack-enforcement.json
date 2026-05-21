@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-21T15:03:00Z",
+  "integration_packs": [
+    {
+      "editor_id": "copilot",
+      "name": "GitHub Copilot",
+      "status": "active",
+      "agent_pack_rules_enforced": true,
+      "instruction_files": [
+        ".github/instructions/atm-governance-router.instructions.md",
+        ".github/instructions/atm-next.instructions.md"
+      ]
+    },
+    {
+      "editor_id": "claude-code",
+      "name": "Claude Code",
+      "status": "active",
+      "agent_pack_rules_enforced": true,
+      "instruction_files": [
+        ".claude/skills/atm-governance-router/SKILL.md"
+      ]
+    },
+    {
+      "editor_id": "cursor",
+      "name": "Cursor",
+      "status": "active",
+      "agent_pack_rules_enforced": true,
+      "instruction_files": [
+        ".cursor/rules/skills/atm-governance-router/SKILL.md"
+      ]
+    }
+  ],
+  "enforcement_status": {
+    "total_packs": 3,
+    "active": 3,
+    "rules_enforced": true,
+    "violations": 0
+  },
+  "atomic_integration": "complete"
+}

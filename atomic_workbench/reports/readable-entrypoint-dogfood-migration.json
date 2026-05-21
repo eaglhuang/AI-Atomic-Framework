@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-21T15:03:00Z",
+  "migration_type": "readable-entrypoint-dogfood",
+  "target_metrics": {
+    "runAtm_with_readable_ref": 75
+  },
+  "current_state": {
+    "runAtm_with_readable_ref": 80,
+    "readable_atoms": 13,
+    "readable_commands": [
+      "node atm.mjs next --json",
+      "node atm.mjs create --bucket CORE",
+      "node atm.mjs guard atomization-coverage",
+      "node atm.mjs validate atomization-coverage",
+      "node atm.mjs atomize backfill --dry-run",
+      "npm run validate:atomization-coverage"
+    ]
+  },
+  "migration_status": "complete",
+  "readable_refs_migrated": 80,
+  "coverage_improvement": "+5%"
+}
