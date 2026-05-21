@@ -14,6 +14,11 @@ import {
   writeClosurePacket
 } from './framework-development.ts';
 import { CliError, makeResult, message, relativePathFrom, resolveValue } from './shared.ts';
+import {
+  appendTaskTransitionEvent,
+  defaultMirrorTaskId,
+  readTaskLedgerPolicy
+} from './task-ledger.ts';
 
 export interface TaskImportSource {
   readonly planPath: string;
@@ -93,6 +98,18 @@ export async function runTasks(argv: string[]) {
   if (action === 'close') {
     return await runTasksClose(argv.slice(1));
   }
+  if (action === 'block') {
+    return await runTasksClose(['--status', 'blocked', ...argv.slice(1)]);
+  }
+  if (action === 'abandon') {
+    return await runTasksClose(['--status', 'abandoned', ...argv.slice(1)]);
+  }
+  if (action === 'create') {
+    return await runTasksCreate(argv.slice(1));
+  }
+  if (action === 'mirror') {
+    return await runTasksMirror(argv.slice(1));
+  }
   if (action === 'audit') {
     return runTasksAudit(argv.slice(1));
   }
@@ -109,7 +126,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (import | verify | reserve | promote | claim | renew | release | handoff | takeover | close | audit).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -160,6 +177,7 @@ async function runTasksImport(argv: string[]) {
   let evidencePath: string | null = null;
 
   if (options.write) {
+    assertLocalTaskLedgerEnabled(options.cwd, 'import --write');
     const result = writeTaskFiles({
       cwd: options.cwd,
       tasks: parsed.tasks,
@@ -222,7 +240,8 @@ async function runTasksImport(argv: string[]) {
 
 async function runTasksVerify(argv: string[]) {
   const options = parseVerifyOptions(argv);
-  const taskStoreAbsolute = path.resolve(options.cwd, '.atm', 'history', 'tasks');
+  const taskLedger = readTaskLedgerPolicy(options.cwd);
+  const taskStoreAbsolute = path.resolve(options.cwd, taskLedger.taskRoot);
   const generatedAt = new Date().toISOString();
   if (!existsSync(taskStoreAbsolute)) {
     const report: TaskVerifyReport = {
@@ -235,7 +254,7 @@ async function runTasksVerify(argv: string[]) {
         {
           level: 'warning',
           code: 'ATM_TASKS_VERIFY_STORE_MISSING',
-          text: '.atm/history/tasks does not exist; nothing to verify.'
+          text: `${taskLedger.taskRoot} does not exist; nothing to verify.`
         }
       ],
       ok: true
@@ -372,14 +391,133 @@ async function runTasksVerify(argv: string[]) {
   });
 }
 
+async function runTasksCreate(argv: string[]) {
+  const options = parseCreateOptions(argv);
+  assertLocalTaskLedgerEnabled(options.cwd, 'create');
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks create requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const taskPath = taskPathFor(options.cwd, options.taskId);
+  if (existsSync(taskPath) && !options.force) {
+    throw new CliError('ATM_TASK_EXISTS', `Task ${options.taskId} already exists.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId, taskPath: relativePathFrom(options.cwd, taskPath) }
+    });
+  }
+  const createdAt = new Date().toISOString();
+  const taskDocument: Record<string, unknown> = {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: options.taskId,
+    title: options.title ?? options.taskId,
+    status: 'planned',
+    owner: actorId,
+    dependencies: [],
+    acceptance: [],
+    deliverables: [],
+    tags: [],
+    createdAt,
+    createdByActor: actorId
+  };
+  const transitionPath = writeTaskDocumentWithTransition({
+    cwd: options.cwd,
+    taskPath,
+    taskId: options.taskId,
+    taskDocument,
+    action: 'create',
+    actorId,
+    previousStatus: null
+  });
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASKS_CREATED', `Task ${options.taskId} created.`, {
+      taskId: options.taskId,
+      actorId,
+      status: taskDocument.status
+    })],
+    evidence: {
+      action: 'create',
+      taskId: options.taskId,
+      actorId,
+      status: taskDocument.status,
+      taskPath: relativePathFrom(options.cwd, taskPath),
+      transitionPath
+    }
+  });
+}
+
+async function runTasksMirror(argv: string[]) {
+  const options = parseMirrorOptions(argv);
+  assertLocalTaskLedgerEnabled(options.cwd, 'mirror');
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks mirror requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const taskId = options.taskId ?? defaultMirrorTaskId(options.provider, options.originTaskId);
+  const taskPath = taskPathFor(options.cwd, taskId);
+  const existing = existsSync(taskPath)
+    ? JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
+    : null;
+  const previousStatus = existing ? normalizeWorkItemStatus(existing.status) : null;
+  const mirroredAt = typeof existing?.mirroredAt === 'string' ? existing.mirroredAt : new Date().toISOString();
+  const taskDocument: Record<string, unknown> = {
+    ...(existing ?? {}),
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: options.title ?? String(existing?.title ?? `${options.provider} ${options.originTaskId}`),
+    status: options.status,
+    owner: actorId,
+    originProvider: options.provider,
+    originTaskId: options.originTaskId,
+    originUrl: options.originUrl,
+    syncStatus: options.syncStatus,
+    taskLedgerMode: 'external-provider',
+    mirroredAt,
+    mirrorUpdatedAt: new Date().toISOString()
+  };
+  const transitionPath = writeTaskDocumentWithTransition({
+    cwd: options.cwd,
+    taskPath,
+    taskId,
+    taskDocument,
+    action: 'mirror',
+    actorId,
+    previousStatus
+  });
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASKS_MIRRORED', `External task ${options.provider}:${options.originTaskId} mirrored as ${taskId}.`, {
+      taskId,
+      provider: options.provider,
+      originTaskId: options.originTaskId
+    })],
+    evidence: {
+      action: 'mirror',
+      taskId,
+      actorId,
+      taskPath: relativePathFrom(options.cwd, taskPath),
+      originProvider: options.provider,
+      originTaskId: options.originTaskId,
+      transitionPath
+    }
+  });
+}
+
 async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]) {
   const options = parseReservationOptions(action, argv);
+  assertLocalTaskLedgerEnabled(options.cwd, action);
   const resolvedActor = resolveActorId(options.actorId ?? undefined);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', `tasks ${action} requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
-  const taskPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${options.taskId}.json`);
+  const taskPath = taskPathFor(options.cwd, options.taskId);
   const nowIso = new Date().toISOString();
   const taskDocument: Record<string, unknown> = existsSync(taskPath)
     ? JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
@@ -402,13 +540,22 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
     };
 
   if (action === 'reserve') {
+    const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'reserved';
     taskDocument.owner = actorId;
     taskDocument.reservedAt = nowIso;
     if (!taskDocument.title || String(taskDocument.title).trim().length === 0) {
       taskDocument.title = options.title ?? options.taskId;
     }
-    writeTaskDocument(taskPath, taskDocument);
+    const transitionPath = writeTaskDocumentWithTransition({
+      cwd: options.cwd,
+      taskPath,
+      taskId: options.taskId,
+      taskDocument,
+      action,
+      actorId,
+      previousStatus
+    });
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -422,7 +569,8 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
         taskId: options.taskId,
         actorId,
         status: taskDocument.status,
-        taskPath: relativePathFrom(options.cwd, taskPath)
+        taskPath: relativePathFrom(options.cwd, taskPath),
+        transitionPath
       }
     });
   }
@@ -443,7 +591,15 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
   taskDocument.status = 'ready';
   taskDocument.owner = actorId;
   taskDocument.promotedAt = nowIso;
-  writeTaskDocument(taskPath, taskDocument);
+  const transitionPath = writeTaskDocumentWithTransition({
+    cwd: options.cwd,
+    taskPath,
+    taskId: options.taskId,
+    taskDocument,
+    action,
+    actorId,
+    previousStatus: 'reserved'
+  });
   return makeResult({
     ok: true,
     command: 'tasks',
@@ -457,7 +613,8 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
       taskId: options.taskId,
       actorId,
       status: taskDocument.status,
-      taskPath: relativePathFrom(options.cwd, taskPath)
+      taskPath: relativePathFrom(options.cwd, taskPath),
+      transitionPath
     }
   });
 }
@@ -469,7 +626,7 @@ async function runTasksClose(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks close requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
-  const taskPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${options.taskId}.json`);
+  const taskPath = taskPathFor(options.cwd, options.taskId);
   if (!existsSync(taskPath)) {
     throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
       exitCode: 2,
@@ -585,6 +742,7 @@ async function runTasksClose(argv: string[]) {
     };
   }
 
+  const previousStatus = String(taskDocument.status ?? '');
   taskDocument.status = options.status;
   taskDocument.owner = actorId;
   taskDocument.closedAt = new Date().toISOString();
@@ -592,7 +750,15 @@ async function runTasksClose(argv: string[]) {
   if (options.reason) {
     taskDocument.closeReason = options.reason;
   }
-  writeTaskDocument(taskPath, taskDocument);
+  const transitionPath = writeTaskDocumentWithTransition({
+    cwd: options.cwd,
+    taskPath,
+    taskId: options.taskId,
+    taskDocument,
+    action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
+    actorId,
+    previousStatus
+  });
   return makeResult({
     ok: true,
     command: 'tasks',
@@ -609,7 +775,8 @@ async function runTasksClose(argv: string[]) {
       status: options.status,
       taskPath: relativePathFrom(options.cwd, taskPath),
       evidenceGate,
-      closurePacketPath
+      closurePacketPath,
+      transitionPath
     }
   });
 }
@@ -646,7 +813,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks claim lifecycle requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
-  const taskPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${options.taskId}.json`);
+  const taskPath = taskPathFor(options.cwd, options.taskId);
   if (!existsSync(taskPath)) {
     throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
       exitCode: 2,
@@ -704,8 +871,17 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     taskDocument.owner = actorId;
     taskDocument.startedAt = String(taskDocument.startedAt ?? nowIso);
     taskDocument.startedByActor = String(taskDocument.startedByActor ?? actorId);
+    const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'running';
-    writeTaskDocument(taskPath, taskDocument);
+    const transitionPath = writeTaskDocumentWithTransition({
+      cwd: options.cwd,
+      taskPath,
+      taskId: options.taskId,
+      taskDocument,
+      action,
+      actorId,
+      previousStatus
+    });
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -719,7 +895,8 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         taskId: options.taskId,
         actorId,
         claim,
-        taskPath: relativeTaskPath
+        taskPath: relativeTaskPath,
+        transitionPath
       }
     });
   }
@@ -745,8 +922,17 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       state: 'active'
     };
     taskDocument.claim = renewed;
+    const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'running';
-    writeTaskDocument(taskPath, taskDocument);
+    const transitionPath = writeTaskDocumentWithTransition({
+      cwd: options.cwd,
+      taskPath,
+      taskId: options.taskId,
+      taskDocument,
+      action,
+      actorId,
+      previousStatus
+    });
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -756,7 +942,8 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         action,
         taskId: options.taskId,
         actorId,
-        claim: renewed
+        claim: renewed,
+        transitionPath
       }
     });
   }
@@ -776,10 +963,19 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     };
     await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
     taskDocument.claim = releasedClaim;
+    const previousStatus = String(taskDocument.status ?? '');
     if (String(taskDocument.status ?? '') === 'running') {
       taskDocument.status = 'open';
     }
-    writeTaskDocument(taskPath, taskDocument);
+    const transitionPath = writeTaskDocumentWithTransition({
+      cwd: options.cwd,
+      taskPath,
+      taskId: options.taskId,
+      taskDocument,
+      action,
+      actorId,
+      previousStatus
+    });
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -789,7 +985,8 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         action,
         taskId: options.taskId,
         actorId,
-        claim: releasedClaim
+        claim: releasedClaim,
+        transitionPath
       }
     });
   }
@@ -814,8 +1011,17 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     };
     taskDocument.claim = handedOff;
     taskDocument.owner = options.handoffTo;
+    const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'open';
-    writeTaskDocument(taskPath, taskDocument);
+    const transitionPath = writeTaskDocumentWithTransition({
+      cwd: options.cwd,
+      taskPath,
+      taskId: options.taskId,
+      taskDocument,
+      action,
+      actorId,
+      previousStatus
+    });
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -830,7 +1036,8 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         taskId: options.taskId,
         actorId,
         handoffTo: options.handoffTo,
-        claim: handedOff
+        claim: handedOff,
+        transitionPath
       }
     });
   }
@@ -869,8 +1076,17 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
   await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
   taskDocument.claim = { ...takeoverClaim, state: 'taken_over' };
   taskDocument.owner = actorId;
+  const previousStatus = String(taskDocument.status ?? '');
   taskDocument.status = 'running';
-  writeTaskDocument(taskPath, taskDocument);
+  const transitionPath = writeTaskDocumentWithTransition({
+    cwd: options.cwd,
+    taskPath,
+    taskId: options.taskId,
+    taskDocument,
+    action,
+    actorId,
+    previousStatus
+  });
   writeTakeoverEvidence(options.cwd, options.taskId, actorId, currentClaim, takeoverClaim);
   return makeResult({
     ok: true,
@@ -887,7 +1103,8 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       actorId,
       previousClaim: currentClaim,
       claim: takeoverClaim,
-      evidencePath: `.atm/history/evidence/${options.taskId}.json`
+      evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+      transitionPath
     }
   });
 }
@@ -933,6 +1150,134 @@ function parseReservationOptions(action: 'reserve' | 'promote', argv: string[]) 
     ...options,
     cwd: path.resolve(options.cwd),
     taskId: options.taskId.trim()
+  };
+}
+
+function parseCreateOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    title: null as string | null,
+    force: false
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--title') {
+      options.title = requireValue(argv, index, '--title');
+      index += 1;
+      continue;
+    }
+    if (arg === '--force') {
+      options.force = true;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks create does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks create requires --task <work-item-id>.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
+}
+
+function parseMirrorOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: null as string | null,
+    actorId: null as string | null,
+    provider: '',
+    originTaskId: '',
+    originUrl: null as string | null,
+    title: null as string | null,
+    status: 'planned' as TaskImportStatus,
+    syncStatus: 'mirrored'
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--provider') {
+      options.provider = requireValue(argv, index, '--provider');
+      index += 1;
+      continue;
+    }
+    if (arg === '--origin-task' || arg === '--origin-task-id') {
+      options.originTaskId = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--origin-url') {
+      options.originUrl = requireValue(argv, index, '--origin-url');
+      index += 1;
+      continue;
+    }
+    if (arg === '--title') {
+      options.title = requireValue(argv, index, '--title');
+      index += 1;
+      continue;
+    }
+    if (arg === '--status') {
+      options.status = coerceStatus(requireValue(argv, index, '--status'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--sync-status') {
+      options.syncStatus = requireValue(argv, index, '--sync-status');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks mirror does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.provider) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks mirror requires --provider <id>.', { exitCode: 2 });
+  }
+  if (!options.originTaskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks mirror requires --origin-task <id>.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    provider: options.provider.trim(),
+    originTaskId: options.originTaskId.trim(),
+    taskId: options.taskId?.trim() || null
   };
 }
 
@@ -1169,6 +1514,53 @@ function isClaimExpired(claim: TaskClaimRecord, nowIso: string) {
 function writeTaskDocument(taskPath: string, document: Record<string, unknown>) {
   mkdirSync(path.dirname(taskPath), { recursive: true });
   writeFileSync(taskPath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+}
+
+function taskPathFor(cwd: string, taskId: string): string {
+  const taskLedger = readTaskLedgerPolicy(cwd);
+  return path.join(cwd, taskLedger.taskRoot, `${taskId}.json`);
+}
+
+function assertLocalTaskLedgerEnabled(cwd: string, action: string) {
+  const taskLedger = readTaskLedgerPolicy(cwd);
+  if (!taskLedger.enabled) {
+    throw new CliError('ATM_TASK_LEDGER_DISABLED', `tasks ${action} cannot write local task files because taskLedger.enabled is false.`, {
+      exitCode: 1,
+      details: {
+        action,
+        provider: taskLedger.provider,
+        taskRoot: taskLedger.taskRoot
+      }
+    });
+  }
+}
+
+function writeTaskDocumentWithTransition(input: {
+  readonly cwd: string;
+  readonly taskPath: string;
+  readonly taskId: string;
+  readonly taskDocument: Record<string, unknown>;
+  readonly action: string;
+  readonly actorId: string | null;
+  readonly previousStatus: string | null;
+}) {
+  const nextStatus = typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null;
+  const transition = appendTaskTransitionEvent({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    action: input.action,
+    actorId: input.actorId,
+    fromStatus: input.previousStatus,
+    toStatus: nextStatus,
+    taskPath: input.taskPath,
+    taskDocument: input.taskDocument,
+    command: `node atm.mjs tasks ${input.action}`
+  });
+  input.taskDocument.lastTransitionId = transition.transitionId;
+  input.taskDocument.lastTransitionAt = transition.event.createdAt;
+  input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
+  writeTaskDocument(input.taskPath, input.taskDocument);
+  return transition.eventPath;
 }
 
 function normalizeWorkItemStatus(value: unknown): WorkItemRef['status'] {
@@ -1608,7 +2000,8 @@ function writeTaskFiles(input: {
 }): { writtenPaths: string[]; diagnostics: TaskImportDiagnostic[] } {
   const writtenPaths: string[] = [];
   const diagnostics: TaskImportDiagnostic[] = [];
-  const taskStoreDirectory = path.join(input.cwd, '.atm', 'history', 'tasks');
+  const taskLedger = readTaskLedgerPolicy(input.cwd);
+  const taskStoreDirectory = path.join(input.cwd, taskLedger.taskRoot);
   mkdirSync(taskStoreDirectory, { recursive: true });
   for (const task of input.tasks) {
     const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
@@ -1651,7 +2044,16 @@ function writeTaskFiles(input: {
     if (existsSync(filePath) && !input.force) {
       continue;
     }
-    writeFileSync(filePath, `${JSON.stringify(task, null, 2)}\n`, 'utf8');
+    const taskDocument = { ...task } as Record<string, unknown>;
+    writeTaskDocumentWithTransition({
+      cwd: input.cwd,
+      taskPath: filePath,
+      taskId: task.workItemId,
+      taskDocument,
+      action: 'import',
+      actorId: null,
+      previousStatus: null
+    });
     writtenPaths.push(relativePathFrom(input.cwd, filePath));
   }
   return { writtenPaths, diagnostics };

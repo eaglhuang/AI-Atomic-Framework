@@ -5,6 +5,14 @@ import path from 'node:path';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
+import {
+  externalTaskKey,
+  readTaskLedgerPolicy,
+  resolveTaskLedgerMode,
+  transitionEventExists,
+  type TaskLedgerMode,
+  type TaskLedgerPolicy
+} from './task-ledger.ts';
 
 export type FrameworkMode = 'inactive' | 'suspected' | 'required' | 'cross-repo-target-required';
 export type ClosureAuthority = 'local' | 'target_repo' | 'none';
@@ -27,6 +35,8 @@ export interface FrameworkModeStatusReport {
   readonly targetRepoIdentity: FrameworkRepoIdentity | null;
   readonly mode: FrameworkMode;
   readonly closureAuthority: ClosureAuthority;
+  readonly taskLedgerMode: TaskLedgerMode;
+  readonly taskLedger: TaskLedgerPolicy;
   readonly changedFiles: readonly string[];
   readonly criticalChangedFiles: readonly string[];
   readonly docsOnlyChangedFiles: readonly string[];
@@ -213,6 +223,7 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
   const repoIdentity = detectFrameworkRepoIdentity(cwd);
   const targetRepo = input.targetRepo ? path.resolve(cwd, input.targetRepo) : null;
   const targetRepoIdentity = targetRepo ? detectFrameworkRepoIdentity(targetRepo) : null;
+  const taskLedger = readTaskLedgerPolicy(cwd);
   const declaredFiles = (input.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean);
   const changedFiles = declaredFiles.length > 0 ? uniqueSorted(declaredFiles) : readChangedFiles(cwd);
   const criticalChangedFiles = repoIdentity.isFrameworkRepo
@@ -251,6 +262,12 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
       blockers.push('git-head-evidence-missing');
     }
   }
+  const taskLedgerMode = resolveTaskLedgerMode({
+    policy: taskLedger,
+    frameworkMode: mode,
+    repoRole: repoIdentity.isFrameworkRepo ? 'framework' : 'host',
+    closureAuthority
+  });
 
   return {
     schemaId: 'atm.frameworkDevelopmentStatus',
@@ -262,6 +279,8 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
     targetRepoIdentity,
     mode,
     closureAuthority,
+    taskLedgerMode,
+    taskLedger,
     changedFiles,
     criticalChangedFiles,
     docsOnlyChangedFiles,
@@ -321,11 +340,60 @@ export function auditTasks(cwd: string): TaskAuditReport {
   const root = path.resolve(cwd);
   const generatedAt = new Date().toISOString();
   const repoIdentity = detectFrameworkRepoIdentity(root);
+  const taskLedger = readTaskLedgerPolicy(root);
   const findings: TaskAuditFinding[] = [];
   const taskDocs = readTaskDocuments(root);
   const evidenceDocs = readEvidenceDocuments(root);
+  const mirrorKeys = new Set<string>();
 
   for (const task of taskDocs) {
+    const originProvider = normalizeOptionalString(task.document.originProvider ?? task.document.origin_provider);
+    const originTaskId = normalizeOptionalString(task.document.originTaskId ?? task.document.origin_task_id);
+    const syncStatus = normalizeOptionalString(task.document.syncStatus ?? task.document.sync_status);
+    if (originProvider && originTaskId) {
+      mirrorKeys.add(externalTaskKey(originProvider, originTaskId));
+      if (!syncStatus) {
+        findings.push({
+          level: 'error',
+          code: 'ATM_TASK_AUDIT_MIRROR_SYNC_STATUS_MISSING',
+          path: task.relativePath,
+          taskId: task.taskId,
+          detail: `Mirror task ${task.taskId} must declare syncStatus.`
+        });
+      }
+    } else if (originProvider || originTaskId) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TASK_AUDIT_MIRROR_ORIGIN_INCOMPLETE',
+        path: task.relativePath,
+        taskId: task.taskId,
+        detail: `Mirror task ${task.taskId} must declare both originProvider and originTaskId.`
+      });
+    }
+
+    const lastTransitionId = normalizeOptionalString(task.document.lastTransitionId ?? task.document.last_transition_id);
+    const transitionRequired = taskLedger.enabled
+      && taskLedger.provider === 'atm-local'
+      && taskLedger.requireCliTransitions
+      && (task.status === 'done' || Boolean(originProvider || originTaskId));
+    if (transitionRequired && !lastTransitionId) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TASK_AUDIT_TRANSITION_EVIDENCE_MISSING',
+        path: task.relativePath,
+        taskId: task.taskId,
+        detail: `Task ${task.taskId} is missing lastTransitionId; status transitions must use ATM CLI.`
+      });
+    } else if (lastTransitionId && !transitionEventExists(root, task.taskId, lastTransitionId)) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TASK_AUDIT_TRANSITION_EVENT_MISSING',
+        path: task.relativePath,
+        taskId: task.taskId,
+        detail: `Task ${task.taskId} references missing transition event ${lastTransitionId}.`
+      });
+    }
+
     if (task.status !== 'done') continue;
     const closureAuthority = normalizeClosureAuthority(task.document.closure_authority ?? task.document.closureAuthority);
     const targetRepo = normalizeOptionalString(task.document.target_repo ?? task.document.targetRepo ?? task.document.upstream_repo ?? task.document.upstreamRepo);
@@ -353,6 +421,19 @@ export function auditTasks(cwd: string): TaskAuditReport {
         taskId: task.taskId,
         detail: `Task ${task.taskId} is marked done without ATM CLI closure metadata.`
       });
+    }
+  }
+
+  if (taskLedger.enabled && taskLedger.mirrorExternalTasks) {
+    for (const externalTask of taskLedger.externalTasks) {
+      if (!mirrorKeys.has(externalTaskKey(externalTask.provider, externalTask.taskId))) {
+        findings.push({
+          level: 'error',
+          code: 'ATM_TASK_AUDIT_EXTERNAL_TASK_NOT_MIRRORED',
+          path: '.atm/config.json',
+          detail: `External task ${externalTask.provider}:${externalTask.taskId} must have a visible ATM mirror task.`
+        });
+      }
     }
   }
 
@@ -607,7 +688,8 @@ function isDocOnlyPath(relativePath: string): boolean {
 }
 
 function readTaskDocuments(root: string): ReadonlyArray<{ relativePath: string; taskId: string; status: string; document: Record<string, unknown> }> {
-  const jsonTasks = listFiles(path.join(root, '.atm', 'history', 'tasks'), (filePath) => filePath.endsWith('.json'))
+  const taskLedger = readTaskLedgerPolicy(root);
+  const jsonTasks = listFiles(path.join(root, taskLedger.taskRoot), (filePath) => filePath.endsWith('.json'))
     .map((absolutePath) => {
       const document = readJsonIfExists(absolutePath) ?? {};
       const taskId = normalizeOptionalString(document.workItemId ?? document.id ?? document.task_id ?? document.taskId) ?? path.basename(absolutePath, '.json');

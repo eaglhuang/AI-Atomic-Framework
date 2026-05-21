@@ -335,6 +335,7 @@ function createBootstrapConfig(taskId: string) {
       defaultGuards: '.atm/runtime/default-guards.json',
       contextBudget: '.atm/runtime/budget',
       tasks: '.atm/history/tasks',
+      taskEvents: '.atm/history/task-events',
       locks: '.atm/runtime/locks',
       evidence: '.atm/history/evidence',
       handoff: '.atm/history/handoff',
@@ -344,6 +345,13 @@ function createBootstrapConfig(taskId: string) {
       registry: '.atm/catalog/registry',
       index: '.atm/catalog/index',
       shards: '.atm/catalog/shards'
+    },
+    taskLedger: {
+      enabled: true,
+      mode: 'auto',
+      mirrorExternalTasks: true,
+      requireCliTransitions: true,
+      provider: 'atm-local'
     },
     adoption: {
       profile: 'default',
@@ -1147,4 +1155,3 @@ function createEmptyRegistry(timestamp: string): RegistryDocument {
     entries: []
   };
 }
-

@@ -4,16 +4,16 @@
 
 This matrix is generated from built-in agent-pack metadata and advisory confidence profiles. It exists to prevent drift between the installed pack registry, the public compatibility table, and the multi-agent confidence workflow.
 
-Source metadata SHA-256: `2fad5059a958f4711de8b5edd0bc2f025061c43aabf44918cda5e0ec2693b468`
+Source metadata SHA-256: `674540f805cfc2b500fd2f2300d81312d91b69a85f8cc86a6769677f7b7b2da8`
 
 ## Agent Pack Registry Matrix
 
 | Agent | Pack ID | Agent Target | Managed Target Roots | File Formats | Managed Files | First Command | Source Hash |
 | --- | --- | --- | --- | --- | ---: | --- | --- |
 | Claude Code | `claude-code` | `claude-code` | `.claude/commands` | Markdown | 6 | `node atm.mjs next --json` | `1d4354afc8e888fd` |
-| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 9 | `node atm.mjs next --json` | `ad238a9f3a82bf86` |
-| GitHub Copilot Agent | `copilot` | `copilot` | `.github`, `.github/instructions`, `.github/prompts` | Markdown | 19 | `node atm.mjs next --json` | `90236260ee27cd92` |
-| Gemini | `gemini` | `gemini` | `.gemini/commands` | TOML | 9 | `node atm.mjs next --json` | `c99b17ec76caac9e` |
+| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 9 | `node atm.mjs next --json` | `5a6bf03bf00a9a9b` |
+| GitHub Copilot Agent | `copilot` | `copilot` | `.github`, `.github/instructions`, `.github/prompts` | Markdown | 19 | `node atm.mjs next --json` | `d8ec2d82ab5ebe4e` |
+| Gemini | `gemini` | `gemini` | `.gemini/commands` | TOML | 9 | `node atm.mjs next --json` | `d930a009bccfc093` |
 | Windsurf | `windsurf` | `windsurf` | `.windsurf/workflows` | Markdown | 9 | `node atm.mjs next --json` | `ff5d7796e1fce459` |
 
 Every generated agent entry routes the first operational action back to `node atm.mjs next --json`; agent packs are onboarding wrappers, not a second governance protocol.

@@ -3,6 +3,7 @@ import type { GovernanceStores } from './stores';
 export interface GovernanceLayout {
   readonly root: string;
   readonly taskStorePath: string;
+  readonly taskEventStorePath?: string;
   readonly lockStorePath: string;
   readonly documentIndexPath: string;
   readonly shardStorePath: string;
@@ -20,6 +21,7 @@ export interface GovernanceLayout {
 export const defaultGovernanceLayout: GovernanceLayout = {
   root: '.atm',
   taskStorePath: '.atm/history/tasks',
+  taskEventStorePath: '.atm/history/task-events',
   lockStorePath: '.atm/runtime/locks',
   documentIndexPath: '.atm/catalog/index',
   shardStorePath: '.atm/catalog/shards',

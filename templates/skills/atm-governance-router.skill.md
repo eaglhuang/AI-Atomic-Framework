@@ -61,6 +61,17 @@ Before mutating repository files for implementation work, claim the task:
 node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
 ```
 
+ATM's default task ledger is the active flow monitor when `taskLedger.enabled`
+is true. Use the repo-local `.atm/history/tasks` store for adopter work; use the
+ATM framework repo ledger only when `framework-mode status` reports
+`framework-development`. If the user provides an external task (GitHub Issue,
+Jira, Linear, or another provider) and no ATM mirror exists yet, create the
+visible mirror before implementation:
+
+```bash
+node atm.mjs tasks mirror --provider <provider> --origin-task <id> --origin-url <url> --actor "$ATM_ACTOR_ID" --json
+```
+
 If the editor provides pre-write hooks, keep them thin and run only:
 
 ```bash
@@ -129,6 +140,8 @@ Then continue the user's original request with the fallback sources.
   a later governed dry run is selected.
 - Do not start implementation edits before a task is in `ready` and has an
   active claim.
+- Do not bypass the default task ledger when it is enabled; task status changes
+  must go through `tasks create/import/mirror/claim/block/close/abandon`.
 - Do not mark task cards `done` by editing Markdown or JSON directly; use
   `node atm.mjs tasks close --status done` so closure evidence is checked.
 - Do not bulk-complete multiple tasks without a bulk closure manifest and one

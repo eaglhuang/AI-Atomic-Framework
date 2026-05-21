@@ -193,6 +193,7 @@ function createDefaultConfig(options: any) {
       currentTask: '.atm/runtime/current-task.json',
       state: '.atm/runtime/state',
       tasks: '.atm/history/tasks',
+      taskEvents: '.atm/history/task-events',
       locks: '.atm/runtime/locks',
       artifacts: '.atm/history/artifacts',
       logs: '.atm/history/logs',
@@ -208,6 +209,13 @@ function createDefaultConfig(options: any) {
     validation: {
       command: 'atm validate',
       output: 'json'
+    },
+    taskLedger: {
+      enabled: true,
+      mode: 'auto',
+      mirrorExternalTasks: true,
+      requireCliTransitions: true,
+      provider: 'atm-local'
     }
   };
 
