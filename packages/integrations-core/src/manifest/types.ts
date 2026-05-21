@@ -61,6 +61,12 @@ export interface InstallManifest {
   readonly targetDir: string;
   readonly files: readonly InstallManifestFile[];
   readonly metadata?: Readonly<Record<string, string | number | boolean | null>>;
+  readonly hookContractVersion?: 'atm.integration-hooks/v1';
+  readonly hookProvider?: 'atm-framework-development-hooks/v1';
+  readonly supportedHookEvents?: readonly string[];
+  readonly installedHookFiles?: readonly string[];
+  readonly frameworkDevelopmentWakeMode?: 'auto';
+  readonly mandatoryForFrameworkRepo?: boolean;
 }
 
 export interface CreateInstallManifestInput {

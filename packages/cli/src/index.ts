@@ -108,7 +108,7 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   },
   {
     commandName: 'guard',
-    summary: 'Run governance guards for encoding, mutation scope, and git metadata',
+    summary: 'Run governance guards for encoding, mutation scope, git metadata, and commit ranges',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'
@@ -121,8 +121,22 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'git-hooks',
+    summary: 'Install or verify ATM-managed Git hooks',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'handoff',
     summary: 'Write a continuation summary for the current governed task',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
+    commandName: 'hook',
+    summary: 'Run ATM-managed repository Git hook gates',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'
@@ -143,7 +157,7 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   },
   {
     commandName: 'integration',
-    summary: 'List, install, verify, or remove ATM agent integration adapters',
+    summary: 'List, install, verify, remove, or run ATM agent integration hooks',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'

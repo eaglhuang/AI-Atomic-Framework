@@ -2,11 +2,13 @@
 
 ATM is designed as a neutral operating layer. By default it guides agent behavior,
 records evidence, and lets `atm doctor` detect missing governance signals after the
-fact. It does not make commits impossible by itself.
+fact. For normal adopter repositories it does not make commits impossible by
+itself.
 
-Host repositories can choose stronger enforcement without changing ATM core contracts.
-This document explains what ATM enforces natively, where the cooperation boundary
-is, and how a host can add harder gates on top.
+Host repositories can choose stronger enforcement without changing ATM core
+contracts. The special exception is the ATM framework repository itself: when a
+change touches framework critical non-doc source surfaces, framework-development
+mode requires editor hooks, Git hooks, and commit-range gates.
 
 ## Framework Charter Authority
 
@@ -80,25 +82,25 @@ Use these layers in increasing strength:
 | --- | --- | --- |
 | `AGENTS.md` / README entry | Make `node atm.mjs next --json` the first instruction an agent sees. | ATM core (rendered by `atm init`) |
 | `atm doctor` | Detect missing runtime state, layout drift, and Git commits without matching ATM evidence. | ATM core (always available) |
-| Git hooks | Block local commits when the previous HEAD already bypassed ATM, and record staged-tree evidence for the new commit. | **Host opt-in recipe** ([example](../examples/git-hooks-enforcement/README.md)) |
-| CI | Run the same `atm doctor --json` gate on pushed commits. | **Host opt-in recipe** |
+| Editor integration hooks | Wake the agent before response/tool use and block framework critical edits without a claim. | **Mandatory for ATM framework-development; optional for adopters** |
+| Git hooks | Block local commits, run pre-commit checks, and record staged-tree evidence for the new commit. | **Mandatory for ATM framework-development; host opt-in for adopters** ([example](../examples/git-hooks-enforcement/README.md)) |
+| CI / commit-range gate | Catch `--no-verify`, amend, or external-agent commits that bypass local hooks. | **Mandatory for ATM framework-development; host opt-in for adopters** |
 | Branch protection | Require the CI gate before merging protected branches. | Host policy |
 | Review policy | Ask reviewers to inspect the ATM evidence paths linked by `doctor`, handoff summaries, and reports. | Host policy |
 
-### What ATM core does NOT do
+### What ATM core does NOT do for adopter repositories
 
-The framework intentionally does not:
+For normal adopter repositories, the framework intentionally does not:
 
-- install Git hooks into `.git/hooks/` on `atm init` or any other command;
+- require Git hooks on `atm init` or any other bootstrap command;
 - write to CI configuration files (`.github/workflows/`, `.gitlab-ci.yml`, etc.);
 - assume a specific CI provider, host platform, or branch-protection model;
-- enforce that hooks are present — `atm doctor` reports evidence gaps but never
-  inspects whether hooks are installed.
+- enforce that hooks are present.
 
-These are deliberate boundaries. Hooks, CI integration, and branch protection
-are **opt-in host recipes**: the framework ships examples and documents the
-shared `atm doctor` contract, but the host repository decides which gates to
-adopt, how strict they are, and when to update them.
+These are deliberate adopter boundaries. Hooks, CI integration, and branch
+protection remain opt-in host recipes for non-framework projects. In the ATM
+framework repository, `node atm.mjs doctor --json` fails when mandatory editor
+or Git hooks are missing or drifted.
 
 ## Git Evidence Boundary
 
@@ -166,7 +168,7 @@ propagation, review advisory, and approved human review evidence.
 
 1. Bootstrap ATM in the repository.
 2. Keep the single-entry ATM route visible in `AGENTS.md` and the root README.
-3. Install the opt-in example from
+3. Optionally install the hook recipe from
    [examples/git-hooks-enforcement/README.md](../examples/git-hooks-enforcement/README.md).
 4. Add a CI step:
 
@@ -177,10 +179,11 @@ node atm.mjs doctor --json
 5. Treat `ATM_DOCTOR_GIT_EVIDENCE_MISSING` as a blocking signal.
 6. Keep host-specific escalation policy in the host repository, not in ATM core.
 
-The shipped hook example follows the same pattern: the `pre-commit` hook runs
-`atm doctor`, writes staged-tree evidence to
-`.atm/history/evidence/git-head.json`, stages that evidence file, and then the
-`post-commit` hook checks the new HEAD immediately.
+The shipped hook example delegates to `node atm.mjs hook pre-commit --json`.
+That command does not run `doctor` before writing evidence; it checks the staged
+diff, task audit, encoding/mojibake, framework-development blockers, and required
+validators, then writes staged-tree evidence to
+`.atm/history/evidence/git-head.json`.
 
 ## Adapter-Level Enforcement
 

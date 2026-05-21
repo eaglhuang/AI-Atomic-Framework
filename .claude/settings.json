@@ -1,0 +1,44 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node atm.mjs integration hook pre-agent --editor claude-code --json"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node atm.mjs integration hook pre-tool --editor claude-code --json"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node atm.mjs tasks audit --json"
+          }
+        ]
+      }
+    ]
+  },
+  "atmIntegrationHooks": {
+    "hookContractVersion": "atm.integration-hooks/v1",
+    "hookProvider": "atm-framework-development-hooks/v1",
+    "marker": "ATM_INTEGRATION_HOOK_CONTRACT_V1",
+    "frameworkDevelopmentWakeMode": "auto",
+    "mandatoryForFrameworkRepo": true
+  }
+}

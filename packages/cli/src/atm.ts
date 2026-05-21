@@ -14,6 +14,7 @@ import { runExperience } from './commands/experience.ts';
 import { runEvidence } from './commands/evidence.ts';
 import { runFrameworkMode } from './commands/framework-development.ts';
 import { runGuard } from './commands/guard.ts';
+import { runGitHooks, runHook } from './commands/hook.ts';
 import { runAtmGit } from './commands/git-governance.ts';
 import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
@@ -72,10 +73,12 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   'framework-mode': runFrameworkMode,
   git: runAtmGit,
   guard: runGuard,
+  hook: runHook,
   guide: runGuide,
   handoff: runHandoff,
   init: runInit,
   'internal-release': runInternalRelease,
+  'git-hooks': runGitHooks,
   integration: runIntegration,
   lock: runLock,
   next: runNext,

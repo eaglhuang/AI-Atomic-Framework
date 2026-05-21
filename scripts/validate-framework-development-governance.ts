@@ -9,6 +9,7 @@ import {
   runFrameworkMode,
   validateClosurePacket
 } from '../packages/cli/src/commands/framework-development.ts';
+import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -82,6 +83,13 @@ try {
   assert(critical.mode === 'required', 'packages/core change must require framework-development mode');
   assert(critical.criticalChangedFiles.includes('packages/core/src/index.ts'), 'critical file must be listed');
   assert(critical.pinnedRunner.status === 'available', 'framework fixture should have an available pinned runner');
+
+  const preToolBlock = runIntegrationHookInvocation(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'packages/core/src/index.ts']);
+  assert(preToolBlock.ok === false, 'pre-tool hook must block critical framework edits without an active claim');
+  assert(preToolBlock.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED'), 'pre-tool block must report the framework claim requirement');
+
+  const preToolDocsOnly = runIntegrationHookInvocation(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'docs/plan.md']);
+  assert(preToolDocsOnly.ok === true, 'pre-tool hook must allow framework docs-only edits without hard framework claim');
 
   const planningRepo = makeHostRepo(tempRoot, 'planning-repo');
   const crossRepo = createFrameworkModeStatus({ cwd: planningRepo, targetRepo: frameworkRepo });

@@ -8,6 +8,7 @@ import { createATMVersionSummary } from './atm-chart.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
+import { inspectFrameworkHookReadiness } from './integration-hooks.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 
@@ -50,6 +51,7 @@ export async function runDoctor(argv: any) {
     .map((entry) => packageDirLabel(root, entry.packageDir));
   const charterIntegrity = checkCharterIntegrity(root);
   const integrationHealth = await checkIntegrationHealth(root);
+  const frameworkHookReadiness = inspectFrameworkHookReadiness(root);
   const integrationBootstrap = inspectIntegrationBootstrap(root);
   const integrationInstallHint = describeIntegrationInstallHint(integrationBootstrap);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(root);
@@ -96,6 +98,7 @@ export async function runDoctor(argv: any) {
     createCheck('onboarding-lifecycle', onboardingLifecycle.ok, onboardingLifecycle),
     createCheck('version-compatibility', versionSummary.compatibility.ok || versionSummary.compatibility.code === 'chart-missing', versionSummary),
     createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
+    createCheck('framework-integration-hooks', frameworkHookReadiness.ok, frameworkHookReadiness),
     ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
     ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
     createGitHeadEvidenceCheck(root, runtime)
@@ -118,6 +121,8 @@ export async function runDoctor(argv: any) {
       ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
     : failedChecks.includes('integration-adapters')
       ? 'Run node atm.mjs integration verify <id> --json for each failed adapter, then reinstall or remove the drifted integration manifest.'
+    : failedChecks.includes('framework-integration-hooks')
+      ? 'Run node atm.mjs integration hooks install <editor-id> --json, then node atm.mjs git-hooks verify --framework-required --json.'
     : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
       ? 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
       : 'npm run validate:full';
@@ -169,6 +174,8 @@ export async function runDoctor(argv: any) {
         ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
       : failedChecks.includes('integration-adapters')
         ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', { failedChecks })]
+      : failedChecks.includes('framework-integration-hooks')
+        ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]
         : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
   ];
   return makeResult({
@@ -192,6 +199,7 @@ export async function runDoctor(argv: any) {
       migrationNeeded: runtime.migrationNeeded,
       versionSummary,
       integrationBootstrap,
+      frameworkHookReadiness,
       runtimeAdapterReadiness,
       trustIntegrity: trustMode ? trustIntegrity : undefined,
       knownBadStatus: knownBadMode ? knownBadStatus : undefined,

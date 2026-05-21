@@ -24,8 +24,10 @@ import evidenceSpec from './command-specs/evidence.spec.ts';
 import frameworkModeSpec from './command-specs/framework-mode.spec.ts';
 import guardSpec from './command-specs/guard.spec.ts';
 import gitSpec from './command-specs/git.spec.ts';
+import gitHooksSpec from './command-specs/git-hooks.spec.ts';
 import guideSpec from './command-specs/guide.spec.ts';
 import handoffSpec from './command-specs/handoff.spec.ts';
+import hookSpec from './command-specs/hook.spec.ts';
 import initSpec from './command-specs/init.spec.ts';
 import internalReleaseSpec from './command-specs/internal-release.spec.ts';
 import integrationSpec from './command-specs/integration.spec.ts';
@@ -69,8 +71,10 @@ export const commandSpecs = Object.freeze({
   'framework-mode': frameworkModeSpec,
   guard: guardSpec,
   git: gitSpec,
+  'git-hooks': gitHooksSpec,
   guide: guideSpec,
   handoff: handoffSpec,
+  hook: hookSpec,
   init: initSpec,
   'internal-release': internalReleaseSpec,
   integration: integrationSpec,

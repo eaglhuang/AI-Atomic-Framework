@@ -1,0 +1,611 @@
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import type { InstallManifest } from '../../../integrations-core/src/index.ts';
+import {
+  createFrameworkModeStatus,
+  detectFrameworkRepoIdentity,
+  isAtmCriticalNonDocSurface
+} from './framework-development.ts';
+import {
+  hookContractVersion,
+  hookMarker,
+  hookProvider,
+  inspectGitHooks,
+  installGitHooks
+} from './hook.ts';
+import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
+
+export type HookIntegrationId = 'copilot' | 'claude-code' | 'cursor' | 'gemini' | 'codex' | 'antigravity';
+export type IntegrationHookAction = 'pre-agent' | 'pre-tool';
+
+interface InstallEditorHooksOptions {
+  readonly dryRun?: boolean;
+  readonly force?: boolean;
+}
+
+interface HookInvocationOptions {
+  readonly cwd: string;
+  readonly editor: string;
+  readonly event: IntegrationHookAction;
+  readonly prompt: string | null;
+  readonly toolName: string | null;
+  readonly command: string | null;
+  readonly files: readonly string[];
+  readonly stdinPayload: unknown;
+}
+
+const adapterHookEvents: Record<string, readonly string[]> = {
+  copilot: ['sessionStart', 'userPromptSubmitted', 'preToolUse'],
+  'claude-code': ['UserPromptSubmit', 'PreToolUse', 'Stop'],
+  cursor: [],
+  gemini: [],
+  codex: [],
+  antigravity: []
+};
+
+export function runIntegrationHookInvocation(argv: string[]) {
+  const options = parseHookInvocationArgs(argv);
+  if (options.event === 'pre-agent') {
+    return runPreAgentHook(options);
+  }
+  return runPreToolHook(options);
+}
+
+export function installEditorIntegrationHooks(cwd: string, adapterId: string, options: InstallEditorHooksOptions = {}) {
+  const root = path.resolve(cwd);
+  const repoIdentity = detectFrameworkRepoIdentity(root);
+  const normalizedAdapterId = normalizeAdapterId(adapterId);
+  if (normalizedAdapterId !== 'copilot' && normalizedAdapterId !== 'claude-code') {
+    const report = {
+      schemaId: 'atm.integrationHookInstallReport.v1',
+      generatedAt: new Date().toISOString(),
+      adapterId: normalizedAdapterId,
+      supported: false,
+      repoIdentity,
+      writtenFiles: [],
+      gitHooks: null,
+      ok: repoIdentity.isFrameworkRepo ? false : true,
+      reason: 'editor-hard-hooks-not-supported-by-adapter'
+    };
+    return report;
+  }
+
+  const hookFiles = normalizedAdapterId === 'copilot'
+    ? createCopilotHookFiles()
+    : createClaudeHookFiles(root);
+  const writtenFiles = hookFiles.map((file) => file.path);
+  if (options.dryRun !== true) {
+    for (const file of hookFiles) {
+      const absolutePath = path.join(root, file.path);
+      mkdirSync(path.dirname(absolutePath), { recursive: true });
+      writeFileSync(absolutePath, file.content, 'utf8');
+    }
+    patchIntegrationManifestWithHookContract(root, normalizedAdapterId, writtenFiles);
+  }
+  const gitHooks = repoIdentity.isFrameworkRepo && options.dryRun !== true
+    ? installGitHooks(root, { frameworkRequired: true })
+    : inspectGitHooks(root, { frameworkRequired: repoIdentity.isFrameworkRepo });
+  return {
+    schemaId: 'atm.integrationHookInstallReport.v1',
+    generatedAt: new Date().toISOString(),
+    adapterId: normalizedAdapterId,
+    supported: true,
+    repoIdentity,
+    writtenFiles,
+    dryRun: options.dryRun === true,
+    hookContractVersion,
+    hookProvider,
+    supportedHookEvents: adapterHookEvents[normalizedAdapterId],
+    gitHooks,
+    ok: options.dryRun === true ? true : verifyEditorIntegrationHooks(root, normalizedAdapterId).ok && gitHooks.ok
+  };
+}
+
+export function verifyEditorIntegrationHooks(cwd: string, adapterId: string) {
+  const root = path.resolve(cwd);
+  const normalizedAdapterId = normalizeAdapterId(adapterId);
+  const repoIdentity = detectFrameworkRepoIdentity(root);
+  const supported = normalizedAdapterId === 'copilot' || normalizedAdapterId === 'claude-code';
+  const hookFiles = supported
+    ? normalizedAdapterId === 'copilot'
+      ? ['.github/hooks/atm-framework-development.json']
+      : ['.claude/settings.json']
+    : [];
+  const installedHookFiles = hookFiles.map((filePath) => inspectEditorHookFile(root, filePath, normalizedAdapterId));
+  const manifest = readIntegrationManifestIfExists(root, normalizedAdapterId);
+  const manifestHookContractOk = manifest
+    ? manifest.hookContractVersion === hookContractVersion
+      && manifest.hookProvider === hookProvider
+      && Array.isArray(manifest.supportedHookEvents)
+      && Array.isArray(manifest.installedHookFiles)
+    : installedHookFiles.every((entry) => entry.present && entry.markerPresent);
+  const gitHooks = inspectGitHooks(root, { frameworkRequired: repoIdentity.isFrameworkRepo });
+  const editorHookFilesOk = supported && installedHookFiles.every((entry) => entry.present && entry.markerPresent);
+  return {
+    schemaId: 'atm.integrationHookVerifyReport.v1',
+    generatedAt: new Date().toISOString(),
+    adapterId: normalizedAdapterId,
+    supported,
+    repoIdentity,
+    hookContractVersion,
+    hookProvider,
+    supportedHookEvents: adapterHookEvents[normalizedAdapterId] ?? [],
+    installedHookFiles,
+    manifestHookContractOk,
+    gitHooks,
+    ok: repoIdentity.isFrameworkRepo
+      ? supported && editorHookFilesOk && manifestHookContractOk && gitHooks.ok
+      : true
+  };
+}
+
+export function inspectFrameworkHookReadiness(cwd: string) {
+  const root = path.resolve(cwd);
+  const repoIdentity = detectFrameworkRepoIdentity(root);
+  const gitHooks = inspectGitHooks(root, { frameworkRequired: repoIdentity.isFrameworkRepo });
+  const editorHooks = ['copilot', 'claude-code'].map((adapterId) => verifyEditorIntegrationHooks(root, adapterId));
+  const anyEditorHookOk = editorHooks.some((entry) => entry.ok);
+  return {
+    schemaId: 'atm.frameworkHookReadiness.v1',
+    generatedAt: new Date().toISOString(),
+    repoIdentity,
+    required: repoIdentity.isFrameworkRepo,
+    gitHooks,
+    editorHooks,
+    ok: repoIdentity.isFrameworkRepo ? gitHooks.ok && anyEditorHookOk : true
+  };
+}
+
+export function makeIntegrationHookInstallResult(cwd: string, adapterId: string, options: InstallEditorHooksOptions = {}) {
+  const report = installEditorIntegrationHooks(cwd, adapterId, options);
+  return makeResult({
+    ok: report.ok,
+    command: 'integration',
+    cwd,
+    messages: [
+      report.ok
+        ? message('info', 'ATM_INTEGRATION_HOOKS_INSTALLED', `Integration hooks installed for ${adapterId}.`, report)
+        : message('error', 'ATM_INTEGRATION_HOOKS_INSTALL_FAILED', `Integration hooks could not be installed for ${adapterId}.`, report)
+    ],
+    evidence: {
+      action: 'hooks install',
+      report
+    }
+  });
+}
+
+export function makeIntegrationHookVerifyResult(cwd: string, adapterId: string) {
+  const report = verifyEditorIntegrationHooks(cwd, adapterId);
+  return makeResult({
+    ok: report.ok,
+    command: 'integration',
+    cwd,
+    messages: [
+      report.ok
+        ? message('info', 'ATM_INTEGRATION_HOOKS_VERIFY_OK', `Integration hooks verified for ${adapterId}.`, report)
+        : message('error', 'ATM_INTEGRATION_HOOKS_VERIFY_FAILED', `Integration hooks are missing or drifted for ${adapterId}.`, report)
+    ],
+    evidence: {
+      action: 'hooks verify',
+      report
+    }
+  });
+}
+
+function runPreAgentHook(options: HookInvocationOptions) {
+  const status = createFrameworkModeStatus({ cwd: options.cwd });
+  const promptSignals = extractPromptSignals(options.prompt ?? stringifyPayload(options.stdinPayload));
+  const frameworkSignal = status.repoIdentity.isFrameworkRepo && (promptSignals.length > 0 || status.mode !== 'inactive');
+  return makeResult({
+    ok: true,
+    command: 'integration',
+    cwd: options.cwd,
+    messages: [
+      frameworkSignal
+        ? message('warning', 'ATM_INTEGRATION_PRE_AGENT_FRAMEWORK_CONTEXT', 'ATM framework-development context is active or suspected; claim governed work before modifying critical framework files.', {
+          editor: options.editor,
+          mode: status.mode,
+          promptSignals,
+          requiredNextStep: 'node atm.mjs next --claim --actor <id> --json'
+        })
+        : message('info', 'ATM_INTEGRATION_PRE_AGENT_NO_HARD_GATE', 'No ATM framework-development hard gate is required before the agent response.', {
+          editor: options.editor,
+          repoRole: status.repoRole
+        })
+    ],
+    evidence: {
+      action: 'hook pre-agent',
+      editor: options.editor,
+      promptSignals,
+      frameworkStatus: status,
+      instructions: frameworkSignal ? frameworkDevelopmentInstructions() : []
+    }
+  });
+}
+
+function runPreToolHook(options: HookInvocationOptions) {
+  const toolFiles = uniqueSorted([
+    ...options.files,
+    ...extractFilesFromPayload(options.stdinPayload),
+    ...extractFilesFromCommand(options.command ?? '')
+  ]);
+  const toolCommand = options.command ?? extractCommandFromPayload(options.stdinPayload);
+  const gitCommitIntent = /\bgit(?:\.exe)?\s+commit\b/i.test(toolCommand ?? '');
+  const status = createFrameworkModeStatus({ cwd: options.cwd, files: toolFiles });
+  const criticalFiles = status.repoIdentity.isFrameworkRepo
+    ? toolFiles.filter(isAtmCriticalNonDocSurface)
+    : [];
+  const hasFrameworkClaim = status.activeLocks.some((entry) => !entry.includes('/BOOTSTRAP-'));
+  const gitHooks = inspectGitHooks(options.cwd, { frameworkRequired: status.repoIdentity.isFrameworkRepo });
+
+  if (gitCommitIntent && status.repoIdentity.isFrameworkRepo && !gitHooks.ok) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_GIT_HOOK_MISSING', 'Git commit is blocked because ATM framework Git hooks are missing or drifted.', {
+        editor: options.editor,
+        installCommand: 'node atm.mjs integration hooks install <editor-id> --json'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        gitCommitIntent,
+        gitHooks,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (criticalFiles.length > 0 && !hasFrameworkClaim) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED', 'Framework critical source edit is blocked until an ATM framework task is claimed.', {
+        editor: options.editor,
+        criticalFiles,
+        nextStep: 'node atm.mjs next --claim --actor <id> --json'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        criticalFiles,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'integration',
+    cwd: options.cwd,
+    messages: [message('info', gitCommitIntent ? 'ATM_INTEGRATION_PRE_TOOL_DEFER_TO_GIT_HOOK' : 'ATM_INTEGRATION_PRE_TOOL_OK', gitCommitIntent
+      ? 'Git commit intent detected; repository Git hook will run the full pre-commit gate.'
+      : 'ATM pre-tool hook passed.', {
+        editor: options.editor,
+        criticalFiles,
+        gitCommitIntent
+      })],
+    evidence: {
+      action: 'hook pre-tool',
+      editor: options.editor,
+      toolName: options.toolName,
+      toolFiles,
+      criticalFiles,
+      gitCommitIntent,
+      frameworkStatus: status,
+      gitHooks
+    }
+  });
+}
+
+function parseHookInvocationArgs(argv: string[]): HookInvocationOptions {
+  const state = {
+    cwd: process.cwd(),
+    event: null as IntegrationHookAction | null,
+    editor: null as string | null,
+    prompt: null as string | null,
+    toolName: null as string | null,
+    command: null as string | null,
+    files: [] as string[]
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      state.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--editor') {
+      state.editor = requireValue(argv, index, '--editor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--prompt') {
+      state.prompt = requireValue(argv, index, '--prompt');
+      index += 1;
+      continue;
+    }
+    if (arg === '--tool-name') {
+      state.toolName = requireValue(argv, index, '--tool-name');
+      index += 1;
+      continue;
+    }
+    if (arg === '--command') {
+      state.command = requireValue(argv, index, '--command');
+      index += 1;
+      continue;
+    }
+    if (arg === '--files') {
+      state.files = requireValue(argv, index, '--files').split(',').map(normalizeRelativePath).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') continue;
+    if (arg !== 'pre-agent' && arg !== 'pre-tool') {
+      throw new CliError('ATM_CLI_USAGE', 'integration hook supports only: pre-agent | pre-tool', { exitCode: 2 });
+    }
+    state.event = arg;
+  }
+  if (!state.event) {
+    throw new CliError('ATM_CLI_USAGE', 'integration hook requires an event: pre-agent | pre-tool', { exitCode: 2 });
+  }
+  const stdinPayload = readOptionalStdinJson();
+  const payloadEditor = readStringPath(stdinPayload, ['editor', 'editorId', 'source']);
+  return {
+    cwd: path.resolve(state.cwd),
+    event: state.event,
+    editor: normalizeAdapterId(state.editor ?? payloadEditor ?? 'unknown'),
+    prompt: state.prompt ?? readStringPath(stdinPayload, ['prompt', 'userPrompt', 'transcript']),
+    toolName: state.toolName ?? readStringPath(stdinPayload, ['toolName', 'tool_name', 'name']),
+    command: state.command ?? extractCommandFromPayload(stdinPayload),
+    files: state.files,
+    stdinPayload
+  };
+}
+
+function createCopilotHookFiles() {
+  const content = {
+    schemaId: 'atm.copilotFrameworkDevelopmentHooks.v1',
+    hookContractVersion,
+    hookProvider,
+    marker: hookMarker,
+    frameworkDevelopmentWakeMode: 'auto',
+    mandatoryForFrameworkRepo: true,
+    hooks: [
+      {
+        event: 'sessionStart',
+        command: 'node atm.mjs integration hook pre-agent --editor copilot --json',
+        blocking: false
+      },
+      {
+        event: 'userPromptSubmitted',
+        command: 'node atm.mjs integration hook pre-agent --editor copilot --json',
+        blocking: false
+      },
+      {
+        event: 'preToolUse',
+        command: 'node atm.mjs integration hook pre-tool --editor copilot --json',
+        blocking: true
+      }
+    ]
+  };
+  return [{
+    path: '.github/hooks/atm-framework-development.json',
+    content: `${JSON.stringify(content, null, 2)}\n`
+  }];
+}
+
+function createClaudeHookFiles(root: string) {
+  const settingsPath = path.join(root, '.claude', 'settings.json');
+  const currentSettings = readJsonIfExists(settingsPath) ?? {};
+  const settings = currentSettings as Record<string, unknown>;
+  const hooks = typeof settings.hooks === 'object' && settings.hooks !== null && !Array.isArray(settings.hooks)
+    ? settings.hooks as Record<string, unknown>
+    : {};
+  settings.hooks = {
+    ...hooks,
+    UserPromptSubmit: mergeClaudeHookEntries(hooks.UserPromptSubmit, 'node atm.mjs integration hook pre-agent --editor claude-code --json'),
+    PreToolUse: mergeClaudeHookEntries(hooks.PreToolUse, 'node atm.mjs integration hook pre-tool --editor claude-code --json'),
+    Stop: mergeClaudeHookEntries(hooks.Stop, 'node atm.mjs tasks audit --json')
+  };
+  settings.atmIntegrationHooks = {
+    hookContractVersion,
+    hookProvider,
+    marker: hookMarker,
+    frameworkDevelopmentWakeMode: 'auto',
+    mandatoryForFrameworkRepo: true
+  };
+  return [{
+    path: '.claude/settings.json',
+    content: `${JSON.stringify(settings, null, 2)}\n`
+  }];
+}
+
+function mergeClaudeHookEntries(existing: unknown, command: string) {
+  const existingEntries = Array.isArray(existing) ? existing : [];
+  const alreadyPresent = JSON.stringify(existingEntries).includes(command);
+  if (alreadyPresent) return existingEntries;
+  return [
+    ...existingEntries,
+    {
+      matcher: '*',
+      hooks: [
+        {
+          type: 'command',
+          command
+        }
+      ]
+    }
+  ];
+}
+
+function patchIntegrationManifestWithHookContract(root: string, adapterId: string, installedHookFiles: readonly string[]) {
+  const manifestPath = path.join(root, '.atm', 'integrations', `${adapterId}.manifest.json`);
+  if (!existsSync(manifestPath)) return;
+  const manifest = readJsonIfExists(manifestPath);
+  if (!manifest) return;
+  const updatedManifest = {
+    ...manifest,
+    hookContractVersion,
+    hookProvider,
+    supportedHookEvents: adapterHookEvents[adapterId] ?? [],
+    installedHookFiles,
+    frameworkDevelopmentWakeMode: 'auto',
+    mandatoryForFrameworkRepo: true
+  };
+  writeFileSync(manifestPath, `${JSON.stringify(updatedManifest, null, 2)}\n`, 'utf8');
+}
+
+function inspectEditorHookFile(root: string, relativePath: string, adapterId: string) {
+  const absolutePath = path.join(root, relativePath);
+  if (!existsSync(absolutePath)) {
+    return {
+      path: relativePath,
+      present: false,
+      markerPresent: false,
+      sha256: null
+    };
+  }
+  const text = readFileSync(absolutePath, 'utf8');
+  const expectedCommand = adapterId === 'copilot'
+    ? 'node atm.mjs integration hook pre-tool --editor copilot --json'
+    : 'node atm.mjs integration hook pre-tool --editor claude-code --json';
+  return {
+    path: relativePath,
+    present: true,
+    markerPresent: text.includes(hookMarker) && text.includes(hookContractVersion) && text.includes(expectedCommand),
+    sha256: `sha256:${createHash('sha256').update(text).digest('hex')}`
+  };
+}
+
+function extractPromptSignals(prompt: string): readonly string[] {
+  const signals: string[] = [];
+  const lowered = prompt.toLowerCase();
+  if (/\batm\b|ai-atomic-framework|atomic framework/.test(lowered)) signals.push('prompt:atm-framework');
+  if (/\bpackages\/|packages\\|packages\/core|packages\/cli/.test(lowered)) signals.push('prompt:packages');
+  if (/\bframework-development\b|框架開發|治理/.test(lowered)) signals.push('prompt:framework-development');
+  if (/\bhook\b|pre-commit|pre-tool|pre-agent/.test(lowered)) signals.push('prompt:hooks');
+  return uniqueSorted(signals);
+}
+
+function extractFilesFromPayload(value: unknown): readonly string[] {
+  const files: string[] = [];
+  const visit = (candidate: unknown): void => {
+    if (!candidate || typeof candidate !== 'object') return;
+    if (Array.isArray(candidate)) {
+      for (const entry of candidate) visit(entry);
+      return;
+    }
+    const record = candidate as Record<string, unknown>;
+    for (const key of ['file_path', 'filePath', 'path', 'target_file', 'targetFile']) {
+      if (typeof record[key] === 'string') files.push(normalizeRelativePath(record[key]));
+    }
+    for (const key of ['files', 'paths']) {
+      if (Array.isArray(record[key])) {
+        for (const entry of record[key]) {
+          if (typeof entry === 'string') files.push(normalizeRelativePath(entry));
+          else visit(entry);
+        }
+      }
+    }
+    for (const key of ['tool_input', 'toolInput', 'input', 'arguments', 'edits']) visit(record[key]);
+  };
+  visit(value);
+  return uniqueSorted(files.filter(Boolean));
+}
+
+function extractCommandFromPayload(value: unknown): string | null {
+  return readStringPath(value, ['command', 'cmd', 'script', 'bash', 'shell_command'])
+    ?? readStringPath(value, ['tool_input.command', 'toolInput.command', 'input.command', 'arguments.command']);
+}
+
+function extractFilesFromCommand(command: string): readonly string[] {
+  const matches = command.match(/[A-Za-z0-9_.@/-]+\.(?:ts|tsx|js|mjs|json|md|yml|yaml|sh|ps1)/g) ?? [];
+  return uniqueSorted(matches.map(normalizeRelativePath));
+}
+
+function frameworkDevelopmentInstructions() {
+  return [
+    'Run node atm.mjs next --claim --actor <id> --json before changing framework critical files.',
+    'Do not hand-edit task status to done.',
+    'Do not use static JSON reports as completion evidence without commandRuns/stdout hashes.',
+    'Let node atm.mjs hook pre-commit --json and guard commit-range enforce the final gate.'
+  ];
+}
+
+function readOptionalStdinJson(): unknown {
+  if (process.stdin.isTTY) return null;
+  try {
+    const text = readFileSync(0, 'utf8').trim();
+    if (!text) return null;
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function stringifyPayload(value: unknown): string {
+  return value ? JSON.stringify(value) : '';
+}
+
+function readStringPath(value: unknown, keys: readonly string[]): string | null {
+  for (const key of keys) {
+    const parts = key.split('.');
+    let current: unknown = value;
+    for (const part of parts) {
+      if (!current || typeof current !== 'object' || Array.isArray(current)) {
+        current = null;
+        break;
+      }
+      current = (current as Record<string, unknown>)[part];
+    }
+    if (typeof current === 'string' && current.trim().length > 0) return current.trim();
+  }
+  return null;
+}
+
+function readIntegrationManifestIfExists(root: string, adapterId: string): (InstallManifest & Record<string, unknown>) | null {
+  return readJsonIfExists(path.join(root, '.atm', 'integrations', `${adapterId}.manifest.json`)) as (InstallManifest & Record<string, unknown>) | null;
+}
+
+function readJsonIfExists(filePath: string): Record<string, unknown> | null {
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeAdapterId(value: string): HookIntegrationId {
+  const normalized = value.trim().toLowerCase().replace(/[_\s]+/g, '-');
+  if (normalized.includes('copilot')) return 'copilot';
+  if (normalized.includes('claude')) return 'claude-code';
+  if (normalized.includes('cursor')) return 'cursor';
+  if (normalized.includes('gemini')) return 'gemini';
+  if (normalized.includes('codex')) return 'codex';
+  if (normalized.includes('antigravity')) return 'antigravity';
+  return normalized as HookIntegrationId;
+}
+
+function normalizeRelativePath(value: unknown): string {
+  return String(value ?? '').replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function uniqueSorted(values: readonly string[]): readonly string[] {
+  return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
+function requireValue(argv: string[], index: number, flag: string) {
+  const value = argv[index + 1];
+  if (!value || value.startsWith('--')) {
+    throw new CliError('ATM_CLI_USAGE', `integration hook command requires a value for ${flag}`, { exitCode: 2 });
+  }
+  return value;
+}

@@ -836,6 +836,7 @@ function runTasksAudit(argv: string[]) {
     ],
     evidence: {
       action: 'audit',
+      staged: options.staged,
       report
     }
   });
@@ -1459,7 +1460,8 @@ function parseCloseOptions(argv: string[]) {
 
 function parseAuditOptions(argv: string[]) {
   const options = {
-    cwd: process.cwd()
+    cwd: process.cwd(),
+    staged: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -1471,10 +1473,15 @@ function parseAuditOptions(argv: string[]) {
     if (arg === '--json' || arg === '--pretty') {
       continue;
     }
+    if (arg === '--staged') {
+      options.staged = true;
+      continue;
+    }
     throw new CliError('ATM_CLI_USAGE', `tasks audit does not support option ${arg}`, { exitCode: 2 });
   }
   return {
-    cwd: path.resolve(options.cwd)
+    cwd: path.resolve(options.cwd),
+    staged: options.staged
   };
 }
 

@@ -4,6 +4,7 @@ import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-
 import { resolveActorId } from './actor-registry.ts';
 import { runFrameworkDevelopmentGuard } from './framework-development.ts';
 import { evaluateGitGovernanceCheck } from './git-governance.ts';
+import { runCommitRangeGuard } from './hook.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 type ParsedTaskClaim = {
@@ -30,6 +31,9 @@ export function runGuard(argv: string[]) {
   }
   if (options.guardName === 'framework-development') {
     return runFrameworkDevelopmentGuard(options.cwd, options.files);
+  }
+  if (options.guardName === 'commit-range') {
+    return runCommitRangeGuard([...options.rawArgv]);
   }
   return runGitGuard(options);
 }
@@ -189,11 +193,12 @@ function runAtomCallsiteReadabilityGuard(cwd: string) {
 
 interface ParsedGuardArgs {
   readonly cwd: string;
-  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'framework-development';
+  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'framework-development' | 'commit-range';
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
   readonly failOpen: boolean;
+  readonly rawArgv: readonly string[];
 }
 
 function parseGuardArgs(argv: string[]): ParsedGuardArgs {
@@ -240,14 +245,19 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
       state.failOpen = true;
       continue;
     }
+    if (state.guardName === 'commit-range' && (arg === '--base' || arg === '--head')) {
+      requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `guard does not support option ${arg}`, { exitCode: 2 });
     }
     if (state.guardName) {
       throw new CliError('ATM_CLI_USAGE', 'guard accepts only one guard name', { exitCode: 2 });
     }
-    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'framework-development') {
-      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, framework-development', { exitCode: 2 });
+    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'framework-development' && arg !== 'commit-range') {
+      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, framework-development, commit-range', { exitCode: 2 });
     }
     state.guardName = arg;
   }
@@ -265,7 +275,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     files: state.files,
     taskId: state.taskId,
     actorId: state.actorId,
-    failOpen: state.failOpen
+    failOpen: state.failOpen,
+    rawArgv: argv
   };
 }
 

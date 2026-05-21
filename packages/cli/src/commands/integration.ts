@@ -8,6 +8,13 @@ import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } f
 import type { InstallManifest, IntegrationAdapter } from '../../../integrations-core/src/index.ts';
 import { CliError, ensureAtmDirectory, makeResult, message, parseArgsForCommand, readJsonFile, relativePathFrom, resolveValue } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
+import {
+  installEditorIntegrationHooks,
+  makeIntegrationHookInstallResult,
+  makeIntegrationHookVerifyResult,
+  runIntegrationHookInvocation,
+  verifyEditorIntegrationHooks
+} from './integration-hooks.ts';
 
 const integrationAdapterFactories = Object.freeze({
   'claude-code': createClaudeCodeIntegrationAdapter,
@@ -170,9 +177,35 @@ export async function runIntegration(argv: string[]) {
   if (!spec) {
     throw new CliError('ATM_CLI_HELP_NOT_FOUND', 'No help spec found for integration.', { exitCode: 2 });
   }
+  if (argv[0] === 'hook') {
+    return runIntegrationHookInvocation(argv.slice(1));
+  }
   const parsed = parseArgsForCommand(spec, argv);
-  const [action = 'list', adapterId] = parsed.positional;
+  const [action = 'list', adapterId, maybeHookAdapterId] = parsed.positional;
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
+
+  if (action === 'hooks') {
+    const hooksAction = adapterId;
+    const hookAdapterId = maybeHookAdapterId;
+    if (hooksAction === 'install') {
+      const requiredHookAdapterId = requireAdapterId(hookAdapterId, 'hooks install');
+      if (parsed.options.dryRun !== true && !existsSync(path.join(cwd, manifestPathForIntegration(requiredHookAdapterId)))) {
+        await installIntegrationAdapter(cwd, requiredHookAdapterId, {
+          actor: asOptionalString(parsed.options.actor),
+          dryRun: false,
+          force: parsed.options.force === true
+        });
+      }
+      return makeIntegrationHookInstallResult(cwd, requiredHookAdapterId, {
+        dryRun: parsed.options.dryRun === true,
+        force: parsed.options.force === true
+      });
+    }
+    if (hooksAction === 'verify') {
+      return makeIntegrationHookVerifyResult(cwd, requireAdapterId(hookAdapterId, 'hooks verify'));
+    }
+    throw new CliError('ATM_CLI_USAGE', 'integration hooks supports only: install | verify', { exitCode: 2 });
+  }
 
   if (action === 'list') {
     return createIntegrationListResult(cwd);
@@ -185,6 +218,9 @@ export async function runIntegration(argv: string[]) {
       dryRun: parsed.options.dryRun === true,
       force: parsed.options.force === true
     });
+    const hookInstallReport = parsed.options.dryRun === true || (adapterId !== 'copilot' && adapterId !== 'claude-code')
+      ? null
+      : installEditorIntegrationHooks(cwd, adapterId, { force: true });
     return makeResult({
       ok: true,
       command: 'integration',
@@ -196,7 +232,8 @@ export async function runIntegration(argv: string[]) {
       ],
       evidence: {
         action,
-        ...report
+        ...report,
+        hookInstallReport
       }
     });
   }
@@ -206,12 +243,16 @@ export async function runIntegration(argv: string[]) {
     const manifestPath = manifestPathForIntegration(adapter.id);
     const manifest = readIntegrationManifest(cwd, adapter.id);
     const verifyReport = await resolveValue(adapter.verify(createIntegrationContext(cwd, adapter, {}), manifest));
+    const hookVerifyReport = adapter.id === 'copilot' || adapter.id === 'claude-code'
+      ? verifyEditorIntegrationHooks(cwd, adapter.id)
+      : null;
+    const ok = verifyReport.ok && (hookVerifyReport?.ok ?? true);
     return makeResult({
-      ok: verifyReport.ok,
+      ok,
       command: 'integration',
       cwd,
       messages: [
-        verifyReport.ok
+        ok
           ? message('info', 'ATM_INTEGRATION_VERIFY_OK', `Integration adapter ${adapter.id} matches its manifest.`)
           : message('error', 'ATM_INTEGRATION_VERIFY_DRIFT', `Integration adapter ${adapter.id} has manifest drift.`)
       ],
@@ -220,7 +261,8 @@ export async function runIntegration(argv: string[]) {
         adapter: describeAdapter(adapter, cwd),
         manifestPath,
         findings: verifyReport.findings,
-        driftedFiles: verifyReport.driftedFiles
+        driftedFiles: verifyReport.driftedFiles,
+        hookVerifyReport
       }
     });
   }
@@ -249,7 +291,7 @@ export async function runIntegration(argv: string[]) {
   throw new CliError('ATM_CLI_USAGE', `integration does not support action ${action}`, {
     exitCode: 2,
     details: {
-      supportedActions: ['list', 'add', 'verify', 'remove']
+      supportedActions: ['list', 'add', 'verify', 'remove', 'hook', 'hooks']
     }
   });
 }
