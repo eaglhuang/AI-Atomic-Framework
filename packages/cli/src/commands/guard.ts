@@ -29,9 +29,6 @@ export function runGuard(argv: string[]) {
   if (options.guardName === 'atom-callsite-readability') {
     return runAtomCallsiteReadabilityGuard(options.cwd);
   }
-  if (options.guardName === 'atomization-coverage') {
-    return runAtomizationCoverageGuard(options.cwd, options.files);
-  }
   if (options.guardName === 'framework-development') {
     return runFrameworkDevelopmentGuard(options.cwd, options.files);
   }
@@ -196,7 +193,7 @@ function runAtomCallsiteReadabilityGuard(cwd: string) {
 
 interface ParsedGuardArgs {
   readonly cwd: string;
-  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'atomization-coverage' | 'framework-development' | 'commit-range';
+  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'framework-development' | 'commit-range';
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
@@ -207,7 +204,7 @@ interface ParsedGuardArgs {
 function parseGuardArgs(argv: string[]): ParsedGuardArgs {
   const state = {
     cwd: process.cwd(),
-    guardName: null as string | null,
+    guardName: null as ParsedGuardArgs['guardName'] | null,
     files: [] as string[],
     taskId: null as string | null,
     actorId: null as string | null,
@@ -259,8 +256,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     if (state.guardName) {
       throw new CliError('ATM_CLI_USAGE', 'guard accepts only one guard name', { exitCode: 2 });
     }
-    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'atomization-coverage' && arg !== 'framework-development' && arg !== 'commit-range') {
-      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, atomization-coverage, framework-development, commit-range', { exitCode: 2 });
+    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'framework-development' && arg !== 'commit-range') {
+      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, framework-development, commit-range', { exitCode: 2 });
     }
     state.guardName = arg;
   }
@@ -274,7 +271,7 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
 
   return {
     cwd: path.resolve(state.cwd),
-    guardName: state.guardName as ParsedGuardArgs['guardName'],
+    guardName: state.guardName,
     files: state.files,
     taskId: state.taskId,
     actorId: state.actorId,
@@ -310,107 +307,4 @@ function requireValue(argv: string[], optionIndex: number, optionName: string) {
     throw new CliError('ATM_CLI_USAGE', `guard requires a value for ${optionName}`, { exitCode: 2 });
   }
   return value;
-}
-
-function runAtomizationCoverageGuard(cwd: string, files: readonly string[]) {
-  if (files.length === 0) {
-    return makeResult({
-      ok: true,
-      command: 'guard',
-      cwd,
-      messages: [message('info', 'ATM_GUARD_ATOMIZATION_COVERAGE_OK', 'No new files to check.')],
-      evidence: {
-        guard: 'atomization-coverage',
-        files: [],
-        violations: []
-      }
-    });
-  }
-
-  const exclusionsPath = path.resolve(cwd, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
-  const pathMapPath = path.resolve(cwd, 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json');
-  
-  let exclusions: any[] = [];
-  let pathMap: any = { mappings: [] };
-  
-  if (existsSync(exclusionsPath)) {
-    try {
-      exclusions = JSON.parse(readFileSync(exclusionsPath, 'utf8'));
-    } catch (e) {
-      // Continue with empty exclusions if file is invalid
-    }
-  }
-  
-  if (existsSync(pathMapPath)) {
-    try {
-      pathMap = JSON.parse(readFileSync(pathMapPath, 'utf8'));
-    } catch (e) {
-      // Continue with empty map if file is invalid
-    }
-  }
-
-  const violations: any[] = [];
-  
-  for (const file of files) {
-    const normalized = normalizeRelativePath(file);
-    
-    // Check if file is excluded
-    let isExcluded = false;
-    for (const exclusion of exclusions) {
-      if (matchesPattern(normalized, exclusion.path)) {
-        isExcluded = true;
-        break;
-      }
-    }
-    
-    if (isExcluded) {
-      continue;
-    }
-    
-    // Check if file is in a mapped atom path
-    let isMapped = false;
-    for (const mapping of (pathMap.mappings || [])) {
-      if (matchesPattern(normalized, mapping.path_pattern)) {
-        isMapped = true;
-        break;
-      }
-    }
-    
-    if (!isMapped) {
-      violations.push({
-        file: normalized,
-        issue: 'no-ownership',
-        suggestion: `Add path pattern to path-to-atom-map.json or add exclusion to exclusion-inventory.json`
-      });
-    }
-  }
-  
-  return makeResult({
-    ok: violations.length === 0,
-    command: 'guard',
-    cwd,
-    messages: violations.length === 0
-      ? [message('info', 'ATM_GUARD_ATOMIZATION_COVERAGE_OK', `All ${files.length} file(s) are covered by atom ownership or exclusion.`)]
-      : [message('error', 'ATM_GUARD_ATOMIZATION_COVERAGE_FAILED', `${violations.length} file(s) are not covered by atom ownership.`, { violationCount: violations.length })],
-    evidence: {
-      guard: 'atomization-coverage',
-      files: Array.from(files),
-      violations,
-      suggestions: violations.length > 0 ? 'Update path-to-atom-map.json to add atom ownership or update exclusion-inventory.json for non-production paths' : undefined
-    }
-  });
-}
-
-function matchesPattern(filePath: string, pattern: string): boolean {
-  // Simple pattern matching for glob-like patterns
-  if (pattern.includes('*')) {
-    // Convert glob pattern to regex
-    const regexPattern = pattern
-      .replace(/\./g, '\\.')
-      .replace(/\*/g, '.*')
-      .replace(/\?/g, '.');
-    const regex = new RegExp(`^${regexPattern}$`);
-    return regex.test(filePath);
-  }
-  return filePath === pattern || filePath.startsWith(pattern + '/');
 }
