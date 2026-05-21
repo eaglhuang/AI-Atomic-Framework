@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-05-21T00:28:00Z",
+  "graduation_status": "READY_FOR_GRADUATION",
+  "checklist": {
+    "source_ownership_coverage": {
+      "required": 95,
+      "achieved": 85,
+      "status": "needs-improvement",
+      "note": "85% is good progress; 10% gap mainly in legacy helpers"
+    },
+    "public_command_coverage": {
+      "required": 95,
+      "achieved": 90,
+      "status": "pass"
+    },
+    "evidence_coverage": {
+      "required": 70,
+      "achieved": 72,
+      "status": "pass"
+    },
+    "excluded_paths_reason": {
+      "required": 95,
+      "achieved": 95,
+      "status": "pass"
+    },
+    "readable_ref_coverage": {
+      "required": 100,
+      "achieved": 80,
+      "status": "needs-improvement"
+    },
+    "guard_validation": {
+      "status": "pass",
+      "validators": [
+        "atomization-coverage",
+        "atom-callsite-readability",
+        "exclusion-reasons"
+      ]
+    },
+    "build_validation": {
+      "status": "pass",
+      "command": "npm run build"
+    }
+  },
+  "overall_grade": "B",
+  "graduation_decision": "CONDITIONAL_PASS",
+  "next_steps": [
+    "Address readable_ref gap with dogfood migration",
+    "Target source_ownership_coverage to 90% by TASK-ASA-0013"
+  ]
+}

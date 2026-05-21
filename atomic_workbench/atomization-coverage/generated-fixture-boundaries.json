@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "boundaries": {
+    "generated": [
+      "dist/**",
+      "build/**",
+      "release/**",
+      "**/*.gen.ts",
+      "**/*.gen.json",
+      "atomic_workbench/generators/**/outputs/**",
+      "atomic_workbench/generators/**/artifacts/**"
+    ],
+    "fixtures": [
+      "fixtures/**",
+      "tests/**/*.snapshot",
+      "tests/**/*.snap",
+      "__snapshots__/**"
+    ],
+    "production": [
+      "packages/*/src/**",
+      "packages/*/types/**",
+      "scripts/src/**",
+      "integrations/**"
+    ],
+    "documentation": [
+      "docs/**/*.md",
+      "examples/**",
+      "samples/**"
+    ],
+    "test_source": [
+      "tests/**/*.test.ts",
+      "tests/**/*.spec.ts"
+    ]
+  },
+  "clear_boundaries": true,
+  "enforcement": "strict"
+}
