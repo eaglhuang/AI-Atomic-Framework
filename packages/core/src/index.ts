@@ -413,6 +413,8 @@ export * from './registry/map-registry.ts';
 export * from './registry/status-migration.ts';
 export * from './registry/status-machine.ts';
 export * from './registry/semantic-fingerprint.ts';
+export * from './registry/atom-runtime.ts';
+export * from './registry/atom-ref-readability.ts';
 export * from './registry/rollback.ts';
 export * from './registry/registry-migration.ts';
 export * from './guidance/index.ts';

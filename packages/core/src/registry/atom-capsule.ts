@@ -26,13 +26,18 @@ export interface CapsuleImportResult {
 }
 
 export class AtomCapsuleError extends Error {
+  readonly code: string;
+  readonly details: Record<string, unknown>;
+
   constructor(
-    public readonly code: string,
+    code: string,
     message: string,
-    public readonly details: Record<string, unknown> = {}
+    details: Record<string, unknown> = {}
   ) {
     super(message);
     this.name = 'AtomCapsuleError';
+    this.code = code;
+    this.details = details;
   }
 }
 
@@ -89,7 +94,7 @@ export function importAtomCapsule(
     if (verifyPayloadHash(cid, cachedPayload)) {
       compressedPayload = cachedPayload;
     } else {
-      warnings.push(`Cache hit for ${cidShort} but hash verification failed — re-importing from provided payload`);
+      warnings.push(`Cache hit for ${cidShort} but hash verification failed; re-importing from provided payload`);
       fromCache = false;
     }
   }

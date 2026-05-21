@@ -7,7 +7,7 @@
     "notes": "Phase B1 seed governance registry."
   },
   "registryId": "registry.seed",
-  "generatedAt": "2026-05-11T13:56:46.0805195Z",
+  "generatedAt": "2026-05-20T15:08:15.683Z",
   "entries": [
     {
       "atomId": "ATM-CORE-0001",
@@ -18,7 +18,7 @@
       "specPath": "specs/atom-seed-spec.json",
       "hashLock": {
         "algorithm": "sha256",
-        "digest": "sha256:0f1f2ec20d8d985b437b281a804d4f5d25803a6bf078e600eecb1e1ddd2bf3d4",
+        "digest": "sha256:aac4866b76206c5f16da8902cf93d51c3b41cc263118d60c3950a4e2f5226cf4",
         "canonicalization": "json-stable-v1"
       },
       "owner": {
@@ -41,8 +41,8 @@
       ],
       "selfVerification": {
         "legacyPlanningId": "ATM-CORE-0001",
-        "specHash": "sha256:3a35b00c4239215d151c08c0e31318abe9db99c614153a62e69f9b770693aeff",
-        "codeHash": "sha256:0147bd883b407954f0264f7c330aeb7480fd95e1bec6b75dc3cf7463b2311f9e",
+        "specHash": "sha256:cffe2ddde294b2127544af1bb6465abf9ee9c6474dac1697fc538b073280014a",
+        "codeHash": "sha256:edf6f838a8d4a4f0c36ddca644667f93d695e33429be256ae6935f551a1ac270",
         "testHash": "sha256:409be33e76f84f5e49d0d2640a7127f7e80baa98f81636aaeb40a60e0916be6e",
         "sourcePaths": {
           "spec": "specs/atom-seed-spec.json",
@@ -72,8 +72,8 @@
       "versions": [
         {
           "version": "0.1.0",
-          "specHash": "sha256:3a35b00c4239215d151c08c0e31318abe9db99c614153a62e69f9b770693aeff",
-          "codeHash": "sha256:0147bd883b407954f0264f7c330aeb7480fd95e1bec6b75dc3cf7463b2311f9e",
+          "specHash": "sha256:e1110e77b2b84a155078484d6f71cee92f76f4b15a7394c4f2c4bc8cf7763797",
+          "codeHash": "sha256:edf6f838a8d4a4f0c36ddca644667f93d695e33429be256ae6935f551a1ac270",
           "testHash": "sha256:409be33e76f84f5e49d0d2640a7127f7e80baa98f81636aaeb40a60e0916be6e",
           "timestamp": "2026-05-11T13:56:46.0805195Z",
           "semanticFingerprint": "sf:sha256:09f9f60dae2ace765e01a7fbb2b9c0f9c55efb7ff784fbc30b6bc7155822bf13"
@@ -127,7 +127,7 @@
         "legacyPlanningId": "ATM-CORE-0003",
         "specHash": "sha256:c82c2ce926ef6300a499ef5bbc0247caaea1a4b932bb8dd10d3fb343cea3e2d7",
         "codeHash": "sha256:7f0337262770e053828ba27336f8edb5233b0518b8f050987a8a5503dccc9e43",
-        "testHash": "sha256:133895851e4955a0fd08a766a6f8b0e3ebc57e636ad11a72fd8141dd5ae5701e",
+        "testHash": "sha256:3f5f4a308ab7de5cf48973bb2f97612797b7401083065c5b5f9ef3672f265e01",
         "sourcePaths": {
           "spec": "specs/neutrality-scanner.atom.json",
           "code": [
@@ -399,6 +399,92 @@
         "atomic_workbench/maps/ATM-MAP-0002/lineage-log.json"
       ],
       "lineageLogRef": "atomic_workbench/maps/ATM-MAP-0002/lineage-log.json"
+    },
+    {
+      "id": "ATM-CORE-0005",
+      "atomId": "ATM-CORE-0005",
+      "logicalName": "atom.core-atomic-spec-semantic-fingerprint",
+      "atomVersion": "0.1.0",
+      "currentVersion": "0.1.0",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "specHash": "sha256:5c50aac28593f4692adc4f642ef9a7f812f186a25d747d5f486e4be374d4454a",
+          "codeHash": "sha256:ce73ebfd533af34ceb0e4eda6a85ad922805c2bdaf17884231f2e79c78ecfd48",
+          "testHash": "sha256:a957c6e2fe9f6745f5f106a08ca65854f69a9ec90910493c65534d5689b57a05",
+          "timestamp": "2026-05-20T15:08:15.682Z",
+          "semanticFingerprint": "sf:sha256:0eb9218b6692dd96159027dbd3cfc4c68bc45ab1bd69bd2bebcb3380ad110417"
+        }
+      ],
+      "schemaId": "atm.atomicSpec",
+      "specVersion": "0.1.0",
+      "schemaPath": "schemas/atomic-spec.schema.json",
+      "specPath": "atomic_workbench/atoms/ATM-CORE-0005/atom.spec.json",
+      "hashLock": {
+        "algorithm": "sha256",
+        "digest": "sha256:d7a08f9ad6e06f5fa11f0164f8fecf5e66f1da9728ab77e8877b94a232baa66b",
+        "canonicalization": "json-stable-v1"
+      },
+      "owner": {
+        "name": "ATM maintainers",
+        "contact": "maintainers@example.invalid"
+      },
+      "status": "active",
+      "governance": {
+        "tier": "standard"
+      },
+      "semanticFingerprint": "sf:sha256:0eb9218b6692dd96159027dbd3cfc4c68bc45ab1bd69bd2bebcb3380ad110417",
+      "location": {
+        "specPath": "atomic_workbench/atoms/ATM-CORE-0005/atom.spec.json",
+        "codePaths": [
+          "packages/core/src/registry/semantic-fingerprint.ts",
+          "packages/core/src/registry/atom-runtime.ts",
+          "packages/core/src/spec/parse-spec.ts",
+          "atomic_workbench/atoms/ATM-CORE-0005/atom.source.mjs"
+        ],
+        "testPaths": [
+          "atomic_workbench/atoms/ATM-CORE-0005/atom.test.ts",
+          "scripts/validate-core-spec-parser.ts"
+        ],
+        "reportPath": "atomic_workbench/atoms/ATM-CORE-0005/atom.test.report.json",
+        "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0005"
+      },
+      "compatibility": {
+        "coreVersion": "0.1.0",
+        "registryVersion": "0.1.0",
+        "languageAdapter": "language-js"
+      },
+      "evidence": [
+        "generator-provenance:atomize",
+        ".atm/history/reports/upgrade-proposals.json",
+        ".atm/history/reports/upgrade-proposals.md",
+        "atomic_workbench/atoms/ATM-CORE-0005/README.md",
+        "atomic_workbench/atoms/ATM-CORE-0005/atom.spec.json",
+        "atomic_workbench/atoms/ATM-CORE-0005/atom.source.mjs",
+        "atomic_workbench/atoms/ATM-CORE-0005/atom.test.report.json",
+        "packages/core/src/registry/semantic-fingerprint.ts",
+        "packages/core/src/registry/atom-runtime.ts",
+        "packages/core/src/spec/parse-spec.ts"
+      ],
+      "selfVerification": {
+        "legacyPlanningId": null,
+        "specHash": "sha256:5c50aac28593f4692adc4f642ef9a7f812f186a25d747d5f486e4be374d4454a",
+        "codeHash": "sha256:1955af1e867887155b976dbb26130271add64da5fa8aceafe4dfd8c1fb52cf1d",
+        "testHash": "sha256:a957c6e2fe9f6745f5f106a08ca65854f69a9ec90910493c65534d5689b57a05",
+        "sourcePaths": {
+          "spec": "atomic_workbench/atoms/ATM-CORE-0005/atom.spec.json",
+          "code": [
+            "packages/core/src/registry/semantic-fingerprint.ts",
+            "packages/core/src/registry/atom-runtime.ts",
+            "packages/core/src/spec/parse-spec.ts",
+            "atomic_workbench/atoms/ATM-CORE-0005/atom.source.mjs"
+          ],
+          "tests": [
+            "atomic_workbench/atoms/ATM-CORE-0005/atom.test.ts",
+            "scripts/validate-core-spec-parser.ts"
+          ]
+        }
+      }
     }
   ]
 }

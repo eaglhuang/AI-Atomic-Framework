@@ -16,6 +16,13 @@ export interface CliCommandDescriptor {
 
 export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   {
+    commandName: 'atom-ref',
+    summary: 'Generate and validate readable atom/map refs for runAtm callsites',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'bootstrap',
     summary: 'Create the default ATM bootstrap pack and starter task',
     implemented: true,

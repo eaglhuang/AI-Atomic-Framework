@@ -38,13 +38,18 @@ export interface MapCapsuleExportResult {
 }
 
 export class MapCapsuleError extends Error {
+  readonly code: string;
+  readonly details: Record<string, unknown>;
+
   constructor(
-    public readonly code: string,
+    code: string,
     message: string,
-    public readonly details: Record<string, unknown> = {}
+    details: Record<string, unknown> = {}
   ) {
     super(message);
     this.name = 'MapCapsuleError';
+    this.code = code;
+    this.details = details;
   }
 }
 

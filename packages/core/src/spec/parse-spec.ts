@@ -2,7 +2,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
+import { atomicSpecSemanticFingerprintAtom, runAtm } from '../registry/atom-runtime.ts';
+import { normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
@@ -204,7 +205,7 @@ export function normalizeAtomicSpecModel(specDocument: any, options: any = {}) {
     },
     governance: {
       semanticFingerprint: normalizeSemanticFingerprint(
-        specDocument.semanticFingerprint ?? createAtomicSpecSemanticFingerprint(specDocument)
+        specDocument.semanticFingerprint ?? runAtm(atomicSpecSemanticFingerprintAtom, specDocument)
       ),
       lineage: normalizeLineage(specDocument.lineage ?? null),
       ttl: normalizeTtl(specDocument.ttl ?? null),

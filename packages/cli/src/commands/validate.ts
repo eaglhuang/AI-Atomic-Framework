@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { validateAtomRefReadability } from '@ai-atomic-framework/core';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.ts';
 
 const requiredAtomicSpecFields = [
@@ -16,11 +17,36 @@ const requiredAtomicSpecFields = [
 ];
 
 export function runValidate(argv: any) {
+  if (argv.includes('atom-callsite-readability')) {
+    const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
+    const report = validateAtomRefReadability(path.resolve(repo));
+    return makeResult({
+      ok: report.ok,
+      command: 'validate',
+      cwd: path.resolve(repo),
+      messages: [report.ok
+        ? message('info', 'ATM_VALIDATE_ATOM_CALLSITE_READABILITY_OK', 'Atom/map callsite readability validation passed.')
+        : message('error', 'ATM_VALIDATE_ATOM_CALLSITE_READABILITY_FAILED', 'Atom/map callsite readability validation failed.', { violationCount: report.violationCount })],
+      evidence: {
+        validation: 'atom-callsite-readability',
+        report
+      }
+    });
+  }
   const { options } = parseOptions(argv, 'validate');
   if (options.spec) {
     return validateAtomicSpecFile(options.cwd, options.spec);
   }
   return validateRepositoryConfig(options.cwd);
+}
+
+function valueAfter(argv: any, flag: string): string | null {
+  const index = argv.indexOf(flag);
+  if (index === -1) {
+    return null;
+  }
+  const value = argv[index + 1];
+  return typeof value === 'string' && !value.startsWith('--') ? value : null;
 }
 
 function validateRepositoryConfig(cwd: any) {

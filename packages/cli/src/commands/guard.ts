@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { validateAtomRefReadability } from '@ai-atomic-framework/core';
 import { resolveActorId } from './actor-registry.ts';
 import { evaluateGitGovernanceCheck } from './git-governance.ts';
 import { CliError, makeResult, message } from './shared.ts';
@@ -23,6 +24,9 @@ export function runGuard(argv: string[]) {
   if (options.guardName === 'mutation') {
     return runMutationGuard(options);
   }
+  if (options.guardName === 'atom-callsite-readability') {
+    return runAtomCallsiteReadabilityGuard(options.cwd);
+  }
   return runGitGuard(options);
 }
 
@@ -38,7 +42,8 @@ function runEncodingGuard(cwd: string, files: readonly string[]) {
     if (text.includes('\uFFFD')) {
       findings.push({ file: relativeFile, issue: 'replacement-character' });
     }
-    if (/Ã.|â.|å.|璽.|疇.|癟./.test(text)) {
+    const possibleMojibakePattern = /[\u00c3\u00e2\u00e5].|\u749d.|\u7587.|\u765f./;
+    if (possibleMojibakePattern.test(text)) {
       findings.push({ file: relativeFile, issue: 'possible-mojibake' });
     }
   }
@@ -162,9 +167,25 @@ function runGitGuard(options: ParsedGuardArgs) {
   });
 }
 
+function runAtomCallsiteReadabilityGuard(cwd: string) {
+  const report = validateAtomRefReadability(cwd);
+  return makeResult({
+    ok: report.ok,
+    command: 'guard',
+    cwd,
+    messages: [report.ok
+      ? message('info', 'ATM_GUARD_ATOM_CALLSITE_READABILITY_OK', 'Atom/map callsite readability guard passed.')
+      : message('error', 'ATM_GUARD_ATOM_CALLSITE_READABILITY_FAILED', 'Atom/map callsite readability guard found violations.', { violationCount: report.violationCount })],
+    evidence: {
+      guard: 'atom-callsite-readability',
+      report
+    }
+  });
+}
+
 interface ParsedGuardArgs {
   readonly cwd: string;
-  readonly guardName: 'encoding' | 'mutation' | 'git';
+  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability';
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
@@ -185,6 +206,11 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     const arg = argv[index];
     if (arg === '--cwd') {
       state.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--repo') {
+      state.cwd = requireValue(argv, index, '--repo');
       index += 1;
       continue;
     }
@@ -216,8 +242,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     if (state.guardName) {
       throw new CliError('ATM_CLI_USAGE', 'guard accepts only one guard name', { exitCode: 2 });
     }
-    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git') {
-      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git', { exitCode: 2 });
+    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability') {
+      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability', { exitCode: 2 });
     }
     state.guardName = arg;
   }

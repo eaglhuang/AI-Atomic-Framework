@@ -109,7 +109,7 @@ export function rebuildCapsuleRegistry(
         result.orphanedCapsules.push(`${filename} (cid short=${shortId})`);
       }
     } catch (err) {
-      result.skippedFiles.push(`${filename}: parse error — ${err}`);
+      result.skippedFiles.push(`${filename}: parse error; ${err}`);
     }
   }
 
@@ -219,7 +219,7 @@ export function rebuildMapRegistry(
       rebuiltRegistry.currentPointers[mapId] = mapCid;
       result.rebuiltEntries++;
     } catch (err) {
-      result.errors.push(`${filename}: parse error — ${err}`);
+      result.errors.push(`${filename}: parse error; ${err}`);
     }
   }
 

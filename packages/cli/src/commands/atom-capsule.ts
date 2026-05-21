@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
+import type { AtomBundle } from '../../../core/src/registry/atom-capsule.ts';
 import {
-  AtomBundle,
   exportAtomCapsule,
   importAtomCapsule,
   validateCidFormat,
@@ -249,7 +249,7 @@ async function runRollback(cwd: string, options: CapsuleOptions) {
     throw new CliError('ATM_CAPSULE_NOT_FOUND', `No registry entry found for CID: ${cid}`, { exitCode: 1 });
   }
   if (!entry.previousCid) {
-    throw new CliError('ATM_CAPSULE_NO_PREVIOUS', `CID ${cid} has no previousCid — cannot rollback.`, { exitCode: 1 });
+    throw new CliError('ATM_CAPSULE_NO_PREVIOUS', `CID ${cid} has no previousCid; cannot rollback.`, { exitCode: 1 });
   }
 
   markCapsuleRolledBack(globalRegistry, cid);

@@ -2,12 +2,12 @@
   "schemaId": "atm.generatorProvenanceAudit",
   "specVersion": "0.1.0",
   "registryId": "registry.seed",
-  "registryGeneratedAt": "2026-05-11T13:56:46.0805195Z",
+  "registryGeneratedAt": "2026-05-20T15:08:15.683Z",
   "summary": {
-    "total": 6,
+    "total": 7,
     "generated": 2,
     "backfilled": 3,
-    "atomized": 0,
+    "atomized": 1,
     "bootstrapSelf": 1,
     "unmarked": 0
   },
@@ -104,6 +104,26 @@
       "codePaths": [],
       "testPaths": [
         "atomic_workbench/maps/ATM-MAP-0002/map.integration.test.ts"
+      ],
+      "driftOk": true,
+      "issues": []
+    },
+    {
+      "atomId": "ATM-CORE-0005",
+      "logicalName": "atom.core-atomic-spec-semantic-fingerprint",
+      "provenance": "atomize",
+      "marker": "generator-provenance:atomize",
+      "workbenchPath": "atomic_workbench/atoms/ATM-CORE-0005",
+      "specPath": "atomic_workbench/atoms/ATM-CORE-0005/atom.spec.json",
+      "codePaths": [
+        "packages/core/src/registry/semantic-fingerprint.ts",
+        "packages/core/src/registry/atom-runtime.ts",
+        "packages/core/src/spec/parse-spec.ts",
+        "atomic_workbench/atoms/ATM-CORE-0005/atom.source.mjs"
+      ],
+      "testPaths": [
+        "atomic_workbench/atoms/ATM-CORE-0005/atom.test.ts",
+        "scripts/validate-core-spec-parser.ts"
       ],
       "driftOk": true,
       "issues": []
