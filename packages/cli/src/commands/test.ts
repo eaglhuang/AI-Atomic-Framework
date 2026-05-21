@@ -7,6 +7,7 @@ import { runMapEquivalence } from '../../../core/src/equivalence/run-map-equival
 import { runMapIntegrationTest } from '../../../core/src/test-runner/map-integration.ts';
 import { createPropagationReport, runPropagationIntegration } from '../../../core/src/test-runner/propagation.ts';
 import { checkMapFingerprint, recordFingerprintCheck } from '../../../core/src/maps/fingerprint-checker.ts';
+import { runEdgeContractCheck } from '../../../core/src/maps/edge-contract-runner.ts';
 import { CliError, makeResult, message, parseOptions, quoteCliValue, relativePathFrom } from './shared.ts';
 import { runValidate } from './validate.ts';
 
@@ -55,10 +56,16 @@ export async function runTestAsync(argv: any) {
   if (options.fingerprintCheck && !options.map) {
     throw new CliError('ATM_CLI_USAGE', 'test option --fingerprint-check must be paired with --map.', { exitCode: 2 });
   }
+  if (options.edgeContracts && !options.map) {
+    throw new CliError('ATM_CLI_USAGE', 'test option --edge-contracts must be paired with --map.', { exitCode: 2 });
+  }
   if (options.spec) {
     return runSpecTest(options.cwd, options.spec);
   }
   if (options.map) {
+    if (options.edgeContracts) {
+      return runEdgeContractTest(options.cwd, options.map);
+    }
     return runMapTest(options.cwd, options.map, options.equivalenceFixtures, options.fingerprintCheck);
   }
   if (options.propagate) {
@@ -85,6 +92,26 @@ export async function runTestAsync(argv: any) {
       specPath: relativePathFrom(options.cwd, path.join(options.cwd, smoke.specPath)),
       sourcePath: relativePathFrom(options.cwd, path.join(options.cwd, smoke.sourcePath))
     }
+  });
+}
+
+async function runEdgeContractTest(cwd: string, mapId: string) {
+  const report = runEdgeContractCheck(cwd, mapId);
+  const ok = report.failed === 0;
+  return makeResult({
+    ok,
+    command: 'test',
+    cwd,
+    messages: [
+      message(ok ? 'info' : 'error',
+        ok ? 'ATM_EDGE_CONTRACT_PASS' : 'ATM_EDGE_CONTRACT_FAIL',
+        ok
+          ? `Edge contract check passed: ${report.passed}/${report.totalEdges} edges OK.`
+          : `Edge contract check failed: ${report.failed} edge(s) have schema mismatches.`,
+        { mapId, passed: report.passed, failed: report.failed, total: report.totalEdges }
+      )
+    ],
+    evidence: { report }
   });
 }
 

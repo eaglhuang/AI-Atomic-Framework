@@ -266,6 +266,7 @@ type ParsedCliOptions = {
   map?: string;
   equivalenceFixtures?: string;
   fingerprintCheck?: boolean;
+  edgeContracts?: boolean;
   propagate?: string;
   agent?: string;
 };
@@ -291,6 +292,7 @@ export function parseOptions(argv: string[], commandName: string) {
     map: undefined,
     propagate: undefined,
     fingerprintCheck: false,
+    edgeContracts: false,
     agent: undefined
   };
   const positional = [];
@@ -441,6 +443,13 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --fingerprint-check`, { exitCode: 2 });
       }
       options.fingerprintCheck = true;
+      continue;
+    }
+    if (arg === '--edge-contracts') {
+      if (!['test'].includes(commandName)) {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --edge-contracts`, { exitCode: 2 });
+      }
+      options.edgeContracts = true;
       continue;
     }
     if (arg === '--propagate') {
