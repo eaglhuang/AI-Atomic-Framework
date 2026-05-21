@@ -1,6 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
+import { checkProgression, pauseProgression, readProgressionPolicy } from '../../../core/src/registry/progression-policy.ts';
+import { readShadowComparisonReport } from '../../../core/src/maps/shadow-comparator.ts';
 import {
   computeDecisionSnapshotHash,
   createHumanReviewDecisionLog,
@@ -22,8 +24,12 @@ export function runReview(argv: any) {
   const action = positional[0] ? String(positional[0]).trim().toLowerCase() : 'list';
   const proposalId = positional[1] ? String(positional[1]).trim() : '';
 
-  if (!['list', 'show', 'approve', 'reject', 'apply-ready', 'rollout-ready'].includes(action)) {
+  if (!['list', 'show', 'approve', 'reject', 'apply-ready', 'rollout-ready', 'check-progression'].includes(action)) {
     throw new CliError('ATM_CLI_USAGE', `Unsupported review action: ${action}`, { exitCode: 2 });
+  }
+
+  if (action === 'check-progression') {
+    return runCheckProgression(options.cwd, options.map, options.forcePause);
   }
 
   const queuePath = resolveExistingPath(options.cwd, options.queuePath, '.atm/reports/upgrade-proposals.json');
@@ -395,7 +401,17 @@ function readJsonFileSafe(filePath: string) {
 }
 
 function parseReviewOptions(argv: any) {
-  const options = {
+  const options: {
+    cwd: string;
+    queuePath: string;
+    projectionPath: string;
+    decisionLogPath: string;
+    reason: string;
+    decidedBy: string;
+    decidedAt: string;
+    map?: string;
+    forcePause?: boolean;
+  } = {
     cwd: process.cwd(),
     queuePath: '.atm/history/reports/upgrade-proposals.json',
     projectionPath: '.atm/history/reports/upgrade-proposals.md',
@@ -444,6 +460,15 @@ function parseReviewOptions(argv: any) {
       continue;
     }
     if (arg === '--json') {
+      continue;
+    }
+    if (arg === '--map') {
+      options.map = requireOptionValue(argv, index, '--map');
+      index += 1;
+      continue;
+    }
+    if (arg === '--force-pause') {
+      options.forcePause = true;
       continue;
     }
     if (arg.startsWith('--')) {
@@ -504,4 +529,54 @@ function writeJsonFile(filePath: any, value: any) {
 function writeTextFile(filePath: any, text: any) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, text, 'utf8');
+}
+
+function runCheckProgression(cwd: string, mapId: string | undefined, forcePause?: boolean) {
+  if (!mapId) {
+    throw new CliError('ATM_CLI_USAGE', 'review check-progression requires --map <mapId>.', { exitCode: 2 });
+  }
+
+  if (forcePause) {
+    const policy = pauseProgression(cwd, mapId, process.env.AGENT_IDENTITY ?? 'manual');
+    return makeResult({
+      ok: true,
+      command: 'review',
+      cwd,
+      messages: [message('info', 'ATM_PROGRESSION_PAUSED', `Progression automation paused for map ${mapId}.`, { mapId })],
+      evidence: { action: 'check-progression', mapId, paused: true, policy }
+    });
+  }
+
+  const shadowReport = readShadowComparisonReport(cwd, mapId);
+  const result = checkProgression(cwd, mapId, shadowReport);
+  const policy = readProgressionPolicy(cwd, mapId);
+
+  return makeResult({
+    ok: result.canPromote,
+    command: 'review',
+    cwd,
+    messages: [
+      message(
+        result.canPromote ? 'info' : 'warn',
+        result.canPromote ? 'ATM_PROGRESSION_CAN_PROMOTE' : 'ATM_PROGRESSION_BLOCKED',
+        result.canPromote
+          ? `Progression check passed: ${mapId} can advance from ${result.currentLane} to ${result.nextLane}.`
+          : `Progression blocked for ${mapId}: ${result.blockedReasons[0] ?? 'unknown reason'}.`,
+        { mapId, canPromote: result.canPromote, blockedReasons: result.blockedReasons }
+      )
+    ],
+    evidence: {
+      action: 'check-progression',
+      mapId,
+      checkedAt: result.checkedAt,
+      canPromote: result.canPromote,
+      blockedReasons: result.blockedReasons,
+      currentLane: result.currentLane,
+      nextLane: result.nextLane,
+      proposal: result.proposal ?? null,
+      nextProposalHint: result.nextProposalHint ?? null,
+      automationLevel: policy.automationLevel,
+      paused: result.paused
+    }
+  });
 }
