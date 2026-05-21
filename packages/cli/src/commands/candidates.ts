@@ -1,6 +1,15 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
+  isCacheEnabled,
+  computeCacheKey,
+  getGitCommitHash,
+  hasUncommittedChanges,
+  getPolicyHash,
+  readCacheEntry,
+  writeCacheEntry
+} from '../../../core/src/cache/guide-cache.ts';
+import {
   buildSourceInventoryReport,
   type SourceInventoryEntry
 } from '../../../core/src/source-inventory/source-inventory.ts';
@@ -69,6 +78,49 @@ export async function runCandidates(argv: string[]) {
   const options = parseCandidatesOptions(argv);
   if (options.action !== 'rank') {
     throw new CliError('ATM_CLI_USAGE', `candidates only supports action "rank" (got ${options.action})`, { exitCode: 2 });
+  }
+
+  // Cache layer (opt-in, defaults OFF)
+  const cacheEnabled = isCacheEnabled(options.cwd) && !options.noCache;
+  let cacheBypassReason: string | null = null;
+  let cacheKey: string | null = null;
+  let cacheComponents: Parameters<typeof computeCacheKey>[0] | null = null;
+
+  if (cacheEnabled) {
+    const dirty = hasUncommittedChanges(options.cwd);
+    if (dirty) {
+      cacheBypassReason = 'dirty-working-tree';
+    } else {
+      const gitHash = getGitCommitHash(options.cwd);
+      if (!gitHash) {
+        cacheBypassReason = 'no-git-commit';
+      } else {
+        cacheComponents = {
+          goal: options.goal,
+          glob: options.includePatterns.join('|'),
+          gitCommitHash: gitHash,
+          toolVersion: '0.1.0',
+          policyHash: getPolicyHash(options.cwd)
+        };
+        cacheKey = computeCacheKey(cacheComponents);
+        const hit = readCacheEntry(options.cwd, cacheKey);
+        if (hit) {
+          return makeResult({
+            ok: true,
+            command: 'candidates',
+            cwd: options.cwd,
+            messages: [
+              message('info', 'ATM_CANDIDATES_RANK_CACHED', 'Candidate ranking returned from cache.', {
+                cached: true,
+                cacheAge: Math.floor((Date.now() - new Date(hit.cachedAt).getTime()) / 1000) + 's',
+                candidates: (hit.result as any)?.candidateRanking?.length ?? 0
+              })
+            ],
+            evidence: { report: hit.result, cached: true, cachedAt: hit.cachedAt }
+          });
+        }
+      }
+    }
   }
 
   const generatedAt = new Date().toISOString();
@@ -175,6 +227,15 @@ export async function runCandidates(argv: string[]) {
   writeFileSync(guidanceDriftReportPath, `${JSON.stringify(guidanceDriftPolice, null, 2)}\n`, 'utf8');
   writeFileSync(candidateReportPath, `${JSON.stringify(rankingReport, null, 2)}\n`, 'utf8');
 
+  // Write to cache if enabled and no bypass
+  if (cacheEnabled && cacheKey && cacheComponents && !cacheBypassReason) {
+    try {
+      writeCacheEntry(options.cwd, cacheKey, cacheComponents, rankingReport);
+    } catch {
+      // Cache write failure is non-fatal — safe degradation
+    }
+  }
+
   return makeResult({
     ok: true,
     command: 'candidates',
@@ -184,7 +245,9 @@ export async function runCandidates(argv: string[]) {
         candidates: candidateRanking.length,
         sourceFiles: metrics.length,
         recommendedBehaviors,
-        outputPath: relativePathFrom(options.cwd, candidateReportPath)
+        outputPath: relativePathFrom(options.cwd, candidateReportPath),
+        cached: false,
+        cacheBypassReason: cacheBypassReason ?? undefined
       })
     ],
     evidence: {
@@ -205,7 +268,8 @@ function parseCandidatesOptions(argv: string[]) {
     maxFileLines: 1000,
     limit: 10,
     outDir: path.join('.atm', 'history', 'reports', 'candidates'),
-    goal: ''
+    goal: '',
+    noCache: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -238,6 +302,10 @@ function parseCandidatesOptions(argv: string[]) {
     if (arg === '--goal') {
       options.goal = requireOptionValue(argv, index, '--goal');
       index += 1;
+      continue;
+    }
+    if (arg === '--no-cache') {
+      options.noCache = true;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {
