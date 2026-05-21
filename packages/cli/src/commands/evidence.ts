@@ -2,6 +2,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { resolveActorId } from './actor-registry.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
+import {
+  generateDiffEvidence,
+  mergeDiffEvidenceWithExisting,
+  validateDiffEvidence
+} from '../../../core/src/evidence/diff-evidence.ts';
 
 export type EvidenceGate = 'close' | 'commit' | 'pr';
 type CanonicalEvidenceKind = 'test' | 'artifact' | 'attestation' | 'review' | 'commit' | 'waiver' | 'other';
@@ -36,7 +41,84 @@ export async function runEvidence(argv: string[]) {
   if (action === 'verify') {
     return runEvidenceVerify(argv.slice(1));
   }
-  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, verify', { exitCode: 2 });
+  if (action === 'diff') {
+    return runEvidenceDiff(argv.slice(1));
+  }
+  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, verify, diff', { exitCode: 2 });
+}
+
+function runEvidenceDiff(argv: string[]) {
+  const cwd = process.cwd();
+  let taskId: string | undefined;
+  let staged = false;
+  let from: string | undefined;
+  let to: string | undefined;
+  let outputPath: string | undefined;
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if ((arg === '--task' || arg === '-t') && argv[i + 1]) {
+      taskId = argv[++i];
+    } else if (arg === '--staged') {
+      staged = true;
+    } else if (arg === '--from' && argv[i + 1]) {
+      from = argv[++i];
+    } else if (arg === '--to' && argv[i + 1]) {
+      to = argv[++i];
+    } else if (arg === '--output' && argv[i + 1]) {
+      outputPath = argv[++i];
+    }
+  }
+
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence diff requires --task <taskId>', { exitCode: 2 });
+  }
+
+  const draft = generateDiffEvidence({ taskId, repositoryRoot: cwd, staged, from, to });
+
+  // Merge with existing if output file already has human-written fields
+  const resolvedOutput = outputPath ? path.resolve(cwd, outputPath) : null;
+  let finalDraft = draft;
+  if (resolvedOutput && existsSync(resolvedOutput)) {
+    try {
+      const existing = JSON.parse(readFileSync(resolvedOutput, 'utf-8'));
+      if (existing.evidenceType === 'diff-as-evidence' && existing.taskId === taskId) {
+        finalDraft = mergeDiffEvidenceWithExisting(existing, draft);
+      }
+    } catch {
+      // ignore; use fresh draft
+    }
+  }
+
+  const validation = validateDiffEvidence(finalDraft);
+  finalDraft._isValid = validation.valid;
+
+  if (resolvedOutput) {
+    mkdirSync(path.dirname(resolvedOutput), { recursive: true });
+    writeFileSync(resolvedOutput, JSON.stringify(finalDraft, null, 2) + '\n');
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd,
+    messages: [
+      message('info', 'ATM_EVIDENCE_DIFF_GENERATED',
+        `Diff evidence draft generated for ${taskId}. ${finalDraft._isValid ? 'Ready to submit.' : 'Fill in intent/impact/testCoverage to validate.'}`,
+        {
+          taskId,
+          changedFiles: finalDraft.changedFiles.length,
+          linesAdded: finalDraft.linesAdded,
+          linesDeleted: finalDraft.linesDeleted,
+          affectedAtoms: finalDraft.affectedAtoms.length,
+          isValid: finalDraft._isValid,
+          validationReasons: validation.reasons,
+          writtenTo: resolvedOutput ?? null
+        }
+      )
+    ],
+    evidence: { draft: finalDraft }
+  });
 }
 
 export function verifyTaskEvidence(input: {
