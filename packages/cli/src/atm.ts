@@ -44,6 +44,7 @@ import { runActor } from './commands/actor.ts';
 import { runAtomRef } from './commands/atom-ref.ts';
 import { runAtomCapsule } from './commands/atom-capsule.ts';
 import { runMapCapsule } from './commands/map-capsule.ts';
+import { runRescue } from './commands/rescue.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
@@ -92,7 +93,8 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   actor: runActor,
   'atom-ref': runAtomRef,
   'atom-capsule': runAtomCapsule,
-  'map-capsule': runMapCapsule
+  'map-capsule': runMapCapsule,
+  rescue: runRescue
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {

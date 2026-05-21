@@ -37,7 +37,8 @@ export type PoliceFamilyName =
   | 'decomposition'
   | 'evolution'
   | 'polymorph'
-  | 'rollback';
+  | 'rollback'
+  | 'rescue';
 
 export type SharedGateName =
   | 'evidence-integrity'
