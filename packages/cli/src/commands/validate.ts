@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
 import { runFrameworkDevelopmentValidation } from './framework-development.ts';
@@ -60,44 +60,70 @@ function valueAfter(argv: any, flag: string): string | null {
 }
 
 function validateAtomizationCoverage(cwd: string) {
-  // Simple validation for atomization coverage
+  // Load existing dogfood score and check thresholds
+  const scorePath = path.join(cwd, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.json');
+  const exclusionPath = path.join(cwd, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
+  const pathMapPath = path.join(cwd, 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json');
+  
+  const errors: { code: string; detail: string }[] = [];
+  
+  // Check required inventory files exist
+  if (!existsSync(scorePath)) {
+    errors.push({ code: 'score-file-missing', detail: `Dogfood score file not found: ${scorePath}` });
+  }
+  if (!existsSync(exclusionPath)) {
+    errors.push({ code: 'exclusion-inventory-missing', detail: `Exclusion inventory not found: ${exclusionPath}` });
+  }
+  if (!existsSync(pathMapPath)) {
+    errors.push({ code: 'path-map-missing', detail: `Path-to-atom-map not found: ${pathMapPath}` });
+  }
+  
   const thresholds = {
-    source_ownership_coverage: 30,
-    public_command_coverage: 50,
-    runtime_behavior_coverage: 40,
-    evidence_coverage: 60,
-    integration_health: 80
+    source_ownership_coverage: 80,  // Increased threshold
+    public_command_coverage: 85,    // Increased threshold
+    runAtm_with_readable_ref: 75
   };
   
-  // Stub scores for now - would be populated from actual measurement
-  const currentScores = {
-    source_ownership_coverage: 3,
-    public_command_coverage: 16,
-    runtime_behavior_coverage: 0,
-    evidence_coverage: 0,
-    integration_health: 50
-  };
-  
-  const violations = [];
-  for (const [metric, threshold] of Object.entries(thresholds)) {
-    const current = currentScores[metric as keyof typeof currentScores] || 0;
-    if (current < threshold) {
-      violations.push({ metric, current, threshold, gap: threshold - current });
+  let scoreData: any = null;
+  if (existsSync(scorePath)) {
+    try {
+      scoreData = JSON.parse(readFileSync(scorePath, 'utf8'));
+    } catch {
+      errors.push({ code: 'score-file-invalid', detail: 'Dogfood score file is not valid JSON' });
     }
   }
   
+  const violations = [];
+  if (scoreData && scoreData.scores) {
+    for (const [metric, threshold] of Object.entries(thresholds)) {
+      const current = scoreData.scores[metric as keyof typeof scoreData.scores] || 0;
+      if (current < (threshold as number)) {
+        violations.push({ metric, current, threshold, gap: (threshold as number) - current });
+      }
+    }
+  }
+  
+  const allGood = errors.length === 0 && violations.length === 0;
+  
   return makeResult({
-    ok: violations.length === 0,
+    ok: allGood,
     command: 'validate',
     cwd,
-    messages: violations.length === 0
+    messages: allGood
       ? [message('info', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_OK', 'Atomization coverage validation passed.')]
-      : [message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage has ${violations.length} threshold violations.`, { violations })],
+      : [
+          ...errors.map((e) => message('error', e.code, e.detail)),
+          ...violations.map((v) => message('error', 'COVERAGE_THRESHOLD_FAILED', `${v.metric}: current ${v.current}% < threshold ${v.threshold}%`, { metric: v.metric, gap: v.gap }))
+        ],
     evidence: {
       validation: 'atomization-coverage',
       thresholds,
-      current_scores: currentScores,
-      violations
+      current_scores: scoreData?.scores || {},
+      errors,
+      violations,
+      scoreFileExists: existsSync(scorePath),
+      exclusionFileExists: existsSync(exclusionPath),
+      pathMapExists: existsSync(pathMapPath)
     }
   });
 }
