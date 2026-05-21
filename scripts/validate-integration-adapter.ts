@@ -97,7 +97,9 @@ if (!process.exitCode) {
   assert(typeof packageModule.createCodexSkillsAdapter === 'function', 'missing createCodexSkillsAdapter reference factory');
   assert(packageModule.atmFirstCommand === 'node atm.mjs next --json', 'first command constant mismatch');
   assert(packageModule.charterInvariantsPlaceholder === '{{CHARTER_INVARIANTS}}', 'charter invariants placeholder mismatch');
-  assert(packageModule.minimumAtmEntrySkillDefinitions.length === 8, 'minimum ATM entry skill set must contain eight entries');
+  const minimumEntryIds = packageModule.minimumAtmEntrySkillDefinitions.map((entry: any) => entry.id);
+  const minimumEntryCount = minimumEntryIds.length;
+  assert(minimumEntryCount >= 8, 'minimum ATM entry skill set must contain at least eight entries');
   const renderedCharter = packageModule.renderCharterInvariantsBlock(root);
   assert(renderedCharter.fallbackReason === null, 'validator fixture repo must have readable charter invariants');
   assert(renderedCharter.text.includes('INV-ATM-001'), 'rendered charter invariants must include seeded invariant text');
@@ -120,18 +122,18 @@ if (!process.exitCode) {
   assert(codexReferenceAdapter.targetDir() === 'integrations/codex-skills', 'Codex reference adapter targetDir mismatch');
 
   const adapterSpecs = [
-    await createAdapterSpec('claude-code', 'packages/integration-claude-code/src/index.ts', 'createClaudeCodeIntegrationAdapter', '.claude/skills', 'skill', '$ARGUMENTS'),
-    await createAdapterSpec('codex', 'packages/integration-codex/src/index.ts', 'createCodexIntegrationAdapter', 'integrations/codex-skills', 'skill', '$ARGUMENTS'),
-    await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', 17),
-    await createAdapterSpec('cursor', 'packages/integration-cursor/src/index.ts', 'createCursorIntegrationAdapter', '.cursor/rules/skills', 'markdown', '$ARGUMENTS'),
-    await createAdapterSpec('gemini', 'packages/integration-gemini/src/index.ts', 'createGeminiIntegrationAdapter', '.gemini/commands', 'toml', 'toml-fields'),
-    await createAdapterSpec('antigravity', 'packages/integration-gemini/src/index.ts', 'createAntigravityIntegrationAdapter', '.', 'markdown', '$ARGUMENTS', 9)
+    await createAdapterSpec('claude-code', 'packages/integration-claude-code/src/index.ts', 'createClaudeCodeIntegrationAdapter', '.claude/skills', 'skill', '$ARGUMENTS', minimumEntryCount),
+    await createAdapterSpec('codex', 'packages/integration-codex/src/index.ts', 'createCodexIntegrationAdapter', 'integrations/codex-skills', 'skill', '$ARGUMENTS', minimumEntryCount),
+    await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', 1 + minimumEntryCount * 2),
+    await createAdapterSpec('cursor', 'packages/integration-cursor/src/index.ts', 'createCursorIntegrationAdapter', '.cursor/rules/skills', 'markdown', '$ARGUMENTS', minimumEntryCount),
+    await createAdapterSpec('gemini', 'packages/integration-gemini/src/index.ts', 'createGeminiIntegrationAdapter', '.gemini/commands', 'toml', 'toml-fields', minimumEntryCount),
+    await createAdapterSpec('antigravity', 'packages/integration-gemini/src/index.ts', 'createAntigravityIntegrationAdapter', '.', 'markdown', '$ARGUMENTS', 1 + minimumEntryCount)
   ].filter((adapterSpec: any) => requestedAdapterFilter ? adapterSpec.id === requestedAdapterFilter : true);
 
   assert(adapterSpecs.length > 0, `no integration adapter matched filter: ${requestedAdapterFilter}`);
 
   for (const adapterSpec of adapterSpecs) {
-    exerciseAdapter(adapterSpec, validateManifest, fixtureManifest, packageModule.sha256Bytes);
+    exerciseAdapter(adapterSpec, validateManifest, fixtureManifest, packageModule.sha256Bytes, minimumEntryIds);
   }
 }
 
@@ -163,7 +165,7 @@ async function createAdapterSpec(
   };
 }
 
-function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifest: any, sha256Bytes: (input: string | Uint8Array) => string) {
+function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifest: any, sha256Bytes: (input: string | Uint8Array) => string, minimumEntryIds: readonly string[]) {
   const adapter = adapterSpec.adapter;
   assert(adapter.id === adapterSpec.id, `${adapterSpec.id} adapter id mismatch`);
   assert(adapter.fileFormat === adapterSpec.expectedFileFormat, `${adapterSpec.id} adapter fileFormat mismatch`);
@@ -198,7 +200,7 @@ function exerciseAdapter(adapterSpec: any, validateManifest: any, fixtureManifes
 
     const installedPaths = install.manifest.files.map((fileRecord: any) => fileRecord.path);
     if (adapterSpec.requireMinimumEntrySet) {
-      for (const entryId of ['atm-next', 'atm-orient', 'atm-governance-router', 'atm-create', 'atm-lock', 'atm-evidence', 'atm-upgrade-scan', 'atm-handoff']) {
+      for (const entryId of minimumEntryIds) {
         assert(installedPaths.some((installedPath: string) => installedPath.includes(entryId)), `${adapterSpec.id} missing entry file for ${entryId}`);
       }
     }

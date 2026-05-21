@@ -27,6 +27,7 @@ import gitSpec from './command-specs/git.spec.ts';
 import guideSpec from './command-specs/guide.spec.ts';
 import handoffSpec from './command-specs/handoff.spec.ts';
 import initSpec from './command-specs/init.spec.ts';
+import internalReleaseSpec from './command-specs/internal-release.spec.ts';
 import integrationSpec from './command-specs/integration.spec.ts';
 import lockSpec from './command-specs/lock.spec.ts';
 import migrateSpec from './command-specs/migrate.spec.ts';
@@ -71,6 +72,7 @@ export const commandSpecs = Object.freeze({
   guide: guideSpec,
   handoff: handoffSpec,
   init: initSpec,
+  'internal-release': internalReleaseSpec,
   integration: integrationSpec,
   lock: lockSpec,
   migrate: migrateSpec,

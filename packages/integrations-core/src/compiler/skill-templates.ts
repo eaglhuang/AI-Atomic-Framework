@@ -86,6 +86,12 @@ export const minimumAtmEntrySkillDefinitions = [
     title: 'ATM Handoff',
     summary: 'Write a continuation summary for governed work.',
     command: 'node atm.mjs handoff summarize --task "$ARGUMENTS" --json'
+  },
+  {
+    id: 'atm-internal-build-sync',
+    title: 'ATM Internal Build Sync',
+    summary: 'Build the ATM framework runner and sync it to explicit internal adopter repositories with skip/exclude controls.',
+    command: 'node atm.mjs internal-release sync $ARGUMENTS --json'
   }
 ] as const;
 

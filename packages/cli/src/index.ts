@@ -135,6 +135,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'internal-release',
+    summary: 'Build and sync the ATM runner to explicit internal repositories',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'integration',
     summary: 'List, install, verify, or remove ATM agent integration adapters',
     implemented: true,

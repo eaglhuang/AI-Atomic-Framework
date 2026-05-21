@@ -17,7 +17,8 @@ const requiredTemplateIds = [
   'atm-lock',
   'atm-evidence',
   'atm-upgrade-scan',
-  'atm-handoff'
+  'atm-handoff',
+  'atm-internal-build-sync'
 ];
 
 function fail(message: string) {
@@ -91,11 +92,11 @@ const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', te
 const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates, { repositoryRoot: root });
 const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates, { repositoryRoot: root });
 
-assert(claudeFiles.length === 8, 'Claude compiler output must contain eight files');
-assert(codexFiles.length === 8, 'Codex compiler output must contain eight files');
-assert(copilotFiles.length === 17, 'Copilot compiler output must contain root instructions plus sixteen entry files');
-assert(cursorFiles.length === 8, 'Cursor compiler output must contain eight files');
-assert(geminiFiles.length === 8, 'Gemini compiler output must contain eight files');
+assert(claudeFiles.length === 9, 'Claude compiler output must contain nine files');
+assert(codexFiles.length === 9, 'Codex compiler output must contain nine files');
+assert(copilotFiles.length === 19, 'Copilot compiler output must contain root instructions plus eighteen entry files');
+assert(cursorFiles.length === 9, 'Cursor compiler output must contain nine files');
+assert(geminiFiles.length === 9, 'Gemini compiler output must contain nine files');
 
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
   assert(compiledFile.content.includes(packageModule.atmFirstCommand), `${compiledFile.relativePath} missing first command`);
@@ -109,5 +110,5 @@ assert(codexFiles.every((compiledFile: any) => compiledFile.content.includes('ch
 assert(geminiFiles.every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field');
 
 if (!process.exitCode) {
-  console.log(`[skill-templates:${mode}] ok (8 source templates, schema, and 5 adapter compilers)`);
+  console.log(`[skill-templates:${mode}] ok (9 source templates, schema, and 5 adapter compilers)`);
 }

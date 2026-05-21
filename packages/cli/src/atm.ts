@@ -17,6 +17,7 @@ import { runAtmGit } from './commands/git-governance.ts';
 import { runGuide } from './commands/guide.ts';
 import { runHandoff } from './commands/handoff.ts';
 import { runInit } from './commands/init.ts';
+import { runInternalRelease } from './commands/internal-release.ts';
 import { runIntegration } from './commands/integration.ts';
 import { runLock } from './commands/lock.ts';
 import { runNext } from './commands/next.ts';
@@ -72,6 +73,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   guide: runGuide,
   handoff: runHandoff,
   init: runInit,
+  'internal-release': runInternalRelease,
   integration: runIntegration,
   lock: runLock,
   next: runNext,
