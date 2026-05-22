@@ -687,8 +687,26 @@ function readActiveLockPaths(cwd: string): readonly string[] {
   if (!existsSync(lockDir)) return [];
   return readdirSync(lockDir)
     .filter((entry) => entry.endsWith('.lock.json'))
+    .filter((entry) => isRuntimeLockActive(path.join(lockDir, entry)))
     .map((entry) => normalizeRelativePath(path.join('.atm', 'runtime', 'locks', entry)))
     .sort((left, right) => left.localeCompare(right));
+}
+
+function isRuntimeLockActive(lockPath: string): boolean {
+  const document = readJsonIfExists(lockPath);
+  if (!document) return false;
+  if (document.released === true) return false;
+  const status = normalizeOptionalString(document.status)?.toLowerCase();
+  if (status && status !== 'active') return false;
+  const heartbeatAt = normalizeOptionalString(document.heartbeatAt ?? document.lockedAt);
+  const ttlSeconds = Number(document.ttlSeconds ?? 0);
+  if (heartbeatAt && Number.isFinite(ttlSeconds) && ttlSeconds > 0) {
+    const heartbeatMs = Date.parse(heartbeatAt);
+    if (Number.isFinite(heartbeatMs) && heartbeatMs + ttlSeconds * 1000 < Date.now()) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function inspectPinnedRunner(cwd: string): PinnedRunnerStatus {

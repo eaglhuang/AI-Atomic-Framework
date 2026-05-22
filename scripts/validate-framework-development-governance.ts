@@ -86,6 +86,17 @@ try {
   assert(critical.pinnedRunner.status === 'available', 'framework fixture should have an available pinned runner');
   assert(critical.blockers.includes('active-framework-claim-required'), 'critical framework work must require an active framework task claim');
 
+  writeJson(path.join(frameworkRepo, '.atm', 'runtime', 'locks', 'RELEASED-0001.lock.json'), {
+    workItemId: 'RELEASED-0001',
+    status: 'released',
+    released: true,
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 1800
+  });
+  const criticalWithReleasedLock = createFrameworkModeStatus({ cwd: frameworkRepo, files: ['packages/core/src/index.ts'] });
+  assert(criticalWithReleasedLock.activeLocks.length === 0, 'released runtime locks must not satisfy framework-development claim requirements');
+  assert(criticalWithReleasedLock.blockers.includes('active-framework-claim-required'), 'released locks must not clear active framework claim blockers');
+
   const frameworkGuard = runFrameworkDevelopmentGuard(frameworkRepo, ['packages/core/src/index.ts']);
   assert(frameworkGuard.ok === false, 'framework-development guard must fail without an active framework claim');
 
