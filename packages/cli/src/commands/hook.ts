@@ -224,7 +224,12 @@ function runPreCommitHook(cwd: string) {
   const stagedFiles = readStagedFiles(root).filter((entry) => entry !== gitHeadEvidencePath);
   const encodingReport = scanEncoding(root, stagedFiles);
   const frameworkStatus = createFrameworkModeStatus({ cwd: root, files: stagedFiles });
-  const blockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => entry !== 'git-head-evidence-missing');
+  const allowAdopterInfrastructureSync = isAdopterInfrastructureSyncCommit(stagedFiles);
+  const blockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
+    if (entry === 'git-head-evidence-missing') return false;
+    if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
+    return true;
+  });
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
     ? runRequiredFrameworkValidators(root, frameworkStatus.criticalChangedFiles)
@@ -261,12 +266,34 @@ function runPreCommitHook(cwd: string) {
       stagedFiles,
       encodingReport,
       frameworkStatus,
+      allowAdopterInfrastructureSync,
       blockingFrameworkIssues,
       taskAudit,
       commandRuns,
       evidenceWrite
     }
   });
+}
+
+function isAdopterInfrastructureSyncCommit(stagedFiles: readonly string[]) {
+  if (stagedFiles.length === 0) return false;
+  return stagedFiles.every((entry) => isAdopterInfrastructureSyncPath(entry));
+}
+
+function isAdopterInfrastructureSyncPath(value: string) {
+  const normalized = String(value ?? '').replace(/\\/g, '/').replace(/^\.\//, '');
+  return normalized === 'atm.mjs'
+    || normalized === '.atm/runtime/pinned-runner.json'
+    || normalized === '.atm/integrations/copilot.manifest.json'
+    || normalized === '.atm/integrations/codex.manifest.json'
+    || normalized === '.atm/integrations/claude-code.manifest.json'
+    || normalized === '.github/hooks/atm-framework-development.json'
+    || normalized.startsWith('.github/instructions/atm-')
+    || normalized.startsWith('.github/prompts/atm-')
+    || normalized.startsWith('integrations/codex-skills/atm-')
+    || normalized.startsWith('.claude/skills/atm-')
+    || normalized.startsWith('.cursor/rules/skills/atm-')
+    || normalized.startsWith('.gemini/commands/atm-');
 }
 
 function runPrePushHook(cwd: string, base: string | null, head: string | null) {
