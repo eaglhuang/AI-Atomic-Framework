@@ -32,6 +32,7 @@ interface HookInvocationOptions {
   readonly toolName: string | null;
   readonly command: string | null;
   readonly files: readonly string[];
+  readonly targetRepo: string | null;
   readonly stdinPayload: unknown;
 }
 
@@ -194,9 +195,10 @@ export function makeIntegrationHookVerifyResult(cwd: string, adapterId: string) 
 }
 
 function runPreAgentHook(options: HookInvocationOptions) {
-  const status = createFrameworkModeStatus({ cwd: options.cwd });
+  const status = createFrameworkModeStatus({ cwd: options.cwd, targetRepo: options.targetRepo });
   const promptSignals = extractPromptSignals(options.prompt ?? stringifyPayload(options.stdinPayload));
-  const frameworkSignal = status.repoIdentity.isFrameworkRepo && (promptSignals.length > 0 || status.mode !== 'inactive');
+  const frameworkSignal = status.mode !== 'inactive'
+    || ((status.repoIdentity.isFrameworkRepo || status.targetRepoIdentity?.isFrameworkRepo === true) && promptSignals.length > 0);
   return makeResult({
     ok: true,
     command: 'integration',
@@ -232,12 +234,17 @@ function runPreToolHook(options: HookInvocationOptions) {
   ]);
   const toolCommand = options.command ?? extractCommandFromPayload(options.stdinPayload);
   const gitCommitIntent = /\bgit(?:\.exe)?\s+commit\b/i.test(toolCommand ?? '');
-  const status = createFrameworkModeStatus({ cwd: options.cwd, files: toolFiles });
-  const criticalFiles = status.repoIdentity.isFrameworkRepo
-    ? toolFiles.filter(isAtmCriticalNonDocSurface)
+  const status = createFrameworkModeStatus({ cwd: options.cwd, files: toolFiles, targetRepo: options.targetRepo });
+  const frameworkRoot = status.targetRepoIdentity?.isFrameworkRepo && status.targetRepo
+    ? status.targetRepo
+    : status.repoIdentity.isFrameworkRepo
+      ? options.cwd
+      : null;
+  const criticalFiles = frameworkRoot
+    ? toolFiles.map((entry) => normalizePathForFrameworkRoot(entry, frameworkRoot)).filter(isAtmCriticalNonDocSurface)
     : [];
   const hasFrameworkClaim = status.activeLocks.some((entry) => !entry.includes('/BOOTSTRAP-'));
-  const gitHooks = inspectGitHooks(options.cwd, { frameworkRequired: status.repoIdentity.isFrameworkRepo });
+  const gitHooks = inspectGitHooks(frameworkRoot ?? options.cwd, { frameworkRequired: frameworkRoot !== null });
 
   if (gitCommitIntent && status.repoIdentity.isFrameworkRepo && !gitHooks.ok) {
     return makeResult({
@@ -312,7 +319,8 @@ function parseHookInvocationArgs(argv: string[]): HookInvocationOptions {
     prompt: null as string | null,
     toolName: null as string | null,
     command: null as string | null,
-    files: [] as string[]
+    files: [] as string[],
+    targetRepo: null as string | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -346,6 +354,11 @@ function parseHookInvocationArgs(argv: string[]): HookInvocationOptions {
       index += 1;
       continue;
     }
+    if (arg === '--target-repo') {
+      state.targetRepo = requireValue(argv, index, '--target-repo');
+      index += 1;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty') continue;
     if (arg !== 'pre-agent' && arg !== 'pre-tool') {
       throw new CliError('ATM_CLI_USAGE', 'integration hook supports only: pre-agent | pre-tool', { exitCode: 2 });
@@ -357,6 +370,7 @@ function parseHookInvocationArgs(argv: string[]): HookInvocationOptions {
   }
   const stdinPayload = readOptionalStdinJson();
   const payloadEditor = readStringPath(stdinPayload, ['editor', 'editorId', 'source']);
+  const payloadTargetRepo = readStringPath(stdinPayload, ['targetRepo', 'target_repo', 'repository', 'repoPath', 'repo_path']);
   return {
     cwd: path.resolve(state.cwd),
     event: state.event,
@@ -365,6 +379,7 @@ function parseHookInvocationArgs(argv: string[]): HookInvocationOptions {
     toolName: state.toolName ?? readStringPath(stdinPayload, ['toolName', 'tool_name', 'name']),
     command: state.command ?? extractCommandFromPayload(stdinPayload),
     files: state.files,
+    targetRepo: state.targetRepo ?? payloadTargetRepo,
     stdinPayload
   };
 }
@@ -596,6 +611,24 @@ function normalizeAdapterId(value: string): HookIntegrationId {
 
 function normalizeRelativePath(value: unknown): string {
   return String(value ?? '').replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function normalizePathForFrameworkRoot(value: string, frameworkRoot: string): string {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  const normalizedRoot = path.resolve(frameworkRoot).replace(/\\/g, '/').toLowerCase();
+  if (path.isAbsolute(raw)) {
+    const normalizedAbsolute = path.resolve(raw).replace(/\\/g, '/');
+    if (normalizedAbsolute.toLowerCase().startsWith(`${normalizedRoot}/`)) {
+      return normalizedAbsolute.slice(normalizedRoot.length + 1);
+    }
+  }
+  const normalized = normalizeRelativePath(raw);
+  const lowered = normalized.toLowerCase();
+  if (lowered.startsWith(`${normalizedRoot}/`)) {
+    return normalized.slice(normalizedRoot.length + 1);
+  }
+  return normalized;
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {

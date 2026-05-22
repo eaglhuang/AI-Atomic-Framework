@@ -30,7 +30,7 @@ export function runGuard(argv: string[]) {
     return runAtomCallsiteReadabilityGuard(options.cwd);
   }
   if (options.guardName === 'framework-development') {
-    return runFrameworkDevelopmentGuard(options.cwd, options.files);
+    return runFrameworkDevelopmentGuard(options.cwd, options.files, options.targetRepo);
   }
   if (options.guardName === 'commit-range') {
     return runCommitRangeGuard([...options.rawArgv]);
@@ -197,6 +197,7 @@ interface ParsedGuardArgs {
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
+  readonly targetRepo: string | null;
   readonly failOpen: boolean;
   readonly rawArgv: readonly string[];
 }
@@ -208,6 +209,7 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     files: [] as string[],
     taskId: null as string | null,
     actorId: null as string | null,
+    targetRepo: null as string | null,
     failOpen: false
   };
 
@@ -220,6 +222,11 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     }
     if (arg === '--repo') {
       state.cwd = requireValue(argv, index, '--repo');
+      index += 1;
+      continue;
+    }
+    if (arg === '--target-repo') {
+      state.targetRepo = requireValue(argv, index, '--target-repo');
       index += 1;
       continue;
     }
@@ -275,6 +282,7 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     files: state.files,
     taskId: state.taskId,
     actorId: state.actorId,
+    targetRepo: state.targetRepo,
     failOpen: state.failOpen,
     rawArgv: argv
   };

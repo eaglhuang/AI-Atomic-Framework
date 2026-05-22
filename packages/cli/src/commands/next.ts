@@ -14,6 +14,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.t
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { resolveActorId } from './actor-registry.ts';
+import { createFrameworkModeStatus } from './framework-development.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
 import { runTasks } from './tasks.ts';
 
@@ -21,6 +22,16 @@ export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
   const integrationBootstrap = inspectIntegrationBootstrap(options.cwd);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);
+  const earlyFrameworkStatus = createFrameworkModeStatus({ cwd: options.cwd });
+  if (earlyFrameworkStatus.mode === 'cross-repo-target-required') {
+    return buildCrossRepoFrameworkNextResult({
+      cwd: options.cwd,
+      frameworkStatus: earlyFrameworkStatus,
+      integrationBootstrap,
+      runtimeAdapterReadiness,
+      importedTaskQueue: null
+    });
+  }
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
   if (activeGuidanceSession) {
     const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
@@ -235,6 +246,55 @@ function decideNextAction(runtime: any, failedCheckName: any, importedTaskQueue:
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   };
+}
+
+function buildCrossRepoFrameworkNextResult(input: {
+  readonly cwd: string;
+  readonly frameworkStatus: ReturnType<typeof createFrameworkModeStatus>;
+  readonly integrationBootstrap: unknown;
+  readonly runtimeAdapterReadiness: unknown;
+  readonly importedTaskQueue: ImportedTaskQueue | null;
+}) {
+  const targetRepo = input.frameworkStatus.targetRepo ?? '<target-repo>';
+  const nextAction = {
+    status: 'blocked',
+    command: `cd ${quoteCliValue(targetRepo)} ; node atm.mjs framework-mode status --json`,
+    reason: 'the current task metadata points to ATM framework work; closure authority and hard gates must run in the target framework repository',
+    frameworkMode: input.frameworkStatus.mode,
+    targetRepo,
+    closureAuthority: input.frameworkStatus.closureAuthority,
+    allowedCommands: [
+      `cd ${quoteCliValue(targetRepo)} ; node atm.mjs framework-mode status --json`,
+      `cd ${quoteCliValue(targetRepo)} ; node atm.mjs next --claim --actor <id> --json`
+    ],
+    blockedCommands: [
+      'editing framework critical files while cwd is the planning repository',
+      'closing framework target tasks from the planning repository'
+    ]
+  };
+  const userNotice = buildFirstUseUserNotice(nextAction as any);
+  return makeResult({
+    ok: false,
+    command: 'next',
+    cwd: input.cwd,
+    messages: buildNextMessages(
+      nextAction as any,
+      userNotice,
+      input.integrationBootstrap as any,
+      input.runtimeAdapterReadiness as any,
+      message('error', 'ATM_NEXT_FRAMEWORK_TARGET_REPO_REQUIRED', 'ATM framework work was detected from task metadata; switch to the target framework repo before mutating or closing work.', {
+        targetRepo,
+        closureAuthority: input.frameworkStatus.closureAuthority
+      })
+    ),
+    evidence: {
+      nextAction,
+      frameworkStatus: input.frameworkStatus,
+      importedTaskQueue: input.importedTaskQueue,
+      integrationBootstrap: input.integrationBootstrap,
+      runtimeAdapterReadiness: input.runtimeAdapterReadiness
+    }
+  });
 }
 
 function allowedGuidanceBootstrapCommands() {

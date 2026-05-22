@@ -6,6 +6,7 @@ import {
   auditTasks,
   createClosurePacket,
   createFrameworkModeStatus,
+  runFrameworkDevelopmentGuard,
   runFrameworkMode,
   validateClosurePacket
 } from '../packages/cli/src/commands/framework-development.ts';
@@ -83,6 +84,10 @@ try {
   assert(critical.mode === 'required', 'packages/core change must require framework-development mode');
   assert(critical.criticalChangedFiles.includes('packages/core/src/index.ts'), 'critical file must be listed');
   assert(critical.pinnedRunner.status === 'available', 'framework fixture should have an available pinned runner');
+  assert(critical.blockers.includes('active-framework-claim-required'), 'critical framework work must require an active framework task claim');
+
+  const frameworkGuard = runFrameworkDevelopmentGuard(frameworkRepo, ['packages/core/src/index.ts']);
+  assert(frameworkGuard.ok === false, 'framework-development guard must fail without an active framework claim');
 
   const preToolBlock = runIntegrationHookInvocation(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'packages/core/src/index.ts']);
   assert(preToolBlock.ok === false, 'pre-tool hook must block critical framework edits without an active claim');
@@ -95,6 +100,23 @@ try {
   const crossRepo = createFrameworkModeStatus({ cwd: planningRepo, targetRepo: frameworkRepo });
   assert(crossRepo.mode === 'cross-repo-target-required', 'planning repo targeting framework repo must require target closure authority');
   assert(crossRepo.closureAuthority === 'target_repo', 'cross-repo framework work must set target_repo closure authority');
+
+  mkdirSync(path.join(planningRepo, 'docs', 'framework-plan'), { recursive: true });
+  writeFileSync(path.join(planningRepo, 'docs', 'framework-plan', 'TASK-FRAMEWORK-0001.task.md'), [
+    '---',
+    'task_id: TASK-FRAMEWORK-0001',
+    'status: planned',
+    'upstream_repo: ai-atomic-framework',
+    '---',
+    '',
+    '# Framework target task'
+  ].join('\n'), 'utf8');
+  const inferredCrossRepo = createFrameworkModeStatus({ cwd: planningRepo });
+  assert(inferredCrossRepo.mode === 'cross-repo-target-required', 'planning repo task metadata must infer framework target repo');
+  assert(inferredCrossRepo.targetRepo === frameworkRepo, 'inferred framework target repo must resolve sibling repository names');
+
+  const preToolCrossRepo = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(frameworkRepo, 'packages', 'core', 'src', 'index.ts')]);
+  assert(preToolCrossRepo.ok === false, 'pre-tool hook must block cross-repo critical framework edits without target claim');
 
   mkdirSync(path.join(planningRepo, 'docs', 'tasks'), { recursive: true });
   writeFileSync(path.join(planningRepo, 'docs', 'tasks', 'TASK-X-0001.task.md'), [

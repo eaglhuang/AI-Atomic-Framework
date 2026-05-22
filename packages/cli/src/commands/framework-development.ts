@@ -104,6 +104,15 @@ interface FrameworkModeOptions {
   readonly targetRepo?: string | null;
 }
 
+export interface InferredFrameworkTargetRepo {
+  readonly taskId: string;
+  readonly taskPath: string;
+  readonly field: string;
+  readonly rawTargetRepo: string;
+  readonly targetRepo: string;
+  readonly targetRepoIdentity: FrameworkRepoIdentity;
+}
+
 interface ParsedFrameworkModeArgs {
   readonly cwd: string;
   readonly action: 'status';
@@ -164,8 +173,8 @@ export function runFrameworkMode(argv: string[]) {
   });
 }
 
-export function runFrameworkDevelopmentGuard(cwd: string, files: readonly string[] = []) {
-  const report = createFrameworkModeStatus({ cwd, files });
+export function runFrameworkDevelopmentGuard(cwd: string, files: readonly string[] = [], targetRepo: string | null = null) {
+  const report = createFrameworkModeStatus({ cwd, files, targetRepo });
   const ok = report.blockers.length === 0;
   return makeResult({
     ok,
@@ -189,8 +198,8 @@ export function runFrameworkDevelopmentGuard(cwd: string, files: readonly string
   });
 }
 
-export function runFrameworkDevelopmentValidation(cwd: string, files: readonly string[] = []) {
-  const report = createFrameworkModeStatus({ cwd, files });
+export function runFrameworkDevelopmentValidation(cwd: string, files: readonly string[] = [], targetRepo: string | null = null) {
+  const report = createFrameworkModeStatus({ cwd, files, targetRepo });
   const taskAudit = auditTasks(cwd);
   const ok = report.blockers.length === 0 && taskAudit.ok;
   return makeResult({
@@ -221,7 +230,10 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
   const cwd = path.resolve(input.cwd);
   const generatedAt = new Date().toISOString();
   const repoIdentity = detectFrameworkRepoIdentity(cwd);
-  const targetRepo = input.targetRepo ? path.resolve(cwd, input.targetRepo) : null;
+  const inferredTarget = input.targetRepo ? null : inferFrameworkTargetRepoFromTasks(cwd);
+  const targetRepo = input.targetRepo
+    ? resolveTargetRepoReference(cwd, input.targetRepo)
+    : inferredTarget?.targetRepo ?? null;
   const targetRepoIdentity = targetRepo ? detectFrameworkRepoIdentity(targetRepo) : null;
   const taskLedger = readTaskLedgerPolicy(cwd);
   const declaredFiles = (input.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean);
@@ -254,6 +266,10 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
 
   if ((mode === 'required' || mode === 'cross-repo-target-required') && pinnedRunner.status !== 'available') {
     blockers.push('pinned-runner-missing');
+  }
+
+  if (mode === 'required' && !hasActiveFrameworkTaskLock(activeLocks)) {
+    blockers.push('active-framework-claim-required');
   }
 
   if (mode === 'required') {
@@ -321,6 +337,31 @@ export function detectFrameworkRepoIdentity(repositoryRoot: string): FrameworkRe
     name: packageName,
     signals
   };
+}
+
+export function inferFrameworkTargetRepoFromTasks(cwd: string): InferredFrameworkTargetRepo | null {
+  const root = path.resolve(cwd);
+  const currentIdentity = detectFrameworkRepoIdentity(root);
+  if (currentIdentity.isFrameworkRepo) return null;
+
+  for (const task of readTaskDocuments(root)) {
+    if (!isOpenTaskStatus(task.status)) continue;
+    const targetField = firstTargetRepoField(task.document);
+    if (!targetField) continue;
+    const targetRepo = resolveTargetRepoReference(root, targetField.value);
+    const targetRepoIdentity = detectFrameworkRepoIdentity(targetRepo);
+    if (!targetRepoIdentity.isFrameworkRepo || sameRepo(root, targetRepo)) continue;
+    return {
+      taskId: task.taskId,
+      taskPath: task.relativePath,
+      field: targetField.field,
+      rawTargetRepo: targetField.value,
+      targetRepo,
+      targetRepoIdentity
+    };
+  }
+
+  return null;
 }
 
 export function isAtmCriticalNonDocSurface(filePath: string): boolean {
@@ -835,6 +876,67 @@ function matchesCurrentRepoIdentity(root: string, targetRepo: string): boolean {
     || target === identity.name?.toLowerCase()
     || target === basename
     || target.endsWith(`/${basename}`);
+}
+
+function hasActiveFrameworkTaskLock(activeLocks: readonly string[]): boolean {
+  return activeLocks.some((entry) => {
+    const normalized = normalizeRelativePath(entry);
+    return normalized.endsWith('.lock.json') && !normalized.includes('/BOOTSTRAP-');
+  });
+}
+
+function firstTargetRepoField(document: Record<string, unknown>): { field: string; value: string } | null {
+  for (const field of ['target_repo', 'targetRepo', 'upstream_repo', 'upstreamRepo']) {
+    const value = normalizeOptionalString(document[field]);
+    if (value) return { field, value };
+  }
+  return null;
+}
+
+function isOpenTaskStatus(status: string): boolean {
+  return status === 'planned'
+    || status === 'ready'
+    || status === 'open'
+    || status === 'active'
+    || status === 'in_progress'
+    || status === 'waiting_target_evidence'
+    || status === 'blocked';
+}
+
+function resolveTargetRepoReference(cwd: string, targetRepo: string): string {
+  const trimmed = targetRepo.trim();
+  const candidates = targetRepoCandidates(cwd, trimmed);
+  for (const candidate of candidates) {
+    if (existsSync(candidate) && detectFrameworkRepoIdentity(candidate).isFrameworkRepo) {
+      return path.resolve(candidate);
+    }
+  }
+  return path.isAbsolute(trimmed) ? path.resolve(trimmed) : path.resolve(cwd, trimmed);
+}
+
+function targetRepoCandidates(cwd: string, targetRepo: string): readonly string[] {
+  const candidates: string[] = [];
+  const add = (candidate: string) => {
+    const resolved = path.resolve(candidate);
+    if (!candidates.includes(resolved)) candidates.push(resolved);
+  };
+  if (path.isAbsolute(targetRepo)) {
+    add(targetRepo);
+  } else {
+    add(path.join(cwd, targetRepo));
+    add(path.join(cwd, '..', targetRepo));
+  }
+  const repoName = targetRepo
+    .replace(/\\/g, '/')
+    .split('/')
+    .filter(Boolean)
+    .pop()
+    ?.replace(/\.git$/i, '');
+  if (repoName && repoName !== targetRepo) {
+    add(path.join(cwd, repoName));
+    add(path.join(cwd, '..', repoName));
+  }
+  return candidates;
 }
 
 function sameRepo(left: string, right: string | null): boolean {
