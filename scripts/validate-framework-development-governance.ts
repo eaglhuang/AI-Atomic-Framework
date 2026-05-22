@@ -129,6 +129,17 @@ try {
   const preToolCrossRepo = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(frameworkRepo, 'packages', 'core', 'src', 'index.ts')]);
   assert(preToolCrossRepo.ok === false, 'pre-tool hook must block cross-repo critical framework edits without target claim');
 
+  const preToolCrossRepoTaskCard = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(planningRepo, 'docs', 'framework-plan', 'TASK-FRAMEWORK-0001.task.md')]);
+  assert(preToolCrossRepoTaskCard.ok === false, 'pre-tool hook must block planning repo task-card edits when framework closure authority belongs to the target repo');
+  assert(preToolCrossRepoTaskCard.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_CLOSURE_REQUIRED'), 'planning task-card block must report target repo closure requirement');
+
+  const preToolCrossRepoTaskCardRead = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--tool-name', 'Read', '--files', path.join(planningRepo, 'docs', 'framework-plan', 'TASK-FRAMEWORK-0001.task.md')]);
+  assert(preToolCrossRepoTaskCardRead.ok === true, 'pre-tool hook must allow read-only inspection of planning task cards');
+
+  const preToolCrossRepoCommit = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--command', 'git commit -m "close tasks"']);
+  assert(preToolCrossRepoCommit.ok === false, 'pre-tool hook must block planning repo commits while framework closure authority belongs to the target repo');
+  assert(preToolCrossRepoCommit.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_COMMIT_BLOCKED'), 'planning repo commit block must report target repo closure requirement');
+
   mkdirSync(path.join(planningRepo, 'docs', 'tasks'), { recursive: true });
   writeFileSync(path.join(planningRepo, 'docs', 'tasks', 'TASK-X-0001.task.md'), [
     '---',

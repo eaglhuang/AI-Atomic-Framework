@@ -243,8 +243,32 @@ function runPreToolHook(options: HookInvocationOptions) {
   const criticalFiles = frameworkRoot
     ? toolFiles.map((entry) => normalizePathForFrameworkRoot(entry, frameworkRoot)).filter(isAtmCriticalNonDocSurface)
     : [];
+  const planningClosureFiles = status.mode === 'cross-repo-target-required' && isMutatingToolIntent(options.toolName, toolCommand)
+    ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isPlanningClosureSurface)
+    : [];
   const hasFrameworkClaim = status.activeLocks.some((entry) => !entry.includes('/BOOTSTRAP-'));
   const gitHooks = inspectGitHooks(frameworkRoot ?? options.cwd, { frameworkRequired: frameworkRoot !== null });
+
+  if (status.mode === 'cross-repo-target-required' && gitCommitIntent) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_COMMIT_BLOCKED', 'Git commit is blocked in the planning repository while ATM framework closure authority belongs to the target repository.', {
+        editor: options.editor,
+        targetRepo: status.targetRepo,
+        nextStep: status.targetRepo ? `cd "${status.targetRepo}" ; node atm.mjs next --claim --actor <id> --json` : 'node atm.mjs next --json'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        gitCommitIntent,
+        frameworkStatus: status
+      }
+    });
+  }
 
   if (gitCommitIntent && status.repoIdentity.isFrameworkRepo && !gitHooks.ok) {
     return makeResult({
@@ -261,6 +285,28 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolName: options.toolName,
         gitCommitIntent,
         gitHooks,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (planningClosureFiles.length > 0) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_CLOSURE_REQUIRED', 'Planning repository task/evidence edits are blocked because ATM framework closure authority belongs to the target repository.', {
+        editor: options.editor,
+        blockedFiles: planningClosureFiles,
+        targetRepo: status.targetRepo,
+        nextStep: status.targetRepo ? `cd "${status.targetRepo}" ; node atm.mjs next --claim --actor <id> --json` : 'node atm.mjs next --json'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        blockedFiles: planningClosureFiles,
         frameworkStatus: status
       }
     });
@@ -629,6 +675,41 @@ function normalizePathForFrameworkRoot(value: string, frameworkRoot: string): st
     return normalized.slice(normalizedRoot.length + 1);
   }
   return normalized;
+}
+
+function normalizePathForRepoRoot(value: string, repoRoot: string): string {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  if (path.isAbsolute(raw)) {
+    const normalizedAbsolute = path.resolve(raw);
+    const relative = path.relative(path.resolve(repoRoot), normalizedAbsolute);
+    if (!relative.startsWith('..') && !path.isAbsolute(relative)) {
+      return normalizeRelativePath(relative);
+    }
+  }
+  return normalizeRelativePath(raw);
+}
+
+function isPlanningClosureSurface(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  return normalized.endsWith('.task.md')
+    || normalized.startsWith('.atm/history/tasks/')
+    || normalized.startsWith('.atm/history/task-events/')
+    || normalized.startsWith('.atm/history/evidence/')
+    || normalized.startsWith('atomic_workbench/evidence/')
+    || normalized.startsWith('atomic_workbench/reports/');
+}
+
+function isMutatingToolIntent(toolName: string | null, command: string | null): boolean {
+  const normalizedToolName = String(toolName ?? '').trim().toLowerCase();
+  if (/^(read|grep|glob|ls|list|search|view|open)$/i.test(normalizedToolName)) return false;
+  if (/^(edit|write|multiedit|notebookedit|bash|shell|terminal|powershell)$/i.test(normalizedToolName)) return true;
+  if (command) {
+    const normalizedCommand = command.trim().toLowerCase();
+    if (/^(git\s+status|git\s+log|git\s+show|rg\b|dir\b|ls\b|get-content\b|type\b|cat\b)/.test(normalizedCommand)) return false;
+    if (/\b(git\s+add|git\s+commit|set-content|add-content|out-file|new-item|move-item|copy-item|remove-item|apply_patch)\b/.test(normalizedCommand)) return true;
+  }
+  return true;
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {
