@@ -83,7 +83,7 @@ native entry formats:
 
 - Claude Code reads `.claude/skills/*/SKILL.md` files.
 - Codex can consume repo-local skills under `integrations/codex-skills/*/SKILL.md`, with `atm guide install-skill --target codex` kept as an optional global bridge.
-- GitHub Copilot reads `.github/copilot-instructions.md` and `.github/prompts/`.
+- GitHub Copilot reads `.github/copilot-instructions.md`, `.github/instructions/`, and `.github/prompts/`.
 - Cursor reads `.cursor/rules/skills/`.
 - Gemini CLI reads `.gemini/commands/*.toml`.
 
@@ -106,7 +106,7 @@ supported as an installable adapter. Adapters:
 | Adapter ID | Target directory | File format |
 |------------|-----------------|-------------|
 | `claude-code` | `.claude/skills/atm-*/` | SKILL.md |
-| `copilot` | `.github/copilot-instructions.md`, `.github/instructions/atm-*.instructions.md`, `.github/prompts/atm-*.prompt.md` | Markdown |
+| `copilot` | `.github/instructions/atm-*.instructions.md`, `.github/prompts/atm-*.prompt.md` | Markdown |
 | `cursor` | `.cursor/rules/skills/atm-*/` | Markdown |
 | `gemini` | `.gemini/commands/atm-*.toml` | TOML |
 | `codex` | `integrations/codex-skills/atm-*/` | SKILL.md |

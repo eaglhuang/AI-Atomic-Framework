@@ -124,7 +124,7 @@ if (!process.exitCode) {
   const adapterSpecs = [
     await createAdapterSpec('claude-code', 'packages/integration-claude-code/src/index.ts', 'createClaudeCodeIntegrationAdapter', '.claude/skills', 'skill', '$ARGUMENTS', minimumEntryCount),
     await createAdapterSpec('codex', 'packages/integration-codex/src/index.ts', 'createCodexIntegrationAdapter', 'integrations/codex-skills', 'skill', '$ARGUMENTS', minimumEntryCount),
-    await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', 1 + minimumEntryCount * 2),
+    await createAdapterSpec('copilot', 'packages/integration-copilot/src/index.ts', 'createCopilotIntegrationAdapter', '.github', 'instructions-md', '{{vars}}', minimumEntryCount * 2),
     await createAdapterSpec('cursor', 'packages/integration-cursor/src/index.ts', 'createCursorIntegrationAdapter', '.cursor/rules/skills', 'markdown', '$ARGUMENTS', minimumEntryCount),
     await createAdapterSpec('gemini', 'packages/integration-gemini/src/index.ts', 'createGeminiIntegrationAdapter', '.gemini/commands', 'toml', 'toml-fields', minimumEntryCount),
     await createAdapterSpec('antigravity', 'packages/integration-gemini/src/index.ts', 'createAntigravityIntegrationAdapter', '.', 'markdown', '$ARGUMENTS', 1 + minimumEntryCount)

@@ -94,7 +94,7 @@ const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', temp
 
 assert(claudeFiles.length === 9, 'Claude compiler output must contain nine files');
 assert(codexFiles.length === 9, 'Codex compiler output must contain nine files');
-assert(copilotFiles.length === 19, 'Copilot compiler output must contain root instructions plus eighteen entry files');
+assert(copilotFiles.length === 18, 'Copilot compiler output must contain eighteen scoped instruction and prompt files');
 assert(cursorFiles.length === 9, 'Cursor compiler output must contain nine files');
 assert(geminiFiles.length === 9, 'Gemini compiler output must contain nine files');
 

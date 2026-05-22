@@ -24,7 +24,6 @@ export type { RenderedCharterInvariants };
 
 // Private constants — inline literals so compile.ts has no import from index.ts
 const integrationsCoreRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
-const atmFirstCommand = 'node atm.mjs next --json';
 const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
 
 export function renderCharterInvariantsBlock(repositoryRoot = integrationsCoreRepoRoot): RenderedCharterInvariants {
@@ -61,28 +60,20 @@ export function compileSkillTemplatesForAdapter(
       source: 'template'
     }));
   }
-  return [
+  return resolvedTemplates.flatMap((template) => [
     {
-      relativePath: 'copilot-instructions.md',
-      content: compileCopilotRootInstructions(resolvedTemplates, options),
-      fileFormat: 'instructions-md',
-      source: 'template'
+      relativePath: `instructions/${template.frontmatter.id}.instructions.md`,
+      content: compileSkillTemplate(template, 'copilot-instructions', options),
+      fileFormat: 'instructions-md' as const,
+      source: 'template' as const
     },
-    ...resolvedTemplates.flatMap((template) => [
-      {
-        relativePath: `instructions/${template.frontmatter.id}.instructions.md`,
-        content: compileSkillTemplate(template, 'copilot-instructions', options),
-        fileFormat: 'instructions-md' as const,
-        source: 'template' as const
-      },
-      {
-        relativePath: `prompts/${template.frontmatter.id}.prompt.md`,
-        content: compileSkillTemplate(template, 'copilot-prompt', options),
-        fileFormat: 'prompt-md' as const,
-        source: 'template' as const
-      }
-    ])
-  ];
+    {
+      relativePath: `prompts/${template.frontmatter.id}.prompt.md`,
+      content: compileSkillTemplate(template, 'copilot-prompt', options),
+      fileFormat: 'prompt-md' as const,
+      source: 'template' as const
+    }
+  ]);
 }
 
 export function compileSkillTemplate(
@@ -172,34 +163,6 @@ function renderSkillTemplateBody(template: AtmSkillTemplate, options: CompileSki
     .replaceAll('{{handoffs}}', frontmatter.handoffs)
     .replaceAll(charterInvariantsPlaceholder, charterInvariants.text)
     .trimEnd();
-}
-
-function compileCopilotRootInstructions(templates: readonly AtmSkillTemplate[], options: CompileSkillTemplateOptions = {}): string {
-  const entryList = templates.map((template) => `- ${template.frontmatter.id}: ${template.frontmatter.summary}`).join('\n');
-  return `# ATM Copilot Instructions
-
-First command:
-
-\`\`\`bash
-${atmFirstCommand}
-\`\`\`
-
-## Charter Invariants
-
-${renderCharterInvariantsBlock(options.repositoryRoot).text}
-
-## Entry Skills
-
-${entryList}
-
-## Operating Rules
-
-- Route governed work through ATM before editing files.
-- Run \`node atm.mjs framework-mode status --json\` before implementation edits; if it reports \`required\` or \`cross-repo-target-required\`, use the framework-development guard and target-repo closure evidence.
-- Use the ATM prompt and instruction files for specific next, orient, governance-router, create, lock, evidence, upgrade-scan, and handoff flows.
-- Do not hand-edit task status to \`done\`, bulk-close task cards, or treat static \`atomic_workbench/evidence/*.json\` files as completion evidence.
-- Do not create a parallel task model, registry, or approval workflow.
-`;
 }
 
 function escapeTomlBasicString(value: string) {
