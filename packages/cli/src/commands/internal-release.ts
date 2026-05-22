@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +17,7 @@ interface InternalReleaseSyncOptions {
   readonly verify: boolean;
   readonly allowVerifyFailure: boolean;
   readonly source: string | null;
+  readonly keepTemp: boolean;
 }
 
 interface CommandRunRecord {
@@ -41,7 +42,26 @@ interface SyncTargetReport {
   readonly backupPath: string | null;
   readonly verification: readonly CommandRunRecord[];
   readonly warnings: readonly string[];
+  readonly scratchGuard: ScratchGuardReport;
 }
+
+interface ScratchGuardReport {
+  readonly forbiddenRelativePaths: readonly string[];
+  readonly present: readonly string[];
+  readonly removed: readonly string[];
+  readonly kept: readonly string[];
+  readonly fileCount: number;
+  readonly freedBytes: number;
+  readonly dryRun: boolean;
+  readonly keepTemp: boolean;
+  readonly errors: readonly string[];
+  readonly ok: boolean;
+}
+
+const forbiddenAdopterScratchPaths = Object.freeze([
+  'scratch/atm-build-repo',
+  'scratch/atm-upstream-patch'
+]);
 
 export function runInternalRelease(argv: string[]) {
   const action = argv.find((entry) => !entry.startsWith('-'));
@@ -119,6 +139,7 @@ export function runInternalReleaseSync(options: InternalReleaseSyncOptions) {
     dryRun: options.dryRun,
     verify: options.verify,
     allowVerifyFailure: options.allowVerifyFailure,
+    keepTemp: options.keepTemp,
     targets,
     syncedCount: targets.filter((target) => !target.skipped && target.ok).length,
     skippedCount: targets.filter((target) => target.skipped).length,
@@ -142,6 +163,7 @@ function syncTarget(input: {
   const runnerPath = path.join(repoPath, 'atm.mjs');
   const metadataPath = path.join(repoPath, '.atm', 'runtime', 'pinned-runner.json');
   const warnings: string[] = [];
+  const emptyScratchGuard = createEmptyScratchGuard(input.options);
   if (skipReason) {
     return {
       repo: repoPath,
@@ -155,11 +177,24 @@ function syncTarget(input: {
       newSha256: null,
       backupPath: null,
       verification: [],
-      warnings
+      warnings,
+      scratchGuard: emptyScratchGuard
     };
   }
   if (!existsSync(repoPath)) {
-    return failedTarget(repoPath, runnerPath, metadataPath, 'target repo does not exist');
+    return failedTarget(repoPath, runnerPath, metadataPath, 'target repo does not exist', emptyScratchGuard);
+  }
+
+  const scratchGuard = cleanForbiddenAdopterScratch(repoPath, input.options);
+  if (scratchGuard.present.length > 0) {
+    warnings.push(input.options.keepTemp
+      ? 'known ATM scratch directories are present and were kept because --keep-temp was set'
+      : input.options.dryRun
+        ? 'known ATM scratch directories are present; dry-run reports them without cleanup'
+        : 'known ATM scratch directories were removed from the target repo');
+  }
+  if (!scratchGuard.ok) {
+    return failedTarget(repoPath, runnerPath, metadataPath, 'target ATM scratch cleanup failed', scratchGuard);
   }
 
   const previousSha256 = existsSync(runnerPath) ? sha256File(runnerPath) : null;
@@ -214,11 +249,12 @@ function syncTarget(input: {
     newSha256: input.options.dryRun ? input.sourceSha256 : sha256File(runnerPath),
     backupPath: backupPath ? relativePathFrom(repoPath, backupPath) : null,
     verification,
-    warnings
+    warnings,
+    scratchGuard
   };
 }
 
-function failedTarget(repoPath: string, runnerPath: string, metadataPath: string, reason: string): SyncTargetReport {
+function failedTarget(repoPath: string, runnerPath: string, metadataPath: string, reason: string, scratchGuard: ScratchGuardReport): SyncTargetReport {
   return {
     repo: repoPath,
     repoName: path.basename(repoPath),
@@ -238,7 +274,8 @@ function failedTarget(repoPath: string, runnerPath: string, metadataPath: string
       stderrSha256: sha256Text(''),
       ok: false
     }],
-    warnings: [reason]
+    warnings: [reason],
+    scratchGuard
   };
 }
 
@@ -251,7 +288,8 @@ function parseInternalReleaseSyncOptions(argv: string[]): InternalReleaseSyncOpt
     dryRun: false,
     verify: true,
     allowVerifyFailure: false,
-    source: null as string | null
+    source: null as string | null,
+    keepTemp: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -291,6 +329,10 @@ function parseInternalReleaseSyncOptions(argv: string[]): InternalReleaseSyncOpt
       options.allowVerifyFailure = true;
       continue;
     }
+    if (arg === '--keep-temp') {
+      options.keepTemp = true;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty') continue;
     throw new CliError('ATM_CLI_USAGE', `internal-release sync does not support option ${arg}`, { exitCode: 2 });
   }
@@ -302,8 +344,79 @@ function parseInternalReleaseSyncOptions(argv: string[]): InternalReleaseSyncOpt
     dryRun: options.dryRun,
     verify: options.verify,
     allowVerifyFailure: options.allowVerifyFailure,
-    source: options.source
+    source: options.source,
+    keepTemp: options.keepTemp
   };
+}
+
+function cleanForbiddenAdopterScratch(repoPath: string, options: Pick<InternalReleaseSyncOptions, 'dryRun' | 'keepTemp'>): ScratchGuardReport {
+  const present: string[] = [];
+  const removed: string[] = [];
+  const kept: string[] = [];
+  const errors: string[] = [];
+  let fileCount = 0;
+  let freedBytes = 0;
+  for (const relativePath of forbiddenAdopterScratchPaths) {
+    const absolutePath = path.join(repoPath, relativePath);
+    if (!existsSync(absolutePath)) continue;
+    present.push(relativePath);
+    const summary = summarizePath(absolutePath);
+    fileCount += summary.fileCount;
+    if (options.dryRun || options.keepTemp) {
+      kept.push(relativePath);
+      continue;
+    }
+    try {
+      rmSync(absolutePath, { recursive: true, force: true });
+      removed.push(relativePath);
+      freedBytes += summary.totalBytes;
+    } catch (error) {
+      errors.push(`${relativePath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  return {
+    forbiddenRelativePaths: forbiddenAdopterScratchPaths,
+    present,
+    removed,
+    kept,
+    fileCount,
+    freedBytes,
+    dryRun: options.dryRun,
+    keepTemp: options.keepTemp,
+    errors,
+    ok: errors.length === 0
+  };
+}
+
+function createEmptyScratchGuard(options: Pick<InternalReleaseSyncOptions, 'dryRun' | 'keepTemp'>): ScratchGuardReport {
+  return {
+    forbiddenRelativePaths: forbiddenAdopterScratchPaths,
+    present: [],
+    removed: [],
+    kept: [],
+    fileCount: 0,
+    freedBytes: 0,
+    dryRun: options.dryRun,
+    keepTemp: options.keepTemp,
+    errors: [],
+    ok: true
+  };
+}
+
+function summarizePath(absolutePath: string): { readonly fileCount: number; readonly totalBytes: number } {
+  const stats = statSync(absolutePath);
+  if (!stats.isDirectory()) {
+    return { fileCount: 1, totalBytes: stats.size };
+  }
+  let fileCount = 0;
+  let totalBytes = 0;
+  for (const entry of readdirSync(absolutePath, { withFileTypes: true })) {
+    const child = path.join(absolutePath, entry.name);
+    const summary = summarizePath(child);
+    fileCount += summary.fileCount;
+    totalBytes += summary.totalBytes;
+  }
+  return { fileCount, totalBytes };
 }
 
 function createSkipMatcher(skips: readonly string[], cwd: string) {

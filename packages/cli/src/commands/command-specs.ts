@@ -10,6 +10,7 @@ import actorSpec from './command-specs/actor.spec.ts';
 import atomRefSpec from './command-specs/atom-ref.spec.ts';
 import bootstrapSpec from './command-specs/bootstrap.spec.ts';
 import budgetSpec from './command-specs/budget.spec.ts';
+import cacheSpec from './command-specs/cache.spec.ts';
 import candidatesSpec from './command-specs/candidates.spec.ts';
 import createSpec from './command-specs/create.spec.ts';
 import atmChartSpec from './command-specs/atm-chart.spec.ts';
@@ -57,6 +58,7 @@ export const commandSpecs = Object.freeze({
   'atom-ref': atomRefSpec,
   bootstrap: bootstrapSpec,
   budget: budgetSpec,
+  cache: cacheSpec,
   candidates: candidatesSpec,
   create: createSpec,
   'atm-chart': atmChartSpec,

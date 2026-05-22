@@ -21,6 +21,7 @@ export default defineCommandSpec({
     { flag: '--source', value: 'path', summary: 'Runner source path. Defaults to release/atm-onefile/atm.mjs.' },
     { flag: '--no-build', summary: 'Do not run npm run build before syncing.' },
     { flag: '--dry-run', summary: 'Plan sync targets without copying files.' },
+    { flag: '--keep-temp', summary: 'Keep known ATM temporary scratch directories for debugging instead of cleaning them.' },
     { flag: '--no-verify', summary: 'Do not run target doctor/framework-mode/tasks audit after copying.' },
     { flag: '--allow-verify-failure', summary: 'Report verification failures without failing the sync command.' },
     commonJsonOption,

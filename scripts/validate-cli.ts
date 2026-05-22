@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -36,10 +36,11 @@ function readJson(relativePath: any) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
-function runAtm(args: any, cwd = root) {
+function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
   const result = spawnSync(process.execPath, [path.join(root, fixture.entrypoint), ...args], {
     cwd,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: { ...process.env, ...env }
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;
@@ -90,7 +91,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/candidates.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/framework-development.ts', 'packages/cli/src/commands/internal-release.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/police.ts', 'packages/cli/src/commands/registry.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json', 'fixtures/verify/guard-evidence-pass.json', 'fixtures/verify/guard-evidence-missing-justification.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/cache.ts', 'packages/cli/src/commands/candidates.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/framework-development.ts', 'packages/cli/src/commands/internal-release.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/police.ts', 'packages/cli/src/commands/registry.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json', 'fixtures/verify/guard-evidence-pass.json', 'fixtures/verify/guard-evidence-missing-justification.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -134,6 +135,35 @@ for (const commandName of helpCommandSnapshot.commands) {
 
 const tempRoot = createTempWorkspace('atm-cli-');
 try {
+  const onefileCacheRoot = path.join(tempRoot, 'onefile-cache');
+  for (const [entryName, timestamp] of [
+    ['old-a', '2026-05-01T00:00:00.000Z'],
+    ['old-b', '2026-05-02T00:00:00.000Z'],
+    ['new-c', '2026-05-03T00:00:00.000Z']
+  ] as const) {
+    const entryRoot = path.join(onefileCacheRoot, entryName);
+    mkdirSync(entryRoot, { recursive: true });
+    writeFileSync(path.join(entryRoot, 'payload.txt'), entryName, 'utf8');
+    const date = new Date(timestamp);
+    utimesSync(entryRoot, date, date);
+  }
+  const cacheDryRun = runAtm(['cache', 'prune', '--runtime', 'onefile', '--keep', '1', '--dry-run', '--json'], root, {
+    ATM_ONEFILE_CACHE_ROOT: onefileCacheRoot
+  });
+  assert(cacheDryRun.exitCode === 0, 'cache prune dry-run must exit 0');
+  assertReadable(cacheDryRun, 'cache');
+  assert(cacheDryRun.parsed.evidence.result.prunedCount === 2, 'cache prune dry-run must report two prune candidates');
+  assert(existsSync(path.join(onefileCacheRoot, 'old-a')), 'cache prune dry-run must not delete old-a');
+  const cachePrune = runAtm(['cache', 'prune', '--runtime', 'onefile', '--keep', '1', '--json'], root, {
+    ATM_ONEFILE_CACHE_ROOT: onefileCacheRoot
+  });
+  assert(cachePrune.exitCode === 0, 'cache prune must exit 0');
+  assertReadable(cachePrune, 'cache');
+  assert(cachePrune.parsed.evidence.result.prunedCount === 2, 'cache prune must remove two old entries');
+  assert(!existsSync(path.join(onefileCacheRoot, 'old-a')), 'cache prune must delete old-a');
+  assert(!existsSync(path.join(onefileCacheRoot, 'old-b')), 'cache prune must delete old-b');
+  assert(existsSync(path.join(onefileCacheRoot, 'new-c')), 'cache prune must keep newest entry');
+
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
 

@@ -43,6 +43,10 @@ try {
     writeJson(path.join(repo, '.atm', 'config.json'), { schemaVersion: 'atm.config.v0.1' });
   }
   writeFileSync(path.join(targetA, 'atm.mjs'), 'old runner\n', 'utf8');
+  mkdirSync(path.join(targetA, 'scratch', 'atm-build-repo'), { recursive: true });
+  mkdirSync(path.join(targetA, 'scratch', 'atm-upstream-patch'), { recursive: true });
+  writeFileSync(path.join(targetA, 'scratch', 'atm-build-repo', 'stale-atm.mjs'), 'stale build scratch\n', 'utf8');
+  writeFileSync(path.join(targetA, 'scratch', 'atm-upstream-patch', 'doctor.ts'), 'stale patch scratch\n', 'utf8');
   const previousHash = sha256File(path.join(targetA, 'atm.mjs'));
 
   const report = runInternalReleaseSync({
@@ -53,7 +57,8 @@ try {
     dryRun: false,
     verify: false,
     allowVerifyFailure: false,
-    source: sourceRunner
+    source: sourceRunner,
+    keepTemp: false
   });
   assert(report.ok === true, 'sync report must be ok when copied target succeeds and second target is skipped');
   assert(report.sourceSha256 === sourceHash, 'sync report must include source runner hash');
@@ -64,6 +69,11 @@ try {
   assert(hostA.previousSha256 === previousHash, 'host-a must report previous runner hash');
   assert(hostA.newSha256 === sourceHash, 'host-a must report new runner hash');
   assert(Boolean(hostA.backupPath), 'host-a must keep a previous runner backup');
+  assert(hostA.scratchGuard.present.length === 2, 'host-a must detect known ATM scratch directories');
+  assert(hostA.scratchGuard.removed.length === 2, 'host-a must clean known ATM scratch directories by default');
+  assert(hostA.scratchGuard.fileCount === 2, 'host-a scratch guard must report cleaned file count');
+  assert(!existsSync(path.join(targetA, 'scratch', 'atm-build-repo')), 'host-a sync must remove stale atm-build-repo scratch');
+  assert(!existsSync(path.join(targetA, 'scratch', 'atm-upstream-patch')), 'host-a sync must remove stale atm-upstream-patch scratch');
   assert(readFileSync(path.join(targetA, 'atm.mjs'), 'utf8') === readFileSync(sourceRunner, 'utf8'), 'host-a atm.mjs must be replaced by source runner');
   assert(JSON.parse(readFileSync(path.join(targetA, '.atm', 'runtime', 'pinned-runner.json'), 'utf8')).sourceKind === 'internal-build-sync', 'host-a pinned runner metadata must record internal-build-sync');
   assert(hostB?.skipped === true && hostB.skipReason?.includes('--skip'), 'host-b must be skipped by basename');
@@ -77,7 +87,8 @@ try {
     dryRun: true,
     verify: false,
     allowVerifyFailure: false,
-    source: sourceRunner
+    source: sourceRunner,
+    keepTemp: false
   });
   assert(dryRun.ok === true, 'dry-run must be ok');
   assert(dryRun.targets[0]?.newSha256 === sourceHash, 'dry-run target must show planned source hash');

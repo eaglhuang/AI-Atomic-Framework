@@ -37,6 +37,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'cache',
+    summary: 'Manage ATM guide cache and one-file runtime cache',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'candidates',
     summary: 'Rank legacy source candidates and emit inventory plus police evidence',
     implemented: true,
