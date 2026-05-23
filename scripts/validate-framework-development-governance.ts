@@ -107,6 +107,41 @@ try {
   const preToolDocsOnly = runIntegrationHookInvocation(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'docs/plan.md']);
   assert(preToolDocsOnly.ok === true, 'pre-tool hook must allow framework docs-only edits without hard framework claim');
 
+  const promptScopedRepo = makeHostRepo(tempRoot, 'prompt-scope-repo');
+  mkdirSync(path.join(promptScopedRepo, 'docs', 'plan', 'tasks'), { recursive: true });
+  mkdirSync(path.join(promptScopedRepo, 'src'), { recursive: true });
+  writeFileSync(path.join(promptScopedRepo, 'src', 'scope.ts'), 'export const scope = true;\n', 'utf8');
+  writeFileSync(path.join(promptScopedRepo, 'src', 'other.ts'), 'export const other = true;\n', 'utf8');
+  writeFileSync(path.join(promptScopedRepo, 'docs', 'plan', 'tasks', 'TASK-SCOPE-0001.task.md'), [
+    '---',
+    'task_id: TASK-SCOPE-0001',
+    'title: Prompt scoped task',
+    'status: open',
+    'files: src/scope.ts',
+    '---',
+    '',
+    '# TASK-SCOPE-0001'
+  ].join('\n'), 'utf8');
+  const preToolPromptScopedOk = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', promptScopedRepo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', '請實作 TASK-SCOPE-0001',
+    '--files', 'src/scope.ts'
+  ]);
+  assert(preToolPromptScopedOk.ok === true, 'pre-tool hook must allow prompt-scoped in-scope edits');
+  const preToolPromptScopedDrift = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', promptScopedRepo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', '請實作 TASK-SCOPE-0001',
+    '--files', 'src/other.ts'
+  ]);
+  assert(preToolPromptScopedDrift.ok === false, 'pre-tool hook must block prompt-scoped out-of-scope edits');
+  assert(preToolPromptScopedDrift.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'prompt-scoped drift block must report ATM_TOOL_SCOPE_DRIFT_BLOCKED');
+
   const planningRepo = makeHostRepo(tempRoot, 'planning-repo');
   const crossRepo = createFrameworkModeStatus({ cwd: planningRepo, targetRepo: frameworkRepo });
   assert(crossRepo.mode === 'cross-repo-target-required', 'planning repo targeting framework repo must require target closure authority');

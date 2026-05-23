@@ -16,6 +16,7 @@ async function main() {
     const otherTaskDir = path.join(tempRoot, 'docs', 'other', 'tasks');
     mkdirSync(taskDir, { recursive: true });
     mkdirSync(otherTaskDir, { recursive: true });
+
     writeFileSync(path.join(planDir, 'PlanAlpha.md'), '# Plan Alpha\n', 'utf8');
     writeFileSync(path.join(tempRoot, 'docs', 'other', 'OtherPlan.md'), '# Other Plan\n', 'utf8');
     writeTaskCard(path.join(taskDir, 'TASK-ALPHA-0001.task.md'), 'TASK-ALPHA-0001', 'Alpha first task');
@@ -25,6 +26,7 @@ async function main() {
     const exact = await runNext(['--cwd', tempRoot, '--prompt', '請實作 TASK-ALPHA-0001']);
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
     assert((exact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'exact task id prompt selected wrong task');
+
     const markdownClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', '請實作 TASK-ALPHA-0001']);
     assert(markdownClaim.ok === false, 'next --claim must not pretend to claim a Markdown-only task card');
     assert(markdownClaim.messages.some((entry) => entry.code === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'), 'next --claim must require import for Markdown task cards');
@@ -50,9 +52,16 @@ async function main() {
     assert(queue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'plan-scoped ordinal prompt must return a task queue');
     assert((queue.evidence.nextAction as any).queueSize === 2, 'plan-scoped ordinal prompt must select two tasks');
 
-    const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', '請做下一張任務卡']);
+    const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', '請幫我做下一張任務卡']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
     assert(ambiguous.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SELECTION_REQUIRED'), 'ambiguous task-card prompt must ask for task selection');
+
+    const nonTaskPrompt = await runNext(['--cwd', tempRoot, '--prompt', '請幫我整理 onboarding 說明']);
+    assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'non-task prompt must route to prompt-scoped guidance');
+
+    const noPrompt = await runNext(['--cwd', tempRoot]);
+    const importedTaskQueue = noPrompt.evidence.importedTaskQueue as { selectedTask?: unknown };
+    assert(importedTaskQueue.selectedTask == null, 'next without prompt must not auto-pick a global open/planned task');
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }

@@ -14,6 +14,7 @@ import {
   inspectGitHooks,
   installGitHooks
 } from './hook.ts';
+import { resolvePromptScopedTaskContext } from './next.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 
 export type HookIntegrationId = 'copilot' | 'claude-code' | 'cursor' | 'gemini' | 'codex' | 'antigravity';
@@ -261,6 +262,22 @@ function runPreToolHook(options: HookInvocationOptions) {
     : [];
   const hasFrameworkClaim = status.activeLocks.some((entry) => !entry.includes('/BOOTSTRAP-'));
   const gitHooks = inspectGitHooks(frameworkRoot ?? options.cwd, { frameworkRequired: frameworkRoot !== null });
+  const promptScopedContext = resolvePromptScopedTaskContext(options.cwd, { prompt: options.prompt });
+  const promptScope = promptScopedContext.promptScope;
+  const promptScopedAllowedPaths = promptScope
+    ? buildPromptScopedAllowedPaths(promptScope.selectedTasks)
+    : [];
+  const mutatingIntent = isMutatingToolIntent(options.toolName, toolCommand);
+  const promptScopeDriftFiles = mutatingIntent
+    && !gitCommitIntent
+    && Boolean(promptScopedContext.taskIntent?.taskScopeMentioned)
+    && (promptScope?.status === 'ready' || promptScope?.status === 'queue')
+    && promptScopedAllowedPaths.length > 0
+      ? toolFiles
+        .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
+        .filter((entry) => !isPromptScopeDriftExempt(entry))
+        .filter((entry) => !isToolFileInPromptScope(entry, promptScopedAllowedPaths))
+      : [];
 
   if (status.mode === 'cross-repo-target-required' && gitCommitIntent) {
     return makeResult({
@@ -320,6 +337,31 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolName: options.toolName,
         toolFiles,
         blockedFiles: planningClosureFiles,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (promptScopeDriftFiles.length > 0) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_TOOL_SCOPE_DRIFT_BLOCKED', 'Tool edit scope drifted away from the prompt-scoped task route; narrow edits to the selected task scope or refine the prompt.', {
+        editor: options.editor,
+        blockedFiles: promptScopeDriftFiles,
+        selectedTaskIds: promptScope?.selectedTasks.map((task) => task.workItemId) ?? [],
+        scopePaths: promptScopedAllowedPaths.slice(0, 40),
+        nextStep: 'node atm.mjs next --prompt "<more specific prompt with task id or plan path>" --json'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        promptScopeDriftFiles,
+        promptScopedContext,
+        promptScopedAllowedPaths,
         frameworkStatus: status
       }
     });
@@ -565,7 +607,7 @@ function extractPromptSignals(prompt: string): readonly string[] {
   if (/\bpackages\/|packages\\|packages\/core|packages\/cli/.test(lowered)) signals.push('prompt:packages');
   if (/\bframework-development\b|框架開發|治理/.test(lowered)) signals.push('prompt:framework-development');
   if (/\bhook\b|pre-commit|pre-tool|pre-agent/.test(lowered)) signals.push('prompt:hooks');
-  if (/TASK-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*/i.test(prompt)) signals.push('prompt:task-id');
+  if (/\b(?:TASK|ATM)-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/i.test(prompt)) signals.push('prompt:task-id');
   if (/任務卡|task\s*card|計畫書/i.test(prompt)) signals.push('prompt:task-scope');
   return uniqueSorted(signals);
 }
@@ -730,6 +772,54 @@ function isMutatingToolIntent(toolName: string | null, command: string | null): 
     if (/\b(git\s+add|git\s+commit|set-content|add-content|out-file|new-item|move-item|copy-item|remove-item|apply_patch)\b/.test(normalizedCommand)) return true;
   }
   return true;
+}
+
+function buildPromptScopedAllowedPaths(tasks: readonly {
+  readonly taskPath: string;
+  readonly sourcePlanPath: string | null;
+  readonly nearbyPlanPaths: readonly string[];
+  readonly scopePaths: readonly string[];
+}[]): readonly string[] {
+  const paths: string[] = [];
+  for (const task of tasks) {
+    if (task.taskPath) paths.push(normalizeRelativePath(task.taskPath));
+    if (task.sourcePlanPath) paths.push(normalizeRelativePath(task.sourcePlanPath));
+    for (const entry of task.nearbyPlanPaths) paths.push(normalizeRelativePath(entry));
+    for (const entry of task.scopePaths) paths.push(normalizeRelativePath(entry));
+  }
+  return uniqueSorted(paths);
+}
+
+function isPromptScopeDriftExempt(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  return normalized.startsWith('.atm/history/task-events/')
+    || normalized.startsWith('.atm/history/evidence/')
+    || normalized.startsWith('.atm/runtime/locks/')
+    || normalized === '.atm/history/tasks'
+    || normalized === '.atm/history/evidence'
+    || normalized === '.atm/history/task-events';
+}
+
+function isToolFileInPromptScope(filePath: string, scopePaths: readonly string[]): boolean {
+  const normalizedFile = normalizeRelativePath(filePath).toLowerCase();
+  return scopePaths.some((candidate) => matchesPromptScopePath(normalizedFile, candidate.toLowerCase()));
+}
+
+function matchesPromptScopePath(filePath: string, scopePath: string): boolean {
+  if (!scopePath) return false;
+  if (scopePath.includes('*')) {
+    const pattern = scopePath
+      .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+      .replace(/\*\*/g, '::DOUBLE_STAR::')
+      .replace(/\*/g, '[^/]*')
+      .replace(/::DOUBLE_STAR::/g, '.*');
+    return new RegExp(`^${pattern}$`, 'i').test(filePath);
+  }
+  if (filePath === scopePath) return true;
+  if (scopePath.endsWith('/')) return filePath.startsWith(scopePath);
+  const scopeHasExtension = /\.[a-z0-9]+$/i.test(scopePath);
+  if (!scopeHasExtension) return filePath.startsWith(`${scopePath}/`);
+  return false;
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {

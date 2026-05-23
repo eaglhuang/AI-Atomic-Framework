@@ -598,6 +598,7 @@ interface ImportedTaskSummary {
   readonly format: 'json' | 'markdown';
   readonly sourcePlanPath: string | null;
   readonly nearbyPlanPaths: readonly string[];
+  readonly scopePaths: readonly string[];
   readonly targetRepo: string | null;
   readonly closureAuthority: string | null;
   readonly matchScore?: number;
@@ -611,6 +612,21 @@ interface ImportedTaskQueue {
   readonly claimableTask: ImportedTaskSummary | null;
   readonly tasks: readonly ImportedTaskSummary[];
   readonly promptScope: PromptScopedTaskRoute | null;
+}
+
+export interface PromptScopedTaskContext {
+  readonly taskIntent: {
+    readonly userPrompt: string | null;
+    readonly taskScopeMentioned: boolean;
+    readonly requestedAction: RequestedTaskAction | null;
+    readonly source: TaskIntentSource;
+  } | null;
+  readonly promptScope: {
+    readonly status: PromptScopedRouteStatus;
+    readonly selectedTasks: readonly ImportedTaskSummary[];
+    readonly targetRepo: string | null;
+    readonly diagnostics: readonly string[];
+  } | null;
 }
 
 function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): ImportedTaskQueue {
@@ -634,6 +650,9 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         const dependencies = Array.isArray(parsed.dependencies)
           ? parsed.dependencies.filter((entry): entry is string => typeof entry === 'string')
           : [];
+        const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
+          ? parsed.claim as Record<string, unknown>
+          : {};
         const source = parsed.source && typeof parsed.source === 'object' ? parsed.source as Record<string, unknown> : {};
         return [{
           workItemId,
@@ -645,6 +664,12 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           format: 'json',
           sourcePlanPath: normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path),
           nearbyPlanPaths: [],
+          scopePaths: uniqueSorted([
+            ...readStringArray(parsed.scope),
+            ...readStringArray(parsed.scopePaths),
+            ...readStringArray(parsed.files),
+            ...readStringArray(claimRecord.files)
+          ]),
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
           closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
         }];
@@ -671,6 +696,11 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         format: 'markdown',
         sourcePlanPath: normalizeOptionalString(parsed.plan_path ?? parsed.planPath ?? parsed.source_plan ?? parsed.sourcePlan),
         nearbyPlanPaths: findNearbyPlanPaths(cwd, filePath),
+        scopePaths: uniqueSorted([
+          ...splitListValue(parsed.scope ?? parsed.scope_paths ?? parsed.scopePaths),
+          ...splitListValue(parsed.files ?? parsed.file_paths ?? parsed.filePaths),
+          ...splitListValue(parsed.paths)
+        ]),
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
         closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
       };
@@ -686,7 +716,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     });
   const statusById = new Map(allTasks.map((task) => [task.workItemId, task.status]));
   const promptScope = resolvePromptScopedTaskRoute(cwd, tasks, taskIntent);
-  const selectedTaskPool = promptScope?.selectedTasks ?? tasks;
+  const selectedTaskPool = promptScope?.selectedTasks ?? [];
   const selectedTask = selectedTaskPool.find((task) => task.dependencies.every((dependency) => {
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
@@ -713,6 +743,28 @@ function statusQueueWeight(status: string): number {
   if (normalized === 'planned') return 2;
   if (normalized === 'blocked' || normalized === 'waiting_target_evidence') return 3;
   return 3;
+}
+
+export function resolvePromptScopedTaskContext(cwd: string, input: { readonly prompt?: string | null; readonly intentPath?: string | null }): PromptScopedTaskContext {
+  const taskIntent = resolveTaskIntent(cwd, {
+    prompt: normalizeOptionalString(input.prompt) ?? undefined,
+    intentPath: normalizeOptionalString(input.intentPath) ?? undefined
+  });
+  const importedTaskQueue = inspectImportedTaskQueue(cwd, taskIntent);
+  return {
+    taskIntent: taskIntent ? {
+      userPrompt: taskIntent.userPrompt,
+      taskScopeMentioned: taskIntent.taskScopeMentioned,
+      requestedAction: taskIntent.requestedAction,
+      source: taskIntent.source
+    } : null,
+    promptScope: importedTaskQueue.promptScope ? {
+      status: importedTaskQueue.promptScope.status,
+      selectedTasks: importedTaskQueue.promptScope.selectedTasks,
+      targetRepo: importedTaskQueue.promptScope.targetRepo,
+      diagnostics: importedTaskQueue.promptScope.diagnostics
+    } : null
+  };
 }
 
 function resolveTaskIntent(cwd: string, input: { readonly prompt?: string; readonly intentPath?: string }): TaskIntent | null {
@@ -742,7 +794,7 @@ function readTaskIntentFile(cwd: string, intentPath: string): TaskIntent {
 }
 
 function createDeterministicTaskIntent(prompt: string): TaskIntent {
-  const mentionedTaskIds = uniqueSorted((prompt.match(/TASK-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*/gi) ?? []).map((entry) => entry.toUpperCase()));
+  const mentionedTaskIds = uniqueSorted((prompt.match(/\b(?:TASK|ATM)-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi) ?? []).map((entry) => entry.toUpperCase()));
   const mentionedPlanPaths = uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
   const targetRepoHints = uniqueSorted([
     ...(/AI-Atomic-Framework|ATM\s*framework|ATM框架|原子框架/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
@@ -1097,6 +1149,7 @@ function toTaskCandidateView(task: ImportedTaskSummary) {
     format: task.format,
     sourcePlanPath: task.sourcePlanPath,
     nearbyPlanPaths: task.nearbyPlanPaths,
+    scopePaths: task.scopePaths,
     targetRepo: task.targetRepo,
     matchScore: task.matchScore ?? 0,
     matchReasons: task.matchReasons ?? []
