@@ -330,7 +330,7 @@ async function claimNextImportedTask(input: {
     '--json'
   ]);
   const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'
-    ? createOrRefreshTaskQueue({
+    ? findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId) ?? createOrRefreshTaskQueue({
       cwd: input.cwd,
       sourcePrompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId,
       tasks: input.importedTaskQueue.promptScope.selectedTasks,
@@ -817,7 +817,21 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
       return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
     });
   const statusById = new Map(allTasks.map((task) => [task.workItemId, task.status]));
-  const promptScope = resolvePromptScopedTaskRoute(cwd, tasks, taskIntent);
+  const activeQueue = taskIntent?.userPrompt ? findActiveTaskQueue(cwd, taskIntent.userPrompt) : null;
+  const activeQueueTasks = activeQueue
+    ? activeQueue.taskIds
+      .slice(activeQueue.currentIndex)
+      .map((taskId) => tasks.find((task) => task.workItemId === taskId))
+      .filter((task): task is ImportedTaskSummary => Boolean(task))
+    : [];
+  const promptScope = activeQueue && activeQueueTasks.length > 0
+    ? {
+      status: 'queue' as const,
+      selectedTasks: activeQueueTasks,
+      targetRepo: activeQueue.targetRepo,
+      diagnostics: [`active-queue:${activeQueue.queueId}`, `queue-index:${activeQueue.currentIndex}`]
+    }
+    : resolvePromptScopedTaskRoute(cwd, tasks, taskIntent);
   const selectedTaskPool = promptScope?.selectedTasks ?? [];
   const selectedTask = selectedTaskPool.find((task) => task.dependencies.every((dependency) => {
     const status = statusById.get(dependency);
