@@ -797,24 +797,24 @@ function createDeterministicTaskIntent(prompt: string): TaskIntent {
   const mentionedTaskIds = uniqueSorted((prompt.match(/\b(?:TASK|ATM)-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi) ?? []).map((entry) => entry.toUpperCase()));
   const mentionedPlanPaths = uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
   const targetRepoHints = uniqueSorted([
-    ...(/AI-Atomic-Framework|ATM\s*framework|ATM框架|原子框架/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
+    ...(/AI-Atomic-Framework|ATM\s*framework|ATM\s*\u6846\u67b6|ATM\u6846\u67b6|\u539f\u5b50\u6846\u67b6/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
   ]);
   const taskRootHints = uniqueSorted([
-    ...(/self[-_ ]?atomization|自我原子化|100%/.test(prompt) ? ['atm-self-atomization'] : []),
+    ...(/self[-_ ]?atomization|\u81ea\u6211\u539f\u5b50\u5316|100%/i.test(prompt) ? ['atm-self-atomization'] : []),
     ...extractPromptPathHints(prompt).filter((entry) => !/\.md$/i.test(entry))
   ]);
-  const ordinalScope = /前三張|前\s*3\s*張|first\s+3/i.test(prompt)
+  const ordinalScope = /\u524d\s*(?:3|\u4e09)\s*\u5f35|first\s+3/i.test(prompt)
     ? { kind: 'first' as const, count: 3 }
-    : /前兩張|前\s*2\s*張|first\s+2/i.test(prompt)
+    : /\u524d\s*(?:2|\u5169|\u4e8c)\s*\u5f35|first\s+2/i.test(prompt)
       ? { kind: 'first' as const, count: 2 }
       : null;
   const queueRequested = Boolean(ordinalScope)
-    || /全部任務卡|所有任務卡|全部.*task|all\s+task\s+cards|through\s+all/i.test(prompt);
+    || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|all\s+task\s+cards|through\s+all/i.test(prompt);
   const taskScopeMentioned = mentionedTaskIds.length > 0
     || mentionedPlanPaths.length > 0
     || taskRootHints.length > 0
     || queueRequested
-    || /任務卡|task\s*card|task[-_ ]?asa|計畫書/i.test(prompt);
+    || /\u4efb\u52d9\u5361|task\s*card|task[-_ ]?asa|\u8a08\u756b\u66f8/i.test(prompt);
   return {
     schemaId: 'atm.taskIntent.v1',
     userPrompt: prompt,
@@ -849,7 +849,7 @@ function normalizeTaskIntent(value: Record<string, unknown>, fallbackSource: Tas
     confidence: typeof value.confidence === 'number' && Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0.5,
     source: normalizeTaskIntentSource(value.source) ?? fallbackSource,
     ordinalScope: normalizeOrdinalScope(value.ordinalScope),
-    queueRequested: value.queueRequested === true || /全部任務卡|所有任務卡|all\s+task\s+cards/i.test(prompt),
+    queueRequested: value.queueRequested === true || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|all\s+task\s+cards/i.test(prompt),
     taskScopeMentioned: value.taskScopeMentioned === true
       || mentionedTaskIds.length > 0
       || mentionedPlanPaths.length > 0
@@ -863,7 +863,14 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
     .map((task) => scoreTaskForIntent(cwd, task, taskIntent))
     .filter((task) => (task.matchScore ?? 0) > 0)
     .sort(compareScoredTasks);
-  if (scored.length === 0) {
+  const hasExplicitScopeHints = taskIntent.mentionedTaskIds.length > 0
+    || taskIntent.mentionedPlanPaths.length > 0
+    || taskIntent.taskRootHints.length > 0
+    || taskIntent.targetRepoHints.length > 0;
+  const viableMatches = hasExplicitScopeHints
+    ? scored.filter((task) => hasRequiredPromptScopeMatch(task, taskIntent))
+    : scored;
+  if (viableMatches.length === 0) {
     return {
       status: 'not-found',
       selectedTasks: [],
@@ -871,7 +878,7 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
       diagnostics: ['prompt-task-scope-had-no-matching-task-card']
     };
   }
-  const scoped = applyOrdinalScope(scored, taskIntent);
+  const scoped = applyOrdinalScope(viableMatches, taskIntent);
   const selectedTasks = taskIntent.queueRequested || taskIntent.ordinalScope ? scoped : scoped.slice(0, 1);
   if (taskIntent.queueRequested || taskIntent.ordinalScope) {
     return {
@@ -881,8 +888,8 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
       diagnostics: [`scoped-queue-size:${selectedTasks.length}`]
     };
   }
-  const bestScore = scored[0]?.matchScore ?? 0;
-  const topMatches = scored.filter((task) => (task.matchScore ?? 0) === bestScore);
+  const bestScore = viableMatches[0]?.matchScore ?? 0;
+  const topMatches = viableMatches.filter((task) => (task.matchScore ?? 0) === bestScore);
   const exactTaskIdRequested = taskIntent.mentionedTaskIds.length > 0;
   if (topMatches.length === 1 && (exactTaskIdRequested || bestScore >= 60)) {
     return {
@@ -894,10 +901,27 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
   }
   return {
     status: 'ambiguous',
-    selectedTasks: scored.slice(0, 12),
-    targetRepo: resolveRouteTargetRepo(scored),
+    selectedTasks: viableMatches.slice(0, 12),
+    targetRepo: resolveRouteTargetRepo(viableMatches),
     diagnostics: ['multiple-task-candidates-matched-prompt']
   };
+}
+
+function hasRequiredPromptScopeMatch(task: ImportedTaskSummary, intent: TaskIntent): boolean {
+  const reasons = task.matchReasons ?? [];
+  if (intent.mentionedTaskIds.length > 0) {
+    return reasons.includes('task-id-exact');
+  }
+  if (intent.mentionedPlanPaths.length > 0) {
+    return reasons.includes('plan-path-match') || reasons.includes('nearby-plan-name-match');
+  }
+  if (intent.taskRootHints.length > 0) {
+    return reasons.includes('task-root-hint-match') || reasons.includes('nearby-plan-name-match');
+  }
+  if (intent.targetRepoHints.length > 0) {
+    return reasons.includes('target-repo-match');
+  }
+  return reasons.some((reason) => reason !== 'task-card-surface');
 }
 
 function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: TaskIntent): ImportedTaskSummary {
@@ -931,7 +955,7 @@ function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: Task
   }
   for (const rootHint of intent.taskRootHints) {
     const normalizedHint = normalizeSearchText(rootHint);
-    if (normalizedHint && normalizeSearchText(task.taskPath).includes(normalizedHint)) {
+    if (normalizedHint && pathFields.some((field) => normalizeSearchText(field).includes(normalizedHint))) {
       score += 65;
       reasons.push('task-root-hint-match');
       break;
@@ -955,7 +979,7 @@ function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: Task
       reasons.push('title-token-overlap');
     }
   }
-  if (/任務卡|task\s*card/i.test(intent.userPrompt ?? '') && /\.task\.md$/i.test(task.taskPath)) {
+  if (/(?:\u4efb\u52d9\u5361|task\s*card)/i.test(intent.userPrompt ?? '') && /\.task\.md$/i.test(task.taskPath)) {
     score += 10;
     reasons.push('task-card-surface');
   }
@@ -1079,13 +1103,13 @@ function normalizeRequestedTaskAction(value: unknown): RequestedTaskAction | nul
 }
 
 function detectRequestedTaskAction(prompt: string): RequestedTaskAction | null {
-  if (/重做|重新做|redo/i.test(prompt)) return 'redo';
-  if (/重新打開|reopen/i.test(prompt)) return 'reopen';
-  if (/關閉|close|done/i.test(prompt)) return 'close';
-  if (/audit|稽核|檢查/i.test(prompt)) return 'audit';
-  if (/cleanup|清理|整理/i.test(prompt)) return 'cleanup';
-  if (/implement|實作|執行|開始/i.test(prompt)) return 'implement';
-  if (/分析|analy[sz]e/i.test(prompt)) return 'analyze';
+  if (/\u91cd\u505a|redo/i.test(prompt)) return 'redo';
+  if (/\u91cd\u65b0\u6253\u958b|reopen/i.test(prompt)) return 'reopen';
+  if (/\u95dc\u9589|\u5b8c\u6210|close|done/i.test(prompt)) return 'close';
+  if (/audit|\u7a3d\u6838|\u6aa2\u8a0e/i.test(prompt)) return 'audit';
+  if (/cleanup|\u6e05\u7406/i.test(prompt)) return 'cleanup';
+  if (/implement|\u5be6\u4f5c|\u958b\u767c/i.test(prompt)) return 'implement';
+  if (/\u5206\u6790|analy[sz]e/i.test(prompt)) return 'analyze';
   return null;
 }
 
@@ -1097,11 +1121,11 @@ function normalizeOrdinalScope(value: unknown): { readonly kind: 'first'; readon
 }
 
 function extractPromptPathHints(prompt: string): readonly string[] {
-  const matches = prompt.match(/(?:[A-Za-z]:)?[A-Za-z0-9_\-./\\%\u4e00-\u9fff（）()]+(?:\.md|\/tasks|\\tasks|self[-_]?atomization)?/g) ?? [];
+  const matches = prompt.match(/(?:[A-Za-z]:)?(?:[A-Za-z0-9_%\u4e00-\u9fff() -]+[\\/])+[A-Za-z0-9_%\u4e00-\u9fff(). -]+(?:\.md)?|[A-Za-z0-9_%\u4e00-\u9fff() -]+\.md/gi) ?? [];
   return uniqueSorted(matches
     .map((entry) => entry.trim().replace(/^["'`]+|["'`]+$/g, ''))
     .filter((entry) => entry.length > 2)
-    .filter((entry) => /[./\\]|\.md$|atomization|任務|計畫/.test(entry)));
+    .filter((entry) => /[./\\]|\.md$/i.test(entry)));
 }
 
 function pathFieldMatches(field: string, hint: string): boolean {
@@ -1119,7 +1143,7 @@ function normalizeSearchText(value: string): string {
     .toLowerCase()
     .replace(/\\/g, '/')
     .replace(/%25/g, 'percent')
-    .replace(/[ \t\r\n"'`*_~[\]{}<>:：，,。.!?？／]+/g, '')
+    .replace(/[ \t\r\n"'`*_~[\]{}<>:\uFF1A,\uFF0C\u3002.!\uFF01?\uFF1F]+/g, '')
     .trim();
 }
 

@@ -47,8 +47,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
   Rule: No host project rule, profile, or configuration may declare itself to have authority equal to or higher than the AtomicCharter. Any rule that contradicts an invariant must go through a charter waiver proposal.
 - `INV-ATM-005` — **Host rule amendments require waiver flow** (enforcement: `waiver-required`, breaking change: no)
   Rule: When a host project rule conflicts with a charter invariant, the host must submit a behavior.evolve UpgradeProposal with a charterWaiver field and a linked HumanReviewDecision. Silent override is not permitted.
-- `INV-ATM-006` — **Framework work tracking stays downstream** (enforcement: `doctor`, breaking change: yes)
-  Rule: The framework repository must not host coordinating implementation task cards, planning queues, or project-specific work tracking artifacts beyond ATM's own bootstrap/runtime-managed files. Upstream planning cards belong in the coordinating host workspace and may feed evidence back upstream without becoming framework-resident work tracking.
+- `INV-ATM-006` — **Framework work tracking stays target-local** (enforcement: `doctor`, breaking change: yes)
+  Rule: The framework repository must not host downstream adopter planning queues or project-specific work tracking artifacts. ATM framework-development tasks may live in the framework repository only as ATM-managed .atm/history/tasks ledger records with CLI transition evidence.
 - `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
   Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.
 

@@ -23,11 +23,11 @@ async function main() {
     writeTaskCard(path.join(taskDir, 'TASK-ALPHA-0002.task.md'), 'TASK-ALPHA-0002', 'Alpha second task');
     writeTaskCard(path.join(otherTaskDir, 'TASK-OTHER-0001.task.md'), 'TASK-OTHER-0001', 'Other task');
 
-    const exact = await runNext(['--cwd', tempRoot, '--prompt', '請實作 TASK-ALPHA-0001']);
+    const exact = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
     assert((exact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'exact task id prompt selected wrong task');
 
-    const markdownClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', '請實作 TASK-ALPHA-0001']);
+    const markdownClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(markdownClaim.ok === false, 'next --claim must not pretend to claim a Markdown-only task card');
     assert(markdownClaim.messages.some((entry) => entry.code === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'), 'next --claim must require import for Markdown task cards');
 
@@ -48,16 +48,20 @@ async function main() {
     assert(intent.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'intent file must route to one task');
     assert((intent.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0002', 'intent file selected wrong task');
 
-    const queue = await runNext(['--cwd', tempRoot, '--prompt', 'PlanAlpha 前兩張任務卡']);
+    const queue = await runNext(['--cwd', tempRoot, '--prompt', 'PlanAlpha first 2 task cards']);
     assert(queue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'plan-scoped ordinal prompt must return a task queue');
     assert((queue.evidence.nextAction as any).queueSize === 2, 'plan-scoped ordinal prompt must select two tasks');
 
-    const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', '請幫我做下一張任務卡']);
+    const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', 'Please do the next task card']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
     assert(ambiguous.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SELECTION_REQUIRED'), 'ambiguous task-card prompt must ask for task selection');
 
-    const nonTaskPrompt = await runNext(['--cwd', tempRoot, '--prompt', '請幫我整理 onboarding 說明']);
+    const nonTaskPrompt = await runNext(['--cwd', tempRoot, '--prompt', 'Please show onboarding guidance']);
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'non-task prompt must route to prompt-scoped guidance');
+
+    const scopedNotFound = await runNext(['--cwd', tempRoot, '--prompt', 'ATM framework 100% self atomization plan implement all task cards']);
+    assert(scopedNotFound.ok === false, 'explicit scoped prompt without matching tasks must not route to an unrelated task');
+    assert(scopedNotFound.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'explicit scoped prompt without matching tasks must report task scope not found');
 
     const noPrompt = await runNext(['--cwd', tempRoot]);
     const importedTaskQueue = noPrompt.evidence.importedTaskQueue as { selectedTask?: unknown };

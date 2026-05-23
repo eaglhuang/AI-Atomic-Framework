@@ -15,7 +15,7 @@ through ATM evidence before choosing a local implementation path.
 ## First Command
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 If the first command returns a user notice, surface it briefly, then continue the
@@ -49,10 +49,10 @@ Follow the returned `nextCommand`. If the matched intent is
 source analysis by hand. If the matched intent is `task-plan-import`, run the
 task import dry run before creating or editing any task files.
 
-Before mutating repository files for implementation work, claim the task:
+Before mutating repository files for implementation work, claim the prompt-scoped task:
 
 ```bash
-node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 ```
 
 ATM's default task ledger is the active flow monitor when `taskLedger.enabled`

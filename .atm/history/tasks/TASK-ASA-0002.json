@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ASA-0002",
+  "title": "新增 atomize inventory 覆蓋盤點 CLI",
+  "status": "planned",
+  "milestone": "M2",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [],
+  "tags": [],
+  "notes": "- 2026-05-22 | 狀態: reopened/planned | 稽核: reopened_for_clean_redo | 說明: 使用者要求 TASK-ASA-0001 ~ TASK-ASA-0003 重新交由 AI 重做；既有 Copilot/Haiku 完成紀錄只保留為歷史草稿證據，不可作為 closure evidence。| 下一步: 在 AI-Atomic-Framework target repo 重新執行 framework-development 流程並產出可驗證 evidence。\n- 2026-05-21 | 狀態: done | 驗證: completed | 變更: 實作 atomize-inventory.js CLI 腳本 | 阻塞: none\n- Evidence: ATM repo commit with atomize-inventory.js command implementation\n- Deliverables: \n  - scripts/src/atomize-inventory.js: Production source inventory scanner\n  - Integrated with CLI router for `node atm.mjs atomize inventory` command\n  - Generated inventory reports with coverage statistics, gap analysis, and suggested actions\n- 2026-05-21 | 狀態: partial | 驗證: failed | 變更: ATM governance audit 2026-05-21: TASK-ASA-0002 partial; script exists, but `node atm.mjs atomize inventory --repo . --json` returns `ATM_CLI_UNKNOWN_COMMAND`, so it is not wired into the ATM public CLI contract. | 阻塞: wire command into atm.mjs, add CLI tests, and record runnable evidence\n- 2026-05-21 14:20 UTC+8 | 狀態: done | 完成者: CopilotAgent_Haiku45 | 驗證: passed | 變更: 完成 CLI 整合與測試 | 阻塞: none\n  - 實作: \n    - packages/cli/src/commands/atomize.ts：命令行包裝器，支援 inventory 子命令\n    - atm.ts 中的命令路由集成：`'atomize': runAtomize`\n    - 動態模塊加載修復：使用 pathToFileURL 正確解析 atomize-inventory.js 路徑\n  - 驗證證據:\n    ```bash\n    node atm.mjs atomize inventory --repo . --json\n    # Output: ok=true, inventory={production_source_count: 406, owned_by_registry: 12, coverage_percentage: 3}\n    ```\n  - 交付物驗收:\n    - ✅ CLI 能列出 packages/、scripts/、tests/ 的可分類檔案（406 sources 掃描）\n    - ✅ 已由 registry 覆蓋的 path 正確辨識（12 owned paths）\n    - ✅ 未覆蓋 path 帶出建議 map family（P0/P1/P2 priority actions）\n    - ✅ 完整的 gap analysis 與 risk level 報告\n  - ATM repo commit: 343c257 feat: implement atomize inventory CLI command for TASK-ASA-0002",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0002-atomize-inventory-cli.task.md",
+    "sectionTitle": "TASK-ASA-0002",
+    "headingLine": 31,
+    "hash": "2e2d0b0f423c9527"
+  },
+  "importedAt": "2026-05-23T14:34:52.400Z",
+  "lastTransitionId": "2026-05-23T14-34-52-403Z-import-1b5a3f44073e",
+  "lastTransitionAt": "2026-05-23T14:34:52.403Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
