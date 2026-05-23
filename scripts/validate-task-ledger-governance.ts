@@ -152,6 +152,24 @@ try {
   assert(missingMirrorAudit.ok === false, 'declared external task must fail audit until mirrored');
   assert(missingMirrorAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_EXTERNAL_TASK_NOT_MIRRORED'), 'missing external mirror finding must be reported');
 
+  const aiManualRepo = makeHostRepo(tempRoot, 'ai-manual-ledger');
+  writeJson(path.join(aiManualRepo, '.atm', 'history', 'tasks', 'ATM-GOV-9999.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'ATM-GOV-9999',
+    title: 'AI manual task should not persist',
+    status: 'open',
+    source: {
+      planPath: 'manual',
+      sectionTitle: 'ATM-GOV-9999',
+      headingLine: 1,
+      hash: 'manual-ai'
+    },
+    owner: 'codex-main'
+  });
+  const aiManualAudit = auditTasks(aiManualRepo);
+  assert(aiManualAudit.ok === false, 'AI-issued manual tasks must fail audit');
+  assert(aiManualAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_AI_MANUAL_TASK_IN_LEDGER'), 'AI-issued manual task finding must be reported');
+
   const mirrorResult = await runTasks([
     'mirror',
     '--cwd',
@@ -217,7 +235,7 @@ try {
   assert(legacyAuditAfter.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_LEGACY_BASELINE_DONE'), 'legacy baseline done warning must remain visible');
 
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, and legacy baseline migration verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, and legacy baseline migration verified)`);
   }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

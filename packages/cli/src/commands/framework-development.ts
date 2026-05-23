@@ -388,6 +388,17 @@ export function auditTasks(cwd: string): TaskAuditReport {
   const mirrorKeys = new Set<string>();
 
   for (const task of taskDocs) {
+    const manualTaskActor = firstAiIssuedManualTaskActor(task.document);
+    if (manualTaskActor && task.taskId !== bootstrapTaskId) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TASK_AUDIT_AI_MANUAL_TASK_IN_LEDGER',
+        path: task.relativePath,
+        taskId: task.taskId,
+        detail: `AI-issued manual task ${task.taskId} by ${manualTaskActor} must not live in .atm/history/tasks; use an ephemeral runtime lock or a human-authored/imported task card.`
+      });
+    }
+
     const originProvider = normalizeOptionalString(task.document.originProvider ?? task.document.origin_provider);
     const originTaskId = normalizeOptionalString(task.document.originTaskId ?? task.document.origin_task_id);
     const syncStatus = normalizeOptionalString(task.document.syncStatus ?? task.document.sync_status);
@@ -883,6 +894,52 @@ function normalizeClosureAuthority(value: unknown): ClosureAuthority {
 
 function normalizeStatus(value: unknown): string {
   return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+}
+
+function firstAiIssuedManualTaskActor(document: Record<string, unknown>): string | null {
+  if (!isManualTaskSource(document)) return null;
+  for (const actor of taskActorCandidates(document)) {
+    if (isAiIssuedManualTaskActor(actor)) return actor;
+  }
+  return null;
+}
+
+function isManualTaskSource(document: Record<string, unknown>): boolean {
+  const source = document.source;
+  if (source && typeof source === 'object' && !Array.isArray(source)) {
+    const sourceDocument = source as Record<string, unknown>;
+    return normalizeOptionalString(sourceDocument.planPath) === 'manual'
+      || normalizeOptionalString(sourceDocument.plan_path) === 'manual';
+  }
+  return normalizeOptionalString(document.sourcePlanPath ?? document.source_plan_path) === 'manual';
+}
+
+function taskActorCandidates(document: Record<string, unknown>): readonly string[] {
+  const candidates = [
+    normalizeOptionalString(document.owner),
+    normalizeOptionalString(document.reservedByActor ?? document.reserved_by_actor),
+    normalizeOptionalString(document.startedByActor ?? document.started_by_actor),
+    normalizeOptionalString(document.closedByActor ?? document.closed_by_actor),
+    normalizeOptionalString(document.createdByActor ?? document.created_by_actor),
+    normalizeOptionalString(document.updatedByActor ?? document.updated_by_actor)
+  ];
+  const claim = document.claim;
+  if (claim && typeof claim === 'object' && !Array.isArray(claim)) {
+    const claimDocument = claim as Record<string, unknown>;
+    candidates.push(normalizeOptionalString(claimDocument.actorId ?? claimDocument.actor_id));
+  }
+  return candidates.filter((entry): entry is string => Boolean(entry));
+}
+
+function isAiIssuedManualTaskActor(actor: string | null): boolean {
+  const normalized = actor?.trim().toLowerCase();
+  if (!normalized) return false;
+  return normalized === 'codex'
+    || normalized === 'codex-main'
+    || normalized.startsWith('copilot')
+    || normalized.startsWith('claude')
+    || normalized.startsWith('gemini')
+    || normalized.startsWith('cursor');
 }
 
 function matchesCurrentRepoIdentity(root: string, targetRepo: string): boolean {
