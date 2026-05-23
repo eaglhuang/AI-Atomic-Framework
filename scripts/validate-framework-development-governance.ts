@@ -260,7 +260,7 @@ try {
   });
   assert(validateClosurePacket(packet).ok === true, 'generated closure packet must validate');
 
-  const commandStatus = runFrameworkMode(['status', '--cwd', root, '--files', 'packages/core/src/index.ts', '--json']);
+  const commandStatus = await runFrameworkMode(['status', '--cwd', root, '--files', 'packages/core/src/index.ts', '--json']);
   assert(commandStatus.ok === true, 'framework-mode status command must report ok=true');
   const commandEvidence = commandStatus.evidence as { report?: { mode?: string } };
   assert(commandEvidence.report?.mode === 'required', 'framework-mode command must report required for packages/core file scope');

@@ -2,7 +2,9 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
+import type { WorkItemRef } from '@ai-atomic-framework/core';
+import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
+import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom, resolveValue } from './shared.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import {
@@ -115,9 +117,11 @@ export interface InferredFrameworkTargetRepo {
 
 interface ParsedFrameworkModeArgs {
   readonly cwd: string;
-  readonly action: 'status';
+  readonly action: 'status' | 'claim' | 'release';
   readonly files: readonly string[];
   readonly targetRepo: string | null;
+  readonly actor: string | null;
+  readonly reason: string | null;
 }
 
 const frameworkModeSpecVersion = '0.1.0';
@@ -149,6 +153,12 @@ const markdownCompletionPatterns = [
 
 export function runFrameworkMode(argv: string[]) {
   const options = parseFrameworkModeArgs(argv);
+  if (options.action === 'claim') {
+    return runFrameworkTempClaim(options.cwd, options.actor, options.files, options.reason);
+  }
+  if (options.action === 'release') {
+    return runFrameworkTempRelease(options.cwd, options.actor);
+  }
   const report = createFrameworkModeStatus({
     cwd: options.cwd,
     files: options.files,
@@ -171,6 +181,77 @@ export function runFrameworkMode(argv: string[]) {
       report
     }
   });
+}
+
+export async function runFrameworkTempClaim(cwd: string, actor: string | null, files: readonly string[], reason: string | null) {
+  const actorId = normalizeOptionalString(actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY);
+  if (!actorId) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'framework-mode claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const scopedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
+  if (scopedFiles.length === 0) {
+    throw new CliError('ATM_CLI_USAGE', 'framework-mode claim requires --files <csv> for the intended framework edit scope.', { exitCode: 2 });
+  }
+  const root = path.resolve(cwd);
+  const taskId = frameworkTempTaskId(actorId);
+  const adapter = createLocalGovernanceAdapter({ repositoryRoot: root });
+  const task: WorkItemRef = {
+    workItemId: taskId,
+    title: reason?.trim() || 'Temporary ATM framework-development claim',
+    status: 'running'
+  };
+  const lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, scopedFiles, actorId));
+  return makeResult({
+    ok: true,
+    command: 'framework-mode',
+    cwd: root,
+    messages: [message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_ACQUIRED', 'Temporary framework-development runtime lock acquired.', {
+      taskId,
+      actorId,
+      files: scopedFiles
+    })],
+    evidence: {
+      action: 'claim',
+      taskId,
+      actorId,
+      reason: reason ?? null,
+      files: scopedFiles,
+      lock
+    }
+  });
+}
+
+export async function runFrameworkTempRelease(cwd: string, actor: string | null) {
+  const actorId = normalizeOptionalString(actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY);
+  if (!actorId) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'framework-mode release requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const root = path.resolve(cwd);
+  const adapter = createLocalGovernanceAdapter({ repositoryRoot: root });
+  const taskId = frameworkTempTaskId(actorId);
+  const result = await resolveValue(adapter.stores.lockStore.releaseLock(taskId, actorId));
+  return makeResult({
+    ok: true,
+    command: 'framework-mode',
+    cwd: root,
+    messages: [message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_RELEASED', 'Temporary framework-development runtime lock released.', {
+      taskId,
+      actorId
+    })],
+    evidence: {
+      action: 'release',
+      taskId,
+      actorId,
+      result
+    }
+  });
+}
+
+export function buildFrameworkTempClaimCommand(files: readonly string[] = [], reason: string | null = null) {
+  const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
+  const filesValue = normalizedFiles.length > 0 ? normalizedFiles.join(',') : '<files>';
+  const reasonValue = reason?.trim() || 'temporary framework maintenance';
+  return `node atm.mjs framework-mode claim --actor <id> --files ${quoteCliValue(filesValue)} --reason ${quoteCliValue(reasonValue)} --json`;
 }
 
 export function runFrameworkDevelopmentGuard(cwd: string, files: readonly string[] = [], targetRepo: string | null = null) {
@@ -632,9 +713,11 @@ export function requireTargetRepoClosureAuthority(input: {
 function parseFrameworkModeArgs(argv: string[]): ParsedFrameworkModeArgs {
   const state = {
     cwd: process.cwd(),
-    action: null as 'status' | null,
+    action: null as 'status' | 'claim' | 'release' | null,
     files: [] as string[],
-    targetRepo: null as string | null
+    targetRepo: null as string | null,
+    actor: null as string | null,
+    reason: null as string | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -653,6 +736,16 @@ function parseFrameworkModeArgs(argv: string[]): ParsedFrameworkModeArgs {
       index += 1;
       continue;
     }
+    if (arg === '--actor') {
+      state.actor = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      state.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty') {
       continue;
     }
@@ -662,19 +755,21 @@ function parseFrameworkModeArgs(argv: string[]): ParsedFrameworkModeArgs {
     if (state.action) {
       throw new CliError('ATM_CLI_USAGE', 'framework-mode accepts only one action.', { exitCode: 2 });
     }
-    if (arg !== 'status') {
-      throw new CliError('ATM_CLI_USAGE', 'framework-mode supports only: status.', { exitCode: 2 });
+    if (arg !== 'status' && arg !== 'claim' && arg !== 'release') {
+      throw new CliError('ATM_CLI_USAGE', 'framework-mode supports only: status, claim, release.', { exitCode: 2 });
     }
     state.action = arg;
   }
   if (!state.action) {
-    throw new CliError('ATM_CLI_USAGE', 'framework-mode requires an action: status.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'framework-mode requires an action: status | claim | release.', { exitCode: 2 });
   }
   return {
     cwd: path.resolve(state.cwd),
     action: state.action,
     files: state.files,
-    targetRepo: state.targetRepo
+    targetRepo: state.targetRepo,
+    actor: state.actor,
+    reason: state.reason
   };
 }
 
@@ -958,6 +1053,15 @@ function hasActiveFrameworkTaskLock(activeLocks: readonly string[]): boolean {
     const normalized = normalizeRelativePath(entry);
     return normalized.endsWith('.lock.json') && !normalized.includes('/BOOTSTRAP-');
   });
+}
+
+function frameworkTempTaskId(actorId: string) {
+  const normalized = actorId.trim().replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+  return `ATM-FRAMEWORK-TEMP-${normalized || 'actor'}`;
+}
+
+function quoteCliValue(value: string) {
+  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
 function firstTargetRepoField(document: Record<string, unknown>): { field: string; value: string } | null {

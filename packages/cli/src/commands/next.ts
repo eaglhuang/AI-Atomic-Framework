@@ -14,7 +14,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.t
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { resolveActorId } from './actor-registry.ts';
-import { createFrameworkModeStatus } from './framework-development.ts';
+import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
 import { runTasks } from './tasks.ts';
 
@@ -513,6 +513,46 @@ function buildPromptGuidanceNextResult(input: {
 }) {
   const prompt = input.taskIntent?.userPrompt?.trim();
   if (!prompt || input.taskIntent?.taskScopeMentioned === true) return null;
+  const frameworkStatus = createFrameworkModeStatus({ cwd: input.cwd });
+  if (frameworkStatus.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(prompt)) {
+    const claimCommand = buildFrameworkTempClaimCommand([], prompt);
+    const nextAction = {
+      status: 'framework-temp-claim-required',
+      command: claimCommand,
+      reason: 'the prompt appears to be ATM framework maintenance without a human task card, so use a temporary runtime claim before editing critical framework files',
+      allowedCommands: [
+        claimCommand,
+        'node atm.mjs framework-mode status --json',
+        'node atm.mjs guard framework-development --json'
+      ],
+      blockedCommands: [
+        'editing framework critical files before framework-mode claim',
+        'creating AI-authored permanent task cards in .atm/history/tasks'
+      ]
+    };
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_FRAMEWORK_TEMP_CLAIM_REQUIRED', 'ATM detected framework maintenance without a scoped task; acquire a temporary framework runtime claim before editing.', {
+          requiredCommand: claimCommand
+        })
+      ),
+      evidence: {
+        nextAction,
+        agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
+        taskIntent: input.taskIntent,
+        frameworkStatus,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   const nextAction = {
     status: 'prompt-guidance-required',
     command: `node atm.mjs guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
@@ -543,6 +583,30 @@ function buildPromptGuidanceNextResult(input: {
       runtimeAdapterReadiness: input.runtimeAdapterReadiness
     }
   });
+}
+
+function isFrameworkMaintenancePrompt(prompt: string) {
+  const normalized = normalizeSearchText(prompt);
+  return [
+    'framework',
+    'atm',
+    'hook',
+    'pre commit',
+    'pre tool',
+    'baseline',
+    'guard',
+    'validate',
+    'framework mode',
+    'integration',
+    'runner',
+    'governance',
+    '治理',
+    '框架',
+    '基線',
+    '防偏移',
+    '暫態',
+    '鉤子'
+  ].some((signal) => normalized.includes(normalizeSearchText(signal)));
 }
 
 function allowedGuidanceBootstrapCommands() {

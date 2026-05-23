@@ -8,6 +8,7 @@ import {
 
 import actorSpec from './command-specs/actor.spec.ts';
 import atomRefSpec from './command-specs/atom-ref.spec.ts';
+import baselineSpec from './command-specs/baseline.spec.ts';
 import bootstrapSpec from './command-specs/bootstrap.spec.ts';
 import budgetSpec from './command-specs/budget.spec.ts';
 import cacheSpec from './command-specs/cache.spec.ts';
@@ -56,6 +57,7 @@ import reviewAdvisorySpec from './command-specs/review-advisory.spec.ts';
 export const commandSpecs = Object.freeze({
   actor: actorSpec,
   'atom-ref': atomRefSpec,
+  baseline: baselineSpec,
   bootstrap: bootstrapSpec,
   budget: budgetSpec,
   cache: cacheSpec,

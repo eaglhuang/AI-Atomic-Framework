@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runAtomize } from './commands/atomize.ts';
 import { runATMChart } from './commands/atm-chart.ts';
+import { runBaseline } from './commands/baseline.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runBudget } from './commands/budget.ts';
 import { runCandidates } from './commands/candidates.ts';
@@ -61,6 +62,7 @@ import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-in
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
   atomize: runAtomize,
   'atm-chart': runATMChart,
+  baseline: runBaseline,
   bootstrap: runBootstrap,
   budget: runBudget,
   candidates: runCandidates,

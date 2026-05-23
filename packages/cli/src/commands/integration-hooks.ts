@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { InstallManifest } from '../../../integrations-core/src/index.ts';
 import {
+  buildFrameworkTempClaimCommand,
   createFrameworkModeStatus,
   detectFrameworkRepoIdentity,
   isAtmCriticalNonDocSurface
@@ -368,14 +369,15 @@ function runPreToolHook(options: HookInvocationOptions) {
   }
 
   if (criticalFiles.length > 0 && !hasFrameworkClaim) {
+    const claimCommand = buildFrameworkTempClaimCommand(criticalFiles, 'temporary framework maintenance before tool edit');
     return makeResult({
       ok: false,
       command: 'integration',
       cwd: options.cwd,
-      messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED', 'Framework critical source edit is blocked until an ATM framework task is claimed.', {
+      messages: [message('error', 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED', 'Framework critical source edit is blocked until ATM framework work is claimed.', {
         editor: options.editor,
         criticalFiles,
-        nextStep: 'node atm.mjs next --claim --actor <id> --json'
+        nextStep: claimCommand
       })],
       evidence: {
         action: 'hook pre-tool',
@@ -383,6 +385,7 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolName: options.toolName,
         toolFiles,
         criticalFiles,
+        frameworkClaimCommand: claimCommand,
         frameworkStatus: status
       }
     });

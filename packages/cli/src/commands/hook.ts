@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   auditTasks,
+  buildFrameworkTempClaimCommand,
   createFrameworkModeStatus,
   detectFrameworkRepoIdentity,
   isAtmCriticalNonDocSurface
@@ -235,6 +236,9 @@ function runPreCommitHook(cwd: string) {
     ? runRequiredFrameworkValidators(root, frameworkStatus.criticalChangedFiles)
     : [];
   const failedValidatorRuns = commandRuns.filter((entry) => entry.exitCode !== 0);
+  const frameworkClaimCommand = blockingFrameworkIssues.includes('active-framework-claim-required')
+    ? buildFrameworkTempClaimCommand(frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit')
+    : null;
   const ok = encodingReport.ok
     && blockingFrameworkIssues.length === 0
     && taskAudit.ok
@@ -258,7 +262,8 @@ function runPreCommitHook(cwd: string) {
           encodingFindings: encodingReport.findings.length,
           frameworkBlockers: blockingFrameworkIssues,
           taskAuditFindings: taskAudit.findings.length,
-          failedValidators: failedValidatorRuns.map((entry) => entry.command)
+          failedValidators: failedValidatorRuns.map((entry) => entry.command),
+          nextStep: frameworkClaimCommand
         })
     ],
     evidence: {
@@ -268,6 +273,7 @@ function runPreCommitHook(cwd: string) {
       frameworkStatus,
       allowAdopterInfrastructureSync,
       blockingFrameworkIssues,
+      frameworkClaimCommand,
       taskAudit,
       commandRuns,
       evidenceWrite

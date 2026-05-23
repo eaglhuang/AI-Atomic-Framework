@@ -23,6 +23,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'baseline',
+    summary: 'Create, inspect, or restore redteam test baselines for ATM framework work',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'bootstrap',
     summary: 'Create the default ATM bootstrap pack and starter task',
     implemented: true,
