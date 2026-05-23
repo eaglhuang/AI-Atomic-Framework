@@ -41,7 +41,8 @@ export function runValidate(argv: any) {
   if (argv.includes('framework-development')) {
     const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
     const files = (valueAfter(argv, '--files') ?? '').split(',').map((entry) => entry.trim()).filter(Boolean);
-    return runFrameworkDevelopmentValidation(path.resolve(repo), files);
+    const targetRepo = valueAfter(argv, '--target-repo');
+    return runFrameworkDevelopmentValidation(path.resolve(repo), files, targetRepo);
   }
   const { options } = parseOptions(argv, 'validate');
   if (options.spec) {

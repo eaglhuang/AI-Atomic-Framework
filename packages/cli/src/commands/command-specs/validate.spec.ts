@@ -16,6 +16,7 @@ export default defineCommandSpec({
     commonCwdOption,
     { flag: '--repo', value: 'path', summary: 'Repository path for named validation checks.' },
     { flag: '--files', value: 'csv', summary: 'Optional declared file scope for framework-development validation.' },
+    { flag: '--target-repo', value: 'path', summary: 'Optional cross-repo target repository path for framework-development validation.' },
     { flag: '--spec', value: 'path', summary: 'Validate a specific atomic spec path.' },
     commonJsonOption,
     commonPrettyOption,
@@ -25,6 +26,7 @@ export default defineCommandSpec({
     'node atm.mjs validate --json',
     'node atm.mjs validate --spec tests/schema-fixtures/positive/hello-world.atom.json --json',
     'node atm.mjs validate atom-callsite-readability --repo . --json',
-    'node atm.mjs validate framework-development --repo . --json'
+    'node atm.mjs validate framework-development --repo . --json',
+    'node atm.mjs validate framework-development --repo . --target-repo ../AI-Atomic-Framework --json'
   ]
 });
