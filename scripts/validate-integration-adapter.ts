@@ -97,6 +97,7 @@ if (!process.exitCode) {
   assert(typeof packageModule.createCodexSkillsAdapter === 'function', 'missing createCodexSkillsAdapter reference factory');
   assert(packageModule.atmFirstCommand === 'node atm.mjs next --json', 'first command constant mismatch');
   assert(packageModule.atmPromptScopedFirstCommand === 'node atm.mjs next --prompt "$ARGUMENTS" --json', 'prompt-scoped first command constant mismatch');
+  assert(packageModule.atmIntentScopedFirstCommand === 'node atm.mjs next --intent .atm/runtime/task-intent.json --json', 'intent-scoped first command constant mismatch');
   assert(packageModule.charterInvariantsPlaceholder === '{{CHARTER_INVARIANTS}}', 'charter invariants placeholder mismatch');
   const minimumEntryIds = packageModule.minimumAtmEntrySkillDefinitions.map((entry: any) => entry.id);
   const minimumEntryCount = minimumEntryIds.length;
@@ -136,7 +137,8 @@ if (!process.exitCode) {
   for (const adapterSpec of adapterSpecs) {
     exerciseAdapter(adapterSpec, validateManifest, fixtureManifest, packageModule.sha256Bytes, minimumEntryIds, {
       defaultFirstCommand: packageModule.atmFirstCommand,
-      promptScopedFirstCommand: packageModule.atmPromptScopedFirstCommand
+      promptScopedFirstCommand: packageModule.atmPromptScopedFirstCommand,
+      intentScopedFirstCommand: packageModule.atmIntentScopedFirstCommand
     });
   }
 }
@@ -175,7 +177,7 @@ function exerciseAdapter(
   fixtureManifest: any,
   sha256Bytes: (input: string | Uint8Array) => string,
   minimumEntryIds: readonly string[],
-  firstCommands: { readonly defaultFirstCommand: string; readonly promptScopedFirstCommand: string }
+  firstCommands: { readonly defaultFirstCommand: string; readonly promptScopedFirstCommand: string; readonly intentScopedFirstCommand: string }
 ) {
   const adapter = adapterSpec.adapter;
   assert(adapter.id === adapterSpec.id, `${adapterSpec.id} adapter id mismatch`);
@@ -233,7 +235,8 @@ function exerciseAdapter(
         assert(
           installedContent.includes(firstCommands.defaultFirstCommand)
             || installedContent.includes(firstCommands.promptScopedFirstCommand)
-            || installedContent.includes(firstCommands.promptScopedFirstCommand.replaceAll('"', '\\"')),
+            || installedContent.includes(firstCommands.promptScopedFirstCommand.replaceAll('"', '\\"'))
+            || installedContent.includes(firstCommands.intentScopedFirstCommand),
           `${adapterSpec.id} file missing first command: ${fileRecord.path}`
         );
       }

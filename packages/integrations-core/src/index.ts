@@ -21,6 +21,7 @@ export const integrationsCorePackage = {
 
 export const atmFirstCommand = 'node atm.mjs next --json';
 export const atmPromptScopedFirstCommand = 'node atm.mjs next --prompt "$ARGUMENTS" --json';
+export const atmIntentScopedFirstCommand = 'node atm.mjs next --intent .atm/runtime/task-intent.json --json';
 export const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
 
 // ─── Compiler submodule ────────────────────────────────────────────────────

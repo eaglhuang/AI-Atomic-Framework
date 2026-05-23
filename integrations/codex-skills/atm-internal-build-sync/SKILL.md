@@ -1,48 +1,62 @@
 ---
-applyTo: "**"
+name: atm-internal-build-sync
+description: Build the ATM framework runner and sync it to explicit internal adopter repositories with skip/exclude controls.
+argument-hint: "<ATM context>"
+charter-invariants-injected: true
 ---
 
 
-# ATM Next
+# ATM Internal Build Sync
 
-If the current user prompt mentions a task id, task card, plan document, or a
-scoped batch of tasks, invoke the `atm-task-intent-resolver` skill first. That
-skill must write `.atm/runtime/task-intent.json` and route with:
+Use this skill when the user asks to build an ATM framework version and sync the
+fresh runner into internal repositories.
 
-```bash
-node atm.mjs next --intent .atm/runtime/task-intent.json --json
-```
-
-Use the prompt-scoped command below only when no task or plan scope is present or
-when the editor cannot run the semantic intent skill.
-
-First command:
+## First Command
 
 ```bash
-node atm.mjs next --prompt "$ARGUMENTS" --json
+node atm.mjs next --json
 ```
 
-## Route Command
-
-Use this ATM command only after the first command confirms it is the current governed route:
+Then inspect framework-development mode before release mutation:
 
 ```bash
-node atm.mjs next --prompt "$ARGUMENTS" --json
+node atm.mjs framework-mode status --json
+node atm.mjs guard framework-development --json
 ```
 
-For collaboration workflows, claim the selected imported task before edits:
+## Sync Command
+
+Pass every target repository explicitly. Do not bake adopter repository names
+into framework source.
 
 ```bash
-node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
+node atm.mjs internal-release sync --repo <repo-a> --repo <repo-b> --json
 ```
 
-## Handoff
+To intentionally skip one repository, match either its basename or full path:
 
 ```bash
-node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+node atm.mjs internal-release sync --repo <repo-a> --repo <repo-b> --skip <repo-b-name> --json
 ```
 
-## Charter Invariants
+Useful switches:
+
+- `--dry-run`: show what would be copied without writing target repos.
+- `--no-build`: reuse the existing `release/atm-onefile/atm.mjs`.
+- `--no-verify`: copy without running target `doctor`, `framework-mode status`, and `tasks audit`.
+- `--allow-verify-failure`: copy and report verification failures without failing the command.
+
+## Required Evidence
+
+Capture the command JSON evidence, including:
+
+- `sourceSha256`
+- each target `previousSha256` and `newSha256`
+- skipped targets and skip reason
+- target verification command hashes and exit codes
+
+Do not manually copy `atm.mjs` to target repositories when this command is
+available.
 
 - `INV-ATM-001` — **No second registry** (enforcement: `gate`, breaking change: yes)
   Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
@@ -58,15 +72,3 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
   Rule: The framework repository must not host downstream adopter planning queues or project-specific work tracking artifacts. ATM framework-development tasks may live in the framework repository only as ATM-managed .atm/history/tasks ledger records with CLI transition evidence.
 - `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
   Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.
-
-## Guardrails
-
-- Stay inside ATM CLI routing and evidence contracts.
-- Do not create a parallel task model, registry, or approval flow.
-- Treat any planning hint as CLI output, not as template authority.
-- If an `ATM_USER_NOTICE` message or `evidence.userNotice` is present, show it to the user in natural language before executing the returned next action.
-- After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
-- Treat `ATM_ACTOR_ID` as the default actor identity variable. `AGENT_IDENTITY`
-  is legacy-compatible only.
-
-Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.

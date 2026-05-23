@@ -12,6 +12,18 @@ refactor, split, atomize, infect, migrate, or modernize existing source code.
 The goal is to keep the user request natural while still routing the work
 through ATM evidence before choosing a local implementation path.
 
+If the natural-language request mentions a task id, task card, plan document, or
+scoped task batch, invoke `atm-task-intent-resolver` first. It must write
+`.atm/runtime/task-intent.json` from semantic reading of the user prompt and then
+call:
+
+```bash
+node atm.mjs next --intent .atm/runtime/task-intent.json --json
+```
+
+Do not rely on keyword-only `next --prompt` extraction when the task intent
+resolver skill is available.
+
 ## First Command
 
 ```bash

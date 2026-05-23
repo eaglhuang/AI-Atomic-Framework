@@ -12,6 +12,17 @@ handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 
 # {{title}}
 
+If the current user prompt mentions a task id, task card, plan document, or a
+scoped batch of tasks, invoke the `atm-task-intent-resolver` skill first. That
+skill must write `.atm/runtime/task-intent.json` and route with:
+
+```bash
+node atm.mjs next --intent .atm/runtime/task-intent.json --json
+```
+
+Use the prompt-scoped command below only when no task or plan scope is present or
+when the editor cannot run the semantic intent skill.
+
 First command:
 
 ```bash

@@ -75,7 +75,9 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   assert(template.frontmatter.summary === entryDefinition.summary, `${entryDefinition.id} summary must match minimum entry definition`);
   assert(template.frontmatter.command === entryDefinition.command, `${entryDefinition.id} command must match minimum entry definition`);
   assert(
-    template.frontmatter.firstCommand === packageModule.atmFirstCommand || template.frontmatter.firstCommand === packageModule.atmPromptScopedFirstCommand,
+    template.frontmatter.firstCommand === packageModule.atmFirstCommand
+      || template.frontmatter.firstCommand === packageModule.atmPromptScopedFirstCommand
+      || template.frontmatter.firstCommand === packageModule.atmIntentScopedFirstCommand,
     `${entryDefinition.id} first command mismatch`
   );
   assert(template.frontmatter['charter-invariants-injected'] === true, `${entryDefinition.id} must declare charter invariant injection`);
@@ -86,6 +88,12 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
     assert(template.body.includes('ATM_USER_NOTICE'), 'atm-next template must also watch top-level user notice messages');
     assert(template.body.includes('before executing the returned next action'), 'atm-next template must show notices before executing next action');
     assert(template.body.includes('return to the user original request'), 'atm-next template must tell agents to resume the original request after onboarding');
+  }
+  if (entryDefinition.id === 'atm-task-intent-resolver') {
+    assert(template.frontmatter.firstCommand === packageModule.atmIntentScopedFirstCommand, 'atm-task-intent-resolver must route through next --intent after semantic extraction');
+    assert(template.body.includes('Semantic Extraction First'), 'atm-task-intent-resolver must require semantic extraction before CLI routing');
+    assert(template.body.includes('"source": "atm-skill"'), 'atm-task-intent-resolver must produce atm-skill intent');
+    assert(template.body.includes('primary route when this skill is available'), 'atm-task-intent-resolver must downgrade next --prompt to fallback');
   }
   assert(!hasForbiddenPlanningHint(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }
@@ -106,7 +114,8 @@ for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...c
   assert(
     compiledFile.content.includes(packageModule.atmFirstCommand)
       || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand)
-      || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand.replaceAll('"', '\\"')),
+      || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand.replaceAll('"', '\\"'))
+      || compiledFile.content.includes(packageModule.atmIntentScopedFirstCommand),
     `${compiledFile.relativePath} missing first command`
   );
   assert(!compiledFile.content.includes(packageModule.charterInvariantsPlaceholder), `${compiledFile.relativePath} must not leak charter placeholder after compile`);

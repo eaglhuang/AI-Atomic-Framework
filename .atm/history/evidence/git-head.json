@@ -5,7 +5,7 @@
       "evidenceKind": "validation",
       "summary": "Git commit tree is covered by ATM Integration Hook Contract v1.",
       "artifactPaths": [],
-      "createdAt": "2026-05-23T14:40:31.618Z",
+      "createdAt": "2026-05-23T14:59:10.696Z",
       "producedBy": "atm-framework-development-hooks/v1",
       "commandRuns": [
         {
@@ -25,17 +25,26 @@
           "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:cli\n> node --strip-types scripts/validate-cli.ts --mode validate\n\n[cli:validate] ok (34 commands, standalone fixture verified)\n",
           "stderrPreview": ""
+        },
+        {
+          "command": "npm run validate:integration-adapter",
+          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:19063ae4e9017f3439a6036376ae04f39f88e27233b4bfbda0a594b4f7348d3c",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:integration-adapter\n> node --strip-types scripts/validate-integration-adapter.ts --mode validate\n\n[integration-adapter:validate] ok (interface, manifest schema, Codex reference factory, and 6 installable adapters install/verify/uninstall)\n",
+          "stderrPreview": ""
         }
       ],
       "details": {
         "git": {
-          "treeSha": "286f5169bd02d1e9793c800636ec7a8159a40374",
+          "treeSha": "599be8237bd39aefa706e536b1b0bdf8fc81a098",
           "parentCommitShas": [
-            "249c8e198940643571452e2f50269eb0f2234952"
+            "934633a153aa5762e5f468d0c42c3bcc95ebd071"
           ],
-          "stagedPathCount": 58,
+          "stagedPathCount": 30,
           "evidencePath": ".atm/history/evidence/git-head.json",
-          "generatedAt": "2026-05-23T14:40:31.618Z"
+          "generatedAt": "2026-05-23T14:59:10.696Z"
         },
         "hookContractVersion": "atm.integration-hooks/v1",
         "runnerVersion": "0.1.0"
