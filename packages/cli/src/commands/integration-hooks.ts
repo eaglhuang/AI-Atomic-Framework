@@ -196,30 +196,43 @@ export function makeIntegrationHookVerifyResult(cwd: string, adapterId: string) 
 
 function runPreAgentHook(options: HookInvocationOptions) {
   const status = createFrameworkModeStatus({ cwd: options.cwd, targetRepo: options.targetRepo });
-  const promptSignals = extractPromptSignals(options.prompt ?? stringifyPayload(options.stdinPayload));
+  const promptText = options.prompt ?? stringifyPayload(options.stdinPayload);
+  const promptSignals = extractPromptSignals(promptText);
+  const taskIntentDetected = promptSignals.some((entry) => entry.startsWith('prompt:task'));
   const frameworkSignal = status.mode !== 'inactive'
     || ((status.repoIdentity.isFrameworkRepo || status.targetRepoIdentity?.isFrameworkRepo === true) && promptSignals.length > 0);
+  const promptNextCommand = promptText.trim().length > 0
+    ? `node atm.mjs next --prompt ${quoteHookCliValue(promptText)} --json`
+    : 'node atm.mjs next --prompt "<current user prompt>" --json';
   return makeResult({
     ok: true,
     command: 'integration',
     cwd: options.cwd,
     messages: [
+      taskIntentDetected
+        ? message('info', 'ATM_TASK_INTENT_DETECTED', 'The prompt appears to reference ATM task cards; run prompt-scoped next before any task or source edits.', {
+          editor: options.editor,
+          requiredNextStep: promptNextCommand,
+          promptSignals
+        })
+        : null,
       frameworkSignal
         ? message('warning', 'ATM_INTEGRATION_PRE_AGENT_FRAMEWORK_CONTEXT', 'ATM framework-development context is active or suspected; claim governed work before modifying critical framework files.', {
           editor: options.editor,
           mode: status.mode,
           promptSignals,
-          requiredNextStep: 'node atm.mjs next --claim --actor <id> --json'
+          requiredNextStep: promptNextCommand
         })
         : message('info', 'ATM_INTEGRATION_PRE_AGENT_NO_HARD_GATE', 'No ATM framework-development hard gate is required before the agent response.', {
           editor: options.editor,
           repoRole: status.repoRole
         })
-    ],
+    ].filter((entry): entry is ReturnType<typeof message> => entry !== null),
     evidence: {
       action: 'hook pre-agent',
       editor: options.editor,
       promptSignals,
+      promptScopedNextCommand: promptNextCommand,
       frameworkStatus: status,
       instructions: frameworkSignal ? frameworkDevelopmentInstructions() : []
     }
@@ -552,6 +565,8 @@ function extractPromptSignals(prompt: string): readonly string[] {
   if (/\bpackages\/|packages\\|packages\/core|packages\/cli/.test(lowered)) signals.push('prompt:packages');
   if (/\bframework-development\b|框架開發|治理/.test(lowered)) signals.push('prompt:framework-development');
   if (/\bhook\b|pre-commit|pre-tool|pre-agent/.test(lowered)) signals.push('prompt:hooks');
+  if (/TASK-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*/i.test(prompt)) signals.push('prompt:task-id');
+  if (/任務卡|task\s*card|計畫書/i.test(prompt)) signals.push('prompt:task-scope');
   return uniqueSorted(signals);
 }
 
@@ -593,11 +608,16 @@ function extractFilesFromCommand(command: string): readonly string[] {
 
 function frameworkDevelopmentInstructions() {
   return [
-    'Run node atm.mjs next --claim --actor <id> --json before changing framework critical files.',
+    'Run node atm.mjs next --prompt "<current user prompt>" --json, then run the returned claim command before changing framework critical files.',
     'Do not hand-edit task status to done.',
     'Do not use static JSON reports as completion evidence without commandRuns/stdout hashes.',
     'Let node atm.mjs hook pre-commit --json and guard commit-range enforce the final gate.'
   ];
+}
+
+function quoteHookCliValue(value: string): string {
+  const trimmed = value.length > 240 ? `${value.slice(0, 240)}...` : value;
+  return `"${trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
 function readOptionalStdinJson(): unknown {

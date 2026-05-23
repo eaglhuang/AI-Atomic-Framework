@@ -4,8 +4,8 @@ specVersion: 0.1.0
 id: atm-next
 title: ATM Next
 summary: Recommend the next official ATM guidance action from current state.
-command: node atm.mjs next --json
-firstCommand: node atm.mjs next --json
+command: node atm.mjs next --prompt "$ARGUMENTS" --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---
@@ -29,7 +29,7 @@ Use this ATM command only after the first command confirms it is the current gov
 For collaboration workflows, claim the selected imported task before edits:
 
 ```bash
-node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 ```
 
 ## Handoff

@@ -269,6 +269,8 @@ type ParsedCliOptions = {
   edgeContracts?: boolean;
   propagate?: string;
   agent?: string;
+  prompt?: string;
+  intent?: string;
 };
 
 export function parseOptions(argv: string[], commandName: string) {
@@ -293,7 +295,9 @@ export function parseOptions(argv: string[], commandName: string) {
     propagate: undefined,
     fingerprintCheck: false,
     edgeContracts: false,
-    agent: undefined
+    agent: undefined,
+    prompt: undefined,
+    intent: undefined
   };
   const positional = [];
 
@@ -380,6 +384,22 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --actor`, { exitCode: 2 });
       }
       options.agent = requireOptionValue(argv, index, '--actor', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--prompt') {
+      if (commandName !== 'next') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --prompt`, { exitCode: 2 });
+      }
+      options.prompt = requireOptionValue(argv, index, '--prompt', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--intent') {
+      if (commandName !== 'next') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --intent`, { exitCode: 2 });
+      }
+      options.intent = requireOptionValue(argv, index, '--intent', commandName);
       index += 1;
       continue;
     }

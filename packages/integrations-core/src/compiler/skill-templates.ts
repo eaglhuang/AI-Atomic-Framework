@@ -43,7 +43,13 @@ export const minimumAtmEntrySkillDefinitions = [
     id: 'atm-next',
     title: 'ATM Next',
     summary: 'Recommend the next official ATM guidance action from current state.',
-    command: 'node atm.mjs next --json'
+    command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
+  },
+  {
+    id: 'atm-task-intent-resolver',
+    title: 'ATM Task Intent Resolver',
+    summary: 'Resolve the current user prompt into an atm.taskIntent.v1 proposal before next-action routing.',
+    command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
   },
   {
     id: 'atm-orient',

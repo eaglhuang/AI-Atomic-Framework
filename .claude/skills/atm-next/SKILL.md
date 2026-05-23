@@ -11,7 +11,7 @@ charter-invariants-injected: true
 First command:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 ## Route Command
@@ -19,13 +19,13 @@ node atm.mjs next --json
 Use this ATM command only after the first command confirms it is the current governed route:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 For collaboration workflows, claim the selected imported task before edits:
 
 ```bash
-node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 ```
 
 ## Handoff

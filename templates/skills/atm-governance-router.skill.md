@@ -5,7 +5,7 @@ id: atm-governance-router
 title: ATM Governance Router
 summary: Route natural-language cleanup, refactor, migration, and candidate ranking goals through ATM before local analysis.
 command: node atm.mjs guide --goal "$ARGUMENTS" --cwd . --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---
@@ -55,10 +55,10 @@ Follow the returned `nextCommand`. If the matched intent is
 source analysis by hand. If the matched intent is `task-plan-import`, run the
 task import dry run before creating or editing any task files.
 
-Before mutating repository files for implementation work, claim the task:
+Before mutating repository files for implementation work, claim the prompt-scoped task:
 
 ```bash
-node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --json
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 ```
 
 ATM's default task ledger is the active flow monitor when `taskLedger.enabled`

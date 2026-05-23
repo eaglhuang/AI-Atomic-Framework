@@ -11,6 +11,7 @@ const mode = process.argv.includes('--mode')
 
 const requiredTemplateIds = [
   'atm-next',
+  'atm-task-intent-resolver',
   'atm-orient',
   'atm-governance-router',
   'atm-create',
@@ -73,7 +74,10 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
   assert(template.frontmatter.title === entryDefinition.title, `${entryDefinition.id} title must match minimum entry definition`);
   assert(template.frontmatter.summary === entryDefinition.summary, `${entryDefinition.id} summary must match minimum entry definition`);
   assert(template.frontmatter.command === entryDefinition.command, `${entryDefinition.id} command must match minimum entry definition`);
-  assert(template.frontmatter.firstCommand === packageModule.atmFirstCommand, `${entryDefinition.id} first command mismatch`);
+  assert(
+    template.frontmatter.firstCommand === packageModule.atmFirstCommand || template.frontmatter.firstCommand === packageModule.atmPromptScopedFirstCommand,
+    `${entryDefinition.id} first command mismatch`
+  );
   assert(template.frontmatter['charter-invariants-injected'] === true, `${entryDefinition.id} must declare charter invariant injection`);
   assert(template.frontmatter.handoffs.startsWith('node atm.mjs '), `${entryDefinition.id} handoff must route back through ATM CLI`);
   assert(template.body.includes('{{CHARTER_INVARIANTS}}'), `${entryDefinition.id} template body must include charter placeholder`);
@@ -92,14 +96,19 @@ const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', te
 const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates, { repositoryRoot: root });
 const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates, { repositoryRoot: root });
 
-assert(claudeFiles.length === 9, 'Claude compiler output must contain nine files');
-assert(codexFiles.length === 9, 'Codex compiler output must contain nine files');
-assert(copilotFiles.length === 18, 'Copilot compiler output must contain eighteen scoped instruction and prompt files');
-assert(cursorFiles.length === 9, 'Cursor compiler output must contain nine files');
-assert(geminiFiles.length === 9, 'Gemini compiler output must contain nine files');
+assert(claudeFiles.length === 10, 'Claude compiler output must contain ten files');
+assert(codexFiles.length === 10, 'Codex compiler output must contain ten files');
+assert(copilotFiles.length === 20, 'Copilot compiler output must contain twenty scoped instruction and prompt files');
+assert(cursorFiles.length === 10, 'Cursor compiler output must contain ten files');
+assert(geminiFiles.length === 10, 'Gemini compiler output must contain ten files');
 
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
-  assert(compiledFile.content.includes(packageModule.atmFirstCommand), `${compiledFile.relativePath} missing first command`);
+  assert(
+    compiledFile.content.includes(packageModule.atmFirstCommand)
+      || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand)
+      || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand.replaceAll('"', '\\"')),
+    `${compiledFile.relativePath} missing first command`
+  );
   assert(!compiledFile.content.includes(packageModule.charterInvariantsPlaceholder), `${compiledFile.relativePath} must not leak charter placeholder after compile`);
   assert(compiledFile.content.includes(renderedCharter.text), `${compiledFile.relativePath} missing rendered charter invariants`);
   assert(!hasForbiddenPlanningHint(compiledFile.content), `${compiledFile.relativePath} must not bake planning hints into compiled output`);
@@ -110,5 +119,5 @@ assert(codexFiles.every((compiledFile: any) => compiledFile.content.includes('ch
 assert(geminiFiles.every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field');
 
 if (!process.exitCode) {
-  console.log(`[skill-templates:${mode}] ok (9 source templates, schema, and 5 adapter compilers)`);
+  console.log(`[skill-templates:${mode}] ok (10 source templates, schema, and 5 adapter compilers)`);
 }

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
@@ -22,15 +22,53 @@ export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
   const integrationBootstrap = inspectIntegrationBootstrap(options.cwd);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);
-  const earlyFrameworkStatus = createFrameworkModeStatus({ cwd: options.cwd });
+  const taskIntent = resolveTaskIntent(options.cwd, {
+    prompt: options.prompt,
+    intentPath: options.intent
+  });
+  const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent);
+  const scopedTargetRepo = importedTaskQueue.promptScope?.targetRepo ?? null;
+  const earlyFrameworkStatus = createFrameworkModeStatus({
+    cwd: options.cwd,
+    targetRepo: scopedTargetRepo
+  });
   if (earlyFrameworkStatus.mode === 'cross-repo-target-required') {
     return buildCrossRepoFrameworkNextResult({
       cwd: options.cwd,
       frameworkStatus: earlyFrameworkStatus,
       integrationBootstrap,
       runtimeAdapterReadiness,
-      importedTaskQueue: null
+      importedTaskQueue
     });
+  }
+  if (options.claim) {
+    return await claimNextImportedTask({
+      cwd: options.cwd,
+      actor: options.agent,
+      taskIntent,
+      importedTaskQueue,
+      integrationBootstrap,
+      runtimeAdapterReadiness
+    });
+  }
+  const promptScopeResult = buildPromptScopedNextResult({
+    cwd: options.cwd,
+    taskIntent,
+    importedTaskQueue,
+    integrationBootstrap,
+    runtimeAdapterReadiness
+  });
+  if (promptScopeResult) {
+    return promptScopeResult;
+  }
+  const promptGuidanceResult = buildPromptGuidanceNextResult({
+    cwd: options.cwd,
+    taskIntent,
+    integrationBootstrap,
+    runtimeAdapterReadiness
+  });
+  if (promptGuidanceResult) {
+    return promptGuidanceResult;
   }
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
   if (activeGuidanceSession) {
@@ -57,6 +95,8 @@ export async function runNext(argv: any) {
         ...(userNotice ? { userNotice } : {}),
         integrationBootstrap,
         runtimeAdapterReadiness,
+        taskIntent,
+        importedTaskQueue,
         guidanceSession: {
           sessionId: activeGuidanceSession.sessionId,
           goal: activeGuidanceSession.goal,
@@ -69,67 +109,6 @@ export async function runNext(argv: any) {
 
   const doctor = await runDoctor(['--cwd', options.cwd]);
   const runtime = detectGovernanceRuntime(options.cwd, bootstrapTaskId);
-  const importedTaskQueue = inspectImportedTaskQueue(options.cwd);
-  if (options.claim) {
-    if (!importedTaskQueue.claimableTask) {
-      return makeResult({
-        ok: false,
-        command: 'next',
-        cwd: options.cwd,
-        messages: [message('error', 'ATM_NEXT_CLAIM_NO_TASK', 'No claimable imported task is ready at the moment.')],
-        evidence: {
-          importedTaskQueue
-        }
-      });
-    }
-    const resolvedActor = resolveActorId(options.agent ?? undefined);
-    if (!resolvedActor) {
-      throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
-    }
-    const claimResult = await runTasks([
-      'claim',
-      '--cwd',
-      options.cwd,
-      '--task',
-      importedTaskQueue.claimableTask.workItemId,
-      '--actor',
-      resolvedActor.actorId,
-      '--files',
-      importedTaskQueue.claimableTask.taskPath,
-      '--json'
-    ]);
-    const nextAction = {
-      status: 'ready',
-      command: `node atm.mjs start --cwd . --goal ${quoteCliValue(importedTaskQueue.claimableTask.title)} --json`,
-      reason: `claimed imported work item ${importedTaskQueue.claimableTask.workItemId} for ${resolvedActor.actorId}`,
-      selectedTask: importedTaskQueue.claimableTask,
-      allowedCommands: allowedGuidanceBootstrapCommands(),
-      blockedCommands: blockedMutationCommands()
-    };
-    const userNotice = buildFirstUseUserNotice(nextAction as any);
-    return makeResult({
-      ok: true,
-      command: 'next',
-      cwd: options.cwd,
-      messages: buildNextMessages(
-        nextAction as any,
-        userNotice,
-        integrationBootstrap,
-        runtimeAdapterReadiness,
-        message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
-          taskId: importedTaskQueue.claimableTask.workItemId,
-          actorId: resolvedActor.actorId
-        })
-      ),
-      evidence: {
-        nextAction,
-        claimResult: claimResult.evidence,
-        importedTaskQueue,
-        integrationBootstrap,
-        runtimeAdapterReadiness
-      }
-    });
-  }
   const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
   const failed = doctorChecks.find((check) => check.ok !== true);
   const nextAction = decideNextAction(runtime, failed?.name ?? null, importedTaskQueue);
@@ -153,6 +132,7 @@ export async function runNext(argv: any) {
       ...(userNotice ? { userNotice } : {}),
       integrationBootstrap,
       runtimeAdapterReadiness,
+      taskIntent,
       importedTaskQueue,
       doctorSummary: doctorChecks.map((check) => ({ name: check.name, ok: check.ok })),
       layoutVersion: runtime.layoutVersion,
@@ -297,6 +277,274 @@ function buildCrossRepoFrameworkNextResult(input: {
   });
 }
 
+async function claimNextImportedTask(input: {
+  readonly cwd: string;
+  readonly actor: string | undefined;
+  readonly taskIntent: TaskIntent | null;
+  readonly importedTaskQueue: ImportedTaskQueue;
+  readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
+  readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
+}) {
+  if (!input.importedTaskQueue.claimableTask) {
+    const claimCode = input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
+      ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
+      : 'ATM_NEXT_CLAIM_NO_TASK';
+    const claimText = claimCode === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
+      ? 'The prompt-scoped task is a Markdown task card; import or mirror it into the ATM task ledger before claim.'
+      : 'No claimable imported task is ready at the moment.';
+    return makeResult({
+      ok: false,
+      command: 'next',
+      cwd: input.cwd,
+      messages: [message('error', claimCode, claimText, {
+        requiredCommand: input.importedTaskQueue.promptScope?.selectedTasks[0]?.sourcePlanPath
+          ? `node atm.mjs tasks import --from ${quoteCliValue(input.importedTaskQueue.promptScope.selectedTasks[0].sourcePlanPath ?? '')} --dry-run --cwd . --json`
+          : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json'
+      })],
+      evidence: {
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue
+      }
+    });
+  }
+  const resolvedActor = resolveActorId(input.actor ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const claimResult = await runTasks([
+    'claim',
+    '--cwd',
+    input.cwd,
+    '--task',
+    input.importedTaskQueue.claimableTask.workItemId,
+    '--actor',
+    resolvedActor.actorId,
+    '--files',
+    input.importedTaskQueue.claimableTask.taskPath,
+    '--json'
+  ]);
+  const nextAction = {
+    status: 'ready',
+    command: `node atm.mjs start --cwd . --goal ${quoteCliValue(input.importedTaskQueue.claimableTask.title)} --json`,
+    reason: `claimed imported work item ${input.importedTaskQueue.claimableTask.workItemId} for ${resolvedActor.actorId}`,
+    selectedTask: input.importedTaskQueue.claimableTask,
+    allowedCommands: allowedGuidanceBootstrapCommands(),
+    blockedCommands: blockedMutationCommands()
+  };
+  const userNotice = buildFirstUseUserNotice(nextAction as any);
+  return makeResult({
+    ok: true,
+    command: 'next',
+    cwd: input.cwd,
+    messages: buildNextMessages(
+      nextAction as any,
+      userNotice,
+      input.integrationBootstrap,
+      input.runtimeAdapterReadiness,
+      message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
+        taskId: input.importedTaskQueue.claimableTask.workItemId,
+        actorId: resolvedActor.actorId
+      })
+    ),
+    evidence: {
+      nextAction,
+      claimResult: claimResult.evidence,
+      taskIntent: input.taskIntent,
+      importedTaskQueue: input.importedTaskQueue,
+      integrationBootstrap: input.integrationBootstrap,
+      runtimeAdapterReadiness: input.runtimeAdapterReadiness
+    }
+  });
+}
+
+function buildPromptScopedNextResult(input: {
+  readonly cwd: string;
+  readonly taskIntent: TaskIntent | null;
+  readonly importedTaskQueue: ImportedTaskQueue;
+  readonly integrationBootstrap: unknown;
+  readonly runtimeAdapterReadiness: unknown;
+}) {
+  const promptScope = input.importedTaskQueue.promptScope;
+  if (!promptScope) return null;
+  const selectedTasks = promptScope.selectedTasks;
+  if (promptScope.status === 'not-found') {
+    const nextAction = {
+      status: 'task-scope-not-found',
+      command: 'node atm.mjs next --prompt "<current user prompt>" --json',
+      reason: 'the prompt mentions task scope, but no matching ATM task card or ledger task was found',
+      taskIntent: input.taskIntent,
+      candidates: [],
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: blockedMutationCommands()
+    };
+    return makeResult({
+      ok: false,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('error', 'ATM_NEXT_TASK_SCOPE_NOT_FOUND', 'The prompt looks task-scoped, but ATM could not find a matching task.', {
+          taskIntent: input.taskIntent
+        })
+      ),
+      evidence: {
+        nextAction,
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
+  if (promptScope.status === 'ambiguous') {
+    const nextAction = {
+      status: 'task-selection-required',
+      command: 'node atm.mjs next --prompt "<more specific prompt with task id or plan path>" --json',
+      reason: 'the prompt matches multiple task scopes; ATM will not choose a global task by accident',
+      candidates: selectedTasks,
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: blockedMutationCommands()
+    };
+    return makeResult({
+      ok: false,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('error', 'ATM_NEXT_TASK_SELECTION_REQUIRED', 'The prompt matches multiple task cards; choose a task id or plan scope before continuing.', {
+          candidateCount: selectedTasks.length,
+          candidates: selectedTasks.slice(0, 12).map(toTaskCandidateView)
+        })
+      ),
+      evidence: {
+        nextAction,
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
+  if (promptScope.status === 'queue') {
+    const firstTask = selectedTasks[0] ?? null;
+    const nextAction = {
+      status: 'task-queue-ready',
+      command: firstTask
+        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? firstTask.workItemId)} --json`
+        : 'node atm.mjs next --prompt "<current user prompt>" --json',
+      reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
+      selectedTasks,
+      queueSize: selectedTasks.length,
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: blockedMutationCommands()
+    };
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_TASK_QUEUE_READY', 'ATM resolved the prompt to a scoped task queue.', {
+          queueSize: selectedTasks.length,
+          firstTask: firstTask ? toTaskCandidateView(firstTask) : null
+        })
+      ),
+      evidence: {
+        nextAction,
+        agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
+  const selectedTask = selectedTasks[0] ?? null;
+  if (!selectedTask) return null;
+  const nextAction = {
+    status: 'task-route-ready',
+    command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
+    reason: `the prompt resolves to task ${selectedTask.workItemId}`,
+    selectedTask,
+    targetRepo: selectedTask.targetRepo,
+    requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
+    allowedCommands: allowedGuidanceBootstrapCommands(),
+    blockedCommands: blockedMutationCommands()
+  };
+  return makeResult({
+    ok: true,
+    command: 'next',
+    cwd: input.cwd,
+    messages: buildNextMessages(
+      nextAction,
+      null,
+      input.integrationBootstrap as any,
+      input.runtimeAdapterReadiness as any,
+      message('info', 'ATM_NEXT_TASK_ROUTE_READY', 'ATM resolved the prompt to one task route.', {
+        task: toTaskCandidateView(selectedTask),
+        requiredCommand: nextAction.requiredCommand
+      })
+    ),
+    evidence: {
+      nextAction,
+      agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
+      taskIntent: input.taskIntent,
+      importedTaskQueue: input.importedTaskQueue,
+      integrationBootstrap: input.integrationBootstrap,
+      runtimeAdapterReadiness: input.runtimeAdapterReadiness
+    }
+  });
+}
+
+function buildPromptGuidanceNextResult(input: {
+  readonly cwd: string;
+  readonly taskIntent: TaskIntent | null;
+  readonly integrationBootstrap: unknown;
+  readonly runtimeAdapterReadiness: unknown;
+}) {
+  const prompt = input.taskIntent?.userPrompt?.trim();
+  if (!prompt || input.taskIntent?.taskScopeMentioned === true) return null;
+  const nextAction = {
+    status: 'prompt-guidance-required',
+    command: `node atm.mjs guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
+    reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance',
+    allowedCommands: allowedGuidanceBootstrapCommands(),
+    blockedCommands: blockedMutationCommands()
+  };
+  const userNotice = buildFirstUseUserNotice(nextAction as any);
+  return makeResult({
+    ok: true,
+    command: 'next',
+    cwd: input.cwd,
+    messages: buildNextMessages(
+      nextAction,
+      userNotice,
+      input.integrationBootstrap as any,
+      input.runtimeAdapterReadiness as any,
+      message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state.', {
+        command: nextAction.command
+      })
+    ),
+    evidence: {
+      nextAction,
+      agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
+      ...(userNotice ? { userNotice } : {}),
+      taskIntent: input.taskIntent,
+      integrationBootstrap: input.integrationBootstrap,
+      runtimeAdapterReadiness: input.runtimeAdapterReadiness
+    }
+  });
+}
+
 function allowedGuidanceBootstrapCommands() {
   return [
     'node atm.mjs orient --cwd . --json',
@@ -314,6 +562,32 @@ function blockedMutationCommands() {
   ];
 }
 
+type TaskIntentSource = 'integration-hook' | 'atm-skill' | 'cli-deterministic';
+type RequestedTaskAction = 'analyze' | 'implement' | 'redo' | 'reopen' | 'close' | 'audit' | 'cleanup';
+type PromptScopedRouteStatus = 'ready' | 'queue' | 'ambiguous' | 'not-found';
+
+interface TaskIntent {
+  readonly schemaId: 'atm.taskIntent.v1';
+  readonly userPrompt: string | null;
+  readonly mentionedTaskIds: readonly string[];
+  readonly mentionedPlanPaths: readonly string[];
+  readonly taskRootHints: readonly string[];
+  readonly targetRepoHints: readonly string[];
+  readonly requestedAction: RequestedTaskAction | null;
+  readonly confidence: number;
+  readonly source: TaskIntentSource;
+  readonly ordinalScope: { readonly kind: 'first'; readonly count: number } | null;
+  readonly queueRequested: boolean;
+  readonly taskScopeMentioned: boolean;
+}
+
+interface PromptScopedTaskRoute {
+  readonly status: PromptScopedRouteStatus;
+  readonly selectedTasks: readonly ImportedTaskSummary[];
+  readonly targetRepo: string | null;
+  readonly diagnostics: readonly string[];
+}
+
 interface ImportedTaskSummary {
   readonly workItemId: string;
   readonly title: string;
@@ -321,6 +595,13 @@ interface ImportedTaskSummary {
   readonly milestone: string | null;
   readonly dependencies: readonly string[];
   readonly taskPath: string;
+  readonly format: 'json' | 'markdown';
+  readonly sourcePlanPath: string | null;
+  readonly nearbyPlanPaths: readonly string[];
+  readonly targetRepo: string | null;
+  readonly closureAuthority: string | null;
+  readonly matchScore?: number;
+  readonly matchReasons?: readonly string[];
 }
 
 interface ImportedTaskQueue {
@@ -329,21 +610,12 @@ interface ImportedTaskQueue {
   readonly selectedTask: ImportedTaskSummary | null;
   readonly claimableTask: ImportedTaskSummary | null;
   readonly tasks: readonly ImportedTaskSummary[];
+  readonly promptScope: PromptScopedTaskRoute | null;
 }
 
-function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
+function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): ImportedTaskQueue {
   const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
-  if (!existsSync(taskStorePath)) {
-    return {
-      taskStorePath: '.atm/history/tasks',
-      openTaskCount: 0,
-      selectedTask: null,
-      claimableTask: null,
-      tasks: []
-    };
-  }
-
-  const allTasks = readdirSync(taskStorePath)
+  const jsonTasks = existsSync(taskStorePath) ? readdirSync(taskStorePath)
     .filter((entry) => entry.endsWith('.json'))
     .flatMap((entry): ImportedTaskSummary[] => {
       const filePath = path.join(taskStorePath, entry);
@@ -362,49 +634,473 @@ function inspectImportedTaskQueue(cwd: string): ImportedTaskQueue {
         const dependencies = Array.isArray(parsed.dependencies)
           ? parsed.dependencies.filter((entry): entry is string => typeof entry === 'string')
           : [];
+        const source = parsed.source && typeof parsed.source === 'object' ? parsed.source as Record<string, unknown> : {};
         return [{
           workItemId,
           title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim() : workItemId,
           status: typeof parsed.status === 'string' ? parsed.status : 'planned',
           milestone: typeof parsed.milestone === 'string' ? parsed.milestone : null,
           dependencies,
-          taskPath: path.relative(cwd, filePath).replace(/\\/g, '/')
+          taskPath: path.relative(cwd, filePath).replace(/\\/g, '/'),
+          format: 'json',
+          sourcePlanPath: normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path),
+          nearbyPlanPaths: [],
+          targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
+          closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
         }];
       } catch {
         return [];
       }
-    });
+    }) : [];
+  const markdownTasks = listTaskCardFiles(cwd)
+    .map((filePath): ImportedTaskSummary | null => {
+      const rawText = readFileSync(filePath, 'utf8');
+      const parsed = parseMarkdownFrontmatter(rawText);
+      const workItemId = normalizeOptionalString(parsed.task_id ?? parsed.taskId ?? parsed.workItemId ?? parsed.id)
+        ?? path.basename(filePath).replace(/\.task\.md$/, '');
+      if (!workItemId) return null;
+      const dependencies = splitListValue(parsed.dependencies ?? parsed.depends_on ?? parsed.dependsOn);
+      const relativeTaskPath = path.relative(cwd, filePath).replace(/\\/g, '/');
+      return {
+        workItemId,
+        title: normalizeOptionalString(parsed.title ?? parsed.name) ?? workItemId,
+        status: normalizeOptionalString(parsed.status) ?? 'planned',
+        milestone: normalizeOptionalString(parsed.milestone),
+        dependencies,
+        taskPath: relativeTaskPath,
+        format: 'markdown',
+        sourcePlanPath: normalizeOptionalString(parsed.plan_path ?? parsed.planPath ?? parsed.source_plan ?? parsed.sourcePlan),
+        nearbyPlanPaths: findNearbyPlanPaths(cwd, filePath),
+        targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
+        closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
+      };
+    })
+    .filter((entry): entry is ImportedTaskSummary => entry !== null);
+  const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
 
   const tasks = allTasks
-    .filter((task) => task.status === 'ready' || task.status === 'open' || task.status === 'planned')
+    .filter((task) => isTaskRoutable(task.status, taskIntent))
     .sort((left, right) => {
       const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
       return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
     });
   const statusById = new Map(allTasks.map((task) => [task.workItemId, task.status]));
-  const selectedTask = tasks.find((task) => task.dependencies.every((dependency) => {
+  const promptScope = resolvePromptScopedTaskRoute(cwd, tasks, taskIntent);
+  const selectedTaskPool = promptScope?.selectedTasks ?? tasks;
+  const selectedTask = selectedTaskPool.find((task) => task.dependencies.every((dependency) => {
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   })) ?? null;
-  const claimableTask = tasks.find((task) => task.status === 'ready' && task.dependencies.every((dependency) => {
+  const claimableTask = selectedTaskPool.find((task) => task.format === 'json' && task.status === 'ready' && task.dependencies.every((dependency) => {
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   })) ?? null;
 
   return {
-    taskStorePath: path.relative(cwd, taskStorePath).replace(/\\/g, '/'),
+    taskStorePath: existsSync(taskStorePath) ? path.relative(cwd, taskStorePath).replace(/\\/g, '/') : '.atm/history/tasks',
     openTaskCount: tasks.length,
     selectedTask,
     claimableTask,
-    tasks
+    tasks,
+    promptScope
   };
 }
 
 function statusQueueWeight(status: string): number {
-  if (status === 'ready') return 0;
-  if (status === 'open') return 1;
-  if (status === 'planned') return 2;
+  const normalized = status.toLowerCase();
+  if (normalized === 'ready') return 0;
+  if (normalized === 'open') return 1;
+  if (normalized === 'planned') return 2;
+  if (normalized === 'blocked' || normalized === 'waiting_target_evidence') return 3;
   return 3;
+}
+
+function resolveTaskIntent(cwd: string, input: { readonly prompt?: string; readonly intentPath?: string }): TaskIntent | null {
+  const fileIntent = input.intentPath ? readTaskIntentFile(cwd, input.intentPath) : null;
+  if (fileIntent) {
+    return {
+      ...fileIntent,
+      userPrompt: input.prompt ?? fileIntent.userPrompt
+    };
+  }
+  if (input.prompt && input.prompt.trim().length > 0) {
+    return createDeterministicTaskIntent(input.prompt);
+  }
+  return null;
+}
+
+function readTaskIntentFile(cwd: string, intentPath: string): TaskIntent {
+  const absolutePath = path.isAbsolute(intentPath) ? intentPath : path.join(cwd, intentPath);
+  const parsed = parseJsonText(readFileSync(absolutePath, 'utf8')) as Record<string, unknown>;
+  if (parsed.schemaId !== 'atm.taskIntent.v1') {
+    throw new CliError('ATM_TASK_INTENT_SCHEMA_INVALID', 'next --intent requires schemaId atm.taskIntent.v1.', {
+      exitCode: 2,
+      details: { intentPath }
+    });
+  }
+  return normalizeTaskIntent(parsed, 'atm-skill');
+}
+
+function createDeterministicTaskIntent(prompt: string): TaskIntent {
+  const mentionedTaskIds = uniqueSorted((prompt.match(/TASK-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*/gi) ?? []).map((entry) => entry.toUpperCase()));
+  const mentionedPlanPaths = uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
+  const targetRepoHints = uniqueSorted([
+    ...(/AI-Atomic-Framework|ATM\s*framework|ATM框架|原子框架/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
+  ]);
+  const taskRootHints = uniqueSorted([
+    ...(/self[-_ ]?atomization|自我原子化|100%/.test(prompt) ? ['atm-self-atomization'] : []),
+    ...extractPromptPathHints(prompt).filter((entry) => !/\.md$/i.test(entry))
+  ]);
+  const ordinalScope = /前三張|前\s*3\s*張|first\s+3/i.test(prompt)
+    ? { kind: 'first' as const, count: 3 }
+    : /前兩張|前\s*2\s*張|first\s+2/i.test(prompt)
+      ? { kind: 'first' as const, count: 2 }
+      : null;
+  const queueRequested = Boolean(ordinalScope)
+    || /全部任務卡|所有任務卡|全部.*task|all\s+task\s+cards|through\s+all/i.test(prompt);
+  const taskScopeMentioned = mentionedTaskIds.length > 0
+    || mentionedPlanPaths.length > 0
+    || taskRootHints.length > 0
+    || queueRequested
+    || /任務卡|task\s*card|task[-_ ]?asa|計畫書/i.test(prompt);
+  return {
+    schemaId: 'atm.taskIntent.v1',
+    userPrompt: prompt,
+    mentionedTaskIds,
+    mentionedPlanPaths,
+    taskRootHints,
+    targetRepoHints,
+    requestedAction: detectRequestedTaskAction(prompt),
+    confidence: taskScopeMentioned ? 0.7 : 0.25,
+    source: 'cli-deterministic',
+    ordinalScope,
+    queueRequested,
+    taskScopeMentioned
+  };
+}
+
+function normalizeTaskIntent(value: Record<string, unknown>, fallbackSource: TaskIntentSource): TaskIntent {
+  const userPrompt = normalizeOptionalString(value.userPrompt);
+  const mentionedTaskIds = readStringArray(value.mentionedTaskIds).map((entry) => entry.toUpperCase());
+  const mentionedPlanPaths = readStringArray(value.mentionedPlanPaths);
+  const taskRootHints = readStringArray(value.taskRootHints);
+  const targetRepoHints = readStringArray(value.targetRepoHints);
+  const prompt = userPrompt ?? '';
+  return {
+    schemaId: 'atm.taskIntent.v1',
+    userPrompt,
+    mentionedTaskIds,
+    mentionedPlanPaths,
+    taskRootHints,
+    targetRepoHints,
+    requestedAction: normalizeRequestedTaskAction(value.requestedAction) ?? detectRequestedTaskAction(prompt),
+    confidence: typeof value.confidence === 'number' && Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0.5,
+    source: normalizeTaskIntentSource(value.source) ?? fallbackSource,
+    ordinalScope: normalizeOrdinalScope(value.ordinalScope),
+    queueRequested: value.queueRequested === true || /全部任務卡|所有任務卡|all\s+task\s+cards/i.test(prompt),
+    taskScopeMentioned: value.taskScopeMentioned === true
+      || mentionedTaskIds.length > 0
+      || mentionedPlanPaths.length > 0
+      || taskRootHints.length > 0
+  };
+}
+
+function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskSummary[], taskIntent: TaskIntent | null): PromptScopedTaskRoute | null {
+  if (!taskIntent || !taskIntent.taskScopeMentioned) return null;
+  const scored = tasks
+    .map((task) => scoreTaskForIntent(cwd, task, taskIntent))
+    .filter((task) => (task.matchScore ?? 0) > 0)
+    .sort(compareScoredTasks);
+  if (scored.length === 0) {
+    return {
+      status: 'not-found',
+      selectedTasks: [],
+      targetRepo: null,
+      diagnostics: ['prompt-task-scope-had-no-matching-task-card']
+    };
+  }
+  const scoped = applyOrdinalScope(scored, taskIntent);
+  const selectedTasks = taskIntent.queueRequested || taskIntent.ordinalScope ? scoped : scoped.slice(0, 1);
+  if (taskIntent.queueRequested || taskIntent.ordinalScope) {
+    return {
+      status: 'queue',
+      selectedTasks,
+      targetRepo: resolveRouteTargetRepo(selectedTasks),
+      diagnostics: [`scoped-queue-size:${selectedTasks.length}`]
+    };
+  }
+  const bestScore = scored[0]?.matchScore ?? 0;
+  const topMatches = scored.filter((task) => (task.matchScore ?? 0) === bestScore);
+  const exactTaskIdRequested = taskIntent.mentionedTaskIds.length > 0;
+  if (topMatches.length === 1 && (exactTaskIdRequested || bestScore >= 60)) {
+    return {
+      status: 'ready',
+      selectedTasks: [topMatches[0]],
+      targetRepo: topMatches[0].targetRepo,
+      diagnostics: topMatches[0].matchReasons ?? []
+    };
+  }
+  return {
+    status: 'ambiguous',
+    selectedTasks: scored.slice(0, 12),
+    targetRepo: resolveRouteTargetRepo(scored),
+    diagnostics: ['multiple-task-candidates-matched-prompt']
+  };
+}
+
+function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: TaskIntent): ImportedTaskSummary {
+  const prompt = normalizeSearchText(intent.userPrompt ?? '');
+  const reasons: string[] = [];
+  let score = 0;
+  if (intent.mentionedTaskIds.includes(task.workItemId.toUpperCase())) {
+    score += 120;
+    reasons.push('task-id-exact');
+  }
+  const pathFields = [
+    task.taskPath,
+    task.sourcePlanPath,
+    ...task.nearbyPlanPaths
+  ].filter((entry): entry is string => Boolean(entry));
+  for (const planHint of intent.mentionedPlanPaths) {
+    if (pathFields.some((field) => pathFieldMatches(field, planHint))) {
+      score += 90;
+      reasons.push('plan-path-match');
+      break;
+    }
+  }
+  for (const field of pathFields) {
+    const normalizedField = normalizeSearchText(field);
+    const stem = normalizeSearchText(path.basename(field).replace(/\.[^.]+$/, ''));
+    if ((normalizedField && prompt.includes(normalizedField)) || (stem && prompt.includes(stem))) {
+      score += 85;
+      reasons.push('nearby-plan-name-match');
+      break;
+    }
+  }
+  for (const rootHint of intent.taskRootHints) {
+    const normalizedHint = normalizeSearchText(rootHint);
+    if (normalizedHint && normalizeSearchText(task.taskPath).includes(normalizedHint)) {
+      score += 65;
+      reasons.push('task-root-hint-match');
+      break;
+    }
+  }
+  if (intent.targetRepoHints.length > 0 && task.targetRepo) {
+    const target = normalizeSearchText(task.targetRepo);
+    if (intent.targetRepoHints.some((hint) => target.includes(normalizeSearchText(hint)))) {
+      score += 35;
+      reasons.push('target-repo-match');
+    }
+  }
+  const normalizedTitle = normalizeSearchText(task.title);
+  if (normalizedTitle && prompt.includes(normalizedTitle)) {
+    score += 60;
+    reasons.push('title-exact');
+  } else {
+    const overlap = countTokenOverlap(prompt, task.title);
+    if (overlap >= 2) {
+      score += Math.min(30, overlap * 8);
+      reasons.push('title-token-overlap');
+    }
+  }
+  if (/任務卡|task\s*card/i.test(intent.userPrompt ?? '') && /\.task\.md$/i.test(task.taskPath)) {
+    score += 10;
+    reasons.push('task-card-surface');
+  }
+  return {
+    ...task,
+    matchScore: score,
+    matchReasons: reasons
+  };
+}
+
+function applyOrdinalScope(tasks: readonly ImportedTaskSummary[], intent: TaskIntent): readonly ImportedTaskSummary[] {
+  const planScoped = tasks.filter((task) => (task.matchReasons ?? []).some((reason) => reason.includes('plan') || reason.includes('root') || reason.includes('task-id')));
+  const source = planScoped.length > 0 ? planScoped : tasks;
+  if (!intent.ordinalScope) return source;
+  return [...source]
+    .sort((left, right) => left.workItemId.localeCompare(right.workItemId))
+    .slice(0, intent.ordinalScope.count);
+}
+
+function compareScoredTasks(left: ImportedTaskSummary, right: ImportedTaskSummary): number {
+  const scoreDelta = (right.matchScore ?? 0) - (left.matchScore ?? 0);
+  if (scoreDelta !== 0) return scoreDelta;
+  const statusDelta = statusQueueWeight(left.status) - statusQueueWeight(right.status);
+  return statusDelta !== 0 ? statusDelta : left.workItemId.localeCompare(right.workItemId);
+}
+
+function resolveRouteTargetRepo(tasks: readonly ImportedTaskSummary[]): string | null {
+  const targets = uniqueSorted(tasks.map((task) => task.targetRepo).filter((entry): entry is string => Boolean(entry)));
+  return targets.length === 1 ? targets[0] : null;
+}
+
+function isTaskRoutable(status: string, intent: TaskIntent | null): boolean {
+  const normalized = status.trim().toLowerCase();
+  if (intent?.requestedAction === 'redo' || intent?.requestedAction === 'reopen' || intent?.requestedAction === 'audit') {
+    return normalized !== 'abandoned' && normalized !== 'cancelled';
+  }
+  return ['ready', 'open', 'planned', 'blocked', 'waiting_target_evidence', 'reserved'].includes(normalized);
+}
+
+function dedupeTasks(tasks: readonly ImportedTaskSummary[]): readonly ImportedTaskSummary[] {
+  const seen = new Set<string>();
+  const output: ImportedTaskSummary[] = [];
+  for (const task of tasks) {
+    const key = task.workItemId;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    output.push(task);
+  }
+  return output;
+}
+
+function listTaskCardFiles(cwd: string): readonly string[] {
+  return listFilesRecursive(cwd, (filePath) => filePath.endsWith('.task.md'));
+}
+
+function listFilesRecursive(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
+  if (!existsSync(directoryPath)) return [];
+  const stats = statSync(directoryPath);
+  if (stats.isFile()) return predicate(directoryPath) ? [directoryPath] : [];
+  const ignoredDirs = new Set(['.git', 'node_modules', 'dist', 'build', 'release', '.atm-temp', 'scratch']);
+  const output: string[] = [];
+  for (const entry of readdirSync(directoryPath, { withFileTypes: true })) {
+    if (entry.isDirectory() && ignoredDirs.has(entry.name)) continue;
+    const absolutePath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory()) {
+      output.push(...listFilesRecursive(absolutePath, predicate));
+    } else if (entry.isFile() && predicate(absolutePath)) {
+      output.push(absolutePath);
+    }
+  }
+  return output;
+}
+
+function findNearbyPlanPaths(cwd: string, taskPath: string): readonly string[] {
+  const taskDir = path.dirname(taskPath);
+  const parent = path.basename(taskDir).toLowerCase() === 'tasks' ? path.dirname(taskDir) : taskDir;
+  if (!existsSync(parent)) return [];
+  return readdirSync(parent, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md') && !entry.name.endsWith('.task.md'))
+    .map((entry) => path.relative(cwd, path.join(parent, entry.name)).replace(/\\/g, '/'));
+}
+
+function parseMarkdownFrontmatter(text: string): Record<string, unknown> {
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return {};
+  const result: Record<string, unknown> = {};
+  for (const rawLine of match[1].split(/\r?\n/)) {
+    const separatorIndex = rawLine.indexOf(':');
+    if (separatorIndex === -1) continue;
+    const key = rawLine.slice(0, separatorIndex).trim();
+    const value = rawLine.slice(separatorIndex + 1).trim();
+    if (key) result[key] = value;
+  }
+  return result;
+}
+
+function splitListValue(value: unknown): readonly string[] {
+  if (Array.isArray(value)) {
+    return value.map((entry) => String(entry).trim()).filter(Boolean);
+  }
+  if (typeof value !== 'string') return [];
+  return value.split(/[,\s]+/).map((entry) => entry.trim()).filter(Boolean);
+}
+
+function normalizeOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function readStringArray(value: unknown): readonly string[] {
+  return Array.isArray(value) ? uniqueSorted(value.map((entry) => String(entry).trim()).filter(Boolean)) : [];
+}
+
+function normalizeTaskIntentSource(value: unknown): TaskIntentSource | null {
+  return value === 'integration-hook' || value === 'atm-skill' || value === 'cli-deterministic' ? value : null;
+}
+
+function normalizeRequestedTaskAction(value: unknown): RequestedTaskAction | null {
+  return value === 'analyze' || value === 'implement' || value === 'redo' || value === 'reopen' || value === 'close' || value === 'audit' || value === 'cleanup'
+    ? value
+    : null;
+}
+
+function detectRequestedTaskAction(prompt: string): RequestedTaskAction | null {
+  if (/重做|重新做|redo/i.test(prompt)) return 'redo';
+  if (/重新打開|reopen/i.test(prompt)) return 'reopen';
+  if (/關閉|close|done/i.test(prompt)) return 'close';
+  if (/audit|稽核|檢查/i.test(prompt)) return 'audit';
+  if (/cleanup|清理|整理/i.test(prompt)) return 'cleanup';
+  if (/implement|實作|執行|開始/i.test(prompt)) return 'implement';
+  if (/分析|analy[sz]e/i.test(prompt)) return 'analyze';
+  return null;
+}
+
+function normalizeOrdinalScope(value: unknown): { readonly kind: 'first'; readonly count: number } | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  if (record.kind !== 'first' || typeof record.count !== 'number' || !Number.isInteger(record.count) || record.count < 1) return null;
+  return { kind: 'first', count: Math.min(record.count, 50) };
+}
+
+function extractPromptPathHints(prompt: string): readonly string[] {
+  const matches = prompt.match(/(?:[A-Za-z]:)?[A-Za-z0-9_\-./\\%\u4e00-\u9fff（）()]+(?:\.md|\/tasks|\\tasks|self[-_]?atomization)?/g) ?? [];
+  return uniqueSorted(matches
+    .map((entry) => entry.trim().replace(/^["'`]+|["'`]+$/g, ''))
+    .filter((entry) => entry.length > 2)
+    .filter((entry) => /[./\\]|\.md$|atomization|任務|計畫/.test(entry)));
+}
+
+function pathFieldMatches(field: string, hint: string): boolean {
+  const normalizedField = normalizeSearchText(field);
+  const normalizedHint = normalizeSearchText(hint);
+  const fieldStem = normalizeSearchText(path.basename(field).replace(/\.[^.]+$/, ''));
+  const hintStem = normalizeSearchText(path.basename(hint).replace(/\.[^.]+$/, ''));
+  return normalizedField.includes(normalizedHint)
+    || normalizedHint.includes(normalizedField)
+    || Boolean(fieldStem && hintStem && (fieldStem.includes(hintStem) || hintStem.includes(fieldStem)));
+}
+
+function normalizeSearchText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\\/g, '/')
+    .replace(/%25/g, 'percent')
+    .replace(/[ \t\r\n"'`*_~[\]{}<>:：，,。.!?？／]+/g, '')
+    .trim();
+}
+
+function countTokenOverlap(prompt: string, title: string): number {
+  const promptTokens = new Set(tokenizeForMatch(prompt));
+  return tokenizeForMatch(title).filter((token) => promptTokens.has(token)).length;
+}
+
+function tokenizeForMatch(value: string): readonly string[] {
+  return value
+    .toLowerCase()
+    .split(/[^a-z0-9\u4e00-\u9fff]+/u)
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length >= 3);
+}
+
+function uniqueSorted(values: readonly string[]): string[] {
+  return Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
+}
+
+function toTaskCandidateView(task: ImportedTaskSummary) {
+  return {
+    workItemId: task.workItemId,
+    title: task.title,
+    status: task.status,
+    taskPath: task.taskPath,
+    format: task.format,
+    sourcePlanPath: task.sourcePlanPath,
+    nearbyPlanPaths: task.nearbyPlanPaths,
+    targetRepo: task.targetRepo,
+    matchScore: task.matchScore ?? 0,
+    matchReasons: task.matchReasons ?? []
+  };
 }
 
 function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {

@@ -20,6 +20,7 @@ export const integrationsCorePackage = {
 // ─── Adapter-level string constants ───────────────────────────────────────
 
 export const atmFirstCommand = 'node atm.mjs next --json';
+export const atmPromptScopedFirstCommand = 'node atm.mjs next --prompt "$ARGUMENTS" --json';
 export const charterInvariantsPlaceholder = '{{CHARTER_INVARIANTS}}';
 
 // ─── Compiler submodule ────────────────────────────────────────────────────

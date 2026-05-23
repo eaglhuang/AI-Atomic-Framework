@@ -22,7 +22,12 @@
     "title": { "type": "string", "minLength": 1 },
     "summary": { "type": "string", "minLength": 1 },
     "command": { "type": "string", "pattern": "^node atm\\.mjs " },
-    "firstCommand": { "const": "node atm.mjs next --json" },
+    "firstCommand": {
+      "enum": [
+        "node atm.mjs next --json",
+        "node atm.mjs next --prompt \"$ARGUMENTS\" --json"
+      ]
+    },
     "charter-invariants-injected": { "const": true },
     "handoffs": { "type": "string", "pattern": "^node atm\\.mjs " }
   }
