@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'tasks',
-  summary: 'Create/import/mirror/verify/audit task plans, manage reservation/claim lifecycle, migrate legacy ledger records, and close tasks with evidence gates.',
+  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, migrate legacy ledger records, and close tasks with evidence gates.',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | audit | migrate-legacy-ledger | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | audit | queue | migrate-legacy-ledger | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close', required: true }
   ],
   options: [
     commonCwdOption,
@@ -20,6 +20,7 @@ export default defineCommandSpec({
     { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs.' },
     { flag: '--apply', summary: 'Apply tasks migrate-legacy-ledger changes instead of reporting a dry-run.' },
     { flag: '--staged', summary: 'Run tasks audit in staged/pre-commit mode.' },
+    { flag: '--queue', value: 'id', summary: 'Task queue id for tasks queue abandon.' },
     { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close lifecycle actions (or set ATM_ACTOR_ID).' },
     { flag: '--title', value: 'text', summary: 'Optional title for tasks reserve when creating a manual task entry.' },
@@ -44,6 +45,8 @@ export default defineCommandSpec({
     'node atm.mjs tasks verify --json',
     'node atm.mjs tasks audit --json',
     'node atm.mjs tasks audit --staged --json',
+    'node atm.mjs tasks queue status --json',
+    'node atm.mjs tasks queue abandon --queue queue-abc123 --actor codex-main --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --dry-run --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --apply --json',
     'node atm.mjs tasks reserve --task ATM-GOV-0101 --actor codex-main --title "Actor model" --json',

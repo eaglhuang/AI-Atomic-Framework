@@ -11,6 +11,7 @@ import {
   validateClosurePacket
 } from '../packages/cli/src/commands/framework-development.ts';
 import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
+import { writeTaskDirectionLock } from '../packages/cli/src/commands/task-direction.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -122,7 +123,7 @@ try {
     '',
     '# TASK-SCOPE-0001'
   ].join('\n'), 'utf8');
-  const preToolPromptScopedOk = runIntegrationHookInvocation([
+  const preToolPromptScopedNeedsClaim = runIntegrationHookInvocation([
     'pre-tool',
     '--cwd', promptScopedRepo,
     '--editor', 'copilot',
@@ -130,7 +131,25 @@ try {
     '--prompt', '請實作 TASK-SCOPE-0001',
     '--files', 'src/scope.ts'
   ]);
-  assert(preToolPromptScopedOk.ok === true, 'pre-tool hook must allow prompt-scoped in-scope edits');
+  assert(preToolPromptScopedNeedsClaim.ok === false, 'pre-tool hook must require a task direction lock before prompt-scoped edits');
+  assert(preToolPromptScopedNeedsClaim.messages.some((entry) => entry.code === 'ATM_TASK_DIRECTION_LOCK_REQUIRED'), 'prompt-scoped edit without claim must report direction lock requirement');
+  writeTaskDirectionLock({
+    cwd: promptScopedRepo,
+    taskId: 'TASK-SCOPE-0001',
+    actorId: 'governance-test',
+    queue: null,
+    allowedFiles: ['docs/plan/tasks/TASK-SCOPE-0001.task.md', 'src/scope.ts'],
+    prompt: 'TASK-SCOPE-0001'
+  });
+  const preToolPromptScopedOk = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', promptScopedRepo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', '隢祕雿?TASK-SCOPE-0001',
+    '--files', 'src/scope.ts'
+  ]);
+  assert(preToolPromptScopedOk.ok === true, 'pre-tool hook must allow in-scope edits after a task direction lock exists');
   const preToolPromptScopedDrift = runIntegrationHookInvocation([
     'pre-tool',
     '--cwd', promptScopedRepo,
@@ -201,7 +220,7 @@ try {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: 'TASK-X-0002',
     title: 'Cross repo target task',
-    status: 'open',
+    status: 'ready',
     owner: 'test-agent',
     closure_authority: 'target_repo',
     target_repo: frameworkRepo
@@ -230,7 +249,7 @@ try {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: 'TASK-X-0004',
     title: 'Critical framework task',
-    status: 'open',
+    status: 'ready',
     owner: 'test-agent',
     scope: ['packages/core/src/index.ts']
   });
@@ -244,6 +263,15 @@ try {
         details: { kind: 'test' }
       }
     ]
+  });
+  await runTasks(['claim', '--cwd', frameworkWithoutRunner, '--task', 'TASK-X-0004', '--actor', 'test-agent', '--files', 'packages/core/src/index.ts']);
+  writeTaskDirectionLock({
+    cwd: frameworkWithoutRunner,
+    taskId: 'TASK-X-0004',
+    actorId: 'test-agent',
+    queue: null,
+    allowedFiles: ['packages/core/src/index.ts'],
+    prompt: 'TASK-X-0004'
   });
   try {
     await runTasks(['close', '--cwd', frameworkWithoutRunner, '--task', 'TASK-X-0004', '--actor', 'test-agent', '--status', 'done']);

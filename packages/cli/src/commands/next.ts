@@ -15,6 +15,12 @@ import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './i
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
+import {
+  buildAllowedFilesForTask,
+  createOrRefreshTaskQueue,
+  findActiveTaskQueue,
+  writeTaskDirectionLock
+} from './task-direction.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
 import { runTasks } from './tasks.ts';
 
@@ -323,11 +329,29 @@ async function claimNextImportedTask(input: {
     input.importedTaskQueue.claimableTask.taskPath,
     '--json'
   ]);
+  const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'
+    ? createOrRefreshTaskQueue({
+      cwd: input.cwd,
+      sourcePrompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId,
+      tasks: input.importedTaskQueue.promptScope.selectedTasks,
+      actorId: resolvedActor.actorId
+    })
+    : findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId);
+  const directionLock = writeTaskDirectionLock({
+    cwd: input.cwd,
+    taskId: input.importedTaskQueue.claimableTask.workItemId,
+    actorId: resolvedActor.actorId,
+    queue: activeQueue,
+    allowedFiles: buildAllowedFilesForTask(input.importedTaskQueue.claimableTask),
+    prompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId
+  });
   const nextAction = {
     status: 'ready',
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(input.importedTaskQueue.claimableTask.title)} --json`,
     reason: `claimed imported work item ${input.importedTaskQueue.claimableTask.workItemId} for ${resolvedActor.actorId}`,
     selectedTask: input.importedTaskQueue.claimableTask,
+    taskDirectionLock: directionLock,
+    taskQueue: activeQueue,
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   };
@@ -349,6 +373,8 @@ async function claimNextImportedTask(input: {
     evidence: {
       nextAction,
       claimResult: claimResult.evidence,
+      taskDirectionLock: directionLock,
+      taskQueue: activeQueue,
       taskIntent: input.taskIntent,
       importedTaskQueue: input.importedTaskQueue,
       integrationBootstrap: input.integrationBootstrap,
@@ -433,6 +459,12 @@ function buildPromptScopedNextResult(input: {
   }
   if (promptScope.status === 'queue') {
     const firstTask = selectedTasks[0] ?? null;
+    const activeQueue = createOrRefreshTaskQueue({
+      cwd: input.cwd,
+      sourcePrompt: input.taskIntent?.userPrompt ?? firstTask?.workItemId ?? 'prompt-scoped task queue',
+      tasks: selectedTasks
+    });
+    const queueHeadTaskId = activeQueue.taskIds[activeQueue.currentIndex] ?? firstTask?.workItemId ?? null;
     const nextAction = {
       status: 'task-queue-ready',
       command: firstTask
@@ -440,6 +472,9 @@ function buildPromptScopedNextResult(input: {
         : 'node atm.mjs next --prompt "<current user prompt>" --json',
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
       selectedTasks,
+      taskQueue: activeQueue,
+      queueId: activeQueue.queueId,
+      queueHeadTaskId,
       queueSize: selectedTasks.length,
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
@@ -455,11 +490,14 @@ function buildPromptScopedNextResult(input: {
         input.runtimeAdapterReadiness as any,
         message('info', 'ATM_NEXT_TASK_QUEUE_READY', 'ATM resolved the prompt to a scoped task queue.', {
           queueSize: selectedTasks.length,
+          queueId: activeQueue.queueId,
+          queueHeadTaskId,
           firstTask: firstTask ? toTaskCandidateView(firstTask) : null
         })
       ),
       evidence: {
         nextAction,
+        taskQueue: activeQueue,
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         taskIntent: input.taskIntent,
         importedTaskQueue: input.importedTaskQueue,
@@ -785,10 +823,10 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   })) ?? null;
-  const claimableTask = selectedTaskPool.find((task) => task.format === 'json' && task.status === 'ready' && task.dependencies.every((dependency) => {
+  const claimableTask = selectedTask && selectedTask.format === 'json' && selectedTask.status === 'ready' && selectedTask.dependencies.every((dependency) => {
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
-  })) ?? null;
+  }) ? selectedTask : null;
 
   return {
     taskStorePath: existsSync(taskStorePath) ? path.relative(cwd, taskStorePath).replace(/\\/g, '/') : '.atm/history/tasks',

@@ -8,6 +8,7 @@ import {
   detectFrameworkRepoIdentity,
   isAtmCriticalNonDocSurface
 } from './framework-development.ts';
+import { readActiveTaskDirectionLocks } from './task-direction.ts';
 import {
   hookContractVersion,
   hookMarker,
@@ -269,8 +270,25 @@ function runPreToolHook(options: HookInvocationOptions) {
     ? buildPromptScopedAllowedPaths(promptScope.selectedTasks)
     : [];
   const mutatingIntent = isMutatingToolIntent(options.toolName, toolCommand);
+  const activeDirectionLocks = readActiveTaskDirectionLocks(options.cwd);
+  const directionLockAllowedPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
+  const directionLockDriftFiles = mutatingIntent
+    && !gitCommitIntent
+    && activeDirectionLocks.length > 0
+    && directionLockAllowedPaths.length > 0
+      ? toolFiles
+        .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
+        .filter((entry) => !isPromptScopeDriftExempt(entry))
+        .filter((entry) => !isToolFileInPromptScope(entry, directionLockAllowedPaths))
+      : [];
+  const promptScopedClaimRequired = mutatingIntent
+    && !gitCommitIntent
+    && activeDirectionLocks.length === 0
+    && Boolean(promptScopedContext.taskIntent?.taskScopeMentioned)
+    && (promptScope?.status === 'ready' || promptScope?.status === 'queue');
   const promptScopeDriftFiles = mutatingIntent
     && !gitCommitIntent
+    && activeDirectionLocks.length === 0
     && Boolean(promptScopedContext.taskIntent?.taskScopeMentioned)
     && (promptScope?.status === 'ready' || promptScope?.status === 'queue')
     && promptScopedAllowedPaths.length > 0
@@ -343,6 +361,53 @@ function runPreToolHook(options: HookInvocationOptions) {
     });
   }
 
+  if (directionLockDriftFiles.length > 0) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_TOOL_SCOPE_DRIFT_BLOCKED', 'Tool edit scope drifted away from the active ATM task direction lock.', {
+        editor: options.editor,
+        blockedFiles: directionLockDriftFiles,
+        activeTaskIds: activeDirectionLocks.map((lock) => lock.taskId),
+        scopePaths: directionLockAllowedPaths.slice(0, 40),
+        nextStep: 'Finish or release the active task direction lock before editing unrelated files.'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        directionLockDriftFiles,
+        activeDirectionLocks,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (promptScopedClaimRequired) {
+    const requiredCommand = `node atm.mjs next --claim --actor <id> --prompt ${quoteHookCliValue(promptScopedContext.taskIntent?.userPrompt ?? options.prompt ?? '<current user prompt>')} --json`;
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_TASK_DIRECTION_LOCK_REQUIRED', 'Prompt-scoped task work is blocked until ATM claims the selected task or queue head.', {
+        editor: options.editor,
+        selectedTaskIds: promptScope?.selectedTasks.map((task) => task.workItemId) ?? [],
+        nextStep: requiredCommand
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        promptScopedContext,
+        requiredCommand,
+        frameworkStatus: status
+      }
+    });
+  }
+
   if (promptScopeDriftFiles.length > 0) {
     return makeResult({
       ok: false,
@@ -409,6 +474,7 @@ function runPreToolHook(options: HookInvocationOptions) {
       toolFiles,
       criticalFiles,
       gitCommitIntent,
+      activeDirectionLocks,
       frameworkStatus: status,
       gitHooks
     }

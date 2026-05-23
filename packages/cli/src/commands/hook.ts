@@ -12,6 +12,7 @@ import {
 } from './framework-development.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
+import { readActiveTaskDirectionLocks } from './task-direction.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -231,6 +232,13 @@ function runPreCommitHook(cwd: string) {
     if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
     return true;
   });
+  const activeDirectionLocks = readActiveTaskDirectionLocks(root);
+  const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
+  const directionLockDriftFiles = activeDirectionLocks.length > 0
+    ? stagedFiles
+      .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
+      .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
+    : [];
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
     ? runRequiredFrameworkValidators(root, frameworkStatus.criticalChangedFiles)
@@ -241,6 +249,7 @@ function runPreCommitHook(cwd: string) {
     : null;
   const ok = encodingReport.ok
     && blockingFrameworkIssues.length === 0
+    && directionLockDriftFiles.length === 0
     && taskAudit.ok
     && failedValidatorRuns.length === 0;
   const evidenceWrite = ok && stagedFiles.length > 0
@@ -261,6 +270,7 @@ function runPreCommitHook(cwd: string) {
         : message('error', 'ATM_HOOK_PRE_COMMIT_FAILED', 'ATM pre-commit hook blocked this commit.', {
           encodingFindings: encodingReport.findings.length,
           frameworkBlockers: blockingFrameworkIssues,
+          taskDirectionDriftFiles: directionLockDriftFiles,
           taskAuditFindings: taskAudit.findings.length,
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
           nextStep: frameworkClaimCommand
@@ -274,6 +284,8 @@ function runPreCommitHook(cwd: string) {
       allowAdopterInfrastructureSync,
       blockingFrameworkIssues,
       frameworkClaimCommand,
+      activeDirectionLocks,
+      directionLockDriftFiles,
       taskAudit,
       commandRuns,
       evidenceWrite
@@ -803,6 +815,36 @@ function runGit(cwd: string, args: readonly string[], env: Record<string, string
 
 function normalizeGitConfigPath(value: string | null): string | null {
   return value ? value.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '') : null;
+}
+
+function isTaskDirectionPreCommitExempt(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  return normalized.startsWith('.atm/history/task-events/')
+    || normalized.startsWith('.atm/history/evidence/')
+    || normalized.startsWith('.atm/runtime/locks/')
+    || normalized.startsWith('.atm/runtime/task-queues/')
+    || normalized.startsWith('.atm/runtime/task-direction-locks/');
+}
+
+function isPathAllowedByTaskDirection(filePath: string, allowedFiles: readonly string[]): boolean {
+  const normalizedFile = normalizeRelativePath(filePath).toLowerCase();
+  return allowedFiles.some((candidate) => matchesTaskDirectionPath(normalizedFile, normalizeRelativePath(candidate).toLowerCase()));
+}
+
+function matchesTaskDirectionPath(filePath: string, allowedPath: string): boolean {
+  if (!allowedPath) return false;
+  if (allowedPath.includes('*')) {
+    const pattern = allowedPath
+      .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+      .replace(/\*\*/g, '::DOUBLE_STAR::')
+      .replace(/\*/g, '[^/]*')
+      .replace(/::DOUBLE_STAR::/g, '.*');
+    return new RegExp(`^${pattern}$`, 'i').test(filePath);
+  }
+  if (filePath === allowedPath) return true;
+  if (allowedPath.endsWith('/')) return filePath.startsWith(allowedPath);
+  const allowedPathHasExtension = /\.[a-z0-9]+$/i.test(allowedPath);
+  return !allowedPathHasExtension && filePath.startsWith(`${allowedPath}/`);
 }
 
 function normalizeRelativePath(value: string): string {

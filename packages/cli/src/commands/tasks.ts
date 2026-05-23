@@ -20,6 +20,12 @@ import {
   readTaskLedgerPolicy,
   transitionEventExists
 } from './task-ledger.ts';
+import {
+  advanceTaskQueueAfterClose,
+  abandonTaskQueue,
+  assertTaskCloseAllowedByDirection,
+  findActiveTaskQueue
+} from './task-direction.ts';
 
 export interface TaskImportSource {
   readonly planPath: string;
@@ -145,6 +151,9 @@ export async function runTasks(argv: string[]) {
   if (action === 'audit') {
     return runTasksAudit(argv.slice(1));
   }
+  if (action === 'queue') {
+    return runTasksQueue(argv.slice(1));
+  }
   if (action === 'migrate-legacy-ledger') {
     return runTasksMigrateLegacyLedger(argv.slice(1));
   }
@@ -161,7 +170,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | queue | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -682,6 +691,20 @@ async function runTasksClose(argv: string[]) {
     taskId: options.taskId,
     status: options.status
   });
+  if (options.status === 'done') {
+    const claim = parseClaimRecord(taskDocument.claim);
+    if (!claim || claim.state !== 'active' || claim.actorId !== actorId) {
+      throw new CliError('ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active claim owned by ${actorId}.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          actorId,
+          requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${options.taskId}" --json`
+        }
+      });
+    }
+    assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId);
+  }
 
   const taskDeclaredFiles = extractTaskDeclaredFiles(taskDocument);
   const activeFrameworkStatus = options.status === 'done'
@@ -794,6 +817,9 @@ async function runTasksClose(argv: string[]) {
     actorId,
     previousStatus
   });
+  const taskQueue = options.status === 'done'
+    ? advanceTaskQueueAfterClose(options.cwd, options.taskId)
+    : null;
   return makeResult({
     ok: true,
     command: 'tasks',
@@ -811,7 +837,8 @@ async function runTasksClose(argv: string[]) {
       taskPath: relativePathFrom(options.cwd, taskPath),
       evidenceGate,
       closurePacketPath,
-      transitionPath
+      transitionPath,
+      taskQueue
     }
   });
 }
@@ -840,6 +867,58 @@ function runTasksAudit(argv: string[]) {
       report
     }
   });
+}
+
+function runTasksQueue(argv: string[]) {
+  const action = (argv[0] ?? 'status').toLowerCase();
+  const options = parseQueueOptions(argv.slice(action === 'status' || action === 'abandon' ? 1 : 0));
+  if (action === 'status') {
+    const activeQueue = findActiveTaskQueue(options.cwd);
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', activeQueue ? 'ATM_TASK_QUEUE_ACTIVE' : 'ATM_TASK_QUEUE_EMPTY', activeQueue
+        ? `Active task queue ${activeQueue.queueId} is at index ${activeQueue.currentIndex}.`
+        : 'No active task queue is recorded.', {
+          queueId: activeQueue?.queueId ?? null,
+          queueHeadTaskId: activeQueue ? activeQueue.taskIds[activeQueue.currentIndex] ?? null : null
+        })],
+      evidence: {
+        action: 'queue status',
+        activeQueue
+      }
+    });
+  }
+  if (action === 'abandon') {
+    const resolvedActor = resolveActorId(options.actorId ?? undefined);
+    if (!resolvedActor) {
+      throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks queue abandon requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+    }
+    if (!options.queueId) {
+      throw new CliError('ATM_CLI_USAGE', 'tasks queue abandon requires --queue <queueId>.', { exitCode: 2 });
+    }
+    const queue = abandonTaskQueue({
+      cwd: options.cwd,
+      queueId: options.queueId,
+      actorId: resolvedActor.actorId,
+      reason: options.reason
+    });
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASK_QUEUE_ABANDONED', `Task queue ${queue.queueId} was abandoned.`, {
+        queueId: queue.queueId,
+        actorId: resolvedActor.actorId
+      })],
+      evidence: {
+        action: 'queue abandon',
+        queue
+      }
+    });
+  }
+  throw new CliError('ATM_CLI_USAGE', 'tasks queue supports only: status, abandon.', { exitCode: 2 });
 }
 
 async function runTasksMigrateLegacyLedger(argv: string[]) {
@@ -1482,6 +1561,47 @@ function parseAuditOptions(argv: string[]) {
   return {
     cwd: path.resolve(options.cwd),
     staged: options.staged
+  };
+}
+
+function parseQueueOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    queueId: null as string | null,
+    actorId: null as string | null,
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      options.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--queue') {
+      options.queueId = requireValue(argv, index, '--queue');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks queue does not support option ${arg}`, { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    queueId: options.queueId?.trim() || null
   };
 }
 

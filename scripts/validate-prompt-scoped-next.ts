@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 
@@ -51,6 +51,23 @@ async function main() {
     const queue = await runNext(['--cwd', tempRoot, '--prompt', 'PlanAlpha first 2 task cards']);
     assert(queue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'plan-scoped ordinal prompt must return a task queue');
     assert((queue.evidence.nextAction as any).queueSize === 2, 'plan-scoped ordinal prompt must select two tasks');
+    assert((queue.evidence.taskQueue as any)?.schemaId === 'atm.taskQueue.v1', 'plan-scoped queue prompt must persist atm.taskQueue.v1 runtime queue');
+    assert((queue.evidence.nextAction as any).queueHeadTaskId === 'TASK-ALPHA-0001', 'plan-scoped queue must expose the queue head');
+
+    const ledgerTaskDir = path.join(tempRoot, '.atm', 'history', 'tasks');
+    mkdirSync(ledgerTaskDir, { recursive: true });
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-LEDGER-0001.json'), 'TASK-LEDGER-0001', 'Ledger first task', 'src/first.ts');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-LEDGER-0002.json'), 'TASK-LEDGER-0002', 'Ledger second task', 'src/second.ts');
+    const ledgerPrompt = 'TASK-LEDGER-0001 TASK-LEDGER-0002 all task cards';
+    const ledgerQueue = await runNext(['--cwd', tempRoot, '--prompt', ledgerPrompt]);
+    assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'ledger task prompt must create a queue');
+    const ledgerClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', ledgerPrompt]);
+    assert(ledgerClaim.ok === true, 'next --claim must claim the queue head for ledger tasks');
+    assert((ledgerClaim.evidence.taskDirectionLock as any)?.schemaId === 'atm.taskDirectionLock.v1', 'next --claim must persist atm.taskDirectionLock.v1');
+    const lockPath = path.join(tempRoot, '.atm', 'runtime', 'locks', 'TASK-LEDGER-0001.lock.json');
+    assert(existsSync(lockPath), 'direction lock must be embedded in the runtime lock file');
+    const lockDocument = JSON.parse(readFileSync(lockPath, 'utf8'));
+    assert(lockDocument.taskDirectionLock?.taskId === 'TASK-LEDGER-0001', 'runtime lock must include the selected task direction lock');
 
     const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', 'Please do the next task card']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
@@ -81,6 +98,23 @@ closure_authority: target_repo
 ---
 # ${taskId}
 `, 'utf8');
+}
+
+function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string) {
+  writeFileSync(filePath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title,
+    status: 'ready',
+    dependencies: [],
+    scope: [scopePath],
+    source: {
+      planPath: 'docs/plan/PlanAlpha.md',
+      sectionTitle: title,
+      headingLine: 1,
+      hash: taskId
+    }
+  }, null, 2)}\n`, 'utf8');
 }
 
 main().catch((error) => {
