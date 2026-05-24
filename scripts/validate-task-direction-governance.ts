@@ -83,6 +83,17 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(outOfScope.ok === false, 'adopter queue must block edits to the next task before queue head closes');
   assert(outOfScope.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'adopter out-of-scope edit must report scope drift');
 
+  const staticEvidenceBlock = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', repo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', prompt,
+    '--files', 'atomic_workbench/evidence/TASK-ADOPT-0001.json'
+  ]);
+  assert(staticEvidenceBlock.ok === false, 'adopter queue must block direct static evidence artifact edits');
+  assert(staticEvidenceBlock.messages.some((entry) => entry.code === 'ATM_STATIC_EVIDENCE_IMPERSONATION_BLOCKED'), 'adopter static evidence edit must report impersonation block');
+
   try {
     await runTasks(['close', '--cwd', repo, '--task', 'TASK-ADOPT-0002', '--actor', 'adopter-agent', '--status', 'done']);
     fail('adopter queue must not allow closing the second task before queue head');

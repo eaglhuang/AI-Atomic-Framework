@@ -87,7 +87,8 @@ interface ProtectedStateFinding {
     | 'task-transition-command-invalid'
     | 'task-file-missing-transition'
     | 'task-file-transition-mismatch'
-    | 'evidence-file-missing-task-context';
+    | 'evidence-file-missing-task-context'
+    | 'static-evidence-artifact-without-cli-context';
   readonly detail: string;
 }
 
@@ -1041,7 +1042,7 @@ function isTaskDirectionPreCommitExempt(value: string): boolean {
 }
 
 function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]) {
-  const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry));
+  const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry) || isStaticEvidenceArtifactPath(entry));
   if (protectedFiles.length === 0) {
     return {
       ok: true,
@@ -1135,6 +1136,24 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
         });
       }
     }
+
+    if (isStaticEvidenceArtifactPath(normalized)) {
+      const hasSiblingEvidence = protectedFiles.some((entry) => {
+        const candidate = normalizeRelativePath(entry).toLowerCase();
+        return candidate.startsWith('.atm/history/evidence/');
+      });
+      const hasSiblingTaskOrEvent = protectedFiles.some((entry) => {
+        const candidate = normalizeRelativePath(entry).toLowerCase();
+        return candidate.startsWith('.atm/history/tasks/') || candidate.startsWith('.atm/history/task-events/');
+      });
+      if (!hasSiblingEvidence || !hasSiblingTaskOrEvent) {
+        findings.push({
+          file: normalized,
+          reason: 'static-evidence-artifact-without-cli-context',
+          detail: 'Static evidence artifacts under atomic_workbench/evidence or atomic_workbench/reports cannot stand alone; commit them together with ATM CLI evidence/task transition context.'
+        });
+      }
+    }
   }
 
   return {
@@ -1150,6 +1169,17 @@ function isProtectedAtmManagedStatePath(value: string): boolean {
     || normalized.startsWith('.atm/history/task-events/')
     || normalized.startsWith('.atm/history/evidence/')
     || isProtectedAtmRuntimeStatePath(normalized);
+}
+
+function isStaticEvidenceArtifactPath(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  if (normalized.startsWith('atomic_workbench/evidence/') && normalized.endsWith('.json')) {
+    return true;
+  }
+  if (normalized.startsWith('atomic_workbench/reports/') && normalized.endsWith('.json')) {
+    return true;
+  }
+  return false;
 }
 
 function isProtectedAtmRuntimeStatePath(value: string): boolean {

@@ -776,7 +776,8 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
             ...readStringArray(parsed.scope),
             ...readStringArray(parsed.scopePaths),
             ...readStringArray(parsed.files),
-            ...readStringArray(claimRecord.files)
+            ...readStringArray(claimRecord.files),
+            ...extractDeclaredTaskPathsFromDocument(parsed)
           ]),
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
           closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
@@ -807,7 +808,8 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         scopePaths: uniqueSorted([
           ...splitListValue(parsed.scope ?? parsed.scope_paths ?? parsed.scopePaths),
           ...splitListValue(parsed.files ?? parsed.file_paths ?? parsed.filePaths),
-          ...splitListValue(parsed.paths)
+          ...splitListValue(parsed.paths),
+          ...extractPathLikeStringsFromText(rawText)
         ]),
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
         closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
@@ -1209,6 +1211,64 @@ function dedupeTasks(tasks: readonly ImportedTaskSummary[]): readonly ImportedTa
     output.push(task);
   }
   return output;
+}
+
+function extractDeclaredTaskPathsFromDocument(taskDocument: Record<string, unknown>) {
+  const files = new Set<string>();
+  for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles', 'deliverables', 'artifacts']) {
+    collectDeclaredTaskPathValues(taskDocument[key], files);
+  }
+  const source = taskDocument.source;
+  if (source && typeof source === 'object' && !Array.isArray(source)) {
+    const sourceRecord = source as Record<string, unknown>;
+    collectDeclaredTaskPathValues(sourceRecord.path, files);
+    collectDeclaredTaskPathValues(sourceRecord.planPath, files);
+  }
+  for (const key of ['notes', 'summary', 'description', 'acceptance']) {
+    collectDeclaredTaskPathValues(taskDocument[key], files);
+  }
+  return [...files].sort((left, right) => left.localeCompare(right));
+}
+
+function collectDeclaredTaskPathValues(value: unknown, files: Set<string>) {
+  if (typeof value === 'string') {
+    const normalized = normalizeOptionalTaskPath(value);
+    if (normalized) {
+      files.add(normalized);
+    }
+    for (const candidate of extractPathLikeStringsFromText(value)) {
+      files.add(candidate);
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      collectDeclaredTaskPathValues(entry, files);
+    }
+  }
+}
+
+function extractPathLikeStringsFromText(text: string) {
+  const candidates = new Set<string>();
+  const matches = text.matchAll(/\b(?:\.atm|docs|atomic_workbench|packages|scripts|schemas|specs|templates|integrations|examples|tests|release|\.github|\.claude|\.cursor|\.gemini)(?:\/[A-Za-z0-9._-]+)+\b|\b(?:atm\.mjs|package(?:-lock)?\.json|tsconfig(?:\.[A-Za-z0-9._-]+)?\.json)\b/g);
+  for (const match of matches) {
+    const normalized = normalizeOptionalTaskPath(match[0]);
+    if (normalized) {
+      candidates.add(normalized);
+    }
+  }
+  return [...candidates].sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeOptionalTaskPath(value: string | null | undefined) {
+  const normalized = normalizeOptionalString(value);
+  if (!normalized) return null;
+  const candidate = normalized.replace(/^[`"'(]+|[`"'):;,]+$/g, '');
+  if (!candidate) return null;
+  if (/^[A-Za-z]:\//.test(candidate) || candidate.startsWith('http://') || candidate.startsWith('https://')) {
+    return null;
+  }
+  return candidate.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
 function listTaskCardFiles(cwd: string): readonly string[] {

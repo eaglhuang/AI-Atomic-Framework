@@ -366,6 +366,17 @@ try {
   assert(artifactOnlyVerify.parsed.evidence.missing.includes('fresh-evidence-required'), 'artifact-only close evidence must require fresh evidence');
   assert(artifactOnlyVerify.parsed.evidence.missing.includes('artifact-only-evidence-not-allowed'), 'artifact-only close evidence must reject artifact-only closure');
 
+  const staticEvidenceArtifactPath = path.join(repo, 'atomic_workbench', 'evidence', 'ATM-GOV-IMPERSONATE.json');
+  mkdirSync(path.dirname(staticEvidenceArtifactPath), { recursive: true });
+  writeFileSync(staticEvidenceArtifactPath, `${JSON.stringify({ status: 'done', summary: 'handwritten static evidence' }, null, 2)}\n`, 'utf8');
+  assert(runGit(repo, ['add', 'atomic_workbench/evidence/ATM-GOV-IMPERSONATE.json']).exitCode === 0, 'static evidence impersonation fixture must be stageable');
+  const staticEvidencePreCommit = runAtm(['hook', 'pre-commit', '--cwd', repo, '--json']);
+  assert(staticEvidencePreCommit.exitCode === 1, 'pre-commit must fail for static evidence impersonation without CLI evidence context');
+  assert(staticEvidencePreCommit.parsed.ok === false, 'pre-commit must report ok=false for static evidence impersonation');
+  assert((staticEvidencePreCommit.parsed.evidence?.protectedStateReport?.findings ?? []).some((entry: any) => entry.reason === 'static-evidence-artifact-without-cli-context'), 'pre-commit must report the static evidence impersonation finding');
+  assert(runGit(repo, ['rm', '--cached', '--force', '--quiet', 'atomic_workbench/evidence/ATM-GOV-IMPERSONATE.json']).exitCode === 0, 'static evidence impersonation fixture must be removable from index');
+  rmSync(staticEvidenceArtifactPath, { force: true });
+
   const closeTask = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--status', 'done', '--json']);
   assert(closeTask.exitCode === 0, 'tasks close done must exit 0 with evidence');
   assert(closeTask.parsed.ok === true, 'tasks close done must report ok=true with evidence');

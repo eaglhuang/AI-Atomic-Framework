@@ -270,8 +270,13 @@ function runPreToolHook(options: HookInvocationOptions) {
   const gitHooks = inspectGitHooks(frameworkRoot ?? options.cwd, { frameworkRequired: frameworkRoot !== null });
   const promptScopedContext = resolvePromptScopedTaskContext(options.cwd, { prompt: options.prompt });
   const promptScope = promptScopedContext.promptScope;
+  const promptScopedHeadTasks = promptScope
+    ? promptScope.status === 'queue'
+      ? promptScope.selectedTasks.slice(0, 1)
+      : promptScope.selectedTasks
+    : [];
   const promptScopedAllowedPaths = promptScope
-    ? buildPromptScopedAllowedPaths(promptScope.selectedTasks)
+    ? buildPromptScopedAllowedPaths(promptScopedHeadTasks)
     : [];
   const activeDirectionLocks = readActiveTaskDirectionLocks(options.cwd);
   const directionLockAllowedPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
@@ -300,6 +305,9 @@ function runPreToolHook(options: HookInvocationOptions) {
         .filter((entry) => !isPromptScopeDriftExempt(entry))
         .filter((entry) => !isToolFileInPromptScope(entry, promptScopedAllowedPaths))
       : [];
+  const staticEvidenceArtifactFiles = mutatingIntent && !gitCommitIntent
+    ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isStaticEvidenceArtifactPath)
+    : [];
 
   if (status.mode === 'cross-repo-target-required' && gitCommitIntent) {
     return makeResult({
@@ -380,6 +388,28 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolName: options.toolName,
         toolFiles,
         blockedFiles: protectedStateFiles,
+        toolCommand,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (staticEvidenceArtifactFiles.length > 0 && !isAuthorizedStaticEvidenceArtifactCommand(toolCommand)) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_STATIC_EVIDENCE_IMPERSONATION_BLOCKED', 'Do not hand-edit static evidence artifacts. Generate reports with ATM commands and record closure evidence through atm evidence/tasks commands.', {
+        editor: options.editor,
+        blockedFiles: staticEvidenceArtifactFiles,
+        nextStep: 'Use node atm.mjs evidence add ... for closure proof, and generate report artifacts through atm/validator commands instead of direct file edits.'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        blockedFiles: staticEvidenceArtifactFiles,
         toolCommand,
         frameworkStatus: status
       }
@@ -868,10 +898,30 @@ function isProtectedAtmManagedStatePath(value: string): boolean {
     || normalized === '.atm/runtime/guidance/active-session.json';
 }
 
+function isStaticEvidenceArtifactPath(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  if (normalized.startsWith('atomic_workbench/evidence/') && normalized.endsWith('.json')) {
+    return true;
+  }
+  if (normalized.startsWith('atomic_workbench/reports/') && normalized.endsWith('.json')) {
+    return true;
+  }
+  return false;
+}
+
 function isAuthorizedAtmStateMutationCommand(command: string | null): boolean {
   const normalized = String(command ?? '').trim().toLowerCase();
   if (!normalized) return false;
   return /\batm\.mjs\b/.test(normalized);
+}
+
+function isAuthorizedStaticEvidenceArtifactCommand(command: string | null): boolean {
+  const normalized = String(command ?? '').trim().toLowerCase();
+  if (!normalized) return false;
+  return /\batm\.mjs\b/.test(normalized)
+    || /\bnpm\s+run\s+validate:/i.test(normalized)
+    || /\bnode\s+--strip-types\s+scripts\/validate-/i.test(normalized)
+    || /\bnode\s+scripts\//i.test(normalized);
 }
 
 function isMutatingToolIntent(toolName: string | null, command: string | null): boolean {

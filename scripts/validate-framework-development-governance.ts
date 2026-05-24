@@ -118,10 +118,12 @@ try {
     'task_id: TASK-SCOPE-0001',
     'title: Prompt scoped task',
     'status: open',
-    'files: src/scope.ts',
     '---',
     '',
-    '# TASK-SCOPE-0001'
+    '# TASK-SCOPE-0001',
+    '',
+    'Deliverables:',
+    '- src/scope.ts'
   ].join('\n'), 'utf8');
   const preToolPromptScopedNeedsClaim = runIntegrationHookInvocation([
     'pre-tool',
@@ -160,6 +162,16 @@ try {
   ]);
   assert(preToolPromptScopedDrift.ok === false, 'pre-tool hook must block prompt-scoped out-of-scope edits');
   assert(preToolPromptScopedDrift.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'prompt-scoped drift block must report ATM_TOOL_SCOPE_DRIFT_BLOCKED');
+  const preToolStaticEvidenceBlock = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', promptScopedRepo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', 'TASK-SCOPE-0001',
+    '--files', 'atomic_workbench/evidence/TASK-SCOPE-0001.json'
+  ]);
+  assert(preToolStaticEvidenceBlock.ok === false, 'pre-tool hook must block direct static evidence artifact edits');
+  assert(preToolStaticEvidenceBlock.messages.some((entry) => entry.code === 'ATM_STATIC_EVIDENCE_IMPERSONATION_BLOCKED'), 'static evidence artifact edit must report impersonation block');
 
   const planningRepo = makeHostRepo(tempRoot, 'planning-repo');
   const crossRepo = createFrameworkModeStatus({ cwd: planningRepo, targetRepo: frameworkRepo });
