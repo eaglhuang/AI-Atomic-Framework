@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
@@ -154,6 +154,9 @@ export async function runTasks(argv: string[]) {
   if (action === 'queue') {
     return runTasksQueue(argv.slice(1));
   }
+  if (action === 'lock') {
+    return await runTasksLock(argv.slice(1));
+  }
   if (action === 'migrate-legacy-ledger') {
     return runTasksMigrateLegacyLedger(argv.slice(1));
   }
@@ -170,7 +173,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | queue | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | queue | lock | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -865,6 +868,97 @@ function runTasksAudit(argv: string[]) {
       action: 'audit',
       staged: options.staged,
       report
+    }
+  });
+}
+
+async function runTasksLock(argv: string[]) {
+  const action = (argv[0] ?? '').toLowerCase();
+  if (action !== 'cleanup') {
+    throw new CliError('ATM_CLI_USAGE', 'tasks lock supports only: cleanup', { exitCode: 2 });
+  }
+  return await runTasksLockCleanup(argv.slice(1));
+}
+
+async function runTasksLockCleanup(argv: string[]) {
+  const options = parseLockCleanupOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks lock cleanup requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const nowIso = new Date().toISOString();
+  const taskPath = taskPathFor(options.cwd, options.taskId);
+  const taskDocument = existsSync(taskPath)
+    ? JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
+    : null;
+  const currentStatus = normalizeTaskStatus(taskDocument?.status);
+  const currentClaim = parseClaimRecord(taskDocument?.claim);
+  const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
+  const sidecarPath = path.join(options.cwd, '.atm', 'runtime', 'task-direction-locks', `${options.taskId}.json`);
+  const governanceLock = existsSync(lockPath)
+    ? JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>
+    : null;
+  const releasedLock = governanceLock?.released === true || governanceLock?.status === 'released';
+  const staleReasons: string[] = [];
+
+  if (releasedLock) staleReasons.push('released-lock');
+  if (!taskDocument) staleReasons.push('missing-task');
+  if (currentStatus === 'done' || currentStatus === 'abandoned' || currentStatus === 'blocked') {
+    staleReasons.push(`terminal-task:${currentStatus}`);
+  }
+  if (currentClaim && isClaimExpired(currentClaim, nowIso)) staleReasons.push('expired-claim');
+  if (!governanceLock && existsSync(sidecarPath)) staleReasons.push('orphaned-sidecar');
+  if (governanceLock && !releasedLock && !currentClaim && existsSync(sidecarPath)) staleReasons.push('lock-without-claim');
+
+  if (staleReasons.length === 0) {
+    throw new CliError('ATM_TASK_LOCK_CLEANUP_NOT_ALLOWED', `Task ${options.taskId} does not have a stale cleanup candidate.`, {
+      exitCode: 1,
+      details: {
+        taskId: options.taskId,
+        lockPath: existsSync(lockPath) ? relativePathFrom(options.cwd, lockPath) : null,
+        sidecarPath: existsSync(sidecarPath) ? relativePathFrom(options.cwd, sidecarPath) : null,
+        status: currentStatus,
+        claimState: currentClaim?.state ?? null
+      }
+    });
+  }
+
+  const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+  const cleanupActions: string[] = [];
+  if (governanceLock && !releasedLock) {
+    await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+    cleanupActions.push('released-governance-lock');
+  }
+  if (existsSync(sidecarPath)) {
+    rmSync(sidecarPath, { force: true });
+    cleanupActions.push('removed-direction-sidecar');
+  }
+  const reportPath = writeLockCleanupReport({
+    cwd: options.cwd,
+    taskId: options.taskId,
+    actorId,
+    staleReasons,
+    cleanupActions,
+    reason: options.reason
+  });
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASK_LOCK_CLEANUP_OK', `Cleaned stale lock state for ${options.taskId}.`, {
+      taskId: options.taskId,
+      actorId,
+      staleReasons,
+      cleanupActions
+    })],
+    evidence: {
+      action: 'lock-cleanup',
+      taskId: options.taskId,
+      actorId,
+      staleReasons,
+      cleanupActions,
+      reportPath
     }
   });
 }
@@ -1605,6 +1699,50 @@ function parseQueueOptions(argv: string[]) {
   };
 }
 
+function parseLockCleanupOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      options.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks lock cleanup does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks lock cleanup requires --task <work-item-id>.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
+}
+
 function parseLegacyLedgerMigrationOptions(argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -1796,6 +1934,30 @@ function createClaimRecord(input: {
     files: Array.from(new Set(input.files.map((entry) => normalizeRelativePath(entry)).filter(Boolean))),
     state: 'active'
   };
+}
+
+function writeLockCleanupReport(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly staleReasons: readonly string[];
+  readonly cleanupActions: readonly string[];
+  readonly reason: string | null;
+}) {
+  const directory = path.join(input.cwd, '.atm', 'history', 'reports', 'lock-cleanup');
+  mkdirSync(directory, { recursive: true });
+  const timestamp = new Date().toISOString();
+  const filePath = path.join(directory, `${timestamp.replace(/[:.]/g, '-')}-${input.taskId}.json`);
+  writeFileSync(filePath, `${JSON.stringify({
+    schemaId: 'atm.lockCleanupReport.v1',
+    generatedAt: timestamp,
+    taskId: input.taskId,
+    actorId: input.actorId,
+    staleReasons: input.staleReasons,
+    cleanupActions: input.cleanupActions,
+    reason: input.reason
+  }, null, 2)}\n`, 'utf8');
+  return relativePathFrom(input.cwd, filePath);
 }
 
 function isClaimExpired(claim: TaskClaimRecord, nowIso: string) {

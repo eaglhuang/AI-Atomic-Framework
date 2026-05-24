@@ -317,6 +317,11 @@ async function claimNextImportedTask(input: {
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
+  const claimPreparation = await prepareImportedTaskForClaim({
+    cwd: input.cwd,
+    task: input.importedTaskQueue.claimableTask,
+    actorId: resolvedActor.actorId
+  });
   const claimResult = await runTasks([
     'claim',
     '--cwd',
@@ -372,6 +377,7 @@ async function claimNextImportedTask(input: {
     ),
     evidence: {
       nextAction,
+      claimPreparation,
       claimResult: claimResult.evidence,
       taskDirectionLock: directionLock,
       taskQueue: activeQueue,
@@ -837,7 +843,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   })) ?? null;
-  const claimableTask = selectedTask && selectedTask.format === 'json' && selectedTask.status === 'ready' && selectedTask.dependencies.every((dependency) => {
+  const claimableTask = selectedTask && selectedTask.format === 'json' && canTaskBePreparedForClaim(selectedTask.status) && selectedTask.dependencies.every((dependency) => {
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   }) ? selectedTask : null;
@@ -853,12 +859,70 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
 }
 
 function statusQueueWeight(status: string): number {
-  const normalized = status.toLowerCase();
+  const normalized = normalizeTaskRouteStatus(status);
   if (normalized === 'ready') return 0;
   if (normalized === 'open') return 1;
   if (normalized === 'planned') return 2;
   if (normalized === 'blocked' || normalized === 'waiting_target_evidence') return 3;
   return 3;
+}
+
+function canTaskBePreparedForClaim(status: string) {
+  const normalized = normalizeTaskRouteStatus(status);
+  return normalized === 'planned'
+    || normalized === 'open'
+    || normalized === 'reserved'
+    || normalized === 'ready';
+}
+
+async function prepareImportedTaskForClaim(input: {
+  readonly cwd: string;
+  readonly task: ImportedTaskSummary;
+  readonly actorId: string;
+}) {
+  const steps: Array<{ readonly action: 'reserve' | 'promote'; readonly evidence: unknown }> = [];
+  const normalizedStatus = normalizeTaskRouteStatus(input.task.status);
+  if (normalizedStatus === 'planned' || normalizedStatus === 'open') {
+    const reserveResult = await runTasks([
+      'reserve',
+      '--cwd',
+      input.cwd,
+      '--task',
+      input.task.workItemId,
+      '--actor',
+      input.actorId,
+      '--json'
+    ]);
+    steps.push({
+      action: 'reserve',
+      evidence: reserveResult.evidence
+    });
+  }
+  if (normalizedStatus === 'planned' || normalizedStatus === 'open' || normalizedStatus === 'reserved') {
+    const promoteResult = await runTasks([
+      'promote',
+      '--cwd',
+      input.cwd,
+      '--task',
+      input.task.workItemId,
+      '--actor',
+      input.actorId,
+      '--json'
+    ]);
+    steps.push({
+      action: 'promote',
+      evidence: promoteResult.evidence
+    });
+  }
+  return {
+    taskId: input.task.workItemId,
+    originalStatus: normalizedStatus,
+    steps
+  };
+}
+
+function normalizeTaskRouteStatus(status: string) {
+  return String(status ?? '').trim().toLowerCase();
 }
 
 export function resolvePromptScopedTaskContext(cwd: string, input: { readonly prompt?: string | null; readonly intentPath?: string | null }): PromptScopedTaskContext {
