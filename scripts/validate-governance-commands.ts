@@ -128,7 +128,7 @@ try {
   assert(promoteTask.parsed.ok === true, 'tasks promote must report ok=true');
   assert(promoteTask.parsed.evidence.status === 'ready', 'tasks promote must set ready status');
 
-  const nextClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--json']);
+  const nextClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0103', '--json']);
   assert(nextClaim.exitCode === 0, 'next --claim must exit 0');
   assert(nextClaim.parsed.ok === true, 'next --claim must report ok=true');
   assert(nextClaim.parsed.evidence.claimResult?.action === 'claim', 'next --claim must include claim evidence');
@@ -273,9 +273,41 @@ try {
   assert(gitGuardFailOpen.parsed.ok === true, 'guard git --fail-open must report ok=true when violations exist');
   assert(gitGuardFailOpen.parsed.messages?.[0]?.code === 'ATM_GUARD_GIT_FAIL_OPEN', 'guard git --fail-open must return fail-open warning code');
 
-  const addEvidence = runAtm(['evidence', 'add', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--kind', 'test', '--summary', 'fixture governance command validation passed', '--artifacts', 'notes/governance.txt', '--json']);
+  const addEvidence = runAtm([
+    'evidence',
+    'add',
+    '--cwd',
+    repo,
+    '--task',
+    'ATM-GOV-0103',
+    '--actor',
+    'fixture-agent',
+    '--kind',
+    'test',
+    '--summary',
+    'fixture governance command validation passed',
+    '--artifacts',
+    'notes/governance.txt',
+    '--freshness',
+    'fresh',
+    '--command',
+    'npm run typecheck',
+    '--exit-code',
+    '0',
+    '--stdout-sha256',
+    'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+    '--stderr-sha256',
+    'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+    '--validators',
+    'typecheck,validate:cli',
+    '--json'
+  ]);
   assert(addEvidence.exitCode === 0, 'evidence add must exit 0');
   assert(addEvidence.parsed.ok === true, 'evidence add must report ok=true');
+  const evidencePath = path.join(repo, '.atm', 'history', 'evidence', 'ATM-GOV-0103.json');
+  const evidenceBundle = JSON.parse(readFileSync(evidencePath, 'utf8'));
+  assert(evidenceBundle.evidence?.[0]?.evidenceFreshness === 'fresh', 'evidence add must persist fresh evidence metadata');
+  assert(evidenceBundle.evidence?.[0]?.details?.commandRuns?.[0]?.command === 'npm run typecheck', 'evidence add must persist command-run proof');
 
   const verifyCommitEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'commit', '--json']);
   assert(verifyCommitEvidence.exitCode === 0, 'evidence verify commit gate must exit 0');
@@ -297,6 +329,42 @@ try {
   const verifyEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'close', '--json']);
   assert(verifyEvidence.exitCode === 0, 'evidence verify close gate must exit 0');
   assert(verifyEvidence.parsed.ok === true, 'evidence verify close gate must report ok=true');
+
+  const artifactOnlyReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--title', 'Artifact-only closure guard', '--json']);
+  assert(artifactOnlyReserve.exitCode === 0, 'artifact-only tasks reserve must exit 0');
+  const artifactOnlyPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--json']);
+  assert(artifactOnlyPromote.exitCode === 0, 'artifact-only tasks promote must exit 0');
+  const artifactOnlyTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0110.json');
+  const artifactOnlyTask = JSON.parse(readFileSync(artifactOnlyTaskPath, 'utf8'));
+  artifactOnlyTask.targetRepo = 'AI-Atomic-Framework';
+  artifactOnlyTask.closureAuthority = 'target_repo';
+  artifactOnlyTask.notes = 'redteam reopened_for_clean_redo';
+  writeFileSync(artifactOnlyTaskPath, `${JSON.stringify(artifactOnlyTask, null, 2)}\n`, 'utf8');
+  const artifactOnlyEvidence = runAtm([
+    'evidence',
+    'add',
+    '--cwd',
+    repo,
+    '--task',
+    'ATM-GOV-0110',
+    '--actor',
+    'fixture-agent',
+    '--kind',
+    'artifact',
+    '--summary',
+    'static report only',
+    '--freshness',
+    'historical-reference',
+    '--artifacts',
+    'notes/governance.txt',
+    '--json'
+  ]);
+  assert(artifactOnlyEvidence.exitCode === 0, 'artifact-only evidence add must exit 0');
+  const artifactOnlyVerify = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0110', '--gate', 'close', '--json']);
+  assert(artifactOnlyVerify.exitCode === 1, 'artifact-only close evidence must exit 1 for reopened framework-like tasks');
+  assert(artifactOnlyVerify.parsed.ok === false, 'artifact-only close evidence must report ok=false');
+  assert(artifactOnlyVerify.parsed.evidence.missing.includes('fresh-evidence-required'), 'artifact-only close evidence must require fresh evidence');
+  assert(artifactOnlyVerify.parsed.evidence.missing.includes('artifact-only-evidence-not-allowed'), 'artifact-only close evidence must reject artifact-only closure');
 
   const closeTask = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--status', 'done', '--json']);
   assert(closeTask.exitCode === 0, 'tasks close done must exit 0 with evidence');

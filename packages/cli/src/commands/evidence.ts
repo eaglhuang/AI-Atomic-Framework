@@ -10,6 +10,7 @@ import {
 
 export type EvidenceGate = 'close' | 'commit' | 'pr';
 type CanonicalEvidenceKind = 'test' | 'artifact' | 'attestation' | 'review' | 'commit' | 'waiver' | 'other';
+type EvidenceFreshness = 'fresh' | 'historical-reference' | 'draft';
 
 interface CanonicalEvidenceRecord {
   readonly kind: CanonicalEvidenceKind;
@@ -17,6 +18,8 @@ interface CanonicalEvidenceRecord {
   readonly producedBy: string | null;
   readonly artifactPaths: readonly string[];
   readonly createdAt: string | null;
+  readonly freshness: EvidenceFreshness;
+  readonly hasCommandRunProof: boolean;
 }
 
 interface EvidenceEnvelope {
@@ -30,6 +33,10 @@ export interface EvidenceGateResult {
   readonly gate: EvidenceGate;
   readonly total: number;
   readonly counts: Readonly<Record<CanonicalEvidenceKind, number>>;
+  readonly freshCount: number;
+  readonly commandRunEvidenceCount: number;
+  readonly reopenedRedteamTask: boolean;
+  readonly codeOrFrameworkTask: boolean;
   readonly missing: readonly string[];
 }
 
@@ -125,6 +132,9 @@ export function verifyTaskEvidence(input: {
   cwd: string;
   taskId: string;
   gate: EvidenceGate;
+  taskDocument?: Record<string, unknown> | null;
+  taskDeclaredFiles?: readonly string[];
+  frameworkTask?: boolean;
 }): EvidenceGateResult {
   const bundle = readEvidenceBundle(input.cwd, input.taskId);
   const canonical = bundle.evidence.map((entry) => canonicalizeEvidenceRecord(entry));
@@ -142,11 +152,24 @@ export function verifyTaskEvidence(input: {
   }
 
   const nonWaiver = canonical.filter((record) => record.kind !== 'waiver').length;
+  const freshCount = canonical.filter((record) => record.freshness === 'fresh').length;
+  const commandRunEvidenceCount = canonical.filter((record) => record.hasCommandRunProof).length;
   const verificationCount = counts.test + counts.artifact + counts.attestation + counts.commit;
+  const reopenedRedteamTask = detectReopenedOrRedteamTask(input.taskDocument);
+  const codeOrFrameworkTask = Boolean(input.frameworkTask) || detectCodeOrFrameworkTask(input.taskDocument, input.taskDeclaredFiles ?? []);
   const missing: string[] = [];
   if (input.gate === 'close') {
     if (nonWaiver <= 0) {
       missing.push('at-least-one-non-waiver-evidence');
+    }
+    if (reopenedRedteamTask && freshCount <= 0) {
+      missing.push('fresh-evidence-required');
+    }
+    if (codeOrFrameworkTask && counts.artifact === nonWaiver) {
+      missing.push('artifact-only-evidence-not-allowed');
+    }
+    if (codeOrFrameworkTask && (counts.test + counts.commit + counts.attestation + commandRunEvidenceCount) <= 0) {
+      missing.push('code-or-framework-runnable-evidence');
     }
   } else if (input.gate === 'commit') {
     if (nonWaiver <= 0) {
@@ -169,6 +192,10 @@ export function verifyTaskEvidence(input: {
     gate: input.gate,
     total: canonical.length,
     counts,
+    freshCount,
+    commandRunEvidenceCount,
+    reopenedRedteamTask,
+    codeOrFrameworkTask,
     missing
   };
 }
@@ -189,11 +216,15 @@ function runEvidenceAdd(argv: string[]) {
     evidenceType: kind,
     summary: options.summary ?? `${kind} evidence for ${options.taskId}.`,
     artifactPaths: options.artifacts,
+    evidenceFreshness: options.freshness,
     producedBy: actorId,
     createdAt: nowIso,
     details: {
       actorId,
-      kind
+      kind,
+      freshness: options.freshness,
+      ...(options.validators.length > 0 ? { validationPasses: options.validators } : {}),
+      ...(options.commandRun ? { commandRuns: [options.commandRun] } : {})
     }
   };
   const nextEvidence = [...bundle.evidence, evidenceRecord];
@@ -217,6 +248,7 @@ function runEvidenceAdd(argv: string[]) {
       taskId: options.taskId,
       actorId,
       kind,
+      freshness: options.freshness,
       evidencePath: relativePathFrom(options.cwd, evidencePath),
       evidenceCount: nextEvidence.length
     }
@@ -225,10 +257,14 @@ function runEvidenceAdd(argv: string[]) {
 
 function runEvidenceVerify(argv: string[]) {
   const options = parseEvidenceVerifyOptions(argv);
+  const taskDocument = readTaskDocument(options.cwd, options.taskId);
   const result = verifyTaskEvidence({
     cwd: options.cwd,
     taskId: options.taskId,
-    gate: options.gate
+    gate: options.gate,
+    taskDocument,
+    taskDeclaredFiles: extractTaskDeclaredFiles(taskDocument),
+    frameworkTask: false
   });
   return makeResult({
     ok: result.ok,
@@ -247,12 +283,16 @@ function runEvidenceVerify(argv: string[]) {
     evidence: {
       action: 'verify',
       taskId: options.taskId,
-      gate: result.gate,
-      total: result.total,
-      counts: result.counts,
-      missing: result.missing,
-      evidencePath: relativePathFrom(options.cwd, evidencePathForTask(options.cwd, options.taskId))
-    }
+    gate: result.gate,
+    total: result.total,
+    counts: result.counts,
+    freshCount: result.freshCount,
+    commandRunEvidenceCount: result.commandRunEvidenceCount,
+    reopenedRedteamTask: result.reopenedRedteamTask,
+    codeOrFrameworkTask: result.codeOrFrameworkTask,
+    missing: result.missing,
+    evidencePath: relativePathFrom(options.cwd, evidencePathForTask(options.cwd, options.taskId))
+  }
   });
 }
 
@@ -263,7 +303,15 @@ function parseEvidenceAddOptions(argv: string[]) {
     actorId: null as string | null,
     kind: '',
     summary: null as string | null,
-    artifacts: [] as string[]
+    artifacts: [] as string[],
+    freshness: 'fresh' as EvidenceFreshness,
+    validators: [] as string[],
+    commandRun: null as null | {
+      readonly command: string;
+      readonly exitCode: number;
+      readonly stdoutSha256: string;
+      readonly stderrSha256: string;
+    }
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -294,6 +342,38 @@ function parseEvidenceAddOptions(argv: string[]) {
     }
     if (arg === '--artifacts') {
       options.artifacts = requireValue(argv, index, '--artifacts').split(',').map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--freshness') {
+      options.freshness = normalizeEvidenceFreshness(requireValue(argv, index, '--freshness'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--validators') {
+      options.validators = requireValue(argv, index, '--validators').split(',').map((entry) => entry.trim()).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--command') {
+      const command = requireValue(argv, index, '--command');
+      const exitCode = parseIntegerFlag(argv, '--exit-code');
+      const stdoutSha256 = readOptionalFlag(argv, '--stdout-sha256');
+      const stderrSha256 = readOptionalFlag(argv, '--stderr-sha256');
+      if (exitCode === null || !isSha256(stdoutSha256) || !isSha256(stderrSha256)) {
+        throw new CliError('ATM_CLI_USAGE', 'evidence add --command also requires --exit-code, --stdout-sha256, and --stderr-sha256.', { exitCode: 2 });
+      }
+      options.commandRun = {
+        command,
+        exitCode,
+        stdoutSha256,
+        stderrSha256
+      };
+      index += 1;
+      continue;
+    }
+    if (arg === '--exit-code' || arg === '--stdout-sha256' || arg === '--stderr-sha256') {
+      requireValue(argv, index, arg);
       index += 1;
       continue;
     }
@@ -387,6 +467,12 @@ function canonicalizeEvidenceRecord(value: Record<string, unknown>): CanonicalEv
   const evidenceType = typeof value.evidenceType === 'string' ? value.evidenceType : '';
   const evidenceKind = typeof value.evidenceKind === 'string' ? value.evidenceKind : '';
   const detailKind = isRecord(value.details) && typeof value.details.kind === 'string' ? value.details.kind : '';
+  const detailFreshness = isRecord(value.details) && typeof value.details.freshness === 'string' ? value.details.freshness : '';
+  const topFreshness = typeof value.evidenceFreshness === 'string'
+    ? value.evidenceFreshness
+    : typeof value.freshness === 'string'
+      ? value.freshness
+      : '';
   const kind = normalizeEvidenceKind(evidenceType || detailKind || evidenceKind);
   return {
     kind,
@@ -395,7 +481,9 @@ function canonicalizeEvidenceRecord(value: Record<string, unknown>): CanonicalEv
     artifactPaths: Array.isArray(value.artifactPaths)
       ? value.artifactPaths.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => normalizeRelativePath(entry))
       : [],
-    createdAt: typeof value.createdAt === 'string' ? value.createdAt : null
+    createdAt: typeof value.createdAt === 'string' ? value.createdAt : null,
+    freshness: normalizeEvidenceFreshness(topFreshness || detailFreshness),
+    hasCommandRunProof: hasCommandRunProof(value)
   };
 }
 
@@ -410,8 +498,21 @@ function normalizeEvidenceKind(value: string): CanonicalEvidenceKind {
   return 'other';
 }
 
+function normalizeEvidenceFreshness(value: string): EvidenceFreshness {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'historical-reference' || normalized === 'historical_reference' || normalized === 'reference-only') {
+    return 'historical-reference';
+  }
+  if (normalized === 'draft') return 'draft';
+  return 'fresh';
+}
+
 function evidencePathForTask(cwd: string, taskId: string) {
   return path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+}
+
+function taskPathForEvidence(cwd: string, taskId: string) {
+  return path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
 }
 
 function normalizeRelativePath(value: string) {
@@ -428,4 +529,113 @@ function requireValue(argv: string[], index: number, flag: string) {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function readTaskDocument(cwd: string, taskId: string) {
+  const taskPath = taskPathForEvidence(cwd, taskId);
+  if (!existsSync(taskPath)) return null;
+  return JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+}
+
+function extractTaskDeclaredFiles(taskDocument: Record<string, unknown> | null) {
+  if (!taskDocument) return [];
+  const files = new Set<string>();
+  for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles']) {
+    collectTaskFileValues(taskDocument[key], files);
+  }
+  const source = taskDocument.source;
+  if (source && typeof source === 'object' && !Array.isArray(source)) {
+    const sourceRecord = source as Record<string, unknown>;
+    collectTaskFileValues(sourceRecord.path, files);
+    collectTaskFileValues(sourceRecord.planPath, files);
+  }
+  return [...files].sort((left, right) => left.localeCompare(right));
+}
+
+function collectTaskFileValues(value: unknown, files: Set<string>) {
+  if (typeof value === 'string') {
+    const normalized = normalizeRelativePath(value);
+    if (normalized) files.add(normalized);
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      collectTaskFileValues(entry, files);
+    }
+  }
+}
+
+function detectReopenedOrRedteamTask(taskDocument: Record<string, unknown> | null | undefined) {
+  if (!taskDocument) return false;
+  for (const field of ['audit_status', 'auditStatus', 'notes', 'summary', 'description']) {
+    const text = typeof taskDocument[field] === 'string' ? taskDocument[field] : '';
+    if (/(reopened|clean[_ -]?redo|redteam|invalid completion claim|historical draft evidence|draft evidence)/i.test(text)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function detectCodeOrFrameworkTask(taskDocument: Record<string, unknown> | null | undefined, declaredFiles: readonly string[]) {
+  if (!taskDocument) return declaredFiles.some(isCodeLikePath);
+  const closureAuthority = typeof taskDocument.closureAuthority === 'string'
+    ? taskDocument.closureAuthority
+    : typeof taskDocument.closure_authority === 'string'
+      ? taskDocument.closure_authority
+      : '';
+  const targetRepo = typeof taskDocument.targetRepo === 'string'
+    ? taskDocument.targetRepo
+    : typeof taskDocument.target_repo === 'string'
+      ? taskDocument.target_repo
+      : '';
+  if (closureAuthority.trim().toLowerCase() === 'target_repo' || targetRepo.trim().length > 0) {
+    return true;
+  }
+  if (declaredFiles.some(isCodeLikePath)) return true;
+  const notes = typeof taskDocument.notes === 'string' ? taskDocument.notes : '';
+  return isCodeLikePath(notes);
+}
+
+function isCodeLikePath(value: string) {
+  return /(^|[/\s])(packages|scripts|schemas|specs|templates|integrations|examples|tests)\//i.test(value)
+    || /\.(?:ts|tsx|js|jsx|mjs|cjs|mts|cts|py|go|rs|java|cs|cpp|c|h|json|ya?ml|sh|ps1)\b/i.test(value);
+}
+
+function hasCommandRunProof(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  if (Array.isArray(candidate.commandRuns)) {
+    return candidate.commandRuns.some((entry) => isCommandRunProof(entry));
+  }
+  if (isRecord(candidate.details) && Array.isArray(candidate.details.commandRuns)) {
+    return candidate.details.commandRuns.some((entry) => isCommandRunProof(entry));
+  }
+  return false;
+}
+
+function isCommandRunProof(value: unknown) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.command === 'string'
+    && typeof candidate.exitCode === 'number'
+    && isSha256(candidate.stdoutSha256)
+    && isSha256(candidate.stderrSha256);
+}
+
+function isSha256(value: unknown): value is string {
+  return typeof value === 'string' && /^sha256:[a-f0-9]{64}$/i.test(value.trim());
+}
+
+function readOptionalFlag(argv: string[], flag: string) {
+  const index = argv.indexOf(flag);
+  if (index < 0 || index + 1 >= argv.length) return null;
+  const value = argv[index + 1];
+  return value && !value.startsWith('--') ? value.trim() : null;
+}
+
+function parseIntegerFlag(argv: string[], flag: string) {
+  const raw = readOptionalFlag(argv, flag);
+  if (raw === null) return null;
+  const value = Number.parseInt(raw, 10);
+  return Number.isFinite(value) ? value : null;
 }

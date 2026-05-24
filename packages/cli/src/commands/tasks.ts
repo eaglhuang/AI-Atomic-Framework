@@ -744,7 +744,10 @@ async function runTasksClose(argv: string[]) {
     ? verifyTaskEvidence({
       cwd: options.cwd,
       taskId: options.taskId,
-      gate: 'close'
+      gate: 'close',
+      taskDocument,
+      taskDeclaredFiles,
+      frameworkTask: frameworkStatus?.repoRole === 'framework'
     })
     : null;
   if (evidenceGate && !evidenceGate.ok) {
