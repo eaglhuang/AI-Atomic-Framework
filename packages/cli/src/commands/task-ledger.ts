@@ -38,6 +38,28 @@ export interface TaskTransitionEvent {
   readonly command: string;
   readonly originProvider?: string;
   readonly originTaskId?: string;
+  readonly closure?: TaskTransitionClosureMetadata;
+}
+
+export interface TaskTransitionRequiredGatesSnapshot {
+  readonly schemaId: 'atm.requiredGatesSnapshot.v1';
+  readonly generatedAt: string;
+  readonly source: 'frameworkStatus.requiredGates';
+  readonly ruleVersion: string;
+  readonly frameworkMode: string;
+  readonly repoRole: 'framework' | 'host';
+  readonly changedFiles: readonly string[];
+  readonly criticalChangedFiles: readonly string[];
+  readonly requiredGates: readonly string[];
+}
+
+export interface TaskTransitionClosureMetadata {
+  readonly schemaId: 'atm.taskClosureTransition.v1';
+  readonly closurePacketPath: string | null;
+  readonly evidenceFreshness: 'fresh' | 'historical-reference' | 'draft' | null;
+  readonly validationPasses: readonly string[];
+  readonly requiredGates: readonly string[];
+  readonly requiredGatesSnapshot: TaskTransitionRequiredGatesSnapshot | null;
 }
 
 const defaultTaskLedgerPolicy: Omit<TaskLedgerPolicy, 'taskRoot' | 'eventRoot' | 'externalTasks'> = {
@@ -99,6 +121,7 @@ export function appendTaskTransitionEvent(input: {
   readonly taskPath: string;
   readonly taskDocument: Record<string, unknown>;
   readonly command?: string;
+  readonly closureMetadata?: TaskTransitionClosureMetadata | null;
 }): { transitionId: string; eventPath: string; event: TaskTransitionEvent } {
   const root = path.resolve(input.cwd);
   const policy = readTaskLedgerPolicy(root);
@@ -122,7 +145,8 @@ export function appendTaskTransitionEvent(input: {
     createdAt,
     command: input.command ?? `atm tasks ${input.action}`,
     ...(typeof input.taskDocument.originProvider === 'string' ? { originProvider: input.taskDocument.originProvider } : {}),
-    ...(typeof input.taskDocument.originTaskId === 'string' ? { originTaskId: input.taskDocument.originTaskId } : {})
+    ...(typeof input.taskDocument.originTaskId === 'string' ? { originTaskId: input.taskDocument.originTaskId } : {}),
+    ...(input.closureMetadata ? { closure: input.closureMetadata } : {})
   };
   mkdirSync(eventRoot, { recursive: true });
   writeFileSync(eventAbsolute, `${JSON.stringify(event, null, 2)}\n`, 'utf8');

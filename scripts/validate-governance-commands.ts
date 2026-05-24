@@ -369,6 +369,13 @@ try {
   const closeTask = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--status', 'done', '--json']);
   assert(closeTask.exitCode === 0, 'tasks close done must exit 0 with evidence');
   assert(closeTask.parsed.ok === true, 'tasks close done must report ok=true with evidence');
+  const closedTask = JSON.parse(readFileSync(taskPath, 'utf8'));
+  const closeTransitionId = String(closedTask.lastTransitionId ?? '');
+  assert(closeTransitionId.length > 0, 'tasks close done must persist lastTransitionId');
+  const closeTransitionPath = path.join(repo, '.atm', 'history', 'task-events', 'ATM-GOV-0103', `${closeTransitionId}.json`);
+  assert(existsSync(closeTransitionPath), 'tasks close done must write a closure transition event');
+  const closeTransition = JSON.parse(readFileSync(closeTransitionPath, 'utf8'));
+  assert(closeTransition.closure === undefined, 'host-repo closure transition should not fabricate framework closure metadata');
 
   const handoff = runAtm(['handoff', 'summarize', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--json']);
   assert(handoff.exitCode === 0, 'handoff summarize must exit 0');

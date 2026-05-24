@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -328,13 +328,88 @@ try {
     taskId: 'TASK-X-0003',
     actorId: 'test-agent',
     evidencePath: '.atm/history/evidence/TASK-X-0003.json',
-    changedFiles: ['packages/core/src/index.ts']
+    changedFiles: ['packages/core/src/index.ts'],
+    frameworkStatus: createFrameworkModeStatus({
+      cwd: frameworkRepo,
+      files: ['packages/core/src/index.ts']
+    })
   });
   assert(validateClosurePacket(packet).ok === true, 'generated closure packet must validate');
   assert(Array.isArray(packet.validationPasses) && packet.validationPasses.length > 0, 'generated closure packet must include validator pass names');
   assert(Array.isArray(packet.commandRuns) && packet.commandRuns.length > 0, 'generated closure packet must include runnable command proof');
   assert(packet.validationPasses.includes('validate:git-head-evidence'), 'generated closure packet must include required validator pass names for required gates');
   assert(packet.targetCommitDelta.changedFiles.includes('packages/core/src/index.ts'), 'generated closure packet must include target commit delta changed files');
+  assert(packet.requiredGatesSnapshot?.schemaId === 'atm.requiredGatesSnapshot.v1', 'generated closure packet must include a required-gates snapshot');
+  assert(packet.requiredGatesSnapshot?.source === 'frameworkStatus.requiredGates', 'required-gates snapshot must record framework status as its source');
+  assert(JSON.stringify([...packet.requiredGatesSnapshot.requiredGates].sort()) === JSON.stringify([...packet.requiredGates].sort()), 'required-gates snapshot must match packet requiredGates');
+
+  writeJson(path.join(frameworkRepo, '.atm', 'history', 'tasks', 'TASK-X-0005.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-X-0005',
+    title: 'Framework closure transition metadata',
+    status: 'ready',
+    owner: 'test-agent',
+    scope: ['packages/core/src/index.ts']
+  });
+  writeJson(path.join(frameworkRepo, '.atm', 'history', 'evidence', 'TASK-X-0005.json'), {
+    taskId: 'TASK-X-0005',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        evidenceType: 'test',
+        evidenceFreshness: 'fresh',
+        summary: 'framework close evidence',
+        details: {
+          kind: 'test',
+          freshness: 'fresh',
+          validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+          commandRuns: [
+            {
+              command: 'npm run typecheck',
+              cwd: '.',
+              exitCode: 0,
+              stdoutSha256: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+              stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+              runnerVersion: '0.1.0'
+            },
+            {
+              command: 'npm run validate:cli',
+              cwd: '.',
+              exitCode: 0,
+              stdoutSha256: 'sha256:2222222222222222222222222222222222222222222222222222222222222222',
+              stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+              runnerVersion: '0.1.0'
+            },
+            {
+              command: 'npm run validate:git-head-evidence',
+              cwd: '.',
+              exitCode: 0,
+              stdoutSha256: 'sha256:3333333333333333333333333333333333333333333333333333333333333333',
+              stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+              runnerVersion: '0.1.0'
+            }
+          ]
+        }
+      }
+    ]
+  });
+  await runTasks(['claim', '--cwd', frameworkRepo, '--task', 'TASK-X-0005', '--actor', 'test-agent', '--files', 'packages/core/src/index.ts']);
+  writeTaskDirectionLock({
+    cwd: frameworkRepo,
+    taskId: 'TASK-X-0005',
+    actorId: 'test-agent',
+    queue: null,
+    allowedFiles: ['packages/core/src/index.ts'],
+    prompt: 'TASK-X-0005'
+  });
+  await runTasks(['close', '--cwd', frameworkRepo, '--task', 'TASK-X-0005', '--actor', 'test-agent', '--status', 'done']);
+  const closedFrameworkTask = JSON.parse(readFileSync(path.join(frameworkRepo, '.atm', 'history', 'tasks', 'TASK-X-0005.json'), 'utf8'));
+  const closeTransitionId = String(closedFrameworkTask.lastTransitionId ?? '');
+  assert(closeTransitionId.length > 0, 'framework close must persist lastTransitionId');
+  const closeTransition = JSON.parse(readFileSync(path.join(frameworkRepo, '.atm', 'history', 'task-events', 'TASK-X-0005', `${closeTransitionId}.json`), 'utf8'));
+  assert(closeTransition.closure?.schemaId === 'atm.taskClosureTransition.v1', 'framework close transition must embed closure metadata');
+  assert(Array.isArray(closeTransition.closure?.validationPasses) && closeTransition.closure.validationPasses.includes('validate:git-head-evidence'), 'framework close transition must persist validator pass names');
+  assert(closeTransition.closure?.requiredGatesSnapshot?.schemaId === 'atm.requiredGatesSnapshot.v1', 'framework close transition must persist required-gates snapshot metadata');
 
   const commandStatus = await runFrameworkMode(['status', '--cwd', root, '--files', 'packages/core/src/index.ts', '--json']);
   assert(commandStatus.ok === true, 'framework-mode status command must report ok=true');

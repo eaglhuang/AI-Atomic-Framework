@@ -74,6 +74,18 @@ export interface ClosurePacketTargetCommitDelta {
   readonly changedFiles: readonly string[];
 }
 
+export interface ClosurePacketRequiredGatesSnapshot {
+  readonly schemaId: 'atm.requiredGatesSnapshot.v1';
+  readonly generatedAt: string;
+  readonly source: 'frameworkStatus.requiredGates';
+  readonly ruleVersion: string;
+  readonly frameworkMode: FrameworkMode;
+  readonly repoRole: 'framework' | 'host';
+  readonly changedFiles: readonly string[];
+  readonly criticalChangedFiles: readonly string[];
+  readonly requiredGates: readonly string[];
+}
+
 export interface ClosurePacket {
   readonly schemaId: 'atm.closurePacket.v1';
   readonly specVersion: '0.1.0';
@@ -87,6 +99,7 @@ export interface ClosurePacket {
   readonly validationPasses: readonly string[];
   readonly evidenceFreshness: 'fresh' | 'historical-reference' | 'draft';
   readonly requiredGates: readonly string[];
+  readonly requiredGatesSnapshot: ClosurePacketRequiredGatesSnapshot;
   readonly evidencePath: string;
   readonly closedAt: string;
   readonly closedByActor: string;
@@ -673,6 +686,23 @@ export function validateClosurePacket(value: unknown): { ok: boolean; missing: r
       }
     }
   }
+  if (!packet.requiredGatesSnapshot || typeof packet.requiredGatesSnapshot !== 'object' || Array.isArray(packet.requiredGatesSnapshot)) {
+    missing.push('requiredGatesSnapshot');
+  } else {
+    const snapshot = packet.requiredGatesSnapshot as Partial<ClosurePacketRequiredGatesSnapshot>;
+    if (snapshot.schemaId !== 'atm.requiredGatesSnapshot.v1') missing.push('requiredGatesSnapshot/schemaId');
+    if (snapshot.source !== 'frameworkStatus.requiredGates') missing.push('requiredGatesSnapshot/source');
+    if (!normalizeOptionalString(snapshot.ruleVersion)) missing.push('requiredGatesSnapshot/ruleVersion');
+    if (snapshot.frameworkMode !== 'required' && snapshot.frameworkMode !== 'cross-repo-target-required' && snapshot.frameworkMode !== 'suspected' && snapshot.frameworkMode !== 'inactive') {
+      missing.push('requiredGatesSnapshot/frameworkMode');
+    }
+    if (snapshot.repoRole !== 'framework' && snapshot.repoRole !== 'host') missing.push('requiredGatesSnapshot/repoRole');
+    if (!Array.isArray(snapshot.requiredGates)) {
+      missing.push('requiredGatesSnapshot/requiredGates');
+    } else if (!sameStringSet(snapshot.requiredGates, packet.requiredGates ?? [])) {
+      missing.push('requiredGatesSnapshot/requiredGates-mismatch');
+    }
+  }
   if (packet.evidenceFreshness !== 'fresh') {
     missing.push('evidenceFreshness');
   }
@@ -690,10 +720,18 @@ export function createClosurePacket(input: {
   readonly evidencePath: string;
   readonly requiredGates?: readonly string[];
   readonly changedFiles?: readonly string[];
+  readonly frameworkStatus?: Pick<FrameworkModeStatusReport, 'mode' | 'repoRole' | 'changedFiles' | 'criticalChangedFiles' | 'requiredGates'> | null;
 }): ClosurePacket {
   const cwd = path.resolve(input.cwd);
   const targetCommitDelta = readFutureTargetCommitDelta(cwd, input.changedFiles);
   const evidenceContext = readClosureEvidenceContext(cwd, input.taskId);
+  const requiredGates = uniqueSorted((input.requiredGates ?? defaultRequiredGates).map((entry) => String(entry).trim()).filter(Boolean));
+  const requiredGatesSnapshot = createRequiredGatesSnapshot({
+    cwd,
+    changedFiles: input.changedFiles ?? [],
+    frameworkStatus: input.frameworkStatus ?? null,
+    requiredGates
+  });
   return {
     schemaId: 'atm.closurePacket.v1',
     specVersion: frameworkModeSpecVersion,
@@ -706,7 +744,8 @@ export function createClosurePacket(input: {
     commandRuns: evidenceContext.commandRuns,
     validationPasses: evidenceContext.validationPasses,
     evidenceFreshness: evidenceContext.evidenceFreshness,
-    requiredGates: input.requiredGates ?? defaultRequiredGates,
+    requiredGates,
+    requiredGatesSnapshot,
     evidencePath: input.evidencePath,
     closedAt: new Date().toISOString(),
     closedByActor: input.actorId
@@ -1162,6 +1201,29 @@ function readGitHeadDetails(cwd: string): { commitSha: string | null; treeSha: s
   return { commitSha, treeSha, parentCommitShas };
 }
 
+function createRequiredGatesSnapshot(input: {
+  readonly cwd: string;
+  readonly changedFiles: readonly string[];
+  readonly frameworkStatus: Pick<FrameworkModeStatusReport, 'mode' | 'repoRole' | 'changedFiles' | 'criticalChangedFiles' | 'requiredGates'> | null;
+  readonly requiredGates: readonly string[];
+}): ClosurePacketRequiredGatesSnapshot {
+  const status = input.frameworkStatus ?? createFrameworkModeStatus({
+    cwd: input.cwd,
+    files: input.changedFiles.length > 0 ? input.changedFiles : undefined
+  });
+  return {
+    schemaId: 'atm.requiredGatesSnapshot.v1',
+    generatedAt: new Date().toISOString(),
+    source: 'frameworkStatus.requiredGates',
+    ruleVersion: frameworkModeSpecVersion,
+    frameworkMode: status.mode,
+    repoRole: status.repoRole,
+    changedFiles: uniqueSorted((status.changedFiles ?? []).map(normalizeRelativePath).filter(Boolean)),
+    criticalChangedFiles: uniqueSorted((status.criticalChangedFiles ?? []).map(normalizeRelativePath).filter(Boolean)),
+    requiredGates: uniqueSorted(input.requiredGates.map((entry) => String(entry).trim()).filter(Boolean))
+  };
+}
+
 function readFutureTargetCommitDelta(cwd: string, preferredChangedFiles: readonly string[] = []): ClosurePacketTargetCommitDelta {
   const gitDetails = readGitHeadDetails(cwd);
   const worktreeChangedFiles = uniqueSorted([
@@ -1232,6 +1294,11 @@ function runGitWithEnv(cwd: string, args: readonly string[], env: Record<string,
       ...env
     }
   });
+}
+
+function sameStringSet(left: readonly string[], right: readonly string[]) {
+  const normalize = (values: readonly string[]) => [...new Set(values.map((value) => String(value).trim()).filter(Boolean))].sort();
+  return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
 }
 
 function readClosureEvidenceContext(cwd: string, taskId: string): {

@@ -10,6 +10,7 @@ import {
   createClosurePacket,
   createFrameworkModeStatus,
   requireTargetRepoClosureAuthority,
+  type ClosurePacket,
   validateClosurePacket,
   writeClosurePacket
 } from './framework-development.ts';
@@ -18,6 +19,7 @@ import {
   appendTaskTransitionEvent,
   defaultMirrorTaskId,
   readTaskLedgerPolicy,
+  type TaskTransitionClosureMetadata,
   transitionEventExists
 } from './task-ledger.ts';
 import {
@@ -763,6 +765,7 @@ async function runTasksClose(argv: string[]) {
   }
 
   let closurePacketPath: string | null = null;
+  let closurePacket: ClosurePacket | null = null;
   const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
     ? taskDocument.closurePacket
     : typeof taskDocument.closure_packet === 'string'
@@ -775,12 +778,14 @@ async function runTasksClose(argv: string[]) {
         details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath }
       });
     }
-    const validation = validateClosurePacket(JSON.parse(readFileSync(packetPath, 'utf8')));
+    const packet = JSON.parse(readFileSync(packetPath, 'utf8')) as ClosurePacket;
+    const validation = validateClosurePacket(packet);
     if (!validation.ok) {
       throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet is invalid.`, {
         details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath, missing: validation.missing }
       });
     }
+    closurePacket = packet;
     closurePacketPath = existingClosurePacketPath;
   } else if (options.status === 'done' && frameworkStatus?.repoRole === 'framework') {
     const packet = createClosurePacket({
@@ -789,7 +794,8 @@ async function runTasksClose(argv: string[]) {
       actorId,
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
       requiredGates: frameworkStatus.requiredGates,
-      changedFiles: taskDeclaredFiles
+      changedFiles: taskDeclaredFiles,
+      frameworkStatus
     });
     const validation = validateClosurePacket(packet);
     if (!validation.ok) {
@@ -801,6 +807,7 @@ async function runTasksClose(argv: string[]) {
       });
     }
     closurePacketPath = writeClosurePacket(options.cwd, options.taskId, packet);
+    closurePacket = packet;
     taskDocument.closurePacket = closurePacketPath;
   }
 
@@ -831,7 +838,10 @@ async function runTasksClose(argv: string[]) {
     taskDocument,
     action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
     actorId,
-    previousStatus
+    previousStatus,
+    closureMetadata: options.status === 'done'
+      ? createClosureTransitionMetadata(closurePacketPath, closurePacket)
+      : null
   });
   const taskQueue = options.status === 'done'
     ? advanceTaskQueueAfterClose(options.cwd, options.taskId)
@@ -2211,6 +2221,7 @@ function writeTaskDocumentWithTransition(input: {
   readonly action: string;
   readonly actorId: string | null;
   readonly previousStatus: string | null;
+  readonly closureMetadata?: TaskTransitionClosureMetadata | null;
 }) {
   const nextStatus = typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null;
   const transition = appendTaskTransitionEvent({
@@ -2222,13 +2233,43 @@ function writeTaskDocumentWithTransition(input: {
     toStatus: nextStatus,
     taskPath: input.taskPath,
     taskDocument: input.taskDocument,
-    command: `node atm.mjs tasks ${input.action}`
+    command: `node atm.mjs tasks ${input.action}`,
+    closureMetadata: input.closureMetadata ?? null
   });
   input.taskDocument.lastTransitionId = transition.transitionId;
   input.taskDocument.lastTransitionAt = transition.event.createdAt;
   input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
   writeTaskDocument(input.taskPath, input.taskDocument);
   return transition.eventPath;
+}
+
+function createClosureTransitionMetadata(
+  closurePacketPath: string | null,
+  closurePacket: ClosurePacket | null
+): TaskTransitionClosureMetadata | null {
+  if (!closurePacket && !closurePacketPath) {
+    return null;
+  }
+  return {
+    schemaId: 'atm.taskClosureTransition.v1',
+    closurePacketPath,
+    evidenceFreshness: closurePacket?.evidenceFreshness ?? null,
+    validationPasses: closurePacket?.validationPasses ?? [],
+    requiredGates: closurePacket?.requiredGates ?? [],
+    requiredGatesSnapshot: closurePacket?.requiredGatesSnapshot
+      ? {
+        schemaId: closurePacket.requiredGatesSnapshot.schemaId,
+        generatedAt: closurePacket.requiredGatesSnapshot.generatedAt,
+        source: closurePacket.requiredGatesSnapshot.source,
+        ruleVersion: closurePacket.requiredGatesSnapshot.ruleVersion,
+        frameworkMode: closurePacket.requiredGatesSnapshot.frameworkMode,
+        repoRole: closurePacket.requiredGatesSnapshot.repoRole,
+        changedFiles: [...closurePacket.requiredGatesSnapshot.changedFiles],
+        criticalChangedFiles: [...closurePacket.requiredGatesSnapshot.criticalChangedFiles],
+        requiredGates: [...closurePacket.requiredGatesSnapshot.requiredGates]
+      }
+      : null
+  };
 }
 
 function normalizeWorkItemStatus(value: unknown): WorkItemRef['status'] {
