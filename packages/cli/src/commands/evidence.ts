@@ -1,4 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
 import { resolveActorId } from './actor-registry.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
@@ -45,13 +47,16 @@ export async function runEvidence(argv: string[]) {
   if (action === 'add') {
     return runEvidenceAdd(argv.slice(1));
   }
+  if (action === 'git-head-backfill') {
+    return runGitHeadEvidenceBackfill(argv.slice(1));
+  }
   if (action === 'verify') {
     return runEvidenceVerify(argv.slice(1));
   }
   if (action === 'diff') {
     return runEvidenceDiff(argv.slice(1));
   }
-  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, verify, diff', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, git-head-backfill, verify, diff', { exitCode: 2 });
 }
 
 function runEvidenceDiff(argv: string[]) {
@@ -296,6 +301,89 @@ function runEvidenceVerify(argv: string[]) {
   });
 }
 
+function runGitHeadEvidenceBackfill(argv: string[]) {
+  const options = parseGitHeadBackfillOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence git-head-backfill requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const head = runGitScalar(options.cwd, ['rev-parse', '--verify', 'HEAD']);
+  if (!head) {
+    throw new CliError('ATM_GIT_HEAD_MISSING', 'evidence git-head-backfill requires an existing HEAD commit.', { exitCode: 2 });
+  }
+  const treeSha = readGovernedCommitTreeWithoutEvidence(options.cwd, head) ?? runGitScalar(options.cwd, ['rev-parse', `${head}^{tree}`]);
+  if (!treeSha) {
+    throw new CliError('ATM_GIT_TREE_MISSING', 'ATM could not resolve the HEAD tree for git-head evidence backfill.', { exitCode: 2 });
+  }
+  const nowIso = new Date().toISOString();
+  const evidenceAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', 'git-head.json');
+  const payload = {
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        evidenceType: 'commit',
+        summary: options.summary ?? 'Git HEAD is covered by ATM git-head backfill evidence.',
+        artifactPaths: [],
+        createdAt: nowIso,
+        producedBy: actorId,
+        evidenceFreshness: 'fresh',
+        commandRuns: [],
+        details: {
+          actorId,
+          kind: 'commit',
+          freshness: 'fresh',
+          git: {
+            commitSha: head,
+            treeSha,
+            parentCommitShas: [head],
+            stagedPathCount: 1,
+            evidencePath: normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute)),
+            generatedAt: nowIso
+          },
+          backfill: {
+            mode: 'head-commit-evidence',
+            coveredCommitSha: head,
+            reason: options.reason ?? 'Backfill git-head evidence for an existing HEAD commit.'
+          }
+        }
+      }
+    ]
+  };
+  mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
+  writeFileSync(evidenceAbsolute, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  const addResult = runGitCommand(options.cwd, ['add', '--', normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute))]);
+  if (!addResult.ok) {
+    throw new CliError('ATM_GIT_ADD_FAILED', 'ATM wrote git-head backfill evidence but could not stage it.', {
+      exitCode: 1,
+      details: {
+        stderr: addResult.stderr || addResult.stdout
+      }
+    });
+  }
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: options.cwd,
+    messages: [
+      message('info', 'ATM_GIT_HEAD_EVIDENCE_BACKFILLED', 'ATM wrote git-head evidence for the current HEAD. Commit the staged evidence file as the next commit.', {
+        actorId,
+        commitSha: head,
+        treeSha,
+        evidencePath: normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute))
+      })
+    ],
+    evidence: {
+      action: 'git-head-backfill',
+      actorId,
+      commitSha: head,
+      treeSha,
+      evidencePath: normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute))
+    }
+  });
+}
+
 function parseEvidenceAddOptions(argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -396,6 +484,46 @@ function parseEvidenceAddOptions(argv: string[]) {
   };
 }
 
+function parseGitHeadBackfillOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    actorId: null as string | null,
+    summary: null as string | null,
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--summary') {
+      options.summary = requireValue(argv, index, '--summary');
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence git-head-backfill does not support option ${arg}`, { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd)
+  };
+}
+
 function parseEvidenceVerifyOptions(argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -436,6 +564,58 @@ function parseEvidenceVerifyOptions(argv: string[]) {
     cwd: path.resolve(options.cwd),
     taskId: options.taskId.trim()
   };
+}
+
+function readParentCommitShas(cwd: string, commitSha: string) {
+  const result = runGitCommand(cwd, ['rev-list', '--parents', '-n', '1', commitSha]);
+  if (!result.ok) return [];
+  return result.stdout.trim().split(/\s+/).slice(1).filter(Boolean);
+}
+
+function runGitScalar(cwd: string, args: string[]) {
+  const result = runGitCommand(cwd, args);
+  return result.ok ? result.stdout.trim() : null;
+}
+
+function runGitCommand(cwd: string, args: string[], env: Record<string, string> = {}) {
+  const result = spawnSync('git', args, {
+    cwd,
+    env: {
+      ...process.env,
+      ...env
+    },
+    encoding: 'utf8'
+  });
+  return {
+    ok: !result.error && result.status === 0,
+    exitCode: result.status ?? 1,
+    stdout: result.stdout ?? '',
+    stderr: [result.stderr ?? '', result.error?.message ?? ''].filter(Boolean).join('\n')
+  };
+}
+
+function readGovernedCommitTreeWithoutEvidence(cwd: string, commitSha: string) {
+  const tempDir = mkdirTempDir();
+  const tempIndex = path.join(tempDir, 'index');
+  try {
+    const readTree = runGitCommand(cwd, ['read-tree', commitSha], {
+      GIT_INDEX_FILE: tempIndex
+    });
+    if (!readTree.ok) return null;
+    runGitCommand(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json'], {
+      GIT_INDEX_FILE: tempIndex
+    });
+    const writeTree = runGitCommand(cwd, ['write-tree'], {
+      GIT_INDEX_FILE: tempIndex
+    });
+    return writeTree.ok ? writeTree.stdout.trim() : null;
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
+function mkdirTempDir() {
+  return path.resolve(mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-backfill-')));
 }
 
 function readEvidenceBundle(cwd: string, taskId: string): { evidence: readonly Record<string, unknown>[] } {

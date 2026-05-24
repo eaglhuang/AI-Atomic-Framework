@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'evidence',
   summary: 'Add or verify task evidence for close/commit/PR governance gates.',
   positional: [
-    { name: 'action', summary: 'add | verify', required: true }
+    { name: 'action', summary: 'add | git-head-backfill | verify | diff', required: true }
   ],
   options: [
     commonCwdOption,
@@ -25,6 +25,7 @@ export default defineCommandSpec({
     { flag: '--exit-code', value: 'number', summary: 'Exit code paired with --command evidence.' },
     { flag: '--stdout-sha256', value: 'sha256', summary: 'stdout digest paired with --command evidence.' },
     { flag: '--stderr-sha256', value: 'sha256', summary: 'stderr digest paired with --command evidence.' },
+    { flag: '--reason', value: 'text', summary: 'Optional rationale for git-head-backfill.' },
     { flag: '--gate', value: 'type', summary: 'Evidence gate for verify: close|commit|pr.' },
     commonJsonOption,
     commonPrettyOption,
@@ -33,6 +34,7 @@ export default defineCommandSpec({
   examples: [
     'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --summary "governance validator passed" --artifacts reports/governance.json --json',
     'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --freshness fresh --command "npm run typecheck" --exit-code 0 --stdout-sha256 sha256:1111111111111111111111111111111111111111111111111111111111111111 --stderr-sha256 sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --validators typecheck,validate:cli --json',
+    'node atm.mjs evidence git-head-backfill --actor codex-main --reason "Backfill evidence for a pre-ATM HEAD commit" --json',
     'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json'
   ]
 });
