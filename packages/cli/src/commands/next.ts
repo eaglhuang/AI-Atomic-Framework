@@ -317,23 +317,50 @@ async function claimNextImportedTask(input: {
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
-  const claimPreparation = await prepareImportedTaskForClaim({
-    cwd: input.cwd,
-    task: input.importedTaskQueue.claimableTask,
-    actorId: resolvedActor.actorId
-  });
-  const claimResult = await runTasks([
-    'claim',
-    '--cwd',
-    input.cwd,
-    '--task',
-    input.importedTaskQueue.claimableTask.workItemId,
-    '--actor',
-    resolvedActor.actorId,
-    '--files',
-    input.importedTaskQueue.claimableTask.taskPath,
-    '--json'
-  ]);
+  const existingClaimActorId = input.importedTaskQueue.claimableTask.activeClaimActorId;
+  if (existingClaimActorId && existingClaimActorId !== resolvedActor.actorId) {
+    throw new CliError('ATM_LOCK_CONFLICT', `Task ${input.importedTaskQueue.claimableTask.workItemId} is already claimed by ${existingClaimActorId}.`, {
+      exitCode: 1,
+      details: {
+        taskId: input.importedTaskQueue.claimableTask.workItemId,
+        actorId: existingClaimActorId
+      }
+    });
+  }
+  const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
+  const claimPreparation = alreadyClaimedByActor
+    ? {
+      taskId: input.importedTaskQueue.claimableTask.workItemId,
+      originalStatus: normalizeTaskRouteStatus(input.importedTaskQueue.claimableTask.status),
+      steps: [],
+      reusedActiveClaim: true
+    }
+    : await prepareImportedTaskForClaim({
+      cwd: input.cwd,
+      task: input.importedTaskQueue.claimableTask,
+      actorId: resolvedActor.actorId
+    });
+  const claimResult = alreadyClaimedByActor
+    ? {
+      evidence: {
+        action: 'claim',
+        taskId: input.importedTaskQueue.claimableTask.workItemId,
+        actorId: resolvedActor.actorId,
+        reusedActiveClaim: true
+      }
+    }
+    : await runTasks([
+      'claim',
+      '--cwd',
+      input.cwd,
+      '--task',
+      input.importedTaskQueue.claimableTask.workItemId,
+      '--actor',
+      resolvedActor.actorId,
+      '--files',
+      input.importedTaskQueue.claimableTask.taskPath,
+      '--json'
+    ]);
   const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'
     ? findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId) ?? createOrRefreshTaskQueue({
       cwd: input.cwd,
@@ -709,6 +736,7 @@ interface ImportedTaskSummary {
   readonly scopePaths: readonly string[];
   readonly targetRepo: string | null;
   readonly closureAuthority: string | null;
+  readonly activeClaimActorId: string | null;
   readonly matchScore?: number;
   readonly matchReasons?: readonly string[];
 }
@@ -780,7 +808,10 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
             ...extractDeclaredTaskPathsFromDocument(parsed)
           ]),
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
-          closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
+          closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
+          activeClaimActorId: claimRecord.state === 'active' && typeof claimRecord.actorId === 'string'
+            ? claimRecord.actorId
+            : null
         }];
       } catch {
         return [];
@@ -812,14 +843,15 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           ...extractPathLikeStringsFromText(rawText)
         ]),
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
-        closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority)
+        closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
+        activeClaimActorId: null
       };
     })
     .filter((entry): entry is ImportedTaskSummary => entry !== null);
   const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
 
   const tasks = allTasks
-    .filter((task) => isTaskRoutable(task.status, taskIntent))
+    .filter((task) => isTaskRoutable(task.status, taskIntent) || isTaskExplicitlyMentioned(task, taskIntent))
     .sort((left, right) => {
       const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
       return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
@@ -845,7 +877,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   })) ?? null;
-  const claimableTask = selectedTask && selectedTask.format === 'json' && canTaskBePreparedForClaim(selectedTask.status) && selectedTask.dependencies.every((dependency) => {
+  const claimableTask = selectedTask && selectedTask.format === 'json' && (canTaskBePreparedForClaim(selectedTask.status) || isTaskAlreadyActivelyClaimed(selectedTask)) && selectedTask.dependencies.every((dependency) => {
     const status = statusById.get(dependency);
     return status === 'done' || status === 'verified';
   }) ? selectedTask : null;
@@ -875,6 +907,10 @@ function canTaskBePreparedForClaim(status: string) {
     || normalized === 'open'
     || normalized === 'reserved'
     || normalized === 'ready';
+}
+
+function isTaskAlreadyActivelyClaimed(task: ImportedTaskSummary) {
+  return normalizeTaskRouteStatus(task.status) === 'running' && Boolean(task.activeClaimActorId);
 }
 
 async function prepareImportedTaskForClaim(input: {
@@ -1199,6 +1235,15 @@ function isTaskRoutable(status: string, intent: TaskIntent | null): boolean {
     return normalized !== 'abandoned' && normalized !== 'cancelled';
   }
   return ['ready', 'open', 'planned', 'blocked', 'waiting_target_evidence', 'reserved'].includes(normalized);
+}
+
+function isTaskExplicitlyMentioned(task: ImportedTaskSummary, intent: TaskIntent | null): boolean {
+  if (!intent || intent.mentionedTaskIds.length === 0) return false;
+  const normalizedStatus = normalizeTaskRouteStatus(task.status);
+  if (normalizedStatus === 'done' || normalizedStatus === 'abandoned' || normalizedStatus === 'cancelled') {
+    return false;
+  }
+  return intent.mentionedTaskIds.includes(task.workItemId.toUpperCase());
 }
 
 function dedupeTasks(tasks: readonly ImportedTaskSummary[]): readonly ImportedTaskSummary[] {

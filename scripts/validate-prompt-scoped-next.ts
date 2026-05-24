@@ -74,6 +74,18 @@ async function main() {
     const lockDocument = JSON.parse(readFileSync(lockPath, 'utf8'));
     assert(lockDocument.taskDirectionLock?.taskId === 'TASK-LEDGER-0001', 'runtime lock must include the selected task direction lock');
 
+    writeLedgerTask(path.join(ledgerTaskDir, 'SANGUO-BOOTSTRAP-0001.json'), 'SANGUO-BOOTSTRAP-0001', 'Running Sanguo bootstrap task', 'docs/sanguo.md', {
+      status: 'running',
+      claimActorId: 'prompt-scope-test'
+    });
+    const runningExact = await runNext(['--cwd', tempRoot, '--prompt', 'SANGUO-BOOTSTRAP-0001']);
+    assert(runningExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to a running task with active claim');
+    assert((runningExact.evidence.nextAction as any).selectedTask.workItemId === 'SANGUO-BOOTSTRAP-0001', 'exact running task prompt selected wrong task');
+    const runningClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'SANGUO-BOOTSTRAP-0001']);
+    assert(runningClaim.ok === true, 'next --claim must reuse an active claim for a running task');
+    assert((runningClaim.evidence.claimPreparation as any)?.reusedActiveClaim === true, 'running task claim should be reported as reused active claim');
+    assert((runningClaim.evidence.taskDirectionLock as any)?.taskId === 'SANGUO-BOOTSTRAP-0001', 'running task claim must still write a direction lock');
+
     const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', 'Please do the next task card']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
     assert(ambiguous.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SELECTION_REQUIRED'), 'ambiguous task-card prompt must ask for task selection');
@@ -105,14 +117,25 @@ closure_authority: target_repo
 `, 'utf8');
 }
 
-function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string) {
+function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string } = {}) {
   writeFileSync(filePath, `${JSON.stringify({
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
     title,
-    status: 'ready',
+    status: options.status ?? 'ready',
     dependencies: [],
     scope: [scopePath],
+    ...(options.claimActorId ? {
+      claim: {
+        actorId: options.claimActorId,
+        leaseId: `lease-${taskId.toLowerCase()}`,
+        claimedAt: '2026-05-24T00:00:00.000Z',
+        heartbeatAt: '2026-05-24T00:00:00.000Z',
+        ttlSeconds: 1800,
+        files: [scopePath],
+        state: 'active'
+      }
+    } : {}),
     source: {
       planPath: 'docs/plan/PlanAlpha.md',
       sectionTitle: title,
