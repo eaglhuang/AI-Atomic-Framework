@@ -976,7 +976,7 @@ function readTaskIntentFile(cwd: string, intentPath: string): TaskIntent {
 }
 
 function createDeterministicTaskIntent(prompt: string): TaskIntent {
-  const mentionedTaskIds = uniqueSorted((prompt.match(/\b(?:TASK|ATM)-[A-Z0-9][A-Z0-9-]*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi) ?? []).map((entry) => entry.toUpperCase()));
+  const mentionedTaskIds = uniqueSorted((prompt.match(/\b(?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi) ?? []).map((entry) => entry.toUpperCase()));
   const mentionedPlanPaths = uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
   const targetRepoHints = uniqueSorted([
     ...(/AI-Atomic-Framework|ATM\s*framework|ATM\s*\u6846\u67b6|ATM\u6846\u67b6|\u539f\u5b50\u6846\u67b6/i.test(prompt) ? ['AI-Atomic-Framework'] : [])

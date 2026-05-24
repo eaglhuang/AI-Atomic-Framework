@@ -85,7 +85,7 @@ export function findActiveTaskQueue(cwd: string, sourcePrompt?: string | null): 
   const queues = listTaskQueues(cwd).filter((queue) => queue.status === 'active');
   if (promptHash) {
     const exact = queues.find((queue) => queue.sourcePromptHash === promptHash);
-    if (exact) return exact;
+    return exact ?? null;
   }
   return queues.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0] ?? null;
 }

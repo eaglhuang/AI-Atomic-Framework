@@ -117,6 +117,8 @@ try {
   assert(reserveTask.exitCode === 0, 'tasks reserve must exit 0');
   assert(reserveTask.parsed.ok === true, 'tasks reserve must report ok=true');
   assert(reserveTask.parsed.evidence.status === 'reserved', 'tasks reserve must set reserved status');
+  const reservedTaskDocument = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0103.json'), 'utf8'));
+  assert(reservedTaskDocument.status === 'reserved', 'tasks reserve must persist reserved status to the main task document');
 
   const claimBeforeReady = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(claimBeforeReady.exitCode === 1, 'tasks claim before ready must exit 1');
@@ -127,6 +129,8 @@ try {
   assert(promoteTask.exitCode === 0, 'tasks promote must exit 0');
   assert(promoteTask.parsed.ok === true, 'tasks promote must report ok=true');
   assert(promoteTask.parsed.evidence.status === 'ready', 'tasks promote must set ready status');
+  const promotedTaskDocument = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0103.json'), 'utf8'));
+  assert(promotedTaskDocument.status === 'ready', 'tasks promote must persist ready status to the main task document');
 
   const nextClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0103', '--json']);
   assert(nextClaim.exitCode === 0, 'next --claim must exit 0');
@@ -312,6 +316,25 @@ try {
   const verifyCommitEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'commit', '--json']);
   assert(verifyCommitEvidence.exitCode === 0, 'evidence verify commit gate must exit 0');
   assert(verifyCommitEvidence.parsed.ok === true, 'evidence verify commit gate must report ok=true');
+
+  writeFileSync(path.join(repo, '.atm', 'history', 'tasks', 'SANGUO-RAGOPS-0001.json'), `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'SANGUO-RAGOPS-0001',
+    title: 'Legacy imported task',
+    status: 'closed',
+    dependencies: [],
+    evidencePath: '.atm/history/evidence/SANGUO-RAGOPS-0001.json',
+    source: {
+      planPath: 'docs/legacy-plan.md',
+      sectionTitle: 'Legacy section'
+    }
+  }, null, 2)}\n`, 'utf8');
+  const legacyVerify = runAtm(['tasks', 'verify', '--cwd', repo, '--json']);
+  assert(legacyVerify.exitCode === 0, 'tasks verify must tolerate legacy historical task records');
+  assert(legacyVerify.parsed.ok === true, 'tasks verify must keep legacy historical task records as warnings');
+  const legacyFindingCodes = (legacyVerify.parsed.evidence?.report?.findings ?? []).map((entry: any) => entry.code);
+  assert(legacyFindingCodes.includes('ATM_TASKS_VERIFY_LEGACY_STATUS_ALIAS'), 'tasks verify must warn on legacy closed status alias');
+  assert(legacyFindingCodes.includes('ATM_TASKS_VERIFY_LEGACY_SOURCE_TRACE'), 'tasks verify must warn on legacy source traces missing hash metadata');
 
   const verifyPrEvidenceFail = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'pr', '--json']);
   assert(verifyPrEvidenceFail.exitCode === 1, 'evidence verify pr gate without review must exit 1');

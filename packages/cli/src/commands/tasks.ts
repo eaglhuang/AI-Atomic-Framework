@@ -14,7 +14,7 @@ import {
   validateClosurePacket,
   writeClosurePacket
 } from './framework-development.ts';
-import { CliError, makeResult, message, relativePathFrom, resolveValue } from './shared.ts';
+import { CliError, makeResult, message, parseJsonText, relativePathFrom, resolveValue } from './shared.ts';
 import {
   appendTaskTransitionEvent,
   defaultMirrorTaskId,
@@ -361,22 +361,29 @@ async function runTasksVerify(argv: string[]) {
     } else {
       seen.set(workItemId, entry);
     }
-    const status = parsed.status;
-    if (typeof status !== 'string' || !validStatuses.has(status as TaskImportStatus)) {
+    const statusInspection = inspectTaskVerifyStatus(parsed.status);
+    if (!statusInspection.ok) {
       findings.push({
         level: 'error',
         code: 'ATM_TASKS_VERIFY_INVALID_STATUS',
-        text: `Task ${workItemId} has invalid status ${String(status)}. Expected one of ${[...validStatuses].join(', ')}.`,
+        text: `Task ${workItemId} has invalid status ${String(parsed.status)}. Expected one of ${[...validStatuses].join(', ')}.`,
+        workItemId
+      });
+    } else if (statusInspection.warningCode) {
+      findings.push({
+        level: 'warning',
+        code: statusInspection.warningCode,
+        text: `Task ${workItemId} uses legacy status ${String(parsed.status)}; ATM will treat it as ${statusInspection.normalizedStatus}.`,
         workItemId
       });
     }
     if (parsed.source !== undefined) {
-      const source = parsed.source as Record<string, unknown> | null;
-      if (!source || typeof source.planPath !== 'string' || typeof source.sectionTitle !== 'string' || typeof source.hash !== 'string') {
+      const sourceFinding = inspectTaskSourceTrace(parsed, statusInspection);
+      if (sourceFinding) {
         findings.push({
-          level: 'error',
-          code: 'ATM_TASKS_VERIFY_BAD_SOURCE_TRACE',
-          text: `Task ${workItemId} declared a malformed source trace (planPath, sectionTitle, and hash are required).`,
+          level: sourceFinding.level,
+          code: sourceFinding.code,
+          text: `Task ${workItemId} ${sourceFinding.text}`,
           workItemId
         });
       }
@@ -2240,7 +2247,48 @@ function writeTaskDocumentWithTransition(input: {
   input.taskDocument.lastTransitionAt = transition.event.createdAt;
   input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
   writeTaskDocument(input.taskPath, input.taskDocument);
+  verifyPersistedTaskDocument({
+    taskPath: input.taskPath,
+    taskId: input.taskId,
+    expectedStatus: nextStatus,
+    action: input.action
+  });
   return transition.eventPath;
+}
+
+function verifyPersistedTaskDocument(input: {
+  readonly taskPath: string;
+  readonly taskId: string;
+  readonly expectedStatus: string | null;
+  readonly action: string;
+}) {
+  let persisted: Record<string, unknown>;
+  try {
+    persisted = parseJsonText(readFileSync(input.taskPath, 'utf8')) as Record<string, unknown>;
+  } catch (error) {
+    throw new CliError('ATM_TASK_LEDGER_WRITE_INVALID_JSON', `Task ${input.taskId} was written by ${input.action}, but the persisted JSON is unreadable.`, {
+      details: {
+        taskId: input.taskId,
+        taskPath: input.taskPath,
+        action: input.action,
+        reason: error instanceof Error ? error.message : String(error)
+      }
+    });
+  }
+  const persistedTaskId = normalizeTaskDocumentId(persisted, path.basename(input.taskPath, '.json'));
+  const persistedStatus = typeof persisted.status === 'string' ? persisted.status : null;
+  if (persistedTaskId !== input.taskId || persistedStatus !== input.expectedStatus) {
+    throw new CliError('ATM_TASK_LEDGER_WRITE_MISMATCH', `Task ${input.taskId} persisted an unexpected state after ${input.action}.`, {
+      details: {
+        taskId: input.taskId,
+        taskPath: input.taskPath,
+        action: input.action,
+        expectedStatus: input.expectedStatus,
+        persistedTaskId,
+        persistedStatus
+      }
+    });
+  }
 }
 
 function createClosureTransitionMetadata(
@@ -2292,6 +2340,72 @@ function normalizeWorkItemStatus(value: unknown): WorkItemRef['status'] {
     return 'ready';
   }
   return 'planned';
+}
+
+function inspectTaskVerifyStatus(value: unknown): {
+  readonly ok: boolean;
+  readonly normalizedStatus: string | null;
+  readonly warningCode: string | null;
+} {
+  const normalized = normalizeTaskStatus(value);
+  if (validStatuses.has(normalized as TaskImportStatus)) {
+    return {
+      ok: true,
+      normalizedStatus: normalized,
+      warningCode: null
+    };
+  }
+  if (normalized === 'closed' || normalized === 'completed') {
+    return {
+      ok: true,
+      normalizedStatus: 'done',
+      warningCode: 'ATM_TASKS_VERIFY_LEGACY_STATUS_ALIAS'
+    };
+  }
+  return {
+    ok: false,
+    normalizedStatus: null,
+    warningCode: null
+  };
+}
+
+function inspectTaskSourceTrace(
+  document: Record<string, unknown>,
+  statusInspection: { readonly ok: boolean; readonly normalizedStatus: string | null; readonly warningCode: string | null; }
+): { readonly level: 'warning' | 'error'; readonly code: string; readonly text: string } | null {
+  const source = document.source as Record<string, unknown> | null;
+  const planPath = source && typeof source.planPath === 'string' ? source.planPath.trim() : '';
+  const sectionTitle = source && typeof source.sectionTitle === 'string' ? source.sectionTitle.trim() : '';
+  const hash = source && typeof source.hash === 'string' ? source.hash.trim() : '';
+  if (planPath && sectionTitle && hash) {
+    return null;
+  }
+  const legacyHistoricalTask = isLegacyHistoricalTaskDocument(document, statusInspection);
+  if (legacyHistoricalTask && planPath && sectionTitle) {
+    return {
+      level: 'warning',
+      code: 'ATM_TASKS_VERIFY_LEGACY_SOURCE_TRACE',
+      text: 'declared a legacy source trace without hash metadata; ATM will keep it as historical reference only.'
+    };
+  }
+  return {
+    level: 'error',
+    code: 'ATM_TASKS_VERIFY_BAD_SOURCE_TRACE',
+    text: 'declared a malformed source trace (planPath, sectionTitle, and hash are required).'
+  };
+}
+
+function isLegacyHistoricalTaskDocument(
+  document: Record<string, unknown>,
+  statusInspection: { readonly ok: boolean; readonly normalizedStatus: string | null; readonly warningCode: string | null; }
+) {
+  if (statusInspection.warningCode === 'ATM_TASKS_VERIFY_LEGACY_STATUS_ALIAS') {
+    return true;
+  }
+  const importedAt = normalizeStringValue(document.importedAt ?? document.imported_at);
+  const evidencePath = normalizeStringValue(document.evidencePath ?? document.evidence_path);
+  const lastTransitionId = normalizeStringValue(document.lastTransitionId ?? document.last_transition_id);
+  return !importedAt && Boolean(evidencePath) && !lastTransitionId;
 }
 
 function writeTakeoverEvidence(cwd: string, taskId: string, actorId: string, previousClaim: TaskClaimRecord, newClaim: TaskClaimRecord) {
