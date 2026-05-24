@@ -335,14 +335,15 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
   const cwd = path.resolve(input.cwd);
   const generatedAt = new Date().toISOString();
   const repoIdentity = detectFrameworkRepoIdentity(cwd);
-  const inferredTarget = input.targetRepo ? null : inferFrameworkTargetRepoFromTasks(cwd);
+  const declaredFiles = (input.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+  const changedFiles = declaredFiles.length > 0 ? uniqueSorted(declaredFiles) : readChangedFiles(cwd);
+  const adopterInfrastructureSyncOnly = !repoIdentity.isFrameworkRepo && isAdopterInfrastructureSyncCommit(changedFiles);
+  const inferredTarget = input.targetRepo || adopterInfrastructureSyncOnly ? null : inferFrameworkTargetRepoFromTasks(cwd);
   const targetRepo = input.targetRepo
     ? resolveTargetRepoReference(cwd, input.targetRepo)
     : inferredTarget?.targetRepo ?? null;
   const targetRepoIdentity = targetRepo ? detectFrameworkRepoIdentity(targetRepo) : null;
   const taskLedger = readTaskLedgerPolicy(cwd);
-  const declaredFiles = (input.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean);
-  const changedFiles = declaredFiles.length > 0 ? uniqueSorted(declaredFiles) : readChangedFiles(cwd);
   const criticalChangedFiles = repoIdentity.isFrameworkRepo
     ? changedFiles.filter(isAtmCriticalNonDocSurface)
     : [];
@@ -357,7 +358,11 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
   const blockers: string[] = [];
   const warnings: string[] = [];
 
-  if (targetRepoIdentity?.isFrameworkRepo && !sameRepo(cwd, targetRepo)) {
+  if (adopterInfrastructureSyncOnly) {
+    mode = 'inactive';
+    closureAuthority = 'none';
+    warnings.push('adopter-infrastructure-sync');
+  } else if (targetRepoIdentity?.isFrameworkRepo && !sameRepo(cwd, targetRepo)) {
     mode = 'cross-repo-target-required';
     closureAuthority = 'target_repo';
     blockers.push('closure-authority-belongs-to-target-repo');
@@ -480,6 +485,27 @@ export function isAtmCriticalNonDocSurface(filePath: string): boolean {
   if (relativePath === 'atomic-registry.json') return true;
   if (/^compatibility-matrix[^/]*\.json$/.test(relativePath)) return true;
   return /^(packages|schemas|specs|scripts|templates|integrations|examples|tests)\//.test(relativePath);
+}
+
+export function isAdopterInfrastructureSyncCommit(files: readonly string[]): boolean {
+  if (files.length === 0) return false;
+  return files.every((entry) => isAdopterInfrastructureSyncPath(entry));
+}
+
+export function isAdopterInfrastructureSyncPath(value: string): boolean {
+  const normalized = normalizeRelativePath(value);
+  return normalized === 'atm.mjs'
+    || normalized === '.atm/runtime/pinned-runner.json'
+    || normalized === '.atm/integrations/copilot.manifest.json'
+    || normalized === '.atm/integrations/codex.manifest.json'
+    || normalized === '.atm/integrations/claude-code.manifest.json'
+    || normalized === '.github/hooks/atm-framework-development.json'
+    || normalized.startsWith('.github/instructions/atm-')
+    || normalized.startsWith('.github/prompts/atm-')
+    || normalized.startsWith('integrations/codex-skills/atm-')
+    || normalized.startsWith('.claude/skills/atm-')
+    || normalized.startsWith('.cursor/rules/skills/atm-')
+    || normalized.startsWith('.gemini/commands/atm-');
 }
 
 export function auditTasks(cwd: string): TaskAuditReport {

@@ -192,6 +192,14 @@ try {
   assert(inferredCrossRepo.mode === 'cross-repo-target-required', 'planning repo task metadata must infer framework target repo');
   assert(inferredCrossRepo.targetRepo === frameworkRepo, 'inferred framework target repo must resolve sibling repository names');
 
+  const adopterInfraSync = createFrameworkModeStatus({
+    cwd: planningRepo,
+    files: ['atm.mjs', '.atm/runtime/pinned-runner.json']
+  });
+  assert(adopterInfraSync.mode === 'inactive', 'host repo ATM runner sync must stay inactive instead of requiring target repo closure authority');
+  assert(adopterInfraSync.closureAuthority === 'none', 'host repo ATM runner sync must not demand target repo closure authority');
+  assert(adopterInfraSync.warnings.includes('adopter-infrastructure-sync'), 'host repo ATM runner sync should record an adopter infrastructure sync warning');
+
   const preToolCrossRepo = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(frameworkRepo, 'packages', 'core', 'src', 'index.ts')]);
   assert(preToolCrossRepo.ok === false, 'pre-tool hook must block cross-repo critical framework edits without target claim');
 
