@@ -46,6 +46,13 @@ interface ParsedHookArgs {
   readonly head: string | null;
 }
 
+interface PushBaseResolution {
+  readonly base: string | null;
+  readonly source: 'argument' | 'upstream' | 'head-parent' | 'unresolved';
+  readonly upstreamRef: string | null;
+  readonly currentBranch: string | null;
+}
+
 interface ParsedGitHooksArgs {
   readonly cwd: string;
   readonly action: 'install' | 'verify';
@@ -120,6 +127,30 @@ interface FrameworkCommitRangeBaseline {
   readonly rationale: string | null;
 }
 
+interface PrePushRefUpdate {
+  readonly localRef: string;
+  readonly localSha: string;
+  readonly remoteRef: string;
+  readonly remoteSha: string;
+  readonly remoteBranch: string | null;
+}
+
+interface PrePushEnforcementDecision {
+  readonly targetBranches: readonly string[];
+  readonly protectedBranchPatterns: readonly string[];
+  readonly hardProtectedBranchTargets: readonly string[];
+  readonly hardEnforcement: boolean;
+  readonly currentBranch: string | null;
+  readonly upstreamRef: string | null;
+  readonly baseSource: PushBaseResolution['source'];
+  readonly mergeBase: string | null;
+  readonly safeModeRequested: boolean;
+  readonly safeModeActive: boolean;
+  readonly safeModeActor: string | null;
+  readonly safeModeReason: string | null;
+  readonly safeModeReportPath: string | null;
+}
+
 const textFileExtensions = new Set([
   '.cjs',
   '.css',
@@ -140,6 +171,8 @@ const textFileExtensions = new Set([
 
 const hookFileNames = ['pre-commit', 'pre-push'] as const;
 const frameworkCommitRangeBaselineRelativePath = '.atm/history/baselines/framework-commit-range.json' as const;
+const prePushSafeModeRuntimeDir = ['.atm', 'runtime', 'pre-push-safe-mode'] as const;
+const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'] as const;
 
 export function runHook(argv: string[]) {
   const options = parseHookArgs(argv);
@@ -368,8 +401,9 @@ function isAdopterInfrastructureSyncPath(value: string) {
 function runPrePushHook(cwd: string, base: string | null, head: string | null) {
   const root = path.resolve(cwd);
   const resolvedHead = head ?? 'HEAD';
-  const resolvedBase = base ?? resolveDefaultPushBase(root);
-  if (!resolvedBase) {
+  const pushRefs = readPrePushRefUpdates();
+  const baseInfo = resolvePushBase(root, base);
+  if (!baseInfo.base) {
     return makeResult({
       ok: true,
       command: 'hook',
@@ -379,30 +413,62 @@ function runPrePushHook(cwd: string, base: string | null, head: string | null) {
         action: 'pre-push',
         base,
         head: resolvedHead,
+        pushRefs,
+        baseResolution: baseInfo,
         skipped: true
       }
     });
   }
-  const report = createCommitRangeGuardReport(root, resolvedBase, resolvedHead);
+  const report = createCommitRangeGuardReport(root, baseInfo.base, resolvedHead);
+  const enforcement = createPrePushEnforcementDecision(root, pushRefs, baseInfo, report.head);
+  const hardFailure = enforcement.hardEnforcement && report.findings.length > 0 && !enforcement.safeModeActive;
+  const warnOnly = report.findings.length > 0 && !hardFailure;
+  const safeModeMissingMetadata = enforcement.safeModeRequested && !enforcement.safeModeActive;
   return makeResult({
-    ok: report.ok,
+    ok: !hardFailure && !safeModeMissingMetadata,
     command: 'hook',
     cwd: root,
     messages: [
-      report.ok
-        ? message('info', 'ATM_HOOK_PRE_PUSH_OK', 'ATM pre-push commit-range guard passed.', {
-          base: resolvedBase,
+      safeModeMissingMetadata
+        ? message('error', 'ATM_HOOK_PRE_PUSH_SAFE_MODE_METADATA_REQUIRED', 'ATM pre-push safe mode requires ATM_ACTOR_ID (or AGENT_IDENTITY) and ATM_FRAMEWORK_PUSH_GUARD_REASON so bypasses stay traceable.', {
+          base: baseInfo.base,
           head: resolvedHead,
-          criticalCommitCount: report.criticalCommits.length
+          targetBranches: enforcement.targetBranches,
+          currentBranch: enforcement.currentBranch
         })
-        : message('error', 'ATM_HOOK_PRE_PUSH_FAILED', 'ATM pre-push commit-range guard blocked this push.', {
-          base: resolvedBase,
-          head: resolvedHead,
-          findings: report.findings
-        })
+        : hardFailure
+          ? message('error', 'ATM_HOOK_PRE_PUSH_FAILED', 'ATM pre-push commit-range guard blocked this push.', {
+            base: baseInfo.base,
+            head: resolvedHead,
+            findings: report.findings,
+            rangeDecision: enforcement
+          })
+          : warnOnly
+            ? message(
+              'warning',
+              enforcement.safeModeActive ? 'ATM_HOOK_PRE_PUSH_SAFE_MODE_BYPASS' : 'ATM_HOOK_PRE_PUSH_WARN_ONLY_NON_PROTECTED',
+              enforcement.safeModeActive
+                ? 'ATM pre-push commit-range guard findings were downgraded by maintainer safe mode for this protected push.'
+                : 'ATM pre-push commit-range guard findings were downgraded to warnings because the target is not a protected framework branch.',
+              {
+                base: baseInfo.base,
+                head: resolvedHead,
+                findings: report.findings,
+                rangeDecision: enforcement
+              }
+            )
+            : message('info', 'ATM_HOOK_PRE_PUSH_OK', 'ATM pre-push commit-range guard passed.', {
+              base: baseInfo.base,
+              head: resolvedHead,
+              criticalCommitCount: report.criticalCommits.length,
+              rangeDecision: enforcement
+            })
     ],
     evidence: {
       action: 'pre-push',
+      pushRefs,
+      baseResolution: baseInfo,
+      enforcement,
       report
     }
   });
@@ -473,8 +539,56 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
       evidenceMatches,
       closurePacketInspections,
       taskAudit,
-    findings,
-    ok: findings.length === 0
+      protectedBranchPatterns,
+      findings,
+      ok: findings.length === 0
+  };
+}
+
+function createPrePushEnforcementDecision(
+  cwd: string,
+  pushRefs: readonly PrePushRefUpdate[],
+  baseInfo: PushBaseResolution,
+  headRef: string
+): PrePushEnforcementDecision {
+  const targetBranches = uniqueSorted([
+    ...pushRefs.map((entry) => entry.remoteBranch).filter((entry): entry is string => Boolean(entry)),
+    ...deriveBranchesFromRef(baseInfo.upstreamRef),
+    ...deriveBranchesFromRef(baseInfo.currentBranch)
+  ]);
+  const hardProtectedBranchTargets = targetBranches.filter(isProtectedFrameworkBranchTarget);
+  const hardEnforcement = hardProtectedBranchTargets.length > 0;
+  const safeModeRequested = isTruthyEnv(process.env.ATM_FRAMEWORK_PUSH_GUARD_SAFE_MODE);
+  const safeModeActor = normalizeOptionalText(process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY);
+  const safeModeReason = normalizeOptionalText(process.env.ATM_FRAMEWORK_PUSH_GUARD_REASON);
+  const safeModeActive = safeModeRequested && hardEnforcement && Boolean(safeModeActor) && Boolean(safeModeReason);
+  const safeModeReportPath = safeModeActive
+    ? writePrePushSafeModeReport(cwd, {
+      targetBranches,
+      hardProtectedBranchTargets,
+      currentBranch: baseInfo.currentBranch,
+      upstreamRef: baseInfo.upstreamRef,
+      base: baseInfo.base,
+      head: headRef,
+      actorId: safeModeActor!,
+      reason: safeModeReason!,
+      pushRefs
+    })
+    : null;
+  return {
+    targetBranches,
+    protectedBranchPatterns: [...protectedBranchPatterns],
+    hardProtectedBranchTargets,
+    hardEnforcement,
+    currentBranch: baseInfo.currentBranch,
+    upstreamRef: baseInfo.upstreamRef,
+    baseSource: baseInfo.source,
+    mergeBase: baseInfo.base ? runGitScalar(cwd, ['merge-base', baseInfo.base, headRef]) : null,
+    safeModeRequested,
+    safeModeActive,
+    safeModeActor,
+    safeModeReason,
+    safeModeReportPath
   };
 }
 
@@ -823,11 +937,40 @@ function readCurrentHeadForFutureCommit(cwd: string): readonly string[] {
   return head ? [head] : [];
 }
 
-function resolveDefaultPushBase(cwd: string): string | null {
-  const upstream = runGitScalar(cwd, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{upstream}']);
-  if (upstream) return upstream;
+function resolvePushBase(cwd: string, explicitBase: string | null): PushBaseResolution {
+  const currentBranch = runGitScalar(cwd, ['rev-parse', '--abbrev-ref', 'HEAD']);
+  const upstreamRef = runGitScalar(cwd, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{upstream}']);
+  if (explicitBase) {
+    return {
+      base: explicitBase,
+      source: 'argument',
+      upstreamRef,
+      currentBranch
+    };
+  }
+  if (upstreamRef) {
+    return {
+      base: upstreamRef,
+      source: 'upstream',
+      upstreamRef,
+      currentBranch
+    };
+  }
   const parent = runGitScalar(cwd, ['rev-parse', '--verify', 'HEAD~1']);
-  return parent ?? null;
+  if (parent) {
+    return {
+      base: parent,
+      source: 'head-parent',
+      upstreamRef,
+      currentBranch
+    };
+  }
+  return {
+    base: null,
+    source: 'unresolved',
+    upstreamRef,
+    currentBranch
+  };
 }
 
 function createGitHookScript(hookName: 'pre-commit' | 'pre-push') {
@@ -860,6 +1003,30 @@ function inspectHookFile(cwd: string, hookName: 'pre-commit' | 'pre-push'): Hook
     markerPresent: text.includes(hookMarker) && text.includes(`node atm.mjs hook ${hookName}`),
     sha256: sha256(readFileSync(absolutePath))
   };
+}
+
+function readPrePushRefUpdates(): readonly PrePushRefUpdate[] {
+  if (process.stdin.isTTY) return [];
+  try {
+    const input = readFileSync(0, 'utf8');
+    return String(input ?? '')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [localRef = '', localSha = '', remoteRef = '', remoteSha = ''] = line.split(/\s+/);
+        return {
+          localRef,
+          localSha,
+          remoteRef,
+          remoteSha,
+          remoteBranch: normalizeRemoteBranch(remoteRef)
+        };
+      })
+      .filter((entry) => entry.remoteRef.length > 0);
+  } catch {
+    return [];
+  }
 }
 
 function parseHookArgs(argv: string[]): ParsedHookArgs {
@@ -1090,6 +1257,74 @@ function runGit(cwd: string, args: readonly string[], env: Record<string, string
 
 function normalizeGitConfigPath(value: string | null): string | null {
   return value ? value.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '') : null;
+}
+
+function deriveBranchesFromRef(ref: string | null): readonly string[] {
+  const normalized = normalizeRemoteBranch(ref);
+  return normalized ? [normalized] : [];
+}
+
+function normalizeRemoteBranch(ref: string | null): string | null {
+  const normalized = normalizeOptionalText(ref)?.replace(/\\/g, '/');
+  if (!normalized) return null;
+  if (normalized.startsWith('refs/heads/')) {
+    return normalized.slice('refs/heads/'.length);
+  }
+  if (normalized.startsWith('refs/remotes/')) {
+    const parts = normalized.slice('refs/remotes/'.length).split('/');
+    return parts.length > 1 ? parts.slice(1).join('/') : (parts[0] ?? null);
+  }
+  if (normalized.startsWith('origin/')) {
+    return normalized.slice('origin/'.length);
+  }
+  return normalized;
+}
+
+function isProtectedFrameworkBranchTarget(branch: string): boolean {
+  const normalized = normalizeOptionalText(branch)?.replace(/\\/g, '/');
+  if (!normalized) return false;
+  return normalized === 'main'
+    || normalized === 'master'
+    || normalized === 'trunk'
+    || normalized.startsWith('release/');
+}
+
+function isTruthyEnv(value: unknown): boolean {
+  const normalized = normalizeOptionalText(value);
+  return normalized === '1' || normalized?.toLowerCase() === 'true';
+}
+
+function writePrePushSafeModeReport(cwd: string, input: {
+  readonly targetBranches: readonly string[];
+  readonly hardProtectedBranchTargets: readonly string[];
+  readonly currentBranch: string | null;
+  readonly upstreamRef: string | null;
+  readonly base: string | null;
+  readonly head: string;
+  readonly actorId: string;
+  readonly reason: string;
+  readonly pushRefs: readonly PrePushRefUpdate[];
+}): string {
+  const root = path.resolve(cwd);
+  const runtimeDir = path.join(root, ...prePushSafeModeRuntimeDir);
+  mkdirSync(runtimeDir, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const absolutePath = path.join(runtimeDir, `${stamp}.json`);
+  const payload = {
+    schemaId: 'atm.prePushSafeModeReport.v1',
+    generatedAt: new Date().toISOString(),
+    actorId: input.actorId,
+    reason: input.reason,
+    currentBranch: input.currentBranch,
+    upstreamRef: input.upstreamRef,
+    base: input.base,
+    head: input.head,
+    targetBranches: input.targetBranches,
+    hardProtectedBranchTargets: input.hardProtectedBranchTargets,
+    pushRefs: input.pushRefs
+  };
+  writeFileSync(absolutePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  return relativePathFrom(root, absolutePath);
 }
 
 function isTaskDirectionPreCommitExempt(value: string): boolean {
