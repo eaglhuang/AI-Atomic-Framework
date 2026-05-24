@@ -218,8 +218,19 @@ export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, a
       });
     }
   }
-  const matchingLock = readActiveTaskDirectionLocks(cwd).find((lock) => lock.taskId === taskId);
+  const matchingLock = readGovernanceDirectionLockForTask(cwd, taskId);
   if (!matchingLock) {
+    const sidecarPath = path.join(cwd, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
+    if (existsSync(sidecarPath)) {
+      throw new CliError('ATM_TASK_CLOSE_INVALID_DIRECTION_LOCK_SOURCE', `Task ${taskId} cannot close as done from a standalone direction lock sidecar.`, {
+        exitCode: 1,
+        details: {
+          taskId,
+          sidecarPath: relativePathFrom(cwd, sidecarPath),
+          requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${taskId}" --json`
+        }
+      });
+    }
     throw new CliError('ATM_TASK_DIRECTION_LOCK_REQUIRED', `Task ${taskId} cannot close as done without an active task direction lock.`, {
       exitCode: 1,
       details: { taskId, requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${taskId}" --json` }
@@ -303,6 +314,20 @@ function dedupeDirectionLocks(locks: readonly TaskDirectionLock[]) {
     output.push(lock);
   }
   return output;
+}
+
+function readGovernanceDirectionLockForTask(cwd: string, taskId: string): TaskDirectionLock | null {
+  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+  if (!existsSync(lockPath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+    const released = parsed.released === true || parsed.status === 'released';
+    if (released) return null;
+    const embedded = parsed.taskDirectionLock;
+    return isTaskDirectionLock(embedded) ? embedded : null;
+  } catch {
+    return null;
+  }
 }
 
 function writeJson(filePath: string, value: unknown) {

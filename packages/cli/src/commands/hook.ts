@@ -74,6 +74,18 @@ interface CommitEvidenceMatch {
   readonly matchedBy: 'commitSha' | 'treeSha+parentCommitShas' | null;
 }
 
+interface ProtectedStateFinding {
+  readonly file: string;
+  readonly reason:
+    | 'runtime-state-must-not-be-committed'
+    | 'task-transition-json-invalid'
+    | 'task-transition-command-invalid'
+    | 'task-file-missing-transition'
+    | 'task-file-transition-mismatch'
+    | 'evidence-file-missing-task-context';
+  readonly detail: string;
+}
+
 const textFileExtensions = new Set([
   '.cjs',
   '.css',
@@ -239,6 +251,7 @@ function runPreCommitHook(cwd: string) {
       .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
       .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
     : [];
+  const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
     ? runRequiredFrameworkValidators(root, frameworkStatus.criticalChangedFiles)
@@ -250,6 +263,7 @@ function runPreCommitHook(cwd: string) {
   const ok = encodingReport.ok
     && blockingFrameworkIssues.length === 0
     && directionLockDriftFiles.length === 0
+    && protectedStateReport.ok
     && taskAudit.ok
     && failedValidatorRuns.length === 0;
   const evidenceWrite = ok && stagedFiles.length > 0
@@ -271,6 +285,7 @@ function runPreCommitHook(cwd: string) {
           encodingFindings: encodingReport.findings.length,
           frameworkBlockers: blockingFrameworkIssues,
           taskDirectionDriftFiles: directionLockDriftFiles,
+          protectedStateFindings: protectedStateReport.findings,
           taskAuditFindings: taskAudit.findings.length,
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
           nextStep: frameworkClaimCommand
@@ -286,6 +301,7 @@ function runPreCommitHook(cwd: string) {
       frameworkClaimCommand,
       activeDirectionLocks,
       directionLockDriftFiles,
+      protectedStateReport,
       taskAudit,
       commandRuns,
       evidenceWrite
@@ -824,6 +840,136 @@ function isTaskDirectionPreCommitExempt(value: string): boolean {
     || normalized.startsWith('.atm/runtime/locks/')
     || normalized.startsWith('.atm/runtime/task-queues/')
     || normalized.startsWith('.atm/runtime/task-direction-locks/');
+}
+
+function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]) {
+  const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry));
+  if (protectedFiles.length === 0) {
+    return {
+      ok: true,
+      files: [] as readonly string[],
+      findings: [] as readonly ProtectedStateFinding[]
+    };
+  }
+
+  const stagedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
+  const findings: ProtectedStateFinding[] = [];
+
+  for (const file of protectedFiles) {
+    const normalized = normalizeRelativePath(file);
+    const lower = normalized.toLowerCase();
+    const absolutePath = path.join(cwd, normalized);
+
+    if (isProtectedAtmRuntimeStatePath(normalized)) {
+      findings.push({
+        file: normalized,
+        reason: 'runtime-state-must-not-be-committed',
+        detail: 'Runtime lock, queue, or active-session state must stay ephemeral and must not be committed.'
+      });
+      continue;
+    }
+
+    if (lower.startsWith('.atm/history/task-events/')) {
+      const event = readJsonFile(absolutePath);
+      const command = typeof event?.command === 'string' ? event.command.trim() : '';
+      if (event?.schemaId !== 'atm.taskTransition.v1' || typeof event?.transitionId !== 'string' || typeof event?.taskId !== 'string') {
+        findings.push({
+          file: normalized,
+          reason: 'task-transition-json-invalid',
+          detail: 'Task transition event is missing atm.taskTransition.v1 metadata.'
+        });
+        continue;
+      }
+      if (!command.startsWith('node atm.mjs ')) {
+        findings.push({
+          file: normalized,
+          reason: 'task-transition-command-invalid',
+          detail: 'Task transition event does not record a node atm.mjs command as its source.'
+        });
+      }
+      continue;
+    }
+
+    if (lower.startsWith('.atm/history/tasks/')) {
+      const task = readJsonFile(absolutePath);
+      const taskId = typeof task?.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
+      const lastTransitionId = typeof task?.lastTransitionId === 'string' ? task.lastTransitionId : '';
+      const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
+      if (!lastTransitionId || !stagedSet.has(expectedEventPath)) {
+        findings.push({
+          file: normalized,
+          reason: 'task-file-missing-transition',
+          detail: 'Task ledger change must be committed with its matching staged task transition event.'
+        });
+        continue;
+      }
+      const event = readJsonFile(path.join(cwd, expectedEventPath));
+      const expectedSha = sha256(readFileSync(absolutePath));
+      if (event?.schemaId !== 'atm.taskTransition.v1'
+        || event?.transitionId !== lastTransitionId
+        || event?.taskId !== taskId
+        || event?.taskPath !== normalized
+        || event?.taskSha256 !== expectedSha
+        || typeof event?.command !== 'string'
+        || !event.command.startsWith('node atm.mjs ')) {
+        findings.push({
+          file: normalized,
+          reason: 'task-file-transition-mismatch',
+          detail: 'Task ledger change does not match a valid staged ATM CLI transition event.'
+        });
+      }
+      continue;
+    }
+
+    if (lower.startsWith('.atm/history/evidence/')) {
+      const evidence = readJsonFile(absolutePath);
+      const taskId = typeof evidence?.taskId === 'string' ? evidence.taskId : path.basename(normalized, '.json');
+      const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${taskId}.json`);
+      const hasSiblingEvent = protectedFiles.some((entry) => {
+        const candidate = normalizeRelativePath(entry).toLowerCase();
+        return candidate.startsWith(`.atm/history/task-events/${taskId.toLowerCase()}/`);
+      });
+      if (!hasSiblingTask && !hasSiblingEvent) {
+        findings.push({
+          file: normalized,
+          reason: 'evidence-file-missing-task-context',
+          detail: 'Evidence updates must travel with the related staged task ledger change or transition event.'
+        });
+      }
+    }
+  }
+
+  return {
+    ok: findings.length === 0,
+    files: protectedFiles,
+    findings
+  };
+}
+
+function isProtectedAtmManagedStatePath(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  return normalized.startsWith('.atm/history/tasks/')
+    || normalized.startsWith('.atm/history/task-events/')
+    || normalized.startsWith('.atm/history/evidence/')
+    || isProtectedAtmRuntimeStatePath(normalized);
+}
+
+function isProtectedAtmRuntimeStatePath(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  return normalized.startsWith('.atm/runtime/locks/')
+    || normalized.startsWith('.atm/runtime/task-direction-locks/')
+    || normalized.startsWith('.atm/runtime/task-queues/')
+    || normalized === '.atm/runtime/current-task.json'
+    || normalized === '.atm/runtime/guidance/active-session.json';
+}
+
+function readJsonFile(filePath: string): Record<string, unknown> | null {
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
 }
 
 function isPathAllowedByTaskDirection(filePath: string, allowedFiles: readonly string[]): boolean {

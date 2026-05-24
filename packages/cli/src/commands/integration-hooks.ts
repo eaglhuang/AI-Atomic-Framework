@@ -256,8 +256,12 @@ function runPreToolHook(options: HookInvocationOptions) {
     : status.repoIdentity.isFrameworkRepo
       ? options.cwd
       : null;
+  const mutatingIntent = isMutatingToolIntent(options.toolName, toolCommand);
   const criticalFiles = frameworkRoot
     ? toolFiles.map((entry) => normalizePathForFrameworkRoot(entry, frameworkRoot)).filter(isAtmCriticalNonDocSurface)
+    : [];
+  const protectedStateFiles = mutatingIntent && !gitCommitIntent
+    ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isProtectedAtmManagedStatePath)
     : [];
   const planningClosureFiles = status.mode === 'cross-repo-target-required' && isMutatingToolIntent(options.toolName, toolCommand)
     ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isPlanningClosureSurface)
@@ -269,7 +273,6 @@ function runPreToolHook(options: HookInvocationOptions) {
   const promptScopedAllowedPaths = promptScope
     ? buildPromptScopedAllowedPaths(promptScope.selectedTasks)
     : [];
-  const mutatingIntent = isMutatingToolIntent(options.toolName, toolCommand);
   const activeDirectionLocks = readActiveTaskDirectionLocks(options.cwd);
   const directionLockAllowedPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
   const directionLockDriftFiles = mutatingIntent
@@ -356,6 +359,28 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolName: options.toolName,
         toolFiles,
         blockedFiles: planningClosureFiles,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (protectedStateFiles.length > 0 && !isAuthorizedAtmStateMutationCommand(toolCommand)) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_PROTECTED_STATE_MANUAL_EDIT_BLOCKED', 'ATM protected runtime/task/evidence state must be mutated through ATM CLI commands, not by direct file edits.', {
+        editor: options.editor,
+        blockedFiles: protectedStateFiles,
+        nextStep: 'Use node atm.mjs next/tasks/evidence/framework-mode commands instead of editing .atm history or runtime state files directly.'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        blockedFiles: protectedStateFiles,
+        toolCommand,
         frameworkStatus: status
       }
     });
@@ -829,6 +854,24 @@ function isPlanningClosureSurface(value: string): boolean {
     || normalized.startsWith('.atm/history/evidence/')
     || normalized.startsWith('atomic_workbench/evidence/')
     || normalized.startsWith('atomic_workbench/reports/');
+}
+
+function isProtectedAtmManagedStatePath(value: string): boolean {
+  const normalized = normalizeRelativePath(value).toLowerCase();
+  return normalized.startsWith('.atm/history/tasks/')
+    || normalized.startsWith('.atm/history/task-events/')
+    || normalized.startsWith('.atm/history/evidence/')
+    || normalized.startsWith('.atm/runtime/locks/')
+    || normalized.startsWith('.atm/runtime/task-direction-locks/')
+    || normalized.startsWith('.atm/runtime/task-queues/')
+    || normalized === '.atm/runtime/current-task.json'
+    || normalized === '.atm/runtime/guidance/active-session.json';
+}
+
+function isAuthorizedAtmStateMutationCommand(command: string | null): boolean {
+  const normalized = String(command ?? '').trim().toLowerCase();
+  if (!normalized) return false;
+  return /\batm\.mjs\b/.test(normalized);
 }
 
 function isMutatingToolIntent(toolName: string | null, command: string | null): boolean {
