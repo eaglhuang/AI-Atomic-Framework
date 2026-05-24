@@ -6,6 +6,12 @@ Bootstrap prompt:
 
 Read README.md if present, then run "node atm.mjs next --json" from the repository root and execute exactly the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
 
+Framework-repository note:
+
+- The ATM framework repository intentionally does not require `keep.md` or `keep.summary.md`.
+- If a framework repository has no keep file, treat that as normal and continue with `README.md` plus `node atm.mjs next --json`.
+- Keep files are host-side operating memory for adopter or planning repositories, not a framework-repo requirement.
+
 Profile files:
 
 - Project probe: .atm/runtime/project-probe.json

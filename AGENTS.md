@@ -6,6 +6,12 @@ Start with this line:
 
 Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
 
+Framework-repository exception:
+
+- The ATM framework repository itself intentionally does **not** use `keep.md` or `keep.summary.md`.
+- Do not treat a missing keep file in this repository as corruption or a bootstrap failure.
+- For the ATM framework repo, the correct first-touch orientation is `README.md` plus `node atm.mjs next --json`.
+
 Bootstrap files:
 
 - Task: .atm/history/tasks/BOOTSTRAP-0001.json
@@ -75,6 +81,11 @@ If `node atm.mjs doctor --json` reports errors, follow the `resolution` hints be
 ## Framework vs Adopter Repository
 
 This is the **framework repository**. Downstream adopter repositories generate their own AGENTS.md via `node atm.mjs install-agent-pack`. The framework AGENTS.md you are reading now is not a template for adopter entry files; it is the orientation point for contributors working on ATM itself.
+
+Framework repositories and adopter repositories have different documentation expectations:
+
+- Framework repo: no keep file is required; read `README.md` and follow `node atm.mjs next --json`.
+- Adopter / planning repo: local `keep` documents may exist and should be treated as host-specific operating memory.
 
 ## Quick Reference
 

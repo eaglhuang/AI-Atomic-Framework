@@ -18,6 +18,7 @@ import {
   runPoliceFamilyGate
 } from '../../../core/src/police/family.ts';
 import { classifyGuidanceIntent, probeProject } from '../../../core/src/guidance/index.ts';
+import { detectFrameworkRepoIdentity } from './framework-development.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 
@@ -479,7 +480,9 @@ function rankCandidate(metrics: CandidateMetrics, maxFileLines: number, goal: st
 }
 
 function buildGuidedFallback(cwd: string) {
-  const preferredDocs = ['README.md', 'docs/QUICK_START.md', 'docs/keep.summary.md'];
+  const preferredDocs = detectFrameworkRepoIdentity(cwd).isFrameworkRepo
+    ? ['README.md', 'docs/QUICK_START.md']
+    : ['README.md', 'docs/QUICK_START.md', 'docs/keep.summary.md'];
   const missingDocs = preferredDocs.filter((relativePath) => !existsSync(path.join(cwd, relativePath)));
   return {
     missingDocs,
