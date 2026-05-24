@@ -13,7 +13,10 @@ interface ParsedBaselineArgs {
   readonly name: string;
   readonly worktreeOnly: boolean;
   readonly force: boolean;
+  readonly frameworkCommitRangeCut: boolean;
 }
+
+const frameworkCommitRangeBaselinePath = ['.atm', 'history', 'baselines', 'framework-commit-range.json'] as const;
 
 export function runBaseline(argv: string[]) {
   const options = parseBaselineArgs(argv);
@@ -41,6 +44,9 @@ function runBaselineCreate(options: ParsedBaselineArgs) {
   const reportPath = baselineReportPath(root, options.name);
   mkdirSync(path.dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  const frameworkCommitRangeBaseline = options.frameworkCommitRangeCut
+    ? writeFrameworkCommitRangeBaseline(root, options.name, commitSha)
+    : null;
   return makeResult({
     ok: true,
     command: 'baseline',
@@ -55,7 +61,8 @@ function runBaselineCreate(options: ParsedBaselineArgs) {
       name: options.name,
       commitSha,
       reportPath: relativePathFrom(root, reportPath),
-      report
+      report,
+      frameworkCommitRangeBaseline
     }
   });
 }
@@ -178,7 +185,8 @@ function parseBaselineArgs(argv: string[]): ParsedBaselineArgs {
     action: null as BaselineAction | null,
     name: null as string | null,
     worktreeOnly: false,
-    force: false
+    force: false,
+    frameworkCommitRangeCut: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -198,6 +206,10 @@ function parseBaselineArgs(argv: string[]): ParsedBaselineArgs {
     }
     if (arg === '--force') {
       state.force = true;
+      continue;
+    }
+    if (arg === '--framework-commit-range-cut') {
+      state.frameworkCommitRangeCut = true;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {
@@ -225,7 +237,28 @@ function parseBaselineArgs(argv: string[]): ParsedBaselineArgs {
     action: state.action,
     name: state.name,
     worktreeOnly: state.worktreeOnly,
-    force: state.force
+    force: state.force,
+    frameworkCommitRangeCut: state.frameworkCommitRangeCut
+  };
+}
+
+function writeFrameworkCommitRangeBaseline(root: string, name: string, commitSha: string) {
+  const absolutePath = path.join(root, ...frameworkCommitRangeBaselinePath);
+  mkdirSync(path.dirname(absolutePath), { recursive: true });
+  const payload = {
+    schemaId: 'atm.frameworkCommitRangeBaseline.v1',
+    generatedAt: new Date().toISOString(),
+    name,
+    refName: name,
+    commitSha,
+    acceptedHistoryThroughCommitSha: commitSha,
+    strictEvidenceRequiredAfterCommitSha: commitSha,
+    rationale: 'Framework commit-range guard accepts critical history through this baseline and enforces per-commit git-head evidence only for newer framework commits.'
+  };
+  writeFileSync(absolutePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  return {
+    path: relativePathFrom(root, absolutePath),
+    payload
   };
 }
 

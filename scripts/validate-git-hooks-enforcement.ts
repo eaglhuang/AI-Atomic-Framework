@@ -127,6 +127,52 @@ try {
   assert(commitRange.status === 1, 'commit-range guard must fail for critical bypass commit');
   assert(commitRangePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_FAILED'), 'commit-range guard must emit ATM_GUARD_COMMIT_RANGE_FAILED');
 
+  const legacyBaselineRepo = path.join(tempRoot, 'legacy-baseline-cut');
+  mkdirSync(legacyBaselineRepo, { recursive: true });
+  copyRuntime(root, legacyBaselineRepo);
+  runGit(legacyBaselineRepo, ['init']);
+  runGit(legacyBaselineRepo, ['config', 'user.email', 'atm@example.invalid']);
+  runGit(legacyBaselineRepo, ['config', 'user.name', 'ATM Hook Validator']);
+  assert(parsePayload(runCli(legacyBaselineRepo, ['bootstrap', '--cwd', legacyBaselineRepo, '--json'])).ok === true, 'legacy-baseline bootstrap must report ok=true');
+  assert(parsePayload(runCli(legacyBaselineRepo, ['atm-chart', 'render', '--cwd', legacyBaselineRepo, '--json'])).ok === true, 'legacy-baseline atm-chart render must report ok=true');
+  assert(parsePayload(runCli(legacyBaselineRepo, ['welcome', '--cwd', legacyBaselineRepo, '--json'])).ok === true, 'legacy-baseline welcome must report ok=true');
+  runGit(legacyBaselineRepo, ['add', '.']);
+  runGit(legacyBaselineRepo, ['commit', '--no-verify', '-m', 'initial baseline']);
+  const legacyInitialSha = String(runGit(legacyBaselineRepo, ['rev-parse', 'HEAD']).stdout || '').trim();
+
+  writeFileSync(path.join(legacyBaselineRepo, 'packages', 'core', 'src', 'index.ts'), 'export const acceptedLegacyBypass = true;\n', 'utf8');
+  runGit(legacyBaselineRepo, ['add', 'packages/core/src/index.ts']);
+  runGit(legacyBaselineRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'legacy bypass before cut']);
+  const acceptedLegacyCommitSha = String(runGit(legacyBaselineRepo, ['rev-parse', 'HEAD']).stdout || '').trim();
+
+  const legacyBaselineManifestPath = path.join(legacyBaselineRepo, '.atm', 'history', 'baselines', 'framework-commit-range.json');
+  mkdirSync(path.dirname(legacyBaselineManifestPath), { recursive: true });
+  writeFileSync(legacyBaselineManifestPath, `${JSON.stringify({
+    schemaId: 'atm.frameworkCommitRangeBaseline.v1',
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    name: 'fixture-framework-legacy-cut',
+    refName: 'fixture-framework-legacy-cut',
+    commitSha: acceptedLegacyCommitSha,
+    acceptedHistoryThroughCommitSha: acceptedLegacyCommitSha,
+    strictEvidenceRequiredAfterCommitSha: acceptedLegacyCommitSha,
+    rationale: 'Fixture baseline cut for legacy framework history.'
+  }, null, 2)}\n`, 'utf8');
+  runGit(legacyBaselineRepo, ['add', '.atm/history/baselines/framework-commit-range.json']);
+  runGit(legacyBaselineRepo, ['commit', '--no-verify', '-m', 'record framework legacy baseline cut']);
+
+  const legacyOnlyRange = runCli(legacyBaselineRepo, ['guard', 'commit-range', '--base', legacyInitialSha, '--head', 'HEAD', '--json'], { allowFailure: true });
+  const legacyOnlyPayload = parsePayload(legacyOnlyRange);
+  assert(legacyOnlyRange.status === 0, 'commit-range guard must accept legacy critical history before the framework baseline cut');
+  assert((legacyOnlyPayload.evidence?.report?.ignoredLegacyCriticalCommitCount ?? 0) >= 1, 'commit-range report must count ignored legacy critical commits');
+
+  writeFileSync(path.join(legacyBaselineRepo, 'packages', 'core', 'src', 'index.ts'), 'export const rejectedPostBaselineBypass = true;\n', 'utf8');
+  runGit(legacyBaselineRepo, ['add', 'packages/core/src/index.ts']);
+  runGit(legacyBaselineRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'post-baseline bypass without evidence']);
+  const postBaselineRange = runCli(legacyBaselineRepo, ['guard', 'commit-range', '--base', legacyInitialSha, '--head', 'HEAD', '--json'], { allowFailure: true });
+  const postBaselinePayload = parsePayload(postBaselineRange);
+  assert(postBaselineRange.status === 1, 'commit-range guard must still fail for critical commits that happen after the framework baseline cut');
+  assert(postBaselinePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_FAILED'), 'post-baseline bypass must still emit ATM_GUARD_COMMIT_RANGE_FAILED');
+
   const closureRepo = path.join(tempRoot, 'closure-cross-check');
   mkdirSync(closureRepo, { recursive: true });
   copyRuntime(root, closureRepo);
@@ -199,6 +245,17 @@ try {
     validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
     evidenceFreshness: 'fresh',
     requiredGates: ['framework-development', 'tasks-audit', 'doctor', 'git-head-evidence', 'typecheck', 'validate:cli', 'validate:git-head-evidence'],
+    requiredGatesSnapshot: {
+      schemaId: 'atm.requiredGatesSnapshot.v1',
+      generatedAt: '2026-01-01T00:00:00.000Z',
+      source: 'frameworkStatus.requiredGates',
+      ruleVersion: '0.1.0',
+      frameworkMode: 'required',
+      repoRole: 'framework',
+      changedFiles: ['packages/core/src/index.ts'],
+      criticalChangedFiles: ['packages/core/src/index.ts'],
+      requiredGates: ['framework-development', 'tasks-audit', 'doctor', 'git-head-evidence', 'typecheck', 'validate:cli', 'validate:git-head-evidence']
+    },
     evidencePath: '.atm/history/evidence/TASK-X-9001.json',
     closedAt: '2026-01-01T00:00:00.000Z',
     closedByActor: 'validate-git-hooks-enforcement'

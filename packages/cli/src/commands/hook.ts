@@ -109,6 +109,17 @@ interface CommitClosurePacketInspection {
   }[];
 }
 
+interface FrameworkCommitRangeBaseline {
+  readonly schemaId: 'atm.frameworkCommitRangeBaseline.v1';
+  readonly generatedAt: string;
+  readonly name: string | null;
+  readonly refName: string | null;
+  readonly commitSha: string;
+  readonly acceptedHistoryThroughCommitSha: string;
+  readonly strictEvidenceRequiredAfterCommitSha: string;
+  readonly rationale: string | null;
+}
+
 const textFileExtensions = new Set([
   '.cjs',
   '.css',
@@ -128,6 +139,7 @@ const textFileExtensions = new Set([
 ]);
 
 const hookFileNames = ['pre-commit', 'pre-push'] as const;
+const frameworkCommitRangeBaselineRelativePath = '.atm/history/baselines/framework-commit-range.json' as const;
 
 export function runHook(argv: string[]) {
   const options = parseHookArgs(argv);
@@ -399,6 +411,7 @@ function runPrePushHook(cwd: string, base: string | null, head: string | null) {
 function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
   const root = path.resolve(cwd);
   const repoIdentity = detectFrameworkRepoIdentity(root);
+  const legacyBaseline = repoIdentity.isFrameworkRepo ? readFrameworkCommitRangeBaseline(root, head) : null;
   const changedFiles = runGitLines(root, ['diff', '--name-only', `${base}..${head}`]).map(normalizeRelativePath);
   const criticalChangedFiles = repoIdentity.isFrameworkRepo
     ? changedFiles.filter(isAtmCriticalNonDocSurface)
@@ -412,11 +425,18 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
       criticalChangedFiles: readCommitChangedFiles(root, commitSha).filter(isAtmCriticalNonDocSurface)
     }))
     .filter((entry) => entry.criticalChangedFiles.length > 0);
+  const enforcedCriticalCommits = legacyBaseline
+    ? criticalCommits.filter((entry) => !isCommitAcceptedByLegacyBaseline(root, entry.commitSha, legacyBaseline.commitSha))
+    : criticalCommits;
   const evidenceMatches = criticalCommits.map((entry) => inspectCommitGitHeadEvidence(root, entry.commitSha, entry.criticalChangedFiles));
-  const closurePacketInspections = criticalCommits.flatMap((entry, index) => inspectCommitClosurePackets(root, entry.commitSha, evidenceMatches[index]));
+  const closurePacketInspections = enforcedCriticalCommits.flatMap((entry) => {
+    const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
+    return inspectCommitClosurePackets(root, entry.commitSha, match ?? null);
+  });
   const taskAudit = auditTasks(root);
   const findings = [
     ...evidenceMatches
+      .filter((entry) => !legacyBaseline || !isCommitAcceptedByLegacyBaseline(root, entry.commitSha, legacyBaseline.commitSha))
       .filter((entry) => !entry.matched)
       .map((entry) => ({
         level: 'error' as const,
@@ -441,19 +461,59 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
   ];
   return {
     schemaId: 'atm.commitRangeGuardReport.v1',
-    generatedAt: new Date().toISOString(),
-    base,
-    head,
-    repoIdentity,
-    changedFiles,
-    criticalChangedFiles,
-    criticalCommits,
-    evidenceMatches,
-    closurePacketInspections,
-    taskAudit,
+      generatedAt: new Date().toISOString(),
+      base,
+      head,
+      legacyBaseline,
+      ignoredLegacyCriticalCommitCount: criticalCommits.length - enforcedCriticalCommits.length,
+      repoIdentity,
+      changedFiles,
+      criticalChangedFiles,
+      criticalCommits: enforcedCriticalCommits,
+      evidenceMatches,
+      closurePacketInspections,
+      taskAudit,
     findings,
     ok: findings.length === 0
   };
+}
+
+function readFrameworkCommitRangeBaseline(cwd: string, headRef: string): FrameworkCommitRangeBaseline | null {
+  const absolutePath = path.join(cwd, frameworkCommitRangeBaselineRelativePath);
+  if (!existsSync(absolutePath)) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(readFileSync(absolutePath, 'utf8')) as Partial<FrameworkCommitRangeBaseline>;
+    const commitSha = normalizeOptionalText(parsed.commitSha);
+    if (!commitSha) return null;
+    const headCommit = runGitScalar(cwd, ['rev-parse', '--verify', headRef]);
+    if (!headCommit) return null;
+    if (!isAncestorCommit(cwd, commitSha, headCommit)) {
+      return null;
+    }
+    return {
+      schemaId: 'atm.frameworkCommitRangeBaseline.v1',
+      generatedAt: normalizeOptionalText(parsed.generatedAt) ?? new Date(0).toISOString(),
+      name: normalizeOptionalText(parsed.name),
+      refName: normalizeOptionalText(parsed.refName),
+      commitSha,
+      acceptedHistoryThroughCommitSha: normalizeOptionalText(parsed.acceptedHistoryThroughCommitSha) ?? commitSha,
+      strictEvidenceRequiredAfterCommitSha: normalizeOptionalText(parsed.strictEvidenceRequiredAfterCommitSha) ?? commitSha,
+      rationale: normalizeOptionalText(parsed.rationale)
+    };
+  } catch {
+    return null;
+  }
+}
+
+function isCommitAcceptedByLegacyBaseline(cwd: string, commitSha: string, baselineCommitSha: string) {
+  return isAncestorCommit(cwd, commitSha, baselineCommitSha);
+}
+
+function isAncestorCommit(cwd: string, maybeAncestor: string, maybeDescendant: string) {
+  const result = runGit(cwd, ['merge-base', '--is-ancestor', maybeAncestor, maybeDescendant]);
+  return result.exitCode === 0;
 }
 
 function runRequiredFrameworkValidators(cwd: string, requiredGates: readonly string[]): readonly CommandRunReport[] {
@@ -638,7 +698,7 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
   };
 }
 
-function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMatch: CommitEvidenceMatch): readonly CommitClosurePacketInspection[] {
+function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMatch: CommitEvidenceMatch | null): readonly CommitClosurePacketInspection[] {
   const commitChangedFiles = readCommitChangedFiles(cwd, commitSha);
   const closurePacketPaths = commitChangedFiles.filter((entry) => entry.startsWith('.atm/history/evidence/') && entry.endsWith('.closure-packet.json'));
   if (closurePacketPaths.length === 0) return [];
@@ -692,7 +752,7 @@ function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMat
       });
     }
 
-    if (evidenceMatch.matched) {
+    if (evidenceMatch?.matched) {
       const evidenceTreeSha = normalizeOptionalText(evidenceMatch.gitDetails?.treeSha);
       if (packetTreeSha && evidenceTreeSha && packetTreeSha !== evidenceTreeSha) {
         findings.push({
