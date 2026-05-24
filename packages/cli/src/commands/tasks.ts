@@ -788,8 +788,18 @@ async function runTasksClose(argv: string[]) {
       taskId: options.taskId,
       actorId,
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
-      requiredGates: frameworkStatus.requiredGates
+      requiredGates: frameworkStatus.requiredGates,
+      changedFiles: taskDeclaredFiles
     });
+    const validation = validateClosurePacket(packet);
+    if (!validation.ok) {
+      throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet contract is incomplete.`, {
+        details: {
+          taskId: options.taskId,
+          missing: validation.missing
+        }
+      });
+    }
     closurePacketPath = writeClosurePacket(options.cwd, options.taskId, packet);
     taskDocument.closurePacket = closurePacketPath;
   }

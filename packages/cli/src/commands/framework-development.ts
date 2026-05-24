@@ -66,6 +66,13 @@ export interface ClosurePacketCommandRun {
   readonly runnerVersion: string;
 }
 
+export interface ClosurePacketTargetCommitDelta {
+  readonly currentCommitSha: string | null;
+  readonly parentCommitShas: readonly string[];
+  readonly governedTreeSha: string | null;
+  readonly changedFiles: readonly string[];
+}
+
 export interface ClosurePacket {
   readonly schemaId: 'atm.closurePacket.v1';
   readonly specVersion: '0.1.0';
@@ -73,8 +80,11 @@ export interface ClosurePacket {
   readonly targetRepoIdentity: FrameworkRepoIdentity;
   readonly targetCommit: string | null;
   readonly governedTreeSha: string | null;
+  readonly targetCommitDelta: ClosurePacketTargetCommitDelta;
   readonly closedByCommand: 'atm tasks close';
   readonly commandRuns: readonly ClosurePacketCommandRun[];
+  readonly validationPasses: readonly string[];
+  readonly evidenceFreshness: 'fresh' | 'historical-reference' | 'draft';
   readonly requiredGates: readonly string[];
   readonly evidencePath: string;
   readonly closedAt: string;
@@ -636,6 +646,12 @@ export function validateClosurePacket(value: unknown): { ok: boolean; missing: r
   if (!normalizeOptionalString(packet.closedByActor)) missing.push('closedByActor');
   if (!normalizeOptionalString(packet.evidencePath)) missing.push('evidencePath');
   if (!packet.targetRepoIdentity?.isFrameworkRepo) missing.push('targetRepoIdentity');
+  if (!packet.targetCommitDelta || typeof packet.targetCommitDelta !== 'object' || Array.isArray(packet.targetCommitDelta)) {
+    missing.push('targetCommitDelta');
+  } else {
+    if (!Array.isArray(packet.targetCommitDelta.parentCommitShas)) missing.push('targetCommitDelta/parentCommitShas');
+    if (!Array.isArray(packet.targetCommitDelta.changedFiles)) missing.push('targetCommitDelta/changedFiles');
+  }
   if (!Array.isArray(packet.commandRuns) || packet.commandRuns.length === 0) {
     missing.push('commandRuns');
   } else {
@@ -646,6 +662,12 @@ export function validateClosurePacket(value: unknown): { ok: boolean; missing: r
       if (!/^sha256:[a-f0-9]{64}$/.test(String(run.stderrSha256 ?? ''))) missing.push(`commandRuns/${index}/stderrSha256`);
     }
   }
+  if (!Array.isArray(packet.validationPasses) || packet.validationPasses.length === 0) {
+    missing.push('validationPasses');
+  }
+  if (packet.evidenceFreshness !== 'fresh') {
+    missing.push('evidenceFreshness');
+  }
   return { ok: missing.length === 0, missing };
 }
 
@@ -655,9 +677,11 @@ export function createClosurePacket(input: {
   readonly actorId: string;
   readonly evidencePath: string;
   readonly requiredGates?: readonly string[];
+  readonly changedFiles?: readonly string[];
 }): ClosurePacket {
   const cwd = path.resolve(input.cwd);
   const gitDetails = readGitHeadDetails(cwd);
+  const evidenceContext = readClosureEvidenceContext(cwd, input.taskId);
   return {
     schemaId: 'atm.closurePacket.v1',
     specVersion: frameworkModeSpecVersion,
@@ -665,17 +689,16 @@ export function createClosurePacket(input: {
     targetRepoIdentity: detectFrameworkRepoIdentity(cwd),
     targetCommit: gitDetails.commitSha,
     governedTreeSha: gitDetails.treeSha,
+    targetCommitDelta: {
+      currentCommitSha: gitDetails.commitSha,
+      parentCommitShas: gitDetails.parentCommitShas,
+      governedTreeSha: gitDetails.treeSha,
+      changedFiles: uniqueSorted((input.changedFiles ?? []).map(normalizeRelativePath).filter(Boolean))
+    },
     closedByCommand: 'atm tasks close',
-    commandRuns: [
-      {
-        command: 'node atm.mjs tasks close',
-        cwd: relativePathFrom(cwd, cwd) || '.',
-        exitCode: 0,
-        stdoutSha256: sha256('atm tasks close pending result envelope'),
-        stderrSha256: sha256(''),
-        runnerVersion: readFrameworkVersion(cwd)
-      }
-    ],
+    commandRuns: evidenceContext.commandRuns,
+    validationPasses: evidenceContext.validationPasses,
+    evidenceFreshness: evidenceContext.evidenceFreshness,
     requiredGates: input.requiredGates ?? defaultRequiredGates,
     evidencePath: input.evidencePath,
     closedAt: new Date().toISOString(),
@@ -1123,10 +1146,13 @@ function sameRepo(left: string, right: string | null): boolean {
   return path.resolve(left).toLowerCase() === path.resolve(right).toLowerCase();
 }
 
-function readGitHeadDetails(cwd: string): { commitSha: string | null; treeSha: string | null } {
+function readGitHeadDetails(cwd: string): { commitSha: string | null; treeSha: string | null; parentCommitShas: readonly string[] } {
   const commitSha = runGitLines(cwd, ['rev-parse', '--verify', 'HEAD'])[0] ?? null;
   const treeSha = commitSha ? runGitLines(cwd, ['rev-parse', `${commitSha}^{tree}`])[0] ?? null : null;
-  return { commitSha, treeSha };
+  const parentCommitShas = commitSha
+    ? runGitLines(cwd, ['rev-list', '--parents', '-n', '1', commitSha])[0]?.split(/\s+/).slice(1).filter(Boolean) ?? []
+    : [];
+  return { commitSha, treeSha, parentCommitShas };
 }
 
 function readJsonIfExists(filePath: string): Record<string, any> | null {
@@ -1152,6 +1178,116 @@ function uniqueSorted(values: readonly string[]): readonly string[] {
 
 function sha256(value: string): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function readClosureEvidenceContext(cwd: string, taskId: string): {
+  readonly commandRuns: readonly ClosurePacketCommandRun[];
+  readonly validationPasses: readonly string[];
+  readonly evidenceFreshness: 'fresh' | 'historical-reference' | 'draft';
+} {
+  const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+  const records = flattenEvidenceRecords(readJsonIfExists(evidencePath));
+  const commandRuns = dedupeCommandRuns(records.flatMap((record) => extractEvidenceCommandRuns(record, cwd)));
+  const validationPasses = uniqueSorted(records.flatMap(extractValidationPasses));
+  const evidenceFreshness = resolveEvidenceFreshness(records);
+  return {
+    commandRuns,
+    validationPasses,
+    evidenceFreshness
+  };
+}
+
+function flattenEvidenceRecords(value: Record<string, any> | null): readonly Record<string, unknown>[] {
+  if (!value) return [];
+  if (Array.isArray(value.evidence)) {
+    return value.evidence.filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry));
+  }
+  return [value];
+}
+
+function extractEvidenceCommandRuns(record: Record<string, unknown>, cwd: string): readonly ClosurePacketCommandRun[] {
+  const runs = [
+    ...readCommandRunArray(record.commandRuns),
+    ...readCommandRunArray(isObjectRecord(record.details) ? record.details.commandRuns : undefined)
+  ];
+  return runs.map((run) => ({
+    command: String(run.command),
+    cwd: typeof run.cwd === 'string' && run.cwd.trim().length > 0 ? run.cwd : (relativePathFrom(cwd, cwd) || '.'),
+    exitCode: Number(run.exitCode),
+    stdoutSha256: String(run.stdoutSha256),
+    stderrSha256: String(run.stderrSha256),
+    runnerVersion: typeof run.runnerVersion === 'string' && run.runnerVersion.trim().length > 0
+      ? run.runnerVersion
+      : readFrameworkVersion(cwd)
+  }));
+}
+
+function readCommandRunArray(value: unknown): readonly Record<string, unknown>[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is Record<string, unknown> => isObjectRecord(entry) && isClosureCommandRunShape(entry));
+}
+
+function isClosureCommandRunShape(value: Record<string, unknown>) {
+  return typeof value.command === 'string'
+    && typeof value.exitCode === 'number'
+    && /^sha256:[a-f0-9]{64}$/i.test(String(value.stdoutSha256 ?? ''))
+    && /^sha256:[a-f0-9]{64}$/i.test(String(value.stderrSha256 ?? ''));
+}
+
+function extractValidationPasses(record: Record<string, unknown>) {
+  const fromTop = Array.isArray(record.validationPasses) ? record.validationPasses : [];
+  const fromDetails = isObjectRecord(record.details) && Array.isArray(record.details.validationPasses)
+    ? record.details.validationPasses
+    : [];
+  return [...fromTop, ...fromDetails]
+    .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    .map((entry) => entry.trim());
+}
+
+function resolveEvidenceFreshness(records: readonly Record<string, unknown>[]): 'fresh' | 'historical-reference' | 'draft' {
+  let hasFresh = false;
+  let hasHistorical = false;
+  for (const record of records) {
+    const top = typeof record.evidenceFreshness === 'string'
+      ? record.evidenceFreshness
+      : typeof record.freshness === 'string'
+        ? record.freshness
+        : null;
+    const detail = isObjectRecord(record.details) && typeof record.details.freshness === 'string'
+      ? record.details.freshness
+      : null;
+    const normalized = normalizeEvidenceFreshness(top ?? detail ?? null);
+    if (normalized === 'fresh') hasFresh = true;
+    if (normalized === 'historical-reference') hasHistorical = true;
+  }
+  if (hasFresh) return 'fresh';
+  if (hasHistorical) return 'historical-reference';
+  return 'draft';
+}
+
+function normalizeEvidenceFreshness(value: string | null): 'fresh' | 'historical-reference' | 'draft' {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  if (normalized === 'historical-reference' || normalized === 'historical_reference' || normalized === 'reference-only') {
+    return 'historical-reference';
+  }
+  if (normalized === 'draft') return 'draft';
+  return 'fresh';
+}
+
+function dedupeCommandRuns(runs: readonly ClosurePacketCommandRun[]) {
+  const seen = new Set<string>();
+  const output: ClosurePacketCommandRun[] = [];
+  for (const run of runs) {
+    const key = `${run.command}|${run.cwd}|${run.exitCode}|${run.stdoutSha256}|${run.stderrSha256}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    output.push(run);
+  }
+  return output;
+}
+
+function isObjectRecord(value: unknown): value is Record<string, any> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
 function requireValue(argv: string[], index: number, flag: string): string {
