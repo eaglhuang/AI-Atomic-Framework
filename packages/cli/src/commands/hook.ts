@@ -8,7 +8,9 @@ import {
   buildFrameworkTempClaimCommand,
   createFrameworkModeStatus,
   detectFrameworkRepoIdentity,
-  isAtmCriticalNonDocSurface
+  isAtmCriticalNonDocSurface,
+  requiredValidationPassesForClosure,
+  validateClosurePacket
 } from './framework-development.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
@@ -72,6 +74,9 @@ interface CommitEvidenceMatch {
   readonly evidencePath: string;
   readonly matched: boolean;
   readonly matchedBy: 'commitSha' | 'treeSha+parentCommitShas' | null;
+  readonly gitDetails: ReturnType<typeof normalizeGitDetails>;
+  readonly commandRuns: readonly ComparableCommandRun[];
+  readonly validationPasses: readonly string[];
 }
 
 interface ProtectedStateFinding {
@@ -84,6 +89,23 @@ interface ProtectedStateFinding {
     | 'task-file-transition-mismatch'
     | 'evidence-file-missing-task-context';
   readonly detail: string;
+}
+
+interface ComparableCommandRun {
+  readonly command: string;
+  readonly exitCode: number;
+  readonly stdoutSha256: string;
+  readonly stderrSha256: string;
+}
+
+interface CommitClosurePacketInspection {
+  readonly commitSha: string;
+  readonly packetPath: string;
+  readonly taskId: string | null;
+  readonly findings: readonly {
+    readonly code: string;
+    readonly detail: string;
+  }[];
 }
 
 const textFileExtensions = new Set([
@@ -254,7 +276,7 @@ function runPreCommitHook(cwd: string) {
   const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
-    ? runRequiredFrameworkValidators(root, frameworkStatus.criticalChangedFiles)
+    ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
     : [];
   const failedValidatorRuns = commandRuns.filter((entry) => entry.exitCode !== 0);
   const frameworkClaimCommand = blockingFrameworkIssues.includes('active-framework-claim-required')
@@ -390,6 +412,7 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
     }))
     .filter((entry) => entry.criticalChangedFiles.length > 0);
   const evidenceMatches = criticalCommits.map((entry) => inspectCommitGitHeadEvidence(root, entry.commitSha, entry.criticalChangedFiles));
+  const closurePacketInspections = criticalCommits.flatMap((entry, index) => inspectCommitClosurePackets(root, entry.commitSha, evidenceMatches[index]));
   const taskAudit = auditTasks(root);
   const findings = [
     ...evidenceMatches
@@ -400,6 +423,12 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
         commitSha: entry.commitSha,
         detail: `Critical framework commit ${entry.commitSha} has no matching git-head evidence.`
       })),
+    ...closurePacketInspections.flatMap((entry) => entry.findings.map((finding) => ({
+      level: 'error' as const,
+      code: finding.code,
+      commitSha: entry.commitSha,
+      detail: `${entry.packetPath}: ${finding.detail}`
+    }))),
     ...taskAudit.findings
       .filter((entry) => entry.level === 'error')
       .map((entry) => ({
@@ -419,24 +448,18 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
     criticalChangedFiles,
     criticalCommits,
     evidenceMatches,
+    closurePacketInspections,
     taskAudit,
     findings,
     ok: findings.length === 0
   };
 }
 
-function runRequiredFrameworkValidators(cwd: string, criticalChangedFiles: readonly string[]): readonly CommandRunReport[] {
-  if (criticalChangedFiles.length === 0) return [];
-  const commands: Array<readonly [string, readonly string[]]> = [
-    ['npm', ['run', 'typecheck']]
-  ];
-  if (criticalChangedFiles.some((entry) => /^(packages\/cli|scripts|atm\.mjs|templates|integrations)\//.test(entry) || entry === 'atm.mjs')) {
-    commands.push(['npm', ['run', 'validate:cli']]);
-  }
-  if (criticalChangedFiles.some((entry) => /^(templates|integrations)\//.test(entry))) {
-    commands.push(['npm', ['run', 'validate:integration-adapter']]);
-  }
-  return commands.map(([command, args]) => runCommandForReport(cwd, command, args));
+function runRequiredFrameworkValidators(cwd: string, requiredGates: readonly string[]): readonly CommandRunReport[] {
+  const validationPasses = requiredValidationPassesForClosure(requiredGates);
+  if (validationPasses.length === 0) return [];
+  const commands = uniqueSorted(validationPasses.map((gate) => gate === 'typecheck' ? 'npm run typecheck' : `npm run ${gate}`));
+  return commands.map((command) => runShellCommandForReport(cwd, command));
 }
 
 function runCommandForReport(cwd: string, command: string, args: readonly string[]): CommandRunReport {
@@ -445,6 +468,25 @@ function runCommandForReport(cwd: string, command: string, args: readonly string
   const stderr = [String(result.stderr ?? ''), result.error?.message ?? ''].filter(Boolean).join('\n');
   return {
     command: [command, ...args].join(' '),
+    cwd,
+    exitCode: typeof result.status === 'number' ? result.status : 1,
+    stdoutSha256: sha256(stdout),
+    stderrSha256: sha256(stderr),
+    stdoutPreview: stdout.slice(-2000),
+    stderrPreview: stderr.slice(-2000)
+  };
+}
+
+function runShellCommandForReport(cwd: string, commandLine: string): CommandRunReport {
+  const result = spawnSync(commandLine, {
+    cwd,
+    encoding: 'utf8',
+    shell: true
+  });
+  const stdout = String(result.stdout ?? '');
+  const stderr = [String(result.stderr ?? ''), result.error?.message ?? ''].filter(Boolean).join('\n');
+  return {
+    command: commandLine,
     cwd,
     exitCode: typeof result.status === 'number' ? result.status : 1,
     stdoutSha256: sha256(stdout),
@@ -556,13 +598,18 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
   for (const record of records) {
     const git = normalizeGitDetails(record?.details?.git);
     if (!git) continue;
+    const commandRuns = normalizeCommandRuns(record?.commandRuns ?? record?.details?.commandRuns);
+    const validationPasses = inferValidationPassesFromCommandRuns(commandRuns);
     if (git.commitSha === commitSha) {
       return {
         commitSha,
         criticalChangedFiles,
         evidencePath: gitHeadEvidencePath,
         matched: true,
-        matchedBy: 'commitSha'
+        matchedBy: 'commitSha',
+        gitDetails: git,
+        commandRuns,
+        validationPasses
       };
     }
     if (git.treeSha && (git.treeSha === governedTreeSha || git.treeSha === commitTreeSha) && sameStringSet(git.parentCommitShas, parentCommitShas)) {
@@ -571,7 +618,10 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
         criticalChangedFiles,
         evidencePath: gitHeadEvidencePath,
         matched: true,
-        matchedBy: 'treeSha+parentCommitShas'
+        matchedBy: 'treeSha+parentCommitShas',
+        gitDetails: git,
+        commandRuns,
+        validationPasses
       };
     }
   }
@@ -580,8 +630,101 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
     criticalChangedFiles,
     evidencePath: gitHeadEvidencePath,
     matched: false,
-    matchedBy: null
+    matchedBy: null,
+    gitDetails: null,
+    commandRuns: [],
+    validationPasses: []
   };
+}
+
+function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMatch: CommitEvidenceMatch): readonly CommitClosurePacketInspection[] {
+  const commitChangedFiles = readCommitChangedFiles(cwd, commitSha);
+  const closurePacketPaths = commitChangedFiles.filter((entry) => entry.startsWith('.atm/history/evidence/') && entry.endsWith('.closure-packet.json'));
+  if (closurePacketPaths.length === 0) return [];
+  const parentCommitShas = readParentCommitShas(cwd, commitSha);
+  const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
+  const commitChangedSet = new Set(commitChangedFiles.map((entry) => normalizeRelativePath(entry)));
+  return closurePacketPaths.map((packetPath) => {
+    const packetText = runGitScalar(cwd, ['show', `${commitSha}:${packetPath}`]);
+    const packet = packetText ? readJsonText(packetText) : null;
+    const findings: Array<{ readonly code: string; readonly detail: string }> = [];
+    const validation = validateClosurePacket(packet);
+    const taskId = typeof (packet as Record<string, unknown> | null)?.taskId === 'string'
+      ? String((packet as Record<string, unknown>).taskId)
+      : null;
+    if (!validation.ok) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_INVALID',
+        detail: `closure packet contract is incomplete (${validation.missing.join(', ')})`
+      });
+      return { commitSha, packetPath, taskId, findings };
+    }
+
+    const normalizedPacket = packet as Record<string, unknown>;
+    const packetTargetCommit = normalizeOptionalText(normalizedPacket.targetCommit);
+    const packetTreeSha = normalizeOptionalText((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.governedTreeSha ?? normalizedPacket.governedTreeSha);
+    const packetParentCommitShas = normalizeStringArray((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.parentCommitShas);
+    const packetChangedFiles = normalizeStringArray((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.changedFiles).map(normalizeRelativePath).filter(Boolean);
+    const invalidChangedFiles = packetChangedFiles.filter((entry) => !commitChangedSet.has(entry));
+    if (invalidChangedFiles.length > 0) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_CHANGED_FILES_MISMATCH',
+        detail: `targetCommitDelta.changedFiles includes files not present in commit ${commitSha}: ${invalidChangedFiles.join(', ')}`
+      });
+    }
+    if (!sameStringSet(packetParentCommitShas, parentCommitShas)) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_PARENT_MISMATCH',
+        detail: `targetCommitDelta.parentCommitShas does not match commit parents for ${commitSha}.`
+      });
+    }
+    if (packetTargetCommit && !parentCommitShas.includes(packetTargetCommit)) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TARGET_COMMIT_MISMATCH',
+        detail: `targetCommit ${packetTargetCommit} is not a parent of commit ${commitSha}.`
+      });
+    }
+    if (packetTreeSha && governedTreeSha && packetTreeSha !== governedTreeSha) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH',
+        detail: `targetCommitDelta.governedTreeSha ${packetTreeSha} does not match governed tree ${governedTreeSha} for commit ${commitSha}.`
+      });
+    }
+
+    if (evidenceMatch.matched) {
+      const evidenceTreeSha = normalizeOptionalText(evidenceMatch.gitDetails?.treeSha);
+      if (packetTreeSha && evidenceTreeSha && packetTreeSha !== evidenceTreeSha) {
+        findings.push({
+          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_GIT_HEAD_TREE_MISMATCH',
+          detail: `closure packet governedTreeSha ${packetTreeSha} is not the same tree recorded by git-head evidence (${evidenceTreeSha}).`
+        });
+      }
+      if (evidenceMatch.gitDetails && !sameStringSet(packetParentCommitShas, evidenceMatch.gitDetails.parentCommitShas)) {
+        findings.push({
+          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_GIT_HEAD_PARENT_MISMATCH',
+          detail: 'closure packet parent commit set does not match git-head evidence parent commit set.'
+        });
+      }
+      const packetCommandRuns = normalizeCommandRuns((normalizedPacket.commandRuns as unknown[] | undefined) ?? []);
+      const missingCommandRuns = packetCommandRuns.filter((entry) => !evidenceMatch.commandRuns.some((candidate) => sameComparableCommandRun(candidate, entry)));
+      if (missingCommandRuns.length > 0) {
+        findings.push({
+          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_COMMAND_RUN_MISMATCH',
+          detail: `closure packet commandRuns are not fully backed by git-head evidence (${missingCommandRuns.map((entry) => entry.command).join(', ')}).`
+        });
+      }
+      const requiredValidationPasses = requiredValidationPassesForClosure(normalizeStringArray(normalizedPacket.requiredGates));
+      const missingValidationPasses = requiredValidationPasses.filter((entry) => !evidenceMatch.validationPasses.includes(entry));
+      if (missingValidationPasses.length > 0) {
+        findings.push({
+          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_VALIDATION_MISMATCH',
+          detail: `git-head evidence does not prove all required validation passes (${missingValidationPasses.join(', ')}).`
+        });
+      }
+    }
+
+    return { commitSha, packetPath, taskId, findings };
+  });
 }
 
 function readCommitTreeWithoutEvidence(cwd: string, commitSha: string): string | null {
@@ -795,6 +938,61 @@ function normalizeGitDetails(value: unknown) {
       ? candidate.parentCommitShas.map((entry) => String(entry).trim()).filter(Boolean)
       : []
   };
+}
+
+function normalizeCommandRuns(value: unknown): readonly ComparableCommandRun[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry) => entry && typeof entry === 'object')
+    .map((entry) => {
+      const candidate = entry as Record<string, unknown>;
+      const command = normalizeOptionalText(candidate.command);
+      const exitCode = Number(candidate.exitCode);
+      const stdoutSha256 = normalizeOptionalText(candidate.stdoutSha256);
+      const stderrSha256 = normalizeOptionalText(candidate.stderrSha256);
+      if (!command || !Number.isFinite(exitCode) || !stdoutSha256 || !stderrSha256) return null;
+      return {
+        command,
+        exitCode,
+        stdoutSha256,
+        stderrSha256
+      };
+    })
+    .filter((entry): entry is ComparableCommandRun => entry !== null);
+}
+
+function inferValidationPassesFromCommandRuns(commandRuns: readonly ComparableCommandRun[]) {
+  const passes = new Set<string>();
+  for (const commandRun of commandRuns) {
+    const command = commandRun.command.trim();
+    const validateMatch = command.match(/\bnpm(?:\.cmd)?\s+run\s+(validate:[a-z0-9:-]+)\b/i);
+    if (validateMatch) {
+      passes.add(validateMatch[1]);
+      continue;
+    }
+    if (/\bnpm(?:\.cmd)?\s+run\s+typecheck\b/i.test(command)) {
+      passes.add('typecheck');
+    }
+  }
+  return [...passes].sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((entry) => String(entry).trim()).filter(Boolean);
+}
+
+function normalizeOptionalText(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function sameComparableCommandRun(left: ComparableCommandRun, right: ComparableCommandRun) {
+  return left.command === right.command
+    && left.exitCode === right.exitCode
+    && left.stdoutSha256 === right.stdoutSha256
+    && left.stderrSha256 === right.stderrSha256;
 }
 
 function readJsonText(text: string): unknown {

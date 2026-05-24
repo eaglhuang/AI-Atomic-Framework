@@ -45,6 +45,17 @@ function parsePayload(result: ReturnType<typeof run>) {
   return payload ? JSON.parse(payload) : {};
 }
 
+function createCommandRun(command: string, stdoutSha256: string) {
+  return {
+    command,
+    cwd: '.',
+    exitCode: 0,
+    stdoutSha256,
+    stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+    runnerVersion: '0.1.0'
+  };
+}
+
 function copyRuntime(sourceRoot: string, targetRoot: string) {
   for (const entry of ['atm.mjs', 'atomic-registry.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json', 'eslint.config.mjs', 'docs', 'packages', 'scripts', 'schemas', 'specs', 'templates', 'examples']) {
     const sourcePath = path.join(sourceRoot, entry);
@@ -115,6 +126,91 @@ try {
   const commitRangePayload = parsePayload(commitRange);
   assert(commitRange.status === 1, 'commit-range guard must fail for critical bypass commit');
   assert(commitRangePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_FAILED'), 'commit-range guard must emit ATM_GUARD_COMMIT_RANGE_FAILED');
+
+  const closureRepo = path.join(tempRoot, 'closure-cross-check');
+  mkdirSync(closureRepo, { recursive: true });
+  copyRuntime(root, closureRepo);
+  runGit(closureRepo, ['init']);
+  runGit(closureRepo, ['config', 'user.email', 'atm@example.invalid']);
+  runGit(closureRepo, ['config', 'user.name', 'ATM Hook Validator']);
+  assert(parsePayload(runCli(closureRepo, ['bootstrap', '--cwd', closureRepo, '--json'])).ok === true, 'closure-cross-check bootstrap must report ok=true');
+  assert(parsePayload(runCli(closureRepo, ['atm-chart', 'render', '--cwd', closureRepo, '--json'])).ok === true, 'closure-cross-check atm-chart render must report ok=true');
+  assert(parsePayload(runCli(closureRepo, ['welcome', '--cwd', closureRepo, '--json'])).ok === true, 'closure-cross-check welcome must report ok=true');
+  runGit(closureRepo, ['add', '.']);
+  runGit(closureRepo, ['commit', '--no-verify', '-m', 'initial baseline']);
+
+  writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'index.ts'), 'export const bypass = "closure-cross-check";\n', 'utf8');
+  runGit(closureRepo, ['add', 'packages/core/src/index.ts']);
+  const governedTreeSha = runGit(closureRepo, ['write-tree']);
+  const parentCommitSha = runGit(closureRepo, ['rev-parse', 'HEAD']);
+  writeFileSync(path.join(closureRepo, '.atm', 'history', 'evidence', 'git-head.json'), `${JSON.stringify({
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        summary: 'Git commit tree is covered by ATM Integration Hook Contract v1.',
+        artifactPaths: [],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        producedBy: 'validate-git-hooks-enforcement',
+        commandRuns: [
+          createCommandRun('npm run typecheck', 'sha256:1111111111111111111111111111111111111111111111111111111111111111'),
+          createCommandRun('npm run validate:cli', 'sha256:2222222222222222222222222222222222222222222222222222222222222222'),
+          createCommandRun('npm run validate:git-head-evidence', 'sha256:3333333333333333333333333333333333333333333333333333333333333333')
+        ],
+        details: {
+          git: {
+            treeSha: governedTreeSha,
+            parentCommitShas: [parentCommitSha],
+            stagedPathCount: 1,
+            evidencePath: '.atm/history/evidence/git-head.json',
+            generatedAt: '2026-01-01T00:00:00.000Z'
+          },
+          hookContractVersion: 'atm.integration-hooks/v1',
+          runnerVersion: '0.1.0'
+        }
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(path.join(closureRepo, '.atm', 'history', 'evidence', 'TASK-X-9001.closure-packet.json'), `${JSON.stringify({
+    schemaId: 'atm.closurePacket.v1',
+    specVersion: '0.1.0',
+    taskId: 'TASK-X-9001',
+    targetRepoIdentity: {
+      isFrameworkRepo: true,
+      score: 4,
+      root: closureRepo,
+      name: 'ai-atomic-framework',
+      signals: ['package-name', 'packages-core', 'packages-cli', 'atomic-registry']
+    },
+    targetCommit: parentCommitSha,
+    governedTreeSha: 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+    targetCommitDelta: {
+      currentCommitSha: parentCommitSha,
+      parentCommitShas: [parentCommitSha],
+      governedTreeSha: 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+      changedFiles: ['packages/core/src/index.ts']
+    },
+    closedByCommand: 'atm tasks close',
+    commandRuns: [
+      createCommandRun('npm run typecheck', 'sha256:1111111111111111111111111111111111111111111111111111111111111111'),
+      createCommandRun('npm run validate:cli', 'sha256:2222222222222222222222222222222222222222222222222222222222222222'),
+      createCommandRun('npm run validate:git-head-evidence', 'sha256:3333333333333333333333333333333333333333333333333333333333333333')
+    ],
+    validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+    evidenceFreshness: 'fresh',
+    requiredGates: ['framework-development', 'tasks-audit', 'doctor', 'git-head-evidence', 'typecheck', 'validate:cli', 'validate:git-head-evidence'],
+    evidencePath: '.atm/history/evidence/TASK-X-9001.json',
+    closedAt: '2026-01-01T00:00:00.000Z',
+    closedByActor: 'validate-git-hooks-enforcement'
+  }, null, 2)}\n`, 'utf8');
+  runGit(closureRepo, ['add', '.atm/history/evidence/git-head.json', '.atm/history/evidence/TASK-X-9001.closure-packet.json']);
+  runGit(closureRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'bypass hooks with mismatched closure packet']);
+
+  const closureCommitRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
+  const closureCommitRangePayload = parsePayload(closureCommitRange);
+  assert(closureCommitRange.status === 1, 'commit-range guard must fail for mismatched closure packet');
+  const closureFindings = closureCommitRangePayload.evidence?.report?.findings ?? [];
+  assert(closureFindings.some((entry: any) => entry.code === 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH'), 'commit-range guard must detect closure packet tree mismatches against governed commit delta');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

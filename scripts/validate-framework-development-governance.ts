@@ -291,13 +291,29 @@ try {
         details: {
           kind: 'test',
           freshness: 'fresh',
-          validationPasses: ['typecheck', 'validate:cli'],
+          validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
           commandRuns: [
             {
               command: 'npm run typecheck',
               cwd: '.',
               exitCode: 0,
               stdoutSha256: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+              stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+              runnerVersion: '0.1.0'
+            },
+            {
+              command: 'npm run validate:cli',
+              cwd: '.',
+              exitCode: 0,
+              stdoutSha256: 'sha256:2222222222222222222222222222222222222222222222222222222222222222',
+              stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+              runnerVersion: '0.1.0'
+            },
+            {
+              command: 'npm run validate:git-head-evidence',
+              cwd: '.',
+              exitCode: 0,
+              stdoutSha256: 'sha256:3333333333333333333333333333333333333333333333333333333333333333',
               stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
               runnerVersion: '0.1.0'
             }
@@ -317,6 +333,7 @@ try {
   assert(validateClosurePacket(packet).ok === true, 'generated closure packet must validate');
   assert(Array.isArray(packet.validationPasses) && packet.validationPasses.length > 0, 'generated closure packet must include validator pass names');
   assert(Array.isArray(packet.commandRuns) && packet.commandRuns.length > 0, 'generated closure packet must include runnable command proof');
+  assert(packet.validationPasses.includes('validate:git-head-evidence'), 'generated closure packet must include required validator pass names for required gates');
   assert(packet.targetCommitDelta.changedFiles.includes('packages/core/src/index.ts'), 'generated closure packet must include target commit delta changed files');
 
   const commandStatus = await runFrameworkMode(['status', '--cwd', root, '--files', 'packages/core/src/index.ts', '--json']);

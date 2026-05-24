@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import type { WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
@@ -664,11 +665,22 @@ export function validateClosurePacket(value: unknown): { ok: boolean; missing: r
   }
   if (!Array.isArray(packet.validationPasses) || packet.validationPasses.length === 0) {
     missing.push('validationPasses');
+  } else {
+    const recorded = new Set(packet.validationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim()));
+    for (const gate of requiredValidationPassesForClosure(packet.requiredGates ?? [])) {
+      if (!recorded.has(gate)) {
+        missing.push(`validationPasses/${gate}`);
+      }
+    }
   }
   if (packet.evidenceFreshness !== 'fresh') {
     missing.push('evidenceFreshness');
   }
   return { ok: missing.length === 0, missing };
+}
+
+export function requiredValidationPassesForClosure(requiredGates: readonly string[]) {
+  return uniqueSorted(requiredGates.filter((gate) => gate === 'typecheck' || gate.startsWith('validate:')));
 }
 
 export function createClosurePacket(input: {
@@ -680,21 +692,16 @@ export function createClosurePacket(input: {
   readonly changedFiles?: readonly string[];
 }): ClosurePacket {
   const cwd = path.resolve(input.cwd);
-  const gitDetails = readGitHeadDetails(cwd);
+  const targetCommitDelta = readFutureTargetCommitDelta(cwd, input.changedFiles);
   const evidenceContext = readClosureEvidenceContext(cwd, input.taskId);
   return {
     schemaId: 'atm.closurePacket.v1',
     specVersion: frameworkModeSpecVersion,
     taskId: input.taskId,
     targetRepoIdentity: detectFrameworkRepoIdentity(cwd),
-    targetCommit: gitDetails.commitSha,
-    governedTreeSha: gitDetails.treeSha,
-    targetCommitDelta: {
-      currentCommitSha: gitDetails.commitSha,
-      parentCommitShas: gitDetails.parentCommitShas,
-      governedTreeSha: gitDetails.treeSha,
-      changedFiles: uniqueSorted((input.changedFiles ?? []).map(normalizeRelativePath).filter(Boolean))
-    },
+    targetCommit: targetCommitDelta.currentCommitSha,
+    governedTreeSha: targetCommitDelta.governedTreeSha,
+    targetCommitDelta,
     closedByCommand: 'atm tasks close',
     commandRuns: evidenceContext.commandRuns,
     validationPasses: evidenceContext.validationPasses,
@@ -870,7 +877,7 @@ function buildRequiredGates(criticalChangedFiles: readonly string[]): readonly s
     gates.add('validate:integration-adapter');
     gates.add('validate:skill-templates');
   }
-  if (criticalChangedFiles.some((entry) => /^(release|templates\/root-drop|packages\/cli|scripts\/build-)/.test(entry))) {
+  if (criticalChangedFiles.some((entry) => /^(release|templates\/root-drop|scripts\/build-)/.test(entry) || entry === 'atm.mjs')) {
     gates.add('validate:root-drop-release');
     gates.add('validate:onefile-release');
   }
@@ -1155,6 +1162,42 @@ function readGitHeadDetails(cwd: string): { commitSha: string | null; treeSha: s
   return { commitSha, treeSha, parentCommitShas };
 }
 
+function readFutureTargetCommitDelta(cwd: string, preferredChangedFiles: readonly string[] = []): ClosurePacketTargetCommitDelta {
+  const gitDetails = readGitHeadDetails(cwd);
+  const worktreeChangedFiles = uniqueSorted([
+    ...runGitLines(cwd, ['diff', '--name-only']),
+    ...runGitLines(cwd, ['diff', '--cached', '--name-only']),
+    ...runGitLines(cwd, ['ls-files', '--others', '--exclude-standard'])
+  ].map(normalizeRelativePath).filter(Boolean));
+  return {
+    currentCommitSha: gitDetails.commitSha,
+    parentCommitShas: gitDetails.commitSha ? [gitDetails.commitSha] : gitDetails.parentCommitShas,
+    governedTreeSha: readFutureCommitTreeWithoutEvidence(cwd) ?? gitDetails.treeSha,
+    changedFiles: uniqueSorted([
+      ...preferredChangedFiles.map(normalizeRelativePath).filter(Boolean),
+      ...worktreeChangedFiles
+    ])
+  };
+}
+
+function readFutureCommitTreeWithoutEvidence(cwd: string): string | null {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-framework-closure-index-'));
+  const tempIndex = path.join(tempDir, 'index');
+  try {
+    const head = runGitLines(cwd, ['rev-parse', '--verify', 'HEAD'])[0] ?? null;
+    if (head) {
+      runGitWithEnv(cwd, ['read-tree', head], { GIT_INDEX_FILE: tempIndex });
+    }
+    const addResult = runGitWithEnv(cwd, ['add', '-A', '--', '.'], { GIT_INDEX_FILE: tempIndex });
+    if (addResult.status !== 0) return null;
+    runGitWithEnv(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json'], { GIT_INDEX_FILE: tempIndex });
+    const tree = runGitWithEnv(cwd, ['write-tree'], { GIT_INDEX_FILE: tempIndex });
+    return tree.status === 0 ? String(tree.stdout ?? '').trim() : null;
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
 function readJsonIfExists(filePath: string): Record<string, any> | null {
   if (!existsSync(filePath)) return null;
   try {
@@ -1178,6 +1221,17 @@ function uniqueSorted(values: readonly string[]): readonly string[] {
 
 function sha256(value: string): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function runGitWithEnv(cwd: string, args: readonly string[], env: Record<string, string>) {
+  return spawnSync('git', args, {
+    cwd,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      ...env
+    }
+  });
 }
 
 function readClosureEvidenceContext(cwd: string, taskId: string): {
