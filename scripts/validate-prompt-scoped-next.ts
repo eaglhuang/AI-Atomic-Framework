@@ -36,7 +36,8 @@ async function main() {
     writeTaskCard(path.join(tempRoot, 'TASK-APO-0030-python-language-adapter-plugin.task.md'), 'TASK-APO-0030-python-language-adapter-plugin', 'Unrelated root task');
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0000-doc-finalize-bridge-index.task.md'), 'TASK-AAO-0000', 'AAO docs baseline', { status: 'done' });
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0001-report-overlap-matrix-routing.task.md'), 'TASK-AAO-0001', 'AAO overlap routing', {
-      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md',
+      files: 'packages/cli/src/commands/next.ts docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0001-report-overlap-matrix-routing.task.md'
     });
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md'), 'TASK-AAO-0002', 'AAO CLI spec drift guard', {
       relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
@@ -106,6 +107,10 @@ async function main() {
     assert((externalPlanQueue.evidence.nextAction as any).recommendedChannel === 'batch', 'external planning document queue must recommend batch channel');
     assert((externalPlanQueue.evidence.nextAction as any).queueHeadTaskId === 'TASK-AAO-0001', 'external planning document queue must start at first open AAO task');
     assert(!((externalPlanQueue.evidence.nextAction as any).selectedTasks ?? []).some((task: any) => task.workItemId === 'TASK-APO-0030-python-language-adapter-plugin'), 'external planning document prompt must not fall back to unrelated low-score root task cards');
+    const externalQueueHead = ((externalPlanQueue.evidence.nextAction as any).selectedTasks ?? [])[0];
+    assert(((externalQueueHead?.planningReadOnlyPaths ?? []) as string[]).length > 0, 'external planning route must expose planningContext.readOnlyPaths');
+    assert((externalQueueHead?.targetAllowedFiles ?? []).includes('packages/cli/src/commands/next.ts'), 'external planning route must expose targetWork.allowedFiles');
+    assert(!(externalQueueHead?.targetAllowedFiles ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/')), 'targetWork.allowedFiles must exclude planning mirror paths');
 
     const surfaceOnlyRejected = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 不存在的治理計畫書，請完成所有任務卡']);
     assert(surfaceOnlyRejected.ok === false, 'named plan prompt with only task-card-surface candidates must fail closed');
@@ -115,6 +120,13 @@ async function main() {
     mkdirSync(ledgerTaskDir, { recursive: true });
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-LEDGER-0001.json'), 'TASK-LEDGER-0001', 'Ledger first task', 'src/first.ts');
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-LEDGER-0002.json'), 'TASK-LEDGER-0002', 'Ledger second task', 'src/second.ts');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-CROSS-0001.json'), 'TASK-CROSS-0001', 'Cross repo task', 'packages/cli/src/commands/next.ts', {
+      scopePaths: [
+        'packages/cli/src/commands/next.ts',
+        'docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-CROSS-0001.task.md'
+      ],
+      sourcePlanPath: '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
     const ledgerPrompt = 'TASK-LEDGER-0001 TASK-LEDGER-0002 all task cards';
     const ledgerQueue = await runNext(['--cwd', tempRoot, '--prompt', ledgerPrompt]);
     assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'ledger task prompt must create a queue');
@@ -188,6 +200,16 @@ async function main() {
     assert(runningAllowedFiles.includes('docs/sanguo.md'), 'direction lock allowedFiles must preserve real task paths');
     assert(!runningAllowedFiles.some((entry: string) => entry.includes('human gate')), 'direction lock allowedFiles must not include natural-language acceptance text');
 
+    const crossClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-CROSS-0001']);
+    assert(crossClaim.ok === true, 'cross-repo ledger task claim must succeed');
+    const crossLock = (crossClaim.evidence.taskDirectionLock as any) ?? {};
+    assert((crossClaim.evidence.nextAction as any).planningContext?.readOnlyPaths?.some((entry: string) => entry.includes('../3KLife/docs/ai_atomic_framework/atm-agent-first-operability')), 'next --claim must surface planningContext.readOnlyPaths');
+    assert((crossClaim.evidence.nextAction as any).targetWork?.allowedFiles?.includes('packages/cli/src/commands/next.ts'), 'next --claim must surface targetWork.allowedFiles');
+    assert(!((crossClaim.evidence.nextAction as any).targetWork?.allowedFiles ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/')), 'targetWork.allowedFiles must exclude planning mirror files');
+    assert((crossLock.allowedFiles ?? []).includes('packages/cli/src/commands/next.ts'), 'direction lock must keep real target files');
+    assert(!((crossLock.allowedFiles ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/'))), 'direction lock allowedFiles must exclude planning mirror files');
+    assert((crossLock.planningMirrorPaths ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/')), 'direction lock must record planning mirror guard paths');
+
     const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', 'Please do the next task card']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
     assert(ambiguous.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SELECTION_REQUIRED'), 'ambiguous task-card prompt must ask for task selection');
@@ -205,7 +227,7 @@ async function main() {
   }
 }
 
-function writeTaskCard(filePath: string, taskId: string, title: string, options: { readonly status?: string; readonly relatedPlan?: string } = {}) {
+function writeTaskCard(filePath: string, taskId: string, title: string, options: { readonly status?: string; readonly relatedPlan?: string; readonly files?: string } = {}) {
   writeFileSync(filePath, `---
 task_id: ${taskId}
 title: ${title}
@@ -213,12 +235,13 @@ status: ${options.status ?? 'planned'}
 target_repo: AI-Atomic-Framework
 closure_authority: target_repo
 ${options.relatedPlan ? `related_plan: ${options.relatedPlan}\n` : ''}
+${options.files ? `files: ${options.files}\n` : ''}
 ---
 # ${taskId}
 `, 'utf8');
 }
 
-function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string } = {}) {
+function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string; readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string } = {}) {
   writeFileSync(filePath, `${JSON.stringify({
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
@@ -226,7 +249,7 @@ function writeLedgerTask(filePath: string, taskId: string, title: string, scopeP
     status: options.status ?? 'ready',
     dependencies: [],
     acceptance: ['bootstrap output reviewed by human gate'],
-    scope: [scopePath],
+    scope: options.scopePaths ?? [scopePath],
     ...(options.claimActorId ? {
       claim: {
         actorId: options.claimActorId,
@@ -239,7 +262,7 @@ function writeLedgerTask(filePath: string, taskId: string, title: string, scopeP
       }
     } : {}),
     source: {
-      planPath: 'docs/plan/PlanAlpha.md',
+      planPath: options.sourcePlanPath ?? 'docs/plan/PlanAlpha.md',
       sectionTitle: title,
       headingLine: 1,
       hash: taskId

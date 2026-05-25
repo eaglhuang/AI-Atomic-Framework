@@ -20,6 +20,7 @@ import {
   createOrRefreshTaskQueue,
   findActiveTaskQueue,
   isTaskDirectionPathCandidate,
+  partitionTaskScope,
   writeTaskDirectionLock
 } from './task-direction.ts';
 import {
@@ -507,6 +508,9 @@ async function claimNextImportedTask(input: {
     actorId: resolvedActor.actorId,
     queue: activeQueue,
     allowedFiles: buildAllowedFilesForTask(claimableTask),
+    planningReadOnlyPaths: claimableTask.planningReadOnlyPaths,
+    planningMirrorPaths: claimableTask.planningMirrorPaths,
+    allowPlanningMirror: claimableTask.allowPlanningMirror,
     prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId
   });
   const inheritedBatchRun = readActiveBatchRun(input.cwd);
@@ -540,7 +544,27 @@ async function claimNextImportedTask(input: {
       taskId: claimableTask.workItemId
     }),
     selectedTask: claimableTask,
+    planningContext: {
+      readOnlyPaths: claimableTask.planningReadOnlyPaths,
+      sourcePlanPath: claimableTask.sourcePlanPath,
+      nearbyPlanPaths: claimableTask.nearbyPlanPaths
+    },
+    targetWork: {
+      allowedFiles: claimableTask.targetAllowedFiles,
+      targetRepo: claimableTask.targetRepo,
+      allowPlanningMirror: claimableTask.allowPlanningMirror
+    },
     taskContext: {
+      planningContext: {
+        readOnlyPaths: claimableTask.planningReadOnlyPaths,
+        sourcePlanPath: claimableTask.sourcePlanPath,
+        nearbyPlanPaths: claimableTask.nearbyPlanPaths
+      },
+      targetWork: {
+        allowedFiles: claimableTask.targetAllowedFiles,
+        targetRepo: claimableTask.targetRepo,
+        allowPlanningMirror: claimableTask.allowPlanningMirror
+      },
       scopePaths: claimableTask.scopePaths,
       sourcePlanPath: claimableTask.sourcePlanPath
     },
@@ -1206,6 +1230,10 @@ interface ImportedTaskSummary {
   readonly nearbyPlanPaths: readonly string[];
   readonly scopePaths: readonly string[];
   readonly targetRepo: string | null;
+  readonly allowPlanningMirror: boolean;
+  readonly planningReadOnlyPaths: readonly string[];
+  readonly planningMirrorPaths: readonly string[];
+  readonly targetAllowedFiles: readonly string[];
   readonly closureAuthority: string | null;
   readonly activeClaimActorId: string | null;
   readonly matchScore?: number;
@@ -1261,7 +1289,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           ? parsed.claim as Record<string, unknown>
           : {};
         const source = parsed.source && typeof parsed.source === 'object' ? parsed.source as Record<string, unknown> : {};
-        return [{
+        return [finalizeImportedTaskSummary({
           workItemId,
           title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim() : workItemId,
           status: typeof parsed.status === 'string' ? parsed.status : 'planned',
@@ -1279,11 +1307,12 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
             ...extractDeclaredTaskPathsFromDocument(parsed)
           ]),
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
+          allowPlanningMirror: allowsPlanningMirror(parsed),
           closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
           activeClaimActorId: claimRecord.state === 'active' && typeof claimRecord.actorId === 'string'
             ? claimRecord.actorId
             : null
-        }];
+        })];
       } catch {
         return [];
       }
@@ -1300,7 +1329,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
       if (!workItemId) return null;
       const dependencies = splitListValue(parsed.dependencies ?? parsed.depends_on ?? parsed.dependsOn ?? parsed.blocked_by ?? parsed.blockedBy);
       const relativeTaskPath = path.relative(cwd, filePath).replace(/\\/g, '/');
-      return {
+      return finalizeImportedTaskSummary({
         workItemId,
         title: normalizeOptionalString(parsed.title ?? parsed.name) ?? workItemId,
         status: normalizeOptionalString(parsed.status) ?? 'planned',
@@ -1319,9 +1348,10 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           ...extractPathLikeStringsFromText(rawText)
         ]),
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
+        allowPlanningMirror: allowsPlanningMirror(parsed),
         closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
         activeClaimActorId: null
-      };
+      });
     })
     .filter((entry): entry is ImportedTaskSummary => entry !== null);
   const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
@@ -1789,6 +1819,16 @@ function dedupeTasks(tasks: readonly ImportedTaskSummary[]): readonly ImportedTa
   return output;
 }
 
+function finalizeImportedTaskSummary(task: Omit<ImportedTaskSummary, 'planningReadOnlyPaths' | 'planningMirrorPaths' | 'targetAllowedFiles'>): ImportedTaskSummary {
+  const partition = partitionTaskScope(task);
+  return {
+    ...task,
+    planningReadOnlyPaths: partition.planningContext.readOnlyPaths,
+    planningMirrorPaths: partition.targetWork.planningMirrorPaths,
+    targetAllowedFiles: partition.targetWork.allowedFiles
+  };
+}
+
 function extractDeclaredTaskPathsFromDocument(taskDocument: Record<string, unknown>) {
   const files = new Set<string>();
   for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles', 'deliverables', 'artifacts']) {
@@ -2066,8 +2106,34 @@ function normalizeOptionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
+function normalizeOptionalBoolean(value: unknown): boolean | null {
+  if (typeof value === 'boolean') return value;
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'true' || normalized === 'yes' || normalized === 'required' || normalized === 'allow') return true;
+  if (normalized === 'false' || normalized === 'no' || normalized === 'deny' || normalized === 'forbid') return false;
+  return null;
+}
+
 function readStringArray(value: unknown): readonly string[] {
   return Array.isArray(value) ? uniqueSorted(value.map((entry) => String(entry).trim()).filter(Boolean)) : [];
+}
+
+function allowsPlanningMirror(record: Record<string, unknown>): boolean {
+  for (const key of [
+    'allow_planning_mirror',
+    'allowPlanningMirror',
+    'planning_mirror_required',
+    'planningMirrorRequired',
+    'mirror_required',
+    'mirrorRequired',
+    'import_required',
+    'importRequired'
+  ]) {
+    const value = normalizeOptionalBoolean(record[key]);
+    if (value !== null) return value;
+  }
+  return false;
 }
 
 function normalizeTaskIntentSource(value: unknown): TaskIntentSource | null {
@@ -2152,6 +2218,13 @@ function toTaskCandidateView(task: ImportedTaskSummary) {
     sourcePlanPath: task.sourcePlanPath,
     nearbyPlanPaths: task.nearbyPlanPaths,
     scopePaths: task.scopePaths,
+    planningContext: {
+      readOnlyPaths: task.planningReadOnlyPaths
+    },
+    targetWork: {
+      allowedFiles: task.targetAllowedFiles,
+      allowPlanningMirror: task.allowPlanningMirror
+    },
     targetRepo: task.targetRepo,
     matchScore: task.matchScore ?? 0,
     matchReasons: task.matchReasons ?? []

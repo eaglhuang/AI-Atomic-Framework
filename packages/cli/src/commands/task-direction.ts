@@ -11,6 +11,18 @@ export interface TaskDirectionTask {
   readonly nearbyPlanPaths: readonly string[];
   readonly scopePaths: readonly string[];
   readonly targetRepo: string | null;
+  readonly allowPlanningMirror: boolean;
+}
+
+export interface TaskScopePartition {
+  readonly planningContext: {
+    readonly readOnlyPaths: readonly string[];
+  };
+  readonly targetWork: {
+    readonly allowedFiles: readonly string[];
+    readonly planningMirrorPaths: readonly string[];
+    readonly allowPlanningMirror: boolean;
+  };
 }
 
 export interface TaskQueueRecord {
@@ -40,6 +52,9 @@ export interface TaskDirectionLock {
   readonly queueId: string | null;
   readonly queueIndex: number | null;
   readonly allowedFiles: readonly string[];
+  readonly planningReadOnlyPaths: readonly string[];
+  readonly planningMirrorPaths: readonly string[];
+  readonly allowPlanningMirror: boolean;
   readonly promptHash: string | null;
   readonly actorId: string;
   readonly createdAt: string;
@@ -147,6 +162,9 @@ export function writeTaskDirectionLock(input: {
   readonly actorId: string;
   readonly queue: TaskQueueRecord | null;
   readonly allowedFiles: readonly string[];
+  readonly planningReadOnlyPaths?: readonly string[];
+  readonly planningMirrorPaths?: readonly string[];
+  readonly allowPlanningMirror?: boolean;
   readonly prompt?: string | null;
 }) {
   const queueIndex = input.queue ? input.queue.taskIds.indexOf(input.taskId) : -1;
@@ -157,6 +175,9 @@ export function writeTaskDirectionLock(input: {
     queueId: input.queue?.queueId ?? null,
     queueIndex: queueIndex >= 0 ? queueIndex : null,
     allowedFiles: sanitizeTaskDirectionAllowedFiles(input.allowedFiles),
+    planningReadOnlyPaths: sanitizeTaskDirectionAllowedFiles(input.planningReadOnlyPaths ?? []),
+    planningMirrorPaths: sanitizeTaskDirectionAllowedFiles(input.planningMirrorPaths ?? []),
+    allowPlanningMirror: input.allowPlanningMirror === true,
     promptHash: input.prompt?.trim() ? sha256(input.prompt.trim()) : input.queue?.sourcePromptHash ?? null,
     actorId: input.actorId,
     createdAt: new Date().toISOString(),
@@ -245,12 +266,32 @@ export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, a
 }
 
 export function buildAllowedFilesForTask(task: TaskDirectionTask): readonly string[] {
-  return sanitizeTaskDirectionAllowedFiles([
-    task.taskPath,
+  return partitionTaskScope(task).targetWork.allowedFiles;
+}
+
+export function partitionTaskScope(task: TaskDirectionTask): TaskScopePartition {
+  const planningReadOnlyPaths = sanitizeTaskDirectionAllowedFiles([
     task.sourcePlanPath ?? '',
     ...task.nearbyPlanPaths,
-    ...task.scopePaths
+    ...task.scopePaths.filter(isExternalPlanningPath)
   ]);
+  const planningMirrorPaths = uniqueSorted(planningReadOnlyPaths.flatMap(derivePlanningMirrorGuardPaths));
+  const targetCandidates = sanitizeTaskDirectionAllowedFiles(task.scopePaths);
+  const allowedFiles = targetCandidates.filter((entry) => {
+    if (planningReadOnlyPaths.includes(entry)) return false;
+    if (!task.allowPlanningMirror && isPlanningMirrorPath(entry, planningMirrorPaths)) return false;
+    return true;
+  });
+  return {
+    planningContext: {
+      readOnlyPaths: planningReadOnlyPaths
+    },
+    targetWork: {
+      allowedFiles,
+      planningMirrorPaths,
+      allowPlanningMirror: task.allowPlanningMirror
+    }
+  };
 }
 
 export function sanitizeTaskDirectionAllowedFiles(values: readonly string[]): readonly string[] {
@@ -291,6 +332,11 @@ export function isTaskDirectionPathCandidate(value: string): boolean {
 
   const lastSegment = normalized.split('/').pop() ?? normalized;
   return /^[^<>:"|?*]+\.[A-Za-z0-9][A-Za-z0-9._-]{0,12}$/.test(lastSegment);
+}
+
+export function isPlanningMirrorPath(filePath: string, planningMirrorPaths: readonly string[]): boolean {
+  const normalizedFile = normalizeRelativePath(filePath).toLowerCase();
+  return planningMirrorPaths.some((candidate) => matchesPlanningMirrorPath(normalizedFile, normalizeRelativePath(candidate).toLowerCase()));
 }
 
 function listTaskQueues(cwd: string): readonly TaskQueueRecord[] {
@@ -372,6 +418,33 @@ function readGovernanceDirectionLockForTask(cwd: string, taskId: string): TaskDi
 
 function writeJson(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function isExternalPlanningPath(value: string) {
+  const normalized = normalizeRelativePath(value);
+  return normalized.startsWith('../');
+}
+
+function derivePlanningMirrorGuardPaths(value: string): readonly string[] {
+  const normalized = normalizeRelativePath(value);
+  const docsIndex = normalized.toLowerCase().indexOf('docs/');
+  if (docsIndex < 0 || docsIndex === 0) return [];
+  const mirrorPath = normalized.slice(docsIndex);
+  if (!isTaskDirectionPathCandidate(mirrorPath)) return [];
+  const guards = new Set<string>([mirrorPath]);
+  let current = path.posix.dirname(mirrorPath);
+  while (current && current !== '.' && current !== 'docs') {
+    guards.add(`${current}/`);
+    current = path.posix.dirname(current);
+  }
+  return [...guards].sort((left, right) => left.localeCompare(right));
+}
+
+function matchesPlanningMirrorPath(filePath: string, mirrorPath: string) {
+  if (!mirrorPath) return false;
+  if (mirrorPath.endsWith('/')) return filePath === mirrorPath.slice(0, -1) || filePath.startsWith(mirrorPath);
+  if (filePath === mirrorPath) return true;
+  return filePath.startsWith(`${mirrorPath}/`);
 }
 
 function sha256(value: string) {

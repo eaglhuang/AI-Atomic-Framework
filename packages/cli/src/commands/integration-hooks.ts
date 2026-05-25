@@ -8,7 +8,7 @@ import {
   detectFrameworkRepoIdentity,
   isAtmCriticalNonDocSurface
 } from './framework-development.ts';
-import { isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
+import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
 import { extractPathLikeStringsFromPrompt, isPathAllowedByScope, isQuickfixPrompt, readActiveQuickfixLock } from './work-channels.ts';
 import {
   hookContractVersion,
@@ -281,8 +281,14 @@ function runPreToolHook(options: HookInvocationOptions) {
   const promptScopedAllowedPaths = promptScope
     ? buildPromptScopedAllowedPaths(promptScopedHeadTasks)
     : [];
+  const promptScopedPlanningMirrorPaths = promptScope
+    ? buildPromptScopedPlanningMirrorPaths(promptScopedHeadTasks)
+    : [];
+  const promptScopedAllowsPlanningMirror = promptScopedHeadTasks.some((task) => task.allowPlanningMirror === true);
   const activeDirectionLocks = readActiveTaskDirectionLocks(options.cwd);
   const directionLockAllowedPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
+  const directionLockPlanningMirrorPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
+  const directionLockAllowsPlanningMirror = activeDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
   const directionLockDriftFiles = mutatingIntent
     && !gitCommitIntent
     && activeDirectionLocks.length > 0
@@ -291,6 +297,16 @@ function runPreToolHook(options: HookInvocationOptions) {
         .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
         .filter((entry) => !isPromptScopeDriftExempt(entry))
         .filter((entry) => !isToolFileInPromptScope(entry, directionLockAllowedPaths))
+      : [];
+  const directionLockPlanningMirrorDriftFiles = mutatingIntent
+    && !gitCommitIntent
+    && activeDirectionLocks.length > 0
+    && directionLockPlanningMirrorPaths.length > 0
+    && !directionLockAllowsPlanningMirror
+      ? toolFiles
+        .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
+        .filter((entry) => !isPromptScopeDriftExempt(entry))
+        .filter((entry) => isPlanningMirrorPath(entry, directionLockPlanningMirrorPaths))
       : [];
   const promptScopedClaimRequired = mutatingIntent
     && !gitCommitIntent
@@ -316,6 +332,18 @@ function runPreToolHook(options: HookInvocationOptions) {
         .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
         .filter((entry) => !isPromptScopeDriftExempt(entry))
         .filter((entry) => !isToolFileInPromptScope(entry, promptScopedAllowedPaths))
+      : [];
+  const promptScopedPlanningMirrorDriftFiles = mutatingIntent
+    && !gitCommitIntent
+    && activeDirectionLocks.length === 0
+    && Boolean(promptScopedContext.taskIntent?.taskScopeMentioned)
+    && (promptScope?.status === 'ready' || promptScope?.status === 'queue')
+    && promptScopedPlanningMirrorPaths.length > 0
+    && !promptScopedAllowsPlanningMirror
+      ? toolFiles
+        .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
+        .filter((entry) => !isPromptScopeDriftExempt(entry))
+        .filter((entry) => isPlanningMirrorPath(entry, promptScopedPlanningMirrorPaths))
       : [];
   const quickfixDriftFiles = mutatingIntent
     && !gitCommitIntent
@@ -460,6 +488,30 @@ function runPreToolHook(options: HookInvocationOptions) {
     });
   }
 
+  if (directionLockPlanningMirrorDriftFiles.length > 0) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_PLANNING_MIRROR_BLOCKED', 'Target-repo edits are trying to create or mutate a planning mirror path. Planning files stay read-only unless the task explicitly allows mirror/import work.', {
+        editor: options.editor,
+        blockedFiles: directionLockPlanningMirrorDriftFiles,
+        planningReadOnlyPaths: uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.planningReadOnlyPaths ?? [])).slice(0, 20),
+        planningMirrorPaths: directionLockPlanningMirrorPaths.slice(0, 20),
+        nextStep: 'Work only inside targetWork.allowedFiles, or add explicit allow_planning_mirror metadata for mirror/import tasks.'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        directionLockPlanningMirrorDriftFiles,
+        activeDirectionLocks,
+        frameworkStatus: status
+      }
+    });
+  }
+
   if (directionLockDriftFiles.length > 0) {
     return makeResult({
       ok: false,
@@ -523,6 +575,31 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolFiles,
         promptScopedContext,
         requiredCommand,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (promptScopedPlanningMirrorDriftFiles.length > 0) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_PLANNING_MIRROR_BLOCKED', 'Prompt-scoped target work cannot create a local planning mirror directory. Planning context is read-only until a task explicitly declares mirror/import work.', {
+        editor: options.editor,
+        blockedFiles: promptScopedPlanningMirrorDriftFiles,
+        selectedTaskIds: promptScope?.selectedTasks.map((task) => task.workItemId) ?? [],
+        planningMirrorPaths: promptScopedPlanningMirrorPaths.slice(0, 20),
+        nextStep: 'Stay inside targetWork.allowedFiles, or add explicit allow_planning_mirror metadata if this task really needs a planning mirror/import.'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        promptScopedPlanningMirrorDriftFiles,
+        promptScopedContext,
+        promptScopedPlanningMirrorPaths,
         frameworkStatus: status
       }
     });
@@ -1006,18 +1083,23 @@ function buildPromptScopedAllowedPaths(tasks: readonly {
   readonly sourcePlanPath: string | null;
   readonly nearbyPlanPaths: readonly string[];
   readonly scopePaths: readonly string[];
+  readonly targetAllowedFiles?: readonly string[];
 }[]): readonly string[] {
   const paths: string[] = [];
   for (const task of tasks) {
-    if (task.taskPath) paths.push(normalizeRelativePath(task.taskPath));
-    if (task.sourcePlanPath) paths.push(normalizeRelativePath(task.sourcePlanPath));
-    for (const entry of task.nearbyPlanPaths) paths.push(normalizeRelativePath(entry));
-    for (const entry of task.scopePaths) {
+    const targetAllowedFiles = task.targetAllowedFiles ?? [];
+    for (const entry of targetAllowedFiles.length > 0 ? targetAllowedFiles : task.scopePaths) {
       const normalized = normalizeRelativePath(entry);
       if (isTaskDirectionPathCandidate(normalized)) paths.push(normalized);
     }
   }
   return uniqueSorted(paths);
+}
+
+function buildPromptScopedPlanningMirrorPaths(tasks: readonly {
+  readonly planningMirrorPaths?: readonly string[];
+}[]): readonly string[] {
+  return uniqueSorted(tasks.flatMap((task) => task.planningMirrorPaths ?? []));
 }
 
 function isPromptScopeDriftExempt(value: string): boolean {

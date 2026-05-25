@@ -15,7 +15,7 @@ import {
 } from './framework-development.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
-import { readActiveTaskDirectionLocks } from './task-direction.ts';
+import { isPlanningMirrorPath, readActiveTaskDirectionLocks } from './task-direction.ts';
 import { isPathAllowedByScope, readActiveBatchRun, readActiveQuickfixLock } from './work-channels.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
@@ -321,10 +321,17 @@ function runPreCommitHook(cwd: string) {
   const activeDirectionLocks = readActiveTaskDirectionLocks(root);
   const activeQuickfixLock = readActiveQuickfixLock(root);
   const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
+  const directionLockPlanningMirrorPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
+  const directionLockAllowsPlanningMirror = activeDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
   const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
     ? stagedFiles
       .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
       .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
+    : [];
+  const planningMirrorDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync && directionLockPlanningMirrorPaths.length > 0 && !directionLockAllowsPlanningMirror
+    ? stagedFiles
+      .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
+      .filter((entry) => isPlanningMirrorPath(entry, directionLockPlanningMirrorPaths))
     : [];
   const quickfixDriftFiles = activeQuickfixLock && !allowAdopterInfrastructureSync
     ? stagedFiles
@@ -351,6 +358,7 @@ function runPreCommitHook(cwd: string) {
     : null;
   const ok = encodingReport.ok
     && blockingFrameworkIssues.length === 0
+    && planningMirrorDriftFiles.length === 0
     && directionLockDriftFiles.length === 0
     && quickfixDriftFiles.length === 0
     && !quickfixFileLimitExceeded
@@ -376,6 +384,7 @@ function runPreCommitHook(cwd: string) {
         : message('error', 'ATM_HOOK_PRE_COMMIT_FAILED', 'ATM pre-commit hook blocked this commit.', {
           encodingFindings: encodingReport.findings.length,
           frameworkBlockers: blockingFrameworkIssues,
+          planningMirrorDriftFiles,
           taskDirectionDriftFiles: directionLockDriftFiles,
           quickfixDriftFiles,
           quickfixFileLimitExceeded,
@@ -396,6 +405,8 @@ function runPreCommitHook(cwd: string) {
       blockingFrameworkIssues,
       frameworkClaimCommand,
       activeDirectionLocks,
+      directionLockPlanningMirrorPaths,
+      planningMirrorDriftFiles,
       activeQuickfixLock,
       directionLockDriftFiles,
       quickfixDriftFiles,

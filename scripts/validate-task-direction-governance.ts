@@ -86,6 +86,35 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(outOfScope.ok === false, 'adopter queue must block edits to the next task before queue head closes');
   assert(outOfScope.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'adopter out-of-scope edit must report scope drift');
 
+  const crossRepo = makeAdopterRepo(tempRoot, 'adopter-cross-repo');
+  writeLedgerTask(crossRepo, 'TASK-CROSS-PLAN-0001', 'Cross planning mirror task', 'src/one.ts', {
+    scopePaths: [
+      'src/one.ts',
+      'docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-CROSS-PLAN-0001.task.md'
+    ],
+    sourcePlanPath: '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+  });
+  writeEvidence(crossRepo, 'TASK-CROSS-PLAN-0001');
+  const crossClaim = await runNext(['--cwd', crossRepo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-CROSS-PLAN-0001']);
+  assert(crossClaim.ok === true, 'cross planning fixture must claim successfully');
+  const mirrorBlock = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', crossRepo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', 'TASK-CROSS-PLAN-0001',
+    '--files', 'docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-CROSS-PLAN-0001.task.md'
+  ]);
+  assert(mirrorBlock.ok === false, 'cross planning mirror edit must be blocked');
+  assert(mirrorBlock.messages.some((entry) => entry.code === 'ATM_PLANNING_MIRROR_BLOCKED'), 'cross planning mirror edit must report the planning mirror blocker');
+  initializeGit(crossRepo);
+  mkdirSync(path.join(crossRepo, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks'), { recursive: true });
+  writeFileSync(path.join(crossRepo, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks', 'TASK-CROSS-PLAN-0001.task.md'), '# mirror\n', 'utf8');
+  runGit(crossRepo, ['add', 'docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-CROSS-PLAN-0001.task.md']);
+  const preCommitMirror = runHook(['pre-commit', '--cwd', crossRepo]);
+  assert(preCommitMirror.ok === false, 'pre-commit must block staged planning mirror files');
+  assert(((preCommitMirror.evidence as any).planningMirrorDriftFiles ?? []).includes('docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-CROSS-PLAN-0001.task.md'), 'pre-commit evidence must report planning mirror drift files');
+
   const staticEvidenceBlock = runIntegrationHookInvocation([
     'pre-tool',
     '--cwd', repo,
@@ -247,16 +276,16 @@ function makeFrameworkRepo(parent: string, name: string) {
   return repo;
 }
 
-function writeLedgerTask(repo: string, taskId: string, title: string, scopePath: string) {
+function writeLedgerTask(repo: string, taskId: string, title: string, scopePath: string, options: { readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string } = {}) {
   writeJson(path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`), {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
     title,
     status: 'ready',
     dependencies: [],
-    scope: [scopePath],
+    scope: options.scopePaths ?? [scopePath],
     source: {
-      planPath: 'docs/plan.md',
+      planPath: options.sourcePlanPath ?? 'docs/plan.md',
       sectionTitle: title,
       headingLine: 1,
       hash: taskId
