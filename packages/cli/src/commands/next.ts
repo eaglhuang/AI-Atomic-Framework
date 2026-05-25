@@ -2174,7 +2174,45 @@ function normalizeOptionalTaskPath(value: string | null | undefined) {
 }
 
 function listTaskCardFiles(cwd: string): readonly string[] {
-  return listFilesRecursive(cwd, (filePath) => filePath.endsWith('.task.md'));
+  const output = new Set<string>();
+  for (const filePath of listRootLevelTaskCardFiles(cwd)) {
+    output.add(filePath);
+  }
+  for (const root of listTaskCardDiscoveryRoots(cwd)) {
+    for (const filePath of listFilesRecursive(root, (candidate) => candidate.endsWith('.task.md'))) {
+      output.add(filePath);
+    }
+  }
+  return uniqueSorted(Array.from(output));
+}
+
+function listRootLevelTaskCardFiles(cwd: string): readonly string[] {
+  return safeReadDir(cwd)
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.task.md'))
+    .map((entry) => path.join(cwd, entry.name));
+}
+
+function listTaskCardDiscoveryRoots(cwd: string): readonly string[] {
+  const relativeRoots = [
+    'docs',
+    'atomic_workbench',
+    'specs',
+    'schemas',
+    'templates',
+    'integrations',
+    'examples',
+    'tests',
+    'packages',
+    'scripts',
+    '.agents',
+    '.github',
+    '.claude',
+    '.cursor',
+    '.gemini'
+  ];
+  return uniqueSorted(relativeRoots
+    .map((entry) => path.join(cwd, entry))
+    .filter((entry) => existsSync(entry)));
 }
 
 function listPromptScopedExternalTaskCardFiles(cwd: string, intent: TaskIntent | null): readonly string[] {
