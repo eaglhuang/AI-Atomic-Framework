@@ -147,15 +147,29 @@ async function runAtomizeScore(options: AtomizeOptions) {
       messages: [
         message('info', 'ATM_ATOMIZE_SCORE_SUCCESS', 'Atomization dogfood score calculated.', {
           timestamp: result.report.timestamp,
-          overallScore: result.report.dogfood_score.overall
+          overallScore: result.report.overall_atomization_score,
+          grade: result.report.grade,
+          stage: result.report.stage,
+          trend: result.report.trend
         })
       ],
       evidence: {
-        score: result.report.dogfood_score,
-        breakdown: result.report.breakdown,
+        schemaId: result.schemaId ?? 'atm.dogfoodScore.v1',
+        overall_atomization_score: result.report.overall_atomization_score,
+        grade: result.report.grade,
+        stage: result.report.stage,
+        trend: result.report.trend,
+        scores: result.report.scores,
+        weighted_components: result.report.weighted_components,
+        weights: result.report.weights,
         next_high_roi_area: result.report.next_high_roi_area,
-        suggested_actions: result.report.suggested_actions,
-        growth_projection: result.report.growth_projection,
+        priority_gaps: result.report.priority_gaps,
+        inventory: result.report.inventory,
+        detail: result.report.detail,
+        artifacts: {
+          json: 'atomic_workbench/atomization-coverage/dogfood-score.json',
+          markdown: 'atomic_workbench/atomization-coverage/dogfood-score.md'
+        },
         full_report: result.report
       }
     });

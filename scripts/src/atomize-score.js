@@ -2,176 +2,442 @@
 /**
  * atomize-score.js - ATM 自我原子化 dogfood 分數報告
  * 對應: TASK-ASA-0003
- * 
+ *
  * 使用: node atm.mjs atomize score --repo . --json
+ *
+ * 行為：
+ * - 重用 atomize-inventory 的 production source / owned / unowned 統計
+ * - 對 atomic-registry.json entries 評估 evidence coverage（test / rollback / provenance / report）
+ * - 對 packages/cli/src/commands 估計 public command coverage
+ * - 對 integrations/* 估計 integration health
+ * - 對 packages/core 與 atom-callsite-readability 報告估計 readable_callsite_coverage
+ * - 依 DogfoodScore schema（docs/ATOMIZATION_COVERAGE_TAXONOMY.md §3.4）輸出 atm.dogfoodScore.v1
+ * - 同時寫出 atomic_workbench/atomization-coverage/dogfood-score.json
+ *   與 atomic_workbench/atomization-coverage/dogfood-score.md
  */
 
 import { execSync } from 'child_process';
-import { resolve } from 'path';
-import { existsSync, readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { pathToFileURL, fileURLToPath } from 'url';
+
+const COMPONENT_WEIGHTS = {
+  source_ownership_coverage: 0.30,
+  public_command_coverage: 0.20,
+  runtime_behavior_coverage: 0.10,
+  evidence_coverage: 0.20,
+  readable_callsite_coverage: 0.10,
+  integration_health: 0.10
+};
+
+const PASS_THRESHOLDS = {
+  source_ownership_coverage: 95,
+  public_command_coverage: 95,
+  atom_with_test_evidence: 80,
+  atom_with_rollback_evidence: 70,
+  excluded_paths_with_reason: 95,
+  runAtm_with_readable_ref: 100,
+  overall_atomization_score: 85
+};
+
+const FAIL_THRESHOLDS = {
+  source_ownership_coverage: 80,
+  public_command_coverage: 80,
+  atom_with_test_evidence: 60,
+  atom_with_rollback_evidence: 50,
+  excluded_paths_with_reason: 90,
+  runAtm_with_readable_ref: 95,
+  overall_atomization_score: 70
+};
+
+function gradeFor(score) {
+  if (score >= 90) return 'A';
+  if (score >= 80) return 'B';
+  if (score >= 70) return 'C';
+  return 'F';
+}
+
+function stageFor(score) {
+  if (score >= 90) return 'dogfood-excellent';
+  if (score >= 70) return 'dogfood-complete';
+  if (score >= 50) return 'dogfood-core';
+  if (score >= 30) return 'dogfood-essential';
+  return 'dogfood-foundation';
+}
+
+function countLineMatches(content, regex) {
+  let count = 0;
+  for (const line of content.split(/\r?\n/)) {
+    if (regex.test(line)) count += 1;
+  }
+  return count;
+}
+
+function listDirIfExists(dirPath) {
+  if (!existsSync(dirPath)) return [];
+  try {
+    return readdirSync(dirPath);
+  } catch {
+    return [];
+  }
+}
+
+function evaluateRegistryEvidence(registry) {
+  const entries = Array.isArray(registry.entries) ? registry.entries : [];
+  if (entries.length === 0) {
+    return {
+      atomTotal: 0,
+      withTest: 0,
+      withRollback: 0,
+      withProvenance: 0,
+      withReport: 0,
+      coverage: 0
+    };
+  }
+
+  let withTest = 0;
+  let withRollback = 0;
+  let withProvenance = 0;
+  let withReport = 0;
+
+  for (const entry of entries) {
+    const ev = Array.isArray(entry.evidence) ? entry.evidence : [];
+    const text = ev.join('\n').toLowerCase();
+    if (/\b(test|spec|test\.report|\.test\.)\b/.test(text)) withTest += 1;
+    if (/rollback/.test(text)) withRollback += 1;
+    if (/provenance/.test(text)) withProvenance += 1;
+    if (/report|attest|verify/.test(text)) withReport += 1;
+  }
+
+  const evidenceWeights = [withTest, withRollback, withProvenance, withReport];
+  const avg = evidenceWeights.reduce((sum, v) => sum + v, 0) / (4 * entries.length);
+  return {
+    atomTotal: entries.length,
+    withTest,
+    withRollback,
+    withProvenance,
+    withReport,
+    coverage: Math.round(avg * 100)
+  };
+}
+
+function evaluateCommandCoverage(cwd, registry) {
+  const cliFile = resolve(cwd, 'packages', 'cli', 'src', 'atm.ts');
+  if (!existsSync(cliFile)) return { total: 0, withAtom: 0, coverage: 0 };
+
+  const content = readFileSync(cliFile, 'utf8');
+  const total = countLineMatches(content, /^\s*'[^']+'\s*:\s*run[A-Z]/);
+
+  const atomIds = new Set(
+    (Array.isArray(registry.entries) ? registry.entries : []).map((e) => e.logicalName ?? e.atomId ?? '')
+  );
+
+  let withAtom = 0;
+  const commandPattern = /'([a-z][a-z0-9-]+)'\s*:\s*run[A-Z]/g;
+  for (const match of content.matchAll(commandPattern)) {
+    const cmd = match[1];
+    for (const atomId of atomIds) {
+      if (typeof atomId === 'string' && (atomId.includes(cmd) || atomId.includes('cli'))) {
+        withAtom += 1;
+        break;
+      }
+    }
+  }
+
+  const coverage = total === 0 ? 0 : Math.round((withAtom / total) * 100);
+  return { total, withAtom, coverage };
+}
+
+function evaluateRuntimeBehaviorCoverage(cwd, pathMap) {
+  const requiredAreas = [
+    'packages/core/src/**',
+    'packages/cli/src/**',
+    'packages/adapters/*/src/**',
+    'scripts/src/build/**',
+    'scripts/src/validate/**',
+    'scripts/src/evidence/**',
+    'integrations/codex/**',
+    'integrations/claude/**'
+  ];
+  const mappings = Array.isArray(pathMap.mappings) ? pathMap.mappings : [];
+  const mappedPatterns = new Set(mappings.map((m) => m.path_pattern));
+  let covered = 0;
+  for (const area of requiredAreas) {
+    if (mappedPatterns.has(area)) covered += 1;
+  }
+  return {
+    requiredAreas: requiredAreas.length,
+    coveredAreas: covered,
+    coverage: Math.round((covered / requiredAreas.length) * 100)
+  };
+}
+
+function evaluateReadableCallsiteCoverage(cwd) {
+  const report = resolve(cwd, 'atomic_workbench', 'reports', 'atom-callsite-readability.report.json');
+  if (!existsSync(report)) {
+    return { coverage: 0, total: 0, withReadable: 0, missing: 'report-not-found' };
+  }
+  try {
+    const data = JSON.parse(readFileSync(report, 'utf8'));
+    const summary = data.summary ?? {};
+    const total = Number(summary.totalCallsites ?? summary.total ?? 0);
+    const readable = Number(summary.readableCallsites ?? summary.readableRefCallsites ?? 0);
+    if (total === 0) return { coverage: 0, total: 0, withReadable: 0 };
+    return {
+      coverage: Math.round((readable / total) * 100),
+      total,
+      withReadable: readable
+    };
+  } catch {
+    return { coverage: 0, total: 0, withReadable: 0, missing: 'report-unreadable' };
+  }
+}
+
+function evaluateIntegrationHealth(cwd) {
+  const integrationRoot = resolve(cwd, 'integrations');
+  const adapters = listDirIfExists(integrationRoot).filter((entry) => {
+    try {
+      return statSync(resolve(integrationRoot, entry)).isDirectory();
+    } catch {
+      return false;
+    }
+  });
+  if (adapters.length === 0) return { adapters: 0, installed: 0, coverage: 0 };
+  let installed = 0;
+  for (const adapter of adapters) {
+    const dir = resolve(integrationRoot, adapter);
+    const files = listDirIfExists(dir);
+    if (files.length > 0) installed += 1;
+  }
+  return {
+    adapters: adapters.length,
+    installed,
+    coverage: Math.round((installed / adapters.length) * 100)
+  };
+}
+
+function evaluateExclusionCoverage(exclusions) {
+  if (!Array.isArray(exclusions) || exclusions.length === 0) return 0;
+  let withReason = 0;
+  for (const entry of exclusions) {
+    if (entry?.reason && entry?.provenance) withReason += 1;
+  }
+  return Math.round((withReason / exclusions.length) * 100);
+}
+
+function buildMarkdownReport(score, inventory) {
+  const lines = [
+    `# ATM Self-Atomization Dogfood Score`,
+    '',
+    `- Generated: ${score.timestamp}`,
+    `- Overall score: **${score.overall_atomization_score} / 100** (Grade ${score.grade})`,
+    `- Stage: \`${score.stage}\``,
+    `- Trend: ${score.trend}`,
+    `- Schema: \`${score.schemaId}\``,
+    '',
+    '## Component scores',
+    '',
+    '| Component | Score | Pass threshold | Fail threshold | Status |',
+    '|---|---|---|---|---|',
+    ...Object.entries(score.scores).map(([key, value]) => {
+      const pass = PASS_THRESHOLDS[key];
+      const fail = FAIL_THRESHOLDS[key];
+      const status = pass !== undefined && value >= pass
+        ? '✅ pass'
+        : fail !== undefined && value < fail
+          ? '❌ fail'
+          : '⚠️ at-risk';
+      return `| ${key} | ${value} | ${pass ?? 'n/a'} | ${fail ?? 'n/a'} | ${status} |`;
+    }),
+    '',
+    '## Inventory snapshot',
+    '',
+    `- production source paths: ${inventory.production_source_count}`,
+    `- owned by registry: ${inventory.owned_by_registry}`,
+    `- unowned: ${inventory.unowned_count}`,
+    `- coverage: ${inventory.coverage_percentage}%`,
+    '',
+    '## Priority gaps',
+    '',
+    ...(score.priority_gaps ?? []).map((gap) =>
+      `- ${gap.area}: ${gap.current} → ${gap.target}${gap.task ? ` (driven by ${gap.task})` : ''}`
+    ),
+    '',
+    `## Next high-ROI area`,
+    '',
+    `- ${score.next_high_roi_area}`,
+    '',
+    '## Notes',
+    '',
+    '- Score schema: `atm.dogfoodScore.v1` (see docs/ATOMIZATION_COVERAGE_TAXONOMY.md §3.4)',
+    '- Grade thresholds: A ≥ 90, B ≥ 80, C ≥ 70, F < 70',
+    ''
+  ];
+  return lines.join('\n');
+}
 
 export async function atomizeScore(options) {
-  const repoPath = options.repo || '.';
+  const repoPath = options.repo || options.cwd || '.';
   const fullPath = resolve(repoPath);
-  
-  // 讀取現有的清單與註冊表
+
   const pathMapPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json');
+  const exclusionPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
   const taxonomyPath = resolve(fullPath, 'docs', 'ATOMIZATION_COVERAGE_TAXONOMY.md');
-  
-  // 計算分數
-  const scoreComponents = {
-    source_ownership_coverage: 0,      // %: 有 owner atom/map 的 source path
-    public_command_coverage: 0,        // %: 有 command atom/map 的 CLI 命令
-    runtime_behavior_coverage: 0,      // %: core runtime behaviors 有 atom/map
-    evidence_coverage: 0,              // %: production atoms 有完整 evidence
-    readable_callsite_coverage: 0,     // %: runAtm/runAtmMap 有語意 ref
-    integration_health: 0              // %: adapters 正常安裝
-  };
-  
-  // 基礎掃描
-  let cliCommands = 0;
-  let commandsWithAtom = 0;
-  let productionAtoms = 0;
-  let atomsWithEvidence = 0;
-  
+  const registryPath = resolve(fullPath, 'atomic-registry.json');
+
+  if (!existsSync(taxonomyPath)) {
+    return {
+      status: 'error',
+      message: 'Coverage taxonomy not found. Run TASK-ASA-0001 first.',
+      suggestedFix: 'Execute TASK-ASA-0001: coverage-taxonomy-exclusion-policy'
+    };
+  }
+
+  const pathMap = existsSync(pathMapPath)
+    ? JSON.parse(readFileSync(pathMapPath, 'utf8'))
+    : { mappings: [] };
+  const exclusions = existsSync(exclusionPath)
+    ? JSON.parse(readFileSync(exclusionPath, 'utf8'))
+    : [];
+  const registry = existsSync(registryPath)
+    ? JSON.parse(readFileSync(registryPath, 'utf8'))
+    : { entries: [] };
+
+  // Reuse inventory CLI for source ownership
+  const inventoryScript = resolve(fullPath, 'scripts', 'src', 'atomize-inventory.js');
+  let inventoryReport = null;
   try {
-    // 掃描 CLI 命令
-    const cliFile = resolve(fullPath, 'packages', 'cli', 'src', 'atm.ts');
-    if (existsSync(cliFile)) {
-      const content = readFileSync(cliFile, 'utf-8');
-      cliCommands = (content.match(/^\s*'[^']+': run[A-Z]/gm) || []).length;
-      commandsWithAtom = Math.ceil(cliCommands * 0.15); // 估計 15% 有 atom
-    }
-    
-    // 掃描 production atoms
-    const registryPath = resolve(fullPath, 'atomic-registry.json');
-    if (existsSync(registryPath)) {
-      try {
-        const registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
-        const atoms = registry.atoms || [];
-        productionAtoms = atoms.filter((a) => 
-          a.type === 'atom' && 
-          !a.spec?.generatedDraft &&
-          (a.evidence?.test || a.evidence?.report || a.evidence?.provenance)
-        ).length;
-        atomsWithEvidence = atoms.filter((a) => 
-          a.evidence && 
-          (a.evidence.test || a.evidence.report || a.evidence.provenance || a.evidence.rollback)
-        ).length;
-      } catch (e) {
-        // Registry parse error
-      }
-    }
-    
-    // 計算綜合分數
-    scoreComponents.source_ownership_coverage = Math.min(100, Math.ceil((12 / 406) * 100)); // 從 inventory 結果
-    scoreComponents.public_command_coverage = Math.ceil((commandsWithAtom / Math.max(1, cliCommands)) * 100);
-    scoreComponents.runtime_behavior_coverage = Math.ceil((productionAtoms / Math.max(1, productionAtoms + 20)) * 100);
-    scoreComponents.evidence_coverage = Math.ceil((atomsWithEvidence / Math.max(1, productionAtoms)) * 100);
-    scoreComponents.readable_callsite_coverage = 25; // 初始低分
-    scoreComponents.integration_health = 50; // 半數 adapters 安裝
-    
-  } catch (err) {
-    // 計算失敗時使用預設分數
+    const { atomizeInventory } = await import(pathToFileURL(inventoryScript).href);
+    const invResult = await atomizeInventory({ repo: fullPath });
+    if (invResult.status === 'success') inventoryReport = invResult.report;
+  } catch {
+    inventoryReport = null;
   }
-  
-  const overallScore = Math.round(
-    Object.values(scoreComponents).reduce((a, b) => a + b, 0) / 
-    Object.keys(scoreComponents).length
+
+  const inv = inventoryReport?.inventory ?? {
+    production_source_count: 0,
+    owned_by_registry: 0,
+    unowned_count: 0,
+    coverage_percentage: 0
+  };
+
+  const evidenceEval = evaluateRegistryEvidence(registry);
+  const commandEval = evaluateCommandCoverage(fullPath, registry);
+  const runtimeEval = evaluateRuntimeBehaviorCoverage(fullPath, pathMap);
+  const readableEval = evaluateReadableCallsiteCoverage(fullPath);
+  const integrationEval = evaluateIntegrationHealth(fullPath);
+  const exclusionCoverage = evaluateExclusionCoverage(exclusions);
+
+  const scores = {
+    source_ownership_coverage: inv.coverage_percentage,
+    public_command_coverage: commandEval.coverage,
+    atom_with_test_evidence: evidenceEval.atomTotal === 0 ? 0 : Math.round((evidenceEval.withTest / evidenceEval.atomTotal) * 100),
+    atom_with_rollback_evidence: evidenceEval.atomTotal === 0 ? 0 : Math.round((evidenceEval.withRollback / evidenceEval.atomTotal) * 100),
+    excluded_paths_with_reason: exclusionCoverage,
+    runAtm_with_readable_ref: readableEval.coverage
+  };
+
+  const weightedScores = {
+    source_ownership_coverage: scores.source_ownership_coverage,
+    public_command_coverage: scores.public_command_coverage,
+    runtime_behavior_coverage: runtimeEval.coverage,
+    evidence_coverage: evidenceEval.coverage,
+    readable_callsite_coverage: scores.runAtm_with_readable_ref,
+    integration_health: integrationEval.coverage
+  };
+
+  const overall = Math.round(
+    Object.entries(weightedScores).reduce((sum, [key, value]) => sum + value * (COMPONENT_WEIGHTS[key] ?? 0), 0)
   );
-  
-  // 確定 stage
-  let currentStage = 'dogfood-foundation';
-  if (overallScore >= 30) currentStage = 'dogfood-essential';
-  if (overallScore >= 50) currentStage = 'dogfood-core';
-  if (overallScore >= 70) currentStage = 'dogfood-complete';
-  if (overallScore >= 90) currentStage = 'dogfood-excellent';
-  
-  // 生成建議
-  const suggestions = [];
-  if (scoreComponents.source_ownership_coverage < 50) {
-    suggestions.push({
-      priority: 'P0',
-      action: 'increase-source-ownership',
-      target: 'Backfill path-to-atom mappings for packages/core and packages/cli',
-      impact: 'expected +20% coverage'
-    });
+
+  const grade = gradeFor(overall);
+  const stage = stageFor(overall);
+  const previousScorePath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.json');
+  let previousOverall = null;
+  if (existsSync(previousScorePath)) {
+    try {
+      const prev = JSON.parse(readFileSync(previousScorePath, 'utf8'));
+      previousOverall = typeof prev.overall_atomization_score === 'number' ? prev.overall_atomization_score : null;
+    } catch {
+      previousOverall = null;
+    }
   }
-  if (scoreComponents.readable_callsite_coverage < 50) {
-    suggestions.push({
-      priority: 'P1',
-      action: 'improve-readable-refs',
-      target: 'Dogfood migration: replace id-only runAtm with semantic readable refs',
-      impact: 'expected +15% coverage'
-    });
+  const trend = previousOverall === null
+    ? 'stable'
+    : overall > previousOverall ? 'improving' : overall < previousOverall ? 'regressing' : 'stable';
+
+  const priorityGaps = [];
+  for (const [key, value] of Object.entries(scores)) {
+    const pass = PASS_THRESHOLDS[key];
+    if (pass !== undefined && value < pass) {
+      priorityGaps.push({
+        area: key,
+        current: `${value}%`,
+        target: `${pass}%`,
+        task: nextTaskForGap(key)
+      });
+    }
   }
-  if (scoreComponents.evidence_coverage < 70) {
-    suggestions.push({
-      priority: 'P1',
-      action: 'evidence-gap-filling',
-      target: 'Add test, rollback, provenance evidence to production atoms',
-      impact: 'expected +25% coverage'
-    });
-  }
-  
+
+  const nextHighRoi = priorityGaps.length === 0
+    ? 'maintain-quality'
+    : priorityGaps.sort((a, b) => Number.parseInt(a.current, 10) - Number.parseInt(b.current, 10))[0].area;
+
   const report = {
     timestamp: new Date().toISOString(),
-    repo: fullPath,
-    dogfood_score: {
-      overall: overallScore,
-      stage: currentStage,
-      components: scoreComponents,
-      max_possible: 100
+    schemaId: 'atm.dogfoodScore.v1',
+    version: '1.1',
+    overall_atomization_score: overall,
+    grade,
+    stage,
+    scores,
+    weighted_components: weightedScores,
+    weights: COMPONENT_WEIGHTS,
+    trend,
+    next_target: Math.min(100, overall + 10),
+    next_high_roi_area: nextHighRoi,
+    priority_gaps: priorityGaps,
+    inventory: inv,
+    detail: {
+      evidence: evidenceEval,
+      command: commandEval,
+      runtime: runtimeEval,
+      readable: readableEval,
+      integration: integrationEval,
+      exclusion_coverage: exclusionCoverage
     },
-    breakdown: {
-      'Source Ownership': {
-        current: scoreComponents.source_ownership_coverage,
-        target: 100,
-        description: 'Production source paths with owner atom/map'
-      },
-      'Public Command Coverage': {
-        current: scoreComponents.public_command_coverage,
-        target: 100,
-        description: 'atm.mjs commands with command atom/map'
-      },
-      'Runtime Behavior Coverage': {
-        current: scoreComponents.runtime_behavior_coverage,
-        target: 100,
-        description: 'Core runtime behaviors covered'
-      },
-      'Evidence Coverage': {
-        current: scoreComponents.evidence_coverage,
-        target: 100,
-        description: 'Production atoms with complete evidence'
-      },
-      'Readable Callsite Coverage': {
-        current: scoreComponents.readable_callsite_coverage,
-        target: 100,
-        description: 'runAtm/runAtmMap calls using semantic refs'
-      },
-      'Integration Health': {
-        current: scoreComponents.integration_health,
-        target: 100,
-        description: 'Agent pack adapters installed and verified'
-      }
-    },
-    next_high_roi_area: scoreComponents.source_ownership_coverage < 50 
-      ? 'source-ownership-expansion' 
-      : 'readable-callsite-migration',
-    suggested_actions: suggestions,
-    growth_projection: {
-      weeks_to_90: Math.ceil((90 - overallScore) / 5),
-      estimated_atom_count_needed: Math.ceil((406 * 0.8) / 5) // estimate
-    }
+    notes: [
+      'Score schema atm.dogfoodScore.v1 (docs/ATOMIZATION_COVERAGE_TAXONOMY.md §3.4).',
+      'TASK-ASA-0003 emits both dogfood-score.json and dogfood-score.md for human + machine consumers.'
+    ]
   };
-  
+
+  // Persist reports
+  const scoreJsonPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.json');
+  const scoreMdPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.md');
+  mkdirSync(dirname(scoreJsonPath), { recursive: true });
+  writeFileSync(scoreJsonPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+  writeFileSync(scoreMdPath, buildMarkdownReport(report, inv), 'utf8');
+
   return {
     status: 'success',
+    schemaId: 'atm.dogfoodScore.v1',
     report
   };
 }
 
-// CLI 入點
+function nextTaskForGap(component) {
+  switch (component) {
+    case 'source_ownership_coverage': return 'TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009';
+    case 'public_command_coverage': return 'TASK-ASA-0007,TASK-ASA-0009';
+    case 'atom_with_test_evidence': return 'TASK-ASA-0010';
+    case 'atom_with_rollback_evidence': return 'TASK-ASA-0010';
+    case 'excluded_paths_with_reason': return 'TASK-ASA-0005';
+    case 'runAtm_with_readable_ref': return 'TASK-ASA-0013';
+    default: return null;
+  }
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const result = await atomizeScore({ repo: '.' });
   console.log(JSON.stringify(result, null, 2));
