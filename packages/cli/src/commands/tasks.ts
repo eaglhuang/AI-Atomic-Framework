@@ -933,7 +933,8 @@ async function runTasksClose(argv: string[]) {
       cwd: options.cwd,
       taskId: options.taskId,
       taskDocument,
-      taskDeclaredFiles
+      taskDeclaredFiles,
+      claim: parseClaimRecord(taskDocument.claim)
     })
     : null;
   if (deliverableGate && !deliverableGate.ok) {
@@ -2250,10 +2251,11 @@ function evaluateTaskDeliverableGate(input: {
   readonly taskId: string;
   readonly taskDocument: Record<string, unknown>;
   readonly taskDeclaredFiles: readonly string[];
+  readonly claim: TaskClaimRecord | null;
 }): TaskDeliverableGateReport {
   const required = isDeliverableDiffRequired(input.taskDocument);
   const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
-  const changedFileReport = listChangedFilesForDeliverableGate(input.cwd);
+  const changedFileReport = listChangedFilesForDeliverableGate(input.cwd, input.claim);
   const changedFiles = (changedFileReport.gitAvailable
     ? changedFileReport.files
     : uniqueStrings([
@@ -2322,7 +2324,7 @@ function isDeliverableDiffRequired(taskDocument: Record<string, unknown>): boole
     || /資料|管線|腳本|執行器|報告|產物|審核表|清單|候選|白名單|黑名單|人物|關係/.test(haystack);
 }
 
-function listChangedFilesForDeliverableGate(cwd: string): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
+function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord | null): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
   const files = new Set<string>();
   let gitAvailable = false;
   for (const args of [
@@ -2341,7 +2343,42 @@ function listChangedFilesForDeliverableGate(cwd: string): { readonly files: read
       // Sandboxed or non-git hosts use a declared-file existence fallback.
     }
   }
+  const committedSinceClaim = listCommittedFilesSinceClaim(cwd, claim);
+  if (committedSinceClaim.gitAvailable) gitAvailable = true;
+  for (const filePath of committedSinceClaim.files) {
+    files.add(filePath);
+  }
   return { files: [...files].sort((left, right) => left.localeCompare(right)), gitAvailable };
+}
+
+function listCommittedFilesSinceClaim(cwd: string, claim: TaskClaimRecord | null): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
+  if (!claim?.claimedAt) return { files: [], gitAvailable: false };
+  const baseline = readGitScalar(cwd, ['rev-list', '-1', `--before=${claim.claimedAt}`, 'HEAD']);
+  if (baseline === null) return { files: [], gitAvailable: false };
+  const files = baseline
+    ? readGitNameOnly(cwd, ['diff', '--name-only', `${baseline}..HEAD`])
+    : readGitNameOnly(cwd, ['diff-tree', '--no-commit-id', '--name-only', '-r', '--root', 'HEAD']);
+  return {
+    files,
+    gitAvailable: true
+  };
+}
+
+function readGitScalar(cwd: string, args: readonly string[]): string | null {
+  try {
+    return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function readGitNameOnly(cwd: string, args: readonly string[]): readonly string[] {
+  try {
+    const output = execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    return uniqueStrings(output.split(/\r?\n/).map(normalizeRelativePath).filter(Boolean));
+  } catch {
+    return [];
+  }
 }
 
 function isRealDeliverablePath(filePath: string): boolean {

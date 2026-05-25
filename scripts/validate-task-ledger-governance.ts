@@ -273,6 +273,37 @@ try {
   const pipelineClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done']);
   assert(pipelineClose.ok === true, 'pipeline task close must pass after a real deliverable diff exists');
 
+  const committedTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0002', '--actor', 'validator', '--title', 'Committed pipeline runner']);
+  assert(committedTask.ok === true, 'committed deliverable fixture task create must succeed');
+  const committedTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', 'TASK-PIPE-0002.json');
+  const committedTaskDoc = readJson(committedTaskPath);
+  committedTaskDoc.deliverables = ['pipelines/sanguo-rag/committed_bootstrap.py'];
+  writeJson(committedTaskPath, committedTaskDoc);
+  const committedClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', 'TASK-PIPE-0002']);
+  assert(committedClaim.ok === true, 'next --claim must create a direction lock for the committed deliverable task');
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', 'TASK-PIPE-0002.json'), {
+    taskId: 'TASK-PIPE-0002',
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'committed deliverable evidence exists',
+      producedBy: 'validator',
+      artifactPaths: ['pipelines/sanguo-rag/committed_bootstrap.py'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate committed pipeline fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  writeFileSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag', 'committed_bootstrap.py'), 'print("committed bootstrap")\n', 'utf8');
+  execFileSync('git', ['add', 'pipelines/sanguo-rag/committed_bootstrap.py'], { cwd: deliverableRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'add committed bootstrap deliverable'], { cwd: deliverableRepo, stdio: 'ignore' });
+  const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0002', '--actor', 'validator', '--status', 'done']);
+  assert(committedClose.ok === true, 'deliverable gate must accept files committed after task claim');
+
   const resetRepo = makeHostRepo(tempRoot, 'reset-release');
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
   assert(resetCreate.ok === true, 'reset fixture task create must succeed');
