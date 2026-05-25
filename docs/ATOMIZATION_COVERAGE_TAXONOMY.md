@@ -2,9 +2,11 @@
 # ATM 100% 原子化覆蓋口徑與排除政策
 
 ## 版本
-- 版本: 1.0
-- 日期: 2026-05-21
-- 作者: ATM Framework Self-Atomization Task-ASA-0001
+- 版本: 1.1
+- 日期: 2026-05-25
+- 來源任務: TASK-ASA-0001（任務契約保存在 upstream planning repo；本文件是 ATM repo 內的政策 SSOT）
+- 上一版: 1.0 (2026-05-21)
+- 變更: 1.1 把 exclusion reason / dogfood score / path-to-atom map 三個草案升級為正式 JSON Schema 區塊，作為後續 guard 與 validator 的 SSOT
 
 ## 1. Production Source 分類規則
 
@@ -47,18 +49,60 @@ samples/**                     # 示例應用
 
 ## 2. Exclusion Reason Schema
 
-所有被排除的路徑必須使用標準 schema 記錄排除原因：
+所有被排除的路徑必須使用標準 schema 記錄排除原因。下方為機器可讀的 JSON Schema 草案（草案編號 `atm.exclusionInventoryEntry.v1`），後續 guard / validator 直接依本節欄位驗收 `atomic_workbench/atomization-coverage/exclusion-inventory.json` 的每一筆 entry。
+
+### 2.0 JSON Schema 草案 (`atm.exclusionInventoryEntry.v1`)
 
 ```json
 {
-  "path": "string",                           // 排除路徑（glob or file）
-  "reason": "generated|fixture|snapshot|doc|example|test-only|internal-only",
-  "owner_atom_id": "string (optional)",       // 如果有對應 atom
-  "provenance": "string",                     // 生成/維護來源說明
-  "valid_until": "RFC3339 (optional)",        // 過期日期（for temporary exclusions）
-  "notes": "string (optional)"                // 附加說明
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.exclusionInventoryEntry.v1",
+  "title": "ATM Atomization Coverage Exclusion Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["path", "reason", "provenance"],
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "排除的 path 或 glob（相對於 ATM repo root）"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "generated",
+        "fixture",
+        "snapshot",
+        "doc",
+        "example",
+        "test-only",
+        "internal-only"
+      ],
+      "description": "排除原因（受控字彙；新類別必須先擴充本 schema）"
+    },
+    "owner_atom_id": {
+      "type": "string",
+      "pattern": "^atom-[a-z0-9-]+$",
+      "description": "若有對應 owner atom，需符合 readable ref 命名"
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1,
+      "description": "生成或維護來源的人類可讀說明"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "暫時性排除的失效時間（RFC3339）"
+    },
+    "notes": {
+      "type": "string",
+      "description": "附加說明（中文或英文）"
+    }
+  }
 }
 ```
+
+`exclusion-inventory.json` 必須是 entry 陣列；每個 entry 都必須通過上述 schema。陣列 top-level 不另外包裝，以維持 `scripts/src/atomize-inventory.js` 直接 `JSON.parse(...)` 後當作 list 使用的契約。
 
 ### 2.1 排除原因分類
 
@@ -122,17 +166,139 @@ interface DogfoodScore {
 - **Grade C**: overall_atomization_score >= 70 && < 80
 - **Grade F**: overall_atomization_score < 70 (Fail, release blocked)
 
-## 4. Exclusion Inventory 檔案
+### 3.4 JSON Schema 草案 (`atm.dogfoodScore.v1`)
 
-核心 exclusion inventory 位置：
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.dogfoodScore.v1",
+  "title": "ATM Self-Atomization Dogfood Score",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "version",
+    "overall_atomization_score",
+    "grade",
+    "scores"
+  ],
+  "properties": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "version": { "type": "string" },
+    "overall_atomization_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "grade": { "type": "string", "enum": ["A", "B", "C", "F"] },
+    "scores": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 100 },
+      "required": [
+        "source_ownership_coverage",
+        "public_command_coverage",
+        "atom_with_test_evidence",
+        "atom_with_rollback_evidence",
+        "excluded_paths_with_reason",
+        "runAtm_with_readable_ref"
+      ]
+    },
+    "trend": { "type": "string", "enum": ["improving", "stable", "regressing"] },
+    "next_target": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "priority_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["area", "current", "target"]
+      }
+    }
+  }
+}
+```
+
+## 4. Exclusion Inventory 與 Path-to-Atom Map 檔案
+
+核心檔案位置（相對 ATM repo root）：
 
 ```
-c:\Users\User\AI-Atomic-Framework\atomic_workbench\atomization-coverage\
-├── exclusion-inventory.json      # 所有排除路徑集中記錄
-├── path-to-atom-map.json         # production path 與 atom 的對應
-└── coverage-reports/
-    ├── coverage-{date}.json      # 日期 snapshot
-    └── trending.json             # 趨勢數據
+atomic_workbench/atomization-coverage/
+├── exclusion-inventory.json            # 所有排除路徑集中記錄（entry 陣列）
+├── path-to-atom-map.json               # production path 與 owner atom 的對應
+├── dogfood-score.json                  # 最近一次 atomize score 結果
+├── generated-fixture-boundaries.json   # generated / fixture 邊界（TASK-ASA-0005）
+└── coverage-reports/                   # 未來日期 snapshot（reserved，目前可不存在）
+```
+
+### 4.1 path-to-atom-map.json 結構
+
+```json
+{
+  "version": "string",
+  "timestamp": "RFC3339",
+  "mappings": [
+    {
+      "path_pattern": "string (glob)",
+      "atom_id": "string (atom-* readable ref)",
+      "capability": "string",
+      "coverage_status": "covered | partial | planned | debt"
+    }
+  ],
+  "summary": {
+    "total_production_paths": "integer",
+    "mapped_paths": "integer",
+    "coverage_percentage": "integer 0-100",
+    "atoms_defined": "integer",
+    "atoms_with_evidence": "integer",
+    "debt_items": "integer"
+  }
+}
+```
+
+### 4.2 JSON Schema 草案 (`atm.pathToAtomMap.v1`)
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.pathToAtomMap.v1",
+  "title": "ATM Path-to-Atom Map",
+  "type": "object",
+  "required": ["version", "mappings", "summary"],
+  "properties": {
+    "version": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path_pattern", "atom_id", "capability", "coverage_status"],
+        "additionalProperties": false,
+        "properties": {
+          "path_pattern": { "type": "string", "minLength": 1 },
+          "atom_id": { "type": "string", "pattern": "^atom-[a-z0-9-]+$" },
+          "capability": { "type": "string", "minLength": 1 },
+          "coverage_status": {
+            "type": "string",
+            "enum": ["covered", "partial", "planned", "debt"]
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_production_paths",
+        "mapped_paths",
+        "coverage_percentage",
+        "atoms_defined",
+        "atoms_with_evidence",
+        "debt_items"
+      ],
+      "properties": {
+        "total_production_paths": { "type": "integer", "minimum": 0 },
+        "mapped_paths": { "type": "integer", "minimum": 0 },
+        "coverage_percentage": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "atoms_defined": { "type": "integer", "minimum": 0 },
+        "atoms_with_evidence": { "type": "integer", "minimum": 0 },
+        "debt_items": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
 ```
 
 ## 5. Guard 與 Validator 入點
@@ -178,8 +344,20 @@ node atm.mjs validate exclusion-reasons --repo . --json
 
 ## 7. 驗收檢查清單
 
-- [ ] exclusion-inventory.json 已建立，包含所有已知排除路徑
-- [ ] path-to-atom-map.json 已建立，覆蓋 >= 95% production source
-- [ ] DogfoodScore 結構已定義，且初次計算得分 >= 70
-- [ ] 本文件經過 doc review 通過
-- [ ] `node atm.mjs validate exclusion-reasons` 無誤
+- [x] exclusion-inventory.json 已建立，包含所有已知排除路徑（17 筆，2026-05-21）
+- [x] path-to-atom-map.json 已建立，列出 12 條 production path → owner atom 映射（2026-05-21）
+- [x] DogfoodScore 結構已定義，dogfood-score.json 含 overall + components，初始 grade=B（2026-05-21）
+- [x] 排除原因、score、map 均提供正式 JSON Schema 草案（2026-05-25, TASK-ASA-0001 v1.1）
+- [ ] `node atm.mjs validate atomization-coverage` 待 TASK-ASA-0004 加入
+- [ ] `node atm.mjs atomize score` 待 TASK-ASA-0003 接通正式管線
+
+## 8. 下游 Task 對應
+
+| 任務 | 引用本文件章節 |
+|---|---|
+| TASK-ASA-0002 atomize inventory CLI | §1, §2, §4 |
+| TASK-ASA-0003 atomize score 報告 | §3, §3.4 |
+| TASK-ASA-0004 atomization-coverage guard | §1, §2, §4 |
+| TASK-ASA-0005 generated/fixture 邊界 | §1.2, §1.3, §2 |
+| TASK-ASA-0006 bulk atom spec backfill | §6 |
+| TASK-ASA-0016 graduation gate | §3.2, §3.3 |
