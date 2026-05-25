@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'tasks',
   summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, migrate legacy ledger records, and close tasks with evidence gates.',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | audit | queue | migrate-legacy-ledger | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | audit | queue | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close', required: true }
   ],
   options: [
     commonCwdOption,
@@ -18,7 +18,10 @@ export default defineCommandSpec({
     { flag: '--dry-run', summary: 'Parse the plan and emit a manifest without writing task files.' },
     { flag: '--write', summary: 'Write canonical task JSON files to .atm/history/tasks/ and persist import evidence.' },
     { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs.' },
+    { flag: '--reset-open', summary: 'Rebuild matching imported tasks as open during tasks import --write.' },
     { flag: '--apply', summary: 'Apply tasks migrate-legacy-ledger changes instead of reporting a dry-run.' },
+    { flag: '--all-stale', summary: 'Clean every stale runtime task lock candidate for tasks lock cleanup.' },
+    { flag: '--reserved-ok', summary: 'Allow tasks release to return a reserved task with no active claim back to open.' },
     { flag: '--staged', summary: 'Run tasks audit in staged/pre-commit mode.' },
     { flag: '--queue', value: 'id', summary: 'Task queue id for tasks queue abandon.' },
     { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close.' },
@@ -47,13 +50,16 @@ export default defineCommandSpec({
     'node atm.mjs tasks audit --staged --json',
     'node atm.mjs tasks queue status --json',
     'node atm.mjs tasks queue abandon --queue queue-abc123 --actor codex-main --json',
+    'node atm.mjs tasks lock cleanup --all-stale --actor codex-main --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --dry-run --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --apply --json',
     'node atm.mjs tasks reserve --task ATM-GOV-0101 --actor codex-main --title "Actor model" --json',
     'node atm.mjs tasks promote --task ATM-GOV-0101 --actor codex-main --json',
+    'node atm.mjs tasks reset --task ATM-GOV-0101 --actor codex-main --to open --reason "rollback cleanup" --json',
     'node atm.mjs tasks claim --task ATM-GOV-0101 --actor codex-main --files packages/core/src/index.ts --json',
     'node atm.mjs tasks renew --task ATM-GOV-0101 --actor codex-main --ttl-seconds 3600 --json',
     'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reason "handoff complete" --json',
+    'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reserved-ok --reason "rollback cleanup" --json',
     'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --json',
     'node atm.mjs tasks block --task ATM-GOV-0104 --actor codex-main --reason "waiting on target evidence" --json'
   ]

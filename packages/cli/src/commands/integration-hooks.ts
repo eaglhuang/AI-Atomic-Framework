@@ -8,7 +8,7 @@ import {
   detectFrameworkRepoIdentity,
   isAtmCriticalNonDocSurface
 } from './framework-development.ts';
-import { readActiveTaskDirectionLocks } from './task-direction.ts';
+import { isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
 import {
   hookContractVersion,
   hookMarker,
@@ -947,7 +947,10 @@ function buildPromptScopedAllowedPaths(tasks: readonly {
     if (task.taskPath) paths.push(normalizeRelativePath(task.taskPath));
     if (task.sourcePlanPath) paths.push(normalizeRelativePath(task.sourcePlanPath));
     for (const entry of task.nearbyPlanPaths) paths.push(normalizeRelativePath(entry));
-    for (const entry of task.scopePaths) paths.push(normalizeRelativePath(entry));
+    for (const entry of task.scopePaths) {
+      const normalized = normalizeRelativePath(entry);
+      if (isTaskDirectionPathCandidate(normalized)) paths.push(normalized);
+    }
   }
   return uniqueSorted(paths);
 }

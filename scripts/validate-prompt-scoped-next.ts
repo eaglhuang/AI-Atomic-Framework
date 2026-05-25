@@ -85,6 +85,9 @@ async function main() {
     assert(runningClaim.ok === true, 'next --claim must reuse an active claim for a running task');
     assert((runningClaim.evidence.claimPreparation as any)?.reusedActiveClaim === true, 'running task claim should be reported as reused active claim');
     assert((runningClaim.evidence.taskDirectionLock as any)?.taskId === 'SANGUO-BOOTSTRAP-0001', 'running task claim must still write a direction lock');
+    const runningAllowedFiles = (runningClaim.evidence.taskDirectionLock as any)?.allowedFiles ?? [];
+    assert(runningAllowedFiles.includes('docs/sanguo.md'), 'direction lock allowedFiles must preserve real task paths');
+    assert(!runningAllowedFiles.some((entry: string) => entry.includes('human gate')), 'direction lock allowedFiles must not include natural-language acceptance text');
 
     const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', 'Please do the next task card']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
@@ -124,6 +127,7 @@ function writeLedgerTask(filePath: string, taskId: string, title: string, scopeP
     title,
     status: options.status ?? 'ready',
     dependencies: [],
+    acceptance: ['文件明寫 bootstrap 不能直接跳過 reviewer 或 human gate 成為 human-locked-100。'],
     scope: [scopePath],
     ...(options.claimActorId ? {
       claim: {

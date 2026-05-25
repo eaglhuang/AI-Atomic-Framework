@@ -156,7 +156,7 @@ export function writeTaskDirectionLock(input: {
     taskId: input.taskId,
     queueId: input.queue?.queueId ?? null,
     queueIndex: queueIndex >= 0 ? queueIndex : null,
-    allowedFiles: uniqueSorted(input.allowedFiles.map(normalizeRelativePath)),
+    allowedFiles: sanitizeTaskDirectionAllowedFiles(input.allowedFiles),
     promptHash: input.prompt?.trim() ? sha256(input.prompt.trim()) : input.queue?.sourcePromptHash ?? null,
     actorId: input.actorId,
     createdAt: new Date().toISOString(),
@@ -245,12 +245,52 @@ export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, a
 }
 
 export function buildAllowedFilesForTask(task: TaskDirectionTask): readonly string[] {
-  return uniqueSorted([
+  return sanitizeTaskDirectionAllowedFiles([
     task.taskPath,
     task.sourcePlanPath ?? '',
     ...task.nearbyPlanPaths,
     ...task.scopePaths
-  ].filter(Boolean));
+  ]);
+}
+
+export function sanitizeTaskDirectionAllowedFiles(values: readonly string[]): readonly string[] {
+  return uniqueSorted(values
+    .map(normalizeRelativePath)
+    .filter(isTaskDirectionPathCandidate));
+}
+
+export function isTaskDirectionPathCandidate(value: string): boolean {
+  const normalized = normalizeRelativePath(value);
+  if (!normalized || normalized.length > 260 || /[\r\n]/.test(normalized)) return false;
+  if (/^https?:\/\//i.test(normalized)) return false;
+  if (/\s\/|\/\s/.test(normalized)) return false;
+
+  const knownRoots = [
+    '.atm/',
+    '.github/',
+    '.claude/',
+    '.cursor/',
+    '.gemini/',
+    'atomic_workbench/',
+    'docs/',
+    'examples/',
+    'fixtures/',
+    'integrations/',
+    'packages/',
+    'pipelines/',
+    'release/',
+    'schemas/',
+    'scripts/',
+    'specs/',
+    'templates/',
+    'tests/',
+    '文件/'
+  ];
+  if (knownRoots.some((root) => normalized === root.slice(0, -1) || normalized.startsWith(root))) return true;
+  if (normalized.includes('*') && normalized.includes('/')) return true;
+
+  const lastSegment = normalized.split('/').pop() ?? normalized;
+  return /^[^<>:"|?*]+\.[A-Za-z0-9][A-Za-z0-9._-]{0,12}$/.test(lastSegment);
 }
 
 function listTaskQueues(cwd: string): readonly TaskQueueRecord[] {

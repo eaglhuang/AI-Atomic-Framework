@@ -1,8 +1,10 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { auditTasks, createFrameworkModeStatus } from '../packages/cli/src/commands/framework-development.ts';
+import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,6 +29,12 @@ function writeJson(filePath: string, value: unknown) {
 
 function readJson(filePath: string): Record<string, any> {
   return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, any>;
+}
+
+function initGitRepo(repo: string) {
+  execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
 }
 
 function evidenceReport(result: Awaited<ReturnType<typeof runTasks>>): Record<string, any> {
@@ -100,7 +108,10 @@ async function expectTaskError(argv: string[], code: string) {
   }
 }
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-task-ledger-'));
+const sandboxFriendlyTempRoot = existsSync(path.join(root, '.atm-temp'))
+  ? path.join(root, '.atm-temp')
+  : os.tmpdir();
+const tempRoot = mkdtempSync(path.join(sandboxFriendlyTempRoot, 'atm-task-ledger-'));
 
 try {
   const hostRepo = makeHostRepo(tempRoot, 'ordinary-adopter');
@@ -127,6 +138,8 @@ try {
       }
     ]
   });
+  const ledgerClaim = await runNext(['--cwd', hostRepo, '--claim', '--actor', 'validator', '--prompt', 'TASK-LEDGER-0001']);
+  assert(ledgerClaim.ok === true, 'next --claim must create the direction lock before close');
   const closeResult = await runTasks(['close', '--cwd', hostRepo, '--task', 'TASK-LEDGER-0001', '--actor', 'validator', '--status', 'done']);
   assert(closeResult.ok === true, 'tasks close must succeed with evidence');
   assert(auditTasks(hostRepo).ok === true, 'closed task with CLI transition evidence must pass audit');
@@ -196,6 +209,50 @@ try {
   const manualMirrorAudit = auditTasks(mirrorRepo);
   assert(manualMirrorAudit.ok === false, 'hand-edited mirror done task must fail audit');
   assert(manualMirrorAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_TRANSITION_EVIDENCE_MISSING'), 'missing transition evidence must be reported');
+
+  const deliverableRepo = makeHostRepo(tempRoot, 'deliverable-gate');
+  initGitRepo(deliverableRepo);
+  const pipelineTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--title', 'Build pipeline runner']);
+  assert(pipelineTask.ok === true, 'pipeline task create must succeed');
+  const pipelineTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', 'TASK-PIPE-0001.json');
+  const pipelineTaskDoc = readJson(pipelineTaskPath);
+  pipelineTaskDoc.deliverables = ['pipelines/sanguo-rag/run_bootstrap.py'];
+  writeJson(pipelineTaskPath, pipelineTaskDoc);
+  const pipelineClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', 'TASK-PIPE-0001']);
+  assert(pipelineClaim.ok === true, 'next --claim must create a direction lock for the pipeline task');
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', 'TASK-PIPE-0001.json'), {
+    taskId: 'TASK-PIPE-0001',
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'runnable evidence exists, but no deliverable file has changed yet',
+      producedBy: 'validator',
+      artifactPaths: [],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate pipeline fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  await expectTaskError(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done'], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+  mkdirSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag'), { recursive: true });
+  writeFileSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag', 'run_bootstrap.py'), 'print("bootstrap")\n', 'utf8');
+  const pipelineClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done']);
+  assert(pipelineClose.ok === true, 'pipeline task close must pass after a real deliverable diff exists');
+
+  const resetRepo = makeHostRepo(tempRoot, 'reset-release');
+  const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
+  assert(resetCreate.ok === true, 'reset fixture task create must succeed');
+  await runTasks(['reserve', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator']);
+  await expectTaskError(['release', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator'], 'ATM_TASK_CLAIM_MISSING');
+  const reservedRelease = await runTasks(['release', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--reserved-ok', '--reason', 'rollback cleanup']);
+  assert(reservedRelease.ok === true, 'reserved task without claim must release with --reserved-ok');
+  await runTasks(['reserve', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator']);
+  const resetOpen = await runTasks(['reset', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--to', 'open', '--reason', 'rollback cleanup']);
+  assert(resetOpen.ok === true, 'reserved task must reset back to open');
 
   const legacyRepo = makeHostRepo(tempRoot, 'legacy-ledger');
   writeJson(path.join(legacyRepo, '.atm', 'history', 'tasks', 'TASK-LEGACY-0001.json'), {

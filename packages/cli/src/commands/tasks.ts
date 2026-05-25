@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
@@ -26,7 +27,9 @@ import {
   advanceTaskQueueAfterClose,
   abandonTaskQueue,
   assertTaskCloseAllowedByDirection,
-  findActiveTaskQueue
+  findActiveTaskQueue,
+  isTaskDirectionPathCandidate,
+  sanitizeTaskDirectionAllowedFiles
 } from './task-direction.ts';
 
 export interface TaskImportSource {
@@ -73,6 +76,19 @@ export interface TaskImportManifest {
   readonly diagnostics: readonly TaskImportDiagnostic[];
   readonly writtenPaths: readonly string[];
   readonly evidencePath: string | null;
+}
+
+export interface TaskDeliverableGateReport {
+  readonly schemaId: 'atm.taskDeliverableGate.v1';
+  readonly generatedAt: string;
+  readonly taskId: string;
+  readonly required: boolean;
+  readonly ok: boolean;
+  readonly reason: string;
+  readonly changedFiles: readonly string[];
+  readonly deliverableFiles: readonly string[];
+  readonly declaredFiles: readonly string[];
+  readonly requiredCommand: string | null;
 }
 
 export interface TaskImportDiagnostic {
@@ -125,11 +141,11 @@ export interface TaskLegacyLedgerMigrationSkip {
 }
 
 const validStatuses = new Set<TaskImportStatus>(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
-const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria'];
-const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes'];
-const dependenciesHeaders = ['dependencies', 'depends on', 'blocked by'];
-const notesHeaders = ['notes', 'implementation notes', 'background'];
-const tagsHeaders = ['tags', 'labels'];
+const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria', '驗收', '驗收條件'];
+const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes', '交付物', '產物', '輸出'];
+const dependenciesHeaders = ['dependencies', 'depends on', 'blocked by', '依賴', '相依', '前置'];
+const notesHeaders = ['notes', 'implementation notes', 'background', '備註', '說明'];
+const tagsHeaders = ['tags', 'labels', '標籤'];
 const taskIdPattern = /^(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 
@@ -137,6 +153,9 @@ export async function runTasks(argv: string[]) {
   const action = (argv[0] ?? '').toLowerCase();
   if (action === 'close') {
     return await runTasksClose(argv.slice(1));
+  }
+  if (action === 'reset') {
+    return await runTasksReset(argv.slice(1));
   }
   if (action === 'block') {
     return await runTasksClose(['--status', 'blocked', ...argv.slice(1)]);
@@ -175,7 +194,7 @@ export async function runTasks(argv: string[]) {
     return await runTasksVerify(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | queue | lock | reserve | promote | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -210,8 +229,21 @@ async function runTasksImport(argv: string[]) {
       parsed.diagnostics.push({
         level: 'error',
         code: 'ATM_TASKS_PLAN_EMPTY',
-        text: 'No task cards were detected in the plan markdown. Each task must be introduced by a TASK-... heading or YAML front matter.'
+        text: 'No task cards were detected in the plan markdown. Each task must be introduced by a TASK-... heading, YAML front matter, a task table, or a labeled Chinese task block.'
       });
+      parsed.diagnostics.push({
+        level: 'info',
+        code: 'ATM_TASKS_PLAN_EXPECTED_PATTERNS',
+        text: 'Supported examples: ## SANGUO-BOOTSTRAP-0101 Title; TaskID: SANGUO-BOOTSTRAP-0101; table columns task/title/milestone/status/dependencies/deliverables.'
+      });
+      for (const heading of detectPlanHeadings(planText).slice(0, 8)) {
+        parsed.diagnostics.push({
+          level: 'info',
+          code: 'ATM_TASKS_PLAN_DETECTED_HEADING',
+          text: heading.text,
+          sourceLine: heading.line
+        });
+      }
     }
     throw new CliError('ATM_TASKS_PLAN_PARSE_FAILED', 'Task plan import failed before writing any tasks.', {
       exitCode: 1,
@@ -230,7 +262,9 @@ async function runTasksImport(argv: string[]) {
     const result = writeTaskFiles({
       cwd: options.cwd,
       tasks: parsed.tasks,
-      force: options.force
+      force: options.force,
+      resetOpen: options.resetOpen,
+      reopen: options.reopen
     });
     writtenPaths.push(...result.writtenPaths);
     parsed.diagnostics.push(...result.diagnostics);
@@ -675,6 +709,90 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
   });
 }
 
+async function runTasksReset(argv: string[]) {
+  const options = parseResetOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks reset requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const taskPath = taskPathFor(options.cwd, options.taskId);
+  if (!existsSync(taskPath)) {
+    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
+      exitCode: 2,
+      details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
+    });
+  }
+  const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+  const previousStatus = normalizeTaskStatus(taskDocument.status);
+  if (options.to !== 'open') {
+    throw new CliError('ATM_CLI_USAGE', 'tasks reset currently supports only --to open.', { exitCode: 2 });
+  }
+  if (previousStatus === 'done') {
+    throw new CliError('ATM_TASK_RESET_DONE_REQUIRES_REOPEN', `Task ${options.taskId} is done and cannot be reset to open without a reopen flow.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId, status: previousStatus }
+    });
+  }
+  if (!['reserved', 'ready', 'running', 'open'].includes(previousStatus)) {
+    throw new CliError('ATM_TASK_RESET_INVALID_STATE', `Task ${options.taskId} cannot reset from ${previousStatus} to open.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId, status: previousStatus, allowedFrom: ['reserved', 'ready', 'running', 'open'] }
+    });
+  }
+  const currentClaim = parseClaimRecord(taskDocument.claim);
+  if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId !== actorId) {
+    throw new CliError('ATM_TASK_CLAIM_OWNER_MISMATCH', `Task ${options.taskId} is claimed by ${currentClaim.actorId}, not ${actorId}.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId, currentActor: currentClaim.actorId, actorId }
+    });
+  }
+  if (currentClaim && currentClaim.actorId === actorId) {
+    const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+    await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+    taskDocument.claim = {
+      ...currentClaim,
+      heartbeatAt: new Date().toISOString(),
+      state: 'released',
+      reason: options.reason ?? 'reset'
+    };
+  }
+  taskDocument.status = 'open';
+  taskDocument.owner = actorId;
+  if (options.reason) taskDocument.resetReason = options.reason;
+  delete taskDocument.closedAt;
+  delete taskDocument.closedByActor;
+  delete taskDocument.closurePacket;
+  const transitionPath = writeTaskDocumentWithTransition({
+    cwd: options.cwd,
+    taskPath,
+    taskId: options.taskId,
+    taskDocument,
+    action: 'reset',
+    actorId,
+    previousStatus
+  });
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASKS_RESET', `Task ${options.taskId} reset to open.`, {
+      taskId: options.taskId,
+      actorId,
+      previousStatus,
+      status: 'open'
+    })],
+    evidence: {
+      action: 'reset',
+      taskId: options.taskId,
+      actorId,
+      previousStatus,
+      status: 'open',
+      transitionPath
+    }
+  });
+}
+
 async function runTasksClose(argv: string[]) {
   const options = parseCloseOptions(argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined);
@@ -768,6 +886,21 @@ async function runTasksClose(argv: string[]) {
         missing: evidenceGate.missing,
         evidenceCount: evidenceGate.total
       }
+    });
+  }
+
+  const deliverableGate = options.status === 'done'
+    ? evaluateTaskDeliverableGate({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      taskDocument,
+      taskDeclaredFiles
+    })
+    : null;
+  if (deliverableGate && !deliverableGate.ok) {
+    throw new CliError('ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', `Task ${options.taskId} cannot be closed as done without a real non-.atm deliverable diff.`, {
+      exitCode: 1,
+      details: deliverableGate as unknown as Record<string, unknown>
     });
   }
 
@@ -871,6 +1004,7 @@ async function runTasksClose(argv: string[]) {
       evidenceGate,
       closurePacketPath,
       transitionPath,
+      deliverableGate: deliverableGate as unknown as Record<string, unknown> | null,
       taskQueue
     }
   });
@@ -917,15 +1051,69 @@ async function runTasksLockCleanup(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks lock cleanup requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  if (options.allStale) {
+    const taskIds = listRuntimeLockTaskIds(options.cwd);
+    const cleaned: unknown[] = [];
+    const skipped: unknown[] = [];
+    for (const taskId of taskIds) {
+      try {
+        cleaned.push(await cleanupTaskLock({ cwd: options.cwd, taskId, actorId, reason: options.reason }));
+      } catch (error) {
+        if ((error as { code?: unknown }).code === 'ATM_TASK_LOCK_CLEANUP_NOT_ALLOWED') {
+          skipped.push({ taskId, reason: 'not-stale' });
+          continue;
+        }
+        throw error;
+      }
+    }
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASK_LOCK_CLEANUP_ALL_STALE_OK', `Cleaned ${cleaned.length} stale task lock(s).`, {
+        cleanedCount: cleaned.length,
+        skippedCount: skipped.length
+      })],
+      evidence: {
+        action: 'lock-cleanup',
+        allStale: true,
+        actorId,
+        cleaned,
+        skipped
+      }
+    });
+  }
+  const report = await cleanupTaskLock({ cwd: options.cwd, taskId: options.taskId, actorId, reason: options.reason });
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASK_LOCK_CLEANUP_OK', `Cleaned stale lock state for ${options.taskId}.`, {
+      taskId: options.taskId,
+      actorId,
+      staleReasons: report.staleReasons,
+      cleanupActions: report.cleanupActions
+    })],
+    evidence: report
+  });
+}
+
+async function cleanupTaskLock(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly reason: string | null;
+}) {
+  const { cwd, taskId, actorId } = input;
   const nowIso = new Date().toISOString();
-  const taskPath = taskPathFor(options.cwd, options.taskId);
+  const taskPath = taskPathFor(cwd, taskId);
   const taskDocument = existsSync(taskPath)
     ? JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
     : null;
   const currentStatus = normalizeTaskStatus(taskDocument?.status);
   const currentClaim = parseClaimRecord(taskDocument?.claim);
-  const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
-  const sidecarPath = path.join(options.cwd, '.atm', 'runtime', 'task-direction-locks', `${options.taskId}.json`);
+  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+  const sidecarPath = path.join(cwd, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
   const governanceLock = existsSync(lockPath)
     ? JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>
     : null;
@@ -942,22 +1130,22 @@ async function runTasksLockCleanup(argv: string[]) {
   if (governanceLock && !releasedLock && !currentClaim && existsSync(sidecarPath)) staleReasons.push('lock-without-claim');
 
   if (staleReasons.length === 0) {
-    throw new CliError('ATM_TASK_LOCK_CLEANUP_NOT_ALLOWED', `Task ${options.taskId} does not have a stale cleanup candidate.`, {
+    throw new CliError('ATM_TASK_LOCK_CLEANUP_NOT_ALLOWED', `Task ${taskId} does not have a stale cleanup candidate.`, {
       exitCode: 1,
       details: {
-        taskId: options.taskId,
-        lockPath: existsSync(lockPath) ? relativePathFrom(options.cwd, lockPath) : null,
-        sidecarPath: existsSync(sidecarPath) ? relativePathFrom(options.cwd, sidecarPath) : null,
+        taskId,
+        lockPath: existsSync(lockPath) ? relativePathFrom(cwd, lockPath) : null,
+        sidecarPath: existsSync(sidecarPath) ? relativePathFrom(cwd, sidecarPath) : null,
         status: currentStatus,
         claimState: currentClaim?.state ?? null
       }
     });
   }
 
-  const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+  const adapter = createLocalGovernanceAdapter({ repositoryRoot: cwd });
   const cleanupActions: string[] = [];
   if (governanceLock && !releasedLock) {
-    await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+    await resolveValue(adapter.stores.lockStore.releaseLock(taskId, actorId));
     cleanupActions.push('released-governance-lock');
   }
   if (existsSync(sidecarPath)) {
@@ -965,32 +1153,36 @@ async function runTasksLockCleanup(argv: string[]) {
     cleanupActions.push('removed-direction-sidecar');
   }
   const reportPath = writeLockCleanupReport({
-    cwd: options.cwd,
-    taskId: options.taskId,
+    cwd,
+    taskId,
     actorId,
     staleReasons,
     cleanupActions,
-    reason: options.reason
+    reason: input.reason
   });
-  return makeResult({
-    ok: true,
-    command: 'tasks',
-    cwd: options.cwd,
-    messages: [message('info', 'ATM_TASK_LOCK_CLEANUP_OK', `Cleaned stale lock state for ${options.taskId}.`, {
-      taskId: options.taskId,
-      actorId,
-      staleReasons,
-      cleanupActions
-    })],
-    evidence: {
-      action: 'lock-cleanup',
-      taskId: options.taskId,
-      actorId,
-      staleReasons,
-      cleanupActions,
-      reportPath
+  return {
+    action: 'lock-cleanup',
+    taskId,
+    actorId,
+    staleReasons,
+    cleanupActions,
+    reportPath
+  };
+}
+
+function listRuntimeLockTaskIds(cwd: string): readonly string[] {
+  const ids = new Set<string>();
+  for (const root of [
+    path.join(cwd, '.atm', 'runtime', 'locks'),
+    path.join(cwd, '.atm', 'runtime', 'task-direction-locks')
+  ]) {
+    if (!existsSync(root)) continue;
+    for (const entry of readdirSync(root)) {
+      if (entry.endsWith('.lock.json')) ids.add(entry.replace(/\.lock\.json$/, ''));
+      if (entry.endsWith('.json')) ids.add(entry.replace(/\.json$/, ''));
     }
-  });
+  }
+  return [...ids].sort((left, right) => left.localeCompare(right));
 }
 
 function runTasksQueue(argv: string[]) {
@@ -1227,10 +1419,46 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     });
   }
 
+  if (!currentClaim && action === 'release' && options.reservedOk && normalizeTaskStatus(taskDocument.status) === 'reserved') {
+    const previousStatus = String(taskDocument.status ?? '');
+    taskDocument.status = 'open';
+    taskDocument.owner = actorId;
+    if (options.reason) taskDocument.releaseReason = options.reason;
+    const transitionPath = writeTaskDocumentWithTransition({
+      cwd: options.cwd,
+      taskPath,
+      taskId: options.taskId,
+      taskDocument,
+      action,
+      actorId,
+      previousStatus
+    });
+    return makeResult({
+      ok: true,
+      command: 'tasks',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_TASKS_RESERVED_RELEASED', `Reserved task ${options.taskId} released back to open.`, {
+        taskId: options.taskId,
+        actorId
+      })],
+      evidence: {
+        action,
+        taskId: options.taskId,
+        actorId,
+        previousStatus,
+        status: 'open',
+        transitionPath
+      }
+    });
+  }
+
   if (!currentClaim) {
     throw new CliError('ATM_TASK_CLAIM_MISSING', `Task ${options.taskId} has no active claim record.`, {
       exitCode: 1,
-      details: { taskId: options.taskId }
+      details: {
+        taskId: options.taskId,
+        requiredCommand: `node atm.mjs tasks reset --task ${options.taskId} --actor ${actorId} --to open --reason "rollback cleanup" --json`
+      }
     });
   }
 
@@ -1661,6 +1889,54 @@ function parseCloseOptions(argv: string[]) {
   };
 }
 
+function parseResetOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    to: 'open',
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      options.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--to') {
+      options.to = requireValue(argv, index, '--to').trim().toLowerCase();
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') continue;
+    throw new CliError('ATM_CLI_USAGE', `tasks reset does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks reset requires --task <work-item-id>.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
+}
+
 function parseAuditOptions(argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -1734,7 +2010,8 @@ function parseLockCleanupOptions(argv: string[]) {
     cwd: process.cwd(),
     taskId: '',
     actorId: null as string | null,
-    reason: null as string | null
+    reason: null as string | null,
+    allStale: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -1758,12 +2035,16 @@ function parseLockCleanupOptions(argv: string[]) {
       index += 1;
       continue;
     }
+    if (arg === '--all-stale') {
+      options.allStale = true;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty') {
       continue;
     }
     throw new CliError('ATM_CLI_USAGE', `tasks lock cleanup does not support option ${arg}`, { exitCode: 2 });
   }
-  if (!options.taskId) {
+  if (!options.taskId && !options.allStale) {
     throw new CliError('ATM_CLI_USAGE', 'tasks lock cleanup requires --task <work-item-id>.', { exitCode: 2 });
   }
   return {
@@ -1828,7 +2109,8 @@ function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'han
     files: [] as string[],
     ttlSeconds: 1800,
     handoffTo: null as string | null,
-    reason: null as string | null
+    reason: null as string | null,
+    reservedOk: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -1872,6 +2154,10 @@ function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'han
       index += 1;
       continue;
     }
+    if (arg === '--reserved-ok') {
+      options.reservedOk = true;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty') {
       continue;
     }
@@ -1889,7 +2175,7 @@ function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'han
 
 function extractTaskDeclaredFiles(taskDocument: Record<string, unknown>) {
   const files = new Set<string>();
-  for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles']) {
+  for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles', 'deliverables', 'artifacts', 'outputs']) {
     collectTaskFileValues(taskDocument[key], files);
   }
   const source = taskDocument.source;
@@ -1899,6 +2185,112 @@ function extractTaskDeclaredFiles(taskDocument: Record<string, unknown>) {
     collectTaskFileValues(sourceRecord.planPath, files);
   }
   return [...files].sort((left, right) => left.localeCompare(right));
+}
+
+function evaluateTaskDeliverableGate(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly taskDocument: Record<string, unknown>;
+  readonly taskDeclaredFiles: readonly string[];
+}): TaskDeliverableGateReport {
+  const required = isDeliverableDiffRequired(input.taskDocument);
+  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const changedFileReport = listChangedFilesForDeliverableGate(input.cwd);
+  const changedFiles = (changedFileReport.gitAvailable
+    ? changedFileReport.files
+    : uniqueStrings([
+      ...changedFileReport.files,
+      ...declaredFiles.filter((filePath) => existsSync(path.resolve(input.cwd, filePath)))
+    ])
+  );
+  const deliverableFiles = changedFiles.filter((filePath) => isRealDeliverablePath(filePath));
+  const enforceDeclaredScope = declaredFiles.some((filePath) =>
+    !filePath.startsWith('.atm/') && filePath !== normalizeRelativePath((input.taskDocument.source as { planPath?: string } | undefined)?.planPath ?? '')
+  );
+  const scopedDeliverables = enforceDeclaredScope
+    ? deliverableFiles.filter((filePath) => declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
+    : deliverableFiles;
+  const ok = !required || scopedDeliverables.length > 0;
+  return {
+    schemaId: 'atm.taskDeliverableGate.v1',
+    generatedAt: new Date().toISOString(),
+    taskId: input.taskId,
+    required,
+    ok,
+    reason: required
+      ? ok
+        ? 'real-deliverable-diff-present'
+        : 'missing-real-deliverable-diff'
+      : 'task-does-not-require-real-deliverable-diff',
+    changedFiles,
+    deliverableFiles: scopedDeliverables,
+    declaredFiles,
+    requiredCommand: ok ? null : `node atm.mjs tasks close --task ${input.taskId} --actor <actor> --status review --reason "awaiting real deliverable diff" --json`
+  };
+}
+
+function isDeliverableDiffRequired(taskDocument: Record<string, unknown>): boolean {
+  const mode = String(taskDocument.deliverableMode ?? taskDocument.deliverable_mode ?? '').toLowerCase();
+  if (mode === 'ledger-only') return false;
+  const haystack = [
+    taskDocument.title,
+    taskDocument.type,
+    taskDocument.kind,
+    taskDocument.category,
+    ...(Array.isArray(taskDocument.tags) ? taskDocument.tags : []),
+    ...(Array.isArray(taskDocument.deliverables) ? taskDocument.deliverables : []),
+    ...(Array.isArray(taskDocument.acceptance) ? taskDocument.acceptance : [])
+  ].filter((entry): entry is string => typeof entry === 'string').join('\n').toLowerCase();
+  return /\b(code|pipeline|data|runner|script|report|artifact|manifest|bundle|adapter|checker|builder|job|jsonl|python|typescript|reviewer)\b/.test(haystack)
+    || /資料|管線|腳本|執行器|報告|產物|審核表|清單|候選|白名單|黑名單|人物|關係/.test(haystack);
+}
+
+function listChangedFilesForDeliverableGate(cwd: string): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
+  const files = new Set<string>();
+  let gitAvailable = false;
+  for (const args of [
+    ['-C', cwd, 'diff', '--name-only', '--cached'],
+    ['-C', cwd, 'diff', '--name-only'],
+    ['-C', cwd, 'ls-files', '-o', '--exclude-standard']
+  ]) {
+    try {
+      const output = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+      gitAvailable = true;
+      for (const line of output.split(/\r?\n/)) {
+        const normalized = normalizeRelativePath(line);
+        if (normalized) files.add(normalized);
+      }
+    } catch {
+      // Sandboxed or non-git hosts use a declared-file existence fallback.
+    }
+  }
+  return { files: [...files].sort((left, right) => left.localeCompare(right)), gitAvailable };
+}
+
+function isRealDeliverablePath(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  if (!normalized) return false;
+  if (normalized.startsWith('.atm/')) return false;
+  if (normalized.startsWith('.git/')) return false;
+  if (/^(node_modules|dist|build|coverage|release|scratch|temp|tmp|\.atm-temp)\//.test(normalized)) return false;
+  return isTaskDirectionPathCandidate(normalized);
+}
+
+function pathMatchesTaskScope(filePath: string, scope: string): boolean {
+  const file = normalizeRelativePath(filePath).toLowerCase();
+  const candidate = normalizeRelativePath(scope).toLowerCase();
+  if (!candidate) return false;
+  if (candidate.includes('*')) {
+    const escaped = candidate
+      .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+      .replace(/\*\*/g, '__ATM_DOUBLE_STAR__')
+      .replace(/\*/g, '[^/]*')
+      .replace(/__ATM_DOUBLE_STAR__/g, '.*');
+    return new RegExp(`^${escaped}$`).test(file);
+  }
+  if (file === candidate) return true;
+  if (candidate.endsWith('/')) return file.startsWith(candidate);
+  return file.startsWith(`${candidate}/`);
 }
 
 function collectTaskFileValues(value: unknown, files: Set<string>) {
@@ -2455,7 +2847,9 @@ function parseImportOptions(argv: string[]) {
     from: '',
     dryRun: false,
     write: false,
-    force: false
+    force: false,
+    resetOpen: false,
+    reopen: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -2479,6 +2873,14 @@ function parseImportOptions(argv: string[]) {
     }
     if (arg === '--force') {
       options.force = true;
+      continue;
+    }
+    if (arg === '--reset-open') {
+      options.resetOpen = true;
+      continue;
+    }
+    if (arg === '--reopen') {
+      options.reopen = true;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {
@@ -2570,6 +2972,11 @@ export function parsePlanMarkdown(input: {
     tasks.push(record.task);
     diagnostics.push(...record.diagnostics);
   }
+  for (const record of parseChineseLabeledTaskBlocks({ lines, planRelativePath, importedAt })) {
+    if (seenIds.has(record.workItemId)) continue;
+    seenIds.add(record.workItemId);
+    tasks.push(record);
+  }
   for (const [workItemId, metadata] of tableMetadata.entries()) {
     if (seenIds.has(workItemId)) continue;
     seenIds.add(workItemId);
@@ -2600,6 +3007,84 @@ interface TaskTableMetadata {
   readonly rowText: string;
 }
 
+function parseChineseLabeledTaskBlocks(input: {
+  readonly lines: readonly string[];
+  readonly planRelativePath: string;
+  readonly importedAt: string;
+}): readonly TaskImportRecord[] {
+  const records: TaskImportRecord[] = [];
+  for (let index = 0; index < input.lines.length; index += 1) {
+    const idMatch = /^\s*(?:[-*]\s*)?(?:任務\s*ID|任務ID|任務|Task\s*ID)\s*[：:]\s*(`?[^`\s]+`?)/i.exec(input.lines[index]);
+    if (!idMatch) continue;
+    const taskIdMatch = taskIdAnywherePattern.exec(idMatch[1]);
+    if (!taskIdMatch) continue;
+    const workItemId = normalizeTaskId(taskIdMatch[0]);
+    const bodyLines: string[] = [];
+    let cursor = index + 1;
+    while (cursor < input.lines.length) {
+      const line = input.lines[cursor];
+      if (/^\s*(?:[-*]\s*)?(?:任務\s*ID|任務ID|Task\s*ID)\s*[：:]/i.test(line)) break;
+      if (/^#{1,3}\s+/.test(line) && taskIdAnywherePattern.test(line)) break;
+      bodyLines.push(line);
+      cursor += 1;
+    }
+    const title = collectChineseLabeledValue(bodyLines, ['標題', '名稱', 'title']) ?? workItemId;
+    const milestone = collectChineseLabeledValue(bodyLines, ['里程碑', '階段', 'milestone']) ?? null;
+    const status = coerceStatus(collectChineseLabeledValue(bodyLines, ['狀態', 'status', 'state']) ?? 'open');
+    const dependencies = parseDependencyList(collectChineseLabeledValue(bodyLines, ['依賴', '相依', '前置', 'depends on']) ?? '', workItemId);
+    const acceptance = collectChineseLabeledList(bodyLines, ['驗收', '驗收條件', 'acceptance']);
+    const deliverables = collectChineseLabeledList(bodyLines, ['交付物', '產物', '輸出', 'deliverables']);
+    const notes = collectChineseLabeledValue(bodyLines, ['備註', '說明', 'notes']);
+    records.push({
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId,
+      title,
+      status,
+      milestone,
+      dependencies,
+      acceptance,
+      deliverables,
+      tags: [],
+      notes,
+      source: {
+        planPath: input.planRelativePath,
+        sectionTitle: title,
+        headingLine: index + 1,
+        hash: hashSection(`${workItemId}\n${bodyLines.join('\n')}`)
+      },
+      importedAt: input.importedAt
+    });
+    index = cursor - 1;
+  }
+  return records;
+}
+
+function collectChineseLabeledValue(lines: readonly string[], labels: readonly string[]): string | null {
+  const labelPattern = labels.map(escapeRegExp).join('|');
+  const regex = new RegExp(`^\\s*(?:[-*]\\s*)?(?:${labelPattern})\\s*[：:]\\s*(.+?)\\s*$`, 'i');
+  for (const line of lines) {
+    const match = regex.exec(line);
+    if (match?.[1]?.trim()) return match[1].trim();
+  }
+  return null;
+}
+
+function collectChineseLabeledList(lines: readonly string[], labels: readonly string[]): readonly string[] {
+  const first = collectChineseLabeledValue(lines, labels);
+  if (!first) return [];
+  return first
+    .split(/[、,，;]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function detectPlanHeadings(planText: string): readonly { readonly line: number; readonly text: string }[] {
+  return planText.split(/\r?\n/).flatMap((line, index) => {
+    const match = /^#{1,6}\s+(.+?)\s*$/.exec(line);
+    return match ? [{ line: index + 1, text: match[1] }] : [];
+  });
+}
+
 function parseTaskTableMetadata(lines: readonly string[]): Map<string, TaskTableMetadata> {
   const entries = new Map<string, TaskTableMetadata>();
   for (let index = 0; index < lines.length - 1; index += 1) {
@@ -2609,15 +3094,15 @@ function parseTaskTableMetadata(lines: readonly string[]): Map<string, TaskTable
       continue;
     }
     const headerCells = parseMarkdownTableCells(headerLine).map((cell) => normalizeTableHeader(cell));
-    const taskIdIndex = findTableColumnIndex(headerCells, ['task id', 'task', 'work item id', 'workitemid', 'id']);
+    const taskIdIndex = findTableColumnIndex(headerCells, ['task id', 'task', 'work item id', 'workitemid', 'id', '任務', '任務id', '任務 id']);
     if (taskIdIndex < 0) {
       continue;
     }
-    const titleIndex = findTableColumnIndex(headerCells, ['title', 'name']);
-    const milestoneIndex = findTableColumnIndex(headerCells, ['milestone', 'phase']);
-    const statusIndex = findTableColumnIndex(headerCells, ['status', 'state']);
-    const dependenciesIndex = findTableColumnIndex(headerCells, ['blocked by', 'depends on', 'dependencies']);
-    const deliverablesIndex = findTableColumnIndex(headerCells, ['deliverables', 'outputs', 'outcomes']);
+    const titleIndex = findTableColumnIndex(headerCells, ['title', 'name', '標題', '名稱']);
+    const milestoneIndex = findTableColumnIndex(headerCells, ['milestone', 'phase', '里程碑', '階段']);
+    const statusIndex = findTableColumnIndex(headerCells, ['status', 'state', '狀態']);
+    const dependenciesIndex = findTableColumnIndex(headerCells, ['blocked by', 'depends on', 'dependencies', '依賴', '相依', '前置']);
+    const deliverablesIndex = findTableColumnIndex(headerCells, ['deliverables', 'outputs', 'outcomes', '交付物', '產物', '輸出']);
 
     let rowIndex = index + 2;
     while (rowIndex < lines.length) {
@@ -2820,6 +3305,8 @@ function writeTaskFiles(input: {
   readonly cwd: string;
   readonly tasks: readonly TaskImportRecord[];
   readonly force: boolean;
+  readonly resetOpen: boolean;
+  readonly reopen: boolean;
 }): { writtenPaths: string[]; diagnostics: TaskImportDiagnostic[] } {
   const writtenPaths: string[] = [];
   const diagnostics: TaskImportDiagnostic[] = [];
@@ -2832,7 +3319,7 @@ function writeTaskFiles(input: {
       try {
         const current = JSON.parse(readFileSync(filePath, 'utf8')) as { hash?: string; source?: { hash?: string } };
         const currentHash = current.source?.hash ?? current.hash ?? '';
-        if (currentHash === task.source.hash) {
+        if (currentHash === task.source.hash && !input.resetOpen && !input.reopen) {
           diagnostics.push({
             level: 'info',
             code: 'ATM_TASKS_IMPORT_UNCHANGED',
@@ -2840,6 +3327,29 @@ function writeTaskFiles(input: {
             workItemId: task.workItemId
           });
           continue;
+        }
+        const currentStatus = normalizeTaskStatus((current as { status?: unknown }).status);
+        if (currentStatus === 'done' && !input.reopen && !input.resetOpen) {
+          diagnostics.push({
+            level: 'error',
+            code: 'ATM_TASKS_IMPORT_DONE_REQUIRES_REOPEN',
+            text: `Task ${task.workItemId} is done; use --reopen or --reset-open before overwriting it.`,
+            workItemId: task.workItemId
+          });
+          continue;
+        }
+        if (input.force) {
+          const currentSource = (current as { source?: { planPath?: string; hash?: string } }).source;
+          const sameSource = currentSource?.planPath === task.source.planPath || currentHash === task.source.hash;
+          if (!sameSource) {
+            diagnostics.push({
+              level: 'error',
+              code: 'ATM_TASKS_IMPORT_FORCE_SOURCE_MISMATCH',
+              text: `Task ${task.workItemId} exists from a different source; refusing --force overwrite.`,
+              workItemId: task.workItemId
+            });
+            continue;
+          }
         }
         diagnostics.push({
           level: 'error',
@@ -2867,7 +3377,18 @@ function writeTaskFiles(input: {
     if (existsSync(filePath) && !input.force) {
       continue;
     }
-    const taskDocument = { ...task } as Record<string, unknown>;
+    const taskDocument = {
+      ...task,
+      ...(input.resetOpen ? { status: 'open' as const } : {}),
+      ...(input.reopen ? { status: 'open' as const, reopenedAt: new Date().toISOString() } : {})
+    } as Record<string, unknown>;
+    if (input.resetOpen || input.reopen) {
+      delete taskDocument.claim;
+      delete taskDocument.closedAt;
+      delete taskDocument.closedByActor;
+      delete taskDocument.closurePacket;
+      delete taskDocument.closeReason;
+    }
     writeTaskDocumentWithTransition({
       cwd: input.cwd,
       taskPath: filePath,
@@ -3143,4 +3664,8 @@ function hashSection(content: string): string {
 
 function uniqueStrings(values: readonly string[]): readonly string[] {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

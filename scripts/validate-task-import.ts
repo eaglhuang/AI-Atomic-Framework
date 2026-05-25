@@ -42,8 +42,9 @@ async function main() {
   const singleCard = path.join(root, 'fixtures/task-plan-import/single-card.md');
   const duplicatePlan = path.join(root, 'fixtures/task-plan-import/duplicate-plan.md');
   const governanceTablePlan = path.join(root, 'fixtures/task-plan-import/governance-table-plan.md');
+  const chineseBootstrapPlan = path.join(root, 'fixtures/task-plan-import/chinese-bootstrap-plan.md');
 
-  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan, governanceTablePlan]) {
+  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan, governanceTablePlan, chineseBootstrapPlan]) {
     if (!existsSync(fixturePath)) {
       fail(`missing fixture: ${path.relative(root, fixturePath)}`);
       return;
@@ -92,6 +93,18 @@ async function main() {
     fail(`governance-table plan should preserve done status for ATM-GOV-0111: ${JSON.stringify(gov0111)}.`);
   }
 
+  const chineseResult = await expectOk('import', ['--from', chineseBootstrapPlan, '--dry-run', '--cwd', root]);
+  const chineseTasks = (chineseResult.evidence as {
+    manifest: { tasks: ReadonlyArray<{ workItemId: string; title: string; dependencies: readonly string[]; deliverables: readonly string[] }> };
+  }).manifest.tasks;
+  if (chineseTasks.length !== 2 || !chineseTasks.some((task) => task.workItemId === 'SANGUO-BOOTSTRAP-0001')) {
+    fail(`Chinese bootstrap plan expected 2 SANGUO tasks, got ${JSON.stringify(chineseTasks)}.`);
+  }
+  const chinese0101 = chineseTasks.find((task) => task.workItemId === 'SANGUO-BOOTSTRAP-0101');
+  if (!chinese0101 || chinese0101.dependencies.join(',') !== 'SANGUO-BOOTSTRAP-0001' || !chinese0101.deliverables.includes('wave-001 job builder runner')) {
+    fail(`Chinese bootstrap plan parsed 0101 incorrectly: ${JSON.stringify(chinese0101)}.`);
+  }
+
   // Single-card import via YAML front matter should yield one task.
   const singleResult = await expectOk('import', ['--from', singleCard, '--dry-run', '--cwd', root]);
   const singleManifest = (singleResult.evidence as { manifest: { tasks: ReadonlyArray<{ workItemId: string; dependencies: readonly string[] }> } }).manifest;
@@ -133,14 +146,14 @@ async function main() {
     if (!verifyReport.ok || verifyReport.inspectedTasks !== 2) {
       fail(`verify expected ok=true with 2 tasks, got ${JSON.stringify(verifyReport)}.`);
     }
-    const nextResult = await runNext(['--cwd', tempWorkspace]);
+    const nextResult = await runNext(['--cwd', tempWorkspace, '--prompt', 'SANGUO-AUTO-0001']);
     const nextQueue = (nextResult.evidence as { importedTaskQueue?: { openTaskCount: number; selectedTask?: { workItemId: string } | null } }).importedTaskQueue;
     if (!nextQueue || nextQueue.openTaskCount !== 2 || nextQueue.selectedTask?.workItemId !== 'SANGUO-AUTO-0001') {
-      fail(`next must surface imported open tasks without runtime edits, got ${JSON.stringify(nextQueue)}.`);
+      fail(`next --prompt must surface the matching imported task without global fallback, got ${JSON.stringify(nextQueue)}.`);
     }
-    const nextClaimResult = await runNext(['--cwd', tempWorkspace, '--claim', '--actor', 'fixture-agent']);
-    if (nextClaimResult.ok !== false || nextClaimResult.messages?.[0]?.code !== 'ATM_NEXT_CLAIM_NO_TASK') {
-      fail(`next --claim must refuse imported open/planned tasks until one is ready, got ${JSON.stringify(nextClaimResult)}.`);
+    const nextClaimResult = await runNext(['--cwd', tempWorkspace, '--claim', '--actor', 'fixture-agent', '--prompt', 'SANGUO-AUTO-0001']);
+    if (nextClaimResult.ok !== true || nextClaimResult.messages?.[0]?.code !== 'ATM_NEXT_CLAIMED') {
+      fail(`next --claim must prepare and claim the prompt-scoped imported task, got ${JSON.stringify(nextClaimResult)}.`);
     }
 
     // Re-importing without --force is idempotent (no errors emitted).
@@ -148,6 +161,12 @@ async function main() {
     const secondManifest = (secondImport.evidence as { manifest: { diagnostics: ReadonlyArray<{ code: string }> } }).manifest;
     if (!secondManifest.diagnostics.some((entry) => entry.code === 'ATM_TASKS_IMPORT_UNCHANGED')) {
       fail('rerunning import without source changes should emit ATM_TASKS_IMPORT_UNCHANGED diagnostics.');
+    }
+
+    const resetImport = await expectOk('import', ['--from', npcPlan, '--write', '--force', '--reset-open', '--cwd', tempWorkspace]);
+    const resetWritten = (resetImport.evidence as { writtenPaths: readonly string[] }).writtenPaths;
+    if (resetWritten.length !== 2) {
+      fail(`--reset-open import expected to rewrite 2 task files, got ${resetWritten.length}.`);
     }
 
     // Sanity check that the verify report flags missing dependencies for tasks that point at unknown ids.

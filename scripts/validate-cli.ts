@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
+import { runCli } from '../packages/cli/src/atm.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -36,12 +37,15 @@ function readJson(relativePath: any) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
-function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
+async function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
   const result = spawnSync(process.execPath, [path.join(root, fixture.entrypoint), ...args], {
     cwd,
     encoding: 'utf8',
     env: { ...process.env, ...env }
   });
+  if ((result.error as NodeJS.ErrnoException | undefined)?.code === 'EPERM') {
+    return runAtmInProcess(args, cwd, env);
+  }
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed;
   try {
@@ -56,6 +60,46 @@ function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
     stderr: result.stderr,
     parsed
   };
+}
+
+async function runAtmInProcess(args: any, cwd = root, env: Record<string, string> = {}) {
+  const previousCwd = process.cwd();
+  const previousEnv = new Map(Object.keys(env).map((key) => [key, process.env[key]]));
+  let stdout = '';
+  let stderr = '';
+  try {
+    process.chdir(cwd);
+    for (const [key, value] of Object.entries(env)) {
+      process.env[key] = value;
+    }
+    const exitCode = await runCli(args, {
+      stdout: { write(chunk: unknown) { stdout += String(chunk); return true; } } as any,
+      stderr: { write(chunk: unknown) { stderr += String(chunk); return true; } } as any
+    });
+    const payload = (stdout || stderr || '').trim();
+    let parsed;
+    try {
+      parsed = JSON.parse(payload);
+    } catch (error: any) {
+      fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
+      parsed = {};
+    }
+    return {
+      exitCode,
+      stdout,
+      stderr,
+      parsed
+    };
+  } finally {
+    process.chdir(previousCwd);
+    for (const [key, value] of previousEnv) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
 }
 
 function writeJson(filePath: any, value: any) {
@@ -101,7 +145,7 @@ for (const commandName of fixture.commands) {
 }
 
 const packageManifest = readJson('package.json');
-const version = runAtm(['--version'], root);
+const version = await runAtm(['--version'], root);
 assert(version.exitCode === 0, '--version must exit 0');
 assertReadable(version, '--version');
 assert(version.parsed.ok === true, '--version must report ok=true');
@@ -109,7 +153,7 @@ assert(version.parsed.command === 'version', '--version must report version comm
 assert(version.parsed.evidence?.frameworkVersion === packageManifest.version, '--version must report package.json version');
 assertMessageCode(version, 'ATM_CLI_VERSION');
 
-const globalHelp = runAtm(['--help'], root);
+const globalHelp = await runAtm(['--help'], root);
 assert(globalHelp.exitCode === 0, '--help must exit 0');
 assertReadable(globalHelp, '--help');
 assert(globalHelp.parsed.ok === true, '--help must report ok=true');
@@ -120,7 +164,7 @@ const listedCommands = (Array.isArray(globalHelp.parsed.evidence?.commands) ? gl
 assert(JSON.stringify(listedCommands) === JSON.stringify([...helpCommandSnapshot.commands].sort((left, right) => left.localeCompare(right))), '--help command list must match snapshot fixture');
 
 for (const commandName of helpCommandSnapshot.commands) {
-  const commandHelp = runAtm([commandName, '--help'], root);
+  const commandHelp = await runAtm([commandName, '--help'], root);
   assert(commandHelp.exitCode === 0, `${commandName} --help must exit 0`);
   assertReadable(commandHelp, `${commandName} --help`);
   assert(commandHelp.parsed.ok === true, `${commandName} --help must report ok=true`);
@@ -147,14 +191,14 @@ try {
     const date = new Date(timestamp);
     utimesSync(entryRoot, date, date);
   }
-  const cacheDryRun = runAtm(['cache', 'prune', '--runtime', 'onefile', '--keep', '1', '--dry-run', '--json'], root, {
+  const cacheDryRun = await runAtm(['cache', 'prune', '--runtime', 'onefile', '--keep', '1', '--dry-run', '--json'], root, {
     ATM_ONEFILE_CACHE_ROOT: onefileCacheRoot
   });
   assert(cacheDryRun.exitCode === 0, 'cache prune dry-run must exit 0');
   assertReadable(cacheDryRun, 'cache');
   assert(cacheDryRun.parsed.evidence.result.prunedCount === 2, 'cache prune dry-run must report two prune candidates');
   assert(existsSync(path.join(onefileCacheRoot, 'old-a')), 'cache prune dry-run must not delete old-a');
-  const cachePrune = runAtm(['cache', 'prune', '--runtime', 'onefile', '--keep', '1', '--json'], root, {
+  const cachePrune = await runAtm(['cache', 'prune', '--runtime', 'onefile', '--keep', '1', '--json'], root, {
     ATM_ONEFILE_CACHE_ROOT: onefileCacheRoot
   });
   assert(cachePrune.exitCode === 0, 'cache prune must exit 0');
@@ -167,13 +211,13 @@ try {
   const blankRepo = path.join(tempRoot, 'blank-repo');
   mkdirSync(blankRepo, { recursive: true });
 
-  const missingStatus = runAtm(['status'], blankRepo);
+  const missingStatus = await runAtm(['status'], blankRepo);
   assert(missingStatus.exitCode === 1, 'status before init must exit 1');
   assertReadable(missingStatus, 'status');
   assert(missingStatus.parsed.ok === false, 'status before init must report ok=false');
   assertMessageCode(missingStatus, 'ATM_CONFIG_MISSING');
 
-  const init = runAtm(['init'], blankRepo);
+  const init = await runAtm(['init'], blankRepo);
   assert(init.exitCode === 0, 'init must exit 0 in blank repo');
   assertReadable(init, 'init');
   assert(init.parsed.ok === true, 'init must report ok=true');
@@ -181,7 +225,7 @@ try {
   assert(init.parsed.evidence.adapterImplemented === false, 'init must not require adapter implementation');
   assert(existsSync(path.join(blankRepo, fixture.configPath)), 'init must create config file');
 
-  const createDryRun = runAtm(['create', '--cwd', blankRepo, '--bucket', 'fixture', '--title', 'CliCreateDryRun', '--description', 'CLI create dry-run fixture.', '--dry-run'], blankRepo);
+  const createDryRun = await runAtm(['create', '--cwd', blankRepo, '--bucket', 'fixture', '--title', 'CliCreateDryRun', '--description', 'CLI create dry-run fixture.', '--dry-run'], blankRepo);
   assert(createDryRun.exitCode === 0, 'create --dry-run must exit 0 in blank repo');
   assertReadable(createDryRun, 'create');
   assert(createDryRun.parsed.ok === true, 'create --dry-run must report ok=true');
@@ -189,7 +233,7 @@ try {
   assert(createDryRun.parsed.evidence.atomId === 'ATM-FIXTURE-0001', 'create --dry-run must allocate ATM-FIXTURE-0001 from blank repo');
   assertMessageCode(createDryRun, 'ATM_CREATE_DRY_RUN_OK');
 
-  const initDryRun = runAtm(['init', '--adopt', '--dry-run'], blankRepo);
+  const initDryRun = await runAtm(['init', '--adopt', '--dry-run'], blankRepo);
   assert(initDryRun.exitCode === 0, 'init --adopt --dry-run must exit 0');
   assertReadable(initDryRun, 'init');
   assert(initDryRun.parsed.ok === true, 'init --adopt --dry-run must report ok=true');
@@ -199,10 +243,10 @@ try {
   const atmChartRepo = path.join(tempRoot, 'atm-chart-repo');
   mkdirSync(atmChartRepo, { recursive: true });
   initializeGitRepository(atmChartRepo);
-  const atmChartBootstrap = runAtm(['bootstrap', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartBootstrap = await runAtm(['bootstrap', '--cwd', atmChartRepo], atmChartRepo);
   assert(atmChartBootstrap.exitCode === 0, 'bootstrap must exit 0 before ATMChart render');
 
-  const atmChartRender = runAtm(['atm-chart', 'render', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartRender = await runAtm(['atm-chart', 'render', '--cwd', atmChartRepo], atmChartRepo);
   assert(atmChartRender.exitCode === 0, 'atm-chart render must exit 0 after bootstrap');
   assertReadable(atmChartRender, 'atm-chart');
   assert(atmChartRender.parsed.ok === true, 'atm-chart render must report ok=true');
@@ -210,25 +254,25 @@ try {
   assert(existsSync(path.join(atmChartRepo, '.atm/memory/atm-chart.md')), 'atm-chart render must write .atm/memory/atm-chart.md');
   assertMessageCode(atmChartRender, 'ATM_CHART_RENDERED');
 
-  const atmChartVerify = runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartVerify = await runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
   assert(atmChartVerify.exitCode === 0, 'atm-chart verify must exit 0 immediately after render');
   assertReadable(atmChartVerify, 'atm-chart');
   assert(atmChartVerify.parsed.ok === true, 'atm-chart verify must report ok=true when fresh');
   assertMessageCode(atmChartVerify, 'ATM_CHART_VERIFY_OK');
 
-  const atmChartVersionVerify = runAtm(['atm-chart', 'verify', '--version-check', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartVersionVerify = await runAtm(['atm-chart', 'verify', '--version-check', '--cwd', atmChartRepo], atmChartRepo);
   assert(atmChartVersionVerify.exitCode === 0, 'atm-chart verify --version-check must exit 0 for default rendered chart');
   assertReadable(atmChartVersionVerify, 'atm-chart');
   assert(atmChartVersionVerify.parsed.evidence.versionCompatibility.status === 'supported', 'atm-chart verify --version-check must report supported status');
   assertMessageCode(atmChartVersionVerify, 'ATM_CHART_VERSION_CHECK_OK');
 
-  const agentPackList = runAtm(['agent-pack', 'list', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackList = await runAtm(['agent-pack', 'list', '--cwd', atmChartRepo], atmChartRepo);
   assert(agentPackList.exitCode === 0, 'agent-pack list must exit 0');
   assertReadable(agentPackList, 'agent-pack');
   assert(agentPackList.parsed.ok === true, 'agent-pack list must report ok=true');
   assert(Array.isArray(agentPackList.parsed.evidence.installedPacks), 'agent-pack list must report installedPacks array');
 
-  const agentPackInstall = runAtm(['agent-pack', 'install', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackInstall = await runAtm(['agent-pack', 'install', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
   assert(agentPackInstall.exitCode === 0, 'agent-pack install --id must exit 0 after bootstrap');
   assertReadable(agentPackInstall, 'agent-pack');
   assert(agentPackInstall.parsed.ok === true, 'agent-pack install --id must report ok=true');
@@ -236,13 +280,13 @@ try {
   assert(existsSync(path.join(atmChartRepo, '.atm/agent-pack/claude-code.manifest.json')), 'agent-pack install must write the pack manifest');
   assertMessageCode(agentPackInstall, 'ATM_AGENT_PACK_INSTALL');
 
-  const agentPackVerifyFresh = runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackVerifyFresh = await runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
   assert(agentPackVerifyFresh.exitCode === 0, 'agent-pack verify-fresh must exit 0 immediately after install');
   assertReadable(agentPackVerifyFresh, 'agent-pack');
   assert(agentPackVerifyFresh.parsed.ok === true, 'agent-pack verify-fresh must report ok=true when fresh');
   assertMessageCode(agentPackVerifyFresh, 'ATM_AGENT_PACK_VERIFY_FRESH_OK');
 
-  const welcomeDryRun = runAtm(['welcome', '--cwd', atmChartRepo, '--dry-run'], atmChartRepo);
+  const welcomeDryRun = await runAtm(['welcome', '--cwd', atmChartRepo, '--dry-run'], atmChartRepo);
   assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must exit 0 after ATMChart render');
   assertReadable(welcomeDryRun, 'welcome');
   assert(welcomeDryRun.parsed.ok === true, 'welcome --dry-run must report ok=true');
@@ -256,7 +300,7 @@ try {
   assertMessageCode(welcomeDryRun, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
   assert(welcomeDryRun.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'welcome --dry-run must recommend editor integration install when none are present');
 
-  const welcome = runAtm(['welcome', '--cwd', atmChartRepo], atmChartRepo);
+  const welcome = await runAtm(['welcome', '--cwd', atmChartRepo], atmChartRepo);
   assert(welcome.exitCode === 0, 'welcome must exit 0 after ATMChart render');
   assertReadable(welcome, 'welcome');
   assert(welcome.parsed.ok === true, 'welcome must report ok=true');
@@ -267,7 +311,7 @@ try {
   assertMessageCode(welcome, 'ATM_WELCOME_READY');
   assertMessageCode(welcome, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
 
-  const nextAfterWelcome = runAtm(['next', '--cwd', atmChartRepo], atmChartRepo);
+  const nextAfterWelcome = await runAtm(['next', '--cwd', atmChartRepo], atmChartRepo);
   assertReadable(nextAfterWelcome, 'next');
   assert(nextAfterWelcome.parsed.evidence.agent_pack_hint != null, 'next must surface agent_pack_hint');
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.slashCommandId === 'string', 'agent_pack_hint must have slashCommandId');
@@ -275,7 +319,7 @@ try {
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.command === 'string', 'agent_pack_hint must have command');
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.reason === 'string', 'agent_pack_hint must have reason');
 
-  const welcomeDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  const welcomeDoctor = await runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
   assertReadable(welcomeDoctor, 'doctor');
   const onboardingCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
   const versionCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'version-compatibility');
@@ -288,7 +332,7 @@ try {
   assert(welcomeDoctor.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'doctor must recommend editor integration install when none are present');
 
   writeHostPackageLockSignals(atmChartRepo);
-  const packageLockHostDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  const packageLockHostDoctor = await runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
   assert(packageLockHostDoctor.exitCode === 0, 'doctor must stay green for host repos that happen to use package-lock');
   assertReadable(packageLockHostDoctor, 'doctor');
   assert(packageLockHostDoctor.parsed.ok === true, 'doctor must report ok=true for package-lock host repos');
@@ -303,17 +347,17 @@ try {
   guards.guards[0].summary = `${guards.guards[0].summary} (drift)`;
   writeFileSync(guardsPath, `${JSON.stringify(guards, null, 2)}\n`, 'utf8');
 
-  const atmChartStale = runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartStale = await runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
   assert(atmChartStale.exitCode === 2, 'atm-chart verify must exit 2 when source guards drift');
   assert(atmChartStale.parsed.ok === false, 'atm-chart verify must report ok=false when stale');
   assertMessageCode(atmChartStale, 'ATM_CHART_STALE');
 
-  const agentPackStale = runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackStale = await runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
   assert(agentPackStale.exitCode === 2, 'agent-pack verify-fresh must exit 2 when source guards drift');
   assert(agentPackStale.parsed.ok === false, 'agent-pack verify-fresh must report ok=false when stale');
   assertMessageCode(agentPackStale, 'ATM_AGENT_PACK_STALE');
 
-  const staleDoctor = runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  const staleDoctor = await runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
   assert(staleDoctor.exitCode === 1, 'doctor must fail when onboarding ATMChart is stale');
   assertReadable(staleDoctor, 'doctor');
   const staleOnboardingCheck = staleDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
@@ -321,13 +365,13 @@ try {
   assert(staleOnboardingCheck.details.atmChartFreshness === 'stale', 'doctor onboarding-lifecycle check must report stale ATMChart');
   assertMessageCode(staleDoctor, 'ATM_DOCTOR_ONBOARDING_STALE');
 
-  const status = runAtm(['status'], blankRepo);
+  const status = await runAtm(['status'], blankRepo);
   assert(status.exitCode === 0, 'status after init must exit 0');
   assertReadable(status, 'status');
   assert(status.parsed.ok === true, 'status after init must report ok=true');
   assert(status.parsed.evidence.standaloneMode === true, 'status must report standaloneMode=true');
 
-  const validateRepo = runAtm(['validate'], blankRepo);
+  const validateRepo = await runAtm(['validate'], blankRepo);
   assert(validateRepo.exitCode === 0, 'validate after init must exit 0');
   assertReadable(validateRepo, 'validate');
   assert(validateRepo.parsed.ok === true, 'validate after init must report ok=true');
@@ -335,7 +379,7 @@ try {
 
   const integrationRepo = path.join(tempRoot, 'integration-repo');
   mkdirSync(integrationRepo, { recursive: true });
-  const integrationList = runAtm(['integration', 'list', '--cwd', integrationRepo], integrationRepo);
+  const integrationList = await runAtm(['integration', 'list', '--cwd', integrationRepo], integrationRepo);
   assert(integrationList.exitCode === 0, 'integration list must exit 0');
   assertReadable(integrationList, 'integration');
   assert(integrationList.parsed.ok === true, 'integration list must report ok=true');
@@ -347,7 +391,7 @@ try {
   assert(integrationList.parsed.evidence.available.includes('antigravity'), 'integration list must include antigravity');
   assertMessageCode(integrationList, 'ATM_INTEGRATION_LIST_OK');
 
-  const integrationAdd = runAtm(['integration', 'add', 'claude-code', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
+  const integrationAdd = await runAtm(['integration', 'add', 'claude-code', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
   assert(integrationAdd.exitCode === 0, 'integration add claude-code must exit 0');
   assertReadable(integrationAdd, 'integration');
   assert(integrationAdd.parsed.ok === true, 'integration add claude-code must report ok=true');
@@ -356,14 +400,14 @@ try {
   assert(existsSync(path.join(integrationRepo, '.claude/skills/atm-next/SKILL.md')), 'integration add must write agent-native entry files');
   assertMessageCode(integrationAdd, 'ATM_INTEGRATION_ADDED');
 
-  const integrationVerify = runAtm(['integration', 'verify', 'claude-code', '--cwd', integrationRepo], integrationRepo);
+  const integrationVerify = await runAtm(['integration', 'verify', 'claude-code', '--cwd', integrationRepo], integrationRepo);
   assert(integrationVerify.exitCode === 0, 'integration verify claude-code must exit 0 after install');
   assertReadable(integrationVerify, 'integration');
   assert(integrationVerify.parsed.ok === true, 'integration verify claude-code must report ok=true');
   assert(integrationVerify.parsed.evidence.driftedFiles.length === 0, 'integration verify must report no drift after install');
   assertMessageCode(integrationVerify, 'ATM_INTEGRATION_VERIFY_OK');
 
-  const integrationRemove = runAtm(['integration', 'remove', 'claude-code', '--cwd', integrationRepo], integrationRepo);
+  const integrationRemove = await runAtm(['integration', 'remove', 'claude-code', '--cwd', integrationRepo], integrationRepo);
   assert(integrationRemove.exitCode === 0, 'integration remove claude-code must exit 0');
   assertReadable(integrationRemove, 'integration');
   assert(integrationRemove.parsed.ok === true, 'integration remove claude-code must report ok=true');
@@ -371,7 +415,7 @@ try {
   assert(!existsSync(path.join(integrationRepo, '.claude/skills/atm-next/SKILL.md')), 'integration remove must remove unchanged entry file');
   assertMessageCode(integrationRemove, 'ATM_INTEGRATION_REMOVED');
 
-  const codexIntegrationAdd = runAtm(['integration', 'add', 'codex', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
+  const codexIntegrationAdd = await runAtm(['integration', 'add', 'codex', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
   assert(codexIntegrationAdd.exitCode === 0, 'integration add codex must exit 0');
   assertReadable(codexIntegrationAdd, 'integration');
   assert(codexIntegrationAdd.parsed.ok === true, 'integration add codex must report ok=true');
@@ -380,14 +424,14 @@ try {
   assert(existsSync(path.join(integrationRepo, 'integrations/codex-skills/atm-next/SKILL.md')), 'codex integration add must write Codex skill files');
   assertMessageCode(codexIntegrationAdd, 'ATM_INTEGRATION_ADDED');
 
-  const codexIntegrationVerify = runAtm(['integration', 'verify', 'codex', '--cwd', integrationRepo], integrationRepo);
+  const codexIntegrationVerify = await runAtm(['integration', 'verify', 'codex', '--cwd', integrationRepo], integrationRepo);
   assert(codexIntegrationVerify.exitCode === 0, 'integration verify codex must exit 0 after install');
   assertReadable(codexIntegrationVerify, 'integration');
   assert(codexIntegrationVerify.parsed.ok === true, 'integration verify codex must report ok=true');
   assert(codexIntegrationVerify.parsed.evidence.driftedFiles.length === 0, 'codex integration verify must report no drift after install');
   assertMessageCode(codexIntegrationVerify, 'ATM_INTEGRATION_VERIFY_OK');
 
-  const codexIntegrationRemove = runAtm(['integration', 'remove', 'codex', '--cwd', integrationRepo], integrationRepo);
+  const codexIntegrationRemove = await runAtm(['integration', 'remove', 'codex', '--cwd', integrationRepo], integrationRepo);
   assert(codexIntegrationRemove.exitCode === 0, 'integration remove codex must exit 0');
   assertReadable(codexIntegrationRemove, 'integration');
   assert(codexIntegrationRemove.parsed.ok === true, 'integration remove codex must report ok=true');
@@ -395,7 +439,7 @@ try {
   assert(!existsSync(path.join(integrationRepo, 'integrations/codex-skills/atm-next/SKILL.md')), 'codex integration remove must remove unchanged entry file');
   assertMessageCode(codexIntegrationRemove, 'ATM_INTEGRATION_REMOVED');
 
-  const antigravityIntegrationAdd = runAtm(['integration', 'add', 'antigravity', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
+  const antigravityIntegrationAdd = await runAtm(['integration', 'add', 'antigravity', '--cwd', integrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], integrationRepo);
   assert(antigravityIntegrationAdd.exitCode === 0, 'integration add antigravity must exit 0');
   assertReadable(antigravityIntegrationAdd, 'integration');
   assert(antigravityIntegrationAdd.parsed.ok === true, 'integration add antigravity must report ok=true');
@@ -405,14 +449,14 @@ try {
   assert(existsSync(path.join(integrationRepo, '.agents/skills/atm-next/SKILL.md')), 'antigravity integration add must write .agents skill files');
   assertMessageCode(antigravityIntegrationAdd, 'ATM_INTEGRATION_ADDED');
 
-  const antigravityIntegrationVerify = runAtm(['integration', 'verify', 'antigravity', '--cwd', integrationRepo], integrationRepo);
+  const antigravityIntegrationVerify = await runAtm(['integration', 'verify', 'antigravity', '--cwd', integrationRepo], integrationRepo);
   assert(antigravityIntegrationVerify.exitCode === 0, 'integration verify antigravity must exit 0 after install');
   assertReadable(antigravityIntegrationVerify, 'integration');
   assert(antigravityIntegrationVerify.parsed.ok === true, 'integration verify antigravity must report ok=true');
   assert(antigravityIntegrationVerify.parsed.evidence.driftedFiles.length === 0, 'antigravity integration verify must report no drift after install');
   assertMessageCode(antigravityIntegrationVerify, 'ATM_INTEGRATION_VERIFY_OK');
 
-  const antigravityIntegrationRemove = runAtm(['integration', 'remove', 'antigravity', '--cwd', integrationRepo], integrationRepo);
+  const antigravityIntegrationRemove = await runAtm(['integration', 'remove', 'antigravity', '--cwd', integrationRepo], integrationRepo);
   assert(antigravityIntegrationRemove.exitCode === 0, 'integration remove antigravity must exit 0');
   assertReadable(antigravityIntegrationRemove, 'integration');
   assert(antigravityIntegrationRemove.parsed.ok === true, 'integration remove antigravity must report ok=true');
@@ -423,7 +467,7 @@ try {
 
   const initIntegrationRepo = path.join(tempRoot, 'init-integration-repo');
   mkdirSync(initIntegrationRepo, { recursive: true });
-  const initWithIntegration = runAtm(['init', '--cwd', initIntegrationRepo, '--integration', 'cursor'], initIntegrationRepo);
+  const initWithIntegration = await runAtm(['init', '--cwd', initIntegrationRepo, '--integration', 'cursor'], initIntegrationRepo);
   assert(initWithIntegration.exitCode === 0, 'init --integration cursor must exit 0');
   assertReadable(initWithIntegration, 'init');
   assert(initWithIntegration.parsed.ok === true, 'init --integration cursor must report ok=true');
@@ -432,7 +476,7 @@ try {
   assert(existsSync(path.join(initIntegrationRepo, '.cursor/rules/skills/atm-next/SKILL.md')), 'init --integration must write adapter files');
   assertMessageCode(initWithIntegration, 'ATM_INIT_INTEGRATION_ADDED');
 
-  const initIntegrationDoctor = runAtm(['doctor', '--cwd', initIntegrationRepo], initIntegrationRepo);
+  const initIntegrationDoctor = await runAtm(['doctor', '--cwd', initIntegrationRepo], initIntegrationRepo);
   assertReadable(initIntegrationDoctor, 'doctor');
   const integrationDoctorCheck = initIntegrationDoctor.parsed.evidence.checks.find((check: any) => check.name === 'integration-adapters');
   assert(integrationDoctorCheck.ok === true, 'doctor integration-adapters check must pass after init --integration');
@@ -440,7 +484,7 @@ try {
 
   const cursorSkillPath = path.join(initIntegrationRepo, '.cursor/rules/skills/atm-next/SKILL.md');
   writeFileSync(cursorSkillPath, `${readFileSync(cursorSkillPath, 'utf8')}\n# drift\n`, 'utf8');
-  const initIntegrationDoctorDrift = runAtm(['doctor', '--cwd', initIntegrationRepo], initIntegrationRepo);
+  const initIntegrationDoctorDrift = await runAtm(['doctor', '--cwd', initIntegrationRepo], initIntegrationRepo);
   assert(initIntegrationDoctorDrift.exitCode === 1, 'doctor must fail after adapter file drift');
   assertReadable(initIntegrationDoctorDrift, 'doctor');
   const integrationDriftCheck = initIntegrationDoctorDrift.parsed.evidence.checks.find((check: any) => check.name === 'integration-adapters');
@@ -448,13 +492,13 @@ try {
   assert(integrationDriftCheck.details.failed[0].driftedFiles.includes('.cursor/rules/skills/atm-next/SKILL.md'), 'doctor integration-adapters check must report drifted file');
 
   const validSpecPath = path.join(root, fixture.validAtomicSpec);
-  const validateSpec = runAtm(['validate', '--spec', validSpecPath], blankRepo);
+  const validateSpec = await runAtm(['validate', '--spec', validSpecPath], blankRepo);
   assert(validateSpec.exitCode === 0, 'validate --spec valid fixture must exit 0');
   assertReadable(validateSpec, 'validate');
   assert(validateSpec.parsed.ok === true, 'validate --spec valid fixture must report ok=true');
   assertMessageCode(validateSpec, 'ATM_VALIDATE_SPEC_OK');
 
-  const specValidate = runAtm(['spec', '--validate', validSpecPath], blankRepo);
+  const specValidate = await runAtm(['spec', '--validate', validSpecPath], blankRepo);
   assert(specValidate.exitCode === 0, 'spec --validate valid fixture must exit 0');
   assertReadable(specValidate, 'spec');
   assert(specValidate.parsed.ok === true, 'spec --validate valid fixture must report ok=true');
@@ -462,25 +506,25 @@ try {
 
   const invalidSpecPath = path.join(blankRepo, 'invalid.atom.json');
   writeFileSync(invalidSpecPath, JSON.stringify({ schemaId: 'atm.atomicSpec', specVersion: '0.1.0' }, null, 2), 'utf8');
-  const validateInvalidSpec = runAtm(['validate', '--spec', invalidSpecPath], blankRepo);
+  const validateInvalidSpec = await runAtm(['validate', '--spec', invalidSpecPath], blankRepo);
   assert(validateInvalidSpec.exitCode === 1, 'validate --spec invalid fixture must exit 1');
   assertReadable(validateInvalidSpec, 'validate');
   assert(validateInvalidSpec.parsed.ok === false, 'validate --spec invalid fixture must report ok=false');
   assertMessageCode(validateInvalidSpec, 'ATM_SPEC_REQUIRED_FIELD');
 
-  const specValidateInvalid = runAtm(['spec', '--validate', invalidSpecPath], blankRepo);
+  const specValidateInvalid = await runAtm(['spec', '--validate', invalidSpecPath], blankRepo);
   assert(specValidateInvalid.exitCode === 1, 'spec --validate invalid fixture must exit 1');
   assertReadable(specValidateInvalid, 'spec');
   assert(specValidateInvalid.parsed.ok === false, 'spec --validate invalid fixture must report ok=false');
   assertMessageCode(specValidateInvalid, 'ATM_SPEC_REQUIRED_FIELD');
 
-  const validateMissingSpec = runAtm(['validate', '--spec', path.join(blankRepo, 'missing.atom.json')], blankRepo);
+  const validateMissingSpec = await runAtm(['validate', '--spec', path.join(blankRepo, 'missing.atom.json')], blankRepo);
   assert(validateMissingSpec.exitCode === 1, 'validate --spec missing fixture must exit 1');
   assertReadable(validateMissingSpec, 'validate');
   assert(validateMissingSpec.parsed.ok === false, 'validate --spec missing fixture must report ok=false');
   assertMessageCode(validateMissingSpec, 'ATM_SPEC_NOT_FOUND');
 
-  const specValidateMissing = runAtm(['spec', '--validate', path.join(blankRepo, 'missing.atom.json')], blankRepo);
+  const specValidateMissing = await runAtm(['spec', '--validate', path.join(blankRepo, 'missing.atom.json')], blankRepo);
   assert(specValidateMissing.exitCode === 1, 'spec --validate missing fixture must exit 1');
   assertReadable(specValidateMissing, 'spec');
   assert(specValidateMissing.parsed.ok === false, 'spec --validate missing fixture must report ok=false');
@@ -488,38 +532,38 @@ try {
 
   const bootstrapRepo = path.join(tempRoot, 'bootstrap-repo');
   mkdirSync(bootstrapRepo, { recursive: true });
-  const bootstrap = runAtm(['bootstrap', '--cwd', bootstrapRepo, '--task', 'Bootstrap ATM self-hosting alpha'], bootstrapRepo);
+  const bootstrap = await runAtm(['bootstrap', '--cwd', bootstrapRepo, '--task', 'Bootstrap ATM self-hosting alpha'], bootstrapRepo);
   assert(bootstrap.exitCode === 0, 'bootstrap must exit 0 in blank repo');
   assertReadable(bootstrap, 'bootstrap');
   assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true');
   assert(bootstrap.parsed.evidence.adoptedProfile === 'default', 'bootstrap must adopt default profile');
   assert(existsSync(path.join(bootstrapRepo, 'AGENTS.md')), 'bootstrap must create AGENTS.md');
 
-  const verifySelf = runAtm(['verify', '--self'], root);
+  const verifySelf = await runAtm(['verify', '--self'], root);
   assert(verifySelf.exitCode === 0, 'verify --self must exit 0 in repository root');
   assertReadable(verifySelf, 'verify');
   assert(verifySelf.parsed.ok === true, 'verify --self must report ok=true');
   assertMessageCode(verifySelf, 'ATM_VERIFY_SELF_OK');
 
-  const verifyNeutrality = runAtm(['verify', '--neutrality'], root);
+  const verifyNeutrality = await runAtm(['verify', '--neutrality'], root);
   assert(verifyNeutrality.exitCode === 0, 'verify --neutrality must exit 0 in repository root');
   assertReadable(verifyNeutrality, 'verify');
   assert(verifyNeutrality.parsed.ok === true, 'verify --neutrality must report ok=true');
   assertMessageCode(verifyNeutrality, 'ATM_VERIFY_NEUTRALITY_OK');
 
-  const verifyAgentsMd = runAtm(['verify', '--agents-md', '--json'], root);
+  const verifyAgentsMd = await runAtm(['verify', '--agents-md', '--json'], root);
   assert(verifyAgentsMd.exitCode === 0, 'verify --agents-md must exit 0 in repository root');
   assertReadable(verifyAgentsMd, 'verify');
   assert(verifyAgentsMd.parsed.ok === true, 'verify --agents-md must report ok=true');
   assertMessageCode(verifyAgentsMd, 'ATM_VERIFY_AGENTS_MD_OK');
 
-  const verifyGuardsPass = runAtm(['verify', '--guards', '--evidence', path.join(root, 'fixtures/verify/guard-evidence-pass.json')], root);
+  const verifyGuardsPass = await runAtm(['verify', '--guards', '--evidence', path.join(root, 'fixtures/verify/guard-evidence-pass.json')], root);
   assert(verifyGuardsPass.exitCode === 0, 'verify --guards --evidence pass must exit 0');
   assertReadable(verifyGuardsPass, 'verify');
   assert(verifyGuardsPass.parsed.ok === true, 'verify --guards --evidence pass must report ok=true');
   assertMessageCode(verifyGuardsPass, 'ATM_VERIFY_GUARDS_OK');
 
-  const verifyGuardsMissing = runAtm(['verify', '--guards', '--evidence', path.join(root, 'fixtures/verify/guard-evidence-missing-justification.json')], root);
+  const verifyGuardsMissing = await runAtm(['verify', '--guards', '--evidence', path.join(root, 'fixtures/verify/guard-evidence-missing-justification.json')], root);
   assert(verifyGuardsMissing.exitCode === 1, 'verify --guards --evidence missing-justification must exit 1');
   assertReadable(verifyGuardsMissing, 'verify');
   assert(verifyGuardsMissing.parsed.ok === false, 'verify --guards --evidence missing-justification must report ok=false');
@@ -528,7 +572,7 @@ try {
   assert(Array.isArray(verifyGuardsMissing.parsed.evidence.missingJustifications), 'verify --guards missing-justification must list missingJustifications');
   assert(verifyGuardsMissing.parsed.evidence.missingJustifications.includes('evidence-after-change'), 'verify --guards missing-justification must name the offending guardId');
 
-  const upgradePass = runAtm([
+  const upgradePass = await runAtm([
     'upgrade',
     '--propose',
     '--atom', 'ATM-CORE-0001',
@@ -551,7 +595,7 @@ try {
   assert(upgradePass.parsed.evidence.proposal.automatedGates.allPassed === true, 'upgrade pass proposal gates must pass');
   assertMessageCode(upgradePass, 'ATM_UPGRADE_PROPOSAL_READY');
 
-  const upgradeBlocked = runAtm([
+  const upgradeBlocked = await runAtm([
     'upgrade',
     '--propose',
     '--atom', 'ATM-CORE-0001',
@@ -574,7 +618,7 @@ try {
   assert(upgradeBlocked.parsed.evidence.blockedGateNames.includes('qualityComparison'), 'upgrade blocked proposal must name qualityComparison');
   assertMessageCode(upgradeBlocked, 'ATM_UPGRADE_PROPOSAL_BLOCKED');
 
-  const upgradeScanEmpty = runAtm([
+  const upgradeScanEmpty = await runAtm([
     'upgrade',
     '--scan',
     '--json',
@@ -588,7 +632,7 @@ try {
   assert(upgradeScanEmpty.parsed.evidence.proposalDraftCount === 0, 'upgrade --scan empty report must not emit drafts');
   assertMessageCode(upgradeScanEmpty, 'ATM_EVIDENCE_SCAN_EMPTY');
 
-  const upgradeScanDraft = runAtm([
+  const upgradeScanDraft = await runAtm([
     'upgrade',
     '--scan',
     '--json',
@@ -611,7 +655,7 @@ try {
   mkdirSync(rollbackRepo, { recursive: true });
   writeJson(path.join(rollbackRepo, 'atomic-registry.json'), readJson('fixtures/registry/v1-with-versions.json'));
 
-  const rollbackPlan = runAtm([
+  const rollbackPlan = await runAtm([
     'rollback',
     '--cwd', rollbackRepo,
     '--atom', 'ATM-FIXTURE-0001',
@@ -624,7 +668,7 @@ try {
   assert(rollbackPlan.parsed.evidence.proofPreview?.toVersion === '1.0.0', 'rollback --plan must preview target version');
   assertMessageCode(rollbackPlan, 'ATM_ROLLBACK_PLAN_READY');
 
-  const rollbackApply = runAtm([
+  const rollbackApply = await runAtm([
     'rollback',
     '--cwd', rollbackRepo,
     '--atom', 'ATM-FIXTURE-0001',
@@ -673,20 +717,20 @@ try {
     entries: [reviewQueueRecord]
   });
 
-  const reviewList = runAtm(['review', 'list', '--cwd', reviewRepo], reviewRepo);
+  const reviewList = await runAtm(['review', 'list', '--cwd', reviewRepo], reviewRepo);
   assert(reviewList.exitCode === 0, 'review list must exit 0');
   assertReadable(reviewList, 'review');
   assert(reviewList.parsed.ok === true, 'review list must report ok=true');
   assertMessageCode(reviewList, 'ATM_REVIEW_LIST_OK');
 
-  const reviewShow = runAtm(['review', 'show', reviewProposal.proposalId, '--cwd', reviewRepo], reviewRepo);
+  const reviewShow = await runAtm(['review', 'show', reviewProposal.proposalId, '--cwd', reviewRepo], reviewRepo);
   assert(reviewShow.exitCode === 0, 'review show must exit 0');
   assertReadable(reviewShow, 'review');
   assert(reviewShow.parsed.ok === true, 'review show must report ok=true');
   assert(reviewShow.parsed.evidence.proposal?.proposalId === reviewProposal.proposalId, 'review show must return requested proposal');
   assertMessageCode(reviewShow, 'ATM_REVIEW_SHOW_OK');
 
-  const reviewApprove = runAtm([
+  const reviewApprove = await runAtm([
     'review',
     'approve',
     reviewProposal.proposalId,
@@ -701,7 +745,7 @@ try {
   assert(reviewApprove.parsed.evidence.decisionSnapshotHash === reviewQueueRecord.proposalSnapshotHash, 'review approve must preserve decision snapshot hash');
   assertMessageCode(reviewApprove, 'ATM_REVIEW_APPROVED');
 
-  const reviewApplyReady = runAtm(['review', 'apply-ready', reviewProposal.proposalId, '--cwd', reviewRepo], reviewRepo);
+  const reviewApplyReady = await runAtm(['review', 'apply-ready', reviewProposal.proposalId, '--cwd', reviewRepo], reviewRepo);
   assert(reviewApplyReady.exitCode === 0, 'review apply-ready must exit 0 for approved proposals');
   assertReadable(reviewApplyReady, 'review');
   assert(reviewApplyReady.parsed.ok === true, 'review apply-ready must report ok=true');
@@ -722,13 +766,13 @@ try {
     generatedAt: '2026-01-01T00:00:00.000Z',
     entries: [reviewQueueRecord]
   });
-  const reviewRejectMissingReason = runAtm(['review', 'reject', reviewProposal.proposalId, '--cwd', reviewRejectFreshRepo], reviewRejectFreshRepo);
+  const reviewRejectMissingReason = await runAtm(['review', 'reject', reviewProposal.proposalId, '--cwd', reviewRejectFreshRepo], reviewRejectFreshRepo);
   assert(reviewRejectMissingReason.exitCode === 2, 'review reject without --reason must exit 2');
   assertReadable(reviewRejectMissingReason, 'review');
   assert(reviewRejectMissingReason.parsed.ok === false, 'review reject without --reason must report ok=false');
   assertMessageCode(reviewRejectMissingReason, 'ATM_CLI_USAGE');
 
-  const reviewReject = runAtm([
+  const reviewReject = await runAtm([
     'review',
     'reject',
     reviewProposal.proposalId,
@@ -742,7 +786,7 @@ try {
   assert(reviewReject.parsed.evidence.status === 'rejected', 'review reject must set rejected status');
   assertMessageCode(reviewReject, 'ATM_REVIEW_REJECTED');
 
-  const testHelloWorld = runAtm(['test', '--atom', 'hello-world'], root);
+  const testHelloWorld = await runAtm(['test', '--atom', 'hello-world'], root);
   assert(testHelloWorld.exitCode === 0, 'test --atom hello-world must exit 0 in repository root');
   assertReadable(testHelloWorld, 'test');
   assert(testHelloWorld.parsed.ok === true, 'test --atom hello-world must report ok=true');
@@ -750,7 +794,7 @@ try {
   assert(testHelloWorld.parsed.evidence.total === 5, 'test --atom hello-world must report 5 total checks');
   assertMessageCode(testHelloWorld, 'ATM_TEST_HELLO_WORLD_OK');
 
-  const selfHostAlpha = runAtm(['self-host-alpha', '--verify', '--json'], root);
+  const selfHostAlpha = await runAtm(['self-host-alpha', '--verify', '--json'], root);
   assert(selfHostAlpha.exitCode === 0, 'self-host-alpha --verify must exit 0 in repository root');
   assertReadable(selfHostAlpha, 'self-host-alpha');
   assert(selfHostAlpha.parsed.ok === true, 'self-host-alpha --verify must report ok=true');
@@ -760,7 +804,7 @@ try {
   assert(selfHostAlpha.parsed.criteria4 === true, 'self-host-alpha criteria4 must be true');
   assertMessageCode(selfHostAlpha, 'ATM_SELF_HOST_ALPHA_OK');
 
-  const selfHostAlphaClaude = runAtm(['self-host-alpha', '--verify', '--agent', 'claude-code', '--json'], root);
+  const selfHostAlphaClaude = await runAtm(['self-host-alpha', '--verify', '--agent', 'claude-code', '--json'], root);
   assert(selfHostAlphaClaude.exitCode === 0, 'self-host-alpha --verify --agent claude-code must exit 0 in repository root');
   assertReadable(selfHostAlphaClaude, 'self-host-alpha');
   assert(selfHostAlphaClaude.parsed.ok === true, 'self-host-alpha --verify --agent claude-code must report ok=true');
@@ -769,7 +813,7 @@ try {
   assert(selfHostAlphaClaude.parsed.evidence.confidence?.confidenceReady === true, 'self-host-alpha --verify --agent claude-code must report confidenceReady=true');
   assertMessageCode(selfHostAlphaClaude, 'ATM_SELF_HOST_ALPHA_CONFIDENCE_ADVISORY');
 
-  const frameworkStatus = runAtm(['status'], root);
+  const frameworkStatus = await runAtm(['status'], root);
   assert(frameworkStatus.exitCode === 0, 'status in framework repository root must exit 0');
   assertReadable(frameworkStatus, 'status');
   assert(frameworkStatus.parsed.ok === true, 'status in framework repository root must report ok=true');

@@ -19,6 +19,7 @@ import {
   buildAllowedFilesForTask,
   createOrRefreshTaskQueue,
   findActiveTaskQueue,
+  isTaskDirectionPathCandidate,
   writeTaskDirectionLock
 } from './task-direction.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
@@ -382,6 +383,10 @@ async function claimNextImportedTask(input: {
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(input.importedTaskQueue.claimableTask.title)} --json`,
     reason: `claimed imported work item ${input.importedTaskQueue.claimableTask.workItemId} for ${resolvedActor.actorId}`,
     selectedTask: input.importedTaskQueue.claimableTask,
+    taskContext: {
+      scopePaths: input.importedTaskQueue.claimableTask.scopePaths,
+      sourcePlanPath: input.importedTaskQueue.claimableTask.sourcePlanPath
+    },
     taskDirectionLock: directionLock,
     taskQueue: activeQueue,
     allowedCommands: allowedGuidanceBootstrapCommands(),
@@ -1278,7 +1283,7 @@ function extractDeclaredTaskPathsFromDocument(taskDocument: Record<string, unkno
 function collectDeclaredTaskPathValues(value: unknown, files: Set<string>) {
   if (typeof value === 'string') {
     const normalized = normalizeOptionalTaskPath(value);
-    if (normalized) {
+    if (normalized && isTaskDirectionPathCandidate(normalized)) {
       files.add(normalized);
     }
     for (const candidate of extractPathLikeStringsFromText(value)) {
