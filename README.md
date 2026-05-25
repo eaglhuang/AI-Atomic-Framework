@@ -6,7 +6,7 @@ AI-Atomic-Framework, also called ATM in this repository, is a governance framewo
 
 ATM is not an agent framework and not a workflow engine. It is the control layer around AI-assisted work: the part that keeps scope, rules, validation, artifacts, evidence, and handoff state explicit.
 
-> Agent first action for a user request: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available. Before editing, closing, or committing, read `evidence.nextAction.playbook` from the ATM response and follow that channel-specific work order. If ATM recommends `batch`, deliver only the queue head, add command-backed evidence, run `node atm.mjs batch checkpoint --actor <id> --json`, and commit only after checkpoint succeeds; do not manually loop over low-level task lifecycle commands.
+> Agent first action for a user request: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available. In this framework repository, `node atm.mjs` runs the frozen built runner; use `node atm.dev.mjs` only when you are explicitly validating source changes to ATM itself. Before editing, closing, or committing, read `evidence.nextAction.playbook` from the ATM response and follow that channel-specific work order. If ATM recommends `batch`, deliver only the queue head, add command-backed evidence, run `node atm.mjs batch checkpoint --actor <id> --json`, and commit only after checkpoint succeeds; do not manually loop over low-level task lifecycle commands.
 
 ## What ATM Does
 
@@ -209,6 +209,15 @@ Host-side enforcement options are documented in [docs/HOST_GOVERNANCE_INTEGRATIO
 This repository uses npm as the official package-manager route and targets Node.js 24 for source-tree development. TypeScript modules run through `node --experimental-strip-types` in local validators and scripts.
 
 The current implementation uses TypeScript, Node.js, JSON schemas, and a small CLI because those tools make the alpha path easy to inspect and test. That toolchain is a recommendation, not a semantic requirement of ATM; other implementations should remain possible if they preserve the same contracts.
+
+Runner entrypoints are intentionally split:
+
+| Entrypoint | Purpose |
+| --- | --- |
+| `node atm.mjs ...` | Stable frozen runner for agents, governance routing, and release-like tests inside this repo. It uses `release/atm-onefile/atm.mjs` when present, then the built `packages/cli/dist/atm.js`. |
+| `node atm.dev.mjs ...` | Source-first runner for ATM framework development. Use this only when you intentionally need current `packages/cli/src/**` behavior before a build. |
+
+Do not ask agents to use `node atm.dev.mjs` for ordinary governance tests. Build first, then verify the frozen entrypoint with `node atm.mjs ...`.
 
 Install dependencies, then use the standard engineering checks:
 

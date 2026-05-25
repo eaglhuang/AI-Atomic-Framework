@@ -4,7 +4,7 @@ This repository uses the default ATM bootstrap pack.
 
 Start with this line when a user has given you a concrete request:
 
-Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, "node atm.mjs next --json" is read-only status. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
+Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, "node atm.mjs next --json" is read-only status. In this framework repository, `node atm.mjs` is the stable frozen runner entrypoint; use `node atm.dev.mjs` only when explicitly validating unbuilt source changes to ATM itself. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
 
 After every `next --prompt` or `next --claim` response, read `evidence.nextAction.playbook` before editing, closing, or committing. The playbook is the short channel-specific work order; do not invent your own lifecycle.
 
@@ -21,6 +21,7 @@ Framework-repository exception:
 - The ATM framework repository itself intentionally does **not** use `keep.md` or `keep.summary.md`.
 - Do not treat a missing keep file in this repository as corruption or a bootstrap failure.
 - For the ATM framework repo, the correct first-touch orientation is `README.md` plus `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested task work. `node atm.mjs next --json` is read-only orientation only.
+- `node atm.mjs` intentionally runs the frozen built ATM runner in this repo. Do not use it to test half-written source changes; use `node atm.dev.mjs` only when the task explicitly requires source-first framework validation.
 
 Bootstrap files:
 
@@ -117,4 +118,10 @@ node atm.mjs doctor --json
 
 # Framework version
 node atm.mjs --version
+```
+
+Source-first framework validation only:
+
+```shell
+node atm.dev.mjs next --prompt "<current user prompt>" --json
 ```
