@@ -80,15 +80,21 @@ async function runAtomizeInventory(options: AtomizeOptions) {
       cwd: options.cwd,
       messages: [
         message('info', 'ATM_ATOMIZE_INVENTORY_SUCCESS', 'Atomization coverage inventory completed.', {
-          timestamp: result.report.timestamp
+          timestamp: result.report.timestamp,
+          coveragePercentage: result.report.inventory?.coverage_percentage ?? null,
+          riskLevel: result.report.risk_level ?? null
         })
       ],
       evidence: {
+        schemaId: result.schemaId ?? 'atm.atomizeInventoryReport.v1',
         inventory: result.report.inventory,
-        registry_owned_paths: result.report.registry_owned_paths,
+        owned_paths: result.report.owned_paths,
         unowned_paths_sample: result.report.unowned_paths_sample,
+        unowned_by_map_family: result.report.unowned_by_map_family,
+        unowned_by_risk: result.report.unowned_by_risk,
+        registry_summary: result.report.registry_summary,
         suggested_actions: result.report.suggested_actions,
-        gap_report: result.report.gap_report,
+        risk_level: result.report.risk_level,
         full_report: result.report
       }
     });
