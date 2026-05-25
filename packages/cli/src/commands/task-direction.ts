@@ -206,7 +206,12 @@ export function writeTaskDirectionLock(input: {
   if (existsSync(lockPath)) {
     try {
       const existing = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
-      writeJson(lockPath, { ...existing, taskDirectionLock: lock });
+      const { released, releasedAt, releasedBy, ...activeLock } = existing;
+      writeJson(lockPath, {
+        ...activeLock,
+        status: 'active',
+        taskDirectionLock: lock
+      });
       return lock;
     } catch {
       // Fall through to sidecar if the governance lock is not parseable.

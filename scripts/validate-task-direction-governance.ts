@@ -6,7 +6,9 @@ import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runFrameworkTempClaim } from '../packages/cli/src/commands/framework-development.ts';
 import { runHook } from '../packages/cli/src/commands/hook.ts';
 import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
+import { runLock } from '../packages/cli/src/commands/lock.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
+import { readActiveTaskDirectionLocks } from '../packages/cli/src/commands/task-direction.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 
 const mode = process.argv.includes('--mode')
@@ -74,6 +76,11 @@ async function validateAdopterGoverned(tempRoot: string) {
     '--files', 'src/one.ts'
   ]);
   assert(inScope.ok === true, 'adopter in-scope edit must pass after direction lock');
+  await runLock(['release', '--cwd', repo, '--task', 'TASK-ADOPT-0001', '--owner', 'adopter-agent', '--json']);
+  const reclaimed = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
+  assert(reclaimed.ok === true, 'next --claim must re-claim a previously released governance lock');
+  const reclaimedLocks = readActiveTaskDirectionLocks(repo);
+  assert(reclaimedLocks.some((lock) => lock.taskId === 'TASK-ADOPT-0001'), 're-claimed released lock must be visible as an active direction lock');
 
   const outOfScope = runIntegrationHookInvocation([
     'pre-tool',
