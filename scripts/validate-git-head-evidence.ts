@@ -145,10 +145,11 @@ try {
   bootstrap(orphanRepo);
   commitAll(orphanRepo, 'bootstrap without git evidence');
   const orphan = runAtmDoctor(orphanRepo);
-  assert(orphan.exitCode === 1, 'orphan doctor must exit 1');
-  assert(orphan.parsed.ok === false, 'orphan doctor must report ok=false');
-  assert(orphan.parsed.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_MISSING'), 'orphan doctor must emit ATM_DOCTOR_GIT_EVIDENCE_MISSING');
+  assert(orphan.exitCode === 0, 'adopter orphan doctor must exit 0');
+  assert(orphan.parsed.ok === true, 'adopter orphan doctor must report ok=true');
+  assert(orphan.parsed.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_WARNING'), 'adopter orphan doctor must emit ATM_DOCTOR_GIT_EVIDENCE_WARNING');
   assert(gitCheck(orphan)?.details?.status === 'missing', 'orphan doctor must report status=missing');
+  assert(gitCheck(orphan)?.details?.enforcement === 'warning', 'adopter orphan git evidence must be warning enforcement');
 
   const commitSha = runGit(orphanRepo, ['rev-parse', 'HEAD']);
   writeGitEvidence(orphanRepo, createGitEvidence({ commitSha }));
@@ -156,6 +157,13 @@ try {
   assert(commitMatched.exitCode === 0, 'commitSha evidence doctor must exit 0');
   assert(commitMatched.parsed.ok === true, 'commitSha evidence doctor must report ok=true');
   assert(gitCheck(commitMatched)?.details?.matchedBy === 'commitSha', 'commitSha evidence must match by commitSha');
+  runGit(orphanRepo, ['add', '.atm/history/evidence/git-head.json']);
+  runGit(orphanRepo, ['commit', '-m', 'backfill git head evidence']);
+  const evidenceOnlyMatched = runAtmDoctor(orphanRepo);
+  assert(evidenceOnlyMatched.exitCode === 0, 'evidence-only HEAD doctor must exit 0');
+  assert(evidenceOnlyMatched.parsed.ok === true, 'evidence-only HEAD doctor must report ok=true');
+  assert(gitCheck(evidenceOnlyMatched)?.details?.evidenceOnlyHead === true, 'evidence-only HEAD must be recognized');
+  assert(gitCheck(evidenceOnlyMatched)?.details?.matchedBy === 'evidenceOnlyParentCommitSha', 'evidence-only HEAD must match parent commit evidence');
 
   const treeRepo = path.join(tempRoot, 'tree-parent');
   initGitRepo(treeRepo);

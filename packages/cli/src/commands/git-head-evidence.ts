@@ -41,8 +41,15 @@ export function createGitHeadEvidenceCheck(cwd: any, runtime: any) {
         && (evidenceTreeSha === governedTreeSha || evidenceTreeSha === treeSha)
         && sameStringSet(entry.git.parentCommitShas, parentCommitShas);
     });
-  const matchedRecord = commitMatch ?? treeMatch ?? null;
-  const matchedBy = commitMatch ? 'commitSha' : treeMatch ? 'treeSha+parentCommitShas' : null;
+  const evidenceOnlyParentMatch = commitMatch || treeMatch
+    ? null
+    : findEvidenceOnlyParentMatch(cwd, commitSha, parentCommitShas, evidenceRecords);
+  const matchedRecord = commitMatch ?? treeMatch ?? evidenceOnlyParentMatch?.record ?? null;
+  const matchedBy = commitMatch
+    ? 'commitSha'
+    : treeMatch
+      ? 'treeSha+parentCommitShas'
+      : evidenceOnlyParentMatch?.matchedBy ?? null;
   const ok = matchedRecord !== null;
 
   return createGitEvidenceDetails(ok ? 'matched' : 'missing', {
@@ -54,7 +61,9 @@ export function createGitHeadEvidenceCheck(cwd: any, runtime: any) {
     expectedEvidencePath: gitHeadEvidencePath,
     evidenceRecordsScanned: evidenceRecords.length,
     matchedBy,
-    matchedEvidencePath: matchedRecord?.path ?? null
+    matchedEvidencePath: matchedRecord?.path ?? null,
+    evidenceOnlyHead: evidenceOnlyParentMatch !== null,
+    evidenceOnlyCoveredCommitSha: evidenceOnlyParentMatch?.coveredCommitSha ?? null
   }, ok);
 }
 
@@ -120,6 +129,62 @@ function readGovernedHeadTreeSha(cwd: any, commitSha: any, evidencePath: any) {
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }
+}
+
+function findEvidenceOnlyParentMatch(cwd: any, commitSha: any, parentCommitShas: any, evidenceRecords: any) {
+  if (!Array.isArray(parentCommitShas) || parentCommitShas.length !== 1) {
+    return null;
+  }
+  if (!isEvidenceOnlyCommit(cwd, commitSha)) {
+    return null;
+  }
+  const parentCommitSha = parentCommitShas[0];
+  const parentCommitMatch = evidenceRecords.find((entry: any) => entry.git.commitSha === parentCommitSha);
+  if (parentCommitMatch) {
+    return {
+      record: parentCommitMatch,
+      matchedBy: 'evidenceOnlyParentCommitSha',
+      coveredCommitSha: parentCommitSha
+    };
+  }
+
+  const parentTreeSha = readGitScalar(cwd, ['rev-parse', `${parentCommitSha}^{tree}`]);
+  const parentGovernedTreeSha = readGovernedHeadTreeSha(cwd, parentCommitSha, gitHeadEvidencePath) ?? parentTreeSha;
+  const parentParents = readParentCommitShasForCommit(cwd, parentCommitSha);
+  const parentTreeMatch = evidenceRecords.find((entry: any) => {
+    const evidenceTreeSha = entry.git.treeSha;
+    return Boolean(evidenceTreeSha)
+      && (evidenceTreeSha === parentGovernedTreeSha || evidenceTreeSha === parentTreeSha)
+      && sameStringSet(entry.git.parentCommitShas, parentParents);
+  });
+  return parentTreeMatch
+    ? {
+      record: parentTreeMatch,
+      matchedBy: 'evidenceOnlyParentTreeSha',
+      coveredCommitSha: parentCommitSha
+    }
+    : null;
+}
+
+function isEvidenceOnlyCommit(cwd: any, commitSha: any) {
+  const changedPaths = readCommitChangedPaths(cwd, commitSha);
+  return changedPaths.length > 0 && changedPaths.every((entry) => entry === gitHeadEvidencePath);
+}
+
+function readCommitChangedPaths(cwd: any, commitSha: any) {
+  const result = runGit(cwd, ['diff-tree', '--no-commit-id', '--name-only', '-r', commitSha]);
+  if (!result.ok) {
+    return [];
+  }
+  return result.stdout.split(/\r?\n/).map((entry) => toPortablePath(entry.trim())).filter(Boolean);
+}
+
+function readParentCommitShasForCommit(cwd: any, commitSha: any) {
+  const result = runGit(cwd, ['rev-list', '--parents', '-n', '1', commitSha]);
+  if (!result.ok) {
+    return [];
+  }
+  return result.stdout.trim().split(/\s+/).slice(1).filter(Boolean);
 }
 
 function readEvidenceRecords(cwd: any, runtime: any) {

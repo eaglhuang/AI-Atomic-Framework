@@ -62,6 +62,8 @@ export async function runDoctor(argv: any) {
   const versionWarnings = createVersionSummaryMessages(versionSummary);
   const trustIntegrity = trustMode ? checkStartupIntegrity(resolveBundledIntegrityRoot()) : null;
   const knownBadStatus = knownBadMode ? checkStartupKnownBadVersion() : null;
+  const rawGitHeadEvidenceCheck = createGitHeadEvidenceCheck(root, runtime);
+  const gitHeadEvidenceCheck = downgradeAdopterGitHeadEvidenceCheck(rawGitHeadEvidenceCheck, repoIdentity);
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -103,7 +105,7 @@ export async function runDoctor(argv: any) {
     createCheck('framework-integration-hooks', frameworkHookReadiness.ok, frameworkHookReadiness),
     ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
     ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
-    createGitHeadEvidenceCheck(root, runtime)
+    gitHeadEvidenceCheck
   ];
   const ok = checks.every((check) => check.ok);
   const failedChecks = checks.filter((check) => !check.ok).map((check) => check.name);
@@ -153,6 +155,14 @@ export async function runDoctor(argv: any) {
           missingCapability: runtimeAdapterReadiness.missingCapability
         }
       )]
+      : []),
+    ...(gitHeadEvidenceCheck.details?.downgradedToWarning
+      ? [message('warning', 'ATM_DOCTOR_GIT_EVIDENCE_WARNING', 'Latest Git commit has no matching ATM git-head evidence. This is a warning in adopter repositories; framework repositories and protected commit-range gates remain strict.', {
+        failedChecks: [],
+        enforcement: gitHeadEvidenceCheck.details.enforcement,
+        commitSha: gitHeadEvidenceCheck.details.commitSha ?? null,
+        recommendedAction: 'Run node atm.mjs evidence git-head-backfill --actor <id> --reason "<reason>" --json when you need a traceable repair record.'
+      })]
       : []),
     ...(ok
       ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
@@ -209,6 +219,22 @@ export async function runDoctor(argv: any) {
       recommendedAction
     }
   });
+}
+
+function downgradeAdopterGitHeadEvidenceCheck(check: any, repoIdentity: any) {
+  if (repoIdentity?.isFrameworkRepo || check?.ok || check?.details?.status !== 'missing') {
+    return check;
+  }
+  return {
+    ...check,
+    ok: true,
+    details: {
+      ...check.details,
+      enforcement: 'warning',
+      downgradedToWarning: true,
+      strictInFrameworkRepo: true
+    }
+  };
 }
 
 function checkOnboardingLifecycle(root: any, runtime: any) {
