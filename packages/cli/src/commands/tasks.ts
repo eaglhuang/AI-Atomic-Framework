@@ -31,7 +31,7 @@ import {
   isTaskDirectionPathCandidate,
   sanitizeTaskDirectionAllowedFiles
 } from './task-direction.ts';
-import { readActiveBatchRun } from './work-channels.ts';
+import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.ts';
 
 export interface TaskImportSource {
   readonly planPath: string;
@@ -825,24 +825,36 @@ async function runTasksClose(argv: string[]) {
     taskId: options.taskId,
     status: options.status
   });
+  const owningBatch = options.status === 'done'
+    ? (options.batchId ? readActiveBatchRun(options.cwd, { batchId: options.batchId }) : findActiveBatchRunForTask(options.cwd, options.taskId))
+    : null;
   if (options.status === 'done') {
-    const activeBatch = readActiveBatchRun(options.cwd);
-    if (activeBatch?.status === 'active' && activeBatch.taskIds.includes(options.taskId) && !options.fromBatchCheckpoint) {
-      const currentTaskId = activeBatch.currentTaskId ?? activeBatch.taskIds[activeBatch.currentIndex] ?? null;
+    if (owningBatch?.status === 'active' && owningBatch.taskIds.includes(options.taskId) && !options.fromBatchCheckpoint) {
+      const currentTaskId = owningBatch.currentTaskId ?? owningBatch.taskIds[owningBatch.currentIndex] ?? null;
       throw new CliError('ATM_BATCH_CHECKPOINT_REQUIRED', currentTaskId === options.taskId
         ? `Task ${options.taskId} is the active batch queue head. Close it through batch checkpoint, not direct tasks close.`
-        : `Task ${options.taskId} belongs to active batch ${activeBatch.batchId}. Do not close batch tasks directly; deliver the current queue head and use batch checkpoint to advance.`, {
+        : `Task ${options.taskId} belongs to active batch ${owningBatch.batchId}. Do not close batch tasks directly; deliver the current queue head and use batch checkpoint to advance.`, {
         exitCode: 1,
         details: {
           taskId: options.taskId,
-          batchId: activeBatch.batchId,
-          currentIndex: activeBatch.currentIndex,
+          batchId: owningBatch.batchId,
+          currentIndex: owningBatch.currentIndex,
           currentTaskId,
-          requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --json`,
+          requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json`,
           blockedPattern: 'manual tasks close during active batch',
           remediation: currentTaskId && currentTaskId !== options.taskId
-            ? `Deliver queue head ${currentTaskId}, then run node atm.mjs batch checkpoint --actor ${actorId} --json instead of directly closing ${options.taskId}.`
-            : `Run node atm.mjs batch checkpoint --actor ${actorId} --json after delivering ${options.taskId}.`
+            ? `Deliver queue head ${currentTaskId}, then run node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json instead of directly closing ${options.taskId}.`
+            : `Run node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json after delivering ${options.taskId}.`
+        }
+      });
+    }
+    if (options.fromBatchCheckpoint && owningBatch?.batchId && options.batchId && owningBatch.batchId !== options.batchId) {
+      throw new CliError('ATM_BATCH_OWNERSHIP_MISMATCH', `Task ${options.taskId} belongs to batch ${owningBatch.batchId}, not ${options.batchId}.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          expectedBatchId: owningBatch.batchId,
+          actualBatchId: options.batchId
         }
       });
     }
@@ -1006,11 +1018,11 @@ async function runTasksClose(argv: string[]) {
     actorId,
     previousStatus,
     closureMetadata: options.status === 'done'
-      ? createClosureTransitionMetadata(closurePacketPath, closurePacket)
+      ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId)
       : null
   });
   const taskQueue = options.status === 'done'
-    ? advanceTaskQueueAfterClose(options.cwd, options.taskId)
+    ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
     : null;
   return makeResult({
     ok: true,
@@ -1868,7 +1880,8 @@ function parseCloseOptions(argv: string[]) {
     actorId: null as string | null,
     status: 'done' as 'done' | 'review' | 'blocked' | 'abandoned',
     reason: null as string | null,
-    fromBatchCheckpoint: false
+    fromBatchCheckpoint: false,
+    batchId: null as string | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -1903,6 +1916,11 @@ function parseCloseOptions(argv: string[]) {
     }
     if (arg === '--from-batch-checkpoint') {
       options.fromBatchCheckpoint = true;
+      continue;
+    }
+    if (arg === '--batch') {
+      options.batchId = requireValue(argv, index, '--batch');
+      index += 1;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {
@@ -2774,13 +2792,15 @@ function verifyPersistedTaskDocument(input: {
 
 function createClosureTransitionMetadata(
   closurePacketPath: string | null,
-  closurePacket: ClosurePacket | null
+  closurePacket: ClosurePacket | null,
+  batchId: string | null = null
 ): TaskTransitionClosureMetadata | null {
-  if (!closurePacket && !closurePacketPath) {
+  if (!closurePacket && !closurePacketPath && !batchId) {
     return null;
   }
   return {
     schemaId: 'atm.taskClosureTransition.v1',
+    batchId,
     closurePacketPath,
     evidenceFreshness: closurePacket?.evidenceFreshness ?? null,
     validationPasses: closurePacket?.validationPasses ?? [],

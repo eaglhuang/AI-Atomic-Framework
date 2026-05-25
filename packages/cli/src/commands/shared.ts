@@ -262,6 +262,9 @@ type ParsedCliOptions = {
   adopt?: string;
   integration?: string;
   task?: string;
+  tasks: string[];
+  batch?: string;
+  scope?: string;
   atom?: string;
   map?: string;
   equivalenceFixtures?: string;
@@ -292,6 +295,9 @@ export function parseOptions(argv: string[], commandName: string) {
     adopt: undefined,
     integration: undefined,
     task: undefined,
+    tasks: [],
+    batch: undefined,
+    scope: undefined,
     atom: undefined,
     map: undefined,
     propagate: undefined,
@@ -381,6 +387,31 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --claim`, { exitCode: 2 });
       }
       options.claim = true;
+      continue;
+    }
+    if (arg === '--tasks') {
+      if (commandName !== 'next') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --tasks`, { exitCode: 2 });
+      }
+      const raw = requireOptionValue(argv, index, '--tasks', commandName);
+      options.tasks = raw.split(',').map((entry: string) => entry.trim()).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--batch') {
+      if (commandName !== 'batch') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --batch`, { exitCode: 2 });
+      }
+      options.batch = requireOptionValue(argv, index, '--batch', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--scope') {
+      if (commandName !== 'batch') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --scope`, { exitCode: 2 });
+      }
+      options.scope = requireOptionValue(argv, index, '--scope', commandName);
+      index += 1;
       continue;
     }
     if (arg === '--actor') {

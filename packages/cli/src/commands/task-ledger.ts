@@ -55,6 +55,7 @@ export interface TaskTransitionRequiredGatesSnapshot {
 
 export interface TaskTransitionClosureMetadata {
   readonly schemaId: 'atm.taskClosureTransition.v1';
+  readonly batchId?: string | null;
   readonly closurePacketPath: string | null;
   readonly evidenceFreshness: 'fresh' | 'historical-reference' | 'draft' | null;
   readonly validationPasses: readonly string[];

@@ -4,7 +4,9 @@ import { runNext } from './next.ts';
 import { runTasks } from './tasks.ts';
 import { findActiveTaskQueue } from './task-direction.ts';
 import {
+  activeBatchSelectionStatus,
   inspectBatchRunConsistency,
+  listActiveBatchRuns,
   readActiveBatchRun,
   releaseBatchRun,
   repairBatchRunFromQueue,
@@ -15,9 +17,29 @@ export async function runBatch(argv: string[]) {
   const { options } = parseOptions(argv, 'batch');
   const action = String(argv[0] ?? 'status').toLowerCase();
   if (action === 'status') {
-    const batchRun = readActiveBatchRun(options.cwd);
-    const taskQueue = batchRun ? findActiveTaskQueue(options.cwd, batchRun.sourcePrompt) : null;
+    const selector = buildBatchSelector(options);
+    const selection = Object.keys(selector).length > 0
+      ? activeBatchSelectionStatus(options.cwd, selector)
+      : activeBatchSelectionStatus(options.cwd);
+    const allActiveBatches = listActiveBatchRuns(options.cwd);
+    const batchRun = selection.batchRun;
+    const taskQueue = batchRun ? findActiveTaskQueue(options.cwd, batchRun.sourcePrompt, { batchId: batchRun.batchId }) : null;
     const consistency = inspectBatchRunConsistency(batchRun, taskQueue);
+    if (!selection.ok && allActiveBatches.length > 1 && Object.keys(selector).length === 0) {
+      return makeResult({
+        ok: false,
+        command: 'batch',
+        cwd: options.cwd,
+        messages: [message('error', 'ATM_BATCH_SELECTION_REQUIRED', 'Multiple active batch runs exist; choose one with --batch <batchId> or --scope <scopeKey>.', {
+          activeBatches: allActiveBatches.map(toBatchCandidate)
+        })],
+        evidence: {
+          action: 'status',
+          activeBatches: allActiveBatches,
+          selection
+        }
+      });
+    }
     return makeResult({
       ok: consistency.ok,
       command: 'batch',
@@ -25,7 +47,10 @@ export async function runBatch(argv: string[]) {
       messages: [consistency.ok
         ? message('info', 'ATM_BATCH_STATUS', batchRun ? 'Active batch run found.' : 'No active batch run found.', {
         active: Boolean(batchRun),
-        currentTaskId: batchRun?.currentTaskId ?? null
+        batchId: batchRun?.batchId ?? null,
+        scopeKey: batchRun?.scopeKey ?? null,
+        currentTaskId: batchRun?.currentTaskId ?? null,
+        activeBatchCount: allActiveBatches.length
         })
         : message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'Active batch runtime is inconsistent and must be repaired before continuing.', {
           active: Boolean(batchRun),
@@ -37,6 +62,7 @@ export async function runBatch(argv: string[]) {
       evidence: {
         action: 'status',
         batchRun,
+        activeBatches: allActiveBatches,
         taskQueue,
         consistency
       }
@@ -49,11 +75,11 @@ export async function runBatch(argv: string[]) {
   }
 
   if (action === 'checkpoint') {
-    const active = readActiveBatchRun(options.cwd);
+    const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
     if (!active) {
       throw new CliError('ATM_BATCH_RUN_MISSING', 'batch checkpoint requires an active batch run. Start with next --claim on a batch-scoped prompt; batch is for delivering each queue item, not for bulk-closing task cards.', { exitCode: 2 });
     }
-    const consistencyQueue = findActiveTaskQueue(options.cwd, active.sourcePrompt);
+    const consistencyQueue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
     const consistency = inspectBatchRunConsistency(active, consistencyQueue);
     if (!consistency.ok) {
       throw new CliError('ATM_BATCH_STATE_REPAIR_REQUIRED', 'batch checkpoint cannot continue because batch-run and task-queue runtime disagree.', {
@@ -63,7 +89,7 @@ export async function runBatch(argv: string[]) {
           reason: consistency.reason,
           batchHeadTaskId: consistency.batchHeadTaskId,
           queueHeadTaskId: consistency.queueHeadTaskId,
-          requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --json`
+          requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
         }
       });
     }
@@ -74,7 +100,7 @@ export async function runBatch(argv: string[]) {
         ok: true,
         command: 'batch',
         cwd: options.cwd,
-        messages: [message('info', 'ATM_BATCH_COMPLETED', 'Batch run is already completed.', { batchId: completed.batchId })],
+        messages: [message('info', 'ATM_BATCH_COMPLETED', 'Batch run is already completed.', { batchId: completed.batchId, scopeKey: completed.scopeKey })],
         evidence: {
           action: 'checkpoint',
           batchRun: completed
@@ -92,6 +118,8 @@ export async function runBatch(argv: string[]) {
       '--status',
       'done',
       '--from-batch-checkpoint',
+      '--batch',
+      active.batchId,
       '--json'
     ]);
     let cleanupResult: unknown = null;
@@ -112,7 +140,7 @@ export async function runBatch(argv: string[]) {
     } catch {
       cleanupResult = null;
     }
-    const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt);
+    const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
     const nextTaskId = queue?.taskIds[queue.currentIndex] ?? null;
     const updated = updateBatchRun(options.cwd, active, {
       currentIndex: queue?.currentIndex ?? active.currentIndex,
@@ -139,14 +167,14 @@ export async function runBatch(argv: string[]) {
         commitInstruction: `Checkpoint succeeded. Now commit the deliverables plus .atm/history/tasks/${currentTaskId}.json, .atm/history/evidence/${currentTaskId}.json, and .atm/history/task-events/${currentTaskId}/ together.`,
         continueInstruction: updated.status === 'completed'
           ? 'Batch is complete after this checkpoint commit.'
-          : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId}.`
+          : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId} using --batch ${updated.batchId}.`
       }),
       ...(updated.status === 'completed'
         ? []
         : [message('warning', 'ATM_BATCH_CONTEXT_ACTIVE', 'This is a batch run. Do not switch to per-task normal flow.', {
           batchId: updated.batchId,
           currentTaskId: updated.currentTaskId,
-          requiredCommand: 'node atm.mjs batch checkpoint --actor <id> --json'
+          requiredCommand: `node atm.mjs batch checkpoint --actor <id> --batch ${updated.batchId} --json`
         })])],
       evidence: {
         action: 'checkpoint',
@@ -170,18 +198,18 @@ export async function runBatch(argv: string[]) {
   }
 
   if (action === 'repair' || action === 'resume') {
-    const active = readActiveBatchRun(options.cwd);
+    const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
     if (!active) {
       throw new CliError('ATM_BATCH_RUN_MISSING', `batch ${action} requires an active batch run.`, { exitCode: 2 });
     }
-    const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt);
+    const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
     const consistency = inspectBatchRunConsistency(active, queue);
     if (!queue) {
       throw new CliError('ATM_BATCH_QUEUE_MISSING', 'Active batch run has no matching active task queue; abandon or recreate the batch from the original prompt.', {
         exitCode: 1,
         details: {
           batchId: active.batchId,
-          requiredCommand: `node atm.mjs batch abandon --actor ${resolvedActor.actorId} --json`
+          requiredCommand: `node atm.mjs batch abandon --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
         }
       });
     }
@@ -205,7 +233,7 @@ export async function runBatch(argv: string[]) {
         message('warning', 'ATM_BATCH_RESUME_INSTRUCTION', 'Resume the batch through the current queue head; do not edit task events by hand.', {
           currentTaskId: repaired.currentTaskId,
           nextCommand: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --prompt "${repaired.sourcePrompt}" --json`,
-          checkpointCommand: `node atm.mjs batch checkpoint --actor ${resolvedActor.actorId} --json`
+          checkpointCommand: `node atm.mjs batch checkpoint --actor ${resolvedActor.actorId} --batch ${repaired.batchId} --json`
         })
       ],
       evidence: {
@@ -220,7 +248,7 @@ export async function runBatch(argv: string[]) {
   }
 
   if (action === 'abandon') {
-    const active = readActiveBatchRun(options.cwd);
+    const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
     if (!active) {
       throw new CliError('ATM_BATCH_RUN_MISSING', 'batch abandon requires an active batch run.', { exitCode: 2 });
     }
@@ -242,4 +270,40 @@ export async function runBatch(argv: string[]) {
   }
 
   throw new CliError('ATM_CLI_USAGE', 'batch supports: status, checkpoint, repair, resume, abandon', { exitCode: 2 });
+}
+
+function buildBatchSelector(options: Record<string, any>) {
+  const selector: { batchId?: string; scopeKey?: string } = {};
+  if (typeof options.batch === 'string' && options.batch.trim()) selector.batchId = options.batch.trim();
+  if (typeof options.scope === 'string' && options.scope.trim()) selector.scopeKey = options.scope.trim();
+  return selector;
+}
+
+function selectRequiredBatch(cwd: string, selector: ReturnType<typeof buildBatchSelector>, actorId: string, action: string) {
+  const selection = activeBatchSelectionStatus(cwd, {
+    ...selector,
+    actorId: selector.batchId || selector.scopeKey ? null : actorId
+  });
+  if (selection.ok) return selection.batchRun;
+  if (selection.reason === 'batch-selection-required') {
+    throw new CliError('ATM_BATCH_SELECTION_REQUIRED', `batch ${action} found multiple active batch runs; choose one with --batch <batchId> or --scope <scopeKey>.`, {
+      exitCode: 2,
+      details: {
+        action,
+        activeBatches: selection.candidates.map(toBatchCandidate)
+      }
+    });
+  }
+  return null;
+}
+
+function toBatchCandidate(batchRun: { readonly batchId: string; readonly scopeKey?: string | null; readonly currentTaskId?: string | null; readonly taskIds: readonly string[]; readonly createdByActor?: string | null }) {
+  return {
+    batchId: batchRun.batchId,
+    scopeKey: batchRun.scopeKey ?? null,
+    currentTaskId: batchRun.currentTaskId ?? null,
+    taskIds: batchRun.taskIds,
+    createdByActor: batchRun.createdByActor ?? null,
+    checkpointCommand: `node atm.mjs batch checkpoint --actor <id> --batch ${batchRun.batchId} --json`
+  };
 }

@@ -16,7 +16,7 @@ import {
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import { isPlanningMirrorPath, readActiveTaskDirectionLocks } from './task-direction.ts';
-import { isPathAllowedByScope, readActiveBatchRun, readActiveQuickfixLock } from './work-channels.ts';
+import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -1370,23 +1370,25 @@ function isTaskDirectionPreCommitExempt(value: string): boolean {
     || normalized.startsWith('.atm/history/evidence/')
     || normalized.startsWith('.atm/runtime/locks/')
     || normalized.startsWith('.atm/runtime/task-queues/')
+    || normalized.startsWith('.atm/runtime/batch-runs/')
     || normalized.startsWith('.atm/runtime/task-direction-locks/');
 }
 
 function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]) {
   const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry) || isStaticEvidenceArtifactPath(entry));
   const findings: ProtectedStateFinding[] = [];
-  const activeBatch = readActiveBatchRun(cwd);
+  const activeBatches = listActiveBatchRuns(cwd);
+  const stagedBatch = activeBatches.find((batchRun) => batchRun.taskIds.some((taskId) => protectedFiles.some((file) => normalizeRelativePath(file).toLowerCase() === `.atm/history/tasks/${taskId.toLowerCase()}.json`))) ?? null;
   const nonAtmStagedFiles = stagedFiles
     .map((entry) => normalizeRelativePath(entry))
     .filter((entry) => !entry.toLowerCase().startsWith('.atm/'));
-  if (activeBatch?.status === 'active'
+  if (stagedBatch?.status === 'active'
     && nonAtmStagedFiles.length > 0
-    && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, activeBatch.taskIds)) {
+    && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, stagedBatch.taskIds, stagedBatch.batchId)) {
     findings.push({
       file: nonAtmStagedFiles[0] ?? '<staged-files>',
       reason: 'batch-commit-before-checkpoint',
-      detail: `Active batch ${activeBatch.batchId} has not checkpointed the staged deliverable commit. Run node atm.mjs batch checkpoint --actor <id> --json first, then commit the deliverables together with the checkpoint task/evidence/events.`
+      detail: `Active batch ${stagedBatch.batchId} has not checkpointed the staged deliverable commit. Run node atm.mjs batch checkpoint --actor <id> --batch ${stagedBatch.batchId} --json first, then commit the deliverables together with the checkpoint task/evidence/events.`
     });
   }
   if (protectedFiles.length === 0) {
@@ -1449,6 +1451,7 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
       }
       const event = readJsonFile(path.join(cwd, expectedEventPath));
       const expectedSha = sha256(readFileSync(absolutePath));
+      const owningBatch = activeBatches.find((batchRun) => batchRun.taskIds.includes(taskId)) ?? null;
       if (event?.schemaId !== 'atm.taskTransition.v1'
         || event?.transitionId !== lastTransitionId
         || event?.taskId !== taskId
@@ -1461,15 +1464,14 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
           reason: 'task-file-transition-mismatch',
           detail: 'Task ledger change does not match a valid staged ATM CLI transition event.'
         });
-      } else if (activeBatch?.status === 'active'
-        && activeBatch.taskIds.includes(taskId)
+      } else if (owningBatch?.status === 'active'
         && typeof event?.command === 'string'
         && event.command.startsWith('node atm.mjs tasks close')
         && !event.command.includes('--from-batch-checkpoint')) {
         findings.push({
           file: normalized,
           reason: 'batch-close-must-use-checkpoint',
-          detail: `Task ${taskId} belongs to active batch ${activeBatch.batchId}; direct tasks close is not allowed. Use batch checkpoint so ATM can close, advance, and claim the next queue head.`
+          detail: `Task ${taskId} belongs to active batch ${owningBatch.batchId}; direct tasks close is not allowed. Use batch checkpoint so ATM can close, advance, and claim the next queue head.`
         });
       }
       continue;
@@ -1518,7 +1520,7 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
   };
 }
 
-function hasStagedBatchCheckpointClosure(cwd: string, protectedFiles: readonly string[], batchTaskIds: readonly string[]) {
+function hasStagedBatchCheckpointClosure(cwd: string, protectedFiles: readonly string[], batchTaskIds: readonly string[], batchId: string | null = null) {
   const protectedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
   for (const file of protectedFiles) {
     const normalized = normalizeRelativePath(file);
@@ -1537,9 +1539,11 @@ function hasStagedBatchCheckpointClosure(cwd: string, protectedFiles: readonly s
       continue;
     }
     const event = readJsonFile(path.join(cwd, expectedEventPath));
+    const closure = event?.closure as { schemaId?: unknown; batchId?: unknown } | undefined;
     if (typeof event?.command === 'string'
       && event.command.startsWith('node atm.mjs tasks close')
-      && event.command.includes('--from-batch-checkpoint')) {
+      && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1')
+      && (!batchId || event.command.includes(`--batch ${batchId}`) || closure?.batchId === batchId)) {
       return true;
     }
   }
@@ -1570,6 +1574,7 @@ function isProtectedAtmRuntimeStatePath(value: string): boolean {
   return normalized.startsWith('.atm/runtime/locks/')
     || normalized.startsWith('.atm/runtime/task-direction-locks/')
     || normalized.startsWith('.atm/runtime/task-queues/')
+    || normalized.startsWith('.atm/runtime/batch-runs/')
     || normalized === '.atm/runtime/current-task.json'
     || normalized === '.atm/runtime/guidance/active-session.json';
 }

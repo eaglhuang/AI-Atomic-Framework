@@ -4,6 +4,7 @@ import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runQuickfix } from '../packages/cli/src/commands/quickfix.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
+import { listActiveBatchRuns } from '../packages/cli/src/commands/work-channels.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -140,10 +141,13 @@ async function main() {
     assert((ledgerClaim.evidence.taskDirectionLock as any)?.schemaId === 'atm.taskDirectionLock.v1', 'next --claim must persist atm.taskDirectionLock.v1');
     assert((ledgerClaim.evidence.nextAction as any).deliveryPrinciple?.notAllowedAsCompletion?.some((entry: string) => entry.includes('.atm/history')), 'next --claim delivery principle must reject ledger-only completion');
     assert((ledgerClaim.evidence.batchRun as any)?.schemaId === 'atm.batchRun.v1', 'batch claim must persist atm.batchRun.v1');
+    const ledgerBatchId = (ledgerClaim.evidence.batchRun as any)?.batchId;
+    assert(typeof ledgerBatchId === 'string' && ledgerBatchId.length > 0, 'batch claim must return a stable batchId');
     const lockPath = path.join(tempRoot, '.atm', 'runtime', 'locks', 'TASK-LEDGER-0001.lock.json');
     assert(existsSync(lockPath), 'direction lock must be embedded in the runtime lock file');
     const lockDocument = JSON.parse(readFileSync(lockPath, 'utf8'));
     assert(lockDocument.taskDirectionLock?.taskId === 'TASK-LEDGER-0001', 'runtime lock must include the selected task direction lock');
+    assert(lockDocument.taskDirectionLock?.batchId === ledgerBatchId, 'direction lock must carry the batchId');
     const batchStatus = await runBatch(['status', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--json']);
     assert((batchStatus.evidence.batchRun as any)?.currentTaskId === 'TASK-LEDGER-0001', 'batch status must point at the claimed queue head');
     const activeBatchExact = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-LEDGER-0002']);
@@ -168,7 +172,7 @@ async function main() {
       directLaterBatchCloseBlocked = (error as { code?: string }).code === 'ATM_BATCH_CHECKPOINT_REQUIRED';
     }
     assert(directLaterBatchCloseBlocked, 'later tasks inside an active batch must also be closed through batch checkpoint, not direct tasks close');
-    const batchRunPath = path.join(tempRoot, '.atm', 'runtime', 'batch-run.json');
+    const batchRunPath = path.join(tempRoot, '.atm', 'runtime', 'batch-runs', `${ledgerBatchId}.json`);
     const corruptedBatchRun = JSON.parse(readFileSync(batchRunPath, 'utf8'));
     corruptedBatchRun.taskIds = ['TASK-LEDGER-0002'];
     corruptedBatchRun.currentIndex = 0;
@@ -180,10 +184,32 @@ async function main() {
     const brokenBatchNext = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-LEDGER-0002']);
     assert(brokenBatchNext.ok === false, 'next must not continue through an inconsistent active batch');
     assert(brokenBatchNext.messages.some((entry) => entry.code === 'ATM_BATCH_STATE_REPAIR_REQUIRED'), 'next must return the batch repair route when runtime is inconsistent');
-    const repairBatch = await runBatch(['repair', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--json']);
+    const repairBatch = await runBatch(['repair', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--batch', ledgerBatchId, '--json']);
     assert(repairBatch.ok === true, 'batch repair must succeed for a queue-backed inconsistent batch');
     assert((repairBatch.evidence.after as any)?.taskIds?.includes('TASK-LEDGER-0001'), 'batch repair must restore the full task queue task list');
     assert((repairBatch.evidence.after as any)?.currentTaskId === 'TASK-LEDGER-0001', 'batch repair must restore the queue head as current task');
+
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-RANGE-0001.json'), 'TASK-RANGE-0001', 'Range first task', 'docs/range-one.md');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-RANGE-0002.json'), 'TASK-RANGE-0002', 'Range second task', 'docs/range-two.md');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-RANGE-0003.json'), 'TASK-RANGE-0003', 'Range third task', 'docs/range-three.md');
+    const explicitRangeClaim = await runNext([
+      '--cwd', tempRoot,
+      '--claim',
+      '--actor', 'prompt-scope-test',
+      '--prompt', 'complete selected range',
+      '--tasks', 'TASK-RANGE-0003,TASK-RANGE-0001,TASK-RANGE-0002'
+    ]);
+    const rangeBatch = (explicitRangeClaim.evidence.batchRun as any) ?? {};
+    assert(rangeBatch.currentTaskId === 'TASK-RANGE-0003', 'explicit --tasks batch must preserve the caller supplied order');
+    assert(JSON.stringify(rangeBatch.taskIds) === JSON.stringify(['TASK-RANGE-0003', 'TASK-RANGE-0001', 'TASK-RANGE-0002']), 'explicit --tasks taskIds must be frozen in order');
+    const activeBatchesAfterRangeClaim = listActiveBatchRuns(tempRoot);
+    assert(activeBatchesAfterRangeClaim.length >= 2, `explicit --tasks claim must coexist with the existing ledger batch, got ${activeBatchesAfterRangeClaim.map((entry) => entry.batchId).join(',')}`);
+    const multiBatchStatus = await runBatch(['status', '--cwd', tempRoot, '--json']);
+    assert(multiBatchStatus.ok === false, 'batch status without selector must not guess when multiple active batches exist');
+    assert(multiBatchStatus.messages.some((entry) => entry.code === 'ATM_BATCH_SELECTION_REQUIRED'), 'multiple active batches must require --batch or --scope selection');
+    const selectedRangeStatus = await runBatch(['status', '--cwd', tempRoot, '--batch', rangeBatch.batchId, '--json']);
+    assert((selectedRangeStatus.evidence.batchRun as any)?.currentTaskId === 'TASK-RANGE-0003', 'batch status --batch must select the requested batch');
+    await runBatch(['abandon', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--batch', rangeBatch.batchId, '--json']);
 
     writeLedgerTask(path.join(ledgerTaskDir, 'SANGUO-BOOTSTRAP-0001.json'), 'SANGUO-BOOTSTRAP-0001', 'Running Sanguo bootstrap task', 'docs/sanguo.md', {
       status: 'running',

@@ -7,15 +7,17 @@ export default defineCommandSpec({
   options: [
     commonCwdOption,
     { flag: '--actor', value: 'id', summary: 'Actor id used for checkpoint or abandon actions.' },
+    { flag: '--batch', value: 'id', summary: 'Select a specific active batch run by batchId.' },
+    { flag: '--scope', value: 'key', summary: 'Select a specific active batch run by scopeKey when batchId is not available.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
   ],
   examples: [
     'node atm.mjs batch status --json',
-    'node atm.mjs batch repair --actor codex-main --json',
-    'node atm.mjs batch resume --actor codex-main --json',
-    'node atm.mjs batch checkpoint --actor codex-main --json',
-    'node atm.mjs batch abandon --actor codex-main --json'
+    'node atm.mjs batch repair --actor codex-main --batch batch-abc123 --json',
+    'node atm.mjs batch resume --actor codex-main --scope TASK-ASA --json',
+    'node atm.mjs batch checkpoint --actor codex-main --batch batch-abc123 --json',
+    'node atm.mjs batch abandon --actor codex-main --batch batch-abc123 --json'
   ]
 });

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { TaskDirectionTask, TaskQueueRecord } from './task-direction.ts';
 
@@ -21,6 +21,8 @@ export interface BatchRunRecord {
   readonly schemaId: 'atm.batchRun.v1';
   readonly specVersion: '0.1.0';
   readonly batchId: string;
+  readonly scopeKey: string;
+  readonly queueId: string | null;
   readonly sourcePrompt: string;
   readonly sourcePromptHash: string;
   readonly targetRepo: string | null;
@@ -37,6 +39,15 @@ export interface BatchRunRecord {
 
 const quickfixLockPath = ['.atm', 'runtime', 'quickfix-lock.json'] as const;
 const batchRunPath = ['.atm', 'runtime', 'batch-run.json'] as const;
+const batchRunsPath = ['.atm', 'runtime', 'batch-runs'] as const;
+
+export interface BatchRunSelector {
+  readonly batchId?: string | null;
+  readonly scopeKey?: string | null;
+  readonly taskId?: string | null;
+  readonly actorId?: string | null;
+  readonly sourcePrompt?: string | null;
+}
 
 export function readActiveQuickfixLock(cwd: string): QuickfixLock | null {
   const filePath = path.join(cwd, ...quickfixLockPath);
@@ -90,15 +101,89 @@ export function releaseQuickfixLock(cwd: string, actorId: string) {
   return released;
 }
 
-export function readActiveBatchRun(cwd: string): BatchRunRecord | null {
+export function readActiveBatchRun(cwd: string, selector: BatchRunSelector = {}): BatchRunRecord | null {
+  return selectActiveBatchRun(cwd, selector);
+}
+
+export function listActiveBatchRuns(cwd: string): readonly BatchRunRecord[] {
+  return dedupeBatchRuns([
+    ...listBatchRuns(cwd),
+    ...readLegacyBatchRun(cwd)
+  ]).filter((entry) => entry.status === 'active');
+}
+
+export function readBatchRunById(cwd: string, batchId: string): BatchRunRecord | null {
+  const normalized = normalizeBatchId(batchId);
+  if (!normalized) return null;
+  const filePath = path.join(cwd, ...batchRunsPath, `${normalized}.json`);
+  const direct = readBatchRunFile(filePath);
+  if (direct) return direct;
+  return listBatchRuns(cwd).find((entry) => entry.batchId === normalized) ?? readLegacyBatchRun(cwd).find((entry) => entry.batchId === normalized) ?? null;
+}
+
+export function findActiveBatchRunForTask(cwd: string, taskId: string): BatchRunRecord | null {
+  return selectActiveBatchRun(cwd, { taskId });
+}
+
+export function selectActiveBatchRun(cwd: string, selector: BatchRunSelector = {}): BatchRunRecord | null {
+  const active = listActiveBatchRuns(cwd);
+  const batchId = normalizeBatchId(selector.batchId ?? '');
+  if (batchId) return active.find((entry) => entry.batchId === batchId) ?? null;
+  const sourcePromptHash = selector.sourcePrompt?.trim() ? sha256(selector.sourcePrompt.trim()) : null;
+  const scopeKey = normalizeOptionalSelector(selector.scopeKey);
+  const taskId = normalizeOptionalSelector(selector.taskId);
+  const actorId = normalizeOptionalSelector(selector.actorId);
+  const filtered = active.filter((entry) => {
+    if (scopeKey && entry.scopeKey !== scopeKey) return false;
+    if (taskId && !entry.taskIds.includes(taskId)) return false;
+    if (actorId && entry.createdByActor !== actorId) return false;
+    if (sourcePromptHash && entry.sourcePromptHash !== sourcePromptHash) return false;
+    return true;
+  });
+  if (filtered.length === 1) return filtered[0] ?? null;
+  return null;
+}
+
+export function activeBatchSelectionStatus(cwd: string, selector: BatchRunSelector = {}) {
+  const active = listActiveBatchRuns(cwd);
+  const batchId = normalizeBatchId(selector.batchId ?? '');
+  if (batchId) {
+    const batchRun = active.find((entry) => entry.batchId === batchId) ?? null;
+    return {
+      ok: Boolean(batchRun),
+      reason: batchRun ? null : 'batch-not-found',
+      batchRun,
+      candidates: batchRun ? [batchRun] : []
+    };
+  }
+  const sourcePromptHash = selector.sourcePrompt?.trim() ? sha256(selector.sourcePrompt.trim()) : null;
+  const scopeKey = normalizeOptionalSelector(selector.scopeKey);
+  const taskId = normalizeOptionalSelector(selector.taskId);
+  const actorId = normalizeOptionalSelector(selector.actorId);
+  const candidates = active.filter((entry) => {
+    if (scopeKey && entry.scopeKey !== scopeKey) return false;
+    if (taskId && !entry.taskIds.includes(taskId)) return false;
+    if (actorId && entry.createdByActor !== actorId) return false;
+    if (sourcePromptHash && entry.sourcePromptHash !== sourcePromptHash) return false;
+    return true;
+  });
+  return {
+    ok: candidates.length === 1,
+    reason: candidates.length === 0 ? 'batch-not-found' : candidates.length > 1 ? 'batch-selection-required' : null,
+    batchRun: candidates.length === 1 ? candidates[0] ?? null : null,
+    candidates
+  };
+}
+
+function readLegacyBatchRun(cwd: string): readonly BatchRunRecord[] {
   const filePath = path.join(cwd, ...batchRunPath);
-  if (!existsSync(filePath)) return null;
+  if (!existsSync(filePath)) return [];
   try {
     const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as BatchRunRecord;
-    if (parsed.schemaId !== 'atm.batchRun.v1' || parsed.status !== 'active') return null;
-    return parsed;
+    if (parsed.schemaId !== 'atm.batchRun.v1') return [];
+    return [normalizeBatchRunRecord(parsed)];
   } catch {
-    return null;
+    return [];
   }
 }
 
@@ -117,12 +202,14 @@ export function writeBatchRun(input: {
   const taskIds = input.queue?.taskIds && input.queue.taskIds.length > 0
     ? [...input.queue.taskIds]
     : sourceTasks.map((task) => task.workItemId);
-  const filePath = path.join(input.cwd, ...batchRunPath);
   const currentIndex = input.queue?.currentIndex ?? 0;
+  const batchId = `batch-${sha256(`${prompt}|${taskIds.join(',')}`).slice(0, 12)}`;
   const record: BatchRunRecord = {
     schemaId: 'atm.batchRun.v1',
     specVersion: '0.1.0',
-    batchId: `batch-${sha256(`${prompt}|${taskIds.join(',')}`).slice(0, 12)}`,
+    batchId,
+    scopeKey: deriveBatchScopeKey(sourceTasks, prompt, taskIds),
+    queueId: input.queue?.queueId ?? null,
     sourcePrompt: prompt,
     sourcePromptHash: sha256(prompt),
     targetRepo: input.queue?.targetRepo ?? resolveBatchTargetRepo(sourceTasks),
@@ -136,20 +223,17 @@ export function writeBatchRun(input: {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
-  mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+  writeBatchRunRecord(input.cwd, record);
   return record;
 }
 
 export function updateBatchRun(cwd: string, current: BatchRunRecord, updates: Partial<BatchRunRecord>) {
-  const filePath = path.join(cwd, ...batchRunPath);
   const record: BatchRunRecord = {
     ...current,
     ...updates,
     updatedAt: new Date().toISOString()
   };
-  mkdirSync(path.dirname(filePath), { recursive: true });
-  writeFileSync(filePath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+  writeBatchRunRecord(cwd, record);
   return record;
 }
 
@@ -200,11 +284,34 @@ export function inspectBatchRunConsistency(batchRun: BatchRunRecord | null, task
 export function repairBatchRunFromQueue(cwd: string, batchRun: BatchRunRecord, taskQueue: TaskQueueRecord) {
   const queueHeadTaskId = taskQueue.taskIds[taskQueue.currentIndex] ?? null;
   return updateBatchRun(cwd, batchRun, {
+    queueId: taskQueue.queueId,
+    scopeKey: taskQueue.scopeKey ?? batchRun.scopeKey,
     targetRepo: taskQueue.targetRepo,
     taskIds: [...taskQueue.taskIds],
     currentIndex: taskQueue.currentIndex,
     currentTaskId: queueHeadTaskId,
     status: taskQueue.status === 'completed' || !queueHeadTaskId ? 'completed' : 'active'
+  });
+}
+
+export function findBatchFileConflicts(input: {
+  readonly currentBatchId: string | null;
+  readonly files: readonly string[];
+  readonly otherBatches: readonly BatchRunRecord[];
+  readonly allowedFilesByBatchId: ReadonlyMap<string, readonly string[]>;
+}) {
+  const files = input.files.map(normalizeRelativePath).filter(Boolean).filter((entry) => !entry.toLowerCase().startsWith('.atm/history/'));
+  return input.otherBatches.flatMap((batchRun) => {
+    if (input.currentBatchId && batchRun.batchId === input.currentBatchId) return [];
+    const allowedFiles = input.allowedFilesByBatchId.get(batchRun.batchId) ?? [];
+    const overlappingFiles = files.filter((file) => isPathAllowedByScope(file, allowedFiles));
+    if (overlappingFiles.length === 0) return [];
+    return [{
+      batchId: batchRun.batchId,
+      scopeKey: batchRun.scopeKey,
+      taskIds: batchRun.taskIds,
+      overlappingFiles: uniqueStrings(overlappingFiles)
+    }];
   });
 }
 
@@ -252,6 +359,91 @@ export function isPathAllowedByScope(filePath: string, allowedFiles: readonly st
 
 function resolveBatchTargetRepo(tasks: readonly TaskDirectionTask[]) {
   return tasks.find((task) => task.targetRepo)?.targetRepo ?? null;
+}
+
+function writeBatchRunRecord(cwd: string, record: BatchRunRecord) {
+  const recordPath = path.join(cwd, ...batchRunsPath, `${record.batchId}.json`);
+  mkdirSync(path.dirname(recordPath), { recursive: true });
+  writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+
+  // Keep the historical single-file location as a compatibility pointer for
+  // older runners and adoption repos during the scoped-batch migration.
+  const legacyPath = path.join(cwd, ...batchRunPath);
+  mkdirSync(path.dirname(legacyPath), { recursive: true });
+  writeFileSync(legacyPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+}
+
+function listBatchRuns(cwd: string): readonly BatchRunRecord[] {
+  const root = path.join(cwd, ...batchRunsPath);
+  if (!existsSync(root)) return [];
+  try {
+    return readDirJsonFiles(root).flatMap((filePath) => {
+      const record = readBatchRunFile(filePath);
+      return record ? [record] : [];
+    });
+  } catch {
+    return [];
+  }
+}
+
+function readBatchRunFile(filePath: string): BatchRunRecord | null {
+  if (!existsSync(filePath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as BatchRunRecord;
+    if (parsed.schemaId !== 'atm.batchRun.v1') return null;
+    return normalizeBatchRunRecord(parsed);
+  } catch {
+    return null;
+  }
+}
+
+function readDirJsonFiles(root: string): readonly string[] {
+  return readdirSync(root)
+    .filter((entry) => entry.endsWith('.json'))
+    .map((entry) => path.join(root, entry));
+}
+
+function normalizeBatchRunRecord(record: BatchRunRecord): BatchRunRecord {
+  const taskIds = Array.isArray(record.taskIds) ? record.taskIds.map(String).filter(Boolean) : [];
+  return {
+    ...record,
+    scopeKey: record.scopeKey || deriveBatchScopeKey([], record.sourcePrompt ?? '', taskIds),
+    queueId: record.queueId ?? null,
+    taskIds
+  };
+}
+
+function dedupeBatchRuns(records: readonly BatchRunRecord[]) {
+  const seen = new Set<string>();
+  const output: BatchRunRecord[] = [];
+  for (const record of records) {
+    if (!record.batchId || seen.has(record.batchId)) continue;
+    seen.add(record.batchId);
+    output.push(record);
+  }
+  return output.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+}
+
+function deriveBatchScopeKey(tasks: readonly TaskDirectionTask[], prompt: string, taskIds: readonly string[]) {
+  const idRoots = uniqueStrings(taskIds.map((taskId) => {
+    const match = taskId.match(/^(.+?)-\d{2,}(?:-.+)?$/);
+    return match?.[1] ?? '';
+  }).filter(Boolean));
+  if (idRoots.length === 1) return idRoots[0] ?? 'custom';
+  const planPaths = uniqueStrings(tasks.map((task) => task.sourcePlanPath).filter((entry): entry is string => Boolean(entry)));
+  if (planPaths.length === 1) return `plan-${sha256(planPaths[0] ?? '').slice(0, 12)}`;
+  if (taskIds.length > 0) return `tasks-${sha256(taskIds.join('\n')).slice(0, 12)}`;
+  return `prompt-${sha256(prompt).slice(0, 12)}`;
+}
+
+function normalizeBatchId(value: string) {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > 0 ? normalized : '';
+}
+
+function normalizeOptionalSelector(value: string | null | undefined) {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > 0 ? normalized : null;
 }
 
 function normalizeRelativePath(value: string | null | undefined) {

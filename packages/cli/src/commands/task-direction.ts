@@ -29,6 +29,8 @@ export interface TaskQueueRecord {
   readonly schemaId: 'atm.taskQueue.v1';
   readonly specVersion: '0.1.0';
   readonly queueId: string;
+  readonly batchId: string | null;
+  readonly scopeKey: string | null;
   readonly sourcePrompt: string;
   readonly sourcePromptHash: string;
   readonly sourcePlanPath: string | null;
@@ -49,6 +51,8 @@ export interface TaskDirectionLock {
   readonly schemaId: 'atm.taskDirectionLock.v1';
   readonly specVersion: '0.1.0';
   readonly taskId: string;
+  readonly batchId: string | null;
+  readonly scopeKey: string | null;
   readonly queueId: string | null;
   readonly queueIndex: number | null;
   readonly allowedFiles: readonly string[];
@@ -66,9 +70,14 @@ export function createOrRefreshTaskQueue(input: {
   readonly sourcePrompt: string;
   readonly tasks: readonly TaskDirectionTask[];
   readonly actorId?: string | null;
+  readonly batchId?: string | null;
+  readonly scopeKey?: string | null;
+  readonly taskIds?: readonly string[] | null;
 }): TaskQueueRecord {
   const sourcePrompt = input.sourcePrompt.trim();
-  const taskIds = uniqueSorted(input.tasks.map((task) => task.workItemId));
+  const taskIds = input.taskIds && input.taskIds.length > 0
+    ? uniqueInOrder(input.taskIds)
+    : uniqueInOrder(input.tasks.map((task) => task.workItemId));
   const queueId = buildQueueId(sourcePrompt, taskIds);
   const now = new Date().toISOString();
   const existing = readTaskQueue(input.cwd, queueId);
@@ -79,6 +88,8 @@ export function createOrRefreshTaskQueue(input: {
     schemaId: 'atm.taskQueue.v1',
     specVersion: '0.1.0',
     queueId,
+    batchId: existing?.batchId ?? input.batchId ?? null,
+    scopeKey: existing?.scopeKey ?? input.scopeKey ?? deriveQueueScopeKey(input.tasks, taskIds),
     sourcePrompt,
     sourcePromptHash: sha256(sourcePrompt),
     sourcePlanPath: resolveQueueSourcePlan(input.tasks),
@@ -95,9 +106,13 @@ export function createOrRefreshTaskQueue(input: {
   return record;
 }
 
-export function findActiveTaskQueue(cwd: string, sourcePrompt?: string | null): TaskQueueRecord | null {
+export function findActiveTaskQueue(cwd: string, sourcePrompt?: string | null, selector: { readonly queueId?: string | null; readonly batchId?: string | null; readonly scopeKey?: string | null; readonly taskId?: string | null } = {}): TaskQueueRecord | null {
   const promptHash = sourcePrompt?.trim() ? sha256(sourcePrompt.trim()) : null;
   const queues = listTaskQueues(cwd).filter((queue) => queue.status === 'active');
+  if (selector.queueId) return queues.find((queue) => queue.queueId === selector.queueId) ?? null;
+  if (selector.batchId) return queues.find((queue) => queue.batchId === selector.batchId) ?? null;
+  if (selector.scopeKey) return queues.find((queue) => queue.scopeKey === selector.scopeKey) ?? null;
+  if (selector.taskId) return queues.find((queue) => queue.taskIds.includes(selector.taskId ?? '')) ?? null;
   if (promptHash) {
     const exact = queues.find((queue) => queue.sourcePromptHash === promptHash);
     return exact ?? null;
@@ -131,8 +146,8 @@ export function abandonTaskQueue(input: {
   return abandoned;
 }
 
-export function advanceTaskQueueAfterClose(cwd: string, taskId: string): TaskQueueRecord | null {
-  const queue = findActiveTaskQueue(cwd);
+export function advanceTaskQueueAfterClose(cwd: string, taskId: string, selector: { readonly batchId?: string | null; readonly queueId?: string | null } = {}): TaskQueueRecord | null {
+  const queue = findActiveTaskQueue(cwd, null, { ...selector, taskId });
   if (!queue) return null;
   const currentTaskId = queue.taskIds[queue.currentIndex] ?? null;
   if (currentTaskId !== taskId) return queue;
@@ -161,6 +176,8 @@ export function writeTaskDirectionLock(input: {
   readonly taskId: string;
   readonly actorId: string;
   readonly queue: TaskQueueRecord | null;
+  readonly batchId?: string | null;
+  readonly scopeKey?: string | null;
   readonly allowedFiles: readonly string[];
   readonly planningReadOnlyPaths?: readonly string[];
   readonly planningMirrorPaths?: readonly string[];
@@ -172,6 +189,8 @@ export function writeTaskDirectionLock(input: {
     schemaId: 'atm.taskDirectionLock.v1',
     specVersion: '0.1.0',
     taskId: input.taskId,
+    batchId: input.batchId ?? input.queue?.batchId ?? null,
+    scopeKey: input.scopeKey ?? input.queue?.scopeKey ?? null,
     queueId: input.queue?.queueId ?? null,
     queueIndex: queueIndex >= 0 ? queueIndex : null,
     allowedFiles: sanitizeTaskDirectionAllowedFiles(input.allowedFiles),
@@ -229,7 +248,7 @@ export function readActiveTaskDirectionLocks(cwd: string): readonly TaskDirectio
 }
 
 export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, actorId: string) {
-  const activeQueue = findActiveTaskQueue(cwd);
+  const activeQueue = findActiveTaskQueue(cwd, null, { taskId });
   if (activeQueue) {
     const currentTaskId = activeQueue.taskIds[activeQueue.currentIndex] ?? null;
     if (currentTaskId && currentTaskId !== taskId) {
@@ -355,7 +374,13 @@ function readTaskQueue(cwd: string, queueId: string): TaskQueueRecord | null {
   if (!existsSync(queuePath)) return null;
   try {
     const parsed = JSON.parse(readFileSync(queuePath, 'utf8')) as TaskQueueRecord;
-    return parsed.schemaId === 'atm.taskQueue.v1' ? parsed : null;
+    return parsed.schemaId === 'atm.taskQueue.v1'
+      ? {
+        ...parsed,
+        batchId: parsed.batchId ?? null,
+        scopeKey: parsed.scopeKey ?? deriveQueueScopeKey(parsed.tasks ?? [], parsed.taskIds ?? [])
+      }
+      : null;
   } catch {
     return null;
   }
@@ -369,6 +394,18 @@ function writeTaskQueue(cwd: string, record: TaskQueueRecord) {
 
 function buildQueueId(sourcePrompt: string, taskIds: readonly string[]) {
   return `queue-${sha256([sourcePrompt.trim(), ...taskIds].join('\n')).slice(0, 16)}`;
+}
+
+function deriveQueueScopeKey(tasks: readonly TaskDirectionTask[], taskIds: readonly string[]) {
+  const idRoots = uniqueSorted(taskIds.map((taskId) => {
+    const match = taskId.match(/^(.+?)-\d{2,}(?:-.+)?$/);
+    return match?.[1] ?? '';
+  }).filter(Boolean));
+  if (idRoots.length === 1) return idRoots[0] ?? null;
+  const planPaths = uniqueSorted(tasks.map((task) => task.sourcePlanPath).filter((entry): entry is string => Boolean(entry)));
+  if (planPaths.length === 1) return `plan-${sha256(planPaths[0] ?? '').slice(0, 12)}`;
+  if (taskIds.length > 0) return `tasks-${sha256(taskIds.join('\n')).slice(0, 12)}`;
+  return null;
 }
 
 function resolveQueueSourcePlan(tasks: readonly TaskDirectionTask[]) {
@@ -457,6 +494,17 @@ function normalizeRelativePath(value: string) {
 
 function uniqueSorted(values: readonly string[]) {
   return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
+function uniqueInOrder(values: readonly string[]) {
+  const seen = new Set<string>();
+  const output: string[] = [];
+  for (const value of values.map(normalizeRelativePath).filter(Boolean)) {
+    if (seen.has(value)) continue;
+    seen.add(value);
+    output.push(value);
+  }
+  return output;
 }
 
 export function toProjectPath(cwd: string, absolutePath: string) {

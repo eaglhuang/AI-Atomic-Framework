@@ -1035,6 +1035,7 @@ function isProtectedAtmManagedStatePath(value: string): boolean {
     || normalized.startsWith('.atm/history/evidence/')
     || normalized.startsWith('.atm/runtime/locks/')
     || normalized.startsWith('.atm/runtime/task-direction-locks/')
+    || normalized.startsWith('.atm/runtime/batch-runs/')
     || normalized.startsWith('.atm/runtime/task-queues/')
     || normalized === '.atm/runtime/current-task.json'
     || normalized === '.atm/runtime/guidance/active-session.json';
