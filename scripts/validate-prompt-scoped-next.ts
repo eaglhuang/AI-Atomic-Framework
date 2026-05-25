@@ -16,8 +16,10 @@ async function main() {
     const planDir = path.join(tempRoot, 'docs', 'plan');
     const taskDir = path.join(planDir, 'tasks');
     const otherTaskDir = path.join(tempRoot, 'docs', 'other', 'tasks');
+    const ignoredTmpTaskDir = path.join(tempRoot, 'local', 'tmp', 'sanguo-rag-smoke', 'tasks');
     mkdirSync(taskDir, { recursive: true });
     mkdirSync(otherTaskDir, { recursive: true });
+    mkdirSync(ignoredTmpTaskDir, { recursive: true });
 
     writeFileSync(path.join(planDir, 'PlanAlpha.md'), '# Plan Alpha\n', 'utf8');
     writeFileSync(path.join(tempRoot, 'docs', 'other', 'OtherPlan.md'), '# Other Plan\n', 'utf8');
@@ -25,6 +27,7 @@ async function main() {
     writeTaskCard(path.join(taskDir, 'TASK-ALPHA-0002.task.md'), 'TASK-ALPHA-0002', 'Alpha second task');
     writeTaskCard(path.join(otherTaskDir, 'TASK-OTHER-0001.task.md'), 'TASK-OTHER-0001', 'Other task');
     writeTaskCard(path.join(otherTaskDir, 'SANGUO-BOOTSTRAP-0001.task.md'), 'SANGUO-BOOTSTRAP-0001', 'Sanguo bootstrap task');
+    writeTaskCard(path.join(ignoredTmpTaskDir, 'TASK-TMP-0001.task.md'), 'TASK-TMP-0001', 'Temporary task that discovery must ignore');
 
     const exact = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
@@ -34,6 +37,9 @@ async function main() {
     const genericExact = await runNext(['--cwd', tempRoot, '--prompt', '請處理 SANGUO-BOOTSTRAP-0001']);
     assert(genericExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'generic governed task id prompt must route to one task');
     assert((genericExact.evidence.nextAction as any).selectedTask.workItemId === 'SANGUO-BOOTSTRAP-0001', 'generic governed task id prompt selected wrong task');
+
+    const ignoredTmpExact = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-TMP-0001']);
+    assert(!ignoredTmpExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'task discovery must ignore task cards under local/tmp');
 
     const quickfixPrompt = '請小修 tsconfig.json typo';
     const quickfixRoute = await runNext(['--cwd', tempRoot, '--prompt', quickfixPrompt]);

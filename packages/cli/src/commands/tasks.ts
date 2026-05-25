@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync, type Dirent } from 'node:fs';
 import path from 'node:path';
 import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
@@ -2502,13 +2502,13 @@ function writeLegacyBaselineTransition(input: {
 
 function listTaskFiles(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
   if (!existsSync(directoryPath)) return [];
-  const stats = statSync(directoryPath);
+  const stats = safeTaskFileStat(directoryPath);
+  if (!stats) return [];
   if (stats.isFile()) return predicate(directoryPath) ? [directoryPath] : [];
-  const ignoredDirs = new Set(['.git', 'node_modules', 'dist', 'build', 'release', '.atm-temp']);
   const output: string[] = [];
-  for (const entry of readdirSync(directoryPath, { withFileTypes: true })) {
-    if (entry.isDirectory() && ignoredDirs.has(entry.name)) continue;
+  for (const entry of safeTaskFileReadDir(directoryPath)) {
     const absolutePath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory() && shouldSkipTaskFileDiscoveryDirectory(absolutePath)) continue;
     if (entry.isDirectory()) {
       output.push(...listTaskFiles(absolutePath, predicate));
     } else if (entry.isFile() && predicate(absolutePath)) {
@@ -2516,6 +2516,45 @@ function listTaskFiles(directoryPath: string, predicate: (filePath: string) => b
     }
   }
   return output;
+}
+
+function safeTaskFileReadDir(directoryPath: string): readonly Dirent[] {
+  try {
+    return readdirSync(directoryPath, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+}
+
+function safeTaskFileStat(filePath: string) {
+  try {
+    return statSync(filePath);
+  } catch {
+    return null;
+  }
+}
+
+function shouldSkipTaskFileDiscoveryDirectory(directoryPath: string) {
+  const normalized = directoryPath.replace(/\\/g, '/');
+  const segments = normalized.split('/').filter(Boolean);
+  const basename = segments[segments.length - 1] ?? '';
+  const ignoredSegmentNames = new Set([
+    '.git',
+    'node_modules',
+    'dist',
+    'build',
+    'release',
+    '.atm-temp',
+    'scratch',
+    'tmp',
+    'temp',
+    'library',
+    'coverage',
+    '.next',
+    '.turbo'
+  ]);
+  if (ignoredSegmentNames.has(basename)) return true;
+  return segments.some((segment, index) => segment === 'local' && (segments[index + 1] === 'tmp' || segments[index + 1] === 'temp'));
 }
 
 function readJsonRecord(filePath: string): Record<string, unknown> {

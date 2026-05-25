@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
 import type { GuidanceNextAction } from '../../../core/src/guidance/guidance-packet.ts';
@@ -1499,13 +1499,13 @@ function listTaskCardFiles(cwd: string): readonly string[] {
 
 function listFilesRecursive(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
   if (!existsSync(directoryPath)) return [];
-  const stats = statSync(directoryPath);
+  const stats = safeStat(directoryPath);
+  if (!stats) return [];
   if (stats.isFile()) return predicate(directoryPath) ? [directoryPath] : [];
-  const ignoredDirs = new Set(['.git', 'node_modules', 'dist', 'build', 'release', '.atm-temp', 'scratch']);
   const output: string[] = [];
-  for (const entry of readdirSync(directoryPath, { withFileTypes: true })) {
-    if (entry.isDirectory() && ignoredDirs.has(entry.name)) continue;
+  for (const entry of safeReadDir(directoryPath)) {
     const absolutePath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory() && shouldSkipRecursiveDiscoveryDirectory(absolutePath)) continue;
     if (entry.isDirectory()) {
       output.push(...listFilesRecursive(absolutePath, predicate));
     } else if (entry.isFile() && predicate(absolutePath)) {
@@ -1519,9 +1519,48 @@ function findNearbyPlanPaths(cwd: string, taskPath: string): readonly string[] {
   const taskDir = path.dirname(taskPath);
   const parent = path.basename(taskDir).toLowerCase() === 'tasks' ? path.dirname(taskDir) : taskDir;
   if (!existsSync(parent)) return [];
-  return readdirSync(parent, { withFileTypes: true })
+  return safeReadDir(parent)
     .filter((entry) => entry.isFile() && entry.name.endsWith('.md') && !entry.name.endsWith('.task.md'))
     .map((entry) => path.relative(cwd, path.join(parent, entry.name)).replace(/\\/g, '/'));
+}
+
+function safeReadDir(directoryPath: string): readonly Dirent[] {
+  try {
+    return readdirSync(directoryPath, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+}
+
+function safeStat(filePath: string) {
+  try {
+    return statSync(filePath);
+  } catch {
+    return null;
+  }
+}
+
+function shouldSkipRecursiveDiscoveryDirectory(directoryPath: string) {
+  const normalized = directoryPath.replace(/\\/g, '/');
+  const segments = normalized.split('/').filter(Boolean);
+  const ignoredSegmentNames = new Set([
+    '.git',
+    'node_modules',
+    'dist',
+    'build',
+    'release',
+    '.atm-temp',
+    'scratch',
+    'tmp',
+    'temp',
+    'library',
+    'coverage',
+    '.next',
+    '.turbo'
+  ]);
+  const basename = segments[segments.length - 1] ?? '';
+  if (ignoredSegmentNames.has(basename)) return true;
+  return segments.some((segment, index) => segment === 'local' && (segments[index + 1] === 'tmp' || segments[index + 1] === 'temp'));
 }
 
 function parseMarkdownFrontmatter(text: string): Record<string, unknown> {
