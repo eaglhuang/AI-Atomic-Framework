@@ -152,6 +152,23 @@ target_repo: AI-Atomic-Framework
     assert(dogfoodAllowedFiles.includes('atomic_workbench/atomization-coverage/dogfood-score.json'), 'linked task-card artifact basename must resolve dogfood-score.json into targetWork.allowedFiles');
     assert(dogfoodAllowedFiles.includes('atomic_workbench/atomization-coverage/dogfood-score.md'), 'linked task-card artifact basename must resolve dogfood-score.md into targetWork.allowedFiles even before the markdown report exists');
 
+    writeFileSync(path.join(taskDir, 'TASK-FRONTMATTER-0001.task.md'), `---
+task_id: TASK-FRONTMATTER-0001
+title: Frontmatter declared scope
+status: planned
+target_repo: AI-Atomic-Framework
+scope: [packages/cli/src/commands/evidence.ts, scripts/validate-evidence-command-runs.ts]
+deliverables:
+  - packages/cli/src/commands/command-specs/evidence.spec.ts
+---
+# TASK-FRONTMATTER-0001
+`, 'utf8');
+    const frontmatterRoute = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-FRONTMATTER-0001']);
+    const frontmatterAllowedFiles = (frontmatterRoute.evidence.nextAction as any).selectedTask?.targetAllowedFiles ?? [];
+    assert(frontmatterAllowedFiles.includes('packages/cli/src/commands/evidence.ts'), 'frontmatter scope inline array must feed targetWork.allowedFiles');
+    assert(frontmatterAllowedFiles.includes('scripts/validate-evidence-command-runs.ts'), 'frontmatter scope must preserve comma-separated path entries');
+    assert(frontmatterAllowedFiles.includes('packages/cli/src/commands/command-specs/evidence.spec.ts'), 'frontmatter deliverables list must feed targetWork.allowedFiles');
+
     writeFileSync(path.join(taskDir, 'TASK-COVERAGE-0004.task.md'), `---
 task_id: TASK-COVERAGE-0004
 title: Coverage guard and validate

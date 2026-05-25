@@ -22,6 +22,7 @@ import {
   findActiveTaskQueue,
   isTaskDirectionPathCandidate,
   partitionTaskScope,
+  type TaskQueueRecord,
   writeTaskDirectionLock
 } from './task-direction.ts';
 import {
@@ -538,6 +539,13 @@ async function claimNextImportedTask(input: {
       scopeKey: batchRun.scopeKey
     })
     : activeQueue;
+  if (batchRun && queueForDirection) {
+    await cleanupPreviousBatchQueueLocks({
+      cwd: input.cwd,
+      actorId: resolvedActor.actorId,
+      queue: queueForDirection
+    });
+  }
   const directionLock = writeTaskDirectionLock({
     cwd: input.cwd,
     taskId: claimableTask.workItemId,
@@ -638,6 +646,33 @@ async function claimNextImportedTask(input: {
       runtimeAdapterReadiness: input.runtimeAdapterReadiness
     }
   });
+}
+
+async function cleanupPreviousBatchQueueLocks(input: {
+  readonly cwd: string;
+  readonly actorId: string;
+  readonly queue: TaskQueueRecord;
+}) {
+  const previousTaskIds = input.queue.taskIds.slice(0, Math.max(0, input.queue.currentIndex));
+  for (const taskId of previousTaskIds) {
+    try {
+      await runTasks([
+        'lock',
+        'cleanup',
+        '--cwd',
+        input.cwd,
+        '--task',
+        taskId,
+        '--actor',
+        input.actorId,
+        '--reason',
+        'batch queue stale lock auto cleanup',
+        '--json'
+      ]);
+    } catch {
+      // The cleanup command already refuses active/non-stale locks; this is best-effort only.
+    }
+  }
 }
 
 function buildPromptScopedNextResult(input: {
@@ -2340,10 +2375,20 @@ function parseMarkdownFrontmatter(text: string): Record<string, unknown> {
 
 function splitListValue(value: unknown): readonly string[] {
   if (Array.isArray(value)) {
-    return value.map((entry) => String(entry).trim()).filter(Boolean);
+    return uniqueSorted(value.flatMap((entry) => splitListValue(entry)));
   }
   if (typeof value !== 'string') return [];
-  return value.split(/[,\s]+/).map((entry) => entry.trim()).filter(Boolean);
+  const trimmed = value.trim();
+  if (!trimmed) return [];
+  const inlineArray = /^\[(.*)\]$/.exec(trimmed);
+  const source = inlineArray ? inlineArray[1] : trimmed;
+  if (source.includes(',') || inlineArray) {
+    return uniqueSorted(source
+      .split(',')
+      .map((entry) => entry.trim().replace(/^['"]|['"]$/g, ''))
+      .filter(Boolean));
+  }
+  return [trimmed.replace(/^['"]|['"]$/g, '')].filter(Boolean);
 }
 
 function normalizeOptionalString(value: unknown): string | null {
@@ -2360,7 +2405,7 @@ function normalizeOptionalBoolean(value: unknown): boolean | null {
 }
 
 function readStringArray(value: unknown): readonly string[] {
-  return Array.isArray(value) ? uniqueSorted(value.map((entry) => String(entry).trim()).filter(Boolean)) : [];
+  return splitListValue(value);
 }
 
 function allowsPlanningMirror(record: Record<string, unknown>): boolean {
@@ -2811,8 +2856,9 @@ function buildChannelPlaybook(input: {
         'Read that task contract and implement the real non-.atm deliverables.',
         'Run the required validator or a focused reproducible verification command.',
         'Add command-backed evidence for the current queue head.',
+        'Stage the deliverables and evidence before checkpoint, but do not commit yet.',
         `Run: node atm.mjs batch checkpoint --actor ${actor} --json`,
-        'Only after checkpoint succeeds, commit the deliverables plus .atm/history/tasks/<task>.json, .atm/history/evidence/<task>.json, and .atm/history/task-events/<task>/ in one commit.',
+        'After checkpoint succeeds, stage the updated .atm/history task/event files and create one commit that contains both deliverables and checkpoint state.',
         'Continue with the next queue head returned by batch checkpoint.'
       ],
       doNot: [
@@ -2826,11 +2872,12 @@ function buildChannelPlaybook(input: {
         `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
         '<implement queue-head deliverables>',
         'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
+        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
-        'git add <deliverables> .atm/history/tasks/<queue-head-task-id>.json .atm/history/evidence/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
+        'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
         'git commit -m "<scope>: complete <queue-head-task-id>"'
       ],
-      commitTiming: 'Commit only after batch checkpoint succeeds for the current queue head.',
+      commitTiming: 'Stage deliverables before checkpoint; commit once after batch checkpoint succeeds.',
       checkpointCommand: `node atm.mjs batch checkpoint --actor ${actor} --json`
     };
   }

@@ -164,7 +164,7 @@ export async function runBatch(argv: string[]) {
         closedTaskId: currentTaskId,
         nextTaskId: updated.currentTaskId,
         deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.',
-        commitInstruction: `Checkpoint succeeded. Now commit the deliverables plus .atm/history/tasks/${currentTaskId}.json, .atm/history/evidence/${currentTaskId}.json, and .atm/history/task-events/${currentTaskId}/ together.`,
+        commitInstruction: `Checkpoint succeeded. Stage .atm/history/tasks/${currentTaskId}.json and .atm/history/task-events/${currentTaskId}/, then create one commit that contains the already staged deliverables, evidence, task file, and task events.`,
         continueInstruction: updated.status === 'completed'
           ? 'Batch is complete after this checkpoint commit.'
           : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId} using --batch ${updated.batchId}.`
@@ -181,7 +181,11 @@ export async function runBatch(argv: string[]) {
         actorId: resolvedActor.actorId,
         closedTaskId: currentTaskId,
         commitInstruction: {
-          timing: 'after-checkpoint-before-next-task',
+          timing: 'single-commit-after-checkpoint',
+          beforeCheckpoint: [
+            '<stage deliverables>',
+            `.atm/history/evidence/${currentTaskId}.json`
+          ],
           files: [
             '<deliverables>',
             `.atm/history/tasks/${currentTaskId}.json`,

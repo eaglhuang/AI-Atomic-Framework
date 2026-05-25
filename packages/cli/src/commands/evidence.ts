@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
@@ -28,6 +29,21 @@ interface EvidenceEnvelope {
   readonly taskId: string;
   readonly updatedAt: string;
   readonly evidence: readonly Record<string, unknown>[];
+}
+
+interface CommandRunEvidenceInput {
+  readonly command: string;
+  readonly cwd?: string;
+  readonly exitCode: number;
+  readonly stdoutSha256: string;
+  readonly stderrSha256: string;
+  readonly validators?: readonly string[];
+  readonly cached?: boolean;
+  readonly cacheKey?: string;
+  readonly runnerKind?: string;
+  readonly sourceCommit?: string;
+  readonly runnerVersion?: string;
+  readonly generatedAt?: string;
 }
 
 export interface EvidenceGateResult {
@@ -216,6 +232,37 @@ function runEvidenceAdd(argv: string[]) {
   const bundle = readEvidenceBundle(options.cwd, options.taskId);
   const nowIso = new Date().toISOString();
   const kind = normalizeEvidenceKind(options.kind);
+  const commandRuns = normalizeEvidenceCommandRuns({
+    cwd: options.cwd,
+    inlineRun: options.commandRun,
+    fileRuns: options.commandRuns,
+    runnerKind: options.runnerKind,
+    sourceCommit: options.sourceCommit
+  });
+  const validationPasses = uniqueStrings([
+    ...options.validators,
+    ...commandRuns.flatMap((run) => Array.isArray(run.validators) ? run.validators : [])
+  ]);
+  const commandRunCache = commandRuns.length > 0
+    ? {
+      schemaId: 'atm.commandRunCache.v1',
+      cacheKey: hashJson({
+        taskId: options.taskId,
+        commandRuns: commandRuns.map((run) => ({
+          command: run.command,
+          cwd: run.cwd ?? '.',
+          exitCode: run.exitCode,
+          stdoutSha256: run.stdoutSha256,
+          stderrSha256: run.stderrSha256,
+          runnerKind: run.runnerKind ?? null,
+          sourceCommit: run.sourceCommit ?? null
+        }))
+      }),
+      reusedRunCount: commandRuns.filter((run) => run.cached === true).length,
+      runCount: commandRuns.length,
+      sourcePath: options.commandRunsPath ? normalizeRelativePath(relativePathFrom(options.cwd, options.commandRunsPath)) : null
+    }
+    : null;
   const evidenceRecord: Record<string, unknown> = {
     evidenceKind: kind === 'waiver' ? 'waiver' : 'validation',
     evidenceType: kind,
@@ -228,8 +275,9 @@ function runEvidenceAdd(argv: string[]) {
       actorId,
       kind,
       freshness: options.freshness,
-      ...(options.validators.length > 0 ? { validationPasses: options.validators } : {}),
-      ...(options.commandRun ? { commandRuns: [options.commandRun] } : {})
+      ...(validationPasses.length > 0 ? { validationPasses } : {}),
+      ...(commandRuns.length > 0 ? { commandRuns } : {}),
+      ...(commandRunCache ? { commandRunCache } : {})
     }
   };
   const nextEvidence = [...bundle.evidence, evidenceRecord];
@@ -255,7 +303,9 @@ function runEvidenceAdd(argv: string[]) {
       kind,
       freshness: options.freshness,
       evidencePath: relativePathFrom(options.cwd, evidencePath),
-      evidenceCount: nextEvidence.length
+      evidenceCount: nextEvidence.length,
+      commandRunCount: commandRuns.length,
+      commandRunCache
     }
   });
 }
@@ -394,12 +444,12 @@ function parseEvidenceAddOptions(argv: string[]) {
     artifacts: [] as string[],
     freshness: 'fresh' as EvidenceFreshness,
     validators: [] as string[],
-    commandRun: null as null | {
-      readonly command: string;
-      readonly exitCode: number;
-      readonly stdoutSha256: string;
-      readonly stderrSha256: string;
-    }
+    commandRun: null as null | CommandRunEvidenceInput,
+    commandRuns: [] as CommandRunEvidenceInput[],
+    commandRunsPath: null as string | null,
+    commandRunsInputPath: null as string | null,
+    runnerKind: null as string | null,
+    sourceCommit: null as string | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -460,6 +510,21 @@ function parseEvidenceAddOptions(argv: string[]) {
       index += 1;
       continue;
     }
+    if (arg === '--command-runs') {
+      options.commandRunsInputPath = requireValue(argv, index, '--command-runs');
+      index += 1;
+      continue;
+    }
+    if (arg === '--runner-kind') {
+      options.runnerKind = normalizeRunnerKind(requireValue(argv, index, '--runner-kind'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--source-commit') {
+      options.sourceCommit = requireValue(argv, index, '--source-commit').trim();
+      index += 1;
+      continue;
+    }
     if (arg === '--exit-code' || arg === '--stdout-sha256' || arg === '--stderr-sha256') {
       requireValue(argv, index, arg);
       index += 1;
@@ -476,11 +541,15 @@ function parseEvidenceAddOptions(argv: string[]) {
   if (!options.kind) {
     throw new CliError('ATM_CLI_USAGE', 'evidence add requires --kind <test|artifact|attestation|review|commit|waiver>.', { exitCode: 2 });
   }
+  const cwd = path.resolve(options.cwd);
+  const commandRunsPath = options.commandRunsInputPath ? path.resolve(cwd, options.commandRunsInputPath) : null;
   return {
     ...options,
-    cwd: path.resolve(options.cwd),
+    cwd,
     taskId: options.taskId.trim(),
-    kind: options.kind.trim().toLowerCase()
+    kind: options.kind.trim().toLowerCase(),
+    commandRunsPath,
+    commandRuns: commandRunsPath ? readCommandRunsInputFile(commandRunsPath) : []
   };
 }
 
@@ -522,6 +591,166 @@ function parseGitHeadBackfillOptions(argv: string[]) {
     ...options,
     cwd: path.resolve(options.cwd)
   };
+}
+
+function readCommandRunsInputFile(filePath: string): CommandRunEvidenceInput[] {
+  if (!existsSync(filePath)) {
+    throw new CliError('ATM_COMMAND_RUNS_FILE_MISSING', `Command runs file not found: ${filePath}`, { exitCode: 2 });
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(filePath, 'utf8')) as unknown;
+  } catch (error) {
+    throw new CliError('ATM_COMMAND_RUNS_FILE_INVALID_JSON', `Command runs file is not valid JSON: ${filePath}`, {
+      exitCode: 2,
+      details: { error: error instanceof Error ? error.message : String(error) }
+    });
+  }
+  const records = Array.isArray(parsed)
+    ? parsed
+    : isRecord(parsed) && Array.isArray(parsed.commandRuns)
+      ? parsed.commandRuns
+      : isRecord(parsed) && Array.isArray(parsed.runs)
+        ? parsed.runs
+        : [];
+  if (records.length === 0) {
+    throw new CliError('ATM_COMMAND_RUNS_FILE_EMPTY', 'Command runs file must be an array or contain commandRuns[].', { exitCode: 2 });
+  }
+  return records.map((record, index) => normalizeCommandRunInput(record, `commandRuns/${index}`));
+}
+
+function normalizeEvidenceCommandRuns(input: {
+  readonly cwd: string;
+  readonly inlineRun: CommandRunEvidenceInput | null;
+  readonly fileRuns: readonly CommandRunEvidenceInput[];
+  readonly runnerKind: string | null;
+  readonly sourceCommit: string | null;
+}): readonly CommandRunEvidenceInput[] {
+  const sourceCommit = input.sourceCommit ?? readCurrentCommit(input.cwd);
+  return uniqueCommandRuns([
+    ...(input.inlineRun ? [input.inlineRun] : []),
+    ...input.fileRuns
+  ].map((run) => {
+    const runnerKind = normalizeRunnerKind(run.runnerKind ?? input.runnerKind ?? inferRunnerKindFromCommand(run.command));
+    return {
+      ...run,
+      cwd: run.cwd ?? '.',
+      runnerKind,
+      sourceCommit: run.sourceCommit ?? (runnerKind === 'dev-source' ? sourceCommit ?? undefined : undefined),
+      cacheKey: run.cacheKey ?? computeCommandRunCacheKey({
+        command: run.command,
+        cwd: run.cwd ?? '.',
+        exitCode: run.exitCode,
+        stdoutSha256: run.stdoutSha256,
+        stderrSha256: run.stderrSha256,
+        runnerKind,
+        sourceCommit: run.sourceCommit ?? (runnerKind === 'dev-source' ? sourceCommit ?? undefined : undefined)
+      }),
+      cached: run.cached === true,
+      generatedAt: run.generatedAt ?? new Date().toISOString()
+    };
+  }));
+}
+
+function normalizeCommandRunInput(value: unknown, label: string): CommandRunEvidenceInput {
+  if (!isRecord(value)) {
+    throw new CliError('ATM_COMMAND_RUN_INVALID', `Command run ${label} must be an object.`, { exitCode: 2 });
+  }
+  const command = typeof value.command === 'string' ? value.command.trim() : '';
+  const exitCode = typeof value.exitCode === 'number'
+    ? value.exitCode
+    : typeof value.exitCode === 'string'
+      ? Number.parseInt(value.exitCode, 10)
+      : Number.NaN;
+  const stdoutSha256 = typeof value.stdoutSha256 === 'string'
+    ? value.stdoutSha256.trim()
+    : typeof value.stdoutHash === 'string'
+      ? value.stdoutHash.trim()
+      : '';
+  const stderrSha256 = typeof value.stderrSha256 === 'string'
+    ? value.stderrSha256.trim()
+    : typeof value.stderrHash === 'string'
+      ? value.stderrHash.trim()
+      : '';
+  if (!command || !Number.isFinite(exitCode) || !isSha256(stdoutSha256) || !isSha256(stderrSha256)) {
+    throw new CliError('ATM_COMMAND_RUN_INVALID', `Command run ${label} requires command, exitCode, stdoutSha256, and stderrSha256.`, {
+      exitCode: 2,
+      details: { label }
+    });
+  }
+  return {
+    command,
+    cwd: typeof value.cwd === 'string' && value.cwd.trim() ? normalizeRelativePath(value.cwd) : undefined,
+    exitCode,
+    stdoutSha256,
+    stderrSha256,
+    validators: Array.isArray(value.validators) ? value.validators.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim()) : undefined,
+    cached: value.cached === true,
+    cacheKey: typeof value.cacheKey === 'string' && value.cacheKey.trim() ? value.cacheKey.trim() : undefined,
+    runnerKind: typeof value.runnerKind === 'string' && value.runnerKind.trim() ? normalizeRunnerKind(value.runnerKind) : undefined,
+    sourceCommit: typeof value.sourceCommit === 'string' && value.sourceCommit.trim() ? value.sourceCommit.trim() : undefined,
+    runnerVersion: typeof value.runnerVersion === 'string' && value.runnerVersion.trim() ? value.runnerVersion.trim() : undefined,
+    generatedAt: typeof value.generatedAt === 'string' && value.generatedAt.trim() ? value.generatedAt.trim() : undefined
+  };
+}
+
+function normalizeRunnerKind(value: string | null | undefined) {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  if (normalized === 'dev' || normalized === 'source' || normalized === 'dev-source' || normalized === 'atm.dev.mjs') return 'dev-source';
+  if (normalized === 'frozen' || normalized === 'release' || normalized === 'stable' || normalized === 'atm.mjs') return 'frozen-runner';
+  if (normalized === 'external' || normalized === 'host') return 'external';
+  return 'unknown';
+}
+
+function inferRunnerKindFromCommand(command: string) {
+  if (/\batm\.dev\.mjs\b/.test(command)) return 'dev-source';
+  if (/\batm\.mjs\b/.test(command)) return 'frozen-runner';
+  return 'unknown';
+}
+
+function uniqueCommandRuns(runs: readonly CommandRunEvidenceInput[]) {
+  const seen = new Set<string>();
+  const output: CommandRunEvidenceInput[] = [];
+  for (const run of runs) {
+    const key = `${run.command}|${run.cwd ?? '.'}|${run.exitCode}|${run.stdoutSha256}|${run.stderrSha256}|${run.runnerKind ?? ''}|${run.sourceCommit ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    output.push(run);
+  }
+  return output;
+}
+
+function computeCommandRunCacheKey(run: {
+  readonly command: string;
+  readonly cwd: string;
+  readonly exitCode: number;
+  readonly stdoutSha256: string;
+  readonly stderrSha256: string;
+  readonly runnerKind?: string;
+  readonly sourceCommit?: string;
+}) {
+  return hashJson({
+    schemaId: 'atm.commandRunCacheKey.v1',
+    command: run.command,
+    cwd: run.cwd,
+    exitCode: run.exitCode,
+    stdoutSha256: run.stdoutSha256,
+    stderrSha256: run.stderrSha256,
+    runnerKind: run.runnerKind ?? null,
+    sourceCommit: run.sourceCommit ?? null
+  });
+}
+
+function hashJson(value: unknown) {
+  return `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
+}
+
+function uniqueStrings(values: readonly string[]) {
+  return [...new Set(values.map((entry) => entry.trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
+function readCurrentCommit(cwd: string) {
+  return runGitScalar(cwd, ['rev-parse', '--verify', 'HEAD']) ?? undefined;
 }
 
 function parseEvidenceVerifyOptions(argv: string[]) {
