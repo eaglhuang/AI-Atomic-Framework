@@ -152,6 +152,30 @@ target_repo: AI-Atomic-Framework
     assert(dogfoodAllowedFiles.includes('atomic_workbench/atomization-coverage/dogfood-score.json'), 'linked task-card artifact basename must resolve dogfood-score.json into targetWork.allowedFiles');
     assert(dogfoodAllowedFiles.includes('atomic_workbench/atomization-coverage/dogfood-score.md'), 'linked task-card artifact basename must resolve dogfood-score.md into targetWork.allowedFiles even before the markdown report exists');
 
+    writeFileSync(path.join(taskDir, 'TASK-COVERAGE-0004.task.md'), `---
+task_id: TASK-COVERAGE-0004
+title: Coverage guard and validate
+status: planned
+target_repo: AI-Atomic-Framework
+---
+# TASK-COVERAGE-0004
+
+## Deliverables
+
+- node atm.mjs guard atomization-coverage --repo . --json
+- node atm.mjs validate atomization-coverage --repo . --json
+- npm run validate:atomization-coverage
+`, 'utf8');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-COVERAGE-0004.json'), 'TASK-COVERAGE-0004', 'Coverage guard and validate', 'atm.mjs', {
+      sourcePlanPath: 'docs/plan/tasks/TASK-COVERAGE-0004.task.md'
+    });
+    const coverageRoute = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-COVERAGE-0004']);
+    const coverageAllowedFiles = (coverageRoute.evidence.nextAction as any).selectedTask?.targetAllowedFiles ?? [];
+    assert(coverageAllowedFiles.includes('packages/cli/src/commands/guard.ts'), 'guard command task card must resolve guard.ts into targetWork.allowedFiles');
+    assert(coverageAllowedFiles.includes('packages/cli/src/commands/validate.ts'), 'validate command task card must resolve validate.ts into targetWork.allowedFiles');
+    assert(coverageAllowedFiles.includes('scripts/validate-atomization-coverage.ts'), 'validate topic task card must resolve topic validator script into targetWork.allowedFiles');
+    assert(coverageAllowedFiles.includes('package.json'), 'npm validate script task card must resolve package.json into targetWork.allowedFiles');
+
     const ledgerPrompt = 'TASK-LEDGER-0001 TASK-LEDGER-0002 all task cards';
     const ledgerQueue = await runNext(['--cwd', tempRoot, '--prompt', ledgerPrompt]);
     assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'ledger task prompt must create a queue');

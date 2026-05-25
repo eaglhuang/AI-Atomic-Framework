@@ -1998,7 +1998,8 @@ function collectDeclaredTaskPathValues(value: unknown, files: Set<string>) {
 function extractTaskArtifactPathsFromMarkdown(cwd: string, text: string) {
   return uniqueSorted([
     ...extractPathLikeStringsFromText(text),
-    ...resolveBareArtifactPathCandidates(cwd, extractBareArtifactFileNames(text))
+    ...resolveBareArtifactPathCandidates(cwd, extractBareArtifactFileNames(text)),
+    ...extractCommandSurfacePathsFromMarkdown(text)
   ]);
 }
 
@@ -2092,6 +2093,31 @@ function resolveAtomizationCoverageArtifactPath(fileName: string) {
   ]);
   if (!atomizationCoverageArtifacts.has(basename)) return null;
   return `atomic_workbench/atomization-coverage/${basename}`;
+}
+
+function extractCommandSurfacePathsFromMarkdown(text: string) {
+  const paths = new Set<string>();
+  for (const match of text.matchAll(/\bnode\s+atm\.mjs\s+(guard|validate)\s+([a-z][a-z0-9-]*)\b/gi)) {
+    const command = match[1]?.toLowerCase();
+    const topic = match[2]?.toLowerCase();
+    if (command === 'guard') {
+      paths.add('packages/cli/src/commands/guard.ts');
+    }
+    if (command === 'validate') {
+      paths.add('packages/cli/src/commands/validate.ts');
+      addValidateTopicPaths(paths, topic);
+    }
+  }
+  for (const match of text.matchAll(/\bnpm\s+run\s+validate:([a-z][a-z0-9-]*)\b/gi)) {
+    addValidateTopicPaths(paths, match[1]?.toLowerCase());
+  }
+  return [...paths].sort((left, right) => left.localeCompare(right));
+}
+
+function addValidateTopicPaths(paths: Set<string>, topic: string | undefined) {
+  if (!topic) return;
+  paths.add('package.json');
+  paths.add(`scripts/validate-${topic}.ts`);
 }
 
 function resolveQuickfixScope(prompt: string) {
