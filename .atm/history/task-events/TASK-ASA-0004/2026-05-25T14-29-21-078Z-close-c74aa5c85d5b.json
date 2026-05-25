@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-25T14-29-21-078Z-close-c74aa5c85d5b",
+  "taskId": "TASK-ASA-0004",
+  "action": "close",
+  "actorId": "opus47-asa-runner",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ASA-0004.json",
+  "taskSha256": "sha256:bb07389b75d12c9ee4b40e19f904a295f5da68c149a08053384791ae0fa2c043",
+  "createdAt": "2026-05-25T14:29:21.078Z",
+  "command": "node atm.mjs tasks close --task TASK-ASA-0004 --actor opus47-asa-runner --status done --from-batch-checkpoint --batch batch-7273973f1e36",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-7273973f1e36",
+    "closurePacketPath": ".atm/history/evidence/TASK-ASA-0004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "atomization-coverage-guard",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-25T14:29:21.075Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0004-atomization-coverage-guard-validate.task.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
