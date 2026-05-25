@@ -9,7 +9,7 @@ description: Explain missing evidence or blocked guidance before proceeding.
 First command:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 ## Route Command

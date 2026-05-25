@@ -9,7 +9,7 @@ description: Scan evidence reports and draft governed upgrade proposals.
 First command:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 ## Route Command

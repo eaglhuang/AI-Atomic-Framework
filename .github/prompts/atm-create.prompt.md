@@ -9,7 +9,7 @@ description: Create and register an atom through the provisioning facade.
 First command:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 ## Route Command

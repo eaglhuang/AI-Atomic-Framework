@@ -37,6 +37,17 @@ For collaboration workflows, claim the selected imported task before edits:
 node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 ```
 
+If the route returns `recommendedChannel: "batch"`, do not manually run
+`tasks reserve`, `tasks promote`, `tasks claim`, or `tasks close` in a loop.
+Work only on the queue head and finish it through:
+
+```bash
+node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json
+```
+
+Batch is the fast path for many task cards. Its speed comes from automated queue
+bookkeeping, not from weaker delivery or evidence requirements.
+
 ## Handoff
 
 ```bash
@@ -65,6 +76,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - Stay inside ATM CLI routing and evidence contracts.
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
+- If ATM recommends batch, use `batch checkpoint`; do not hand-roll a lifecycle
+  loop over low-level `tasks` commands.
 - If an `ATM_USER_NOTICE` message or `evidence.userNotice` is present, show it to the user in natural language before executing the returned next action.
 - After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
 - Treat `ATM_ACTOR_ID` as the default actor identity variable. `AGENT_IDENTITY`

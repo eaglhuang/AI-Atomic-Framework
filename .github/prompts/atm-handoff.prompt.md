@@ -9,7 +9,7 @@ description: Write a continuation summary for governed work.
 First command:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 ## Route Command

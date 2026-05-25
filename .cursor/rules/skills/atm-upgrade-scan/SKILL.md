@@ -1,7 +1,3 @@
----
-applyTo: "**"
----
-
 
 # ATM Upgrade Scan
 
@@ -48,4 +44,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
 
-Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.
+## Rules
+
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.

@@ -1,9 +1,5 @@
----
-applyTo: "**"
----
 
-
-# ATM Upgrade Scan
+# ATM Lock
 
 First command:
 
@@ -16,7 +12,14 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 Use this ATM command only after the first command confirms it is the current governed route:
 
 ```bash
-node atm.mjs upgrade --scan --input "$ARGUMENTS" --json
+node atm.mjs lock check --json
+```
+
+Mutation safety checks should use ATM guard commands:
+
+```bash
+node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <csv> --json
+node atm.mjs guard git --task <task-id> --actor "$ATM_ACTOR_ID" --json
 ```
 
 ## Handoff
@@ -48,4 +51,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
 
-Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.
+## Rules
+
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.

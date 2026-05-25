@@ -11,7 +11,7 @@ fresh runner into internal repositories.
 ## First Command
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 Then inspect framework-development mode before release mutation:

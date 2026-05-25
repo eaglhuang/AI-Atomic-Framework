@@ -9,7 +9,7 @@ description: Inspect a repository and emit a guidance orientation report.
 First command:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 ## Route Command

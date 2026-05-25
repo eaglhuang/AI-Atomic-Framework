@@ -1,9 +1,5 @@
----
-applyTo: "**"
----
 
-
-# ATM Upgrade Scan
+# ATM Orient
 
 First command:
 
@@ -16,7 +12,7 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 Use this ATM command only after the first command confirms it is the current governed route:
 
 ```bash
-node atm.mjs upgrade --scan --input "$ARGUMENTS" --json
+node atm.mjs orient --cwd . --json
 ```
 
 ## Handoff
@@ -48,4 +44,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
 
-Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.
+## Rules
+
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.

@@ -9,7 +9,7 @@ description: Check, acquire, or release a governed scope lock.
 First command:
 
 ```bash
-node atm.mjs next --json
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
 ## Route Command

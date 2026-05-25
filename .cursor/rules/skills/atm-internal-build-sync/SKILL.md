@@ -1,31 +1,55 @@
----
-applyTo: "**"
----
 
+# ATM Internal Build Sync
 
-# ATM Upgrade Scan
+Use this skill when the user asks to build an ATM framework version and sync the
+fresh runner into internal repositories.
 
-First command:
+## First Command
 
 ```bash
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-## Route Command
-
-Use this ATM command only after the first command confirms it is the current governed route:
+Then inspect framework-development mode before release mutation:
 
 ```bash
-node atm.mjs upgrade --scan --input "$ARGUMENTS" --json
+node atm.mjs framework-mode status --json
+node atm.mjs guard framework-development --json
 ```
 
-## Handoff
+## Sync Command
+
+Pass every target repository explicitly. Do not bake adopter repository names
+into framework source.
 
 ```bash
-node atm.mjs handoff summarize --task "$ARGUMENTS" --json
+node atm.mjs internal-release sync --repo <repo-a> --repo <repo-b> --json
 ```
 
-## Charter Invariants
+To intentionally skip one repository, match either its basename or full path:
+
+```bash
+node atm.mjs internal-release sync --repo <repo-a> --repo <repo-b> --skip <repo-b-name> --json
+```
+
+Useful switches:
+
+- `--dry-run`: show what would be copied without writing target repos.
+- `--no-build`: reuse the existing `release/atm-onefile/atm.mjs`.
+- `--no-verify`: copy without running target `doctor`, `framework-mode status`, and `tasks audit`.
+- `--allow-verify-failure`: copy and report verification failures without failing the command.
+
+## Required Evidence
+
+Capture the command JSON evidence, including:
+
+- `sourceSha256`
+- each target `previousSha256` and `newSha256`
+- skipped targets and skip reason
+- target verification command hashes and exit codes
+
+Do not manually copy `atm.mjs` to target repositories when this command is
+available.
 
 - `INV-ATM-001` — **No second registry** (enforcement: `gate`, breaking change: yes)
   Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
@@ -42,10 +66,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
   Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.
 
-## Guardrails
+## Rules
 
-- Stay inside ATM CLI routing and evidence contracts.
-- Do not create a parallel task model, registry, or approval flow.
-- Treat any planning hint as CLI output, not as template authority.
-
-Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.
