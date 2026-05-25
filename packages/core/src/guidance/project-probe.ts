@@ -274,6 +274,7 @@ function hasFileWithExtension(root: string, extension: string): boolean {
     for (const entry of readdirSync(absolutePath, { withFileTypes: true })) {
       if (entry.isFile() && entry.name.endsWith(extension)) return true;
       if (entry.isDirectory() && relativePath === '') {
+        if (shouldSkipProbeDirectory(entry.name)) continue;
         const nestedPath = path.join(absolutePath, entry.name);
         try {
           if (readdirSync(nestedPath, { withFileTypes: true }).some((nestedEntry) => nestedEntry.isFile() && nestedEntry.name.endsWith(extension))) {
@@ -286,6 +287,29 @@ function hasFileWithExtension(root: string, extension: string): boolean {
     }
   }
   return false;
+}
+
+function shouldSkipProbeDirectory(name: string): boolean {
+  return new Set([
+    '.git',
+    '.atm',
+    '.atm-temp',
+    '.tmp',
+    '.venv',
+    'node_modules',
+    'library',
+    'temp',
+    'tmp',
+    'local',
+    'artifacts',
+    'profiles',
+    'settings',
+    'scratch',
+    'dist',
+    'build',
+    'release',
+    'coverage'
+  ]).has(name);
 }
 
 function readJsonIfExists(filePath: string): unknown | null {
