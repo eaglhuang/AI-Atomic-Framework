@@ -375,12 +375,32 @@ async function claimNextImportedTask(input: {
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
-  const existingClaimActorId = input.importedTaskQueue.claimableTask.activeClaimActorId;
+  let claimableTask = input.importedTaskQueue.claimableTask;
+  if (normalizeTaskRouteStatus(claimableTask.status) === 'reserved' && !claimableTask.activeClaimActorId) {
+    await runTasks([
+      'release',
+      '--cwd',
+      input.cwd,
+      '--task',
+      claimableTask.workItemId,
+      '--actor',
+      resolvedActor.actorId,
+      '--reserved-ok',
+      '--reason',
+      'next --claim stale reserved cleanup',
+      '--json'
+    ]);
+    claimableTask = {
+      ...claimableTask,
+      status: 'open'
+    };
+  }
+  const existingClaimActorId = claimableTask.activeClaimActorId;
   if (existingClaimActorId && existingClaimActorId !== resolvedActor.actorId) {
-    throw new CliError('ATM_LOCK_CONFLICT', `Task ${input.importedTaskQueue.claimableTask.workItemId} is already claimed by ${existingClaimActorId}.`, {
+    throw new CliError('ATM_LOCK_CONFLICT', `Task ${claimableTask.workItemId} is already claimed by ${existingClaimActorId}.`, {
       exitCode: 1,
       details: {
-        taskId: input.importedTaskQueue.claimableTask.workItemId,
+        taskId: claimableTask.workItemId,
         actorId: existingClaimActorId
       }
     });
@@ -388,21 +408,21 @@ async function claimNextImportedTask(input: {
   const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
   const claimPreparation = alreadyClaimedByActor
     ? {
-      taskId: input.importedTaskQueue.claimableTask.workItemId,
-      originalStatus: normalizeTaskRouteStatus(input.importedTaskQueue.claimableTask.status),
+      taskId: claimableTask.workItemId,
+      originalStatus: normalizeTaskRouteStatus(claimableTask.status),
       steps: [],
       reusedActiveClaim: true
     }
     : await prepareImportedTaskForClaim({
       cwd: input.cwd,
-      task: input.importedTaskQueue.claimableTask,
+      task: claimableTask,
       actorId: resolvedActor.actorId
     });
   const claimResult = alreadyClaimedByActor
     ? {
       evidence: {
         action: 'claim',
-        taskId: input.importedTaskQueue.claimableTask.workItemId,
+        taskId: claimableTask.workItemId,
         actorId: resolvedActor.actorId,
         reusedActiveClaim: true
       }
@@ -412,33 +432,33 @@ async function claimNextImportedTask(input: {
       '--cwd',
       input.cwd,
       '--task',
-      input.importedTaskQueue.claimableTask.workItemId,
+      claimableTask.workItemId,
       '--actor',
       resolvedActor.actorId,
       '--files',
-      input.importedTaskQueue.claimableTask.taskPath,
+      claimableTask.taskPath,
       '--json'
     ]);
   const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'
-    ? findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId) ?? createOrRefreshTaskQueue({
+    ? findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? claimableTask.workItemId) ?? createOrRefreshTaskQueue({
       cwd: input.cwd,
-      sourcePrompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId,
+      sourcePrompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
       tasks: input.importedTaskQueue.promptScope.selectedTasks,
       actorId: resolvedActor.actorId
     })
-    : findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId);
+    : findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? claimableTask.workItemId);
   const directionLock = writeTaskDirectionLock({
     cwd: input.cwd,
-    taskId: input.importedTaskQueue.claimableTask.workItemId,
+    taskId: claimableTask.workItemId,
     actorId: resolvedActor.actorId,
     queue: activeQueue,
-    allowedFiles: buildAllowedFilesForTask(input.importedTaskQueue.claimableTask),
-    prompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId
+    allowedFiles: buildAllowedFilesForTask(claimableTask),
+    prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId
   });
   const batchRun = input.importedTaskQueue.promptScope?.status === 'queue'
     ? writeBatchRun({
       cwd: input.cwd,
-      sourcePrompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId,
+      sourcePrompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
       tasks: input.importedTaskQueue.promptScope.selectedTasks,
       queue: activeQueue,
       actorId: resolvedActor.actorId
@@ -446,14 +466,14 @@ async function claimNextImportedTask(input: {
     : readActiveBatchRun(input.cwd);
   const nextAction = {
     status: 'ready',
-    command: `node atm.mjs start --cwd . --goal ${quoteCliValue(input.importedTaskQueue.claimableTask.title)} --json`,
-    reason: `claimed imported work item ${input.importedTaskQueue.claimableTask.workItemId} for ${resolvedActor.actorId}`,
+    command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
+    reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
     recommendedChannel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'batch' : 'normal',
     riskLevel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'high' : 'medium',
-    selectedTask: input.importedTaskQueue.claimableTask,
+    selectedTask: claimableTask,
     taskContext: {
-      scopePaths: input.importedTaskQueue.claimableTask.scopePaths,
-      sourcePlanPath: input.importedTaskQueue.claimableTask.sourcePlanPath
+      scopePaths: claimableTask.scopePaths,
+      sourcePlanPath: claimableTask.sourcePlanPath
     },
     taskDirectionLock: directionLock,
     taskQueue: activeQueue,
@@ -472,7 +492,7 @@ async function claimNextImportedTask(input: {
       input.integrationBootstrap,
       input.runtimeAdapterReadiness,
       message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
-        taskId: input.importedTaskQueue.claimableTask.workItemId,
+        taskId: claimableTask.workItemId,
         actorId: resolvedActor.actorId
       })
     ),
@@ -567,10 +587,10 @@ function buildPromptScopedNextResult(input: {
     });
   }
   if (promptScope.status === 'queue') {
-    const firstTask = selectedTasks[0] ?? null;
-    const queuePrompt = input.taskIntent?.userPrompt ?? firstTask?.workItemId ?? 'prompt-scoped task queue';
+    const queueHeadTask = input.importedTaskQueue.selectedTask ?? selectedTasks[0] ?? null;
+    const queuePrompt = input.taskIntent?.userPrompt ?? queueHeadTask?.workItemId ?? 'prompt-scoped task queue';
     const activeQueue = findActiveTaskQueue(input.cwd, queuePrompt);
-    const queueHeadTaskId = activeQueue?.taskIds[activeQueue.currentIndex] ?? firstTask?.workItemId ?? null;
+    const queueHeadTaskId = activeQueue?.taskIds[activeQueue.currentIndex] ?? queueHeadTask?.workItemId ?? null;
     const queuePreview = {
       schemaId: 'atm.taskQueuePreview.v1',
       sourcePrompt: queuePrompt,
@@ -581,7 +601,7 @@ function buildPromptScopedNextResult(input: {
     };
     const nextAction = {
       status: 'task-queue-ready',
-      command: firstTask
+      command: queueHeadTask
         ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --json`
         : 'node atm.mjs next --prompt "<current user prompt>" --json',
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
@@ -608,7 +628,7 @@ function buildPromptScopedNextResult(input: {
           queueSize: selectedTasks.length,
           queueId: activeQueue?.queueId ?? null,
           queueHeadTaskId,
-          firstTask: firstTask ? toTaskCandidateView(firstTask) : null
+          firstTask: queueHeadTask ? toTaskCandidateView(queueHeadTask) : null
         })
       ),
       evidence: {
@@ -1146,6 +1166,7 @@ function createDeterministicTaskIntent(prompt: string): TaskIntent {
   ]);
   const taskRootHints = uniqueSorted([
     ...(/self[-_ ]?atomization|\u81ea\u6211\u539f\u5b50\u5316|100%/i.test(prompt) ? ['atm-self-atomization'] : []),
+    ...extractTaskRootHintsFromPrompt(prompt, mentionedTaskIds),
     ...extractPromptPathHints(prompt).filter((entry) => !/\.md$/i.test(entry))
   ]);
   const ordinalScope = /\u524d\s*(?:3|\u4e09)\s*\u5f35|first\s+3/i.test(prompt)
@@ -1153,8 +1174,7 @@ function createDeterministicTaskIntent(prompt: string): TaskIntent {
     : /\u524d\s*(?:2|\u5169|\u4e8c)\s*\u5f35|first\s+2/i.test(prompt)
       ? { kind: 'first' as const, count: 2 }
       : null;
-  const queueRequested = Boolean(ordinalScope)
-    || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|\u5168\u90e8\u4efb\u52d9|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all\s+task\s+cards|all\s+tasks|entire\s+plan|whole\s+plan|through\s+all/i.test(prompt);
+  const queueRequested = isQueueRequestedPrompt(prompt) || Boolean(ordinalScope);
   const taskScopeMentioned = mentionedTaskIds.length > 0
     || mentionedPlanPaths.length > 0
     || taskRootHints.length > 0
@@ -1194,7 +1214,7 @@ function normalizeTaskIntent(value: Record<string, unknown>, fallbackSource: Tas
     confidence: typeof value.confidence === 'number' && Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0.5,
     source: normalizeTaskIntentSource(value.source) ?? fallbackSource,
     ordinalScope: normalizeOrdinalScope(value.ordinalScope),
-    queueRequested: value.queueRequested === true || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|\u5168\u90e8\u4efb\u52d9|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all\s+task\s+cards|all\s+tasks|entire\s+plan|whole\s+plan/i.test(prompt),
+    queueRequested: value.queueRequested === true || isQueueRequestedPrompt(prompt),
     taskScopeMentioned: value.taskScopeMentioned === true
       || mentionedTaskIds.length > 0
       || mentionedPlanPaths.length > 0
@@ -1255,7 +1275,13 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
 function hasRequiredPromptScopeMatch(task: ImportedTaskSummary, intent: TaskIntent): boolean {
   const reasons = task.matchReasons ?? [];
   if (intent.mentionedTaskIds.length > 0) {
-    return reasons.includes('task-id-exact');
+    if (reasons.includes('task-id-exact')) return true;
+    if (intent.queueRequested || intent.ordinalScope) {
+      return reasons.includes('task-root-hint-match')
+        || reasons.includes('nearby-plan-name-match')
+        || reasons.includes('plan-path-match');
+    }
+    return false;
   }
   if (intent.mentionedPlanPaths.length > 0) {
     return reasons.includes('plan-path-match') || reasons.includes('nearby-plan-name-match');
@@ -1300,7 +1326,10 @@ function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: Task
   }
   for (const rootHint of intent.taskRootHints) {
     const normalizedHint = normalizeSearchText(rootHint);
-    if (normalizedHint && pathFields.some((field) => normalizeSearchText(field).includes(normalizedHint))) {
+    if (normalizedHint && (
+      normalizeSearchText(task.workItemId).includes(normalizedHint)
+      || pathFields.some((field) => normalizeSearchText(field).includes(normalizedHint))
+    )) {
       score += 65;
       reasons.push('task-root-hint-match');
       break;
@@ -1362,6 +1391,20 @@ function isTaskRoutable(status: string, intent: TaskIntent | null): boolean {
     return normalized !== 'abandoned' && normalized !== 'cancelled';
   }
   return ['ready', 'open', 'planned', 'blocked', 'waiting_target_evidence', 'reserved'].includes(normalized);
+}
+
+function extractTaskRootHintsFromPrompt(prompt: string, mentionedTaskIds: readonly string[]): readonly string[] {
+  const directRoots = (prompt.match(/\b[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)+\b/g) ?? [])
+    .map((entry) => entry.toUpperCase())
+    .filter((entry) => !/\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*$/.test(entry));
+  const derivedRoots = mentionedTaskIds
+    .map((taskId) => taskId.match(/^(.*)-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*$/)?.[1] ?? null)
+    .filter((entry): entry is string => Boolean(entry));
+  return uniqueSorted([...directRoots, ...derivedRoots]);
+}
+
+function isQueueRequestedPrompt(prompt: string): boolean {
+  return /\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u6240\u6709(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all(?:[\s\S]{0,80})task\s+cards|all(?:[\s\S]{0,80})tasks|entire\s+plan|whole\s+plan|through\s+all/i.test(prompt);
 }
 
 function isTaskExplicitlyMentioned(task: ImportedTaskSummary, intent: TaskIntent | null): boolean {
