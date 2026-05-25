@@ -18,6 +18,7 @@ import {
 import { CliError, makeResult, message, parseJsonText, relativePathFrom, resolveValue } from './shared.ts';
 import {
   appendTaskTransitionEvent,
+  createTaskTransitionId,
   defaultMirrorTaskId,
   readTaskLedgerPolicy,
   type TaskTransitionClosureMetadata,
@@ -2529,6 +2530,7 @@ function writeLegacyBaselineTransition(input: {
   readonly actorId: string;
   readonly reason: string;
 }): string {
+  const createdAt = new Date().toISOString();
   const updatedDocument: Record<string, unknown> = {
     ...input.task.document,
     ledgerContractVersion: 'task-ledger/v1',
@@ -2537,6 +2539,26 @@ function writeLegacyBaselineTransition(input: {
     ledgerBaselineReason: input.reason,
     ledgerBaselineSourceSha256: sha256(input.task.rawText ?? `${JSON.stringify(input.task.document, null, 2)}\n`)
   };
+  const transitionId = createTaskTransitionId({
+    createdAt,
+    taskId: input.task.taskId,
+    action: 'migrate-legacy-ledger',
+    taskDocument: updatedDocument
+  });
+  updatedDocument.lastTransitionId = transitionId;
+  updatedDocument.lastTransitionAt = createdAt;
+  updatedDocument.ledgerBaselineAt = createdAt;
+  if (input.task.format === 'json') {
+    updatedDocument.legacyLedgerBaseline = {
+      schemaId: 'atm.legacyTaskLedgerBaseline.v1',
+      migratedAt: createdAt,
+      migratedByActor: input.actorId,
+      previousStatus: input.task.status || null,
+      reason: input.reason,
+      sourceTaskSha256: updatedDocument.ledgerBaselineSourceSha256,
+      transitionId
+    };
+  }
   const transition = appendTaskTransitionEvent({
     cwd: input.cwd,
     taskId: input.task.taskId,
@@ -2546,21 +2568,11 @@ function writeLegacyBaselineTransition(input: {
     toStatus: input.task.status || null,
     taskPath: input.task.absolutePath,
     taskDocument: updatedDocument,
-    command: 'node atm.mjs tasks migrate-legacy-ledger'
+    command: 'node atm.mjs tasks migrate-legacy-ledger',
+    createdAt,
+    transitionId
   });
-  updatedDocument.lastTransitionId = transition.transitionId;
-  updatedDocument.lastTransitionAt = transition.event.createdAt;
-  updatedDocument.ledgerBaselineAt = transition.event.createdAt;
   if (input.task.format === 'json') {
-    updatedDocument.legacyLedgerBaseline = {
-      schemaId: 'atm.legacyTaskLedgerBaseline.v1',
-      migratedAt: transition.event.createdAt,
-      migratedByActor: input.actorId,
-      previousStatus: input.task.status || null,
-      reason: input.reason,
-      sourceTaskSha256: updatedDocument.ledgerBaselineSourceSha256,
-      transitionId: transition.transitionId
-    };
     writeTaskDocument(input.task.absolutePath, updatedDocument);
   } else {
     writeTaskMarkdownFrontmatter(input.task.absolutePath, input.task.rawText ?? '', updatedDocument);
@@ -2730,6 +2742,16 @@ function writeTaskDocumentWithTransition(input: {
   readonly closureMetadata?: TaskTransitionClosureMetadata | null;
 }) {
   const nextStatus = typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null;
+  const createdAt = new Date().toISOString();
+  const transitionId = createTaskTransitionId({
+    createdAt,
+    taskId: input.taskId,
+    action: input.action,
+    taskDocument: input.taskDocument
+  });
+  input.taskDocument.lastTransitionId = transitionId;
+  input.taskDocument.lastTransitionAt = createdAt;
+  input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
   const transition = appendTaskTransitionEvent({
     cwd: input.cwd,
     taskId: input.taskId,
@@ -2740,11 +2762,10 @@ function writeTaskDocumentWithTransition(input: {
     taskPath: input.taskPath,
     taskDocument: input.taskDocument,
     command: `node atm.mjs tasks ${input.action}`,
-    closureMetadata: input.closureMetadata ?? null
+    closureMetadata: input.closureMetadata ?? null,
+    createdAt,
+    transitionId
   });
-  input.taskDocument.lastTransitionId = transition.transitionId;
-  input.taskDocument.lastTransitionAt = transition.event.createdAt;
-  input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
   writeTaskDocument(input.taskPath, input.taskDocument);
   verifyPersistedTaskDocument({
     taskPath: input.taskPath,

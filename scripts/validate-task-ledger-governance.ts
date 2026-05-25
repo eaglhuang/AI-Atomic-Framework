@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,6 +30,21 @@ function writeJson(filePath: string, value: unknown) {
 
 function readJson(filePath: string): Record<string, any> {
   return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, any>;
+}
+
+function sha256File(filePath: string): string {
+  return `sha256:${createHash('sha256').update(readFileSync(filePath)).digest('hex')}`;
+}
+
+function assertLastTransitionHashMatchesDisk(repo: string, taskId: string) {
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`);
+  const task = readJson(taskPath);
+  const transitionId = task.lastTransitionId;
+  assert(typeof transitionId === 'string' && transitionId.length > 0, `${taskId} must record lastTransitionId`);
+  const eventPath = path.join(repo, '.atm', 'history', 'task-events', taskId, `${transitionId}.json`);
+  assert(existsSync(eventPath), `${taskId} transition event must exist`);
+  const event = readJson(eventPath);
+  assert(event.taskSha256 === sha256File(taskPath), `${taskId} transition event taskSha256 must match persisted task document`);
 }
 
 function initGitRepo(repo: string) {
@@ -134,6 +150,7 @@ try {
   const createdTask = readJson(createdTaskPath);
   assert(typeof createdTask.lastTransitionId === 'string', 'created task must record lastTransitionId');
   assert(existsSync(path.join(hostRepo, '.atm', 'history', 'task-events', 'TASK-LEDGER-0001', `${createdTask.lastTransitionId}.json`)), 'created task transition event must exist');
+  assertLastTransitionHashMatchesDisk(hostRepo, 'TASK-LEDGER-0001');
 
   writeJson(path.join(hostRepo, '.atm', 'history', 'evidence', 'TASK-LEDGER-0001.json'), {
     taskId: 'TASK-LEDGER-0001',
@@ -152,6 +169,7 @@ try {
   assert(ledgerClaim.ok === true, 'next --claim must create the direction lock before close');
   const closeResult = await runTasks(['close', '--cwd', hostRepo, '--task', 'TASK-LEDGER-0001', '--actor', 'validator', '--status', 'done']);
   assert(closeResult.ok === true, 'tasks close must succeed with evidence');
+  assertLastTransitionHashMatchesDisk(hostRepo, 'TASK-LEDGER-0001');
   assert(auditTasks(hostRepo).ok === true, 'closed task with CLI transition evidence must pass audit');
 
   const disabledRepo = makeHostRepo(tempRoot, 'disabled-ledger', {
@@ -296,6 +314,7 @@ try {
   const migratedJsonTask = readJson(path.join(legacyRepo, '.atm', 'history', 'tasks', 'TASK-LEGACY-0001.json'));
   assert(migratedJsonTask.ledgerBaselineKind === 'legacy-transition-backfill', 'JSON task must record legacy baseline kind');
   assert(typeof migratedJsonTask.lastTransitionId === 'string', 'JSON task must record migrated lastTransitionId');
+  assertLastTransitionHashMatchesDisk(legacyRepo, 'TASK-LEGACY-0001');
   const migratedMarkdownText = readFileSync(legacyMarkdownPath, 'utf8');
   assert(migratedMarkdownText.includes('ledgerBaselineKind: legacy-transition-backfill'), 'Markdown task must record legacy baseline kind');
   assert(migratedMarkdownText.includes('lastTransitionId:'), 'Markdown task must record migrated lastTransitionId');

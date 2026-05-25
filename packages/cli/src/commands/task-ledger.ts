@@ -123,13 +123,19 @@ export function appendTaskTransitionEvent(input: {
   readonly taskDocument: Record<string, unknown>;
   readonly command?: string;
   readonly closureMetadata?: TaskTransitionClosureMetadata | null;
+  readonly createdAt?: string;
+  readonly transitionId?: string;
 }): { transitionId: string; eventPath: string; event: TaskTransitionEvent } {
   const root = path.resolve(input.cwd);
   const policy = readTaskLedgerPolicy(root);
-  const createdAt = new Date().toISOString();
+  const createdAt = input.createdAt ?? new Date().toISOString();
   const taskJson = `${JSON.stringify(input.taskDocument, null, 2)}\n`;
-  const seed = `${createdAt}\n${input.taskId}\n${input.action}\n${taskJson}`;
-  const transitionId = `${createdAt.replace(/[:.]/g, '-')}-${input.action}-${createHash('sha256').update(seed).digest('hex').slice(0, 12)}`;
+  const transitionId = input.transitionId ?? createTaskTransitionId({
+    createdAt,
+    taskId: input.taskId,
+    action: input.action,
+    taskDocument: input.taskDocument
+  });
   const eventRoot = path.join(root, policy.eventRoot, sanitizeTaskId(input.taskId));
   const eventAbsolute = path.join(eventRoot, `${transitionId}.json`);
   const event: TaskTransitionEvent = {
@@ -156,6 +162,17 @@ export function appendTaskTransitionEvent(input: {
     eventPath: relativePathFrom(root, eventAbsolute),
     event
   };
+}
+
+export function createTaskTransitionId(input: {
+  readonly createdAt: string;
+  readonly taskId: string;
+  readonly action: string;
+  readonly taskDocument: Record<string, unknown>;
+}): string {
+  const taskJson = `${JSON.stringify(input.taskDocument, null, 2)}\n`;
+  const seed = `${input.createdAt}\n${input.taskId}\n${input.action}\n${taskJson}`;
+  return `${input.createdAt.replace(/[:.]/g, '-')}-${input.action}-${createHash('sha256').update(seed).digest('hex').slice(0, 12)}`;
 }
 
 export function transitionEventExists(cwd: string, taskId: string, transitionId: string): boolean {
