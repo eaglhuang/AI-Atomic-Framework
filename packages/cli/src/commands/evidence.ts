@@ -771,6 +771,12 @@ function detectCodeOrFrameworkTask(taskDocument: Record<string, unknown> | null 
   if (closureAuthority.trim().toLowerCase() === 'target_repo' || targetRepo.trim().length > 0) {
     return true;
   }
+  const source = taskDocument.source && typeof taskDocument.source === 'object' && !Array.isArray(taskDocument.source)
+    ? taskDocument.source as Record<string, unknown>
+    : {};
+  if (typeof source.planPath === 'string' && source.planPath.trim().length > 0) {
+    return true;
+  }
   if (declaredFiles.some(isCodeLikePath)) return true;
   const notes = typeof taskDocument.notes === 'string' ? taskDocument.notes : '';
   return isCodeLikePath(notes);

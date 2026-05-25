@@ -5,7 +5,7 @@ id: atm-evidence
 title: ATM Evidence
 summary: Explain missing evidence or blocked guidance before proceeding.
 command: node atm.mjs explain --why blocked --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---

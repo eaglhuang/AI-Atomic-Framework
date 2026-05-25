@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
+import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runFrameworkTempClaim } from '../packages/cli/src/commands/framework-development.ts';
 import { runHook } from '../packages/cli/src/commands/hook.ts';
 import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
@@ -103,7 +104,8 @@ async function validateAdopterGoverned(tempRoot: string) {
     assert((error as any).code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED' || (error as any).code === 'ATM_TASK_QUEUE_HEAD_REQUIRED', 'adopter queue must reject premature close');
   }
 
-  await runTasks(['close', '--cwd', repo, '--task', 'TASK-ADOPT-0001', '--actor', 'adopter-agent', '--status', 'done']);
+  writeFileSync(path.join(repo, 'src', 'one.ts'), 'export const one = 2;\n', 'utf8');
+  await runBatch(['checkpoint', '--cwd', repo, '--actor', 'adopter-agent', '--json']);
   const afterFirstClose = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert((afterFirstClose.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0002', 'adopter queue must advance to second task after closing first');
 
@@ -265,7 +267,16 @@ function writeEvidence(repo: string, taskId: string) {
         evidenceKind: 'validation',
         evidenceType: 'test',
         summary: 'validator fixture evidence',
-        details: { command: 'fixture-pass', exitCode: 0 }
+        details: {
+          commandRuns: [
+            {
+              command: 'fixture-pass',
+              exitCode: 0,
+              stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+              stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+            }
+          ]
+        }
       }
     ]
   });

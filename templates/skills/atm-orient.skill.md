@@ -5,7 +5,7 @@ id: atm-orient
 title: ATM Orient
 summary: Inspect a repository and emit a guidance orientation report.
 command: node atm.mjs orient --cwd . --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---

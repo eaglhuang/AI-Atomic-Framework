@@ -95,7 +95,7 @@ if (!process.exitCode) {
   assert(typeof packageModule.createInstallManifest === 'function', 'missing createInstallManifest helper');
   assert(typeof packageModule.createStaticIntegrationAdapter === 'function', 'missing createStaticIntegrationAdapter helper');
   assert(typeof packageModule.createCodexSkillsAdapter === 'function', 'missing createCodexSkillsAdapter reference factory');
-  assert(packageModule.atmFirstCommand === 'node atm.mjs next --json', 'first command constant mismatch');
+  assert(packageModule.atmFirstCommand === 'node atm.mjs next --prompt "$ARGUMENTS" --json', 'first command constant mismatch');
   assert(packageModule.atmPromptScopedFirstCommand === 'node atm.mjs next --prompt "$ARGUMENTS" --json', 'prompt-scoped first command constant mismatch');
   assert(packageModule.atmIntentScopedFirstCommand === 'node atm.mjs next --intent .atm/runtime/task-intent.json --json', 'intent-scoped first command constant mismatch');
   assert(packageModule.charterInvariantsPlaceholder === '{{CHARTER_INVARIANTS}}', 'charter invariants placeholder mismatch');

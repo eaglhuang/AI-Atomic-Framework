@@ -5,7 +5,7 @@ id: atm-lock
 title: ATM Lock
 summary: Check, acquire, or release a governed scope lock.
 command: node atm.mjs lock check --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---

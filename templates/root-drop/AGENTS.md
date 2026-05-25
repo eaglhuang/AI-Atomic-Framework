@@ -3,15 +3,20 @@
 
 This repository uses the default ATM bootstrap pack.
 
-Start with this line:
+Start with this line when a user has given you a concrete request:
 
 {{RECOMMENDED_PROMPT}}
 
+If the request says to finish all task cards, a whole plan, a task family, or multiple tasks, you must let `next --prompt` route it as `recommendedChannel: "batch"` and then use `node atm.mjs batch checkpoint --actor <id> --json` after delivering the current queue head. Do not manually loop over `tasks reserve/promote/claim/close`.
+
+Use `node atm.mjs next --json` only as read-only repository orientation when there is no current user prompt.
+
 First-contact behavior:
 
-1. If `node atm.mjs next --json` returns an `ATM_USER_NOTICE` message or `evidence.userNotice`, show that notice to the user in natural language before running the returned next action.
-2. If an existing host instruction references a missing local document, mention the missing file once and continue with the ATM route.
-3. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
+1. For user-requested task work, run `node atm.mjs next --prompt "<current user prompt>" --json`; use `node atm.mjs next --json` only as read-only orientation when no user prompt is available.
+2. If the ATM result returns an `ATM_USER_NOTICE` message or `evidence.userNotice`, show that notice to the user in natural language before running the returned next action.
+3. If an existing host instruction references a missing local document, mention the missing file once and continue with the ATM route.
+4. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
 
 Editor integration self-check:
 

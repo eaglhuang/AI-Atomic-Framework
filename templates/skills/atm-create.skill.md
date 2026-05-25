@@ -5,7 +5,7 @@ id: atm-create
 title: ATM Create
 summary: Create and register an atom through the provisioning facade.
 command: node atm.mjs create --bucket CORE --title "$ARGUMENTS" --dry-run --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---

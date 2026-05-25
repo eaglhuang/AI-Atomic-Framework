@@ -93,7 +93,7 @@ function runAtm(args: any, cwd: any) {
 function assertReadmeEntry(hostRepo: string) {
   const readme = readText(path.join(hostRepo, 'README.md'));
   assert(readme.includes('<!-- ATM README ENTRY:START -->'), 'README.md must include ATM README entry marker');
-  assert(readme.includes('node atm.mjs next --json'), 'README.md must point directly to the ATM next command');
+  assert(readme.includes('node atm.mjs next --prompt "<current user prompt>" --json'), 'README.md must point directly to prompt-scoped ATM next for user work');
   assert(readme.includes('ATM_USER_NOTICE'), 'README.md must tell agents to surface ATM user notices');
   assert(readme.includes('return to the user original request'), 'README.md must tell agents to resume the original request after onboarding');
   assert(!readme.includes('Read AGENTS.md'), 'README.md must not point back to AGENTS.md');
@@ -108,7 +108,7 @@ function assertPinnedRunner(hostRepo: string) {
   assert(metadata.schemaVersion === 'atm.pinnedRunner.v0.1', 'pinned runner metadata schema mismatch');
   assert(metadata.runnerPath === 'atm.mjs', 'pinned runner metadata must point to root atm.mjs');
   assert(metadata.sha256 && metadata.sha256.length === 64, 'pinned runner metadata must include runner sha256');
-  assert(metadata.command === 'node atm.mjs next --json', 'pinned runner metadata must preserve first command');
+  assert(metadata.command === 'node atm.mjs next --prompt "<current user prompt>" --json', 'pinned runner metadata must preserve prompt-scoped first command');
 
   const result = spawnSync(process.execPath, [runnerPath, 'next', '--cwd', hostRepo, '--json'], {
     cwd: hostRepo,
@@ -148,7 +148,7 @@ function assertAgentsEntry(hostRepo: string, expectedOriginalText?: string) {
     assert(agents.includes(expectedOriginalText), 'AGENTS.md must preserve existing host instructions');
     assert(agents.includes('<!-- ATM ROOT ENTRY:START -->'), 'existing AGENTS.md must include managed ATM entry marker');
   }
-  assert(agents.includes('node atm.mjs next --json'), 'AGENTS.md must point to the ATM next command');
+  assert(agents.includes('node atm.mjs next --prompt "<current user prompt>" --json'), 'AGENTS.md must point to prompt-scoped ATM next for user work');
   assert(agents.includes('ATM_USER_NOTICE'), 'AGENTS.md must tell agents to surface ATM user notices');
   assert(agents.includes('missing local document'), 'AGENTS.md must define missing-document fallback behavior');
   assert(agents.includes('return to the user original request'), 'AGENTS.md must tell agents to resume the original request after onboarding');

@@ -5,7 +5,7 @@ id: atm-internal-build-sync
 title: ATM Internal Build Sync
 summary: Build the ATM framework runner and sync it to explicit internal adopter repositories with skip/exclude controls.
 command: node atm.mjs internal-release sync $ARGUMENTS --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---

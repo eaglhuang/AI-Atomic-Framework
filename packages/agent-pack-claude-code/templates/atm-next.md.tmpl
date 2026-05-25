@@ -3,9 +3,10 @@ description: Route through ATM next and execute the returned governed action.
 ---
 
 1. Read `README.md` if present.
-2. Run `node atm.mjs next --json` from the repository root.
+2. For user-requested task work, run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available.
 3. If the JSON result includes an `ATM_USER_NOTICE` message or `evidence.userNotice`, show it to the user in natural language before executing the returned command.
 4. Parse the JSON result and execute exactly the returned `evidence.nextAction.command`.
-5. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
-6. If `evidence.agent_pack_hint` is present, use `evidence.agent_pack_hint.slashCommandId` to determine which slash command to invoke after completing the current action.
-7. Preserve the returned evidence in your final summary.
+5. If the route recommends `batch`, work only on the queue head and finish it with `node atm.mjs batch checkpoint --actor <id> --json`; do not manually loop over low-level task lifecycle commands.
+6. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
+7. If `evidence.agent_pack_hint` is present, use `evidence.agent_pack_hint.slashCommandId` to determine which slash command to invoke after completing the current action.
+8. Preserve the returned evidence in your final summary.

@@ -55,6 +55,15 @@ export async function runNext(argv: any) {
       importedTaskQueue
     });
   }
+  if (!taskIntent && hasPromptScopedWorkItems(importedTaskQueue)) {
+    return buildPromptRequiredNextResult({
+      cwd: options.cwd,
+      claimRequested: Boolean(options.claim),
+      importedTaskQueue,
+      integrationBootstrap,
+      runtimeAdapterReadiness
+    });
+  }
   if (options.claim) {
     return await claimNextImportedTask({
       cwd: options.cwd,
@@ -497,7 +506,14 @@ async function claimNextImportedTask(input: {
       input.runtimeAdapterReadiness,
       message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
         taskId: claimableTask.workItemId,
-        actorId: resolvedActor.actorId
+        actorId: resolvedActor.actorId,
+        recommendedChannel: nextAction.recommendedChannel,
+        batchCheckpointCommand: nextAction.recommendedChannel === 'batch'
+          ? 'node atm.mjs batch checkpoint --actor <id> --json'
+          : null,
+        blockedPattern: nextAction.recommendedChannel === 'batch'
+          ? 'manual tasks reserve/promote/claim/close loop'
+          : null
       })
     ),
     evidence: {
@@ -611,6 +627,7 @@ function buildPromptScopedNextResult(input: {
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
       recommendedChannel: 'batch',
       riskLevel: 'high',
+      batchInstruction: 'After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks reserve/promote/claim/close.',
       deliveryPrinciple: buildTaskDeliveryPrinciple({
         channel: 'batch',
         taskId: queueHeadTaskId ?? undefined
@@ -636,7 +653,10 @@ function buildPromptScopedNextResult(input: {
           queueSize: selectedTasks.length,
           queueId: activeQueue?.queueId ?? null,
           queueHeadTaskId,
-          firstTask: queueHeadTask ? toTaskCandidateView(queueHeadTask) : null
+          firstTask: queueHeadTask ? toTaskCandidateView(queueHeadTask) : null,
+          requiredCommand: nextAction.command,
+          batchCheckpointCommand: 'node atm.mjs batch checkpoint --actor <id> --json',
+          blockedPattern: 'manual tasks reserve/promote/claim/close loop'
         })
       ),
       evidence: {
@@ -815,6 +835,61 @@ function buildPromptGuidanceNextResult(input: {
   });
 }
 
+function buildPromptRequiredNextResult(input: {
+  readonly cwd: string;
+  readonly claimRequested: boolean;
+  readonly importedTaskQueue: ImportedTaskQueue;
+  readonly integrationBootstrap: unknown;
+  readonly runtimeAdapterReadiness: unknown;
+}) {
+  const candidatePreview = input.importedTaskQueue.tasks.slice(0, 12).map(toTaskCandidateView);
+  const nextAction = {
+    status: 'prompt-required',
+    command: 'node atm.mjs next --prompt "<current user prompt>" --json',
+    reason: 'task cards exist, but no current user prompt was provided; ATM will not choose a global task or batch by accident',
+    recommendedChannel: null,
+    riskLevel: 'medium',
+    candidateCount: input.importedTaskQueue.tasks.length,
+    candidates: candidatePreview,
+    batchInstruction: 'If the user asked for all task cards, a whole plan, or multiple tasks, rerun with the original prompt so ATM can return recommendedChannel=batch and require batch checkpoint.',
+    allowedCommands: [
+      'node atm.mjs next --prompt "<current user prompt>" --json',
+      'node atm.mjs next --claim --actor <id> --prompt "<current user prompt>" --json'
+    ],
+    blockedCommands: [
+      'manual tasks reserve/promote/claim/close loops without prompt-scoped next',
+      'batch task closure without node atm.mjs batch checkpoint --actor <id> --json'
+    ]
+  };
+  return makeResult({
+    ok: false,
+    command: 'next',
+    cwd: input.cwd,
+    messages: buildNextMessages(
+      nextAction as any,
+      null,
+      input.integrationBootstrap as any,
+      input.runtimeAdapterReadiness as any,
+      message(
+        'error',
+        input.claimRequested ? 'ATM_NEXT_CLAIM_PROMPT_REQUIRED' : 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING',
+        'ATM found task cards, but no user prompt was provided. Rerun next with the current user prompt so ATM can choose fast, normal, or batch correctly.',
+        {
+          requiredCommand: nextAction.command,
+          candidateCount: nextAction.candidateCount,
+          batchInstruction: nextAction.batchInstruction
+        }
+      )
+    ),
+    evidence: {
+      nextAction,
+      importedTaskQueue: input.importedTaskQueue,
+      integrationBootstrap: input.integrationBootstrap,
+      runtimeAdapterReadiness: input.runtimeAdapterReadiness
+    }
+  });
+}
+
 function isFrameworkMaintenancePrompt(prompt: string) {
   const normalized = normalizeSearchText(prompt);
   return [
@@ -843,6 +918,7 @@ function allowedGuidanceBootstrapCommands() {
   return [
     'node atm.mjs orient --cwd . --json',
     'node atm.mjs start --cwd . --goal "<goal>" --json',
+    'node atm.mjs next --prompt "<current user prompt>" --json',
     'node atm.mjs next --cwd . --json',
     'node atm.mjs explain --why blocked --json'
   ];
@@ -851,6 +927,8 @@ function allowedGuidanceBootstrapCommands() {
 function blockedMutationCommands() {
   return [
     'host mutation without active guidance session',
+    'manual task lifecycle loop without prompt-scoped next',
+    'batch task closure without batch checkpoint',
     'atomize/infect/split apply without dry-run proposal',
     'apply without human review approval'
   ];
@@ -1049,6 +1127,10 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     tasks,
     promptScope
   };
+}
+
+function hasPromptScopedWorkItems(importedTaskQueue: ImportedTaskQueue) {
+  return importedTaskQueue.tasks.some((task) => task.workItemId !== bootstrapTaskId);
 }
 
 function statusQueueWeight(status: string): number {

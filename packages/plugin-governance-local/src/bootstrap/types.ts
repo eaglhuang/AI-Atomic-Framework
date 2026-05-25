@@ -42,7 +42,7 @@ export interface LocalGovernancePinnedRunnerResult {
   readonly schemaVersion: 'atm.pinnedRunner.v0.1';
   readonly runnerPath: 'atm.mjs';
   readonly metadataPath: '.atm/runtime/pinned-runner.json';
-  readonly command: 'node atm.mjs next --json';
+  readonly command: 'node atm.mjs next --prompt "<current user prompt>" --json';
   readonly status: 'installed' | 'replaced' | 'unchanged' | 'skipped-existing-different' | 'source-unavailable';
   readonly sourceKind: 'explicit-env' | 'onefile-launcher' | 'release-onefile' | 'unavailable';
   readonly sourcePath?: string;

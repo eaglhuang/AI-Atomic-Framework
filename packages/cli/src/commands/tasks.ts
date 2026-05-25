@@ -31,6 +31,7 @@ import {
   isTaskDirectionPathCandidate,
   sanitizeTaskDirectionAllowedFiles
 } from './task-direction.ts';
+import { readActiveBatchRun } from './work-channels.ts';
 
 export interface TaskImportSource {
   readonly planPath: string;
@@ -825,6 +826,19 @@ async function runTasksClose(argv: string[]) {
     status: options.status
   });
   if (options.status === 'done') {
+    const activeBatch = readActiveBatchRun(options.cwd);
+    if (activeBatch?.currentTaskId === options.taskId && !options.fromBatchCheckpoint) {
+      throw new CliError('ATM_BATCH_CHECKPOINT_REQUIRED', `Task ${options.taskId} is the active batch queue head. Close it through batch checkpoint, not direct tasks close.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          batchId: activeBatch.batchId,
+          currentIndex: activeBatch.currentIndex,
+          requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --json`,
+          blockedPattern: 'manual tasks close during active batch'
+        }
+      });
+    }
     const claim = parseClaimRecord(taskDocument.claim);
     if (!claim || claim.state !== 'active' || claim.actorId !== actorId) {
       throw new CliError('ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active claim owned by ${actorId}.`, {
@@ -1846,7 +1860,8 @@ function parseCloseOptions(argv: string[]) {
     taskId: '',
     actorId: null as string | null,
     status: 'done' as 'done' | 'review' | 'blocked' | 'abandoned',
-    reason: null as string | null
+    reason: null as string | null,
+    fromBatchCheckpoint: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -1877,6 +1892,10 @@ function parseCloseOptions(argv: string[]) {
     if (arg === '--reason') {
       options.reason = requireValue(argv, index, '--reason');
       index += 1;
+      continue;
+    }
+    if (arg === '--from-batch-checkpoint') {
+      options.fromBatchCheckpoint = true;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {
@@ -2251,6 +2270,11 @@ function taskDeliveryPrincipleText() {
 function isDeliverableDiffRequired(taskDocument: Record<string, unknown>): boolean {
   const mode = String(taskDocument.deliverableMode ?? taskDocument.deliverable_mode ?? '').toLowerCase();
   if (mode === 'ledger-only') return false;
+  const source = taskDocument.source && typeof taskDocument.source === 'object' && !Array.isArray(taskDocument.source)
+    ? taskDocument.source as Record<string, unknown>
+    : {};
+  const importedFromPlan = typeof source.planPath === 'string' && source.planPath.trim().length > 0;
+  if (importedFromPlan) return true;
   const haystack = [
     taskDocument.title,
     taskDocument.type,

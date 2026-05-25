@@ -5,7 +5,7 @@ id: atm-upgrade-scan
 title: ATM Upgrade Scan
 summary: Scan evidence reports and draft governed upgrade proposals.
 command: node atm.mjs upgrade --scan --input "$ARGUMENTS" --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---

@@ -2,15 +2,21 @@
 
 This repository uses the default ATM bootstrap pack.
 
-Start with this line:
+Start with this line when a user has given you a concrete request:
 
-Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
+Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, "node atm.mjs next --json" is read-only status. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
+
+Batch task rule:
+
+- If the request says to finish all task cards, a whole plan, a task family, or multiple tasks, let `next --prompt` route it as `recommendedChannel: "batch"`.
+- After claiming a batch route, work only on the queue head and run `node atm.mjs batch checkpoint --actor <id> --json` after delivering that task.
+- Do not manually loop over `tasks reserve/promote/claim/close`; the batch checkpoint is the governed completion entry.
 
 Framework-repository exception:
 
 - The ATM framework repository itself intentionally does **not** use `keep.md` or `keep.summary.md`.
 - Do not treat a missing keep file in this repository as corruption or a bootstrap failure.
-- For the ATM framework repo, the correct first-touch orientation is `README.md` plus `node atm.mjs next --json`.
+- For the ATM framework repo, the correct first-touch orientation is `README.md` plus `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested task work. `node atm.mjs next --json` is read-only orientation only.
 
 Bootstrap files:
 
@@ -61,14 +67,14 @@ This is the **AI-Atomic-Framework (ATM)** repository — a governance framework 
 
 ## Key Rules
 
-- **Do not create a parallel task model.** `node atm.mjs next --json` is the single deterministic router.
+- **Do not create a parallel task model.** `node atm.mjs next --prompt "<current user prompt>" --json` is the deterministic router for user-requested work.
 - **Do not mark work done without evidence.** ATM requires guard output, artifacts, or attestation before closing a work item.
 - **Do not modify `.atm/` runtime state directly.** Use CLI commands; the runtime directory is managed by ATM.
 - **Do not add host-specific policy to framework docs.** Adopter rules belong in adapter or plugin configuration, not in `packages/core` or protected public docs.
 
 ## Diagnosing Repository State
 
-`node atm.mjs next --json` distinguishes three states:
+`node atm.mjs next --prompt "<current user prompt>" --json` distinguishes user-requested task routes; `node atm.mjs next --json` is read-only orientation when no prompt exists.
 
 | State | Meaning | Next step |
 |---|---|---|
@@ -84,7 +90,7 @@ This is the **framework repository**. Downstream adopter repositories generate t
 
 Framework repositories and adopter repositories have different documentation expectations:
 
-- Framework repo: no keep file is required; read `README.md` and follow `node atm.mjs next --json`.
+- Framework repo: no keep file is required; read `README.md` and follow `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested task work.
 - Adopter / planning repo: local `keep` documents may exist and should be treated as host-specific operating memory.
 
 ## Quick Reference
@@ -98,7 +104,7 @@ node atm.mjs atm-chart render
 node atm.mjs atm-chart verify
 
 # Deterministic next governed action
-node atm.mjs next --json
+node atm.mjs next --prompt "<current user prompt>" --json
 
 # Health check
 node atm.mjs doctor --json

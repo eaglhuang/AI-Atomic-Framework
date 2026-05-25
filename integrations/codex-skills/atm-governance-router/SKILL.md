@@ -79,6 +79,16 @@ Before mutating repository files for implementation work, claim the prompt-scope
 node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 ```
 
+If the claim result says `recommendedChannel: "batch"`, the governed route is:
+
+1. Deliver the current queue head only.
+2. Run validators and evidence for that queue-head deliverable.
+3. Run `node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json`.
+4. Commit only the checkpoint-approved task change before moving on.
+
+Do not manually loop through `tasks reserve`, `tasks promote`, `tasks claim`,
+`tasks close`, or old close commits. That is governance bypass, not batch.
+
 ATM's default task ledger is the active flow monitor when `taskLedger.enabled`
 is true. Use the repo-local `.atm/history/tasks` store for adopter work; use the
 ATM framework repo ledger only when `framework-mode status` reports
@@ -158,6 +168,9 @@ Then continue the user's original request with the fallback sources.
   a later governed dry run is selected.
 - Do not treat task closure as the work. Implement the task's requested
   deliverables first, then close.
+- Do not hand-roll batch task completion with low-level task lifecycle commands;
+  if `recommendedChannel` is `batch`, finish each queue head with
+  `node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json`.
 - Do not start implementation edits before a task is in `ready` and has an
   active claim.
 - Do not bypass the default task ledger when it is enabled; task status changes

@@ -5,7 +5,7 @@ id: atm-handoff
 title: ATM Handoff
 summary: Write a continuation summary for governed work.
 command: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
-firstCommand: node atm.mjs next --json
+firstCommand: node atm.mjs next --prompt "$ARGUMENTS" --json
 charter-invariants-injected: true
 handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ---

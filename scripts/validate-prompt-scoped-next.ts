@@ -3,6 +3,7 @@ import path from 'node:path';
 import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runQuickfix } from '../packages/cli/src/commands/quickfix.ts';
+import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -91,6 +92,7 @@ async function main() {
     const ledgerPrompt = 'TASK-LEDGER-0001 TASK-LEDGER-0002 all task cards';
     const ledgerQueue = await runNext(['--cwd', tempRoot, '--prompt', ledgerPrompt]);
     assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'ledger task prompt must create a queue');
+    assert((ledgerQueue.evidence.nextAction as any).batchInstruction?.includes('batch checkpoint'), 'batch route must explicitly point agents to batch checkpoint');
     const ledgerClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', ledgerPrompt]);
     assert(ledgerClaim.ok === true, 'next --claim must claim the queue head for ledger tasks');
     assert(ledgerClaim.messages.some((entry) => entry.code === 'ATM_TASK_DELIVERY_PRINCIPLE'), 'next --claim must remind agents that the claimed task must be delivered before closure');
@@ -103,6 +105,13 @@ async function main() {
     assert(lockDocument.taskDirectionLock?.taskId === 'TASK-LEDGER-0001', 'runtime lock must include the selected task direction lock');
     const batchStatus = await runBatch(['status', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--json']);
     assert((batchStatus.evidence.batchRun as any)?.currentTaskId === 'TASK-LEDGER-0001', 'batch status must point at the claimed queue head');
+    let directBatchCloseBlocked = false;
+    try {
+      await runTasks(['close', '--cwd', tempRoot, '--task', 'TASK-LEDGER-0001', '--actor', 'prompt-scope-test', '--status', 'done']);
+    } catch (error) {
+      directBatchCloseBlocked = (error as { code?: string }).code === 'ATM_BATCH_CHECKPOINT_REQUIRED';
+    }
+    assert(directBatchCloseBlocked, 'active batch queue head must be closed through batch checkpoint, not direct tasks close');
 
     writeLedgerTask(path.join(ledgerTaskDir, 'SANGUO-BOOTSTRAP-0001.json'), 'SANGUO-BOOTSTRAP-0001', 'Running Sanguo bootstrap task', 'docs/sanguo.md', {
       status: 'running',
@@ -131,8 +140,9 @@ async function main() {
     assert(scopedNotFound.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'explicit scoped prompt without matching tasks must report task scope not found');
 
     const noPrompt = await runNext(['--cwd', tempRoot]);
-    const importedTaskQueue = noPrompt.evidence.importedTaskQueue as { selectedTask?: unknown };
-    assert(importedTaskQueue.selectedTask == null, 'next without prompt must not auto-pick a global open/planned task');
+    assert(noPrompt.ok === false, 'next without prompt must not proceed when non-bootstrap tasks exist');
+    assert(noPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING'), 'next without prompt must require the current user prompt for task routing');
+    assert((noPrompt.evidence.nextAction as any).batchInstruction?.includes('recommendedChannel=batch'), 'next without prompt must explain that batch needs the original prompt');
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }

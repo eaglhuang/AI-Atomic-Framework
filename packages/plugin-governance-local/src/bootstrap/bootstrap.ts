@@ -157,7 +157,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     summary: 'Default ATM bootstrap pack created and linked to evidence, context budget, and the next continuation prompt.',
     nextActions: [
       `Read .atm/history/tasks/${taskId}.json and .atm/runtime/profile/default.md.`,
-      'Run node atm.mjs next --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.',
+      'Run node atm.mjs next --prompt "<current user prompt>" --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.',
       'Record the first smoke artifact, log, evidence, and handoff before closing the work item.'
     ],
     artifactPaths: ['.atm/history/artifacts', '.atm/history/logs', '.atm/history/reports'],
@@ -167,7 +167,7 @@ export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernance
     handoffKind: 'bootstrap',
     continuationGoal: 'Resume bootstrap from the generated task, profile, evidence, and budget surfaces.',
     resumePrompt: recommendedPrompt,
-    resumeCommand: ['node', 'atm.mjs', 'next', '--json'],
+    resumeCommand: ['node', 'atm.mjs', 'next', '--prompt', '<current user prompt>', '--json'],
     budgetDecision: bootstrapBudgetEvaluation.decision,
     hardStop: bootstrapBudgetEvaluation.decision === 'hard-stop'
   };
@@ -309,11 +309,11 @@ export function createOfficialBootstrapCommand(commandCwd = '.'): string {
 }
 
 export function createRecommendedPrompt(taskId = defaultBootstrapTaskId): string {
-  return `Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
+  return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
 }
 
 export function createSelfHostingAlphaPrompt(): string {
-  return 'Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.';
+  return 'Read README.md if present, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, `node atm.mjs next --json` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.';
 }
 
 function createBootstrapConfig(taskId: string) {
@@ -633,7 +633,7 @@ function installPinnedRunner(cwd: string, force: boolean, created: string[], unc
       schemaVersion: 'atm.pinnedRunner.v0.1',
       runnerPath: 'atm.mjs',
       metadataPath: metadataRelativePath,
-      command: 'node atm.mjs next --json',
+      command: 'node atm.mjs next --prompt "<current user prompt>" --json',
       status: 'source-unavailable',
       sourceKind: 'unavailable',
       frameworkVersion: '0.0.0',
@@ -667,7 +667,7 @@ function installPinnedRunner(cwd: string, force: boolean, created: string[], unc
     schemaVersion: 'atm.pinnedRunner.v0.1',
     runnerPath: 'atm.mjs',
     metadataPath: metadataRelativePath,
-    command: 'node atm.mjs next --json',
+      command: 'node atm.mjs next --prompt "<current user prompt>" --json',
     status,
     sourceKind: source.kind,
     sourcePath: describePinnedRunnerSource(source),
@@ -811,14 +811,15 @@ function createAgentsRootEntryBlock(tokens: Record<string, string>): string {
     'Read the repository root README.md for project context, then run:',
     '',
     '```bash',
-    'node atm.mjs next --json',
+    'node atm.mjs next --prompt "<current user prompt>" --json',
     '```',
     '',
     'First-contact behavior:',
     '',
-    '1. If `node atm.mjs next --json` returns an `ATM_USER_NOTICE` message or `evidence.userNotice`, show that notice to the user in natural language before running the returned next action.',
-    '2. If existing host instructions reference a missing local document, mention the missing file once and continue with the ATM route.',
-    '3. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.',
+    '1. For user-requested task work, run `node atm.mjs next --prompt "<current user prompt>" --json`; use `node atm.mjs next --json` only as read-only orientation when no user prompt is available.',
+    '2. If the ATM result returns an `ATM_USER_NOTICE` message or `evidence.userNotice`, show that notice to the user in natural language before running the returned next action.',
+    '3. If existing host instructions reference a missing local document, mention the missing file once and continue with the ATM route.',
+    '4. After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.',
     '',
     'Editor integration self-check:',
     '',
@@ -856,10 +857,10 @@ function createReadmeRootEntryBlock(): string {
     'After reading this repository overview, run:',
     '',
     '```bash',
-    'node atm.mjs next --json',
+    'node atm.mjs next --prompt "<current user prompt>" --json',
     '```',
     '',
-    'If the result includes an `ATM_USER_NOTICE` message or `evidence.userNotice`, show it to the user in natural language before running the returned next action.',
+    'Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available. If the result includes an `ATM_USER_NOTICE` message or `evidence.userNotice`, show it to the user in natural language before running the returned next action.',
     '',
     'After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.',
     '',
@@ -905,7 +906,7 @@ function upsertManagedRootEntryBlock(
   if (existingPattern.test(current)) {
     return current.replace(existingPattern, `${formattedBlock}${lineBreak}`);
   }
-  if (current.includes('node atm.mjs next --json') && !force) {
+  if (current.includes('node atm.mjs next --prompt "<current user prompt>" --json') && !force) {
     return current;
   }
   const insertionIndex = findRootEntryInsertionIndex(current, insertion);

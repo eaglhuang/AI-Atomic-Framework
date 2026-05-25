@@ -61,6 +61,7 @@ export async function runBatch(argv: string[]) {
       resolvedActor.actorId,
       '--status',
       'done',
+      '--from-batch-checkpoint',
       '--json'
     ]);
     let cleanupResult: unknown = null;

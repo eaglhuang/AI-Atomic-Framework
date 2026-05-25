@@ -6,7 +6,7 @@ AI-Atomic-Framework, also called ATM in this repository, is a governance framewo
 
 ATM is not an agent framework and not a workflow engine. It is the control layer around AI-assisted work: the part that keeps scope, rules, validation, artifacts, evidence, and handoff state explicit.
 
-> Agent first action: read this README, then run `node atm.mjs next --json` from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
+> Agent first action for a user request: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available. If ATM recommends `batch`, deliver only the queue head and then run `node atm.mjs batch checkpoint --actor <id> --json`; do not manually loop over low-level task lifecycle commands.
 
 ## What ATM Does
 
@@ -26,7 +26,7 @@ The practical result is simple: an AI agent can enter a repository, ask ATM what
 
 ```mermaid
 flowchart LR
-    Goal["Human or agent goal"] --> Next["atm next --json"]
+    Goal["Human or agent goal"] --> Next["atm next --prompt"]
     Next --> Ready{"ATM ready?"}
     Ready -- "not yet" --> Bootstrap["bootstrap / init / welcome"]
     Ready -- "yes" --> Lock["lock scope"]
@@ -38,7 +38,7 @@ flowchart LR
     Handoff --> Next
 ```
 
-The key idea is that `next` remains the deterministic router. README files, generated agent entry files, shell wrappers, and integrations should guide an agent back to `node atm.mjs next --json`; they should not create a second task model, approval workflow, or rule authority.
+The key idea is that `next` remains the deterministic router. README files, generated agent entry files, shell wrappers, and integrations should guide an agent back to `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested work; they should not create a second task model, approval workflow, or rule authority.
 
 ## Atomic Behaviors
 
@@ -136,12 +136,12 @@ For an existing repository, use one official distribution:
 | `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime. |
 | npm `create-atm` | You want the lowest-friction starter route. |
 
-This is the release-bundle root-drop bootstrap workflow: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --json` route bootstrap, orientation, and governed work.
+This is the release-bundle root-drop bootstrap workflow: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --prompt "<current user prompt>" --json` route user-requested governed work. `node atm.mjs next --json` remains a read-only orientation command when no user prompt is available.
 
 Then give your AI agent one instruction:
 
 ```text
-Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
+Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
 ```
 
 The first `next` call will route to bootstrap or orientation when the repository is not ready yet. After that, governed work keeps returning through `next`.
@@ -150,7 +150,8 @@ The first `next` call will route to bootstrap or orientation when the repository
 
 | Command | Purpose |
 | --- | --- |
-| `node atm.mjs next --json` | Recommend the next official ATM action from the current repository state. |
+| `node atm.mjs next --prompt "<current user prompt>" --json` | Recommend the next official ATM action for the current user request. |
+| `node atm.mjs next --json` | Read-only repository orientation when no user prompt is available. |
 | `node atm.mjs welcome --json` | Summarize ATMChart, integration health, and the next ATM action for first-touch onboarding. |
 | `node atm.mjs doctor --json` | Inspect engineering readiness, layout health, trust signals, version compatibility, and integration drift. |
 | `node atm.mjs atm-chart render --json` | Render `.atm/memory/atm-chart.md` from guard sources and schema hashes. |
@@ -195,7 +196,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full layer model.
 
 ATM is designed to cooperate with the systems a repository already has.
 
-- Keep `node atm.mjs next --json` visible in repository entry guidance.
+- Keep `node atm.mjs next --prompt "<current user prompt>" --json` visible in repository entry guidance for user-requested work.
 - Use `atm welcome`, ATMChart, and optional integrations to help agents discover the local route.
 - Use `atm doctor --json` to inspect readiness and detect possible governance bypass.
 - Add Git hooks, CI gates, branch protection, or review policy in the host repository when stronger enforcement is needed.
