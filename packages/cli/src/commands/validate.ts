@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
@@ -61,46 +62,58 @@ function valueAfter(argv: any, flag: string): string | null {
 }
 
 function validateAtomizationCoverage(cwd: string) {
-  // Simple validation for atomization coverage
-  const thresholds = {
-    source_ownership_coverage: 30,
-    public_command_coverage: 50,
-    runtime_behavior_coverage: 40,
-    evidence_coverage: 60,
-    integration_health: 80
-  };
-  
-  // Stub scores for now - would be populated from actual measurement
-  const currentScores = {
-    source_ownership_coverage: 3,
-    public_command_coverage: 16,
-    runtime_behavior_coverage: 0,
-    evidence_coverage: 0,
-    integration_health: 50
-  };
-  
-  const violations = [];
-  for (const [metric, threshold] of Object.entries(thresholds)) {
-    const current = currentScores[metric as keyof typeof currentScores] || 0;
-    if (current < threshold) {
-      violations.push({ metric, current, threshold, gap: threshold - current });
-    }
+  // Delegate to scripts/validate-atomization-coverage.ts for real validation
+  // against atm.atomizationCoverageValidation.v1 schema.
+  const scriptPath = path.resolve(cwd, 'scripts', 'validate-atomization-coverage.ts');
+  if (!existsSync(scriptPath)) {
+    return makeResult({
+      ok: false,
+      command: 'validate',
+      cwd,
+      messages: [
+        message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_SCRIPT_MISSING',
+          'scripts/validate-atomization-coverage.ts is missing. Run TASK-ASA-0004 to add it.', {})
+      ],
+      evidence: { validation: 'atomization-coverage' }
+    });
   }
-  
-  return makeResult({
-    ok: violations.length === 0,
-    command: 'validate',
-    cwd,
-    messages: violations.length === 0
-      ? [message('info', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_OK', 'Atomization coverage validation passed.')]
-      : [message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage has ${violations.length} threshold violations.`, { violations })],
-    evidence: {
-      validation: 'atomization-coverage',
-      thresholds,
-      current_scores: currentScores,
-      violations
+  try {
+    const cmd = `node --strip-types "${scriptPath}" --mode validate --repo "${cwd}"`;
+    let stdout = '';
+    let exitCode = 0;
+    try {
+      stdout = execSync(cmd, { encoding: 'utf8' });
+    } catch (err: any) {
+      stdout = err.stdout?.toString() ?? '';
+      exitCode = err.status ?? 1;
     }
-  });
+    const report = stdout ? JSON.parse(stdout) : { ok: false, violations: [{ detail: 'no output' }] };
+    const violations = report.violations ?? [];
+    return makeResult({
+      ok: exitCode === 0,
+      command: 'validate',
+      cwd,
+      messages: exitCode === 0
+        ? [message('info', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_OK', 'Atomization coverage validation passed.')]
+        : [message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage has ${violations.length} violations.`, { violations })],
+      evidence: {
+        validation: 'atomization-coverage',
+        schemaId: report.schemaId,
+        report
+      }
+    });
+  } catch (err: any) {
+    return makeResult({
+      ok: false,
+      command: 'validate',
+      cwd,
+      messages: [
+        message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED',
+          `Atomization coverage validation failed: ${err.message}`, {})
+      ],
+      evidence: { validation: 'atomization-coverage', error: err.message }
+    });
+  }
 }
 
 function validateRepositoryConfig(cwd: any) {

@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
@@ -28,6 +29,9 @@ export function runGuard(argv: string[]) {
   }
   if (options.guardName === 'atom-callsite-readability') {
     return runAtomCallsiteReadabilityGuard(options.cwd);
+  }
+  if (options.guardName === 'atomization-coverage') {
+    return runAtomizationCoverageGuard(options.cwd, options.files);
   }
   if (options.guardName === 'framework-development') {
     return runFrameworkDevelopmentGuard(options.cwd, options.files, options.targetRepo);
@@ -191,9 +195,51 @@ function runAtomCallsiteReadabilityGuard(cwd: string) {
   });
 }
 
+function runAtomizationCoverageGuard(cwd: string, files: readonly string[]) {
+  const scriptPath = path.resolve(cwd, 'scripts', 'validate-atomization-coverage.ts');
+  if (!existsSync(scriptPath)) {
+    return makeResult({
+      ok: false,
+      command: 'guard',
+      cwd,
+      messages: [
+        message('error', 'ATM_GUARD_ATOMIZATION_COVERAGE_SCRIPT_MISSING',
+          'scripts/validate-atomization-coverage.ts is missing. Run TASK-ASA-0004.', {})
+      ],
+      evidence: { guard: 'atomization-coverage' }
+    });
+  }
+  const newPaths = files.length > 0 ? `--new-paths "${files.join(',')}"` : '';
+  const cmd = `node --strip-types "${scriptPath}" --mode guard --repo "${cwd}" ${newPaths}`.trim();
+  let stdout = '';
+  let exitCode = 0;
+  try {
+    stdout = execSync(cmd, { encoding: 'utf8' });
+  } catch (err: any) {
+    stdout = err.stdout?.toString() ?? '';
+    exitCode = err.status ?? 1;
+  }
+  let report: any = {};
+  try { report = JSON.parse(stdout); } catch {}
+  const violations = report.violations ?? [];
+  return makeResult({
+    ok: exitCode === 0,
+    command: 'guard',
+    cwd,
+    messages: exitCode === 0
+      ? [message('info', 'ATM_GUARD_ATOMIZATION_COVERAGE_OK', 'Atomization coverage guard passed: every new production source has atom/map ownership or explicit exclusion reason.')]
+      : [message('error', 'ATM_GUARD_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage guard found ${violations.length} violations.`, { violations })],
+    evidence: {
+      guard: 'atomization-coverage',
+      schemaId: report.schemaId,
+      report
+    }
+  });
+}
+
 interface ParsedGuardArgs {
   readonly cwd: string;
-  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'framework-development' | 'commit-range';
+  readonly guardName: 'encoding' | 'mutation' | 'git' | 'atom-callsite-readability' | 'atomization-coverage' | 'framework-development' | 'commit-range';
   readonly files: readonly string[];
   readonly taskId: string | null;
   readonly actorId: string | null;
@@ -263,8 +309,8 @@ function parseGuardArgs(argv: string[]): ParsedGuardArgs {
     if (state.guardName) {
       throw new CliError('ATM_CLI_USAGE', 'guard accepts only one guard name', { exitCode: 2 });
     }
-    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'framework-development' && arg !== 'commit-range') {
-      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, framework-development, commit-range', { exitCode: 2 });
+    if (arg !== 'encoding' && arg !== 'mutation' && arg !== 'git' && arg !== 'atom-callsite-readability' && arg !== 'atomization-coverage' && arg !== 'framework-development' && arg !== 'commit-range') {
+      throw new CliError('ATM_CLI_USAGE', 'guard supports only: encoding, mutation, git, atom-callsite-readability, atomization-coverage, framework-development, commit-range', { exitCode: 2 });
     }
     state.guardName = arg;
   }
