@@ -1392,10 +1392,13 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         return [];
       }
     }) : [];
-  const markdownTasks = uniqueSorted([
-    ...listTaskCardFiles(cwd),
-    ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent)
-  ])
+  const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent)
+    ? uniqueSorted([
+      ...listTaskCardFiles(cwd),
+      ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent)
+    ])
+    : [];
+  const markdownTasks = markdownTaskFiles
     .map((filePath): ImportedTaskSummary | null => {
       const rawText = readFileSync(filePath, 'utf8');
       const parsed = parseMarkdownFrontmatter(rawText);
@@ -1972,6 +1975,15 @@ function dedupeTasks(tasks: readonly ImportedTaskSummary[]): readonly ImportedTa
     output.push(task);
   }
   return output;
+}
+
+function shouldDiscoverMarkdownTaskCards(intent: TaskIntent | null): boolean {
+  if (!intent) return false;
+  return intent.taskScopeMentioned
+    || intent.queueRequested
+    || intent.mentionedTaskIds.length > 0
+    || intent.taskRootHints.length > 0
+    || intent.mentionedPlanPaths.length > 0;
 }
 
 function finalizeImportedTaskSummary(task: Omit<ImportedTaskSummary, 'planningReadOnlyPaths' | 'planningMirrorPaths' | 'targetAllowedFiles'>): ImportedTaskSummary {
