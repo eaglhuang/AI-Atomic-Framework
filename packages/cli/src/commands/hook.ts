@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -15,7 +15,7 @@ import {
 } from './framework-development.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
-import { isPlanningMirrorPath, readActiveTaskDirectionLocks } from './task-direction.ts';
+import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
@@ -321,12 +321,20 @@ function runPreCommitHook(cwd: string) {
   const activeDirectionLocks = readActiveTaskDirectionLocks(root);
   const activeQuickfixLock = readActiveQuickfixLock(root);
   const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
+  const checkpointClosedTaskAllowedFiles = activeDirectionLocks.length > 0
+    ? collectStagedBatchCheckpointScopeFiles(root, stagedFiles)
+    : [];
+  const frameworkTempClaimAllowedFiles = activeDirectionLocks.length > 0
+    ? collectFrameworkTempClaimAllowedFiles(root)
+    : [];
   const directionLockPlanningMirrorPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
   const directionLockAllowsPlanningMirror = activeDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
   const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
     ? stagedFiles
       .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
       .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
+      .filter((entry) => !isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles))
+      .filter((entry) => !isPathAllowedByTaskDirection(entry, frameworkTempClaimAllowedFiles))
     : [];
   const planningMirrorDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync && directionLockPlanningMirrorPaths.length > 0 && !directionLockAllowsPlanningMirror
     ? stagedFiles
@@ -1374,6 +1382,74 @@ function isTaskDirectionPreCommitExempt(value: string): boolean {
     || normalized.startsWith('.atm/runtime/task-direction-locks/');
 }
 
+function collectStagedBatchCheckpointScopeFiles(cwd: string, stagedFiles: readonly string[]): readonly string[] {
+  const stagedSet = new Set(stagedFiles.map((entry) => normalizeRelativePath(entry)));
+  const allowedFiles: string[] = [];
+  for (const file of stagedFiles) {
+    const normalized = normalizeRelativePath(file);
+    const lower = normalized.toLowerCase();
+    if (!lower.startsWith('.atm/history/tasks/') || !lower.endsWith('.json')) {
+      continue;
+    }
+    const task = readJsonFile(path.join(cwd, normalized));
+    if (task?.status !== 'done') continue;
+    const taskId = typeof task.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
+    const lastTransitionId = typeof task.lastTransitionId === 'string' ? task.lastTransitionId : '';
+    const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
+    if (!lastTransitionId || !stagedSet.has(expectedEventPath)) {
+      continue;
+    }
+    const event = readJsonFile(path.join(cwd, expectedEventPath));
+    const closure = event?.closure as { schemaId?: unknown } | undefined;
+    if (typeof event?.command !== 'string'
+      || !event.command.startsWith('node atm.mjs tasks close')
+      || (!event.command.includes('--from-batch-checkpoint') && closure?.schemaId !== 'atm.taskClosureTransition.v1')) {
+      continue;
+    }
+    allowedFiles.push(...extractCheckpointTaskScopeFiles(task));
+  }
+  return uniqueSorted(allowedFiles);
+}
+
+function collectFrameworkTempClaimAllowedFiles(cwd: string): readonly string[] {
+  const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
+  if (!existsSync(lockRoot)) return [];
+  const allowedFiles: string[] = [];
+  for (const entry of readdirSync(lockRoot).filter((fileName) => fileName.startsWith('ATM-FRAMEWORK-TEMP-') && fileName.endsWith('.lock.json'))) {
+    const lock = readJsonFile(path.join(lockRoot, entry));
+    collectStringArrayField(lock?.files, allowedFiles);
+  }
+  return uniqueSorted(allowedFiles.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+}
+
+function extractCheckpointTaskScopeFiles(task: Record<string, unknown>): readonly string[] {
+  const candidates: string[] = [];
+  collectStringArrayField(task.scope, candidates);
+  collectStringArrayField(task.scopePaths, candidates);
+  collectStringArrayField(task.deliverables, candidates);
+  collectStringArrayField(task.files, candidates);
+  collectStringArrayField(task.allowedFiles, candidates);
+  const targetWork = isPlainObject(task.targetWork) ? task.targetWork : null;
+  if (targetWork) {
+    collectStringArrayField(targetWork.allowedFiles, candidates);
+    collectStringArrayField(targetWork.files, candidates);
+  }
+  return uniqueSorted(candidates
+    .map(normalizeRelativePath)
+    .filter(isTaskDirectionPathCandidate));
+}
+
+function collectStringArrayField(value: unknown, output: string[]) {
+  if (!Array.isArray(value)) return;
+  for (const entry of value) {
+    if (typeof entry === 'string') output.push(entry);
+  }
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]) {
   const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry) || isStaticEvidenceArtifactPath(entry));
   const findings: ProtectedStateFinding[] = [];
@@ -1467,7 +1543,8 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
       } else if (owningBatch?.status === 'active'
         && typeof event?.command === 'string'
         && event.command.startsWith('node atm.mjs tasks close')
-        && !event.command.includes('--from-batch-checkpoint')) {
+        && !event.command.includes('--from-batch-checkpoint')
+        && (event?.closure as { schemaId?: unknown } | undefined)?.schemaId !== 'atm.taskClosureTransition.v1') {
         findings.push({
           file: normalized,
           reason: 'batch-close-must-use-checkpoint',

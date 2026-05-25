@@ -1020,7 +1020,15 @@ async function runTasksClose(argv: string[]) {
     previousStatus,
     closureMetadata: options.status === 'done'
       ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId)
-      : null
+      : null,
+    command: buildTaskTransitionCommand({
+      action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
+      taskId: options.taskId,
+      actorId,
+      status: options.status,
+      fromBatchCheckpoint: options.fromBatchCheckpoint,
+      batchId: owningBatch?.batchId ?? options.batchId
+    })
   });
   const taskQueue = options.status === 'done'
     ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
@@ -2731,6 +2739,39 @@ function assertLocalTaskLedgerEnabled(cwd: string, action: string) {
   }
 }
 
+function buildTaskTransitionCommand(input: {
+  readonly action: string;
+  readonly taskId: string;
+  readonly actorId: string | null;
+  readonly status?: string | null;
+  readonly fromBatchCheckpoint?: boolean;
+  readonly batchId?: string | null;
+}): string {
+  const parts = ['node', 'atm.mjs', 'tasks', input.action];
+  if (input.taskId) {
+    parts.push('--task', quoteCommandValue(input.taskId));
+  }
+  if (input.actorId) {
+    parts.push('--actor', quoteCommandValue(input.actorId));
+  }
+  if (input.status) {
+    parts.push('--status', quoteCommandValue(input.status));
+  }
+  if (input.fromBatchCheckpoint) {
+    parts.push('--from-batch-checkpoint');
+  }
+  if (input.batchId) {
+    parts.push('--batch', quoteCommandValue(input.batchId));
+  }
+  return parts.join(' ');
+}
+
+function quoteCommandValue(value: string): string {
+  return /^[A-Za-z0-9._:/\\-]+$/.test(value)
+    ? value
+    : `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
 function writeTaskDocumentWithTransition(input: {
   readonly cwd: string;
   readonly taskPath: string;
@@ -2740,6 +2781,7 @@ function writeTaskDocumentWithTransition(input: {
   readonly actorId: string | null;
   readonly previousStatus: string | null;
   readonly closureMetadata?: TaskTransitionClosureMetadata | null;
+  readonly command?: string;
 }) {
   const nextStatus = typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null;
   const createdAt = new Date().toISOString();
@@ -2761,7 +2803,7 @@ function writeTaskDocumentWithTransition(input: {
     toStatus: nextStatus,
     taskPath: input.taskPath,
     taskDocument: input.taskDocument,
-    command: `node atm.mjs tasks ${input.action}`,
+    command: input.command ?? `node atm.mjs tasks ${input.action}`,
     closureMetadata: input.closureMetadata ?? null,
     createdAt,
     transitionId

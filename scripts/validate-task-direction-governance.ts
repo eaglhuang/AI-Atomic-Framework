@@ -142,6 +142,16 @@ async function validateAdopterGoverned(tempRoot: string) {
   await runBatch(['checkpoint', '--cwd', repo, '--actor', 'adopter-agent', '--json']);
   const afterFirstClose = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert((afterFirstClose.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0002', 'adopter queue must advance to second task after closing first');
+  initializeGit(repo);
+  runGit(repo, ['add',
+    'src/one.ts',
+    '.atm/history/tasks/TASK-ADOPT-0001.json',
+    '.atm/history/evidence/TASK-ADOPT-0001.json',
+    '.atm/history/task-events/TASK-ADOPT-0001'
+  ]);
+  const checkpointCommit = runHook(['pre-commit', '--cwd', repo]);
+  assert(checkpointCommit.ok === true, 'batch checkpoint commit must pass even after the direction lock advances to the next queue head');
+  assert(((checkpointCommit.evidence as any).directionLockDriftFiles ?? []).length === 0, 'checkpointed task deliverables must not be reported as drift against the next task lock');
 
   const syncRepo = makeAdopterRepo(tempRoot, 'adopter-infra-sync-with-lock');
   initializeGit(syncRepo);
