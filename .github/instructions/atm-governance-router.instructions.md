@@ -11,6 +11,16 @@ refactor, split, atomize, infect, migrate, or modernize existing source code.
 The goal is to keep the user request natural while still routing the work
 through ATM evidence before choosing a local implementation path.
 
+## Delivery Principle
+
+The objective is to deliver the task content, not to close task cards. A task
+card is a delivery contract. `done` is only the record after the requested
+code, data, pipeline, document, or artifact exists and validators/evidence pass.
+
+Do not optimize for making many cards become `done`. Optimize for producing the
+requested non-.atm deliverables for the current task or current batch queue
+head.
+
 If the natural-language request mentions a task id, task card, plan document, or
 scoped task batch, invoke `atm-task-intent-resolver` first. It must write
 `.atm/runtime/task-intent.json` from semantic reading of the user prompt and then
@@ -143,6 +153,8 @@ Then continue the user's original request with the fallback sources.
   evidence exist.
 - Do not mutate host files during candidate ranking; ranking is advisory until
   a later governed dry run is selected.
+- Do not treat task closure as the work. Implement the task's requested
+  deliverables first, then close.
 - Do not start implementation edits before a task is in `ready` and has an
   active claim.
 - Do not bypass the default task ledger when it is enabled; task status changes

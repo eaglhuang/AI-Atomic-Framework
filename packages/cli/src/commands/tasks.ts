@@ -82,12 +82,15 @@ export interface TaskDeliverableGateReport {
   readonly schemaId: 'atm.taskDeliverableGate.v1';
   readonly generatedAt: string;
   readonly taskId: string;
+  readonly deliveryPrinciple: string;
   readonly required: boolean;
   readonly ok: boolean;
   readonly reason: string;
   readonly changedFiles: readonly string[];
   readonly deliverableFiles: readonly string[];
   readonly declaredFiles: readonly string[];
+  readonly notAllowedAsCompletion: readonly string[];
+  readonly remediation: string;
   readonly requiredCommand: string | null;
 }
 
@@ -878,13 +881,15 @@ async function runTasksClose(argv: string[]) {
     })
     : null;
   if (evidenceGate && !evidenceGate.ok) {
-    throw new CliError('ATM_TASK_CLOSE_EVIDENCE_REQUIRED', `Task ${options.taskId} cannot be closed as done without required evidence.`, {
+    throw new CliError('ATM_TASK_CLOSE_EVIDENCE_REQUIRED', `Task ${options.taskId} cannot be closed as done without required delivery evidence. The goal is to deliver the task, not to mark it done.`, {
       exitCode: 1,
       details: {
         taskId: options.taskId,
+        deliveryPrinciple: taskDeliveryPrincipleText(),
         gate: evidenceGate.gate,
         missing: evidenceGate.missing,
-        evidenceCount: evidenceGate.total
+        evidenceCount: evidenceGate.total,
+        remediation: 'Implement the requested non-.atm deliverables, run the required validators, then add command-backed evidence before closing done.'
       }
     });
   }
@@ -898,7 +903,7 @@ async function runTasksClose(argv: string[]) {
     })
     : null;
   if (deliverableGate && !deliverableGate.ok) {
-    throw new CliError('ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', `Task ${options.taskId} cannot be closed as done without a real non-.atm deliverable diff.`, {
+    throw new CliError('ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', `Task ${options.taskId} cannot be closed as done because ATM found no real non-.atm deliverable diff. Task delivery comes before task closure.`, {
       exitCode: 1,
       details: deliverableGate as unknown as Record<string, unknown>
     });
@@ -2215,6 +2220,7 @@ function evaluateTaskDeliverableGate(input: {
     schemaId: 'atm.taskDeliverableGate.v1',
     generatedAt: new Date().toISOString(),
     taskId: input.taskId,
+    deliveryPrinciple: taskDeliveryPrincipleText(),
     required,
     ok,
     reason: required
@@ -2225,8 +2231,21 @@ function evaluateTaskDeliverableGate(input: {
     changedFiles,
     deliverableFiles: scopedDeliverables,
     declaredFiles,
+    notAllowedAsCompletion: [
+      'only changing .atm/history task JSON, evidence JSON, task-events, runtime locks, or queue state',
+      'text-only evidence without a real deliverable file diff',
+      'replaying old close commits or cherry-picking prior ledger-only closure',
+      'closing a batch queue item before implementing the current task deliverables'
+    ],
+    remediation: ok
+      ? 'Deliverable diff found; continue with validators and closure evidence.'
+      : 'Implement the deliverables described by the task, stage or leave the real file changes visible, then rerun tasks close --status done. If the task is not delivered yet, close review instead of done.',
     requiredCommand: ok ? null : `node atm.mjs tasks close --task ${input.taskId} --actor <actor> --status review --reason "awaiting real deliverable diff" --json`
   };
+}
+
+function taskDeliveryPrincipleText() {
+  return 'The goal is to deliver the requested task content, not to close task cards. done is only the record after real deliverables and validators exist.';
 }
 
 function isDeliverableDiffRequired(taskDocument: Record<string, unknown>): boolean {

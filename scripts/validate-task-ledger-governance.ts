@@ -108,6 +108,16 @@ async function expectTaskError(argv: string[], code: string) {
   }
 }
 
+async function expectTaskErrorDetails(argv: string[], code: string): Promise<Record<string, any>> {
+  try {
+    await runTasks(argv);
+    fail(`tasks ${argv.join(' ')} expected ${code} but succeeded.`);
+  } catch (error) {
+    assert((error as { code?: string }).code === code, `tasks ${argv.join(' ')} expected ${code}, got ${(error as { code?: string }).code ?? 'unknown'}.`);
+    return ((error as { details?: Record<string, any> }).details ?? {}) as Record<string, any>;
+  }
+}
+
 const sandboxFriendlyTempRoot = existsSync(path.join(root, '.atm-temp'))
   ? path.join(root, '.atm-temp')
   : os.tmpdir();
@@ -237,7 +247,9 @@ try {
       }]
     }]
   });
-  await expectTaskError(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done'], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+  const deliverableError = await expectTaskErrorDetails(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done'], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+  assert(typeof deliverableError.deliveryPrinciple === 'string' && deliverableError.deliveryPrinciple.includes('deliver'), 'deliverable gate error must explain that delivery comes before closure');
+  assert(Array.isArray(deliverableError.notAllowedAsCompletion) && deliverableError.notAllowedAsCompletion.some((entry: string) => entry.includes('.atm/history')), 'deliverable gate error must reject ledger-only completion');
   mkdirSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag'), { recursive: true });
   writeFileSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag', 'run_bootstrap.py'), 'print("bootstrap")\n', 'utf8');
   const pipelineClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done']);

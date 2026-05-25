@@ -35,7 +35,7 @@ export async function runBatch(argv: string[]) {
   if (action === 'checkpoint') {
     const active = readActiveBatchRun(options.cwd);
     if (!active) {
-      throw new CliError('ATM_BATCH_RUN_MISSING', 'batch checkpoint requires an active batch run. Start with next --claim on a batch-scoped prompt.', { exitCode: 2 });
+      throw new CliError('ATM_BATCH_RUN_MISSING', 'batch checkpoint requires an active batch run. Start with next --claim on a batch-scoped prompt; batch is for delivering each queue item, not for bulk-closing task cards.', { exitCode: 2 });
     }
     const currentTaskId = active.currentTaskId;
     if (!currentTaskId) {
@@ -103,7 +103,8 @@ export async function runBatch(argv: string[]) {
         : 'Batch checkpoint closed the current task and claimed the next queue head.', {
         batchId: updated.batchId,
         closedTaskId: currentTaskId,
-        nextTaskId: updated.currentTaskId
+        nextTaskId: updated.currentTaskId,
+        deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.'
       })],
       evidence: {
         action: 'checkpoint',

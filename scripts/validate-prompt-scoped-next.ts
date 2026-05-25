@@ -77,8 +77,10 @@ async function main() {
 
     const queue = await runNext(['--cwd', tempRoot, '--prompt', 'PlanAlpha first 2 task cards']);
     assert(queue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'plan-scoped ordinal prompt must return a task queue');
+    assert(queue.messages.some((entry) => entry.code === 'ATM_TASK_DELIVERY_PRINCIPLE'), 'plan-scoped queue route must remind agents that delivery comes before closure');
     assert((queue.evidence.nextAction as any).queueSize === 2, 'plan-scoped ordinal prompt must select two tasks');
     assert((queue.evidence.nextAction as any).recommendedChannel === 'batch', 'plan-scoped queue prompt must recommend batch channel');
+    assert((queue.evidence.nextAction as any).deliveryPrinciple?.schemaId === 'atm.taskDeliveryPrinciple.v1', 'plan-scoped queue prompt must carry delivery principle evidence');
     assert((queue.evidence.taskQueue as any)?.schemaId === 'atm.taskQueuePreview.v1', 'plan-scoped queue prompt must stay read-only and only expose a queue preview');
     assert((queue.evidence.nextAction as any).queueHeadTaskId === 'TASK-ALPHA-0001', 'plan-scoped queue must expose the queue head');
 
@@ -91,7 +93,9 @@ async function main() {
     assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'ledger task prompt must create a queue');
     const ledgerClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', ledgerPrompt]);
     assert(ledgerClaim.ok === true, 'next --claim must claim the queue head for ledger tasks');
+    assert(ledgerClaim.messages.some((entry) => entry.code === 'ATM_TASK_DELIVERY_PRINCIPLE'), 'next --claim must remind agents that the claimed task must be delivered before closure');
     assert((ledgerClaim.evidence.taskDirectionLock as any)?.schemaId === 'atm.taskDirectionLock.v1', 'next --claim must persist atm.taskDirectionLock.v1');
+    assert((ledgerClaim.evidence.nextAction as any).deliveryPrinciple?.notAllowedAsCompletion?.some((entry: string) => entry.includes('.atm/history')), 'next --claim delivery principle must reject ledger-only completion');
     assert((ledgerClaim.evidence.batchRun as any)?.schemaId === 'atm.batchRun.v1', 'batch claim must persist atm.batchRun.v1');
     const lockPath = path.join(tempRoot, '.atm', 'runtime', 'locks', 'TASK-LEDGER-0001.lock.json');
     assert(existsSync(lockPath), 'direction lock must be embedded in the runtime lock file');

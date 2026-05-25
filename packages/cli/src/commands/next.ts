@@ -470,6 +470,10 @@ async function claimNextImportedTask(input: {
     reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
     recommendedChannel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'batch' : 'normal',
     riskLevel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'high' : 'medium',
+    deliveryPrinciple: buildTaskDeliveryPrinciple({
+      channel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'batch' : 'normal',
+      taskId: claimableTask.workItemId
+    }),
     selectedTask: claimableTask,
     taskContext: {
       scopePaths: claimableTask.scopePaths,
@@ -607,6 +611,10 @@ function buildPromptScopedNextResult(input: {
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
       recommendedChannel: 'batch',
       riskLevel: 'high',
+      deliveryPrinciple: buildTaskDeliveryPrinciple({
+        channel: 'batch',
+        taskId: queueHeadTaskId ?? undefined
+      }),
       selectedTasks,
       taskQueue: activeQueue ?? queuePreview,
       queueId: activeQueue?.queueId ?? null,
@@ -651,6 +659,10 @@ function buildPromptScopedNextResult(input: {
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
     recommendedChannel: 'normal',
     riskLevel: 'medium',
+    deliveryPrinciple: buildTaskDeliveryPrinciple({
+      channel: 'normal',
+      taskId: selectedTask.workItemId
+    }),
     selectedTask,
     targetRepo: selectedTask.targetRepo,
     requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
@@ -1929,8 +1941,28 @@ function buildAgentPackHint(status: string, command: string, reason: string) {
   };
 }
 
+function buildTaskDeliveryPrinciple(input: { readonly channel: 'normal' | 'batch'; readonly taskId?: string }) {
+  return {
+    schemaId: 'atm.taskDeliveryPrinciple.v1',
+    taskId: input.taskId ?? null,
+    channel: input.channel,
+    principle: 'The goal is to deliver the requested task content, not to close task cards.',
+    instruction: 'Implement or update the real non-.atm deliverables first; only close the task after those deliverables exist and validators/evidence pass.',
+    doneMeans: 'done records completed delivery; it is not the objective itself.',
+    notAllowedAsCompletion: [
+      'changing only .atm/history task status or task events',
+      'adding text-only evidence without real deliverable files',
+      'replaying or cherry-picking old close commits',
+      'batch-closing later tasks before the current queue head is delivered'
+    ],
+    nextStep: input.channel === 'batch'
+      ? 'Work only on the current queue head, produce its real deliverables, then run node atm.mjs batch checkpoint --actor <id> --json.'
+      : 'Produce the task deliverables, run required validators, then close with node atm.mjs tasks close --status done.'
+  };
+}
+
 function buildNextMessages(
-  nextAction: { readonly status: string },
+  nextAction: { readonly status: string; readonly deliveryPrinciple?: ReturnType<typeof buildTaskDeliveryPrinciple>; readonly selectedTask?: unknown; readonly selectedTasks?: unknown },
   userNotice: AtmUserNotice | null,
   integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>,
   runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>,
@@ -1969,6 +2001,16 @@ function buildNextMessages(
         atomBirthApplyDeferred: runtimeAdapterReadiness.atomBirthApplyDeferred,
         missingCapability: runtimeAdapterReadiness.missingCapability
       }
+    ));
+  }
+  const deliveryPrinciple = nextAction.deliveryPrinciple
+    ?? (nextAction.selectedTask || nextAction.selectedTasks ? buildTaskDeliveryPrinciple({ channel: nextAction.selectedTasks ? 'batch' : 'normal' }) : null);
+  if (deliveryPrinciple) {
+    messages.push(message(
+      'warning',
+      'ATM_TASK_DELIVERY_PRINCIPLE',
+      'Task cards are not targets to close; they are delivery contracts. Implement the requested non-.atm deliverables before closing.',
+      deliveryPrinciple
     ));
   }
   messages.push(routeMessage);

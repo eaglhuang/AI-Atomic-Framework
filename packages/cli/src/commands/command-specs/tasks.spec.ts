@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'tasks',
-  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, migrate legacy ledger records, and close tasks with evidence gates.',
+  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, migrate legacy ledger records, and close tasks with deliverable/evidence gates.',
   positional: [
     { name: 'action', summary: 'create | import | mirror | verify | audit | queue | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close', required: true }
   ],
@@ -34,7 +34,7 @@ export default defineCommandSpec({
     { flag: '--files', value: 'csv', summary: 'Comma-separated scope files for claim/takeover lock acquisition.' },
     { flag: '--ttl-seconds', value: 'number', summary: 'Lease ttl in seconds for claim/renew/takeover.' },
     { flag: '--to', value: 'id', summary: 'Target actor id for handoff.' },
-    { flag: '--status', value: 'state', summary: 'Target status for tasks close: done|review|blocked|abandoned.' },
+    { flag: '--status', value: 'state', summary: 'Target status for tasks close: done|review|blocked|abandoned. done requires real non-.atm deliverables plus evidence.' },
     { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, takeover, or close.' },
     commonJsonOption,
     commonPrettyOption,
