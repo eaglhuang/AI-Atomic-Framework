@@ -112,7 +112,11 @@ export function writeBatchRun(input: {
   readonly checkpointSize?: number;
 }) {
   const prompt = input.sourcePrompt.trim();
-  const taskIds = input.tasks.map((task) => task.workItemId);
+  const queueTasks = input.queue?.tasks ?? null;
+  const sourceTasks = queueTasks && queueTasks.length > 0 ? queueTasks : input.tasks;
+  const taskIds = input.queue?.taskIds && input.queue.taskIds.length > 0
+    ? [...input.queue.taskIds]
+    : sourceTasks.map((task) => task.workItemId);
   const filePath = path.join(input.cwd, ...batchRunPath);
   const currentIndex = input.queue?.currentIndex ?? 0;
   const record: BatchRunRecord = {
@@ -121,7 +125,7 @@ export function writeBatchRun(input: {
     batchId: `batch-${sha256(`${prompt}|${taskIds.join(',')}`).slice(0, 12)}`,
     sourcePrompt: prompt,
     sourcePromptHash: sha256(prompt),
-    targetRepo: resolveBatchTargetRepo(input.tasks),
+    targetRepo: input.queue?.targetRepo ?? resolveBatchTargetRepo(sourceTasks),
     taskIds,
     currentIndex,
     currentTaskId: taskIds[currentIndex] ?? null,
@@ -153,6 +157,54 @@ export function releaseBatchRun(cwd: string, current: BatchRunRecord, status: Ba
   return updateBatchRun(cwd, current, {
     status,
     currentTaskId: status === 'completed' ? null : current.currentTaskId
+  });
+}
+
+export function inspectBatchRunConsistency(batchRun: BatchRunRecord | null, taskQueue: TaskQueueRecord | null) {
+  if (!batchRun || batchRun.status !== 'active') {
+    return {
+      ok: true,
+      reason: null,
+      queueHeadTaskId: null,
+      batchHeadTaskId: null
+    };
+  }
+  if (!taskQueue || taskQueue.status !== 'active') {
+    return {
+      ok: false,
+      reason: 'active-batch-without-active-queue',
+      queueHeadTaskId: null,
+      batchHeadTaskId: batchRun.currentTaskId
+    };
+  }
+  const queueHeadTaskId = taskQueue.taskIds[taskQueue.currentIndex] ?? null;
+  const sameTaskIds = JSON.stringify([...batchRun.taskIds]) === JSON.stringify([...taskQueue.taskIds]);
+  const sameIndex = batchRun.currentIndex === taskQueue.currentIndex;
+  const sameHead = batchRun.currentTaskId === queueHeadTaskId;
+  if (sameTaskIds && sameIndex && sameHead) {
+    return {
+      ok: true,
+      reason: null,
+      queueHeadTaskId,
+      batchHeadTaskId: batchRun.currentTaskId
+    };
+  }
+  return {
+    ok: false,
+    reason: 'batch-run-task-queue-mismatch',
+    queueHeadTaskId,
+    batchHeadTaskId: batchRun.currentTaskId
+  };
+}
+
+export function repairBatchRunFromQueue(cwd: string, batchRun: BatchRunRecord, taskQueue: TaskQueueRecord) {
+  const queueHeadTaskId = taskQueue.taskIds[taskQueue.currentIndex] ?? null;
+  return updateBatchRun(cwd, batchRun, {
+    targetRepo: taskQueue.targetRepo,
+    taskIds: [...taskQueue.taskIds],
+    currentIndex: taskQueue.currentIndex,
+    currentTaskId: queueHeadTaskId,
+    status: taskQueue.status === 'completed' || !queueHeadTaskId ? 'completed' : 'active'
   });
 }
 

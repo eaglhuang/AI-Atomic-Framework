@@ -3,7 +3,13 @@ import { resolveActorId } from './actor-registry.ts';
 import { runNext } from './next.ts';
 import { runTasks } from './tasks.ts';
 import { findActiveTaskQueue } from './task-direction.ts';
-import { readActiveBatchRun, releaseBatchRun, updateBatchRun } from './work-channels.ts';
+import {
+  inspectBatchRunConsistency,
+  readActiveBatchRun,
+  releaseBatchRun,
+  repairBatchRunFromQueue,
+  updateBatchRun
+} from './work-channels.ts';
 
 export async function runBatch(argv: string[]) {
   const { options } = parseOptions(argv, 'batch');
@@ -11,18 +17,28 @@ export async function runBatch(argv: string[]) {
   if (action === 'status') {
     const batchRun = readActiveBatchRun(options.cwd);
     const taskQueue = batchRun ? findActiveTaskQueue(options.cwd, batchRun.sourcePrompt) : null;
+    const consistency = inspectBatchRunConsistency(batchRun, taskQueue);
     return makeResult({
-      ok: true,
+      ok: consistency.ok,
       command: 'batch',
       cwd: options.cwd,
-      messages: [message('info', 'ATM_BATCH_STATUS', batchRun ? 'Active batch run found.' : 'No active batch run found.', {
+      messages: [consistency.ok
+        ? message('info', 'ATM_BATCH_STATUS', batchRun ? 'Active batch run found.' : 'No active batch run found.', {
         active: Boolean(batchRun),
         currentTaskId: batchRun?.currentTaskId ?? null
-      })],
+        })
+        : message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'Active batch runtime is inconsistent and must be repaired before continuing.', {
+          active: Boolean(batchRun),
+          batchHeadTaskId: consistency.batchHeadTaskId,
+          queueHeadTaskId: consistency.queueHeadTaskId,
+          reason: consistency.reason,
+          requiredCommand: 'node atm.mjs batch repair --actor <id> --json'
+        })],
       evidence: {
         action: 'status',
         batchRun,
-        taskQueue
+        taskQueue,
+        consistency
       }
     });
   }
@@ -36,6 +52,20 @@ export async function runBatch(argv: string[]) {
     const active = readActiveBatchRun(options.cwd);
     if (!active) {
       throw new CliError('ATM_BATCH_RUN_MISSING', 'batch checkpoint requires an active batch run. Start with next --claim on a batch-scoped prompt; batch is for delivering each queue item, not for bulk-closing task cards.', { exitCode: 2 });
+    }
+    const consistencyQueue = findActiveTaskQueue(options.cwd, active.sourcePrompt);
+    const consistency = inspectBatchRunConsistency(active, consistencyQueue);
+    if (!consistency.ok) {
+      throw new CliError('ATM_BATCH_STATE_REPAIR_REQUIRED', 'batch checkpoint cannot continue because batch-run and task-queue runtime disagree.', {
+        exitCode: 1,
+        details: {
+          batchId: active.batchId,
+          reason: consistency.reason,
+          batchHeadTaskId: consistency.batchHeadTaskId,
+          queueHeadTaskId: consistency.queueHeadTaskId,
+          requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --json`
+        }
+      });
     }
     const currentTaskId = active.currentTaskId;
     if (!currentTaskId) {
@@ -139,6 +169,56 @@ export async function runBatch(argv: string[]) {
     });
   }
 
+  if (action === 'repair' || action === 'resume') {
+    const active = readActiveBatchRun(options.cwd);
+    if (!active) {
+      throw new CliError('ATM_BATCH_RUN_MISSING', `batch ${action} requires an active batch run.`, { exitCode: 2 });
+    }
+    const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt);
+    const consistency = inspectBatchRunConsistency(active, queue);
+    if (!queue) {
+      throw new CliError('ATM_BATCH_QUEUE_MISSING', 'Active batch run has no matching active task queue; abandon or recreate the batch from the original prompt.', {
+        exitCode: 1,
+        details: {
+          batchId: active.batchId,
+          requiredCommand: `node atm.mjs batch abandon --actor ${resolvedActor.actorId} --json`
+        }
+      });
+    }
+    const repaired = consistency.ok ? active : repairBatchRunFromQueue(options.cwd, active, queue);
+    return makeResult({
+      ok: true,
+      command: 'batch',
+      cwd: options.cwd,
+      messages: [
+        consistency.ok
+          ? message('info', 'ATM_BATCH_REPAIR_NOT_NEEDED', 'Batch runtime is already consistent.', {
+            batchId: active.batchId,
+            currentTaskId: active.currentTaskId
+          })
+          : message('info', 'ATM_BATCH_REPAIRED', 'Batch runtime was repaired from the active task queue.', {
+            batchId: repaired.batchId,
+            previousTaskId: active.currentTaskId,
+            currentTaskId: repaired.currentTaskId,
+            queueHeadTaskId: queue.taskIds[queue.currentIndex] ?? null
+          }),
+        message('warning', 'ATM_BATCH_RESUME_INSTRUCTION', 'Resume the batch through the current queue head; do not edit task events by hand.', {
+          currentTaskId: repaired.currentTaskId,
+          nextCommand: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --prompt "${repaired.sourcePrompt}" --json`,
+          checkpointCommand: `node atm.mjs batch checkpoint --actor ${resolvedActor.actorId} --json`
+        })
+      ],
+      evidence: {
+        action,
+        actorId: resolvedActor.actorId,
+        before: active,
+        after: repaired,
+        taskQueue: queue,
+        consistency
+      }
+    });
+  }
+
   if (action === 'abandon') {
     const active = readActiveBatchRun(options.cwd);
     if (!active) {
@@ -161,5 +241,5 @@ export async function runBatch(argv: string[]) {
     });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'batch supports: status, checkpoint, abandon', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'batch supports: status, checkpoint, repair, resume, abandon', { exitCode: 2 });
 }

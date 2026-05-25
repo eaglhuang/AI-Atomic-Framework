@@ -3,7 +3,7 @@ import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption
 
 export default defineCommandSpec({
   name: 'batch',
-  summary: 'Inspect or checkpoint an active ATM batch run. Batch automates queue bookkeeping, but each task still needs real deliverables before closure.',
+  summary: 'Inspect, repair, resume, or checkpoint an active ATM batch run. Batch automates queue bookkeeping, but each task still needs real deliverables before closure.',
   options: [
     commonCwdOption,
     { flag: '--actor', value: 'id', summary: 'Actor id used for checkpoint or abandon actions.' },
@@ -13,6 +13,8 @@ export default defineCommandSpec({
   ],
   examples: [
     'node atm.mjs batch status --json',
+    'node atm.mjs batch repair --actor codex-main --json',
+    'node atm.mjs batch resume --actor codex-main --json',
     'node atm.mjs batch checkpoint --actor codex-main --json',
     'node atm.mjs batch abandon --actor codex-main --json'
   ]

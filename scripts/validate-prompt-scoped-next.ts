@@ -130,6 +130,22 @@ async function main() {
       directLaterBatchCloseBlocked = (error as { code?: string }).code === 'ATM_BATCH_CHECKPOINT_REQUIRED';
     }
     assert(directLaterBatchCloseBlocked, 'later tasks inside an active batch must also be closed through batch checkpoint, not direct tasks close');
+    const batchRunPath = path.join(tempRoot, '.atm', 'runtime', 'batch-run.json');
+    const corruptedBatchRun = JSON.parse(readFileSync(batchRunPath, 'utf8'));
+    corruptedBatchRun.taskIds = ['TASK-LEDGER-0002'];
+    corruptedBatchRun.currentIndex = 0;
+    corruptedBatchRun.currentTaskId = 'TASK-LEDGER-0002';
+    writeFileSync(batchRunPath, `${JSON.stringify(corruptedBatchRun, null, 2)}\n`, 'utf8');
+    const brokenBatchStatus = await runBatch(['status', '--cwd', tempRoot, '--json']);
+    assert(brokenBatchStatus.ok === false, 'batch status must fail when batch-run and task-queue disagree');
+    assert(brokenBatchStatus.messages.some((entry) => entry.code === 'ATM_BATCH_STATE_REPAIR_REQUIRED'), 'broken batch status must require repair');
+    const brokenBatchNext = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-LEDGER-0002']);
+    assert(brokenBatchNext.ok === false, 'next must not continue through an inconsistent active batch');
+    assert(brokenBatchNext.messages.some((entry) => entry.code === 'ATM_BATCH_STATE_REPAIR_REQUIRED'), 'next must return the batch repair route when runtime is inconsistent');
+    const repairBatch = await runBatch(['repair', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--json']);
+    assert(repairBatch.ok === true, 'batch repair must succeed for a queue-backed inconsistent batch');
+    assert((repairBatch.evidence.after as any)?.taskIds?.includes('TASK-LEDGER-0001'), 'batch repair must restore the full task queue task list');
+    assert((repairBatch.evidence.after as any)?.currentTaskId === 'TASK-LEDGER-0001', 'batch repair must restore the queue head as current task');
 
     writeLedgerTask(path.join(ledgerTaskDir, 'SANGUO-BOOTSTRAP-0001.json'), 'SANGUO-BOOTSTRAP-0001', 'Running Sanguo bootstrap task', 'docs/sanguo.md', {
       status: 'running',

@@ -24,6 +24,7 @@ import {
 } from './task-direction.ts';
 import {
   extractPathLikeStringsFromPrompt,
+  inspectBatchRunConsistency,
   isQuickfixPrompt,
   readActiveBatchRun,
   writeBatchRun,
@@ -391,6 +392,22 @@ async function claimNextImportedTask(input: {
   }
   let claimableTask = input.importedTaskQueue.claimableTask;
   const activeBatchAtClaimStart = readActiveBatchRun(input.cwd);
+  if (activeBatchAtClaimStart?.status === 'active') {
+    const activeBatchQueue = findActiveTaskQueue(input.cwd, activeBatchAtClaimStart.sourcePrompt);
+    const consistency = inspectBatchRunConsistency(activeBatchAtClaimStart, activeBatchQueue);
+    if (!consistency.ok) {
+      throw new CliError('ATM_BATCH_STATE_REPAIR_REQUIRED', 'next --claim cannot continue because batch-run and task-queue runtime disagree.', {
+        exitCode: 1,
+        details: {
+          batchId: activeBatchAtClaimStart.batchId,
+          reason: consistency.reason,
+          batchHeadTaskId: consistency.batchHeadTaskId,
+          queueHeadTaskId: consistency.queueHeadTaskId,
+          requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --json`
+        }
+      });
+    }
+  }
   if (activeBatchAtClaimStart?.status === 'active'
     && activeBatchAtClaimStart.currentTaskId
     && claimableTask
@@ -649,6 +666,46 @@ function buildPromptScopedNextResult(input: {
     const queueHeadTask = input.importedTaskQueue.selectedTask ?? selectedTasks[0] ?? null;
     const queuePrompt = input.taskIntent?.userPrompt ?? queueHeadTask?.workItemId ?? 'prompt-scoped task queue';
     const activeQueue = findActiveTaskQueue(input.cwd, queuePrompt);
+    const activeBatch = readActiveBatchRun(input.cwd);
+    const consistency = inspectBatchRunConsistency(activeBatch, activeBatch ? activeQueue : null);
+    if (!consistency.ok) {
+      const nextAction = {
+        status: 'batch-state-repair-required',
+        command: 'node atm.mjs batch repair --actor <id> --json',
+        reason: 'active batch runtime is inconsistent; repair it before claiming, editing, closing, or committing',
+        recommendedChannel: 'batch',
+        riskLevel: 'high',
+        requiredCommand: 'node atm.mjs batch repair --actor <id> --json',
+        blockedCommands: blockedMutationCommands()
+      };
+      return makeResult({
+        ok: false,
+        command: 'next',
+        cwd: input.cwd,
+        messages: buildNextMessages(
+          nextAction,
+          null,
+          input.integrationBootstrap as any,
+          input.runtimeAdapterReadiness as any,
+          message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'ATM detected an inconsistent active batch. Repair the runtime before continuing.', {
+            batchId: activeBatch?.batchId ?? null,
+            reason: consistency.reason,
+            batchHeadTaskId: consistency.batchHeadTaskId,
+            queueHeadTaskId: consistency.queueHeadTaskId,
+            requiredCommand: nextAction.requiredCommand
+          })
+        ),
+        evidence: {
+          nextAction,
+          recommendedChannel: 'batch',
+          batchRun: activeBatch,
+          taskQueue: activeQueue,
+          consistency,
+          taskIntent: input.taskIntent,
+          importedTaskQueue: input.importedTaskQueue
+        }
+      });
+    }
     const queueHeadTaskId = activeQueue?.taskIds[activeQueue.currentIndex] ?? queueHeadTask?.workItemId ?? null;
     const queuePreview = {
       schemaId: 'atm.taskQueuePreview.v1',
@@ -721,6 +778,45 @@ function buildPromptScopedNextResult(input: {
   const activeBatch = readActiveBatchRun(input.cwd);
   if (activeBatch?.status === 'active' && activeBatch.taskIds.includes(selectedTask.workItemId)) {
     const activeQueue = findActiveTaskQueue(input.cwd, activeBatch.sourcePrompt) ?? findActiveTaskQueue(input.cwd);
+    const consistency = inspectBatchRunConsistency(activeBatch, activeQueue);
+    if (!consistency.ok) {
+      const nextAction = {
+        status: 'batch-state-repair-required',
+        command: 'node atm.mjs batch repair --actor <id> --json',
+        reason: 'active batch runtime is inconsistent; repair it before claiming, editing, closing, or committing',
+        recommendedChannel: 'batch',
+        riskLevel: 'high',
+        requiredCommand: 'node atm.mjs batch repair --actor <id> --json',
+        blockedCommands: blockedMutationCommands()
+      };
+      return makeResult({
+        ok: false,
+        command: 'next',
+        cwd: input.cwd,
+        messages: buildNextMessages(
+          nextAction,
+          null,
+          input.integrationBootstrap as any,
+          input.runtimeAdapterReadiness as any,
+          message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'ATM detected an inconsistent active batch. Repair the runtime before continuing.', {
+            batchId: activeBatch.batchId,
+            reason: consistency.reason,
+            batchHeadTaskId: consistency.batchHeadTaskId,
+            queueHeadTaskId: consistency.queueHeadTaskId,
+            requiredCommand: nextAction.requiredCommand
+          })
+        ),
+        evidence: {
+          nextAction,
+          recommendedChannel: 'batch',
+          batchRun: activeBatch,
+          taskQueue: activeQueue,
+          consistency,
+          taskIntent: input.taskIntent,
+          importedTaskQueue: input.importedTaskQueue
+        }
+      });
+    }
     const queueHeadTaskId = activeBatch.currentTaskId
       ?? activeQueue?.taskIds[activeQueue.currentIndex]
       ?? selectedTask.workItemId;
