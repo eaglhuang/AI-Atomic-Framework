@@ -1,0 +1,106 @@
+{
+  "taskId": "TASK-ASA-0003",
+  "updatedAt": "2026-05-25T13:20:15.105Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "atomize score CLI emits atm.dogfoodScore.v1 with 6 weighted components and grade/stage/trend",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "opus47-asa-runner",
+      "createdAt": "2026-05-25T13:20:14.120Z",
+      "details": {
+        "actorId": "opus47-asa-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "atomize-score"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs atomize score --repo . --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:667cb79bcf93f0fdab720c6081bd5338800f969a70de6a0d96d3a2021292300d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck pass",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "opus47-asa-runner",
+      "createdAt": "2026-05-25T13:20:14.459Z",
+      "details": {
+        "actorId": "opus47-asa-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli pass",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "opus47-asa-runner",
+      "createdAt": "2026-05-25T13:20:14.770Z",
+      "details": {
+        "actorId": "opus47-asa-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e6c195eea0ce698c56decf4733547527ecec426bbf43d5b7732f48bc0d0612fe",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:git-head-evidence pass",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "opus47-asa-runner",
+      "createdAt": "2026-05-25T13:20:15.105Z",
+      "details": {
+        "actorId": "opus47-asa-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    }
+  ]
+}
