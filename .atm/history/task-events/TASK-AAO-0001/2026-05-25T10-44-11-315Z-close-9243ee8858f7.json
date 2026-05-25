@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-25T10-44-11-315Z-close-9243ee8858f7",
+  "taskId": "TASK-AAO-0001",
+  "action": "close",
+  "actorId": "codex",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0001.json",
+  "taskSha256": "sha256:8e1edc08bd650d6a313550ab01fbc98f1233cf21d885d260931bf031105f8ba3",
+  "createdAt": "2026-05-25T10:44:11.315Z",
+  "command": "node atm.mjs tasks close --from-batch-checkpoint",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0001.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "tasks verify",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-25T10:44:11.312Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "docs/ai_atomic_framework/atm-agent-first-operability/AAO-Plan.md",
+        "overlap matrix, routing table, bridge notes"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
