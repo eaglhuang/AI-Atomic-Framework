@@ -317,7 +317,7 @@ function runPreCommitHook(cwd: string) {
   });
   const activeDirectionLocks = readActiveTaskDirectionLocks(root);
   const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
-  const directionLockDriftFiles = activeDirectionLocks.length > 0
+  const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
     ? stagedFiles
       .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
       .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))

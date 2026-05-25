@@ -1,7 +1,9 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { runFrameworkTempClaim } from '../packages/cli/src/commands/framework-development.ts';
+import { runHook } from '../packages/cli/src/commands/hook.ts';
 import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
@@ -104,6 +106,23 @@ async function validateAdopterGoverned(tempRoot: string) {
   await runTasks(['close', '--cwd', repo, '--task', 'TASK-ADOPT-0001', '--actor', 'adopter-agent', '--status', 'done']);
   const afterFirstClose = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert((afterFirstClose.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0002', 'adopter queue must advance to second task after closing first');
+
+  const syncRepo = makeAdopterRepo(tempRoot, 'adopter-infra-sync-with-lock');
+  initializeGit(syncRepo);
+  const syncPrompt = 'TASK-ADOPT-0001';
+  const syncClaim = await runNext(['--cwd', syncRepo, '--claim', '--actor', 'adopter-agent', '--prompt', syncPrompt]);
+  assert(syncClaim.ok === true, 'adopter sync fixture must acquire a direction lock');
+  writeFileSync(path.join(syncRepo, 'atm.mjs'), '#!/usr/bin/env node\n', 'utf8');
+  writeJson(path.join(syncRepo, '.atm', 'runtime', 'pinned-runner.json'), {
+    schemaVersion: 'atm.pinnedRunner.v0.1',
+    runnerPath: 'atm.mjs',
+    sourcePath: 'C:/Users/User/AI-Atomic-Framework/release/atm-onefile/atm.mjs'
+  });
+  runGit(syncRepo, ['add', 'atm.mjs', '.atm/runtime/pinned-runner.json']);
+  const preCommitSync = runHook(['pre-commit', '--cwd', syncRepo]);
+  assert(preCommitSync.ok === true, 'adopter infrastructure sync must pass pre-commit even with an active task direction lock');
+  assert((preCommitSync.evidence as any).allowAdopterInfrastructureSync === true, 'adopter infrastructure sync must be reported in pre-commit evidence');
+  assert(((preCommitSync.evidence as any).directionLockDriftFiles ?? []).length === 0, 'adopter infrastructure sync must not be reported as task direction drift');
 }
 
 async function validateFrameworkDevelopment(tempRoot: string) {
@@ -250,6 +269,18 @@ function writeEvidence(repo: string, taskId: string) {
       }
     ]
   });
+}
+
+function initializeGit(repo: string) {
+  runGit(repo, ['init', '-q']);
+  runGit(repo, ['add', '.']);
+  runGit(repo, ['-c', 'user.name=ATM Test', '-c', 'user.email=atm-test@example.invalid', 'commit', '-m', 'initial fixture']);
+}
+
+function runGit(repo: string, args: string[]) {
+  const result = spawnSync('git', args, { cwd: repo, encoding: 'utf8' });
+  assert(result.status === 0, `git ${args.join(' ')} must exit 0: ${result.stderr || result.stdout}`);
+  return result.stdout.trim();
 }
 
 main().catch((error) => {
