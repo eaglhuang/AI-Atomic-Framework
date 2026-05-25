@@ -16,6 +16,7 @@ import {
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import { readActiveTaskDirectionLocks } from './task-direction.ts';
+import { isPathAllowedByScope, readActiveQuickfixLock } from './work-channels.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -316,12 +317,27 @@ function runPreCommitHook(cwd: string) {
     return true;
   });
   const activeDirectionLocks = readActiveTaskDirectionLocks(root);
+  const activeQuickfixLock = readActiveQuickfixLock(root);
   const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
   const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
     ? stagedFiles
       .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
       .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
     : [];
+  const quickfixDriftFiles = activeQuickfixLock && !allowAdopterInfrastructureSync
+    ? stagedFiles
+      .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
+      .filter((entry) => !isPathAllowedByScope(entry, activeQuickfixLock.allowedFiles))
+    : [];
+  const quickfixFileLimitExceeded = activeQuickfixLock
+    ? stagedFiles.filter((entry) => !entry.startsWith('.atm/')).length > activeQuickfixLock.maxFiles
+    : false;
+  const quickfixChangedLineCount = activeQuickfixLock
+    ? readStagedChangedLineCount(root, stagedFiles.filter((entry) => !entry.startsWith('.atm/')))
+    : 0;
+  const quickfixLineLimitExceeded = activeQuickfixLock
+    ? quickfixChangedLineCount > activeQuickfixLock.maxChangedLines
+    : false;
   const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
@@ -334,6 +350,9 @@ function runPreCommitHook(cwd: string) {
   const ok = encodingReport.ok
     && blockingFrameworkIssues.length === 0
     && directionLockDriftFiles.length === 0
+    && quickfixDriftFiles.length === 0
+    && !quickfixFileLimitExceeded
+    && !quickfixLineLimitExceeded
     && protectedStateReport.ok
     && taskAudit.ok
     && failedValidatorRuns.length === 0;
@@ -356,6 +375,10 @@ function runPreCommitHook(cwd: string) {
           encodingFindings: encodingReport.findings.length,
           frameworkBlockers: blockingFrameworkIssues,
           taskDirectionDriftFiles: directionLockDriftFiles,
+          quickfixDriftFiles,
+          quickfixFileLimitExceeded,
+          quickfixLineLimitExceeded,
+          quickfixChangedLineCount,
           protectedStateFindings: protectedStateReport.findings,
           taskAuditFindings: taskAudit.findings.length,
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
@@ -371,7 +394,12 @@ function runPreCommitHook(cwd: string) {
       blockingFrameworkIssues,
       frameworkClaimCommand,
       activeDirectionLocks,
+      activeQuickfixLock,
       directionLockDriftFiles,
+      quickfixDriftFiles,
+      quickfixFileLimitExceeded,
+      quickfixLineLimitExceeded,
+      quickfixChangedLineCount,
       protectedStateReport,
       taskAudit,
       commandRuns,
@@ -657,6 +685,20 @@ function readStagedFiles(cwd: string): readonly string[] {
   return uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'])
     .map(normalizeRelativePath)
     .filter(Boolean));
+}
+
+function readStagedChangedLineCount(cwd: string, files: readonly string[]) {
+  if (files.length === 0) return 0;
+  const lines = runGitLines(cwd, ['diff', '--cached', '--numstat', '--', ...files]);
+  let total = 0;
+  for (const line of lines) {
+    const [added, deleted] = line.split('\t');
+    const addedCount = Number.parseInt(added, 10);
+    const deletedCount = Number.parseInt(deleted, 10);
+    if (Number.isFinite(addedCount)) total += addedCount;
+    if (Number.isFinite(deletedCount)) total += deletedCount;
+  }
+  return total;
 }
 
 function scanEncoding(cwd: string, files: readonly string[]) {

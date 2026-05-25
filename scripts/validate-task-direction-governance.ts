@@ -46,7 +46,7 @@ async function validateAdopterGoverned(tempRoot: string) {
 
   const route = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert(route.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'adopter prompt must resolve to a scoped task queue');
-  assert((route.evidence.taskQueue as any)?.schemaId === 'atm.taskQueue.v1', 'adopter queue must persist atm.taskQueue.v1');
+  assert((route.evidence.taskQueue as any)?.schemaId === 'atm.taskQueuePreview.v1', 'adopter prompt route must stay read-only and only expose atm.taskQueuePreview.v1');
   assert((route.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0001', 'adopter queue head must be first task');
 
   const beforeClaim = runIntegrationHookInvocation([

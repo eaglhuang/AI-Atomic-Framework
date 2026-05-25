@@ -22,6 +22,13 @@ import {
   isTaskDirectionPathCandidate,
   writeTaskDirectionLock
 } from './task-direction.ts';
+import {
+  extractPathLikeStringsFromPrompt,
+  isQuickfixPrompt,
+  readActiveBatchRun,
+  writeBatchRun,
+  writeQuickfixLock
+} from './work-channels.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
 import { runTasks } from './tasks.ts';
 
@@ -292,6 +299,56 @@ async function claimNextImportedTask(input: {
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
+  const promptText = input.taskIntent?.userPrompt?.trim() ?? '';
+  const quickfixScope = promptText ? resolveQuickfixScope(promptText) : [];
+  if (!input.importedTaskQueue.claimableTask
+    && !input.importedTaskQueue.promptScope
+    && isQuickfixPrompt(promptText)
+    && quickfixScope.length > 0) {
+    const resolvedActor = resolveActorId(input.actor ?? undefined);
+    if (!resolvedActor) {
+      throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+    }
+    const quickfixLock = writeQuickfixLock({
+      cwd: input.cwd,
+      actorId: resolvedActor.actorId,
+      prompt: promptText,
+      reason: promptText,
+      allowedFiles: quickfixScope
+    });
+    const nextAction = {
+      status: 'ready',
+      command: 'Apply the quickfix within the allowed files and commit normally.',
+      reason: `claimed ATM quickfix lock for ${resolvedActor.actorId}`,
+      recommendedChannel: 'fast',
+      riskLevel: 'low',
+      quickfixLock
+    };
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction as any,
+        null,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
+        message('info', 'ATM_NEXT_QUICKFIX_CLAIMED', 'Acquired a quickfix lock from next --claim.', {
+          actorId: resolvedActor.actorId,
+          allowedFiles: quickfixLock.allowedFiles
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: 'fast',
+        quickfixLock,
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   if (!input.importedTaskQueue.claimableTask) {
     const claimCode = input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
       ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
@@ -378,10 +435,21 @@ async function claimNextImportedTask(input: {
     allowedFiles: buildAllowedFilesForTask(input.importedTaskQueue.claimableTask),
     prompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId
   });
+  const batchRun = input.importedTaskQueue.promptScope?.status === 'queue'
+    ? writeBatchRun({
+      cwd: input.cwd,
+      sourcePrompt: input.taskIntent?.userPrompt ?? input.importedTaskQueue.claimableTask.workItemId,
+      tasks: input.importedTaskQueue.promptScope.selectedTasks,
+      queue: activeQueue,
+      actorId: resolvedActor.actorId
+    })
+    : readActiveBatchRun(input.cwd);
   const nextAction = {
     status: 'ready',
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(input.importedTaskQueue.claimableTask.title)} --json`,
     reason: `claimed imported work item ${input.importedTaskQueue.claimableTask.workItemId} for ${resolvedActor.actorId}`,
+    recommendedChannel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'batch' : 'normal',
+    riskLevel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'high' : 'medium',
     selectedTask: input.importedTaskQueue.claimableTask,
     taskContext: {
       scopePaths: input.importedTaskQueue.claimableTask.scopePaths,
@@ -389,6 +457,7 @@ async function claimNextImportedTask(input: {
     },
     taskDirectionLock: directionLock,
     taskQueue: activeQueue,
+    batchRun,
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   };
@@ -413,6 +482,8 @@ async function claimNextImportedTask(input: {
       claimResult: claimResult.evidence,
       taskDirectionLock: directionLock,
       taskQueue: activeQueue,
+      batchRun,
+      recommendedChannel: nextAction.recommendedChannel,
       taskIntent: input.taskIntent,
       importedTaskQueue: input.importedTaskQueue,
       integrationBootstrap: input.integrationBootstrap,
@@ -497,21 +568,28 @@ function buildPromptScopedNextResult(input: {
   }
   if (promptScope.status === 'queue') {
     const firstTask = selectedTasks[0] ?? null;
-    const activeQueue = createOrRefreshTaskQueue({
-      cwd: input.cwd,
-      sourcePrompt: input.taskIntent?.userPrompt ?? firstTask?.workItemId ?? 'prompt-scoped task queue',
-      tasks: selectedTasks
-    });
-    const queueHeadTaskId = activeQueue.taskIds[activeQueue.currentIndex] ?? firstTask?.workItemId ?? null;
+    const queuePrompt = input.taskIntent?.userPrompt ?? firstTask?.workItemId ?? 'prompt-scoped task queue';
+    const activeQueue = findActiveTaskQueue(input.cwd, queuePrompt);
+    const queueHeadTaskId = activeQueue?.taskIds[activeQueue.currentIndex] ?? firstTask?.workItemId ?? null;
+    const queuePreview = {
+      schemaId: 'atm.taskQueuePreview.v1',
+      sourcePrompt: queuePrompt,
+      targetRepo: selectedTasks.find((task) => task.targetRepo)?.targetRepo ?? null,
+      taskIds: selectedTasks.map((task) => task.workItemId),
+      currentIndex: activeQueue?.currentIndex ?? 0,
+      queueHeadTaskId
+    };
     const nextAction = {
       status: 'task-queue-ready',
       command: firstTask
-        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? firstTask.workItemId)} --json`
+        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --json`
         : 'node atm.mjs next --prompt "<current user prompt>" --json',
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
+      recommendedChannel: 'batch',
+      riskLevel: 'high',
       selectedTasks,
-      taskQueue: activeQueue,
-      queueId: activeQueue.queueId,
+      taskQueue: activeQueue ?? queuePreview,
+      queueId: activeQueue?.queueId ?? null,
       queueHeadTaskId,
       queueSize: selectedTasks.length,
       allowedCommands: allowedGuidanceBootstrapCommands(),
@@ -528,14 +606,15 @@ function buildPromptScopedNextResult(input: {
         input.runtimeAdapterReadiness as any,
         message('info', 'ATM_NEXT_TASK_QUEUE_READY', 'ATM resolved the prompt to a scoped task queue.', {
           queueSize: selectedTasks.length,
-          queueId: activeQueue.queueId,
+          queueId: activeQueue?.queueId ?? null,
           queueHeadTaskId,
           firstTask: firstTask ? toTaskCandidateView(firstTask) : null
         })
       ),
       evidence: {
         nextAction,
-        taskQueue: activeQueue,
+        recommendedChannel: 'batch',
+        taskQueue: activeQueue ?? queuePreview,
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         taskIntent: input.taskIntent,
         importedTaskQueue: input.importedTaskQueue,
@@ -550,6 +629,8 @@ function buildPromptScopedNextResult(input: {
     status: 'task-route-ready',
     command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
+    recommendedChannel: 'normal',
+    riskLevel: 'medium',
     selectedTask,
     targetRepo: selectedTask.targetRepo,
     requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
@@ -572,6 +653,7 @@ function buildPromptScopedNextResult(input: {
     ),
     evidence: {
       nextAction,
+      recommendedChannel: 'normal',
       agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
       taskIntent: input.taskIntent,
       importedTaskQueue: input.importedTaskQueue,
@@ -589,6 +671,41 @@ function buildPromptGuidanceNextResult(input: {
 }) {
   const prompt = input.taskIntent?.userPrompt?.trim();
   if (!prompt || input.taskIntent?.taskScopeMentioned === true) return null;
+  const quickfixScope = resolveQuickfixScope(prompt);
+  if (isQuickfixPrompt(prompt) && quickfixScope.length > 0) {
+    const nextAction = {
+      status: 'quickfix-ready',
+      command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(prompt)} --json`,
+      reason: 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel',
+      recommendedChannel: 'fast',
+      riskLevel: 'low',
+      allowedFiles: quickfixScope,
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: blockedMutationCommands()
+    };
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction as any,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_QUICKFIX_ROUTE_READY', 'ATM routed this prompt to the fast quickfix channel.', {
+          requiredCommand: nextAction.command,
+          allowedFiles: quickfixScope
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: 'fast',
+        taskIntent: input.taskIntent,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   const frameworkStatus = createFrameworkModeStatus({ cwd: input.cwd });
   if (frameworkStatus.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(prompt)) {
     const claimCommand = buildFrameworkTempClaimCommand([], prompt);
@@ -596,6 +713,8 @@ function buildPromptGuidanceNextResult(input: {
       status: 'framework-temp-claim-required',
       command: claimCommand,
       reason: 'the prompt appears to be ATM framework maintenance without a human task card, so use a temporary runtime claim before editing critical framework files',
+      recommendedChannel: 'fast',
+      riskLevel: 'high',
       allowedCommands: [
         claimCommand,
         'node atm.mjs framework-mode status --json',
@@ -621,6 +740,7 @@ function buildPromptGuidanceNextResult(input: {
       ),
       evidence: {
         nextAction,
+        recommendedChannel: 'fast',
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         taskIntent: input.taskIntent,
         frameworkStatus,
@@ -633,6 +753,8 @@ function buildPromptGuidanceNextResult(input: {
     status: 'prompt-guidance-required',
     command: `node atm.mjs guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
     reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance',
+    recommendedChannel: null,
+    riskLevel: 'medium',
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   };
@@ -1032,7 +1154,7 @@ function createDeterministicTaskIntent(prompt: string): TaskIntent {
       ? { kind: 'first' as const, count: 2 }
       : null;
   const queueRequested = Boolean(ordinalScope)
-    || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|all\s+task\s+cards|through\s+all/i.test(prompt);
+    || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|\u5168\u90e8\u4efb\u52d9|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all\s+task\s+cards|all\s+tasks|entire\s+plan|whole\s+plan|through\s+all/i.test(prompt);
   const taskScopeMentioned = mentionedTaskIds.length > 0
     || mentionedPlanPaths.length > 0
     || taskRootHints.length > 0
@@ -1072,7 +1194,7 @@ function normalizeTaskIntent(value: Record<string, unknown>, fallbackSource: Tas
     confidence: typeof value.confidence === 'number' && Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0.5,
     source: normalizeTaskIntentSource(value.source) ?? fallbackSource,
     ordinalScope: normalizeOrdinalScope(value.ordinalScope),
-    queueRequested: value.queueRequested === true || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|all\s+task\s+cards/i.test(prompt),
+    queueRequested: value.queueRequested === true || /\u5168\u90e8\u4efb\u52d9\u5361|\u6240\u6709\u4efb\u52d9\u5361|\u5168\u90e8\u4efb\u52d9|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all\s+task\s+cards|all\s+tasks|entire\s+plan|whole\s+plan/i.test(prompt),
     taskScopeMentioned: value.taskScopeMentioned === true
       || mentionedTaskIds.length > 0
       || mentionedPlanPaths.length > 0
@@ -1308,6 +1430,13 @@ function extractPathLikeStringsFromText(text: string) {
     }
   }
   return [...candidates].sort((left, right) => left.localeCompare(right));
+}
+
+function resolveQuickfixScope(prompt: string) {
+  return uniqueSorted([
+    ...extractPathLikeStringsFromText(prompt),
+    ...extractPathLikeStringsFromPrompt(prompt)
+  ]);
 }
 
 function normalizeOptionalTaskPath(value: string | null | undefined) {

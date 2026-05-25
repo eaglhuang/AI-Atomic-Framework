@@ -9,6 +9,7 @@ import {
 import actorSpec from './command-specs/actor.spec.ts';
 import atomRefSpec from './command-specs/atom-ref.spec.ts';
 import baselineSpec from './command-specs/baseline.spec.ts';
+import batchSpec from './command-specs/batch.spec.ts';
 import bootstrapSpec from './command-specs/bootstrap.spec.ts';
 import budgetSpec from './command-specs/budget.spec.ts';
 import cacheSpec from './command-specs/cache.spec.ts';
@@ -20,6 +21,7 @@ import doctorSpec from './command-specs/doctor.spec.ts';
 import experienceSpec from './command-specs/experience.spec.ts';
 import orientSpec from './command-specs/orient.spec.ts';
 import policeSpec from './command-specs/police.spec.ts';
+import quickfixSpec from './command-specs/quickfix.spec.ts';
 import startSpec from './command-specs/start.spec.ts';
 import explainSpec from './command-specs/explain.spec.ts';
 import evidenceSpec from './command-specs/evidence.spec.ts';
@@ -58,6 +60,7 @@ export const commandSpecs = Object.freeze({
   actor: actorSpec,
   'atom-ref': atomRefSpec,
   baseline: baselineSpec,
+  batch: batchSpec,
   bootstrap: bootstrapSpec,
   budget: budgetSpec,
   cache: cacheSpec,
@@ -69,6 +72,7 @@ export const commandSpecs = Object.freeze({
   experience: experienceSpec,
   orient: orientSpec,
   police: policeSpec,
+  quickfix: quickfixSpec,
   start: startSpec,
   explain: explainSpec,
   evidence: evidenceSpec,

@@ -30,6 +30,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'batch',
+    summary: 'Checkpoint or inspect a prompt-scoped ATM batch run',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'bootstrap',
     summary: 'Create the default ATM bootstrap pack and starter task',
     implemented: true,
@@ -249,6 +256,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
   {
     commandName: 'police',
     summary: 'Run the ATM police family gate and emit a report',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
+    commandName: 'quickfix',
+    summary: 'Acquire or release the lightweight ATM quickfix runtime lock',
     implemented: true,
     standaloneMode: true,
     outputFormat: 'pretty+json'

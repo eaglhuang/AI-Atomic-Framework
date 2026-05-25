@@ -271,6 +271,8 @@ type ParsedCliOptions = {
   agent?: string;
   prompt?: string;
   intent?: string;
+  files: string[];
+  reason?: string;
 };
 
 export function parseOptions(argv: string[], commandName: string) {
@@ -297,7 +299,9 @@ export function parseOptions(argv: string[], commandName: string) {
     edgeContracts: false,
     agent: undefined,
     prompt: undefined,
-    intent: undefined
+    intent: undefined,
+    files: [],
+    reason: undefined
   };
   const positional = [];
 
@@ -380,7 +384,7 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--actor') {
-      if (commandName !== 'next') {
+      if (!['next', 'batch', 'quickfix'].includes(commandName)) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --actor`, { exitCode: 2 });
       }
       options.agent = requireOptionValue(argv, index, '--actor', commandName);
@@ -388,7 +392,7 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--prompt') {
-      if (commandName !== 'next') {
+      if (!['next', 'quickfix'].includes(commandName)) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --prompt`, { exitCode: 2 });
       }
       options.prompt = requireOptionValue(argv, index, '--prompt', commandName);
@@ -400,6 +404,23 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --intent`, { exitCode: 2 });
       }
       options.intent = requireOptionValue(argv, index, '--intent', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--files') {
+      if (commandName !== 'quickfix') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --files`, { exitCode: 2 });
+      }
+      const raw = requireOptionValue(argv, index, '--files', commandName);
+      options.files = raw.split(',').map((entry: string) => entry.trim()).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      if (!['batch', 'quickfix'].includes(commandName)) {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --reason`, { exitCode: 2 });
+      }
+      options.reason = requireOptionValue(argv, index, '--reason', commandName);
       index += 1;
       continue;
     }

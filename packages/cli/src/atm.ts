@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { runAtomize } from './commands/atomize.ts';
 import { runATMChart } from './commands/atm-chart.ts';
 import { runBaseline } from './commands/baseline.ts';
+import { runBatch } from './commands/batch.ts';
 import { runBootstrap } from './commands/bootstrap-entry.ts';
 import { runBudget } from './commands/budget.ts';
 import { runCandidates } from './commands/candidates.ts';
@@ -26,6 +27,7 @@ import { runLock } from './commands/lock.ts';
 import { runNext } from './commands/next.ts';
 import { runOrient } from './commands/orient.ts';
 import { runPolice } from './commands/police.ts';
+import { runQuickfix } from './commands/quickfix.ts';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.ts';
 import { runSpec } from './commands/spec.ts';
 import { runStart } from './commands/start.ts';
@@ -63,6 +65,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   atomize: runAtomize,
   'atm-chart': runATMChart,
   baseline: runBaseline,
+  batch: runBatch,
   bootstrap: runBootstrap,
   budget: runBudget,
   candidates: runCandidates,
@@ -86,6 +89,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   next: runNext,
   orient: runOrient,
   police: runPolice,
+  quickfix: runQuickfix,
   'self-host-alpha': runSelfHostAlphaAsync,
   spec: runSpec,
   start: runStart,

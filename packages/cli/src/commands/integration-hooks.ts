@@ -9,6 +9,7 @@ import {
   isAtmCriticalNonDocSurface
 } from './framework-development.ts';
 import { isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
+import { extractPathLikeStringsFromPrompt, isPathAllowedByScope, isQuickfixPrompt, readActiveQuickfixLock } from './work-channels.ts';
 import {
   hookContractVersion,
   hookMarker,
@@ -270,6 +271,8 @@ function runPreToolHook(options: HookInvocationOptions) {
   const gitHooks = inspectGitHooks(frameworkRoot ?? options.cwd, { frameworkRequired: frameworkRoot !== null });
   const promptScopedContext = resolvePromptScopedTaskContext(options.cwd, { prompt: options.prompt });
   const promptScope = promptScopedContext.promptScope;
+  const activeQuickfixLock = readActiveQuickfixLock(options.cwd);
+  const quickfixAllowedPaths = activeQuickfixLock?.allowedFiles ?? [];
   const promptScopedHeadTasks = promptScope
     ? promptScope.status === 'queue'
       ? promptScope.selectedTasks.slice(0, 1)
@@ -291,9 +294,18 @@ function runPreToolHook(options: HookInvocationOptions) {
       : [];
   const promptScopedClaimRequired = mutatingIntent
     && !gitCommitIntent
+    && !activeQuickfixLock
     && activeDirectionLocks.length === 0
     && Boolean(promptScopedContext.taskIntent?.taskScopeMentioned)
     && (promptScope?.status === 'ready' || promptScope?.status === 'queue');
+  const promptScopedQuickfixRequired = mutatingIntent
+    && !gitCommitIntent
+    && !activeQuickfixLock
+    && activeDirectionLocks.length === 0
+    && Boolean(options.prompt)
+    && !Boolean(promptScopedContext.taskIntent?.taskScopeMentioned)
+    && isQuickfixPrompt(options.prompt ?? '')
+    && extractPathLikeStringsFromPrompt(options.prompt ?? '').length > 0;
   const promptScopeDriftFiles = mutatingIntent
     && !gitCommitIntent
     && activeDirectionLocks.length === 0
@@ -304,6 +316,15 @@ function runPreToolHook(options: HookInvocationOptions) {
         .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
         .filter((entry) => !isPromptScopeDriftExempt(entry))
         .filter((entry) => !isToolFileInPromptScope(entry, promptScopedAllowedPaths))
+      : [];
+  const quickfixDriftFiles = mutatingIntent
+    && !gitCommitIntent
+    && Boolean(activeQuickfixLock)
+    && quickfixAllowedPaths.length > 0
+      ? toolFiles
+        .map((entry) => normalizePathForRepoRoot(entry, options.cwd))
+        .filter((entry) => !isPromptScopeDriftExempt(entry))
+        .filter((entry) => !isPathAllowedByScope(entry, quickfixAllowedPaths))
       : [];
   const staticEvidenceArtifactFiles = mutatingIntent && !gitCommitIntent
     ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isStaticEvidenceArtifactPath)
@@ -416,6 +437,29 @@ function runPreToolHook(options: HookInvocationOptions) {
     });
   }
 
+  if (quickfixDriftFiles.length > 0) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_QUICKFIX_SCOPE_EXCEEDED', 'Tool edit scope drifted away from the active ATM quickfix lock.', {
+        editor: options.editor,
+        blockedFiles: quickfixDriftFiles,
+        scopePaths: quickfixAllowedPaths.slice(0, 40),
+        nextStep: 'Finish or release the active quickfix lock before editing unrelated files.'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        quickfixDriftFiles,
+        quickfixLock: activeQuickfixLock,
+        frameworkStatus: status
+      }
+    });
+  }
+
   if (directionLockDriftFiles.length > 0) {
     return makeResult({
       ok: false,
@@ -435,6 +479,27 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolFiles,
         directionLockDriftFiles,
         activeDirectionLocks,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (promptScopedQuickfixRequired) {
+    const requiredCommand = `node atm.mjs next --claim --actor <id> --prompt ${quoteHookCliValue(options.prompt ?? '<current user prompt>')} --json`;
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_CHANNEL_REQUIRED', 'This looks like a small targeted fix; let ATM establish the fast quickfix channel before editing.', {
+        editor: options.editor,
+        nextStep: requiredCommand
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        requiredCommand,
         frameworkStatus: status
       }
     });
