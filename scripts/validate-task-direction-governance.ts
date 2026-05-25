@@ -101,7 +101,12 @@ async function validateAdopterGoverned(tempRoot: string) {
     await runTasks(['close', '--cwd', repo, '--task', 'TASK-ADOPT-0002', '--actor', 'adopter-agent', '--status', 'done']);
     fail('adopter queue must not allow closing the second task before queue head');
   } catch (error) {
-    assert((error as any).code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED' || (error as any).code === 'ATM_TASK_QUEUE_HEAD_REQUIRED', 'adopter queue must reject premature close');
+    assert(
+      (error as any).code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED'
+      || (error as any).code === 'ATM_TASK_QUEUE_HEAD_REQUIRED'
+      || (error as any).code === 'ATM_BATCH_CHECKPOINT_REQUIRED',
+      'adopter queue must reject premature close'
+    );
   }
 
   writeFileSync(path.join(repo, 'src', 'one.ts'), 'export const one = 2;\n', 'utf8');

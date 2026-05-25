@@ -143,6 +143,10 @@ no_parallel_registry = true
 no_parallel_task_model = true
 hash_guarded_uninstall = true
 
+instructions = """
+${body}
+"""
+
 charter_invariants = """
 ${renderCharterInvariantsBlock(options.repositoryRoot).text}
 """

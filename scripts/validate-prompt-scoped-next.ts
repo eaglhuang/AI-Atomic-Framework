@@ -93,6 +93,9 @@ async function main() {
     const ledgerQueue = await runNext(['--cwd', tempRoot, '--prompt', ledgerPrompt]);
     assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'ledger task prompt must create a queue');
     assert((ledgerQueue.evidence.nextAction as any).batchInstruction?.includes('batch checkpoint'), 'batch route must explicitly point agents to batch checkpoint');
+    assert((ledgerQueue.evidence.nextAction as any).playbook?.channel === 'batch', 'batch route must include an executable batch playbook');
+    assert((ledgerQueue.evidence.nextAction as any).playbook?.commitTiming?.includes('after batch checkpoint'), 'batch playbook must tell agents not to commit before checkpoint');
+    assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_CHANNEL_PLAYBOOK_REQUIRED'), 'batch route must emit the channel playbook as a warning message');
     const ledgerClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', ledgerPrompt]);
     assert(ledgerClaim.ok === true, 'next --claim must claim the queue head for ledger tasks');
     assert(ledgerClaim.messages.some((entry) => entry.code === 'ATM_TASK_DELIVERY_PRINCIPLE'), 'next --claim must remind agents that the claimed task must be delivered before closure');
@@ -105,6 +108,14 @@ async function main() {
     assert(lockDocument.taskDirectionLock?.taskId === 'TASK-LEDGER-0001', 'runtime lock must include the selected task direction lock');
     const batchStatus = await runBatch(['status', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--json']);
     assert((batchStatus.evidence.batchRun as any)?.currentTaskId === 'TASK-LEDGER-0001', 'batch status must point at the claimed queue head');
+    const activeBatchExact = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-LEDGER-0002']);
+    assert(activeBatchExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'exact task id inside an active batch must stay in queue routing');
+    assert((activeBatchExact.evidence.nextAction as any).recommendedChannel === 'batch', 'exact task id inside an active batch must recommend batch channel');
+    assert((activeBatchExact.evidence.nextAction as any).queueHeadTaskId === 'TASK-LEDGER-0001', 'active batch exact route must still point at the current queue head');
+    assert(String((activeBatchExact.evidence.nextAction as any).requiredCommand ?? '').includes(ledgerPrompt), 'active batch exact route must redirect claim back to the original batch prompt');
+    const activeBatchClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-LEDGER-0002']);
+    assert((activeBatchClaim.evidence.nextAction as any).selectedTask.workItemId === 'TASK-LEDGER-0001', 'active batch next --claim must claim the current queue head, not the later exact task prompt');
+    assert((activeBatchClaim.evidence.nextAction as any).recommendedChannel === 'batch', 'active batch next --claim must stay in batch channel');
     let directBatchCloseBlocked = false;
     try {
       await runTasks(['close', '--cwd', tempRoot, '--task', 'TASK-LEDGER-0001', '--actor', 'prompt-scope-test', '--status', 'done']);
@@ -112,6 +123,13 @@ async function main() {
       directBatchCloseBlocked = (error as { code?: string }).code === 'ATM_BATCH_CHECKPOINT_REQUIRED';
     }
     assert(directBatchCloseBlocked, 'active batch queue head must be closed through batch checkpoint, not direct tasks close');
+    let directLaterBatchCloseBlocked = false;
+    try {
+      await runTasks(['close', '--cwd', tempRoot, '--task', 'TASK-LEDGER-0002', '--actor', 'prompt-scope-test', '--status', 'done']);
+    } catch (error) {
+      directLaterBatchCloseBlocked = (error as { code?: string }).code === 'ATM_BATCH_CHECKPOINT_REQUIRED';
+    }
+    assert(directLaterBatchCloseBlocked, 'later tasks inside an active batch must also be closed through batch checkpoint, not direct tasks close');
 
     writeLedgerTask(path.join(ledgerTaskDir, 'SANGUO-BOOTSTRAP-0001.json'), 'SANGUO-BOOTSTRAP-0001', 'Running Sanguo bootstrap task', 'docs/sanguo.md', {
       status: 'running',

@@ -1,20 +1,12 @@
 ---
-applyTo: "**"
+name: atm-orient
+description: Inspect a repository and emit a guidance orientation report.
+argument-hint: "<ATM context>"
+charter-invariants-injected: true
 ---
 
 
-# ATM Next
-
-If the current user prompt mentions a task id, task card, plan document, or a
-scoped batch of tasks, invoke the `atm-task-intent-resolver` skill first. That
-skill must write `.atm/runtime/task-intent.json` and route with:
-
-```bash
-node atm.mjs next --intent .atm/runtime/task-intent.json --json
-```
-
-Use the prompt-scoped command below only when no task or plan scope is present or
-when the editor cannot run the semantic intent skill.
+# ATM Orient
 
 First command:
 
@@ -22,43 +14,13 @@ First command:
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-After the first command returns, read `evidence.nextAction.playbook` before
-editing, closing, or committing. The playbook is the authoritative short
-instruction sheet for the selected channel:
-
-- `fast`: small quickfix, no task close.
-- `normal`: one task, claim -> deliver -> evidence -> tasks close -> commit.
-- `batch`: many tasks, claim original prompt -> deliver queue head -> evidence
-  -> batch checkpoint -> commit -> continue next queue head.
-
 ## Route Command
 
 Use this ATM command only after the first command confirms it is the current governed route:
 
 ```bash
-node atm.mjs next --prompt "$ARGUMENTS" --json
+node atm.mjs orient --cwd . --json
 ```
-
-For collaboration workflows, claim the selected imported task before edits:
-
-```bash
-node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
-```
-
-If the route returns `recommendedChannel: "batch"`, do not manually run
-`tasks reserve`, `tasks promote`, `tasks claim`, or `tasks close` in a loop.
-Work only on the queue head, do not commit before checkpoint, and finish it
-through:
-
-```bash
-node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json
-```
-
-Batch is the fast path for many task cards. Its speed comes from automated queue
-bookkeeping, not from weaker delivery or evidence requirements.
-After checkpoint succeeds, commit the queue-head deliverables together with the
-matching `.atm/history/tasks/<task>.json`, `.atm/history/evidence/<task>.json`,
-and `.atm/history/task-events/<task>/` files.
 
 ## Handoff
 
@@ -88,11 +50,3 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - Stay inside ATM CLI routing and evidence contracts.
 - Do not create a parallel task model, registry, or approval flow.
 - Treat any planning hint as CLI output, not as template authority.
-- If ATM recommends batch, use `batch checkpoint`; do not hand-roll a lifecycle
-  loop over low-level `tasks` commands.
-- If an `ATM_USER_NOTICE` message or `evidence.userNotice` is present, show it to the user in natural language before executing the returned next action.
-- After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
-- Treat `ATM_ACTOR_ID` as the default actor identity variable. `AGENT_IDENTITY`
-  is legacy-compatible only.
-
-Keep this flow inside ATM CLI routing. Preserve host edits and rely on install manifest hashes for uninstall safety.

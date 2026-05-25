@@ -6,7 +6,7 @@ AI-Atomic-Framework, also called ATM in this repository, is a governance framewo
 
 ATM is not an agent framework and not a workflow engine. It is the control layer around AI-assisted work: the part that keeps scope, rules, validation, artifacts, evidence, and handoff state explicit.
 
-> Agent first action for a user request: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available. If ATM recommends `batch`, deliver only the queue head and then run `node atm.mjs batch checkpoint --actor <id> --json`; do not manually loop over low-level task lifecycle commands.
+> Agent first action for a user request: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available. Before editing, closing, or committing, read `evidence.nextAction.playbook` from the ATM response and follow that channel-specific work order. If ATM recommends `batch`, deliver only the queue head, add command-backed evidence, run `node atm.mjs batch checkpoint --actor <id> --json`, and commit only after checkpoint succeeds; do not manually loop over low-level task lifecycle commands.
 
 ## What ATM Does
 

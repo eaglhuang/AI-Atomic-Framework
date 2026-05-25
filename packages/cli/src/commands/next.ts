@@ -331,6 +331,11 @@ async function claimNextImportedTask(input: {
       reason: `claimed ATM quickfix lock for ${resolvedActor.actorId}`,
       recommendedChannel: 'fast',
       riskLevel: 'low',
+      playbook: buildChannelPlaybook({
+        channel: 'fast',
+        originalPrompt: promptText,
+        actorPlaceholder: resolvedActor.actorId
+      }),
       quickfixLock
     };
     return makeResult({
@@ -385,6 +390,29 @@ async function claimNextImportedTask(input: {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   let claimableTask = input.importedTaskQueue.claimableTask;
+  const activeBatchAtClaimStart = readActiveBatchRun(input.cwd);
+  if (activeBatchAtClaimStart?.status === 'active'
+    && activeBatchAtClaimStart.currentTaskId
+    && claimableTask
+    && activeBatchAtClaimStart.taskIds.includes(claimableTask.workItemId)
+    && activeBatchAtClaimStart.currentTaskId !== claimableTask.workItemId) {
+    const batchPromptQueue = inspectImportedTaskQueue(input.cwd, createDeterministicTaskIntent(activeBatchAtClaimStart.sourcePrompt));
+    const queueHeadTask = input.importedTaskQueue.tasks.find((task) => task.workItemId === activeBatchAtClaimStart.currentTaskId)
+      ?? batchPromptQueue.tasks.find((task) => task.workItemId === activeBatchAtClaimStart.currentTaskId)
+      ?? batchPromptQueue.claimableTask;
+    if (!queueHeadTask) {
+      throw new CliError('ATM_BATCH_QUEUE_HEAD_REQUIRED', `Batch ${activeBatchAtClaimStart.batchId} is active, but ATM could not resolve queue head ${activeBatchAtClaimStart.currentTaskId}.`, {
+        exitCode: 1,
+        details: {
+          batchId: activeBatchAtClaimStart.batchId,
+          currentTaskId: activeBatchAtClaimStart.currentTaskId,
+          attemptedTaskId: claimableTask.workItemId,
+          requiredCommand: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --prompt ${quoteCliValue(activeBatchAtClaimStart.sourcePrompt)} --json`
+        }
+      });
+    }
+    claimableTask = queueHeadTask;
+  }
   if (normalizeTaskRouteStatus(claimableTask.status) === 'reserved' && !claimableTask.activeClaimActorId) {
     await runTasks([
       'release',
@@ -464,6 +492,7 @@ async function claimNextImportedTask(input: {
     allowedFiles: buildAllowedFilesForTask(claimableTask),
     prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId
   });
+  const inheritedBatchRun = readActiveBatchRun(input.cwd);
   const batchRun = input.importedTaskQueue.promptScope?.status === 'queue'
     ? writeBatchRun({
       cwd: input.cwd,
@@ -472,15 +501,25 @@ async function claimNextImportedTask(input: {
       queue: activeQueue,
       actorId: resolvedActor.actorId
     })
-    : readActiveBatchRun(input.cwd);
+    : inheritedBatchRun?.status === 'active' && inheritedBatchRun.taskIds.includes(claimableTask.workItemId)
+      ? inheritedBatchRun
+      : null;
+  const recommendedChannel = batchRun?.status === 'active' ? 'batch' : 'normal';
   const nextAction = {
     status: 'ready',
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
     reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
-    recommendedChannel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'batch' : 'normal',
-    riskLevel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'high' : 'medium',
+    recommendedChannel,
+    riskLevel: recommendedChannel === 'batch' ? 'high' : 'medium',
+    playbook: buildChannelPlaybook({
+      channel: recommendedChannel,
+      taskId: claimableTask.workItemId,
+      queueHeadTaskId: batchRun?.currentTaskId ?? claimableTask.workItemId,
+      originalPrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
+      actorPlaceholder: resolvedActor.actorId
+    }),
     deliveryPrinciple: buildTaskDeliveryPrinciple({
-      channel: input.importedTaskQueue.promptScope?.status === 'queue' ? 'batch' : 'normal',
+      channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
       taskId: claimableTask.workItemId
     }),
     selectedTask: claimableTask,
@@ -627,7 +666,13 @@ function buildPromptScopedNextResult(input: {
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
       recommendedChannel: 'batch',
       riskLevel: 'high',
-      batchInstruction: 'After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks reserve/promote/claim/close.',
+      batchInstruction: 'This is a batch run. Do not switch to per-task normal flow. After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks reserve/promote/claim/close.',
+      playbook: buildChannelPlaybook({
+        channel: 'batch',
+        taskId: queueHeadTaskId ?? undefined,
+        queueHeadTaskId,
+        originalPrompt: queuePrompt
+      }),
       deliveryPrinciple: buildTaskDeliveryPrinciple({
         channel: 'batch',
         taskId: queueHeadTaskId ?? undefined
@@ -673,12 +718,97 @@ function buildPromptScopedNextResult(input: {
   }
   const selectedTask = selectedTasks[0] ?? null;
   if (!selectedTask) return null;
+  const activeBatch = readActiveBatchRun(input.cwd);
+  if (activeBatch?.status === 'active' && activeBatch.taskIds.includes(selectedTask.workItemId)) {
+    const activeQueue = findActiveTaskQueue(input.cwd, activeBatch.sourcePrompt) ?? findActiveTaskQueue(input.cwd);
+    const queueHeadTaskId = activeBatch.currentTaskId
+      ?? activeQueue?.taskIds[activeQueue.currentIndex]
+      ?? selectedTask.workItemId;
+    const taskQueue = activeQueue ? {
+      queueId: activeQueue.queueId,
+      sourcePrompt: activeQueue.sourcePrompt,
+      taskIds: activeQueue.taskIds,
+      currentIndex: activeQueue.currentIndex,
+      queueHeadTaskId
+    } : {
+      schemaId: 'atm.taskQueuePreview.v1',
+      sourcePrompt: activeBatch.sourcePrompt,
+      targetRepo: selectedTask.targetRepo ?? null,
+      taskIds: activeBatch.taskIds,
+      currentIndex: activeBatch.currentIndex,
+      queueHeadTaskId
+    };
+    const nextAction = {
+      status: 'task-batch-context-active',
+      command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --json`,
+      reason: `task ${selectedTask.workItemId} belongs to active batch ${activeBatch.batchId}; continue through the current batch queue head`,
+      recommendedChannel: 'batch',
+      riskLevel: 'high',
+      batchInstruction: `This is a batch run. Do not switch to per-task normal flow. Deliver only queue head ${queueHeadTaskId}, then run node atm.mjs batch checkpoint --actor <id> --json to close, advance, and claim the next task.`,
+      playbook: buildChannelPlaybook({
+        channel: 'batch',
+        taskId: queueHeadTaskId ?? selectedTask.workItemId,
+        queueHeadTaskId,
+        originalPrompt: activeBatch.sourcePrompt
+      }),
+      deliveryPrinciple: buildTaskDeliveryPrinciple({
+        channel: 'batch',
+        taskId: queueHeadTaskId ?? selectedTask.workItemId
+      }),
+      selectedTask,
+      targetRepo: selectedTask.targetRepo,
+      requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --json`,
+      taskQueue,
+      queueId: activeQueue?.queueId ?? activeBatch.batchId,
+      queueHeadTaskId,
+      queueSize: activeBatch.taskIds.length,
+      activeBatchRunId: activeBatch.batchId,
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: blockedMutationCommands()
+    };
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_TASK_QUEUE_READY', 'ATM kept this task inside the active batch context.', {
+          queueSize: activeBatch.taskIds.length,
+          queueId: activeQueue?.queueId ?? activeBatch.batchId,
+          queueHeadTaskId,
+          selectedTaskId: selectedTask.workItemId,
+          requiredCommand: nextAction.requiredCommand,
+          batchCheckpointCommand: 'node atm.mjs batch checkpoint --actor <id> --json',
+          blockedPattern: 'manual per-task normal-flow switching during active batch'
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: 'batch',
+        batchRun: activeBatch,
+        taskQueue,
+        agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   const nextAction = {
     status: 'task-route-ready',
     command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
     recommendedChannel: 'normal',
     riskLevel: 'medium',
+    playbook: buildChannelPlaybook({
+      channel: 'normal',
+      taskId: selectedTask.workItemId,
+      originalPrompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId
+    }),
     deliveryPrinciple: buildTaskDeliveryPrinciple({
       channel: 'normal',
       taskId: selectedTask.workItemId
@@ -731,6 +861,10 @@ function buildPromptGuidanceNextResult(input: {
       reason: 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel',
       recommendedChannel: 'fast',
       riskLevel: 'low',
+      playbook: buildChannelPlaybook({
+        channel: 'fast',
+        originalPrompt: prompt
+      }),
       allowedFiles: quickfixScope,
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
@@ -767,6 +901,10 @@ function buildPromptGuidanceNextResult(input: {
       reason: 'the prompt appears to be ATM framework maintenance without a human task card, so use a temporary runtime claim before editing critical framework files',
       recommendedChannel: 'fast',
       riskLevel: 'high',
+      playbook: buildChannelPlaybook({
+        channel: 'fast',
+        originalPrompt: prompt
+      }),
       allowedCommands: [
         claimCommand,
         'node atm.mjs framework-mode status --json',
@@ -2043,8 +2181,116 @@ function buildTaskDeliveryPrinciple(input: { readonly channel: 'normal' | 'batch
   };
 }
 
+type GovernanceChannel = 'fast' | 'normal' | 'batch';
+
+function buildChannelPlaybook(input: {
+  readonly channel: GovernanceChannel;
+  readonly taskId?: string | null;
+  readonly originalPrompt?: string | null;
+  readonly queueHeadTaskId?: string | null;
+  readonly actorPlaceholder?: string;
+}) {
+  const actor = input.actorPlaceholder ?? '<id>';
+  const prompt = input.originalPrompt?.trim() || '<current user prompt>';
+  if (input.channel === 'fast') {
+    return {
+      schemaId: 'atm.channelPlaybook.v1',
+      channel: 'fast',
+      title: 'Fast quickfix playbook',
+      mustFollow: true,
+      summary: 'Use this only for small, low-risk edits. It is not a task-card closure path.',
+      steps: [
+        `Run: node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+        'Edit only the allowed files returned by ATM.',
+        'Run the smallest relevant validator for the touched file.',
+        'Commit only the real non-.atm diff and any required git-head evidence.'
+      ],
+      doNot: [
+        'Do not edit .atm/history/**.',
+        'Do not close task cards.',
+        'Do not expand the scope after the quickfix lock is created.'
+      ],
+      commandSequence: [
+        `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+        '<edit allowed files>',
+        '<run focused validator>',
+        'git add <changed files>',
+        'git commit -m "<message>"'
+      ],
+      commitTiming: 'Commit after the focused validator passes.'
+    };
+  }
+  if (input.channel === 'batch') {
+    const head = input.queueHeadTaskId ?? input.taskId ?? '<queue-head-task-id>';
+    return {
+      schemaId: 'atm.channelPlaybook.v1',
+      channel: 'batch',
+      title: 'Batch queue-head playbook',
+      mustFollow: true,
+      summary: 'This is a batch run. Do not switch to per-task normal flow. Batch still works one task at a time, but ATM owns the queue, checkpoint, and advance.',
+      steps: [
+        `Run: node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+        `Work only on the current queue head: ${head}.`,
+        'Read that task contract and implement the real non-.atm deliverables.',
+        'Run the required validator or a focused reproducible verification command.',
+        'Add command-backed evidence for the current queue head.',
+        `Run: node atm.mjs batch checkpoint --actor ${actor} --json`,
+        'Only after checkpoint succeeds, commit the deliverables plus .atm/history/tasks/<task>.json, .atm/history/evidence/<task>.json, and .atm/history/task-events/<task>/ in one commit.',
+        'Continue with the next queue head returned by batch checkpoint.'
+      ],
+      doNot: [
+        'Do not run tasks reserve/promote/claim/close manually.',
+        'Do not run next --prompt with a later single task id to leave batch.',
+        'Do not commit before batch checkpoint succeeds.',
+        'Do not close later tasks before the queue head is delivered.',
+        'Do not use .atm/history/** changes as the deliverable.'
+      ],
+      commandSequence: [
+        `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+        '<implement queue-head deliverables>',
+        'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
+        `node atm.mjs batch checkpoint --actor ${actor} --json`,
+        'git add <deliverables> .atm/history/tasks/<queue-head-task-id>.json .atm/history/evidence/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
+        'git commit -m "<scope>: complete <queue-head-task-id>"'
+      ],
+      commitTiming: 'Commit only after batch checkpoint succeeds for the current queue head.',
+      checkpointCommand: `node atm.mjs batch checkpoint --actor ${actor} --json`
+    };
+  }
+  return {
+    schemaId: 'atm.channelPlaybook.v1',
+    channel: 'normal',
+    title: 'Single-task playbook',
+    mustFollow: true,
+    summary: 'Use this for one explicit task card. ATM owns the claim and task close sequence.',
+    steps: [
+      `Run: node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+      'Work only on the claimed task and its allowed files.',
+      'Implement the real non-.atm deliverables.',
+      'Run required validators or a focused reproducible verification command.',
+      'Add command-backed evidence.',
+      `Run: node atm.mjs tasks close --task ${input.taskId ?? '<task-id>'} --actor ${actor} --status done --json`,
+      'Commit the deliverables plus matching task/evidence/task-events files.'
+    ],
+    doNot: [
+      'Do not manually reserve/promote/claim before next --claim.',
+      'Do not close without real non-.atm deliverables.',
+      'Do not commit task closure separately from the deliverable it proves.'
+    ],
+    commandSequence: [
+      `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+      '<implement task deliverables>',
+      'node atm.mjs evidence add --task <task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
+      `node atm.mjs tasks close --task ${input.taskId ?? '<task-id>'} --actor ${actor} --status done --json`,
+      'git add <deliverables> .atm/history/tasks/<task-id>.json .atm/history/evidence/<task-id>.json .atm/history/task-events/<task-id>/',
+      'git commit -m "<scope>: complete <task-id>"'
+    ],
+    commitTiming: 'Commit only after tasks close succeeds.'
+  };
+}
+
 function buildNextMessages(
-  nextAction: { readonly status: string; readonly deliveryPrinciple?: ReturnType<typeof buildTaskDeliveryPrinciple>; readonly selectedTask?: unknown; readonly selectedTasks?: unknown },
+  nextAction: { readonly status: string; readonly deliveryPrinciple?: ReturnType<typeof buildTaskDeliveryPrinciple>; readonly selectedTask?: unknown; readonly selectedTasks?: unknown; readonly playbook?: ReturnType<typeof buildChannelPlaybook> },
   userNotice: AtmUserNotice | null,
   integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>,
   runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>,
@@ -2083,6 +2329,14 @@ function buildNextMessages(
         atomBirthApplyDeferred: runtimeAdapterReadiness.atomBirthApplyDeferred,
         missingCapability: runtimeAdapterReadiness.missingCapability
       }
+    ));
+  }
+  if (nextAction.playbook) {
+    messages.push(message(
+      'warning',
+      'ATM_CHANNEL_PLAYBOOK_REQUIRED',
+      `Follow the ${nextAction.playbook.channel} playbook exactly before editing, closing, or committing.`,
+      nextAction.playbook
     ));
   }
   const deliveryPrinciple = nextAction.deliveryPrinciple

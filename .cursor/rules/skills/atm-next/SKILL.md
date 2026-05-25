@@ -18,6 +18,15 @@ First command:
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
+After the first command returns, read `evidence.nextAction.playbook` before
+editing, closing, or committing. The playbook is the authoritative short
+instruction sheet for the selected channel:
+
+- `fast`: small quickfix, no task close.
+- `normal`: one task, claim -> deliver -> evidence -> tasks close -> commit.
+- `batch`: many tasks, claim original prompt -> deliver queue head -> evidence
+  -> batch checkpoint -> commit -> continue next queue head.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms it is the current governed route:
@@ -34,7 +43,8 @@ node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 
 If the route returns `recommendedChannel: "batch"`, do not manually run
 `tasks reserve`, `tasks promote`, `tasks claim`, or `tasks close` in a loop.
-Work only on the queue head and finish it through:
+Work only on the queue head, do not commit before checkpoint, and finish it
+through:
 
 ```bash
 node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json
@@ -42,6 +52,9 @@ node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json
 
 Batch is the fast path for many task cards. Its speed comes from automated queue
 bookkeeping, not from weaker delivery or evidence requirements.
+After checkpoint succeeds, commit the queue-head deliverables together with the
+matching `.atm/history/tasks/<task>.json`, `.atm/history/evidence/<task>.json`,
+and `.atm/history/task-events/<task>/` files.
 
 ## Handoff
 

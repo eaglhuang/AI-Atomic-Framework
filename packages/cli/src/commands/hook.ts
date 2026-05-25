@@ -16,7 +16,7 @@ import {
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import { readActiveTaskDirectionLocks } from './task-direction.ts';
-import { isPathAllowedByScope, readActiveQuickfixLock } from './work-channels.ts';
+import { isPathAllowedByScope, readActiveBatchRun, readActiveQuickfixLock } from './work-channels.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -97,7 +97,9 @@ interface ProtectedStateFinding {
     | 'task-file-missing-transition'
     | 'task-file-transition-mismatch'
     | 'evidence-file-missing-task-context'
-    | 'static-evidence-artifact-without-cli-context';
+    | 'static-evidence-artifact-without-cli-context'
+    | 'batch-close-must-use-checkpoint'
+    | 'batch-commit-before-checkpoint';
   readonly detail: string;
 }
 
@@ -1362,16 +1364,29 @@ function isTaskDirectionPreCommitExempt(value: string): boolean {
 
 function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]) {
   const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry) || isStaticEvidenceArtifactPath(entry));
+  const findings: ProtectedStateFinding[] = [];
+  const activeBatch = readActiveBatchRun(cwd);
+  const nonAtmStagedFiles = stagedFiles
+    .map((entry) => normalizeRelativePath(entry))
+    .filter((entry) => !entry.toLowerCase().startsWith('.atm/'));
+  if (activeBatch?.status === 'active'
+    && nonAtmStagedFiles.length > 0
+    && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, activeBatch.taskIds)) {
+    findings.push({
+      file: nonAtmStagedFiles[0] ?? '<staged-files>',
+      reason: 'batch-commit-before-checkpoint',
+      detail: `Active batch ${activeBatch.batchId} has not checkpointed the staged deliverable commit. Run node atm.mjs batch checkpoint --actor <id> --json first, then commit the deliverables together with the checkpoint task/evidence/events.`
+    });
+  }
   if (protectedFiles.length === 0) {
     return {
-      ok: true,
+      ok: findings.length === 0,
       files: [] as readonly string[],
-      findings: [] as readonly ProtectedStateFinding[]
+      findings
     };
   }
 
   const stagedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
-  const findings: ProtectedStateFinding[] = [];
 
   for (const file of protectedFiles) {
     const normalized = normalizeRelativePath(file);
@@ -1435,6 +1450,16 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
           reason: 'task-file-transition-mismatch',
           detail: 'Task ledger change does not match a valid staged ATM CLI transition event.'
         });
+      } else if (activeBatch?.status === 'active'
+        && activeBatch.taskIds.includes(taskId)
+        && typeof event?.command === 'string'
+        && event.command.startsWith('node atm.mjs tasks close')
+        && !event.command.includes('--from-batch-checkpoint')) {
+        findings.push({
+          file: normalized,
+          reason: 'batch-close-must-use-checkpoint',
+          detail: `Task ${taskId} belongs to active batch ${activeBatch.batchId}; direct tasks close is not allowed. Use batch checkpoint so ATM can close, advance, and claim the next queue head.`
+        });
       }
       continue;
     }
@@ -1480,6 +1505,34 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
     files: protectedFiles,
     findings
   };
+}
+
+function hasStagedBatchCheckpointClosure(cwd: string, protectedFiles: readonly string[], batchTaskIds: readonly string[]) {
+  const protectedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
+  for (const file of protectedFiles) {
+    const normalized = normalizeRelativePath(file);
+    const lower = normalized.toLowerCase();
+    if (!lower.startsWith('.atm/history/tasks/') || !lower.endsWith('.json')) {
+      continue;
+    }
+    const task = readJsonFile(path.join(cwd, normalized));
+    const taskId = typeof task?.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
+    if (!batchTaskIds.includes(taskId) || task?.status !== 'done') {
+      continue;
+    }
+    const lastTransitionId = typeof task?.lastTransitionId === 'string' ? task.lastTransitionId : '';
+    const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
+    if (!lastTransitionId || !protectedSet.has(expectedEventPath)) {
+      continue;
+    }
+    const event = readJsonFile(path.join(cwd, expectedEventPath));
+    if (typeof event?.command === 'string'
+      && event.command.startsWith('node atm.mjs tasks close')
+      && event.command.includes('--from-batch-checkpoint')) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function isProtectedAtmManagedStatePath(value: string): boolean {

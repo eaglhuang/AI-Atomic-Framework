@@ -79,13 +79,25 @@ node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
 
 If the claim result says `recommendedChannel: "batch"`, the governed route is:
 
-1. Deliver the current queue head only.
-2. Run validators and evidence for that queue-head deliverable.
-3. Run `node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json`.
-4. Commit only the checkpoint-approved task change before moving on.
+1. Read `evidence.nextAction.playbook` before editing. Treat it as the
+   step-by-step work order for this request.
+2. Run `node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json`.
+3. Deliver the current queue head only.
+4. Run validators and add command-backed evidence for that queue-head deliverable.
+5. Run `node atm.mjs batch checkpoint --actor "$ATM_ACTOR_ID" --json`.
+6. Commit only after checkpoint succeeds, and commit the deliverables together
+   with `.atm/history/tasks/<task>.json`,
+   `.atm/history/evidence/<task>.json`, and
+   `.atm/history/task-events/<task>/`.
+7. Continue with the next queue head returned by the checkpoint response.
 
 Do not manually loop through `tasks reserve`, `tasks promote`, `tasks claim`,
 `tasks close`, or old close commits. That is governance bypass, not batch.
+Do not commit before `batch checkpoint` succeeds.
+
+If `recommendedChannel` is `fast` or `normal`, still read
+`evidence.nextAction.playbook` first. It tells you the exact claim, evidence,
+close, and commit order for that channel.
 
 ATM's default task ledger is the active flow monitor when `taskLedger.enabled`
 is true. Use the repo-local `.atm/history/tasks` store for adopter work; use the

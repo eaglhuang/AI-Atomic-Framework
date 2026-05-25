@@ -827,15 +827,22 @@ async function runTasksClose(argv: string[]) {
   });
   if (options.status === 'done') {
     const activeBatch = readActiveBatchRun(options.cwd);
-    if (activeBatch?.currentTaskId === options.taskId && !options.fromBatchCheckpoint) {
-      throw new CliError('ATM_BATCH_CHECKPOINT_REQUIRED', `Task ${options.taskId} is the active batch queue head. Close it through batch checkpoint, not direct tasks close.`, {
+    if (activeBatch?.status === 'active' && activeBatch.taskIds.includes(options.taskId) && !options.fromBatchCheckpoint) {
+      const currentTaskId = activeBatch.currentTaskId ?? activeBatch.taskIds[activeBatch.currentIndex] ?? null;
+      throw new CliError('ATM_BATCH_CHECKPOINT_REQUIRED', currentTaskId === options.taskId
+        ? `Task ${options.taskId} is the active batch queue head. Close it through batch checkpoint, not direct tasks close.`
+        : `Task ${options.taskId} belongs to active batch ${activeBatch.batchId}. Do not close batch tasks directly; deliver the current queue head and use batch checkpoint to advance.`, {
         exitCode: 1,
         details: {
           taskId: options.taskId,
           batchId: activeBatch.batchId,
           currentIndex: activeBatch.currentIndex,
+          currentTaskId,
           requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --json`,
-          blockedPattern: 'manual tasks close during active batch'
+          blockedPattern: 'manual tasks close during active batch',
+          remediation: currentTaskId && currentTaskId !== options.taskId
+            ? `Deliver queue head ${currentTaskId}, then run node atm.mjs batch checkpoint --actor ${actorId} --json instead of directly closing ${options.taskId}.`
+            : `Run node atm.mjs batch checkpoint --actor ${actorId} --json after delivering ${options.taskId}.`
         }
       });
     }

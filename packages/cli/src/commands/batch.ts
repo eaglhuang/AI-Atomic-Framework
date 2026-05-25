@@ -101,16 +101,36 @@ export async function runBatch(argv: string[]) {
       cwd: options.cwd,
       messages: [message('info', 'ATM_BATCH_CHECKPOINT_OK', updated.status === 'completed'
         ? 'Batch checkpoint closed the final task and completed the batch run.'
-        : 'Batch checkpoint closed the current task and claimed the next queue head.', {
+        : 'Batch checkpoint closed the current task, advanced the batch, and claimed the next queue head.', {
         batchId: updated.batchId,
         closedTaskId: currentTaskId,
         nextTaskId: updated.currentTaskId,
-        deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.'
-      })],
+        deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.',
+        commitInstruction: `Checkpoint succeeded. Now commit the deliverables plus .atm/history/tasks/${currentTaskId}.json, .atm/history/evidence/${currentTaskId}.json, and .atm/history/task-events/${currentTaskId}/ together.`,
+        continueInstruction: updated.status === 'completed'
+          ? 'Batch is complete after this checkpoint commit.'
+          : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId}.`
+      }),
+      ...(updated.status === 'completed'
+        ? []
+        : [message('warning', 'ATM_BATCH_CONTEXT_ACTIVE', 'This is a batch run. Do not switch to per-task normal flow.', {
+          batchId: updated.batchId,
+          currentTaskId: updated.currentTaskId,
+          requiredCommand: 'node atm.mjs batch checkpoint --actor <id> --json'
+        })])],
       evidence: {
         action: 'checkpoint',
         actorId: resolvedActor.actorId,
         closedTaskId: currentTaskId,
+        commitInstruction: {
+          timing: 'after-checkpoint-before-next-task',
+          files: [
+            '<deliverables>',
+            `.atm/history/tasks/${currentTaskId}.json`,
+            `.atm/history/evidence/${currentTaskId}.json`,
+            `.atm/history/task-events/${currentTaskId}/`
+          ]
+        },
         closeResult: closeResult.evidence,
         cleanupResult: (cleanupResult as { evidence?: unknown } | null)?.evidence ?? null,
         batchRun: updated,

@@ -6,10 +6,14 @@ Start with this line when a user has given you a concrete request:
 
 Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, "node atm.mjs next --json" is read-only status. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
 
+After every `next --prompt` or `next --claim` response, read `evidence.nextAction.playbook` before editing, closing, or committing. The playbook is the short channel-specific work order; do not invent your own lifecycle.
+
 Batch task rule:
 
 - If the request says to finish all task cards, a whole plan, a task family, or multiple tasks, let `next --prompt` route it as `recommendedChannel: "batch"`.
 - After claiming a batch route, work only on the queue head and run `node atm.mjs batch checkpoint --actor <id> --json` after delivering that task.
+- Do not commit queue-head deliverables before `batch checkpoint` succeeds.
+- After checkpoint succeeds, commit the deliverables together with the matching `.atm/history/tasks/<task>.json`, `.atm/history/evidence/<task>.json`, and `.atm/history/task-events/<task>/`.
 - Do not manually loop over `tasks reserve/promote/claim/close`; the batch checkpoint is the governed completion entry.
 
 Framework-repository exception:
@@ -44,6 +48,8 @@ Editor integration self-check:
    - `cursor`: `.cursor/rules/skills/atm-governance-router/SKILL.md`
    - `copilot`: `.github/instructions/atm-governance-router.instructions.md`
    - `gemini`: `.gemini/commands/atm-governance-router.toml`
+   - `antigravity`: `GEMINI.md`
+4. Google-side coverage has two entry shapes: `gemini` installs Gemini CLI command files under `.gemini/commands`, while `antigravity` installs the Antigravity editor entry `GEMINI.md` and `.agents/skills`. If the current Google editor is Antigravity, verify/install `antigravity`, not only `gemini`.
 
 Python-only runtime self-check:
 
