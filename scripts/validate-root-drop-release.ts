@@ -56,6 +56,12 @@ function refreshOnboarding(cwd: any) {
   assert(welcome.parsed.ok === true, 'blank root-drop repo welcome must report ok=true after bootstrap');
 }
 
+function installFrameworkHooks(cwd: any, label: string) {
+  const install = runAtm(cwd, ['integration', 'hooks', 'install', 'copilot', '--json']);
+  assert(install.exitCode === 0, `${label} framework hook install must exit 0`);
+  assert(install.parsed.ok === true, `${label} framework hook install must report ok=true`);
+}
+
 function writeGitHeadEvidence(cwd: any) {
   const commitSha = tryReadHeadCommitSha(cwd);
   if (!commitSha) return;
@@ -108,6 +114,7 @@ try {
   mkdirSync(bundleRepo, { recursive: true });
   cpSync(release.releaseRoot, bundleRepo, { recursive: true });
   initializeGitRepository(bundleRepo);
+  installFrameworkHooks(bundleRepo, 'release bundle');
 
   const bundleDoctor = runAtm(bundleRepo, ['doctor', '--json']);
   assert(bundleDoctor.exitCode === 0, 'release bundle doctor must exit 0');
@@ -172,6 +179,7 @@ try {
   const bootstrap = runAtm(blankRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'blank root-drop repo bootstrap must exit 0');
   assert(bootstrap.parsed.ok === true, 'blank root-drop repo bootstrap must report ok=true');
+  installFrameworkHooks(blankRepo, 'blank root-drop repo');
   refreshOnboarding(blankRepo);
   writeGitHeadEvidence(blankRepo);
 

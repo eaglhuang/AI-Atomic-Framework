@@ -174,7 +174,8 @@ function extractPayload(cacheRoot) {
 function ensureExtractedRoot() {
   const cacheRoot = path.join(os.tmpdir(), 'atm-onefile-cache', payloadSha256);
   const markerPath = path.join(cacheRoot, '.payload-ready.json');
-  if (!existsSync(markerPath)) {
+  const entrypointPath = path.join(cacheRoot, 'atm.mjs');
+  if (!existsSync(markerPath) || !existsSync(entrypointPath)) {
     extractPayload(cacheRoot);
   }
   return cacheRoot;
