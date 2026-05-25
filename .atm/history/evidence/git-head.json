@@ -5,18 +5,46 @@
       "evidenceKind": "validation",
       "summary": "Git commit tree is covered by ATM Integration Hook Contract v1.",
       "artifactPaths": [],
-      "createdAt": "2026-05-25T13:15:20.567Z",
+      "createdAt": "2026-05-25T13:41:18.261Z",
       "producedBy": "atm-framework-development-hooks/v1",
-      "commandRuns": [],
+      "commandRuns": [
+        {
+          "command": "npm run typecheck",
+          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+          "stderrPreview": ""
+        },
+        {
+          "command": "npm run validate:cli",
+          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:e6c195eea0ce698c56decf4733547527ecec426bbf43d5b7732f48bc0d0612fe",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:cli\n> node --strip-types scripts/validate-cli.ts --mode validate\n\n[cli:validate] ok (37 commands, standalone fixture verified)\n",
+          "stderrPreview": ""
+        },
+        {
+          "command": "npm run validate:git-head-evidence",
+          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:git-head-evidence\n> node --strip-types scripts/validate-git-head-evidence.ts --mode validate\n\n[git-head-evidence:validate] ok (doctor git evidence states verified)\n",
+          "stderrPreview": ""
+        }
+      ],
       "details": {
         "git": {
-          "treeSha": "db4d0ee9315c3e9bdda124e036d448d2666ea984",
+          "treeSha": "a4d9e229203efa4c2327c76cd6a95f8fa6d6322d",
           "parentCommitShas": [
-            "b6746263ec7ca787a0f4d1780b999a8803a8cc0b"
+            "9cd51d4fda74364f58afc12354c8ba5efa398c5b"
           ],
-          "stagedPathCount": 7,
+          "stagedPathCount": 2,
           "evidencePath": ".atm/history/evidence/git-head.json",
-          "generatedAt": "2026-05-25T13:15:20.567Z"
+          "generatedAt": "2026-05-25T13:41:18.261Z"
         },
         "hookContractVersion": "atm.integration-hooks/v1",
         "runnerVersion": "0.1.0"

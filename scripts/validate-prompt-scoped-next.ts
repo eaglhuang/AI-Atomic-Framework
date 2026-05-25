@@ -128,6 +128,30 @@ async function main() {
       ],
       sourcePlanPath: '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
     });
+    const atomizationCoverageDir = path.join(tempRoot, 'atomic_workbench', 'atomization-coverage');
+    mkdirSync(atomizationCoverageDir, { recursive: true });
+    writeFileSync(path.join(atomizationCoverageDir, 'dogfood-score.json'), '{}\n', 'utf8');
+    writeFileSync(path.join(taskDir, 'TASK-DOG-0003.task.md'), `---
+task_id: TASK-DOG-0003
+title: Dogfood score report
+status: planned
+target_repo: AI-Atomic-Framework
+---
+# TASK-DOG-0003
+
+## Deliverables
+
+- atm-dogfood-score.json
+- atm-dogfood-score.md
+`, 'utf8');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DOG-0003.json'), 'TASK-DOG-0003', 'Dogfood score report', 'scripts/src/atomize-score.js', {
+      sourcePlanPath: 'docs/plan/tasks/TASK-DOG-0003.task.md'
+    });
+    const dogfoodRoute = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-DOG-0003']);
+    const dogfoodAllowedFiles = (dogfoodRoute.evidence.nextAction as any).selectedTask?.targetAllowedFiles ?? [];
+    assert(dogfoodAllowedFiles.includes('atomic_workbench/atomization-coverage/dogfood-score.json'), 'linked task-card artifact basename must resolve dogfood-score.json into targetWork.allowedFiles');
+    assert(dogfoodAllowedFiles.includes('atomic_workbench/atomization-coverage/dogfood-score.md'), 'linked task-card artifact basename must resolve dogfood-score.md into targetWork.allowedFiles even before the markdown report exists');
+
     const ledgerPrompt = 'TASK-LEDGER-0001 TASK-LEDGER-0002 all task cards';
     const ledgerQueue = await runNext(['--cwd', tempRoot, '--prompt', ledgerPrompt]);
     assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'ledger task prompt must create a queue');

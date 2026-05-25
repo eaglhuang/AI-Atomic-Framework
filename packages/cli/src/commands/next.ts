@@ -1343,7 +1343,8 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
             ...readStringArray(parsed.scopePaths),
             ...readStringArray(parsed.files),
             ...readStringArray(claimRecord.files),
-            ...extractDeclaredTaskPathsFromDocument(parsed)
+            ...extractDeclaredTaskPathsFromDocument(parsed),
+            ...extractLinkedSourceTaskArtifactPaths(cwd, normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path))
           ]),
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
           allowPlanningMirror: allowsPlanningMirror(parsed),
@@ -1384,7 +1385,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           ...splitListValue(parsed.allowed_files ?? parsed.allowedFiles),
           ...splitListValue(parsed.deliverables),
           ...splitListValue(parsed.paths),
-          ...extractPathLikeStringsFromText(rawText)
+          ...extractTaskArtifactPathsFromMarkdown(cwd, rawText)
         ]),
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
         allowPlanningMirror: allowsPlanningMirror(parsed),
@@ -1965,6 +1966,17 @@ function extractDeclaredTaskPathsFromDocument(taskDocument: Record<string, unkno
   return [...files].sort((left, right) => left.localeCompare(right));
 }
 
+function extractLinkedSourceTaskArtifactPaths(cwd: string, sourcePlanPath: string | null) {
+  if (!sourcePlanPath) return [];
+  const absolutePlanPath = path.isAbsolute(sourcePlanPath) ? sourcePlanPath : path.resolve(cwd, sourcePlanPath);
+  if (!existsSync(absolutePlanPath)) return [];
+  try {
+    return extractTaskArtifactPathsFromMarkdown(cwd, readFileSync(absolutePlanPath, 'utf8'));
+  } catch {
+    return [];
+  }
+}
+
 function collectDeclaredTaskPathValues(value: unknown, files: Set<string>) {
   if (typeof value === 'string') {
     const normalized = normalizeOptionalTaskPath(value);
@@ -1983,6 +1995,13 @@ function collectDeclaredTaskPathValues(value: unknown, files: Set<string>) {
   }
 }
 
+function extractTaskArtifactPathsFromMarkdown(cwd: string, text: string) {
+  return uniqueSorted([
+    ...extractPathLikeStringsFromText(text),
+    ...resolveBareArtifactPathCandidates(cwd, extractBareArtifactFileNames(text))
+  ]);
+}
+
 function extractPathLikeStringsFromText(text: string) {
   const candidates = new Set<string>();
   const matches = text.matchAll(/\b(?:\.atm|docs|atomic_workbench|packages|scripts|schemas|specs|templates|integrations|examples|tests|release|\.github|\.claude|\.cursor|\.gemini)(?:\/[A-Za-z0-9._-]+)+\b|\b(?:atm\.mjs|package(?:-lock)?\.json|tsconfig(?:\.[A-Za-z0-9._-]+)?\.json)\b/g);
@@ -1993,6 +2012,86 @@ function extractPathLikeStringsFromText(text: string) {
     }
   }
   return [...candidates].sort((left, right) => left.localeCompare(right));
+}
+
+function extractBareArtifactFileNames(text: string) {
+  const candidates = new Set<string>();
+  const matches = text.matchAll(/(?:^|[\s`"'([>-])([A-Za-z0-9][A-Za-z0-9._-]*\.(?:json|jsonl|md|csv|tsv|txt|ya?ml|html|xml))(?:$|[\s`"')\]<,.;:])/gmi);
+  for (const match of matches) {
+    const fileName = match[1]?.trim();
+    if (!fileName || fileName.includes('/') || fileName.includes('\\')) continue;
+    if (fileName.length > 120) continue;
+    candidates.add(fileName);
+  }
+  return [...candidates].sort((left, right) => left.localeCompare(right));
+}
+
+function resolveBareArtifactPathCandidates(cwd: string, fileNames: readonly string[]) {
+  if (fileNames.length === 0) return [];
+  const output = new Set<string>();
+  const knownArtifactFiles = listKnownArtifactFiles(cwd);
+  const artifactFilesByBasename = new Map<string, string[]>();
+  for (const artifactPath of knownArtifactFiles) {
+    const key = path.basename(artifactPath).toLowerCase();
+    const existing = artifactFilesByBasename.get(key) ?? [];
+    existing.push(artifactPath);
+    artifactFilesByBasename.set(key, existing);
+  }
+
+  for (const fileName of fileNames) {
+    for (const candidateName of artifactFileNameVariants(fileName)) {
+      for (const existingPath of artifactFilesByBasename.get(candidateName.toLowerCase()) ?? []) {
+        output.add(existingPath);
+      }
+      const atomizationCoveragePath = resolveAtomizationCoverageArtifactPath(candidateName);
+      if (atomizationCoveragePath) {
+        output.add(atomizationCoveragePath);
+      }
+    }
+  }
+  return [...output].sort((left, right) => left.localeCompare(right));
+}
+
+function listKnownArtifactFiles(cwd: string) {
+  const roots = [
+    'atomic_workbench',
+    'artifacts',
+    'docs',
+    'fixtures',
+    'reports',
+    'schemas'
+  ];
+  return uniqueSorted(roots.flatMap((root) => {
+    const absoluteRoot = path.join(cwd, root);
+    return listFilesRecursive(absoluteRoot, (filePath) => {
+      const ext = path.extname(filePath).toLowerCase();
+      return ['.json', '.jsonl', '.md', '.csv', '.tsv', '.txt', '.yaml', '.yml'].includes(ext);
+    }).map((filePath) => path.relative(cwd, filePath).replace(/\\/g, '/'));
+  }));
+}
+
+function artifactFileNameVariants(fileName: string) {
+  const variants = new Set<string>();
+  const normalized = fileName.trim();
+  if (!normalized) return [];
+  variants.add(normalized);
+  if (normalized.startsWith('atm-')) {
+    variants.add(normalized.slice('atm-'.length));
+  }
+  return [...variants].sort((left, right) => left.localeCompare(right));
+}
+
+function resolveAtomizationCoverageArtifactPath(fileName: string) {
+  const basename = path.basename(fileName);
+  const atomizationCoverageArtifacts = new Set([
+    'dogfood-score.json',
+    'dogfood-score.md',
+    'exclusion-inventory.json',
+    'generated-fixture-boundaries.json',
+    'path-to-atom-map.json'
+  ]);
+  if (!atomizationCoverageArtifacts.has(basename)) return null;
+  return `atomic_workbench/atomization-coverage/${basename}`;
 }
 
 function resolveQuickfixScope(prompt: string) {
