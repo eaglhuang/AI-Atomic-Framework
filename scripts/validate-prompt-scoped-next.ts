@@ -18,17 +18,29 @@ async function main() {
     const taskDir = path.join(planDir, 'tasks');
     const otherTaskDir = path.join(tempRoot, 'docs', 'other', 'tasks');
     const ignoredTmpTaskDir = path.join(tempRoot, 'local', 'tmp', 'sanguo-rag-smoke', 'tasks');
+    const externalPlanDir = path.join(path.dirname(tempRoot), '3KLife', 'docs', 'ai_atomic_framework', 'atm-agent-first-operability');
+    const externalTaskDir = path.join(externalPlanDir, 'tasks');
     mkdirSync(taskDir, { recursive: true });
     mkdirSync(otherTaskDir, { recursive: true });
     mkdirSync(ignoredTmpTaskDir, { recursive: true });
+    mkdirSync(externalTaskDir, { recursive: true });
 
     writeFileSync(path.join(planDir, 'PlanAlpha.md'), '# Plan Alpha\n', 'utf8');
     writeFileSync(path.join(tempRoot, 'docs', 'other', 'OtherPlan.md'), '# Other Plan\n', 'utf8');
+    writeFileSync(path.join(externalPlanDir, 'ATM Agent-First 可操作性優化計畫書.md'), '# ATM Agent-First 可操作性優化計畫書\n\n| 任務 | 狀態 |\n|---|---|\n| TASK-AAO-0001 | open |\n| TASK-AAO-0002 | open |\n', 'utf8');
     writeTaskCard(path.join(taskDir, 'TASK-ALPHA-0001.task.md'), 'TASK-ALPHA-0001', 'Alpha first task');
     writeTaskCard(path.join(taskDir, 'TASK-ALPHA-0002.task.md'), 'TASK-ALPHA-0002', 'Alpha second task');
     writeTaskCard(path.join(otherTaskDir, 'TASK-OTHER-0001.task.md'), 'TASK-OTHER-0001', 'Other task');
     writeTaskCard(path.join(otherTaskDir, 'SANGUO-BOOTSTRAP-0001.task.md'), 'SANGUO-BOOTSTRAP-0001', 'Sanguo bootstrap task');
     writeTaskCard(path.join(ignoredTmpTaskDir, 'TASK-TMP-0001.task.md'), 'TASK-TMP-0001', 'Temporary task that discovery must ignore');
+    writeTaskCard(path.join(tempRoot, 'TASK-APO-0030-python-language-adapter-plugin.task.md'), 'TASK-APO-0030-python-language-adapter-plugin', 'Unrelated root task');
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0000-doc-finalize-bridge-index.task.md'), 'TASK-AAO-0000', 'AAO docs baseline', { status: 'done' });
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0001-report-overlap-matrix-routing.task.md'), 'TASK-AAO-0001', 'AAO overlap routing', {
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md'), 'TASK-AAO-0002', 'AAO CLI spec drift guard', {
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
 
     const exact = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
@@ -84,6 +96,20 @@ async function main() {
     assert((queue.evidence.nextAction as any).deliveryPrinciple?.schemaId === 'atm.taskDeliveryPrinciple.v1', 'plan-scoped queue prompt must carry delivery principle evidence');
     assert((queue.evidence.taskQueue as any)?.schemaId === 'atm.taskQueuePreview.v1', 'plan-scoped queue prompt must stay read-only and only expose a queue preview');
     assert((queue.evidence.nextAction as any).queueHeadTaskId === 'TASK-ALPHA-0001', 'plan-scoped queue must expose the queue head');
+
+    const scopedNotFound = await runNext(['--cwd', tempRoot, '--prompt', 'ATM framework 100% self atomization plan implement all task cards']);
+    assert(scopedNotFound.ok === false, 'explicit scoped prompt without matching tasks must not route to an unrelated task');
+    assert(scopedNotFound.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'explicit scoped prompt without matching tasks must report task scope not found');
+
+    const externalPlanQueue = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 ATM Agent-First 可操作性優化計畫書，請按照 ATM 的流程完成所有任務卡']);
+    assert(externalPlanQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'external planning document prompt must route to its adjacent task cards');
+    assert((externalPlanQueue.evidence.nextAction as any).recommendedChannel === 'batch', 'external planning document queue must recommend batch channel');
+    assert((externalPlanQueue.evidence.nextAction as any).queueHeadTaskId === 'TASK-AAO-0001', 'external planning document queue must start at first open AAO task');
+    assert(!((externalPlanQueue.evidence.nextAction as any).selectedTasks ?? []).some((task: any) => task.workItemId === 'TASK-APO-0030-python-language-adapter-plugin'), 'external planning document prompt must not fall back to unrelated low-score root task cards');
+
+    const surfaceOnlyRejected = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 不存在的治理計畫書，請完成所有任務卡']);
+    assert(surfaceOnlyRejected.ok === false, 'named plan prompt with only task-card-surface candidates must fail closed');
+    assert(surfaceOnlyRejected.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'named plan prompt with only task-card-surface candidates must report task scope not found');
 
     const ledgerTaskDir = path.join(tempRoot, '.atm', 'history', 'tasks');
     mkdirSync(ledgerTaskDir, { recursive: true });
@@ -169,26 +195,24 @@ async function main() {
     const nonTaskPrompt = await runNext(['--cwd', tempRoot, '--prompt', 'Please show onboarding guidance']);
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'non-task prompt must route to prompt-scoped guidance');
 
-    const scopedNotFound = await runNext(['--cwd', tempRoot, '--prompt', 'ATM framework 100% self atomization plan implement all task cards']);
-    assert(scopedNotFound.ok === false, 'explicit scoped prompt without matching tasks must not route to an unrelated task');
-    assert(scopedNotFound.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'explicit scoped prompt without matching tasks must report task scope not found');
-
     const noPrompt = await runNext(['--cwd', tempRoot]);
     assert(noPrompt.ok === false, 'next without prompt must not proceed when non-bootstrap tasks exist');
     assert(noPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING'), 'next without prompt must require the current user prompt for task routing');
     assert((noPrompt.evidence.nextAction as any).batchInstruction?.includes('recommendedChannel=batch'), 'next without prompt must explain that batch needs the original prompt');
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
+    rmSync(path.join(path.dirname(tempRoot), '3KLife'), { recursive: true, force: true });
   }
 }
 
-function writeTaskCard(filePath: string, taskId: string, title: string) {
+function writeTaskCard(filePath: string, taskId: string, title: string, options: { readonly status?: string; readonly relatedPlan?: string } = {}) {
   writeFileSync(filePath, `---
 task_id: ${taskId}
 title: ${title}
-status: planned
+status: ${options.status ?? 'planned'}
 target_repo: AI-Atomic-Framework
 closure_authority: target_repo
+${options.relatedPlan ? `related_plan: ${options.relatedPlan}\n` : ''}
 ---
 # ${taskId}
 `, 'utf8');

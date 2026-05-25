@@ -1288,14 +1288,17 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         return [];
       }
     }) : [];
-  const markdownTasks = listTaskCardFiles(cwd)
+  const markdownTasks = uniqueSorted([
+    ...listTaskCardFiles(cwd),
+    ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent)
+  ])
     .map((filePath): ImportedTaskSummary | null => {
       const rawText = readFileSync(filePath, 'utf8');
       const parsed = parseMarkdownFrontmatter(rawText);
       const workItemId = normalizeOptionalString(parsed.task_id ?? parsed.taskId ?? parsed.workItemId ?? parsed.id)
         ?? path.basename(filePath).replace(/\.task\.md$/, '');
       if (!workItemId) return null;
-      const dependencies = splitListValue(parsed.dependencies ?? parsed.depends_on ?? parsed.dependsOn);
+      const dependencies = splitListValue(parsed.dependencies ?? parsed.depends_on ?? parsed.dependsOn ?? parsed.blocked_by ?? parsed.blockedBy);
       const relativeTaskPath = path.relative(cwd, filePath).replace(/\\/g, '/');
       return {
         workItemId,
@@ -1305,11 +1308,13 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         dependencies,
         taskPath: relativeTaskPath,
         format: 'markdown',
-        sourcePlanPath: normalizeOptionalString(parsed.plan_path ?? parsed.planPath ?? parsed.source_plan ?? parsed.sourcePlan),
+        sourcePlanPath: normalizeOptionalString(parsed.plan_path ?? parsed.planPath ?? parsed.source_plan ?? parsed.sourcePlan ?? parsed.related_plan ?? parsed.relatedPlan),
         nearbyPlanPaths: findNearbyPlanPaths(cwd, filePath),
         scopePaths: uniqueSorted([
           ...splitListValue(parsed.scope ?? parsed.scope_paths ?? parsed.scopePaths),
           ...splitListValue(parsed.files ?? parsed.file_paths ?? parsed.filePaths),
+          ...splitListValue(parsed.allowed_files ?? parsed.allowedFiles),
+          ...splitListValue(parsed.deliverables),
           ...splitListValue(parsed.paths),
           ...extractPathLikeStringsFromText(rawText)
         ]),
@@ -1571,6 +1576,22 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
       diagnostics: ['prompt-task-scope-had-no-matching-task-card']
     };
   }
+  if (viableMatches.every(isTaskCardSurfaceOnlyMatch)) {
+    if (looksLikeNamedPlanPrompt(taskIntent.userPrompt ?? '')) {
+      return {
+        status: 'not-found',
+        selectedTasks: [],
+        targetRepo: null,
+        diagnostics: ['low-confidence-task-card-surface-rejected', 'named-plan-prompt-had-no-matching-plan-tasks']
+      };
+    }
+    return {
+      status: 'ambiguous',
+      selectedTasks: viableMatches.slice(0, 12),
+      targetRepo: resolveRouteTargetRepo(viableMatches),
+      diagnostics: ['low-confidence-task-card-surface-selection-required']
+    };
+  }
   const scoped = applyOrdinalScope(viableMatches, taskIntent);
   const selectedTasks = taskIntent.queueRequested || taskIntent.ordinalScope ? scoped : scoped.slice(0, 1);
   if (taskIntent.queueRequested || taskIntent.ordinalScope) {
@@ -1621,6 +1642,18 @@ function hasRequiredPromptScopeMatch(task: ImportedTaskSummary, intent: TaskInte
     return reasons.includes('target-repo-match');
   }
   return reasons.some((reason) => reason !== 'task-card-surface');
+}
+
+function isTaskCardSurfaceOnlyMatch(task: ImportedTaskSummary): boolean {
+  const reasons = task.matchReasons ?? [];
+  if (reasons.length === 0) return false;
+  return (task.matchScore ?? 0) <= 20 && reasons.every((reason) => reason === 'task-card-surface');
+}
+
+function looksLikeNamedPlanPrompt(prompt: string): boolean {
+  const normalized = normalizeSearchText(prompt);
+  if (!/(?:\u8a08\u756b\u66f8|\u8a08\u756b|\u6587\u4ef6|plan|roadmap|spec|document)/i.test(prompt)) return false;
+  return normalized.length >= 10;
 }
 
 function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: TaskIntent): ImportedTaskSummary {
@@ -1825,6 +1858,104 @@ function listTaskCardFiles(cwd: string): readonly string[] {
   return listFilesRecursive(cwd, (filePath) => filePath.endsWith('.task.md'));
 }
 
+function listPromptScopedExternalTaskCardFiles(cwd: string, intent: TaskIntent | null): readonly string[] {
+  if (!intent?.userPrompt || !intent.taskScopeMentioned) return [];
+  const output = new Set<string>();
+  for (const root of listCandidatePlanningRoots(cwd)) {
+    const markdownFiles = listFilesRecursive(root, (filePath) => filePath.endsWith('.md') && !filePath.endsWith('.task.md'));
+    for (const planPath of markdownFiles) {
+      if (!planFileMatchesPrompt(cwd, planPath, intent)) continue;
+      const taskDir = path.join(path.dirname(planPath), 'tasks');
+      for (const taskPath of listFilesRecursive(taskDir, (filePath) => filePath.endsWith('.task.md'))) {
+        output.add(taskPath);
+      }
+    }
+    if (intent.mentionedTaskIds.length > 0 || intent.taskRootHints.length > 0) {
+      for (const taskPath of listFilesRecursive(root, (filePath) => filePath.endsWith('.task.md'))) {
+        if (taskCardPathMatchesIntent(taskPath, intent)) {
+          output.add(taskPath);
+        }
+      }
+    }
+  }
+  return uniqueSorted(Array.from(output));
+}
+
+function listCandidatePlanningRoots(cwd: string): readonly string[] {
+  const roots = new Set<string>();
+  for (const configuredRoot of readConfiguredPlanningRoots(cwd)) {
+    roots.add(path.isAbsolute(configuredRoot) ? configuredRoot : path.resolve(cwd, configuredRoot));
+  }
+  roots.add(path.join(cwd, 'docs', 'ai_atomic_framework'));
+
+  const parent = path.dirname(path.resolve(cwd));
+  for (const entry of safeReadDir(parent)) {
+    if (!entry.isDirectory()) continue;
+    roots.add(path.join(parent, entry.name, 'docs', 'ai_atomic_framework'));
+  }
+
+  return Array.from(roots)
+    .map((entry) => path.resolve(entry))
+    .filter((entry) => existsSync(entry))
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function readConfiguredPlanningRoots(cwd: string): readonly string[] {
+  const configPath = path.join(cwd, '.atm', 'config.json');
+  if (!existsSync(configPath)) return [];
+  try {
+    const parsed = parseJsonText(readFileSync(configPath, 'utf8')) as Record<string, unknown>;
+    const taskLedger = parsed.taskLedger && typeof parsed.taskLedger === 'object' && !Array.isArray(parsed.taskLedger)
+      ? parsed.taskLedger as Record<string, unknown>
+      : {};
+    return readStringArray(taskLedger.planningRoots ?? taskLedger.externalPlanningRoots);
+  } catch {
+    return [];
+  }
+}
+
+function planFileMatchesPrompt(cwd: string, planPath: string, intent: TaskIntent): boolean {
+  const prompt = normalizeSearchText(intent.userPrompt ?? '');
+  const relativePlanPath = path.relative(cwd, planPath).replace(/\\/g, '/');
+  if (intent.mentionedPlanPaths.some((hint) => pathFieldMatches(relativePlanPath, hint) || pathFieldMatches(planPath, hint))) {
+    return true;
+  }
+
+  const stem = normalizeSearchText(path.basename(planPath).replace(/\.[^.]+$/, ''));
+  if (stem.length >= 8 && prompt.includes(stem)) return true;
+
+  const title = readMarkdownTitle(planPath);
+  const normalizedTitle = title ? normalizeSearchText(title) : '';
+  if (normalizedTitle.length >= 8 && prompt.includes(normalizedTitle)) return true;
+
+  return false;
+}
+
+function readMarkdownTitle(filePath: string): string | null {
+  try {
+    const head = readFileSync(filePath, 'utf8').split(/\r?\n/, 40);
+    for (const line of head) {
+      const match = /^#{1,6}\s+(.+?)\s*$/.exec(line);
+      if (match?.[1]?.trim()) return match[1].trim();
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function taskCardPathMatchesIntent(taskPath: string, intent: TaskIntent): boolean {
+  const normalizedTaskPath = normalizeSearchText(taskPath);
+  const basename = path.basename(taskPath).replace(/\.task\.md$/i, '').toUpperCase();
+  if (intent.mentionedTaskIds.some((taskId) => basename === taskId || normalizedTaskPath.includes(normalizeSearchText(taskId)))) {
+    return true;
+  }
+  return intent.taskRootHints.some((hint) => {
+    const normalizedHint = normalizeSearchText(hint);
+    return normalizedHint.length > 0 && normalizedTaskPath.includes(normalizedHint);
+  });
+}
+
 function listFilesRecursive(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
   if (!existsSync(directoryPath)) return [];
   const stats = safeStat(directoryPath);
@@ -1895,12 +2026,30 @@ function parseMarkdownFrontmatter(text: string): Record<string, unknown> {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
   const result: Record<string, unknown> = {};
+  let currentListKey: string | null = null;
   for (const rawLine of match[1].split(/\r?\n/)) {
+    const listMatch = /^\s*-\s+(.+?)\s*$/.exec(rawLine);
+    if (listMatch && currentListKey) {
+      const current = Array.isArray(result[currentListKey]) ? result[currentListKey] as string[] : [];
+      current.push(listMatch[1].trim());
+      result[currentListKey] = current;
+      continue;
+    }
     const separatorIndex = rawLine.indexOf(':');
-    if (separatorIndex === -1) continue;
+    if (separatorIndex === -1) {
+      if (rawLine.trim()) currentListKey = null;
+      continue;
+    }
     const key = rawLine.slice(0, separatorIndex).trim();
     const value = rawLine.slice(separatorIndex + 1).trim();
-    if (key) result[key] = value;
+    if (!key) continue;
+    if (!value) {
+      result[key] = [];
+      currentListKey = key;
+      continue;
+    }
+    result[key] = value;
+    currentListKey = null;
   }
   return result;
 }
