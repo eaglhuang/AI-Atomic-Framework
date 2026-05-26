@@ -107,13 +107,35 @@ async function main() {
 
   // Single-card import via YAML front matter should yield one task.
   const singleResult = await expectOk('import', ['--from', singleCard, '--dry-run', '--cwd', root]);
-  const singleManifest = (singleResult.evidence as { manifest: { tasks: ReadonlyArray<{ workItemId: string; dependencies: readonly string[] }> } }).manifest;
+  const singleManifest = (singleResult.evidence as {
+    manifest: {
+      tasks: ReadonlyArray<{
+        workItemId: string;
+        dependencies: readonly string[];
+        deliverables: readonly string[];
+        scopePaths?: readonly string[];
+        validators?: readonly string[];
+        planningRepo?: string | null;
+        targetRepo?: string | null;
+        closureAuthority?: string | null;
+        planningReadOnlyPaths?: readonly string[];
+        planningMirrorPaths?: readonly string[];
+        outOfScope?: readonly string[];
+        nonGoals?: readonly string[];
+        evidenceRequired?: string | null;
+        rollbackStrategy?: string | null;
+        atomizationImpact?: { ownerAtomOrMap?: string | null; mapUpdates?: readonly string[] };
+      }>
+    }
+  }).manifest;
   if (singleManifest.tasks.length !== 1 || singleManifest.tasks[0].workItemId !== 'TASK-FIXTURE-0001') {
     fail('single-card fixture should produce a single TASK-FIXTURE-0001 entry.');
   }
-  if (!singleManifest.tasks[0].dependencies.includes('TASK-FIXTURE-0000')) {
+  const singleTask = singleManifest.tasks[0];
+  if (!singleTask.dependencies.includes('TASK-FIXTURE-0000')) {
     fail('single-card fixture should record dependency TASK-FIXTURE-0000.');
   }
+  assertImportedTaskContract(singleTask, 'single-card dry-run');
 
   // Duplicate plan should throw.
   await expectThrow('import', ['--from', duplicatePlan, '--dry-run', '--cwd', root], 'ATM_TASKS_PLAN_PARSE_FAILED');
@@ -140,19 +162,27 @@ async function main() {
       fail('tasks import must not create runtime locks.');
     }
 
+    const singleWriteResult = await expectOk('import', ['--from', singleCard, '--write', '--cwd', tempWorkspace]);
+    const singleWritten = (singleWriteResult.evidence as { writtenPaths: readonly string[] }).writtenPaths;
+    if (singleWritten.length !== 1 || !singleWritten[0].endsWith('TASK-FIXTURE-0001.json')) {
+      fail(`single-card write expected TASK-FIXTURE-0001.json, got ${JSON.stringify(singleWritten)}.`);
+    }
+    const singleWrittenTask = JSON.parse(readFileSync(path.join(tempWorkspace, '.atm', 'history', 'tasks', 'TASK-FIXTURE-0001.json'), 'utf8'));
+    assertImportedTaskContract(singleWrittenTask, 'single-card write');
+
     // verify should pass.
     const verifyResult = await expectOk('verify', ['--cwd', tempWorkspace]);
     const verifyReport = (verifyResult.evidence as { report: { inspectedTasks: number; ok: boolean } }).report;
-    if (!verifyReport.ok || verifyReport.inspectedTasks !== 2) {
-      fail(`verify expected ok=true with 2 tasks, got ${JSON.stringify(verifyReport)}.`);
+    if (!verifyReport.ok || verifyReport.inspectedTasks < 2) {
+      fail(`verify expected ok=true with at least 2 tasks, got ${JSON.stringify(verifyReport)}.`);
     }
     const nextResult = await runNext(['--cwd', tempWorkspace, '--prompt', 'SANGUO-AUTO-0001']);
     const nextQueue = (nextResult.evidence as { importedTaskQueue?: { openTaskCount: number; selectedTask?: { workItemId: string } | null } }).importedTaskQueue;
-    if (!nextQueue || nextQueue.openTaskCount !== 2 || nextQueue.selectedTask?.workItemId !== 'SANGUO-AUTO-0001') {
+    if (!nextQueue || nextQueue.openTaskCount < 2 || nextQueue.selectedTask?.workItemId !== 'SANGUO-AUTO-0001') {
       fail(`next --prompt must surface the matching imported task without global fallback, got ${JSON.stringify(nextQueue)}.`);
     }
     const nextClaimResult = await runNext(['--cwd', tempWorkspace, '--claim', '--actor', 'fixture-agent', '--prompt', 'SANGUO-AUTO-0001']);
-    if (nextClaimResult.ok !== true || nextClaimResult.messages?.[0]?.code !== 'ATM_NEXT_CLAIMED') {
+    if (nextClaimResult.ok !== true || !nextClaimResult.messages?.some((entry) => entry.code === 'ATM_NEXT_CLAIMED')) {
       fail(`next --claim must prepare and claim the prompt-scoped imported task, got ${JSON.stringify(nextClaimResult)}.`);
     }
 
@@ -192,3 +222,54 @@ async function main() {
 }
 
 await main();
+
+function assertImportedTaskContract(task: {
+  readonly deliverables?: readonly string[];
+  readonly scopePaths?: readonly string[];
+  readonly validators?: readonly string[];
+  readonly planningRepo?: string | null;
+  readonly targetRepo?: string | null;
+  readonly closureAuthority?: string | null;
+  readonly planningReadOnlyPaths?: readonly string[];
+  readonly planningMirrorPaths?: readonly string[];
+  readonly outOfScope?: readonly string[];
+  readonly nonGoals?: readonly string[];
+  readonly evidenceRequired?: string | null;
+  readonly rollbackStrategy?: string | null;
+  readonly atomizationImpact?: { ownerAtomOrMap?: string | null; mapUpdates?: readonly string[] };
+}, label: string) {
+  const scopePaths = task.scopePaths ?? [];
+  const deliverables = task.deliverables ?? [];
+  if (!scopePaths.includes('packages/cli/src/commands/tasks.ts') || !scopePaths.includes('packages/cli/src/commands/next.ts')) {
+    fail(`${label} must preserve frontmatter scopePaths, got ${JSON.stringify(scopePaths)}.`);
+  }
+  if (!deliverables.includes('packages/cli/src/commands/tasks.ts') || !deliverables.includes('scripts/validate-task-import.ts')) {
+    fail(`${label} must preserve deliverable file paths, got ${JSON.stringify(deliverables)}.`);
+  }
+  if (task.planningRepo !== '3KLife' || task.targetRepo !== 'AI-Atomic-Framework' || task.closureAuthority !== 'target_repo') {
+    fail(`${label} must preserve planning/target/closure authority, got ${JSON.stringify({
+      planningRepo: task.planningRepo,
+      targetRepo: task.targetRepo,
+      closureAuthority: task.closureAuthority
+    })}.`);
+  }
+  if (!(task.planningReadOnlyPaths ?? []).some((entry) => entry.includes('../3KLife/docs/ai_atomic_framework/example/tasks/TASK-FIXTURE-0001.task.md'))) {
+    fail(`${label} must preserve planningReadOnlyPaths.`);
+  }
+  if (!(task.planningMirrorPaths ?? []).includes('docs/ai_atomic_framework/example/tasks/TASK-FIXTURE-0001.task.md')) {
+    fail(`${label} must preserve planningMirrorPaths.`);
+  }
+  if (!(task.outOfScope ?? []).includes('.atm/runtime/**') || !(task.nonGoals ?? []).includes('Rewrite the task lifecycle engine.')) {
+    fail(`${label} must preserve outOfScope and nonGoals.`);
+  }
+  if (!(task.validators ?? []).includes('npm run validate:task-import')) {
+    fail(`${label} must preserve validators.`);
+  }
+  if (task.evidenceRequired !== 'command-backed' || task.rollbackStrategy !== 'revert-commit') {
+    fail(`${label} must preserve evidence and rollback metadata.`);
+  }
+  if (task.atomizationImpact?.ownerAtomOrMap !== 'atm.task-ledger-governance-map'
+    || !(task.atomizationImpact?.mapUpdates ?? []).includes('atomic_workbench/atomization-coverage/path-to-atom-map.json')) {
+    fail(`${label} must preserve atomizationImpact metadata.`);
+  }
+}

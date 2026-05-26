@@ -3414,7 +3414,15 @@ function parseSingleCard(input: {
   const planningReadOnlyPaths = parseYamlList(frontMatter.data.planningReadOnlyPaths ?? frontMatter.data.planning_read_only_paths);
   const outOfScope = parseYamlList(frontMatter.data.outOfScope ?? frontMatter.data.out_of_scope ?? frontMatter.data.forbidden_files);
   const nonGoals = parseYamlList(frontMatter.data.nonGoals ?? frontMatter.data.non_goals);
-  const mapUpdates = parseYamlList(frontMatter.data.mapUpdates ?? frontMatter.data.map_updates);
+  const atomizationImpactFrontMatter = frontMatter.data.atomizationImpact && typeof frontMatter.data.atomizationImpact === 'object' && !Array.isArray(frontMatter.data.atomizationImpact)
+    ? frontMatter.data.atomizationImpact as Record<string, unknown>
+    : {};
+  const mapUpdates = parseYamlList(
+    frontMatter.data.mapUpdates
+    ?? frontMatter.data.map_updates
+    ?? atomizationImpactFrontMatter.mapUpdates
+    ?? atomizationImpactFrontMatter.map_updates
+  );
   const body = input.planText.slice(frontMatter.endIndex);
   const sections = sliceBodyByHeadings(body);
   const acceptance = collectBulletList(sections, acceptanceHeaders);
@@ -3448,7 +3456,12 @@ function parseSingleCard(input: {
     evidenceRequired,
     rollbackStrategy,
     atomizationImpact: {
-      ownerAtomOrMap: normalizeOptionalString(frontMatter.data.ownerAtomOrMap ?? frontMatter.data.owner_atom_or_map),
+      ownerAtomOrMap: normalizeOptionalString(
+        frontMatter.data.ownerAtomOrMap
+        ?? frontMatter.data.owner_atom_or_map
+        ?? atomizationImpactFrontMatter.ownerAtomOrMap
+        ?? atomizationImpactFrontMatter.owner_atom_or_map
+      ),
       mapUpdates
     },
     legacyImportAliases: {
@@ -3748,7 +3761,7 @@ function writeImportEvidence(input: {
 }
 
 interface FrontMatter {
-  readonly data: Record<string, string | readonly string[]>;
+  readonly data: Record<string, unknown>;
   readonly endIndex: number;
   readonly headingLine: number;
 }
@@ -3757,8 +3770,10 @@ function extractFrontMatter(text: string): FrontMatter | null {
   const match = /^---\s*\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/.exec(text);
   if (!match) return null;
   const block = match[1];
-  const data: Record<string, string | readonly string[]> = {};
+  const data: Record<string, unknown> = {};
   let currentKey: string | null = null;
+  let currentObjectKey: string | null = null;
+  let currentObjectListKey: string | null = null;
   for (const rawLine of block.split(/\r?\n/)) {
     const line = rawLine;
     if (/^[A-Za-z_][A-Za-z0-9_]*\s*:/.test(line)) {
@@ -3766,7 +3781,34 @@ function extractFrontMatter(text: string): FrontMatter | null {
       const key = line.slice(0, colonIndex).trim();
       const value = line.slice(colonIndex + 1).trim();
       currentKey = key;
+      currentObjectKey = value.length === 0 ? key : null;
+      currentObjectListKey = null;
       data[key] = value;
+      continue;
+    }
+    const objectFieldMatch = /^ {2}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
+    if (currentObjectKey && objectFieldMatch) {
+      const objectValue = data[currentObjectKey];
+      const objectRecord = objectValue && typeof objectValue === 'object' && !Array.isArray(objectValue)
+        ? objectValue as Record<string, unknown>
+        : {};
+      const key = objectFieldMatch[1];
+      const value = objectFieldMatch[2].trim();
+      objectRecord[key] = value;
+      data[currentObjectKey] = objectRecord;
+      currentObjectListKey = value.length === 0 ? key : null;
+      continue;
+    }
+    if (currentObjectKey && currentObjectListKey && /^ {4}-\s+/.test(line)) {
+      const objectRecord = data[currentObjectKey] as Record<string, unknown>;
+      const value = line.replace(/^ {4}-\s+/, '').trim();
+      const existing = objectRecord[currentObjectListKey];
+      objectRecord[currentObjectListKey] = Array.isArray(existing)
+        ? [...existing, value]
+        : typeof existing === 'string' && existing.length > 0
+          ? [existing, value]
+          : [value];
+      data[currentObjectKey] = objectRecord;
       continue;
     }
     if (currentKey && /^\s*-\s+/.test(line)) {
