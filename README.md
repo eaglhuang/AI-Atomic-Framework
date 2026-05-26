@@ -1,6 +1,17 @@
 # AI-Atomic-Framework
 
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-0f172a.svg)](LICENSE)
+[![Node 24](https://img.shields.io/badge/Node-24-1f6feb.svg)](package.json)
+[![npm](https://img.shields.io/badge/npm-create--atm-cb3837.svg)](https://www.npmjs.com/)
+[![6 Agent Integrations](https://img.shields.io/badge/Integrations-6-0ea5e9.svg)](docs/AGENT_PACK_ONBOARDING.md)
+[![Onefile Release](https://img.shields.io/badge/Release-Onefile-16a34a.svg)](release/atm-onefile/atm.mjs)
+[![Root Drop Release](https://img.shields.io/badge/Release-Root--Drop-22c55e.svg)](release/atm-root-drop/)
+
+[![AI Governance Framework](https://img.shields.io/badge/AI-Governance%20Framework-f97316.svg)](#why-atm-exists)
+[![Deterministic Routing](https://img.shields.io/badge/Deterministic-Routing-f59e0b.svg)](#how-it-works)
+[![Evidence First](https://img.shields.io/badge/Evidence-First-ef4444.svg)](#safety-model)
+[![Agent Ready](https://img.shields.io/badge/Agent-Ready-8b5cf6.svg)](#for-ai-agents)
 
 AI-Atomic-Framework, also called ATM in this repository, is a governance framework for AI-assisted engineering work. It helps humans and AI agents change code inside an inspectable loop: route the next governed action, lock the intended scope, run deterministic checks, preserve evidence, and hand off enough context for the next iteration.
 
