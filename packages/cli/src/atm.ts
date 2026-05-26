@@ -36,6 +36,7 @@ import { runTasks } from './commands/tasks.ts';
 import { runUpgrade } from './commands/upgrade.ts';
 import { runTestAsync } from './commands/test.ts';
 import { runTelemetry } from './commands/telemetry.ts';
+import { runTeam } from './commands/team.ts';
 import { runValidate } from './commands/validate.ts';
 import { runVerify } from './commands/verify.ts';
 import { runWelcome } from './commands/welcome.ts';
@@ -97,6 +98,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   tasks: runTasks,
   upgrade: runUpgrade,
   telemetry: runTelemetry,
+  team: runTeam,
   test: runTestAsync,
   validate: runValidate,
   verify: runVerify,

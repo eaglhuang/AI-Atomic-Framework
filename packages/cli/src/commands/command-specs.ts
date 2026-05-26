@@ -52,6 +52,7 @@ import tasksSpec from './command-specs/tasks.spec.ts';
 import upgradeSpec from './command-specs/upgrade.spec.ts';
 import testSpec from './command-specs/test.spec.ts';
 import telemetrySpec from './command-specs/telemetry.spec.ts';
+import teamSpec from './command-specs/team.spec.ts';
 import validateSpec from './command-specs/validate.spec.ts';
 import welcomeSpec from './command-specs/welcome.spec.ts';
 import verifySpec from './command-specs/verify.spec.ts';
@@ -123,6 +124,7 @@ export const commandSpecs = Object.freeze({
   tasks: tasksSpec,
   test: testSpec,
   telemetry: telemetrySpec,
+  team: teamSpec,
   upgrade: upgradeSpec,
   validate: validateSpec,
   welcome: welcomeSpec,

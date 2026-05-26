@@ -226,6 +226,13 @@ export const plannedCliCommands: readonly CliCommandDescriptor[] = [
     outputFormat: 'pretty+json'
   },
   {
+    commandName: 'team',
+    summary: 'Plan dry-run ATM team agent roles and exclusive permissions for a task',
+    implemented: true,
+    standaloneMode: true,
+    outputFormat: 'pretty+json'
+  },
+  {
     commandName: 'upgrade',
     summary: 'Propose an evolution upgrade from report inputs',
     implemented: true,
