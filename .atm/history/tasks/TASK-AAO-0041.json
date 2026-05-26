@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0041",
+  "title": "batch checkpoint --hold",
+  "status": "done",
+  "milestone": "M14",
+  "dependencies": [
+    "TASK-AAO-0037",
+    "TASK-AAO-0024"
+  ],
+  "acceptance": [
+    "`batch checkpoint --hold --batch <id>` closes only the current task and does not create the next task direction lock.",
+    "`batch status --batch <id>` shows the held state and the exact resume command.",
+    "The previous task can be committed after hold without being blocked by the next task's scope.",
+    "The batch can resume from the next queue item without rebuilding the batch."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/work-channels.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "scripts/validate-task-direction-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "tags": [],
+  "notes": "This is a usability valve, not a weaker checkpoint. It changes timing, not evidence requirements.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0041-batch-checkpoint-hold.task.md",
+    "sectionTitle": "TASK-AAO-0041",
+    "headingLine": 50,
+    "hash": "7fb17dc1d26c07d2"
+  },
+  "importedAt": "2026-05-26T06:26:38.024Z",
+  "scopePaths": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/work-channels.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "scripts/validate-task-direction-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-direction-governance.ts --mode validate"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing task card format",
+    "Adding unrelated commit automation"
+  ],
+  "nonGoals": [
+    "Replacing normal checkpoint",
+    "Changing git merge behavior"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "lastTransitionId": "2026-05-26T12-51-55-992Z-close-0217520faa21",
+  "lastTransitionAt": "2026-05-26T12:51:55.992Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-05-26T12:47:00.217Z",
+  "promotedAt": "2026-05-26T12:47:00.219Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-a39df9461bab",
+    "claimedAt": "2026-05-26T12:47:00.221Z",
+    "heartbeatAt": "2026-05-26T12:51:55.992Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0041.json"
+    ],
+    "state": "released",
+    "reason": "Implement batch checkpoint --hold with held status and resume"
+  },
+  "startedAt": "2026-05-26T12:47:00.221Z",
+  "startedByActor": "codex-main",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0041.closure-packet.json",
+  "closedAt": "2026-05-26T12:51:55.992Z",
+  "closedByActor": "codex-main",
+  "closeReason": "Implement batch checkpoint --hold with held status and resume"
+}

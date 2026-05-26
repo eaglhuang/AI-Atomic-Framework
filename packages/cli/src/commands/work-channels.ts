@@ -32,9 +32,20 @@ export interface BatchRunRecord {
   readonly commitMode: 'per-task' | 'checkpoint' | 'single';
   readonly checkpointSize: number;
   readonly status: 'active' | 'paused' | 'completed' | 'abandoned';
+  readonly hold?: BatchRunHold | null;
   readonly createdByActor: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
+}
+
+export interface BatchRunHold {
+  readonly schemaId: 'atm.batchHold.v1';
+  readonly status: 'held';
+  readonly afterTaskId: string;
+  readonly currentTaskId: string | null;
+  readonly heldByActor: string;
+  readonly heldAt: string;
+  readonly resumeCommand: string;
 }
 
 const quickfixLockPath = ['.atm', 'runtime', 'quickfix-lock.json'] as const;
@@ -240,7 +251,8 @@ export function updateBatchRun(cwd: string, current: BatchRunRecord, updates: Pa
 export function releaseBatchRun(cwd: string, current: BatchRunRecord, status: BatchRunRecord['status']) {
   return updateBatchRun(cwd, current, {
     status,
-    currentTaskId: status === 'completed' ? null : current.currentTaskId
+    currentTaskId: status === 'completed' ? null : current.currentTaskId,
+    hold: null
   });
 }
 

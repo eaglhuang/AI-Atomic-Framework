@@ -34,6 +34,7 @@ async function main() {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-task-direction-governance-'));
   try {
     await validateAdopterGoverned(tempRoot);
+    await validateBatchCheckpointHold(tempRoot);
     await validateFrameworkDevelopment(tempRoot);
     if (!process.exitCode) {
       console.log(`[task-direction-governance:${mode}] ok (adopter-governed and framework-development task direction gates verified)`);
@@ -41,6 +42,34 @@ async function main() {
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
+}
+
+async function validateBatchCheckpointHold(tempRoot: string) {
+  const repo = makeAdopterRepo(tempRoot, 'adopter-batch-hold');
+  const prompt = 'TASK-ADOPT-0001 TASK-ADOPT-0002 all task cards';
+  const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
+  assert(claim.ok === true, 'batch hold fixture must claim queue head');
+  const batchId = (claim.evidence.batchRun as any)?.batchId;
+  assert(typeof batchId === 'string' && batchId.length > 0, 'batch hold fixture must create a batchId');
+
+  writeFileSync(path.join(repo, 'src', 'one.ts'), 'export const one = 3;\n', 'utf8');
+  const checkpoint = await runBatch(['checkpoint', '--cwd', repo, '--actor', 'adopter-agent', '--batch', batchId, '--hold', '--json']);
+  assert(checkpoint.ok === true, 'batch checkpoint --hold must close the current task');
+  assert((checkpoint.evidence as any).held === true, 'batch checkpoint --hold evidence must mark the checkpoint as held');
+  assert((checkpoint.evidence as any).nextClaim === null, 'batch checkpoint --hold must not auto-claim the next task');
+  assert(!readActiveTaskDirectionLocks(repo).some((lock) => lock.taskId === 'TASK-ADOPT-0002'), 'batch checkpoint --hold must not create the next task direction lock');
+
+  const status = await runBatch(['current', '--cwd', repo, '--batch', batchId, '--compact', '--json']);
+  const current = status.evidence.current as any;
+  assert(current.held === true, 'batch current --compact must expose the held state');
+  assert(current.hold?.afterTaskId === 'TASK-ADOPT-0001', 'held state must record the task that was just checkpointed');
+  assert(String(current.resumeCommand ?? '').includes('batch resume'), 'held status must include an exact batch resume command');
+  assert(current.pendingCommitWindow?.taskId === 'TASK-ADOPT-0001', 'held status must preserve the previous task commit window');
+
+  const resume = await runBatch(['resume', '--cwd', repo, '--actor', 'adopter-agent', '--batch', batchId, '--json']);
+  assert(resume.ok === true, 'batch resume must succeed after checkpoint --hold');
+  assert((resume.evidence as any).after?.hold === null, 'batch resume must clear the held state');
+  assert(readActiveTaskDirectionLocks(repo).some((lock) => lock.taskId === 'TASK-ADOPT-0002'), 'batch resume must claim the next queue head through next');
 }
 
 async function validateAdopterGoverned(tempRoot: string) {

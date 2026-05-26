@@ -1,0 +1,110 @@
+{
+  "taskId": "TASK-AAO-0041",
+  "updatedAt": "2026-05-26T12:51:51.079Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "batch checkpoint --hold records held state and resumes the next queue head",
+      "artifactPaths": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T12:51:51.079Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck",
+          "validate:cli",
+          "validate:cli:surface",
+          "validate:git-head-evidence",
+          "validate:task-direction-governance"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cached": false,
+            "cacheKey": "sha256:9f831b4189e0e87ca8bd18048a6c792060da7068d51c760105ba3eaf9db372aa",
+            "runnerKind": "dev-source",
+            "generatedAt": "2026-05-26T12:51:51.081Z"
+          },
+          {
+            "command": "npm run validate:cli:surface",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:25638993145cd9a536947143f39a13808e06110a85a881682d89db4200fdda3d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli:surface"
+            ],
+            "cached": false,
+            "cacheKey": "sha256:bf21c4b32d949c9c53cb092d9fd531c68eccf747531e76dc758df6dfb8719464",
+            "runnerKind": "dev-source",
+            "generatedAt": "2026-05-26T12:51:51.081Z"
+          },
+          {
+            "command": "node --strip-types scripts/validate-task-direction-governance.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2e52d7af7cba08a328cfdafa28f6b383d64d7ff71c6a759b30267f3728e192a7",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:task-direction-governance"
+            ],
+            "cached": false,
+            "cacheKey": "sha256:c29a843f099de56b2cd2257c02ad522b58c1617993fd80c80927d408535187e6",
+            "runnerKind": "dev-source",
+            "generatedAt": "2026-05-26T12:51:51.081Z"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cached": false,
+            "cacheKey": "sha256:541f545031fc99706b538a127ac81da0512617d3e2820b25f5741537da5ea310",
+            "runnerKind": "dev-source",
+            "generatedAt": "2026-05-26T12:51:51.081Z"
+          },
+          {
+            "command": "npm run validate:git-head-evidence",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cached": false,
+            "cacheKey": "sha256:9bca56d2878a3903388aa046b70d7fa0132365569a9c7658f922f556bddd7f78",
+            "runnerKind": "dev-source",
+            "generatedAt": "2026-05-26T12:51:51.081Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:476474474043695979db490f24db4dacc1cd8f87fecb8534c3b2f7550f6dd966",
+          "reusedRunCount": 0,
+          "runCount": 5,
+          "sourcePath": "../../../tmp/aao-0041-command-runs.json"
+        }
+      }
+    }
+  ]
+}

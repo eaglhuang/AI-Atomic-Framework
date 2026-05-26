@@ -205,7 +205,18 @@ export async function runBatch(argv: string[]) {
     const updated = updateBatchRun(options.cwd, active, {
       currentIndex: queue?.currentIndex ?? active.currentIndex,
       currentTaskId: nextTaskId,
-      status: queue?.status === 'completed' || !nextTaskId ? 'completed' : 'active'
+      status: queue?.status === 'completed' || !nextTaskId ? 'completed' : 'active',
+      hold: holdNextClaim && nextTaskId
+        ? {
+          schemaId: 'atm.batchHold.v1',
+          status: 'held',
+          afterTaskId: currentTaskId,
+          currentTaskId: nextTaskId,
+          heldByActor: resolvedActor.actorId,
+          heldAt: new Date().toISOString(),
+          resumeCommand: `node atm.mjs batch resume --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
+        }
+        : null
     });
     const nextClaim = updated.status === 'active' && !holdNextClaim
       ? await runNext(['--cwd', options.cwd, '--claim', '--actor', resolvedActor.actorId, '--prompt', active.sourcePrompt, '--json'])
@@ -284,6 +295,12 @@ export async function runBatch(argv: string[]) {
       });
     }
     const repaired = consistency.ok ? active : repairBatchRunFromQueue(options.cwd, active, queue);
+    const resumed = action === 'resume' && repaired.hold
+      ? updateBatchRun(options.cwd, repaired, { hold: null })
+      : repaired;
+    const nextClaim = action === 'resume' && resumed.currentTaskId
+      ? await runNext(['--cwd', options.cwd, '--claim', '--actor', resolvedActor.actorId, '--prompt', resumed.sourcePrompt, '--json'])
+      : null;
     return makeResult({
       ok: true,
       command: 'batch',
@@ -292,27 +309,36 @@ export async function runBatch(argv: string[]) {
         consistency.ok
           ? message('info', 'ATM_BATCH_REPAIR_NOT_NEEDED', 'Batch runtime is already consistent.', {
             batchId: active.batchId,
-            currentTaskId: active.currentTaskId
+            currentTaskId: active.currentTaskId,
+            held: Boolean(active.hold)
           })
           : message('info', 'ATM_BATCH_REPAIRED', 'Batch runtime was repaired from the active task queue.', {
-            batchId: repaired.batchId,
+            batchId: resumed.batchId,
             previousTaskId: active.currentTaskId,
-            currentTaskId: repaired.currentTaskId,
+            currentTaskId: resumed.currentTaskId,
             queueHeadTaskId: queue.taskIds[queue.currentIndex] ?? null
           }),
-        message('warning', 'ATM_BATCH_RESUME_INSTRUCTION', 'Resume the batch through the current queue head; do not edit task events by hand.', {
-          currentTaskId: repaired.currentTaskId,
-          nextCommand: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --prompt "${repaired.sourcePrompt}" --json`,
-          checkpointCommand: `node atm.mjs batch checkpoint --actor ${resolvedActor.actorId} --batch ${repaired.batchId} --json`
-        })
+        action === 'resume'
+          ? message('info', 'ATM_BATCH_RESUMED', 'Batch hold cleared and the current queue head was claimed through next.', {
+            batchId: resumed.batchId,
+            currentTaskId: resumed.currentTaskId,
+            nextClaimed: Boolean(nextClaim?.ok),
+            checkpointCommand: `node atm.mjs batch checkpoint --actor ${resolvedActor.actorId} --batch ${resumed.batchId} --json`
+          })
+          : message('warning', 'ATM_BATCH_RESUME_INSTRUCTION', 'Resume the batch through the current queue head; do not edit task events by hand.', {
+            currentTaskId: resumed.currentTaskId,
+            nextCommand: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --prompt "${resumed.sourcePrompt}" --json`,
+            checkpointCommand: `node atm.mjs batch checkpoint --actor ${resolvedActor.actorId} --batch ${resumed.batchId} --json`
+          })
       ],
       evidence: {
         action,
         actorId: resolvedActor.actorId,
         before: active,
-        after: repaired,
+        after: resumed,
         taskQueue: queue,
-        consistency
+        consistency,
+        nextClaim: nextClaim?.evidence ?? null
       }
     });
   }
@@ -389,11 +415,13 @@ function toBatchCandidate(batchRun: { readonly batchId: string; readonly scopeKe
   };
 }
 
-function toCompactBatchCandidate(batchRun: { readonly batchId: string; readonly scopeKey?: string | null; readonly currentTaskId?: string | null; readonly taskIds: readonly string[]; readonly currentIndex?: number | null; readonly createdByActor?: string | null }) {
+function toCompactBatchCandidate(batchRun: { readonly batchId: string; readonly scopeKey?: string | null; readonly currentTaskId?: string | null; readonly taskIds: readonly string[]; readonly currentIndex?: number | null; readonly createdByActor?: string | null; readonly hold?: { readonly status?: string; readonly resumeCommand?: string } | null }) {
   return {
     batchId: batchRun.batchId,
     scopeKey: batchRun.scopeKey ?? null,
     currentTaskId: batchRun.currentTaskId ?? null,
+    held: Boolean(batchRun.hold),
+    resumeCommand: batchRun.hold?.resumeCommand ?? null,
     currentIndex: batchRun.currentIndex ?? null,
     totalTasks: batchRun.taskIds.length,
     createdByActor: batchRun.createdByActor ?? null,
@@ -415,6 +443,9 @@ function buildCompactBatchStatus(
   const validators = queueHead ? readTaskValidators(cwd, queueHead.taskPath) : [];
   const batchId = batchRun?.batchId ?? null;
   const currentTaskId = batchRun?.currentTaskId ?? taskQueue?.taskIds?.[taskQueue?.currentIndex ?? 0] ?? null;
+  const held = Boolean(batchRun?.hold);
+  const resumeCommand = batchRun?.hold?.resumeCommand
+    ?? (batchId ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json` : null);
   return {
     schemaId: 'atm.batchCurrent.v1',
     ok: consistency.ok,
@@ -426,6 +457,8 @@ function buildCompactBatchStatus(
     currentIndex: batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null,
     totalTasks: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0,
     progress: buildCompactProgress(batchRun, taskQueue),
+    held,
+    hold: batchRun?.hold ?? null,
     currentTaskId,
     currentTask: queueHead
       ? {
@@ -450,6 +483,9 @@ function buildCompactBatchStatus(
       checkpointHold: batchId
         ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --hold --json`
         : null,
+      resume: batchId
+        ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json`
+        : null,
       repair: batchId
         ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json`
         : 'node atm.mjs batch repair --actor <id> --json',
@@ -471,6 +507,7 @@ function buildCompactBatchStatus(
     nextCommand: batchRun?.sourcePrompt
       ? `node atm.mjs next --claim --actor <id> --prompt "${batchRun.sourcePrompt}" --json`
       : null,
+    resumeCommand,
     repairCommand: batchId
       ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json`
       : 'node atm.mjs batch repair --actor <id> --json',
