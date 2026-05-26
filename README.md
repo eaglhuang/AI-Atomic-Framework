@@ -2,31 +2,88 @@
 
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
 
-AI-Atomic-Framework, also called ATM in this repository, is a governance framework for AI-assisted engineering work. It is not just an atom runner. It helps humans and AI agents make changes through an inspectable loop: understand the next governed action, lock the intended scope, run deterministic checks, preserve evidence, and hand off enough context for the next iteration.
+AI-Atomic-Framework, also called ATM in this repository, is a governance framework for AI-assisted engineering work. It helps humans and AI agents change code inside an inspectable loop: route the next governed action, lock the intended scope, run deterministic checks, preserve evidence, and hand off enough context for the next iteration.
 
 ATM is not an agent framework and not a workflow engine. It is the control layer around AI-assisted work: the part that keeps scope, rules, validation, artifacts, evidence, and handoff state explicit.
 
-> Agent first action: read this README, then run `node atm.mjs next --json` from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
+> AI agent entry point: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available.
 
-## What ATM Does
+## Why ATM Exists
 
-ATM gives a repository a repeatable work envelope:
+AI-assisted engineering breaks down in predictable ways when the working rules stay implicit:
 
-- models AI-assisted work as atoms that can split, merge, compose, evolve, expire, infect legacy code, and become reusable templates;
-- turns large goals into governed work items;
-- locks file, package, or capability scope before mutation;
-- runs guards, tests, and validation as evidence, not just as terminal noise;
-- records artifacts, logs, reports, and context summaries under ATM-managed history;
-- keeps host-specific policy in adapters or plugins instead of hard-coding it into core;
-- lets a downstream project adopt the default governance bundle or map ATM contracts onto its own systems.
+- an agent edits before understanding local constraints;
+- a large request gets handled without a scoped work boundary;
+- validations run, but nobody can tell later what actually passed;
+- review sees the final diff, but not the evidence or decision trail;
+- handoff depends on chat history instead of durable project artifacts.
 
-The practical result is simple: an AI agent can enter a repository, ask ATM what the next safe action is, do the work inside a declared boundary, and leave reviewable proof behind.
+ATM gives repositories a shared operating contract for those moments. The goal is simple: an agent should be able to enter a repository, ask ATM what the next safe action is, do the work inside a declared boundary, and leave reviewable proof behind.
+
+## What You Get
+
+| Capability | What it provides |
+| --- | --- |
+| Deterministic routing | `atm next` recommends the official next action for a real user request. |
+| Scope control | Locks file, package, or capability scope before mutation. |
+| Evidence-first validation | Guards, tests, reports, and logs become durable evidence instead of terminal noise. |
+| First-touch onboarding | `atm welcome`, ATMChart, and agent integrations make the local route discoverable. |
+| Portable contracts | Core contracts stay neutral across languages, repositories, and agent environments. |
+| Replaceable governance bundle | Tasks, rules, artifacts, evidence, and adapters can be swapped without forking core semantics. |
+| Atom behaviors | Work can split, merge, compose, evolve, expire, or absorb legacy code through governed behavior plugins. |
+
+## 60-Second Start
+
+### Start a new governed project
+
+```bash
+npx create-atm test-app --agent claude-code
+```
+
+`create-atm` creates the project directory, runs the official ATM bootstrap, renders the ATMChart rule summary, and installs the selected agent integration. Omit `--agent` to initialize only the governed ATM project and rule chart.
+
+### Add ATM to an existing repository
+
+Use one official distribution:
+
+| Distribution | Use when |
+| --- | --- |
+| `release/atm-root-drop/` | You want the portable multi-file bundle. |
+| `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime. |
+| npm `create-atm` | You want the lowest-friction starter route. |
+
+The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --prompt "<current user prompt>" --json` route user-requested governed work.
+
+### Give the agent one instruction
+
+```text
+Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
+```
+
+The first `next` call will route to bootstrap or orientation when the repository is not ready yet. After that, governed work keeps returning through `next`.
+
+## For AI Agents
+
+When you enter an ATM repository for user-requested work:
+
+1. Read the repository entry guidance.
+2. Run `node atm.mjs next --prompt "<current user prompt>" --json`.
+3. Read `evidence.nextAction.playbook` before editing, closing, or committing.
+4. Edit only within the allowed scope returned by ATM.
+5. Run the smallest relevant validators and preserve the resulting evidence.
+
+Important details for this framework repository:
+
+- `node atm.mjs` runs the frozen built runner. Use it for normal governance routing and release-like validation.
+- `node atm.dev.mjs` is for source-first ATM framework validation only. Do not use it as the default entrypoint for ordinary agent work.
+- If ATM recommends `batch`, deliver only the queue head, run `node atm.mjs batch checkpoint --actor <id> --json`, and commit only after checkpoint succeeds.
+- README files, generated agent entry files, shell wrappers, and integrations should guide an agent back to `node atm.mjs next --prompt "<current user prompt>" --json`; they should not create a second task model, approval workflow, or rule authority.
 
 ## How It Works
 
 ```mermaid
 flowchart LR
-    Goal["Human or agent goal"] --> Next["atm next --json"]
+    Goal["Human or agent goal"] --> Next["atm next --prompt"]
     Next --> Ready{"ATM ready?"}
     Ready -- "not yet" --> Bootstrap["bootstrap / init / welcome"]
     Ready -- "yes" --> Lock["lock scope"]
@@ -38,119 +95,54 @@ flowchart LR
     Handoff --> Next
 ```
 
-The key idea is that `next` remains the deterministic router. README files, generated agent entry files, shell wrappers, and integrations should guide an agent back to `node atm.mjs next --json`; they should not create a second task model, approval workflow, or rule authority.
-
-## Atomic Behaviors
-
-The atom is the main ATM product idea. An atom is not just a task, ticket, command, or prompt. It behaves more like a governed cell in a living codebase: it can divide, fuse, form chains, evolve, go dormant, or attach itself to legacy tissue.
-
-Each behavior is itself a governed atom supplied by the reference behavior pack. Core defines the `AtomBehavior` interface and evidence schema; behavior plugins provide the actual moves. Every move should expose the same contract surface: trigger, evidence, gates, registry transition, and rollback.
-
-```mermaid
-flowchart TB
-    Stage["Atom behavior theater"]
-
-    One(("atom"))
-    SplitA(("atom A"))
-    SplitB(("atom B"))
-    MergeA(("atom"))
-    MergeB(("atom"))
-    Merged(("merged atom"))
-    Chain["atom map"]
-    Legacy["legacy code"]
-    Patch["patch plan"]
-    Template(("template atom"))
-    VariantA(("variant A"))
-    VariantB(("variant B"))
-    Deprecated(("deprecated"))
-    Expired(("expired"))
-
-    Stage --> Split["split: one cell buds into focused atoms"]
-    Split --> One
-    One --> SplitA
-    One --> SplitB
-
-    Stage --> Merge["merge: related cells fuse"]
-    MergeA --> Merged
-    MergeB --> Merged
-    Merge --> Merged
-
-    Stage --> Compose["compose: active atoms perform as a map"]
-    SplitA --> Chain
-    SplitB --> Chain
-    Compose --> Chain
-
-    Stage --> Evolve["evolve / polymorphize: same identity, better shape"]
-    Evolve --> Template
-    Template --> VariantA
-    Template --> VariantB
-
-    Stage --> Infect["infect / atomize: legacy code joins the colony"]
-    Legacy --> Patch
-    Patch --> One
-    Infect --> Patch
-
-    Stage --> Sanitize["sweep / expire: unused cells leave the stage"]
-    One --> Deprecated
-    Deprecated --> Expired
-    Sanitize --> Deprecated
-
-    classDef atom fill:#e8f7ff,stroke:#4078a8,stroke-width:2px;
-    classDef action fill:#fff4cf,stroke:#a87720,stroke-width:1px;
-    classDef legacy fill:#f5f5f5,stroke:#777,stroke-dasharray:4 3;
-    class One,SplitA,SplitB,MergeA,MergeB,Merged,Template,VariantA,VariantB,Deprecated,Expired atom;
-    class Split,Merge,Compose,Evolve,Infect,Sanitize action;
-    class Legacy,Patch legacy;
-```
-
-| Behavior | Cell-like performance | Framework signal |
+| Stage | Typical command | Expected result |
 | --- | --- | --- |
-| `behavior.split` | One crowded atom divides into two or more focused active atoms. | `split-plan`, new semantic fingerprints, `bornBy: split`. |
-| `behavior.merge` | Several compatible atoms fuse into one clearer atom. | `merge-plan`, merged fingerprint, absorbed atoms marked deprecated. |
-| `behavior.compose` | Active atoms line up into a reusable map or tree. | Map composition with `members[]` and `edges[]`. |
-| `behavior.dedup-merge` | A duplicate atom is swallowed by the surviving atom. | Similarity report, dedup decision, caller refs redirected. |
-| `behavior.sweep` | An unused atom goes dormant when nobody calls it. | Unused-caller report, `active -> deprecated`. |
-| `behavior.evolve` | An atom keeps its identity while gaining a better version. | Upgrade proposal, quality comparison, automated gates. |
-| `behavior.expire` | A deprecated atom reaches TTL and leaves the system. | Expiry report, `deprecated -> expired`. |
-| `behavior.polymorphize` | One atom becomes a template with parameterized variants. | Polymorph template, dimension spec, lazy validated instances. |
-| `behavior.infect` | An existing atom attaches to matching legacy code and becomes its caller target. | Infect plan, dry-run patch, caller refs added. |
-| `behavior.atomize` | A legacy code region transforms into a new governed atom. | Atomize proposal, new atom spec, legacy mapping patch. |
+| Route | `node atm.mjs next --prompt "<current user prompt>" --json` | The next governed action and playbook. |
+| Bootstrap or orient | `node atm.mjs welcome --json` or init flow | A ready repository with visible local rules. |
+| Lock | `atm lock` or channel-specific claim flow | A declared mutation boundary. |
+| Work | Normal implementation commands | Actual code, docs, assets, or config changes. |
+| Validate | `doctor`, guards, focused validators, tests | Evidence that the requested work passed the required gates. |
+| Handoff | `atm handoff --help` | Durable context for the next human or agent pass. |
 
-The public behavior naming guidance lives in [docs/governance/behavior-taxonomy.md](docs/governance/behavior-taxonomy.md). The consolidated reference implementation lives in [packages/plugin-behavior-pack](packages/plugin-behavior-pack).
+## Safety Model
 
-## 60-Second Adoption
+ATM keeps the governance layer explicit:
 
-Use the npm starter when you want a fresh governed project:
+- scope is locked before governed mutation;
+- validators and guards are evidence, not just console output;
+- artifacts, logs, and reports live in ATM-managed history;
+- host-specific enforcement belongs in adapters, hooks, or plugins instead of `packages/core`;
+- the deterministic router remains `next`, even when a repository installs welcome flows, agent packs, or shell shortcuts.
 
-```bash
-npx create-atm test-app --agent claude-code
-```
+## Project Structure
 
-`create-atm` creates the project directory, runs the official ATM bootstrap, renders the ATMChart rule summary, and installs the selected agent integration. Omit `--agent` to initialize only the governed ATM project and rule chart.
-
-For an existing repository, use one official distribution:
-
-| Distribution | Use when |
+| Path | Purpose |
 | --- | --- |
-| `release/atm-root-drop/` | You want the portable multi-file bundle. |
-| `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime. |
-| npm `create-atm` | You want the lowest-friction starter route. |
+| `packages/` | Framework packages such as core contracts, CLI, adapters, and plugins. |
+| `release/` | Official release distributions, including the onefile and root-drop forms. |
+| `docs/` | Public framework documentation and governance references. |
+| `examples/` | Example adopter setups and integration patterns. |
+| `.atm/` | ATM runtime state, evidence, integrations, and generated memory for the local repository. |
+| `integrations/` | Agent-specific entry files and installable integration surfaces. |
+| `scripts/` | Validators, builders, and framework maintenance tooling. |
 
-This is the release-bundle root-drop bootstrap workflow: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --json` route bootstrap, orientation, and governed work.
+## Framework Repo vs Adopter Repo
 
-Then give your AI agent one instruction:
+This repository is the public ATM framework repository, not an adopter project workspace.
 
-```text
-Read README.md if present, then run "node atm.mjs next --json" from the repository root. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
-```
+| Repository type | What to do | What not to do |
+| --- | --- | --- |
+| Framework repo | Keep public framework docs English-only, contributor-facing, and repository-neutral. | Do not store downstream project planning queues, host-specific operating notes, or adopter-only governance rules here. |
+| Adopter repo | Keep the ATM route visible, install optional integrations, and layer host enforcement in hooks, CI, or review policy. | Do not replace ATM core contracts with a second registry, second task model, or a competing authority document. |
 
-The first `next` call will route to bootstrap or orientation when the repository is not ready yet. After that, governed work keeps returning through `next`.
+The Default Governance Bundle is the official default experience, but it is not a `packages/core` hard dependency. Core defines contracts; the default bundle is a reference implementation of those contracts.
 
 ## Core Commands
 
 | Command | Purpose |
 | --- | --- |
-| `node atm.mjs next --json` | Recommend the next official ATM action from the current repository state. |
+| `node atm.mjs next --prompt "<current user prompt>" --json` | Recommend the next official ATM action for the current user request. |
+| `node atm.mjs next --json` | Read-only repository orientation when no user prompt is available. |
 | `node atm.mjs welcome --json` | Summarize ATMChart, integration health, and the next ATM action for first-touch onboarding. |
 | `node atm.mjs doctor --json` | Inspect engineering readiness, layout health, trust signals, version compatibility, and integration drift. |
 | `node atm.mjs atm-chart render --json` | Render `.atm/memory/atm-chart.md` from guard sources and schema hashes. |
@@ -166,6 +158,27 @@ For all available commands, run:
 node atm.mjs --help
 ```
 
+## Atomic Behaviors
+
+The atom is the main ATM product idea. An atom is not just a task, ticket, command, or prompt. It behaves more like a governed cell in a living codebase: it can divide, fuse, form chains, evolve, go dormant, or attach itself to legacy tissue.
+
+Core defines the `AtomBehavior` interface and evidence schema. Behavior plugins provide the actual moves, and every move should expose the same contract surface: trigger, evidence, gates, registry transition, and rollback.
+
+| Behavior | What it means | Framework signal |
+| --- | --- | --- |
+| `behavior.split` | One crowded atom divides into two or more focused active atoms. | `split-plan`, new semantic fingerprints, `bornBy: split`. |
+| `behavior.merge` | Several compatible atoms fuse into one clearer atom. | `merge-plan`, merged fingerprint, absorbed atoms marked deprecated. |
+| `behavior.compose` | Active atoms line up into a reusable map or tree. | Map composition with `members[]` and `edges[]`. |
+| `behavior.dedup-merge` | A duplicate atom is swallowed by the surviving atom. | Similarity report, dedup decision, caller refs redirected. |
+| `behavior.sweep` | An unused atom goes dormant when nobody calls it. | Unused-caller report, `active -> deprecated`. |
+| `behavior.evolve` | An atom keeps its identity while gaining a better version. | Upgrade proposal, quality comparison, automated gates. |
+| `behavior.expire` | A deprecated atom reaches TTL and leaves the system. | Expiry report, `deprecated -> expired`. |
+| `behavior.polymorphize` | One atom becomes a template with parameterized variants. | Polymorph template, dimension spec, lazy validated instances. |
+| `behavior.infect` | An existing atom attaches to matching legacy code and becomes its caller target. | Infect plan, dry-run patch, caller refs added. |
+| `behavior.atomize` | A legacy code region transforms into a new governed atom. | Atomize proposal, new atom spec, legacy mapping patch. |
+
+The public behavior naming guidance lives in [docs/governance/behavior-taxonomy.md](docs/governance/behavior-taxonomy.md). The consolidated reference implementation lives in [packages/plugin-behavior-pack](packages/plugin-behavior-pack).
+
 ## Architecture In One Page
 
 ATM is organized around contracts first. Implementations may vary, but the semantics should remain portable across languages, repositories, and agent environments.
@@ -179,23 +192,13 @@ ATM is organized around contracts first. Implementations may vary, but the seman
 | Default Governance Bundle | Replaceable starter plugins for tasks, locks, rules, context budgets, logs, artifacts, and evidence. | Become a hard dependency of `packages/core`. |
 | Plugins and Host Adapters | Optional governance capabilities and host-specific storage, Git, CI, issue tracker, language, or runtime integrations. | Push host-specific rules back into core contracts. |
 
-## Public Repository Boundary
-
-This repository keeps the public framework contract, not the coordinating project workspace.
-
-- Public contributor-facing framework documentation stays English-only.
-- Do not create or keep coordinating implementation task cards, planning queues, or downstream operating notes inside this framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.
-- Downstream experiments may feed evidence upstream only after they have been converted into neutral framework artifacts such as docs, schemas, fixtures, validators, adapters, or plugins.
-
-The Default Governance Bundle is the official default experience, but it is not a `packages/core` hard dependency. Core defines contracts; the default bundle is a reference implementation of those contracts.
-
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full layer model.
 
 ## Adopter Guidance
 
 ATM is designed to cooperate with the systems a repository already has.
 
-- Keep `node atm.mjs next --json` visible in repository entry guidance.
+- Keep `node atm.mjs next --prompt "<current user prompt>" --json` visible in repository entry guidance for user-requested work.
 - Use `atm welcome`, ATMChart, and optional integrations to help agents discover the local route.
 - Use `atm doctor --json` to inspect readiness and detect possible governance bypass.
 - Add Git hooks, CI gates, branch protection, or review policy in the host repository when stronger enforcement is needed.
@@ -208,6 +211,15 @@ Host-side enforcement options are documented in [docs/HOST_GOVERNANCE_INTEGRATIO
 This repository uses npm as the official package-manager route and targets Node.js 24 for source-tree development. TypeScript modules run through `node --experimental-strip-types` in local validators and scripts.
 
 The current implementation uses TypeScript, Node.js, JSON schemas, and a small CLI because those tools make the alpha path easy to inspect and test. That toolchain is a recommendation, not a semantic requirement of ATM; other implementations should remain possible if they preserve the same contracts.
+
+Runner entrypoints are intentionally split:
+
+| Entrypoint | Purpose |
+| --- | --- |
+| `node atm.mjs ...` | Stable frozen runner for agents, governance routing, and release-like tests inside this repo. It uses `release/atm-onefile/atm.mjs` when present, then the built `packages/cli/dist/atm.js`. |
+| `node atm.dev.mjs ...` | Source-first runner for ATM framework development. Use this only when you intentionally need current `packages/cli/src/**` behavior before a build. |
+
+Do not ask agents to use `node atm.dev.mjs` for ordinary governance tests. Build first, then verify the frozen entrypoint with `node atm.mjs ...`.
 
 Install dependencies, then use the standard engineering checks:
 
