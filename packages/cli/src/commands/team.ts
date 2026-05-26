@@ -1,11 +1,13 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import {
   CliError,
   makeResult,
   message,
   parseArgsForCommand,
-  readJsonFile
+  readJsonFile,
+  writeJsonFile
 } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
 
@@ -39,6 +41,13 @@ type PermissionFinding = {
   detail: string;
   permission?: string;
   agentIds?: string[];
+  paths?: string[];
+};
+
+type PermissionLease = {
+  permission: string;
+  agentId: string;
+  paths?: string[];
 };
 
 const teamPermissionCatalog: TeamPermissionDefinition[] = [
@@ -103,32 +112,117 @@ export async function runTeam(argv: string[]) {
   const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
 
-  if (action !== 'plan') {
-    throw new CliError('ATM_CLI_USAGE', 'team currently supports only: plan', { exitCode: 2 });
+  if (!['plan', 'start', 'status', 'validate'].includes(action)) {
+    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate', { exitCode: 2 });
+  }
+
+  if (action === 'status') {
+    return buildTeamStatusResult({
+      cwd,
+      requestedTeamRunId: String(parsed.options.team ?? '').trim(),
+      compact: Boolean(parsed.options.compact)
+    });
   }
 
   const taskId = String(parsed.options.task ?? '').trim();
   if (!taskId) {
-    throw new CliError('ATM_TEAM_TASK_REQUIRED', 'team plan requires --task <id>.', { exitCode: 2 });
+    throw new CliError('ATM_TEAM_TASK_REQUIRED', `team ${action} requires --task <id>.`, { exitCode: 2 });
   }
 
-  const task = readTask(cwd, taskId);
-  const recipes = loadTeamRecipes(cwd);
-  const requestedRecipeId = String(parsed.options.recipe ?? '').trim();
-  const recipe = selectRecipe({
-    recipes,
-    requestedRecipeId,
-    task
+  const context = buildTeamPlanningContext({
+    cwd,
+    taskId,
+    requestedRecipeId: String(parsed.options.recipe ?? '').trim()
   });
-  const validation = validateTeamRecipe(recipe);
-  const writePaths = deriveWritePaths(task);
-  const teamPlan = buildTeamPlan({
-    task,
-    recipe,
-    writePaths,
-    validation
-  });
+  const { task, recipes, recipe, validation, teamPlan } = context;
   const ok = validation.findings.every((finding) => finding.level !== 'error');
+
+  if (action === 'validate') {
+    return makeResult({
+      ok,
+      command: 'team',
+      cwd,
+      messages: [
+        message(ok ? 'info' : 'error', ok ? 'ATM_TEAM_PERMISSION_VALID' : 'ATM_TEAM_PERMISSION_INVALID', ok
+          ? 'Team recipe and permission leases are valid.'
+          : 'Team recipe or permission leases contain blocking findings.', {
+          taskId,
+          recipeId: recipe.recipeId,
+          findingCount: validation.findings.length
+        })
+      ],
+      evidence: {
+        action: 'validate',
+        dryRun: true,
+        runtimeWritten: false,
+        agentsSpawned: false,
+        task: summarizeTask(taskId, task),
+        recipe,
+        recipeSources: recipes.sources,
+        permissionCatalog: teamPermissionCatalog,
+        validation,
+        suggestedPermissionLeases: teamPlan.suggestedPermissionLeases
+      }
+    });
+  }
+
+  if (action === 'start') {
+    const actorId = String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? '').trim();
+    if (!actorId) {
+      throw new CliError('ATM_ACTOR_ID_MISSING', 'team start requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+    }
+    if (!ok) {
+      return makeResult({
+        ok: false,
+        command: 'team',
+        cwd,
+        messages: [
+          message('error', 'ATM_TEAM_START_BLOCKED', 'Team start blocked by permission validation findings.', {
+            taskId,
+            recipeId: recipe.recipeId,
+            findingCount: validation.findings.length
+          })
+        ],
+        evidence: {
+          action: 'start',
+          runtimeWritten: false,
+          agentsSpawned: false,
+          task: summarizeTask(taskId, task),
+          recipe,
+          validation,
+          teamPlan
+        }
+      });
+    }
+    const teamRun = writeTeamRun({
+      cwd,
+      actorId,
+      taskId,
+      task,
+      recipe,
+      teamPlan,
+      validation
+    });
+    return makeResult({
+      ok: true,
+      command: 'team',
+      cwd,
+      messages: [
+        message('info', 'ATM_TEAM_STARTED', 'Team run started. Runtime state was written, but no agents were spawned.', {
+          teamRunId: teamRun.teamRunId,
+          taskId,
+          recipeId: recipe.recipeId
+        })
+      ],
+      evidence: {
+        action: 'start',
+        runtimeWritten: true,
+        agentsSpawned: false,
+        teamRunPath: `.atm/runtime/team-runs/${teamRun.teamRunId}.json`,
+        teamRun
+      }
+    });
+  }
 
   return makeResult({
     ok,
@@ -148,13 +242,7 @@ export async function runTeam(argv: string[]) {
       dryRun: true,
       runtimeWritten: false,
       agentsSpawned: false,
-      task: {
-        taskId,
-        title: task.title ?? task.workItemId ?? taskId,
-        status: task.status ?? null,
-        targetRepo: task.targetRepo ?? null,
-        sourcePlanPath: task.source?.planPath ?? task.sourcePlanPath ?? null
-      },
+      task: summarizeTask(taskId, task),
       recipe,
       recipeSources: recipes.sources,
       permissionCatalog: teamPermissionCatalog,
@@ -162,6 +250,40 @@ export async function runTeam(argv: string[]) {
       teamPlan
     }
   });
+}
+
+function buildTeamPlanningContext(input: {
+  cwd: string;
+  taskId: string;
+  requestedRecipeId: string;
+}) {
+  const task = readTask(input.cwd, input.taskId);
+  const recipes = loadTeamRecipes(input.cwd);
+  const recipe = selectRecipe({
+    recipes,
+    requestedRecipeId: input.requestedRecipeId,
+    task
+  });
+  const recipeValidation = validateTeamRecipe(recipe);
+  const writePaths = deriveWritePaths(task);
+  const teamPlan = buildTeamPlan({
+    task,
+    recipe,
+    writePaths,
+    validation: recipeValidation
+  });
+  const leaseValidation = validatePermissionLeases(teamPlan.suggestedPermissionLeases);
+  const validation = mergeValidation(recipeValidation, leaseValidation);
+  return {
+    task,
+    recipes,
+    recipe,
+    validation,
+    teamPlan: {
+      ...teamPlan,
+      validation
+    }
+  };
 }
 
 function readTask(cwd: string, taskId: string) {
@@ -315,6 +437,77 @@ function validateTeamRecipe(recipe: TeamRecipe) {
   };
 }
 
+function validatePermissionLeases(leases: PermissionLease[]) {
+  const permissionDefinitions = new Map(teamPermissionCatalog.map((entry) => [entry.id, entry]));
+  const findings: PermissionFinding[] = [];
+  const ownersByExclusivePermission = new Map<string, string[]>();
+
+  for (const lease of leases) {
+    const definition = permissionDefinitions.get(lease.permission);
+    if (!definition) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TEAM_PERMISSION_UNKNOWN',
+        detail: `Unknown team permission lease: ${lease.permission}`,
+        permission: lease.permission,
+        agentIds: [lease.agentId]
+      });
+      continue;
+    }
+    if (definition.mode === 'exclusive') {
+      ownersByExclusivePermission.set(lease.permission, [
+        ...(ownersByExclusivePermission.get(lease.permission) ?? []),
+        lease.agentId
+      ]);
+    }
+    if (definition.scopeRequired && (!Array.isArray(lease.paths) || lease.paths.length === 0)) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TEAM_PERMISSION_SCOPE_REQUIRED',
+        detail: `${lease.permission} requires explicit scoped paths.`,
+        permission: lease.permission,
+        agentIds: [lease.agentId]
+      });
+    }
+    const forbiddenRuntimePaths = (lease.paths ?? []).filter((entry) => entry.replace(/\\/g, '/').startsWith('.atm/runtime/'));
+    if (forbiddenRuntimePaths.length > 0) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN',
+        detail: `${lease.permission} cannot lease .atm/runtime/** paths.`,
+        permission: lease.permission,
+        agentIds: [lease.agentId],
+        paths: forbiddenRuntimePaths
+      });
+    }
+  }
+
+  for (const [permission, owners] of ownersByExclusivePermission.entries()) {
+    if (new Set(owners).size > 1) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TEAM_PERMISSION_LEASE_CONFLICT',
+        detail: `Exclusive permission lease ${permission} has multiple owners.`,
+        permission,
+        agentIds: owners
+      });
+    }
+  }
+
+  return {
+    ok: findings.every((finding) => finding.level !== 'error'),
+    findings
+  };
+}
+
+function mergeValidation(...reports: { ok: boolean; findings: PermissionFinding[] }[]) {
+  const findings = reports.flatMap((report) => report.findings);
+  return {
+    ok: findings.every((finding) => finding.level !== 'error'),
+    findings
+  };
+}
+
 function buildTeamPlan(input: {
   task: any;
   recipe: TeamRecipe;
@@ -339,13 +532,129 @@ function buildTeamPlan(input: {
         agentId: fileWriteOwner.agentId,
         paths: input.writePaths
       }] : [])
-    ],
+    ] satisfies PermissionLease[],
     nextSteps: [
       'Review this dry-run plan.',
-      'If accepted, implement a future team start runtime command.',
-      'Do not write .atm/runtime team state from team plan.'
+      'Run team start when you want a runtime team run record.',
+      'Do not hand-edit .atm/runtime team state.'
     ],
     validation: input.validation
+  };
+}
+
+function writeTeamRun(input: {
+  cwd: string;
+  actorId: string;
+  taskId: string;
+  task: any;
+  recipe: TeamRecipe;
+  teamPlan: ReturnType<typeof buildTeamPlan>;
+  validation: { ok: boolean; findings: PermissionFinding[] };
+}) {
+  const now = new Date().toISOString();
+  const teamRunId = createTeamRunId(input.taskId, input.actorId, now);
+  const teamRun = {
+    schemaId: 'atm.teamRun.v1',
+    teamRunId,
+    channel: input.teamPlan.channelHint,
+    taskId: input.taskId,
+    batchId: null,
+    actorId: input.actorId,
+    recipeId: input.recipe.recipeId,
+    status: 'active',
+    executionMode: 'manual-team',
+    agentsSpawned: false,
+    runtimeWritten: true,
+    task: summarizeTask(input.taskId, input.task),
+    agents: input.recipe.agents,
+    permissionLeases: input.teamPlan.suggestedPermissionLeases,
+    validation: input.validation,
+    createdAt: now,
+    updatedAt: now
+  };
+  const directory = teamRunsDirectory(input.cwd);
+  mkdirSync(directory, { recursive: true });
+  writeJsonFile(path.join(directory, `${teamRunId}.json`), teamRun);
+  return teamRun;
+}
+
+function buildTeamStatusResult(input: {
+  cwd: string;
+  requestedTeamRunId: string;
+  compact: boolean;
+}) {
+  const runs = input.requestedTeamRunId
+    ? [readTeamRun(input.cwd, input.requestedTeamRunId)]
+    : listTeamRuns(input.cwd);
+  return makeResult({
+    ok: true,
+    command: 'team',
+    cwd: input.cwd,
+    messages: [
+      message('info', 'ATM_TEAM_STATUS_READY', 'Team runtime status loaded.', {
+        teamRunCount: runs.length,
+        compact: input.compact
+      })
+    ],
+    evidence: {
+      action: 'status',
+      teamRunCount: runs.length,
+      teamRuns: input.compact ? runs.map(compactTeamRun) : runs
+    }
+  });
+}
+
+function listTeamRuns(cwd: string) {
+  const directory = teamRunsDirectory(cwd);
+  if (!existsSync(directory)) return [];
+  return readdirSync(directory)
+    .filter((entry) => entry.endsWith('.json'))
+    .map((entry) => readJsonFile(path.join(directory, entry), 'ATM_TEAM_RUN_INVALID'));
+}
+
+function readTeamRun(cwd: string, teamRunId: string) {
+  const filePath = path.join(teamRunsDirectory(cwd), `${teamRunId}.json`);
+  if (!existsSync(filePath)) {
+    throw new CliError('ATM_TEAM_RUN_NOT_FOUND', `Team run not found: ${teamRunId}`, {
+      exitCode: 2,
+      details: { teamRunId, path: path.relative(cwd, filePath).replace(/\\/g, '/') }
+    });
+  }
+  return readJsonFile(filePath, 'ATM_TEAM_RUN_INVALID');
+}
+
+function compactTeamRun(run: any) {
+  return {
+    teamRunId: run.teamRunId,
+    taskId: run.taskId,
+    recipeId: run.recipeId,
+    status: run.status,
+    agentCount: Array.isArray(run.agents) ? run.agents.length : 0,
+    permissionLeaseCount: Array.isArray(run.permissionLeases) ? run.permissionLeases.length : 0,
+    agentsSpawned: run.agentsSpawned === true,
+    updatedAt: run.updatedAt ?? null
+  };
+}
+
+function teamRunsDirectory(cwd: string) {
+  return path.join(cwd, '.atm', 'runtime', 'team-runs');
+}
+
+function createTeamRunId(taskId: string, actorId: string, createdAt: string) {
+  const digest = createHash('sha256')
+    .update(`${taskId}\n${actorId}\n${createdAt}`)
+    .digest('hex')
+    .slice(0, 12);
+  return `team-${digest}`;
+}
+
+function summarizeTask(taskId: string, task: any) {
+  return {
+    taskId,
+    title: task.title ?? task.workItemId ?? taskId,
+    status: task.status ?? null,
+    targetRepo: task.targetRepo ?? null,
+    sourcePlanPath: task.source?.planPath ?? task.sourcePlanPath ?? null
   };
 }
 

@@ -577,6 +577,14 @@ async function claimNextImportedTask(input: {
     prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId
   });
   const recommendedChannel = batchRun?.status === 'active' ? 'batch' : 'normal';
+  const teamRecommendation = buildTeamRecommendation({
+    taskId: claimableTask.workItemId,
+    actorId: resolvedActor.actorId,
+    channel: recommendedChannel,
+    reason: recommendedChannel === 'batch'
+      ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
+      : 'This task can use an optional team run for role/permission coordination.'
+  });
   const nextAction = {
     status: 'ready',
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
@@ -594,6 +602,7 @@ async function claimNextImportedTask(input: {
       channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
       taskId: claimableTask.workItemId
     }),
+    teamRecommendation,
     selectedTask: claimableTask,
     batchId: batchRun?.batchId ?? null,
     scopeKey: batchRun?.scopeKey ?? null,
@@ -656,6 +665,7 @@ async function claimNextImportedTask(input: {
       taskDirectionLock: directionLock,
       taskQueue: activeQueue,
       batchRun,
+      teamRecommendation,
       recommendedChannel: nextAction.recommendedChannel,
       taskIntent: input.taskIntent,
       importedTaskQueue: input.importedTaskQueue,
@@ -3213,6 +3223,36 @@ function buildChannelPlaybook(input: {
       'git commit -m "<scope>: complete <task-id>"'
     ],
     commitTiming: 'Commit only after tasks close succeeds.'
+  };
+}
+
+function buildTeamRecommendation(input: {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly channel: 'normal' | 'batch';
+  readonly reason: string;
+}) {
+  const recipeId = input.channel === 'batch'
+    ? 'atm.default.batch'
+    : 'atm.default.normal.typescript';
+  const quotedTask = quoteCliValue(input.taskId);
+  return {
+    schemaId: 'atm.teamRecommendation.v1',
+    enabled: true,
+    required: false,
+    channel: input.channel,
+    taskId: input.taskId,
+    recipeId,
+    reason: input.reason,
+    planCommand: `node atm.mjs team plan --task ${quotedTask} --recipe ${recipeId} --json`,
+    validateCommand: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
+    startCommand: `node atm.mjs team start --task ${quotedTask} --actor ${input.actorId} --recipe ${recipeId} --json`,
+    statusCommand: 'node atm.mjs team status --compact --json',
+    constraints: [
+      'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
+      'Team agents are not spawned by this recommendation.',
+      'Coordinator remains the only task.lifecycle and git.write owner.'
+    ]
   };
 }
 
