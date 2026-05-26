@@ -393,13 +393,25 @@
       "atom_id": "atom-integration-playbook",
       "capability": "Reusable playbook fragments included by every editor adapter skill manifest",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "schemas/atom-map.schema.json",
+      "atom_id": "atom-atom-map-spec",
+      "capability": "JSON Schema (atm.atomicMap) that every atomic_workbench/maps/**/map.spec.json must conform to",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "scripts/validate-map-spec-schema.ts",
+      "atom_id": "atom-validator-map-spec-schema",
+      "capability": "validator that walks atomic_workbench/maps/**/map.spec.json and validates each file against atom-map.schema.json",
+      "coverage_status": "active"
     }
   ],
   "summary": {
-    "total_production_paths": 34,
-    "mapped_paths": 34,
+    "total_production_paths": 36,
+    "mapped_paths": 36,
     "coverage_percentage": 100,
-    "atoms_defined": 33,
+    "atoms_defined": 35,
     "atoms_with_evidence": 0,
     "debt_items": 30,
     "core_wave1_completed": true
