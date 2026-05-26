@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0040",
   "title": "Sandbox git process diagnostics",
-  "status": "planned",
+  "status": "done",
   "milestone": "M13",
   "dependencies": [
     "TASK-AAO-0004",
@@ -28,10 +28,10 @@
   "source": {
     "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0040-sandbox-git-process-diagnostic.task.md",
     "sectionTitle": "TASK-AAO-0040",
-    "headingLine": 52,
-    "hash": "3871a93da9bd0f0d"
+    "headingLine": 54,
+    "hash": "d3daf52c1fbc2072"
   },
-  "importedAt": "2026-05-26T06:04:11.175Z",
+  "importedAt": "2026-05-26T12:56:19.015Z",
   "scopePaths": [
     "packages/cli/src/commands/hook.ts",
     "packages/cli/src/commands/doctor.ts",
@@ -62,11 +62,34 @@
   "evidenceRequired": null,
   "rollbackStrategy": null,
   "atomizationImpact": {
-    "ownerAtomOrMap": null,
-    "mapUpdates": []
+    "ownerAtomOrMap": "atm.validator-envelope-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-244Z-import-c0be75c9b2a4",
-  "lastTransitionAt": "2026-05-26T06:04:11.244Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-05-26T13-45-48-188Z-close-7d7cdeafbd1d",
+  "lastTransitionAt": "2026-05-26T13:45:48.188Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-05-26T13:40:29.751Z",
+  "promotedAt": "2026-05-26T13:40:29.754Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-4ee77d85f567",
+    "claimedAt": "2026-05-26T13:40:29.757Z",
+    "heartbeatAt": "2026-05-26T13:45:48.187Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0040.json"
+    ],
+    "state": "released",
+    "reason": "完成 sandbox git EPERM 診斷與可操作修復提示"
+  },
+  "startedAt": "2026-05-26T13:40:29.757Z",
+  "startedByActor": "codex-main",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0040.closure-packet.json",
+  "closedAt": "2026-05-26T13:45:48.187Z",
+  "closedByActor": "codex-main",
+  "closeReason": "完成 sandbox git EPERM 診斷與可操作修復提示"
 }

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { auditTasks, createFrameworkModeStatus } from '../packages/cli/src/commands/framework-development.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
+import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -45,6 +46,37 @@ function assertLastTransitionHashMatchesDisk(repo: string, taskId: string) {
   assert(existsSync(eventPath), `${taskId} transition event must exist`);
   const event = readJson(eventPath);
   assert(event.taskSha256 === sha256File(taskPath), `${taskId} transition event taskSha256 must match persisted task document`);
+}
+
+function assertSandboxDiagnosticsAreActionable() {
+  const command = 'npm run validate:cli';
+  const sandboxEnvelope = createValidatorFailureEnvelope({
+    validatorName: 'synthetic-cli',
+    command,
+    entry: 'scripts/validate-cli.ts',
+    mode: 'validate',
+    ok: false,
+    exitCode: 1,
+    stderr: 'Error: spawnSync git EPERM'
+  });
+  const sandboxFinding = sandboxEnvelope.blockingFindings.find((finding) => finding.code === 'ATM_ENV_SANDBOX_GIT_EPERM');
+  assert(sandboxFinding?.classification === 'environment', 'sandbox git EPERM must be an environment finding');
+  assert((sandboxFinding?.data as any)?.notTaskEvidenceFailure === true, 'sandbox git EPERM must not be treated as task evidence failure');
+  assert(Array.isArray((sandboxFinding?.data as any)?.suggestedCommands), 'sandbox git EPERM must include suggested commands');
+  assert(sandboxEnvelope.repairHints.some((hint) => hint.includes('ATM_TEMP_ROOT')), 'sandbox git EPERM repair hint must include ATM_TEMP_ROOT');
+
+  const indexPermissionEnvelope = createValidatorFailureEnvelope({
+    validatorName: 'synthetic-git-index',
+    command,
+    entry: 'scripts/validate-cli.ts',
+    mode: 'validate',
+    ok: false,
+    exitCode: 1,
+    stderr: 'fatal: Unable to create C:/repo/.git/index.lock: Permission denied.'
+  });
+  const indexFinding = indexPermissionEnvelope.blockingFindings.find((finding) => finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED');
+  assert(indexFinding?.classification === 'environment', '.git/index.lock permission denied must be an environment finding');
+  assert((indexFinding?.data as any)?.notTaskEvidenceFailure === true, '.git/index.lock permission denied must not be treated as task evidence failure');
 }
 
 function initGitRepo(repo: string) {
@@ -140,6 +172,8 @@ const sandboxFriendlyTempRoot = existsSync(path.join(root, '.atm-temp'))
 const tempRoot = mkdtempSync(path.join(sandboxFriendlyTempRoot, 'atm-task-ledger-'));
 
 try {
+  assertSandboxDiagnosticsAreActionable();
+
   const hostRepo = makeHostRepo(tempRoot, 'ordinary-adopter');
   const hostStatus = createFrameworkModeStatus({ cwd: hostRepo, files: ['src/index.ts'] });
   assert(hostStatus.taskLedgerMode === 'adopter-governed', 'ordinary adopter repo must use adopter-governed task ledger mode');

@@ -172,7 +172,14 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       detail: 'The validator could not spawn or access git in the current sandbox.',
       requiredCommand: input.command,
       classification: 'environment',
-      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+      data: {
+        exitCode: input.exitCode,
+        entry: input.entry ?? null,
+        mode: input.mode ?? null,
+        environmentDiagnostic: true,
+        notTaskEvidenceFailure: true,
+        suggestedCommands: sandboxGitRepairCommands(input.command)
+      }
     });
   } else if (/spawn(?:sync)?\s+.*(?:eperm|eacces)/i.test(payload)) {
     findings.push({
@@ -181,7 +188,14 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       detail: 'The validator runner could not spawn a child process in the current sandbox.',
       requiredCommand: input.command,
       classification: 'environment',
-      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+      data: {
+        exitCode: input.exitCode,
+        entry: input.entry ?? null,
+        mode: input.mode ?? null,
+        environmentDiagnostic: true,
+        notTaskEvidenceFailure: true,
+        suggestedCommands: sandboxProcessRepairCommands(input.command)
+      }
     });
   } else if (isGitIndexLockPresentFailure(payload, lowerPayload)) {
     findings.push({
@@ -190,7 +204,17 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       detail: 'Git reported an existing index.lock while the validator was running.',
       requiredCommand: input.command,
       classification: 'environment',
-      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+      data: {
+        exitCode: input.exitCode,
+        entry: input.entry ?? null,
+        mode: input.mode ?? null,
+        environmentDiagnostic: true,
+        notTaskEvidenceFailure: true,
+        suggestedCommands: [
+          'Confirm no Git process is active before removing or retrying around .git/index.lock.',
+          input.command
+        ]
+      }
     });
   } else if (isGitIndexPermissionFailure(payload, lowerPayload)) {
     findings.push({
@@ -199,7 +223,14 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       detail: 'Git index access failed while the validator was running. This is an environment diagnostic, not task evidence or a task audit failure.',
       requiredCommand: input.command,
       classification: 'environment',
-      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+      data: {
+        exitCode: input.exitCode,
+        entry: input.entry ?? null,
+        mode: input.mode ?? null,
+        environmentDiagnostic: true,
+        notTaskEvidenceFailure: true,
+        suggestedCommands: sandboxGitRepairCommands(input.command)
+      }
     });
   }
 
@@ -357,22 +388,37 @@ function buildRepairHints(findings: readonly ValidatorBlockingFinding[], command
   }
   return findings.map((finding) => {
     if (finding.code === 'ATM_ENV_SANDBOX_GIT_EPERM') {
-      return 'Rerun the same validator with repository-level permissions, or use ATM_TEMP_ROOT=C:\\tmp when the validator creates temporary git repositories.';
+      return `Environment issue, not task evidence: rerun with repository-level permissions, or use PowerShell: $env:ATM_TEMP_ROOT="C:\\tmp"; ${command}`;
     }
     if (finding.code === 'ATM_ENV_PROCESS_SPAWN_EPERM') {
-      return 'Rerun the same validator with repository-level permissions so the runner can spawn child validator processes.';
+      return `Environment issue, not task evidence: rerun with repository-level permissions so the validator can spawn child processes: ${command}`;
     }
     if (finding.code === 'ATM_GIT_INDEX_LOCK_PRESENT') {
       return 'Confirm no Git process is active, resolve the stale .git/index.lock condition, then rerun the validator.';
     }
     if (finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED') {
-      return 'Resolve the local Git/index permission problem outside ATM, then rerun the validator. This is environment setup, not task evidence.';
+      return `Environment issue, not task evidence: resolve the local Git/index permission problem, or use PowerShell: $env:ATM_TEMP_ROOT="C:\\tmp"; ${command}`;
     }
     if (finding.requiredCommand) {
       return `Run required command: ${finding.requiredCommand}`;
     }
     return `Fix ${finding.source} finding ${finding.code}, then rerun ${command}.`;
   });
+}
+
+function sandboxGitRepairCommands(command: string): readonly string[] {
+  return [
+    'Codex on Windows: set ~/.codex/config.toml [windows] sandbox = "elevated", restart Codex, then rerun.',
+    `PowerShell temp-root retry: $env:ATM_TEMP_ROOT="C:\\tmp"; ${command}`,
+    `Repository-permission retry: ${command}`
+  ];
+}
+
+function sandboxProcessRepairCommands(command: string): readonly string[] {
+  return [
+    'Codex on Windows: set ~/.codex/config.toml [windows] sandbox = "elevated", restart Codex, then rerun.',
+    `Repository-permission retry: ${command}`
+  ];
 }
 
 function collectFindingsFromValue(value: unknown, fingerprints: Set<string>): void {
