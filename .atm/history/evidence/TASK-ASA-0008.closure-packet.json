@@ -1,0 +1,124 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASA-0008",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9710cd9a9a66df397e42e5975c8bcb465912af6b",
+  "governedTreeSha": "e31480bbb701fce70c91d418a115f48ce802061c",
+  "targetCommitDelta": {
+    "currentCommitSha": "9710cd9a9a66df397e42e5975c8bcb465912af6b",
+    "parentCommitShas": [
+      "9710cd9a9a66df397e42e5975c8bcb465912af6b"
+    ],
+    "governedTreeSha": "e31480bbb701fce70c91d418a115f48ce802061c",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0008-packages-core-coverage-wave.task.md",
+      ".atm/history/evidence/TASK-ASA-0008.json",
+      ".atm/history/task-events/TASK-ASA-0008/2026-05-26T01-20-37-774Z-reserve-412762477f42.json",
+      ".atm/history/task-events/TASK-ASA-0008/2026-05-26T01-20-37-777Z-promote-e7ff0f584dc8.json",
+      ".atm/history/task-events/TASK-ASA-0008/2026-05-26T01-20-37-781Z-claim-c1df8053fab8.json",
+      ".atm/history/tasks/TASK-ASA-0008.json",
+      ".atm/runtime/batch-run.json",
+      ".atm/runtime/batch-runs/batch-7273973f1e36.json",
+      ".atm/runtime/task-queues/queue-8f7ec1e2dccd3f7a.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/reports/packages-core-wave1-coverage.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d66bd451370019e532db68db81e2f2542b493288dc5bde07e060b5b85c84a40b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:registry-core",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b17c75819a901872dbc21ac0da9088e2a4380ad2a1d66f11ad871f34fa54af6c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:generator-provenance",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:54aee2a7126f694f85d95b32bf893137ed204d61522ed7a25434e694d0d7fcba",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a355f2fac0bba83c30e74aec4c6f64ea279206f517a012151c83c599875de873",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2eb14b324a0ccc6925888ad990d221e361895240f526c337e6cdfe814f345c85",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:generator-provenance",
+    "validate:git-head-evidence",
+    "validate:registry-core"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-26T01:23:12.592Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0008-packages-core-coverage-wave.task.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASA-0008.json",
+  "closedAt": "2026-05-26T01:23:12.593Z",
+  "closedByActor": "opus47-asa-runner"
+}

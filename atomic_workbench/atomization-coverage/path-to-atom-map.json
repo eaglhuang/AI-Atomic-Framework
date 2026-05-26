@@ -5,9 +5,135 @@
   "timestamp": "2026-05-21T00:00:00Z",
   "mappings": [
     {
-      "path_pattern": "packages/core/src/**",
+      "path_pattern": "packages/core/src/registry/**",
       "atom_id": "atom-core-registry",
       "capability": "registry management, atom ownership tracking",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/core/src/spec/**",
+      "atom_id": "atom-core-spec-parser",
+      "capability": "atomic spec parsing, schema validation",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/manager/**",
+      "atom_id": "atom-core-atom-generator",
+      "capability": "atom/map generation, id allocation",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/hash-lock/**",
+      "atom_id": "atom-core-hash-lock",
+      "capability": "hash lock canonicalization and verification",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/governance/**",
+      "atom_id": "atom-core-governance",
+      "capability": "scope lock, governance contracts",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/guidance/**",
+      "atom_id": "atom-core-guidance",
+      "capability": "guidance routing, intent classifier, session store",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/agent-execute/**",
+      "atom_id": "atom-core-agent-execute",
+      "capability": "agent task execution and validation",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/agent-prompt/**",
+      "atom_id": "atom-core-agent-prompt",
+      "capability": "agent prompt construction",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/cache/**",
+      "atom_id": "atom-core-cache",
+      "capability": "guide cache and command run cache",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/daemon/**",
+      "atom_id": "atom-core-daemon",
+      "capability": "daemon config and file watcher",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/equivalence/**",
+      "atom_id": "atom-core-equivalence",
+      "capability": "map equivalence checks",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/evidence/**",
+      "atom_id": "atom-core-evidence",
+      "capability": "evidence diff and aggregation",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/maps/**",
+      "atom_id": "atom-core-maps",
+      "capability": "map composition utilities",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/police/**",
+      "atom_id": "atom-core-police",
+      "capability": "neutrality scanner and policy enforcement",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/polymorph/**",
+      "atom_id": "atom-core-polymorph",
+      "capability": "polymorph template engine",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/rescue/**",
+      "atom_id": "atom-core-rescue",
+      "capability": "rescue workflows for stuck atoms",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/source-inventory/**",
+      "atom_id": "atom-core-source-inventory",
+      "capability": "source code inventory scanner",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/test-runner/**",
+      "atom_id": "atom-core-test-runner",
+      "capability": "atom/map test runner",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/upgrade/**",
+      "atom_id": "atom-core-upgrade",
+      "capability": "upgrade proposal and behaviors",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/validation/**",
+      "atom_id": "atom-core-validation",
+      "capability": "validation helpers and contracts",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/index.ts",
+      "atom_id": "atom-core-registry",
+      "capability": "core package entrypoint, public exports",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/core/src/**",
+      "atom_id": "atom-core-registry",
+      "capability": "core package fallback ownership (anything not matched above)",
       "coverage_status": "partial"
     },
     {
@@ -78,11 +204,12 @@
     }
   ],
   "summary": {
-    "total_production_paths": 12,
-    "mapped_paths": 12,
+    "total_production_paths": 32,
+    "mapped_paths": 32,
     "coverage_percentage": 100,
-    "atoms_defined": 12,
+    "atoms_defined": 32,
     "atoms_with_evidence": 0,
-    "debt_items": 12
+    "debt_items": 30,
+    "core_wave1_completed": true
   }
 }
