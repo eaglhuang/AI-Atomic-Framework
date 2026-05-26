@@ -665,7 +665,7 @@ function buildPreCommitRepairHints(
       return 'Rerun the commit with repository-level Git permissions, or set ATM_TEMP_ROOT=C:\\tmp for validators that create temporary Git repositories.';
     }
     if (finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED') {
-      return 'Resolve the local Git/index permission problem outside ATM, then retry the commit.';
+      return 'Resolve the local Git/index permission problem outside ATM, then retry the commit. This is an environment diagnostic, not task evidence.';
     }
     if (finding.requiredCommand) {
       return `Run required command: ${finding.requiredCommand}`;
@@ -679,6 +679,7 @@ function inspectGitIndexAccess(cwd: string) {
   const status = runGit(cwd, ['status', '--short']);
   const stderr = status.stderr.trim();
   const environmentFailure = classifySandboxGitFailure(stderr);
+  const gitIndexPermissionFailure = classifyGitIndexPermissionFailure(stderr);
   const detail = status.exitCode === 0
     ? 'Git index is readable by ATM pre-commit diagnostics.'
     : classifyGitIndexFailure(stderr || `git status exited with ${status.exitCode}`);
@@ -689,7 +690,7 @@ function inspectGitIndexAccess(cwd: string) {
       ? 'ATM_GIT_INDEX_OK'
       : environmentFailure
         ? 'ATM_ENV_SANDBOX_GIT_EPERM'
-      : /index\.lock|permission denied|eperm|unable to create/i.test(stderr)
+      : gitIndexPermissionFailure
         ? 'ATM_GIT_INDEX_PERMISSION_DENIED'
         : 'ATM_GIT_INDEX_UNAVAILABLE',
     exitCode: status.exitCode,
@@ -706,17 +707,20 @@ function inspectGitIndexAccess(cwd: string) {
 }
 
 function classifyGitIndexFailure(stderr: string) {
-  if (/index\.lock|permission denied|eperm|unable to create/i.test(stderr)) {
+  if (classifyGitIndexPermissionFailure(stderr)) {
     return `Git could not access the index lock (${stderr}). This is an environment or sandbox permission problem, not a task evidence failure.`;
   }
   return `Git index diagnostic failed (${stderr}).`;
 }
 
 function classifySandboxGitFailure(stderr: string): boolean {
-  return /spawnSync\s+git\s+(?:EPERM|EACCES)/i.test(stderr)
-    || /(?:EPERM|EACCES).*git/i.test(stderr)
-    || /permission denied/i.test(stderr)
-    || /\.git[\\/]+index\.lock/i.test(stderr);
+  return /spawnSync\s+git(?:\.exe)?\s+(?:EPERM|EACCES)/i.test(stderr)
+    || /Error:\s+spawn\s+git(?:\.exe)?\s+(?:EPERM|EACCES)/i.test(stderr);
+}
+
+function classifyGitIndexPermissionFailure(stderr: string): boolean {
+  return /(?:^|[\\/])?\.?git[\\/]+index\.lock|index\.lock/i.test(stderr)
+    && /permission denied|eperm|eacces|unable to create/i.test(stderr);
 }
 
 function runPrePushHook(cwd: string, base: string | null, head: string | null) {

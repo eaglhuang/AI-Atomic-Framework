@@ -107,7 +107,7 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
   const payload = [input.stdout, input.stderr, input.spawnError ?? ''].filter(Boolean).join('\n');
   const lowerPayload = payload.toLowerCase();
 
-  if (/atm_env_sandbox_git_eperm/i.test(payload) || /spawnsync\s+git(?:\.exe)?\s+(?:eperm|eacces)/i.test(payload)) {
+  if (/atm_env_sandbox_git_eperm/i.test(payload) || isSandboxGitSpawnFailure(payload)) {
     findings.push({
       code: 'ATM_ENV_SANDBOX_GIT_EPERM',
       source: 'environment',
@@ -125,7 +125,7 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       classification: 'environment',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
     });
-  } else if (/\.git[\\/]+index\.lock/i.test(payload) && /file exists|already exists|unable to create/i.test(lowerPayload)) {
+  } else if (isGitIndexLockPresentFailure(payload, lowerPayload)) {
     findings.push({
       code: 'ATM_GIT_INDEX_LOCK_PRESENT',
       source: 'git-index',
@@ -134,11 +134,11 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       classification: 'environment',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
     });
-  } else if (/index\.lock|permission denied|eperm|eacces/i.test(payload)) {
+  } else if (isGitIndexPermissionFailure(payload, lowerPayload)) {
     findings.push({
       code: 'ATM_GIT_INDEX_PERMISSION_DENIED',
       source: 'git-index',
-      detail: 'Git index access failed while the validator was running.',
+      detail: 'Git index access failed while the validator was running. This is an environment diagnostic, not task evidence or a task audit failure.',
       requiredCommand: input.command,
       classification: 'environment',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
@@ -159,6 +159,22 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
   }
 
   return dedupeFindings(findings);
+}
+
+function isSandboxGitSpawnFailure(payload: string): boolean {
+  return /spawnsync\s+git(?:\.exe)?\s+(?:eperm|eacces)/i.test(payload)
+    || /error:\s+spawn\s+git(?:\.exe)?\s+(?:eperm|eacces)/i.test(payload);
+}
+
+function isGitIndexLockPresentFailure(payload: string, lowerPayload: string): boolean {
+  return /(?:^|[\\/])\.git[\\/]+index\.lock/i.test(payload)
+    && /file exists|already exists|unable to create/i.test(lowerPayload)
+    && !/permission denied|eperm|eacces/i.test(payload);
+}
+
+function isGitIndexPermissionFailure(payload: string, lowerPayload: string): boolean {
+  return /(?:^|[\\/])?\.?git[\\/]+index\.lock|index\.lock/i.test(payload)
+    && /permission denied|eperm|eacces|unable to create/i.test(lowerPayload);
 }
 
 export function summarizeBlockingFindings(envelopes: readonly ValidatorFailureEnvelope[]): readonly ValidatorBlockingFinding[] {
@@ -287,7 +303,7 @@ function buildRepairHints(findings: readonly ValidatorBlockingFinding[], command
       return 'Confirm no Git process is active, resolve the stale .git/index.lock condition, then rerun the validator.';
     }
     if (finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED') {
-      return 'Resolve the local Git/index permission problem outside ATM, then rerun the validator.';
+      return 'Resolve the local Git/index permission problem outside ATM, then rerun the validator. This is environment setup, not task evidence.';
     }
     if (finding.requiredCommand) {
       return `Run required command: ${finding.requiredCommand}`;
