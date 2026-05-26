@@ -1,0 +1,126 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASA-0016",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "3481a00032f9c209d755d29f8c547fa51edc2954",
+  "governedTreeSha": "0f90a63c4c087edf2cc5fb6fcb76ca95ca5c9791",
+  "targetCommitDelta": {
+    "currentCommitSha": "3481a00032f9c209d755d29f8c547fa51edc2954",
+    "parentCommitShas": [
+      "3481a00032f9c209d755d29f8c547fa51edc2954"
+    ],
+    "governedTreeSha": "0f90a63c4c087edf2cc5fb6fcb76ca95ca5c9791",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0016-self-atomization-graduation-gate.task.md",
+      ".agents/skills/atm-task-card-authoring/SKILL.md",
+      ".atm/history/evidence/TASK-ASA-0016.json",
+      ".atm/history/task-events/TASK-ASA-0016/2026-05-26T02-00-16-162Z-reserve-b12eccd85cc0.json",
+      ".atm/history/task-events/TASK-ASA-0016/2026-05-26T02-00-16-166Z-promote-d5ba43abe3b1.json",
+      ".atm/history/task-events/TASK-ASA-0016/2026-05-26T02-00-16-169Z-claim-3db98138e2c1.json",
+      ".atm/history/tasks/TASK-ASA-0016.json",
+      ".atm/runtime/batch-run.json",
+      ".atm/runtime/batch-runs/batch-7273973f1e36.json",
+      ".atm/runtime/task-queues/queue-8f7ec1e2dccd3f7a.json",
+      ".claude/skills/atm-task-card-authoring/SKILL.md",
+      ".cursor/rules/skills/atm-task-card-authoring/SKILL.md",
+      ".gemini/commands/atm-task-card-authoring.toml",
+      ".github/instructions/atm-task-card-authoring.instructions.md",
+      ".github/prompts/atm-task-card-authoring.prompt.md",
+      "atomic_workbench/atomization-coverage/dogfood-score.json",
+      "atomic_workbench/atomization-coverage/dogfood-score.md",
+      "atomic_workbench/graduation-gate/final-checklist.json",
+      "atomic_workbench/graduation-gate/graduation-decision-record.md",
+      "atomic_workbench/reports/atm-self-atomization-final-report.json",
+      "integrations/codex-skills/atm-task-card-authoring/SKILL.md",
+      "templates/skills/atm-task-card-authoring.skill.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run validate:atm-self-atomization",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:b844199a005d06a9b12895147d4d02228d621b612a5526fd162a157afdcf3bba",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d66bd451370019e532db68db81e2f2542b493288dc5bde07e060b5b85c84a40b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a355f2fac0bba83c30e74aec4c6f64ea279206f517a012151c83c599875de873",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2eb14b324a0ccc6925888ad990d221e361895240f526c337e6cdfe814f345c85",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:atm-self-atomization",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-26T02:37:49.683Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0016-self-atomization-graduation-gate.task.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASA-0016.json",
+  "closedAt": "2026-05-26T02:37:49.683Z",
+  "closedByActor": "opus47-asa-runner"
+}
