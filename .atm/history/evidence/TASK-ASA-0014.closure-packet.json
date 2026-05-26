@@ -1,0 +1,124 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASA-0014",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1e3a791090c2588375b33aedc46e868f03d2be1a",
+  "governedTreeSha": "c98687a5e7f6c9c123238ae384149ea9404e2625",
+  "targetCommitDelta": {
+    "currentCommitSha": "1e3a791090c2588375b33aedc46e868f03d2be1a",
+    "parentCommitShas": [
+      "1e3a791090c2588375b33aedc46e868f03d2be1a"
+    ],
+    "governedTreeSha": "c98687a5e7f6c9c123238ae384149ea9404e2625",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0014-release-build-distribution-atomization.task.md",
+      ".atm/history/evidence/TASK-ASA-0014.json",
+      ".atm/history/task-events/TASK-ASA-0014/2026-05-26T01-53-33-270Z-reserve-32ac56ab5a14.json",
+      ".atm/history/task-events/TASK-ASA-0014/2026-05-26T01-53-33-273Z-promote-1c137e4da52f.json",
+      ".atm/history/task-events/TASK-ASA-0014/2026-05-26T01-53-33-276Z-claim-d19fa0efd69a.json",
+      ".atm/history/tasks/TASK-ASA-0014.json",
+      ".atm/runtime/batch-run.json",
+      ".atm/runtime/batch-runs/batch-7273973f1e36.json",
+      ".atm/runtime/task-queues/queue-8f7ec1e2dccd3f7a.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/reports/release-build-atomization.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run validate:root-drop-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f1bf85385c6e3e75612a5be94a6dc703db490c81ee366711e2bbfe5021919057",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cb555409ffa835038641b148b1f7d328ee1da1a101947a9fb04d700ad046e769",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d66bd451370019e532db68db81e2f2542b493288dc5bde07e060b5b85c84a40b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a355f2fac0bba83c30e74aec4c6f64ea279206f517a012151c83c599875de873",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2eb14b324a0ccc6925888ad990d221e361895240f526c337e6cdfe814f345c85",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-26T01:55:58.603Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0014-release-build-distribution-atomization.task.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASA-0014.json",
+  "closedAt": "2026-05-26T01:55:58.603Z",
+  "closedByActor": "opus47-asa-runner"
+}
