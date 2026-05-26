@@ -1567,14 +1567,16 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     }
     : resolvePromptScopedTaskRoute(cwd, tasks, taskIntent);
   const selectedTaskPool = promptScope?.selectedTasks ?? [];
-  const selectedTask = selectedTaskPool.find((task) => task.dependencies.every((dependency) => {
-    const status = statusById.get(dependency);
-    return status === 'done' || status === 'verified';
-  })) ?? null;
-  const claimableTask = selectedTask && selectedTask.format === 'json' && (canTaskBePreparedForClaim(selectedTask.status) || isTaskAlreadyActivelyClaimed(selectedTask)) && selectedTask.dependencies.every((dependency) => {
-    const status = statusById.get(dependency);
-    return status === 'done' || status === 'verified';
-  }) ? selectedTask : null;
+  const explicitSingleTaskRoute = isExplicitSingleTaskRoute(promptScope, taskIntent);
+  const selectedTask = explicitSingleTaskRoute
+    ? selectedTaskPool[0] ?? null
+    : selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById)) ?? null;
+  const claimableTask = selectedTask
+    && selectedTask.format === 'json'
+    && (canTaskBePreparedForClaim(selectedTask.status) || isTaskAlreadyActivelyClaimed(selectedTask))
+    && (areTaskDependenciesSatisfied(selectedTask, statusById) || explicitSingleTaskRoute || isTaskAlreadyActivelyClaimed(selectedTask))
+    ? selectedTask
+    : null;
 
   return {
     taskStorePath: existsSync(taskStorePath) ? path.relative(cwd, taskStorePath).replace(/\\/g, '/') : '.atm/history/tasks',
@@ -1588,6 +1590,21 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
 
 function hasPromptScopedWorkItems(importedTaskQueue: ImportedTaskQueue) {
   return importedTaskQueue.tasks.some((task) => task.workItemId !== bootstrapTaskId);
+}
+
+function isExplicitSingleTaskRoute(promptScope: PromptScopedTaskRoute | null, taskIntent: TaskIntent | null) {
+  if (promptScope?.status !== 'ready' || promptScope.selectedTasks.length !== 1 || !taskIntent) return false;
+  const selectedTaskId = promptScope.selectedTasks[0]?.workItemId.toUpperCase();
+  if (!selectedTaskId) return false;
+  return taskIntent.explicitTaskIds.includes(selectedTaskId)
+    || taskIntent.mentionedTaskIds.includes(selectedTaskId);
+}
+
+function areTaskDependenciesSatisfied(task: ImportedTaskSummary, statusById: ReadonlyMap<string, string>) {
+  return task.dependencies.every((dependency) => {
+    const status = statusById.get(dependency);
+    return status === 'done' || status === 'verified';
+  });
 }
 
 function statusQueueWeight(status: string): number {

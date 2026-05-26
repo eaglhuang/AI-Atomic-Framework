@@ -81,15 +81,16 @@ export function createOrRefreshTaskQueue(input: {
   const queueId = buildQueueId(sourcePrompt, taskIds);
   const now = new Date().toISOString();
   const existing = readTaskQueue(input.cwd, queueId);
-  const currentIndex = existing?.status === 'active'
-    ? Math.min(existing.currentIndex, Math.max(0, taskIds.length - 1))
+  const activeExisting = existing?.status === 'active' ? existing : null;
+  const currentIndex = activeExisting
+    ? Math.min(activeExisting.currentIndex, Math.max(0, taskIds.length - 1))
     : 0;
   const record: TaskQueueRecord = {
     schemaId: 'atm.taskQueue.v1',
     specVersion: '0.1.0',
     queueId,
-    batchId: existing?.batchId ?? input.batchId ?? null,
-    scopeKey: existing?.scopeKey ?? input.scopeKey ?? deriveQueueScopeKey(input.tasks, taskIds),
+    batchId: activeExisting?.batchId ?? input.batchId ?? null,
+    scopeKey: activeExisting?.scopeKey ?? input.scopeKey ?? deriveQueueScopeKey(input.tasks, taskIds),
     sourcePrompt,
     sourcePromptHash: sha256(sourcePrompt),
     sourcePlanPath: resolveQueueSourcePlan(input.tasks),
@@ -98,8 +99,8 @@ export function createOrRefreshTaskQueue(input: {
     tasks: taskIds.map((taskId) => input.tasks.find((task) => task.workItemId === taskId)).filter((task): task is TaskDirectionTask => Boolean(task)),
     currentIndex,
     status: 'active',
-    createdByActor: existing?.createdByActor ?? input.actorId ?? null,
-    createdAt: existing?.createdAt ?? now,
+    createdByActor: activeExisting?.createdByActor ?? input.actorId ?? null,
+    createdAt: activeExisting?.createdAt ?? now,
     updatedAt: now
   };
   writeTaskQueue(input.cwd, record);

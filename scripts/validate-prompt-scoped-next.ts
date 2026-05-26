@@ -325,6 +325,10 @@ target_repo: AI-Atomic-Framework
     const selectedRangeStatus = await runBatch(['status', '--cwd', tempRoot, '--batch', rangeBatch.batchId, '--json']);
     assert((selectedRangeStatus.evidence.batchRun as any)?.currentTaskId === 'TASK-RANGE-0003', 'batch status --batch must select the requested batch');
     await runBatch(['abandon', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--batch', rangeBatch.batchId, '--json']);
+    const rangeAfterAbandon = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-RANGE-0002']);
+    assert(rangeAfterAbandon.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'abandoned batch queue must not be reused by exact task routing');
+    assert((rangeAfterAbandon.evidence.nextAction as any).recommendedChannel === 'normal', 'abandoned batch queue must not keep exact task prompts in batch mode');
+    assert((rangeAfterAbandon.evidence.nextAction as any).selectedTask?.workItemId === 'TASK-RANGE-0002', 'exact task after batch abandon must route to the requested task');
 
     writeLedgerTask(path.join(ledgerTaskDir, 'SANGUO-BOOTSTRAP-0001.json'), 'SANGUO-BOOTSTRAP-0001', 'Running Sanguo bootstrap task', 'docs/sanguo.md', {
       status: 'running',
@@ -340,6 +344,18 @@ target_repo: AI-Atomic-Framework
     const runningAllowedFiles = (runningClaim.evidence.taskDirectionLock as any)?.allowedFiles ?? [];
     assert(runningAllowedFiles.includes('docs/sanguo.md'), 'direction lock allowedFiles must preserve real task paths');
     assert(!runningAllowedFiles.some((entry: string) => entry.includes('human gate')), 'direction lock allowedFiles must not include natural-language acceptance text');
+
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DEP-0001.json'), 'TASK-DEP-0001', 'Unfinished dependency', 'docs/dep.md', {
+      status: 'planned'
+    });
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DEP-0040.json'), 'TASK-DEP-0040', 'Explicit running task with advisory dependency', 'docs/dep-0040.md', {
+      status: 'running',
+      claimActorId: 'prompt-scope-test',
+      dependencies: ['TASK-DEP-0001']
+    });
+    const explicitRunningWithDependencyClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-DEP-0040']);
+    assert(explicitRunningWithDependencyClaim.ok === true, 'explicit running task claim must recreate direction lock even when advisory dependencies are not complete');
+    assert((explicitRunningWithDependencyClaim.evidence.taskDirectionLock as any)?.taskId === 'TASK-DEP-0040', 'explicit running task claim with advisory dependency must lock the requested task');
 
     const crossClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-CROSS-0001']);
     assert(crossClaim.ok === true, 'cross-repo ledger task claim must succeed');
@@ -389,13 +405,13 @@ ${options.files ? `files: ${options.files}\n` : ''}
 `, 'utf8');
 }
 
-function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string; readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string; readonly closedAt?: string; readonly closedByActor?: string; readonly closurePacket?: string } = {}) {
+function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string; readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string; readonly closedAt?: string; readonly closedByActor?: string; readonly closurePacket?: string; readonly dependencies?: readonly string[] } = {}) {
   writeFileSync(filePath, `${JSON.stringify({
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
     title,
     status: options.status ?? 'ready',
-    dependencies: [],
+    dependencies: options.dependencies ?? [],
     acceptance: ['bootstrap output reviewed by human gate'],
     scope: options.scopePaths ?? [scopePath],
     ...(options.closurePacket ? { closurePacket: options.closurePacket } : {}),

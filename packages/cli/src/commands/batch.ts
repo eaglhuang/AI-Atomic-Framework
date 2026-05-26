@@ -4,7 +4,7 @@ import { CliError, makeResult, message, parseOptions } from './shared.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { runNext } from './next.ts';
 import { runTasks } from './tasks.ts';
-import { findActiveTaskQueue, partitionTaskScope } from './task-direction.ts';
+import { abandonTaskQueue, findActiveTaskQueue, partitionTaskScope } from './task-direction.ts';
 import {
   activeBatchSelectionStatus,
   inspectBatchRunConsistency,
@@ -297,6 +297,16 @@ export async function runBatch(argv: string[]) {
     if (!active) {
       throw new CliError('ATM_BATCH_RUN_MISSING', 'batch abandon requires an active batch run.', { exitCode: 2 });
     }
+    const activeQueue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId })
+      ?? findActiveTaskQueue(options.cwd, null, { batchId: active.batchId });
+    const abandonedQueue = activeQueue
+      ? abandonTaskQueue({
+        cwd: options.cwd,
+        queueId: activeQueue.queueId,
+        actorId: resolvedActor.actorId,
+        reason: `batch ${active.batchId} abandoned`
+      })
+      : null;
     const abandoned = releaseBatchRun(options.cwd, active, 'abandoned');
     return makeResult({
       ok: true,
@@ -309,7 +319,8 @@ export async function runBatch(argv: string[]) {
       evidence: {
         action: 'abandon',
         actorId: resolvedActor.actorId,
-        batchRun: abandoned
+        batchRun: abandoned,
+        taskQueue: abandonedQueue
       }
     });
   }
