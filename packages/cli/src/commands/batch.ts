@@ -20,6 +20,7 @@ export async function runBatch(argv: string[]) {
   const action = String(argv[0] ?? 'status').toLowerCase();
   if (action === 'status' || action === 'current') {
     const selector = buildBatchSelector(options);
+    const compact = options.compact === true || action === 'current';
     const selection = Object.keys(selector).length > 0
       ? activeBatchSelectionStatus(options.cwd, selector)
       : activeBatchSelectionStatus(options.cwd);
@@ -28,6 +29,24 @@ export async function runBatch(argv: string[]) {
     const taskQueue = batchRun ? findActiveTaskQueue(options.cwd, batchRun.sourcePrompt, { batchId: batchRun.batchId }) : null;
     const consistency = inspectBatchRunConsistency(batchRun, taskQueue);
     if (!selection.ok && allActiveBatches.length > 1 && Object.keys(selector).length === 0) {
+      if (compact) {
+        return makeResult({
+          ok: false,
+          command: 'batch',
+          cwd: options.cwd,
+          messages: [message('error', 'ATM_BATCH_SELECTION_REQUIRED', 'Multiple active batch runs exist; choose one with --batch <batchId> or --scope <scopeKey>.', {
+            activeBatchCount: allActiveBatches.length,
+            candidates: allActiveBatches.map(toCompactBatchCandidate)
+          })],
+          evidence: {
+            action,
+            compact: true,
+            activeBatchCount: allActiveBatches.length,
+            candidates: allActiveBatches.map(toCompactBatchCandidate),
+            requiredCommand: 'node atm.mjs batch current --batch <batchId> --compact --json'
+          }
+        });
+      }
       return makeResult({
         ok: false,
         command: 'batch',
@@ -42,7 +61,6 @@ export async function runBatch(argv: string[]) {
         }
       });
     }
-    const compact = options.compact === true || action === 'current';
     if (compact) {
       const compactStatus = buildCompactBatchStatus(options.cwd, batchRun, taskQueue, consistency, allActiveBatches.length);
       return makeResult({
@@ -364,6 +382,19 @@ function toBatchCandidate(batchRun: { readonly batchId: string; readonly scopeKe
   };
 }
 
+function toCompactBatchCandidate(batchRun: { readonly batchId: string; readonly scopeKey?: string | null; readonly currentTaskId?: string | null; readonly taskIds: readonly string[]; readonly currentIndex?: number | null; readonly createdByActor?: string | null }) {
+  return {
+    batchId: batchRun.batchId,
+    scopeKey: batchRun.scopeKey ?? null,
+    currentTaskId: batchRun.currentTaskId ?? null,
+    currentIndex: batchRun.currentIndex ?? null,
+    totalTasks: batchRun.taskIds.length,
+    createdByActor: batchRun.createdByActor ?? null,
+    statusCommand: `node atm.mjs batch current --batch ${batchRun.batchId} --compact --json`,
+    checkpointCommand: `node atm.mjs batch checkpoint --actor <id> --batch ${batchRun.batchId} --json`
+  };
+}
+
 function buildCompactBatchStatus(
   cwd: string,
   batchRun: any,
@@ -386,6 +417,7 @@ function buildCompactBatchStatus(
     queueId: taskQueue?.queueId ?? batchRun?.queueId ?? null,
     currentIndex: batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null,
     totalTasks: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0,
+    progress: buildCompactProgress(batchRun, taskQueue),
     currentTaskId,
     currentTask: queueHead
       ? {
@@ -402,6 +434,20 @@ function buildCompactBatchStatus(
     checkpointCommand: batchId
       ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json`
       : null,
+    commands: {
+      checkpoint: batchId
+        ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json`
+        : null,
+      checkpointHold: batchId
+        ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --hold --json`
+        : null,
+      repair: batchId
+        ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json`
+        : 'node atm.mjs batch repair --actor <id> --json',
+      status: batchId
+        ? `node atm.mjs batch current --batch ${batchId} --compact --json`
+        : 'node atm.mjs batch current --compact --json'
+    },
     commitInstruction: currentTaskId
       ? {
         timing: 'after-checkpoint',
@@ -419,7 +465,31 @@ function buildCompactBatchStatus(
     repairCommand: batchId
       ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json`
       : 'node atm.mjs batch repair --actor <id> --json',
+    omitted: {
+      taskIds: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0,
+      fullTaskQueue: true,
+      fullBatchRun: true,
+      useVerboseCommand: batchId
+        ? `node atm.mjs batch status --batch ${batchId} --json`
+        : 'node atm.mjs batch status --json'
+    },
     consistency
+  };
+}
+
+function buildCompactProgress(batchRun: any, taskQueue: any) {
+  const currentIndex = batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null;
+  const totalTasks = batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0;
+  const ordinal = typeof currentIndex === 'number' && totalTasks > 0
+    ? Math.min(totalTasks, currentIndex + 1)
+    : null;
+  return {
+    currentIndex,
+    ordinal,
+    totalTasks,
+    remainingTasks: typeof currentIndex === 'number'
+      ? Math.max(0, totalTasks - currentIndex)
+      : totalTasks
   };
 }
 

@@ -261,6 +261,13 @@ target_repo: AI-Atomic-Framework
     assert(lockDocument.taskDirectionLock?.batchId === ledgerBatchId, 'direction lock must carry the batchId');
     const batchStatus = await runBatch(['status', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--json']);
     assert((batchStatus.evidence.batchRun as any)?.currentTaskId === 'TASK-LEDGER-0001', 'batch status must point at the claimed queue head');
+    const compactBatchStatus = await runBatch(['current', '--cwd', tempRoot, '--batch', ledgerBatchId, '--compact', '--json']);
+    assert((compactBatchStatus.evidence.current as any)?.schemaId === 'atm.batchCurrent.v1', 'batch current --compact must return the compact current schema');
+    assert((compactBatchStatus.evidence.current as any)?.currentTaskId === 'TASK-LEDGER-0001', 'compact batch current must point at the queue head');
+    assert(Array.isArray((compactBatchStatus.evidence.current as any)?.allowedFiles), 'compact batch current must include allowedFiles');
+    assert((compactBatchStatus.evidence as any).batchRun === undefined, 'compact batch current must omit the full batchRun payload');
+    assert((compactBatchStatus.evidence as any).taskQueue === undefined, 'compact batch current must omit the full taskQueue payload');
+    assert(String((compactBatchStatus.evidence.current as any)?.commands?.checkpoint ?? '').includes(`--batch ${ledgerBatchId}`), 'compact batch current must include a batch-specific checkpoint command');
     const activeBatchExact = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-LEDGER-0002']);
     assert(activeBatchExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'exact task id inside an active batch must stay in queue routing');
     assert((activeBatchExact.evidence.nextAction as any).recommendedChannel === 'batch', 'exact task id inside an active batch must recommend batch channel');
@@ -322,6 +329,12 @@ target_repo: AI-Atomic-Framework
     const multiBatchStatus = await runBatch(['status', '--cwd', tempRoot, '--json']);
     assert(multiBatchStatus.ok === false, 'batch status without selector must not guess when multiple active batches exist');
     assert(multiBatchStatus.messages.some((entry) => entry.code === 'ATM_BATCH_SELECTION_REQUIRED'), 'multiple active batches must require --batch or --scope selection');
+    const compactMultiBatchStatus = await runBatch(['current', '--cwd', tempRoot, '--compact', '--json']);
+    assert(compactMultiBatchStatus.ok === false, 'compact batch current without selector must not guess when multiple active batches exist');
+    assert((compactMultiBatchStatus.evidence as any).compact === true, 'compact multi-batch selection response must stay compact');
+    assert(Array.isArray((compactMultiBatchStatus.evidence as any).candidates), 'compact multi-batch selection response must list compact candidates');
+    assert((compactMultiBatchStatus.evidence as any).activeBatches === undefined, 'compact multi-batch selection response must omit full activeBatches');
+    assert((compactMultiBatchStatus.evidence as any).candidates.every((entry: any) => Array.isArray(entry.taskIds) === false), 'compact candidates must not include full task id arrays');
     const selectedRangeStatus = await runBatch(['status', '--cwd', tempRoot, '--batch', rangeBatch.batchId, '--json']);
     assert((selectedRangeStatus.evidence.batchRun as any)?.currentTaskId === 'TASK-RANGE-0003', 'batch status --batch must select the requested batch');
     await runBatch(['abandon', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--batch', rangeBatch.batchId, '--json']);
