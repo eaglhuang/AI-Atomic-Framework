@@ -397,18 +397,28 @@ async function claimNextImportedTask(input: {
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
+  const activeQueueForIntent = findActiveTaskQueueForIntent(input.cwd, input.taskIntent, {
+    taskId: input.importedTaskQueue.claimableTask?.workItemId ?? null
+  });
+  const activeBatchForIntent = activeQueueForIntent?.batchId
+    ? readActiveBatchRun(input.cwd, { batchId: activeQueueForIntent.batchId })
+    : findActiveBatchRunForIntent(input.cwd, input.taskIntent, {
+      taskId: input.importedTaskQueue.claimableTask?.workItemId ?? null
+    });
   assertPromptBatchDoesNotConflict({
     cwd: input.cwd,
     promptScope: input.importedTaskQueue.promptScope,
     allTasks: input.importedTaskQueue.tasks,
-    sourcePrompt: input.taskIntent?.userPrompt ?? null
+    sourcePrompt: input.taskIntent?.userPrompt ?? null,
+    currentBatchId: activeBatchForIntent?.batchId ?? null
   });
   let claimableTask = input.importedTaskQueue.claimableTask;
   const activeBatchAtClaimStart = input.importedTaskQueue.promptScope?.status === 'queue'
-    ? readActiveBatchRun(input.cwd, { sourcePrompt: input.taskIntent?.userPrompt ?? null })
+    ? activeBatchForIntent
     : readActiveBatchRun(input.cwd, { taskId: claimableTask?.workItemId ?? null });
   if (activeBatchAtClaimStart?.status === 'active') {
-    const activeBatchQueue = findActiveTaskQueue(input.cwd, activeBatchAtClaimStart.sourcePrompt, { batchId: activeBatchAtClaimStart.batchId });
+    const activeBatchQueue = activeQueueForIntent
+      ?? findActiveTaskQueue(input.cwd, activeBatchAtClaimStart.sourcePrompt, { batchId: activeBatchAtClaimStart.batchId });
     const consistency = inspectBatchRunConsistency(activeBatchAtClaimStart, activeBatchQueue);
     if (!consistency.ok) {
       throw new CliError('ATM_BATCH_STATE_REPAIR_REQUIRED', 'next --claim cannot continue because batch-run and task-queue runtime disagree.', {
@@ -513,7 +523,7 @@ async function claimNextImportedTask(input: {
       '--json'
     ]);
   const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'
-    ? findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? claimableTask.workItemId) ?? createOrRefreshTaskQueue({
+    ? findActiveTaskQueueForIntent(input.cwd, input.taskIntent, { taskId: claimableTask.workItemId }) ?? createOrRefreshTaskQueue({
       cwd: input.cwd,
       sourcePrompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
       tasks: input.importedTaskQueue.promptScope.selectedTasks,
@@ -523,13 +533,15 @@ async function claimNextImportedTask(input: {
     : findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? claimableTask.workItemId);
   const inheritedBatchRun = readActiveBatchRun(input.cwd, { taskId: claimableTask.workItemId });
   const batchRun = input.importedTaskQueue.promptScope?.status === 'queue'
-    ? writeBatchRun({
-      cwd: input.cwd,
-      sourcePrompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
-      tasks: input.importedTaskQueue.promptScope.selectedTasks,
-      queue: activeQueue,
-      actorId: resolvedActor.actorId
-    })
+    ? activeBatchAtClaimStart?.status === 'active' && activeBatchAtClaimStart.taskIds.includes(claimableTask.workItemId)
+      ? activeBatchAtClaimStart
+      : writeBatchRun({
+        cwd: input.cwd,
+        sourcePrompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
+        tasks: input.importedTaskQueue.promptScope.selectedTasks,
+        queue: activeQueue,
+        actorId: resolvedActor.actorId
+      })
     : inheritedBatchRun?.status === 'active' && inheritedBatchRun.taskIds.includes(claimableTask.workItemId)
       ? inheritedBatchRun
       : null;
@@ -756,13 +768,22 @@ function buildPromptScopedNextResult(input: {
   }
   if (promptScope.status === 'queue') {
     const queueHeadTask = input.importedTaskQueue.selectedTask ?? selectedTasks[0] ?? null;
-    const queuePrompt = input.taskIntent?.userPrompt ?? queueHeadTask?.workItemId ?? 'prompt-scoped task queue';
-    const activeQueue = findActiveTaskQueue(input.cwd, queuePrompt);
-    const activeBatch = readActiveBatchRun(input.cwd, {
-      sourcePrompt: queuePrompt,
+    const requestedQueuePrompt = input.taskIntent?.userPrompt ?? queueHeadTask?.workItemId ?? 'prompt-scoped task queue';
+    const activeQueue = findActiveTaskQueueForIntent(input.cwd, input.taskIntent, {
+      sourcePromptFallback: requestedQueuePrompt,
       taskId: queueHeadTask?.workItemId ?? null
     });
-    const consistency = inspectBatchRunConsistency(activeBatch, activeBatch ? activeQueue : null);
+    const activeBatch = activeQueue?.batchId
+      ? readActiveBatchRun(input.cwd, { batchId: activeQueue.batchId })
+      : findActiveBatchRunForIntent(input.cwd, input.taskIntent, {
+        sourcePromptFallback: requestedQueuePrompt,
+        taskId: queueHeadTask?.workItemId ?? null
+      });
+    const queuePrompt = activeBatch?.sourcePrompt ?? activeQueue?.sourcePrompt ?? requestedQueuePrompt;
+    const activeBatchQueue = activeBatch && !activeQueue
+      ? findActiveTaskQueue(input.cwd, activeBatch.sourcePrompt, { batchId: activeBatch.batchId })
+      : activeQueue;
+    const consistency = inspectBatchRunConsistency(activeBatch, activeBatch ? activeBatchQueue : null);
     if (!consistency.ok) {
       const nextAction = {
         status: 'batch-state-repair-required',
@@ -794,14 +815,14 @@ function buildPromptScopedNextResult(input: {
           nextAction,
           recommendedChannel: 'batch',
           batchRun: activeBatch,
-          taskQueue: activeQueue,
+          taskQueue: activeBatchQueue,
           consistency,
           taskIntent: input.taskIntent,
           importedTaskQueue: input.importedTaskQueue
         }
       });
     }
-    const queueHeadTaskId = activeQueue?.taskIds[activeQueue.currentIndex] ?? queueHeadTask?.workItemId ?? null;
+    const queueHeadTaskId = activeBatchQueue?.taskIds[activeBatchQueue.currentIndex] ?? queueHeadTask?.workItemId ?? null;
     const queuePreview = {
       schemaId: 'atm.taskQueuePreview.v1',
       sourcePrompt: queuePrompt,
@@ -809,7 +830,7 @@ function buildPromptScopedNextResult(input: {
       scopeKey: activeBatch?.scopeKey ?? null,
       targetRepo: selectedTasks.find((task) => task.targetRepo)?.targetRepo ?? null,
       taskIds: selectedTasks.map((task) => task.workItemId),
-      currentIndex: activeQueue?.currentIndex ?? 0,
+      currentIndex: activeBatchQueue?.currentIndex ?? 0,
       queueHeadTaskId
     };
     const nextAction = {
@@ -820,6 +841,9 @@ function buildPromptScopedNextResult(input: {
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
       recommendedChannel: 'batch',
       riskLevel: 'high',
+      requiredCommand: queueHeadTask
+        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --json`
+        : 'node atm.mjs next --prompt "<current user prompt>" --json',
       batchInstruction: 'This is a batch run. Do not switch to per-task normal flow. After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks reserve/promote/claim/close.',
       playbook: buildChannelPlaybook({
         channel: 'batch',
@@ -832,8 +856,8 @@ function buildPromptScopedNextResult(input: {
         taskId: queueHeadTaskId ?? undefined
       }),
       selectedTasks,
-      taskQueue: activeQueue ?? queuePreview,
-      queueId: activeQueue?.queueId ?? null,
+      taskQueue: activeBatchQueue ?? queuePreview,
+      queueId: activeBatchQueue?.queueId ?? null,
       batchId: activeBatch?.batchId ?? null,
       scopeKey: activeBatch?.scopeKey ?? null,
       queueHeadTaskId,
@@ -852,7 +876,7 @@ function buildPromptScopedNextResult(input: {
         input.runtimeAdapterReadiness as any,
         message('info', 'ATM_NEXT_TASK_QUEUE_READY', 'ATM resolved the prompt to a scoped task queue.', {
           queueSize: selectedTasks.length,
-          queueId: activeQueue?.queueId ?? null,
+          queueId: activeBatchQueue?.queueId ?? null,
           queueHeadTaskId,
           firstTask: queueHeadTask ? toTaskCandidateView(queueHeadTask) : null,
           requiredCommand: nextAction.command,
@@ -863,7 +887,7 @@ function buildPromptScopedNextResult(input: {
       evidence: {
         nextAction,
         recommendedChannel: 'batch',
-        taskQueue: activeQueue ?? queuePreview,
+        taskQueue: activeBatchQueue ?? queuePreview,
         agent_pack_hint: buildAgentPackHint(nextAction.status, nextAction.command, nextAction.reason),
         taskIntent: input.taskIntent,
         importedTaskQueue: input.importedTaskQueue,
@@ -1513,11 +1537,11 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
       return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
     });
   const statusById = new Map(allTasks.map((task) => [task.workItemId, task.status]));
-  const activeQueue = taskIntent?.userPrompt ? findActiveTaskQueue(cwd, taskIntent.userPrompt) : null;
+  const activeQueue = findActiveTaskQueueForIntent(cwd, taskIntent);
   const activeQueueTasks = activeQueue
     ? activeQueue.taskIds
       .slice(activeQueue.currentIndex)
-      .map((taskId) => tasks.find((task) => task.workItemId === taskId))
+      .map((taskId) => allTasks.find((task) => task.workItemId === taskId))
       .filter((task): task is ImportedTaskSummary => Boolean(task))
     : [];
   const promptScope = activeQueue && activeQueueTasks.length > 0
@@ -1682,6 +1706,73 @@ function readTaskIntentFile(cwd: string, intentPath: string): TaskIntent {
   return normalizeTaskIntent(parsed, 'atm-skill');
 }
 
+function findActiveTaskQueueForIntent(cwd: string, intent: TaskIntent | null, options: {
+  readonly sourcePromptFallback?: string | null;
+  readonly taskId?: string | null;
+} = {}): TaskQueueRecord | null {
+  if (intent?.userPrompt) {
+    const exact = findActiveTaskQueue(cwd, intent.userPrompt);
+    if (exact) return exact;
+  }
+  if (options.sourcePromptFallback) {
+    const fallback = findActiveTaskQueue(cwd, options.sourcePromptFallback);
+    if (fallback) return fallback;
+  }
+  for (const scopeKey of deriveBatchScopeKeysFromIntent(intent)) {
+    const scoped = findActiveTaskQueue(cwd, null, { scopeKey });
+    if (scoped) return scoped;
+  }
+  if (options.taskId) {
+    const byTask = findActiveTaskQueue(cwd, null, { taskId: options.taskId });
+    if (byTask) return byTask;
+  }
+  return null;
+}
+
+function findActiveBatchRunForIntent(cwd: string, intent: TaskIntent | null, options: {
+  readonly sourcePromptFallback?: string | null;
+  readonly taskId?: string | null;
+} = {}) {
+  if (intent?.userPrompt) {
+    const exact = readActiveBatchRun(cwd, { sourcePrompt: intent.userPrompt });
+    if (exact) return exact;
+  }
+  if (options.sourcePromptFallback) {
+    const fallback = readActiveBatchRun(cwd, { sourcePrompt: options.sourcePromptFallback });
+    if (fallback) return fallback;
+  }
+  for (const scopeKey of deriveBatchScopeKeysFromIntent(intent)) {
+    const scoped = readActiveBatchRun(cwd, { scopeKey });
+    if (scoped) return scoped;
+  }
+  if (options.taskId) {
+    const byTask = readActiveBatchRun(cwd, { taskId: options.taskId });
+    if (byTask) return byTask;
+  }
+  return null;
+}
+
+function deriveBatchScopeKeysFromIntent(intent: TaskIntent | null): readonly string[] {
+  if (!intent) return [];
+  const roots = [
+    ...intent.taskRootHints,
+    ...intent.mentionedTaskIds
+      .map((taskId) => taskId.match(/^(.+?)-\d{2,}(?:-.+)?$/)?.[1] ?? null)
+      .filter((entry): entry is string => Boolean(entry))
+  ];
+  return uniqueSorted(roots.flatMap((root) => normalizeRootHintScopeKeys(root)));
+}
+
+function normalizeRootHintScopeKeys(root: string): readonly string[] {
+  const normalized = root.trim().toUpperCase().replace(/_/g, '-');
+  if (!normalized) return [];
+  if (normalized.startsWith('TASK-')) return [normalized];
+  if (/^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*$/.test(normalized)) {
+    return [`TASK-${normalized}`];
+  }
+  return [normalized];
+}
+
 function createDeterministicTaskIntent(prompt: string, explicitTaskIds: readonly string[] = []): TaskIntent {
   const mentionedTaskIds = uniqueSorted((prompt.match(/\b(?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi) ?? []).map((entry) => entry.toUpperCase()));
   const mentionedPlanPaths = uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
@@ -1690,6 +1781,7 @@ function createDeterministicTaskIntent(prompt: string, explicitTaskIds: readonly
   ]);
   const taskRootHints = uniqueSorted([
     ...(/self[-_ ]?atomization|\u81ea\u6211\u539f\u5b50\u5316|100%/i.test(prompt) ? ['atm-self-atomization'] : []),
+    ...extractTaskFamilyRootHintsFromPrompt(prompt),
     ...extractTaskRootHintsFromPrompt(prompt, mentionedTaskIds),
     ...extractPromptPathHints(prompt).filter((entry) => !/\.md$/i.test(entry))
   ]);
@@ -1846,6 +1938,7 @@ function assertPromptBatchDoesNotConflict(input: {
   readonly promptScope: PromptScopedTaskRoute | null;
   readonly allTasks: readonly ImportedTaskSummary[];
   readonly sourcePrompt: string | null;
+  readonly currentBatchId?: string | null;
 }) {
   if (input.promptScope?.status !== 'queue') return;
   const requestedTaskIds = input.promptScope.selectedTasks.map((task) => task.workItemId);
@@ -1853,6 +1946,7 @@ function assertPromptBatchDoesNotConflict(input: {
   const sourcePromptHash = input.sourcePrompt?.trim() ? sha256(input.sourcePrompt.trim()) : null;
   const activeBatches = listActiveBatchRuns(input.cwd);
   for (const batchRun of activeBatches) {
+    if (input.currentBatchId && batchRun.batchId === input.currentBatchId) continue;
     if (sourcePromptHash && batchRun.sourcePromptHash === sourcePromptHash) continue;
     const overlappingTaskIds = requestedTaskIds.filter((taskId) => batchRun.taskIds.includes(taskId));
     if (overlappingTaskIds.length > 0) {
@@ -2029,8 +2123,23 @@ function extractTaskRootHintsFromPrompt(prompt: string, mentionedTaskIds: readon
   return uniqueSorted([...directRoots, ...derivedRoots]);
 }
 
+function extractTaskFamilyRootHintsFromPrompt(prompt: string): readonly string[] {
+  const ignoredCodes = new Set(['AI', 'API', 'ATM', 'CLI', 'CPU', 'CSS', 'GIT', 'HTML', 'HTTP', 'JSON', 'MD', 'NPM', 'SDK', 'TASK', 'TS', 'UI']);
+  const output = new Set<string>();
+  for (const match of prompt.matchAll(/\b([A-Z][A-Z0-9]{1,9})\b/g)) {
+    const code = match[1]?.toUpperCase();
+    if (!code || ignoredCodes.has(code)) continue;
+    const index = match.index ?? 0;
+    const context = prompt.slice(Math.max(0, index - 30), Math.min(prompt.length, index + code.length + 40));
+    if (/(?:\u7cfb\u5217|\u4efb\u52d9\u5361|\u4efb\u52d9|\u5f8c\u9762|\u5f8c\u7e8c|\u5269\u9918|\u63a5\u4e0b\u4f86|\u9010\u4e00|task\s*cards?|tasks?|task\s*family|family|remaining|next|later)/i.test(context)) {
+      output.add(`TASK-${code}`);
+    }
+  }
+  return [...output].sort((left, right) => left.localeCompare(right));
+}
+
 function isQueueRequestedPrompt(prompt: string): boolean {
-  return /\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u6240\u6709(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all(?:[\s\S]{0,80})task\s+cards|all(?:[\s\S]{0,80})tasks|entire\s+plan|whole\s+plan|through\s+all/i.test(prompt);
+  return /\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u6240\u6709(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9|\u5f8c\u9762(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u5f8c\u7e8c(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u5269\u9918(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u63a5\u4e0b\u4f86(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u9010\u4e00(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u4e00\u5f35\u5f35(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all(?:[\s\S]{0,80})task\s+cards|all(?:[\s\S]{0,80})tasks|remaining(?:[\s\S]{0,80})(?:task\s+cards|tasks)|later(?:[\s\S]{0,80})(?:task\s+cards|tasks)|one\s+by\s+one(?:[\s\S]{0,80})(?:task\s+cards|tasks)|entire\s+plan|whole\s+plan|through\s+all/i.test(prompt);
 }
 
 function isTaskExplicitlyMentioned(task: ImportedTaskSummary, intent: TaskIntent | null): boolean {

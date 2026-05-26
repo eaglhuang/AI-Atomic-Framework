@@ -1,0 +1,170 @@
+{
+  "taskId": "TASK-AAO-0003",
+  "updatedAt": "2026-05-26T07:00:56.218Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed for TASK-AAO-0003 next decisionTrail routing changes",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-runner",
+      "createdAt": "2026-05-26T06:58:47.238Z",
+      "details": {
+        "actorId": "codex-aao-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-05-26T06:58:47.240Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:de24d84e9368303add4f133e87d5bcaf0009ac99e6e24b4faaa33f2764a8fb28",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli passed for TASK-AAO-0003 after rerun outside sandbox git EPERM",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-runner",
+      "createdAt": "2026-05-26T06:58:56.983Z",
+      "details": {
+        "actorId": "codex-aao-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e6c195eea0ce698c56decf4733547527ecec426bbf43d5b7732f48bc0d0612fe",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:cf11f83f53f707c1b4fc53bf34204a51d4158625621e63834a73e6e799b18219",
+            "cached": false,
+            "generatedAt": "2026-05-26T06:58:56.985Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ec790f7c5fe3152a40e62d84fc6f1d80da54df5b852ab802766e18e021ea67fd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "prompt-scoped next validator passed with AAO family and active batch scope regression coverage",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-runner",
+      "createdAt": "2026-05-26T06:59:06.676Z",
+      "details": {
+        "actorId": "codex-aao-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-prompt-scoped-next"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-prompt-scoped-next.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:d0dd94d756e428d6c932885ea30a7237c9f1fbe607094d171ef5f95d41c590d3",
+            "cached": false,
+            "generatedAt": "2026-05-26T06:59:06.678Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:06704413d325895b656182912e770a3a290463a6af11d79356870030dad70890",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git head evidence validator passed for TASK-AAO-0003 closure packet",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-runner",
+      "createdAt": "2026-05-26T07:00:56.218Z",
+      "details": {
+        "actorId": "codex-aao-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-05-26T07:00:56.220Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f694f59193a08585c8e79a429f5dad8beaae4eaeaec6151076150d07710bc643",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

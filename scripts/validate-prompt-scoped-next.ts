@@ -138,6 +138,13 @@ async function main() {
     assert((externalQueueHead?.targetAllowedFiles ?? []).includes('packages/cli/src/commands/next.ts'), 'external planning route must expose targetWork.allowedFiles');
     assert(!(externalQueueHead?.targetAllowedFiles ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/')), 'targetWork.allowedFiles must exclude planning mirror paths');
 
+    const familyQueue = await runNext(['--cwd', tempRoot, '--prompt', 'Please continue remaining AAO task cards one by one']);
+    assert(familyQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'task family prompt must route to the matching task root queue');
+    assert((familyQueue.evidence.nextAction as any).queueHeadTaskId === 'TASK-AAO-0001', 'task family queue must start at the first open matching family task');
+    assert(!((familyQueue.evidence.nextAction as any).selectedTasks ?? []).some((task: any) => task.workItemId.includes('APO')), 'task family prompt must not fall back to unrelated root task cards');
+    const familyTrail = assertDecisionTrail(familyQueue.evidence.nextAction as any, 'task family queue');
+    assert(familyTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-AAO-0001')), 'task family decisionTrail must record the matching queue head');
+
     const surfaceOnlyRejected = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 不存在的治理計畫書，請完成所有任務卡']);
     assert(surfaceOnlyRejected.ok === false, 'named plan prompt with only task-card-surface candidates must fail closed');
     assert(surfaceOnlyRejected.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'named plan prompt with only task-card-surface candidates must report task scope not found');
@@ -259,6 +266,10 @@ target_repo: AI-Atomic-Framework
     assert((activeBatchExact.evidence.nextAction as any).recommendedChannel === 'batch', 'exact task id inside an active batch must recommend batch channel');
     assert((activeBatchExact.evidence.nextAction as any).queueHeadTaskId === 'TASK-LEDGER-0001', 'active batch exact route must still point at the current queue head');
     assert(String((activeBatchExact.evidence.nextAction as any).requiredCommand ?? '').includes(ledgerPrompt), 'active batch exact route must redirect claim back to the original batch prompt');
+    const activeBatchFamily = await runNext(['--cwd', tempRoot, '--prompt', 'Please continue remaining LEDGER task cards one by one']);
+    assert(activeBatchFamily.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'alternate same-family prompt inside an active batch must stay in queue routing');
+    assert((activeBatchFamily.evidence.nextAction as any).queueHeadTaskId === 'TASK-LEDGER-0001', 'alternate same-family prompt must keep the active batch queue head');
+    assert(String((activeBatchFamily.evidence.nextAction as any).requiredCommand ?? '').includes(ledgerPrompt), 'alternate same-family prompt must redirect claim back to the original batch prompt');
     const activeBatchClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-LEDGER-0002']);
     assert((activeBatchClaim.evidence.nextAction as any).selectedTask.workItemId === 'TASK-LEDGER-0001', 'active batch next --claim must claim the current queue head, not the later exact task prompt');
     assert((activeBatchClaim.evidence.nextAction as any).recommendedChannel === 'batch', 'active batch next --claim must stay in batch channel');
