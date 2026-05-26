@@ -18,9 +18,9 @@ ASA continues to own the framework self-atomization mainline. AAO only picks up 
 |---|---|---|---|---|---|
 | TASK-AAO-0000 | AAO file mirror and ASA bridge index | M0 | done | none | mirror plan, README, tasks README |
 | TASK-AAO-0001 | Report overlap matrix and route decisions | M1 | open | TASK-AAO-0000 | overlap matrix, routing table, bridge notes |
-| TASK-AAO-0002 | CLI command spec / runner SSOT drift guard | M1 | open | TASK-AAO-0001, TASK-ASA-0009 | runner/spec/help drift guard, validate-cli assertions |
-| TASK-AAO-0003 | next decisionTrail JSON contract | M1 | open | TASK-AAO-0001, TASK-ASA-0009 | stable decisionTrail shape, guidance assertions |
-| TASK-AAO-0004 | validator failure envelope standardization | M2 | open | TASK-AAO-0001, TASK-ASA-0010 | stable failure envelope, validator harness updates |
+| TASK-AAO-0002 | CLI command spec / runner SSOT drift guard | M1 | done | TASK-AAO-0001, TASK-ASA-0009 | runner/spec/help drift guard, validate-cli assertions |
+| TASK-AAO-0003 | next decisionTrail JSON contract | M1 | done | TASK-AAO-0001, TASK-ASA-0009 | stable decisionTrail shape, guidance assertions |
+| TASK-AAO-0004 | validator failure envelope standardization | M2 | done | TASK-AAO-0001, TASK-ASA-0010 | stable failure envelope, validator harness updates |
 | TASK-AAO-0005 | CLI context slimming wave 1 | M2 | open | TASK-AAO-0002, TASK-AAO-0003, TASK-ASA-0009 | split next/tasks helpers, keep behaviour stable |
 | TASK-AAO-0006 | docs / schema / command drift guard | M3 | open | TASK-AAO-0002, TASK-AAO-0004, TASK-ASA-0010, TASK-ASA-0014 | docs drift validator, source-of-truth checks |
 | TASK-AAO-0007 | onefile size / startup budget | M3 | open | TASK-AAO-0001, TASK-ASA-0014, TASK-ATD-0025, TASK-ATD-0032 | size/startup budget, release validation output |
@@ -54,4 +54,3 @@ ASA continues to own the framework self-atomization mainline. AAO only picks up 
 - Do not reopen `TASK-ATD-0023` or `TASK-ATD-0032`.
 - Do not introduce a new CLI framework.
 - Do not treat this mirror as the authoritative AAO implementation source; it is a repo-local import bridge.
-
