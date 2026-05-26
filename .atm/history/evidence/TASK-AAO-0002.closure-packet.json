@@ -22,8 +22,10 @@
     "parentCommitShas": [],
     "governedTreeSha": null,
     "changedFiles": [
-      "docs/ai_atomic_framework/atm-agent-first-operability/AAO-Plan.md",
-      "runner/spec/help drift guard, validate-cli assertions"
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs.ts",
+      "scripts/validate-cli.ts"
     ]
   },
   "closedByCommand": "atm tasks close",
@@ -51,6 +53,22 @@
       "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
       "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e6c195eea0ce698c56decf4733547527ecec426bbf43d5b7732f48bc0d0612fe",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
     }
   ],
   "validationPasses": [
@@ -70,16 +88,21 @@
   ],
   "requiredGatesSnapshot": {
     "schemaId": "atm.requiredGatesSnapshot.v1",
-    "generatedAt": "2026-05-26T04:44:57.014Z",
+    "generatedAt": "2026-05-26T06:40:12.149Z",
     "source": "frameworkStatus.requiredGates",
     "ruleVersion": "0.1.0",
-    "frameworkMode": "suspected",
+    "frameworkMode": "required",
     "repoRole": "framework",
     "changedFiles": [
-      "docs/ai_atomic_framework/atm-agent-first-operability/AAO-Plan.md",
-      "runner/spec/help drift guard, validate-cli assertions"
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs.ts",
+      "scripts/validate-cli.ts"
     ],
-    "criticalChangedFiles": [],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs.ts",
+      "scripts/validate-cli.ts"
+    ],
     "requiredGates": [
       "doctor",
       "framework-development",
@@ -91,6 +114,6 @@
     ]
   },
   "evidencePath": ".atm/history/evidence/TASK-AAO-0002.json",
-  "closedAt": "2026-05-26T04:44:57.014Z",
+  "closedAt": "2026-05-26T06:40:12.149Z",
   "closedByActor": "codex-aao-runner"
 }
