@@ -133,6 +133,31 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(staticEvidenceBlock.ok === false, 'adopter queue must block direct static evidence artifact edits');
   assert(staticEvidenceBlock.messages.some((entry) => entry.code === 'ATM_STATIC_EVIDENCE_IMPERSONATION_BLOCKED'), 'adopter static evidence edit must report impersonation block');
 
+  const runtimeLockEditBlock = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', repo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', prompt,
+    '--files', '.atm/runtime/locks/TASK-ADOPT-0001.lock.json'
+  ]);
+  assert(runtimeLockEditBlock.ok === false, 'adopter queue must block manual runtime lock edits');
+  assert(runtimeLockEditBlock.messages.some((entry) => entry.code === 'ATM_RUNTIME_LOCK_MANUAL_EDIT_BLOCKED'), 'manual runtime lock edits must report the dedicated blocker');
+
+  const scopeExpansionRepo = makeAdopterRepo(tempRoot, 'adopter-scope-expansion');
+  writeLedgerTask(scopeExpansionRepo, 'TASK-EXPAND-0005', 'Generated fixture exclusion boundaries', 'src/one.ts');
+  writeEvidence(scopeExpansionRepo, 'TASK-EXPAND-0005');
+  initializeGit(scopeExpansionRepo);
+  mkdirSync(path.join(scopeExpansionRepo, 'atomic_workbench', 'atomization-coverage'), { recursive: true });
+  writeFileSync(path.join(scopeExpansionRepo, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json'), '{}\n', 'utf8');
+  let scopeExpansionBlocked = false;
+  try {
+    await runNext(['--cwd', scopeExpansionRepo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-EXPAND-0005']);
+  } catch (error) {
+    scopeExpansionBlocked = (error as { code?: string }).code === 'ATM_TASK_SCOPE_EXPANSION_REQUIRED';
+  }
+  assert(scopeExpansionBlocked, 'next --claim must require task scope expansion for deliverable-like pending files outside allowedFiles');
+
   try {
     await runTasks(['close', '--cwd', repo, '--task', 'TASK-ADOPT-0002', '--actor', 'adopter-agent', '--status', 'done']);
     fail('adopter queue must not allow closing the second task before queue head');

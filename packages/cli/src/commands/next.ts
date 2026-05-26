@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/src/guidance/index.ts';
@@ -473,6 +474,10 @@ async function claimNextImportedTask(input: {
       }
     });
   }
+  assertNoPendingTaskArtifactScopeExpansion({
+    cwd: input.cwd,
+    task: claimableTask
+  });
   const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
   const claimPreparation = alreadyClaimedByActor
     ? {
@@ -2183,6 +2188,68 @@ function normalizeOptionalTaskPath(value: string | null | undefined) {
     return null;
   }
   return candidate.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function assertNoPendingTaskArtifactScopeExpansion(input: {
+  readonly cwd: string;
+  readonly task: ImportedTaskSummary;
+}) {
+  const allowedFiles = buildAllowedFilesForTask(input.task);
+  const pendingFiles = listPendingGitFiles(input.cwd)
+    .filter((entry) => !entry.startsWith('.atm/'))
+    .filter((entry) => !isPathAllowedByScope(entry, allowedFiles));
+  const expansionCandidates = pendingFiles.filter((entry) => looksLikeTaskArtifact(entry, input.task));
+  if (expansionCandidates.length === 0) return;
+  throw new CliError(
+    'ATM_TASK_SCOPE_EXPANSION_REQUIRED',
+    `Task ${input.task.workItemId} has pending deliverable-like files outside targetWork.allowedFiles; update the task scope/deliverables instead of editing runtime locks.`,
+    {
+      exitCode: 1,
+      details: {
+        taskId: input.task.workItemId,
+        outsideAllowedFiles: expansionCandidates,
+        allowedFiles,
+        requiredAction: 'Add these real deliverables to the task card frontmatter scope/deliverables or reset the unrelated files, then rerun node atm.mjs next --claim.',
+        notAllowed: 'Do not edit .atm/runtime/locks/** or task direction lock JSON to bypass this scope mismatch.'
+      }
+    }
+  );
+}
+
+function listPendingGitFiles(cwd: string): readonly string[] {
+  const files: string[] = [];
+  for (const args of [
+    ['diff', '--name-only', '--cached'],
+    ['diff', '--name-only'],
+    ['ls-files', '--others', '--exclude-standard']
+  ]) {
+    const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+    if (result.status !== 0) continue;
+    files.push(...result.stdout
+      .split(/\r?\n/)
+      .map((entry: string) => normalizeOptionalTaskPath(entry))
+      .filter((entry: string | null): entry is string => Boolean(entry)));
+  }
+  return uniqueSorted(files);
+}
+
+function looksLikeTaskArtifact(filePath: string, task: ImportedTaskSummary): boolean {
+  const normalized = normalizeOptionalTaskPath(filePath)?.toLowerCase() ?? '';
+  if (!normalized) return false;
+  if (normalized.startsWith('.git/') || normalized.startsWith('node_modules/')) return false;
+  const taskText = [
+    task.workItemId,
+    task.title,
+    task.sourcePlanPath ?? '',
+    ...task.scopePaths,
+    ...task.targetAllowedFiles
+  ].join(' ').toLowerCase();
+  const fileTokens = tokenizeForMatch(normalized);
+  const taskTokens = new Set(tokenizeForMatch(taskText));
+  if (fileTokens.some((token) => taskTokens.has(token))) return true;
+  if (normalized.startsWith('atomic_workbench/') && /\batomization\b|generated|fixture|exclusion|dogfood|coverage/.test(taskText)) return true;
+  if (normalized.startsWith('docs/ai_atomic_framework/') && task.sourcePlanPath?.includes('docs/ai_atomic_framework/')) return true;
+  return false;
 }
 
 function listTaskCardFiles(cwd: string): readonly string[] {

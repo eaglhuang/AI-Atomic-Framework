@@ -264,6 +264,9 @@ function runPreToolHook(options: HookInvocationOptions) {
   const protectedStateFiles = mutatingIntent && !gitCommitIntent
     ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isProtectedAtmManagedStatePath)
     : [];
+  const runtimeLockFiles = mutatingIntent && !gitCommitIntent
+    ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isRuntimeLockStatePath)
+    : [];
   const planningClosureFiles = status.mode === 'cross-repo-target-required' && isMutatingToolIntent(options.toolName, toolCommand)
     ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isPlanningClosureSurface)
     : [];
@@ -416,6 +419,29 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolName: options.toolName,
         toolFiles,
         blockedFiles: planningClosureFiles,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  if (runtimeLockFiles.length > 0 && !isAuthorizedRuntimeLockMutationCommand(toolCommand)) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_RUNTIME_LOCK_MANUAL_EDIT_BLOCKED', 'Manual edits to .atm/runtime/locks/** are blocked. Runtime locks must be changed only by ATM CLI lifecycle commands.', {
+        editor: options.editor,
+        blockedFiles: runtimeLockFiles,
+        requiredCommand: 'node atm.mjs next --claim --actor <id> --prompt "<current user prompt>" --json',
+        nextStep: 'If a lock is stale, use node atm.mjs tasks lock cleanup ... or node atm.mjs lock release ... instead of editing lock JSON.'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        blockedFiles: runtimeLockFiles,
+        toolCommand,
         frameworkStatus: status
       }
     });
@@ -910,7 +936,7 @@ function extractCommandFromPayload(value: unknown): string | null {
 }
 
 function extractFilesFromCommand(command: string): readonly string[] {
-  const matches = command.match(/[A-Za-z0-9_.@/-]+\.(?:ts|tsx|js|mjs|json|md|yml|yaml|sh|ps1)/g) ?? [];
+  const matches = command.match(/[A-Za-z0-9_.@:/\\-]+\.(?:ts|tsx|js|mjs|json|md|yml|yaml|sh|ps1)/g) ?? [];
   return uniqueSorted(matches.map(normalizeRelativePath));
 }
 
@@ -1041,6 +1067,10 @@ function isProtectedAtmManagedStatePath(value: string): boolean {
     || normalized === '.atm/runtime/guidance/active-session.json';
 }
 
+function isRuntimeLockStatePath(value: string): boolean {
+  return normalizeRelativePath(value).toLowerCase().startsWith('.atm/runtime/locks/');
+}
+
 function isStaticEvidenceArtifactPath(value: string): boolean {
   const normalized = normalizeRelativePath(value).toLowerCase();
   if (normalized.startsWith('atomic_workbench/evidence/') && normalized.endsWith('.json')) {
@@ -1053,6 +1083,12 @@ function isStaticEvidenceArtifactPath(value: string): boolean {
 }
 
 function isAuthorizedAtmStateMutationCommand(command: string | null): boolean {
+  const normalized = String(command ?? '').trim().toLowerCase();
+  if (!normalized) return false;
+  return /\batm\.mjs\b/.test(normalized);
+}
+
+function isAuthorizedRuntimeLockMutationCommand(command: string | null): boolean {
   const normalized = String(command ?? '').trim().toLowerCase();
   if (!normalized) return false;
   return /\batm\.mjs\b/.test(normalized);

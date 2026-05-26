@@ -8,6 +8,7 @@ import {
 
 import actorSpec from './command-specs/actor.spec.ts';
 import atomRefSpec from './command-specs/atom-ref.spec.ts';
+import atomizeSpec from './command-specs/atomize.spec.ts';
 import baselineSpec from './command-specs/baseline.spec.ts';
 import batchSpec from './command-specs/batch.spec.ts';
 import bootstrapSpec from './command-specs/bootstrap.spec.ts';
@@ -59,6 +60,7 @@ import reviewAdvisorySpec from './command-specs/review-advisory.spec.ts';
 export const commandSpecs = Object.freeze({
   actor: actorSpec,
   'atom-ref': atomRefSpec,
+  atomize: atomizeSpec,
   baseline: baselineSpec,
   batch: batchSpec,
   bootstrap: bootstrapSpec,
@@ -117,3 +119,4 @@ export function getCommandSpec(commandName: string) {
 export function listCommandSpecs() {
   return Object.values(commandSpecs);
 }
+

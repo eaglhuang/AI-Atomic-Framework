@@ -165,7 +165,12 @@ const defaultIgnoredDirs = new Set([
   'dist',
   'build',
   'release',
-  '.atm-temp'
+  '.atm-temp',
+  '.cache',
+  'local',
+  'scratch',
+  'tmp',
+  'temp'
 ]);
 
 const markdownCompletionPatterns = [
@@ -1048,10 +1053,21 @@ function hasCommandRunEvidence(value: unknown): boolean {
 
 function listFiles(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
   if (!existsSync(directoryPath)) return [];
-  const stats = statSync(directoryPath);
+  let stats;
+  try {
+    stats = statSync(directoryPath);
+  } catch {
+    return [];
+  }
   if (stats.isFile()) return predicate(directoryPath) ? [directoryPath] : [];
   const output: string[] = [];
-  for (const entry of readdirSync(directoryPath, { withFileTypes: true })) {
+  let entries;
+  try {
+    entries = readdirSync(directoryPath, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  for (const entry of entries) {
     if (defaultIgnoredDirs.has(entry.name)) continue;
     const absolutePath = path.join(directoryPath, entry.name);
     if (entry.isDirectory()) {
