@@ -251,6 +251,7 @@ function createSummary({ profile, mode, filters, parallel, legacy, startedAt, re
   const passed = results.filter((entry: any) => entry.ok === true).length;
   const failed = results.length - passed;
   const envelopes = results.map((entry: any) => entry.envelope).filter(Boolean);
+  const blockingFindings = summarizeBlockingFindings(envelopes);
   return {
     schemaId: 'atm.validatorRunSummary.v1',
     profile,
@@ -263,7 +264,9 @@ function createSummary({ profile, mode, filters, parallel, legacy, startedAt, re
     parallel,
     legacy,
     requiredCommand: firstRequiredCommand(envelopes),
-    blockingFindings: summarizeBlockingFindings(envelopes),
+    blockingFindings,
+    environmentFindings: blockingFindings.filter(isEnvironmentFinding),
+    currentTaskFindings: blockingFindings.filter((finding: any) => !isEnvironmentFinding(finding)),
     validators: results
   };
 }
@@ -289,4 +292,13 @@ function formatSpawnError(error: unknown): string {
     return `${error.name}: ${error.message}${code}`;
   }
   return String(error);
+}
+
+function isEnvironmentFinding(finding: any): boolean {
+  const code = String(finding?.code ?? '');
+  const source = String(finding?.source ?? '');
+  return source === 'environment'
+    || source === 'git-index'
+    || code.startsWith('ATM_ENV_')
+    || code.startsWith('ATM_GIT_INDEX_');
 }

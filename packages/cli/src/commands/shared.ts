@@ -265,6 +265,7 @@ type ParsedCliOptions = {
   tasks: string[];
   batch?: string;
   scope?: string;
+  compact?: boolean;
   atom?: string;
   map?: string;
   equivalenceFixtures?: string;
@@ -298,6 +299,7 @@ export function parseOptions(argv: string[], commandName: string) {
     tasks: [],
     batch: undefined,
     scope: undefined,
+    compact: false,
     atom: undefined,
     map: undefined,
     propagate: undefined,
@@ -412,6 +414,13 @@ export function parseOptions(argv: string[], commandName: string) {
       }
       options.scope = requireOptionValue(argv, index, '--scope', commandName);
       index += 1;
+      continue;
+    }
+    if (arg === '--compact') {
+      if (commandName !== 'batch') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --compact`, { exitCode: 2 });
+      }
+      options.compact = true;
       continue;
     }
     if (arg === '--actor') {

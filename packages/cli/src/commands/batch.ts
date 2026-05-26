@@ -1,8 +1,10 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { CliError, makeResult, message, parseOptions } from './shared.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { runNext } from './next.ts';
 import { runTasks } from './tasks.ts';
-import { findActiveTaskQueue } from './task-direction.ts';
+import { findActiveTaskQueue, partitionTaskScope } from './task-direction.ts';
 import {
   activeBatchSelectionStatus,
   inspectBatchRunConsistency,
@@ -16,7 +18,7 @@ import {
 export async function runBatch(argv: string[]) {
   const { options } = parseOptions(argv, 'batch');
   const action = String(argv[0] ?? 'status').toLowerCase();
-  if (action === 'status') {
+  if (action === 'status' || action === 'current') {
     const selector = buildBatchSelector(options);
     const selection = Object.keys(selector).length > 0
       ? activeBatchSelectionStatus(options.cwd, selector)
@@ -37,6 +39,38 @@ export async function runBatch(argv: string[]) {
           action: 'status',
           activeBatches: allActiveBatches,
           selection
+        }
+      });
+    }
+    const compact = options.compact === true || action === 'current';
+    if (compact) {
+      const compactStatus = buildCompactBatchStatus(options.cwd, batchRun, taskQueue, consistency, allActiveBatches.length);
+      return makeResult({
+        ok: consistency.ok,
+        command: 'batch',
+        cwd: options.cwd,
+        messages: [consistency.ok
+          ? message('info', 'ATM_BATCH_CURRENT', batchRun ? 'Current batch queue head resolved.' : 'No active batch run found.', {
+            active: Boolean(batchRun),
+            batchId: batchRun?.batchId ?? null,
+            currentTaskId: batchRun?.currentTaskId ?? null,
+            checkpointCommand: batchRun
+              ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchRun.batchId} --json`
+              : null
+          })
+          : message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'Active batch runtime is inconsistent and must be repaired before continuing.', {
+            active: Boolean(batchRun),
+            batchHeadTaskId: consistency.batchHeadTaskId,
+            queueHeadTaskId: consistency.queueHeadTaskId,
+            reason: consistency.reason,
+            requiredCommand: batchRun
+              ? `node atm.mjs batch repair --actor <id> --batch ${batchRun.batchId} --json`
+              : 'node atm.mjs batch repair --actor <id> --json'
+          })],
+        evidence: {
+          action,
+          compact: true,
+          current: compactStatus
         }
       });
     }
@@ -273,7 +307,7 @@ export async function runBatch(argv: string[]) {
     });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'batch supports: status, checkpoint, repair, resume, abandon', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, abandon', { exitCode: 2 });
 }
 
 function buildBatchSelector(options: Record<string, any>) {
@@ -310,4 +344,76 @@ function toBatchCandidate(batchRun: { readonly batchId: string; readonly scopeKe
     createdByActor: batchRun.createdByActor ?? null,
     checkpointCommand: `node atm.mjs batch checkpoint --actor <id> --batch ${batchRun.batchId} --json`
   };
+}
+
+function buildCompactBatchStatus(
+  cwd: string,
+  batchRun: any,
+  taskQueue: any,
+  consistency: any,
+  activeBatchCount: number
+) {
+  const queueHead = taskQueue?.tasks?.[taskQueue.currentIndex] ?? null;
+  const scope = queueHead ? partitionTaskScope(queueHead) : null;
+  const validators = queueHead ? readTaskValidators(cwd, queueHead.taskPath) : [];
+  const batchId = batchRun?.batchId ?? null;
+  const currentTaskId = batchRun?.currentTaskId ?? taskQueue?.taskIds?.[taskQueue?.currentIndex ?? 0] ?? null;
+  return {
+    schemaId: 'atm.batchCurrent.v1',
+    ok: consistency.ok,
+    active: Boolean(batchRun),
+    activeBatchCount,
+    batchId,
+    scopeKey: batchRun?.scopeKey ?? null,
+    queueId: taskQueue?.queueId ?? batchRun?.queueId ?? null,
+    currentIndex: batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null,
+    totalTasks: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0,
+    currentTaskId,
+    currentTask: queueHead
+      ? {
+        workItemId: queueHead.workItemId,
+        title: queueHead.title,
+        taskPath: queueHead.taskPath,
+        sourcePlanPath: queueHead.sourcePlanPath,
+        targetRepo: queueHead.targetRepo
+      }
+      : null,
+    allowedFiles: scope?.targetWork.allowedFiles ?? [],
+    planningReadOnlyPaths: scope?.planningContext.readOnlyPaths ?? [],
+    validators,
+    checkpointCommand: batchId
+      ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json`
+      : null,
+    commitInstruction: currentTaskId
+      ? {
+        timing: 'after-checkpoint',
+        files: [
+          '<deliverables>',
+          `.atm/history/tasks/${currentTaskId}.json`,
+          `.atm/history/evidence/${currentTaskId}.json`,
+          `.atm/history/task-events/${currentTaskId}/`
+        ]
+      }
+      : null,
+    nextCommand: batchRun?.sourcePrompt
+      ? `node atm.mjs next --claim --actor <id> --prompt "${batchRun.sourcePrompt}" --json`
+      : null,
+    repairCommand: batchId
+      ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json`
+      : 'node atm.mjs batch repair --actor <id> --json',
+    consistency
+  };
+}
+
+function readTaskValidators(cwd: string, taskPath: string | null | undefined): readonly string[] {
+  if (!taskPath) return [];
+  const absolutePath = path.isAbsolute(taskPath) ? taskPath : path.resolve(cwd, taskPath);
+  if (!existsSync(absolutePath)) return [];
+  try {
+    const parsed = JSON.parse(readFileSync(absolutePath, 'utf8'));
+    const validators = Array.isArray(parsed?.validators) ? parsed.validators : [];
+    return validators.map(String).filter(Boolean);
+  } catch {
+    return [];
+  }
 }
