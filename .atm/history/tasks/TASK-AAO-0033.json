@@ -1,41 +1,49 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0033",
+  "title": "Final dogfood rerun 與雙 repo sync",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M10",
   "dependencies": [
-    "TASK-AAO-0001"
+    "TASK-AAO-0020",
+    "TASK-AAO-0021",
+    "TASK-AAO-0022",
+    "TASK-AAO-0023",
+    "TASK-AAO-0028",
+    "TASK-AAO-0032"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "AAO final report 記錄分數與剩餘 gaps。",
+    "ATM frozen runner build 完成並同步雙 repo。",
+    "3KLife 與 3klife-npc-brain 的 integration verify 通過。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    "atomic_workbench/reports/aao-final-dogfood-report.json",
+    "docs/ai_atomic_framework/atm-agent-first-operability/AAO_FINAL_REPORT.md",
+    "release/**",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
-    "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0033-aao-final-dogfood-sync.task.md",
+    "sectionTitle": "TASK-AAO-0033",
+    "headingLine": 55,
+    "hash": "bfddffb13bd0dece"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
-    "package.json",
+    "scripts/validate-atm-self-atomization.ts",
+    "atomic_workbench/reports/**",
+    "docs/ai_atomic_framework/atm-agent-first-operability/**",
+    "release/**",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
     "npm run typecheck",
-    "npm run validate:cli"
+    "npm run validate:cli",
+    "npm run validate:atm-self-atomization",
+    "node atm.mjs doctor --json"
   ],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
@@ -59,7 +67,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-235Z-import-3d08ddb4343a",
+  "lastTransitionAt": "2026-05-26T06:04:11.235Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

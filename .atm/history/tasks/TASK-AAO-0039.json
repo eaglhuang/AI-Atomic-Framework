@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0039",
+  "title": "Planning-only ledger audit boundary",
+  "status": "planned",
+  "milestone": "M13",
+  "dependencies": [
+    "TASK-AAO-0025",
+    "TASK-AAO-0038"
+  ],
+  "acceptance": [
+    "匯入 `TASK-AAO-0000` 這類 planning-only done card 不會阻塞 AI-Atomic-Framework pre-commit。",
+    "target-repo `done` task 若缺 closure packet 仍會被擋。",
+    "Audit output 對 planning-only task 回 warning + required sync/import action，而不是 target closure error。",
+    "Regression test 覆蓋 planning authority 與 target authority 的差異。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/next.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validate-prompt-scoped-next.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "tags": [],
+  "notes": "這張卡不是放寬 target repo，而是避免把 planning repo 的歷史工作誤當 target repo 壞帳。",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0039-planning-only-ledger-audit-boundary.task.md",
+    "sectionTitle": "TASK-AAO-0039",
+    "headingLine": 51,
+    "hash": "cb8bae5dd63c8863"
+  },
+  "importedAt": "2026-05-26T06:04:11.175Z",
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/next.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validate-prompt-scoped-next.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:prompt-scoped-next",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Allowing target-repo work to bypass closure evidence",
+    "Treating broken target tasks as planning-only without explicit metadata"
+  ],
+  "nonGoals": [
+    "Deleting planning tasks from source planning repo",
+    "Lowering audit requirements for framework source tasks"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "lastTransitionId": "2026-05-26T06-04-11-243Z-import-c7d4d85bba32",
+  "lastTransitionAt": "2026-05-26T06:04:11.243Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

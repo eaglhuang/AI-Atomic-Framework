@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0040",
+  "title": "Sandbox git process diagnostics",
+  "status": "planned",
+  "milestone": "M13",
+  "dependencies": [
+    "TASK-AAO-0004",
+    "TASK-AAO-0026"
+  ],
+  "acceptance": [
+    "Simulated git `EPERM` 會回 `ATM_ENV_SANDBOX_GIT_EPERM` 或等價環境診斷。",
+    "`.git/index.lock Permission denied` 被標成 environment/sandbox，而不是 task audit 或 evidence gate failure。",
+    "Error envelope 包含可操作下一步，例如設定 `ATM_TEMP_ROOT=C:\\tmp` 或用外層權限重跑原 validator。",
+    "真正的 git command 失敗仍回原本 gate failure，不被誤判為 sandbox。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/doctor.ts",
+    "packages/cli/src/commands/status.ts",
+    "scripts/validate-cli.ts",
+    "scripts/lib",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "tags": [],
+  "notes": "這張卡只改善診斷和重跑路徑，不把環境失敗當作通過。",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0040-sandbox-git-process-diagnostic.task.md",
+    "sectionTitle": "TASK-AAO-0040",
+    "headingLine": 52,
+    "hash": "3871a93da9bd0f0d"
+  },
+  "importedAt": "2026-05-26T06:04:11.175Z",
+  "scopePaths": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/doctor.ts",
+    "packages/cli/src/commands/status.ts",
+    "scripts/validate-cli.ts",
+    "scripts/lib",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing Codex sandbox policy",
+    "Silencing real git failures"
+  ],
+  "nonGoals": [
+    "Automatically escalating permissions",
+    "Treating environment failures as successful validation"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "lastTransitionId": "2026-05-26T06-04-11-244Z-import-c0be75c9b2a4",
+  "lastTransitionAt": "2026-05-26T06:04:11.244Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

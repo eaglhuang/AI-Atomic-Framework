@@ -1,28 +1,30 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0001",
-  "title": "Overlap matrix 與路由裁決",
-  "status": "done",
-  "milestone": "M1",
+  "workItemId": "TASK-AAO-0008",
+  "title": "AAO roadmap backwrite 與 ASA bridge closure",
+  "status": "planned",
+  "milestone": "M4",
   "dependencies": [
-    "TASK-AAO-0000"
+    "TASK-AAO-0005",
+    "TASK-AAO-0006",
+    "TASK-AAO-0007"
   ],
   "acceptance": [
-    "計畫書含 AAO/ASA/ATD overlap matrix。",
-    "每條路由都有保留、拆分或轉交判定。",
-    "import dry-run 仍能找到 AAO 任務。"
+    "計畫書標明 baseline AAO 完成/未完成狀態。",
+    "ASA bridge 不再宣稱 score-gated gap 已完成。",
+    "tasks README 對應最新任務清單。"
   ],
   "deliverables": [
     "docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md",
     "docs/ai_atomic_framework/atm-agent-first-operability/tasks/README.md"
   ],
   "tags": [],
-  "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.\n- Closure sync: ATM framework ledger already closed this task in commit `ce1e9cd` with closure packet `.atm/history/evidence/TASK-AAO-0001.closure-packet.json`; this card records the planning-side status alignment only.",
+  "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0001-report-overlap-matrix-routing.task.md",
-    "sectionTitle": "TASK-AAO-0001",
-    "headingLine": 45,
-    "hash": "ead42717ab6482e3"
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0008-roadmap-backwrite-bridge-closure.task.md",
+    "sectionTitle": "TASK-AAO-0008",
+    "headingLine": 47,
+    "hash": "14c71f79698d2003"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
@@ -36,8 +38,8 @@
     "git diff --check"
   ],
   "planningRepo": "3KLife",
-  "targetRepo": "3KLife",
-  "closureAuthority": "planning_repo",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
   "planningReadOnlyPaths": [],
   "planningMirrorPaths": [],
   "outOfScope": [
@@ -57,7 +59,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-190Z-import-4bee9264d309",
-  "lastTransitionAt": "2026-05-26T06:04:11.190Z",
+  "lastTransitionId": "2026-05-26T06-04-11-200Z-import-b5865cb9d79a",
+  "lastTransitionAt": "2026-05-26T06:04:11.200Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

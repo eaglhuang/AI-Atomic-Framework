@@ -1,40 +1,40 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0018",
+  "title": "Neutrality scanner staged-only mode",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M7",
   "dependencies": [
-    "TASK-AAO-0001"
+    "TASK-AAO-0009"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "staged-only mode 可用於 pre-commit。",
+    "full mode 仍保留給 release。",
+    "輸出區分 current diff 與 historical debt。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    "scripts/validate-neutrality-staged.ts",
+    "package.json",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0018-neutrality-staged-only.task.md",
+    "sectionTitle": "TASK-AAO-0018",
     "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "hash": "d6f04c7f19d8d02f"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
+    "scripts/validate-neutrality*.ts",
+    "packages/cli/src/commands/hook.ts",
     "package.json",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
     "npm run typecheck",
+    "npm run validate:neutrality",
     "npm run validate:cli"
   ],
   "planningRepo": "3KLife",
@@ -59,7 +59,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-214Z-import-365ec8397f64",
+  "lastTransitionAt": "2026-05-26T06:04:11.214Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

@@ -1,40 +1,41 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0007",
+  "title": "Onefile size / startup budget",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M3",
   "dependencies": [
     "TASK-AAO-0001"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "validator 會輸出 size/startup budget。",
+    "超過 budget 時提供明確 remediation。",
+    "release runner 與 dev runner 用途界線仍清楚。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    "scripts/validate-onefile-budget.ts",
+    "package.json",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
-    "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0007-onefile-size-startup-budget.task.md",
+    "sectionTitle": "TASK-AAO-0007",
+    "headingLine": 48,
+    "hash": "6d772a2a1166d8e2"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/validate-onefile-budget.ts",
+    "release/atm-onefile/**",
     "package.json",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
-    "npm run typecheck",
+    "npm run build",
+    "node --strip-types scripts/validate-onefile-budget.ts",
     "npm run validate:cli"
   ],
   "planningRepo": "3KLife",
@@ -59,7 +60,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-197Z-import-9aac92879d51",
+  "lastTransitionAt": "2026-05-26T06:04:11.197Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

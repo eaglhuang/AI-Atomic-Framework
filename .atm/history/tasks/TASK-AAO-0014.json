@@ -1,41 +1,41 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0014",
+  "title": "State-aware batch playbook",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M6",
   "dependencies": [
-    "TASK-AAO-0001"
+    "TASK-AAO-0013"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "active batch 的 playbook 會顯示目前 phase。",
+    "已 checkpoint 未 commit 時提示先 commit。",
+    "running 但缺 evidence 時提示 evidence 指令。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    "packages/cli/src/commands/next.ts",
+    "docs/governance/batch-playbook.md",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0014-state-aware-batch-playbook.task.md",
+    "sectionTitle": "TASK-AAO-0014",
     "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "hash": "a7bff2074f9ac5cf"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
-    "package.json",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/batch.ts",
+    "docs/governance/batch-playbook.md",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
     "npm run typecheck",
-    "npm run validate:cli"
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-prompt-scoped-next.ts"
   ],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
@@ -59,7 +59,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-209Z-import-f4f0965fca43",
+  "lastTransitionAt": "2026-05-26T06:04:11.209Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

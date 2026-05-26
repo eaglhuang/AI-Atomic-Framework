@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0037",
+  "title": "Batch checkpoint commit window",
+  "status": "planned",
+  "milestone": "M13",
+  "dependencies": [
+    "TASK-AAO-0013",
+    "TASK-AAO-0014",
+    "TASK-AAO-0024",
+    "TASK-AAO-0032"
+  ],
+  "acceptance": [
+    "Checkpoint 關閉 TASK-A 後，batch 可推進 TASK-B，但 staged TASK-A deliverables + `.atm/history/tasks/TASK-A.json` + evidence + task-events 可通過 pre-commit。",
+    "若 staged files 不屬於 TASK-A checkpoint window，也不屬於 TASK-B current lock，仍被擋。",
+    "`batch status --batch <id>` 顯示 pending commit window 與 required commit command。",
+    "Checkpoint window 在 commit 後清掉或被視為 satisfied。",
+    "Regression test 覆蓋 checkpoint 後 commit 不被下一張 lock 誤擋。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/work-channels.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "scripts/validate-task-direction-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "tags": [],
+  "notes": "這張卡修的是「已經合法 checkpoint 的上一張任務如何被提交」，不是放寬任務完成條件。",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0037-batch-checkpoint-commit-window.task.md",
+    "sectionTitle": "TASK-AAO-0037",
+    "headingLine": 55,
+    "hash": "7d46109785a20154"
+  },
+  "importedAt": "2026-05-26T06:04:11.175Z",
+  "scopePaths": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/work-channels.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-task-direction-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-direction-governance.ts --mode validate"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing task card import semantics",
+    "Weakening deliverable or evidence gates"
+  ],
+  "nonGoals": [
+    "Allowing commit without checkpoint",
+    "Letting a later task close before the queue head is delivered"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "lastTransitionId": "2026-05-26T06-04-11-241Z-import-d7e79e574334",
+  "lastTransitionAt": "2026-05-26T06:04:11.241Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

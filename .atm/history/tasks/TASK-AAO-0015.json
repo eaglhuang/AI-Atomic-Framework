@@ -1,36 +1,35 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0015",
+  "title": "evidence validators --list",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M6",
   "dependencies": [
-    "TASK-AAO-0001"
+    "TASK-AAO-0014"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "`evidence validators --list --task <id>` 可列 required gates。",
+    "輸出含 validator name、expected command、current evidence state。",
+    "help spec 與 atom map 同卡更新。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/command-specs/evidence.spec.ts",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
-    "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0015-evidence-validator-catalog.task.md",
+    "sectionTitle": "TASK-AAO-0015",
+    "headingLine": 46,
+    "hash": "2e990f09d9a53d19"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
-    "package.json",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/command-specs/evidence.spec.ts",
+    "packages/cli/src/commands/tasks.ts",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
@@ -59,7 +58,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-211Z-import-3986a0e48c7e",
+  "lastTransitionAt": "2026-05-26T06:04:11.211Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

@@ -1,41 +1,41 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0032",
+  "title": "Artifact commit policy 收斂",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M9",
   "dependencies": [
-    "TASK-AAO-0001"
+    "TASK-AAO-0019"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "artifact-only commit 被擋時有可操作說明。",
+    "checkpointed artifact commit 可通過。",
+    "draft static evidence 與 command-backed evidence 分層。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    "docs/governance/artifact-commit-policy.md",
+    "packages/cli/src/commands/hook.ts",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0032-artifact-commit-policy.task.md",
+    "sectionTitle": "TASK-AAO-0032",
     "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "hash": "fceea16997e2f9ac"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
-    "package.json",
+    "packages/cli/src/commands/hook.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "docs/governance/artifact-commit-policy.md",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
     "npm run typecheck",
-    "npm run validate:cli"
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-git-hooks.ts --mode validate"
   ],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
@@ -59,7 +59,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-234Z-import-ce7bde76b86d",
+  "lastTransitionAt": "2026-05-26T06:04:11.234Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

@@ -1,41 +1,42 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0028",
+  "title": "batch playbook 文件化",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M9",
   "dependencies": [
-    "TASK-AAO-0001"
+    "TASK-AAO-0014"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "五種編輯器 integration 都引用相同 batch playbook。",
+    "模板包含 command sequence。",
+    "verify 能檢測 entry drift。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    "docs/governance/batch-playbook.md",
+    "templates/agent-pack/**",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
-    "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0028-batch-playbook-docs.task.md",
+    "sectionTitle": "TASK-AAO-0028",
+    "headingLine": 48,
+    "hash": "650ab8a2836e5a41"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
-    "package.json",
+    "docs/governance/batch-playbook.md",
+    "templates/**",
+    ".agents/skills/**",
+    "packages/cli/src/commands/integration*.ts",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
     "npm run typecheck",
-    "npm run validate:cli"
+    "npm run validate:cli",
+    "node atm.mjs integration verify codex --json"
   ],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
@@ -59,7 +60,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-227Z-import-9b3aa324d667",
+  "lastTransitionAt": "2026-05-26T06:04:11.227Z",
   "ledgerContractVersion": "task-ledger/v1"
 }

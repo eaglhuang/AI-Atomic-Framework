@@ -1,40 +1,42 @@
 {
   "schemaVersion": "atm.workItem.v0.2",
-  "workItemId": "TASK-AAO-0002",
-  "title": "CLI command spec / runner SSOT drift guard",
+  "workItemId": "TASK-AAO-0030",
+  "title": "CRLF policy",
   "status": "planned",
-  "milestone": "M1",
+  "milestone": "M9",
   "dependencies": [
-    "TASK-AAO-0001"
+    "TASK-AAO-0009"
   ],
   "acceptance": [
-    "公開命令、hidden/internal 命令、runner registry 的差異有明確斷言。",
-    "`atomize --help` 類命令不再缺 spec。",
-    "新增或調整的 command spec 同卡更新 atomization ownership。"
+    "policy 說明哪些檔案固定 LF。",
+    "validator 可檢測 touched files。",
+    ".gitattributes 不破壞既有 binary/artifact。"
   ],
   "deliverables": [
-    "packages/cli/src/commands/command-specs.ts",
-    "scripts/validate-cli.ts",
+    ".gitattributes",
+    "docs/governance/line-ending-policy.md",
+    "scripts/validate-line-endings.ts",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "tags": [],
   "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
   "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md",
-    "sectionTitle": "TASK-AAO-0002",
-    "headingLine": 47,
-    "hash": "f52179543bd70fb5"
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0030-crlf-policy.task.md",
+    "sectionTitle": "TASK-AAO-0030",
+    "headingLine": 49,
+    "hash": "20cdcb2fa208a862"
   },
   "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
-    "packages/cli/src/commands/command-specs.ts",
-    "packages/cli/src/commands/command-specs/**",
-    "scripts/validate-cli.ts",
+    ".gitattributes",
+    "docs/governance/line-ending-policy.md",
+    "scripts/validate-line-endings.ts",
     "package.json",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "validators": [
-    "npm run typecheck",
+    "git diff --check",
+    "node --strip-types scripts/validate-line-endings.ts",
     "npm run validate:cli"
   ],
   "planningRepo": "3KLife",
@@ -59,7 +61,7 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-192Z-import-f935bddaf883",
-  "lastTransitionAt": "2026-05-26T06:04:11.192Z",
+  "lastTransitionId": "2026-05-26T06-04-11-230Z-import-e8c3feae8856",
+  "lastTransitionAt": "2026-05-26T06:04:11.230Z",
   "ledgerContractVersion": "task-ledger/v1"
 }
