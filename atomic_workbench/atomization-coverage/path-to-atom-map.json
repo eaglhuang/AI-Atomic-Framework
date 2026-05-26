@@ -167,6 +167,12 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/hook.ts",
+      "atom_id": "atm.validator-envelope-map",
+      "capability": "pre-commit blocking findings and validator-compatible failure envelope output",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/**",
       "atom_id": "atom-cli-router",
       "capability": "CLI command implementations (dispatch handlers)",
@@ -305,6 +311,18 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "scripts/lib/validator-envelope.ts",
+      "atom_id": "atm.validator-envelope-map",
+      "capability": "validator failure envelope schema, requiredCommand promotion, and failure classification helpers",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "scripts/validate-validator-envelope.ts",
+      "atom_id": "atm.validator-envelope-map",
+      "capability": "validator failure envelope regression coverage for sandbox, index-lock, ATM gate, and runner JSON cases",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "scripts/validate-*.ts",
       "atom_id": "atom-validator-framework",
       "capability": "individual validator scripts (per-feature) — owned by atom-validator-framework family",
@@ -330,9 +348,9 @@
     },
     {
       "path_pattern": "scripts/run-validators.ts",
-      "atom_id": "atom-validator-orchestrator",
-      "capability": "validator runner with quick/standard/full presets",
-      "coverage_status": "partial"
+      "atom_id": "atm.validator-envelope-map",
+      "capability": "validator runner with quick/standard/full presets and standardized failure envelope aggregation",
+      "coverage_status": "active"
     },
     {
       "path_pattern": "scripts/src/evidence/**",

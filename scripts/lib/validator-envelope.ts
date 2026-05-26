@@ -1,0 +1,263 @@
+import crypto from 'node:crypto';
+
+export const VALIDATOR_FAILURE_ENVELOPE_SCHEMA_ID = 'atm.validatorFailureEnvelope.v1' as const;
+
+export interface ValidatorBlockingFinding {
+  readonly code: string;
+  readonly source: string;
+  readonly detail: string;
+  readonly file?: string;
+  readonly files?: readonly string[];
+  readonly requiredCommand?: string | null;
+  readonly data?: unknown;
+}
+
+export interface ValidatorFailureEnvelope {
+  readonly schemaId: typeof VALIDATOR_FAILURE_ENVELOPE_SCHEMA_ID;
+  readonly ok: boolean;
+  readonly validatorName: string;
+  readonly command: string;
+  readonly entry: string | null;
+  readonly mode: string | null;
+  readonly exitCode: number;
+  readonly durationMs: number | null;
+  readonly requiredCommand: string | null;
+  readonly blockingFindings: readonly ValidatorBlockingFinding[];
+  readonly repairHints: readonly string[];
+  readonly diagnostics: {
+    readonly stdoutSha256: string;
+    readonly stderrSha256: string;
+    readonly stdoutTail: string | null;
+    readonly stderrTail: string | null;
+    readonly spawnError: string | null;
+    readonly classificationCodes: readonly string[];
+  };
+}
+
+export interface ValidatorFailureEnvelopeInput {
+  readonly validatorName: string;
+  readonly command: string;
+  readonly entry?: string | null;
+  readonly mode?: string | null;
+  readonly ok: boolean;
+  readonly exitCode: number;
+  readonly durationMs?: number | null;
+  readonly stdout?: string | null;
+  readonly stderr?: string | null;
+  readonly spawnError?: string | null;
+}
+
+export function createValidatorFailureEnvelope(input: ValidatorFailureEnvelopeInput): ValidatorFailureEnvelope {
+  const stdout = input.stdout ?? '';
+  const stderr = input.stderr ?? '';
+  const spawnError = input.spawnError ?? null;
+  const blockingFindings = input.ok
+    ? []
+    : classifyValidatorFailure({
+      ...input,
+      stdout,
+      stderr,
+      spawnError
+    });
+  const requiredCommand = input.ok
+    ? null
+    : blockingFindings.find((finding) => finding.requiredCommand)?.requiredCommand ?? input.command;
+
+  return {
+    schemaId: VALIDATOR_FAILURE_ENVELOPE_SCHEMA_ID,
+    ok: input.ok,
+    validatorName: input.validatorName,
+    command: input.command,
+    entry: input.entry ?? null,
+    mode: input.mode ?? null,
+    exitCode: input.exitCode,
+    durationMs: input.durationMs ?? null,
+    requiredCommand,
+    blockingFindings,
+    repairHints: input.ok ? [] : buildRepairHints(blockingFindings, input.command),
+    diagnostics: {
+      stdoutSha256: sha256Text(stdout),
+      stderrSha256: sha256Text(stderr),
+      stdoutTail: tailOrNull(stdout),
+      stderrTail: tailOrNull(stderr),
+      spawnError,
+      classificationCodes: blockingFindings.map((finding) => finding.code)
+    }
+  };
+}
+
+export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEnvelopeInput,
+  'validatorName' | 'command' | 'ok' | 'exitCode'
+>> & {
+  readonly entry?: string | null;
+  readonly mode?: string | null;
+  readonly durationMs?: number | null;
+  readonly stdout: string;
+  readonly stderr: string;
+  readonly spawnError: string | null;
+}): readonly ValidatorBlockingFinding[] {
+  const findings: ValidatorBlockingFinding[] = [];
+  const payload = [input.stdout, input.stderr, input.spawnError ?? ''].filter(Boolean).join('\n');
+  const lowerPayload = payload.toLowerCase();
+
+  if (/atm_env_sandbox_git_eperm/i.test(payload) || /spawnsync\s+git(?:\.exe)?\s+(?:eperm|eacces)/i.test(payload)) {
+    findings.push({
+      code: 'ATM_ENV_SANDBOX_GIT_EPERM',
+      source: 'environment',
+      detail: 'The validator could not spawn or access git in the current sandbox.',
+      requiredCommand: input.command,
+      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+    });
+  } else if (/spawn(?:sync)?\s+.*(?:eperm|eacces)/i.test(payload)) {
+    findings.push({
+      code: 'ATM_ENV_PROCESS_SPAWN_EPERM',
+      source: 'environment',
+      detail: 'The validator runner could not spawn a child process in the current sandbox.',
+      requiredCommand: input.command,
+      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+    });
+  } else if (/\.git[\\/]+index\.lock/i.test(payload) && /file exists|already exists|unable to create/i.test(lowerPayload)) {
+    findings.push({
+      code: 'ATM_GIT_INDEX_LOCK_PRESENT',
+      source: 'git-index',
+      detail: 'Git reported an existing index.lock while the validator was running.',
+      requiredCommand: input.command,
+      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+    });
+  } else if (/index\.lock|permission denied|eperm|eacces/i.test(payload)) {
+    findings.push({
+      code: 'ATM_GIT_INDEX_PERMISSION_DENIED',
+      source: 'git-index',
+      detail: 'Git index access failed while the validator was running.',
+      requiredCommand: input.command,
+      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+    });
+  }
+
+  findings.push(...extractAtmJsonFindings(input.stdout, input.stderr, input.command));
+
+  if (findings.length === 0) {
+    findings.push({
+      code: 'ATM_VALIDATOR_FAILED',
+      source: 'validator',
+      detail: `${input.validatorName} exited with ${input.exitCode}.`,
+      requiredCommand: input.command,
+      data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
+    });
+  }
+
+  return dedupeFindings(findings);
+}
+
+export function summarizeBlockingFindings(envelopes: readonly ValidatorFailureEnvelope[]): readonly ValidatorBlockingFinding[] {
+  return dedupeFindings(envelopes.flatMap((envelope) => envelope.blockingFindings));
+}
+
+export function firstRequiredCommand(envelopes: readonly ValidatorFailureEnvelope[]): string | null {
+  return envelopes.find((envelope) => envelope.requiredCommand)?.requiredCommand ?? null;
+}
+
+function extractAtmJsonFindings(stdout: string, stderr: string, fallbackCommand: string): readonly ValidatorBlockingFinding[] {
+  const findings: ValidatorBlockingFinding[] = [];
+  for (const parsed of parseJsonCandidates(stdout, stderr)) {
+    const messages = Array.isArray((parsed as any).messages) ? (parsed as any).messages : [];
+    for (const message of messages) {
+      const data = typeof message === 'object' && message ? (message as any).data : null;
+      const nestedFindings = Array.isArray(data?.blockingFindings) ? data.blockingFindings : [];
+      for (const nested of nestedFindings) {
+        if (!nested || typeof nested !== 'object') continue;
+        findings.push({
+          code: String((nested as any).code ?? 'ATM_GATE_BLOCKING_FINDING'),
+          source: String((nested as any).source ?? 'atm-gate'),
+          detail: String((nested as any).detail ?? 'ATM gate reported a blocking finding.'),
+          file: typeof (nested as any).file === 'string' ? (nested as any).file : undefined,
+          files: Array.isArray((nested as any).files) ? (nested as any).files.map(String) : undefined,
+          requiredCommand: typeof (nested as any).requiredCommand === 'string' ? (nested as any).requiredCommand : null,
+          data: nested
+        });
+      }
+      const code = typeof message?.code === 'string' ? message.code : null;
+      if (!code || code === 'ATM_HOOK_PRE_COMMIT_FAILED') continue;
+      const level = typeof message?.level === 'string' ? message.level : null;
+      if (level !== 'error') continue;
+      findings.push({
+        code,
+        source: 'atm-gate',
+        detail: typeof message.text === 'string' ? message.text : 'ATM gate returned an error message.',
+        requiredCommand: extractRequiredCommand(parsed, data) ?? fallbackCommand,
+        data: message
+      });
+    }
+  }
+  return findings;
+}
+
+function extractRequiredCommand(parsed: unknown, data: unknown): string | null {
+  if (data && typeof data === 'object') {
+    const requiredCommand = (data as any).requiredCommand ?? (data as any).nextStep;
+    if (typeof requiredCommand === 'string' && requiredCommand.trim()) return requiredCommand;
+  }
+  const nextAction = (parsed as any)?.evidence?.nextAction;
+  if (nextAction && typeof nextAction === 'object') {
+    const requiredCommand = (nextAction as any).requiredCommand ?? (nextAction as any).command;
+    if (typeof requiredCommand === 'string' && requiredCommand.trim()) return requiredCommand;
+  }
+  return null;
+}
+
+function parseJsonCandidates(stdout: string, stderr: string): readonly unknown[] {
+  const values: unknown[] = [];
+  for (const text of [stdout, stderr]) {
+    const trimmed = text.trim();
+    if (!trimmed || (!trimmed.startsWith('{') && !trimmed.startsWith('['))) continue;
+    try {
+      values.push(JSON.parse(trimmed));
+    } catch {
+      // Validator output may be mixed text. Tail hashes still preserve evidence.
+    }
+  }
+  return values;
+}
+
+function buildRepairHints(findings: readonly ValidatorBlockingFinding[], command: string): readonly string[] {
+  if (findings.length === 0) return [`Rerun ${command}.`];
+  return findings.map((finding) => {
+    if (finding.code === 'ATM_ENV_SANDBOX_GIT_EPERM') {
+      return 'Rerun the same validator with repository-level permissions, or use ATM_TEMP_ROOT=C:\\tmp when the validator creates temporary git repositories.';
+    }
+    if (finding.code === 'ATM_ENV_PROCESS_SPAWN_EPERM') {
+      return 'Rerun the same validator with repository-level permissions so the runner can spawn child validator processes.';
+    }
+    if (finding.code === 'ATM_GIT_INDEX_LOCK_PRESENT') {
+      return 'Confirm no Git process is active, resolve the stale .git/index.lock condition, then rerun the validator.';
+    }
+    if (finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED') {
+      return 'Resolve the local Git/index permission problem outside ATM, then rerun the validator.';
+    }
+    if (finding.requiredCommand) {
+      return `Run required command: ${finding.requiredCommand}`;
+    }
+    return `Fix ${finding.source} finding ${finding.code}, then rerun ${command}.`;
+  });
+}
+
+function dedupeFindings(findings: readonly ValidatorBlockingFinding[]): readonly ValidatorBlockingFinding[] {
+  const seen = new Set<string>();
+  const deduped: ValidatorBlockingFinding[] = [];
+  for (const finding of findings) {
+    const key = `${finding.code}\0${finding.source}\0${finding.detail}\0${finding.requiredCommand ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(finding);
+  }
+  return deduped;
+}
+
+function sha256Text(text: string): string {
+  return `sha256:${crypto.createHash('sha256').update(text).digest('hex')}`;
+}
+
+function tailOrNull(text: string, maxLength = 1600): string | null {
+  if (!text) return null;
+  return text.length <= maxLength ? text : text.slice(text.length - maxLength);
+}

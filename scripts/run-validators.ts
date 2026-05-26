@@ -2,6 +2,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import {
+  createValidatorFailureEnvelope,
+  firstRequiredCommand,
+  summarizeBlockingFindings
+} from './lib/validator-envelope.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const configPath = path.join(root, 'scripts', 'validators.config.json');
@@ -158,28 +163,69 @@ async function runValidatorsSequential(validators: any, mode: any, options: any)
 function runValidator(validator: any, mode: any, options: any): Promise<any> {
   return new Promise<any>((resolve) => {
     const startedAt = Date.now();
-    const child = spawn(process.execPath, ['--strip-types', path.join(root, validator.entry), '--mode', mode], {
-      cwd: root,
-      stdio: ['ignore', 'pipe', 'pipe']
-    });
+    const validatorPath = path.join(root, validator.entry);
+    const command = `node --strip-types ${normalizeCommandPath(validator.entry)} --mode ${mode}`;
     let stdout = '';
     let stderr = '';
+    let spawnError: string | null = null;
+    let settled = false;
 
-    child.stdout.on('data', (chunk) => {
+    let child: ReturnType<typeof spawn>;
+    try {
+      child = spawn(process.execPath, ['--strip-types', validatorPath, '--mode', mode], {
+        cwd: root,
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+    } catch (error) {
+      finalize(1, formatSpawnError(error));
+      return;
+    }
+
+    child.stdout?.on('data', (chunk) => {
       stdout += String(chunk);
     });
-    child.stderr.on('data', (chunk) => {
+    child.stderr?.on('data', (chunk) => {
       stderr += String(chunk);
     });
 
+    child.on('error', (error) => {
+      finalize(1, `${error.name}: ${error.message}`);
+    });
+
     child.on('close', (code) => {
-      const ok = (code ?? 1) === 0;
+      finalize(code ?? 1);
+    });
+
+    function finalize(exitCode: number, immediateSpawnError: string | null = null) {
+      if (settled) return;
+      settled = true;
+      spawnError = immediateSpawnError ?? spawnError;
+      const durationMs = Date.now() - startedAt;
+      const envelope = createValidatorFailureEnvelope({
+        validatorName: validator.name,
+        command,
+        entry: validator.entry,
+        mode,
+        ok: exitCode === 0,
+        exitCode,
+        durationMs,
+        stdout,
+        stderr,
+        spawnError
+      });
       if (!options.json) {
         if (stdout) {
           process.stdout.write(stdout);
         }
         if (stderr) {
           process.stderr.write(stderr);
+        }
+        if (!envelope.ok) {
+          process.stderr.write(`[validator-envelope:${validator.name}] ${JSON.stringify({
+            requiredCommand: envelope.requiredCommand,
+            blockingFindings: envelope.blockingFindings,
+            repairHints: envelope.repairHints
+          }, null, 2)}\n`);
         }
       }
       resolve({
@@ -188,11 +234,15 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
         tags: validator.tags ?? [],
         slow: validator.slow === true,
         mode,
-        ok,
-        exitCode: code ?? 1,
-        durationMs: Date.now() - startedAt
+        ok: exitCode === 0,
+        exitCode,
+        durationMs,
+        command,
+        requiredCommand: envelope.requiredCommand,
+        blockingFindings: envelope.blockingFindings,
+        envelope
       });
-    });
+    }
   });
 }
 
@@ -200,7 +250,9 @@ function createSummary({ profile, mode, filters, parallel, legacy, startedAt, re
   const durationMs = Date.now() - startedAt;
   const passed = results.filter((entry: any) => entry.ok === true).length;
   const failed = results.length - passed;
+  const envelopes = results.map((entry: any) => entry.envelope).filter(Boolean);
   return {
+    schemaId: 'atm.validatorRunSummary.v1',
     profile,
     mode,
     total: results.length,
@@ -210,6 +262,8 @@ function createSummary({ profile, mode, filters, parallel, legacy, startedAt, re
     filters,
     parallel,
     legacy,
+    requiredCommand: firstRequiredCommand(envelopes),
+    blockingFindings: summarizeBlockingFindings(envelopes),
     validators: results
   };
 }
@@ -221,4 +275,18 @@ function emitSummary(summary: any, jsonMode: any) {
   }
   const status = summary.failed === 0 ? 'ok' : 'failed';
   process.stdout.write(`[validators:${summary.profile}] ${status} (passed=${summary.passed}, failed=${summary.failed}, total=${summary.total}, durationMs=${summary.durationMs})\n`);
+}
+
+function normalizeCommandPath(relativePath: string): string {
+  return relativePath.split(path.sep).join('/');
+}
+
+function formatSpawnError(error: unknown): string {
+  if (error instanceof Error) {
+    const code = 'code' in error && typeof (error as any).code === 'string'
+      ? ` (${(error as any).code})`
+      : '';
+    return `${error.name}: ${error.message}${code}`;
+  }
+  return String(error);
 }

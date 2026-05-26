@@ -124,6 +124,24 @@ interface PreCommitBlockingFinding {
   readonly data?: unknown;
 }
 
+interface PreCommitFailureEnvelope {
+  readonly schemaId: 'atm.validatorFailureEnvelope.v1';
+  readonly ok: false;
+  readonly surface: 'pre-commit';
+  readonly requiredCommand: string | null;
+  readonly blockingFindings: readonly PreCommitBlockingFinding[];
+  readonly repairHints: readonly string[];
+  readonly diagnostics: {
+    readonly gitIndexDiagnostic: ReturnType<typeof inspectGitIndexAccess>;
+    readonly failedValidators: readonly {
+      readonly command: string;
+      readonly exitCode: number;
+      readonly stdoutSha256: string;
+      readonly stderrSha256: string;
+    }[];
+  };
+}
+
 interface ComparableCommandRun {
   readonly command: string;
   readonly exitCode: number;
@@ -416,6 +434,14 @@ function runPreCommitHook(cwd: string) {
     taskAuditFindings: taskAudit.findings,
     failedValidatorRuns
   });
+  const failureEnvelope = ok
+    ? null
+    : buildPreCommitFailureEnvelope({
+      blockingFindings,
+      frameworkClaimCommand,
+      gitIndexDiagnostic,
+      failedValidatorRuns
+    });
 
   return makeResult({
     ok,
@@ -443,6 +469,7 @@ function runPreCommitHook(cwd: string) {
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
           gitIndexDiagnostic,
           blockingFindings,
+          failureEnvelope,
           nextStep: blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand ?? frameworkClaimCommand
         })
     ],
@@ -469,6 +496,7 @@ function runPreCommitHook(cwd: string) {
       taskAudit,
       commandRuns,
       blockingFindings,
+      failureEnvelope,
       evidenceWrite
     }
   });
@@ -595,6 +623,55 @@ function buildPreCommitBlockingFindings(input: {
     });
   }
   return findings;
+}
+
+function buildPreCommitFailureEnvelope(input: {
+  readonly blockingFindings: readonly PreCommitBlockingFinding[];
+  readonly frameworkClaimCommand: string | null;
+  readonly gitIndexDiagnostic: ReturnType<typeof inspectGitIndexAccess>;
+  readonly failedValidatorRuns: readonly CommandRunReport[];
+}): PreCommitFailureEnvelope {
+  const requiredCommand = input.blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand
+    ?? input.frameworkClaimCommand
+    ?? null;
+  return {
+    schemaId: 'atm.validatorFailureEnvelope.v1',
+    ok: false,
+    surface: 'pre-commit',
+    requiredCommand,
+    blockingFindings: input.blockingFindings,
+    repairHints: buildPreCommitRepairHints(input.blockingFindings, requiredCommand),
+    diagnostics: {
+      gitIndexDiagnostic: input.gitIndexDiagnostic,
+      failedValidators: input.failedValidatorRuns.map((entry) => ({
+        command: entry.command,
+        exitCode: entry.exitCode,
+        stdoutSha256: entry.stdoutSha256,
+        stderrSha256: entry.stderrSha256
+      }))
+    }
+  };
+}
+
+function buildPreCommitRepairHints(
+  findings: readonly PreCommitBlockingFinding[],
+  requiredCommand: string | null
+): readonly string[] {
+  if (findings.length === 0) {
+    return requiredCommand ? [`Run required command: ${requiredCommand}`] : [];
+  }
+  return findings.map((finding) => {
+    if (finding.code === 'ATM_ENV_SANDBOX_GIT_EPERM') {
+      return 'Rerun the commit with repository-level Git permissions, or set ATM_TEMP_ROOT=C:\\tmp for validators that create temporary Git repositories.';
+    }
+    if (finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED') {
+      return 'Resolve the local Git/index permission problem outside ATM, then retry the commit.';
+    }
+    if (finding.requiredCommand) {
+      return `Run required command: ${finding.requiredCommand}`;
+    }
+    return `Resolve ${finding.source} finding ${finding.code}, then retry the commit.`;
+  });
 }
 
 function inspectGitIndexAccess(cwd: string) {
@@ -1696,6 +1773,7 @@ function collectStagedBatchCheckpointScopeFiles(cwd: string, stagedFiles: readon
       || (!event.command.includes('--from-batch-checkpoint') && closure?.schemaId !== 'atm.taskClosureTransition.v1')) {
       continue;
     }
+    allowedFiles.push(normalized);
     allowedFiles.push(...extractCheckpointTaskScopeFiles(task));
   }
   return uniqueSorted(allowedFiles);
