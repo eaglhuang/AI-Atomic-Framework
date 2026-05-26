@@ -1,0 +1,118 @@
+{
+  "schemaId": "atm.integrationAgentPackEnforcement.v1",
+  "specVersion": "1.0.0",
+  "generatedAt": "2026-05-26T01:48:00.000Z",
+  "generatedBy": "TASK-ASA-0012",
+  "summary": {
+    "totalAdapters": 6,
+    "installedAdapters": 6,
+    "manifestHealthCheck": "all installed",
+    "atomizationCoverageEnforced": true,
+    "atomCallsiteReadabilityEnforced": true
+  },
+  "adapters": [
+    {
+      "id": "claude-code",
+      "displayName": "Claude Code skills",
+      "installed": true,
+      "targetDir": ".claude/skills",
+      "instructionEnforcement": {
+        "atomization-coverage": "Run `node atm.mjs guard atomization-coverage --new-paths <files>` when staging new production source.",
+        "atom-callsite-readability": "Run `node atm.mjs guard atom-callsite-readability` when adding/modifying runAtm or runAtmMap callsites.",
+        "evidence-required": "Run the validator that owns the touched atom (see validator-to-atom-relationship.json)."
+      },
+      "graduationStatus": "active",
+      "manifestPath": ".atm/integrations/claude-code.manifest.json"
+    },
+    {
+      "id": "codex",
+      "displayName": "Codex skills",
+      "installed": true,
+      "targetDir": "integrations/codex-skills",
+      "instructionEnforcement": {
+        "atomization-coverage": "Codex entry-only profile: invokes `node atm.mjs guard atomization-coverage` via skill harness; full enforcement pending graduation.",
+        "atom-callsite-readability": "Codex entry-only profile: spec-only enforcement; runtime gate pending graduation.",
+        "evidence-required": "Codex entry-only profile: evidence collection via batch checkpoint, not direct skill"
+      },
+      "graduationStatus": "entry-only",
+      "graduationCriteria": "When Codex skill harness provides reliable in-conversation hook execution, codex adapter graduates to full enforcement parity with claude-code.",
+      "currentGap": "Codex skill profiles do not auto-execute pre-commit-style gates; ATM relies on local git hook instead.",
+      "manifestPath": ".atm/integrations/codex.manifest.json"
+    },
+    {
+      "id": "copilot",
+      "displayName": "GitHub Copilot",
+      "installed": true,
+      "targetDir": ".github",
+      "instructionEnforcement": {
+        "atomization-coverage": "Copilot reads .github/copilot-instructions.md; instruction includes atomization-coverage guard reminder.",
+        "atom-callsite-readability": "Copilot reads .github/copilot-instructions.md; readability guard reminder included.",
+        "evidence-required": "Copilot defers to local git hook for evidence enforcement (no in-loop hook).",
+        "limitations": "Copilot cannot directly execute CLI commands; user must run guards manually."
+      },
+      "graduationStatus": "active-via-instructions",
+      "manifestPath": ".atm/integrations/copilot.manifest.json"
+    },
+    {
+      "id": "cursor",
+      "displayName": "Cursor rules",
+      "installed": true,
+      "targetDir": ".cursor/rules/skills",
+      "instructionEnforcement": {
+        "atomization-coverage": "Cursor rules include atomization-coverage skill that runs guard before commit.",
+        "atom-callsite-readability": "Cursor rules include readability guard skill.",
+        "evidence-required": "Cursor skill harness runs validators per task scope."
+      },
+      "graduationStatus": "active",
+      "manifestPath": ".atm/integrations/cursor.manifest.json"
+    },
+    {
+      "id": "gemini",
+      "displayName": "Gemini commands",
+      "installed": true,
+      "targetDir": ".gemini/commands",
+      "instructionEnforcement": {
+        "atomization-coverage": "Gemini commands include atomization-coverage guard wrapper.",
+        "atom-callsite-readability": "Gemini commands include readability guard wrapper.",
+        "evidence-required": "Gemini commands chain validators per task scope."
+      },
+      "graduationStatus": "active",
+      "manifestPath": ".atm/integrations/gemini.manifest.json"
+    },
+    {
+      "id": "antigravity",
+      "displayName": "Antigravity (Windsurf successor)",
+      "installed": true,
+      "targetDir": ".",
+      "instructionEnforcement": {
+        "atomization-coverage": "Antigravity profile uses workspace-root instructions to invoke atomization guards.",
+        "atom-callsite-readability": "Antigravity profile includes readability guard reminder.",
+        "evidence-required": "Antigravity defers to local git hook."
+      },
+      "graduationStatus": "active",
+      "manifestPath": ".atm/integrations/antigravity.manifest.json"
+    }
+  ],
+  "manifestHealthChecks": [
+    { "check": "manifest files exist for each adapter", "result": "PASS", "detail": "All 6 adapter manifests present in .atm/integrations/" },
+    { "check": "target directories writable", "result": "PASS", "detail": "All 6 target directories accessible" },
+    { "check": "instruction templates include atomization guards", "result": "PASS", "detail": "All adapters reference atomization-coverage and atom-callsite-readability" },
+    { "check": "evidence required before promote", "result": "PASS", "detail": "evidence-add command required by all adapters" }
+  ],
+  "newProductionSourceEnforcement": {
+    "trigger": "Agent stages a new .ts/.js file in production paths",
+    "enforcement": "Pre-commit hook runs atomization-coverage guard which blocks unmapped paths.",
+    "agentInstruction": "Every agent pack includes instruction: 'When you add a new production source file, run `node atm.mjs guard atomization-coverage` first to confirm ownership.'"
+  },
+  "runAtmCallsiteEnforcement": {
+    "trigger": "Agent adds or modifies a runAtm/runAtmMap callsite",
+    "enforcement": "Pre-commit hook runs atom-callsite-readability guard.",
+    "agentInstruction": "Every agent pack includes instruction: 'When you touch a runAtm callsite, run `node atm.mjs guard atom-callsite-readability` first.'"
+  },
+  "codexEntryOnlyResolutionPlan": "See atomic_workbench/reports/codex-entry-only-graduation-plan.md",
+  "rollbackPlan": {
+    "approach": "Adapters can be uninstalled via `node atm.mjs integration uninstall <id>`.",
+    "noProductionCodeChanges": true,
+    "reversibility": "Adapter manifest files are removable without affecting source code."
+  }
+}
