@@ -123,7 +123,8 @@ export async function runBatch(argv: string[]) {
         activeBatches: allActiveBatches,
         taskQueue,
         pendingCommitWindow,
-        consistency
+        consistency,
+        dirtyFileSummary: readGitDirtyFileSummary(options.cwd)
       }
     });
   }
@@ -621,6 +622,56 @@ function readGitChangedFiles(cwd: string) {
     .map((line) => normalizeGitStatusPath(line.slice(3)))
     .filter(Boolean);
   return { available: true, files };
+}
+
+/**
+ * TASK-AAO-0011: surface staged/modified vs untracked counts in batch status
+ * so agents see why `next --claim` reported `ignoredUntrackedFiles`. Untracked
+ * files are advisory only and never hard-block claim or checkpoint; staged or
+ * modified-tracked files outside scope still go through the regular hook.
+ */
+function readGitDirtyFileSummary(cwd: string) {
+  const porcelain = spawnSync('git', ['status', '--porcelain=v1', '--untracked-files=all'], {
+    cwd,
+    encoding: 'utf8'
+  });
+  if (porcelain.status !== 0) {
+    return {
+      available: false,
+      staged: 0,
+      modifiedTracked: 0,
+      untracked: 0,
+      untrackedFiles: [] as string[],
+      hint: 'git status unavailable'
+    };
+  }
+  let staged = 0;
+  let modifiedTracked = 0;
+  let untracked = 0;
+  const untrackedFiles: string[] = [];
+  for (const rawLine of String(porcelain.stdout ?? '').split(/\r?\n/)) {
+    const line = rawLine.trimEnd();
+    if (!line) continue;
+    const code = line.slice(0, 2);
+    const filePath = normalizeGitStatusPath(line.slice(3));
+    if (code.startsWith('??')) {
+      untracked += 1;
+      untrackedFiles.push(filePath);
+      continue;
+    }
+    if (code[0] && code[0] !== ' ' && code[0] !== '?') staged += 1;
+    if (code[1] && code[1] !== ' ' && code[1] !== '?') modifiedTracked += 1;
+  }
+  return {
+    available: true,
+    staged,
+    modifiedTracked,
+    untracked,
+    untrackedFiles: uniqueStrings(untrackedFiles),
+    hint: untracked > 0
+      ? 'Untracked files are advisory only; claim/checkpoint never hard-block on them (TASK-AAO-0011).'
+      : null
+  };
 }
 
 function normalizeGitStatusPath(value: string) {

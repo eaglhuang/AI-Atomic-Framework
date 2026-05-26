@@ -405,13 +405,25 @@
       "atom_id": "atom-validator-map-spec-schema",
       "capability": "validator that walks atomic_workbench/maps/**/map.spec.json and validates each file against atom-map.schema.json",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts",
+      "atom_id": "atom-next-router",
+      "capability": "next selector / claim orchestrator: now treats unrelated untracked files as warning-only (ignoredUntrackedFiles) instead of hard-blocking claim (TASK-AAO-0011).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch.ts",
+      "atom_id": "atom-batch-run",
+      "capability": "batch lifecycle and status: status output now reports dirtyFileSummary so agents see staged vs untracked counts at the batch level.",
+      "coverage_status": "active"
     }
   ],
   "summary": {
-    "total_production_paths": 36,
-    "mapped_paths": 36,
+    "total_production_paths": 38,
+    "mapped_paths": 38,
     "coverage_percentage": 100,
-    "atoms_defined": 35,
+    "atoms_defined": 37,
     "atoms_with_evidence": 0,
     "debt_items": 30,
     "core_wave1_completed": true

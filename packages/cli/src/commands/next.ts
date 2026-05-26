@@ -488,7 +488,7 @@ async function claimNextImportedTask(input: {
       }
     });
   }
-  assertNoPendingTaskArtifactScopeExpansion({
+  const scopeDiagnostic = checkPendingTaskArtifactScopeExpansion({
     cwd: input.cwd,
     task: claimableTask
   });
@@ -637,6 +637,8 @@ async function claimNextImportedTask(input: {
     taskDirectionLock: directionLock,
     taskQueue: activeQueue,
     batchRun,
+    scopeDiagnostic,
+    ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles,
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   };
@@ -659,6 +661,10 @@ async function claimNextImportedTask(input: {
           : null,
         blockedPattern: nextAction.recommendedChannel === 'batch'
           ? 'manual tasks reserve/promote/claim/close loop'
+          : null,
+        ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles,
+        ignoredUntrackedNote: scopeDiagnostic.ignoredUntrackedFiles.length > 0
+          ? 'These files are NOT blocking the claim. If any of them is actually a deliverable for this task, run `node atm.mjs tasks scope --add <paths>` to widen the scope and then `git add` them.'
           : null
       })
     ),
@@ -2441,47 +2447,88 @@ function normalizeOptionalTaskPath(value: string | null | undefined) {
   return candidate.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
-function assertNoPendingTaskArtifactScopeExpansion(input: {
+interface PendingTaskArtifactScopeDiagnostic {
+  readonly schemaId: 'atm.taskArtifactScopeDiagnostic.v1';
+  readonly ignoredUntrackedFiles: readonly string[];
+}
+
+/**
+ * TASK-AAO-0011: claim/checkpoint must not hard-block on unrelated untracked
+ * files (e.g. an unrelated svg in `docs/assets/`, a peer agent's WIP, screenshots,
+ * tmp patches). Untracked candidates are demoted to a warning surfaced via
+ * `ignoredUntrackedFiles`; the claim still produces a valid direction lock.
+ *
+ * The hard-block path remains for STAGED or MODIFIED-TRACKED files that look
+ * like a deliverable for this task but live outside its allowedFiles — those
+ * are the real "scope expansion required" cases that demand
+ * `tasks scope --add` instead of editing runtime locks.
+ */
+function checkPendingTaskArtifactScopeExpansion(input: {
   readonly cwd: string;
   readonly task: ImportedTaskSummary;
-}) {
+}): PendingTaskArtifactScopeDiagnostic {
   const allowedFiles = buildAllowedFilesForTask(input.task);
-  const pendingFiles = listPendingGitFiles(input.cwd)
-    .filter((entry) => !entry.startsWith('.atm/'))
-    .filter((entry) => !isPathAllowedByScope(entry, allowedFiles));
-  const expansionCandidates = pendingFiles.filter((entry) => looksLikeTaskArtifact(entry, input.task));
-  if (expansionCandidates.length === 0) return;
-  throw new CliError(
-    'ATM_TASK_SCOPE_EXPANSION_REQUIRED',
-    `Task ${input.task.workItemId} has pending deliverable-like files outside targetWork.allowedFiles; update the task scope/deliverables instead of editing runtime locks.`,
-    {
-      exitCode: 1,
-      details: {
-        taskId: input.task.workItemId,
-        outsideAllowedFiles: expansionCandidates,
-        allowedFiles,
-        requiredAction: 'Add these real deliverables to the task card frontmatter scope/deliverables or reset the unrelated files, then rerun node atm.mjs next --claim.',
-        notAllowed: 'Do not edit .atm/runtime/locks/** or task direction lock JSON to bypass this scope mismatch.'
+  const { stagedOrTracked, untracked } = listPendingGitFilesByKind(input.cwd);
+  const outsideScope = (entry: string) =>
+    !entry.startsWith('.atm/') && !isPathAllowedByScope(entry, allowedFiles);
+
+  const stagedExpansion = stagedOrTracked
+    .filter(outsideScope)
+    .filter((entry) => looksLikeTaskArtifact(entry, input.task));
+  const untrackedExpansion = untracked
+    .filter(outsideScope)
+    .filter((entry) => looksLikeTaskArtifact(entry, input.task));
+
+  if (stagedExpansion.length > 0) {
+    throw new CliError(
+      'ATM_TASK_SCOPE_EXPANSION_REQUIRED',
+      `Task ${input.task.workItemId} has staged or modified deliverable-like files outside targetWork.allowedFiles; update the task scope/deliverables instead of editing runtime locks.`,
+      {
+        exitCode: 1,
+        details: {
+          taskId: input.task.workItemId,
+          outsideAllowedFiles: stagedExpansion,
+          ignoredUntrackedFiles: untrackedExpansion,
+          allowedFiles,
+          requiredAction: 'Add these real deliverables to the task card frontmatter scope/deliverables (then re-import) or run `node atm.mjs tasks scope --add <paths>`; do not edit runtime locks.',
+          notAllowed: 'Do not edit .atm/runtime/locks/** or task direction lock JSON to bypass this scope mismatch.'
+        }
       }
-    }
-  );
+    );
+  }
+
+  return {
+    schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
+    ignoredUntrackedFiles: untrackedExpansion
+  };
+}
+
+function listPendingGitFilesByKind(cwd: string): {
+  readonly stagedOrTracked: readonly string[];
+  readonly untracked: readonly string[];
+} {
+  const collect = (args: readonly string[]) => {
+    const result = spawnSync('git', args as string[], { cwd, encoding: 'utf8' });
+    if (result.status !== 0) return [] as string[];
+    return result.stdout
+      .split(/\r?\n/)
+      .map((entry: string) => normalizeOptionalTaskPath(entry))
+      .filter((entry: string | null): entry is string => Boolean(entry));
+  };
+  const staged = [
+    ...collect(['diff', '--name-only', '--cached']),
+    ...collect(['diff', '--name-only'])
+  ];
+  const untracked = collect(['ls-files', '--others', '--exclude-standard']);
+  return {
+    stagedOrTracked: uniqueSorted(staged),
+    untracked: uniqueSorted(untracked)
+  };
 }
 
 function listPendingGitFiles(cwd: string): readonly string[] {
-  const files: string[] = [];
-  for (const args of [
-    ['diff', '--name-only', '--cached'],
-    ['diff', '--name-only'],
-    ['ls-files', '--others', '--exclude-standard']
-  ]) {
-    const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
-    if (result.status !== 0) continue;
-    files.push(...result.stdout
-      .split(/\r?\n/)
-      .map((entry: string) => normalizeOptionalTaskPath(entry))
-      .filter((entry: string | null): entry is string => Boolean(entry)));
-  }
-  return uniqueSorted(files);
+  const { stagedOrTracked, untracked } = listPendingGitFilesByKind(cwd);
+  return uniqueSorted([...stagedOrTracked, ...untracked]);
 }
 
 function looksLikeTaskArtifact(filePath: string, task: ImportedTaskSummary): boolean {
