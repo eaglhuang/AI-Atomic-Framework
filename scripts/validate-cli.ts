@@ -4,7 +4,8 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
-import { runCli } from '../packages/cli/src/atm.ts';
+import { cliCommandRunners, runCli } from '../packages/cli/src/atm.ts';
+import { commandSpecs, listCommandSpecs } from '../packages/cli/src/commands/command-specs.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -21,6 +22,15 @@ const perCommandHelpSnapshots = {
   registry: readJson('tests/cli-fixtures/help-snapshots/registry.json'),
   upgrade: readJson('tests/cli-fixtures/help-snapshots/upgrade.json')
 };
+const publicCommandNames = listCommandSpecs()
+  .map((spec: any) => spec.name)
+  .sort((left: any, right: any) => left.localeCompare(right));
+const internalCommandNames = Object.values(commandSpecs)
+  .filter((spec: any) => spec.visibility === 'internal')
+  .map((spec: any) => spec.name)
+  .sort((left: any, right: any) => left.localeCompare(right));
+const runnerCommandNames = Object.keys(cliCommandRunners).sort((left, right) => left.localeCompare(right));
+const allSpecCommandNames = Object.keys(commandSpecs).sort((left, right) => left.localeCompare(right));
 
 function fail(message: any) {
   console.error(`[cli:${mode}] ${message}`);
@@ -161,9 +171,21 @@ const listedCommands = (Array.isArray(globalHelp.parsed.evidence?.commands) ? gl
   .map((entry: any) => typeof entry === 'string' ? entry : entry.command)
   .filter(Boolean)
   .sort((left: any, right: any) => left.localeCompare(right));
+assert(JSON.stringify(runnerCommandNames) === JSON.stringify(allSpecCommandNames), 'runner registry and command spec registry must stay in sync');
+assert(JSON.stringify(listedCommands) === JSON.stringify(publicCommandNames), '--help command list must match public command specs');
 assert(JSON.stringify(listedCommands) === JSON.stringify([...helpCommandSnapshot.commands].sort((left, right) => left.localeCompare(right))), '--help command list must match snapshot fixture');
 
-for (const commandName of helpCommandSnapshot.commands) {
+for (const commandName of internalCommandNames) {
+  assert(!listedCommands.includes(commandName), `${commandName} must stay hidden from the global help command list`);
+  const commandHelp = await runAtm([commandName, '--help'], root);
+  assert(commandHelp.exitCode === 0, `${commandName} --help must exit 0`);
+  assertReadable(commandHelp, `${commandName} --help`);
+  assert(commandHelp.parsed.ok === true, `${commandName} --help must report ok=true`);
+  assert(commandHelp.parsed.command === commandName, `${commandName} --help must keep command identity`);
+  assert(commandHelp.parsed.evidence?.usage?.command === commandName, `${commandName} --help must report usage.command`);
+}
+
+for (const commandName of publicCommandNames) {
   const commandHelp = await runAtm([commandName, '--help'], root);
   assert(commandHelp.exitCode === 0, `${commandName} --help must exit 0`);
   assertReadable(commandHelp, `${commandName} --help`);

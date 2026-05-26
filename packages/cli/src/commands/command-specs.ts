@@ -8,6 +8,7 @@ import {
 
 import actorSpec from './command-specs/actor.spec.ts';
 import atomRefSpec from './command-specs/atom-ref.spec.ts';
+import atomCapsuleSpec from './command-specs/atom-capsule.spec.ts';
 import atomizeSpec from './command-specs/atomize.spec.ts';
 import baselineSpec from './command-specs/baseline.spec.ts';
 import batchSpec from './command-specs/batch.spec.ts';
@@ -18,11 +19,16 @@ import candidatesSpec from './command-specs/candidates.spec.ts';
 import createSpec from './command-specs/create.spec.ts';
 import atmChartSpec from './command-specs/atm-chart.spec.ts';
 import createMapSpec from './command-specs/create-map.spec.ts';
+import daemonSpec from './command-specs/daemon.spec.ts';
 import doctorSpec from './command-specs/doctor.spec.ts';
+import doSpec from './command-specs/do.spec.ts';
 import experienceSpec from './command-specs/experience.spec.ts';
+import healthReportSpec from './command-specs/health-report.spec.ts';
 import orientSpec from './command-specs/orient.spec.ts';
+import mapCapsuleSpec from './command-specs/map-capsule.spec.ts';
 import policeSpec from './command-specs/police.spec.ts';
 import quickfixSpec from './command-specs/quickfix.spec.ts';
+import rescueSpec from './command-specs/rescue.spec.ts';
 import startSpec from './command-specs/start.spec.ts';
 import explainSpec from './command-specs/explain.spec.ts';
 import evidenceSpec from './command-specs/evidence.spec.ts';
@@ -57,10 +63,20 @@ import reviewSpec from './command-specs/review.spec.ts';
 import agentPackSpec from './command-specs/agent-pack.spec.ts';
 import reviewAdvisorySpec from './command-specs/review-advisory.spec.ts';
 
+function withVisibility(spec: any, visibility: 'public' | 'internal' = 'public') {
+  return Object.freeze({
+    ...spec,
+    visibility
+  });
+}
+
 export const commandSpecs = Object.freeze({
   actor: actorSpec,
+  'agent-pack': agentPackSpec,
+  'atom-capsule': withVisibility(atomCapsuleSpec, 'internal'),
   'atom-ref': atomRefSpec,
   atomize: atomizeSpec,
+  'atm-chart': atmChartSpec,
   baseline: baselineSpec,
   batch: batchSpec,
   bootstrap: bootstrapSpec,
@@ -68,46 +84,49 @@ export const commandSpecs = Object.freeze({
   cache: cacheSpec,
   candidates: candidatesSpec,
   create: createSpec,
-  'atm-chart': atmChartSpec,
   'create-map': createMapSpec,
+  daemon: withVisibility(daemonSpec, 'internal'),
   doctor: doctorSpec,
+  do: withVisibility(doSpec, 'internal'),
   experience: experienceSpec,
-  orient: orientSpec,
-  police: policeSpec,
-  quickfix: quickfixSpec,
-  start: startSpec,
   explain: explainSpec,
   evidence: evidenceSpec,
   'framework-mode': frameworkModeSpec,
-  guard: guardSpec,
   git: gitSpec,
   'git-hooks': gitHooksSpec,
   guide: guideSpec,
+  guard: guardSpec,
   handoff: handoffSpec,
+  'health-report': withVisibility(healthReportSpec, 'internal'),
   hook: hookSpec,
   init: initSpec,
   'internal-release': internalReleaseSpec,
   integration: integrationSpec,
   lock: lockSpec,
+  'map-capsule': withVisibility(mapCapsuleSpec, 'internal'),
   migrate: migrateSpec,
   next: nextSpec,
-  'self-host-alpha': selfHostAlphaSpec,
-  spec: specSpec,
-  status: statusSpec,
-  tasks: tasksSpec,
-  upgrade: upgradeSpec,
-  test: testSpec,
-  telemetry: telemetrySpec,
-  validate: validateSpec,
-  welcome: welcomeSpec,
-  verify: verifySpec,
+  orient: orientSpec,
+  police: policeSpec,
+  quickfix: quickfixSpec,
+  rescue: withVisibility(rescueSpec, 'internal'),
   registry: registrySpec,
   'registry-diff': registryDiffSpec,
   'replacement-lane': replacementLaneSpec,
-  rollback: rollbackSpec,
   review: reviewSpec,
-  'agent-pack': agentPackSpec,
   'review-advisory': reviewAdvisorySpec,
+  rollback: rollbackSpec,
+  'self-host-alpha': selfHostAlphaSpec,
+  spec: specSpec,
+  start: startSpec,
+  status: statusSpec,
+  tasks: tasksSpec,
+  test: testSpec,
+  telemetry: telemetrySpec,
+  upgrade: upgradeSpec,
+  validate: validateSpec,
+  welcome: welcomeSpec,
+  verify: verifySpec,
 });
 
 export function getCommandSpec(commandName: string) {
@@ -116,7 +135,7 @@ export function getCommandSpec(commandName: string) {
     : null;
 }
 
-export function listCommandSpecs() {
-  return Object.values(commandSpecs);
+export function listCommandSpecs(options: { includeInternal?: boolean } = {}) {
+  return Object.values(commandSpecs).filter((spec: any) => options.includeInternal || spec.visibility !== 'internal');
 }
 

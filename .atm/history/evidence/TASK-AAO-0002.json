@@ -1,0 +1,147 @@
+{
+  "taskId": "TASK-AAO-0002",
+  "updatedAt": "2026-05-26T04:44:44.502Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed for internal command spec drift guard updates",
+      "artifactPaths": [
+        "packages/cli/src/commands/command-specs.ts",
+        "packages/cli/src/commands/command-specs/atom-capsule.spec.ts",
+        "packages/cli/src/commands/command-specs/map-capsule.spec.ts",
+        "packages/cli/src/commands/command-specs/rescue.spec.ts",
+        "packages/cli/src/commands/command-specs/do.spec.ts",
+        "packages/cli/src/commands/command-specs/daemon.spec.ts",
+        "packages/cli/src/commands/command-specs/health-report.spec.ts",
+        "scripts/validate-cli.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-runner",
+      "createdAt": "2026-05-26T04:43:09.442Z",
+      "details": {
+        "actorId": "codex-aao-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2987b7df4ad725288009044ebe541350237ad1eaf3fae70c05d4c7ccac1d8b0d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4370e0039298bbeca14629453a75cfedd2f1899daa8b4d3733f48d8adae898d7",
+            "cached": false,
+            "generatedAt": "2026-05-26T04:43:09.444Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:321415ffa7638af3544bbb430f6518630c3910fc8fba30926bb6bb7bc3a9dc4b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli passed for public/internal command spec drift guard",
+      "artifactPaths": [
+        "packages/cli/src/commands/command-specs.ts",
+        "packages/cli/src/commands/command-specs/atom-capsule.spec.ts",
+        "packages/cli/src/commands/command-specs/map-capsule.spec.ts",
+        "packages/cli/src/commands/command-specs/rescue.spec.ts",
+        "packages/cli/src/commands/command-specs/do.spec.ts",
+        "packages/cli/src/commands/command-specs/daemon.spec.ts",
+        "packages/cli/src/commands/command-specs/health-report.spec.ts",
+        "scripts/validate-cli.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-runner",
+      "createdAt": "2026-05-26T04:43:09.537Z",
+      "details": {
+        "actorId": "codex-aao-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7c4a41a0475c343eb106b79d071d0391d9a39a9d97fd552b135d257913196aea",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:2114a2e0dc836b515c4ea6f526be7373f6628d170819a336c6f456653a8e7abb",
+            "cached": false,
+            "generatedAt": "2026-05-26T04:43:09.539Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:856b0c148b78deea8e220265f9c998661501bd7cdf86527bc0cd0fb91829848a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:git-head-evidence passed for queue-head checkpoint closure",
+      "artifactPaths": [
+        "packages/cli/src/commands/command-specs.ts",
+        "packages/cli/src/commands/command-specs/atom-capsule.spec.ts",
+        "packages/cli/src/commands/command-specs/map-capsule.spec.ts",
+        "packages/cli/src/commands/command-specs/rescue.spec.ts",
+        "packages/cli/src/commands/command-specs/do.spec.ts",
+        "packages/cli/src/commands/command-specs/daemon.spec.ts",
+        "packages/cli/src/commands/command-specs/health-report.spec.ts",
+        "scripts/validate-cli.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-runner",
+      "createdAt": "2026-05-26T04:44:44.502Z",
+      "details": {
+        "actorId": "codex-aao-runner",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:57edbc16c0246fd2a2f532252ca97917dbd25d92b5079293ed9df2d7db3633ef",
+            "cached": false,
+            "generatedAt": "2026-05-26T04:44:44.505Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a03d82cffe1b75104c24162c39087306a85d7617fcb89d4774a19084c54ad4cb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
