@@ -1,0 +1,107 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASA-0010",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "310b5072513f757f209a8b0bfea4bc0f22dd7241",
+  "governedTreeSha": "c8bf781ed3f406cd1c3e10b1ee9f3a4564e0330e",
+  "targetCommitDelta": {
+    "currentCommitSha": "310b5072513f757f209a8b0bfea4bc0f22dd7241",
+    "parentCommitShas": [
+      "310b5072513f757f209a8b0bfea4bc0f22dd7241"
+    ],
+    "governedTreeSha": "c8bf781ed3f406cd1c3e10b1ee9f3a4564e0330e",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0010-validators-evidence-pipeline.task.md",
+      ".atm/history/evidence/TASK-ASA-0010.json",
+      ".atm/history/task-events/TASK-ASA-0010/2026-05-26T01-26-54-878Z-reserve-fb359a8f53d0.json",
+      ".atm/history/task-events/TASK-ASA-0010/2026-05-26T01-26-54-881Z-promote-d49f01d9192f.json",
+      ".atm/history/task-events/TASK-ASA-0010/2026-05-26T01-26-54-887Z-claim-8dae3cccb12d.json",
+      ".atm/history/tasks/TASK-ASA-0010.json",
+      ".atm/runtime/batch-run.json",
+      ".atm/runtime/batch-runs/batch-7273973f1e36.json",
+      ".atm/runtime/task-queues/queue-8f7ec1e2dccd3f7a.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/reports/validator-evidence-freshness-matrix.json",
+      "atomic_workbench/reports/validator-to-atom-relationship.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d66bd451370019e532db68db81e2f2542b493288dc5bde07e060b5b85c84a40b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a355f2fac0bba83c30e74aec4c6f64ea279206f517a012151c83c599875de873",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2eb14b324a0ccc6925888ad990d221e361895240f526c337e6cdfe814f345c85",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-26T01:42:47.399Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0010-validators-evidence-pipeline.task.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASA-0010.json",
+  "closedAt": "2026-05-26T01:42:47.399Z",
+  "closedByActor": "opus47-asa-runner"
+}
