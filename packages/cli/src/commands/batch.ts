@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, parseOptions } from './shared.ts';
@@ -8,6 +9,7 @@ import { abandonTaskQueue, findActiveTaskQueue, partitionTaskScope } from './tas
 import {
   activeBatchSelectionStatus,
   inspectBatchRunConsistency,
+  isPathAllowedByScope,
   listActiveBatchRuns,
   readActiveBatchRun,
   releaseBatchRun,
@@ -28,6 +30,7 @@ export async function runBatch(argv: string[]) {
     const batchRun = selection.batchRun;
     const taskQueue = batchRun ? findActiveTaskQueue(options.cwd, batchRun.sourcePrompt, { batchId: batchRun.batchId }) : null;
     const consistency = inspectBatchRunConsistency(batchRun, taskQueue);
+    const pendingCommitWindow = batchRun ? buildPendingCheckpointCommitWindow(options.cwd, batchRun, taskQueue) : null;
     if (!selection.ok && allActiveBatches.length > 1 && Object.keys(selector).length === 0) {
       if (compact) {
         return makeResult({
@@ -62,7 +65,7 @@ export async function runBatch(argv: string[]) {
       });
     }
     if (compact) {
-      const compactStatus = buildCompactBatchStatus(options.cwd, batchRun, taskQueue, consistency, allActiveBatches.length);
+      const compactStatus = buildCompactBatchStatus(options.cwd, batchRun, taskQueue, consistency, allActiveBatches.length, pendingCommitWindow);
       return makeResult({
         ok: consistency.ok,
         command: 'batch',
@@ -72,6 +75,7 @@ export async function runBatch(argv: string[]) {
             active: Boolean(batchRun),
             batchId: batchRun?.batchId ?? null,
             currentTaskId: batchRun?.currentTaskId ?? null,
+            pendingCommitTaskId: pendingCommitWindow?.taskId ?? null,
             checkpointCommand: batchRun
               ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchRun.batchId} --json`
               : null
@@ -102,7 +106,9 @@ export async function runBatch(argv: string[]) {
         batchId: batchRun?.batchId ?? null,
         scopeKey: batchRun?.scopeKey ?? null,
         currentTaskId: batchRun?.currentTaskId ?? null,
-        activeBatchCount: allActiveBatches.length
+        activeBatchCount: allActiveBatches.length,
+        pendingCommitTaskId: pendingCommitWindow?.taskId ?? null,
+        pendingCommitCommand: pendingCommitWindow?.commitCommand ?? null
         })
         : message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'Active batch runtime is inconsistent and must be repaired before continuing.', {
           active: Boolean(batchRun),
@@ -116,6 +122,7 @@ export async function runBatch(argv: string[]) {
         batchRun,
         activeBatches: allActiveBatches,
         taskQueue,
+        pendingCommitWindow,
         consistency
       }
     });
@@ -400,7 +407,8 @@ function buildCompactBatchStatus(
   batchRun: any,
   taskQueue: any,
   consistency: any,
-  activeBatchCount: number
+  activeBatchCount: number,
+  pendingCommitWindow: ReturnType<typeof buildPendingCheckpointCommitWindow>
 ) {
   const queueHead = taskQueue?.tasks?.[taskQueue.currentIndex] ?? null;
   const scope = queueHead ? partitionTaskScope(queueHead) : null;
@@ -431,6 +439,7 @@ function buildCompactBatchStatus(
     allowedFiles: scope?.targetWork.allowedFiles ?? [],
     planningReadOnlyPaths: scope?.planningContext.readOnlyPaths ?? [],
     validators,
+    pendingCommitWindow,
     checkpointCommand: batchId
       ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json`
       : null,
@@ -475,6 +484,133 @@ function buildCompactBatchStatus(
     },
     consistency
   };
+}
+
+function buildPendingCheckpointCommitWindow(cwd: string, batchRun: any, taskQueue: any) {
+  if (!batchRun?.batchId || !Array.isArray(batchRun.taskIds)) return null;
+  const gitChanges = readGitChangedFiles(cwd);
+  const changedFiles = gitChanges.files;
+  if (gitChanges.available && changedFiles.length === 0) return null;
+  for (const taskId of batchRun.taskIds.map(String)) {
+    const taskFile = `.atm/history/tasks/${taskId}.json`;
+    const relatedFiles = changedFiles.filter((file) => isTaskCheckpointRelatedFile(file, taskId));
+    if (gitChanges.available && !relatedFiles.includes(taskFile)) continue;
+    const task = readJson(cwd, taskFile);
+    if (task?.status !== 'done') continue;
+    const lastTransitionId = typeof task.lastTransitionId === 'string' ? task.lastTransitionId : '';
+    const eventFile = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
+    if (!lastTransitionId) continue;
+    if (gitChanges.available && !changedFiles.includes(eventFile)) continue;
+    const event = readJson(cwd, eventFile);
+    const closure = event?.closure as { schemaId?: unknown; batchId?: unknown } | undefined;
+    const checkpointClosure = typeof event?.command === 'string'
+      && event.command.startsWith('node atm.mjs tasks close')
+      && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1')
+      && (event.command.includes(`--batch ${batchRun.batchId}`) || closure?.batchId === batchRun.batchId);
+    if (!checkpointClosure) continue;
+    const scope = extractTaskScopeFiles(task);
+    const deliverableFiles = changedFiles.filter((file) => scope.some((allowed) => isPathAllowedByScope(file, [allowed])));
+    const evidenceFile = `.atm/history/evidence/${taskId}.json`;
+    const checkpointFiles = relatedFiles.length > 0
+      ? relatedFiles
+      : uniqueStrings([
+        taskFile,
+        existsSync(path.join(cwd, normalizeRelativePath(evidenceFile))) ? evidenceFile : '',
+        eventFile
+      ].filter(Boolean));
+    const commitFiles = uniqueStrings([
+      ...deliverableFiles,
+      taskFile,
+      evidenceFile,
+      `.atm/history/task-events/${taskId}/`
+    ]);
+    return {
+      schemaId: 'atm.batchCheckpointCommitWindow.v1',
+      batchId: batchRun.batchId,
+      taskId,
+      currentBatchTaskId: batchRun.currentTaskId ?? taskQueue?.taskIds?.[taskQueue?.currentIndex ?? 0] ?? null,
+      changedFiles: checkpointFiles,
+      deliverableFiles,
+      commitFiles,
+      commitCommand: `git add ${commitFiles.map(quoteShellArg).join(' ')} && git commit -m "complete ${taskId}"`,
+      statusCommand: `node atm.mjs batch current --batch ${batchRun.batchId} --compact --json`,
+      note: 'Checkpoint has closed this task. Commit these files before continuing with the next queue head.'
+    };
+  }
+  return null;
+}
+
+function isTaskCheckpointRelatedFile(filePath: string, taskId: string) {
+  const normalized = normalizeRelativePath(filePath);
+  const lower = normalized.toLowerCase();
+  const taskLower = taskId.toLowerCase();
+  return lower === `.atm/history/tasks/${taskLower}.json`
+    || lower === `.atm/history/evidence/${taskLower}.json`
+    || lower === `.atm/history/evidence/${taskLower}.closure-packet.json`
+    || lower.startsWith(`.atm/history/task-events/${taskLower}/`);
+}
+
+function extractTaskScopeFiles(task: Record<string, unknown>): readonly string[] {
+  const output: string[] = [];
+  collectStringArray(task.scope, output);
+  collectStringArray(task.scopePaths, output);
+  collectStringArray(task.deliverables, output);
+  collectStringArray(task.files, output);
+  collectStringArray(task.allowedFiles, output);
+  const targetWork = task.targetWork && typeof task.targetWork === 'object' && !Array.isArray(task.targetWork)
+    ? task.targetWork as Record<string, unknown>
+    : null;
+  if (targetWork) collectStringArray(targetWork.allowedFiles, output);
+  return uniqueStrings(output.map(normalizeRelativePath).filter(Boolean));
+}
+
+function collectStringArray(value: unknown, output: string[]) {
+  if (!Array.isArray(value)) return;
+  for (const entry of value) {
+    if (typeof entry === 'string') output.push(entry);
+  }
+}
+
+function readGitChangedFiles(cwd: string) {
+  const result = spawnSync('git', ['status', '--porcelain=v1', '--untracked-files=all'], {
+    cwd,
+    encoding: 'utf8'
+  });
+  if (result.status !== 0) return { available: false, files: [] as string[] };
+  const files = String(result.stdout ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter(Boolean)
+    .map((line) => normalizeGitStatusPath(line.slice(3)))
+    .filter(Boolean);
+  return { available: true, files };
+}
+
+function normalizeGitStatusPath(value: string) {
+  const renamed = value.includes(' -> ') ? value.split(' -> ').pop() ?? value : value;
+  return normalizeRelativePath(renamed.replace(/^"|"$/g, ''));
+}
+
+function readJson(cwd: string, relativePath: string): any {
+  const filePath = path.join(cwd, normalizeRelativePath(relativePath));
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function quoteShellArg(value: string) {
+  return `"${value.replace(/"/g, '\\"')}"`;
+}
+
+function normalizeRelativePath(value: string | null | undefined) {
+  return String(value ?? '').trim().replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function uniqueStrings(values: readonly string[]) {
+  return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort((left, right) => left.localeCompare(right));
 }
 
 function buildCompactProgress(batchRun: any, taskQueue: any) {

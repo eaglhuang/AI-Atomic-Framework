@@ -66,6 +66,8 @@ async function validateAdopterGoverned(tempRoot: string) {
   const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
   assert(claim.ok === true, 'adopter next --claim must claim queue head');
   assert((claim.evidence.taskDirectionLock as any)?.taskId === 'TASK-ADOPT-0001', 'adopter claim must create direction lock for queue head');
+  const adopterBatchId = (claim.evidence.batchRun as any)?.batchId;
+  assert(typeof adopterBatchId === 'string' && adopterBatchId.length > 0, 'adopter claim must create a batchId for checkpoint status');
 
   const inScope = runIntegrationHookInvocation([
     'pre-tool',
@@ -172,6 +174,9 @@ async function validateAdopterGoverned(tempRoot: string) {
 
   writeFileSync(path.join(repo, 'src', 'one.ts'), 'export const one = 2;\n', 'utf8');
   await runBatch(['checkpoint', '--cwd', repo, '--actor', 'adopter-agent', '--json']);
+  const checkpointWindowStatus = await runBatch(['current', '--cwd', repo, '--batch', adopterBatchId, '--compact', '--json']);
+  assert((checkpointWindowStatus.evidence.current as any)?.pendingCommitWindow?.taskId === 'TASK-ADOPT-0001', 'batch current --compact must show the pending checkpoint commit window after checkpoint');
+  assert(String((checkpointWindowStatus.evidence.current as any)?.pendingCommitWindow?.commitCommand ?? '').includes('TASK-ADOPT-0001'), 'pending checkpoint commit window must include a task-specific commit command');
   const afterFirstClose = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert((afterFirstClose.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0002', 'adopter queue must advance to second task after closing first');
   initializeGit(repo);

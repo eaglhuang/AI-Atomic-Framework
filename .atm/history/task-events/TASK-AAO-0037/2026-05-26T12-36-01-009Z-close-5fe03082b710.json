@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-26T12-36-01-009Z-close-5fe03082b710",
+  "taskId": "TASK-AAO-0037",
+  "action": "close",
+  "actorId": "codex-main",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0037.json",
+  "taskSha256": "sha256:2a0a57b85c9230f7f781c7e105f16a9d29c581fbef1e33bb5cff4e16d96d114a",
+  "createdAt": "2026-05-26T12:36:01.009Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0037 --actor codex-main --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0037.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:cli:surface",
+      "validate:git-head-evidence",
+      "validate:task-direction-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-26T12:36:01.007Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0037-batch-checkpoint-commit-window.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
