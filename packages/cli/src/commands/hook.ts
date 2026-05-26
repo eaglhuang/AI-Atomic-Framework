@@ -101,6 +101,17 @@ interface ProtectedStateFinding {
     | 'batch-close-must-use-checkpoint'
     | 'batch-commit-before-checkpoint';
   readonly detail: string;
+  readonly requiredCommand?: string;
+}
+
+interface PreCommitBlockingFinding {
+  readonly code: string;
+  readonly source: string;
+  readonly detail: string;
+  readonly file?: string;
+  readonly files?: readonly string[];
+  readonly requiredCommand?: string | null;
+  readonly data?: unknown;
 }
 
 interface ComparableCommandRun {
@@ -308,6 +319,7 @@ export function installGitHooks(cwd: string, options: { frameworkRequired?: bool
 function runPreCommitHook(cwd: string) {
   const root = path.resolve(cwd);
   const stagedFiles = readStagedFiles(root).filter((entry) => entry !== gitHeadEvidencePath);
+  const gitIndexDiagnostic = inspectGitIndexAccess(root);
   const encodingReport = scanEncoding(root, stagedFiles);
   const frameworkStatus = createFrameworkModeStatus({ cwd: root, files: stagedFiles });
   const allowAdopterInfrastructureSync = isAdopterInfrastructureSyncCommit(
@@ -365,6 +377,7 @@ function runPreCommitHook(cwd: string) {
     ? buildFrameworkTempClaimCommand(frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit')
     : null;
   const ok = encodingReport.ok
+    && gitIndexDiagnostic.ok
     && blockingFrameworkIssues.length === 0
     && planningMirrorDriftFiles.length === 0
     && directionLockDriftFiles.length === 0
@@ -377,6 +390,21 @@ function runPreCommitHook(cwd: string) {
   const evidenceWrite = ok && stagedFiles.length > 0
     ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
     : null;
+  const blockingFindings = buildPreCommitBlockingFindings({
+    encodingReport,
+    gitIndexDiagnostic,
+    blockingFrameworkIssues,
+    frameworkClaimCommand,
+    planningMirrorDriftFiles,
+    directionLockDriftFiles,
+    quickfixDriftFiles,
+    quickfixFileLimitExceeded,
+    quickfixLineLimitExceeded,
+    quickfixChangedLineCount,
+    protectedStateFindings: protectedStateReport.findings,
+    taskAuditFindings: taskAudit.findings,
+    failedValidatorRuns
+  });
 
   return makeResult({
     ok,
@@ -401,12 +429,15 @@ function runPreCommitHook(cwd: string) {
           protectedStateFindings: protectedStateReport.findings,
           taskAuditFindings: taskAudit.findings.length,
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
-          nextStep: frameworkClaimCommand
+          gitIndexDiagnostic,
+          blockingFindings,
+          nextStep: blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand ?? frameworkClaimCommand
         })
     ],
     evidence: {
       action: 'pre-commit',
       stagedFiles,
+      gitIndexDiagnostic,
       encodingReport,
       frameworkStatus,
       allowAdopterInfrastructureSync,
@@ -424,9 +455,155 @@ function runPreCommitHook(cwd: string) {
       protectedStateReport,
       taskAudit,
       commandRuns,
+      blockingFindings,
       evidenceWrite
     }
   });
+}
+
+function buildPreCommitBlockingFindings(input: {
+  readonly encodingReport: ReturnType<typeof scanEncoding>;
+  readonly gitIndexDiagnostic: ReturnType<typeof inspectGitIndexAccess>;
+  readonly blockingFrameworkIssues: readonly string[];
+  readonly frameworkClaimCommand: string | null;
+  readonly planningMirrorDriftFiles: readonly string[];
+  readonly directionLockDriftFiles: readonly string[];
+  readonly quickfixDriftFiles: readonly string[];
+  readonly quickfixFileLimitExceeded: boolean;
+  readonly quickfixLineLimitExceeded: boolean;
+  readonly quickfixChangedLineCount: number;
+  readonly protectedStateFindings: readonly ProtectedStateFinding[];
+  readonly taskAuditFindings: ReturnType<typeof auditTasks>['findings'];
+  readonly failedValidatorRuns: readonly CommandRunReport[];
+}): readonly PreCommitBlockingFinding[] {
+  const findings: PreCommitBlockingFinding[] = [];
+  if (!input.gitIndexDiagnostic.ok) {
+    findings.push({
+      code: input.gitIndexDiagnostic.code,
+      source: 'git-index',
+      detail: input.gitIndexDiagnostic.detail,
+      requiredCommand: input.gitIndexDiagnostic.requiredCommand,
+      data: input.gitIndexDiagnostic
+    });
+  }
+  for (const finding of input.encodingReport.findings) {
+    findings.push({
+      code: `ATM_ENCODING_${finding.issue.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
+      source: 'encoding',
+      file: finding.file,
+      detail: `Encoding guard found ${finding.issue} in ${finding.file}.`
+    });
+  }
+  for (const blocker of input.blockingFrameworkIssues) {
+    findings.push({
+      code: `ATM_FRAMEWORK_${blocker.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
+      source: 'framework-development',
+      detail: `Framework-development gate blocked this commit: ${blocker}.`,
+      requiredCommand: blocker === 'active-framework-claim-required' ? input.frameworkClaimCommand : null
+    });
+  }
+  if (input.planningMirrorDriftFiles.length > 0) {
+    findings.push({
+      code: 'ATM_PLANNING_MIRROR_DRIFT',
+      source: 'direction-lock',
+      files: input.planningMirrorDriftFiles,
+      detail: 'Staged files include planning/mirror paths while the active direction lock allows target work only.'
+    });
+  }
+  if (input.directionLockDriftFiles.length > 0) {
+    findings.push({
+      code: 'ATM_TASK_DIRECTION_SCOPE_DRIFT',
+      source: 'direction-lock',
+      files: input.directionLockDriftFiles,
+      detail: 'Staged files are outside the active task direction lock allowedFiles.'
+    });
+  }
+  if (input.quickfixDriftFiles.length > 0) {
+    findings.push({
+      code: 'ATM_QUICKFIX_SCOPE_DRIFT',
+      source: 'quickfix',
+      files: input.quickfixDriftFiles,
+      detail: 'Staged files are outside the active quickfix allowedFiles.'
+    });
+  }
+  if (input.quickfixFileLimitExceeded) {
+    findings.push({
+      code: 'ATM_QUICKFIX_FILE_LIMIT_EXCEEDED',
+      source: 'quickfix',
+      detail: 'Quickfix changed too many non-.atm files for the fast channel.'
+    });
+  }
+  if (input.quickfixLineLimitExceeded) {
+    findings.push({
+      code: 'ATM_QUICKFIX_LINE_LIMIT_EXCEEDED',
+      source: 'quickfix',
+      detail: `Quickfix changed ${input.quickfixChangedLineCount} lines, exceeding the fast-channel line limit.`
+    });
+  }
+  for (const finding of input.protectedStateFindings) {
+    findings.push({
+      code: `ATM_PROTECTED_STATE_${finding.reason.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
+      source: 'protected-atm-state',
+      file: finding.file,
+      detail: finding.detail,
+      requiredCommand: finding.requiredCommand ?? null
+    });
+  }
+  for (const finding of input.taskAuditFindings.filter((entry) => entry.level === 'error')) {
+    findings.push({
+      code: finding.code,
+      source: 'task-audit',
+      file: 'path' in finding && typeof finding.path === 'string' ? finding.path : undefined,
+      detail: finding.detail
+    });
+  }
+  for (const run of input.failedValidatorRuns) {
+    findings.push({
+      code: 'ATM_FRAMEWORK_VALIDATOR_FAILED',
+      source: 'framework-validator',
+      detail: `${run.command} exited with ${run.exitCode}.`,
+      data: {
+        command: run.command,
+        exitCode: run.exitCode,
+        stdoutSha256: run.stdoutSha256,
+        stderrSha256: run.stderrSha256
+      }
+    });
+  }
+  return findings;
+}
+
+function inspectGitIndexAccess(cwd: string) {
+  const indexLockPath = path.join(cwd, '.git', 'index.lock');
+  const status = runGit(cwd, ['status', '--short']);
+  const stderr = status.stderr.trim();
+  const detail = status.exitCode === 0
+    ? 'Git index is readable by ATM pre-commit diagnostics.'
+    : classifyGitIndexFailure(stderr || `git status exited with ${status.exitCode}`);
+  return {
+    schemaId: 'atm.gitIndexDiagnostic.v1',
+    ok: status.exitCode === 0,
+    code: status.exitCode === 0
+      ? 'ATM_GIT_INDEX_OK'
+      : /index\.lock|permission denied|eperm|unable to create/i.test(stderr)
+        ? 'ATM_GIT_INDEX_PERMISSION_DENIED'
+        : 'ATM_GIT_INDEX_UNAVAILABLE',
+    exitCode: status.exitCode,
+    indexLockPath: normalizeRelativePath(relativePathFrom(cwd, indexLockPath)),
+    indexLockPresent: existsSync(indexLockPath),
+    stderr,
+    detail,
+    requiredCommand: status.exitCode === 0
+      ? null
+      : 'Resolve the local Git/index permission problem outside ATM, then rerun the commit. Do not edit .git/index.lock by hand unless you have confirmed no Git process is active.'
+  };
+}
+
+function classifyGitIndexFailure(stderr: string) {
+  if (/index\.lock|permission denied|eperm|unable to create/i.test(stderr)) {
+    return `Git could not access the index lock (${stderr}). This is an environment or sandbox permission problem, not a task evidence failure.`;
+  }
+  return `Git index diagnostic failed (${stderr}).`;
 }
 
 function runPrePushHook(cwd: string, base: string | null, head: string | null) {
@@ -1461,10 +1638,12 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
   if (stagedBatch?.status === 'active'
     && nonAtmStagedFiles.length > 0
     && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, stagedBatch.taskIds, stagedBatch.batchId)) {
+    const requiredCommand = `node atm.mjs batch checkpoint --actor <id> --batch ${stagedBatch.batchId} --json`;
     findings.push({
       file: nonAtmStagedFiles[0] ?? '<staged-files>',
       reason: 'batch-commit-before-checkpoint',
-      detail: `Active batch ${stagedBatch.batchId} has not checkpointed the staged deliverable commit. Run node atm.mjs batch checkpoint --actor <id> --batch ${stagedBatch.batchId} --json first, then commit the deliverables together with the checkpoint task/evidence/events.`
+      detail: `Active batch ${stagedBatch.batchId} has not checkpointed the staged deliverable commit. Run ${requiredCommand} first, then commit the deliverables together with the checkpoint task/evidence/events.`,
+      requiredCommand
     });
   }
   if (protectedFiles.length === 0) {
@@ -1545,10 +1724,12 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
         && event.command.startsWith('node atm.mjs tasks close')
         && !event.command.includes('--from-batch-checkpoint')
         && (event?.closure as { schemaId?: unknown } | undefined)?.schemaId !== 'atm.taskClosureTransition.v1') {
+        const requiredCommand = `node atm.mjs batch checkpoint --actor <id> --batch ${owningBatch.batchId} --json`;
         findings.push({
           file: normalized,
           reason: 'batch-close-must-use-checkpoint',
-          detail: `Task ${taskId} belongs to active batch ${owningBatch.batchId}; direct tasks close is not allowed. Use batch checkpoint so ATM can close, advance, and claim the next queue head.`
+          detail: `Task ${taskId} belongs to active batch ${owningBatch.batchId}; direct tasks close is not allowed. Use batch checkpoint so ATM can close, advance, and claim the next queue head.`,
+          requiredCommand
         });
       }
       continue;

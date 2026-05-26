@@ -243,6 +243,27 @@ function runEvidenceAdd(argv: string[]) {
     ...options.validators,
     ...commandRuns.flatMap((run) => Array.isArray(run.validators) ? run.validators : [])
   ]);
+  const failedValidationRuns = commandRuns.filter((run) => run.exitCode !== 0 && (
+    validationPasses.length > 0 || (Array.isArray(run.validators) && run.validators.length > 0)
+  ));
+  if (failedValidationRuns.length > 0) {
+    throw new CliError(
+      'ATM_EVIDENCE_VALIDATION_PASS_FAILED_COMMAND',
+      'evidence add refused to record validationPasses from commandRuns with non-zero exitCode.',
+      {
+        exitCode: 2,
+        details: {
+          taskId: options.taskId,
+          failedCommands: failedValidationRuns.map((run) => ({
+            command: run.command,
+            exitCode: run.exitCode,
+            validators: run.validators ?? []
+          })),
+          remediation: 'Record failed commands as failure diagnostics, or rerun the validator successfully before adding validation pass evidence.'
+        }
+      }
+    );
+  }
   const commandRunCache = commandRuns.length > 0
     ? {
       schemaId: 'atm.commandRunCache.v1',

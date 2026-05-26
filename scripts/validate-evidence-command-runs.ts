@@ -81,6 +81,41 @@ async function main() {
   assert(record.details.validationPasses.includes('sample-validator'), 'command run validators must be merged into validationPasses');
   assert(record.details.validationPasses.includes('typecheck'), 'all command run validators must be merged');
 
+  const failedRunsPath = path.join(repo, '.atm', 'runtime', 'command-runs', 'failed-validator.json');
+  writeFileSync(failedRunsPath, `${JSON.stringify({
+    commandRuns: [
+      {
+        command: 'npm run validate:atm-self-atomization',
+        exitCode: 1,
+        stdoutSha256: emptySha,
+        stderrSha256: emptySha,
+        validators: ['validate:atm-self-atomization']
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
+  let rejectedFailedPass = false;
+  try {
+    await runEvidence([
+      'add',
+      '--cwd',
+      repo,
+      '--task',
+      'TASK-EVIDENCE-0001',
+      '--actor',
+      'validator',
+      '--kind',
+      'test',
+      '--summary',
+      'failed validator should not become pass evidence',
+      '--command-runs',
+      failedRunsPath,
+      '--json'
+    ]);
+  } catch (error) {
+    rejectedFailedPass = (error as { code?: string }).code === 'ATM_EVIDENCE_VALIDATION_PASS_FAILED_COMMAND';
+  }
+  assert(rejectedFailedPass, 'evidence add must reject validationPasses backed by non-zero commandRuns');
+
   const verify = await runEvidence([
     'verify',
     '--cwd',
