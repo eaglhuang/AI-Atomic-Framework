@@ -30,7 +30,6 @@ const { runCli } = await import(pathToFileURL(distEntrypoint).href);
 process.exitCode = await runCli(process.argv.slice(2));
 
 function warnIfStableRunnerIsStale(rootDir, runnerPath, cliArgs) {
-  if (cliArgs.includes('--json')) return;
   const newestSourceMtime = newestMtime([
     path.join(rootDir, 'packages', 'cli', 'src'),
     path.join(rootDir, 'scripts')
