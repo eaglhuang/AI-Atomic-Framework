@@ -121,31 +121,101 @@ function evaluateRegistryEvidence(registry) {
   };
 }
 
-function evaluateCommandCoverage(cwd, registry) {
-  const cliFile = resolve(cwd, 'packages', 'cli', 'src', 'atm.ts');
-  if (!existsSync(cliFile)) return { total: 0, withAtom: 0, coverage: 0 };
-
-  const content = readFileSync(cliFile, 'utf8');
-  const total = countLineMatches(content, /^\s*'[^']+'\s*:\s*run[A-Z]/);
-
-  const atomIds = new Set(
-    (Array.isArray(registry.entries) ? registry.entries : []).map((e) => e.logicalName ?? e.atomId ?? '')
+/**
+ * TASK-AAO-0020: public_command_coverage uses packages/cli/src/commands/command-specs.ts as
+ * the canonical public command catalog. A command is public when its registry entry does not
+ * use `withVisibility(spec, 'internal')`. Each public command must ship a per-command help
+ * spec file under packages/cli/src/commands/command-specs/<name>.spec.ts — missing files are
+ * counted as coverage gaps.
+ */
+function evaluateCommandCoverage(cwd) {
+  const specsRegistryPath = resolve(
+    cwd,
+    'packages',
+    'cli',
+    'src',
+    'commands',
+    'command-specs.ts'
   );
+  const specsDir = resolve(cwd, 'packages', 'cli', 'src', 'commands', 'command-specs');
+  const relativeRegistry = 'packages/cli/src/commands/command-specs.ts';
 
-  let withAtom = 0;
-  const commandPattern = /'([a-z][a-z0-9-]+)'\s*:\s*run[A-Z]/g;
-  for (const match of content.matchAll(commandPattern)) {
-    const cmd = match[1];
-    for (const atomId of atomIds) {
-      if (typeof atomId === 'string' && (atomId.includes(cmd) || atomId.includes('cli'))) {
-        withAtom += 1;
-        break;
-      }
+  if (!existsSync(specsRegistryPath)) {
+    return {
+      total: 0,
+      withSpec: 0,
+      coverage: 0,
+      source: relativeRegistry,
+      missing: [],
+      publicCommands: [],
+      internalCommands: [],
+      notes: ['command-specs.ts not found; scorer cannot evaluate public command coverage']
+    };
+  }
+
+  const content = readFileSync(specsRegistryPath, 'utf8');
+  const blockMatch = content.match(
+    /export\s+const\s+commandSpecs\s*=\s*Object\.freeze\(\{([\s\S]*?)\}\s*\)\s*;/
+  );
+  if (!blockMatch) {
+    return {
+      total: 0,
+      withSpec: 0,
+      coverage: 0,
+      source: relativeRegistry,
+      missing: [],
+      publicCommands: [],
+      internalCommands: [],
+      notes: ['commandSpecs Object.freeze block not found in command-specs.ts']
+    };
+  }
+
+  const block = blockMatch[1];
+  const publicCommands = [];
+  const internalCommands = [];
+  // Each entry is on its own line, e.g. `actor: actorSpec,`,
+  // `'agent-pack': agentPackSpec,`, or `do: withVisibility(doSpec, 'internal'),`.
+  // We parse line-by-line so commas inside withVisibility(...) do not split the RHS.
+  const entryLineRe = /^\s*(?:'([^']+)'|([A-Za-z][A-Za-z0-9_-]*))\s*:\s*(.+?),?\s*$/;
+  for (const line of block.split(/\r?\n/)) {
+    if (!line.trim() || line.trim().startsWith('//')) continue;
+    const match = entryLineRe.exec(line);
+    if (!match) continue;
+    const name = match[1] ?? match[2];
+    const rhs = match[3];
+    if (!name) continue;
+    if (/withVisibility\(.*,\s*['"]internal['"]\s*\)/.test(rhs)) {
+      internalCommands.push(name);
+    } else {
+      publicCommands.push(name);
     }
   }
 
-  const coverage = total === 0 ? 0 : Math.round((withAtom / total) * 100);
-  return { total, withAtom, coverage };
+  publicCommands.sort();
+  internalCommands.sort();
+
+  const missing = [];
+  let withSpec = 0;
+  for (const name of publicCommands) {
+    const specFile = resolve(specsDir, `${name}.spec.ts`);
+    if (existsSync(specFile)) {
+      withSpec += 1;
+    } else {
+      missing.push(name);
+    }
+  }
+
+  const total = publicCommands.length;
+  const coverage = total === 0 ? 0 : Math.round((withSpec / total) * 100);
+  return {
+    total,
+    withSpec,
+    coverage,
+    source: relativeRegistry,
+    missing,
+    publicCommands,
+    internalCommands
+  };
 }
 
 function evaluateRuntimeBehaviorCoverage(cwd, pathMap) {
@@ -322,7 +392,7 @@ export async function atomizeScore(options) {
   };
 
   const evidenceEval = evaluateRegistryEvidence(registry);
-  const commandEval = evaluateCommandCoverage(fullPath, registry);
+  const commandEval = evaluateCommandCoverage(fullPath);
   const runtimeEval = evaluateRuntimeBehaviorCoverage(fullPath, pathMap);
   const readableEval = evaluateReadableCallsiteCoverage(fullPath);
   const integrationEval = evaluateIntegrationHealth(fullPath);
@@ -429,7 +499,7 @@ export async function atomizeScore(options) {
 function nextTaskForGap(component) {
   switch (component) {
     case 'source_ownership_coverage': return 'TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009';
-    case 'public_command_coverage': return 'TASK-ASA-0007,TASK-ASA-0009';
+    case 'public_command_coverage': return 'TASK-AAO-0020';
     case 'atom_with_test_evidence': return 'TASK-ASA-0010';
     case 'atom_with_rollback_evidence': return 'TASK-ASA-0010';
     case 'excluded_paths_with_reason': return 'TASK-ASA-0005';
