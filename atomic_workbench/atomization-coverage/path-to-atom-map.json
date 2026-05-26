@@ -137,9 +137,33 @@
       "coverage_status": "partial"
     },
     {
+      "path_pattern": "packages/cli/src/atm.ts",
+      "atom_id": "atom-cli-router",
+      "capability": "CLI entrypoint, argv dispatch",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/**",
+      "atom_id": "atom-cli-command-specs",
+      "capability": "CLI command help spec catalog (per-command spec definitions)",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/atm-chart/**",
+      "atom_id": "atom-cli-atm-chart",
+      "capability": "atm-chart command (semver and chart utilities)",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/**",
+      "atom_id": "atom-cli-router",
+      "capability": "CLI command implementations (dispatch handlers)",
+      "coverage_status": "partial"
+    },
+    {
       "path_pattern": "packages/cli/src/**",
       "atom_id": "atom-cli-router",
-      "capability": "CLI dispatch, command routing",
+      "capability": "CLI package fallback ownership (anything not matched above)",
       "coverage_status": "partial"
     },
     {
