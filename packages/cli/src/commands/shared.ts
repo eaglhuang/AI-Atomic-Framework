@@ -266,6 +266,7 @@ type ParsedCliOptions = {
   batch?: string;
   scope?: string;
   compact?: boolean;
+  hold?: boolean;
   atom?: string;
   map?: string;
   equivalenceFixtures?: string;
@@ -300,6 +301,7 @@ export function parseOptions(argv: string[], commandName: string) {
     batch: undefined,
     scope: undefined,
     compact: false,
+    hold: false,
     atom: undefined,
     map: undefined,
     propagate: undefined,
@@ -421,6 +423,13 @@ export function parseOptions(argv: string[], commandName: string) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --compact`, { exitCode: 2 });
       }
       options.compact = true;
+      continue;
+    }
+    if (arg === '--hold') {
+      if (commandName !== 'batch') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --hold`, { exitCode: 2 });
+      }
+      options.hold = true;
       continue;
     }
     if (arg === '--actor') {

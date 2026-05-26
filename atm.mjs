@@ -9,7 +9,7 @@ const onefileEntrypoint = path.join(root, 'release', 'atm-onefile', 'atm.mjs');
 const distEntrypoint = path.join(root, 'packages', 'cli', 'dist', 'atm.js');
 
 if (existsSync(onefileEntrypoint)) {
-  warnIfStableRunnerIsStale(root, onefileEntrypoint);
+  warnIfStableRunnerIsStale(root, onefileEntrypoint, process.argv.slice(2));
   const result = spawnSync(process.execPath, [onefileEntrypoint, ...process.argv.slice(2)], {
     cwd: process.cwd(),
     env: process.env,
@@ -29,7 +29,8 @@ if (!existsSync(distEntrypoint)) {
 const { runCli } = await import(pathToFileURL(distEntrypoint).href);
 process.exitCode = await runCli(process.argv.slice(2));
 
-function warnIfStableRunnerIsStale(rootDir, runnerPath) {
+function warnIfStableRunnerIsStale(rootDir, runnerPath, cliArgs) {
+  if (cliArgs.includes('--json')) return;
   const newestSourceMtime = newestMtime([
     path.join(rootDir, 'packages', 'cli', 'src'),
     path.join(rootDir, 'scripts')

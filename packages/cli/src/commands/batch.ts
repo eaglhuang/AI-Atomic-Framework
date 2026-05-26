@@ -109,6 +109,7 @@ export async function runBatch(argv: string[]) {
   }
 
   if (action === 'checkpoint') {
+    const holdNextClaim = options.hold === true;
     const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
     if (!active) {
       throw new CliError('ATM_BATCH_RUN_MISSING', 'batch checkpoint requires an active batch run. Start with next --claim on a batch-scoped prompt; batch is for delivering each queue item, not for bulk-closing task cards.', { exitCode: 2 });
@@ -181,7 +182,7 @@ export async function runBatch(argv: string[]) {
       currentTaskId: nextTaskId,
       status: queue?.status === 'completed' || !nextTaskId ? 'completed' : 'active'
     });
-    const nextClaim = updated.status === 'active'
+    const nextClaim = updated.status === 'active' && !holdNextClaim
       ? await runNext(['--cwd', options.cwd, '--claim', '--actor', resolvedActor.actorId, '--prompt', active.sourcePrompt, '--json'])
       : null;
     if (updated.status === 'completed') {
@@ -193,17 +194,22 @@ export async function runBatch(argv: string[]) {
       cwd: options.cwd,
       messages: [message('info', 'ATM_BATCH_CHECKPOINT_OK', updated.status === 'completed'
         ? 'Batch checkpoint closed the final task and completed the batch run.'
-        : 'Batch checkpoint closed the current task, advanced the batch, and claimed the next queue head.', {
+        : holdNextClaim
+          ? 'Batch checkpoint closed the current task and held before claiming the next queue head.'
+          : 'Batch checkpoint closed the current task, advanced the batch, and claimed the next queue head.', {
         batchId: updated.batchId,
         closedTaskId: currentTaskId,
         nextTaskId: updated.currentTaskId,
+        held: holdNextClaim,
         deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.',
         commitInstruction: `Checkpoint succeeded. Stage .atm/history/tasks/${currentTaskId}.json and .atm/history/task-events/${currentTaskId}/, then create one commit that contains the already staged deliverables, evidence, task file, and task events.`,
         continueInstruction: updated.status === 'completed'
           ? 'Batch is complete after this checkpoint commit.'
+          : holdNextClaim
+            ? `Commit the closed task first, then resume with node atm.mjs batch resume --actor <id> --batch ${updated.batchId} --json or node atm.mjs next --claim --actor <id> --prompt "${updated.sourcePrompt}" --json.`
           : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId} using --batch ${updated.batchId}.`
       }),
-      ...(updated.status === 'completed'
+      ...(updated.status === 'completed' || holdNextClaim
         ? []
         : [message('warning', 'ATM_BATCH_CONTEXT_ACTIVE', 'This is a batch run. Do not switch to per-task normal flow.', {
           batchId: updated.batchId,
@@ -214,6 +220,7 @@ export async function runBatch(argv: string[]) {
         action: 'checkpoint',
         actorId: resolvedActor.actorId,
         closedTaskId: currentTaskId,
+        held: holdNextClaim,
         commitInstruction: {
           timing: 'single-commit-after-checkpoint',
           beforeCheckpoint: [

@@ -1,4 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs';
+import crypto from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -25,7 +26,7 @@ const selectedValidators = selectedNames.map((name: any) => {
     throw new Error(`Unknown validator in profile "${parsedCli.profile}": ${name}`);
   }
   return validator;
-});
+}).filter((validator: any) => parsedCli.skipSlow ? validator.slow !== true : true);
 
 if (selectedValidators.length === 0) {
   const summary = createSummary({
@@ -34,6 +35,8 @@ if (selectedValidators.length === 0) {
     filters: parsedCli.filters,
     parallel: parsedCli.parallel,
     legacy: parsedCli.legacy,
+    cache: parsedCli.cache,
+    skipSlow: parsedCli.skipSlow,
     startedAt: Date.now(),
     results: []
   });
@@ -44,9 +47,10 @@ if (selectedValidators.length === 0) {
 
 const startedAt = Date.now();
 const results = parsedCli.parallel && !parsedCli.legacy
-  ? await Promise.all(selectedValidators.map((validator: any) => runValidator(validator, profileConfig.mode, { json: parsedCli.json })))
+  ? await Promise.all(selectedValidators.map((validator: any) => runValidator(validator, profileConfig.mode, { json: parsedCli.json, cache: parsedCli.cache })))
   : await runValidatorsSequential(selectedValidators, profileConfig.mode, {
       json: parsedCli.json,
+      cache: parsedCli.cache,
       stopOnFailure: parsedCli.legacy
     });
 
@@ -56,6 +60,8 @@ const summary = createSummary({
   filters: parsedCli.filters,
   parallel: parsedCli.parallel && !parsedCli.legacy,
   legacy: parsedCli.legacy,
+  cache: parsedCli.cache,
+  skipSlow: parsedCli.skipSlow,
   startedAt,
   results
 });
@@ -69,11 +75,15 @@ function parseCliArgs(argv: any) {
     parallel: boolean;
     json: boolean;
     legacy: boolean;
+    cache: boolean;
+    skipSlow: boolean;
   } = {
     filters: [],
     parallel: false,
     json: false,
-    legacy: false
+    legacy: false,
+    cache: false,
+    skipSlow: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -98,6 +108,14 @@ function parseCliArgs(argv: any) {
     }
     if (arg === '--legacy') {
       options.legacy = true;
+      continue;
+    }
+    if (arg === '--cache') {
+      options.cache = true;
+      continue;
+    }
+    if (arg === '--skip-slow') {
+      options.skipSlow = true;
       continue;
     }
     if (arg.startsWith('--')) {
@@ -165,6 +183,22 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
     const startedAt = Date.now();
     const validatorPath = path.join(root, validator.entry);
     const command = `node --strip-types ${normalizeCommandPath(validator.entry)} --mode ${mode}`;
+    const cacheKey = buildValidatorCacheKey(validator, mode, command, validatorPath);
+    if (options.cache) {
+      const cached = readValidatorCache(cacheKey);
+      if (cached) {
+        resolve({
+          ...cached,
+          cached: true,
+          durationMs: 0,
+          envelope: {
+            ...cached.envelope,
+            durationMs: 0
+          }
+        });
+        return;
+      }
+    }
     let stdout = '';
     let stderr = '';
     let spawnError: string | null = null;
@@ -228,7 +262,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
           }, null, 2)}\n`);
         }
       }
-      resolve({
+      const result = {
         name: validator.name,
         entry: validator.entry,
         tags: validator.tags ?? [],
@@ -238,15 +272,21 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
         exitCode,
         durationMs,
         command,
+        cacheKey,
+        cached: false,
         requiredCommand: envelope.requiredCommand,
         blockingFindings: envelope.blockingFindings,
         envelope
-      });
+      };
+      if (options.cache && result.ok === true) {
+        writeValidatorCache(cacheKey, result);
+      }
+      resolve(result);
     }
   });
 }
 
-function createSummary({ profile, mode, filters, parallel, legacy, startedAt, results }: any) {
+function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSlow, startedAt, results }: any) {
   const durationMs = Date.now() - startedAt;
   const passed = results.filter((entry: any) => entry.ok === true).length;
   const failed = results.length - passed;
@@ -263,6 +303,9 @@ function createSummary({ profile, mode, filters, parallel, legacy, startedAt, re
     filters,
     parallel,
     legacy,
+    cache,
+    skipSlow,
+    cached: results.filter((entry: any) => entry.cached === true).length,
     requiredCommand: firstRequiredCommand(envelopes),
     blockingFindings,
     environmentFindings: blockingFindings.filter(isEnvironmentFinding),
@@ -277,7 +320,7 @@ function emitSummary(summary: any, jsonMode: any) {
     return;
   }
   const status = summary.failed === 0 ? 'ok' : 'failed';
-  process.stdout.write(`[validators:${summary.profile}] ${status} (passed=${summary.passed}, failed=${summary.failed}, total=${summary.total}, durationMs=${summary.durationMs})\n`);
+  process.stdout.write(`[validators:${summary.profile}] ${status} (passed=${summary.passed}, failed=${summary.failed}, total=${summary.total}, cached=${summary.cached}, durationMs=${summary.durationMs})\n`);
 }
 
 function normalizeCommandPath(relativePath: string): string {
@@ -292,6 +335,53 @@ function formatSpawnError(error: unknown): string {
     return `${error.name}: ${error.message}${code}`;
   }
   return String(error);
+}
+
+function buildValidatorCacheKey(validator: any, mode: string, command: string, validatorPath: string): string {
+  const fingerprint = {
+    schemaId: 'atm.validatorCacheKey.v1',
+    validator: validator.name,
+    entry: validator.entry,
+    mode,
+    command,
+    sourceMtimeMs: safeMtimeMs(validatorPath)
+  };
+  return crypto.createHash('sha256').update(JSON.stringify(fingerprint)).digest('hex');
+}
+
+function validatorCachePath(cacheKey: string): string {
+  return path.join(root, '.atm', 'runtime', 'validator-cache', `${cacheKey}.json`);
+}
+
+function readValidatorCache(cacheKey: string): any | null {
+  const filePath = validatorCachePath(cacheKey);
+  if (!existsSync(filePath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+    const result = parsed?.schemaId === 'atm.validatorRunCache.v1' ? parsed.result ?? null : null;
+    return result?.ok === true ? result : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeValidatorCache(cacheKey: string, result: any): void {
+  const filePath = validatorCachePath(cacheKey);
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, `${JSON.stringify({
+    schemaId: 'atm.validatorRunCache.v1',
+    cacheKey,
+    generatedAt: new Date().toISOString(),
+    result
+  }, null, 2)}\n`, 'utf8');
+}
+
+function safeMtimeMs(filePath: string): number | null {
+  try {
+    return statSync(filePath).mtimeMs;
+  } catch {
+    return null;
+  }
 }
 
 function isEnvironmentFinding(finding: any): boolean {
