@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-26T01-53-10-182Z-close-5c4c4ca31527",
+  "taskId": "TASK-ASA-0013",
+  "action": "close",
+  "actorId": "opus47-asa-runner",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ASA-0013.json",
+  "taskSha256": "sha256:bae16434b734e09857efc8c672e50a15517c7f5fdb19d9942668c3364864fb28",
+  "createdAt": "2026-05-26T01:53:10.182Z",
+  "command": "node atm.mjs tasks close --task TASK-ASA-0013 --actor opus47-asa-runner --status done --from-batch-checkpoint --batch batch-7273973f1e36",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-7273973f1e36",
+    "closurePacketPath": ".atm/history/evidence/TASK-ASA-0013.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:atom-callsite-readability",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-26T01:53:10.180Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0013-readable-entrypoint-dogfood-migration.task.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
