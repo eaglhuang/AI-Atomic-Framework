@@ -119,6 +119,8 @@ flowchart LR
 
 ## Safety Model
 
+![ATM governance layers](docs/assets/atm-governance-layers.svg)
+
 ATM keeps the governance layer explicit:
 
 - scope is locked before governed mutation;
