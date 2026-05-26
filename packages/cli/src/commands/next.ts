@@ -874,6 +874,58 @@ function buildPromptScopedNextResult(input: {
   }
   const selectedTask = selectedTasks[0] ?? null;
   if (!selectedTask) return null;
+  if (isClosedTaskStatus(selectedTask.status) && input.taskIntent?.requestedAction !== 'redo' && input.taskIntent?.requestedAction !== 'reopen') {
+    const nextAction = {
+      status: 'task-already-closed',
+      command: 'node atm.mjs next --prompt "<current user prompt>" --json',
+      reason: `task ${selectedTask.workItemId} is already ${normalizeTaskRouteStatus(selectedTask.status)}; do not edit planning task cards to simulate closure`,
+      recommendedChannel: 'normal',
+      riskLevel: 'low',
+      selectedTask,
+      closure: {
+        taskId: selectedTask.workItemId,
+        status: normalizeTaskRouteStatus(selectedTask.status),
+        closedAt: selectedTask.closedAt,
+        closedByActor: selectedTask.closedByActor,
+        closurePacketPath: selectedTask.closurePacket,
+        lastTransitionId: selectedTask.lastTransitionId,
+        lastTransitionAt: selectedTask.lastTransitionAt
+      },
+      planningStatusSync: {
+        authority: 'atm-ledger',
+        instruction: 'Planning task-card status is only a mirror. Official closure must come from the ATM task ledger close transition and closure packet.'
+      },
+      allowedCommands: allowedGuidanceBootstrapCommands(),
+      blockedCommands: [
+        ...blockedMutationCommands(),
+        'manual planning task-card status: done as completion evidence'
+      ]
+    };
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_TASK_ALREADY_CLOSED', 'ATM found the task, and it is already closed in the task ledger.', {
+          task: toTaskCandidateView(selectedTask),
+          closure: nextAction.closure,
+          planningStatusSync: nextAction.planningStatusSync
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: 'normal',
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   const activeBatch = readActiveBatchRun(input.cwd, { taskId: selectedTask.workItemId });
   if (activeBatch?.status === 'active' && activeBatch.taskIds.includes(selectedTask.workItemId)) {
     const activeQueue = findActiveTaskQueue(input.cwd, activeBatch.sourcePrompt, { batchId: activeBatch.batchId }) ?? findActiveTaskQueue(input.cwd, null, { batchId: activeBatch.batchId });
@@ -1300,6 +1352,11 @@ interface ImportedTaskSummary {
   readonly workItemId: string;
   readonly title: string;
   readonly status: string;
+  readonly closedAt: string | null;
+  readonly closedByActor: string | null;
+  readonly closurePacket: string | null;
+  readonly lastTransitionId: string | null;
+  readonly lastTransitionAt: string | null;
   readonly milestone: string | null;
   readonly dependencies: readonly string[];
   readonly taskPath: string;
@@ -1372,6 +1429,11 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           workItemId,
           title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim() : workItemId,
           status: typeof parsed.status === 'string' ? parsed.status : 'planned',
+          closedAt: normalizeOptionalString(parsed.closedAt ?? parsed.closed_at),
+          closedByActor: normalizeOptionalString(parsed.closedByActor ?? parsed.closed_by_actor),
+          closurePacket: normalizeOptionalString(parsed.closurePacket ?? parsed.closure_packet),
+          lastTransitionId: normalizeOptionalString(parsed.lastTransitionId ?? parsed.last_transition_id),
+          lastTransitionAt: normalizeOptionalString(parsed.lastTransitionAt ?? parsed.last_transition_at),
           milestone: typeof parsed.milestone === 'string' ? parsed.milestone : null,
           dependencies,
           taskPath: path.relative(cwd, filePath).replace(/\\/g, '/'),
@@ -1416,6 +1478,11 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         workItemId,
         title: normalizeOptionalString(parsed.title ?? parsed.name) ?? workItemId,
         status: normalizeOptionalString(parsed.status) ?? 'planned',
+        closedAt: normalizeOptionalString(parsed.closed_at ?? parsed.closedAt),
+        closedByActor: normalizeOptionalString(parsed.closed_by_actor ?? parsed.closedByActor),
+        closurePacket: normalizeOptionalString(parsed.closure_packet ?? parsed.closurePacket),
+        lastTransitionId: normalizeOptionalString(parsed.last_transition_id ?? parsed.lastTransitionId),
+        lastTransitionAt: normalizeOptionalString(parsed.last_transition_at ?? parsed.lastTransitionAt),
         milestone: normalizeOptionalString(parsed.milestone),
         dependencies,
         taskPath: relativeTaskPath,
@@ -1554,6 +1621,11 @@ async function prepareImportedTaskForClaim(input: {
 
 function normalizeTaskRouteStatus(status: string) {
   return String(status ?? '').trim().toLowerCase();
+}
+
+function isClosedTaskStatus(status: string) {
+  const normalized = normalizeTaskRouteStatus(status);
+  return normalized === 'done' || normalized === 'verified';
 }
 
 export function resolvePromptScopedTaskContext(cwd: string, input: { readonly prompt?: string | null; readonly intentPath?: string | null }): PromptScopedTaskContext {
@@ -1964,7 +2036,7 @@ function isQueueRequestedPrompt(prompt: string): boolean {
 function isTaskExplicitlyMentioned(task: ImportedTaskSummary, intent: TaskIntent | null): boolean {
   if (!intent || intent.mentionedTaskIds.length === 0) return false;
   const normalizedStatus = normalizeTaskRouteStatus(task.status);
-  if (normalizedStatus === 'done' || normalizedStatus === 'abandoned' || normalizedStatus === 'cancelled') {
+  if (normalizedStatus === 'abandoned' || normalizedStatus === 'cancelled') {
     return false;
   }
   return intent.mentionedTaskIds.includes(task.workItemId.toUpperCase());
@@ -2634,6 +2706,11 @@ function toTaskCandidateView(task: ImportedTaskSummary) {
     workItemId: task.workItemId,
     title: task.title,
     status: task.status,
+    closedAt: task.closedAt,
+    closedByActor: task.closedByActor,
+    closurePacket: task.closurePacket,
+    lastTransitionId: task.lastTransitionId,
+    lastTransitionAt: task.lastTransitionAt,
     taskPath: task.taskPath,
     format: task.format,
     sourcePlanPath: task.sourcePlanPath,

@@ -104,6 +104,16 @@ interface ProtectedStateFinding {
   readonly requiredCommand?: string;
 }
 
+interface TaskCardStatusFinding {
+  readonly file: string;
+  readonly taskId: string;
+  readonly previousStatus: string | null;
+  readonly nextStatus: string;
+  readonly reason: 'planning-card-done-without-ledger-closure';
+  readonly detail: string;
+  readonly requiredCommand: string;
+}
+
 interface PreCommitBlockingFinding {
   readonly code: string;
   readonly source: string;
@@ -368,6 +378,7 @@ function runPreCommitHook(cwd: string) {
     ? quickfixChangedLineCount > activeQuickfixLock.maxChangedLines
     : false;
   const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
+  const taskCardStatusReport = inspectTaskCardStatusChanges(root, stagedFiles);
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
     ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
@@ -385,6 +396,7 @@ function runPreCommitHook(cwd: string) {
     && !quickfixFileLimitExceeded
     && !quickfixLineLimitExceeded
     && protectedStateReport.ok
+    && taskCardStatusReport.ok
     && taskAudit.ok
     && failedValidatorRuns.length === 0;
   const evidenceWrite = ok && stagedFiles.length > 0
@@ -402,6 +414,7 @@ function runPreCommitHook(cwd: string) {
     quickfixLineLimitExceeded,
     quickfixChangedLineCount,
     protectedStateFindings: protectedStateReport.findings,
+    taskCardStatusFindings: taskCardStatusReport.findings,
     taskAuditFindings: taskAudit.findings,
     failedValidatorRuns
   });
@@ -427,6 +440,7 @@ function runPreCommitHook(cwd: string) {
           quickfixLineLimitExceeded,
           quickfixChangedLineCount,
           protectedStateFindings: protectedStateReport.findings,
+          taskCardStatusFindings: taskCardStatusReport.findings,
           taskAuditFindings: taskAudit.findings.length,
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
           gitIndexDiagnostic,
@@ -453,6 +467,7 @@ function runPreCommitHook(cwd: string) {
       quickfixLineLimitExceeded,
       quickfixChangedLineCount,
       protectedStateReport,
+      taskCardStatusReport,
       taskAudit,
       commandRuns,
       blockingFindings,
@@ -473,6 +488,7 @@ function buildPreCommitBlockingFindings(input: {
   readonly quickfixLineLimitExceeded: boolean;
   readonly quickfixChangedLineCount: number;
   readonly protectedStateFindings: readonly ProtectedStateFinding[];
+  readonly taskCardStatusFindings: readonly TaskCardStatusFinding[];
   readonly taskAuditFindings: ReturnType<typeof auditTasks>['findings'];
   readonly failedValidatorRuns: readonly CommandRunReport[];
 }): readonly PreCommitBlockingFinding[] {
@@ -547,6 +563,16 @@ function buildPreCommitBlockingFindings(input: {
       file: finding.file,
       detail: finding.detail,
       requiredCommand: finding.requiredCommand ?? null
+    });
+  }
+  for (const finding of input.taskCardStatusFindings) {
+    findings.push({
+      code: 'ATM_TASK_CARD_STATUS_DONE_REQUIRES_LEDGER_CLOSURE',
+      source: 'task-card-status',
+      file: finding.file,
+      detail: finding.detail,
+      requiredCommand: finding.requiredCommand,
+      data: finding
     });
   }
   for (const finding of input.taskAuditFindings.filter((entry) => entry.level === 'error')) {
@@ -923,6 +949,83 @@ function scanEncoding(cwd: string, files: readonly string[]) {
     findings,
     ok: findings.length === 0
   };
+}
+
+function inspectTaskCardStatusChanges(cwd: string, stagedFiles: readonly string[]) {
+  const findings: TaskCardStatusFinding[] = [];
+  for (const file of stagedFiles) {
+    if (!isTaskCardMarkdownPath(file)) continue;
+    const stagedText = readGitObjectText(cwd, `:${file}`);
+    if (!stagedText) continue;
+    const nextStatus = parseMarkdownTaskCardStatus(stagedText);
+    if (!isDoneLikeTaskCardStatus(nextStatus)) continue;
+    const headText = readGitObjectText(cwd, `HEAD:${file}`);
+    const previousStatus = headText ? parseMarkdownTaskCardStatus(headText) : null;
+    if (isDoneLikeTaskCardStatus(previousStatus)) continue;
+    const taskId = parseMarkdownTaskCardId(stagedText, file);
+    if (hasLocalLedgerClosure(cwd, taskId) || hasClosureSyncAttestation(stagedText)) continue;
+    findings.push({
+      file,
+      taskId,
+      previousStatus,
+      nextStatus: nextStatus ?? 'done',
+      reason: 'planning-card-done-without-ledger-closure',
+      detail: `Task card ${file} changes status to done, but ATM could not verify a matching task ledger closure packet. Planning cards are mirrors; close the task through ATM before syncing status.`,
+      requiredCommand: `node atm.mjs next --prompt ${JSON.stringify(taskId)} --json`
+    });
+  }
+  return {
+    schemaId: 'atm.taskCardStatusPreCommitReport.v1',
+    inspectedFileCount: stagedFiles.filter(isTaskCardMarkdownPath).length,
+    findings,
+    ok: findings.length === 0
+  };
+}
+
+function isTaskCardMarkdownPath(file: string) {
+  return normalizeRelativePath(file).toLowerCase().endsWith('.task.md');
+}
+
+function parseMarkdownTaskCardStatus(text: string): string | null {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? text.slice(0, 2000);
+  const match = /^status:\s*['"]?([^'"\r\n#]+)['"]?\s*$/im.exec(frontmatter);
+  return match ? match[1].trim().toLowerCase() : null;
+}
+
+function parseMarkdownTaskCardId(text: string, file: string): string {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? text.slice(0, 2000);
+  const match = /^(?:task_id|taskId|workItemId|id):\s*['"]?([^'"\r\n#]+)['"]?\s*$/im.exec(frontmatter);
+  const fallback = path.basename(file).replace(/\.task\.md$/i, '');
+  return (match?.[1]?.trim() || fallback).toUpperCase();
+}
+
+function isDoneLikeTaskCardStatus(status: string | null) {
+  return status === 'done' || status === 'verified';
+}
+
+function hasLocalLedgerClosure(cwd: string, taskId: string) {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return false;
+  try {
+    const parsed = readJsonText(readFileSync(taskPath, 'utf8')) as Record<string, unknown> | null;
+    if (!parsed || !isDoneLikeTaskCardStatus(normalizeOptionalText(parsed.status)?.toLowerCase() ?? null)) return false;
+    const closurePacket = normalizeOptionalText(parsed.closurePacket ?? parsed.closure_packet);
+    if (!closurePacket) return false;
+    return existsSync(path.join(cwd, closurePacket));
+  } catch {
+    return false;
+  }
+}
+
+function hasClosureSyncAttestation(text: string) {
+  return /Closure sync:/i.test(text)
+    && /\.closure-packet\.json/i.test(text)
+    && /\b[0-9a-f]{7,40}\b/i.test(text);
+}
+
+function readGitObjectText(cwd: string, ref: string): string | null {
+  const result = runGit(cwd, ['show', ref]);
+  return result.exitCode === 0 ? result.stdout : null;
 }
 
 function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly string[], commandRuns: readonly CommandRunReport[]) {

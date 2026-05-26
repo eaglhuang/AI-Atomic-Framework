@@ -121,6 +121,18 @@ async function main() {
     mkdirSync(ledgerTaskDir, { recursive: true });
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-LEDGER-0001.json'), 'TASK-LEDGER-0001', 'Ledger first task', 'src/first.ts');
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-LEDGER-0002.json'), 'TASK-LEDGER-0002', 'Ledger second task', 'src/second.ts');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DONE-0001.json'), 'TASK-DONE-0001', 'Already closed ledger task', 'src/done.ts', {
+      status: 'done',
+      closedAt: '2026-05-25T10:44:11.314Z',
+      closedByActor: 'prompt-scope-test',
+      closurePacket: '.atm/history/evidence/TASK-DONE-0001.closure-packet.json'
+    });
+    const doneExact = await runNext(['--cwd', tempRoot, '--prompt', 'Please check TASK-DONE-0001']);
+    assert(doneExact.ok === true, 'exact already-closed task prompt must return a successful diagnostic');
+    assert(doneExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ALREADY_CLOSED'), 'exact already-closed task prompt must report already-closed instead of scope-not-found');
+    assert((doneExact.evidence.nextAction as any).status === 'task-already-closed', 'already-closed route must expose task-already-closed status');
+    assert((doneExact.evidence.nextAction as any).closure?.closurePacketPath === '.atm/history/evidence/TASK-DONE-0001.closure-packet.json', 'already-closed route must point to the closure packet');
+    assert(!String((doneExact.evidence.nextAction as any).requiredCommand ?? '').includes('next --claim'), 'already-closed route must not tell agents to claim the task');
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-CROSS-0001.json'), 'TASK-CROSS-0001', 'Cross repo task', 'packages/cli/src/commands/next.ts', {
       scopePaths: [
         'packages/cli/src/commands/next.ts',
@@ -332,7 +344,7 @@ ${options.files ? `files: ${options.files}\n` : ''}
 `, 'utf8');
 }
 
-function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string; readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string } = {}) {
+function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string; readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string; readonly closedAt?: string; readonly closedByActor?: string; readonly closurePacket?: string } = {}) {
   writeFileSync(filePath, `${JSON.stringify({
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
@@ -341,6 +353,9 @@ function writeLedgerTask(filePath: string, taskId: string, title: string, scopeP
     dependencies: [],
     acceptance: ['bootstrap output reviewed by human gate'],
     scope: options.scopePaths ?? [scopePath],
+    ...(options.closurePacket ? { closurePacket: options.closurePacket } : {}),
+    ...(options.closedAt ? { closedAt: options.closedAt } : {}),
+    ...(options.closedByActor ? { closedByActor: options.closedByActor } : {}),
     ...(options.claimActorId ? {
       claim: {
         actorId: options.claimActorId,
