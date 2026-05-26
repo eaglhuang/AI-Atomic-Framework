@@ -248,6 +248,7 @@ export function quoteCliValue(value: unknown) {
 
 type ParsedCliOptions = {
   cwd: string;
+  ciProfile?: string;
   spec?: string;
   validate?: string;
   self: boolean;
@@ -278,11 +279,13 @@ type ParsedCliOptions = {
   intent?: string;
   files: string[];
   reason?: string;
+  skipChecks: string[];
 };
 
 export function parseOptions(argv: string[], commandName: string) {
   const options: ParsedCliOptions = {
     cwd: process.cwd(),
+    ciProfile: undefined,
     spec: undefined,
     validate: undefined,
     self: false,
@@ -311,7 +314,8 @@ export function parseOptions(argv: string[], commandName: string) {
     prompt: undefined,
     intent: undefined,
     files: [],
-    reason: undefined
+    reason: undefined,
+    skipChecks: []
   };
   const positional = [];
 
@@ -319,6 +323,23 @@ export function parseOptions(argv: string[], commandName: string) {
     const arg = argv[index];
     if (arg === '--cwd') {
       options.cwd = requireOptionValue(argv, index, '--cwd', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--ci-profile') {
+      if (commandName !== 'doctor') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --ci-profile`, { exitCode: 2 });
+      }
+      options.ciProfile = requireOptionValue(argv, index, '--ci-profile', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--skip-check') {
+      if (commandName !== 'doctor') {
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --skip-check`, { exitCode: 2 });
+      }
+      const raw = requireOptionValue(argv, index, '--skip-check', commandName);
+      options.skipChecks = options.skipChecks.concat(raw.split(',').map((entry: string) => entry.trim()).filter(Boolean));
       index += 1;
       continue;
     }

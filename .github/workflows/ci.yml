@@ -27,7 +27,13 @@ jobs:
         run: npm ci
 
       - name: ATM Doctor
-        run: node atm.mjs doctor --json
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] && [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            node atm.mjs doctor --ci-profile dependency-pr --json
+          else
+            node atm.mjs doctor --json
+          fi
 
       - name: ATM Task Audit
         run: node atm.mjs tasks audit --json

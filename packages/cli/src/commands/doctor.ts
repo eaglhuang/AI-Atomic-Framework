@@ -11,7 +11,7 @@ import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './go
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectFrameworkHookReadiness } from './integration-hooks.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
-import { makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
+import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 
 const legacyBehaviorPackageNames = [
   'plugin-behavior-atomize',
@@ -33,6 +33,7 @@ export async function runDoctor(argv: any) {
   const doctorModeFlags = new Set(['--trust', '--known-bad']);
   const { options } = parseOptions((trustMode || knownBadMode) ? argv.filter((arg: string) => !doctorModeFlags.has(arg)) : argv, 'doctor');
   const root = options.cwd;
+  const doctorPolicy = resolveDoctorPolicy(options);
   const rootPackage = readJsonIfExists(path.join(root, 'package.json')) ?? {};
   const repoIdentity = detectFrameworkRepoIdentity(root);
   const frameworkContractExpected = isFrameworkContractExpected(repoIdentity);
@@ -63,7 +64,10 @@ export async function runDoctor(argv: any) {
   const trustIntegrity = trustMode ? checkStartupIntegrity(resolveBundledIntegrityRoot()) : null;
   const knownBadStatus = knownBadMode ? checkStartupKnownBadVersion() : null;
   const rawGitHeadEvidenceCheck = createGitHeadEvidenceCheck(root, runtime);
-  const gitHeadEvidenceCheck = downgradeAdopterGitHeadEvidenceCheck(rawGitHeadEvidenceCheck, repoIdentity);
+  const gitHeadEvidenceCheck = applyDoctorPolicyToCheck(
+    downgradeAdopterGitHeadEvidenceCheck(rawGitHeadEvidenceCheck, repoIdentity),
+    doctorPolicy
+  );
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -164,6 +168,14 @@ export async function runDoctor(argv: any) {
         recommendedAction: 'Run node atm.mjs evidence git-head-backfill --actor <id> --reason "<reason>" --json when you need a traceable repair record.'
       })]
       : []),
+    ...(gitHeadEvidenceCheck.details?.status === 'skipped'
+      ? [message('warning', 'ATM_DOCTOR_CHECK_SKIPPED', 'Doctor skipped git-head-evidence for an explicit CI profile or --skip-check policy. Other doctor checks remain enforced.', {
+        skippedCheck: 'git-head-evidence',
+        ciProfile: doctorPolicy.ciProfile,
+        skipChecks: doctorPolicy.skipChecks,
+        originalStatus: gitHeadEvidenceCheck.details.originalStatus ?? null
+      })]
+      : []),
     ...(ok
       ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
       : failedChecks.includes('charter-integrity')
@@ -216,9 +228,75 @@ export async function runDoctor(argv: any) {
       runtimeAdapterReadiness,
       trustIntegrity: trustMode ? trustIntegrity : undefined,
       knownBadStatus: knownBadMode ? knownBadStatus : undefined,
+      doctorPolicy,
       recommendedAction
     }
   });
+}
+
+function resolveDoctorPolicy(options: any) {
+  const supportedProfiles = new Set(['dependency-pr']);
+  const supportedSkipChecks = new Set(['git-head-evidence']);
+  const ciProfile = typeof options.ciProfile === 'string' && options.ciProfile.trim()
+    ? options.ciProfile.trim()
+    : null;
+  if (ciProfile && !supportedProfiles.has(ciProfile)) {
+    throw new CliError('ATM_CLI_USAGE', `doctor does not support CI profile ${ciProfile}`, {
+      exitCode: 2,
+      details: {
+        supportedProfiles: [...supportedProfiles]
+      }
+    });
+  }
+
+  const skipChecks = new Set<string>();
+  for (const checkName of options.skipChecks ?? []) {
+    const normalized = String(checkName).trim();
+    if (!normalized) {
+      continue;
+    }
+    if (!supportedSkipChecks.has(normalized)) {
+      throw new CliError('ATM_CLI_USAGE', `doctor does not support skipping check ${normalized}`, {
+        exitCode: 2,
+        details: {
+          supportedSkipChecks: [...supportedSkipChecks]
+        }
+      });
+    }
+    skipChecks.add(normalized);
+  }
+  if (ciProfile === 'dependency-pr') {
+    skipChecks.add('git-head-evidence');
+  }
+
+  return {
+    ciProfile,
+    skipChecks: [...skipChecks],
+    skipReason: ciProfile === 'dependency-pr'
+      ? 'Dependency automation PRs do not produce ATM git-head governance evidence, but other doctor checks still run.'
+      : skipChecks.size > 0
+        ? 'Explicit doctor --skip-check policy.'
+        : null
+  };
+}
+
+function applyDoctorPolicyToCheck(check: any, policy: ReturnType<typeof resolveDoctorPolicy>) {
+  if (!policy.skipChecks.includes(check?.name)) {
+    return check;
+  }
+  return {
+    ...check,
+    ok: true,
+    details: {
+      status: 'skipped',
+      skippedBy: policy.ciProfile ? 'ci-profile' : 'skip-check',
+      ciProfile: policy.ciProfile,
+      reason: policy.skipReason,
+      originalStatus: check?.details?.status ?? null,
+      originalOk: check?.ok === true,
+      originalDetails: check?.details ?? null
+    }
+  };
 }
 
 function downgradeAdopterGitHeadEvidenceCheck(check: any, repoIdentity: any) {
