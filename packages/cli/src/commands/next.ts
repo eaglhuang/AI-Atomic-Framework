@@ -36,6 +36,7 @@ import {
   writeBatchRun,
   writeQuickfixLock
 } from './work-channels.ts';
+import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
 import { runTasks } from './tasks.ts';
 
@@ -433,27 +434,30 @@ async function claimNextImportedTask(input: {
       });
     }
   }
-  if (activeBatchAtClaimStart?.status === 'active'
-    && activeBatchAtClaimStart.currentTaskId
-    && claimableTask
-    && activeBatchAtClaimStart.taskIds.includes(claimableTask.workItemId)
-    && activeBatchAtClaimStart.currentTaskId !== claimableTask.workItemId) {
+  if (activeBatchAtClaimStart?.status === 'active' && claimableTask) {
     const batchPromptQueue = inspectImportedTaskQueue(input.cwd, createDeterministicTaskIntent(activeBatchAtClaimStart.sourcePrompt));
-    const queueHeadTask = input.importedTaskQueue.tasks.find((task) => task.workItemId === activeBatchAtClaimStart.currentTaskId)
-      ?? batchPromptQueue.tasks.find((task) => task.workItemId === activeBatchAtClaimStart.currentTaskId)
-      ?? batchPromptQueue.claimableTask;
-    if (!queueHeadTask) {
-      throw new CliError('ATM_BATCH_QUEUE_HEAD_REQUIRED', `Batch ${activeBatchAtClaimStart.batchId} is active, but ATM could not resolve queue head ${activeBatchAtClaimStart.currentTaskId}.`, {
+    const activeBatchClaimDecision = decideActiveBatchClaimTask({
+      activeBatch: activeBatchAtClaimStart,
+      activeQueue: activeQueueForIntent
+        ?? findActiveTaskQueue(input.cwd, activeBatchAtClaimStart.sourcePrompt, { batchId: activeBatchAtClaimStart.batchId }),
+      claimableTask,
+      visibleTasks: input.importedTaskQueue.tasks,
+      fallbackTasks: batchPromptQueue.tasks
+    });
+    if (activeBatchClaimDecision?.kind === 'queue-head-missing') {
+      throw new CliError('ATM_BATCH_QUEUE_HEAD_REQUIRED', `Batch ${activeBatchClaimDecision.batchId} is active, but ATM could not resolve queue head ${activeBatchClaimDecision.currentTaskId}.`, {
         exitCode: 1,
         details: {
-          batchId: activeBatchAtClaimStart.batchId,
-          currentTaskId: activeBatchAtClaimStart.currentTaskId,
-          attemptedTaskId: claimableTask.workItemId,
-          requiredCommand: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --prompt ${quoteCliValue(activeBatchAtClaimStart.sourcePrompt)} --json`
+          batchId: activeBatchClaimDecision.batchId,
+          currentTaskId: activeBatchClaimDecision.currentTaskId,
+          attemptedTaskId: activeBatchClaimDecision.attemptedTaskId,
+          requiredCommand: `node atm.mjs next --claim --actor ${resolvedActor.actorId} --prompt ${quoteCliValue(activeBatchClaimDecision.requiredPrompt)} --json`
         }
       });
     }
-    claimableTask = queueHeadTask;
+    if (activeBatchClaimDecision?.kind === 'use-queue-head') {
+      claimableTask = activeBatchClaimDecision.task;
+    }
   }
   if (normalizeTaskRouteStatus(claimableTask.status) === 'reserved' && !claimableTask.activeClaimActorId) {
     await runTasks([
