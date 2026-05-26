@@ -1,0 +1,146 @@
+{
+  "schemaId": "atm.behaviorPackAtomizationReport.v1",
+  "specVersion": "1.0.0",
+  "generatedAt": "2026-05-26T01:45:00.000Z",
+  "generatedBy": "TASK-ASA-0011",
+  "summary": {
+    "totalBehaviors": 10,
+    "behaviorsWithAtomContract": 10,
+    "alphaBehaviors": 1,
+    "atomCoveragePercentage": 100,
+    "mapOwner": "atm.behavior-pack-map",
+    "mapSpecPath": "atomic_workbench/maps/atm-behavior-pack/map.spec.json"
+  },
+  "behaviors": [
+    {
+      "name": "atomize",
+      "atomId": "atom-behavior-atomize",
+      "sourcePath": "packages/plugin-behavior-pack/src/atomize.ts",
+      "trigger": "user-initiated via behavior pack command",
+      "evidence": "atomize-dry-run.json fixture; atomize-inventory.js produces evidence",
+      "gate": "review-gate (generatedDraft -> reviewed before promote)",
+      "registryTransition": "creates new atom in generatedDraft status",
+      "rollbackContract": "remove proposal artifacts; no source modification",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "compose",
+      "atomId": "atom-behavior-compose",
+      "sourcePath": "packages/plugin-behavior-pack/src/compose.ts",
+      "trigger": "atom group reaches threshold for capability map",
+      "evidence": "compose-dry-run.json fixture",
+      "gate": "human-review for map composition",
+      "registryTransition": "creates new map referencing atoms",
+      "rollbackContract": "remove map.spec.json; atoms remain",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "dedup-merge",
+      "atomId": "atom-behavior-dedup-merge",
+      "sourcePath": "packages/plugin-behavior-pack/src/dedup-merge.ts",
+      "trigger": "atom-mass-detector finds duplicate semantics",
+      "evidence": "dedup-merge-dry-run.json fixture",
+      "gate": "review-gate with semantic-fingerprint diff",
+      "registryTransition": "deprecates one atom, redirects refs",
+      "rollbackContract": "reverse-redirect via lineage log",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "evolve",
+      "atomId": "atom-behavior-evolve",
+      "sourcePath": "packages/plugin-behavior-pack/src/evolve.ts",
+      "trigger": "evidence shows persistent gap in current atom",
+      "evidence": "evolve-dry-run.json fixture; conversation-driven evidence",
+      "gate": "review-gate + upgrade-proposal",
+      "registryTransition": "produces upgrade proposal with new version",
+      "rollbackContract": "rollback to previous version via hashLock",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "expire",
+      "atomId": "atom-behavior-expire",
+      "sourcePath": "packages/plugin-behavior-pack/src/expire.ts",
+      "trigger": "atom unused for N days or marked stale",
+      "evidence": "expire-dry-run.json fixture",
+      "gate": "human-review (irreversible)",
+      "registryTransition": "marks atom as expired",
+      "rollbackContract": "un-expire via attestation",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "infect",
+      "atomId": "atom-behavior-infect",
+      "sourcePath": "packages/plugin-behavior-pack/src/infect.ts",
+      "trigger": "bulk contract propagation needed across atoms",
+      "evidence": "infect-dry-run.json fixture",
+      "gate": "mutation-guard blocks runtime; alpha-flag required",
+      "registryTransition": "bulk-applies contract change to N atoms",
+      "rollbackContract": "snapshot-before-infect rollback bundle",
+      "graduationCriteria": "alpha — needs evidence of safe rollback at scale before promoting"
+    },
+    {
+      "name": "merge",
+      "atomId": "atom-behavior-merge",
+      "sourcePath": "packages/plugin-behavior-pack/src/merge.ts",
+      "trigger": "two atoms cover overlapping capability",
+      "evidence": "merge-dry-run.json fixture",
+      "gate": "review-gate with capability overlap analysis",
+      "registryTransition": "creates merged atom, deprecates two",
+      "rollbackContract": "restore deprecated atoms via lineage log",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "polymorphize",
+      "atomId": "atom-behavior-polymorphize",
+      "sourcePath": "packages/plugin-behavior-pack/src/polymorphize.ts",
+      "trigger": "concrete atom has 3+ near-identical variants",
+      "evidence": "polymorphize-dry-run.json fixture",
+      "gate": "review-gate + polymorph-template validation",
+      "registryTransition": "creates polymorph template atom",
+      "rollbackContract": "revert to concrete atoms via template inversion",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "split",
+      "atomId": "atom-behavior-split",
+      "sourcePath": "packages/plugin-behavior-pack/src/split.ts",
+      "trigger": "atom grew beyond single-responsibility size threshold",
+      "evidence": "split-dry-run.json fixture",
+      "gate": "review-gate with responsibility analysis",
+      "registryTransition": "splits one atom into N",
+      "rollbackContract": "re-merge via merge behavior",
+      "graduationCriteria": "production-ready"
+    },
+    {
+      "name": "sweep",
+      "atomId": "atom-behavior-sweep",
+      "sourcePath": "packages/plugin-behavior-pack/src/sweep.ts",
+      "trigger": "periodic maintenance or registry drift detected",
+      "evidence": "sweep-dry-run.json fixture",
+      "gate": "review-gate for any removal actions",
+      "registryTransition": "removes orphaned refs and dead entries",
+      "rollbackContract": "restore from snapshot before sweep",
+      "graduationCriteria": "production-ready"
+    }
+  ],
+  "mapFixtureValidation": {
+    "fixtureFiles": [
+      "fixtures/behaviors/atomize-dry-run.json",
+      "fixtures/behaviors/behavior-pack.manifest.json",
+      "fixtures/behaviors/compose-dry-run.json",
+      "fixtures/behaviors/dedup-merge-dry-run.json",
+      "fixtures/behaviors/evolve-dry-run.json",
+      "fixtures/behaviors/expire-dry-run.json",
+      "fixtures/behaviors/infect-dry-run.json",
+      "fixtures/behaviors/merge-dry-run.json",
+      "fixtures/behaviors/polymorphize-dry-run.json",
+      "fixtures/behaviors/split-dry-run.json",
+      "fixtures/behaviors/sweep-dry-run.json"
+    ],
+    "validatorCommand": "npm run validate:behavior-pack"
+  },
+  "rollbackPlan": {
+    "approach": "Remove the 12 newly added behavior path-to-atom-map mappings and this report.",
+    "noProductionCodeChanges": true
+  }
+}
