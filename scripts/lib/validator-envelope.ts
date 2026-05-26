@@ -9,6 +9,7 @@ export interface ValidatorBlockingFinding {
   readonly file?: string;
   readonly files?: readonly string[];
   readonly requiredCommand?: string | null;
+  readonly classification?: 'environment' | 'baseline' | 'current-task' | 'blocking';
   readonly data?: unknown;
 }
 
@@ -23,6 +24,8 @@ export interface ValidatorFailureEnvelope {
   readonly durationMs: number | null;
   readonly requiredCommand: string | null;
   readonly blockingFindings: readonly ValidatorBlockingFinding[];
+  readonly baselineFailures: readonly ValidatorBlockingFinding[];
+  readonly currentTaskFailures: readonly ValidatorBlockingFinding[];
   readonly repairHints: readonly string[];
   readonly diagnostics: {
     readonly stdoutSha256: string;
@@ -59,6 +62,8 @@ export function createValidatorFailureEnvelope(input: ValidatorFailureEnvelopeIn
       stderr,
       spawnError
     });
+  const baselineFailures = blockingFindings.filter(isBaselineFinding);
+  const currentTaskFailures = blockingFindings.filter((finding) => !isBaselineFinding(finding) && !isEnvironmentFinding(finding));
   const requiredCommand = input.ok
     ? null
     : blockingFindings.find((finding) => finding.requiredCommand)?.requiredCommand ?? input.command;
@@ -74,6 +79,8 @@ export function createValidatorFailureEnvelope(input: ValidatorFailureEnvelopeIn
     durationMs: input.durationMs ?? null,
     requiredCommand,
     blockingFindings,
+    baselineFailures,
+    currentTaskFailures,
     repairHints: input.ok ? [] : buildRepairHints(blockingFindings, input.command),
     diagnostics: {
       stdoutSha256: sha256Text(stdout),
@@ -106,6 +113,7 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       source: 'environment',
       detail: 'The validator could not spawn or access git in the current sandbox.',
       requiredCommand: input.command,
+      classification: 'environment',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
     });
   } else if (/spawn(?:sync)?\s+.*(?:eperm|eacces)/i.test(payload)) {
@@ -114,6 +122,7 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       source: 'environment',
       detail: 'The validator runner could not spawn a child process in the current sandbox.',
       requiredCommand: input.command,
+      classification: 'environment',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
     });
   } else if (/\.git[\\/]+index\.lock/i.test(payload) && /file exists|already exists|unable to create/i.test(lowerPayload)) {
@@ -122,6 +131,7 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       source: 'git-index',
       detail: 'Git reported an existing index.lock while the validator was running.',
       requiredCommand: input.command,
+      classification: 'environment',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
     });
   } else if (/index\.lock|permission denied|eperm|eacces/i.test(payload)) {
@@ -130,6 +140,7 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       source: 'git-index',
       detail: 'Git index access failed while the validator was running.',
       requiredCommand: input.command,
+      classification: 'environment',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
     });
   }
@@ -142,6 +153,7 @@ export function classifyValidatorFailure(input: Required<Pick<ValidatorFailureEn
       source: 'validator',
       detail: `${input.validatorName} exited with ${input.exitCode}.`,
       requiredCommand: input.command,
+      classification: 'current-task',
       data: { exitCode: input.exitCode, entry: input.entry ?? null, mode: input.mode ?? null }
     });
   }
@@ -160,6 +172,8 @@ export function firstRequiredCommand(envelopes: readonly ValidatorFailureEnvelop
 function extractAtmJsonFindings(stdout: string, stderr: string, fallbackCommand: string): readonly ValidatorBlockingFinding[] {
   const findings: ValidatorBlockingFinding[] = [];
   for (const parsed of parseJsonCandidates(stdout, stderr)) {
+    findings.push(...extractClassifiedFindings(parsed, 'baselineFailures', 'baseline', fallbackCommand));
+    findings.push(...extractClassifiedFindings(parsed, 'currentTaskFailures', 'current-task', fallbackCommand));
     const messages = Array.isArray((parsed as any).messages) ? (parsed as any).messages : [];
     for (const message of messages) {
       const data = typeof message === 'object' && message ? (message as any).data : null;
@@ -173,6 +187,7 @@ function extractAtmJsonFindings(stdout: string, stderr: string, fallbackCommand:
           file: typeof (nested as any).file === 'string' ? (nested as any).file : undefined,
           files: Array.isArray((nested as any).files) ? (nested as any).files.map(String) : undefined,
           requiredCommand: typeof (nested as any).requiredCommand === 'string' ? (nested as any).requiredCommand : null,
+          classification: normalizeClassification((nested as any).classification),
           data: nested
         });
       }
@@ -185,11 +200,51 @@ function extractAtmJsonFindings(stdout: string, stderr: string, fallbackCommand:
         source: 'atm-gate',
         detail: typeof message.text === 'string' ? message.text : 'ATM gate returned an error message.',
         requiredCommand: extractRequiredCommand(parsed, data) ?? fallbackCommand,
+        classification: normalizeClassification((data as any)?.classification),
         data: message
       });
     }
   }
   return findings;
+}
+
+function extractClassifiedFindings(
+  parsed: unknown,
+  fieldName: 'baselineFailures' | 'currentTaskFailures',
+  classification: 'baseline' | 'current-task',
+  fallbackCommand: string
+): readonly ValidatorBlockingFinding[] {
+  const rawFindings = (parsed as any)?.[fieldName];
+  if (!Array.isArray(rawFindings)) return [];
+  return rawFindings
+    .filter((entry) => entry && typeof entry === 'object')
+    .map((entry) => ({
+      code: String((entry as any).code ?? (classification === 'baseline' ? 'ATM_VALIDATOR_BASELINE_FAILURE' : 'ATM_VALIDATOR_CURRENT_TASK_FAILURE')),
+      source: String((entry as any).source ?? (classification === 'baseline' ? 'baseline' : 'validator')),
+      detail: String((entry as any).detail ?? (classification === 'baseline' ? 'Unrelated baseline validator failure.' : 'Current task validator failure.')),
+      file: typeof (entry as any).file === 'string' ? (entry as any).file : undefined,
+      files: Array.isArray((entry as any).files) ? (entry as any).files.map(String) : undefined,
+      requiredCommand: typeof (entry as any).requiredCommand === 'string' ? (entry as any).requiredCommand : fallbackCommand,
+      classification,
+      data: entry
+    }));
+}
+
+function normalizeClassification(value: unknown): ValidatorBlockingFinding['classification'] | undefined {
+  if (value === 'environment' || value === 'baseline' || value === 'current-task' || value === 'blocking') return value;
+  return undefined;
+}
+
+function isBaselineFinding(finding: ValidatorBlockingFinding): boolean {
+  return finding.classification === 'baseline' || finding.source === 'baseline';
+}
+
+function isEnvironmentFinding(finding: ValidatorBlockingFinding): boolean {
+  return finding.classification === 'environment'
+    || finding.source === 'environment'
+    || finding.source === 'git-index'
+    || finding.code.startsWith('ATM_ENV_')
+    || finding.code.startsWith('ATM_GIT_INDEX_');
 }
 
 function extractRequiredCommand(parsed: unknown, data: unknown): string | null {

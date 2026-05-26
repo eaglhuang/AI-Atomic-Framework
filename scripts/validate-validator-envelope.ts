@@ -76,6 +76,40 @@ validator.assert(
   'ATM gate requiredCommand must be promoted to the envelope root'
 );
 
+const baselineNoiseEnvelope = createValidatorFailureEnvelope({
+  validatorName: 'synthetic-baseline-noise',
+  command: 'npm run validate:standard',
+  entry: 'scripts/run-validators.ts',
+  mode: 'validate',
+  ok: false,
+  exitCode: 1,
+  stdout: JSON.stringify({
+    schemaId: 'atm.validatorRunSummary.v1',
+    baselineFailures: [
+      {
+        code: 'ATM_VALIDATOR_BASELINE_FAILURE',
+        source: 'baseline',
+        detail: 'pre-existing validate:standard failure unrelated to current task',
+        requiredCommand: 'npm run validate:standard'
+      }
+    ],
+    currentTaskFailures: []
+  })
+});
+
+validator.assert(
+  baselineNoiseEnvelope.baselineFailures.some((finding) => finding.code === 'ATM_VALIDATOR_BASELINE_FAILURE'),
+  'baseline validator failures must be surfaced separately from current-task failures'
+);
+validator.assert(
+  baselineNoiseEnvelope.currentTaskFailures.length === 0,
+  'baseline-only validator noise must not be reported as a current-task failure'
+);
+validator.assert(
+  baselineNoiseEnvelope.blockingFindings.some((finding) => finding.classification === 'baseline'),
+  'baseline findings must keep a stable classification marker'
+);
+
 const passingEnvelope = createValidatorFailureEnvelope({
   validatorName: 'synthetic-pass',
   command: 'node --strip-types scripts/validate-product-charter.ts --mode validate',
@@ -106,6 +140,8 @@ if (runnerStdout.trim().startsWith('{')) {
   const parsed = JSON.parse(runnerStdout);
   validator.assert(parsed.schemaId === 'atm.validatorRunSummary.v1', 'runner JSON summary must declare its schemaId');
   validator.assert(Array.isArray(parsed.blockingFindings), 'runner JSON summary must include blockingFindings[]');
+  validator.assert(Array.isArray(parsed.baselineFailures), 'runner JSON summary must include baselineFailures[]');
+  validator.assert(Array.isArray(parsed.currentTaskFailures), 'runner JSON summary must include currentTaskFailures[]');
   validator.assert(
     parsed.validators?.[0]?.envelope?.schemaId === 'atm.validatorFailureEnvelope.v1',
     'each runner validator result must include a validator failure envelope'

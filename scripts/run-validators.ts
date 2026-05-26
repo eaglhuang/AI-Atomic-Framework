@@ -292,6 +292,8 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
   const failed = results.length - passed;
   const envelopes = results.map((entry: any) => entry.envelope).filter(Boolean);
   const blockingFindings = summarizeBlockingFindings(envelopes);
+  const baselineFailures = dedupeFindings(envelopes.flatMap((envelope: any) => envelope.baselineFailures ?? []));
+  const currentTaskFailures = dedupeFindings(envelopes.flatMap((envelope: any) => envelope.currentTaskFailures ?? []));
   return {
     schemaId: 'atm.validatorRunSummary.v1',
     profile,
@@ -308,8 +310,12 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
     cached: results.filter((entry: any) => entry.cached === true).length,
     requiredCommand: firstRequiredCommand(envelopes),
     blockingFindings,
+    baselineFailures,
+    currentTaskFailures,
     environmentFindings: blockingFindings.filter(isEnvironmentFinding),
-    currentTaskFindings: blockingFindings.filter((finding: any) => !isEnvironmentFinding(finding)),
+    currentTaskFindings: currentTaskFailures.length > 0
+      ? currentTaskFailures
+      : blockingFindings.filter((finding: any) => !isEnvironmentFinding(finding) && !isBaselineFinding(finding)),
     validators: results
   };
 }
@@ -387,8 +393,26 @@ function safeMtimeMs(filePath: string): number | null {
 function isEnvironmentFinding(finding: any): boolean {
   const code = String(finding?.code ?? '');
   const source = String(finding?.source ?? '');
-  return source === 'environment'
+  const classification = String(finding?.classification ?? '');
+  return classification === 'environment'
+    || source === 'environment'
     || source === 'git-index'
     || code.startsWith('ATM_ENV_')
     || code.startsWith('ATM_GIT_INDEX_');
+}
+
+function isBaselineFinding(finding: any): boolean {
+  return String(finding?.classification ?? '') === 'baseline' || String(finding?.source ?? '') === 'baseline';
+}
+
+function dedupeFindings(findings: readonly any[]): readonly any[] {
+  const seen = new Set<string>();
+  const deduped: any[] = [];
+  for (const finding of findings) {
+    const key = `${finding?.code ?? ''}\0${finding?.source ?? ''}\0${finding?.detail ?? ''}\0${finding?.requiredCommand ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(finding);
+  }
+  return deduped;
 }
