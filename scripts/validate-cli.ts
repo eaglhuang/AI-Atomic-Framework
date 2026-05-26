@@ -11,6 +11,11 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+const profile = process.argv.includes('--profile')
+  ? process.argv[process.argv.indexOf('--profile') + 1]
+  : null;
+const surfaceOnly = mode === 'surface' || profile === 'surface' || process.argv.includes('--surface');
+const childProcessSmokeEnabled = process.env.ATM_VALIDATE_CLI_CHILD_SMOKE !== '0';
 const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
 const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');
 const perCommandHelpSnapshots = {
@@ -47,13 +52,26 @@ function readJson(relativePath: any) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
+function sandboxEpermHint(args: any, cwd: any) {
+  return [
+    `child process EPERM while running ATM args "${args.join(' ')}" in ${cwd}.`,
+    'If this is Codex on Windows, set ~/.codex/config.toml [windows] sandbox = "elevated",',
+    'or rerun this validator elevated. For temp workspace git failures, set ATM_TEMP_ROOT=C:\\tmp.'
+  ].join(' ');
+}
+
 async function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
+  return runAtmInProcess(args, cwd, env);
+}
+
+async function runAtmSpawned(args: any, cwd = root, env: Record<string, string> = {}) {
   const result = spawnSync(process.execPath, [path.join(root, fixture.entrypoint), ...args], {
     cwd,
     encoding: 'utf8',
     env: { ...process.env, ...env }
   });
   if ((result.error as NodeJS.ErrnoException | undefined)?.code === 'EPERM') {
+    console.error(`[cli:${mode}] warning: ${sandboxEpermHint(args, cwd)}`);
     return runAtmInProcess(args, cwd, env);
   }
   const payload = (result.stdout || result.stderr || '').trim();
@@ -117,6 +135,22 @@ function writeJson(filePath: any, value: any) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+function createCliTempWorkspace(prefix: string) {
+  try {
+    return createTempWorkspace(prefix);
+  } catch (error: any) {
+    if (error?.code === 'EPERM') {
+      fail([
+        `temp workspace EPERM while creating ${error.path ?? 'a validator workspace'}.`,
+        'If this is Codex on Windows, rerun this validator elevated or restart Codex after setting [windows] sandbox = "elevated".',
+        'If a custom temp root is needed, set ATM_TEMP_ROOT=C:\\tmp and make sure the directory is writable.'
+      ].join(' '));
+      process.exit(process.exitCode ?? 1);
+    }
+    throw error;
+  }
+}
+
 function writeHostPackageLockSignals(cwd: any) {
   writeJson(path.join(cwd, 'package.json'), {
     name: 'host-with-package-lock',
@@ -155,6 +189,13 @@ for (const commandName of fixture.commands) {
 }
 
 const packageManifest = readJson('package.json');
+if (childProcessSmokeEnabled) {
+  const spawnedVersion = await runAtmSpawned(['--version'], root);
+  assert(spawnedVersion.exitCode === 0, 'spawned --version smoke test must exit 0');
+  assertReadable(spawnedVersion, 'spawned --version');
+  assert(spawnedVersion.parsed.ok === true, 'spawned --version smoke test must report ok=true');
+}
+
 const version = await runAtm(['--version'], root);
 assert(version.exitCode === 0, '--version must exit 0');
 assertReadable(version, '--version');
@@ -199,7 +240,14 @@ for (const commandName of publicCommandNames) {
   }
 }
 
-const tempRoot = createTempWorkspace('atm-cli-');
+if (surfaceOnly) {
+  if (!process.exitCode) {
+    console.log(`[cli:${mode}] ok surface (${publicCommandNames.length} public commands, ${internalCommandNames.length} internal commands, in-process help checks)`);
+  }
+  process.exit(process.exitCode ?? 0);
+}
+
+const tempRoot = createCliTempWorkspace('atm-cli-');
 try {
   const onefileCacheRoot = path.join(tempRoot, 'onefile-cache');
   for (const [entryName, timestamp] of [
