@@ -6,6 +6,8 @@ type AtomizeOptions = {
   cwd: string;
   subcommand: string | null;
   repo: string;
+  apply: boolean;
+  dryRun: boolean;
 };
 
 export async function runAtomize(argv: any) {
@@ -33,13 +35,17 @@ export async function runAtomize(argv: any) {
     return runAtomizeScore(options);
   }
 
+  if (options.subcommand === 'backfill') {
+    return runAtomizeBackfill(options);
+  }
+
   return makeResult({
     ok: false,
     command: 'atomize',
     cwd: options.cwd,
     messages: [
       message('error', 'ATM_ATOMIZE_UNKNOWN_SUBCOMMAND', `Unknown subcommand: ${options.subcommand}`, {
-        supportedSubcommands: ['inventory', 'score']
+        supportedSubcommands: ['inventory', 'score', 'backfill']
       })
     ]
   });
@@ -187,16 +193,80 @@ async function runAtomizeScore(options: AtomizeOptions) {
   }
 }
 
+async function runAtomizeBackfill(options: AtomizeOptions) {
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const repoRoot = path.resolve(__dirname, '../../../../');
+    const scriptPath = path.join(repoRoot, 'scripts', 'src', 'atomize-backfill.js');
+
+    const { atomizeBackfill } = await import(pathToFileURL(scriptPath).href);
+
+    const result = await atomizeBackfill({
+      repo: options.repo,
+      apply: options.apply
+    });
+
+    if (result.status === 'error') {
+      return makeResult({
+        ok: false,
+        command: 'atomize backfill',
+        cwd: options.cwd,
+        messages: [
+          message('error', 'ATM_ATOMIZE_BACKFILL_ERROR', result.message, {})
+        ]
+      });
+    }
+
+    const modeLabel = result.mode === 'apply' ? 'applied (governance artifacts only)' : 'dry-run proposal';
+    return makeResult({
+      ok: true,
+      command: 'atomize backfill',
+      cwd: options.cwd,
+      messages: [
+        message('info', 'ATM_ATOMIZE_BACKFILL_SUCCESS', `Atomize backfill completed: ${modeLabel}.`, {
+          mode: result.mode,
+          atomProposalCount: result.report?.summary?.total_atom_proposals ?? 0,
+          familyBreakdown: result.report?.summary?.family_breakdown ?? {}
+        })
+      ],
+      evidence: {
+        schemaId: result.schemaId ?? 'atm.atomBackfillProposal.v1',
+        mode: result.mode,
+        summary: result.report?.summary ?? null,
+        artifactPaths: result.artifactPaths,
+        review_required: true,
+        no_production_code_changes: true,
+        all_generated_marked_as: 'generatedDraft',
+        proposalSample: (result.report?.proposals ?? []).slice(0, 5)
+      }
+    });
+  } catch (err: any) {
+    return makeResult({
+      ok: false,
+      command: 'atomize backfill',
+      cwd: options.cwd,
+      messages: [
+        message('error', 'ATM_ATOMIZE_BACKFILL_FAILED', `Atomize backfill failed: ${err.message}`, {
+          stack: err.stack
+        })
+      ]
+    });
+  }
+}
+
 function parseAtomizeArgs(argv: any) {
   const state: AtomizeOptions = {
     cwd: process.cwd(),
     subcommand: null,
-    repo: '.'
+    repo: '.',
+    apply: false,
+    dryRun: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
-    
+
     if (arg === '--cwd') {
       state.cwd = requireValue(argv, index, '--cwd');
       index += 1;
@@ -206,6 +276,16 @@ function parseAtomizeArgs(argv: any) {
     if (arg === '--repo') {
       state.repo = requireValue(argv, index, '--repo');
       index += 1;
+      continue;
+    }
+
+    if (arg === '--apply') {
+      state.apply = true;
+      continue;
+    }
+
+    if (arg === '--dry-run') {
+      state.dryRun = true;
       continue;
     }
 
