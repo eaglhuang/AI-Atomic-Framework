@@ -1,0 +1,142 @@
+{
+  "schemaId": "atm.atomBackfillAppliedManifest.v1",
+  "specVersion": "1.0.0",
+  "appliedAt": "2026-05-26T00:32:41.693Z",
+  "mode": "apply",
+  "proposal_path": "atomic_workbench/atomization-coverage/atom-backfill-proposal.json",
+  "applied_count": 21,
+  "governance_artifacts_only": true,
+  "no_production_code_changes": true,
+  "registry_placeholders": [
+    {
+      "atomId": "atom-adapter-local-git",
+      "mapFamily": "atm.bootstrap-runtime-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/adapter-local-git/src/index.ts"
+    },
+    {
+      "atomId": "atom-local-git-adapter",
+      "mapFamily": "atm.bootstrap-runtime-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/adapter-local-git/src/local-git-adapter.ts"
+    },
+    {
+      "atomId": "atom-agent-pack-claude-code",
+      "mapFamily": "atm.bootstrap-runtime-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/agent-pack-claude-code/src/index.ts"
+    },
+    {
+      "atomId": "atom-agent-pack-copilot",
+      "mapFamily": "atm.bootstrap-runtime-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/agent-pack-copilot/src/index.ts"
+    },
+    {
+      "atomId": "atom-agent-pack-cursor",
+      "mapFamily": "atm.bootstrap-runtime-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/agent-pack-cursor/src/index.ts"
+    },
+    {
+      "atomId": "atom-index",
+      "mapFamily": "atm.language-adapter-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/language-js/src/index.ts"
+    },
+    {
+      "atomId": "atom-language-js-adapter",
+      "mapFamily": "atm.language-adapter-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/language-js/src/language-js-adapter.ts"
+    },
+    {
+      "atomId": "atom-index",
+      "mapFamily": "atm.language-adapter-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/language-python/src/index.ts"
+    },
+    {
+      "atomId": "atom-language-python-adapter",
+      "mapFamily": "atm.language-adapter-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/language-python/src/language-python-adapter.ts"
+    },
+    {
+      "atomId": "atom-behavior-atomize",
+      "mapFamily": "atm.behavior-pack-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/plugin-behavior-pack/src/atomize.ts"
+    },
+    {
+      "atomId": "atom-behavior-compose",
+      "mapFamily": "atm.behavior-pack-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/plugin-behavior-pack/src/compose.ts"
+    },
+    {
+      "atomId": "atom-behavior-dedup-merge",
+      "mapFamily": "atm.behavior-pack-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/plugin-behavior-pack/src/dedup-merge.ts"
+    },
+    {
+      "atomId": "atom-behavior-evolve",
+      "mapFamily": "atm.behavior-pack-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/plugin-behavior-pack/src/evolve.ts"
+    },
+    {
+      "atomId": "atom-behavior-expire",
+      "mapFamily": "atm.behavior-pack-map",
+      "status": "generatedDraft",
+      "sourcePath": "packages/plugin-behavior-pack/src/expire.ts"
+    },
+    {
+      "atomId": "atom-atomize-inventory",
+      "mapFamily": "atm.atom-birth-map",
+      "status": "generatedDraft",
+      "sourcePath": "scripts/src/atomize-inventory.js"
+    },
+    {
+      "atomId": "atom-atomize-score",
+      "mapFamily": "atm.atom-birth-map",
+      "status": "generatedDraft",
+      "sourcePath": "scripts/src/atomize-score.js"
+    },
+    {
+      "atomId": "atom-validator-agent-execute",
+      "mapFamily": "atm.guard-validation-map",
+      "status": "generatedDraft",
+      "sourcePath": "scripts/validate-agent-execute.ts"
+    },
+    {
+      "atomId": "atom-validator-agent-prompt",
+      "mapFamily": "atm.guard-validation-map",
+      "status": "generatedDraft",
+      "sourcePath": "scripts/validate-agent-prompt.ts"
+    },
+    {
+      "atomId": "atom-validator-atom-callsite-readability",
+      "mapFamily": "atm.guard-validation-map",
+      "status": "generatedDraft",
+      "sourcePath": "scripts/validate-atom-callsite-readability.ts"
+    },
+    {
+      "atomId": "atom-validator-atomization-coverage",
+      "mapFamily": "atm.guard-validation-map",
+      "status": "generatedDraft",
+      "sourcePath": "scripts/validate-atomization-coverage.ts"
+    },
+    {
+      "atomId": "atom-validator-behavior-pack",
+      "mapFamily": "atm.guard-validation-map",
+      "status": "generatedDraft",
+      "sourcePath": "scripts/validate-behavior-pack.ts"
+    }
+  ],
+  "review_gate": {
+    "required": true,
+    "next_step": "Run human-review on each generatedDraft atom before promoting status to reviewed."
+  }
+}
