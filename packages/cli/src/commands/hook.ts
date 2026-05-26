@@ -343,9 +343,7 @@ function runPreCommitHook(cwd: string) {
   const activeDirectionLocks = readActiveTaskDirectionLocks(root);
   const activeQuickfixLock = readActiveQuickfixLock(root);
   const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
-  const checkpointClosedTaskAllowedFiles = activeDirectionLocks.length > 0
-    ? collectStagedBatchCheckpointScopeFiles(root, stagedFiles)
-    : [];
+  const checkpointClosedTaskAllowedFiles = collectStagedBatchCheckpointScopeFiles(root, stagedFiles);
   const frameworkTempClaimAllowedFiles = activeDirectionLocks.length > 0
     ? collectFrameworkTempClaimAllowedFiles(root)
     : [];
@@ -603,6 +601,7 @@ function inspectGitIndexAccess(cwd: string) {
   const indexLockPath = path.join(cwd, '.git', 'index.lock');
   const status = runGit(cwd, ['status', '--short']);
   const stderr = status.stderr.trim();
+  const environmentFailure = classifySandboxGitFailure(stderr);
   const detail = status.exitCode === 0
     ? 'Git index is readable by ATM pre-commit diagnostics.'
     : classifyGitIndexFailure(stderr || `git status exited with ${status.exitCode}`);
@@ -611,6 +610,8 @@ function inspectGitIndexAccess(cwd: string) {
     ok: status.exitCode === 0,
     code: status.exitCode === 0
       ? 'ATM_GIT_INDEX_OK'
+      : environmentFailure
+        ? 'ATM_ENV_SANDBOX_GIT_EPERM'
       : /index\.lock|permission denied|eperm|unable to create/i.test(stderr)
         ? 'ATM_GIT_INDEX_PERMISSION_DENIED'
         : 'ATM_GIT_INDEX_UNAVAILABLE',
@@ -621,6 +622,8 @@ function inspectGitIndexAccess(cwd: string) {
     detail,
     requiredCommand: status.exitCode === 0
       ? null
+      : environmentFailure
+        ? 'Rerun the same command with repository-level permissions, or set ATM_TEMP_ROOT=C:\\tmp for validators that create temporary git repositories, then retry. This is an environment diagnostic, not task evidence.'
       : 'Resolve the local Git/index permission problem outside ATM, then rerun the commit. Do not edit .git/index.lock by hand unless you have confirmed no Git process is active.'
   };
 }
@@ -630,6 +633,13 @@ function classifyGitIndexFailure(stderr: string) {
     return `Git could not access the index lock (${stderr}). This is an environment or sandbox permission problem, not a task evidence failure.`;
   }
   return `Git index diagnostic failed (${stderr}).`;
+}
+
+function classifySandboxGitFailure(stderr: string): boolean {
+  return /spawnSync\s+git\s+(?:EPERM|EACCES)/i.test(stderr)
+    || /(?:EPERM|EACCES).*git/i.test(stderr)
+    || /permission denied/i.test(stderr)
+    || /\.git[\\/]+index\.lock/i.test(stderr);
 }
 
 function runPrePushHook(cwd: string, base: string | null, head: string | null) {

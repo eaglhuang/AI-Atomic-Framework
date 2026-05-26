@@ -211,6 +211,26 @@ try {
   assert(aiManualAudit.ok === false, 'AI-issued manual tasks must fail audit');
   assert(aiManualAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_AI_MANUAL_TASK_IN_LEDGER'), 'AI-issued manual task finding must be reported');
 
+  const planningOnlyRepo = makeFrameworkRepo(tempRoot);
+  writeJson(path.join(planningOnlyRepo, '.atm', 'history', 'tasks', 'TASK-PLAN-0001.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-PLAN-0001',
+    title: 'Planning-only done task',
+    status: 'done',
+    planning_repo: '3KLife',
+    target_repo: '3KLife',
+    closure_authority: 'planning_repo',
+    source: {
+      planPath: '../3KLife/docs/plan.md',
+      sectionTitle: 'TASK-PLAN-0001',
+      headingLine: 1,
+      hash: 'planning-only'
+    }
+  });
+  const planningOnlyAudit = auditTasks(planningOnlyRepo);
+  assert(planningOnlyAudit.ok === true, 'planning-only done tasks must not block target framework audit');
+  assert(planningOnlyAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_PLANNING_ONLY_DONE'), 'planning-only done task must be reported as warning');
+
   const mirrorResult = await runTasks([
     'mirror',
     '--cwd',

@@ -12,8 +12,27 @@ function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
+function assertDecisionTrail(action: any, expectedStatus: string) {
+  const trail = action?.decisionTrail;
+  assert(Array.isArray(trail) && trail.length > 0, `${expectedStatus} route must expose nextAction.decisionTrail`);
+  assert(trail[0]?.check === 'route-status', `${expectedStatus} decisionTrail must start with route-status`);
+  assert(trail[0]?.reason && typeof trail[0].reason === 'string', `${expectedStatus} decisionTrail route-status needs a public reason`);
+  assert(!JSON.stringify(trail).toLowerCase().includes('chain-of-thought'), `${expectedStatus} decisionTrail must not expose private reasoning labels`);
+  return trail as Array<{
+    check: string;
+    result: string;
+    reason: string;
+    evidencePath?: string;
+    nextCommand?: string;
+  }>;
+}
+
 async function main() {
   const tempRoot = mkdtempSync(path.join(process.cwd(), '.atm-temp', 'prompt-scoped-next-'));
+  const previousGitCeilingDirectories = process.env.GIT_CEILING_DIRECTORIES;
+  process.env.GIT_CEILING_DIRECTORIES = [process.cwd(), previousGitCeilingDirectories]
+    .filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
+    .join(path.delimiter);
   try {
     const planDir = path.join(tempRoot, 'docs', 'plan');
     const taskDir = path.join(planDir, 'tasks');
@@ -48,6 +67,8 @@ async function main() {
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
     assert((exact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'exact task id prompt selected wrong task');
     assert((exact.evidence.nextAction as any).recommendedChannel === 'normal', 'exact task id prompt must recommend normal channel');
+    const exactTrail = assertDecisionTrail(exact.evidence.nextAction as any, 'task-route-ready');
+    assert(exactTrail.some((entry) => entry.check === 'task-selection' && entry.result === 'pass'), 'exact task route decisionTrail must record task selection');
 
     const genericExact = await runNext(['--cwd', tempRoot, '--prompt', '請處理 SANGUO-BOOTSTRAP-0001']);
     assert(genericExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'generic governed task id prompt must route to one task');
@@ -98,10 +119,14 @@ async function main() {
     assert((queue.evidence.nextAction as any).deliveryPrinciple?.schemaId === 'atm.taskDeliveryPrinciple.v1', 'plan-scoped queue prompt must carry delivery principle evidence');
     assert((queue.evidence.taskQueue as any)?.schemaId === 'atm.taskQueuePreview.v1', 'plan-scoped queue prompt must stay read-only and only expose a queue preview');
     assert((queue.evidence.nextAction as any).queueHeadTaskId === 'TASK-ALPHA-0001', 'plan-scoped queue must expose the queue head');
+    const queueTrail = assertDecisionTrail(queue.evidence.nextAction as any, 'task-queue-ready');
+    assert(queueTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-ALPHA-0001')), 'queue decisionTrail must record the queue head');
 
     const scopedNotFound = await runNext(['--cwd', tempRoot, '--prompt', 'ATM framework 100% self atomization plan implement all task cards']);
     assert(scopedNotFound.ok === false, 'explicit scoped prompt without matching tasks must not route to an unrelated task');
     assert(scopedNotFound.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'explicit scoped prompt without matching tasks must report task scope not found');
+    const scopedNotFoundTrail = assertDecisionTrail(scopedNotFound.evidence.nextAction as any, 'task-scope-not-found');
+    assert(scopedNotFoundTrail.some((entry) => entry.check === 'prompt-scope-resolution' && entry.result === 'blocked'), 'scope-not-found decisionTrail must record fail-closed scope resolution');
 
     const externalPlanQueue = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 ATM Agent-First 可操作性優化計畫書，請按照 ATM 的流程完成所有任務卡']);
     assert(externalPlanQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'external planning document prompt must route to its adjacent task cards');
@@ -218,6 +243,8 @@ target_repo: AI-Atomic-Framework
     assert((ledgerClaim.evidence.taskDirectionLock as any)?.schemaId === 'atm.taskDirectionLock.v1', 'next --claim must persist atm.taskDirectionLock.v1');
     assert((ledgerClaim.evidence.nextAction as any).deliveryPrinciple?.notAllowedAsCompletion?.some((entry: string) => entry.includes('.atm/history')), 'next --claim delivery principle must reject ledger-only completion');
     assert((ledgerClaim.evidence.batchRun as any)?.schemaId === 'atm.batchRun.v1', 'batch claim must persist atm.batchRun.v1');
+    const ledgerClaimTrail = assertDecisionTrail(ledgerClaim.evidence.nextAction as any, 'claimed batch route');
+    assert(ledgerClaimTrail.some((entry) => entry.check === 'task-direction-lock' && entry.result === 'pass'), 'claimed route decisionTrail must record task direction lock evidence');
     const ledgerBatchId = (ledgerClaim.evidence.batchRun as any)?.batchId;
     assert(typeof ledgerBatchId === 'string' && ledgerBatchId.length > 0, 'batch claim must return a stable batchId');
     const lockPath = path.join(tempRoot, '.atm', 'runtime', 'locks', 'TASK-LEDGER-0001.lock.json');
@@ -316,6 +343,8 @@ target_repo: AI-Atomic-Framework
     const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', 'Please do the next task card']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
     assert(ambiguous.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SELECTION_REQUIRED'), 'ambiguous task-card prompt must ask for task selection');
+    const ambiguousTrail = assertDecisionTrail(ambiguous.evidence.nextAction as any, 'task-selection-required');
+    assert(ambiguousTrail.some((entry) => entry.check === 'prompt-scope-resolution' && entry.result === 'blocked'), 'ambiguous route decisionTrail must record selection requirement');
 
     const nonTaskPrompt = await runNext(['--cwd', tempRoot, '--prompt', 'Please show onboarding guidance']);
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'non-task prompt must route to prompt-scoped guidance');
@@ -325,6 +354,11 @@ target_repo: AI-Atomic-Framework
     assert(noPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING'), 'next without prompt must require the current user prompt for task routing');
     assert((noPrompt.evidence.nextAction as any).batchInstruction?.includes('recommendedChannel=batch'), 'next without prompt must explain that batch needs the original prompt');
   } finally {
+    if (previousGitCeilingDirectories === undefined) {
+      delete process.env.GIT_CEILING_DIRECTORIES;
+    } else {
+      process.env.GIT_CEILING_DIRECTORIES = previousGitCeilingDirectories;
+    }
     rmSync(tempRoot, { recursive: true, force: true });
     rmSync(path.join(path.dirname(tempRoot), '3KLife'), { recursive: true, force: true });
   }

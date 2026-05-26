@@ -524,6 +524,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
   const mirrorKeys = new Set<string>();
 
   for (const task of taskDocs) {
+    const planningOnlyTask = isPlanningOnlyAuthorityTask(root, task.document);
     const manualTaskActor = firstAiIssuedManualTaskActor(task.document);
     if (manualTaskActor && task.taskId !== bootstrapTaskId) {
       findings.push({
@@ -564,6 +565,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
     const transitionRequired = taskLedger.enabled
       && taskLedger.provider === 'atm-local'
       && taskLedger.requireCliTransitions
+      && !planningOnlyTask
       && (task.status === 'done' || Boolean(originProvider || originTaskId));
     if (transitionRequired && !lastTransitionId) {
       findings.push({
@@ -590,6 +592,17 @@ export function auditTasks(cwd: string): TaskAuditReport {
     const hasCliClosure = Boolean(task.document.closedByActor || task.document.closedByCommand === 'atm tasks close');
     const hasLegacyBaseline = normalizeOptionalString(task.document.ledgerBaselineKind ?? task.document.ledger_baseline_kind) === 'legacy-transition-backfill'
       && hasTransitionEvent;
+
+    if (planningOnlyTask) {
+      findings.push({
+        level: 'warning',
+        code: 'ATM_TASK_AUDIT_PLANNING_ONLY_DONE',
+        path: task.relativePath,
+        taskId: task.taskId,
+        detail: `Task ${task.taskId} is marked done under planning authority and is not enforced as target-repo closure evidence in this repository.`
+      });
+      continue;
+    }
 
     if (closureAuthority === 'target_repo' && targetRepo && !matchesCurrentRepoIdentity(root, targetRepo)) {
       if (!closurePacketRef) {
@@ -1096,6 +1109,16 @@ function parseMarkdownFrontmatter(text: string): Record<string, unknown> {
 function normalizeClosureAuthority(value: unknown): ClosureAuthority {
   const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
   return normalized === 'target_repo' ? 'target_repo' : normalized === 'local' ? 'local' : 'none';
+}
+
+function isPlanningOnlyAuthorityTask(root: string, document: Record<string, unknown>): boolean {
+  const explicitPlanningOnly = String(document.planningOnly ?? document.planning_only ?? '').trim().toLowerCase();
+  if (explicitPlanningOnly === 'true' || explicitPlanningOnly === 'yes') return true;
+  const closureAuthorityRaw = String(document.closure_authority ?? document.closureAuthority ?? '').trim().toLowerCase().replace(/-/g, '_');
+  if (closureAuthorityRaw === 'planning_repo') return true;
+  const targetRepo = normalizeOptionalString(document.target_repo ?? document.targetRepo ?? document.upstream_repo ?? document.upstreamRepo);
+  const planningRepo = normalizeOptionalString(document.planning_repo ?? document.planningRepo);
+  return Boolean(planningRepo && targetRepo && !matchesCurrentRepoIdentity(root, targetRepo) && closureAuthorityRaw !== 'target_repo');
 }
 
 function normalizeStatus(value: unknown): string {

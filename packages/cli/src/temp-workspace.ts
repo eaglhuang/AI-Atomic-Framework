@@ -20,8 +20,19 @@ export function initializeGitRepository(repositoryRoot: any) {
     encoding: 'utf8'
   });
   if (result.status !== 0) {
-    throw new Error(`git init failed for ${repositoryRoot}: ${result.stderr || result.stdout}`);
+    const stderr = [String(result.stderr ?? ''), result.error?.message ?? ''].filter(Boolean).join('\n');
+    if (isSandboxGitProcessFailure(stderr)) {
+      throw new Error(`ATM_ENV_SANDBOX_GIT_EPERM: git init failed for ${repositoryRoot}: ${stderr || result.stdout}. Set ATM_TEMP_ROOT=C:\\tmp or rerun with repository-level permissions; this is an environment/sandbox failure, not task evidence.`);
+    }
+    throw new Error(`git init failed for ${repositoryRoot}: ${stderr || result.stdout}`);
   }
+}
+
+function isSandboxGitProcessFailure(stderr: string): boolean {
+  return /spawnSync\s+git\s+(?:EPERM|EACCES)/i.test(stderr)
+    || /(?:EPERM|EACCES).*git/i.test(stderr)
+    || /permission denied/i.test(stderr)
+    || /\.git[\\/]+index\.lock/i.test(stderr);
 }
 
 function resolveTempBaseRoot() {

@@ -50,6 +50,22 @@ export interface TaskImportRecord {
   readonly dependencies: readonly string[];
   readonly acceptance: readonly string[];
   readonly deliverables: readonly string[];
+  readonly scopePaths?: readonly string[];
+  readonly validators?: readonly string[];
+  readonly planningRepo?: string | null;
+  readonly targetRepo?: string | null;
+  readonly closureAuthority?: string | null;
+  readonly planningReadOnlyPaths?: readonly string[];
+  readonly planningMirrorPaths?: readonly string[];
+  readonly outOfScope?: readonly string[];
+  readonly nonGoals?: readonly string[];
+  readonly evidenceRequired?: string | null;
+  readonly rollbackStrategy?: string | null;
+  readonly atomizationImpact?: {
+    readonly ownerAtomOrMap?: string | null;
+    readonly mapUpdates?: readonly string[];
+  };
+  readonly legacyImportAliases?: Record<string, readonly string[] | string>;
   readonly tags: readonly string[];
   readonly notes?: string | null;
   readonly source: TaskImportSource;
@@ -223,9 +239,15 @@ async function runTasksImport(argv: string[]) {
 
   const planText = readFileSync(planAbsolute, 'utf8');
   const generatedAt = new Date().toISOString();
-  const parsed = parsePlanMarkdown({
+  let parsed = parsePlanMarkdown({
     planText,
     planRelativePath: relativePathFrom(options.cwd, planAbsolute),
+    importedAt: generatedAt
+  });
+  parsed = enrichParsedTasksFromSiblingTaskCards({
+    cwd: options.cwd,
+    planAbsolute,
+    parsed,
     importedAt: generatedAt
   });
 
@@ -3381,18 +3403,29 @@ function parseSingleCard(input: {
   const frontMatter = extractFrontMatter(input.planText);
   if (!frontMatter || typeof frontMatter.data.task_id !== 'string') return null;
   const workItemId = normalizeTaskId(frontMatter.data.task_id);
-  const title = typeof frontMatter.data.title === 'string' && frontMatter.data.title.trim()
-    ? frontMatter.data.title.trim()
-    : workItemId;
+  const title = normalizeOptionalString(frontMatter.data.title) ?? workItemId;
   const status = coerceStatus(typeof frontMatter.data.status === 'string' ? frontMatter.data.status : 'planned');
-  const milestone = typeof frontMatter.data.milestone === 'string' ? frontMatter.data.milestone : null;
-  const dependencies = parseYamlList(frontMatter.data.blocked_by ?? frontMatter.data.dependencies);
+  const milestone = normalizeOptionalString(frontMatter.data.milestone);
+  const dependencies = parseYamlList(frontMatter.data.depends_on ?? frontMatter.data.blocked_by ?? frontMatter.data.dependencies);
   const tags = parseYamlList(frontMatter.data.tags);
+  const scopePaths = parseYamlList(frontMatter.data.scopePaths ?? frontMatter.data.scope_paths ?? frontMatter.data.allowed_files ?? frontMatter.data.allowedFiles ?? frontMatter.data.scope);
+  const validators = parseYamlList(frontMatter.data.validators);
+  const planningMirrorPaths = parseYamlList(frontMatter.data.planningMirrorPaths ?? frontMatter.data.planning_mirror_paths);
+  const planningReadOnlyPaths = parseYamlList(frontMatter.data.planningReadOnlyPaths ?? frontMatter.data.planning_read_only_paths);
+  const outOfScope = parseYamlList(frontMatter.data.outOfScope ?? frontMatter.data.out_of_scope ?? frontMatter.data.forbidden_files);
+  const nonGoals = parseYamlList(frontMatter.data.nonGoals ?? frontMatter.data.non_goals);
+  const mapUpdates = parseYamlList(frontMatter.data.mapUpdates ?? frontMatter.data.map_updates);
   const body = input.planText.slice(frontMatter.endIndex);
   const sections = sliceBodyByHeadings(body);
   const acceptance = collectBulletList(sections, acceptanceHeaders);
-  const deliverables = collectBulletList(sections, deliverablesHeaders);
+  const frontMatterDeliverables = parseYamlList(frontMatter.data.deliverables);
+  const deliverables = uniqueStrings([
+    ...frontMatterDeliverables,
+    ...collectBulletList(sections, deliverablesHeaders)
+  ].map(normalizeYamlScalar));
   const notes = collectText(sections, notesHeaders) ?? null;
+  const evidenceRequired = normalizeOptionalString(frontMatter.data.evidenceRequired ?? frontMatter.data.evidence_required ?? frontMatter.data.required);
+  const rollbackStrategy = normalizeOptionalString(frontMatter.data.rollbackStrategy ?? frontMatter.data.rollback_strategy ?? frontMatter.data.strategy);
 
   return {
     schemaVersion: 'atm.workItem.v0.2',
@@ -3403,6 +3436,26 @@ function parseSingleCard(input: {
     dependencies,
     acceptance,
     deliverables,
+    scopePaths,
+    validators,
+    planningRepo: normalizeOptionalString(frontMatter.data.planning_repo ?? frontMatter.data.planningRepo),
+    targetRepo: normalizeOptionalString(frontMatter.data.target_repo ?? frontMatter.data.targetRepo ?? frontMatter.data.upstream_repo ?? frontMatter.data.upstreamRepo),
+    closureAuthority: normalizeOptionalString(frontMatter.data.closure_authority ?? frontMatter.data.closureAuthority),
+    planningReadOnlyPaths,
+    planningMirrorPaths,
+    outOfScope,
+    nonGoals,
+    evidenceRequired,
+    rollbackStrategy,
+    atomizationImpact: {
+      ownerAtomOrMap: normalizeOptionalString(frontMatter.data.ownerAtomOrMap ?? frontMatter.data.owner_atom_or_map),
+      mapUpdates
+    },
+    legacyImportAliases: {
+      ...(frontMatter.data.allowed_files ? { allowed_files: parseYamlList(frontMatter.data.allowed_files) } : {}),
+      ...(frontMatter.data.blocked_by ? { blocked_by: parseYamlList(frontMatter.data.blocked_by) } : {}),
+      ...(frontMatter.data.upstream_repo ? { upstream_repo: normalizeOptionalString(frontMatter.data.upstream_repo) ?? '' } : {})
+    },
     tags,
     notes,
     source: {
@@ -3413,6 +3466,57 @@ function parseSingleCard(input: {
     },
     importedAt: input.importedAt
   };
+}
+
+function enrichParsedTasksFromSiblingTaskCards(input: {
+  readonly cwd: string;
+  readonly planAbsolute: string;
+  readonly parsed: ParsedPlanResult;
+  readonly importedAt: string;
+}): ParsedPlanResult {
+  const taskCardRoot = path.join(path.dirname(input.planAbsolute), 'tasks');
+  if (!existsSync(taskCardRoot)) return input.parsed;
+  let entries: Dirent[];
+  try {
+    entries = readdirSync(taskCardRoot, { withFileTypes: true });
+  } catch {
+    return input.parsed;
+  }
+  const cardByTaskId = new Map<string, TaskImportRecord>();
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.task.md')) continue;
+    const taskIdMatch = taskIdPattern.exec(entry.name);
+    if (!taskIdMatch) continue;
+    const cardPath = path.join(taskCardRoot, entry.name);
+    const cardText = readFileSync(cardPath, 'utf8');
+    const card = parseSingleCard({
+      planText: cardText,
+      planRelativePath: relativePathFrom(input.cwd, cardPath),
+      importedAt: input.importedAt
+    });
+    if (card) cardByTaskId.set(card.workItemId, card);
+  }
+  if (cardByTaskId.size === 0) return input.parsed;
+  const tasks = input.parsed.tasks.map((task) => {
+    const card = cardByTaskId.get(task.workItemId);
+    if (!card) return task;
+    return {
+      ...task,
+      ...card,
+      source: card.source,
+      importedAt: task.importedAt
+    };
+  });
+  const diagnostics = [...input.parsed.diagnostics];
+  const enrichedCount = tasks.filter((task) => cardByTaskId.has(task.workItemId)).length;
+  if (enrichedCount > 0) {
+    diagnostics.push({
+      level: 'info',
+      code: 'ATM_TASKS_IMPORT_CARD_CONTRACT_MERGED',
+      text: `Merged machine-readable frontmatter from ${enrichedCount} sibling task card(s).`
+    });
+  }
+  return { tasks, diagnostics };
 }
 
 function parseTaskSection(input: {
@@ -3689,7 +3793,10 @@ function extractFrontMatter(text: string): FrontMatter | null {
 
 function parseYamlList(value: unknown): readonly string[] {
   if (!value) return [];
-  if (Array.isArray(value)) return value.filter((entry): entry is string => typeof entry === 'string');
+  if (Array.isArray(value)) return value
+    .filter((entry): entry is string => typeof entry === 'string')
+    .map(normalizeYamlScalar)
+    .filter(Boolean);
   if (typeof value !== 'string') return [];
   const trimmed = value.trim();
   if (!trimmed) return [];
@@ -3700,7 +3807,15 @@ function parseYamlList(value: unknown): readonly string[] {
       .map((entry) => entry.trim().replace(/^['"]|['"]$/g, ''))
       .filter(Boolean);
   }
-  return [trimmed];
+  return [normalizeYamlScalar(trimmed)].filter(Boolean);
+}
+
+function normalizeOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? normalizeYamlScalar(value) : null;
+}
+
+function normalizeYamlScalar(value: string): string {
+  return value.trim().replace(/^['"`]|['"`]$/g, '');
 }
 
 interface HeadingSection {
