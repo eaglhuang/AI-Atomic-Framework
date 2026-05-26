@@ -30,6 +30,7 @@ export interface TaskTransitionEvent {
   readonly taskId: string;
   readonly action: string;
   readonly actorId: string | null;
+  readonly sessionId?: string | null;
   readonly fromStatus: string | null;
   readonly toStatus: string | null;
   readonly taskPath: string;
@@ -56,6 +57,7 @@ export interface TaskTransitionRequiredGatesSnapshot {
 export interface TaskTransitionClosureMetadata {
   readonly schemaId: 'atm.taskClosureTransition.v1';
   readonly batchId?: string | null;
+  readonly sessionId?: string | null;
   readonly closurePacketPath: string | null;
   readonly evidenceFreshness: 'fresh' | 'historical-reference' | 'draft' | null;
   readonly validationPasses: readonly string[];
@@ -117,6 +119,7 @@ export function appendTaskTransitionEvent(input: {
   readonly taskId: string;
   readonly action: string;
   readonly actorId?: string | null;
+  readonly sessionId?: string | null;
   readonly fromStatus?: string | null;
   readonly toStatus?: string | null;
   readonly taskPath: string;
@@ -145,6 +148,7 @@ export function appendTaskTransitionEvent(input: {
     taskId: input.taskId,
     action: input.action,
     actorId: input.actorId ?? null,
+    sessionId: input.sessionId ?? null,
     fromStatus: input.fromStatus ?? null,
     toStatus: input.toStatus ?? null,
     taskPath: relativePathFrom(root, input.taskPath),

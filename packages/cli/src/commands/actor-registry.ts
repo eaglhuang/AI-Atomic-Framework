@@ -3,12 +3,25 @@ import path from 'node:path';
 import type { ActorKind, ActorRecord, ActorRegistryDocument } from '@ai-atomic-framework/core';
 
 export const actorRegistryRelativePath = '.atm/catalog/registry/actors.json' as const;
+export const runtimeIdentityRelativePath = '.atm/runtime/identity/default.json' as const;
 export const actorIdEnvVar = 'ATM_ACTOR_ID' as const;
 export const legacyActorIdEnvVar = 'AGENT_IDENTITY' as const;
 
 export interface ResolvedActorId {
   readonly actorId: string;
-  readonly source: 'option' | 'env' | 'legacy-env';
+  readonly source: 'option' | 'env' | 'legacy-env' | 'repo-default';
+}
+
+export interface RuntimeIdentityDefaultDocument {
+  readonly schemaId: 'atm.identityDefault.v1';
+  readonly specVersion: '0.1.0';
+  readonly actorId: string;
+  readonly gitName?: string | null;
+  readonly gitEmail?: string | null;
+  readonly editor?: string | null;
+  readonly provider?: string | null;
+  readonly activeSessionId?: string | null;
+  readonly updatedAt: string;
 }
 
 export interface CreateActorInput {
@@ -88,7 +101,37 @@ export function upsertActorRecord(cwd: string, input: CreateActorInput): { actor
   return { actor, path: registryPath };
 }
 
-export function resolveActorId(inputActorId?: string | null): ResolvedActorId | null {
+export function readRuntimeIdentityDefault(cwd: string): RuntimeIdentityDefaultDocument | null {
+  const absolutePath = path.join(path.resolve(cwd), runtimeIdentityRelativePath);
+  if (!existsSync(absolutePath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(absolutePath, 'utf8')) as Partial<RuntimeIdentityDefaultDocument>;
+    const actorId = sanitizeOptional(parsed.actorId);
+    if (!actorId) return null;
+    return {
+      schemaId: 'atm.identityDefault.v1',
+      specVersion: '0.1.0',
+      actorId,
+      gitName: sanitizeOptional(parsed.gitName) ?? null,
+      gitEmail: sanitizeOptional(parsed.gitEmail) ?? null,
+      editor: sanitizeOptional(parsed.editor) ?? null,
+      provider: sanitizeOptional(parsed.provider) ?? null,
+      activeSessionId: sanitizeOptional(parsed.activeSessionId) ?? null,
+      updatedAt: sanitizeOptional(parsed.updatedAt) ?? new Date().toISOString()
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function writeRuntimeIdentityDefault(cwd: string, document: RuntimeIdentityDefaultDocument): string {
+  const absolutePath = path.join(path.resolve(cwd), runtimeIdentityRelativePath);
+  mkdirSync(path.dirname(absolutePath), { recursive: true });
+  writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+  return runtimeIdentityRelativePath;
+}
+
+export function resolveActorId(inputActorId?: string | null, cwd?: string | null): ResolvedActorId | null {
   const explicit = sanitizeOptional(inputActorId);
   if (explicit) {
     return { actorId: explicit, source: 'option' };
@@ -100,6 +143,10 @@ export function resolveActorId(inputActorId?: string | null): ResolvedActorId | 
   const legacyEnvActor = sanitizeOptional(process.env[legacyActorIdEnvVar]);
   if (legacyEnvActor) {
     return { actorId: legacyEnvActor, source: 'legacy-env' };
+  }
+  const defaultIdentity = cwd ? readRuntimeIdentityDefault(cwd) : null;
+  if (defaultIdentity?.actorId) {
+    return { actorId: defaultIdentity.actorId, source: 'repo-default' };
   }
   return null;
 }

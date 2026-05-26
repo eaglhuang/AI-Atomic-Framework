@@ -5,6 +5,7 @@ import path from 'node:path';
 import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import { resolveActorId } from './actor-registry.ts';
+import { resolveActorWorkSession, updateActorWorkSessionState, upsertActorWorkSession } from './actor-session.ts';
 import { verifyTaskEvidence } from './evidence.ts';
 import {
   auditTasks,
@@ -511,7 +512,7 @@ async function runTasksVerify(argv: string[]) {
 async function runTasksCreate(argv: string[]) {
   const options = parseCreateOptions(argv);
   assertLocalTaskLedgerEnabled(options.cwd, 'create');
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks create requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -569,7 +570,7 @@ async function runTasksCreate(argv: string[]) {
 async function runTasksMirror(argv: string[]) {
   const options = parseMirrorOptions(argv);
   assertLocalTaskLedgerEnabled(options.cwd, 'mirror');
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks mirror requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -629,7 +630,7 @@ async function runTasksMirror(argv: string[]) {
 async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]) {
   const options = parseReservationOptions(action, argv);
   assertLocalTaskLedgerEnabled(options.cwd, action);
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', `tasks ${action} requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
   }
@@ -738,7 +739,7 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
 
 async function runTasksReset(argv: string[]) {
   const options = parseResetOptions(argv);
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks reset requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -822,7 +823,7 @@ async function runTasksReset(argv: string[]) {
 
 async function runTasksClose(argv: string[]) {
   const options = parseCloseOptions(argv);
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks close requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -835,6 +836,13 @@ async function runTasksClose(argv: string[]) {
     });
   }
   const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+  const currentClaim = parseClaimRecord(taskDocument.claim);
+  const activeSession = resolveActorWorkSession(options.cwd, {
+    actorId,
+    taskId: options.taskId,
+    claimLeaseId: currentClaim?.leaseId ?? null,
+    includeNonActive: true
+  });
   const currentOwner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
   if (currentOwner && currentOwner !== actorId) {
     throw new CliError('ATM_TASK_CLOSE_OWNER_MISMATCH', `Task ${options.taskId} owner is ${currentOwner}, not ${actorId}.`, {
@@ -881,8 +889,7 @@ async function runTasksClose(argv: string[]) {
         }
       });
     }
-    const claim = parseClaimRecord(taskDocument.claim);
-    if (!claim || claim.state !== 'active' || claim.actorId !== actorId) {
+    if (!currentClaim || currentClaim.state !== 'active' || currentClaim.actorId !== actorId) {
       throw new CliError('ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active claim owned by ${actorId}.`, {
         exitCode: 1,
         details: {
@@ -994,6 +1001,7 @@ async function runTasksClose(argv: string[]) {
       cwd: options.cwd,
       taskId: options.taskId,
       actorId,
+      sessionId: activeSession?.sessionId ?? null,
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
       requiredGates: frameworkStatus.requiredGates,
       changedFiles: taskDeclaredFiles,
@@ -1013,12 +1021,11 @@ async function runTasksClose(argv: string[]) {
     taskDocument.closurePacket = closurePacketPath;
   }
 
-  const claim = parseClaimRecord(taskDocument.claim);
-  if (claim && claim.state === 'active' && claim.actorId === actorId) {
+  if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
     const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
     await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
     taskDocument.claim = {
-      ...claim,
+      ...currentClaim,
       heartbeatAt: new Date().toISOString(),
       state: 'released',
       reason: options.reason ?? 'closed'
@@ -1030,6 +1037,7 @@ async function runTasksClose(argv: string[]) {
   taskDocument.owner = actorId;
   taskDocument.closedAt = new Date().toISOString();
   taskDocument.closedByActor = actorId;
+  taskDocument.closedBySessionId = activeSession?.sessionId ?? null;
   if (options.reason) {
     taskDocument.closeReason = options.reason;
   }
@@ -1040,9 +1048,10 @@ async function runTasksClose(argv: string[]) {
     taskDocument,
     action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
     actorId,
+    sessionId: activeSession?.sessionId ?? null,
     previousStatus,
     closureMetadata: options.status === 'done'
-      ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId)
+      ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null)
       : null,
     command: buildTaskTransitionCommand({
       action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
@@ -1053,6 +1062,14 @@ async function runTasksClose(argv: string[]) {
       batchId: owningBatch?.batchId ?? options.batchId
     })
   });
+  if (activeSession?.sessionId) {
+    updateActorWorkSessionState({
+      cwd: options.cwd,
+      sessionId: activeSession.sessionId,
+      status: options.status === 'done' ? 'closed' : currentClaim?.state === 'handoff' ? 'handoff' : 'released',
+      reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
+    });
+  }
   const taskQueue = options.status === 'done'
     ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
     : null;
@@ -1116,7 +1133,7 @@ async function runTasksLock(argv: string[]) {
 
 async function runTasksLockCleanup(argv: string[]) {
   const options = parseLockCleanupOptions(argv);
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks lock cleanup requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -1277,7 +1294,7 @@ function runTasksQueue(argv: string[]) {
     });
   }
   if (action === 'abandon') {
-    const resolvedActor = resolveActorId(options.actorId ?? undefined);
+    const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
     if (!resolvedActor) {
       throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks queue abandon requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
@@ -1310,7 +1327,7 @@ function runTasksQueue(argv: string[]) {
 async function runTasksMigrateLegacyLedger(argv: string[]) {
   const options = parseLegacyLedgerMigrationOptions(argv);
   assertLocalTaskLedgerEnabled(options.cwd, 'migrate-legacy-ledger');
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks migrate-legacy-ledger requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -1396,7 +1413,7 @@ async function runTasksMigrateLegacyLedger(argv: string[]) {
 
 async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
   const options = parseClaimLifecycleOptions(action, argv);
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks claim lifecycle requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -1459,6 +1476,16 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     taskDocument.owner = actorId;
     taskDocument.startedAt = String(taskDocument.startedAt ?? nowIso);
     taskDocument.startedByActor = String(taskDocument.startedByActor ?? actorId);
+    const sessionRecord = upsertActorWorkSession({
+      cwd: options.cwd,
+      actorId,
+      taskId: options.taskId,
+      claimLeaseId: claim.leaseId,
+      status: 'active',
+      taskPath: relativeTaskPath,
+      timestamp: nowIso
+    });
+    taskDocument.startedBySessionId = sessionRecord.session.sessionId;
     const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'running';
     const transitionPath = writeTaskDocumentWithTransition({
@@ -1468,6 +1495,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       taskDocument,
       action,
       actorId,
+      sessionId: sessionRecord.session.sessionId,
       previousStatus
     });
     return makeResult({
@@ -1484,7 +1512,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         actorId,
         claim,
         taskPath: relativeTaskPath,
-        transitionPath
+        transitionPath,
+        sessionId: sessionRecord.session.sessionId,
+        session: sessionRecord.session
       }
     });
   }
@@ -1502,6 +1532,15 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       action,
       actorId,
       previousStatus
+    });
+    const sessionRecord = updateActorWorkSessionState({
+      cwd: options.cwd,
+      actorId,
+      taskId: options.taskId,
+      claimLeaseId: null,
+      status: 'released',
+      reason: options.reason ?? null,
+      timestamp: nowIso
     });
     return makeResult({
       ok: true,
@@ -1546,6 +1585,14 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       state: 'active'
     };
     taskDocument.claim = renewed;
+    const sessionRecord = updateActorWorkSessionState({
+      cwd: options.cwd,
+      actorId,
+      taskId: options.taskId,
+      claimLeaseId: currentClaim.leaseId,
+      status: 'active',
+      timestamp: nowIso
+    });
     const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'running';
     const transitionPath = writeTaskDocumentWithTransition({
@@ -1555,6 +1602,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       taskDocument,
       action,
       actorId,
+      sessionId: sessionRecord?.session.sessionId ?? null,
       previousStatus
     });
     return makeResult({
@@ -1567,7 +1615,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         taskId: options.taskId,
         actorId,
         claim: renewed,
-        transitionPath
+        transitionPath,
+        sessionId: sessionRecord?.session.sessionId ?? null,
+        session: sessionRecord?.session ?? null
       }
     });
   }
@@ -1587,6 +1637,15 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     };
     await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
     taskDocument.claim = releasedClaim;
+    const sessionRecord = updateActorWorkSessionState({
+      cwd: options.cwd,
+      actorId,
+      taskId: options.taskId,
+      claimLeaseId: currentClaim.leaseId,
+      status: 'released',
+      reason: options.reason ?? currentClaim.reason ?? null,
+      timestamp: nowIso
+    });
     const previousStatus = String(taskDocument.status ?? '');
     if (String(taskDocument.status ?? '') === 'running') {
       taskDocument.status = 'open';
@@ -1598,6 +1657,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       taskDocument,
       action,
       actorId,
+      sessionId: sessionRecord?.session.sessionId ?? null,
       previousStatus
     });
     return makeResult({
@@ -1610,7 +1670,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         taskId: options.taskId,
         actorId,
         claim: releasedClaim,
-        transitionPath
+        transitionPath,
+        sessionId: sessionRecord?.session.sessionId ?? null,
+        session: sessionRecord?.session ?? null
       }
     });
   }
@@ -1635,6 +1697,15 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     };
     taskDocument.claim = handedOff;
     taskDocument.owner = options.handoffTo;
+    const sessionRecord = updateActorWorkSessionState({
+      cwd: options.cwd,
+      actorId,
+      taskId: options.taskId,
+      claimLeaseId: currentClaim.leaseId,
+      status: 'handoff',
+      reason: options.reason ?? 'handoff',
+      timestamp: nowIso
+    });
     const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'open';
     const transitionPath = writeTaskDocumentWithTransition({
@@ -1644,6 +1715,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       taskDocument,
       action,
       actorId,
+      sessionId: sessionRecord?.session.sessionId ?? null,
       previousStatus
     });
     return makeResult({
@@ -1661,7 +1733,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         actorId,
         handoffTo: options.handoffTo,
         claim: handedOff,
-        transitionPath
+        transitionPath,
+        sessionId: sessionRecord?.session.sessionId ?? null,
+        session: sessionRecord?.session ?? null
       }
     });
   }
@@ -1700,6 +1774,16 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
   await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
   taskDocument.claim = { ...takeoverClaim, state: 'taken_over' };
   taskDocument.owner = actorId;
+  const sessionRecord = upsertActorWorkSession({
+    cwd: options.cwd,
+    actorId,
+    taskId: options.taskId,
+    claimLeaseId: takeoverClaim.leaseId,
+    status: 'taken_over',
+    taskPath: relativeTaskPath,
+    reason: options.reason ?? `takeover from ${currentClaim.actorId}`,
+    timestamp: nowIso
+  });
   const previousStatus = String(taskDocument.status ?? '');
   taskDocument.status = 'running';
   const transitionPath = writeTaskDocumentWithTransition({
@@ -1709,6 +1793,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     taskDocument,
     action,
     actorId,
+    sessionId: sessionRecord.session.sessionId,
     previousStatus
   });
   writeTakeoverEvidence(options.cwd, options.taskId, actorId, currentClaim, takeoverClaim);
@@ -1728,7 +1813,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       previousClaim: currentClaim,
       claim: takeoverClaim,
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
-      transitionPath
+      transitionPath,
+      sessionId: sessionRecord.session.sessionId,
+      session: sessionRecord.session
     }
   });
 }
@@ -2838,6 +2925,7 @@ function writeTaskDocumentWithTransition(input: {
   readonly taskDocument: Record<string, unknown>;
   readonly action: string;
   readonly actorId: string | null;
+  readonly sessionId?: string | null;
   readonly previousStatus: string | null;
   readonly closureMetadata?: TaskTransitionClosureMetadata | null;
   readonly command?: string;
@@ -2858,6 +2946,7 @@ function writeTaskDocumentWithTransition(input: {
     taskId: input.taskId,
     action: input.action,
     actorId: input.actorId,
+    sessionId: input.sessionId ?? null,
     fromStatus: input.previousStatus,
     toStatus: nextStatus,
     taskPath: input.taskPath,
@@ -2915,14 +3004,16 @@ function verifyPersistedTaskDocument(input: {
 function createClosureTransitionMetadata(
   closurePacketPath: string | null,
   closurePacket: ClosurePacket | null,
-  batchId: string | null = null
+  batchId: string | null = null,
+  sessionId: string | null = null
 ): TaskTransitionClosureMetadata | null {
-  if (!closurePacket && !closurePacketPath && !batchId) {
+  if (!closurePacket && !closurePacketPath && !batchId && !sessionId) {
     return null;
   }
   return {
     schemaId: 'atm.taskClosureTransition.v1',
     batchId,
+    sessionId,
     closurePacketPath,
     evidenceFreshness: closurePacket?.evidenceFreshness ?? null,
     validationPasses: closurePacket?.validationPasses ?? [],

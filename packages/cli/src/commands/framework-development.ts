@@ -103,6 +103,7 @@ export interface ClosurePacket {
   readonly evidencePath: string;
   readonly closedAt: string;
   readonly closedByActor: string;
+  readonly sessionId: string | null;
 }
 
 export interface TaskAuditFinding {
@@ -761,6 +762,7 @@ export function createClosurePacket(input: {
   readonly cwd: string;
   readonly taskId: string;
   readonly actorId: string;
+  readonly sessionId?: string | null;
   readonly evidencePath: string;
   readonly requiredGates?: readonly string[];
   readonly changedFiles?: readonly string[];
@@ -792,7 +794,8 @@ export function createClosurePacket(input: {
     requiredGatesSnapshot,
     evidencePath: input.evidencePath,
     closedAt: new Date().toISOString(),
-    closedByActor: input.actorId
+    closedByActor: input.actorId,
+    sessionId: normalizeOptionalString(input.sessionId) ?? null
   };
 }
 

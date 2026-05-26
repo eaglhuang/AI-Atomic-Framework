@@ -24,6 +24,7 @@ import doctorSpec from './command-specs/doctor.spec.ts';
 import doSpec from './command-specs/do.spec.ts';
 import experienceSpec from './command-specs/experience.spec.ts';
 import healthReportSpec from './command-specs/health-report.spec.ts';
+import identitySpec from './command-specs/identity.spec.ts';
 import orientSpec from './command-specs/orient.spec.ts';
 import mapCapsuleSpec from './command-specs/map-capsule.spec.ts';
 import policeSpec from './command-specs/police.spec.ts';
@@ -100,6 +101,7 @@ export const commandSpecs = Object.freeze({
   handoff: handoffSpec,
   'health-report': withVisibility(healthReportSpec, 'internal'),
   hook: hookSpec,
+  identity: identitySpec,
   init: initSpec,
   'internal-release': internalReleaseSpec,
   integration: integrationSpec,

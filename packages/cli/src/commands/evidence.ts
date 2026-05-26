@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { resolveActorId } from './actor-registry.ts';
+import { resolveActorWorkSession } from './actor-session.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 import {
   generateDiffEvidence,
@@ -223,7 +224,7 @@ export function verifyTaskEvidence(input: {
 
 function runEvidenceAdd(argv: string[]) {
   const options = parseEvidenceAddOptions(argv);
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence add requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -232,6 +233,11 @@ function runEvidenceAdd(argv: string[]) {
   const bundle = readEvidenceBundle(options.cwd, options.taskId);
   const nowIso = new Date().toISOString();
   const kind = normalizeEvidenceKind(options.kind);
+  const session = resolveActorWorkSession(options.cwd, {
+    actorId,
+    taskId: options.taskId,
+    includeNonActive: true
+  });
   const commandRuns = normalizeEvidenceCommandRuns({
     cwd: options.cwd,
     inlineRun: options.commandRun,
@@ -291,9 +297,11 @@ function runEvidenceAdd(argv: string[]) {
     artifactPaths: options.artifacts,
     evidenceFreshness: options.freshness,
     producedBy: actorId,
+    sessionId: session?.sessionId ?? null,
     createdAt: nowIso,
     details: {
       actorId,
+      sessionId: session?.sessionId ?? null,
       kind,
       freshness: options.freshness,
       ...(validationPasses.length > 0 ? { validationPasses } : {}),
@@ -315,6 +323,7 @@ function runEvidenceAdd(argv: string[]) {
     messages: [message('info', 'ATM_EVIDENCE_ADDED', `Added ${kind} evidence for ${options.taskId}.`, {
       taskId: options.taskId,
       actorId,
+      sessionId: session?.sessionId ?? null,
       kind
     })],
     evidence: {
@@ -323,6 +332,7 @@ function runEvidenceAdd(argv: string[]) {
       actorId,
       kind,
       freshness: options.freshness,
+      sessionId: session?.sessionId ?? null,
       evidencePath: relativePathFrom(options.cwd, evidencePath),
       evidenceCount: nextEvidence.length,
       commandRunCount: commandRuns.length,
@@ -374,7 +384,7 @@ function runEvidenceVerify(argv: string[]) {
 
 function runGitHeadEvidenceBackfill(argv: string[]) {
   const options = parseGitHeadBackfillOptions(argv);
-  const resolvedActor = resolveActorId(options.actorId ?? undefined);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence git-head-backfill requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }

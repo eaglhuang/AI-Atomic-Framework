@@ -16,6 +16,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.t
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { resolveActorId } from './actor-registry.ts';
+import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.ts';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
 import {
   buildAllowedFilesForTask,
@@ -323,7 +324,7 @@ async function claimNextImportedTask(input: {
     && !input.importedTaskQueue.promptScope
     && isQuickfixPrompt(promptText)
     && quickfixScope.length > 0) {
-    const resolvedActor = resolveActorId(input.actor ?? undefined);
+    const resolvedActor = resolveActorId(input.actor ?? undefined, input.cwd);
     if (!resolvedActor) {
       throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
@@ -394,7 +395,7 @@ async function claimNextImportedTask(input: {
       }
     });
   }
-  const resolvedActor = resolveActorId(input.actor ?? undefined);
+  const resolvedActor = resolveActorId(input.actor ?? undefined, input.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -580,6 +581,31 @@ async function claimNextImportedTask(input: {
     allowPlanningMirror: claimableTask.allowPlanningMirror,
     prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId
   });
+  const claimEvidence = claimResult && typeof claimResult === 'object' && 'evidence' in claimResult && claimResult.evidence && typeof claimResult.evidence === 'object'
+    ? claimResult.evidence as Record<string, unknown>
+    : null;
+  const claimRecord = claimEvidence && typeof claimEvidence.claim === 'object' && claimEvidence.claim
+    ? claimEvidence.claim as Record<string, unknown>
+    : null;
+  const claimedSessionId = typeof claimEvidence?.sessionId === 'string' ? claimEvidence.sessionId : null;
+  const actorSession = upsertActorWorkSession({
+    cwd: input.cwd,
+    sessionId: claimedSessionId,
+    actorId: resolvedActor.actorId,
+    taskId: claimableTask.workItemId,
+    claimLeaseId: typeof claimRecord?.leaseId === 'string'
+      ? claimRecord.leaseId
+      : resolveActorWorkSession(input.cwd, {
+        actorId: resolvedActor.actorId,
+        taskId: claimableTask.workItemId,
+        includeNonActive: true
+      })?.claimLeaseId ?? null,
+    status: 'active',
+    taskPath: claimableTask.taskPath,
+    sourcePrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
+    batchId: batchRun?.batchId ?? null,
+    guidanceSessionId: null
+  }).session;
   const recommendedChannel = batchRun?.status === 'active' ? 'batch' : 'normal';
   const teamRecommendation = buildTeamRecommendation({
     taskId: claimableTask.workItemId,
@@ -637,6 +663,8 @@ async function claimNextImportedTask(input: {
     taskDirectionLock: directionLock,
     taskQueue: activeQueue,
     batchRun,
+    sessionId: actorSession.sessionId,
+    actorSession,
     scopeDiagnostic,
     ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles,
     allowedCommands: allowedGuidanceBootstrapCommands(),
@@ -675,7 +703,9 @@ async function claimNextImportedTask(input: {
       taskDirectionLock: directionLock,
       taskQueue: activeQueue,
       batchRun,
-      teamRecommendation,
+    teamRecommendation,
+      sessionId: actorSession.sessionId,
+      actorSession,
       recommendedChannel: nextAction.recommendedChannel,
       taskIntent: input.taskIntent,
       importedTaskQueue: input.importedTaskQueue,

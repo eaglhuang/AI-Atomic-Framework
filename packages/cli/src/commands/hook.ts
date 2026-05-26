@@ -13,6 +13,8 @@ import {
   requiredValidationPassesForClosure,
   validateClosurePacket
 } from './framework-development.ts';
+import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-registry.ts';
+import { resolveActorWorkSession } from './actor-session.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
@@ -398,6 +400,7 @@ function runPreCommitHook(cwd: string) {
     : false;
   const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
   const taskCardStatusReport = inspectTaskCardStatusChanges(root, stagedFiles);
+  const commitAttributionReport = inspectCommitAttribution(root, stagedFiles);
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
     ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
@@ -414,6 +417,7 @@ function runPreCommitHook(cwd: string) {
     && quickfixDriftFiles.length === 0
     && !quickfixFileLimitExceeded
     && !quickfixLineLimitExceeded
+    && commitAttributionReport.ok
     && protectedStateReport.ok
     && taskCardStatusReport.ok
     && taskAudit.ok
@@ -432,6 +436,7 @@ function runPreCommitHook(cwd: string) {
     quickfixFileLimitExceeded,
     quickfixLineLimitExceeded,
     quickfixChangedLineCount,
+    commitAttributionFindings: commitAttributionReport.findings,
     protectedStateFindings: protectedStateReport.findings,
     taskCardStatusFindings: taskCardStatusReport.findings,
     taskAuditFindings: taskAudit.findings,
@@ -494,6 +499,7 @@ function runPreCommitHook(cwd: string) {
       quickfixFileLimitExceeded,
       quickfixLineLimitExceeded,
       quickfixChangedLineCount,
+      commitAttributionReport,
       protectedStateReport,
       taskCardStatusReport,
       taskAudit,
@@ -516,6 +522,7 @@ function buildPreCommitBlockingFindings(input: {
   readonly quickfixFileLimitExceeded: boolean;
   readonly quickfixLineLimitExceeded: boolean;
   readonly quickfixChangedLineCount: number;
+  readonly commitAttributionFindings: readonly PreCommitBlockingFinding[];
   readonly protectedStateFindings: readonly ProtectedStateFinding[];
   readonly taskCardStatusFindings: readonly TaskCardStatusFinding[];
   readonly taskAuditFindings: ReturnType<typeof auditTasks>['findings'];
@@ -532,6 +539,7 @@ function buildPreCommitBlockingFindings(input: {
       data: input.gitIndexDiagnostic
     });
   }
+  findings.push(...input.commitAttributionFindings);
   for (const finding of input.encodingReport.findings) {
     findings.push({
       code: `ATM_ENCODING_${finding.issue.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
@@ -2042,6 +2050,168 @@ function isProtectedAtmManagedStatePath(value: string): boolean {
     || isProtectedAtmRuntimeStatePath(normalized);
 }
 
+function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): {
+  readonly ok: boolean;
+  readonly findings: readonly PreCommitBlockingFinding[];
+} {
+  const actorId = normalizeOptionalText(process.env.ATM_COMMIT_ACTOR_ID);
+  const taskId = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID);
+  const claimLeaseId = normalizeOptionalText(process.env.ATM_COMMIT_CLAIM_LEASE_ID);
+  const sessionId = normalizeOptionalText(process.env.ATM_COMMIT_SESSION_ID);
+  const stagedTaskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+  const findings: PreCommitBlockingFinding[] = [];
+
+  if (!actorId && !taskId && !sessionId) {
+    if (stagedTaskIds.length > 0) {
+      const wrapperRequired: PreCommitBlockingFinding = {
+        code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED',
+        source: 'commit-attribution',
+        detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently.',
+        requiredCommand: `node atm.mjs git commit --actor <id> --task ${stagedTaskIds[0]} --message "<summary>" --json`,
+        classification: 'current-task'
+      };
+      return {
+        ok: false,
+        findings: [wrapperRequired]
+      };
+    }
+    return {
+      ok: true,
+      findings
+    };
+  }
+
+  const effectiveTaskId = taskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : null);
+  if (!actorId || (stagedTaskIds.length > 0 && !effectiveTaskId)) {
+    findings.push({
+      code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED',
+      source: 'commit-attribution',
+      detail: 'Governed task commits must use node atm.mjs git commit --actor <id> --task <task> --message "<summary>" so ATM can bind author, session, claim, and trailers consistently.',
+      requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json',
+      classification: 'current-task'
+    });
+    return {
+      ok: false,
+      findings
+    };
+  }
+
+  if (!effectiveTaskId) {
+    const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+    const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
+    const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);
+    if (!expectedIdentity.gitName || !expectedIdentity.gitEmail) {
+      findings.push({
+        code: 'ATM_COMMIT_IDENTITY_PROFILE_MISSING',
+        source: 'commit-attribution',
+        detail: `Actor ${actorId} has no resolved git identity profile in actor registry or .atm/runtime/identity/default.json.`,
+        classification: 'current-task'
+      });
+    } else {
+      if (authorName !== expectedIdentity.gitName) {
+        findings.push({
+          code: 'ATM_COMMIT_AUTHOR_NAME_MISMATCH',
+          source: 'commit-attribution',
+          detail: `Commit author name is ${authorName ?? 'unset'}, expected ${expectedIdentity.gitName}.`,
+          classification: 'current-task'
+        });
+      }
+      if (authorEmail !== expectedIdentity.gitEmail) {
+        findings.push({
+          code: 'ATM_COMMIT_AUTHOR_EMAIL_MISMATCH',
+          source: 'commit-attribution',
+          detail: `Commit author email is ${authorEmail ?? 'unset'}, expected ${expectedIdentity.gitEmail}.`,
+          classification: 'current-task'
+        });
+      }
+    }
+    return {
+      ok: findings.length === 0,
+      findings
+    };
+  }
+
+  const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${effectiveTaskId}.json`));
+  const claim = parseHookTaskClaim(task?.claim);
+  const session = resolveActorWorkSession(cwd, {
+    sessionId,
+    actorId,
+    taskId: effectiveTaskId,
+    claimLeaseId: claimLeaseId ?? claim?.leaseId ?? null,
+    includeNonActive: true
+  });
+  if (!session) {
+    findings.push({
+      code: 'ATM_COMMIT_SESSION_MISSING',
+      source: 'commit-attribution',
+      detail: `No ATM work session matched actor ${actorId} and task ${effectiveTaskId}. Claim the task through ATM before committing.`,
+      requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${effectiveTaskId}" --json`,
+      classification: 'current-task'
+    });
+    return {
+      ok: false,
+      findings
+    };
+  }
+  if (session.actorId !== actorId) {
+    findings.push({
+      code: 'ATM_COMMIT_SESSION_ACTOR_MISMATCH',
+      source: 'commit-attribution',
+      detail: `Session ${session.sessionId} belongs to ${session.actorId}, not ${actorId}.`,
+      classification: 'current-task'
+    });
+  }
+  if (session.taskId !== effectiveTaskId) {
+    findings.push({
+      code: 'ATM_COMMIT_SESSION_TASK_MISMATCH',
+      source: 'commit-attribution',
+      detail: `Session ${session.sessionId} is for ${session.taskId}, not ${effectiveTaskId}.`,
+      classification: 'current-task'
+    });
+  }
+  if ((claimLeaseId ?? claim?.leaseId ?? null) && session.claimLeaseId !== (claimLeaseId ?? claim?.leaseId ?? null)) {
+    findings.push({
+      code: 'ATM_COMMIT_SESSION_CLAIM_MISMATCH',
+      source: 'commit-attribution',
+      detail: `Session ${session.sessionId} is bound to claim ${session.claimLeaseId ?? 'unset'}, not ${(claimLeaseId ?? claim?.leaseId) ?? 'unset'}.`,
+      classification: 'current-task'
+    });
+  }
+  const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+  const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
+  const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);
+  if (!expectedIdentity.gitName || !expectedIdentity.gitEmail) {
+    findings.push({
+      code: 'ATM_COMMIT_IDENTITY_PROFILE_MISSING',
+      source: 'commit-attribution',
+      detail: `Actor ${actorId} has no resolved git identity profile in actor registry or .atm/runtime/identity/default.json.`,
+      classification: 'current-task'
+    });
+  } else {
+    if (authorName !== expectedIdentity.gitName) {
+      findings.push({
+        code: 'ATM_COMMIT_AUTHOR_NAME_MISMATCH',
+        source: 'commit-attribution',
+        detail: `Commit author name is ${authorName ?? 'unset'}, expected ${expectedIdentity.gitName}.`,
+        classification: 'current-task'
+      });
+    }
+    if (authorEmail !== expectedIdentity.gitEmail) {
+      findings.push({
+        code: 'ATM_COMMIT_AUTHOR_EMAIL_MISMATCH',
+        source: 'commit-attribution',
+        detail: `Commit author email is ${authorEmail ?? 'unset'}, expected ${expectedIdentity.gitEmail}.`,
+        classification: 'current-task'
+      });
+    }
+  }
+
+  return {
+    ok: findings.length === 0,
+    findings
+  };
+}
+
 function isStaticEvidenceArtifactPath(value: string): boolean {
   const normalized = normalizeRelativePath(value).toLowerCase();
   if (normalized.startsWith('atomic_workbench/evidence/') && normalized.endsWith('.json')) {
@@ -2059,6 +2229,8 @@ function isProtectedAtmRuntimeStatePath(value: string): boolean {
     || normalized.startsWith('.atm/runtime/task-direction-locks/')
     || normalized.startsWith('.atm/runtime/task-queues/')
     || normalized.startsWith('.atm/runtime/batch-runs/')
+    || normalized.startsWith('.atm/runtime/sessions/')
+    || normalized.startsWith('.atm/runtime/identity/')
     || normalized === '.atm/runtime/current-task.json'
     || normalized === '.atm/runtime/guidance/active-session.json';
 }
@@ -2070,6 +2242,50 @@ function readJsonFile(filePath: string): Record<string, unknown> | null {
   } catch {
     return null;
   }
+}
+
+function inferTaskIdsFromStagedFiles(stagedFiles: readonly string[]) {
+  const taskIds = new Set<string>();
+  for (const file of stagedFiles) {
+    const normalized = normalizeRelativePath(file);
+    const taskMatch = normalized.match(/^\.atm\/history\/tasks\/([^/]+)\.json$/i);
+    if (taskMatch) {
+      taskIds.add(taskMatch[1]);
+      continue;
+    }
+    const closurePacketMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.closure-packet\.json$/i);
+    if (closurePacketMatch) {
+      taskIds.add(closurePacketMatch[1]);
+      continue;
+    }
+    const evidenceMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.json$/i);
+    if (evidenceMatch) {
+      taskIds.add(evidenceMatch[1]);
+      continue;
+    }
+    const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
+    if (eventMatch) {
+      taskIds.add(eventMatch[1]);
+    }
+  }
+  return [...taskIds].sort((left, right) => left.localeCompare(right));
+}
+
+function parseHookTaskClaim(value: unknown): { actorId: string; leaseId: string } | null {
+  if (!isPlainObject(value)) return null;
+  const actorId = normalizeOptionalText(value.actorId);
+  const leaseId = normalizeOptionalText(value.leaseId);
+  return actorId && leaseId ? { actorId, leaseId } : null;
+}
+
+function resolveExpectedGitIdentityForActor(cwd: string, actorId: string) {
+  const actorRecord = findActorByResolvedId(cwd, { actorId, source: 'option' });
+  const defaultIdentity = readRuntimeIdentityDefault(cwd);
+  const defaultMatches = defaultIdentity?.actorId === actorId;
+  return {
+    gitName: actorRecord?.gitName ?? (defaultMatches ? defaultIdentity?.gitName ?? null : null),
+    gitEmail: actorRecord?.gitEmail ?? (defaultMatches ? defaultIdentity?.gitEmail ?? null : null)
+  };
 }
 
 function isPathAllowedByTaskDirection(filePath: string, allowedFiles: readonly string[]): boolean {

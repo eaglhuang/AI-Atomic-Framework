@@ -61,6 +61,7 @@ import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { CliError, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
+import { runIdentity } from './commands/identity.ts';
 
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
   atomize: runAtomize,
@@ -119,7 +120,8 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   do: runDo,
   daemon: runDaemon,
   cache: runCache,
-  'health-report': runHealthReport
+  'health-report': runHealthReport,
+  identity: runIdentity
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
