@@ -1,0 +1,116 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASA-0005",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "35d914804de188398ad766275fd07503505912c6",
+  "governedTreeSha": "0f5dcfa294b5102eefccc970768bd262bc719f37",
+  "targetCommitDelta": {
+    "currentCommitSha": "35d914804de188398ad766275fd07503505912c6",
+    "parentCommitShas": [
+      "35d914804de188398ad766275fd07503505912c6"
+    ],
+    "governedTreeSha": "0f5dcfa294b5102eefccc970768bd262bc719f37",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0005-generated-fixture-boundaries.task.md",
+      ".atm/history/evidence/TASK-ASA-0005.json",
+      ".atm/history/task-events/TASK-ASA-0005/2026-05-25T14-32-37-412Z-reserve-63a639b2efa9.json",
+      ".atm/history/task-events/TASK-ASA-0005/2026-05-25T14-32-44-616Z-promote-976f66f4f7cd.json",
+      ".atm/history/task-events/TASK-ASA-0005/2026-05-25T14-33-13-904Z-promote-d029cc87081a.json",
+      ".atm/history/task-events/TASK-ASA-0005/2026-05-25T14-33-22-269Z-claim-d7b2d1837a4e.json",
+      ".atm/history/tasks/TASK-ASA-0005.json",
+      ".atm/runtime/batch-run.json",
+      ".atm/runtime/batch-runs/batch-7273973f1e36.json",
+      ".atm/runtime/task-queues/queue-8f7ec1e2dccd3f7a.json",
+      "atomic_workbench/atomization-coverage/exclusion-inventory.json",
+      "atomic_workbench/atomization-coverage/generated-fixture-boundaries.json",
+      "atomic_workbench/reports/atomization-exclusions.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atm.mjs guard atomization-coverage --repo . --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:457216c7de5c5dc5d825d7f6d86d1fda978368289024fc163a98d08f99b616ee",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d66bd451370019e532db68db81e2f2542b493288dc5bde07e060b5b85c84a40b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a355f2fac0bba83c30e74aec4c6f64ea279206f517a012151c83c599875de873",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2eb14b324a0ccc6925888ad990d221e361895240f526c337e6cdfe814f345c85",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-26T00:26:21.326Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-self-atomization/tasks/TASK-ASA-0005-generated-fixture-boundaries.task.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASA-0005.json",
+  "closedAt": "2026-05-26T00:26:21.326Z",
+  "closedByActor": "opus47-asa-runner"
+}

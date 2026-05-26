@@ -1,37 +1,134 @@
 {
-  "version": "1.0",
+  "schemaId": "atm.generatedFixtureBoundaries.v1",
+  "specVersion": "1.0.0",
+  "generatedAt": "2026-05-25T14:35:00.000Z",
+  "generatedBy": "TASK-ASA-0005",
   "boundaries": {
-    "generated": [
-      "dist/**",
-      "build/**",
-      "release/**",
-      "**/*.gen.ts",
-      "**/*.gen.json",
-      "atomic_workbench/generators/**/outputs/**",
-      "atomic_workbench/generators/**/artifacts/**"
-    ],
-    "fixtures": [
-      "fixtures/**",
-      "tests/**/*.snapshot",
-      "tests/**/*.snap",
-      "__snapshots__/**"
-    ],
-    "production": [
-      "packages/*/src/**",
-      "packages/*/types/**",
-      "scripts/src/**",
-      "integrations/**"
-    ],
-    "documentation": [
-      "docs/**/*.md",
-      "examples/**",
-      "samples/**"
-    ],
-    "test_source": [
-      "tests/**/*.test.ts",
-      "tests/**/*.spec.ts"
-    ]
+    "generated": {
+      "patterns": [
+        "dist/**",
+        "build/**",
+        "release/**",
+        "**/*.gen.ts",
+        "**/*.gen.json",
+        "atomic_workbench/generators/**/outputs/**",
+        "atomic_workbench/generators/**/artifacts/**",
+        ".atm-temp/**",
+        ".atm/runtime/**",
+        "node_modules/**"
+      ],
+      "trackedFileCount": 0,
+      "notes": "All generated paths are either gitignored or use .gen.* naming convention. Zero tracked generated files in current repo state."
+    },
+    "fixtures": {
+      "patterns": [
+        "fixtures/**",
+        "tests/fixtures/**",
+        "tests/cli-fixtures/**",
+        "tests/guidance-fixtures/**",
+        "tests/core-spec-parser-fixtures/**",
+        "tests/language-js-fixtures/**",
+        "tests/neutrality-fixtures/**",
+        "tests/known-bad/**",
+        "__snapshots__/**",
+        "tests/**/*.snapshot",
+        "tests/**/*.snap"
+      ],
+      "trackedFileCount": 171,
+      "notes": "fixtures/ contains test data (golden files, mocks, scenario inputs). tests/*-fixtures/ directories are test-scoped fixture data."
+    },
+    "production": {
+      "patterns": [
+        "packages/*/src/**",
+        "packages/*/types/**",
+        "scripts/src/**",
+        "integrations/**"
+      ],
+      "notes": "Production source code that requires atom/map ownership. The atomization-coverage guard enforces this."
+    },
+    "documentation": {
+      "patterns": [
+        "docs/**/*.md"
+      ],
+      "trackedFileCount": 69,
+      "notes": "Narrative documentation. Not runtime source, excluded from atomization ownership."
+    },
+    "examples": {
+      "patterns": [
+        "examples/**",
+        "samples/**",
+        "specs/samples/**"
+      ],
+      "trackedFileCount": 39,
+      "notes": "Reference implementations for adopters. Not production source."
+    },
+    "test_source": {
+      "patterns": [
+        "tests/**/*.test.ts",
+        "tests/**/*.spec.ts"
+      ],
+      "trackedFileCount": 189,
+      "notes": "Test implementation files. Validate production code quality but are not shipped."
+    },
+    "internal_only": {
+      "patterns": [
+        "scripts/internal/**"
+      ],
+      "notes": "Internal utilities not part of public contract."
+    }
   },
-  "clear_boundaries": true,
+  "classificationRules": [
+    {
+      "rule": "generated-by-build",
+      "description": "Any output of npm run build, tsc, or release scripts",
+      "patterns": ["dist/**", "build/**", "release/**"],
+      "permanent": true
+    },
+    {
+      "rule": "generated-by-codegen",
+      "description": "Files produced by code generators with .gen.* extension",
+      "patterns": ["**/*.gen.ts", "**/*.gen.json"],
+      "permanent": true
+    },
+    {
+      "rule": "fixture-test-data",
+      "description": "Test input/output fixtures, golden files, and mocks",
+      "patterns": ["fixtures/**", "tests/*-fixtures/**", "tests/fixtures/**", "tests/known-bad/**"],
+      "permanent": true
+    },
+    {
+      "rule": "snapshot-test-output",
+      "description": "Snapshot test output files",
+      "patterns": ["__snapshots__/**", "tests/**/*.snapshot", "tests/**/*.snap"],
+      "permanent": true
+    },
+    {
+      "rule": "documentation",
+      "description": "Markdown documentation not executed at runtime",
+      "patterns": ["docs/**/*.md"],
+      "permanent": true
+    },
+    {
+      "rule": "example-code",
+      "description": "Reference implementations for adopters, not production",
+      "patterns": ["examples/**", "samples/**", "specs/samples/**"],
+      "permanent": true
+    },
+    {
+      "rule": "runtime-ephemeral",
+      "description": "ATM runtime state and temporary files (always gitignored)",
+      "patterns": [".atm-temp/**", ".atm/runtime/**", "node_modules/**"],
+      "permanent": true
+    }
+  ],
+  "freshnessCheck": {
+    "lastAuditedAt": "2026-05-25T14:35:00.000Z",
+    "auditedBy": "TASK-ASA-0005",
+    "totalExcludedPatterns": 28,
+    "totalExcludedTrackedFiles": 468,
+    "staleEntries": 0,
+    "nextAuditDue": "2026-08-25",
+    "auditFrequency": "quarterly"
+  },
   "enforcement": "strict"
 }
