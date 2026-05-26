@@ -1,58 +1,102 @@
-[
-  {
-    "name": "atm.bootstrap-runtime-map",
-    "id": "map-bootstrap-0001",
-    "capability": "Bootstrap runtime: next, welcome, doctor, bootstrap commands",
-    "atoms": 4,
-    "status": "partial"
+{
+  "schemaId": "atm.topLevelMapCatalog.v1",
+  "specVersion": "1.0.0",
+  "generatedAt": "2026-05-26T00:50:00.000Z",
+  "generatedBy": "TASK-ASA-0007",
+  "maps": [
+    {
+      "name": "atm.bootstrap-runtime-map",
+      "id": "map-bootstrap-runtime-0001",
+      "mapSpecPath": "atomic_workbench/maps/atm-bootstrap-runtime/map.spec.json",
+      "capability": "Bootstrap runtime: next, welcome, doctor, bootstrap, adapter loading, agent pack initialization",
+      "memberCount": 5,
+      "entrypointCount": 1,
+      "edgeCount": 4,
+      "status": "generatedDraft",
+      "sourcePathPatterns": ["packages/adapter-*/src/**", "packages/agent-pack-*/src/**"]
+    },
+    {
+      "name": "atm.cli-command-router-map",
+      "id": "map-cli-command-router-0001",
+      "mapSpecPath": "atomic_workbench/maps/atm-cli-command-router/map.spec.json",
+      "capability": "CLI dispatch, command routing, argv parsing, command execution",
+      "memberCount": 8,
+      "entrypointCount": 1,
+      "edgeCount": 7,
+      "status": "partial",
+      "sourcePathPatterns": ["packages/cli/src/**"]
+    },
+    {
+      "name": "atm.atom-registry-lifecycle-map",
+      "id": "map-atom-registry-lifecycle-0001",
+      "mapSpecPath": "atomic_workbench/maps/atm-atom-registry-lifecycle/map.spec.json",
+      "capability": "Registry load/save, hash lock, catalog, provenance, atom CRUD, lineage tracking",
+      "memberCount": 5,
+      "entrypointCount": 1,
+      "edgeCount": 4,
+      "status": "partial",
+      "sourcePathPatterns": ["packages/core/src/registry/**", "packages/core/src/index.ts"]
+    },
+    {
+      "name": "atm.guard-validation-map",
+      "id": "map-guard-validation-0001",
+      "mapSpecPath": "atomic_workbench/maps/atm-guard-validation/map.spec.json",
+      "capability": "Guard validation, validator scripts, encoding/mutation/scope checks, gate enforcement",
+      "memberCount": 7,
+      "entrypointCount": 3,
+      "edgeCount": 3,
+      "status": "partial",
+      "sourcePathPatterns": ["scripts/validate-*.ts", "scripts/audit-*.ts"]
+    },
+    {
+      "name": "atm.behavior-pack-map",
+      "id": "map-behavior-pack-0001",
+      "mapSpecPath": "atomic_workbench/maps/atm-behavior-pack/map.spec.json",
+      "capability": "Behavior pack workflows: atomize/evolve/compose/expire/split/merge/infect/dedup-merge/polymorphize/sweep",
+      "memberCount": 10,
+      "entrypointCount": 1,
+      "edgeCount": 4,
+      "status": "generatedDraft",
+      "sourcePathPatterns": ["packages/plugin-behavior-pack/src/**"]
+    },
+    {
+      "name": "atm.integration-pack-map",
+      "id": "map-integration-pack-0001",
+      "mapSpecPath": "atomic_workbench/maps/atm-integration-pack/map.spec.json",
+      "capability": "Editor integrations: Codex, Claude Code, Cursor, Copilot, Gemini, Windsurf adapters",
+      "memberCount": 6,
+      "entrypointCount": 1,
+      "edgeCount": 5,
+      "status": "generatedDraft",
+      "sourcePathPatterns": ["packages/agent-pack-*/src/**"]
+    },
+    {
+      "name": "atm.release-build-map",
+      "id": "map-release-build-0001",
+      "mapSpecPath": "atomic_workbench/maps/atm-release-build/map.spec.json",
+      "capability": "Release build orchestration: root-drop release, onefile bundle, package dist, version checks",
+      "memberCount": 6,
+      "entrypointCount": 1,
+      "edgeCount": 5,
+      "status": "generatedDraft",
+      "sourcePathPatterns": ["scripts/build-*.ts", "scripts/validate-root-drop-release.ts", "scripts/validate-onefile-release.ts"]
+    }
+  ],
+  "summary": {
+    "totalMaps": 7,
+    "totalMembers": 47,
+    "totalEdges": 32,
+    "statusBreakdown": {
+      "partial": 3,
+      "generatedDraft": 4
+    },
+    "mermaidSupport": true,
+    "graphViewSupport": true
   },
-  {
-    "name": "atm.cli-command-router-map",
-    "id": "map-cli-router-0001",
-    "capability": "CLI dispatch, routing, command execution",
-    "atoms": 12,
-    "status": "partial"
-  },
-  {
-    "name": "atm.atom-registry-lifecycle-map",
-    "id": "map-registry-0001",
-    "capability": "Registry load/save, hash lock, catalog, provenance",
-    "atoms": 5,
-    "status": "partial"
-  },
-  {
-    "name": "atm.atom-birth-map",
-    "id": "map-birth-0001",
-    "capability": "Atom generation, ID allocation, spec scaffold",
-    "atoms": 4,
-    "status": "in-progress"
-  },
-  {
-    "name": "atm.guard-validation-map",
-    "id": "map-guard-0001",
-    "capability": "Guard validation, test facade, encoding/mutation checks",
-    "atoms": 6,
-    "status": "in-progress"
-  },
-  {
-    "name": "atm.behavior-pack-map",
-    "id": "map-behavior-0001",
-    "capability": "Split, merge, compose, evolve, infect behaviors",
-    "atoms": 5,
-    "status": "planned"
-  },
-  {
-    "name": "atm.integration-pack-map",
-    "id": "map-integration-0001",
-    "capability": "Editor integrations (Codex, Claude, Cursor, Copilot, Gemini)",
-    "atoms": 5,
-    "status": "partial"
-  },
-  {
-    "name": "atm.release-build-map",
-    "id": "map-release-0001",
-    "capability": "Root-drop, onefile, package dist, version checks",
-    "atoms": 4,
-    "status": "in-progress"
-  }
-]
+  "supportedRenderers": ["mermaid", "graphviz-dot", "json-graph"],
+  "downstreamUse": [
+    "human-readable capability discovery before atom-level deep-dive",
+    "atomization-coverage source-path enforcement",
+    "release-blocker capability gap visualization"
+  ]
+}

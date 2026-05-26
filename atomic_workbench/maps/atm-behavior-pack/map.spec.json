@@ -1,0 +1,45 @@
+{
+  "schemaId": "atm.atomicMap",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Top-level capability map for behavior pack, created by TASK-ASA-0007."
+  },
+  "mapId": "map-behavior-pack-0001",
+  "mapName": "atm.behavior-pack-map",
+  "mapVersion": "0.1.0",
+  "capability": "Behavior pack workflows: atomize, evolve, compose, expire, split, merge, infect, dedup-merge, polymorphize, sweep",
+  "members": [
+    { "atomId": "atom-behavior-atomize", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-evolve", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-compose", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-expire", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-split", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-merge", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-infect", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-dedup-merge", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-polymorphize", "version": "0.1.0", "status": "generatedDraft" },
+    { "atomId": "atom-behavior-sweep", "version": "0.1.0", "status": "generatedDraft" }
+  ],
+  "edges": [
+    { "from": "atom-behavior-atomize", "to": "atom-behavior-evolve", "binding": "feeds-into" },
+    { "from": "atom-behavior-evolve", "to": "atom-behavior-compose", "binding": "feeds-into" },
+    { "from": "atom-behavior-compose", "to": "atom-behavior-dedup-merge", "binding": "feeds-into" },
+    { "from": "atom-behavior-split", "to": "atom-behavior-merge", "binding": "complements" }
+  ],
+  "entrypoints": ["atom-behavior-atomize"],
+  "qualityTargets": {
+    "promoteGateRequired": true,
+    "requiredChecks": 5,
+    "testCoverage": "dry-run-fixture",
+    "rollbackEvidenceRequired": true
+  },
+  "sourcePathPatterns": [
+    "packages/plugin-behavior-pack/src/**"
+  ],
+  "ownsUnattachedPaths": true,
+  "reviewStatus": "generatedDraft",
+  "mapHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "semanticFingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+}
