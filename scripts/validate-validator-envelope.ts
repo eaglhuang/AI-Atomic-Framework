@@ -1,6 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import { createValidator } from './lib/validator-harness.ts';
-import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
+import {
+  applyBaselineFailureSnapshot,
+  collectBaselineFindingFingerprints,
+  createValidatorFailureEnvelope
+} from './lib/validator-envelope.ts';
 
 const validator = createValidator('validate-validator-envelope');
 
@@ -108,6 +112,38 @@ validator.assert(
 validator.assert(
   baselineNoiseEnvelope.blockingFindings.some((finding) => finding.classification === 'baseline'),
   'baseline findings must keep a stable classification marker'
+);
+
+const currentFailureBeforeBaseline = createValidatorFailureEnvelope({
+  validatorName: 'synthetic-preexisting-failure',
+  command: 'node --strip-types scripts/validate-standard.ts --mode validate',
+  entry: 'scripts/validate-standard.ts',
+  mode: 'validate',
+  ok: false,
+  exitCode: 1,
+  stdout: '',
+  stderr: ''
+});
+const baselineFingerprints = collectBaselineFindingFingerprints({
+  schemaId: 'atm.validatorRunSummary.v1',
+  validators: [
+    {
+      envelope: currentFailureBeforeBaseline
+    }
+  ]
+});
+const reclassifiedBaseline = applyBaselineFailureSnapshot(currentFailureBeforeBaseline, baselineFingerprints);
+validator.assert(
+  reclassifiedBaseline.baselineFailures.length === 1,
+  'known pre-existing validator failure must be reclassified as baseline failure'
+);
+validator.assert(
+  reclassifiedBaseline.currentTaskFailures.length === 0,
+  'known pre-existing validator failure must not remain a current-task failure'
+);
+validator.assert(
+  reclassifiedBaseline.requiredCommand === null,
+  'baseline-only validator failures should not force a current-task requiredCommand'
 );
 
 const passingEnvelope = createValidatorFailureEnvelope({

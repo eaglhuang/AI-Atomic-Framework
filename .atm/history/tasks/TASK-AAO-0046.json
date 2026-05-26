@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0046",
+  "title": "Validator baseline noise diagnostics",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0004",
+    "TASK-AAO-0015",
+    "TASK-AAO-0017"
+  ],
+  "acceptance": [
+    "Validator envelopes expose baselineFailures[], currentTaskFailures[], and blockingFindings[] or equivalent stable fields.",
+    "If an unrelated validator already fails before the task changes, ATM reports it as baseline noise and gives a focused validator command for the current card.",
+    "Single-task evidence and batch checkpoint are not forced to debug unrelated baseline failures unless the task touched that surface.",
+    "Release-level validation still reports baseline failures and remains allowed to block release decisions.",
+    "Regression evidence includes one fixture where validate:standard has an unrelated existing failure while the current task focused validator passes."
+  ],
+  "deliverables": [
+    "scripts/run-validators.ts",
+    "scripts/lib/validator-envelope.ts",
+    "packages/cli/src/commands/hook.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "scripts/run-validators.ts",
+    "scripts/lib/**",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/batch.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:standard"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing validator pass/fail semantics for true current-task failures",
+    "Weakening release-level gates",
+    "Editing .atm/runtime/** manually"
+  ],
+  "nonGoals": [
+    "Making validate:standard optional for release",
+    "Suppressing real failures introduced by the current task"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-envelope-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "tags": [],
+  "notes": "This is opened because TASK-AAO-0004 was already completed and committed. New dogfood findings should be handled as follow-up work, not retroactively injected into completed acceptance.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0046-validator-baseline-noise-diagnostics.task.md",
+    "sectionTitle": "TASK-AAO-0046",
+    "headingLine": 52,
+    "hash": "aa6f2b1c3197d048"
+  },
+  "importedAt": "2026-05-26T11:42:23.421Z",
+  "lastTransitionId": "2026-05-26T11-55-49-318Z-close-43942ff41147",
+  "lastTransitionAt": "2026-05-26T11:55:49.318Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-05-26T11:42:28.377Z",
+  "promotedAt": "2026-05-26T11:42:28.403Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-2d6b0ef69590",
+    "claimedAt": "2026-05-26T11:42:28.404Z",
+    "heartbeatAt": "2026-05-26T11:55:49.318Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0046.json"
+    ],
+    "state": "released",
+    "reason": "Completed validator baseline noise diagnostics with baseline/current-task failure separation."
+  },
+  "startedAt": "2026-05-26T11:42:28.404Z",
+  "startedByActor": "codex-main",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0046.closure-packet.json",
+  "closedAt": "2026-05-26T11:55:49.318Z",
+  "closedByActor": "codex-main",
+  "closeReason": "Completed validator baseline noise diagnostics with baseline/current-task failure separation."
+}

@@ -50,6 +50,38 @@ export interface ValidatorFailureEnvelopeInput {
   readonly spawnError?: string | null;
 }
 
+export function findingFingerprint(finding: ValidatorBlockingFinding): string {
+  return JSON.stringify({
+    code: finding.code,
+    source: finding.source,
+    detail: finding.detail,
+    file: finding.file ?? null,
+    files: [...(finding.files ?? [])].sort(),
+    requiredCommand: finding.requiredCommand ?? null
+  });
+}
+
+export function collectBaselineFindingFingerprints(summary: unknown): ReadonlySet<string> {
+  const fingerprints = new Set<string>();
+  collectFindingsFromValue(summary, fingerprints);
+  return fingerprints;
+}
+
+export function applyBaselineFailureSnapshot(
+  envelope: ValidatorFailureEnvelope,
+  baselineFingerprints: ReadonlySet<string>
+): ValidatorFailureEnvelope {
+  if (baselineFingerprints.size === 0 || envelope.blockingFindings.length === 0) return envelope;
+  const blockingFindings = envelope.blockingFindings.map((finding) => {
+    if (!baselineFingerprints.has(findingFingerprint(finding))) return finding;
+    return {
+      ...finding,
+      classification: 'baseline' as const
+    };
+  });
+  return rebuildEnvelopeClassifications(envelope, blockingFindings);
+}
+
 export function createValidatorFailureEnvelope(input: ValidatorFailureEnvelopeInput): ValidatorFailureEnvelope {
   const stdout = input.stdout ?? '';
   const stderr = input.stderr ?? '';
@@ -88,6 +120,32 @@ export function createValidatorFailureEnvelope(input: ValidatorFailureEnvelopeIn
       stdoutTail: tailOrNull(stdout),
       stderrTail: tailOrNull(stderr),
       spawnError,
+      classificationCodes: blockingFindings.map((finding) => finding.code)
+    }
+  };
+}
+
+function rebuildEnvelopeClassifications(
+  envelope: ValidatorFailureEnvelope,
+  blockingFindings: readonly ValidatorBlockingFinding[]
+): ValidatorFailureEnvelope {
+  const baselineFailures = blockingFindings.filter(isBaselineFinding);
+  const currentTaskFailures = blockingFindings.filter((finding) => !isBaselineFinding(finding) && !isEnvironmentFinding(finding));
+  const actionableFindings = blockingFindings.filter((finding) => !isBaselineFinding(finding));
+  const requiredCommand = envelope.ok
+    ? null
+    : actionableFindings.find((finding) => finding.requiredCommand)?.requiredCommand
+      ?? (actionableFindings.length > 0 ? envelope.command : null);
+
+  return {
+    ...envelope,
+    requiredCommand,
+    blockingFindings,
+    baselineFailures,
+    currentTaskFailures,
+    repairHints: buildRepairHints(blockingFindings, envelope.command),
+    diagnostics: {
+      ...envelope.diagnostics,
       classificationCodes: blockingFindings.map((finding) => finding.code)
     }
   };
@@ -292,6 +350,11 @@ function parseJsonCandidates(stdout: string, stderr: string): readonly unknown[]
 
 function buildRepairHints(findings: readonly ValidatorBlockingFinding[], command: string): readonly string[] {
   if (findings.length === 0) return [`Rerun ${command}.`];
+  if (findings.every(isBaselineFinding)) {
+    return [
+      'All validator failures match the supplied baseline. Run the focused validator for the current task, or fix the baseline separately before a release gate.'
+    ];
+  }
   return findings.map((finding) => {
     if (finding.code === 'ATM_ENV_SANDBOX_GIT_EPERM') {
       return 'Rerun the same validator with repository-level permissions, or use ATM_TEMP_ROOT=C:\\tmp when the validator creates temporary git repositories.';
@@ -310,6 +373,48 @@ function buildRepairHints(findings: readonly ValidatorBlockingFinding[], command
     }
     return `Fix ${finding.source} finding ${finding.code}, then rerun ${command}.`;
   });
+}
+
+function collectFindingsFromValue(value: unknown, fingerprints: Set<string>): void {
+  if (!value || typeof value !== 'object') return;
+  if (Array.isArray(value)) {
+    for (const entry of value) collectFindingsFromValue(entry, fingerprints);
+    return;
+  }
+  const record = value as Record<string, unknown>;
+  for (const fieldName of ['blockingFindings', 'baselineFailures', 'currentTaskFailures']) {
+    const rawFindings = record[fieldName];
+    if (!Array.isArray(rawFindings)) continue;
+    for (const raw of rawFindings) {
+      const finding = normalizeFindingCandidate(raw);
+      if (finding) fingerprints.add(findingFingerprint(finding));
+    }
+  }
+  const validators = record.validators;
+  if (Array.isArray(validators)) {
+    for (const validator of validators) {
+      collectFindingsFromValue((validator as any)?.envelope ?? validator, fingerprints);
+    }
+  }
+}
+
+function normalizeFindingCandidate(value: unknown): ValidatorBlockingFinding | null {
+  if (!value || typeof value !== 'object') return null;
+  const record = value as Record<string, unknown>;
+  const code = typeof record.code === 'string' ? record.code : null;
+  const source = typeof record.source === 'string' ? record.source : null;
+  const detail = typeof record.detail === 'string' ? record.detail : null;
+  if (!code || !source || !detail) return null;
+  return {
+    code,
+    source,
+    detail,
+    file: typeof record.file === 'string' ? record.file : undefined,
+    files: Array.isArray(record.files) ? record.files.map(String) : undefined,
+    requiredCommand: typeof record.requiredCommand === 'string' ? record.requiredCommand : null,
+    classification: normalizeClassification(record.classification),
+    data: record.data
+  };
 }
 
 function dedupeFindings(findings: readonly ValidatorBlockingFinding[]): readonly ValidatorBlockingFinding[] {

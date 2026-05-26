@@ -1,0 +1,124 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0046",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": null,
+  "governedTreeSha": null,
+  "targetCommitDelta": {
+    "currentCommitSha": null,
+    "parentCommitShas": [],
+    "governedTreeSha": null,
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0046-validator-baseline-noise-diagnostics.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/run-validators.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2987b7df4ad725288009044ebe541350237ad1eaf3fae70c05d4c7ccac1d8b0d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:validator-envelope",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c15ef550dbf5c1eea153834cab92a4f2aae91849c183ac931232967059239450",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli:surface",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df6efac98b047fdd29e3776d0c010554da9bbf029098253d17f209e0eaefb3e7",
+      "stderrSha256": "sha256:c88c229cdaa50c3cf4996320de650474457a01005c100e7a1c67d625319d03e8",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4125be1928eede5ca03f87d44fffe7424e8b4f7e528412b1432848760a07aca5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "cli-surface",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validator-envelope"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-26T11:55:49.316Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0046-validator-baseline-noise-diagnostics.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/run-validators.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/hook.ts",
+      "scripts/lib/validator-envelope.ts",
+      "scripts/run-validators.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0046.json",
+  "closedAt": "2026-05-26T11:55:49.316Z",
+  "closedByActor": "codex-main"
+}

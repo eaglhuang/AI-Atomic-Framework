@@ -4,6 +4,8 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
+  applyBaselineFailureSnapshot,
+  collectBaselineFindingFingerprints,
   createValidatorFailureEnvelope,
   firstRequiredCommand,
   summarizeBlockingFindings
@@ -20,6 +22,8 @@ const validatorMap = new Map(config.validators.map((entry: any) => [entry.name, 
 const parsedCli = parseCliArgs(process.argv.slice(2));
 const profileConfig = resolveProfileConfig(parsedCli.profile);
 const selectedNames = applyFilters(resolveProfileValidatorNames(parsedCli.profile), parsedCli.filters);
+const baselineSummary = parsedCli.baselinePath ? readBaselineSummary(parsedCli.baselinePath) : null;
+const baselineFingerprints = collectBaselineFindingFingerprints(baselineSummary);
 const selectedValidators = selectedNames.map((name: any) => {
   const validator = validatorMap.get(name);
   if (!validator) {
@@ -37,6 +41,8 @@ if (selectedValidators.length === 0) {
     legacy: parsedCli.legacy,
     cache: parsedCli.cache,
     skipSlow: parsedCli.skipSlow,
+    baselinePath: parsedCli.baselinePath,
+    baselineFingerprintCount: baselineFingerprints.size,
     startedAt: Date.now(),
     results: []
   });
@@ -48,10 +54,12 @@ if (selectedValidators.length === 0) {
 const startedAt = Date.now();
 const results = parsedCli.parallel && !parsedCli.legacy
   ? await Promise.all(selectedValidators.map((validator: any) => runValidator(validator, profileConfig.mode, { json: parsedCli.json, cache: parsedCli.cache })))
+    .then((items) => items.map((item) => markResultAgainstBaseline(item, baselineFingerprints)))
   : await runValidatorsSequential(selectedValidators, profileConfig.mode, {
       json: parsedCli.json,
       cache: parsedCli.cache,
-      stopOnFailure: parsedCli.legacy
+      stopOnFailure: parsedCli.legacy,
+      baselineFingerprints
     });
 
 const summary = createSummary({
@@ -62,6 +70,8 @@ const summary = createSummary({
   legacy: parsedCli.legacy,
   cache: parsedCli.cache,
   skipSlow: parsedCli.skipSlow,
+  baselinePath: parsedCli.baselinePath,
+  baselineFingerprintCount: baselineFingerprints.size,
   startedAt,
   results
 });
@@ -77,13 +87,15 @@ function parseCliArgs(argv: any) {
     legacy: boolean;
     cache: boolean;
     skipSlow: boolean;
+    baselinePath: string | null;
   } = {
     filters: [],
     parallel: false,
     json: false,
     legacy: false,
     cache: false,
-    skipSlow: false
+    skipSlow: false,
+    baselinePath: null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -116,6 +128,16 @@ function parseCliArgs(argv: any) {
     }
     if (arg === '--skip-slow') {
       options.skipSlow = true;
+      continue;
+    }
+    if (arg === '--baseline') {
+      const value = argv[index + 1];
+      const valueText = String(value ?? '');
+      if (!valueText || valueText.startsWith('--')) {
+        throw new Error('--baseline requires a validator summary JSON path');
+      }
+      options.baselinePath = valueText;
+      index += 1;
       continue;
     }
     if (arg.startsWith('--')) {
@@ -169,7 +191,8 @@ function applyFilters(validatorNames: any, filters: any) {
 async function runValidatorsSequential(validators: any, mode: any, options: any) {
   const results: any[] = [];
   for (const validator of validators) {
-    const result = await runValidator(validator, mode, options);
+    const rawResult = await runValidator(validator, mode, options);
+    const result = markResultAgainstBaseline(rawResult, options.baselineFingerprints ?? new Set());
     results.push(result);
     if (options.stopOnFailure && result.ok !== true) {
       break;
@@ -286,7 +309,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
   });
 }
 
-function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSlow, startedAt, results }: any) {
+function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSlow, baselinePath, baselineFingerprintCount, startedAt, results }: any) {
   const durationMs = Date.now() - startedAt;
   const passed = results.filter((entry: any) => entry.ok === true).length;
   const failed = results.length - passed;
@@ -294,6 +317,10 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
   const blockingFindings = summarizeBlockingFindings(envelopes);
   const baselineFailures = dedupeFindings(envelopes.flatMap((envelope: any) => envelope.baselineFailures ?? []));
   const currentTaskFailures = dedupeFindings(envelopes.flatMap((envelope: any) => envelope.currentTaskFailures ?? []));
+  const environmentFindings = blockingFindings.filter(isEnvironmentFinding);
+  const currentTaskFindings = currentTaskFailures.length > 0
+    ? currentTaskFailures
+    : blockingFindings.filter((finding: any) => !isEnvironmentFinding(finding) && !isBaselineFinding(finding));
   return {
     schemaId: 'atm.validatorRunSummary.v1',
     profile,
@@ -307,15 +334,18 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
     legacy,
     cache,
     skipSlow,
+    baselinePath: baselinePath ?? null,
+    baselineFingerprintCount: baselineFingerprintCount ?? 0,
     cached: results.filter((entry: any) => entry.cached === true).length,
     requiredCommand: firstRequiredCommand(envelopes),
     blockingFindings,
     baselineFailures,
     currentTaskFailures,
-    environmentFindings: blockingFindings.filter(isEnvironmentFinding),
-    currentTaskFindings: currentTaskFailures.length > 0
-      ? currentTaskFailures
-      : blockingFindings.filter((finding: any) => !isEnvironmentFinding(finding) && !isBaselineFinding(finding)),
+    environmentFindings,
+    currentTaskFindings,
+    currentTaskOk: currentTaskFindings.length === 0 && environmentFindings.length === 0,
+    taskLevelOk: currentTaskFindings.length === 0 && environmentFindings.length === 0,
+    focusedValidatorCommand: buildFocusedValidatorCommand(results),
     validators: results
   };
 }
@@ -380,6 +410,37 @@ function writeValidatorCache(cacheKey: string, result: any): void {
     generatedAt: new Date().toISOString(),
     result
   }, null, 2)}\n`, 'utf8');
+}
+
+function markResultAgainstBaseline(result: any, baselineFingerprints: ReadonlySet<string>): any {
+  if (!result?.envelope || baselineFingerprints.size === 0) return result;
+  const envelope = applyBaselineFailureSnapshot(result.envelope, baselineFingerprints);
+  return {
+    ...result,
+    requiredCommand: envelope.requiredCommand,
+    blockingFindings: envelope.blockingFindings,
+    envelope
+  };
+}
+
+function readBaselineSummary(baselinePath: string): unknown {
+  const resolved = path.resolve(root, baselinePath);
+  if (!existsSync(resolved)) {
+    throw new Error(`Baseline validator summary not found: ${baselinePath}`);
+  }
+  return JSON.parse(readFileSync(resolved, 'utf8').replace(/^\uFEFF/, ''));
+}
+
+function buildFocusedValidatorCommand(results: readonly any[]): string | null {
+  const failingCurrentTask = results.find((entry) => (entry.envelope?.currentTaskFailures ?? []).length > 0);
+  if (failingCurrentTask?.command) {
+    return String(failingCurrentTask.command);
+  }
+  const firstFailed = results.find((entry) => entry.ok !== true);
+  if (firstFailed?.command) {
+    return String(firstFailed.command);
+  }
+  return null;
 }
 
 function safeMtimeMs(filePath: string): number | null {

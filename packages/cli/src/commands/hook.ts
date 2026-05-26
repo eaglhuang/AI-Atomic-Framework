@@ -121,6 +121,7 @@ interface PreCommitBlockingFinding {
   readonly file?: string;
   readonly files?: readonly string[];
   readonly requiredCommand?: string | null;
+  readonly classification?: 'environment' | 'baseline' | 'current-task' | 'blocking';
   readonly data?: unknown;
 }
 
@@ -130,6 +131,8 @@ interface PreCommitFailureEnvelope {
   readonly surface: 'pre-commit';
   readonly requiredCommand: string | null;
   readonly blockingFindings: readonly PreCommitBlockingFinding[];
+  readonly baselineFailures: readonly PreCommitBlockingFinding[];
+  readonly currentTaskFailures: readonly PreCommitBlockingFinding[];
   readonly repairHints: readonly string[];
   readonly diagnostics: {
     readonly gitIndexDiagnostic: ReturnType<typeof inspectGitIndexAccess>;
@@ -525,6 +528,7 @@ function buildPreCommitBlockingFindings(input: {
       source: 'git-index',
       detail: input.gitIndexDiagnostic.detail,
       requiredCommand: input.gitIndexDiagnostic.requiredCommand,
+      classification: 'environment',
       data: input.gitIndexDiagnostic
     });
   }
@@ -533,7 +537,8 @@ function buildPreCommitBlockingFindings(input: {
       code: `ATM_ENCODING_${finding.issue.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
       source: 'encoding',
       file: finding.file,
-      detail: `Encoding guard found ${finding.issue} in ${finding.file}.`
+      detail: `Encoding guard found ${finding.issue} in ${finding.file}.`,
+      classification: 'current-task'
     });
   }
   for (const blocker of input.blockingFrameworkIssues) {
@@ -541,7 +546,8 @@ function buildPreCommitBlockingFindings(input: {
       code: `ATM_FRAMEWORK_${blocker.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
       source: 'framework-development',
       detail: `Framework-development gate blocked this commit: ${blocker}.`,
-      requiredCommand: blocker === 'active-framework-claim-required' ? input.frameworkClaimCommand : null
+      requiredCommand: blocker === 'active-framework-claim-required' ? input.frameworkClaimCommand : null,
+      classification: 'current-task'
     });
   }
   if (input.planningMirrorDriftFiles.length > 0) {
@@ -549,7 +555,8 @@ function buildPreCommitBlockingFindings(input: {
       code: 'ATM_PLANNING_MIRROR_DRIFT',
       source: 'direction-lock',
       files: input.planningMirrorDriftFiles,
-      detail: 'Staged files include planning/mirror paths while the active direction lock allows target work only.'
+      detail: 'Staged files include planning/mirror paths while the active direction lock allows target work only.',
+      classification: 'current-task'
     });
   }
   if (input.directionLockDriftFiles.length > 0) {
@@ -557,7 +564,8 @@ function buildPreCommitBlockingFindings(input: {
       code: 'ATM_TASK_DIRECTION_SCOPE_DRIFT',
       source: 'direction-lock',
       files: input.directionLockDriftFiles,
-      detail: 'Staged files are outside the active task direction lock allowedFiles.'
+      detail: 'Staged files are outside the active task direction lock allowedFiles.',
+      classification: 'current-task'
     });
   }
   if (input.quickfixDriftFiles.length > 0) {
@@ -565,21 +573,24 @@ function buildPreCommitBlockingFindings(input: {
       code: 'ATM_QUICKFIX_SCOPE_DRIFT',
       source: 'quickfix',
       files: input.quickfixDriftFiles,
-      detail: 'Staged files are outside the active quickfix allowedFiles.'
+      detail: 'Staged files are outside the active quickfix allowedFiles.',
+      classification: 'current-task'
     });
   }
   if (input.quickfixFileLimitExceeded) {
     findings.push({
       code: 'ATM_QUICKFIX_FILE_LIMIT_EXCEEDED',
       source: 'quickfix',
-      detail: 'Quickfix changed too many non-.atm files for the fast channel.'
+      detail: 'Quickfix changed too many non-.atm files for the fast channel.',
+      classification: 'current-task'
     });
   }
   if (input.quickfixLineLimitExceeded) {
     findings.push({
       code: 'ATM_QUICKFIX_LINE_LIMIT_EXCEEDED',
       source: 'quickfix',
-      detail: `Quickfix changed ${input.quickfixChangedLineCount} lines, exceeding the fast-channel line limit.`
+      detail: `Quickfix changed ${input.quickfixChangedLineCount} lines, exceeding the fast-channel line limit.`,
+      classification: 'current-task'
     });
   }
   for (const finding of input.protectedStateFindings) {
@@ -588,7 +599,8 @@ function buildPreCommitBlockingFindings(input: {
       source: 'protected-atm-state',
       file: finding.file,
       detail: finding.detail,
-      requiredCommand: finding.requiredCommand ?? null
+      requiredCommand: finding.requiredCommand ?? null,
+      classification: 'current-task'
     });
   }
   for (const finding of input.taskCardStatusFindings) {
@@ -598,6 +610,7 @@ function buildPreCommitBlockingFindings(input: {
       file: finding.file,
       detail: finding.detail,
       requiredCommand: finding.requiredCommand,
+      classification: 'current-task',
       data: finding
     });
   }
@@ -606,7 +619,8 @@ function buildPreCommitBlockingFindings(input: {
       code: finding.code,
       source: 'task-audit',
       file: 'path' in finding && typeof finding.path === 'string' ? finding.path : undefined,
-      detail: finding.detail
+      detail: finding.detail,
+      classification: 'current-task'
     });
   }
   for (const run of input.failedValidatorRuns) {
@@ -614,6 +628,7 @@ function buildPreCommitBlockingFindings(input: {
       code: 'ATM_FRAMEWORK_VALIDATOR_FAILED',
       source: 'framework-validator',
       detail: `${run.command} exited with ${run.exitCode}.`,
+      classification: 'current-task',
       data: {
         command: run.command,
         exitCode: run.exitCode,
@@ -634,12 +649,16 @@ function buildPreCommitFailureEnvelope(input: {
   const requiredCommand = input.blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand
     ?? input.frameworkClaimCommand
     ?? null;
+  const baselineFailures = input.blockingFindings.filter(isPreCommitBaselineFinding);
+  const currentTaskFailures = input.blockingFindings.filter((finding) => !isPreCommitBaselineFinding(finding) && !isPreCommitEnvironmentFinding(finding));
   return {
     schemaId: 'atm.validatorFailureEnvelope.v1',
     ok: false,
     surface: 'pre-commit',
     requiredCommand,
     blockingFindings: input.blockingFindings,
+    baselineFailures,
+    currentTaskFailures,
     repairHints: buildPreCommitRepairHints(input.blockingFindings, requiredCommand),
     diagnostics: {
       gitIndexDiagnostic: input.gitIndexDiagnostic,
@@ -672,6 +691,18 @@ function buildPreCommitRepairHints(
     }
     return `Resolve ${finding.source} finding ${finding.code}, then retry the commit.`;
   });
+}
+
+function isPreCommitBaselineFinding(finding: PreCommitBlockingFinding): boolean {
+  return finding.classification === 'baseline' || finding.source === 'baseline';
+}
+
+function isPreCommitEnvironmentFinding(finding: PreCommitBlockingFinding): boolean {
+  return finding.classification === 'environment'
+    || finding.source === 'environment'
+    || finding.source === 'git-index'
+    || finding.code.startsWith('ATM_ENV_')
+    || finding.code.startsWith('ATM_GIT_INDEX_');
 }
 
 function inspectGitIndexAccess(cwd: string) {

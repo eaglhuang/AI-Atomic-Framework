@@ -1,0 +1,211 @@
+{
+  "taskId": "TASK-AAO-0046",
+  "updatedAt": "2026-05-26T11:55:45.196Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed for validator baseline noise diagnostics",
+      "artifactPaths": [
+        "scripts/run-validators.ts",
+        "scripts/lib/validator-envelope.ts",
+        "packages/cli/src/commands/hook.ts",
+        "scripts/validate-validator-envelope.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T11:54:45.170Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2987b7df4ad725288009044ebe541350237ad1eaf3fae70c05d4c7ccac1d8b0d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4370e0039298bbeca14629453a75cfedd2f1899daa8b4d3733f48d8adae898d7",
+            "cached": false,
+            "generatedAt": "2026-05-26T11:54:45.172Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:86d2320afd4e5de81b5c90160fba940d9f93ef1df549c332f6a1339ae64aa3f3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validator envelope regression passed including baseline failure reclassification",
+      "artifactPaths": [
+        "scripts/lib/validator-envelope.ts",
+        "scripts/validate-validator-envelope.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T11:54:45.502Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validator-envelope"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:validator-envelope",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c15ef550dbf5c1eea153834cab92a4f2aae91849c183ac931232967059239450",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:fda7b4f94e944f48fc76979e79d4d3ade64796c88bc0c0a1a7ac9ef431ba512d",
+            "cached": false,
+            "generatedAt": "2026-05-26T11:54:45.504Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a19d8707699f23af6c65554cafbdbcf8febcd0768c9a3964bb65ad1b4df4166d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "CLI surface validation passed while preserving sandbox warning as diagnostic output",
+      "artifactPaths": [
+        "packages/cli/src/commands/hook.ts",
+        "scripts/run-validators.ts",
+        "scripts/lib/validator-envelope.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T11:54:45.831Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "cli-surface"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli:surface",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:df6efac98b047fdd29e3776d0c010554da9bbf029098253d17f209e0eaefb3e7",
+            "stderrSha256": "sha256:c88c229cdaa50c3cf4996320de650474457a01005c100e7a1c67d625319d03e8",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:1acebc49ef98656ba3e69e63e611841b78b1e1ffc08a30acce9bacaec4fe37fa",
+            "cached": false,
+            "generatedAt": "2026-05-26T11:54:45.833Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:095472eba113962258b6f54f0004a070d2d71590be7c14c8f43d78ba341f5c3e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli passed for closure packet",
+      "artifactPaths": [
+        "scripts/run-validators.ts",
+        "scripts/lib/validator-envelope.ts",
+        "packages/cli/src/commands/hook.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T11:55:44.879Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:4125be1928eede5ca03f87d44fffe7424e8b4f7e528412b1432848760a07aca5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ac4718e29e1190fd598c9660d002fe93682e6f13312aee2d65a0c5ce74b56aea",
+            "cached": false,
+            "generatedAt": "2026-05-26T11:55:44.881Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0478651256c7c640bdb249d4d97e10cdade94020af369bbb32b15119cadc454b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:git-head-evidence passed for closure packet",
+      "artifactPaths": [
+        "scripts/run-validators.ts",
+        "scripts/lib/validator-envelope.ts",
+        "packages/cli/src/commands/hook.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T11:55:45.196Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:57edbc16c0246fd2a2f532252ca97917dbd25d92b5079293ed9df2d7db3633ef",
+            "cached": false,
+            "generatedAt": "2026-05-26T11:55:45.198Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1bf1184edae3d7f287bc8819bb3c091788939ddb6675c097e2fc304b70cb0812",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
