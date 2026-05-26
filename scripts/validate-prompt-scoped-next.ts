@@ -62,6 +62,15 @@ async function main() {
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md'), 'TASK-AAO-0002', 'AAO CLI spec drift guard', {
       relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
     });
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0011-untracked-file-scope-warnings.task.md'), 'TASK-AAO-0011', 'AAO untracked file scope warnings', {
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0030-crlf-policy.task.md'), 'TASK-AAO-0030', 'AAO CRLF policy', {
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0046-validator-baseline-noise-diagnostics.task.md'), 'TASK-AAO-0046', 'AAO validator noise diagnostics', {
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
 
     const exact = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
@@ -144,6 +153,17 @@ async function main() {
     assert(!((familyQueue.evidence.nextAction as any).selectedTasks ?? []).some((task: any) => task.workItemId.includes('APO')), 'task family prompt must not fall back to unrelated root task cards');
     const familyTrail = assertDecisionTrail(familyQueue.evidence.nextAction as any, 'task family queue');
     assert(familyTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-AAO-0001')), 'task family decisionTrail must record the matching queue head');
+
+    const shorthandExact = await runNext(['--cwd', tempRoot, '--prompt', '請補強 AAO-0011 unrelated untracked claim 行為']);
+    assert(shorthandExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'AAO shorthand task id must route to canonical TASK-AAO card');
+    assert((shorthandExact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-AAO-0011', 'AAO shorthand exact route selected wrong canonical task');
+
+    const shorthandMulti = await runNext(['--cwd', tempRoot, '--prompt', '補強 AAO-0030/0046 hook 診斷排序驗收條件']);
+    assert(shorthandMulti.ok === false, 'multiple AAO shorthand task ids should ask for selection instead of silently choosing one');
+    assert(shorthandMulti.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SELECTION_REQUIRED'), 'multiple AAO shorthand task ids must return selection required, not scope-not-found');
+    const shorthandCandidates = (shorthandMulti.evidence.nextAction as any).candidates ?? [];
+    assert(shorthandCandidates.some((task: any) => task.workItemId === 'TASK-AAO-0030'), 'multiple shorthand route must include TASK-AAO-0030 candidate');
+    assert(shorthandCandidates.some((task: any) => task.workItemId === 'TASK-AAO-0046'), 'multiple shorthand route must include TASK-AAO-0046 candidate');
 
     const surfaceOnlyRejected = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 不存在的治理計畫書，請完成所有任務卡']);
     assert(surfaceOnlyRejected.ok === false, 'named plan prompt with only task-card-surface candidates must fail closed');

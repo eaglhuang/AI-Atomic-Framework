@@ -1805,7 +1805,7 @@ function normalizeRootHintScopeKeys(root: string): readonly string[] {
 }
 
 function createDeterministicTaskIntent(prompt: string, explicitTaskIds: readonly string[] = []): TaskIntent {
-  const mentionedTaskIds = uniqueSorted((prompt.match(/\b(?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi) ?? []).map((entry) => entry.toUpperCase()));
+  const mentionedTaskIds = uniqueSorted(extractTaskIdReferencesFromPrompt(prompt).flatMap((entry) => expandTaskIdReferenceAliases(entry)));
   const mentionedPlanPaths = uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
   const targetRepoHints = uniqueSorted([
     ...(/AI-Atomic-Framework|ATM\s*framework|ATM\s*\u6846\u67b6|ATM\u6846\u67b6|\u539f\u5b50\u6846\u67b6/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
@@ -1852,7 +1852,7 @@ function normalizeTaskIntent(value: Record<string, unknown>, fallbackSource: Tas
     ...readStringArray(value.taskIds),
     ...readStringArray(value.tasks)
   ].map((entry) => entry.toUpperCase()));
-  const mentionedTaskIds = readStringArray(value.mentionedTaskIds).map((entry) => entry.toUpperCase());
+  const mentionedTaskIds = uniqueSorted(readStringArray(value.mentionedTaskIds).flatMap((entry) => expandTaskIdReferenceAliases(entry)));
   const mentionedPlanPaths = readStringArray(value.mentionedPlanPaths);
   const taskRootHints = readStringArray(value.taskRootHints);
   const targetRepoHints = readStringArray(value.targetRepoHints);
@@ -1882,9 +1882,9 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
   if (!taskIntent || !taskIntent.taskScopeMentioned) return null;
   if (taskIntent.explicitTaskIds.length > 0) {
     const selectedTasks = taskIntent.explicitTaskIds
-      .map((taskId) => tasks.find((task) => task.workItemId.toUpperCase() === taskId.toUpperCase()))
+      .map((taskId) => findTaskByTaskIdReference(tasks, taskId))
       .filter((task): task is ImportedTaskSummary => Boolean(task));
-    const missingTaskIds = taskIntent.explicitTaskIds.filter((taskId) => !selectedTasks.some((task) => task.workItemId.toUpperCase() === taskId.toUpperCase()));
+    const missingTaskIds = taskIntent.explicitTaskIds.filter((taskId) => !findTaskByTaskIdReference(selectedTasks, taskId));
     if (missingTaskIds.length > 0) {
       return {
         status: 'not-found',
@@ -1962,6 +1962,11 @@ function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskS
     targetRepo: resolveRouteTargetRepo(viableMatches),
     diagnostics: ['multiple-task-candidates-matched-prompt']
   };
+}
+
+function findTaskByTaskIdReference(tasks: readonly ImportedTaskSummary[], taskIdReference: string): ImportedTaskSummary | null {
+  const aliases = expandTaskIdReferenceAliases(taskIdReference);
+  return tasks.find((task) => aliases.includes(task.workItemId.toUpperCase())) ?? null;
 }
 
 function assertPromptBatchDoesNotConflict(input: {
@@ -2152,6 +2157,40 @@ function extractTaskRootHintsFromPrompt(prompt: string, mentionedTaskIds: readon
     .map((taskId) => taskId.match(/^(.*)-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*$/)?.[1] ?? null)
     .filter((entry): entry is string => Boolean(entry));
   return uniqueSorted([...directRoots, ...derivedRoots]);
+}
+
+function extractTaskIdReferencesFromPrompt(prompt: string): readonly string[] {
+  const references = new Set<string>();
+  for (const match of prompt.matchAll(/\b(?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi)) {
+    references.add(match[0].toUpperCase());
+  }
+  for (const match of prompt.matchAll(/\b((?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*)-(\d{2,})((?:\s*[\/,]\s*\d{2,})+)/gi)) {
+    const prefix = match[1]?.toUpperCase();
+    const firstNumber = match[2] ?? '';
+    const suffix = match[3] ?? '';
+    if (!prefix || !firstNumber) continue;
+    for (const numberMatch of suffix.matchAll(/\d{2,}/g)) {
+      const number = numberMatch[0]?.padStart(firstNumber.length, '0');
+      if (number) references.add(`${prefix}-${number}`);
+    }
+  }
+  return [...references].sort((left, right) => left.localeCompare(right));
+}
+
+function expandTaskIdReferenceAliases(taskIdReference: string): readonly string[] {
+  const normalized = taskIdReference
+    .trim()
+    .toUpperCase()
+    .replace(/_/g, '-')
+    .replace(/^[`"'(]+|[`"'):;,]+$/g, '');
+  if (!normalized) return [];
+  const aliases = new Set<string>([normalized]);
+  if (normalized.startsWith('TASK-')) {
+    aliases.add(normalized.slice('TASK-'.length));
+  } else if (/^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*$/.test(normalized)) {
+    aliases.add(`TASK-${normalized}`);
+  }
+  return [...aliases];
 }
 
 function extractTaskFamilyRootHintsFromPrompt(prompt: string): readonly string[] {

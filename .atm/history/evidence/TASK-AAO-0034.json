@@ -1,0 +1,206 @@
+{
+  "taskId": "TASK-AAO-0034",
+  "updatedAt": "2026-05-26T13:35:58.616Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passes after next shorthand routing normalization",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T13:34:38.620Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2987b7df4ad725288009044ebe541350237ad1eaf3fae70c05d4c7ccac1d8b0d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4370e0039298bbeca14629453a75cfedd2f1899daa8b4d3733f48d8adae898d7",
+            "cached": false,
+            "generatedAt": "2026-05-26T13:34:38.622Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ff5c9130c01f569805a27a9e7b9d26b902a8ff15e3b4c217b812015438359d7b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "prompt-scoped next validates AAO shorthand task id routing",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T13:34:47.122Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "prompt-scoped-next"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-prompt-scoped-next.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:d0dd94d756e428d6c932885ea30a7237c9f1fbe607094d171ef5f95d41c590d3",
+            "cached": false,
+            "generatedAt": "2026-05-26T13:34:47.124Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4b8a66d0e6fb8f4693fc187c4f1c927eaf19e11e4c2d17e23a07d6446a574368",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate cli passes for next routing changes",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T13:34:53.791Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:4125be1928eede5ca03f87d44fffe7424e8b4f7e528412b1432848760a07aca5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ac4718e29e1190fd598c9660d002fe93682e6f13312aee2d65a0c5ce74b56aea",
+            "cached": false,
+            "generatedAt": "2026-05-26T13:34:53.795Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:28f28a7b467b367beb349f1cf2c98eb0553b51a0b9d66473d12e2e033fe9abc5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate cli closure validator passes",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T13:35:51.401Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:4125be1928eede5ca03f87d44fffe7424e8b4f7e528412b1432848760a07aca5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ac4718e29e1190fd598c9660d002fe93682e6f13312aee2d65a0c5ce74b56aea",
+            "cached": false,
+            "generatedAt": "2026-05-26T13:35:51.403Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:28f28a7b467b367beb349f1cf2c98eb0553b51a0b9d66473d12e2e033fe9abc5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git head evidence validator passes",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "createdAt": "2026-05-26T13:35:58.616Z",
+      "details": {
+        "actorId": "codex-main",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:57edbc16c0246fd2a2f532252ca97917dbd25d92b5079293ed9df2d7db3633ef",
+            "cached": false,
+            "generatedAt": "2026-05-26T13:35:58.618Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:46abbd4ec5125045be767699f9d0499abfa45ffe1e09d1c3b313a1a574633ac4",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
