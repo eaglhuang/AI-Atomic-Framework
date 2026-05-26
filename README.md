@@ -13,11 +13,13 @@
 [![Evidence First](https://img.shields.io/badge/Evidence-First-ef4444.svg)](#safety-model)
 [![Agent Ready](https://img.shields.io/badge/Agent-Ready-8b5cf6.svg)](#for-ai-agents)
 
-AI-Atomic-Framework, also called ATM in this repository, is a governance framework for AI-assisted engineering work. It helps humans and AI agents change code inside an inspectable loop: route the next governed action, lock the intended scope, run deterministic checks, preserve evidence, and hand off enough context for the next iteration.
+ATM helps people and AI agents work in the same repo without making a mess.
 
-ATM is not an agent framework and not a workflow engine. It is the control layer around AI-assisted work: the part that keeps scope, rules, validation, artifacts, evidence, and handoff state explicit.
+It tells the agent what to do next, keeps changes inside the right scope, and leaves clear proof of what changed and what passed.
 
-> AI agent entry point: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root. Use `node atm.mjs next --json` only as read-only orientation when no user prompt is available.
+It is not another chat agent or workflow app. It is the safety layer around AI-assisted engineering.
+
+> For AI agents: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json`. Use `node atm.mjs next --json` only when there is no user prompt.
 
 ## Why ATM Exists
 
