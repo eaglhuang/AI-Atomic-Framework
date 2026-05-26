@@ -35,6 +35,7 @@ async function main() {
   try {
     await validateAdopterGoverned(tempRoot);
     await validateBatchCheckpointHold(tempRoot);
+    await validateAaoThroughputAgentJourney(tempRoot);
     await validateFrameworkDevelopment(tempRoot);
     if (!process.exitCode) {
       console.log(`[task-direction-governance:${mode}] ok (adopter-governed and framework-development task direction gates verified)`);
@@ -42,6 +43,63 @@ async function main() {
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
+}
+
+async function validateAaoThroughputAgentJourney(tempRoot: string) {
+  const repo = makeAdopterRepo(tempRoot, 'adopter-aao-throughput-journey');
+  initializeGit(repo);
+  const prompt = 'TASK-ADOPT-0001 TASK-ADOPT-0002 all task cards';
+  const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
+  assert(claim.ok === true, 'AAO throughput journey must claim the first queue head');
+  const batchId = (claim.evidence.batchRun as any)?.batchId;
+  assert(typeof batchId === 'string' && batchId.length > 0, 'AAO throughput journey must create a batchId');
+
+  const compactBeforeWork = await runBatch(['current', '--cwd', repo, '--batch', batchId, '--compact', '--json']);
+  const currentBeforeWork = compactBeforeWork.evidence.current as any;
+  assert(currentBeforeWork?.schemaId === 'atm.batchCurrent.v1', 'AAO throughput journey must expose compact batch current schema');
+  assert(currentBeforeWork.currentTaskId === 'TASK-ADOPT-0001', 'compact current must show the queue head before work');
+  assert(Array.isArray(currentBeforeWork.allowedFiles) && currentBeforeWork.allowedFiles.includes('src/one.ts'), 'compact current must include queue-head allowedFiles');
+  assert((compactBeforeWork.evidence as any).batchRun === undefined, 'compact current must omit full batchRun payload');
+  assert((compactBeforeWork.evidence as any).taskQueue === undefined, 'compact current must omit full taskQueue payload');
+
+  const preWriteDrift = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', repo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', prompt,
+    '--files', 'src/two.ts'
+  ]);
+  assert(preWriteDrift.ok === false, 'AAO throughput journey must block a pre-write edit outside queue-head deliverables');
+  assert(preWriteDrift.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'pre-write drift must return the dedicated scope blocker');
+
+  writeFileSync(path.join(repo, 'src', 'one.ts'), 'export const one = 47;\n', 'utf8');
+  const checkpoint = await runBatch(['checkpoint', '--cwd', repo, '--actor', 'adopter-agent', '--batch', batchId, '--hold', '--json']);
+  assert(checkpoint.ok === true, 'AAO throughput journey checkpoint --hold must close the delivered queue head');
+  assert((checkpoint.evidence as any).held === true, 'AAO throughput journey must hold before claiming the next task');
+  assert((checkpoint.evidence as any).nextClaim === null, 'checkpoint --hold must not auto-claim the next task');
+  assert(!readActiveTaskDirectionLocks(repo).some((lock) => lock.taskId === 'TASK-ADOPT-0002'), 'checkpoint --hold must leave the next task unclaimed until resume');
+
+  const compactAfterCheckpoint = await runBatch(['current', '--cwd', repo, '--batch', batchId, '--compact', '--json']);
+  const currentAfterCheckpoint = compactAfterCheckpoint.evidence.current as any;
+  assert(currentAfterCheckpoint.held === true, 'compact current must show held state after checkpoint --hold');
+  assert(currentAfterCheckpoint.pendingCommitWindow?.taskId === 'TASK-ADOPT-0001', 'compact current must preserve the checkpoint commit window');
+  assert(String(currentAfterCheckpoint.pendingCommitWindow?.commitCommand ?? '').includes('TASK-ADOPT-0001'), 'pending commit window must provide a task-specific commit command');
+  assert(String(currentAfterCheckpoint.commands?.resume ?? '').includes(`--batch ${batchId}`), 'compact current must provide a batch-specific resume command');
+
+  runGit(repo, ['add',
+    'src/one.ts',
+    '.atm/history/tasks/TASK-ADOPT-0001.json',
+    '.atm/history/evidence/TASK-ADOPT-0001.json',
+    '.atm/history/task-events/TASK-ADOPT-0001'
+  ]);
+  const preCommit = runHook(['pre-commit', '--cwd', repo]);
+  assert(preCommit.ok === true, 'checkpoint commit window must allow committing the just-closed task while the batch is held');
+  runGit(repo, ['-c', 'user.name=ATM Test', '-c', 'user.email=atm-test@example.invalid', 'commit', '-m', 'complete TASK-ADOPT-0001']);
+
+  const resume = await runBatch(['resume', '--cwd', repo, '--actor', 'adopter-agent', '--batch', batchId, '--json']);
+  assert(resume.ok === true, 'AAO throughput journey must resume the held batch');
+  assert(readActiveTaskDirectionLocks(repo).some((lock) => lock.taskId === 'TASK-ADOPT-0002'), 'batch resume must claim the next queue head only after the checkpoint commit window is safe');
 }
 
 async function validateBatchCheckpointHold(tempRoot: string) {

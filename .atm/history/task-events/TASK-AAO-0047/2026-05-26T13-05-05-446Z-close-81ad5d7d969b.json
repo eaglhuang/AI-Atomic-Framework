@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-26T13-05-05-446Z-close-81ad5d7d969b",
+  "taskId": "TASK-AAO-0047",
+  "action": "close",
+  "actorId": "codex-main",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0047.json",
+  "taskSha256": "sha256:0a0b0c89e939959154fd317adf0dd34a74b430d8cdac884e11847d4773a6a766",
+  "createdAt": "2026-05-26T13:05:05.446Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0047 --actor codex-main --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0047.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate-prompt-scoped-next",
+      "validate-task-direction-governance",
+      "validate:cli",
+      "validate:cli:surface",
+      "validate:git-head-evidence",
+      "validate:quick:cached"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-26T13:05:05.444Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0047-p0-throughput-acceleration-bundle.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "atomization ownership map updates for touched scripts/commands.",
+        "batch compact/current output for queue-head only views.",
+        "next claim idempotency for active batch current head.",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "sandbox EPERM and validator baseline-noise diagnostics that are actionable.",
+        "scripts/run-validators.ts",
+        "scripts/validate-cli.ts",
+        "source/frozen runner stale diagnostic that points to build/sync instead of --no-verify.",
+        "validator fast surface path and evidence reuse hooks where safe."
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "scripts/run-validators.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
