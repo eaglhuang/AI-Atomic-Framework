@@ -10,22 +10,17 @@
   "acceptance": [
     "close/checkpoint fail 含 missingValidationPasses。",
     "每個 missing pass 有 suggested evidence command。",
-    "blockingFindings[] 包含所有 gate，而非只列 audit。"
+    "blockingFindings[] 包含所有 gate，而非只列 audit。",
+    "[Feedback] Add a pre-close query path such as `node atm.mjs evidence missing --task <id> --json` so agents can see required validators/evidence before attempting close or checkpoint.",
+    "[Feedback] Closure errors must include the same missing evidence list plus one concrete `requiredCommand` per missing category.",
+    "[Feedback] The command must distinguish absent evidence, failed command runs, stale evidence, and diagnostic-only evidence.",
+    "[Feedback] Closure Error TL;DR: 當關閉任務或 checkpoint 遭遇門檻攔截失敗時，ATM CLI 必須輸出簡短且易讀的 TL;DR 錯誤摘要，指出確切的阻擋原因（如缺少哪些 evidence 或有哪些 critical diff），而不是僅輸出大量冗長的 JSON 或堆疊軌跡。"
   ],
   "deliverables": [
     "packages/cli/src/commands/tasks.ts",
     "packages/cli/src/commands/batch.ts",
     "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
-  "tags": [],
-  "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
-  "source": {
-    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0017-closure-validator-remediation.task.md",
-    "sectionTitle": "TASK-AAO-0017",
-    "headingLine": 47,
-    "hash": "cb76174b25f4f594"
-  },
-  "importedAt": "2026-05-26T06:04:11.175Z",
   "scopePaths": [
     "packages/cli/src/commands/tasks.ts",
     "packages/cli/src/commands/batch.ts",
@@ -52,14 +47,25 @@
     "不建立第二套 task lifecycle",
     "不繞過 ATM evidence gate"
   ],
-  "evidenceRequired": null,
-  "rollbackStrategy": null,
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾該任務 commit；若有新增產物或 validator，連同 atomization map 更新一起 revert。",
   "atomizationImpact": {
     "ownerAtomOrMap": null,
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-213Z-import-91b9f359e8a3",
-  "lastTransitionAt": "2026-05-26T06:04:11.213Z",
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0017-closure-validator-remediation.task.md",
+    "sectionTitle": "TASK-AAO-0017",
+    "headingLine": 47,
+    "hash": "b9b036d085369535"
+  },
+  "importedAt": "2026-05-27T13:37:58.928Z",
+  "lastTransitionId": "2026-05-27T13-37-58-933Z-import-15b1ab3904c0",
+  "lastTransitionAt": "2026-05-27T13:37:58.933Z",
   "ledgerContractVersion": "task-ledger/v1"
 }
