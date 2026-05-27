@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
+import { createFrameworkModeStatus } from './framework-development.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 import {
   generateDiffEvidence,
@@ -73,7 +74,174 @@ export async function runEvidence(argv: string[]) {
   if (action === 'diff') {
     return runEvidenceDiff(argv.slice(1));
   }
-  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, git-head-backfill, verify, diff', { exitCode: 2 });
+  if (action === 'validators') {
+    return runEvidenceValidators(argv.slice(1));
+  }
+  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, git-head-backfill, verify, diff, validators', { exitCode: 2 });
+}
+
+/** validator tier 說明
+ * - focused: 必須每次 task 重跑，例如 typecheck、validate:cli、validate:git-head-evidence
+ * - batch: cache key 未變時可跨 task 重用，例如 framework-development、tasks-audit、doctor
+ * - release: 只在 release task 需要，例如 validate:root-drop-release
+ */
+type ValidatorTier = 'focused' | 'batch' | 'milestone' | 'release';
+
+/**
+ * 將 task card 裡的 validator 字串正規化成 gate 名稱。
+ * 例如 "npm run typecheck" → "typecheck"
+ *       "npm run validate:cli" → "validate:cli"
+ */
+function normalizeValidatorGateName(raw: string): string {
+  // "npm run <gate>" → "<gate>"
+  const npmMatch = raw.match(/^npm run (.+)$/);
+  if (npmMatch) return npmMatch[1].trim();
+  // "node --strip-types scripts/validate-<name>.ts --mode validate" → "validate:<name>"
+  const nodeScriptMatch = raw.match(/validate-([a-z0-9-]+)\.ts/);
+  if (nodeScriptMatch) return `validate:${nodeScriptMatch[1]}`;
+  // 已是 gate 名稱
+  return raw;
+}
+
+/** 依 gate 名稱歸類 tier */
+function classifyValidatorTier(gate: string): ValidatorTier {
+  // Release gates — 只有 release 類 task 才需要重跑
+  if (
+    gate === 'validate:integration-adapter' ||
+    gate === 'validate:skill-templates' ||
+    gate === 'validate:root-drop-release' ||
+    gate === 'validate:onefile-release'
+  ) {
+    return 'release';
+  }
+  // Focused — 每次任務必須跑的核心 validator
+  if (gate === 'typecheck' || gate === 'validate:cli' || gate === 'validate:git-head-evidence') {
+    return 'focused';
+  }
+  // 其他 validate: 前綴 — 視為 focused
+  if (gate.startsWith('validate:')) {
+    return 'focused';
+  }
+  // 其餘 framework 健康 gate — 可 batch 重用
+  return 'batch';
+}
+
+/** 依 gate 名稱回傳對應的執行指令（human-readable 提示用） */
+function resolveValidatorExpectedCommand(gate: string): string {
+  if (gate === 'typecheck') return 'npm run typecheck';
+  if (gate.startsWith('validate:')) return `npm run ${gate}`;
+  if (gate === 'framework-development') return 'node atm.mjs next --json';
+  if (gate === 'tasks-audit') return 'node atm.mjs tasks audit --json';
+  if (gate === 'doctor') return 'node atm.mjs doctor --json';
+  if (gate === 'git-head-evidence') return 'node atm.mjs evidence git-head-backfill --actor <actor> --json';
+  return `node atm.mjs ${gate} --json`;
+}
+
+/** evidence validators --list --task <id> 的執行邏輯 */
+function runEvidenceValidators(argv: string[]) {
+  let cwd = process.cwd();
+  let taskId: string | null = null;
+  let list = false;
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--cwd') {
+      cwd = requireValue(argv, i, '--cwd');
+      i++;
+      continue;
+    }
+    if (arg === '--task') {
+      taskId = requireValue(argv, i, '--task');
+      i++;
+      continue;
+    }
+    if (arg === '--list') {
+      list = true;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence validators does not support option ${arg}`, { exitCode: 2 });
+  }
+
+  if (!list) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence validators requires --list', { exitCode: 2 });
+  }
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence validators --list requires --task <work-item-id>', { exitCode: 2 });
+  }
+
+  const resolvedCwd = path.resolve(cwd);
+  const resolvedTaskId = taskId.trim();
+
+  // 1. 取得 framework 必要 gates（由 criticalChangedFiles 動態決定）
+  const frameworkStatus = createFrameworkModeStatus({ cwd: resolvedCwd });
+  const frameworkGates = frameworkStatus.requiredGates;
+
+  // 2. 取得 task card 宣告的 validators（由 tasks import 時寫入 ledger）
+  // task card 裡常以完整命令字串表示（如 "npm run typecheck"），需正規化成 gate 名稱
+  const taskDocument = readTaskDocument(resolvedCwd, resolvedTaskId);
+  const taskDeclaredValidators: string[] = Array.isArray(taskDocument?.validators)
+    ? (taskDocument.validators as unknown[])
+        .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
+        .map((v) => normalizeValidatorGateName(v.trim()))
+        .filter(Boolean)
+    : [];
+
+  // 3. 讀取 evidence 中已記錄的 validationPasses
+  const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
+  const recordedPasses = new Set<string>();
+  for (const record of bundle.evidence) {
+    // top-level validationPasses（部分 legacy 格式）
+    if (Array.isArray(record.validationPasses)) {
+      for (const v of record.validationPasses as unknown[]) {
+        if (typeof v === 'string' && v.trim()) recordedPasses.add(v.trim());
+      }
+    }
+    // details.validationPasses（主要格式，由 evidence add 寫入）
+    if (record.details && typeof record.details === 'object' && !Array.isArray(record.details)) {
+      const d = record.details as Record<string, unknown>;
+      if (Array.isArray(d.validationPasses)) {
+        for (const v of d.validationPasses as unknown[]) {
+          if (typeof v === 'string' && v.trim()) recordedPasses.add(v.trim());
+        }
+      }
+    }
+  }
+
+  // 4. 合併 framework gates 與 task 宣告 validators，去重後排序
+  const allGates = uniqueStrings([...frameworkGates, ...taskDeclaredValidators]);
+
+  // 5. 建立 validator catalog
+  const catalog = allGates.map((gate) => ({
+    name: gate,
+    tier: classifyValidatorTier(gate),
+    expectedCommand: resolveValidatorExpectedCommand(gate),
+    evidenceState: recordedPasses.has(gate) ? 'pass' as const : 'missing' as const
+  }));
+
+  const passedCount = catalog.filter((v) => v.evidenceState === 'pass').length;
+  const missingCount = catalog.filter((v) => v.evidenceState === 'missing').length;
+
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: resolvedCwd,
+    messages: [
+      message('info', 'ATM_EVIDENCE_VALIDATORS_LISTED', `Validator catalog for ${resolvedTaskId}: ${passedCount} passed, ${missingCount} missing.`, {
+        taskId: resolvedTaskId,
+        total: catalog.length,
+        passed: passedCount,
+        missing: missingCount
+      })
+    ],
+    evidence: {
+      action: 'validators',
+      taskId: resolvedTaskId,
+      catalog
+    }
+  });
 }
 
 function runEvidenceDiff(argv: string[]) {

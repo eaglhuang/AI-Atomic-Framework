@@ -531,13 +531,25 @@
       "atom_id": "atm.task-ledger-governance-map",
       "capability": "next routing applies classifyTaskDelivery; planning_repo authority + foreign target_repo emits ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED instead of normal delivery playbook; next --claim refuses mirror-sync-only tasks with ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED (TASK-AAO-0038).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/evidence.ts",
+      "atom_id": "atm.evidence-command-map",
+      "capability": "evidence CLI command: add, git-head-backfill, verify, diff, validators --list; validators --list returns per-task validator catalog with tier (focused/batch/milestone/release), expectedCommand, and evidenceState (pass/missing) sourced from framework requiredGates and task-declared validators (TASK-AAO-0015).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "atom_id": "atm.evidence-command-map",
+      "capability": "evidence command surface specification including validators subcommand with --list --task flags and example (TASK-AAO-0015).",
+      "coverage_status": "active"
     }
   ],
   "summary": {
-    "total_production_paths": 48,
-    "mapped_paths": 48,
+    "total_production_paths": 50,
+    "mapped_paths": 50,
     "coverage_percentage": 100,
-    "atoms_defined": 40,
+    "atoms_defined": 41,
     "atoms_with_evidence": 0,
     "debt_items": 30,
     "core_wave1_completed": true
