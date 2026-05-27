@@ -62,32 +62,32 @@ export async function runNext(argv: any) {
     targetRepo: scopedTargetRepo
   });
   if (earlyFrameworkStatus.mode === 'cross-repo-target-required') {
-    return buildCrossRepoFrameworkNextResult({
+    return withRunnerMode(buildCrossRepoFrameworkNextResult({
       cwd: options.cwd,
       frameworkStatus: earlyFrameworkStatus,
       integrationBootstrap,
       runtimeAdapterReadiness,
       importedTaskQueue
-    });
+    }), options.cwd);
   }
   if (!taskIntent && hasPromptScopedWorkItems(importedTaskQueue)) {
-    return buildPromptRequiredNextResult({
+    return withRunnerMode(buildPromptRequiredNextResult({
       cwd: options.cwd,
       claimRequested: Boolean(options.claim),
       importedTaskQueue,
       integrationBootstrap,
       runtimeAdapterReadiness
-    });
+    }), options.cwd);
   }
   if (options.claim) {
-    return await claimNextImportedTask({
+    return withRunnerMode(await claimNextImportedTask({
       cwd: options.cwd,
       actor: options.agent,
       taskIntent,
       importedTaskQueue,
       integrationBootstrap,
       runtimeAdapterReadiness
-    });
+    }), options.cwd);
   }
   const promptScopeResult = buildPromptScopedNextResult({
     cwd: options.cwd,
@@ -97,7 +97,7 @@ export async function runNext(argv: any) {
     runtimeAdapterReadiness
   });
   if (promptScopeResult) {
-    return promptScopeResult;
+    return withRunnerMode(promptScopeResult, options.cwd);
   }
   const promptGuidanceResult = buildPromptGuidanceNextResult({
     cwd: options.cwd,
@@ -106,7 +106,7 @@ export async function runNext(argv: any) {
     runtimeAdapterReadiness
   });
   if (promptGuidanceResult) {
-    return promptGuidanceResult;
+    return withRunnerMode(promptGuidanceResult, options.cwd);
   }
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
   if (activeGuidanceSession) {
@@ -114,7 +114,7 @@ export async function runNext(argv: any) {
     const legacyPlan = activeGuidanceSession.legacyRoutePlan ?? null;
     const nextAction = legacyPlan ? enrichWithLegacyPlan(options.cwd, baseAction, legacyPlan, activeGuidanceSession.sessionId) : baseAction;
     const userNotice = buildFirstUseUserNotice(nextAction);
-    return makeResult({
+    return withRunnerMode(makeResult({
       ok: nextAction.status !== 'blocked',
       command: 'next',
       cwd: options.cwd,
@@ -142,7 +142,7 @@ export async function runNext(argv: any) {
           confidence: activeGuidanceSession.routeDecision.confidence
         }
       }
-    });
+    }), options.cwd);
   }
 
   const doctor = await runDoctor(['--cwd', options.cwd]);
@@ -151,7 +151,7 @@ export async function runNext(argv: any) {
   const failed = doctorChecks.find((check) => check.ok !== true);
   const nextAction = decideNextAction(runtime, failed?.name ?? null, importedTaskQueue);
   const userNotice = buildFirstUseUserNotice(nextAction);
-  return makeResult({
+  return withRunnerMode(makeResult({
     ok: nextAction.status === 'ready',
     command: 'next',
     cwd: options.cwd,
@@ -179,7 +179,64 @@ export async function runNext(argv: any) {
       lastEvidenceAt: runtime.lastEvidenceAt,
       lastHandoffAt: runtime.lastHandoffAt
     }
-  });
+  }), options.cwd);
+}
+
+function withRunnerMode<T extends { evidence?: any; messages?: any[] }>(result: T, cwd: string): T {
+  const runnerMode = describeRunnerMode(cwd);
+  if (result.evidence && typeof result.evidence === 'object') {
+    result.evidence.runnerMode = runnerMode;
+    if (result.evidence.nextAction && typeof result.evidence.nextAction === 'object' && !Array.isArray(result.evidence.nextAction)) {
+      result.evidence.nextAction.runnerMode = runnerMode;
+    }
+  }
+  if (Array.isArray(result.messages) && !result.messages.some((entry) => entry?.code === 'ATM_RUNNER_MODE')) {
+    result.messages.push(message('info', 'ATM_RUNNER_MODE', `ATM next is running in ${runnerMode.mode} mode.`, runnerMode));
+  }
+  return result;
+}
+
+function describeRunnerMode(cwd: string) {
+  const root = path.resolve(cwd);
+  const entrypointPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+  const entrypoint = entrypointPath ? normalizeRelativePath(root, entrypointPath) : null;
+  const mode = classifyRunnerMode(entrypoint);
+  return {
+    schemaId: 'atm.runnerMode.v1',
+    mode,
+    entrypoint,
+    normalGovernanceCommand: 'node atm.mjs ...',
+    sourceFirstCommand: 'node atm.dev.mjs ...',
+    sourceFirstOnlyWhen: 'explicit source-first framework validation is requested for unbuilt source changes',
+    syncCommand: 'npm run build',
+    frozenRunnerSources: [
+      'release/atm-onefile/atm.mjs',
+      'packages/cli/dist/atm.js'
+    ],
+    guidance: mode === 'source-first' || mode === 'source-import'
+      ? 'Use this only for explicit source-first framework validation. Run npm run build before release-like validation through node atm.mjs.'
+      : 'Use node atm.mjs for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run npm run build and rerun the frozen entrypoint.'
+  };
+}
+
+function classifyRunnerMode(entrypoint: string | null) {
+  if (!entrypoint) return 'unknown';
+  const normalized = entrypoint.replace(/\\/g, '/');
+  if (normalized === 'atm.dev.mjs') return 'source-first';
+  if (normalized === 'atm.mjs'
+    || normalized === 'release/atm-onefile/atm.mjs'
+    || normalized === 'packages/cli/dist/atm.js'
+    || normalized === 'release/atm-root-drop/atm.mjs'
+    || normalized.includes('/atm-onefile-cache/')) {
+    return 'frozen';
+  }
+  if (normalized.startsWith('scripts/') || normalized.includes('/scripts/') || normalized.includes('/packages/cli/src/')) return 'source-import';
+  return 'unknown';
+}
+
+function normalizeRelativePath(root: string, entryPath: string) {
+  const relative = path.relative(root, entryPath).replace(/\\/g, '/');
+  return relative && !relative.startsWith('..') ? relative : entryPath.replace(/\\/g, '/');
 }
 
 function decideNextAction(runtime: any, failedCheckName: any, importedTaskQueue: ImportedTaskQueue) {

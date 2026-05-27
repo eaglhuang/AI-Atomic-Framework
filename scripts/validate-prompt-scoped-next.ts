@@ -27,6 +27,17 @@ function assertDecisionTrail(action: any, expectedStatus: string) {
   }>;
 }
 
+function assertRunnerMode(result: any) {
+  const runnerMode = result?.evidence?.nextAction?.runnerMode;
+  assert(runnerMode?.schemaId === 'atm.runnerMode.v1', 'nextAction must expose atm.runnerMode.v1');
+  assert(result?.evidence?.runnerMode?.schemaId === 'atm.runnerMode.v1', 'next evidence must expose runnerMode');
+  assert(runnerMode.normalGovernanceCommand === 'node atm.mjs ...', 'runner mode must point normal governance to node atm.mjs');
+  assert(runnerMode.sourceFirstCommand === 'node atm.dev.mjs ...', 'runner mode must point source validation to node atm.dev.mjs');
+  assert(runnerMode.syncCommand === 'npm run build', 'runner mode must preserve npm run build as the frozen sync command');
+  assert(['frozen', 'source-first', 'source-import'].includes(runnerMode.mode), 'runner mode must classify known ATM entrypoints');
+  assert(String(runnerMode.sourceFirstOnlyWhen).includes('explicit source-first framework validation'), 'runner mode must restrict source-first guidance to explicit validation');
+}
+
 async function main() {
   const tempRoot = mkdtempSync(path.join(process.cwd(), '.atm-temp', 'prompt-scoped-next-'));
   const previousGitCeilingDirectories = process.env.GIT_CEILING_DIRECTORIES;
@@ -84,6 +95,7 @@ async function main() {
     assert((explicitTask.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'next --task selected wrong task');
     assert((explicitTask.evidence.nextAction as any).recommendedChannel === 'normal', 'next --task must recommend normal channel');
     assert(String((explicitTask.evidence.nextAction as any).requiredCommand).includes('--task TASK-ALPHA-0001'), 'next --task must keep the claim command on --task');
+    assertRunnerMode(explicitTask);
 
     const genericExact = await runNext(['--cwd', tempRoot, '--prompt', '請處理 SANGUO-BOOTSTRAP-0001']);
     assert(genericExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'generic governed task id prompt must route to one task');

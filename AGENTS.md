@@ -22,6 +22,7 @@ Framework-repository exception:
 - Do not treat a missing keep file in this repository as corruption or a bootstrap failure.
 - For the ATM framework repo, the correct first-touch orientation is `README.md` plus `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested task work. `node atm.mjs next --json` is read-only orientation only.
 - `node atm.mjs` intentionally runs the frozen built ATM runner in this repo. Do not use it to test half-written source changes; use `node atm.dev.mjs` only when the task explicitly requires source-first framework validation.
+- `atm next` reports `evidence.nextAction.runnerMode`. If `ATM_RUNNER_SYNC_REQUIRED` appears, run `npm run build` and rerun `node atm.mjs`; do not switch ordinary governance work to `node atm.dev.mjs` to hide stale frozen artifacts.
 
 Bootstrap files:
 

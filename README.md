@@ -255,6 +255,8 @@ Runner entrypoints are intentionally split:
 
 Do not ask agents to use `node atm.dev.mjs` for ordinary governance tests. Build first, then verify the frozen entrypoint with `node atm.mjs ...`.
 
+`atm next` reports `evidence.nextAction.runnerMode` so agents can see which entrypoint is active. Treat `node atm.mjs` as the normal frozen route; use `node atm.dev.mjs` only for explicit source-first framework validation, and run `npm run build` when `ATM_RUNNER_SYNC_REQUIRED` says the frozen runner is stale.
+
 Install dependencies, then use the standard engineering checks:
 
 ```bash
