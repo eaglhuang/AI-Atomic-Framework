@@ -287,10 +287,12 @@ target_repo: AI-Atomic-Framework
     assert((ledgerQueue.evidence.nextAction as any).playbook?.channel === 'batch', 'batch route must include an executable batch playbook');
     assert((ledgerQueue.evidence.nextAction as any).playbook?.commitTiming?.includes('after batch checkpoint'), 'batch playbook must tell agents not to commit before checkpoint');
     assert(ledgerQueue.messages.some((entry) => entry.code === 'ATM_CHANNEL_PLAYBOOK_REQUIRED'), 'batch route must emit the channel playbook as a warning message');
+    assert((ledgerQueue.evidence.nextAction as any).playbook?.state === 'queue-preview', 'batch queue preview must mark the playbook as queue-preview');
     const ledgerClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', ledgerPrompt]);
     assert(ledgerClaim.ok === true, 'next --claim must claim the queue head for ledger tasks');
     assert(ledgerClaim.messages.some((entry) => entry.code === 'ATM_TASK_DELIVERY_PRINCIPLE'), 'next --claim must remind agents that the claimed task must be delivered before closure');
     assert((ledgerClaim.evidence.taskDirectionLock as any)?.schemaId === 'atm.taskDirectionLock.v1', 'next --claim must persist atm.taskDirectionLock.v1');
+    assert((ledgerClaim.evidence.nextAction as any).playbook?.state === 'queue-head-active', 'claimed batch route must mark the playbook as queue-head-active');
     assert((ledgerClaim.evidence.nextAction as any).deliveryPrinciple?.notAllowedAsCompletion?.some((entry: string) => entry.includes('.atm/history')), 'next --claim delivery principle must reject ledger-only completion');
     assert((ledgerClaim.evidence.batchRun as any)?.schemaId === 'atm.batchRun.v1', 'batch claim must persist atm.batchRun.v1');
     const ledgerClaimTrail = assertDecisionTrail(ledgerClaim.evidence.nextAction as any, 'claimed batch route');
@@ -349,6 +351,7 @@ target_repo: AI-Atomic-Framework
     const brokenBatchNext = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-LEDGER-0002']);
     assert(brokenBatchNext.ok === false, 'next must not continue through an inconsistent active batch');
     assert(brokenBatchNext.messages.some((entry) => entry.code === 'ATM_BATCH_STATE_REPAIR_REQUIRED'), 'next must return the batch repair route when runtime is inconsistent');
+    assert((brokenBatchNext.evidence.nextAction as any).playbook?.state === 'repair-required', 'repair route must mark the playbook as repair-required');
     const repairBatch = await runBatch(['repair', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--batch', ledgerBatchId, '--json']);
     assert(repairBatch.ok === true, 'batch repair must succeed for a queue-backed inconsistent batch');
     assert((repairBatch.evidence.after as any)?.taskIds?.includes('TASK-LEDGER-0001'), 'batch repair must restore the full task queue task list');

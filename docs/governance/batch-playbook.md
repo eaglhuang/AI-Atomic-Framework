@@ -39,6 +39,20 @@ ATM picked.
 Batch mode is for moving through a known set of tasks in dependency order
 without re-claiming each one manually.
 
+### Batch playbook states
+
+The `atm.channelPlaybook.v1` response includes a `state` field that tells you
+which of the three batch phases you are in:
+
+| State | Meaning | First required command |
+|---|---|---|
+| **`queue-preview`** | ATM has built a task queue but you have not claimed any task yet. This is a read-only preview — no lock, no active head. | `node atm.mjs next --claim --actor <id> --prompt "<prompt>" --json` |
+| **`queue-head-active`** | A task is the current queue head. Only work on that head; do not skip ahead or switch to single-task flow. | `node atm.mjs batch checkpoint --actor <id> --json` after delivering the head. |
+| **`repair-required`** | The batch runtime is inconsistent (e.g. `batchRun.json` and `task-queue` disagree). **Do not continue work** until ATM reports the batch is clean. | `node atm.mjs batch repair --actor <id> --batch <batchId> --json` |
+
+If ATM returns `state: 'repair-required'`, stop immediately and run the
+`repairCommand` printed in the playbook before touching any task files.
+
 ### Mental model in plain words
 
 - You ask ATM to claim a batch of tasks (or a planning doc that contains them).

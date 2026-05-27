@@ -934,6 +934,14 @@ function buildPromptScopedNextResult(input: {
         recommendedChannel: 'batch',
         riskLevel: 'high',
         requiredCommand: activeBatch ? `node atm.mjs batch repair --actor <id> --batch ${activeBatch.batchId} --json` : 'node atm.mjs batch repair --actor <id> --json',
+        playbook: buildChannelPlaybook({
+          channel: 'batch',
+          taskId: queueHeadTask?.workItemId ?? null,
+          queueHeadTaskId: queueHeadTask?.workItemId ?? null,
+          originalPrompt: queuePrompt,
+          batchId: activeBatch?.batchId ?? null,
+          batchState: 'repair-required'
+        }),
         blockedCommands: blockedMutationCommands()
       };
       return makeResult({
@@ -991,7 +999,9 @@ function buildPromptScopedNextResult(input: {
         channel: 'batch',
         taskId: queueHeadTaskId ?? undefined,
         queueHeadTaskId,
-        originalPrompt: queuePrompt
+        originalPrompt: queuePrompt,
+        batchId: activeBatch?.batchId ?? null,
+        batchState: activeBatch ? 'queue-head-active' : 'queue-preview'
       }),
       deliveryPrinciple: buildTaskDeliveryPrinciple({
         channel: 'batch',
@@ -1207,7 +1217,9 @@ function buildPromptScopedNextResult(input: {
         channel: 'batch',
         taskId: queueHeadTaskId ?? selectedTask.workItemId,
         queueHeadTaskId,
-        originalPrompt: activeBatch.sourcePrompt
+        originalPrompt: activeBatch.sourcePrompt,
+        batchId: activeBatch.batchId,
+        batchState: 'queue-head-active'
       }),
       deliveryPrinciple: buildTaskDeliveryPrinciple({
         channel: 'batch',
@@ -3460,6 +3472,7 @@ function buildMirrorSyncNextAction(input: {
 }
 
 type GovernanceChannel = 'fast' | 'normal' | 'batch';
+type BatchPlaybookState = 'queue-preview' | 'queue-head-active' | 'repair-required';
 
 function buildChannelPlaybook(input: {
   readonly channel: GovernanceChannel;
@@ -3467,6 +3480,8 @@ function buildChannelPlaybook(input: {
   readonly originalPrompt?: string | null;
   readonly queueHeadTaskId?: string | null;
   readonly actorPlaceholder?: string;
+  readonly batchId?: string | null;
+  readonly batchState?: BatchPlaybookState;
 }) {
   const actor = input.actorPlaceholder ?? '<id>';
   const prompt = input.originalPrompt?.trim() || '<current user prompt>';
@@ -3500,23 +3515,67 @@ function buildChannelPlaybook(input: {
   }
   if (input.channel === 'batch') {
     const head = input.queueHeadTaskId ?? input.taskId ?? '<queue-head-task-id>';
+    const batchState = input.batchState ?? 'queue-head-active';
+    const batchLabel = input.batchId ? `batch ${input.batchId}` : 'this batch';
+    const isRepairState = batchState === 'repair-required';
+    const batchClaimCommand = `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`;
+    const batchRepairCommand = `node atm.mjs batch repair --actor ${actor}${input.batchId ? ` --batch ${input.batchId}` : ''} --json`;
+    const stateSummary = batchState === 'queue-preview'
+      ? 'This is a batch preview. Claim the queue head, then work one task at a time.'
+      : isRepairState
+        ? `${batchLabel} is out of sync and needs repair before any task work continues.`
+        : 'This is an active batch. Keep work on the current queue head and checkpoint before commit.';
+    const commandSequence = isRepairState
+      ? [
+        batchRepairCommand,
+        batchClaimCommand,
+        '<implement queue-head deliverables>',
+        'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
+        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
+        `node atm.mjs batch checkpoint --actor ${actor} --json`,
+        'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
+        'git commit -m "<scope>: complete <queue-head-task-id>"'
+      ]
+      : [
+        batchClaimCommand,
+        '<implement queue-head deliverables>',
+        'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
+        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
+        `node atm.mjs batch checkpoint --actor ${actor} --json`,
+        'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
+        'git commit -m "<scope>: complete <queue-head-task-id>"'
+      ];
     return {
       schemaId: 'atm.channelPlaybook.v1',
       channel: 'batch',
       title: 'Batch queue-head playbook',
       mustFollow: true,
-      summary: 'This is a batch run. Do not switch to per-task normal flow. Batch still works one task at a time, but ATM owns the queue, checkpoint, and advance.',
-      steps: [
-        `Run: node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
-        `Work only on the current queue head: ${head}.`,
-        'Read that task contract and implement the real non-.atm deliverables.',
-        'Run the required validator or a focused reproducible verification command.',
-        'Add command-backed evidence for the current queue head.',
-        'Stage the deliverables and evidence before checkpoint, but do not commit yet.',
-        `Run: node atm.mjs batch checkpoint --actor ${actor} --json`,
-        'After checkpoint succeeds, stage the updated .atm/history task/event files and create one commit that contains both deliverables and checkpoint state.',
-        'Continue with the next queue head returned by batch checkpoint.'
-      ],
+      summary: stateSummary,
+      state: batchState,
+      steps: isRepairState
+        ? [
+          `Run: ${batchRepairCommand}`,
+          `Then rerun: ${batchClaimCommand}`,
+          `Work only on the current queue head: ${head}.`,
+          'Read that task contract and implement the real non-.atm deliverables.',
+          'Run the required validator or a focused reproducible verification command.',
+          'Add command-backed evidence for the current queue head.',
+          'Stage the deliverables and evidence before checkpoint, but do not commit yet.',
+          `Run: node atm.mjs batch checkpoint --actor ${actor} --json`,
+          'After checkpoint succeeds, stage the updated .atm/history task/event files and create one commit that contains both deliverables and checkpoint state.',
+          'Continue with the next queue head returned by batch checkpoint.'
+        ]
+        : [
+          `Run: ${batchClaimCommand}`,
+          `Work only on the current queue head: ${head}.`,
+          'Read that task contract and implement the real non-.atm deliverables.',
+          'Run the required validator or a focused reproducible verification command.',
+          'Add command-backed evidence for the current queue head.',
+          'Stage the deliverables and evidence before checkpoint, but do not commit yet.',
+          `Run: node atm.mjs batch checkpoint --actor ${actor} --json`,
+          'After checkpoint succeeds, stage the updated .atm/history task/event files and create one commit that contains both deliverables and checkpoint state.',
+          'Continue with the next queue head returned by batch checkpoint.'
+        ],
       doNot: [
         'Do not run tasks reserve/promote/claim/close manually.',
         'Do not run next --prompt with a later single task id to leave batch.',
@@ -3524,17 +3583,12 @@ function buildChannelPlaybook(input: {
         'Do not close later tasks before the queue head is delivered.',
         'Do not use .atm/history/** changes as the deliverable.'
       ],
-      commandSequence: [
-        `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
-        '<implement queue-head deliverables>',
-        'node atm.mjs evidence add --task <queue-head-task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
-        'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
-        `node atm.mjs batch checkpoint --actor ${actor} --json`,
-        'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
-        'git commit -m "<scope>: complete <queue-head-task-id>"'
-      ],
-      commitTiming: 'Stage deliverables before checkpoint; commit once after batch checkpoint succeeds.',
-      checkpointCommand: `node atm.mjs batch checkpoint --actor ${actor} --json`
+      commandSequence,
+      commitTiming: isRepairState
+        ? 'Repair the batch runtime first, then stage deliverables before checkpoint; commit once after batch checkpoint succeeds.'
+        : 'Stage deliverables before checkpoint; commit once after batch checkpoint succeeds.',
+      checkpointCommand: `node atm.mjs batch checkpoint --actor ${actor} --json`,
+      repairCommand: batchRepairCommand
     };
   }
   return {
