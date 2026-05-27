@@ -187,6 +187,33 @@ export async function runBatch(argv: string[]) {
       ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]),
       '--json'
     ]);
+    // TASK-AAO-0013: close 失敗時傳回帶 category + requiredCommand 的錯誤訊息，
+    // 避免 AI 誤以為 partial-ok = 整批完成。
+    if (!closeResult.ok) {
+      const closeCategory = categorizeCheckpointCloseFailure(closeResult, currentTaskId, resolvedActor.actorId);
+      return makeResult({
+        ok: false,
+        command: 'batch',
+        cwd: options.cwd,
+        messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED',
+          `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, {
+          batchId: active.batchId,
+          closedTaskId: currentTaskId,
+          category: closeCategory.category,
+          reason: closeCategory.reason,
+          requiredCommand: closeCategory.requiredCommand
+        })],
+        evidence: {
+          action: 'checkpoint',
+          actorId: resolvedActor.actorId,
+          closedTaskId: currentTaskId,
+          held: holdNextClaim,
+          historicalDeliveryRefs: batchHistoricalDeliveryRefs,
+          closeResult: closeResult.evidence,
+          failureCategory: closeCategory
+        }
+      });
+    }
     let cleanupResult: unknown = null;
     try {
       cleanupResult = await runTasks([
@@ -229,28 +256,50 @@ export async function runBatch(argv: string[]) {
     if (updated.status === 'completed') {
       releaseBatchRun(options.cwd, updated, 'completed');
     }
+    // TASK-AAO-0013: 分三個狀態，訊息 code 不同，避免 AI 把 partial-ok 誤讀成整批完成。
+    // - ATM_BATCH_CHECKPOINT_OK        → batch-complete（最後一個 task 已 close，整批結束）
+    // - ATM_BATCH_CHECKPOINT_OK        → held（close 完成但暫停，等待手動 resume）
+    // - ATM_BATCH_CHECKPOINT_PARTIAL_OK → partial-ok（此 task done，但還有後續 task 尚未完成）
+    const totalTasks = updated.taskIds?.length ?? 0;
+    const currentIndex = updated.currentIndex ?? 0;
+    const remainingTasks = updated.status === 'completed' ? 0 : Math.max(0, totalTasks - currentIndex);
+    const isBatchComplete = updated.status === 'completed';
+    const isPartialOk = !isBatchComplete && !holdNextClaim;
+    const primaryCode = isPartialOk ? 'ATM_BATCH_CHECKPOINT_PARTIAL_OK' : 'ATM_BATCH_CHECKPOINT_OK';
+    const primaryText = isBatchComplete
+      ? 'Batch checkpoint closed the final task and completed the batch run.'
+      : holdNextClaim
+        ? 'Batch checkpoint closed the current task and held before claiming the next queue head.'
+        : `Batch checkpoint closed task ${currentTaskId}; ${remainingTasks} task(s) remain — batch is NOT yet complete.`;
     return makeResult({
       ok: true,
       command: 'batch',
       cwd: options.cwd,
-      messages: [message('info', 'ATM_BATCH_CHECKPOINT_OK', updated.status === 'completed'
-        ? 'Batch checkpoint closed the final task and completed the batch run.'
-        : holdNextClaim
-          ? 'Batch checkpoint closed the current task and held before claiming the next queue head.'
-          : 'Batch checkpoint closed the current task, advanced the batch, and claimed the next queue head.', {
+      messages: [message('info', primaryCode, primaryText, {
         batchId: updated.batchId,
         closedTaskId: currentTaskId,
         nextTaskId: updated.currentTaskId,
         held: holdNextClaim,
+        // TASK-AAO-0013: category 讓 AI 能程式化判斷狀態
+        category: isBatchComplete ? 'batch-complete' : holdNextClaim ? 'held' : 'partial-ok',
+        // 剩餘 task 數量；partial-ok 時一定 > 0
+        remainingTasks,
+        totalTasks,
+        // partial-ok 時明確告訴 AI 還沒完成
+        batchComplete: isBatchComplete,
         deliveryPrinciple: 'Batch speed comes from automated queue bookkeeping, not relaxed delivery. Each task still needs real non-.atm deliverables before checkpoint can close it.',
         commitInstruction: `Checkpoint succeeded. Stage .atm/history/tasks/${currentTaskId}.json and .atm/history/task-events/${currentTaskId}/, then create one commit that contains the already staged deliverables, evidence, task file, and task events.`,
-        continueInstruction: updated.status === 'completed'
+        continueInstruction: isBatchComplete
           ? 'Batch is complete after this checkpoint commit.'
           : holdNextClaim
             ? `Commit the closed task first, then resume with node atm.mjs batch resume --actor <id> --batch ${updated.batchId} --json or node atm.mjs next --claim --actor <id> --prompt "${updated.sourcePrompt}" --json.`
-          : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId} using --batch ${updated.batchId}.`
+            : `This is a batch run. Do not switch to per-task normal flow. After this checkpoint commit, continue with ${updated.currentTaskId} using --batch ${updated.batchId}.`,
+        // partial-ok 時補 requiredCommand，讓 AI 知道下一步
+        requiredCommand: isPartialOk
+          ? `node atm.mjs batch checkpoint --actor <id> --batch ${updated.batchId} --json`
+          : null
       }),
-      ...(updated.status === 'completed' || holdNextClaim
+      ...(isBatchComplete || holdNextClaim
         ? []
         : [message('warning', 'ATM_BATCH_CONTEXT_ACTIVE', 'This is a batch run. Do not switch to per-task normal flow.', {
           batchId: updated.batchId,
@@ -761,4 +810,64 @@ function readTaskValidators(cwd: string, taskPath: string | null | undefined): r
   } catch {
     return [];
   }
+}
+
+/**
+ * TASK-AAO-0013: checkpoint close 失敗分類器。
+ * 把 closeResult.messages 裡的 error code 對映到 category + reason + requiredCommand，
+ * 讓呼叫方（以及閱讀輸出的 AI）能直接知道要怎麼處理，不用猜。
+ */
+function categorizeCheckpointCloseFailure(
+  closeResult: { ok: boolean; messages?: readonly { code?: string; data?: Record<string, unknown> }[]; evidence?: unknown },
+  taskId: string,
+  actorId: string
+): { category: string; reason: string; requiredCommand: string | null } {
+  const errorMsg = Array.isArray(closeResult.messages)
+    ? closeResult.messages.find((m) => typeof m.code === 'string' && m.code.startsWith('ATM_TASK_CLOSE'))
+    : null;
+  const code = errorMsg?.code ?? 'ATM_TASK_CLOSE_UNKNOWN';
+
+  if (code === 'ATM_TASK_CLOSE_EVIDENCE_REQUIRED' || code === 'ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID') {
+    return {
+      category: 'missing-evidence',
+      reason: `Task ${taskId} lacks required command-backed evidence or a valid closure packet.`,
+      requiredCommand: `node atm.mjs evidence add --task ${taskId} --actor ${actorId} --kind test --freshness fresh --json`
+    };
+  }
+  if (code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED') {
+    return {
+      category: 'missing-deliverable',
+      reason: `Task ${taskId} has no real non-.atm deliverable diff; implement the required files first.`,
+      requiredCommand: null
+    };
+  }
+  if (code === 'ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE' || code === 'ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED') {
+    const requiredCommand = typeof errorMsg?.data?.requiredCommand === 'string'
+      ? errorMsg.data.requiredCommand
+      : null;
+    return {
+      category: 'framework-gate-failed',
+      reason: `Task ${taskId} cannot close due to ATM framework delivery window or gate blocker.`,
+      requiredCommand
+    };
+  }
+  if (code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED') {
+    return {
+      category: 'no-active-claim',
+      reason: `Task ${taskId} has no active claim owned by ${actorId}.`,
+      requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${taskId}" --json`
+    };
+  }
+  if (code === 'ATM_TASK_CLOSE_OWNER_MISMATCH') {
+    return {
+      category: 'owner-mismatch',
+      reason: `Task ${taskId} is owned by a different actor; use takeover or correct --actor.`,
+      requiredCommand: `node atm.mjs tasks takeover --task ${taskId} --actor ${actorId} --json`
+    };
+  }
+  return {
+    category: 'close-failed',
+    reason: `Task ${taskId} close returned ok=false (code: ${code}).`,
+    requiredCommand: null
+  };
 }
