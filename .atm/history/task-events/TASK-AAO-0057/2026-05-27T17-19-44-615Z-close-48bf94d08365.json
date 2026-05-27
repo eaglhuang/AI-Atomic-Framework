@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T17-19-44-615Z-close-48bf94d08365",
+  "taskId": "TASK-AAO-0057",
+  "action": "close",
+  "actorId": "Augment",
+  "sessionId": "session-20260527165641-Augment-TASK-AAO-0057-98dc013999",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0057.json",
+  "taskSha256": "sha256:3d16a89e949ef6c8c6a8796f102874a27e196a77180c1b35d5f9cbd2c0a896ad",
+  "createdAt": "2026-05-27T17:19:44.615Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0057 --actor Augment --status done --historical-delivery a0ab5b42c8295a0fc18c15102469b44952fa765e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527165641-Augment-TASK-AAO-0057-98dc013999",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0057.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T17:19:44.613Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0057-close-gate-scoped-diff-isolation.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
