@@ -3,23 +3,32 @@
   "evidence": [
     {
       "evidenceKind": "validation",
-      "summary": "Git commit tree is covered by ATM Integration Hook Contract v1.",
+      "evidenceType": "commit",
+      "summary": "Git HEAD is covered by ATM git-head backfill evidence.",
       "artifactPaths": [],
-      "createdAt": "2026-05-27T12:21:30.592Z",
-      "producedBy": "atm-framework-development-hooks/v1",
+      "createdAt": "2026-05-27T12:21:36.306Z",
+      "producedBy": "Augment",
+      "evidenceFreshness": "fresh",
       "commandRuns": [],
       "details": {
+        "actorId": "Augment",
+        "kind": "commit",
+        "freshness": "fresh",
         "git": {
+          "commitSha": "2862405a2973be9be13e5658da5fb45433a63d26",
           "treeSha": "9b963c3a262b9e2a8c9b990f43391a96acf0b191",
           "parentCommitShas": [
-            "98f150e548c2959bf8dfc55cf690860e6b9caa73"
+            "2862405a2973be9be13e5658da5fb45433a63d26"
           ],
-          "stagedPathCount": 7,
+          "stagedPathCount": 1,
           "evidencePath": ".atm/history/evidence/git-head.json",
-          "generatedAt": "2026-05-27T12:21:30.592Z"
+          "generatedAt": "2026-05-27T12:21:36.306Z"
         },
-        "hookContractVersion": "atm.integration-hooks/v1",
-        "runnerVersion": "0.1.0"
+        "backfill": {
+          "mode": "head-commit-evidence",
+          "coveredCommitSha": "2862405a2973be9be13e5658da5fb45433a63d26",
+          "reason": "Backfill git-head evidence for an existing HEAD commit."
+        }
       }
     }
   ]
