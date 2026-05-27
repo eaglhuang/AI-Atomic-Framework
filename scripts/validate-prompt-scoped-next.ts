@@ -406,6 +406,98 @@ target_repo: AI-Atomic-Framework
     assert(!((crossLock.allowedFiles ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/'))), 'direction lock allowedFiles must exclude planning mirror files');
     assert((crossLock.planningMirrorPaths ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/')), 'direction lock must record planning mirror guard paths');
 
+    // Regression: TASK-AAO-0038 import contract fidelity — nested evidence/rollback, legacy alias diagnostics.
+    writeFileSync(path.join(taskDir, 'TASK-FIDELITY-0001.task.md'), `---
+task_id: TASK-FIDELITY-0001
+title: Import contract fidelity card
+status: planned
+target_repo: AI-Atomic-Framework
+closure_authority: target_repo
+scopePaths:
+  - "packages/cli/src/commands/tasks.ts"
+deliverables:
+  - "packages/cli/src/commands/tasks.ts"
+validators:
+  - "npm run typecheck"
+evidence:
+  required: command-backed
+rollback:
+  strategy: revert-commit
+  notes: "Restore previous projection if import regresses."
+atomizationImpact:
+  ownerAtomOrMap: "atm.task-ledger-governance-map"
+  mapUpdates:
+    - "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+---
+# TASK-FIDELITY-0001
+`, 'utf8');
+    const fidelityImport = await runTasks(['import', '--cwd', tempRoot, '--from', path.join('docs', 'plan', 'tasks', 'TASK-FIDELITY-0001.task.md'), '--dry-run', '--json']);
+    const fidelityManifest = (fidelityImport.evidence as any).manifest ?? {};
+    const fidelityTask = Array.isArray(fidelityManifest.tasks) ? fidelityManifest.tasks[0] : null;
+    assert(fidelityTask, 'tasks import --dry-run must parse nested evidence/rollback task card');
+    assert(fidelityTask.evidenceRequired === 'command-backed', 'tasks import must unpack nested evidence.required');
+    assert(fidelityTask.rollbackStrategy === 'revert-commit', 'tasks import must unpack nested rollback.strategy');
+    assert(fidelityTask.rollbackNotes && fidelityTask.rollbackNotes.includes('Restore previous projection'), 'tasks import must unpack nested rollback.notes');
+    assert(fidelityTask.atomizationImpact?.ownerAtomOrMap === 'atm.task-ledger-governance-map', 'tasks import must unpack nested atomizationImpact.ownerAtomOrMap');
+    assert(Array.isArray(fidelityTask.atomizationImpact?.mapUpdates) && fidelityTask.atomizationImpact.mapUpdates.includes('atomic_workbench/atomization-coverage/path-to-atom-map.json'), 'tasks import must unpack nested atomizationImpact.mapUpdates');
+    assert(fidelityTask.targetRepo === 'AI-Atomic-Framework', 'tasks import must preserve targetRepo');
+    assert(fidelityTask.closureAuthority === 'target_repo', 'tasks import must preserve closureAuthority');
+
+    // Regression: legacy allowed_files alias must produce an import diagnostic.
+    writeFileSync(path.join(taskDir, 'TASK-LEGACY-0001.task.md'), `---
+task_id: TASK-LEGACY-0001
+title: Legacy alias card
+status: planned
+target_repo: AI-Atomic-Framework
+allowed_files:
+  - "packages/cli/src/commands/tasks.ts"
+---
+# TASK-LEGACY-0001
+`, 'utf8');
+    const legacyImport = await runTasks(['import', '--cwd', tempRoot, '--from', path.join('docs', 'plan', 'tasks', 'TASK-LEGACY-0001.task.md'), '--dry-run', '--json']);
+    const legacyManifest = (legacyImport.evidence as any).manifest ?? {};
+    const legacyTask = Array.isArray(legacyManifest.tasks) ? legacyManifest.tasks[0] : null;
+    assert(legacyTask, 'tasks import --dry-run must parse legacy allowed_files card');
+    assert(Array.isArray(legacyTask.scopePaths) && legacyTask.scopePaths.includes('packages/cli/src/commands/tasks.ts'), 'legacy allowed_files must project to scopePaths');
+    const legacyDiagnostics = Array.isArray(legacyTask.importDiagnostics) ? legacyTask.importDiagnostics : [];
+    assert(legacyDiagnostics.some((entry: any) => entry?.code === 'ATM_TASK_IMPORT_LEGACY_ALIAS' && entry?.alias === 'allowed_files'), 'legacy allowed_files alias must emit ATM_TASK_IMPORT_LEGACY_ALIAS diagnostic');
+    assert(legacyTask.legacyImportAliases?.allowed_files, 'legacy alias projection must retain allowed_files lineage');
+
+    // Regression: planning_repo authority + different target_repo must route to mirror-sync-only.
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-PLANNING-0001.json'), 'TASK-PLANNING-0001', 'Planning-only stale mirror', 'docs/planning-only.md', {
+      status: 'planned',
+      sourcePlanPath: path.relative(tempRoot, path.join(externalTaskDir, 'TASK-PLANNING-0001.task.md')).replace(/\\/g, '/'),
+      scopePaths: ['docs/planning-only.md'],
+      targetRepo: 'PlanningRepo',
+      closureAuthority: 'planning_repo',
+      planningRepo: 'PlanningRepo'
+    });
+    writeFileSync(path.join(externalTaskDir, 'TASK-PLANNING-0001.task.md'), `---
+task_id: TASK-PLANNING-0001
+title: Planning-only mirror source card
+status: done
+target_repo: PlanningRepo
+planning_repo: PlanningRepo
+closure_authority: planning_repo
+scopePaths:
+  - "docs/planning-only.md"
+---
+# TASK-PLANNING-0001
+`, 'utf8');
+    const planningRoute = await runNext(['--cwd', tempRoot, '--prompt', 'TASK-PLANNING-0001']);
+    assert(planningRoute.ok === true, 'planning_repo-authority task lookup must still succeed');
+    assert(planningRoute.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED'), 'planning_repo authority + different target_repo must emit ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED');
+    const planningNextAction = (planningRoute.evidence.nextAction as any) ?? {};
+    assert(planningNextAction.status === 'task-mirror-sync-required', 'planning_repo authority must produce task-mirror-sync-required next action');
+    assert(planningNextAction.recommendedChannel === 'mirror-sync', 'planning_repo authority must recommend mirror-sync channel, not normal/batch');
+    assert(planningNextAction.deliveryClassification?.intent === 'mirror-sync-only', 'planning_repo authority must classify as mirror-sync-only');
+    assert(planningNextAction.deliveryClassification?.statusDivergence === true, 'planning_repo authority with stale ledger must record statusDivergence');
+    assert(planningNextAction.deliveryClassification?.sourceStatus === 'done', 'planning_repo authority must read source-card status (done) from the source task card');
+    assert(typeof planningNextAction.requiredCommand === 'string' && planningNextAction.requiredCommand.includes('tasks import') && planningNextAction.requiredCommand.includes('--write') && planningNextAction.requiredCommand.includes('--force'), 'planning_repo authority must recommend tasks import --write --force as required command');
+    const planningClaimBlocked = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-PLANNING-0001']).catch((error: any) => ({ ok: false, error }));
+    const planningClaimError = (planningClaimBlocked as any).error;
+    assert(planningClaimError && planningClaimError.code === 'ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED', 'next --claim on a planning_repo-authority task must throw ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED');
+
     const ambiguous = await runNext(['--cwd', tempRoot, '--prompt', 'Please do the next task card']);
     assert(ambiguous.ok === false, 'ambiguous task-card prompt must not route as ok');
     assert(ambiguous.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SELECTION_REQUIRED'), 'ambiguous task-card prompt must ask for task selection');
@@ -444,7 +536,7 @@ ${options.files ? `files: ${options.files}\n` : ''}
 `, 'utf8');
 }
 
-function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string; readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string; readonly closedAt?: string; readonly closedByActor?: string; readonly closurePacket?: string; readonly dependencies?: readonly string[] } = {}) {
+function writeLedgerTask(filePath: string, taskId: string, title: string, scopePath: string, options: { readonly status?: string; readonly claimActorId?: string; readonly scopePaths?: readonly string[]; readonly sourcePlanPath?: string; readonly closedAt?: string; readonly closedByActor?: string; readonly closurePacket?: string; readonly dependencies?: readonly string[]; readonly targetRepo?: string; readonly closureAuthority?: string; readonly planningRepo?: string } = {}) {
   writeFileSync(filePath, `${JSON.stringify({
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
@@ -456,6 +548,9 @@ function writeLedgerTask(filePath: string, taskId: string, title: string, scopeP
     ...(options.closurePacket ? { closurePacket: options.closurePacket } : {}),
     ...(options.closedAt ? { closedAt: options.closedAt } : {}),
     ...(options.closedByActor ? { closedByActor: options.closedByActor } : {}),
+    ...(options.targetRepo ? { targetRepo: options.targetRepo } : {}),
+    ...(options.closureAuthority ? { closureAuthority: options.closureAuthority } : {}),
+    ...(options.planningRepo ? { planningRepo: options.planningRepo } : {}),
     ...(options.claimActorId ? {
       claim: {
         actorId: options.claimActorId,

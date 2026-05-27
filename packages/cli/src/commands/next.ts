@@ -18,6 +18,7 @@ import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.ts';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
+import { classifyTaskDelivery, type TaskDeliveryClassification } from './task-intent.ts';
 import {
   buildAllowedFilesForTask,
   createOrRefreshTaskQueue,
@@ -493,6 +494,36 @@ async function claimNextImportedTask(input: {
       }
     });
   }
+  const claimDeliveryClassification = classifyTaskDelivery({
+    cwd: input.cwd,
+    task: {
+      workItemId: claimableTask.workItemId,
+      status: claimableTask.status,
+      targetRepo: claimableTask.targetRepo,
+      closureAuthority: claimableTask.closureAuthority,
+      planningRepo: claimableTask.planningRepo,
+      sourcePlanPath: claimableTask.sourcePlanPath,
+      taskPath: claimableTask.taskPath
+    }
+  });
+  if (claimDeliveryClassification.intent === 'mirror-sync-only') {
+    const sourcePath = claimableTask.sourcePlanPath ?? '<source-task-card-path>';
+    const requiredCommand = `node atm.mjs tasks import --from ${quoteCliValue(sourcePath)} --write --force --json`;
+    throw new CliError('ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED', `Task ${claimableTask.workItemId} is a planning-only mirror in this repo; sync the ledger from the source task card instead of claiming a delivery.`, {
+      exitCode: 1,
+      details: {
+        taskId: claimableTask.workItemId,
+        targetRepo: claimDeliveryClassification.targetRepo,
+        closureAuthority: claimDeliveryClassification.closureAuthority,
+        planningRepo: claimDeliveryClassification.planningRepo,
+        sourceStatus: claimDeliveryClassification.sourceStatus,
+        ledgerStatus: claimDeliveryClassification.ledgerStatus,
+        statusDivergence: claimDeliveryClassification.statusDivergence,
+        requiredCommand,
+        deliveryClassification: claimDeliveryClassification
+      }
+    });
+  }
   const scopeDiagnostic = checkPendingTaskArtifactScopeExpansion({
     cwd: input.cwd,
     task: claimableTask
@@ -952,6 +983,51 @@ function buildPromptScopedNextResult(input: {
   }
   const selectedTask = selectedTasks[0] ?? null;
   if (!selectedTask) return null;
+  const deliveryClassification = classifyTaskDelivery({
+    cwd: input.cwd,
+    task: {
+      workItemId: selectedTask.workItemId,
+      status: selectedTask.status,
+      targetRepo: selectedTask.targetRepo,
+      closureAuthority: selectedTask.closureAuthority,
+      planningRepo: selectedTask.planningRepo,
+      sourcePlanPath: selectedTask.sourcePlanPath,
+      taskPath: selectedTask.taskPath
+    }
+  });
+  if (deliveryClassification.intent === 'mirror-sync-only'
+    && input.taskIntent?.requestedAction !== 'redo'
+    && input.taskIntent?.requestedAction !== 'reopen') {
+    const nextAction = buildMirrorSyncNextAction({
+      task: selectedTask,
+      classification: deliveryClassification
+    });
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction as any,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED', 'ATM detected a planning-only task; deliverables live in another repo. Sync the ledger mirror instead of running a delivery playbook here.', {
+          task: toTaskCandidateView(selectedTask),
+          classification: deliveryClassification,
+          requiredCommand: nextAction.requiredCommand
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: nextAction.recommendedChannel,
+        deliveryClassification,
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   if (isClosedTaskStatus(selectedTask.status) && input.taskIntent?.requestedAction !== 'redo' && input.taskIntent?.requestedAction !== 'reopen') {
     const nextAction = {
       status: 'task-already-closed',
@@ -1450,6 +1526,7 @@ interface ImportedTaskSummary {
   readonly nearbyPlanPaths: readonly string[];
   readonly scopePaths: readonly string[];
   readonly targetRepo: string | null;
+  readonly planningRepo: string | null;
   readonly allowPlanningMirror: boolean;
   readonly planningReadOnlyPaths: readonly string[];
   readonly planningMirrorPaths: readonly string[];
@@ -1534,6 +1611,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
             ...extractLinkedSourceTaskArtifactPaths(cwd, normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path))
           ]),
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
+          planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
           allowPlanningMirror: allowsPlanningMirror(parsed),
           closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
           activeClaimActorId: claimRecord.state === 'active' && typeof claimRecord.actorId === 'string'
@@ -1583,6 +1661,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           ...extractTaskArtifactPathsFromMarkdown(cwd, rawText)
         ]),
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
+        planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
         allowPlanningMirror: allowsPlanningMirror(parsed),
         closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
         activeClaimActorId: null
@@ -3261,6 +3340,56 @@ function buildTaskDeliveryPrinciple(input: { readonly channel: 'normal' | 'batch
     nextStep: input.channel === 'batch'
       ? 'Work only on the current queue head, produce its real deliverables, then run node atm.mjs batch checkpoint --actor <id> --json.'
       : 'Produce the task deliverables, run required validators, then close with node atm.mjs tasks close --status done.'
+  };
+}
+
+function buildMirrorSyncNextAction(input: {
+  readonly task: ImportedTaskSummary;
+  readonly classification: TaskDeliveryClassification;
+}) {
+  const sourcePath = input.task.sourcePlanPath ?? '<source-task-card-path>';
+  const importCommand = `node atm.mjs tasks import --from ${quoteCliValue(sourcePath)} --write --force --json`;
+  const dryRunCommand = `node atm.mjs tasks import --from ${quoteCliValue(sourcePath)} --dry-run --json`;
+  return {
+    status: 'task-mirror-sync-required',
+    command: input.classification.statusDivergence ? importCommand : dryRunCommand,
+    reason: input.classification.reason,
+    recommendedChannel: 'mirror-sync' as const,
+    riskLevel: 'low' as const,
+    requiredCommand: input.classification.statusDivergence ? importCommand : dryRunCommand,
+    deliveryClassification: input.classification,
+    mirrorSync: {
+      schemaId: 'atm.taskMirrorSync.v1',
+      taskId: input.task.workItemId,
+      targetRepo: input.classification.targetRepo,
+      closureAuthority: input.classification.closureAuthority,
+      planningRepo: input.classification.planningRepo,
+      ledgerStatus: input.classification.ledgerStatus,
+      sourceStatus: input.classification.sourceStatus,
+      statusDivergence: input.classification.statusDivergence,
+      sourcePlanPath: input.task.sourcePlanPath,
+      ledgerMirrorPath: input.task.taskPath,
+      recommendedCommandSequence: input.classification.statusDivergence
+        ? [
+          importCommand,
+          `git add ${quoteCliValue(input.task.taskPath)}`,
+          `git commit -m "atm: sync ${input.task.workItemId} ledger mirror from planning source"`
+        ]
+        : [dryRunCommand],
+      doNotDeliverHere: true
+    },
+    allowedCommands: [
+      importCommand,
+      dryRunCommand,
+      'node atm.mjs tasks audit --task <task-id> --json',
+      'node atm.mjs framework-mode status --json'
+    ],
+    blockedCommands: [
+      'editing or staging this task\'s deliverables in the current repo',
+      'node atm.mjs next --claim for this task in the current repo',
+      'node atm.mjs tasks close for this task in the current repo',
+      'creating evidence for non-existent deliverable files'
+    ]
   };
 }
 

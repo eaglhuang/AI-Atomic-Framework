@@ -171,6 +171,16 @@ const sandboxFriendlyTempRoot = existsSync(path.join(root, '.atm-temp'))
   : os.tmpdir();
 const tempRoot = mkdtempSync(path.join(sandboxFriendlyTempRoot, 'atm-task-ledger-'));
 
+// Prevent inner git lookups inside the temp scratch repos from walking up into
+// the framework repo's working tree. Without this, edits to
+// validate-task-ledger-governance.ts itself can be mis-detected as
+// TASK-LEDGER-0001 deliverables because the token "ledger" matches both the
+// file name and the task id.
+const previousGitCeilingDirectories = process.env.GIT_CEILING_DIRECTORIES;
+process.env.GIT_CEILING_DIRECTORIES = [process.cwd(), previousGitCeilingDirectories]
+  .filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
+  .join(path.delimiter);
+
 try {
   assertSandboxDiagnosticsAreActionable();
 
@@ -407,9 +417,98 @@ try {
   assert(legacyAuditAfter.ok === true, 'legacy tasks with baseline transition evidence must pass audit');
   assert(legacyAuditAfter.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_LEGACY_BASELINE_DONE'), 'legacy baseline done warning must remain visible');
 
+  // Regression: TASK-AAO-0038 import contract fidelity — nested evidence/rollback, legacy alias diagnostics, planning_repo-authority ledger snapshot.
+  const fidelityRepo = makeHostRepo(tempRoot, 'import-fidelity');
+  const fidelityPlanDir = path.join(fidelityRepo, 'docs', 'plan', 'tasks');
+  mkdirSync(fidelityPlanDir, { recursive: true });
+  writeFileSync(path.join(fidelityPlanDir, 'TASK-IMPORT-0001.task.md'), [
+    '---',
+    'task_id: TASK-IMPORT-0001',
+    'title: "Nested machine fields card"',
+    'status: planned',
+    'target_repo: ImportFidelityRepo',
+    'planning_repo: PlanningRepoExample',
+    'closure_authority: target_repo',
+    'scopePaths:',
+    '  - "packages/cli/src/commands/tasks.ts"',
+    'deliverables:',
+    '  - "packages/cli/src/commands/tasks.ts"',
+    'validators:',
+    '  - "npm run typecheck"',
+    'evidence:',
+    '  required: command-backed',
+    'rollback:',
+    '  strategy: revert-commit',
+    '  notes: "Restore previous projection on regression."',
+    'atomizationImpact:',
+    '  ownerAtomOrMap: "atm.task-ledger-governance-map"',
+    '  mapUpdates:',
+    '    - "atomic_workbench/atomization-coverage/path-to-atom-map.json"',
+    'outOfScope:',
+    '  - "Changing task-card authoring format"',
+    '---',
+    '# TASK-IMPORT-0001',
+    ''
+  ].join('\n'), 'utf8');
+  const importDryRun = await runTasks(['import', '--cwd', fidelityRepo, '--from', path.join('docs', 'plan', 'tasks', 'TASK-IMPORT-0001.task.md'), '--dry-run', '--json']);
+  const importManifest = (importDryRun.evidence as any).manifest ?? {};
+  const importedTask = Array.isArray(importManifest.tasks) ? importManifest.tasks[0] : null;
+  assert(importedTask, 'tasks import --dry-run must yield a parsed task');
+  assert(importedTask.evidenceRequired === 'command-backed', 'import must unpack nested evidence.required into evidenceRequired');
+  assert(importedTask.rollbackStrategy === 'revert-commit', 'import must unpack nested rollback.strategy into rollbackStrategy');
+  assert(typeof importedTask.rollbackNotes === 'string' && importedTask.rollbackNotes.includes('Restore previous projection'), 'import must unpack nested rollback.notes into rollbackNotes');
+  assert(importedTask.targetRepo === 'ImportFidelityRepo', 'import must preserve target_repo as targetRepo');
+  assert(importedTask.planningRepo === 'PlanningRepoExample', 'import must preserve planning_repo as planningRepo');
+  assert(importedTask.closureAuthority === 'target_repo', 'import must preserve closure_authority as closureAuthority');
+  assert(Array.isArray(importedTask.outOfScope) && importedTask.outOfScope[0]?.includes('task-card authoring format'), 'import must preserve outOfScope as machine field');
+  assert(importedTask.atomizationImpact?.ownerAtomOrMap === 'atm.task-ledger-governance-map', 'import must preserve nested atomizationImpact.ownerAtomOrMap');
+  assert(Array.isArray(importedTask.atomizationImpact?.mapUpdates) && importedTask.atomizationImpact.mapUpdates.includes('atomic_workbench/atomization-coverage/path-to-atom-map.json'), 'import must preserve nested atomizationImpact.mapUpdates');
+
+  const writeImport = await runTasks(['import', '--cwd', fidelityRepo, '--from', path.join('docs', 'plan', 'tasks', 'TASK-IMPORT-0001.task.md'), '--write', '--json']);
+  assert(writeImport.ok === true, 'tasks import --write must succeed for fidelity card');
+  const fidelityLedger = readJson(path.join(fidelityRepo, '.atm', 'history', 'tasks', 'TASK-IMPORT-0001.json'));
+  assert(fidelityLedger.evidenceRequired === 'command-backed', 'ledger JSON must persist nested evidence.required after --write');
+  assert(fidelityLedger.rollbackStrategy === 'revert-commit', 'ledger JSON must persist nested rollback.strategy after --write');
+  assert(typeof fidelityLedger.rollbackNotes === 'string' && fidelityLedger.rollbackNotes.includes('Restore previous projection'), 'ledger JSON must persist nested rollback.notes after --write');
+  assert(fidelityLedger.targetRepo === 'ImportFidelityRepo', 'ledger JSON must persist targetRepo after --write');
+  assert(fidelityLedger.planningRepo === 'PlanningRepoExample', 'ledger JSON must persist planningRepo after --write');
+  assert(fidelityLedger.closureAuthority === 'target_repo', 'ledger JSON must persist closureAuthority after --write');
+
+  // Regression: legacy allowed_files alias must downgrade with a diagnostic, not silently drop scope.
+  writeFileSync(path.join(fidelityPlanDir, 'TASK-IMPORT-0002.task.md'), [
+    '---',
+    'task_id: TASK-IMPORT-0002',
+    'title: "Legacy allowed_files card"',
+    'status: planned',
+    'target_repo: ImportFidelityRepo',
+    'allowed_files:',
+    '  - "packages/cli/src/commands/tasks.ts"',
+    '  - "packages/cli/src/commands/next.ts"',
+    'blocked_by:',
+    '  - "TASK-OTHER-0099"',
+    '---',
+    '# TASK-IMPORT-0002',
+    ''
+  ].join('\n'), 'utf8');
+  const legacyAliasImport = await runTasks(['import', '--cwd', fidelityRepo, '--from', path.join('docs', 'plan', 'tasks', 'TASK-IMPORT-0002.task.md'), '--dry-run', '--json']);
+  const legacyAliasManifest = (legacyAliasImport.evidence as any).manifest ?? {};
+  const legacyAliasTask = Array.isArray(legacyAliasManifest.tasks) ? legacyAliasManifest.tasks[0] : null;
+  assert(legacyAliasTask, 'tasks import --dry-run must yield a legacy alias task');
+  assert(Array.isArray(legacyAliasTask.scopePaths) && legacyAliasTask.scopePaths.includes('packages/cli/src/commands/tasks.ts'), 'legacy allowed_files must project into scopePaths');
+  assert(Array.isArray(legacyAliasTask.dependencies) && legacyAliasTask.dependencies.includes('TASK-OTHER-0099'), 'legacy blocked_by must project into dependencies');
+  const aliasDiagnostics = Array.isArray(legacyAliasTask.importDiagnostics) ? legacyAliasTask.importDiagnostics : [];
+  assert(aliasDiagnostics.some((entry: any) => entry?.code === 'ATM_TASK_IMPORT_LEGACY_ALIAS' && entry?.alias === 'allowed_files' && entry?.canonical === 'scopePaths'), 'legacy allowed_files must emit ATM_TASK_IMPORT_LEGACY_ALIAS diagnostic');
+  assert(aliasDiagnostics.some((entry: any) => entry?.code === 'ATM_TASK_IMPORT_LEGACY_ALIAS' && entry?.alias === 'blocked_by' && entry?.canonical === 'depends_on'), 'legacy blocked_by must emit ATM_TASK_IMPORT_LEGACY_ALIAS diagnostic');
+  assert(legacyAliasTask.legacyImportAliases?.allowed_files, 'legacy alias lineage must be preserved on the import record');
+
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, and legacy baseline migration verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, and TASK-AAO-0038 import contract fidelity verified)`);
   }
 } finally {
+  if (previousGitCeilingDirectories === undefined) {
+    delete process.env.GIT_CEILING_DIRECTORIES;
+  } else {
+    process.env.GIT_CEILING_DIRECTORIES = previousGitCeilingDirectories;
+  }
   rmSync(tempRoot, { recursive: true, force: true });
 }

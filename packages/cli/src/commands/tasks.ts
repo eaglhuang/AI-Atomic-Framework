@@ -42,6 +42,16 @@ export interface TaskImportSource {
   readonly hash: string;
 }
 
+export interface TaskCardImportDiagnostic {
+  readonly code: string;
+  readonly severity: 'info' | 'warning' | 'error';
+  readonly message: string;
+  readonly field?: string;
+  readonly alias?: string;
+  readonly canonical?: string;
+  readonly candidates?: readonly string[];
+}
+
 export interface TaskImportRecord {
   readonly schemaVersion: 'atm.workItem.v0.2';
   readonly workItemId: string;
@@ -62,11 +72,13 @@ export interface TaskImportRecord {
   readonly nonGoals?: readonly string[];
   readonly evidenceRequired?: string | null;
   readonly rollbackStrategy?: string | null;
+  readonly rollbackNotes?: string | null;
   readonly atomizationImpact?: {
     readonly ownerAtomOrMap?: string | null;
     readonly mapUpdates?: readonly string[];
   };
   readonly legacyImportAliases?: Record<string, readonly string[] | string>;
+  readonly importDiagnostics?: readonly TaskCardImportDiagnostic[];
   readonly tags: readonly string[];
   readonly notes?: string | null;
   readonly source: TaskImportSource;
@@ -3612,8 +3624,61 @@ function parseSingleCard(input: {
     ...collectBulletList(sections, deliverablesHeaders)
   ].map(normalizeYamlScalar));
   const notes = collectText(sections, notesHeaders) ?? null;
-  const evidenceRequired = normalizeOptionalString(frontMatter.data.evidenceRequired ?? frontMatter.data.evidence_required ?? frontMatter.data.required);
-  const rollbackStrategy = normalizeOptionalString(frontMatter.data.rollbackStrategy ?? frontMatter.data.rollback_strategy ?? frontMatter.data.strategy);
+  const evidenceFrontMatter = frontMatter.data.evidence && typeof frontMatter.data.evidence === 'object' && !Array.isArray(frontMatter.data.evidence)
+    ? frontMatter.data.evidence as Record<string, unknown>
+    : {};
+  const rollbackFrontMatter = frontMatter.data.rollback && typeof frontMatter.data.rollback === 'object' && !Array.isArray(frontMatter.data.rollback)
+    ? frontMatter.data.rollback as Record<string, unknown>
+    : {};
+  const evidenceRequired = normalizeOptionalString(
+    frontMatter.data.evidenceRequired
+    ?? frontMatter.data.evidence_required
+    ?? frontMatter.data.required
+    ?? evidenceFrontMatter.required
+    ?? evidenceFrontMatter.kind
+  );
+  const rollbackStrategy = normalizeOptionalString(
+    frontMatter.data.rollbackStrategy
+    ?? frontMatter.data.rollback_strategy
+    ?? frontMatter.data.strategy
+    ?? rollbackFrontMatter.strategy
+  );
+  const rollbackNotes = normalizeOptionalString(
+    frontMatter.data.rollbackNotes
+    ?? frontMatter.data.rollback_notes
+    ?? rollbackFrontMatter.notes
+  );
+  const importDiagnostics: TaskCardImportDiagnostic[] = [];
+  if (frontMatter.data.allowed_files !== undefined && frontMatter.data.scopePaths === undefined && frontMatter.data.scope_paths === undefined) {
+    importDiagnostics.push({
+      code: 'ATM_TASK_IMPORT_LEGACY_ALIAS',
+      severity: 'warning',
+      message: 'Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.',
+      field: 'scopePaths',
+      alias: 'allowed_files',
+      canonical: 'scopePaths'
+    });
+  }
+  if (frontMatter.data.blocked_by !== undefined && frontMatter.data.depends_on === undefined && frontMatter.data.dependencies === undefined) {
+    importDiagnostics.push({
+      code: 'ATM_TASK_IMPORT_LEGACY_ALIAS',
+      severity: 'warning',
+      message: 'Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.',
+      field: 'dependencies',
+      alias: 'blocked_by',
+      canonical: 'depends_on'
+    });
+  }
+  if (frontMatter.data.upstream_repo !== undefined && frontMatter.data.target_repo === undefined && frontMatter.data.targetRepo === undefined) {
+    importDiagnostics.push({
+      code: 'ATM_TASK_IMPORT_LEGACY_ALIAS',
+      severity: 'warning',
+      message: 'Front-matter uses legacy alias `upstream_repo`; ATM imports the value as `targetRepo`. Prefer `target_repo`.',
+      field: 'targetRepo',
+      alias: 'upstream_repo',
+      canonical: 'target_repo'
+    });
+  }
 
   return {
     schemaVersion: 'atm.workItem.v0.2',
@@ -3635,6 +3700,7 @@ function parseSingleCard(input: {
     nonGoals,
     evidenceRequired,
     rollbackStrategy,
+    rollbackNotes,
     atomizationImpact: {
       ownerAtomOrMap: normalizeOptionalString(
         frontMatter.data.ownerAtomOrMap
@@ -3649,6 +3715,7 @@ function parseSingleCard(input: {
       ...(frontMatter.data.blocked_by ? { blocked_by: parseYamlList(frontMatter.data.blocked_by) } : {}),
       ...(frontMatter.data.upstream_repo ? { upstream_repo: normalizeOptionalString(frontMatter.data.upstream_repo) ?? '' } : {})
     },
+    importDiagnostics,
     tags,
     notes,
     source: {

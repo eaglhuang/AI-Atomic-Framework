@@ -435,11 +435,29 @@
       "atom_id": "atom-cli-command-specs",
       "capability": "canonical commandSpecs Object.freeze registry: source of truth for public_command_coverage scorer (TASK-AAO-0020).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/task-intent.ts",
+      "atom_id": "atm.task-ledger-governance-map",
+      "capability": "task delivery intent classification (framework-delivery, mirror-sync-only, cross-repo-delivery) driven by imported machine fields (target_repo, closure_authority, planning_repo) and source-card status (TASK-AAO-0038).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks.ts",
+      "atom_id": "atm.task-ledger-governance-map",
+      "capability": "tasks import preserves nested evidence.required, rollback.strategy/notes, atomizationImpact, target_repo, planning_repo, closure_authority, planningMirrorPaths/planningReadOnlyPaths; emits importDiagnostics for legacy aliases allowed_files / blocked_by / upstream_repo (TASK-AAO-0038).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts",
+      "atom_id": "atm.task-ledger-governance-map",
+      "capability": "next routing applies classifyTaskDelivery; planning_repo authority + foreign target_repo emits ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED instead of normal delivery playbook; next --claim refuses mirror-sync-only tasks with ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED (TASK-AAO-0038).",
+      "coverage_status": "active"
     }
   ],
   "summary": {
-    "total_production_paths": 41,
-    "mapped_paths": 41,
+    "total_production_paths": 44,
+    "mapped_paths": 44,
     "coverage_percentage": 100,
     "atoms_defined": 39,
     "atoms_with_evidence": 0,
