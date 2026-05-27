@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0013",
-  "updatedAt": "2026-05-27T10:58:14.801Z",
+  "updatedAt": "2026-05-27T11:05:23.462Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -78,6 +78,45 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:75ff409cb02707c2e036afde12ffbd915cdbbb29df3847d1c00ed1e08c309f49",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "test evidence for TASK-AAO-0013.",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Augment",
+      "sessionId": "session-20260527105237-Augment-TASK-AAO-0013-e3ca802de7",
+      "createdAt": "2026-05-27T11:05:23.462Z",
+      "details": {
+        "actorId": "Augment",
+        "sessionId": "session-20260527105237-Augment-TASK-AAO-0013-e3ca802de7",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs evidence git-head-backfill --actor Augment --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:8d0953c97c25f43204cbef68d92375bdebe0b7ddb368d4d20279667df6723234",
+            "cached": false,
+            "generatedAt": "2026-05-27T11:05:23.515Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b7891253c92976ec288ad51fed4c1bc3904df768a84a5cfc11a4d82b42081783",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
