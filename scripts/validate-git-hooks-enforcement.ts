@@ -21,10 +21,11 @@ function assert(condition: unknown, message: string) {
   }
 }
 
-function run(command: string, args: readonly string[], cwd: string, options: { allowFailure?: boolean; env?: Record<string, string> } = {}) {
+function run(command: string, args: readonly string[], cwd: string, options: { allowFailure?: boolean; env?: Record<string, string>; input?: string } = {}) {
   const result = spawnSync(command, [...args], {
     cwd,
     encoding: 'utf8',
+    input: options.input,
     env: {
       ...process.env,
       ...(options.env ?? {})
@@ -40,7 +41,7 @@ function runGit(repo: string, args: readonly string[], options: { allowFailure?:
   return run('git', args, repo, options);
 }
 
-function runCli(repo: string, args: readonly string[], options: { allowFailure?: boolean; env?: Record<string, string> } = {}) {
+function runCli(repo: string, args: readonly string[], options: { allowFailure?: boolean; env?: Record<string, string>; input?: string } = {}) {
   return run(process.execPath, ['atm.mjs', ...args], repo, options);
 }
 
@@ -196,6 +197,33 @@ try {
   const warnOnlyPayload = parsePayload(warnOnlyHook);
   assert(warnOnlyHook.status === 0, 'pre-push hook must downgrade framework findings to warnings on non-protected feature branches');
   assert(warnOnlyPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_WARN_ONLY_NON_PROTECTED'), 'pre-push hook must emit warn-only code for non-protected branches');
+
+  const protectedLocalToFeatureRemoteRepo = path.join(tempRoot, 'protected-local-to-feature-remote');
+  mkdirSync(protectedLocalToFeatureRemoteRepo, { recursive: true });
+  copyRuntime(root, protectedLocalToFeatureRemoteRepo);
+  runGit(protectedLocalToFeatureRemoteRepo, ['init']);
+  runGit(protectedLocalToFeatureRemoteRepo, ['checkout', '-b', 'main']);
+  runGit(protectedLocalToFeatureRemoteRepo, ['config', 'user.email', 'atm@example.invalid']);
+  runGit(protectedLocalToFeatureRemoteRepo, ['config', 'user.name', 'ATM Hook Validator']);
+  assert(parsePayload(runCli(protectedLocalToFeatureRemoteRepo, ['bootstrap', '--cwd', protectedLocalToFeatureRemoteRepo, '--json'])).ok === true, 'protected-local feature push bootstrap must report ok=true');
+  assert(parsePayload(runCli(protectedLocalToFeatureRemoteRepo, ['atm-chart', 'render', '--cwd', protectedLocalToFeatureRemoteRepo, '--json'])).ok === true, 'protected-local feature push atm-chart render must report ok=true');
+  assert(parsePayload(runCli(protectedLocalToFeatureRemoteRepo, ['welcome', '--cwd', protectedLocalToFeatureRemoteRepo, '--json'])).ok === true, 'protected-local feature push welcome must report ok=true');
+  runGit(protectedLocalToFeatureRemoteRepo, ['add', '.']);
+  runGit(protectedLocalToFeatureRemoteRepo, ['commit', '--no-verify', '-m', 'initial protected local baseline']);
+  writeFileSync(path.join(protectedLocalToFeatureRemoteRepo, 'packages', 'core', 'src', 'index.ts'), 'export const protectedLocalFeaturePush = true;\n', 'utf8');
+  runGit(protectedLocalToFeatureRemoteRepo, ['add', 'packages/core/src/index.ts']);
+  runGit(protectedLocalToFeatureRemoteRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'protected local bypass without evidence']);
+  const protectedLocalHead = String(runGit(protectedLocalToFeatureRemoteRepo, ['rev-parse', 'HEAD']).stdout || '').trim();
+  const prePushStdin = `refs/heads/main ${protectedLocalHead} refs/heads/codex/readme-only 0000000000000000000000000000000000000000\n`;
+  const protectedLocalFeaturePush = runCli(
+    protectedLocalToFeatureRemoteRepo,
+    ['hook', 'pre-push', '--base', 'HEAD~1', '--head', 'HEAD', '--json'],
+    { allowFailure: true, input: prePushStdin }
+  );
+  const protectedLocalFeaturePushPayload = parsePayload(protectedLocalFeaturePush);
+  assert(protectedLocalFeaturePush.status === 0, 'pre-push hook must not hard-block a protected local branch when the actual remote target is a non-protected branch');
+  assert(protectedLocalFeaturePushPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_WARN_ONLY_NON_PROTECTED'), 'protected local to feature remote push must be warn-only');
+  assert((protectedLocalFeaturePushPayload.evidence?.enforcement?.hardProtectedBranchTargets ?? []).length === 0, 'pre-push enforcement must derive protected targets from remote push refs before falling back to current branch');
 
   const safeModeRepo = path.join(tempRoot, 'safe-mode-protected-branch');
   mkdirSync(safeModeRepo, { recursive: true });

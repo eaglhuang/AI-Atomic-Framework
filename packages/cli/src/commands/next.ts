@@ -2993,7 +2993,16 @@ function extractPromptPathHints(prompt: string): readonly string[] {
   return uniqueSorted(matches
     .map((entry) => entry.trim().replace(/^["'`]+|["'`]+$/g, ''))
     .filter((entry) => entry.length > 2)
-    .filter((entry) => /[./\\]|\.md$/i.test(entry)));
+    .filter((entry) => /[./\\]|\.md$/i.test(entry))
+    .filter(isLikelyPromptPathHint));
+}
+
+function isLikelyPromptPathHint(value: string): boolean {
+  const normalized = value.replace(/\\/g, '/').trim();
+  if (!normalized) return false;
+  if (/^[A-Za-z]:\//.test(normalized) || normalized.startsWith('./') || normalized.startsWith('../') || normalized.startsWith('.atm/') || normalized.startsWith('.github/')) return true;
+  if (/\.md$/i.test(normalized)) return true;
+  return /^(?:app|apps|assets|atomic_workbench|client|config|docs|examples|fixtures|integrations|lib|packages|public|release|schemas|scripts|server|specs|src|templates|tests|tools|ui|web)\//.test(normalized);
 }
 
 function pathFieldMatches(field: string, hint: string): boolean {

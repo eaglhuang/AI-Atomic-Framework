@@ -948,11 +948,13 @@ function createPrePushEnforcementDecision(
   baseInfo: PushBaseResolution,
   headRef: string
 ): PrePushEnforcementDecision {
-  const targetBranches = uniqueSorted([
-    ...pushRefs.map((entry) => entry.remoteBranch).filter((entry): entry is string => Boolean(entry)),
-    ...deriveBranchesFromRef(baseInfo.upstreamRef),
-    ...deriveBranchesFromRef(baseInfo.currentBranch)
-  ]);
+  const pushedBranches = uniqueSorted(pushRefs.map((entry) => entry.remoteBranch).filter((entry): entry is string => Boolean(entry)));
+  const targetBranches = pushedBranches.length > 0
+    ? pushedBranches
+    : uniqueSorted([
+      ...deriveBranchesFromRef(baseInfo.upstreamRef),
+      ...deriveBranchesFromRef(baseInfo.currentBranch)
+    ]);
   const hardProtectedBranchTargets = targetBranches.filter(isProtectedFrameworkBranchTarget);
   const hardEnforcement = hardProtectedBranchTargets.length > 0;
   const safeModeRequested = isTruthyEnv(process.env.ATM_FRAMEWORK_PUSH_GUARD_SAFE_MODE);

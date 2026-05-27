@@ -143,6 +143,11 @@ async function main() {
     const scopedNotFoundTrail = assertDecisionTrail(scopedNotFound.evidence.nextAction as any, 'task-scope-not-found');
     assert(scopedNotFoundTrail.some((entry) => entry.check === 'prompt-scope-resolution' && entry.result === 'blocked'), 'scope-not-found decisionTrail must record fail-closed scope resolution');
 
+    const collaborationIsolationPrompt = '修正 git hook 的平行協作隔離：docs-only 或不含 ATM task/evidence 的一般 commit/push 不應被其他本機 ahead governance commits 或 active ATM task 狀態阻擋';
+    const collaborationIsolation = await runNext(['--cwd', tempRoot, '--prompt', collaborationIsolationPrompt]);
+    assert(!collaborationIsolation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'natural language commit/push isolation prompt must not be misread as a task scope because of task/evidence or commit/push text');
+    assert((collaborationIsolation.evidence.taskIntent as any)?.taskScopeMentioned === false, 'commit/push isolation prompt must not set taskScopeMentioned without a real task id, task card, plan, or path');
+
     const externalPlanQueue = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 ATM Agent-First 可操作性優化計畫書，請按照 ATM 的流程完成所有任務卡']);
     assert(externalPlanQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'external planning document prompt must route to its adjacent task cards');
     assert((externalPlanQueue.evidence.nextAction as any).recommendedChannel === 'batch', 'external planning document queue must recommend batch channel');
