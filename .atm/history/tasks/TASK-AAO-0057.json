@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0057",
+  "title": "Close gate scoped diff isolation",
+  "status": "planned",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0006",
+    "TASK-AAO-0051"
+  ],
+  "acceptance": [
+    "強化 close/checkpoint 的驗證邏輯，僅對當前任務申報的 `scopePaths` / `allowedFiles` 進行變更追蹤與 diff 審查。",
+    "當工作區內存在非當前任務所屬的無關變更（如其他 agent 或人類產生的無關 dirty 變更、或者是 IDE/編譯器產生的無關臨時 untracked files）時，close gate 應能夠將其安全隔離（isolate），不應直接報錯 `ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE` 或類似的全域阻擋訊號。",
+    "必須確保任務自身申報之 `deliverables` 與 `scopePaths` 變更是完整且符合規範的，隔離僅適用於「與本卡無關之無涉檔案變更」。",
+    "提供精確的隔離診斷輸出，明確指出哪些是隔離中的無涉變更，哪些是本卡真正應改但未改、或是不該改但改了的 scope 溢出變更。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/batch.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "手動 reserve/promote/claim/close 繞過 batch lifecycle",
+    "手動修改 .atm/history/** 迴避治理",
+    "修改 unrelated 3KLife dirty files"
+  ],
+  "nonGoals": [
+    "不建立第二套 task lifecycle",
+    "不繞過 ATM evidence gate"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾 scoped diff isolation 修正 commit，連同相關之 atomization map 變更一起 revert。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-governance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0057-close-gate-scoped-diff-isolation.task.md",
+    "sectionTitle": "TASK-AAO-0057",
+    "headingLine": 48,
+    "hash": "400f0a8f5189ae5b"
+  },
+  "importedAt": "2026-05-27T15:07:14.544Z",
+  "lastTransitionId": "2026-05-27T15-07-14-547Z-import-5ff145048119",
+  "lastTransitionAt": "2026-05-27T15:07:14.547Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
