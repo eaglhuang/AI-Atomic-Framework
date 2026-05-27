@@ -304,20 +304,22 @@ try {
 
   const deliverableRepo = makeHostRepo(tempRoot, 'deliverable-gate');
   initGitRepo(deliverableRepo);
-  const pipelineTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--title', 'Build pipeline runner']);
-  assert(pipelineTask.ok === true, 'pipeline task create must succeed');
-  const pipelineTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', 'TASK-PIPE-0001.json');
+  const pipelineFixtureTaskId = 'TEST-TASK-0001';
+  const committedFixtureTaskId = 'TEST-TASK-0002';
+  const pipelineTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', pipelineFixtureTaskId, '--actor', 'validator', '--title', 'Build pipeline runner test fixture']);
+  assert(pipelineTask.ok === true, 'pipeline test fixture task create must succeed');
+  const pipelineTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', `${pipelineFixtureTaskId}.json`);
   const pipelineTaskDoc = readJson(pipelineTaskPath);
   pipelineTaskDoc.deliverables = ['pipelines/sanguo-rag/run_bootstrap.py'];
   writeJson(pipelineTaskPath, pipelineTaskDoc);
-  const pipelineClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', 'TASK-PIPE-0001']);
-  assert(pipelineClaim.ok === true, 'next --claim must create a direction lock for the pipeline task');
-  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', 'TASK-PIPE-0001.json'), {
-    taskId: 'TASK-PIPE-0001',
+  const pipelineClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', pipelineFixtureTaskId]);
+  assert(pipelineClaim.ok === true, 'next --claim must create a direction lock for the pipeline test fixture task');
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', `${pipelineFixtureTaskId}.json`), {
+    taskId: pipelineFixtureTaskId,
     evidence: [{
       evidenceKind: 'validation',
       evidenceType: 'test',
-      summary: 'runnable evidence exists, but no deliverable file has changed yet',
+      summary: 'test fixture evidence exists, but no deliverable file has changed yet',
       producedBy: 'validator',
       artifactPaths: [],
       createdAt: new Date().toISOString(),
@@ -329,28 +331,28 @@ try {
       }]
     }]
   });
-  const deliverableError = await expectTaskErrorDetails(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done'], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+  const deliverableError = await expectTaskErrorDetails(['close', '--cwd', deliverableRepo, '--task', pipelineFixtureTaskId, '--actor', 'validator', '--status', 'done'], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
   assert(typeof deliverableError.deliveryPrinciple === 'string' && deliverableError.deliveryPrinciple.includes('deliver'), 'deliverable gate error must explain that delivery comes before closure');
   assert(Array.isArray(deliverableError.notAllowedAsCompletion) && deliverableError.notAllowedAsCompletion.some((entry: string) => entry.includes('.atm/history')), 'deliverable gate error must reject ledger-only completion');
   mkdirSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag'), { recursive: true });
   writeFileSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag', 'run_bootstrap.py'), 'print("bootstrap")\n', 'utf8');
-  const pipelineClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0001', '--actor', 'validator', '--status', 'done']);
-  assert(pipelineClose.ok === true, 'pipeline task close must pass after a real deliverable diff exists');
+  const pipelineClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', pipelineFixtureTaskId, '--actor', 'validator', '--status', 'done']);
+  assert(pipelineClose.ok === true, 'pipeline test fixture close must pass after a real deliverable diff exists');
 
-  const committedTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0002', '--actor', 'validator', '--title', 'Committed pipeline runner']);
+  const committedTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', committedFixtureTaskId, '--actor', 'validator', '--title', 'Committed pipeline runner test fixture']);
   assert(committedTask.ok === true, 'committed deliverable fixture task create must succeed');
-  const committedTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', 'TASK-PIPE-0002.json');
+  const committedTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', `${committedFixtureTaskId}.json`);
   const committedTaskDoc = readJson(committedTaskPath);
   committedTaskDoc.deliverables = ['pipelines/sanguo-rag/committed_bootstrap.py'];
   writeJson(committedTaskPath, committedTaskDoc);
-  const committedClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', 'TASK-PIPE-0002']);
+  const committedClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', committedFixtureTaskId]);
   assert(committedClaim.ok === true, 'next --claim must create a direction lock for the committed deliverable task');
-  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', 'TASK-PIPE-0002.json'), {
-    taskId: 'TASK-PIPE-0002',
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', `${committedFixtureTaskId}.json`), {
+    taskId: committedFixtureTaskId,
     evidence: [{
       evidenceKind: 'validation',
       evidenceType: 'test',
-      summary: 'committed deliverable evidence exists',
+      summary: 'committed test fixture deliverable evidence exists',
       producedBy: 'validator',
       artifactPaths: ['pipelines/sanguo-rag/committed_bootstrap.py'],
       createdAt: new Date().toISOString(),
@@ -365,7 +367,7 @@ try {
   writeFileSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag', 'committed_bootstrap.py'), 'print("committed bootstrap")\n', 'utf8');
   execFileSync('git', ['add', 'pipelines/sanguo-rag/committed_bootstrap.py'], { cwd: deliverableRepo, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'add committed bootstrap deliverable'], { cwd: deliverableRepo, stdio: 'ignore' });
-  const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0002', '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
+  const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', committedFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
   assert(committedClose.ok === true, 'deliverable gate must accept a scoped historical delivery commit');
 
   const frameworkBatchRepo = makeFrameworkRepo(tempRoot);
@@ -591,7 +593,7 @@ try {
   rmSync(staleLockPath, { force: true });
 
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, and TASK-AAO-0053 batch framework delivery window verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, and TASK-AAO-0053 batch framework delivery window verified)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {
