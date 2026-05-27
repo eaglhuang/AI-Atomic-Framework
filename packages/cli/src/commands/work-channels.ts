@@ -351,6 +351,12 @@ export function isBatchPrompt(prompt: string) {
     || /(全部任務卡|整份計畫|整個計畫|全部任務|批次完成|整批處理|一次做完|全部做完)/.test(prompt);
 }
 
+/**
+ * Quickfix / batch scope path matcher. NOT the source of truth for task direction
+ * lock allowed files. For task direction governance (claim → guard → close) use
+ * `taskDirectionLock.allowedFiles` via `getCanonicalAllowedFilesForTask` /
+ * `diagnoseTaskDirectionLockAllowedFiles` in `task-direction.ts` (TASK-AAO-0012).
+ */
 export function isPathAllowedByScope(filePath: string, allowedFiles: readonly string[]) {
   const normalizedFile = normalizeRelativePath(filePath).toLowerCase();
   if (!normalizedFile) return false;

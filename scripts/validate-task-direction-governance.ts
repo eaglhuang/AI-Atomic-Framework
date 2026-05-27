@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
@@ -30,6 +30,22 @@ function writeJson(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+function assertGovernanceLockAllowedFilesAreSsot(repo: string, taskId: string) {
+  const lockPath = path.join(repo, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+  assert(existsSync(lockPath), `governance lock for ${taskId} must exist after claim`);
+  const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+  const embedded = (parsed as { taskDirectionLock?: { allowedFiles?: unknown } }).taskDirectionLock;
+  const canonical = Array.isArray(embedded?.allowedFiles)
+    ? [...(embedded!.allowedFiles as unknown[])].filter((entry): entry is string => typeof entry === 'string').map((entry) => entry.replace(/\\/g, '/')).sort()
+    : null;
+  const lockFiles = Array.isArray(parsed.files)
+    ? [...(parsed.files as unknown[])].filter((entry): entry is string => typeof entry === 'string').map((entry) => entry.replace(/\\/g, '/')).sort()
+    : null;
+  assert(canonical !== null, `governance lock for ${taskId} must embed taskDirectionLock.allowedFiles`);
+  assert(lockFiles !== null, `governance lock for ${taskId} must expose top-level files`);
+  assert(JSON.stringify(canonical) === JSON.stringify(lockFiles), `ATM_TASK_DIRECTION_LOCK_FILES_MISMATCH: governance lock top-level files for ${taskId} must equal taskDirectionLock.allowedFiles (SSOT). canonical=${JSON.stringify(canonical)} files=${JSON.stringify(lockFiles)}`);
+}
+
 async function main() {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-task-direction-governance-'));
   try {
@@ -51,6 +67,7 @@ async function validateAaoThroughputAgentJourney(tempRoot: string) {
   const prompt = 'TASK-ADOPT-0001 TASK-ADOPT-0002 all task cards';
   const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
   assert(claim.ok === true, 'AAO throughput journey must claim the first queue head');
+  assertGovernanceLockAllowedFilesAreSsot(repo, 'TASK-ADOPT-0001');
   const batchId = (claim.evidence.batchRun as any)?.batchId;
   assert(typeof batchId === 'string' && batchId.length > 0, 'AAO throughput journey must create a batchId');
 
@@ -153,6 +170,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
   assert(claim.ok === true, 'adopter next --claim must claim queue head');
   assert((claim.evidence.taskDirectionLock as any)?.taskId === 'TASK-ADOPT-0001', 'adopter claim must create direction lock for queue head');
+  assertGovernanceLockAllowedFilesAreSsot(repo, 'TASK-ADOPT-0001');
   const adopterBatchId = (claim.evidence.batchRun as any)?.batchId;
   assert(typeof adopterBatchId === 'string' && adopterBatchId.length > 0, 'adopter claim must create a batchId for checkpoint status');
 

@@ -503,6 +503,24 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/task-direction.ts",
+      "atom_id": "atm.task-direction-map",
+      "capability": "task direction lock SSOT: writeTaskDirectionLock syncs governance lock top-level files with taskDirectionLock.allowedFiles; getCanonicalAllowedFilesForTask and diagnoseTaskDirectionLockAllowedFiles expose the canonical allowed-files set and report drift across governance lock files, embedded allowedFiles, and claim.files (TASK-AAO-0012).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook.ts",
+      "atom_id": "atm.task-direction-map",
+      "capability": "pre-commit hook runs diagnoseTaskDirectionLockAllowedFiles per active direction lock and emits ATM_DIRECTION_LOCK_ALLOWED_FILES_MISMATCH warning (non-blocking) with drift evidence when canonical allowedFiles diverges from governance lock files or claim.files (TASK-AAO-0012).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/work-channels.ts",
+      "atom_id": "atm.task-direction-map",
+      "capability": "isPathAllowedByScope is the quickfix/batch scope path matcher; explicitly NOT the SSOT for task direction allowed files (TASK-AAO-0012).",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/next.ts",
       "atom_id": "atm.task-ledger-governance-map",
       "capability": "next routing applies classifyTaskDelivery; planning_repo authority + foreign target_repo emits ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED instead of normal delivery playbook; next --claim refuses mirror-sync-only tasks with ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED (TASK-AAO-0038).",
@@ -510,8 +528,8 @@
     }
   ],
   "summary": {
-    "total_production_paths": 46,
-    "mapped_paths": 46,
+    "total_production_paths": 48,
+    "mapped_paths": 48,
     "coverage_percentage": 100,
     "atoms_defined": 40,
     "atoms_with_evidence": 0,

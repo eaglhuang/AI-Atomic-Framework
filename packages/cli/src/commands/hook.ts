@@ -20,7 +20,13 @@ import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-regis
 import { resolveActorWorkSession } from './actor-session.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, relativePathFrom } from './shared.ts';
-import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
+import {
+  diagnoseTaskDirectionLockAllowedFiles,
+  isPlanningMirrorPath,
+  isTaskDirectionPathCandidate,
+  readActiveTaskDirectionLocks,
+  type TaskDirectionAllowedFilesDiagnosis
+} from './task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
@@ -364,6 +370,9 @@ function runPreCommitHook(cwd: string) {
   const activeDirectionLocks = readActiveTaskDirectionLocks(root);
   const activeQuickfixLock = readActiveQuickfixLock(root);
   const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
+  const directionLockAllowedFilesDiagnoses: readonly TaskDirectionAllowedFilesDiagnosis[] = activeDirectionLocks
+    .map((lock) => diagnoseTaskDirectionLockAllowedFiles(root, lock.taskId));
+  const directionLockAllowedFilesMismatches = directionLockAllowedFilesDiagnoses.filter((entry) => entry.mismatches.length > 0);
   const checkpointClosedTaskAllowedFiles = collectStagedBatchCheckpointScopeFiles(root, stagedFiles);
   const checkpointCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles));
@@ -463,6 +472,12 @@ function runPreCommitHook(cwd: string) {
       failedValidatorRuns
     });
 
+  const directionLockAllowedFilesWarning = directionLockAllowedFilesMismatches.length > 0
+    ? message('warn', 'ATM_DIRECTION_LOCK_ALLOWED_FILES_MISMATCH', 'Active task direction lock(s) have drifted between top-level files, embedded allowedFiles, or claim.files. Canonical source is taskDirectionLock.allowedFiles.', {
+      diagnoses: directionLockAllowedFilesMismatches
+    })
+    : null;
+
   return makeResult({
     ok,
     command: 'hook',
@@ -491,7 +506,8 @@ function runPreCommitHook(cwd: string) {
           blockingFindings,
           failureEnvelope,
           nextStep: blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand ?? frameworkClaimCommand
-        })
+        }),
+      ...(directionLockAllowedFilesWarning ? [directionLockAllowedFilesWarning] : [])
     ],
     evidence: {
       action: 'pre-commit',
@@ -504,6 +520,8 @@ function runPreCommitHook(cwd: string) {
       frameworkClaimCommand,
       activeDirectionLocks,
       directionLockPlanningMirrorPaths,
+      directionLockAllowedFilesDiagnoses,
+      directionLockAllowedFilesMismatches,
       planningMirrorDriftFiles,
       activeQuickfixLock,
       directionLockDriftFiles,

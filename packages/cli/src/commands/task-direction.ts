@@ -210,6 +210,7 @@ export function writeTaskDirectionLock(input: {
       const { released, releasedAt, releasedBy, ...activeLock } = existing;
       writeJson(lockPath, {
         ...activeLock,
+        files: [...lock.allowedFiles],
         status: 'active',
         taskDirectionLock: lock
       });
@@ -222,6 +223,108 @@ export function writeTaskDirectionLock(input: {
   mkdirSync(path.dirname(sidecarPath), { recursive: true });
   writeJson(sidecarPath, lock);
   return lock;
+}
+
+export function getCanonicalAllowedFilesForTask(cwd: string, taskId: string): readonly string[] | null {
+  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+  if (existsSync(lockPath)) {
+    try {
+      const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+      const released = parsed.released === true || parsed.status === 'released';
+      const embedded = parsed.taskDirectionLock;
+      if (!released && isTaskDirectionLock(embedded)) return embedded.allowedFiles;
+    } catch {
+      // Fall through to sidecar.
+    }
+  }
+  const sidecarPath = path.join(cwd, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
+  if (existsSync(sidecarPath)) {
+    try {
+      const parsed = JSON.parse(readFileSync(sidecarPath, 'utf8'));
+      if (isTaskDirectionLock(parsed)) return parsed.allowedFiles;
+    } catch {
+      // Ignore malformed runtime files.
+    }
+  }
+  return null;
+}
+
+export interface TaskDirectionAllowedFilesDiagnosis {
+  readonly taskId: string;
+  readonly hasGovernanceLock: boolean;
+  readonly canonicalAllowedFiles: readonly string[] | null;
+  readonly governanceLockFiles: readonly string[] | null;
+  readonly claimFiles: readonly string[] | null;
+  readonly mismatches: readonly TaskDirectionAllowedFilesMismatch[];
+}
+
+export interface TaskDirectionAllowedFilesMismatch {
+  readonly source: 'governance-lock-files' | 'claim-files';
+  readonly missingFromSource: readonly string[];
+  readonly extraInSource: readonly string[];
+}
+
+export function diagnoseTaskDirectionLockAllowedFiles(cwd: string, taskId: string): TaskDirectionAllowedFilesDiagnosis {
+  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+  let canonicalAllowedFiles: readonly string[] | null = null;
+  let governanceLockFiles: readonly string[] | null = null;
+  let hasGovernanceLock = false;
+  if (existsSync(lockPath)) {
+    try {
+      const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+      const released = parsed.released === true || parsed.status === 'released';
+      if (!released) {
+        hasGovernanceLock = true;
+        const embedded = parsed.taskDirectionLock;
+        if (isTaskDirectionLock(embedded)) canonicalAllowedFiles = embedded.allowedFiles;
+        if (Array.isArray(parsed.files)) {
+          governanceLockFiles = uniqueSorted(parsed.files.filter((entry): entry is string => typeof entry === 'string').map(normalizeRelativePath));
+        }
+      }
+    } catch {
+      // Ignore malformed runtime files.
+    }
+  }
+  if (!canonicalAllowedFiles) {
+    canonicalAllowedFiles = getCanonicalAllowedFilesForTask(cwd, taskId);
+  }
+  let claimFiles: readonly string[] | null = null;
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (existsSync(taskPath)) {
+    try {
+      const parsed = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+      const claim = (parsed as { claim?: unknown }).claim;
+      if (claim && typeof claim === 'object' && Array.isArray((claim as { files?: unknown }).files)) {
+        claimFiles = uniqueSorted(((claim as { files: unknown[] }).files)
+          .filter((entry): entry is string => typeof entry === 'string')
+          .map(normalizeRelativePath));
+      }
+    } catch {
+      // Ignore malformed ledger files.
+    }
+  }
+  const mismatches: TaskDirectionAllowedFilesMismatch[] = [];
+  if (canonicalAllowedFiles && governanceLockFiles) {
+    const drift = computeAllowedFilesDrift(canonicalAllowedFiles, governanceLockFiles);
+    if (drift.missingFromSource.length > 0 || drift.extraInSource.length > 0) {
+      mismatches.push({ source: 'governance-lock-files', ...drift });
+    }
+  }
+  if (canonicalAllowedFiles && claimFiles) {
+    const drift = computeAllowedFilesDrift(canonicalAllowedFiles, claimFiles);
+    if (drift.missingFromSource.length > 0 || drift.extraInSource.length > 0) {
+      mismatches.push({ source: 'claim-files', ...drift });
+    }
+  }
+  return { taskId, hasGovernanceLock, canonicalAllowedFiles, governanceLockFiles, claimFiles, mismatches };
+}
+
+function computeAllowedFilesDrift(canonical: readonly string[], source: readonly string[]) {
+  const canonicalSet = new Set(canonical.map((value) => normalizeRelativePath(value).toLowerCase()));
+  const sourceSet = new Set(source.map((value) => normalizeRelativePath(value).toLowerCase()));
+  const missingFromSource = [...canonicalSet].filter((value) => !sourceSet.has(value)).sort();
+  const extraInSource = [...sourceSet].filter((value) => !canonicalSet.has(value)).sort();
+  return { missingFromSource, extraInSource };
 }
 
 export function readActiveTaskDirectionLocks(cwd: string): readonly TaskDirectionLock[] {
