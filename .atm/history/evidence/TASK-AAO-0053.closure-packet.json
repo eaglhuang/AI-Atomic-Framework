@@ -1,0 +1,115 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0053",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework-clones\\aao-0053-clean",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "fc896cd41dcf9db90549446487dec27a103f4676",
+  "governedTreeSha": "7425243d016b3f0947fb9bdd89bb05259cf4dd70",
+  "targetCommitDelta": {
+    "currentCommitSha": "fc896cd41dcf9db90549446487dec27a103f4676",
+    "parentCommitShas": [
+      "fc896cd41dcf9db90549446487dec27a103f4676"
+    ],
+    "governedTreeSha": "7425243d016b3f0947fb9bdd89bb05259cf4dd70",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-AAO-0053.json",
+      ".atm/history/tasks/TASK-AAO-0053.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck; npm run validate:cli; node --strip-types scripts/validate-task-ledger-governance.ts --mode validate; git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e2300cfb2c64414d872aab4e40adc317d4107953904654a55492e7703d2d1d43",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "diff-check",
+    "typecheck",
+    "validate-task-ledger-governance",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-27T08:03:26.560Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0053-batch-checkpoint-framework-critical-delivery-window.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/batch.ts` (支援 `--historical-delivery <commit>` 或 `--delivery-commit <commit>`)",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/hook.ts` (使 pre-commit 與 checkpoint window 得以感知對應的 critical diff 合法性)",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/batch.ts` (支援 `--historical-delivery <commit>` 或 `--delivery-commit <commit>`)",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/hook.ts` (使 pre-commit 與 checkpoint window 得以感知對應的 critical diff 合法性)",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0053.json",
+  "closedAt": "2026-05-27T08:03:26.560Z",
+  "closedByActor": "codex-aao-0053",
+  "sessionId": "session-20260527075914-codex-aao-0053-TASK-AAO-0053-1611c1622c"
+}

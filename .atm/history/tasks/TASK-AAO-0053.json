@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0053",
+  "title": "batch checkpoint 支援 framework critical delivery window",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0037",
+    "TASK-AAO-0038",
+    "TASK-AAO-0047"
+  ],
+  "acceptance": [
+    "以 `TASK-AAO-0052` 作為 dogfood 案例，進行完整流程回歸測試。",
+    "當 `batch checkpoint` 遇到 framework critical source diff 被阻擋時，必須回傳極其清晰的引導與診斷 (guidance)，指導 Agent 使用正確的指令收尾，不可讓 Agent 卡在互相矛盾的規則裡。",
+    "提供正式的 CLI 參數路徑，例如 `batch checkpoint --historical-delivery <commit>` 或 `batch checkpoint --delivery-commit <commit>`，或等價的 governed delivery window，確保其行為與 `tasks close --historical-delivery` 對齊且安全。",
+    "依然不允許 Agent 透過手動 `reserve/promote/claim/close` 來繞過 batch lifecycle（這會使 batch queue 錯亂）。",
+    "不允許只提交 `.atm/history` 關閉記錄而沒有對應的 `delivery commit linkage`。",
+    "驗證命令至少涵蓋 typecheck、validate:cli、batch/checkpoint regression、git diff --check。",
+    "整個實作與測試過程中，不可觸碰或弄髒當前 `TASK-AAO-0052` 已經 stage 的任何 changes。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/hook.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "packages/cli/src/commands/batch.ts` (支援 `--historical-delivery <commit>` 或 `--delivery-commit <commit>`)",
+    "packages/cli/src/commands/hook.ts` (使 pre-commit 與 checkpoint window 得以感知對應的 critical diff 合法性)"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "手動 reserve/promote/claim/close 繞過 batch lifecycle",
+    "手改 .atm/runtime/**",
+    "把 .atm/history/** 當作獨立功能交付物",
+    "修改 unrelated 3KLife dirty files"
+  ],
+  "nonGoals": [
+    "不建立第二套 task lifecycle",
+    "不繞過 ATM evidence gate",
+    "允許只提交 .atm/history closure 而沒有 delivery commit linkage"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾該任務 commit；若有新增產物或 validator，連同 atomization map 更新一起 revert。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.batch-run-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0053-batch-checkpoint-framework-critical-delivery-window.task.md",
+    "sectionTitle": "TASK-AAO-0053",
+    "headingLine": 55,
+    "hash": "613f19a199499200"
+  },
+  "importedAt": "2026-05-27T07:59:04.078Z",
+  "lastTransitionId": "2026-05-27T08-03-26-563Z-close-382635e0d84b",
+  "lastTransitionAt": "2026-05-27T08:03:26.563Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-aao-0053",
+  "reservedAt": "2026-05-27T07:59:14.657Z",
+  "promotedAt": "2026-05-27T07:59:14.661Z",
+  "claim": {
+    "actorId": "codex-aao-0053",
+    "leaseId": "lease-0e17598d86ba",
+    "claimedAt": "2026-05-27T07:59:14.664Z",
+    "heartbeatAt": "2026-05-27T08:03:26.563Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0053.json"
+    ],
+    "state": "released",
+    "reason": "Implemented governed batch checkpoint delivery window for framework critical tasks."
+  },
+  "startedAt": "2026-05-27T07:59:14.664Z",
+  "startedByActor": "codex-aao-0053",
+  "startedBySessionId": "session-20260527075914-codex-aao-0053-TASK-AAO-0053-1611c1622c",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0053.closure-packet.json",
+  "closedAt": "2026-05-27T08:03:26.563Z",
+  "closedByActor": "codex-aao-0053",
+  "closedBySessionId": "session-20260527075914-codex-aao-0053-TASK-AAO-0053-1611c1622c",
+  "closeReason": "Implemented governed batch checkpoint delivery window for framework critical tasks."
+}

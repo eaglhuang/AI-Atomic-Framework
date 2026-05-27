@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T08-03-26-563Z-close-382635e0d84b",
+  "taskId": "TASK-AAO-0053",
+  "action": "close",
+  "actorId": "codex-aao-0053",
+  "sessionId": "session-20260527075914-codex-aao-0053-TASK-AAO-0053-1611c1622c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0053.json",
+  "taskSha256": "sha256:0646ac59ee8aac343b935f9af4c0935aab34c35d4d0fd3f231719836ddccf368",
+  "createdAt": "2026-05-27T08:03:26.563Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0053 --actor codex-aao-0053 --status done --historical-delivery fc896cd41dcf9db90549446487dec27a103f4676",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527075914-codex-aao-0053-TASK-AAO-0053-1611c1622c",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0053.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "diff-check",
+      "typecheck",
+      "validate-task-ledger-governance",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T08:03:26.560Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0053-batch-checkpoint-framework-critical-delivery-window.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch.ts` (支援 `--historical-delivery <commit>` 或 `--delivery-commit <commit>`)",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/hook.ts` (使 pre-commit 與 checkpoint window 得以感知對應的 critical diff 合法性)",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch.ts` (支援 `--historical-delivery <commit>` 或 `--delivery-commit <commit>`)",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/hook.ts` (使 pre-commit 與 checkpoint window 得以感知對應的 critical diff 合法性)",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
