@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0058",
+  "title": "Task ledger/evidence/events self-allow on claim",
+  "status": "planned",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0012",
+    "TASK-AAO-0051"
+  ],
+  "acceptance": [
+    "在 claim 任務或建立 task direction lock 時，ATM 必須將該任務自身的治理變更路徑自動、隱式地加入到當前允許編輯的檔案清單 (`taskDirectionLock.allowedFiles`) 中。",
+    "自動加入之治理檔案路徑必須精確覆蓋：",
+    "`.atm/history/tasks/<task-id>.json`",
+    "`.atm/history/evidence/<task-id>.*`",
+    "`.atm/history/task-events/<task-id>/**`",
+    "AI 代理人在執行 evidence 收集、中繼 checkpoint 或 close 任務時，不會因為這些 ATM 內部治理檔案的變更而被 `ScopeLock` 阻擋，免除手動執行 `tasks scope --add` 的冗餘操作。",
+    "此 self-allow 規則必須為 strict lock 模式之內建機制，不得破壞主線 source deliverables 的邊界防護，絕不允許漏掉任何實質代碼 source 變更審查。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/task-direction.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "packages/cli/src/commands/task-direction.ts` (強化 allowedFiles 初始化機制，納入 self-allow 自動規則)"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-direction-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "手動 reserve/promote/claim/close 繞過 batch lifecycle",
+    "手動修改 .atm/history/** 迴避治理",
+    "修改 unrelated 3KLife dirty files"
+  ],
+  "nonGoals": [
+    "不建立 second registry",
+    "不允許無限制擴展 allowedFiles"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾 self-allow 修正 commit，連同相關之 atomization map 變更一起 revert。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-direction-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0058-task-ledger-evidence-events-self-allow-on-claim.task.md",
+    "sectionTitle": "TASK-AAO-0058",
+    "headingLine": 46,
+    "hash": "6cc1c866aa80468d"
+  },
+  "importedAt": "2026-05-27T14:27:36.578Z",
+  "lastTransitionId": "2026-05-27T14-27-36-581Z-import-b702d6d3a136",
+  "lastTransitionAt": "2026-05-27T14:27:36.581Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
