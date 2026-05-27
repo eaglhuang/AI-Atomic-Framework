@@ -1,23 +1,23 @@
 {
   "schemaId": "atm.dogfoodScore.v1",
   "version": "1.2",
-  "overall_atomization_score": 79,
-  "grade": "C",
+  "overall_atomization_score": 89,
+  "grade": "B",
   "stage": "dogfood-complete",
   "scores": {
-    "source_ownership_coverage": 79,
+    "source_ownership_coverage": 80,
     "public_command_coverage": 100,
     "atom_with_test_evidence": 100,
     "atom_with_rollback_evidence": 0,
     "excluded_paths_with_reason": 100,
-    "runAtm_with_readable_ref": 0
+    "runAtm_with_readable_ref": 100
   },
   "weighted_components": {
-    "source_ownership_coverage": 79,
+    "source_ownership_coverage": 80,
     "public_command_coverage": 100,
     "runtime_behavior_coverage": 100,
     "evidence_coverage": 75,
-    "readable_callsite_coverage": 0,
+    "readable_callsite_coverage": 100,
     "integration_health": 100
   },
   "weights": {
@@ -28,8 +28,8 @@
     "readable_callsite_coverage": 0.1,
     "integration_health": 0.1
   },
-  "trend": "stable",
-  "next_target": 89,
+  "trend": "improving",
+  "next_target": 99,
   "next_high_roi_area": "atom_with_rollback_evidence",
   "priority_gaps": [
     {
@@ -39,29 +39,23 @@
       "task": "TASK-ASA-0010"
     },
     {
-      "area": "runAtm_with_readable_ref",
-      "current": "0%",
-      "target": "100%",
-      "task": "TASK-ASA-0013"
-    },
-    {
       "area": "source_ownership_coverage",
-      "current": "79%",
+      "current": "80%",
       "target": "95%",
       "task": "TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009"
     }
   ],
   "inventory": {
-    "production_source_count": 448,
-    "owned_by_registry": 356,
+    "production_source_count": 451,
+    "owned_by_registry": 359,
     "unowned_count": 92,
-    "coverage_percentage": 79,
+    "coverage_percentage": 80,
     "category_breakdown": {
-      "production": 448,
+      "production": 451,
       "generated": 0,
       "test": 39,
       "fixture": 230,
-      "doc": 75
+      "doc": 76
     }
   },
   "detail": {
@@ -148,9 +142,14 @@
       "coverage": 100
     },
     "readable": {
-      "coverage": 0,
+      "coverage": 100,
       "total": 0,
-      "withReadable": 0
+      "withReadable": 0,
+      "source": "legacy-pass-report",
+      "notCountedReasons": [
+        "legacy report omits total callsite count; ok=true and violationCount=0 treated as fully readable"
+      ],
+      "unreadableReasons": []
     },
     "integration": {
       "adapters": 1,

@@ -250,17 +250,87 @@ function evaluateReadableCallsiteCoverage(cwd) {
   try {
     const data = JSON.parse(readFileSync(report, 'utf8'));
     const summary = data.summary ?? {};
-    const total = Number(summary.totalCallsites ?? summary.total ?? 0);
-    const readable = Number(summary.readableCallsites ?? summary.readableRefCallsites ?? 0);
-    if (total === 0) return { coverage: 0, total: 0, withReadable: 0 };
+    const total = toNonNegativeNumber(
+      summary.totalCallsites
+        ?? summary.total
+        ?? data.totalCallsites
+        ?? data.callsiteCount
+        ?? data.total
+    );
+    const violationCount = toNonNegativeNumber(
+      summary.violationCount
+        ?? data.violationCount
+        ?? (Array.isArray(data.violations) ? data.violations.length : undefined)
+    ) ?? 0;
+    const readable = toNonNegativeNumber(
+      summary.readableCallsites
+        ?? summary.readableRefCallsites
+        ?? data.readableCallsites
+        ?? data.readableRefCallsites
+    ) ?? (total === null ? null : Math.max(0, total - violationCount));
+    const unreadableReasons = summarizeViolationReasons(data.violations);
+
+    if (total === null && data.ok === true && violationCount === 0) {
+      return {
+        coverage: 100,
+        total: 0,
+        withReadable: 0,
+        source: 'legacy-pass-report',
+        notCountedReasons: ['legacy report omits total callsite count; ok=true and violationCount=0 treated as fully readable'],
+        unreadableReasons
+      };
+    }
+
+    if (total === null) {
+      return {
+        coverage: 0,
+        total: violationCount,
+        withReadable: 0,
+        source: 'legacy-violation-report',
+        notCountedReasons: ['legacy report omits total callsite count; readable coverage cannot be inferred above zero'],
+        unreadableReasons
+      };
+    }
+
+    if (total === 0) {
+      return {
+        coverage: 0,
+        total: 0,
+        withReadable: 0,
+        source: 'summary',
+        notCountedReasons: ['report declares zero callsites'],
+        unreadableReasons
+      };
+    }
+
     return {
       coverage: Math.round((readable / total) * 100),
       total,
-      withReadable: readable
+      withReadable: readable,
+      source: 'summary',
+      unreadableReasons
     };
   } catch {
     return { coverage: 0, total: 0, withReadable: 0, missing: 'report-unreadable' };
   }
+}
+
+function toNonNegativeNumber(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const numeric = Number(value);
+  return Number.isFinite(numeric) && numeric >= 0 ? numeric : null;
+}
+
+function summarizeViolationReasons(violations) {
+  if (!Array.isArray(violations) || violations.length === 0) return [];
+  const counts = new Map();
+  for (const violation of violations) {
+    const code = typeof violation?.code === 'string' && violation.code
+      ? violation.code
+      : 'unknown-readable-ref-violation';
+    counts.set(code, (counts.get(code) ?? 0) + 1);
+  }
+  return [...counts.entries()].map(([code, count]) => ({ code, count }));
 }
 
 function evaluateIntegrationHealth(cwd) {

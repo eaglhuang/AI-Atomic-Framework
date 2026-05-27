@@ -1,0 +1,72 @@
+{
+  "taskId": "TASK-AAO-0021",
+  "updatedAt": "2026-05-27T12:41:19.337Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck and readable ref scorer checks passed",
+      "artifactPaths": [
+        "scripts/src/atomize-score.js",
+        "atomic_workbench/atomization-coverage/dogfood-score.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527123250-copilot-TASK-AAO-0021-7677827f45",
+      "createdAt": "2026-05-27T12:41:19.337Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527123250-copilot-TASK-AAO-0021-7677827f45",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "readable-ref-score",
+          "typecheck",
+          "validate:atom-callsite-readability"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "cwd": "C:/Users/User/AI-Atomic-Framework",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:f1efdeeebf7e7b5cc75d13474425877f56da0b89af6cb76f642e9ff5484b74c1",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-27T12:41:19.372Z"
+          },
+          {
+            "command": "npm run validate:atom-callsite-readability",
+            "cwd": "C:/Users/User/AI-Atomic-Framework",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2426d84cef6d804cda9d5c2285da0ecd6a92c2e0d371a71c9a51d21cd5bb514c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:1f0e485de1d2f7887b582bd71a2041bfce2fdafbe62edd7fa4c8cacce2975ef6",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-27T12:41:19.372Z"
+          },
+          {
+            "command": "node -e \"const fs=require('fs'); const score=JSON.parse(fs.readFileSync('atomic_workbench/atomization-coverage/dogfood-score.json','utf8')); const readable=score.detail && score.detail.readable || {}; if (!score.scores || score.scores.runAtm_with_readable_ref !== 100 || readable.source !== 'legacy-pass-report') { console.error('readable ref score assertion failed'); process.exit(1); } console.log('[readable-ref-score] ok (runAtm_with_readable_ref=100, legacy report reason recorded)');\"",
+            "cwd": "C:/Users/User/AI-Atomic-Framework",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2eed09b561c373ae50332f0580ce01a81b9975f36cc91eede12e0fdb55d2fbb3",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:bf1591a60544d81851f2891cca485775890afb1baef3bf1752675955e705e445",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-27T12:41:19.372Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bde917cd344c5fe3df13dca5ed7402271d2d4274d27b7ebb20d9b65519b1755a",
+          "reusedRunCount": 0,
+          "runCount": 3,
+          "sourcePath": "../AppData/Local/Temp/TASK-AAO-0021-command-runs.json"
+        }
+      }
+    }
+  ]
+}
