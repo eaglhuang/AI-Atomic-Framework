@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T15-05-35-739Z-close-f13ff0e9473c",
+  "taskId": "TASK-AAO-0058",
+  "action": "close",
+  "actorId": "Augment",
+  "sessionId": "session-20260527144431-Augment-TASK-AAO-0058-52657a18ae",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0058.json",
+  "taskSha256": "sha256:937a565a15e23a6b9b4f340f920a6f98c76811bacfa33a4fb945a621505ce87c",
+  "createdAt": "2026-05-27T15:05:35.739Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0058 --actor Augment --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527144431-Augment-TASK-AAO-0058-52657a18ae",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0058.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate-task-direction-governance",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-direction-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T15:05:35.734Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0058-task-ledger-evidence-events-self-allow-on-claim.task.md",
+        ".atm/history/evidence/TASK-AAO-0058.closure-packet.json",
+        ".atm/history/evidence/TASK-AAO-0058.json",
+        ".atm/history/task-events/TASK-AAO-0058/**",
+        ".atm/history/tasks/TASK-AAO-0058.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
