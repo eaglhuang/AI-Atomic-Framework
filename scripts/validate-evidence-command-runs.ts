@@ -127,6 +127,71 @@ async function main() {
     '--json'
   ]);
   assert(verify.ok === true, 'commandRun evidence must satisfy close evidence gate');
+
+  // TASK-AAO-0017 follow-up regression：已 close 的 task 在只擁有 focused/task-declared
+  // validator 證據時，evidence missing 不應因 advisory framework gates（doctor、
+  // framework-development、tasks-audit、git-head-evidence）回 ok:false。
+  // 1) 將 task 標記為 done 並補上 closure marker
+  const closedTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'TASK-EVIDENCE-0001.json');
+  const closedTask = JSON.parse(readFileSync(closedTaskPath, 'utf8'));
+  closedTask.status = 'done';
+  closedTask.closedAt = new Date().toISOString();
+  closedTask.validators = ['npm run typecheck', 'npm run validate:cli'];
+  writeFileSync(closedTaskPath, `${JSON.stringify(closedTask, null, 2)}\n`, 'utf8');
+
+  // 2) 補一筆 validate:git-head-evidence 的 fresh command-run，模擬 close 前完整覆蓋 focused 三個
+  const focusedRunsPath = path.join(repo, '.atm', 'runtime', 'command-runs', 'focused.json');
+  writeFileSync(focusedRunsPath, `${JSON.stringify({
+    commandRuns: [
+      {
+        command: 'npm run validate:git-head-evidence',
+        exitCode: 0,
+        stdoutSha256: emptySha,
+        stderrSha256: emptySha,
+        validators: ['validate:git-head-evidence']
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
+  await runEvidence([
+    'add',
+    '--cwd', repo,
+    '--task', 'TASK-EVIDENCE-0001',
+    '--actor', 'validator',
+    '--kind', 'test',
+    '--summary', 'closure-required focused validator captured',
+    '--command-runs', focusedRunsPath,
+    '--json'
+  ]);
+
+  // 3) 呼叫 evidence missing
+  const missing = await runEvidence([
+    'missing',
+    '--cwd', repo,
+    '--task', 'TASK-EVIDENCE-0001',
+    '--actor', 'validator',
+    '--json'
+  ]);
+  const report = (missing.evidence as any) ?? {};
+  assert(missing.ok === true, `evidence missing on closed task with focused validators must be ok:true, got ok=${missing.ok}, tldr=${report.tldr}`);
+  assert(Array.isArray(report.blockingFindings) && report.blockingFindings.length === 0,
+    `closed task evidence missing must have empty blockingFindings, got ${JSON.stringify(report.blockingFindings)}`);
+  assert(Array.isArray(report.missingValidationPasses) && report.missingValidationPasses.length === 0,
+    'closure-required missingValidationPasses must be empty when focused validators captured');
+  assert(Array.isArray(report.advisoryFindings) && report.advisoryFindings.length > 0,
+    'advisoryFindings must surface batch-tier framework gates (doctor/framework-development/tasks-audit/git-head-evidence) as non-blocking');
+  const advisoryNames = report.advisoryFindings.map((f: any) => f.validator);
+  for (const adv of ['doctor', 'framework-development', 'tasks-audit', 'git-head-evidence']) {
+    assert(advisoryNames.includes(adv),
+      `advisoryFindings must include ${adv} when no evidence captured for it; got ${JSON.stringify(advisoryNames)}`);
+  }
+  // 4) catalog entries must carry closureRequired flag with correct values
+  const catalog = report.validators as any[];
+  const typecheckEntry = catalog.find((e) => e.name === 'typecheck');
+  assert(typecheckEntry?.closureRequired === true,
+    'typecheck must be closureRequired:true');
+  const doctorEntry = catalog.find((e) => e.name === 'doctor');
+  assert(doctorEntry?.closureRequired === false,
+    'doctor must be closureRequired:false (advisory batch-tier gate)');
 }
 
 main().catch((error) => {

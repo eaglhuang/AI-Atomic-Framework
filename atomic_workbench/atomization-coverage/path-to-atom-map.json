@@ -535,7 +535,7 @@
     {
       "path_pattern": "packages/cli/src/commands/evidence.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; --recent-run reuses cached results; validators --list returns per-task validator catalog with tier (focused/batch/milestone/release), expectedCommand, and evidenceState (pass/missing) sourced from framework requiredGates and task-declared validators (TASK-AAO-0015, TASK-AAO-0016); missing subcommand emits computeMissingValidatorReport — classifies each gate as pass/absent/failed-run/stale/diagnostic-only and returns TL;DR + missingValidationPasses[{code,validator,category,summary,requiredCommand}] + blockingFindings[] (TASK-AAO-0017).",
+      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; --recent-run reuses cached results; validators --list returns per-task validator catalog with tier (focused/batch/milestone/release), expectedCommand, and evidenceState (pass/missing) sourced from framework requiredGates and task-declared validators (TASK-AAO-0015, TASK-AAO-0016); missing subcommand emits computeMissingValidatorReport — classifies each gate as pass/absent/failed-run/stale/diagnostic-only, scopes missingValidationPasses/blockingFindings to closure-required (focused + release + task-declared) validators, and surfaces batch-tier framework health gates as advisoryFindings that never block close; catalog entries carry closureRequired flag (TASK-AAO-0017, TASK-AAO-0017 follow-up).",
       "coverage_status": "active"
     },
     {
@@ -547,7 +547,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-closure-map",
-      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport (TASK-AAO-0017).",
+      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport — missingValidationPasses/blockingFindings now contain only closure-required validators so advisory framework health gates (doctor, framework-development, tasks-audit, git-head-evidence) do not falsely block close (TASK-AAO-0017, TASK-AAO-0017 follow-up).",
       "coverage_status": "active"
     },
     {

@@ -132,6 +132,20 @@ function classifyValidatorTier(gate: string): ValidatorTier {
   return 'batch';
 }
 
+/**
+ * TASK-AAO-0017 follow-up：判斷一個 validator 是否為 closure-required（會阻擋 tasks close）。
+ * - focused tier：typecheck、validate:cli、validate:* 等每次 task 必須重跑的 gate
+ * - release tier：只有 release 變更會出現的 gate（已動態加入 requiredGates）
+ * - batch tier：framework 健康類 advisory gate（doctor、framework-development、
+ *   tasks-audit、git-head-evidence），不應被 evidence missing 當作 hard block
+ * - task card 顯式宣告的 validator 一律視為 closure-required
+ */
+function isClosureRequiredValidator(gate: string, taskDeclaredValidators: readonly string[]): boolean {
+  if (taskDeclaredValidators.includes(gate)) return true;
+  const tier = classifyValidatorTier(gate);
+  return tier === 'focused' || tier === 'release';
+}
+
 /** 依 gate 名稱回傳對應的執行指令（human-readable 提示用） */
 function resolveValidatorExpectedCommand(gate: string): string {
   if (gate === 'typecheck') return 'npm run typecheck';
@@ -265,6 +279,8 @@ export interface MissingValidatorFinding {
 export interface ValidatorCatalogEntry {
   readonly name: string;
   readonly tier: ValidatorTier;
+  /** TASK-AAO-0017 follow-up：標記此 validator 是否為 closure gate 必要條件 */
+  readonly closureRequired: boolean;
   readonly expectedCommand: string;
   readonly evidenceState: ValidatorEvidenceState;
 }
@@ -283,8 +299,12 @@ export interface MissingValidatorReport {
     readonly stale: readonly string[];
     readonly diagnosticOnly: readonly string[];
   };
+  /** Closure-required 缺失（advisory gates 不會進入此清單） */
   readonly missingValidationPasses: readonly MissingValidatorFinding[];
+  /** Closure-required 中 absent + failed-run 的 hard blocker 子集 */
   readonly blockingFindings: readonly MissingValidatorFinding[];
+  /** TASK-AAO-0017 follow-up：batch-tier advisory gate 缺失，不阻擋 close */
+  readonly advisoryFindings: readonly MissingValidatorFinding[];
   readonly validators: readonly ValidatorCatalogEntry[];
 }
 
@@ -436,63 +456,79 @@ export function computeMissingValidatorReport(
   );
 
   // 5. 分類每個 gate 的 evidence 狀態
+  // TASK-AAO-0017 follow-up：closure-required 與 advisory 分開計算，
+  // batch-tier framework 健康類 gate 為 advisory，缺失不應阻擋 close。
   const absent: string[] = [];
   const failedRun: string[] = [];
   const stale: string[] = [];
   const diagnosticOnly: string[] = [];
 
-  const allFindings: MissingValidatorFinding[] = [];
+  const requiredFindings: MissingValidatorFinding[] = [];
+  const advisoryFindings: MissingValidatorFinding[] = [];
   const catalogEntries: ValidatorCatalogEntry[] = [];
 
   for (const gate of allGates) {
     const state = classifyValidatorEvidenceState(bundleRecords, gate);
+    const tier = classifyValidatorTier(gate);
+    const closureRequired = isClosureRequiredValidator(gate, taskDeclaredValidators);
     catalogEntries.push({
       name: gate,
-      tier: classifyValidatorTier(gate),
+      tier,
+      closureRequired,
       expectedCommand: resolveValidatorExpectedCommand(gate),
       evidenceState: state
     });
     if (state !== 'pass') {
       const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId);
-      allFindings.push(finding);
-      if (state === 'absent') absent.push(gate);
-      else if (state === 'failed-run') failedRun.push(gate);
-      else if (state === 'stale') stale.push(gate);
-      else diagnosticOnly.push(gate);
+      if (closureRequired) {
+        requiredFindings.push(finding);
+        if (state === 'absent') absent.push(gate);
+        else if (state === 'failed-run') failedRun.push(gate);
+        else if (state === 'stale') stale.push(gate);
+        else diagnosticOnly.push(gate);
+      } else {
+        advisoryFindings.push(finding);
+      }
     }
   }
 
-  const passedCount = allGates.length - allFindings.length;
-  const missingCount = allFindings.length;
+  const closureRequiredTotal = catalogEntries.filter((entry) => entry.closureRequired).length;
+  const passedCount = closureRequiredTotal - requiredFindings.length;
+  const missingCount = requiredFindings.length;
   const ok = missingCount === 0;
 
   // 6. 人類層 TL;DR
   let tldr: string;
   if (ok) {
-    tldr = `All ${allGates.length} required validators passed for task ${resolvedTaskId}.`;
+    const adv = advisoryFindings.length > 0
+      ? ` (${advisoryFindings.length} advisory framework gate(s) not satisfied; not blocking)`
+      : '';
+    tldr = `All ${closureRequiredTotal} closure-required validator(s) passed for task ${resolvedTaskId}${adv}.`;
   } else {
     const parts: string[] = [];
     if (absent.length) parts.push(`${absent.length} absent (no evidence): ${absent.join(', ')}`);
     if (failedRun.length) parts.push(`${failedRun.length} failed-run: ${failedRun.join(', ')}`);
     if (stale.length) parts.push(`${stale.length} stale (historical-reference/draft): ${stale.join(', ')}`);
     if (diagnosticOnly.length) parts.push(`${diagnosticOnly.length} diagnostic-only (no command proof): ${diagnosticOnly.join(', ')}`);
-    tldr = `Task ${resolvedTaskId} close blocked — ${missingCount}/${allGates.length} validator(s) not satisfied. ${parts.join('; ')}.`;
+    tldr = `Task ${resolvedTaskId} close blocked — ${missingCount}/${closureRequiredTotal} closure-required validator(s) not satisfied. ${parts.join('; ')}.`;
   }
 
-  // 7. blockingFindings = absent + failed-run（stale 和 diagnostic-only 是警告，非硬封鎖）
-  const blockingFindings = allFindings.filter((f) => f.category === 'absent' || f.category === 'failed-run');
+  // 7. blockingFindings = closure-required 中的 absent + failed-run
+  //    （stale 和 diagnostic-only 是 closure-required 中的警告，非硬封鎖；advisory 全部排除）
+  const blockingFindings = requiredFindings.filter((f) => f.category === 'absent' || f.category === 'failed-run');
 
   return {
     schemaId: 'atm.missingValidatorReport.v1',
     taskId: resolvedTaskId,
     ok,
     tldr,
-    totalRequired: allGates.length,
+    totalRequired: closureRequiredTotal,
     passedCount,
     missingCount,
     categories: { absent, failedRun, stale, diagnosticOnly },
-    missingValidationPasses: allFindings,
+    missingValidationPasses: requiredFindings,
     blockingFindings,
+    advisoryFindings,
     validators: catalogEntries
   };
 }
@@ -531,7 +567,8 @@ function runEvidenceMissing(argv: string[]) {
         missingCount: report.missingCount,
         categories: report.categories,
         missingValidationPasses: report.missingValidationPasses,
-        blockingFindings: report.blockingFindings
+        blockingFindings: report.blockingFindings,
+        advisoryFindings: report.advisoryFindings
       })
     ],
     evidence: {
