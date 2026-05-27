@@ -16,7 +16,7 @@ import {
 import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
-import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
+import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
 
@@ -2105,6 +2105,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
         code: 'ATM_COMMIT_IDENTITY_PROFILE_MISSING',
         source: 'commit-attribution',
         detail: `Actor ${actorId} has no resolved git identity profile in actor registry or .atm/runtime/identity/default.json.`,
+        requiredCommand: buildIdentitySetRequiredCommand(cwd, actorId),
         classification: 'current-task'
       });
     } else {
@@ -2185,6 +2186,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
       code: 'ATM_COMMIT_IDENTITY_PROFILE_MISSING',
       source: 'commit-attribution',
       detail: `Actor ${actorId} has no resolved git identity profile in actor registry or .atm/runtime/identity/default.json.`,
+      requiredCommand: buildIdentitySetRequiredCommand(cwd, actorId),
       classification: 'current-task'
     });
   } else {
@@ -2286,6 +2288,12 @@ function resolveExpectedGitIdentityForActor(cwd: string, actorId: string) {
     gitName: actorRecord?.gitName ?? (defaultMatches ? defaultIdentity?.gitName ?? null : null),
     gitEmail: actorRecord?.gitEmail ?? (defaultMatches ? defaultIdentity?.gitEmail ?? null : null)
   };
+}
+
+function buildIdentitySetRequiredCommand(cwd: string, actorId: string) {
+  const gitName = runGitScalar(cwd, ['config', '--local', '--get', 'user.name']) ?? '<git user.name>';
+  const gitEmail = runGitScalar(cwd, ['config', '--local', '--get', 'user.email']) ?? '<git user.email>';
+  return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name ${quoteCliValue(gitName)} --git-email ${quoteCliValue(gitEmail)} --json`;
 }
 
 function isPathAllowedByTaskDirection(filePath: string, allowedFiles: readonly string[]): boolean {

@@ -1,9 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, resolveActorId } from './actor-registry.ts';
+import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, resolveActorId, writeRuntimeIdentityDefault } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
-import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
+import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
 type TaskClaimRecord = {
   actorId: string;
@@ -197,6 +197,9 @@ function runGitPrepare(options: ParsedGitOptions) {
 
   writeGitConfig(options.cwd, 'user.name', nextName);
   writeGitConfig(options.cwd, 'user.email', nextEmail);
+  const identityPath = options.gitName !== null && options.gitEmail !== null
+    ? writePreparedRuntimeIdentity(options.cwd, actorId, nextName, nextEmail, actorRecord)
+    : null;
 
   const taskDocument = options.taskId ? readTaskDocument(options.cwd, options.taskId) : null;
   const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
@@ -222,11 +225,13 @@ function runGitPrepare(options: ParsedGitOptions) {
     messages: [message('info', 'ATM_GIT_PREPARED', 'Repo-local git identity has been prepared for the resolved actor.', {
       actorId,
       gitName: nextName,
-      gitEmail: nextEmail
+      gitEmail: nextEmail,
+      runtimeIdentityPath: identityPath
     })],
     evidence: {
       action: 'prepare',
       actorId,
+      identityPath,
       sessionId: session?.sessionId ?? null,
       git: {
         name: nextName,
@@ -251,7 +256,10 @@ function runGitCommit(options: ParsedGitOptions) {
   if (!profile.gitName || !profile.gitEmail) {
     throw new CliError('ATM_GIT_COMMIT_IDENTITY_MISSING', 'git commit requires a resolved git identity profile. Run identity set or actor register first.', {
       exitCode: 2,
-      details: { actorId }
+      details: {
+        actorId,
+        requiredCommand: buildIdentitySetRequiredCommand(options.cwd, actorId)
+      }
     });
   }
   const taskDocument = options.taskId ? readTaskDocument(options.cwd, options.taskId) : null;
@@ -457,6 +465,34 @@ function resolveGitIdentityProfile(cwd: string, actorId: string, actorRecord: Re
     gitName: null,
     gitEmail: null
   };
+}
+
+function writePreparedRuntimeIdentity(
+  cwd: string,
+  actorId: string,
+  gitName: string,
+  gitEmail: string,
+  actorRecord: ReturnType<typeof findActorByResolvedId>
+) {
+  const existing = readRuntimeIdentityDefault(cwd);
+  const existingMatchesActor = existing?.actorId === actorId;
+  return writeRuntimeIdentityDefault(cwd, {
+    schemaId: 'atm.identityDefault.v1',
+    specVersion: '0.1.0',
+    actorId,
+    gitName,
+    gitEmail,
+    editor: (existingMatchesActor ? existing?.editor : null) ?? actorRecord?.editor ?? null,
+    provider: (existingMatchesActor ? existing?.provider : null) ?? actorRecord?.provider ?? null,
+    activeSessionId: existingMatchesActor ? existing?.activeSessionId ?? null : null,
+    updatedAt: new Date().toISOString()
+  });
+}
+
+function buildIdentitySetRequiredCommand(cwd: string, actorId: string) {
+  const gitName = readGitConfig(cwd, 'user.name') ?? '<git user.name>';
+  const gitEmail = readGitConfig(cwd, 'user.email') ?? '<git user.email>';
+  return `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --git-name ${quoteCliValue(gitName)} --git-email ${quoteCliValue(gitEmail)} --json`;
 }
 
 function readTaskDocument(cwd: string, taskId: string): Record<string, unknown> | null {

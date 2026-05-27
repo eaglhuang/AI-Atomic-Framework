@@ -20,10 +20,11 @@ function assert(condition: any, message: any) {
   }
 }
 
-function runAtm(args: any) {
+function runAtm(args: any, env: Record<string, string> = {}) {
   const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
     cwd: root,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: { ...process.env, ...env }
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {
@@ -232,6 +233,27 @@ try {
   assert(runGit(repo, ['config', 'user.name', 'fixture-agent']).exitCode === 0, 'fixture git user.name must match the registered actor before governed commits');
   assert(runGit(repo, ['config', 'user.email', 'fixture-agent@example.com']).exitCode === 0, 'fixture git user.email must match the registered actor before governed commits');
 
+  const explicitIdentityPrepare = runAtm([
+    'git',
+    'prepare',
+    '--cwd',
+    repo,
+    '--actor',
+    'prepare-only-agent',
+    '--name',
+    'Prepare Only',
+    '--email',
+    'prepare-only@example.com',
+    '--json'
+  ]);
+  assert(explicitIdentityPrepare.exitCode === 0, 'git prepare with explicit name/email must exit 0');
+  assert(explicitIdentityPrepare.parsed.ok === true, 'git prepare with explicit name/email must report ok=true');
+  assert(explicitIdentityPrepare.parsed.evidence?.identityPath === '.atm/runtime/identity/default.json', 'explicit git prepare must report the runtime identity path');
+  const preparedIdentity = JSON.parse(readFileSync(path.join(repo, '.atm', 'runtime', 'identity', 'default.json'), 'utf8'));
+  assert(preparedIdentity.actorId === 'prepare-only-agent', 'explicit git prepare must seed the runtime identity actor');
+  assert(preparedIdentity.gitName === 'Prepare Only', 'explicit git prepare must seed the runtime identity git name');
+  assert(preparedIdentity.gitEmail === 'prepare-only@example.com', 'explicit git prepare must seed the runtime identity git email');
+
   const mutationGuard = runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(mutationGuard.exitCode === 0, 'guard mutation must pass for in-scope claimed file');
   assert(mutationGuard.parsed.ok === true, 'guard mutation must report ok=true for in-scope claimed file');
@@ -281,6 +303,21 @@ try {
   assert(gitGuardFailOpen.exitCode === 0, 'guard git --fail-open must exit 0 when violations exist');
   assert(gitGuardFailOpen.parsed.ok === true, 'guard git --fail-open must report ok=true when violations exist');
   assert(gitGuardFailOpen.parsed.messages?.[0]?.code === 'ATM_GUARD_GIT_FAIL_OPEN', 'guard git --fail-open must return fail-open warning code');
+
+  assert(runGit(repo, ['config', 'user.name', 'Missing Identity']).exitCode === 0, 'fixture git user.name must be configurable for identity repair command validation');
+  assert(runGit(repo, ['config', 'user.email', 'missing-identity@example.com']).exitCode === 0, 'fixture git user.email must be configurable for identity repair command validation');
+  const expectedIdentitySetCommand = 'node atm.mjs identity set --actor "missing-identity-agent" --git-name "Missing Identity" --git-email "missing-identity@example.com" --json';
+  const missingIdentityCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'missing-identity-agent', '--message', 'chore: blocked missing identity', '--json']);
+  assert(missingIdentityCommit.exitCode === 2, 'git commit must fail before committing when the actor identity profile is missing');
+  assert(missingIdentityCommit.parsed.messages?.[0]?.data?.requiredCommand === expectedIdentitySetCommand, 'git commit missing identity must return a runnable identity set command from repo-local git config');
+  const missingIdentityPreCommit = runAtm(['hook', 'pre-commit', '--cwd', repo, '--json'], {
+    ATM_COMMIT_ACTOR_ID: 'missing-identity-agent'
+  });
+  assert(missingIdentityPreCommit.exitCode === 1, 'pre-commit must fail when ATM commit actor has no identity profile');
+  assert((missingIdentityPreCommit.parsed.evidence?.commitAttributionReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_COMMIT_IDENTITY_PROFILE_MISSING' && entry.requiredCommand === expectedIdentitySetCommand), 'pre-commit missing identity finding must return a runnable identity set command from repo-local git config');
+  const gitPrepareAfterMissingIdentityCheck = runAtm(['git', 'prepare', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  assert(gitPrepareAfterMissingIdentityCheck.exitCode === 0, 'git prepare must restore fixture git identity after missing identity repair command validation');
+  assert(gitPrepareAfterMissingIdentityCheck.parsed.ok === true, 'git prepare restore must report ok=true');
 
   const addEvidence = runAtm([
     'evidence',
