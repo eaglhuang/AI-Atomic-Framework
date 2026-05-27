@@ -551,6 +551,12 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/tasks.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "close-gate scoped diff isolation: ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE now triggers only when scopedCriticalChangedFiles (intersection of working-tree framework critical diffs with the task's declared scopePaths) is non-empty without a governed delivery window. evaluateFrameworkDeliveryWindow accepts --from-batch-checkpoint or --historical-delivery as the governance window and ignores unscoped (unrelated) critical changes. buildCloseScopedDiffIsolation emits atm.taskCloseScopedDiffIsolation.v1 diagnostic (declaredFiles, scopedCriticalChangedFiles, isolatedUnrelatedChanges, declaredButUnchanged, summary, advisoryNote) on both error details and close success evidence so agents can distinguish in-scope diffs from advisory unrelated changes and scope-overflow drift (TASK-AAO-0057).",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/batch.ts",
       "atom_id": "atm.task-closure-map",
       "capability": "batch checkpoint failure (ATM_BATCH_CHECKPOINT_CLOSE_FAILED) passes through tldr, missingValidationPasses, and blockingFindings from the inner tasks close failure via categorizeCheckpointCloseFailure; requiredCommand for missing-evidence now points to evidence missing subcommand (TASK-AAO-0017).",

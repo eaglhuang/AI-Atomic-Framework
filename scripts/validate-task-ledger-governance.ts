@@ -412,6 +412,63 @@ try {
   assert(checkpointFrameworkClose.ok === true, 'batch checkpoint must close scoped framework critical diff without requiring a pre-checkpoint commit');
   assertLastTransitionHashMatchesDisk(frameworkBatchRepo, frameworkBatchTaskId);
 
+  // Regression: TASK-AAO-0057 close-gate scoped diff isolation — unrelated dirty
+  // framework critical files outside the task scope must be isolated as advisory
+  // and must not raise ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE. The task's own scoped
+  // deliverable diff still has to be governed (here via --historical-delivery).
+  const isolationRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(isolationRepo);
+  execFileSync('git', ['add', '.'], { cwd: isolationRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial framework fixture'], { cwd: isolationRepo, stdio: 'ignore' });
+  const isolationTaskId = 'TEST-TASK-ISOLATION-0057';
+  const isolationTaskCreate = await runTasks(['create', '--cwd', isolationRepo, '--task', isolationTaskId, '--actor', 'validator', '--title', 'Scoped diff isolation fixture']);
+  assert(isolationTaskCreate.ok === true, 'isolation fixture task create must succeed');
+  const isolationTaskPath = path.join(isolationRepo, '.atm', 'history', 'tasks', `${isolationTaskId}.json`);
+  const isolationTaskDoc = readJson(isolationTaskPath);
+  isolationTaskDoc.status = 'ready';
+  isolationTaskDoc.scopePaths = ['packages/cli/src/commands/batch.ts'];
+  isolationTaskDoc.deliverables = ['packages/cli/src/commands/batch.ts'];
+  writeJson(isolationTaskPath, isolationTaskDoc);
+  const isolationClaim = await runNext(['--cwd', isolationRepo, '--claim', '--actor', 'validator', '--task', isolationTaskId]);
+  assert(isolationClaim.ok === true, 'isolation fixture task must be claimable');
+  writeJson(path.join(isolationRepo, '.atm', 'history', 'evidence', `${isolationTaskId}.json`), {
+    taskId: isolationTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'isolation fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['packages/cli/src/commands/batch.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate scoped diff isolation fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  mkdirSync(path.join(isolationRepo, 'packages', 'cli', 'src', 'commands'), { recursive: true });
+  // Scoped deliverable: modified and committed so HEAD carries the in-scope diff.
+  writeFileSync(path.join(isolationRepo, 'packages', 'cli', 'src', 'commands', 'batch.ts'), 'export const cli = "scoped delivery";\n', 'utf8');
+  execFileSync('git', ['add', 'packages/cli/src/commands/batch.ts'], { cwd: isolationRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'scoped delivery commit for isolation fixture'], { cwd: isolationRepo, stdio: 'ignore' });
+  // Unrelated critical change: dirty in the working tree, outside the task scope.
+  const unrelatedRelativePath = 'packages/cli/src/commands/hook.ts';
+  writeFileSync(path.join(isolationRepo, unrelatedRelativePath), 'export const hook = "unrelated dirty change";\n', 'utf8');
+  const isolationClose = await runTasks(['close', '--cwd', isolationRepo, '--task', isolationTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
+  assert(isolationClose.ok === true, 'close must succeed when only unrelated critical files are dirty (scoped diff isolation)');
+  const isolationDiagnosticRaw = (isolationClose.evidence as Record<string, any>)?.closeScopedDiffIsolation as Record<string, any> | null;
+  assert(isolationDiagnosticRaw, 'close result must expose closeScopedDiffIsolation diagnostic in framework mode');
+  const isolationDiagnostic = isolationDiagnosticRaw!;
+  assert(isolationDiagnostic.schemaId === 'atm.taskCloseScopedDiffIsolation.v1', 'isolation diagnostic must declare its schema id');
+  assert(Array.isArray(isolationDiagnostic.isolatedUnrelatedChanges) && isolationDiagnostic.isolatedUnrelatedChanges.includes(unrelatedRelativePath), 'unrelated dirty critical file must appear in isolatedUnrelatedChanges');
+  assert(Array.isArray(isolationDiagnostic.scopedCriticalChangedFiles) && !isolationDiagnostic.scopedCriticalChangedFiles.includes(unrelatedRelativePath), 'unrelated dirty critical file must not be classified as scoped');
+  assert(Array.isArray(isolationDiagnostic.declaredFiles) && isolationDiagnostic.declaredFiles.includes('packages/cli/src/commands/batch.ts'), 'isolation diagnostic must echo declared scope paths');
+  assertLastTransitionHashMatchesDisk(isolationRepo, isolationTaskId);
+
   const resetRepo = makeHostRepo(tempRoot, 'reset-release');
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
   assert(resetCreate.ok === true, 'reset fixture task create must succeed');
@@ -593,7 +650,7 @@ try {
   rmSync(staleLockPath, { force: true });
 
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, and TASK-AAO-0053 batch framework delivery window verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, and TASK-AAO-0057 close-gate scoped diff isolation verified)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {

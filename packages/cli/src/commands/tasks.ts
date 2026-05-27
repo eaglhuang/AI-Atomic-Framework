@@ -948,12 +948,28 @@ async function runTasksClose(argv: string[]) {
       historicalDeliveryRefs: options.historicalDeliveryRefs
     })
     : null;
+  // TASK-AAO-0057: scoped diff isolation — partition framework critical changes
+  // into in-scope (must be governed) vs unrelated (advisory, isolated) so that
+  // dirty/untracked files outside the task scope never hard-block close.
+  const closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
+    ? buildCloseScopedDiffIsolation({
+      taskId: options.taskId,
+      taskDeclaredFiles,
+      frameworkChangedFiles: activeFrameworkStatus?.changedFiles ?? [],
+      frameworkDeliveryWindow
+    })
+    : null;
   if (frameworkStatus?.repoRole === 'framework') {
-    if ((activeFrameworkStatus?.criticalChangedFiles.length ?? 0) > 0 && frameworkDeliveryWindow?.ok !== true) {
-      throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE', `Task ${options.taskId} cannot be closed while ATM framework critical files are still modified.`, {
+    const scopedCriticalChangedFiles = frameworkDeliveryWindow?.scopedCriticalChangedFiles ?? [];
+    const isolatedUnrelatedChanges = frameworkDeliveryWindow?.unscopedCriticalChangedFiles ?? [];
+    if (scopedCriticalChangedFiles.length > 0 && frameworkDeliveryWindow?.ok !== true) {
+      throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE', `Task ${options.taskId} cannot be closed while in-scope ATM framework critical files are still modified outside the governed delivery window.`, {
         details: {
           taskId: options.taskId,
           criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
+          scopedCriticalChangedFiles,
+          isolatedUnrelatedChanges,
+          closeScopedDiffIsolation,
           frameworkDeliveryWindow,
           requiredCommand: frameworkDeliveryWindow?.requiredCommand ?? null,
           remediation: frameworkDeliveryWindow?.remediation ?? 'Stage only the task-scoped deliverables/evidence, then close through the governed task or batch lifecycle.'
@@ -974,6 +990,7 @@ async function runTasksClose(argv: string[]) {
             ? frameworkStatus.blockers.filter((entry) => frameworkDeliveryWindow.allowedBlockers.includes(entry))
             : [],
           frameworkDeliveryWindow,
+          closeScopedDiffIsolation,
           criticalChangedFiles: frameworkStatus.criticalChangedFiles,
           requiredGates: frameworkStatus.requiredGates,
           tldr: missingReport.tldr,
@@ -1164,6 +1181,9 @@ async function runTasksClose(argv: string[]) {
       closurePacketPath,
       transitionPath,
       deliverableGate: deliverableGate as unknown as Record<string, unknown> | null,
+      // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
+      // critical changes were in-scope vs isolated as advisory unrelated changes.
+      closeScopedDiffIsolation,
       taskQueue
     }
   });
@@ -2330,21 +2350,26 @@ function evaluateFrameworkDeliveryWindow(input: {
     : `node atm.mjs batch checkpoint --actor ${input.actorId} --delivery-commit <commit> --json`;
   const normalHistoricalCloseCommand = `node atm.mjs tasks close --task ${input.taskId} --actor ${input.actorId} --status done --historical-delivery <deliveryCommit> --json`;
   const normalDeliveryCommitCommand = `node atm.mjs git commit --actor ${input.actorId} --task ${input.taskId} --message "<delivery message>" --json`;
-  const ok = input.fromBatchCheckpoint
-    && criticalChangedFiles.length > 0
-    && unscopedCriticalChangedFiles.length === 0;
+  // TASK-AAO-0057: scoped diff isolation — unrelated (unscoped) critical changes
+  // are advisory and no longer block the governed window; the window is governed
+  // by either --from-batch-checkpoint or --historical-delivery covering the
+  // scoped diff. Out-of-scope dirty files are surfaced separately as advisory
+  // isolation diagnostics by the caller.
+  const hasHistoricalDelivery = input.historicalDeliveryRefs.length > 0;
+  const hasGovernedDeliveryFlag = input.fromBatchCheckpoint || hasHistoricalDelivery;
+  const ok = hasGovernedDeliveryFlag && criticalChangedFiles.length > 0;
   return {
     schemaId: 'atm.frameworkDeliveryWindow.v1',
     taskId: input.taskId,
     batchId: input.batchId,
     ok,
     reason: ok
-      ? 'batch-checkpoint-scoped-framework-critical-diff'
-      : !input.fromBatchCheckpoint
+      ? input.fromBatchCheckpoint
+        ? 'batch-checkpoint-scoped-framework-critical-diff'
+        : 'historical-delivery-scoped-framework-critical-diff'
+      : !hasGovernedDeliveryFlag
         ? 'not-from-batch-checkpoint'
-        : criticalChangedFiles.length === 0
-          ? 'no-active-framework-critical-diff'
-          : 'framework-critical-diff-outside-task-scope',
+        : 'no-active-framework-critical-diff',
     criticalChangedFiles,
     scopedCriticalChangedFiles,
     unscopedCriticalChangedFiles,
@@ -2357,6 +2382,43 @@ function evaluateFrameworkDeliveryWindow(input: {
       : input.fromBatchCheckpoint
         ? `Remove unrelated framework critical diffs or add the real deliverable paths to the task scope before rerunning ${checkpointCommand}. If the scoped delivery already landed, use ${historicalCommand}.`
         : `Normal framework critical tasks close in two phases: first create a governed delivery commit with ${normalDeliveryCommitCommand}; then close with ${normalHistoricalCloseCommand}. Batch checkpoint commands are only for --from-batch-checkpoint closures.`
+  };
+}
+
+// TASK-AAO-0057: precise scoped-diff isolation diagnostic produced during close.
+// Splits framework working-tree changes into three categories so close/checkpoint
+// can isolate unrelated dirty/untracked changes (advisory) while still defending
+// the task's own deliverables and flagging scope-overflow critical changes.
+function buildCloseScopedDiffIsolation(input: {
+  readonly taskId: string;
+  readonly taskDeclaredFiles: readonly string[];
+  readonly frameworkChangedFiles: readonly string[];
+  readonly frameworkDeliveryWindow: {
+    readonly scopedCriticalChangedFiles: readonly string[];
+    readonly unscopedCriticalChangedFiles: readonly string[];
+    readonly declaredFiles: readonly string[];
+  };
+}) {
+  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const allChangedFiles = uniqueStrings(input.frameworkChangedFiles.map(normalizeRelativePath).filter(Boolean));
+  const scopedCriticalChangedFiles = [...input.frameworkDeliveryWindow.scopedCriticalChangedFiles];
+  const isolatedUnrelatedChanges = [...input.frameworkDeliveryWindow.unscopedCriticalChangedFiles];
+  const declaredButUnchanged = declaredFiles.filter((declared) =>
+    !allChangedFiles.some((changed) => pathMatchesTaskScope(changed, declared))
+  );
+  return {
+    schemaId: 'atm.taskCloseScopedDiffIsolation.v1' as const,
+    taskId: input.taskId,
+    declaredFiles,
+    scopedCriticalChangedFiles,
+    isolatedUnrelatedChanges,
+    declaredButUnchanged,
+    summary: isolatedUnrelatedChanges.length === 0 && declaredButUnchanged.length === 0
+      ? 'no-isolation-required'
+      : isolatedUnrelatedChanges.length > 0 && scopedCriticalChangedFiles.length === 0
+        ? 'all-critical-changes-isolated-as-advisory'
+        : 'mixed-in-scope-and-isolated-changes',
+    advisoryNote: 'isolatedUnrelatedChanges are framework critical files outside this task scope; they are advisory and do not block close. Address them via their own governed task.'
   };
 }
 
