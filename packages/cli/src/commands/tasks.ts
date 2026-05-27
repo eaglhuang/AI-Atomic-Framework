@@ -934,20 +934,41 @@ async function runTasksClose(argv: string[]) {
       files: taskDeclaredFiles.length > 0 ? taskDeclaredFiles : undefined
     })
     : null;
+  const frameworkDeliveryWindow = options.status === 'done'
+    ? evaluateFrameworkDeliveryWindow({
+      taskId: options.taskId,
+      actorId,
+      batchId: options.batchId ?? owningBatch?.batchId ?? null,
+      fromBatchCheckpoint: options.fromBatchCheckpoint,
+      taskDeclaredFiles,
+      criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
+      historicalDeliveryRefs: options.historicalDeliveryRefs
+    })
+    : null;
   if (frameworkStatus?.repoRole === 'framework') {
-    if ((activeFrameworkStatus?.criticalChangedFiles.length ?? 0) > 0) {
+    if ((activeFrameworkStatus?.criticalChangedFiles.length ?? 0) > 0 && frameworkDeliveryWindow?.ok !== true) {
       throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE', `Task ${options.taskId} cannot be closed while ATM framework critical files are still modified.`, {
         details: {
           taskId: options.taskId,
-          criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? []
+          criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
+          frameworkDeliveryWindow,
+          requiredCommand: frameworkDeliveryWindow?.requiredCommand ?? null,
+          remediation: frameworkDeliveryWindow?.remediation ?? 'Stage only the task-scoped deliverables/evidence, then close through the governed task or batch lifecycle.'
         }
       });
     }
-    if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && frameworkStatus.blockers.length > 0) {
+    const effectiveFrameworkBlockers = frameworkDeliveryWindow?.ok === true
+      ? frameworkStatus.blockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
+      : frameworkStatus.blockers;
+    if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && effectiveFrameworkBlockers.length > 0) {
       throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED', `Task ${options.taskId} cannot be closed until framework-development blockers are resolved.`, {
         details: {
           taskId: options.taskId,
-          blockers: frameworkStatus.blockers,
+          blockers: effectiveFrameworkBlockers,
+          suppressedBlockers: frameworkDeliveryWindow?.ok === true
+            ? frameworkStatus.blockers.filter((entry) => frameworkDeliveryWindow.allowedBlockers.includes(entry))
+            : [],
+          frameworkDeliveryWindow,
           criticalChangedFiles: frameworkStatus.criticalChangedFiles,
           requiredGates: frameworkStatus.requiredGates
         }
@@ -2095,6 +2116,59 @@ function parseHistoricalDeliveryRefs(value: string): string[] {
     .filter(Boolean);
 }
 
+function evaluateFrameworkDeliveryWindow(input: {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly batchId: string | null;
+  readonly fromBatchCheckpoint: boolean;
+  readonly taskDeclaredFiles: readonly string[];
+  readonly criticalChangedFiles: readonly string[];
+  readonly historicalDeliveryRefs: readonly string[];
+}) {
+  const criticalChangedFiles = uniqueStrings(input.criticalChangedFiles.map(normalizeRelativePath).filter(Boolean));
+  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const scopedCriticalChangedFiles = criticalChangedFiles.filter((filePath) =>
+    declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
+  );
+  const unscopedCriticalChangedFiles = criticalChangedFiles.filter((filePath) => !scopedCriticalChangedFiles.includes(filePath));
+  const checkpointCommand = input.batchId
+    ? `node atm.mjs batch checkpoint --actor ${input.actorId} --batch ${input.batchId} --json`
+    : `node atm.mjs batch checkpoint --actor ${input.actorId} --json`;
+  const historicalCommand = input.batchId
+    ? `node atm.mjs batch checkpoint --actor ${input.actorId} --batch ${input.batchId} --delivery-commit <commit> --json`
+    : `node atm.mjs batch checkpoint --actor ${input.actorId} --delivery-commit <commit> --json`;
+  const normalHistoricalCloseCommand = `node atm.mjs tasks close --task ${input.taskId} --actor ${input.actorId} --status done --historical-delivery <deliveryCommit> --json`;
+  const normalDeliveryCommitCommand = `node atm.mjs git commit --actor ${input.actorId} --task ${input.taskId} --message "<delivery message>" --json`;
+  const ok = input.fromBatchCheckpoint
+    && criticalChangedFiles.length > 0
+    && unscopedCriticalChangedFiles.length === 0;
+  return {
+    schemaId: 'atm.frameworkDeliveryWindow.v1',
+    taskId: input.taskId,
+    batchId: input.batchId,
+    ok,
+    reason: ok
+      ? 'batch-checkpoint-scoped-framework-critical-diff'
+      : !input.fromBatchCheckpoint
+        ? 'not-from-batch-checkpoint'
+        : criticalChangedFiles.length === 0
+          ? 'no-active-framework-critical-diff'
+          : 'framework-critical-diff-outside-task-scope',
+    criticalChangedFiles,
+    scopedCriticalChangedFiles,
+    unscopedCriticalChangedFiles,
+    declaredFiles,
+    historicalDeliveryRefs: input.historicalDeliveryRefs,
+    allowedBlockers: ['active-framework-claim-required', 'git-head-evidence-missing'],
+    requiredCommand: input.fromBatchCheckpoint ? checkpointCommand : normalDeliveryCommitCommand,
+    remediation: ok
+      ? 'Batch checkpoint is the governed delivery window; commit the scoped deliverables, evidence, task file, and task events together after checkpoint succeeds.'
+      : input.fromBatchCheckpoint
+        ? `Remove unrelated framework critical diffs or add the real deliverable paths to the task scope before rerunning ${checkpointCommand}. If the scoped delivery already landed, use ${historicalCommand}.`
+        : `Normal framework critical tasks close in two phases: first create a governed delivery commit with ${normalDeliveryCommitCommand}; then close with ${normalHistoricalCloseCommand}. Batch checkpoint commands are only for --from-batch-checkpoint closures.`
+  };
+}
+
 function parseResetOptions(argv: string[]) {
   const options = {
     cwd: process.cwd(),
@@ -2381,7 +2455,7 @@ function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'han
 
 function extractTaskDeclaredFiles(taskDocument: Record<string, unknown>) {
   const files = new Set<string>();
-  for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles', 'deliverables', 'artifacts', 'outputs']) {
+  for (const key of ['scope', 'scopePaths', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles', 'deliverables', 'artifacts', 'outputs']) {
     collectTaskFileValues(taskDocument[key], files);
   }
   const source = taskDocument.source;

@@ -18,8 +18,11 @@ import {
 } from './work-channels.ts';
 
 export async function runBatch(argv: string[]) {
-  const { options } = parseOptions(argv, 'batch');
   const action = String(argv[0] ?? 'status').toLowerCase();
+  const batchHistoricalDeliveryRefs = action === 'checkpoint'
+    ? parseBatchHistoricalDeliveryRefs(argv)
+    : [];
+  const { options } = parseOptions(action === 'checkpoint' ? stripBatchHistoricalDeliveryArgs(argv) : argv, 'batch');
   if (action === 'status' || action === 'current') {
     const selector = buildBatchSelector(options);
     const compact = options.compact === true || action === 'current';
@@ -181,6 +184,7 @@ export async function runBatch(argv: string[]) {
       '--from-batch-checkpoint',
       '--batch',
       active.batchId,
+      ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]),
       '--json'
     ]);
     let cleanupResult: unknown = null;
@@ -258,6 +262,7 @@ export async function runBatch(argv: string[]) {
         actorId: resolvedActor.actorId,
         closedTaskId: currentTaskId,
         held: holdNextClaim,
+        historicalDeliveryRefs: batchHistoricalDeliveryRefs,
         commitInstruction: {
           timing: 'single-commit-after-checkpoint',
           beforeCheckpoint: [
@@ -385,6 +390,34 @@ function buildBatchSelector(options: Record<string, any>) {
   if (typeof options.batch === 'string' && options.batch.trim()) selector.batchId = options.batch.trim();
   if (typeof options.scope === 'string' && options.scope.trim()) selector.scopeKey = options.scope.trim();
   return selector;
+}
+
+function stripBatchHistoricalDeliveryArgs(argv: readonly string[]) {
+  const stripped: string[] = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit') {
+      index += 1;
+      continue;
+    }
+    stripped.push(arg);
+  }
+  return stripped;
+}
+
+function parseBatchHistoricalDeliveryRefs(argv: readonly string[]) {
+  const refs: string[] = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg !== '--historical-delivery' && arg !== '--historical-delivery-commit' && arg !== '--delivery-commit') continue;
+    const value = argv[index + 1];
+    if (!value || value.startsWith('--')) {
+      throw new CliError('ATM_CLI_USAGE', `batch checkpoint ${arg} requires a commit ref.`, { exitCode: 2 });
+    }
+    refs.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
+    index += 1;
+  }
+  return uniqueStrings(refs);
 }
 
 function selectRequiredBatch(cwd: string, selector: ReturnType<typeof buildBatchSelector>, actorId: string, action: string) {

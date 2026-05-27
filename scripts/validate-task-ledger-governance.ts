@@ -368,6 +368,48 @@ try {
   const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0002', '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
   assert(committedClose.ok === true, 'deliverable gate must accept a scoped historical delivery commit');
 
+  const frameworkBatchRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(frameworkBatchRepo);
+  execFileSync('git', ['add', '.'], { cwd: frameworkBatchRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial framework fixture'], { cwd: frameworkBatchRepo, stdio: 'ignore' });
+  const frameworkBatchTaskId = 'TEST-TASK-BATCH-0052';
+  const frameworkBatchTask = await runTasks(['create', '--cwd', frameworkBatchRepo, '--task', frameworkBatchTaskId, '--actor', 'validator', '--title', 'Framework batch delivery runner']);
+  assert(frameworkBatchTask.ok === true, 'framework batch dogfood task create must succeed');
+  const frameworkBatchTaskPath = path.join(frameworkBatchRepo, '.atm', 'history', 'tasks', `${frameworkBatchTaskId}.json`);
+  const frameworkBatchTaskDoc = readJson(frameworkBatchTaskPath);
+  frameworkBatchTaskDoc.status = 'ready';
+  frameworkBatchTaskDoc.deliverables = ['packages/cli/src/commands/batch.ts'];
+  writeJson(frameworkBatchTaskPath, frameworkBatchTaskDoc);
+  const frameworkBatchClaim = await runNext(['--cwd', frameworkBatchRepo, '--claim', '--actor', 'validator', '--task', frameworkBatchTaskId]);
+  assert(frameworkBatchClaim.ok === true, 'framework batch dogfood task must be claimable before critical diff');
+  writeJson(path.join(frameworkBatchRepo, '.atm', 'history', 'evidence', `${frameworkBatchTaskId}.json`), {
+    taskId: frameworkBatchTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'framework batch checkpoint dogfood evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['packages/cli/src/commands/batch.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate framework batch checkpoint fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  mkdirSync(path.join(frameworkBatchRepo, 'packages', 'cli', 'src', 'commands'), { recursive: true });
+  writeFileSync(path.join(frameworkBatchRepo, 'packages', 'cli', 'src', 'commands', 'batch.ts'), 'export const cli = "batch delivery";\n', 'utf8');
+  const directFrameworkClose = await expectTaskErrorDetails(['close', '--cwd', frameworkBatchRepo, '--task', frameworkBatchTaskId, '--actor', 'validator', '--status', 'done'], 'ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE');
+  assert(directFrameworkClose.frameworkDeliveryWindow?.requiredCommand?.includes('git commit'), 'normal active framework diff error must point to governed delivery commit');
+  assert(String(directFrameworkClose.frameworkDeliveryWindow?.remediation ?? '').includes(`tasks close --task ${frameworkBatchTaskId}`) && String(directFrameworkClose.frameworkDeliveryWindow?.remediation ?? '').includes('--historical-delivery'), 'normal active framework diff remediation must point to historical-delivery close');
+  const checkpointFrameworkClose = await runTasks(['close', '--cwd', frameworkBatchRepo, '--task', frameworkBatchTaskId, '--actor', 'validator', '--status', 'done', '--from-batch-checkpoint', '--batch', 'batch-dogfood']);
+  assert(checkpointFrameworkClose.ok === true, 'batch checkpoint must close scoped framework critical diff without requiring a pre-checkpoint commit');
+  assertLastTransitionHashMatchesDisk(frameworkBatchRepo, frameworkBatchTaskId);
+
   const resetRepo = makeHostRepo(tempRoot, 'reset-release');
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
   assert(resetCreate.ok === true, 'reset fixture task create must succeed');
@@ -549,7 +591,7 @@ try {
   rmSync(staleLockPath, { force: true });
 
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, and TASK-AAO-0050 stale framework lock classification verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, and TASK-AAO-0053 batch framework delivery window verified)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {

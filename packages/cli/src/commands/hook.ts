@@ -361,15 +361,18 @@ function runPreCommitHook(cwd: string) {
   const allowAdopterInfrastructureSync = isAdopterInfrastructureSyncCommit(
     stagedFiles.length > 0 ? stagedFiles : frameworkStatus.changedFiles
   );
-  const blockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
-    if (entry === 'git-head-evidence-missing') return false;
-    if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
-    return true;
-  });
   const activeDirectionLocks = readActiveTaskDirectionLocks(root);
   const activeQuickfixLock = readActiveQuickfixLock(root);
   const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
   const checkpointClosedTaskAllowedFiles = collectStagedBatchCheckpointScopeFiles(root, stagedFiles);
+  const checkpointCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
+    && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles));
+  const blockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
+    if (entry === 'git-head-evidence-missing') return false;
+    if (entry === 'active-framework-claim-required' && checkpointCoversFrameworkCriticalFiles) return false;
+    if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
+    return true;
+  });
   const frameworkTempClaimAllowedFiles = activeDirectionLocks.length > 0
     ? collectFrameworkTempClaimAllowedFiles(root)
     : [];

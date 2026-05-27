@@ -1,0 +1,55 @@
+{
+  "taskId": "TASK-AAO-0053",
+  "updatedAt": "2026-05-27T08:01:12.412Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "TASK-AAO-0053 validators passed; batch checkpoint supports scoped framework critical delivery windows and normal close guidance stays on governed delivery commit plus historical-delivery.",
+      "artifactPaths": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-aao-0053",
+      "sessionId": "session-20260527075914-codex-aao-0053-TASK-AAO-0053-1611c1622c",
+      "createdAt": "2026-05-27T08:01:12.412Z",
+      "details": {
+        "actorId": "codex-aao-0053",
+        "sessionId": "session-20260527075914-codex-aao-0053-TASK-AAO-0053-1611c1622c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "diff-check",
+          "typecheck",
+          "validate-task-ledger-governance",
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck; npm run validate:cli; node --strip-types scripts/validate-task-ledger-governance.ts --mode validate; git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e2300cfb2c64414d872aab4e40adc317d4107953904654a55492e7703d2d1d43",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:66b52a72427173679323c0e870e3e8e15ef578dc0abafd94f18c355c359d2c16",
+            "cached": false,
+            "generatedAt": "2026-05-27T08:01:12.455Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2c723f339705499f4f137636a0dc0f0c8a7a08709bb234290a85d83bbba77ed7",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
