@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'evidence',
   summary: 'Add or verify task evidence for close/commit/PR governance gates.',
   positional: [
-    { name: 'action', summary: 'add | git-head-backfill | verify | diff | validators', required: true }
+    { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators', required: true }
   ],
   options: [
     commonCwdOption,
@@ -31,6 +31,7 @@ export default defineCommandSpec({
     { flag: '--reason', value: 'text', summary: 'Optional rationale for git-head-backfill.' },
     { flag: '--gate', value: 'type', summary: 'Evidence gate for verify: close|commit|pr.' },
     { flag: '--list', summary: 'List all required validators with tier and current evidence state (used with validators action).' },
+    { flag: '--recent-run', summary: 'Use the most recent cached command run if available in the task evidence (used with run action).' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -41,6 +42,7 @@ export default defineCommandSpec({
     'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --command-runs .atm/runtime/command-runs/batch-validators.json --validators typecheck,validate:cli --json',
     'node atm.mjs evidence git-head-backfill --actor codex-main --reason "Backfill evidence for a pre-ATM HEAD commit" --json',
     'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json',
-    'node atm.mjs evidence validators --list --task ATM-GOV-0104 --json'
+    'node atm.mjs evidence validators --list --task ATM-GOV-0104 --json',
+    'node atm.mjs evidence run --task ATM-GOV-0104 --actor Augment --command "npm run typecheck" --validators typecheck --recent-run --json'
   ]
 });

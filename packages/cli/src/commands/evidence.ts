@@ -65,6 +65,9 @@ export async function runEvidence(argv: string[]) {
   if (action === 'add') {
     return runEvidenceAdd(argv.slice(1));
   }
+  if (action === 'run') {
+    return runEvidenceRun(argv.slice(1));
+  }
   if (action === 'git-head-backfill') {
     return runGitHeadEvidenceBackfill(argv.slice(1));
   }
@@ -242,6 +245,160 @@ function runEvidenceValidators(argv: string[]) {
       catalog
     }
   });
+}
+
+/** evidence run --task <id> --command "<cmd>" --recent-run 的執行邏輯 */
+function runEvidenceRun(argv: string[]) {
+  const options = parseEvidenceRunOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence run requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const resolvedCwd = path.resolve(options.cwd);
+  const resolvedTaskId = options.taskId.trim();
+
+  // 1. 檢查是否要重用最近一次的執行結果
+  let reusedRun: CommandRunEvidenceInput | null = null;
+  if (options.recentRun) {
+    const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
+    const runnerKind = normalizeRunnerKind(options.runnerKind ?? inferRunnerKindFromCommand(options.command));
+
+    // 從最新的 evidence 開始往回找匹配的 command run
+    for (let i = bundle.evidence.length - 1; i >= 0; i--) {
+      const record = bundle.evidence[i];
+      const runs = (isRecord(record.details) && Array.isArray(record.details.commandRuns))
+        ? (record.details.commandRuns as unknown[]).map(r => normalizeCommandRunInput(r, `evidence[${i}]/commandRuns`))
+        : [];
+
+      const match = runs.find(r => r.command === options.command && (r.runnerKind ?? 'unknown') === runnerKind);
+      if (match) {
+        reusedRun = {
+          ...match,
+          cached: true
+        };
+        break;
+      }
+    }
+  }
+
+  let finalRun: CommandRunEvidenceInput;
+  if (reusedRun) {
+    finalRun = reusedRun;
+  } else {
+    // 2. 實際執行指令
+    const shell = process.platform === 'win32' ? 'powershell.exe' : '/bin/sh';
+    const shellArgs = process.platform === 'win32' ? ['-NoProfile', '-Command', options.command] : ['-c', options.command];
+
+    const result = spawnSync(shell, shellArgs, {
+      cwd: resolvedCwd,
+      encoding: 'utf8',
+      env: { ...process.env, ATM_ACTOR_ID: actorId, ATM_TASK_ID: resolvedTaskId }
+    });
+
+    finalRun = {
+      command: options.command,
+      exitCode: result.status ?? (result.error ? 1 : 0),
+      stdoutSha256: hashString(result.stdout ?? ''),
+      stderrSha256: hashString(result.stderr ?? ''),
+      generatedAt: new Date().toISOString(),
+      validators: options.validators
+    };
+
+    if (result.error) {
+      // 執行發生系統錯誤 (例如找不到指令)
+      throw new CliError('ATM_EVIDENCE_RUN_FAILED', `Failed to spawn command: ${options.command}`, {
+        exitCode: 1,
+        details: { error: result.error.message }
+      });
+    }
+  }
+
+  // 3. 呼叫 evidence add 邏輯 (透過建構 argv 再呼叫 runEvidenceAdd)
+  // 這樣可以確保寫入格式、sessionId、git commit 等邏輯一致
+  const addArgv = [
+    '--task', resolvedTaskId,
+    '--actor', actorId,
+    '--kind', options.kind,
+    '--summary', options.summary ?? (reusedRun ? `Reused cached run for: ${options.command}` : `Auto-run: ${options.command}`),
+    '--exit-code', finalRun.exitCode.toString(),
+    '--stdout-sha256', finalRun.stdoutSha256,
+    '--stderr-sha256', finalRun.stderrSha256,
+    '--command', finalRun.command
+  ];
+
+  if (options.validators.length > 0) {
+    addArgv.push('--validators', options.validators.join(','));
+  }
+  if (options.artifacts.length > 0) {
+    addArgv.push('--artifacts', options.artifacts.join(','));
+  }
+  if (options.runnerKind) {
+    addArgv.push('--runner-kind', options.runnerKind);
+  }
+  if (reusedRun) {
+    addArgv.push('--freshness', 'historical-reference');
+  }
+
+  return runEvidenceAdd(addArgv);
+}
+
+function parseEvidenceRunOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    command: '',
+    recentRun: false,
+    kind: 'test',
+    summary: null as string | null,
+    artifacts: [] as string[],
+    validators: [] as string[],
+    runnerKind: null as string | null
+  };
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, i, '--cwd');
+      i++;
+    } else if (arg === '--task') {
+      options.taskId = requireValue(argv, i, '--task');
+      i++;
+    } else if (arg === '--actor') {
+      options.actorId = requireValue(argv, i, '--actor');
+      i++;
+    } else if (arg === '--command') {
+      options.command = requireValue(argv, i, '--command');
+      i++;
+    } else if (arg === '--recent-run') {
+      options.recentRun = true;
+    } else if (arg === '--kind') {
+      options.kind = requireValue(argv, i, '--kind');
+      i++;
+    } else if (arg === '--summary') {
+      options.summary = requireValue(argv, i, '--summary');
+      i++;
+    } else if (arg === '--artifacts') {
+      options.artifacts = requireValue(argv, i, '--artifacts').split(',').map(s => s.trim()).filter(Boolean);
+      i++;
+    } else if (arg === '--validators') {
+      options.validators = requireValue(argv, i, '--validators').split(',').map(s => s.trim()).filter(Boolean);
+      i++;
+    } else if (arg === '--runner-kind') {
+      options.runnerKind = requireValue(argv, i, '--runner-kind');
+      i++;
+    }
+  }
+
+  if (!options.taskId) throw new CliError('ATM_CLI_USAGE', 'evidence run requires --task <id>', { exitCode: 2 });
+  if (!options.command) throw new CliError('ATM_CLI_USAGE', 'evidence run requires --command "<cmd>"', { exitCode: 2 });
+
+  return options;
+}
+
+function hashString(value: string) {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
 function runEvidenceDiff(argv: string[]) {
