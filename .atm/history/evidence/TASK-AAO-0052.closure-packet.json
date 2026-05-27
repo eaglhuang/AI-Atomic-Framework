@@ -1,0 +1,116 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0052",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "239d9a78a9d6a854c9676a39337a697d21f39518",
+  "governedTreeSha": "350a17b8d5b932d38b006eab9acd4e46083d8d1b",
+  "targetCommitDelta": {
+    "currentCommitSha": "239d9a78a9d6a854c9676a39337a697d21f39518",
+    "parentCommitShas": [
+      "239d9a78a9d6a854c9676a39337a697d21f39518"
+    ],
+    "governedTreeSha": "350a17b8d5b932d38b006eab9acd4e46083d8d1b",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-AAO-0052.json",
+      ".atm/history/tasks/TASK-AAO-0052.json",
+      ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
+      ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "README.md",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm --prefix C:\\Users\\User\\AI-Atomic-Framework run typecheck; npm --prefix C:\\Users\\User\\AI-Atomic-Framework run validate:cli; node --strip-types scripts/validate-task-ledger-governance.ts --mode validate; git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:35c45b921216f3d9c6034351e083a06108ae9512da571f28a2c4e06cf28805d4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck; npm run validate:cli; node --strip-types scripts/validate-task-ledger-governance.ts --mode validate; git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:adb45b2fd1bc6576a135920f84ca02f8499051bb2386749b5486ff03cc9c0926",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "diff-check",
+    "typecheck",
+    "validate-task-ledger-governance",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-27T08:19:06.369Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0052-validator-fixture-task-id-clarity.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "Atomization ownership refresh for any touched validator path in `atomic_workbench/atomization-coverage/path-to-atom-map.json`.",
+      "Regression coverage proving the committed fixture path still passes through `--historical-delivery HEAD` or the equivalent active governance path.",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "Shared guard or surface updates in `scripts/validate-cli.ts` only if the same clarity needs to be reflected there.",
+      "Task-ledger governance fixture updates in `scripts/validate-task-ledger-governance.ts` so the internal regression uses TEST-TASK-* ids."
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0052.json",
+  "closedAt": "2026-05-27T08:19:06.369Z",
+  "closedByActor": "GitHubCopilot",
+  "sessionId": "session-20260527065629-GitHubCopilot-TASK-AAO-0052-3c3968959c"
+}

@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0052",
-  "updatedAt": "2026-05-27T08:17:05.395Z",
+  "updatedAt": "2026-05-27T08:18:47.930Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -84,6 +84,47 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:5b8a9973fcd4b9643edadb8f2bb875c51463e8e3266446f28900f5a0333ee18b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:git-head-evidence passed after TASK-AAO-0052 delivery commit git-head backfill.",
+      "artifactPaths": [
+        ".atm/history/evidence/git-head.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "GitHubCopilot",
+      "sessionId": "session-20260527065629-GitHubCopilot-TASK-AAO-0052-3c3968959c",
+      "createdAt": "2026-05-27T08:18:47.930Z",
+      "details": {
+        "actorId": "GitHubCopilot",
+        "sessionId": "session-20260527065629-GitHubCopilot-TASK-AAO-0052-3c3968959c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:57edbc16c0246fd2a2f532252ca97917dbd25d92b5079293ed9df2d7db3633ef",
+            "cached": false,
+            "generatedAt": "2026-05-27T08:18:47.985Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:76ea84ebbc51d0e7067e87204d61dbc6279281bd0f73b911734fcede64b20965",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
