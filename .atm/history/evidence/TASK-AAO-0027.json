@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0027",
-  "updatedAt": "2026-05-27T09:20:09.649Z",
+  "updatedAt": "2026-05-27T09:23:39.168Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -46,6 +46,51 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:e41e8eaf528dbcf2d7892e4715103b7c7a00688df8b02e39ba11ca1a3e35d17d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Framework closure validators passed for historical delivery commit.",
+      "artifactPaths": [
+        ".atm/history/evidence/git-head.json",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-root-drop/atm.mjs"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "github-copilot",
+      "sessionId": "session-20260527090903-github-copilot-TASK-AAO-0027-8c103dffaf",
+      "createdAt": "2026-05-27T09:23:39.168Z",
+      "details": {
+        "actorId": "github-copilot",
+        "sessionId": "session-20260527090903-github-copilot-TASK-AAO-0027-8c103dffaf",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence",
+          "validate:onefile-release",
+          "validate:root-drop-release"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence; npm run validate:onefile-release; npm run validate:root-drop-release",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:ce6e1a83c281cae9dfc27b5f61067aa2a8f0cff3e8b213283c264c4029e385e0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:44c8296256a7df73d48ddfab1c8ac538ee1fa1c815cfdeb274f6904360958fbe",
+            "cached": false,
+            "generatedAt": "2026-05-27T09:23:39.201Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e39ffd89ee2b971ac9004d739dc1beaca7fe491a8af365d27b95c559f1837ea2",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

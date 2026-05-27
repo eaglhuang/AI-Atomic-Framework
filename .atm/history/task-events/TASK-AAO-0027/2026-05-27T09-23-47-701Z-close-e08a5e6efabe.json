@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T09-23-47-701Z-close-e08a5e6efabe",
+  "taskId": "TASK-AAO-0027",
+  "action": "close",
+  "actorId": "github-copilot",
+  "sessionId": "session-20260527090903-github-copilot-TASK-AAO-0027-8c103dffaf",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0027.json",
+  "taskSha256": "sha256:127cd2e097abb7bae4786807a0da005825b0cea2e9ff518d896d858c9642551e",
+  "createdAt": "2026-05-27T09:23:47.701Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0027 --actor github-copilot --status done --historical-delivery 21b7064db3079a06c8366bd7cfa0d75de5c264b1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527090903-github-copilot-TASK-AAO-0027-8c103dffaf",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0027.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "git-diff-check",
+      "runnerMode-smoke",
+      "typecheck",
+      "validate-prompt-scoped-next",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release",
+      "validate:runner-entrypoints"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T09:23:47.698Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0027-dev-runner-guidance.task.md",
+        "AGENTS.md",
+        "atm.dev.mjs",
+        "atm.mjs",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/next.ts",
+        "README.md"
+      ],
+      "criticalChangedFiles": [
+        "atm.mjs",
+        "packages/cli/src/commands/next.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
