@@ -37,6 +37,25 @@ git add <deliverables> \
 git commit -m "<scope>: complete <task-id>"
 ```
 
+For ordinary files, the lifecycle is:
+
+```text
+claim -> implement -> validators -> evidence add -> tasks close -> commit
+```
+
+For framework critical files, the claim, validators, and evidence requirements
+do not change. If `tasks close` fails with
+`ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, make a governed delivery commit for the
+real scoped deliverables, then close with:
+
+```bash
+node atm.mjs tasks close --task <task-id> --actor <id> --status done --historical-delivery <commit> --json
+```
+
+After that succeeds, make a separate closure commit for the generated ATM
+ledger updates. This is a gate repair path, not permission to skip evidence or
+ignore ATM.
+
 ### Don't
 
 - ❌ `tasks reserve` / `promote` / `claim` manually before `next --claim`.

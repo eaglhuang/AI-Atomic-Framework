@@ -61,6 +61,25 @@ task status to `done`, do not bulk-close task cards, and do not treat static
 task, run `guard framework-development`, `tasks audit`, `doctor`, and the
 required validators before closing with `tasks close`.
 
+For ordinary task-card delivery, the lifecycle remains:
+
+```text
+claim -> implement -> validators -> evidence add -> tasks close -> commit
+```
+
+Framework critical files only change the close/commit timing when the close gate
+blocks a live critical diff. If `tasks close` reports
+`ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, do not bypass the gate. Make a governed
+delivery commit for the scoped non-`.atm` deliverables, then run:
+
+```bash
+node atm.mjs tasks close --task <task-id> --actor "$ATM_ACTOR_ID" --status done --historical-delivery <commit> --json
+```
+
+After close succeeds, make a separate closure commit for the generated ATM
+ledger updates. This historical-delivery path still requires validators and
+command-backed evidence; it is not a relaxed closure rule.
+
 ## Route Command
 
 ```bash

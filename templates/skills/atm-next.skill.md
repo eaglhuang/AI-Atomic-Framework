@@ -56,6 +56,20 @@ claim -> implement -> validators -> evidence add -> tasks close -> commit
 Do not commit a normal task before the matching evidence has been added and
 `tasks close` has succeeded.
 
+Framework critical files have one narrow exception to the close timing, not to
+the evidence requirement. If `tasks close` is blocked by
+`ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, keep the active claim and command-backed
+evidence, make a governed delivery commit for the scoped non-`.atm`
+deliverables, then close with:
+
+```bash
+node atm.mjs tasks close --task <task-id> --actor "$ATM_ACTOR_ID" --status done --historical-delivery <commit> --json
+```
+
+After that close succeeds, make a separate closure commit for the ATM ledger
+updates. Do not treat the critical-diff gate as permission to skip ATM or close
+without evidence.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms it is the current governed route:

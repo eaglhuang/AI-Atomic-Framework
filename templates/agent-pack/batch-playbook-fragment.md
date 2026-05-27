@@ -39,6 +39,24 @@ git add .atm/history/tasks/<queue-head-task-id>.json \
 git commit -m "<scope>: complete <queue-head-task-id>"
 ```
 
+For ordinary queue-head files, keep the lifecycle as:
+
+```text
+claim batch -> implement queue head -> validators -> evidence add -> batch checkpoint -> commit
+```
+
+Framework critical files still require the same claim, validators, and
+command-backed evidence. If the close/checkpoint gate reports
+`ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, do not edit ATM history by hand and do
+not ignore the gate. Follow the gate repair path:
+
+```text
+governed delivery commit -> tasks close --historical-delivery <commit> -> closure commit
+```
+
+Use that only when ATM is repairing a framework critical delivery that already
+landed in a scoped delivery commit. It is not a weaker evidence path.
+
 ### Do
 
 - Trust ATM to own the queue order.

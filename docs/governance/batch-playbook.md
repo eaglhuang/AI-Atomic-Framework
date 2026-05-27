@@ -111,11 +111,39 @@ git commit -m "<scope>: complete <queue-head-task-id>"
 
 | Error code | Plain meaning | Fix |
 |---|---|---|
-| `ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE` | Framework critical files are still modified (e.g. uncommitted `packages/cli/src/*.ts`). | Commit framework code first, then re-run checkpoint. |
+| `ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE` | Framework critical files are still modified (e.g. uncommitted `packages/cli/src/*.ts`). | Make a governed delivery commit, then close with `--historical-delivery <commit>` or follow the checkpoint repair command ATM prints. |
 | `ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID` with `missing: ['validationPasses/...']` | Closure packet is missing required validator evidence. | Run the validator, attach evidence with `--validators <name>`, then checkpoint. |
 | `ATM_TASK_SCOPE_EXPANSION_REQUIRED` | A staged or pending file is outside `taskDirectionLock.allowedFiles`. | Use `tasks scope --add <paths>` (do NOT edit lock JSON directly). |
 | `ATM_BATCH_CONTEXT_ACTIVE` | You are inside a batch and tried to use single-task flow. | Use `batch checkpoint` instead of `tasks close`. |
 | `ATM_RUNNER_SYNC_REQUIRED` | The frozen `atm.mjs` is older than `packages/cli/src/`. | Run `npm run build`, or use `node atm.dev.mjs` for source-first validation. |
+
+### Framework critical close gate
+
+Framework critical files have a narrower close path than ordinary task files.
+The normal task lifecycle is still:
+
+```text
+claim -> implement -> validators -> evidence add -> tasks close -> commit
+```
+
+If `tasks close` is blocked by `ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, do not
+edit ledger files by hand and do not ignore the gate. The gate means ATM cannot
+close the task while framework critical deliverables are still an uncommitted
+working-tree diff. The governed repair path is:
+
+```text
+governed delivery commit -> tasks close --historical-delivery <commit> -> closure commit
+```
+
+The delivery commit must contain the scoped non-`.atm` deliverables that were
+implemented under the active claim and validated with command-backed evidence.
+Then `tasks close --historical-delivery <commit>` verifies that earlier commit
+instead of trusting an empty working tree. The final closure commit records the
+ATM ledger updates produced by `tasks close`.
+
+This is not a weaker evidence rule. It exists so agents do not confuse a
+critical-diff close gate with permission to bypass ATM. Validators and evidence
+are still required before the task can close.
 
 ### Resuming after interruption
 
@@ -157,6 +185,24 @@ git add <deliverables> \
         .atm/history/task-events/<task-id>/
 git commit -m "<scope>: complete <task-id>"
 ```
+
+For ordinary files, keep the lifecycle in this exact order:
+
+```text
+claim -> implement -> validators -> evidence add -> tasks close -> commit
+```
+
+For framework critical files, use the same claim, validation, and evidence
+requirements. The only exception is close timing: if `tasks close` reports
+`ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, first make a governed delivery commit
+for the real scoped deliverables, then close with:
+
+```bash
+node atm.mjs tasks close --task <task-id> --actor <id> --status done --historical-delivery <commit> --json
+```
+
+After that close succeeds, make a separate closure commit for the generated
+ATM task, evidence, and task-event ledger updates.
 
 ### Don't
 
