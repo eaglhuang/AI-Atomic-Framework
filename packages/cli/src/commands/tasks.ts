@@ -237,8 +237,11 @@ export async function runTasks(argv: string[]) {
   if (action === 'verify') {
     return await runTasksVerify(argv.slice(1));
   }
+  if (action === 'scope') {
+    return await runTasksScope(argv.slice(1));
+  }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | audit | migrate-legacy-ledger).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -1174,6 +1177,170 @@ async function runTasksLock(argv: string[]) {
     throw new CliError('ATM_CLI_USAGE', 'tasks lock supports only: cleanup', { exitCode: 2 });
   }
   return await runTasksLockCleanup(argv.slice(1));
+}
+
+async function runTasksScope(argv: string[]) {
+  const subAction = (argv[0] ?? '').toLowerCase();
+  if (subAction === 'add') {
+    return runTasksScopeAdd(argv.slice(1));
+  }
+  if (!subAction) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope requires a sub-action: add', { exitCode: 2 });
+  }
+  throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add`, { exitCode: 2 });
+}
+
+function runTasksScopeAdd(argv: string[]) {
+  const options = parseScopeAddOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks scope add requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+
+  const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
+  if (!existsSync(lockPath)) {
+    throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `No active direction lock found for task ${options.taskId}. The task must be claimed before amending its scope.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId }
+    });
+  }
+
+  let outerLock: Record<string, unknown>;
+  try {
+    outerLock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+  } catch {
+    throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Could not read direction lock for task ${options.taskId}.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId }
+    });
+  }
+
+  if (outerLock.released === true || outerLock.status === 'released') {
+    throw new CliError('ATM_SCOPE_AMENDMENT_LOCK_RELEASED', `Task ${options.taskId} direction lock is released; claim the task first.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId }
+    });
+  }
+
+  const embeddedLock = outerLock.taskDirectionLock;
+  if (!embeddedLock || typeof embeddedLock !== 'object' || Array.isArray(embeddedLock)) {
+    throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Lock file for ${options.taskId} does not contain an embedded taskDirectionLock.`, {
+      exitCode: 1,
+      details: { taskId: options.taskId }
+    });
+  }
+  const embeddedLockRecord = embeddedLock as Record<string, unknown>;
+
+  const existingAllowed = sanitizeTaskDirectionAllowedFiles(
+    Array.isArray(embeddedLockRecord.allowedFiles) ? (embeddedLockRecord.allowedFiles as string[]) : []
+  );
+  const requestedPaths = sanitizeTaskDirectionAllowedFiles(options.addPaths);
+  const addedPaths = requestedPaths.filter((p) => !existingAllowed.includes(p));
+  const alreadyPresent = requestedPaths.filter((p) => existingAllowed.includes(p));
+  const mergedAllowed = sanitizeTaskDirectionAllowedFiles([...existingAllowed, ...requestedPaths]);
+
+  // 寫入更新後的 lock（保留 outer lock 所有欄位，僅更新嵌入的 allowedFiles）
+  const updatedEmbeddedLock = { ...embeddedLockRecord, allowedFiles: [...mergedAllowed] };
+  const updatedOuterLock = { ...outerLock, taskDirectionLock: updatedEmbeddedLock };
+  writeFileSync(lockPath, `${JSON.stringify(updatedOuterLock, null, 2)}\n`, 'utf8');
+
+  // 記錄 scope-amendment 轉換事件
+  const taskPath = taskPathFor(options.cwd, options.taskId);
+  if (existsSync(taskPath)) {
+    const taskDocument = readJsonRecord(taskPath);
+    const commandLine = `node atm.mjs tasks scope add --task ${options.taskId} --actor ${actorId} --add ${options.addPaths.join(',')} --json`;
+    appendTaskTransitionEvent({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      action: 'scope-amendment',
+      actorId,
+      fromStatus: String(taskDocument.status ?? 'running'),
+      toStatus: String(taskDocument.status ?? 'running'),
+      taskPath,
+      taskDocument,
+      command: commandLine
+    });
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [
+      message(
+        'info',
+        'ATM_SCOPE_AMENDMENT_APPLIED',
+        addedPaths.length > 0
+          ? `Scope amendment applied for ${options.taskId}: ${addedPaths.length} path(s) added to allowedFiles.`
+          : `Scope amendment for ${options.taskId}: all requested paths were already in allowedFiles.`,
+        {
+          taskId: options.taskId,
+          actorId,
+          addedPaths,
+          alreadyPresent,
+          allowedFiles: mergedAllowed,
+          requiredCommand: `node atm.mjs tasks scope add --task ${options.taskId} --actor ${actorId} --add <paths> --json`
+        }
+      )
+    ],
+    evidence: {
+      action: 'scope-amendment',
+      taskId: options.taskId,
+      actorId,
+      addedPaths,
+      alreadyPresent,
+      allowedFiles: mergedAllowed
+    }
+  });
+}
+
+function parseScopeAddOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    addPaths: [] as string[]
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      options.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--add') {
+      const raw = requireValue(argv, index, '--add');
+      options.addPaths = raw.split(',').map((p) => p.trim()).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks scope add does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --task <work-item-id>.', { exitCode: 2 });
+  }
+  if (options.addPaths.length === 0) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --add <paths> (comma-separated).', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
 }
 
 async function runTasksLockCleanup(argv: string[]) {
