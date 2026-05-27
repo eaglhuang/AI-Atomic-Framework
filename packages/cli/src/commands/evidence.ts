@@ -80,7 +80,10 @@ export async function runEvidence(argv: string[]) {
   if (action === 'validators') {
     return runEvidenceValidators(argv.slice(1));
   }
-  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, git-head-backfill, verify, diff, validators', { exitCode: 2 });
+  if (action === 'missing') {
+    return runEvidenceMissing(argv.slice(1));
+  }
+  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing', { exitCode: 2 });
 }
 
 /** validator tier 說明
@@ -243,6 +246,297 @@ function runEvidenceValidators(argv: string[]) {
       action: 'validators',
       taskId: resolvedTaskId,
       catalog
+    }
+  });
+}
+
+// ===== TASK-AAO-0017: Missing-validator report (pre-close query + close-error TL;DR) =====
+
+export type ValidatorEvidenceState = 'pass' | 'absent' | 'failed-run' | 'stale' | 'diagnostic-only';
+
+export interface MissingValidatorFinding {
+  readonly code: string;
+  readonly validator: string;
+  readonly category: 'absent' | 'failed-run' | 'stale' | 'diagnostic-only';
+  readonly summary: string;
+  readonly requiredCommand: string;
+}
+
+export interface ValidatorCatalogEntry {
+  readonly name: string;
+  readonly tier: ValidatorTier;
+  readonly expectedCommand: string;
+  readonly evidenceState: ValidatorEvidenceState;
+}
+
+export interface MissingValidatorReport {
+  readonly schemaId: 'atm.missingValidatorReport.v1';
+  readonly taskId: string;
+  readonly ok: boolean;
+  readonly tldr: string;
+  readonly totalRequired: number;
+  readonly passedCount: number;
+  readonly missingCount: number;
+  readonly categories: {
+    readonly absent: readonly string[];
+    readonly failedRun: readonly string[];
+    readonly stale: readonly string[];
+    readonly diagnosticOnly: readonly string[];
+  };
+  readonly missingValidationPasses: readonly MissingValidatorFinding[];
+  readonly blockingFindings: readonly MissingValidatorFinding[];
+  readonly validators: readonly ValidatorCatalogEntry[];
+}
+
+function collectRecordCommandRuns(record: Record<string, unknown>): readonly Record<string, unknown>[] {
+  const out: Record<string, unknown>[] = [];
+  const top = (record as { commandRuns?: unknown }).commandRuns;
+  if (Array.isArray(top)) {
+    for (const r of top) if (isRecord(r)) out.push(r);
+  }
+  if (isRecord(record.details)) {
+    const inner = (record.details as { commandRuns?: unknown }).commandRuns;
+    if (Array.isArray(inner)) {
+      for (const r of inner) if (isRecord(r)) out.push(r);
+    }
+  }
+  return out;
+}
+
+function readRecordValidationPasses(record: Record<string, unknown>): readonly string[] {
+  const passes = new Set<string>();
+  const top = (record as { validationPasses?: unknown }).validationPasses;
+  if (Array.isArray(top)) {
+    for (const v of top) if (typeof v === 'string' && v.trim()) passes.add(v.trim());
+  }
+  if (isRecord(record.details)) {
+    const inner = (record.details as { validationPasses?: unknown }).validationPasses;
+    if (Array.isArray(inner)) {
+      for (const v of inner) if (typeof v === 'string' && v.trim()) passes.add(v.trim());
+    }
+  }
+  return [...passes];
+}
+
+function readRecordFreshness(record: Record<string, unknown>): EvidenceFreshness {
+  const top = (record as { evidenceFreshness?: unknown }).evidenceFreshness;
+  if (top === 'fresh' || top === 'historical-reference' || top === 'draft') return top;
+  if (isRecord(record.details)) {
+    const inner = (record.details as { freshness?: unknown }).freshness;
+    if (inner === 'fresh' || inner === 'historical-reference' || inner === 'draft') return inner;
+  }
+  return 'fresh';
+}
+
+function classifyValidatorEvidenceState(bundle: readonly Record<string, unknown>[], gate: string): ValidatorEvidenceState {
+  const rank: Record<string, number> = { pass: 3, stale: 2, 'diagnostic-only': 1 };
+  let bestPositive: 'pass' | 'stale' | 'diagnostic-only' | null = null;
+  let sawFailedRun = false;
+  for (const record of bundle) {
+    const passes = readRecordValidationPasses(record);
+    const commandRuns = collectRecordCommandRuns(record);
+    if (passes.includes(gate)) {
+      const proof = commandRuns.some((run) => isCommandRunProof(run));
+      const freshness = readRecordFreshness(record);
+      const state: 'pass' | 'stale' | 'diagnostic-only' = (freshness === 'fresh' && proof)
+        ? 'pass'
+        : proof ? 'stale' : 'diagnostic-only';
+      if (!bestPositive || rank[state] > rank[bestPositive]) bestPositive = state;
+    }
+    for (const run of commandRuns) {
+      const runValidators = Array.isArray((run as { validators?: unknown }).validators)
+        ? ((run as { validators: unknown[] }).validators)
+            .filter((v): v is string => typeof v === 'string')
+            .map((v) => v.trim())
+        : [];
+      const cmd = typeof (run as { command?: unknown }).command === 'string' ? (run as { command: string }).command : '';
+      const matches = runValidators.includes(gate) || normalizeValidatorGateName(cmd) === gate;
+      const exitCode = (run as { exitCode?: unknown }).exitCode;
+      if (matches && typeof exitCode === 'number' && exitCode !== 0) sawFailedRun = true;
+    }
+  }
+  if (bestPositive === 'pass') return 'pass';
+  if (sawFailedRun) return 'failed-run';
+  return bestPositive ?? 'absent';
+}
+
+function buildMissingValidatorFinding(
+  gate: string,
+  state: Exclude<ValidatorEvidenceState, 'pass'>,
+  taskId: string,
+  actor: string
+): MissingValidatorFinding {
+  const expectedCommand = resolveValidatorExpectedCommand(gate);
+  const requiredCommand = `node atm.mjs evidence run --task ${taskId} --actor ${actor} --command "${expectedCommand}" --validators ${gate} --json`;
+  if (state === 'absent') {
+    return {
+      code: 'ATM_EVIDENCE_VALIDATOR_ABSENT',
+      validator: gate, category: 'absent',
+      summary: `No evidence record claims validator '${gate}' passed. Run the validator and capture command-backed evidence.`,
+      requiredCommand
+    };
+  }
+  if (state === 'failed-run') {
+    return {
+      code: 'ATM_EVIDENCE_VALIDATOR_FAILED_RUN',
+      validator: gate, category: 'failed-run',
+      summary: `Validator '${gate}' has at least one command run with non-zero exit code. Fix the failure and rerun, then add fresh evidence.`,
+      requiredCommand
+    };
+  }
+  if (state === 'stale') {
+    return {
+      code: 'ATM_EVIDENCE_VALIDATOR_STALE',
+      validator: gate, category: 'stale',
+      summary: `Validator '${gate}' evidence is not fresh (historical-reference or draft). Rerun in this session to refresh.`,
+      requiredCommand
+    };
+  }
+  return {
+    code: 'ATM_EVIDENCE_VALIDATOR_DIAGNOSTIC_ONLY',
+    validator: gate, category: 'diagnostic-only',
+    summary: `Validator '${gate}' evidence exists but lacks command-backed proof (stdout/stderr sha256 + exit code). Rerun via evidence run to attach a proof.`,
+    requiredCommand
+  };
+}
+
+
+/**
+ * TASK-AAO-0017: 計算缺失 validator 報告，可被 tasks close / batch checkpoint 的錯誤訊息引用，
+ * 也可獨立供 `evidence missing` 子命令呼叫。
+ */
+export function computeMissingValidatorReport(
+  cwd: string,
+  taskId: string,
+  actorId: string
+): MissingValidatorReport {
+  const resolvedCwd = path.resolve(cwd);
+  const resolvedTaskId = taskId.trim();
+
+  // 1. 取得 framework 必要 gates
+  const frameworkStatus = createFrameworkModeStatus({ cwd: resolvedCwd });
+  const frameworkGates = frameworkStatus.requiredGates;
+
+  // 2. 取得 task card 宣告的 validators
+  const taskDocument = readTaskDocument(resolvedCwd, resolvedTaskId);
+  const taskDeclaredValidators: string[] = Array.isArray(taskDocument?.validators)
+    ? (taskDocument.validators as unknown[])
+        .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
+        .map((v) => normalizeValidatorGateName(v.trim()))
+        .filter(Boolean)
+    : [];
+
+  // 3. 合併並去重
+  const allGates = uniqueStrings([...frameworkGates, ...taskDeclaredValidators]);
+
+  // 4. 讀取 evidence bundle
+  const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
+  const bundleRecords = bundle.evidence.map((r) =>
+    isRecord(r) ? r : {} as Record<string, unknown>
+  );
+
+  // 5. 分類每個 gate 的 evidence 狀態
+  const absent: string[] = [];
+  const failedRun: string[] = [];
+  const stale: string[] = [];
+  const diagnosticOnly: string[] = [];
+
+  const allFindings: MissingValidatorFinding[] = [];
+  const catalogEntries: ValidatorCatalogEntry[] = [];
+
+  for (const gate of allGates) {
+    const state = classifyValidatorEvidenceState(bundleRecords, gate);
+    catalogEntries.push({
+      name: gate,
+      tier: classifyValidatorTier(gate),
+      expectedCommand: resolveValidatorExpectedCommand(gate),
+      evidenceState: state
+    });
+    if (state !== 'pass') {
+      const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId);
+      allFindings.push(finding);
+      if (state === 'absent') absent.push(gate);
+      else if (state === 'failed-run') failedRun.push(gate);
+      else if (state === 'stale') stale.push(gate);
+      else diagnosticOnly.push(gate);
+    }
+  }
+
+  const passedCount = allGates.length - allFindings.length;
+  const missingCount = allFindings.length;
+  const ok = missingCount === 0;
+
+  // 6. 人類層 TL;DR
+  let tldr: string;
+  if (ok) {
+    tldr = `All ${allGates.length} required validators passed for task ${resolvedTaskId}.`;
+  } else {
+    const parts: string[] = [];
+    if (absent.length) parts.push(`${absent.length} absent (no evidence): ${absent.join(', ')}`);
+    if (failedRun.length) parts.push(`${failedRun.length} failed-run: ${failedRun.join(', ')}`);
+    if (stale.length) parts.push(`${stale.length} stale (historical-reference/draft): ${stale.join(', ')}`);
+    if (diagnosticOnly.length) parts.push(`${diagnosticOnly.length} diagnostic-only (no command proof): ${diagnosticOnly.join(', ')}`);
+    tldr = `Task ${resolvedTaskId} close blocked — ${missingCount}/${allGates.length} validator(s) not satisfied. ${parts.join('; ')}.`;
+  }
+
+  // 7. blockingFindings = absent + failed-run（stale 和 diagnostic-only 是警告，非硬封鎖）
+  const blockingFindings = allFindings.filter((f) => f.category === 'absent' || f.category === 'failed-run');
+
+  return {
+    schemaId: 'atm.missingValidatorReport.v1',
+    taskId: resolvedTaskId,
+    ok,
+    tldr,
+    totalRequired: allGates.length,
+    passedCount,
+    missingCount,
+    categories: { absent, failedRun, stale, diagnosticOnly },
+    missingValidationPasses: allFindings,
+    blockingFindings,
+    validators: catalogEntries
+  };
+}
+
+/** evidence missing --task <id> --actor <actor> 的執行邏輯 */
+function runEvidenceMissing(argv: string[]) {
+  let cwd = '.';
+  let taskId: string | null = null;
+  let actorId: string | null = null;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--cwd') { cwd = requireValue(argv, i, '--cwd'); i++; continue; }
+    if (arg === '--task') { taskId = requireValue(argv, i, '--task'); i++; continue; }
+    if (arg === '--actor') { actorId = requireValue(argv, i, '--actor'); i++; continue; }
+    if (arg === '--json' || arg === '--pretty') continue;
+    throw new CliError('ATM_CLI_USAGE', `evidence missing does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence missing requires --task <work-item-id>', { exitCode: 2 });
+  }
+  const resolvedActor = resolveActorId(actorId ?? undefined, cwd);
+  const actor = resolvedActor?.actorId ?? actorId ?? 'unknown';
+
+  const report = computeMissingValidatorReport(cwd, taskId, actor);
+  const code = report.ok ? 'ATM_EVIDENCE_VALIDATORS_ALL_PASS' : 'ATM_EVIDENCE_VALIDATORS_MISSING';
+  const level = report.ok ? 'info' : 'error';
+  return makeResult({
+    ok: report.ok,
+    command: 'evidence',
+    cwd: path.resolve(cwd),
+    messages: [
+      message(level, code, report.tldr, {
+        taskId: report.taskId,
+        totalRequired: report.totalRequired,
+        passedCount: report.passedCount,
+        missingCount: report.missingCount,
+        categories: report.categories,
+        missingValidationPasses: report.missingValidationPasses,
+        blockingFindings: report.blockingFindings
+      })
+    ],
+    evidence: {
+      action: 'missing',
+      ...report
     }
   });
 }

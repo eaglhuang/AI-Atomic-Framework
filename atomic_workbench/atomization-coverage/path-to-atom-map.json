@@ -535,13 +535,25 @@
     {
       "path_pattern": "packages/cli/src/commands/evidence.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; --recent-run reuses cached results; validators --list returns per-task validator catalog with tier (focused/batch/milestone/release), expectedCommand, and evidenceState (pass/missing) sourced from framework requiredGates and task-declared validators (TASK-AAO-0015, TASK-AAO-0016).",
+      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; --recent-run reuses cached results; validators --list returns per-task validator catalog with tier (focused/batch/milestone/release), expectedCommand, and evidenceState (pass/missing) sourced from framework requiredGates and task-declared validators (TASK-AAO-0015, TASK-AAO-0016); missing subcommand emits computeMissingValidatorReport — classifies each gate as pass/absent/failed-run/stale/diagnostic-only and returns TL;DR + missingValidationPasses[{code,validator,category,summary,requiredCommand}] + blockingFindings[] (TASK-AAO-0017).",
       "coverage_status": "active"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/evidence.spec.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence command surface specification including validators subcommand with --list --task flags and example (TASK-AAO-0015).",
+      "capability": "evidence command surface specification including validators subcommand with --list --task flags, run with --recent-run, and missing subcommand with example (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport (TASK-AAO-0017).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "batch checkpoint failure (ATM_BATCH_CHECKPOINT_CLOSE_FAILED) passes through tldr, missingValidationPasses, and blockingFindings from the inner tasks close failure via categorizeCheckpointCloseFailure; requiredCommand for missing-evidence now points to evidence missing subcommand (TASK-AAO-0017).",
       "coverage_status": "active"
     }
   ],
@@ -549,7 +561,7 @@
     "total_production_paths": 50,
     "mapped_paths": 50,
     "coverage_percentage": 100,
-    "atoms_defined": 41,
+    "atoms_defined": 42,
     "atoms_with_evidence": 0,
     "debt_items": 30,
     "core_wave1_completed": true

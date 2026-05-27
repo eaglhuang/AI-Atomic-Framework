@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'evidence',
   summary: 'Add or verify task evidence for close/commit/PR governance gates.',
   positional: [
-    { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators', required: true }
+    { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing', required: true }
   ],
   options: [
     commonCwdOption,
@@ -43,6 +43,7 @@ export default defineCommandSpec({
     'node atm.mjs evidence git-head-backfill --actor codex-main --reason "Backfill evidence for a pre-ATM HEAD commit" --json',
     'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json',
     'node atm.mjs evidence validators --list --task ATM-GOV-0104 --json',
-    'node atm.mjs evidence run --task ATM-GOV-0104 --actor Augment --command "npm run typecheck" --validators typecheck --recent-run --json'
+    'node atm.mjs evidence run --task ATM-GOV-0104 --actor Augment --command "npm run typecheck" --validators typecheck --recent-run --json',
+    'node atm.mjs evidence missing --task ATM-GOV-0104 --actor Augment --json'
   ]
 });

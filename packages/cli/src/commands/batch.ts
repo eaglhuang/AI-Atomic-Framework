@@ -196,12 +196,16 @@ export async function runBatch(argv: string[]) {
         command: 'batch',
         cwd: options.cwd,
         messages: [message('error', 'ATM_BATCH_CHECKPOINT_CLOSE_FAILED',
-          `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, {
+          closeCategory.tldr ?? `Batch checkpoint could not close task ${currentTaskId}; resolve the issue and retry.`, {
           batchId: active.batchId,
           closedTaskId: currentTaskId,
           category: closeCategory.category,
           reason: closeCategory.reason,
-          requiredCommand: closeCategory.requiredCommand
+          requiredCommand: closeCategory.requiredCommand,
+          // TASK-AAO-0017: 透傳 TL;DR 和結構化缺失 validator 報告
+          tldr: closeCategory.tldr,
+          missingValidationPasses: closeCategory.missingValidationPasses,
+          blockingFindings: closeCategory.blockingFindings
         })],
         evidence: {
           action: 'checkpoint',
@@ -817,28 +821,47 @@ function readTaskValidators(cwd: string, taskPath: string | null | undefined): r
  * 把 closeResult.messages 裡的 error code 對映到 category + reason + requiredCommand，
  * 讓呼叫方（以及閱讀輸出的 AI）能直接知道要怎麼處理，不用猜。
  */
+// TASK-AAO-0017: 回傳型別加入 TL;DR 和結構化缺失 validator 欄位
 function categorizeCheckpointCloseFailure(
   closeResult: { ok: boolean; messages?: readonly { code?: string; data?: Record<string, unknown> }[]; evidence?: unknown },
   taskId: string,
   actorId: string
-): { category: string; reason: string; requiredCommand: string | null } {
+): {
+  category: string;
+  reason: string;
+  requiredCommand: string | null;
+  tldr: string | null;
+  missingValidationPasses: readonly unknown[];
+  blockingFindings: readonly unknown[];
+} {
   const errorMsg = Array.isArray(closeResult.messages)
     ? closeResult.messages.find((m) => typeof m.code === 'string' && m.code.startsWith('ATM_TASK_CLOSE'))
     : null;
   const code = errorMsg?.code ?? 'ATM_TASK_CLOSE_UNKNOWN';
 
+  // TASK-AAO-0017: 從 tasks.ts 已寫入的 data 欄位提取 TL;DR 和結構化報告
+  const tldr = typeof errorMsg?.data?.tldr === 'string' ? errorMsg.data.tldr : null;
+  const missingValidationPasses = Array.isArray(errorMsg?.data?.missingValidationPasses)
+    ? (errorMsg.data.missingValidationPasses as readonly unknown[])
+    : [];
+  const blockingFindings = Array.isArray(errorMsg?.data?.blockingFindings)
+    ? (errorMsg.data.blockingFindings as readonly unknown[])
+    : [];
+
   if (code === 'ATM_TASK_CLOSE_EVIDENCE_REQUIRED' || code === 'ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID') {
     return {
       category: 'missing-evidence',
-      reason: `Task ${taskId} lacks required command-backed evidence or a valid closure packet.`,
-      requiredCommand: `node atm.mjs evidence add --task ${taskId} --actor ${actorId} --kind test --freshness fresh --json`
+      reason: tldr ?? `Task ${taskId} lacks required command-backed evidence or a valid closure packet.`,
+      requiredCommand: `node atm.mjs evidence missing --task ${taskId} --actor ${actorId} --json`,
+      tldr, missingValidationPasses, blockingFindings
     };
   }
   if (code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED') {
     return {
       category: 'missing-deliverable',
       reason: `Task ${taskId} has no real non-.atm deliverable diff; implement the required files first.`,
-      requiredCommand: null
+      requiredCommand: null,
+      tldr, missingValidationPasses, blockingFindings
     };
   }
   if (code === 'ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE' || code === 'ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED') {
@@ -847,27 +870,31 @@ function categorizeCheckpointCloseFailure(
       : null;
     return {
       category: 'framework-gate-failed',
-      reason: `Task ${taskId} cannot close due to ATM framework delivery window or gate blocker.`,
-      requiredCommand
+      reason: tldr ?? `Task ${taskId} cannot close due to ATM framework delivery window or gate blocker.`,
+      requiredCommand,
+      tldr, missingValidationPasses, blockingFindings
     };
   }
   if (code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED') {
     return {
       category: 'no-active-claim',
       reason: `Task ${taskId} has no active claim owned by ${actorId}.`,
-      requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${taskId}" --json`
+      requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${taskId}" --json`,
+      tldr, missingValidationPasses, blockingFindings
     };
   }
   if (code === 'ATM_TASK_CLOSE_OWNER_MISMATCH') {
     return {
       category: 'owner-mismatch',
       reason: `Task ${taskId} is owned by a different actor; use takeover or correct --actor.`,
-      requiredCommand: `node atm.mjs tasks takeover --task ${taskId} --actor ${actorId} --json`
+      requiredCommand: `node atm.mjs tasks takeover --task ${taskId} --actor ${actorId} --json`,
+      tldr, missingValidationPasses, blockingFindings
     };
   }
   return {
     category: 'close-failed',
     reason: `Task ${taskId} close returned ok=false (code: ${code}).`,
-    requiredCommand: null
+    requiredCommand: null,
+    tldr, missingValidationPasses, blockingFindings
   };
 }

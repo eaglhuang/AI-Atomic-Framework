@@ -6,7 +6,7 @@ import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, updateActorWorkSessionState, upsertActorWorkSession } from './actor-session.ts';
-import { verifyTaskEvidence } from './evidence.ts';
+import { computeMissingValidatorReport, verifyTaskEvidence } from './evidence.ts';
 import {
   auditTasks,
   createClosurePacket,
@@ -964,6 +964,8 @@ async function runTasksClose(argv: string[]) {
       ? frameworkStatus.blockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
       : frameworkStatus.blockers;
     if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && effectiveFrameworkBlockers.length > 0) {
+      // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+      const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
       throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED', `Task ${options.taskId} cannot be closed until framework-development blockers are resolved.`, {
         details: {
           taskId: options.taskId,
@@ -973,7 +975,10 @@ async function runTasksClose(argv: string[]) {
             : [],
           frameworkDeliveryWindow,
           criticalChangedFiles: frameworkStatus.criticalChangedFiles,
-          requiredGates: frameworkStatus.requiredGates
+          requiredGates: frameworkStatus.requiredGates,
+          tldr: missingReport.tldr,
+          missingValidationPasses: missingReport.missingValidationPasses,
+          blockingFindings: missingReport.blockingFindings
         }
       });
     }
@@ -990,6 +995,8 @@ async function runTasksClose(argv: string[]) {
     })
     : null;
   if (evidenceGate && !evidenceGate.ok) {
+    // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+    const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
     throw new CliError('ATM_TASK_CLOSE_EVIDENCE_REQUIRED', `Task ${options.taskId} cannot be closed as done without required delivery evidence. The goal is to deliver the task, not to mark it done.`, {
       exitCode: 1,
       details: {
@@ -998,7 +1005,10 @@ async function runTasksClose(argv: string[]) {
         gate: evidenceGate.gate,
         missing: evidenceGate.missing,
         evidenceCount: evidenceGate.total,
-        remediation: 'Implement the requested non-.atm deliverables, run the required validators, then add command-backed evidence before closing done.'
+        remediation: 'Implement the requested non-.atm deliverables, run the required validators, then add command-backed evidence before closing done.',
+        tldr: missingReport.tldr,
+        missingValidationPasses: missingReport.missingValidationPasses,
+        blockingFindings: missingReport.blockingFindings
       }
     });
   }
@@ -1037,8 +1047,17 @@ async function runTasksClose(argv: string[]) {
     const packet = JSON.parse(readFileSync(packetPath, 'utf8')) as ClosurePacket;
     const validation = validateClosurePacket(packet);
     if (!validation.ok) {
+      // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+      const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
       throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet is invalid.`, {
-        details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath, missing: validation.missing }
+        details: {
+          taskId: options.taskId,
+          closurePacketPath: existingClosurePacketPath,
+          missing: validation.missing,
+          tldr: missingReport.tldr,
+          missingValidationPasses: missingReport.missingValidationPasses,
+          blockingFindings: missingReport.blockingFindings
+        }
       });
     }
     closurePacket = packet;
@@ -1056,10 +1075,15 @@ async function runTasksClose(argv: string[]) {
     });
     const validation = validateClosurePacket(packet);
     if (!validation.ok) {
+      // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+      const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
       throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet contract is incomplete.`, {
         details: {
           taskId: options.taskId,
-          missing: validation.missing
+          missing: validation.missing,
+          tldr: missingReport.tldr,
+          missingValidationPasses: missingReport.missingValidationPasses,
+          blockingFindings: missingReport.blockingFindings
         }
       });
     }
