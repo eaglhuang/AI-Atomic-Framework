@@ -1,0 +1,150 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0050",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "69b720dd0979c02ecede95abd3c612cd0c48d677",
+  "governedTreeSha": "bd59b082b20d50125ddb6ff46d58584aa681e67f",
+  "targetCommitDelta": {
+    "currentCommitSha": "69b720dd0979c02ecede95abd3c612cd0c48d677",
+    "parentCommitShas": [
+      "69b720dd0979c02ecede95abd3c612cd0c48d677"
+    ],
+    "governedTreeSha": "bd59b082b20d50125ddb6ff46d58584aa681e67f",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-AAO-0050.json",
+      ".atm/history/tasks/TASK-AAO-0050.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:14e8df9b2cd13000f7527f15ec5e90e7aa7cf0a4e53be4d139ab42ca32c4269c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "ATM_TEMP_ROOT=C:\\tmp node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6c678215d12ca37d40bfb96baebbb61fc012d3cb357546acca0758fb7f9370fa",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run build",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0137f50d7a694b0d533bd96c7b25293f8c3b2c004ac44d0e49f4e9afd4747492",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "build",
+    "doctor",
+    "typecheck",
+    "validate-task-ledger-governance",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-27T06:10:12.746Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0050-framework-stale-lock-cleanup-guidance.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "Atomization ownership map update for any touched command or validator paths.",
+      "Doctor or audit visibility for stale framework locks that can block future work.",
+      "Framework-mode claim/release diagnostics for stale completed-task locks.",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/guard.ts",
+      "packages/cli/src/commands/hook.ts",
+      "Pre-commit hook finding with a concrete `requiredCommand` for safe cleanup.",
+      "Regression coverage for a completed-task lock blocking a new task by the same actor.",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/guard.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0050.json",
+  "closedAt": "2026-05-27T06:10:12.746Z",
+  "closedByActor": "Codex",
+  "sessionId": "session-20260527055253-Codex-TASK-AAO-0050-387e8eb2d0"
+}

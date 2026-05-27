@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0050",
+  "title": "Framework stale lock cleanup guidance",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0040"
+  ],
+  "acceptance": [
+    "A stale lock from a completed task produces a specific finding such as `ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED` or equivalent stable code.",
+    "The finding includes the stale task id, current task id, actor id, lock path, and a safe `requiredCommand` sequence: release stale framework lock, then claim fresh for the current task.",
+    "If the stale lock task is still running, ATM blocks cleanup and gives takeover/handoff guidance instead of release.",
+    "If the actor differs, ATM does not recommend silent cleanup.",
+    "If the task id differs, ATM does not recommend extending or reusing the old lock as the default path.",
+    "Pre-commit hook output, framework-mode claim output, and doctor/audit diagnostics use the same classification rules.",
+    "Regression evidence includes the dogfood shape: an old `TASK-AAO-0020` framework lock for `opus47-aao-doc-runner` blocks a fresh task until ATM guides release-then-claim."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/guard.ts",
+    "packages/cli/src/commands/doctor.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "Framework-mode claim/release diagnostics for stale completed-task locks.",
+    "Pre-commit hook finding with a concrete `requiredCommand` for safe cleanup.",
+    "Doctor or audit visibility for stale framework locks that can block future work.",
+    "Regression coverage for a completed-task lock blocking a new task by the same actor.",
+    "Atomization ownership map update for any touched command or validator paths."
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/guard.ts",
+    "packages/cli/src/commands/doctor.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Reusing a completed-task framework lock for a different task",
+    "Skipping framework-mode, pre-commit, evidence, or protected-state gates",
+    "Manual deletion or hand editing of .atm/runtime/locks/**",
+    "Taking over a still-running task lock without explicit takeover or handoff"
+  ],
+  "nonGoals": [
+    "Automatically deleting every old lock without checking task status and actor",
+    "Weakening framework critical file claim requirements",
+    "Replacing the framework-mode claim/release lifecycle"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert stale-lock classification, requiredCommand, and diagnostic changes; stale framework locks return to the previous manual recovery behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.framework-mode-governance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "This is an AAO P0 early unblocker because it prevents agents from choosing unsafe lock reuse or framework-mode bypass during critical framework commits.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0050-framework-stale-lock-cleanup-guidance.task.md",
+    "sectionTitle": "TASK-AAO-0050",
+    "headingLine": 57,
+    "hash": "af8125f267c20a02"
+  },
+  "importedAt": "2026-05-27T05:51:30.541Z",
+  "lastTransitionId": "2026-05-27T06-10-12-749Z-close-ba22ffb9f3cb",
+  "lastTransitionAt": "2026-05-27T06:10:12.749Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex",
+  "reservedAt": "2026-05-27T05:52:53.129Z",
+  "promotedAt": "2026-05-27T05:52:53.132Z",
+  "resetReason": "Reset imported ready task after abandoned Opus claim lock so Codex can take over with explicit user authorization.",
+  "claim": {
+    "actorId": "Codex",
+    "leaseId": "lease-2be89c016a38",
+    "claimedAt": "2026-05-27T05:52:53.135Z",
+    "heartbeatAt": "2026-05-27T06:10:12.748Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0050.json"
+    ],
+    "state": "released",
+    "reason": "Closed after governed delivery commit 69b720dd0979c02ecede95abd3c612cd0c48d677 with command-backed evidence and stale lock regression coverage."
+  },
+  "startedAt": "2026-05-27T05:52:53.135Z",
+  "startedByActor": "Codex",
+  "startedBySessionId": "session-20260527055253-Codex-TASK-AAO-0050-387e8eb2d0",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0050.closure-packet.json",
+  "closedAt": "2026-05-27T06:10:12.748Z",
+  "closedByActor": "Codex",
+  "closedBySessionId": "session-20260527055253-Codex-TASK-AAO-0050-387e8eb2d0",
+  "closeReason": "Closed after governed delivery commit 69b720dd0979c02ecede95abd3c612cd0c48d677 with command-backed evidence and stale lock regression coverage."
+}

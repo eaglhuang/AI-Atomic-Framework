@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T06-10-12-749Z-close-ba22ffb9f3cb",
+  "taskId": "TASK-AAO-0050",
+  "action": "close",
+  "actorId": "Codex",
+  "sessionId": "session-20260527055253-Codex-TASK-AAO-0050-387e8eb2d0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0050.json",
+  "taskSha256": "sha256:5a9a9326e50aa8fd7724c9b343c81e65b607ffa439be312b07ea4edd328abf4e",
+  "createdAt": "2026-05-27T06:10:12.749Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0050 --actor Codex --status done --historical-delivery 69b720dd0979c02ecede95abd3c612cd0c48d677",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527055253-Codex-TASK-AAO-0050-387e8eb2d0",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0050.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "doctor",
+      "typecheck",
+      "validate-task-ledger-governance",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T06:10:12.746Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0050-framework-stale-lock-cleanup-guidance.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "Atomization ownership map update for any touched command or validator paths.",
+        "Doctor or audit visibility for stale framework locks that can block future work.",
+        "Framework-mode claim/release diagnostics for stale completed-task locks.",
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/guard.ts",
+        "packages/cli/src/commands/hook.ts",
+        "Pre-commit hook finding with a concrete `requiredCommand` for safe cleanup.",
+        "Regression coverage for a completed-task lock blocking a new task by the same actor.",
+        "scripts/validate-cli.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/guard.ts",
+        "packages/cli/src/commands/hook.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
