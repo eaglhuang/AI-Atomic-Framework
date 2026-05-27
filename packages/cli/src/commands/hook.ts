@@ -2164,14 +2164,16 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
 
   const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${effectiveTaskId}.json`));
   const claim = parseHookTaskClaim(task?.claim);
-  const session = resolveActorWorkSession(cwd, {
+  const mirrorSyncOnly = inspectMirrorSyncOnlyStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+  const claimForSession = mirrorSyncOnly.ok ? null : claim;
+  const session = mirrorSyncOnly.ok && !sessionId ? null : resolveActorWorkSession(cwd, {
     sessionId,
     actorId,
     taskId: effectiveTaskId,
-    claimLeaseId: claimLeaseId ?? claim?.leaseId ?? null,
+    claimLeaseId: claimLeaseId ?? claimForSession?.leaseId ?? null,
     includeNonActive: true
   });
-  if (!session) {
+  if (!session && !mirrorSyncOnly.ok) {
     findings.push({
       code: 'ATM_COMMIT_SESSION_MISSING',
       source: 'commit-attribution',
@@ -2184,7 +2186,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
       findings
     };
   }
-  if (session.actorId !== actorId) {
+  if (session && session.actorId !== actorId) {
     findings.push({
       code: 'ATM_COMMIT_SESSION_ACTOR_MISMATCH',
       source: 'commit-attribution',
@@ -2192,7 +2194,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
       classification: 'current-task'
     });
   }
-  if (session.taskId !== effectiveTaskId) {
+  if (session && session.taskId !== effectiveTaskId) {
     findings.push({
       code: 'ATM_COMMIT_SESSION_TASK_MISMATCH',
       source: 'commit-attribution',
@@ -2200,11 +2202,11 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
       classification: 'current-task'
     });
   }
-  if ((claimLeaseId ?? claim?.leaseId ?? null) && session.claimLeaseId !== (claimLeaseId ?? claim?.leaseId ?? null)) {
+  if (session && (claimLeaseId ?? claimForSession?.leaseId ?? null) && session.claimLeaseId !== (claimLeaseId ?? claimForSession?.leaseId ?? null)) {
     findings.push({
       code: 'ATM_COMMIT_SESSION_CLAIM_MISMATCH',
       source: 'commit-attribution',
-      detail: `Session ${session.sessionId} is bound to claim ${session.claimLeaseId ?? 'unset'}, not ${(claimLeaseId ?? claim?.leaseId) ?? 'unset'}.`,
+      detail: `Session ${session.sessionId} is bound to claim ${session.claimLeaseId ?? 'unset'}, not ${(claimLeaseId ?? claimForSession?.leaseId) ?? 'unset'}.`,
       classification: 'current-task'
     });
   }
@@ -2301,6 +2303,47 @@ function inferTaskIdsFromStagedFiles(stagedFiles: readonly string[]) {
     }
   }
   return [...taskIds].sort((left, right) => left.localeCompare(right));
+}
+
+function inspectMirrorSyncOnlyStagedArtifacts(cwd: string, taskId: string, stagedFiles: readonly string[]) {
+  if (stagedFiles.length === 0) {
+    return { ok: false, reason: 'no-staged-files' };
+  }
+  const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
+  let hasTaskLedger = false;
+  let hasImportEvent = false;
+  let hasImportReport = false;
+  for (const file of stagedFiles) {
+    const normalized = normalizeRelativePath(file);
+    const lower = normalized.toLowerCase();
+    if (lower === expectedTaskPath) {
+      hasTaskLedger = true;
+      continue;
+    }
+    if (lower.startsWith(`.atm/history/task-events/${taskId.toLowerCase()}/`) && lower.includes('import') && lower.endsWith('.json')) {
+      hasImportEvent = true;
+      continue;
+    }
+    if (lower.startsWith('.atm/history/reports/task-import/') && lower.endsWith('.json') && taskImportReportReferencesTask(cwd, normalized, taskId)) {
+      hasImportReport = true;
+      continue;
+    }
+    return { ok: false, reason: `unexpected-staged-file:${normalized}` };
+  }
+  return {
+    ok: hasTaskLedger && hasImportEvent && hasImportReport,
+    reason: hasTaskLedger && hasImportEvent && hasImportReport ? null : 'incomplete-mirror-sync-artifacts'
+  };
+}
+
+function taskImportReportReferencesTask(cwd: string, file: string, taskId: string): boolean {
+  try {
+    const content = readFileSync(path.join(cwd, file), 'utf8');
+    const parsed = JSON.parse(content) as unknown;
+    return JSON.stringify(parsed).includes(`"${taskId}"`);
+  } catch {
+    return false;
+  }
 }
 
 function parseHookTaskClaim(value: unknown): { actorId: string; leaseId: string } | null {

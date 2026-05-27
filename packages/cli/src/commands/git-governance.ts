@@ -16,6 +16,13 @@ interface GitIdentityProfile {
   readonly gitEmail: string | null;
 }
 
+interface MirrorSyncOnlyStagedArtifactsReport {
+  readonly ok: boolean;
+  readonly taskId: string;
+  readonly stagedFiles: readonly string[];
+  readonly reason: string | null;
+}
+
 export interface GitGovernanceViolation {
   readonly code: string;
   readonly detail: string;
@@ -93,12 +100,14 @@ export function evaluateGitGovernanceCheck(input: {
   const gitEmail = readGitConfig(cwd, 'user.email');
   const taskDocument = input.taskId ? readTaskDocument(cwd, input.taskId) : null;
   const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
-  const session = resolveActorWorkSession(cwd, {
+  const stagedMirrorSync = input.taskId ? inspectMirrorSyncOnlyStagedArtifacts(cwd, input.taskId) : null;
+  const claimForTrailers = stagedMirrorSync?.ok ? null : claim;
+  const session = resolveGitGovernanceSession(cwd, {
     sessionId: input.sessionId ?? null,
     actorId,
     taskId: input.taskId,
-    claimLeaseId: claim?.leaseId ?? null,
-    includeNonActive: true
+    claimLeaseId: claimForTrailers?.leaseId ?? null,
+    allowImplicitSession: Boolean(input.taskId && !stagedMirrorSync?.ok)
   });
   const trailers = parseTrailers(readHeadCommitMessage(cwd));
 
@@ -157,8 +166,8 @@ export function evaluateGitGovernanceCheck(input: {
     if (input.taskId) {
       requireTrailerValue(trailers, 'ATM-Task', input.taskId, violations, 'trailer-task-missing');
     }
-    if (claim?.leaseId) {
-      requireTrailerValue(trailers, 'ATM-Claim', claim.leaseId, violations, 'trailer-claim-missing');
+    if (claimForTrailers?.leaseId) {
+      requireTrailerValue(trailers, 'ATM-Claim', claimForTrailers.leaseId, violations, 'trailer-claim-missing');
     }
     if (session?.sessionId) {
       requireTrailerValue(trailers, 'ATM-Session', session.sessionId, violations, 'trailer-session-missing');
@@ -169,7 +178,7 @@ export function evaluateGitGovernanceCheck(input: {
     ok: violations.length === 0,
     actorId,
     taskId: input.taskId,
-    claimLeaseId: claim?.leaseId ?? null,
+    claimLeaseId: claimForTrailers?.leaseId ?? null,
     sessionId: session?.sessionId ?? null,
     gitName,
     gitEmail,
@@ -203,12 +212,12 @@ function runGitPrepare(options: ParsedGitOptions) {
 
   const taskDocument = options.taskId ? readTaskDocument(options.cwd, options.taskId) : null;
   const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
-  const session = resolveActorWorkSession(options.cwd, {
+  const session = resolveGitGovernanceSession(options.cwd, {
     sessionId: options.sessionId ?? null,
     actorId,
     taskId: options.taskId,
     claimLeaseId: claim?.leaseId ?? null,
-    includeNonActive: true
+    allowImplicitSession: Boolean(options.taskId)
   });
   const trailerHints = [
     `ATM-Actor: ${actorId}`,
@@ -264,14 +273,16 @@ function runGitCommit(options: ParsedGitOptions) {
   }
   const taskDocument = options.taskId ? readTaskDocument(options.cwd, options.taskId) : null;
   const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
-  const session = resolveActorWorkSession(options.cwd, {
+  const stagedMirrorSync = options.taskId ? inspectMirrorSyncOnlyStagedArtifacts(options.cwd, options.taskId) : null;
+  const claimForTrailers = stagedMirrorSync?.ok ? null : claim;
+  const session = resolveGitGovernanceSession(options.cwd, {
     sessionId: options.sessionId ?? null,
     actorId,
     taskId: options.taskId,
-    claimLeaseId: claim?.leaseId ?? null,
-    includeNonActive: true
+    claimLeaseId: claimForTrailers?.leaseId ?? null,
+    allowImplicitSession: Boolean(options.taskId && !stagedMirrorSync?.ok)
   });
-  if (options.taskId && !session) {
+  if (options.taskId && !session && !stagedMirrorSync?.ok) {
     throw new CliError('ATM_GIT_COMMIT_SESSION_REQUIRED', `git commit requires an active or recent ATM work session for ${options.taskId}.`, {
       exitCode: 1,
       details: {
@@ -284,7 +295,7 @@ function runGitCommit(options: ParsedGitOptions) {
   const trailers = [
     `ATM-Actor: ${actorId}`,
     ...(options.taskId ? [`ATM-Task: ${options.taskId}`] : []),
-    ...(claim?.leaseId ? [`ATM-Claim: ${claim.leaseId}`] : []),
+    ...(claimForTrailers?.leaseId ? [`ATM-Claim: ${claimForTrailers.leaseId}`] : []),
     ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : [])
   ];
   const args = [
@@ -308,7 +319,7 @@ function runGitCommit(options: ParsedGitOptions) {
         GIT_COMMITTER_EMAIL: profile.gitEmail,
         ATM_COMMIT_ACTOR_ID: actorId,
         ATM_COMMIT_TASK_ID: options.taskId ?? '',
-        ATM_COMMIT_CLAIM_LEASE_ID: claim?.leaseId ?? '',
+        ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
         ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
         ATM_COMMIT_TRAILERS: trailers.join('\n')
       }
@@ -342,7 +353,7 @@ function runGitCommit(options: ParsedGitOptions) {
       action: 'commit',
       actorId,
       taskId: options.taskId,
-      claimLeaseId: claim?.leaseId ?? null,
+      claimLeaseId: claimForTrailers?.leaseId ?? null,
       sessionId: session?.sessionId ?? null,
       commitSha,
       trailers,
@@ -522,6 +533,83 @@ function parseTaskClaim(value: unknown): TaskClaimRecord | null {
     return null;
   }
   return { actorId, leaseId, state };
+}
+
+function resolveGitGovernanceSession(cwd: string, input: {
+  readonly sessionId: string | null;
+  readonly actorId: string;
+  readonly taskId: string | null;
+  readonly claimLeaseId: string | null;
+  readonly allowImplicitSession: boolean;
+}) {
+  if (!input.sessionId && !input.allowImplicitSession) {
+    return null;
+  }
+  return resolveActorWorkSession(cwd, {
+    sessionId: input.sessionId,
+    actorId: input.actorId,
+    taskId: input.taskId,
+    claimLeaseId: input.claimLeaseId,
+    includeNonActive: true
+  });
+}
+
+function inspectMirrorSyncOnlyStagedArtifacts(cwd: string, taskId: string): MirrorSyncOnlyStagedArtifactsReport {
+  const stagedFiles = readStagedFiles(cwd);
+  if (stagedFiles.length === 0) {
+    return { ok: false, taskId, stagedFiles, reason: 'no-staged-files' };
+  }
+  const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
+  let hasTaskLedger = false;
+  let hasImportEvent = false;
+  let hasImportReport = false;
+  for (const file of stagedFiles) {
+    const normalized = normalizeRelativePath(file);
+    const lower = normalized.toLowerCase();
+    if (lower === expectedTaskPath) {
+      hasTaskLedger = true;
+      continue;
+    }
+    if (lower.startsWith(`.atm/history/task-events/${taskId.toLowerCase()}/`) && lower.includes('import') && lower.endsWith('.json')) {
+      hasImportEvent = true;
+      continue;
+    }
+    if (lower.startsWith('.atm/history/reports/task-import/') && lower.endsWith('.json') && taskImportReportReferencesTask(cwd, normalized, taskId)) {
+      hasImportReport = true;
+      continue;
+    }
+    return { ok: false, taskId, stagedFiles, reason: `unexpected-staged-file:${normalized}` };
+  }
+  if (!hasTaskLedger) return { ok: false, taskId, stagedFiles, reason: 'missing-task-ledger' };
+  if (!hasImportEvent) return { ok: false, taskId, stagedFiles, reason: 'missing-import-event' };
+  if (!hasImportReport) return { ok: false, taskId, stagedFiles, reason: 'missing-task-import-report' };
+  return { ok: true, taskId, stagedFiles, reason: null };
+}
+
+function readStagedFiles(cwd: string): readonly string[] {
+  try {
+    return execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).split(/\r?\n/).map(normalizeRelativePath).filter(Boolean).sort((left, right) => left.localeCompare(right));
+  } catch {
+    return [];
+  }
+}
+
+function taskImportReportReferencesTask(cwd: string, file: string, taskId: string): boolean {
+  try {
+    const content = readFileSync(path.join(cwd, file), 'utf8');
+    const parsed = JSON.parse(content) as unknown;
+    return JSON.stringify(parsed).includes(`"${taskId}"`);
+  } catch {
+    return false;
+  }
+}
+
+function normalizeRelativePath(value: string): string {
+  return value.trim().replace(/\\/g, '/').replace(/^\.\//, '');
 }
 
 function readGitConfig(cwd: string, key: 'user.name' | 'user.email'): string | null {

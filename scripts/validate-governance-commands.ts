@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import { createTempWorkspace } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -21,7 +22,7 @@ function assert(condition: any, message: any) {
 }
 
 function runAtm(args: any, env: Record<string, string> = {}) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.dev.mjs'), ...args], {
     cwd: root,
     encoding: 'utf8',
     env: { ...process.env, ...env }
@@ -43,6 +44,10 @@ function runGit(cwd: string, args: string[]) {
     stdout: (result.stdout ?? '').trim(),
     stderr: (result.stderr ?? '').trim()
   };
+}
+
+function sha256(buffer: Buffer | string) {
+  return `sha256:${createHash('sha256').update(buffer).digest('hex')}`;
 }
 
 const tempRoot = createTempWorkspace('atm-governance-commands-');
@@ -303,6 +308,76 @@ try {
   assert(gitGuardFailOpen.exitCode === 0, 'guard git --fail-open must exit 0 when violations exist');
   assert(gitGuardFailOpen.parsed.ok === true, 'guard git --fail-open must report ok=true when violations exist');
   assert(gitGuardFailOpen.parsed.messages?.[0]?.code === 'ATM_GUARD_GIT_FAIL_OPEN', 'guard git --fail-open must return fail-open warning code');
+
+  const claimSessionPath = path.join(repo, '.atm', 'runtime', 'sessions', `${claimSessionId}.json`);
+  const closedClaimSession = JSON.parse(readFileSync(claimSessionPath, 'utf8'));
+  closedClaimSession.status = 'closed';
+  closedClaimSession.closedAt = '2026-01-01T00:00:00.000Z';
+  closedClaimSession.updatedAt = '2026-01-01T00:00:00.000Z';
+  writeFileSync(claimSessionPath, `${JSON.stringify(closedClaimSession, null, 2)}\n`, 'utf8');
+  const tasklessFile = path.join(repo, 'notes', 'taskless.txt');
+  writeFileSync(tasklessFile, 'taskless fixture\n', 'utf8');
+  assert(runGit(repo, ['add', 'notes/taskless.txt']).exitCode === 0, 'taskless fixture must stage');
+  assert(runGit(repo, ['commit', '--no-verify', '-m', ['chore: taskless fixture', '', 'ATM-Actor: fixture-agent'].join('\n')]).exitCode === 0, 'taskless fixture commit must succeed');
+  const tasklessGitCheck = runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--json']);
+  assert(tasklessGitCheck.exitCode === 0, 'actor-only git check must not inherit a closed prior session');
+  assert(tasklessGitCheck.parsed.ok === true, 'actor-only git check must pass with actor-only trailers when no task is supplied');
+  assert(tasklessGitCheck.parsed.evidence?.taskId === null, 'actor-only git check must not infer a task from closed session history');
+  assert(tasklessGitCheck.parsed.evidence?.sessionId === null, 'actor-only git check must not infer a closed session');
+  const tasklessGitPrepare = runAtm(['git', 'prepare', '--cwd', repo, '--actor', 'fixture-agent', '--json']);
+  assert(tasklessGitPrepare.exitCode === 0, 'actor-only git prepare must exit 0');
+  assert(!(tasklessGitPrepare.parsed.evidence?.trailerHints ?? []).some((entry: string) => entry.startsWith('ATM-Session: ')), 'actor-only git prepare must not suggest a stale closed session trailer');
+
+  const mirrorTaskId = 'ATM-GOV-MIRROR';
+  const mirrorTaskPath = path.join(repo, '.atm', 'history', 'tasks', `${mirrorTaskId}.json`);
+  const mirrorEventId = '2026-01-01T00-00-00-000Z-import-fixture';
+  const mirrorEventPath = path.join(repo, '.atm', 'history', 'task-events', mirrorTaskId, `${mirrorEventId}.json`);
+  const mirrorReportPath = path.join(repo, '.atm', 'history', 'reports', 'task-import', '2026-01-01T00-00-00-000Z.json');
+  mkdirSync(path.dirname(mirrorTaskPath), { recursive: true });
+  mkdirSync(path.dirname(mirrorEventPath), { recursive: true });
+  mkdirSync(path.dirname(mirrorReportPath), { recursive: true });
+  writeFileSync(mirrorTaskPath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: mirrorTaskId,
+    title: 'Mirror sync fixture',
+    status: 'done',
+    lastTransitionId: mirrorEventId,
+    lastTransitionAt: '2026-01-01T00:00:00.000Z',
+    closureAuthority: 'planning_repo',
+    targetRepo: 'Fixture',
+    source: { planPath: '../planning/tasks/mirror.task.md' }
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(mirrorEventPath, `${JSON.stringify({
+    schemaId: 'atm.taskTransition.v1',
+    specVersion: '0.1.0',
+    transitionId: mirrorEventId,
+    taskId: mirrorTaskId,
+    action: 'import',
+    actorId: 'fixture-agent',
+    fromStatus: null,
+    toStatus: 'done',
+    taskPath: `.atm/history/tasks/${mirrorTaskId}.json`,
+    taskSha256: sha256(readFileSync(mirrorTaskPath)),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    command: 'node atm.mjs tasks import --write --force --json'
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(mirrorReportPath, `${JSON.stringify({
+    schemaId: 'atm.taskImportReport.v1',
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    manifest: {
+      mode: 'write',
+      tasks: [{ workItemId: mirrorTaskId }]
+    }
+  }, null, 2)}\n`, 'utf8');
+  assert(runGit(repo, ['add', `.atm/history/tasks/${mirrorTaskId}.json`, `.atm/history/task-events/${mirrorTaskId}/${mirrorEventId}.json`, '.atm/history/reports/task-import/2026-01-01T00-00-00-000Z.json']).exitCode === 0, 'mirror-sync fixture artifacts must stage');
+  const mirrorSyncCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', mirrorTaskId, '--message', 'atm: sync mirror fixture', '--json']);
+  assert(mirrorSyncCommit.exitCode === 0, 'mirror-sync-only git commit must not require a fake claim or stale session');
+  assert(mirrorSyncCommit.parsed.ok === true, 'mirror-sync-only git commit must report ok=true');
+  assert(mirrorSyncCommit.parsed.evidence?.sessionId === null, 'mirror-sync-only git commit must not inherit a closed session');
+  assert(!(mirrorSyncCommit.parsed.evidence?.trailers ?? []).some((entry: string) => entry.startsWith('ATM-Session: ')), 'mirror-sync-only git commit must not write a stale session trailer');
+  rmSync(mirrorTaskPath, { force: true });
+  rmSync(path.dirname(mirrorEventPath), { recursive: true, force: true });
+  rmSync(mirrorReportPath, { force: true });
 
   assert(runGit(repo, ['config', 'user.name', 'Missing Identity']).exitCode === 0, 'fixture git user.name must be configurable for identity repair command validation');
   assert(runGit(repo, ['config', 'user.email', 'missing-identity@example.com']).exitCode === 0, 'fixture git user.email must be configurable for identity repair command validation');

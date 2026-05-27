@@ -29,6 +29,8 @@ export default defineCommandSpec({
   examples: [
     'node atm.mjs git prepare --task ATM-GOV-0105 --actor codex-main --json',
     'node atm.mjs git check --task ATM-GOV-0105 --actor codex-main --json',
+    'node atm.mjs git check --actor codex-main --json',
+    'node atm.mjs git commit --actor codex-main --task TASK-AAO-0036 --message "atm: sync TASK-AAO-0036 ledger mirror" --json',
     'node atm.mjs git commit --actor codex-main --task ATM-GOV-0105 --message "complete ATM-GOV-0105" --json'
   ]
 });
