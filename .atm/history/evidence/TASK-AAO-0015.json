@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0015",
-  "updatedAt": "2026-05-27T13:30:24.417Z",
+  "updatedAt": "2026-05-27T13:34:23.311Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -81,6 +81,47 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:5ebf03b5d1cc576b25b31f6e746e6cdc059773d0f969d16f0a4f0099da98a83e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git-head evidence backfilled at delivery commit acc904b55",
+      "artifactPaths": [
+        ".atm/history/evidence/git-head.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Augment",
+      "sessionId": "session-20260527132017-Augment-TASK-AAO-0015-96e0206856",
+      "createdAt": "2026-05-27T13:34:23.311Z",
+      "details": {
+        "actorId": "Augment",
+        "sessionId": "session-20260527132017-Augment-TASK-AAO-0015-96e0206856",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs evidence git-head-backfill --actor Augment --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:8d0953c97c25f43204cbef68d92375bdebe0b7ddb368d4d20279667df6723234",
+            "cached": false,
+            "generatedAt": "2026-05-27T13:34:23.353Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d15213866760d577a81e02699624ed547aac280dc33c6dcd1dfa0491a878d042",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
