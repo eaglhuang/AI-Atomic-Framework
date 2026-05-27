@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0007",
-  "updatedAt": "2026-05-27T02:31:31.610Z",
+  "updatedAt": "2026-05-27T02:37:47.402Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -113,6 +113,123 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:43b62747724c5a54799ae1767be114f26381d94514783390c82fde2cdf18f1e2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "npm run typecheck passed for framework closure gate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "GitHubCopilot",
+      "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+      "createdAt": "2026-05-27T02:37:46.542Z",
+      "details": {
+        "actorId": "GitHubCopilot",
+        "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-05-27T02:37:46.579Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ea110994b4e5e94f740ba96c508657226bb1a73b71236fd7a1c8e1ae1c614c6c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "npm run validate:cli passed for framework closure gate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "GitHubCopilot",
+      "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+      "createdAt": "2026-05-27T02:37:46.963Z",
+      "details": {
+        "actorId": "GitHubCopilot",
+        "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:073699fa4a5013b0607b6e8ef297c341896969ef44d4d9666fddf123fc76fcb0",
+            "cached": false,
+            "generatedAt": "2026-05-27T02:37:47.001Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:43b62747724c5a54799ae1767be114f26381d94514783390c82fde2cdf18f1e2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "npm run validate:git-head-evidence passed for framework closure gate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "GitHubCopilot",
+      "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+      "createdAt": "2026-05-27T02:37:47.402Z",
+      "details": {
+        "actorId": "GitHubCopilot",
+        "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-05-27T02:37:47.444Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4c7553266cbea143b6ff718e2bc6961de317c8261810c9f1c9d6df086aab3fb0",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

@@ -1,0 +1,127 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0007",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d54b08562aeb73d8fb38c461b480ef9abab47675",
+  "governedTreeSha": "7e3c8df4a5e1fa03a01fb4f7b0480936c61486a3",
+  "targetCommitDelta": {
+    "currentCommitSha": "d54b08562aeb73d8fb38c461b480ef9abab47675",
+    "parentCommitShas": [
+      "d54b08562aeb73d8fb38c461b480ef9abab47675"
+    ],
+    "governedTreeSha": "7e3c8df4a5e1fa03a01fb4f7b0480936c61486a3",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-AAO-0007.json",
+      ".atm/history/tasks/TASK-AAO-0007.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "scripts/validate-onefile-budget.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run build",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c21b9d8f8846d35cb5b649d58d46975d1c0985c63f93efd7c5892eee2a7708ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-onefile-budget.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e0c74a0b0d3ba23a1a3865e158d2026f3d7d26076b46c1019af72d609139a15c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "build",
+    "typecheck",
+    "validate-cli",
+    "validate-onefile-budget",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-27T02:37:54.755Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0007-onefile-size-startup-budget.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "scripts/validate-onefile-budget.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "scripts/validate-onefile-budget.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0007.json",
+  "closedAt": "2026-05-27T02:37:54.756Z",
+  "closedByActor": "GitHubCopilot",
+  "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5"
+}

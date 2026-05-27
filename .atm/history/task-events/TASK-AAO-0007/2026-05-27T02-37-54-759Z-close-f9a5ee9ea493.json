@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T02-37-54-759Z-close-f9a5ee9ea493",
+  "taskId": "TASK-AAO-0007",
+  "action": "close",
+  "actorId": "GitHubCopilot",
+  "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0007.json",
+  "taskSha256": "sha256:c87ba5fef06a38e30275c18d3050830ee576e259de58b5db0206273533e69de0",
+  "createdAt": "2026-05-27T02:37:54.759Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0007 --actor GitHubCopilot --status done --historical-delivery d54b08562aeb73d8fb38c461b480ef9abab47675",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527015528-GitHubCopilot-TASK-AAO-0007-6dbf6081f5",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0007.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "typecheck",
+      "validate-cli",
+      "validate-onefile-budget",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T02:37:54.755Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0007-onefile-size-startup-budget.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "package.json",
+        "scripts/validate-onefile-budget.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/validate-onefile-budget.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
