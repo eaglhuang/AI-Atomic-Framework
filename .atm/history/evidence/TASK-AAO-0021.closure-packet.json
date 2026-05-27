@@ -1,0 +1,128 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0021",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "168e8379b0ba126dfd1a406cbc78346b3b8d7880",
+  "governedTreeSha": "f57d74354a378b81ab19dfdbc25ec0bbccf62b57",
+  "targetCommitDelta": {
+    "currentCommitSha": "168e8379b0ba126dfd1a406cbc78346b3b8d7880",
+    "parentCommitShas": [
+      "168e8379b0ba126dfd1a406cbc78346b3b8d7880"
+    ],
+    "governedTreeSha": "f57d74354a378b81ab19dfdbc25ec0bbccf62b57",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-AAO-0021.json",
+      ".atm/history/tasks/TASK-AAO-0021.json",
+      ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
+      ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
+      "atomic_workbench/atomization-coverage/dogfood-score.json",
+      "scripts/src/atomize-score.js"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": "C:/Users/User/AI-Atomic-Framework",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:atom-callsite-readability",
+      "cwd": "C:/Users/User/AI-Atomic-Framework",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2426d84cef6d804cda9d5c2285da0ecd6a92c2e0d371a71c9a51d21cd5bb514c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node -e \"const fs=require('fs'); const score=JSON.parse(fs.readFileSync('atomic_workbench/atomization-coverage/dogfood-score.json','utf8')); const readable=score.detail && score.detail.readable || {}; if (!score.scores || score.scores.runAtm_with_readable_ref !== 100 || readable.source !== 'legacy-pass-report') { console.error('readable ref score assertion failed'); process.exit(1); } console.log('[readable-ref-score] ok (runAtm_with_readable_ref=100, legacy report reason recorded)');\"",
+      "cwd": "C:/Users/User/AI-Atomic-Framework",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2eed09b561c373ae50332f0580ce01a81b9975f36cc91eede12e0fdb55d2fbb3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": "C:/Users/User/AI-Atomic-Framework",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": "C:/Users/User/AI-Atomic-Framework",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "readable-ref-score",
+    "typecheck",
+    "validate:atom-callsite-readability",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-27T12:44:26.729Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0021-readable-ref-score-integration.task.md",
+      "atomic_workbench/atomization-coverage/dogfood-score.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "scripts/src/atomize-score.js",
+      "scripts/validate-atom-callsite-readability.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/src/atomize-score.js",
+      "scripts/validate-atom-callsite-readability.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0021.json",
+  "closedAt": "2026-05-27T12:44:26.729Z",
+  "closedByActor": "copilot",
+  "sessionId": "session-20260527123250-copilot-TASK-AAO-0021-7677827f45"
+}
