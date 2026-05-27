@@ -186,6 +186,12 @@ export function writeTaskDirectionLock(input: {
   readonly prompt?: string | null;
 }) {
   const queueIndex = input.queue ? input.queue.taskIds.indexOf(input.taskId) : -1;
+  // TASK-AAO-0058：claim 時自動將任務自身治理路徑隱式 self-allow，
+  // 讓 agent 在 evidence 收集、checkpoint 或 close 時不受 ScopeLock 阻擋。
+  const mergedAllowedFiles = sanitizeTaskDirectionAllowedFiles([
+    ...input.allowedFiles,
+    ...buildTaskSelfAllowPaths(input.taskId)
+  ]);
   const lock: TaskDirectionLock = {
     schemaId: 'atm.taskDirectionLock.v1',
     specVersion: '0.1.0',
@@ -194,7 +200,7 @@ export function writeTaskDirectionLock(input: {
     scopeKey: input.scopeKey ?? input.queue?.scopeKey ?? null,
     queueId: input.queue?.queueId ?? null,
     queueIndex: queueIndex >= 0 ? queueIndex : null,
-    allowedFiles: sanitizeTaskDirectionAllowedFiles(input.allowedFiles),
+    allowedFiles: mergedAllowedFiles,
     planningReadOnlyPaths: sanitizeTaskDirectionAllowedFiles(input.planningReadOnlyPaths ?? []),
     planningMirrorPaths: sanitizeTaskDirectionAllowedFiles(input.planningMirrorPaths ?? []),
     allowPlanningMirror: input.allowPlanningMirror === true,
@@ -395,6 +401,26 @@ export function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, a
 
 export function buildAllowedFilesForTask(task: TaskDirectionTask): readonly string[] {
   return partitionTaskScope(task).targetWork.allowedFiles;
+}
+
+/**
+ * TASK-AAO-0058：回傳任務自身治理路徑（task self-allow）的 canonical 三條路徑。
+ * 這些路徑會在 writeTaskDirectionLock 建立鎖時自動併入 allowedFiles，
+ * 讓 agent 在 evidence 收集、checkpoint 或 close 時不會被 ScopeLock 阻擋。
+ *
+ * 覆蓋範圍：
+ *   - .atm/history/tasks/<task-id>.json
+ *   - .atm/history/evidence/<task-id>.* （含 closure-packet.json）
+ *   - .atm/history/task-events/<task-id>/**
+ *
+ * 不含整個 .atm/history/**，以保持精確邊界。
+ */
+export function buildTaskSelfAllowPaths(taskId: string): readonly string[] {
+  return [
+    `.atm/history/tasks/${taskId}.json`,
+    `.atm/history/evidence/${taskId}.*`,
+    `.atm/history/task-events/${taskId}/**`
+  ];
 }
 
 export function partitionTaskScope(task: TaskDirectionTask): TaskScopePartition {

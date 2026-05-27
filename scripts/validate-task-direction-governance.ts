@@ -8,7 +8,7 @@ import { runHook } from '../packages/cli/src/commands/hook.ts';
 import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
 import { runLock } from '../packages/cli/src/commands/lock.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
-import { readActiveTaskDirectionLocks } from '../packages/cli/src/commands/task-direction.ts';
+import { buildTaskSelfAllowPaths, readActiveTaskDirectionLocks } from '../packages/cli/src/commands/task-direction.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 
 const mode = process.argv.includes('--mode')
@@ -53,12 +53,51 @@ async function main() {
     await validateBatchCheckpointHold(tempRoot);
     await validateAaoThroughputAgentJourney(tempRoot);
     await validateFrameworkDevelopment(tempRoot);
+    await validateTaskSelfAllowOnClaim(tempRoot);
     if (!process.exitCode) {
       console.log(`[task-direction-governance:${mode}] ok (adopter-governed and framework-development task direction gates verified)`);
     }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
+}
+
+/**
+ * TASK-AAO-0058 regression：
+ * 任務 claim 後，direction lock.allowedFiles 必須自動包含三條 canonical governance 路徑，
+ * 且不包含整個 .atm/history/** 放寬路徑。
+ */
+async function validateTaskSelfAllowOnClaim(tempRoot: string) {
+  const repo = makeAdopterRepo(tempRoot, 'adopter-self-allow');
+  const prompt = 'TASK-ADOPT-0001';
+  const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
+  assert(claim.ok === true, 'self-allow regression: next --claim must succeed');
+  assertGovernanceLockAllowedFilesAreSsot(repo, 'TASK-ADOPT-0001');
+
+  // 1. 讀取 canonical allowedFiles
+  const lockPath = path.join(repo, '.atm', 'runtime', 'locks', 'TASK-ADOPT-0001.lock.json');
+  assert(existsSync(lockPath), 'self-allow regression: governance lock must exist after claim');
+  const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+  const embedded = (parsed as { taskDirectionLock?: { allowedFiles?: unknown } }).taskDirectionLock;
+  const allowedFiles = Array.isArray(embedded?.allowedFiles)
+    ? (embedded!.allowedFiles as string[]).map((entry) => entry.replace(/\\/g, '/'))
+    : null;
+  assert(allowedFiles !== null, 'self-allow regression: taskDirectionLock.allowedFiles must be an array');
+
+  // 2. 三條 canonical governance 路徑必須存在
+  const selfAllow = buildTaskSelfAllowPaths('TASK-ADOPT-0001');
+  for (const govPath of selfAllow) {
+    assert(
+      allowedFiles.some((entry) => entry === govPath || entry.replace(/\\/g, '/') === govPath),
+      `self-allow regression: allowedFiles must contain canonical governance path "${govPath}" after claim. Got: ${JSON.stringify(allowedFiles)}`
+    );
+  }
+
+  // 3. 不允許整個 .atm/history/** 作為放寬路徑
+  assert(
+    !allowedFiles.some((entry) => entry === '.atm/history/**' || entry === '.atm/history'),
+    `self-allow regression: allowedFiles must NOT contain broadened ".atm/history/**" or ".atm/history". Got: ${JSON.stringify(allowedFiles)}`
+  );
 }
 
 async function validateAaoThroughputAgentJourney(tempRoot: string) {
@@ -110,7 +149,21 @@ async function validateAaoThroughputAgentJourney(tempRoot: string) {
     '.atm/history/evidence/TASK-ADOPT-0001.json',
     '.atm/history/task-events/TASK-ADOPT-0001'
   ]);
-  const preCommit = runHook(['pre-commit', '--cwd', repo]);
+  // 模擬 `node atm.mjs git commit` 設定的 attribution env vars，
+  // pre-commit hook 偵測到 staged task 檔案時需要這些才不會要求 ATM wrapper
+  process.env.ATM_COMMIT_ACTOR_ID = 'adopter-agent';
+  process.env.ATM_COMMIT_TASK_ID = 'TASK-ADOPT-0001';
+  process.env.GIT_AUTHOR_NAME = 'ATM Test';
+  process.env.GIT_AUTHOR_EMAIL = 'atm-test@example.invalid';
+  let preCommit: ReturnType<typeof runHook>;
+  try {
+    preCommit = runHook(['pre-commit', '--cwd', repo]);
+  } finally {
+    delete process.env.ATM_COMMIT_ACTOR_ID;
+    delete process.env.ATM_COMMIT_TASK_ID;
+    delete process.env.GIT_AUTHOR_NAME;
+    delete process.env.GIT_AUTHOR_EMAIL;
+  }
   assert(preCommit.ok === true, 'checkpoint commit window must allow committing the just-closed task while the batch is held');
   runGit(repo, ['-c', 'user.name=ATM Test', '-c', 'user.email=atm-test@example.invalid', 'commit', '-m', 'complete TASK-ADOPT-0001']);
 
@@ -257,6 +310,8 @@ async function validateAdopterGoverned(tempRoot: string) {
   initializeGit(scopeExpansionRepo);
   mkdirSync(path.join(scopeExpansionRepo, 'atomic_workbench', 'atomization-coverage'), { recursive: true });
   writeFileSync(path.join(scopeExpansionRepo, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json'), '{}\n', 'utf8');
+  // 必須先 stage，否則 TASK-AAO-0011 之後 scope expansion guard 只對 staged/modified-tracked 檔案作用
+  runGit(scopeExpansionRepo, ['add', 'atomic_workbench/atomization-coverage/exclusion-inventory.json']);
   let scopeExpansionBlocked = false;
   try {
     await runNext(['--cwd', scopeExpansionRepo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-EXPAND-0005']);
@@ -401,6 +456,15 @@ function makeAdopterRepo(parent: string, name: string) {
   writeLedgerTask(repo, 'TASK-ADOPT-0002', 'Adopter task two', 'src/two.ts');
   writeEvidence(repo, 'TASK-ADOPT-0001');
   writeEvidence(repo, 'TASK-ADOPT-0002');
+  // 建立 actor 預設 identity，以便 pre-commit hook 的 commit attribution 查詢 gitName/gitEmail
+  writeJson(path.join(repo, '.atm', 'runtime', 'identity', 'default.json'), {
+    schemaId: 'atm.identityDefault.v1',
+    specVersion: '0.1.0',
+    actorId: 'adopter-agent',
+    gitName: 'ATM Test',
+    gitEmail: 'atm-test@example.invalid',
+    updatedAt: new Date().toISOString()
+  });
   return repo;
 }
 

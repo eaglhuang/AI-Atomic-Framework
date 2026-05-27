@@ -3,32 +3,51 @@
   "evidence": [
     {
       "evidenceKind": "validation",
-      "evidenceType": "commit",
-      "summary": "Git HEAD is covered by ATM git-head backfill evidence.",
+      "summary": "Git commit tree is covered by ATM Integration Hook Contract v1.",
       "artifactPaths": [],
-      "createdAt": "2026-05-27T14:43:47.008Z",
-      "producedBy": "Augment",
-      "evidenceFreshness": "fresh",
-      "commandRuns": [],
-      "details": {
-        "actorId": "Augment",
-        "kind": "commit",
-        "freshness": "fresh",
-        "git": {
-          "commitSha": "ff885a3b64cca7f00ffe00e26756337e608716d6",
-          "treeSha": "40840186d5435912c724acd96bee4fd2db21acbe",
-          "parentCommitShas": [
-            "ff885a3b64cca7f00ffe00e26756337e608716d6"
-          ],
-          "stagedPathCount": 1,
-          "evidencePath": ".atm/history/evidence/git-head.json",
-          "generatedAt": "2026-05-27T14:43:47.008Z"
+      "createdAt": "2026-05-27T15:05:13.247Z",
+      "producedBy": "atm-framework-development-hooks/v1",
+      "commandRuns": [
+        {
+          "command": "npm run typecheck",
+          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+          "stderrPreview": ""
         },
-        "backfill": {
-          "mode": "head-commit-evidence",
-          "coveredCommitSha": "ff885a3b64cca7f00ffe00e26756337e608716d6",
-          "reason": "Backfill git-head evidence for an existing HEAD commit."
+        {
+          "command": "npm run validate:cli",
+          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:cli\n> node --strip-types scripts/validate-cli.ts --mode validate\n\n[cli:validate] ok (38 commands, standalone fixture verified)\n",
+          "stderrPreview": ""
+        },
+        {
+          "command": "npm run validate:git-head-evidence",
+          "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+          "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:git-head-evidence\n> node --strip-types scripts/validate-git-head-evidence.ts --mode validate\n\n[git-head-evidence:validate] ok (doctor git evidence states verified)\n",
+          "stderrPreview": ""
         }
+      ],
+      "details": {
+        "git": {
+          "treeSha": "d17f85502fa2a734d5b86fadcc785ab748734cff",
+          "parentCommitShas": [
+            "32ca251dda2cc71988c9c14fe913c9980ea46241"
+          ],
+          "stagedPathCount": 8,
+          "evidencePath": ".atm/history/evidence/git-head.json",
+          "generatedAt": "2026-05-27T15:05:13.247Z"
+        },
+        "hookContractVersion": "atm.integration-hooks/v1",
+        "runnerVersion": "0.1.0"
       }
     }
   ]

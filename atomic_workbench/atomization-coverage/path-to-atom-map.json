@@ -511,7 +511,7 @@
     {
       "path_pattern": "packages/cli/src/commands/task-direction.ts",
       "atom_id": "atm.task-direction-map",
-      "capability": "task direction lock SSOT: writeTaskDirectionLock syncs governance lock top-level files with taskDirectionLock.allowedFiles; getCanonicalAllowedFilesForTask and diagnoseTaskDirectionLockAllowedFiles expose the canonical allowed-files set and report drift across governance lock files, embedded allowedFiles, and claim.files (TASK-AAO-0012).",
+      "capability": "task direction lock SSOT: writeTaskDirectionLock syncs governance lock top-level files with taskDirectionLock.allowedFiles; getCanonicalAllowedFilesForTask and diagnoseTaskDirectionLockAllowedFiles expose the canonical allowed-files set and report drift across governance lock files, embedded allowedFiles, and claim.files (TASK-AAO-0012). buildTaskSelfAllowPaths automatically merges the task's four canonical governance paths (.atm/history/tasks/<id>.json, .atm/history/evidence/<id>.json, .atm/history/evidence/<id>.closure-packet.json, .atm/history/task-events/<id>/**) into allowedFiles during claim without broadening to .atm/history/** (TASK-AAO-0058).",
       "coverage_status": "active"
     },
     {
