@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T09-34-52-802Z-close-82d8d08b4740",
+  "taskId": "TASK-AAO-0054",
+  "action": "close",
+  "actorId": "Codex",
+  "sessionId": "session-20260527093359-Codex-TASK-AAO-0054-c3856593d2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0054.json",
+  "taskSha256": "sha256:d61d415558859d9109dd3ceefadda050e2a5edbe6cb14515357ca090400ef94d",
+  "createdAt": "2026-05-27T09:34:52.802Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0054 --actor Codex --status done --historical-delivery a343188a033b12dcf474bf7f5254ae69798029e4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527093359-Codex-TASK-AAO-0054-c3856593d2",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0054.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "diff-check",
+      "typecheck",
+      "validate-git-hooks-enforcement",
+      "validate-prompt-scoped-next",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T09:34:52.799Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0054-git-hook-pre-push-refs-isolation.task.md",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

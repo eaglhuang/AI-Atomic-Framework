@@ -1,0 +1,93 @@
+{
+  "taskId": "TASK-AAO-0054",
+  "updatedAt": "2026-05-27T09:34:50.502Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "TASK-AAO-0054 historical delivery a343188 validators passed; pre-push remote refs isolation and prompt scope false-positive regression remain covered.",
+      "artifactPaths": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex",
+      "sessionId": null,
+      "createdAt": "2026-05-27T09:31:06.515Z",
+      "details": {
+        "actorId": "Codex",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "diff-check",
+          "typecheck",
+          "validate-git-hooks-enforcement",
+          "validate-prompt-scoped-next",
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck; npm run validate:cli; node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate; node --strip-types scripts/validate-prompt-scoped-next.ts; git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b9f064ca01b8485155064089aa8a687f7137a2f41a7b51d3823910413d1c5d3b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:210f9c912a5ab1bb3e4e38a11789ed0b186052fd9c2d7a636cc8c290e8fa4104",
+            "cached": false,
+            "generatedAt": "2026-05-27T09:31:06.552Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c2e17d2d54d87631f1374727bb5ade4aa2ec201b9e51f72231bc7eff8e459d88",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:git-head-evidence passed for TASK-AAO-0054 historical closure packet.",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex",
+      "sessionId": "session-20260527093359-Codex-TASK-AAO-0054-c3856593d2",
+      "createdAt": "2026-05-27T09:34:50.502Z",
+      "details": {
+        "actorId": "Codex",
+        "sessionId": "session-20260527093359-Codex-TASK-AAO-0054-c3856593d2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2f18511c7230782c58061698b7e2bcea896a98a822a695b2621aa9304f922d77",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:57edbc16c0246fd2a2f532252ca97917dbd25d92b5079293ed9df2d7db3633ef",
+            "cached": false,
+            "generatedAt": "2026-05-27T09:34:50.538Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5c1125f6a26980e4ec226593ba2c5d9e9c719fb48108c607f8b3307a42c11729",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
