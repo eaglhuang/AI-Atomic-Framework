@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T00-55-54-173Z-close-d6e20abad841",
+  "taskId": "TASK-AAO-0011",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260527005332-codex-main-TASK-AAO-0011-f0fc6d711e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0011.json",
+  "taskSha256": "sha256:19cd5bb82c598f40aa5127b55a2cc267b60bf9c0b4286c728521360386804b7a",
+  "createdAt": "2026-05-27T00:55:54.173Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0011 --actor codex-main --status done --historical-delivery 247df234e3ff26fc83efa8104fe71d5ecc2f6eec",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527005332-codex-main-TASK-AAO-0011-f0fc6d711e",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0011.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T00:55:54.170Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0011-untracked-file-scope-warnings.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/next.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0028",
-  "updatedAt": "2026-05-26T13:00:29.644Z",
+  "updatedAt": "2026-05-27T01:00:11.945Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -110,6 +110,123 @@
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:git-head-evidence passed for historical closure sync",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260527005809-codex-main-TASK-AAO-0028-bd8453fb2f",
+      "createdAt": "2026-05-27T00:58:17.383Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260527005809-codex-main-TASK-AAO-0028-bd8453fb2f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:087032bce6ba429501071fff543c7480a3209428b2cd79ff77d49db9c6bd300e",
+            "stderrSha256": "sha256:d3297819a4fffe5ba83783f48e8ba58378e61c539fb2f0e81069af4afe593f67",
+            "cached": false,
+            "cacheKey": "sha256:29422ea4231b56c4b8a5413ed1c3780fe7ede2371bba6faace618b6629c6e316",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-27T00:55:24.7194455Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a21a26859964e4f281db9bfcec6b9d5ac2341b316ed8253f749d7dbe53cb5a70",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": ".atm-temp/command-runs/validate-git-head-evidence.json"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:integration-adapter passed for TASK-AAO-0028 closure sync",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260527005809-codex-main-TASK-AAO-0028-bd8453fb2f",
+      "createdAt": "2026-05-27T01:00:04.752Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260527005809-codex-main-TASK-AAO-0028-bd8453fb2f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:integration-adapter"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-integration-adapter.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f216a1eb21cc08274c81820cd9eceba37ea439a1af2ce1b0d89a72c7caa0d250",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:5c83bda78c3b35578f1e3304a82ccc76d9c72bd5ac41e52e9fac9e5ae29c8e71",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-27T00:59:49.8458838Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f4b1047559e1da0c9589ad1970191458757c5ae0701d1e6cd9507e7ff407510e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": ".atm-temp/command-runs/validate-integration-adapter.json"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:skill-templates passed for TASK-AAO-0028 closure sync",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": "session-20260527005809-codex-main-TASK-AAO-0028-bd8453fb2f",
+      "createdAt": "2026-05-27T01:00:11.945Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": "session-20260527005809-codex-main-TASK-AAO-0028-bd8453fb2f",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:skill-templates"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-skill-templates.ts --mode validate",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2598e8036d1aafb1dc91317bcf8b1175a26fad7a7fe941baece33c7d51e7f7ef",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:440b56af3482cf855a0d1ac6ac5b7a4866102482f97b5e334c2a4684044a36ac",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-27T00:59:50.1065050Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:53ee704f82fc6fbb39099279a2d880ef26bab3e6f707ff15f7b48cedb4ba42f2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": ".atm-temp/command-runs/validate-skill-templates.json"
         }
       }
     }

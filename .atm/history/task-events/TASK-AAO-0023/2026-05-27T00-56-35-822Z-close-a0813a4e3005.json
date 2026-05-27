@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-27T00-56-35-822Z-close-a0813a4e3005",
+  "taskId": "TASK-AAO-0023",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260527005621-codex-main-TASK-AAO-0023-9636dc3795",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0023.json",
+  "taskSha256": "sha256:cfb599ca60df3d952fb16880690fe5278fa7604a9b77002f030c08a0bfe82603",
+  "createdAt": "2026-05-27T00:56:35.822Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0023 --actor codex-main --status done --historical-delivery f3572d7fe74a566d6f1adaadecfe99e03f64a8ee",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260527005621-codex-main-TASK-AAO-0023-9636dc3795",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0023.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:map-spec-schema"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-27T00:56:35.819Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0023-map-spec-schema-validator.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "package.json",
+        "schemas/atom-map.schema.json",
+        "scripts/validate-map-spec-schema.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "schemas/atom-map.schema.json",
+        "scripts/validate-map-spec-schema.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
