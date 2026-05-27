@@ -1,0 +1,342 @@
+{
+  "taskId": "TASK-AAO-0006",
+  "updatedAt": "2026-05-27T10:59:31.102Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed for TASK-AAO-0006 non-map docs command drift deliverables",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:58:55.069Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2987b7df4ad725288009044ebe541350237ad1eaf3fae70c05d4c7ccac1d8b0d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4370e0039298bbeca14629453a75cfedd2f1899daa8b4d3733f48d8adae898d7",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:58:55.108Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4d5507fc28252a00de8890e36c5b090bb45199987cc3bd6b49e7f6fa01f51bf1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli passed for TASK-AAO-0006 non-map docs command drift deliverables",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:59:07.822Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:4125be1928eede5ca03f87d44fffe7424e8b4f7e528412b1432848760a07aca5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ac4718e29e1190fd598c9660d002fe93682e6f13312aee2d65a0c5ce74b56aea",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:59:07.867Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7fe8a53bc12e3d883b1db4c7090f0549c2420a0603987687eb15638365d2668b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "docs command drift guard passed for TASK-AAO-0006 seed",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:59:08.560Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-docs-command-drift"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-docs-command-drift.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:36113cd6eaf9600831c73b2ccf4f433edb9a6f99bb8142cdbb2c08b4902a9f13",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:27f2c6cf1c251772031bd466719289553eacf3779126ed32cedeb35678030e33",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:59:08.600Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0c7fa446466b7edd7e0d9d94e0379ed127b7565c89736271b63f74d9f7bab105",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git diff --check passed for TASK-AAO-0006 non-map deliverables",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:59:09.075Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:59:09.112Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5e52aa663c010422001d1e29ef7cfcc4001d82b1a863fe85b55a596e4a654d9d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed for TASK-AAO-0006 non-map docs command drift deliverables",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:59:17.794Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2987b7df4ad725288009044ebe541350237ad1eaf3fae70c05d4c7ccac1d8b0d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4370e0039298bbeca14629453a75cfedd2f1899daa8b4d3733f48d8adae898d7",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:59:17.831Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4d5507fc28252a00de8890e36c5b090bb45199987cc3bd6b49e7f6fa01f51bf1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli passed for TASK-AAO-0006 non-map docs command drift deliverables",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:59:29.872Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:4125be1928eede5ca03f87d44fffe7424e8b4f7e528412b1432848760a07aca5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ac4718e29e1190fd598c9660d002fe93682e6f13312aee2d65a0c5ce74b56aea",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:59:29.910Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7fe8a53bc12e3d883b1db4c7090f0549c2420a0603987687eb15638365d2668b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "docs command drift guard passed for TASK-AAO-0006 seed",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:59:30.574Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-docs-command-drift"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-docs-command-drift.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:36113cd6eaf9600831c73b2ccf4f433edb9a6f99bb8142cdbb2c08b4902a9f13",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:27f2c6cf1c251772031bd466719289553eacf3779126ed32cedeb35678030e33",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:59:30.622Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0c7fa446466b7edd7e0d9d94e0379ed127b7565c89736271b63f74d9f7bab105",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git diff --check passed for TASK-AAO-0006 non-map deliverables",
+      "artifactPaths": [
+        "scripts/validate-docs-command-drift.ts",
+        "docs/governance/command-surface.md"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+      "createdAt": "2026-05-27T10:59:31.102Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260527105159-copilot-TASK-AAO-0006-5a34c832db",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-05-27T10:59:31.142Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5e52aa663c010422001d1e29ef7cfcc4001d82b1a863fe85b55a596e4a654d9d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
