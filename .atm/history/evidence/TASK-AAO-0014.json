@@ -1,0 +1,170 @@
+{
+  "taskId": "TASK-AAO-0014",
+  "updatedAt": "2026-05-27T12:20:52.745Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed: tsc --noEmit returned exit 0 after BatchPlaybookState and state-aware buildChannelPlaybook changes",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Augment",
+      "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+      "createdAt": "2026-05-27T12:19:14.323Z",
+      "details": {
+        "actorId": "Augment",
+        "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:e8dddbd032cdd5ef8a2ce4a7cda82376c5150617c26efbbc23cd03ede2a4a580",
+            "cached": false,
+            "generatedAt": "2026-05-27T12:19:14.366Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:9da06c896a30f170301042ba8a6fdc0544b75c4e54ec0e9f7a99cba2e16283d2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli passed: 38 commands validated after state-aware batch playbook changes",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Augment",
+      "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+      "createdAt": "2026-05-27T12:19:20.717Z",
+      "details": {
+        "actorId": "Augment",
+        "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:a106c269c29eec018478384d0ae8cc6240b99faf77e6c6df6c509745eec2cddc",
+            "cached": false,
+            "generatedAt": "2026-05-27T12:19:20.752Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:822265286afdf8eec5815b5343973f88b982dff8a7d4b98c70e41ae8086f838c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate-prompt-scoped-next passed: new assertions for playbook.state queue-preview / queue-head-active / repair-required all passed",
+      "artifactPaths": [
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Augment",
+      "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+      "createdAt": "2026-05-27T12:19:28.269Z",
+      "details": {
+        "actorId": "Augment",
+        "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-prompt-scoped-next"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-prompt-scoped-next.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:620626bc4f1993f351717ced87f023f7b838bcd73232b35ea8ca457e3d3793f8",
+            "cached": false,
+            "generatedAt": "2026-05-27T12:19:28.305Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f5c17d780e0372ebc0d7c57861b5a99927fea96c9ac74f6774c9d89d56f9162a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git-head evidence backfilled at commit 98f150e",
+      "artifactPaths": [
+        ".atm/history/evidence/git-head.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Augment",
+      "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+      "createdAt": "2026-05-27T12:20:52.745Z",
+      "details": {
+        "actorId": "Augment",
+        "sessionId": "session-20260527121017-Augment-TASK-AAO-0014-b85021e907",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs evidence git-head-backfill --actor Augment --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:8d0953c97c25f43204cbef68d92375bdebe0b7ddb368d4d20279667df6723234",
+            "cached": false,
+            "generatedAt": "2026-05-27T12:20:52.786Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:63154ca11df254824f8baf8d900d9963c4be24ae1548dd9efddaa7e999211481",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
