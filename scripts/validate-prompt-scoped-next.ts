@@ -79,6 +79,12 @@ async function main() {
     const exactTrail = assertDecisionTrail(exact.evidence.nextAction as any, 'task-route-ready');
     assert(exactTrail.some((entry) => entry.check === 'task-selection' && entry.result === 'pass'), 'exact task route decisionTrail must record task selection');
 
+    const explicitTask = await runNext(['--cwd', tempRoot, '--task', 'TASK-ALPHA-0001']);
+    assert(explicitTask.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'next --task must route to one task');
+    assert((explicitTask.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'next --task selected wrong task');
+    assert((explicitTask.evidence.nextAction as any).recommendedChannel === 'normal', 'next --task must recommend normal channel');
+    assert(String((explicitTask.evidence.nextAction as any).requiredCommand).includes('--task TASK-ALPHA-0001'), 'next --task must keep the claim command on --task');
+
     const genericExact = await runNext(['--cwd', tempRoot, '--prompt', '請處理 SANGUO-BOOTSTRAP-0001']);
     assert(genericExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'generic governed task id prompt must route to one task');
     assert((genericExact.evidence.nextAction as any).selectedTask.workItemId === 'SANGUO-BOOTSTRAP-0001', 'generic governed task id prompt selected wrong task');

@@ -85,6 +85,23 @@ When you enter an ATM repository for user-requested work:
 4. Edit only within the allowed scope returned by ATM.
 5. Run the smallest relevant validators and preserve the resulting evidence.
 
+For an explicit task card, keep the normal lifecycle order simple and fixed:
+
+```text
+claim -> implement -> validators -> evidence add -> tasks close -> commit
+```
+
+Use the exact task selector when the user gives a specific task id:
+
+```bash
+node atm.mjs next --task TASK-ABC-0001 --json
+node atm.mjs next --claim --actor <id> --task TASK-ABC-0001 --json
+```
+
+Use `.atm/runtime/task-intent.json` only when a semantic skill or integration
+needs to resolve fuzzy task, plan, or batch scope. Do not overwrite the shared
+runtime intent file for a single exact task id.
+
 Important details for this framework repository:
 
 - `node atm.mjs` runs the frozen built runner. Use it for normal governance routing and release-like validation.

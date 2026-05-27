@@ -572,7 +572,7 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--task') {
-      if (commandName !== 'init' && commandName !== 'bootstrap') {
+      if (!['init', 'bootstrap', 'next'].includes(commandName)) {
         throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --task`, { exitCode: 2 });
       }
       options.task = requireOptionValue(argv, index, '--task', commandName);

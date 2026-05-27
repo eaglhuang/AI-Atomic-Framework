@@ -45,10 +45,14 @@ export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
   const integrationBootstrap = inspectIntegrationBootstrap(options.cwd);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);
+  const explicitTaskIds = uniqueInOrder([
+    ...(typeof options.task === 'string' && options.task.trim().length > 0 ? [options.task] : []),
+    ...(Array.isArray(options.tasks) ? options.tasks : [])
+  ]);
   const taskIntent = resolveTaskIntent(options.cwd, {
     prompt: options.prompt,
     intentPath: options.intent,
-    explicitTaskIds: Array.isArray(options.tasks) ? options.tasks : []
+    explicitTaskIds
   });
   const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent);
   const scopedTargetRepo = importedTaskQueue.promptScope?.targetRepo ?? null;
@@ -1121,9 +1125,16 @@ function buildPromptScopedNextResult(input: {
       }
     });
   }
+  const explicitTaskSelector = input.taskIntent?.explicitTaskIds.length === 1
+    && findTaskByTaskIdReference([selectedTask], input.taskIntent.explicitTaskIds[0])?.workItemId === selectedTask.workItemId
+    ? input.taskIntent.explicitTaskIds[0]
+    : null;
+  const normalClaimCommand = explicitTaskSelector
+    ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --json`
+    : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`;
   const nextAction = {
     status: 'task-route-ready',
-    command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
+    command: normalClaimCommand,
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
     recommendedChannel: 'normal',
     riskLevel: 'medium',
@@ -1138,7 +1149,7 @@ function buildPromptScopedNextResult(input: {
     }),
     selectedTask,
     targetRepo: selectedTask.targetRepo,
-    requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`,
+    requiredCommand: normalClaimCommand,
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   };
