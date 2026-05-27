@@ -1,6 +1,5 @@
 # ATM Self-Atomization Dogfood Score
 
-- Generated: 2026-05-26T23:06:46.318Z
 - Overall score: **79 / 100** (Grade C)
 - Stage: `dogfood-complete`
 - Trend: stable

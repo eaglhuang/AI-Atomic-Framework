@@ -36,6 +36,7 @@ export default defineCommandSpec({
     { flag: '--to', value: 'id', summary: 'Target actor id for handoff.' },
     { flag: '--status', value: 'state', summary: 'Target status for tasks close: done|review|blocked|abandoned. done requires real non-.atm deliverables plus evidence.' },
     { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, takeover, or close.' },
+    { flag: '--historical-delivery', value: 'commit', summary: 'Allow tasks close done to verify an earlier delivery commit instead of requiring a current working-tree deliverable diff.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -61,6 +62,7 @@ export default defineCommandSpec({
     'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reason "handoff complete" --json',
     'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reserved-ok --reason "rollback cleanup" --json',
     'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --json',
+    'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --historical-delivery abc123 --json',
     'node atm.mjs tasks block --task ATM-GOV-0104 --actor codex-main --reason "waiting on target evidence" --json'
   ]
 });

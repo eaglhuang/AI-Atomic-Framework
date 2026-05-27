@@ -143,6 +143,8 @@ try {
   assert(taskAfterClaim.status === 'running', 'tasks claim must update task status to running');
   const claimLeaseId = String(nextClaim.parsed.evidence.claimResult?.claim?.leaseId ?? '');
   assert(claimLeaseId.length > 0, 'next --claim must produce a lease id');
+  const claimSessionId = String(nextClaim.parsed.evidence.claimResult?.sessionId ?? nextClaim.parsed.evidence.claimResult?.session?.sessionId ?? '');
+  assert(claimSessionId.length > 0, 'next --claim must produce a session id');
 
   const renewTask = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--title', 'Renew release test', '--json']);
   assert(renewTask.exitCode === 0, 'secondary tasks reserve must exit 0');
@@ -227,6 +229,8 @@ try {
   ]);
   assert(registerActor.exitCode === 0, 'actor register must exit 0');
   assert(registerActor.parsed.ok === true, 'actor register must report ok=true');
+  assert(runGit(repo, ['config', 'user.name', 'fixture-agent']).exitCode === 0, 'fixture git user.name must match the registered actor before governed commits');
+  assert(runGit(repo, ['config', 'user.email', 'fixture-agent@example.com']).exitCode === 0, 'fixture git user.email must match the registered actor before governed commits');
 
   const mutationGuard = runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(mutationGuard.exitCode === 0, 'guard mutation must pass for in-scope claimed file');
@@ -256,6 +260,7 @@ try {
     'ATM-Actor: fixture-agent',
     'ATM-Task: ATM-GOV-0103',
     `ATM-Claim: ${claimLeaseId}`,
+    `ATM-Session: ${claimSessionId}`,
     'ATM-Evidence: .atm/history/evidence/ATM-GOV-0103.json'
   ].join('\n');
   assert(runGit(repo, ['commit', '-m', commitMessage]).exitCode === 0, 'governance fixture commit must succeed');
@@ -353,6 +358,65 @@ try {
   assert(verifyEvidence.exitCode === 0, 'evidence verify close gate must exit 0');
   assert(verifyEvidence.parsed.ok === true, 'evidence verify close gate must report ok=true');
 
+  const historicalDeliveryPath = path.join(repo, 'src', 'historical-delivery.ts');
+  mkdirSync(path.dirname(historicalDeliveryPath), { recursive: true });
+  writeFileSync(historicalDeliveryPath, 'export const historicalDeliveryFixture = true;\n', 'utf8');
+  assert(runGit(repo, ['add', 'src/historical-delivery.ts']).exitCode === 0, 'historical delivery fixture must be stageable');
+  assert(runGit(repo, ['commit', '-m', 'feat: historical delivery fixture']).exitCode === 0, 'historical delivery fixture commit must succeed');
+  const historicalDeliveryCommit = runGit(repo, ['rev-parse', 'HEAD']).stdout;
+  assert(historicalDeliveryCommit.length > 0, 'historical delivery fixture commit sha must be available');
+
+  const historicalReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--title', 'Historical delivery code close test', '--json']);
+  assert(historicalReserve.exitCode === 0, 'historical delivery tasks reserve must exit 0');
+  const historicalPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--json']);
+  assert(historicalPromote.exitCode === 0, 'historical delivery tasks promote must exit 0');
+  const historicalTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0111.json');
+  const historicalTaskDocument = JSON.parse(readFileSync(historicalTaskPath, 'utf8'));
+  historicalTaskDocument.scopePaths = ['src/historical-delivery.ts'];
+  historicalTaskDocument.deliverables = ['src/historical-delivery.ts'];
+  writeFileSync(historicalTaskPath, `${JSON.stringify(historicalTaskDocument, null, 2)}\n`, 'utf8');
+  const historicalClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0111', '--json']);
+  assert(historicalClaim.exitCode === 0, 'historical delivery next --claim must exit 0');
+  const historicalEvidence = runAtm([
+    'evidence',
+    'add',
+    '--cwd',
+    repo,
+    '--task',
+    'ATM-GOV-0111',
+    '--actor',
+    'fixture-agent',
+    '--kind',
+    'test',
+    '--summary',
+    'historical delivery commit verified',
+    '--artifacts',
+    'src/historical-delivery.ts',
+    '--freshness',
+    'fresh',
+    '--command',
+    'npm run typecheck',
+    '--exit-code',
+    '0',
+    '--stdout-sha256',
+    'sha256:2222222222222222222222222222222222222222222222222222222222222222',
+    '--stderr-sha256',
+    'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+    '--validators',
+    'typecheck',
+    '--json'
+  ]);
+  assert(historicalEvidence.exitCode === 0, 'historical delivery evidence add must exit 0');
+  const historicalCloseWithoutCommit = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--json']);
+  assert(historicalCloseWithoutCommit.exitCode === 1, 'historical delivery close without a delivery commit must fail when there is no current deliverable diff');
+  assert(historicalCloseWithoutCommit.parsed.messages?.[0]?.code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', 'historical delivery close without commit must report deliverable diff requirement');
+  const historicalClose = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--historical-delivery', historicalDeliveryCommit, '--json']);
+  assert(historicalClose.exitCode === 0, 'historical delivery close with a scoped delivery commit must exit 0');
+  assert(historicalClose.parsed.ok === true, 'historical delivery close with a scoped delivery commit must report ok=true');
+  const historicalCloseGate = historicalClose.parsed.evidence?.deliverableGate ?? {};
+  assert(historicalCloseGate.reason === 'historical-delivery-diff-present', 'historical delivery close must report historical-delivery-diff-present');
+  assert((historicalCloseGate.deliverableFiles ?? []).includes('src/historical-delivery.ts'), 'historical delivery close must include scoped historical deliverable file');
+
   const artifactOnlyReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--title', 'Artifact-only closure guard', '--json']);
   assert(artifactOnlyReserve.exitCode === 0, 'artifact-only tasks reserve must exit 0');
   const artifactOnlyPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--json']);
@@ -409,7 +473,11 @@ try {
   const closeTransitionPath = path.join(repo, '.atm', 'history', 'task-events', 'ATM-GOV-0103', `${closeTransitionId}.json`);
   assert(existsSync(closeTransitionPath), 'tasks close done must write a closure transition event');
   const closeTransition = JSON.parse(readFileSync(closeTransitionPath, 'utf8'));
-  assert(closeTransition.closure === undefined, 'host-repo closure transition should not fabricate framework closure metadata');
+  if (closeTransition.closure) {
+    assert(closeTransition.closure.closurePacketPath === null, 'host-repo closure transition must not fabricate a framework closure packet');
+    assert((closeTransition.closure.requiredGates ?? []).length === 0, 'host-repo closure transition must not fabricate framework required gates');
+    assert((closeTransition.closure.validationPasses ?? []).length === 0, 'host-repo closure transition must not fabricate framework validation passes');
+  }
 
   const handoff = runAtm(['handoff', 'summarize', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--json']);
   assert(handoff.exitCode === 0, 'handoff summarize must exit 0');

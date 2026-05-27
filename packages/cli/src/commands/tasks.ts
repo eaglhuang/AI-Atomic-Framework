@@ -108,9 +108,19 @@ export interface TaskDeliverableGateReport {
   readonly changedFiles: readonly string[];
   readonly deliverableFiles: readonly string[];
   readonly declaredFiles: readonly string[];
+  readonly historicalDeliveries: readonly TaskHistoricalDeliveryReport[];
   readonly notAllowedAsCompletion: readonly string[];
   readonly remediation: string;
   readonly requiredCommand: string | null;
+}
+
+export interface TaskHistoricalDeliveryReport {
+  readonly requestedRef: string;
+  readonly commitSha: string | null;
+  readonly ok: boolean;
+  readonly reason: string;
+  readonly changedFiles: readonly string[];
+  readonly deliverableFiles: readonly string[];
 }
 
 export interface TaskImportDiagnostic {
@@ -963,7 +973,8 @@ async function runTasksClose(argv: string[]) {
       taskId: options.taskId,
       taskDocument,
       taskDeclaredFiles,
-      claim: parseClaimRecord(taskDocument.claim)
+      claim: parseClaimRecord(taskDocument.claim),
+      historicalDeliveryRefs: options.historicalDeliveryRefs
     })
     : null;
   if (deliverableGate && !deliverableGate.ok) {
@@ -1004,7 +1015,7 @@ async function runTasksClose(argv: string[]) {
       sessionId: activeSession?.sessionId ?? null,
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
       requiredGates: frameworkStatus.requiredGates,
-      changedFiles: taskDeclaredFiles,
+      changedFiles: deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
       frameworkStatus
     });
     const validation = validateClosurePacket(packet);
@@ -1059,7 +1070,8 @@ async function runTasksClose(argv: string[]) {
       actorId,
       status: options.status,
       fromBatchCheckpoint: options.fromBatchCheckpoint,
-      batchId: owningBatch?.batchId ?? options.batchId
+      batchId: owningBatch?.batchId ?? options.batchId,
+      historicalDeliveryRefs: options.historicalDeliveryRefs
     })
   });
   if (activeSession?.sessionId) {
@@ -2000,7 +2012,8 @@ function parseCloseOptions(argv: string[]) {
     status: 'done' as 'done' | 'review' | 'blocked' | 'abandoned',
     reason: null as string | null,
     fromBatchCheckpoint: false,
-    batchId: null as string | null
+    batchId: null as string | null,
+    historicalDeliveryRefs: [] as string[]
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -2042,6 +2055,11 @@ function parseCloseOptions(argv: string[]) {
       index += 1;
       continue;
     }
+    if (arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit') {
+      options.historicalDeliveryRefs.push(...parseHistoricalDeliveryRefs(requireValue(argv, index, arg)));
+      index += 1;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty') {
       continue;
     }
@@ -2053,8 +2071,16 @@ function parseCloseOptions(argv: string[]) {
   return {
     ...options,
     cwd: path.resolve(options.cwd),
-    taskId: options.taskId.trim()
+    taskId: options.taskId.trim(),
+    historicalDeliveryRefs: uniqueStrings(options.historicalDeliveryRefs)
   };
+}
+
+function parseHistoricalDeliveryRefs(value: string): string[] {
+  return value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 }
 
 function parseResetOptions(argv: string[]) {
@@ -2361,6 +2387,7 @@ function evaluateTaskDeliverableGate(input: {
   readonly taskDocument: Record<string, unknown>;
   readonly taskDeclaredFiles: readonly string[];
   readonly claim: TaskClaimRecord | null;
+  readonly historicalDeliveryRefs?: readonly string[];
 }): TaskDeliverableGateReport {
   const required = isDeliverableDiffRequired(input.taskDocument);
   const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
@@ -2379,7 +2406,25 @@ function evaluateTaskDeliverableGate(input: {
   const scopedDeliverables = enforceDeclaredScope
     ? deliverableFiles.filter((filePath) => declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
     : deliverableFiles;
-  const ok = !required || scopedDeliverables.length > 0;
+  const historicalDeliveries = (input.historicalDeliveryRefs ?? []).map((ref) => inspectHistoricalDelivery({
+    cwd: input.cwd,
+    requestedRef: ref,
+    declaredFiles,
+    enforceDeclaredScope
+  }));
+  const historicalDeliveryErrors = historicalDeliveries.filter((entry) => !entry.ok);
+  const historicalDeliverableFiles = uniqueStrings(historicalDeliveries.flatMap((entry) => entry.deliverableFiles));
+  const allDeliverableFiles = uniqueStrings([...scopedDeliverables, ...historicalDeliverableFiles]);
+  const ok = !required || (allDeliverableFiles.length > 0 && historicalDeliveryErrors.length === 0);
+  const reason = required
+    ? ok
+      ? scopedDeliverables.length > 0
+        ? 'real-deliverable-diff-present'
+        : 'historical-delivery-diff-present'
+      : historicalDeliveryErrors.length > 0
+        ? 'historical-delivery-invalid'
+        : 'missing-real-deliverable-diff'
+    : 'task-does-not-require-real-deliverable-diff';
   return {
     schemaId: 'atm.taskDeliverableGate.v1',
     generatedAt: new Date().toISOString(),
@@ -2387,29 +2432,69 @@ function evaluateTaskDeliverableGate(input: {
     deliveryPrinciple: taskDeliveryPrincipleText(),
     required,
     ok,
-    reason: required
-      ? ok
-        ? 'real-deliverable-diff-present'
-        : 'missing-real-deliverable-diff'
-      : 'task-does-not-require-real-deliverable-diff',
+    reason,
     changedFiles,
-    deliverableFiles: scopedDeliverables,
+    deliverableFiles: allDeliverableFiles,
     declaredFiles,
+    historicalDeliveries,
     notAllowedAsCompletion: [
       'only changing .atm/history task JSON, evidence JSON, task-events, runtime locks, or queue state',
       'text-only evidence without a real deliverable file diff',
-      'replaying old close commits or cherry-picking prior ledger-only closure',
+      'replaying old close commits or cherry-picking prior ledger-only closure without a scoped delivery commit',
       'closing a batch queue item before implementing the current task deliverables'
     ],
     remediation: ok
       ? 'Deliverable diff found; continue with validators and closure evidence.'
-      : 'Implement the deliverables described by the task, stage or leave the real file changes visible, then rerun tasks close --status done. If the task is not delivered yet, close review instead of done.',
+      : 'Implement the deliverables described by the task, stage or leave the real file changes visible, then rerun tasks close --status done. If the deliverable already landed in an earlier commit, pass --historical-delivery <commit> so ATM can verify the scoped non-.atm files. If the task is not delivered yet, close review instead of done.',
     requiredCommand: ok ? null : `node atm.mjs tasks close --task ${input.taskId} --actor <actor> --status review --reason "awaiting real deliverable diff" --json`
   };
 }
 
 function taskDeliveryPrincipleText() {
   return 'The goal is to deliver the requested task content, not to close task cards. done is only the record after real deliverables and validators exist.';
+}
+
+function inspectHistoricalDelivery(input: {
+  readonly cwd: string;
+  readonly requestedRef: string;
+  readonly declaredFiles: readonly string[];
+  readonly enforceDeclaredScope: boolean;
+}): TaskHistoricalDeliveryReport {
+  const requestedRef = input.requestedRef.trim();
+  if (!requestedRef) {
+    return {
+      requestedRef,
+      commitSha: null,
+      ok: false,
+      reason: 'empty-ref',
+      changedFiles: [],
+      deliverableFiles: []
+    };
+  }
+  const commitSha = readGitScalar(input.cwd, ['rev-parse', '--verify', `${requestedRef}^{commit}`]);
+  if (!commitSha) {
+    return {
+      requestedRef,
+      commitSha: null,
+      ok: false,
+      reason: 'commit-not-found',
+      changedFiles: [],
+      deliverableFiles: []
+    };
+  }
+  const changedFiles = readGitNameOnly(input.cwd, ['show', '--pretty=format:', '--name-only', commitSha, '--']);
+  const deliverableCandidates = changedFiles.filter((filePath) => isRealDeliverablePath(filePath));
+  const deliverableFiles = input.enforceDeclaredScope
+    ? deliverableCandidates.filter((filePath) => input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
+    : deliverableCandidates;
+  return {
+    requestedRef,
+    commitSha,
+    ok: deliverableFiles.length > 0,
+    reason: deliverableFiles.length > 0 ? 'scoped-deliverable-files-present' : 'no-scoped-deliverable-files',
+    changedFiles,
+    deliverableFiles
+  };
 }
 
 function isDeliverableDiffRequired(taskDocument: Record<string, unknown>): boolean {
@@ -2892,6 +2977,7 @@ function buildTaskTransitionCommand(input: {
   readonly status?: string | null;
   readonly fromBatchCheckpoint?: boolean;
   readonly batchId?: string | null;
+  readonly historicalDeliveryRefs?: readonly string[];
 }): string {
   const parts = ['node', 'atm.mjs', 'tasks', input.action];
   if (input.taskId) {
@@ -2908,6 +2994,9 @@ function buildTaskTransitionCommand(input: {
   }
   if (input.batchId) {
     parts.push('--batch', quoteCommandValue(input.batchId));
+  }
+  for (const ref of input.historicalDeliveryRefs ?? []) {
+    parts.push('--historical-delivery', quoteCommandValue(ref));
   }
   return parts.join(' ');
 }

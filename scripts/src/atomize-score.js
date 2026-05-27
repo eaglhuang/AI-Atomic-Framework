@@ -295,11 +295,43 @@ function evaluateExclusionCoverage(exclusions) {
   return Math.round((withReason / exclusions.length) * 100);
 }
 
+function stableInventorySnapshot(inventory) {
+  const categoryBreakdown = inventory?.category_breakdown && typeof inventory.category_breakdown === 'object'
+    ? Object.fromEntries(Object.entries(inventory.category_breakdown).filter(([key]) => key !== 'uncategorized'))
+    : null;
+  const snapshot = {
+    production_source_count: inventory.production_source_count,
+    owned_by_registry: inventory.owned_by_registry,
+    unowned_count: inventory.unowned_count,
+    coverage_percentage: inventory.coverage_percentage
+  };
+  if (categoryBreakdown) {
+    snapshot.category_breakdown = categoryBreakdown;
+  }
+  return snapshot;
+}
+
+function buildRunMetadata(input) {
+  const uncategorizedPathCount = typeof input.inventory?.category_breakdown?.uncategorized === 'number'
+    ? input.inventory.category_breakdown.uncategorized
+    : null;
+  return {
+    schemaId: 'atm.dogfoodScoreRunMetadata.v1',
+    generatedAt: input.generatedAt,
+    repo: input.repo,
+    artifacts: input.artifacts,
+    volatileInputs: {
+      inventoryTimestamp: input.inventoryReport?.timestamp ?? null,
+      uncategorizedPathCount,
+      trackedPathCount: input.inventoryReport?.sourceTotal ?? null
+    }
+  };
+}
+
 function buildMarkdownReport(score, inventory) {
   const lines = [
     `# ATM Self-Atomization Dogfood Score`,
     '',
-    `- Generated: ${score.timestamp}`,
     `- Overall score: **${score.overall_atomization_score} / 100** (Grade ${score.grade})`,
     `- Stage: \`${score.stage}\``,
     `- Trend: ${score.trend}`,
@@ -388,8 +420,10 @@ export async function atomizeScore(options) {
     production_source_count: 0,
     owned_by_registry: 0,
     unowned_count: 0,
-    coverage_percentage: 0
+    coverage_percentage: 0,
+    category_breakdown: {}
   };
+  const scoreInventory = stableInventorySnapshot(inv);
 
   const evidenceEval = evaluateRegistryEvidence(registry);
   const commandEval = evaluateCommandCoverage(fullPath);
@@ -453,10 +487,10 @@ export async function atomizeScore(options) {
     ? 'maintain-quality'
     : priorityGaps.sort((a, b) => Number.parseInt(a.current, 10) - Number.parseInt(b.current, 10))[0].area;
 
+  const generatedAt = new Date().toISOString();
   const report = {
-    timestamp: new Date().toISOString(),
     schemaId: 'atm.dogfoodScore.v1',
-    version: '1.1',
+    version: '1.2',
     overall_atomization_score: overall,
     grade,
     stage,
@@ -467,7 +501,7 @@ export async function atomizeScore(options) {
     next_target: Math.min(100, overall + 10),
     next_high_roi_area: nextHighRoi,
     priority_gaps: priorityGaps,
-    inventory: inv,
+    inventory: scoreInventory,
     detail: {
       evidence: evidenceEval,
       command: commandEval,
@@ -485,14 +519,31 @@ export async function atomizeScore(options) {
   // Persist reports
   const scoreJsonPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.json');
   const scoreMdPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'dogfood-score.md');
+  const runMetadataPath = resolve(fullPath, '.atm-temp', 'atomization-coverage', 'dogfood-score.run-metadata.json');
+  const artifacts = {
+    json: 'atomic_workbench/atomization-coverage/dogfood-score.json',
+    markdown: 'atomic_workbench/atomization-coverage/dogfood-score.md',
+    runMetadata: '.atm-temp/atomization-coverage/dogfood-score.run-metadata.json'
+  };
+  const runMetadata = buildRunMetadata({
+    generatedAt,
+    repo: fullPath,
+    inventory: inv,
+    inventoryReport,
+    artifacts
+  });
   mkdirSync(dirname(scoreJsonPath), { recursive: true });
+  mkdirSync(dirname(runMetadataPath), { recursive: true });
   writeFileSync(scoreJsonPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
-  writeFileSync(scoreMdPath, buildMarkdownReport(report, inv), 'utf8');
+  writeFileSync(scoreMdPath, buildMarkdownReport(report, scoreInventory), 'utf8');
+  writeFileSync(runMetadataPath, JSON.stringify(runMetadata, null, 2) + '\n', 'utf8');
 
   return {
     status: 'success',
     schemaId: 'atm.dogfoodScore.v1',
-    report
+    report,
+    runMetadata,
+    artifacts
   };
 }
 
