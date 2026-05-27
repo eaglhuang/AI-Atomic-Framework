@@ -1,0 +1,103 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0010",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2e375d61475e6df90651c328c7cf7f72d2750efe",
+  "governedTreeSha": "80ae40c2e49c84031a5f22bf72c319385ca93f33",
+  "targetCommitDelta": {
+    "currentCommitSha": "2e375d61475e6df90651c328c7cf7f72d2750efe",
+    "parentCommitShas": [
+      "2e375d61475e6df90651c328c7cf7f72d2750efe"
+    ],
+    "governedTreeSha": "80ae40c2e49c84031a5f22bf72c319385ca93f33",
+    "changedFiles": [
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/TASK-AAO-0010.json",
+      ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
+      ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck && npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs evidence git-head-backfill --actor Augment --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-27T10:20:34.989Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0010-scope-amendment-cli.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0010.json",
+  "closedAt": "2026-05-27T10:20:34.989Z",
+  "closedByActor": "Augment",
+  "sessionId": "session-20260527100641-Augment-TASK-AAO-0010-371b3feb75"
+}
