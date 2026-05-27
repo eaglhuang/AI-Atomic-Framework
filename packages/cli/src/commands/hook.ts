@@ -6,8 +6,11 @@ import path from 'node:path';
 import {
   auditTasks,
   buildFrameworkTempClaimCommand,
+  buildFrameworkStaleCleanupCommand,
   createFrameworkModeStatus,
   detectFrameworkRepoIdentity,
+  type FrameworkStaleLockInfo,
+  isFrameworkStaleLockReleasable,
   isAdopterInfrastructureSyncCommit,
   isAtmCriticalNonDocSurface,
   requiredValidationPassesForClosure,
@@ -406,8 +409,13 @@ function runPreCommitHook(cwd: string) {
     ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
     : [];
   const failedValidatorRuns = commandRuns.filter((entry) => entry.exitCode !== 0);
+  const staleLocks = frameworkStatus.staleLocks;
+  const releasableStaleLock = staleLocks.find(isFrameworkStaleLockReleasable) ?? null;
+  const baseClaimCommand = buildFrameworkTempClaimCommand(frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit', releasableStaleLock?.actorId ?? null);
   const frameworkClaimCommand = blockingFrameworkIssues.includes('active-framework-claim-required')
-    ? buildFrameworkTempClaimCommand(frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit')
+    ? baseClaimCommand
+    : blockingFrameworkIssues.includes('framework-stale-lock-cleanup-required') && releasableStaleLock
+      ? buildFrameworkStaleCleanupCommand(releasableStaleLock, frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit')
     : null;
   const ok = encodingReport.ok
     && gitIndexDiagnostic.ok
@@ -430,6 +438,7 @@ function runPreCommitHook(cwd: string) {
     gitIndexDiagnostic,
     blockingFrameworkIssues,
     frameworkClaimCommand,
+    staleLocks,
     planningMirrorDriftFiles,
     directionLockDriftFiles,
     quickfixDriftFiles,
@@ -516,6 +525,7 @@ function buildPreCommitBlockingFindings(input: {
   readonly gitIndexDiagnostic: ReturnType<typeof inspectGitIndexAccess>;
   readonly blockingFrameworkIssues: readonly string[];
   readonly frameworkClaimCommand: string | null;
+  readonly staleLocks: readonly FrameworkStaleLockInfo[];
   readonly planningMirrorDriftFiles: readonly string[];
   readonly directionLockDriftFiles: readonly string[];
   readonly quickfixDriftFiles: readonly string[];
@@ -556,6 +566,26 @@ function buildPreCommitBlockingFindings(input: {
       detail: `Framework-development gate blocked this commit: ${blocker}.`,
       requiredCommand: blocker === 'active-framework-claim-required' ? input.frameworkClaimCommand : null,
       classification: 'current-task'
+    });
+  }
+  for (const stale of input.staleLocks) {
+    const requiredCommand = isFrameworkStaleLockReleasable(stale)
+      ? (input.frameworkClaimCommand ?? buildFrameworkStaleCleanupCommand(stale))
+      : stale.requiredCommand;
+    findings.push({
+      code: 'ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED',
+      source: 'framework-development',
+      detail: stale.detail,
+      requiredCommand,
+      classification: stale.kind === 'still-active' ? 'blocking' : 'current-task',
+      data: {
+        kind: stale.kind,
+        lockTaskId: stale.lockTaskId,
+        lockPath: stale.lockPath,
+        linkedTaskId: stale.linkedTaskId,
+        currentTaskId: stale.currentTaskId,
+        actorId: stale.actorId
+      }
     });
   }
   if (input.planningMirrorDriftFiles.length > 0) {

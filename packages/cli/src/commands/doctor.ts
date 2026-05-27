@@ -5,7 +5,7 @@ import { computeSha256ForFile } from '../../../core/src/hash-lock/hash-lock.ts';
 import { checkStartupKnownBadVersion } from '../startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from '../startup-integrity.ts';
 import { createATMVersionSummary } from './atm-chart.ts';
-import { detectFrameworkRepoIdentity } from './framework-development.ts';
+import { detectFrameworkRepoIdentity, detectFrameworkStaleLocks } from './framework-development.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
@@ -202,6 +202,18 @@ export async function runDoctor(argv: any) {
         ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]
         : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
   ];
+  // Report stale framework locks without deleting runtime state automatically.
+  const staleLocks = detectFrameworkStaleLocks(root);
+  for (const stale of staleLocks) {
+    messages.push(message('warning', 'ATM_DOCTOR_FRAMEWORK_STALE_LOCK', `Stale framework-mode lock detected for actor ${stale.actorId}.`, {
+      kind: stale.kind,
+      lockTaskId: stale.lockTaskId,
+      actorId: stale.actorId,
+      lockedAt: stale.lockedAt,
+      linkedTaskId: stale.linkedTaskId,
+      requiredCommand: stale.requiredCommand
+    }));
+  }
   return makeResult({
     ok,
     command: 'doctor',
@@ -229,7 +241,8 @@ export async function runDoctor(argv: any) {
       trustIntegrity: trustMode ? trustIntegrity : undefined,
       knownBadStatus: knownBadMode ? knownBadStatus : undefined,
       doctorPolicy,
-      recommendedAction
+      recommendedAction,
+      ...(staleLocks.length > 0 ? { staleLocks } : {})
     }
   });
 }

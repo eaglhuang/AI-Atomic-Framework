@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { auditTasks, createFrameworkModeStatus } from '../packages/cli/src/commands/framework-development.ts';
+import { auditTasks, classifyFrameworkStaleLock, createFrameworkModeStatus, runFrameworkTempClaim } from '../packages/cli/src/commands/framework-development.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
@@ -365,8 +365,8 @@ try {
   writeFileSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag', 'committed_bootstrap.py'), 'print("committed bootstrap")\n', 'utf8');
   execFileSync('git', ['add', 'pipelines/sanguo-rag/committed_bootstrap.py'], { cwd: deliverableRepo, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'add committed bootstrap deliverable'], { cwd: deliverableRepo, stdio: 'ignore' });
-  const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0002', '--actor', 'validator', '--status', 'done']);
-  assert(committedClose.ok === true, 'deliverable gate must accept files committed after task claim');
+  const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', 'TASK-PIPE-0002', '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
+  assert(committedClose.ok === true, 'deliverable gate must accept a scoped historical delivery commit');
 
   const resetRepo = makeHostRepo(tempRoot, 'reset-release');
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
@@ -501,8 +501,55 @@ try {
   assert(aliasDiagnostics.some((entry: any) => entry?.code === 'ATM_TASK_IMPORT_LEGACY_ALIAS' && entry?.alias === 'blocked_by' && entry?.canonical === 'depends_on'), 'legacy blocked_by must emit ATM_TASK_IMPORT_LEGACY_ALIAS diagnostic');
   assert(legacyAliasTask.legacyImportAliases?.allowed_files, 'legacy alias lineage must be preserved on the import record');
 
+  // TASK-AAO-0050: stale framework lock classification.
+  const staleLockActorId = 'stale-lock-test-actor';
+  const staleLockTaskId = `ATM-FRAMEWORK-TEMP-${staleLockActorId}`;
+  const staleLockPath = path.join(fidelityRepo, '.atm', 'runtime', 'locks', `${staleLockTaskId}.lock.json`);
+  const staleLockLinkedTask = 'TASK-STALE-DEMO-0001';
+  const staleLockCurrentTask = 'TASK-STALE-DEMO-0002';
+  writeJson(path.join(fidelityRepo, '.atm', 'history', 'tasks', `${staleLockLinkedTask}.json`), {
+    schemaId: 'atm.workItem.v0.2',
+    workItemId: staleLockLinkedTask,
+    title: 'Stale lock regression demo task',
+    status: 'done',
+    closedAt: new Date().toISOString()
+  });
+  writeJson(staleLockPath, {
+    schemaId: 'atm.governanceScopeLock',
+    specVersion: '0.1.0',
+    workItemId: staleLockTaskId,
+    lockedBy: staleLockActorId,
+    lockedAt: new Date().toISOString(),
+    actorId: staleLockActorId,
+    leaseId: `lease-stale-test`,
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 86400,
+    files: ['packages/cli/src/commands/framework-development.ts'],
+    linkedTaskId: staleLockLinkedTask
+  });
+  const staleLockInfo = classifyFrameworkStaleLock(fidelityRepo, staleLockActorId, { currentTaskId: staleLockCurrentTask });
+  assert(staleLockInfo, 'classifyFrameworkStaleLock must detect the active stale lock');
+  assert(staleLockInfo!.kind === 'stale-completed', `stale lock kind must be stale-completed, got ${staleLockInfo!.kind}`);
+  assert(staleLockInfo!.linkedTaskId === staleLockLinkedTask, 'stale lock must report linked task id');
+  assert(staleLockInfo!.currentTaskId === staleLockCurrentTask, 'stale lock must report the current task id');
+  assert(staleLockInfo!.lockPath.endsWith(`${staleLockTaskId}.lock.json`), 'stale lock must report the lock path');
+  assert(staleLockInfo!.actorId === staleLockActorId, 'stale lock must report actor id');
+  assert(staleLockInfo!.requiredCommand.includes('framework-mode release'), 'stale lock requiredCommand must include framework-mode release');
+  let staleClaimErrorCode: string | null = null;
+  let staleClaimRequiredCommand = '';
+  try {
+    await runFrameworkTempClaim(fidelityRepo, staleLockActorId, ['packages/cli/src/commands/hook.ts'], 'new task claim');
+    staleClaimErrorCode = null;
+  } catch (error: any) {
+    staleClaimErrorCode = error?.code ?? null;
+    staleClaimRequiredCommand = String(error?.details?.requiredCommand ?? '');
+  }
+  assert(staleClaimErrorCode === 'ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED', `framework-mode claim must throw ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED for stale lock, got ${staleClaimErrorCode}`);
+  assert(staleClaimRequiredCommand.includes('framework-mode release') && staleClaimRequiredCommand.includes('framework-mode claim'), 'stale lock claim error must include release-then-claim guidance');
+  rmSync(staleLockPath, { force: true });
+
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, and TASK-AAO-0038 import contract fidelity verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, and TASK-AAO-0050 stale framework lock classification verified)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {

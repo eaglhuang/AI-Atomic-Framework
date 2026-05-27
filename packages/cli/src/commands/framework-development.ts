@@ -8,6 +8,8 @@ import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/s
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom, resolveValue } from './shared.ts';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
+import { listActorWorkSessions } from './actor-session.ts';
+import { readActiveTaskDirectionLocks } from './task-direction.ts';
 import {
   externalTaskKey,
   readTaskLedgerPolicy,
@@ -19,6 +21,33 @@ import {
 
 export type FrameworkMode = 'inactive' | 'suspected' | 'required' | 'cross-repo-target-required';
 export type ClosureAuthority = 'local' | 'target_repo' | 'none';
+
+/**
+ * Classification of an existing framework-temp lock that blocks a new claim.
+ *
+ * - `stale-completed` means the linked task is terminal and release-then-claim is safe.
+ * - `stale-ttl-expired` means the runtime lease expired without renewal.
+ * - `possibly-stale` means ATM can see a live lock but cannot verify the linked task.
+ * - `still-active` means the linked task is still active and must use handoff/takeover.
+ */
+export type FrameworkStaleLockKind =
+  | 'stale-completed'
+  | 'stale-ttl-expired'
+  | 'possibly-stale'
+  | 'still-active';
+
+export interface FrameworkStaleLockInfo {
+  readonly kind: FrameworkStaleLockKind;
+  readonly lockTaskId: string;
+  readonly lockPath: string;
+  readonly actorId: string;
+  readonly lockedAt: string | null;
+  readonly linkedTaskId: string | null;
+  readonly currentTaskId: string | null;
+  readonly requiredCommand: string;
+  readonly releaseCommand: string | null;
+  readonly detail: string;
+}
 
 export interface FrameworkRepoIdentity {
   readonly isFrameworkRepo: boolean;
@@ -45,6 +74,7 @@ export interface FrameworkModeStatusReport {
   readonly docsOnlyChangedFiles: readonly string[];
   readonly requiredGates: readonly string[];
   readonly activeLocks: readonly string[];
+  readonly staleLocks: readonly FrameworkStaleLockInfo[];
   readonly pinnedRunner: PinnedRunnerStatus;
   readonly blockers: readonly string[];
   readonly warnings: readonly string[];
@@ -213,7 +243,7 @@ export function runFrameworkMode(argv: string[]) {
   });
 }
 
-export async function runFrameworkTempClaim(cwd: string, actor: string | null, files: readonly string[], reason: string | null) {
+export async function runFrameworkTempClaim(cwd: string, actor: string | null, files: readonly string[], reason: string | null, linkedTaskId?: string | null) {
   const actorId = normalizeOptionalString(actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY);
   if (!actorId) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'framework-mode claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
@@ -223,6 +253,30 @@ export async function runFrameworkTempClaim(cwd: string, actor: string | null, f
     throw new CliError('ATM_CLI_USAGE', 'framework-mode claim requires --files <csv> for the intended framework edit scope.', { exitCode: 2 });
   }
   const root = path.resolve(cwd);
+
+  const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, linkedTaskId);
+  const staleLock = classifyFrameworkStaleLock(root, actorId, { currentTaskId });
+  if (staleLock) {
+    const details = isFrameworkStaleLockReleasable(staleLock)
+      ? {
+        ...staleLock,
+        requiredCommand: buildFrameworkStaleCleanupCommand(staleLock, scopedFiles, reason)
+      }
+      : staleLock;
+    if (staleLock.kind === 'still-active') {
+      throw new CliError(
+        'ATM_FRAMEWORK_LOCK_OCCUPIED',
+        staleLock.detail,
+        { exitCode: 1, details: details as unknown as Record<string, unknown> }
+      );
+    }
+    throw new CliError(
+      'ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED',
+      staleLock.detail,
+      { exitCode: 1, details: details as unknown as Record<string, unknown> }
+    );
+  }
+
   const taskId = frameworkTempTaskId(actorId);
   const adapter = createLocalGovernanceAdapter({ repositoryRoot: root });
   const task: WorkItemRef = {
@@ -231,6 +285,20 @@ export async function runFrameworkTempClaim(cwd: string, actor: string | null, f
     status: 'running'
   };
   const lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, scopedFiles, actorId));
+
+  const resolvedLinkedTaskId = currentTaskId;
+  if (resolvedLinkedTaskId) {
+    try {
+      const lockPath = path.join(root, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+      const existing = readJsonIfExists(lockPath);
+      if (existing) {
+        writeFileSync(lockPath, `${JSON.stringify({ ...existing, linkedTaskId: resolvedLinkedTaskId }, null, 2)}\n`, 'utf8');
+      }
+    } catch {
+      // Missing link metadata only reduces future classification precision.
+    }
+  }
+
   return makeResult({
     ok: true,
     command: 'framework-mode',
@@ -238,13 +306,15 @@ export async function runFrameworkTempClaim(cwd: string, actor: string | null, f
     messages: [message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_ACQUIRED', 'Temporary framework-development runtime lock acquired.', {
       taskId,
       actorId,
-      files: scopedFiles
+      files: scopedFiles,
+      ...(resolvedLinkedTaskId ? { linkedTaskId: resolvedLinkedTaskId } : {})
     })],
     evidence: {
       action: 'claim',
       taskId,
       actorId,
       reason: reason ?? null,
+      linkedTaskId: resolvedLinkedTaskId,
       files: scopedFiles,
       lock
     }
@@ -277,11 +347,109 @@ export async function runFrameworkTempRelease(cwd: string, actor: string | null)
   });
 }
 
-export function buildFrameworkTempClaimCommand(files: readonly string[] = [], reason: string | null = null) {
+export function buildFrameworkTempClaimCommand(files: readonly string[] = [], reason: string | null = null, actorId: string | null = null) {
   const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
   const filesValue = normalizedFiles.length > 0 ? normalizedFiles.join(',') : '<files>';
   const reasonValue = reason?.trim() || 'temporary framework maintenance';
-  return `node atm.mjs framework-mode claim --actor <id> --files ${quoteCliValue(filesValue)} --reason ${quoteCliValue(reasonValue)} --json`;
+  const actorValue = actorId?.trim() || '<id>';
+  return `node atm.mjs framework-mode claim --actor ${actorValue === '<id>' ? actorValue : quoteCliValue(actorValue)} --files ${quoteCliValue(filesValue)} --reason ${quoteCliValue(reasonValue)} --json`;
+}
+
+/**
+ * Inspect the framework-temp lock for one actor and classify the safe recovery path.
+ */
+export function classifyFrameworkStaleLock(cwd: string, actorId: string, options: { readonly currentTaskId?: string | null } = {}): FrameworkStaleLockInfo | null {
+  const root = path.resolve(cwd);
+  const lockId = frameworkTempTaskId(actorId);
+  const lockPath = path.join(root, '.atm', 'runtime', 'locks', `${lockId}.lock.json`);
+  const document = readJsonIfExists(lockPath);
+  if (!document) return null;
+  if (document.released === true) return null;
+  const lockedAt = normalizeOptionalString(document.lockedAt ?? null);
+  const linkedTaskId = normalizeOptionalString(document.linkedTaskId ?? null)
+    ?? inferLinkedTaskIdFromActorSessions(root, actorId, lockedAt);
+  const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, options.currentTaskId ?? null);
+  const releaseCommand = buildFrameworkStaleReleaseCommand(actorId);
+  const base = {
+    lockTaskId: lockId,
+    lockPath: relativePathFrom(root, lockPath),
+    actorId,
+    lockedAt,
+    linkedTaskId,
+    currentTaskId
+  };
+
+  if (linkedTaskId && currentTaskId && linkedTaskId === currentTaskId) {
+    return null;
+  }
+
+  if (linkedTaskId) {
+    const linkedStatus = readTaskStatusFromLedger(root, linkedTaskId);
+    if (linkedStatus !== null && isTerminalTaskStatus(linkedStatus)) {
+      return {
+        kind: 'stale-completed',
+        ...base,
+        requiredCommand: releaseCommand,
+        releaseCommand,
+        detail: `Framework-mode lock for actor ${actorId} was not released after task ${linkedTaskId} reached status "${linkedStatus}". Release the stale lock, then claim fresh for ${currentTaskId ?? 'the current task'}.`
+      };
+    }
+    if (linkedStatus !== null) {
+      return {
+        kind: 'still-active',
+        ...base,
+        requiredCommand: `node atm.mjs tasks handoff --task ${linkedTaskId} --actor ${quoteCliValue(actorId)} --to <new-actor> --reason "transferring framework lock" --json`,
+        releaseCommand: null,
+        detail: `Framework-mode lock for actor ${actorId} is linked to non-terminal task ${linkedTaskId} (${linkedStatus}). Use handoff or takeover before releasing.`
+      };
+    }
+  }
+
+  if (!isRuntimeLockActive(lockPath)) {
+    return {
+      kind: 'stale-ttl-expired',
+      ...base,
+      requiredCommand: releaseCommand,
+      releaseCommand,
+      detail: `Framework-mode lock for actor ${actorId} exceeded its TTL without heartbeat renewal. Release the stale lock, then claim fresh.`
+    };
+  }
+
+  return {
+    kind: 'possibly-stale',
+    ...base,
+    requiredCommand: `node atm.mjs framework-mode status --json`,
+    releaseCommand: null,
+    detail: `Framework-mode lock for actor ${actorId} is active but ATM cannot verify the original task context. Review the prior session before releasing.`
+  };
+}
+
+/**
+ * Scan framework-temp locks and return locks that need explicit recovery guidance.
+ */
+export function detectFrameworkStaleLocks(cwd: string): readonly FrameworkStaleLockInfo[] {
+  const root = path.resolve(cwd);
+  const lockDir = path.join(root, '.atm', 'runtime', 'locks');
+  if (!existsSync(lockDir)) return [];
+  return readdirSync(lockDir)
+    .filter((name) => name.startsWith('ATM-FRAMEWORK-TEMP-') && name.endsWith('.lock.json'))
+    .flatMap((name) => {
+      const lockPath = path.join(lockDir, name);
+      const document = readJsonIfExists(lockPath);
+      const actor = normalizeOptionalString(document?.actorId ?? document?.lockedBy)
+        ?? name.replace(/^ATM-FRAMEWORK-TEMP-/, '').replace(/\.lock\.json$/, '');
+      const info = classifyFrameworkStaleLock(root, actor);
+      return info ? [info] : [];
+    });
+}
+
+export function buildFrameworkStaleCleanupCommand(staleLock: FrameworkStaleLockInfo, files: readonly string[] = [], reason: string | null = null) {
+  if (!isFrameworkStaleLockReleasable(staleLock) || !staleLock.releaseCommand) return staleLock.requiredCommand;
+  return `${staleLock.releaseCommand} && ${buildFrameworkTempClaimCommand(files, reason, staleLock.actorId)}`;
+}
+
+export function isFrameworkStaleLockReleasable(staleLock: FrameworkStaleLockInfo) {
+  return staleLock.kind === 'stale-completed' || staleLock.kind === 'stale-ttl-expired';
 }
 
 export function runFrameworkDevelopmentGuard(cwd: string, files: readonly string[] = [], targetRepo: string | null = null) {
@@ -304,7 +472,8 @@ export function runFrameworkDevelopmentGuard(cwd: string, files: readonly string
     ],
     evidence: {
       guard: 'framework-development',
-      report
+      report,
+      ...(report.staleLocks.length > 0 ? { staleLocks: report.staleLocks } : {})
     }
   });
 }
@@ -357,6 +526,7 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
     ? changedFiles.filter((entry) => !isAtmCriticalNonDocSurface(entry))
     : [];
   const activeLocks = readActiveLockPaths(cwd);
+  const staleLocks = classifyCurrentFrameworkStaleLocks(cwd);
   const pinnedRunner = inspectPinnedRunner(cwd);
   const requiredGates = buildRequiredGates(criticalChangedFiles);
   let mode: FrameworkMode = 'inactive';
@@ -384,7 +554,12 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
     blockers.push('pinned-runner-missing');
   }
 
-  if (mode === 'required' && !hasActiveFrameworkTaskLock(activeLocks)) {
+  const blockingStaleLocks = staleLocks.filter((entry) => entry.kind !== 'possibly-stale' || entry.currentTaskId !== null);
+  if (mode === 'required' && blockingStaleLocks.length > 0) {
+    blockers.push('framework-stale-lock-cleanup-required');
+  }
+
+  if (mode === 'required' && blockingStaleLocks.length === 0 && !hasActiveFrameworkTaskLock(activeLocks)) {
     blockers.push('active-framework-claim-required');
   }
 
@@ -418,6 +593,7 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
     docsOnlyChangedFiles,
     requiredGates,
     activeLocks,
+    staleLocks,
     pinnedRunner,
     blockers,
     warnings
@@ -1126,6 +1302,65 @@ function isPlanningOnlyAuthorityTask(root: string, document: Record<string, unkn
 
 function normalizeStatus(value: unknown): string {
   return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+}
+
+function classifyCurrentFrameworkStaleLocks(cwd: string): readonly FrameworkStaleLockInfo[] {
+  const root = path.resolve(cwd);
+  const locks = readActiveTaskDirectionLocks(root);
+  const seenActors = new Set<string>();
+  const output: FrameworkStaleLockInfo[] = [];
+  for (const lock of locks) {
+    if (seenActors.has(lock.actorId)) continue;
+    seenActors.add(lock.actorId);
+    const stale = classifyFrameworkStaleLock(root, lock.actorId, { currentTaskId: lock.taskId });
+    if (stale) output.push(stale);
+  }
+  return output;
+}
+
+function resolveCurrentFrameworkTaskId(cwd: string, actorId: string, explicitTaskId?: string | null): string | null {
+  const explicit = normalizeOptionalString(explicitTaskId);
+  if (explicit) return explicit;
+  const actorKey = actorId.toLowerCase();
+  const locks = readActiveTaskDirectionLocks(cwd)
+    .filter((lock) => lock.actorId.toLowerCase() === actorKey)
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  return locks[0]?.taskId ?? null;
+}
+
+function inferLinkedTaskIdFromActorSessions(cwd: string, actorId: string, lockedAt: string | null): string | null {
+  const actorKey = actorId.toLowerCase();
+  const lockedAtMs = lockedAt ? Date.parse(lockedAt) : Number.NaN;
+  const sessions = listActorWorkSessions(cwd)
+    .filter((session) => session.actorId.toLowerCase() === actorKey)
+    .filter((session) => {
+      if (!Number.isFinite(lockedAtMs)) return true;
+      const createdMs = Date.parse(session.createdAt);
+      return Number.isFinite(createdMs) && createdMs <= lockedAtMs;
+    })
+    .sort((left, right) => {
+      const leftTime = Date.parse(left.updatedAt ?? left.createdAt);
+      const rightTime = Date.parse(right.updatedAt ?? right.createdAt);
+      return rightTime - leftTime;
+    });
+  return sessions[0]?.taskId ?? null;
+}
+
+function readTaskStatusFromLedger(cwd: string, taskId: string): string | null {
+  const taskLedger = readTaskLedgerPolicy(cwd);
+  const taskPath = path.join(cwd, taskLedger.taskRoot, `${taskId}.json`);
+  const document = readJsonIfExists(taskPath);
+  if (!document) return null;
+  return normalizeOptionalString(document.status) ?? null;
+}
+
+function isTerminalTaskStatus(status: string): boolean {
+  const s = status.toLowerCase();
+  return s === 'done' || s === 'abandoned' || s === 'review';
+}
+
+function buildFrameworkStaleReleaseCommand(actorId: string): string {
+  return `node atm.mjs framework-mode release --actor ${quoteCliValue(actorId)} --json`;
 }
 
 function firstAiIssuedManualTaskActor(document: Record<string, unknown>): string | null {
