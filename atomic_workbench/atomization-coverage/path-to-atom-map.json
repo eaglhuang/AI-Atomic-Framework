@@ -2,7 +2,7 @@
   "schemaId": "atm.pathToAtomMap.v1",
   "schemaSource": "docs/ATOMIZATION_COVERAGE_TAXONOMY.md#42-json-schema-草案-atmpathtoatommapv1",
   "version": "1.0",
-  "timestamp": "2026-05-27T00:00:00Z",
+  "timestamp": "2026-05-28T00:00:00Z",
   "mappings": [
     {
       "path_pattern": "packages/core/src/registry/**",
@@ -560,6 +560,18 @@
       "path_pattern": "packages/cli/src/commands/batch.ts",
       "atom_id": "atm.task-closure-map",
       "capability": "batch checkpoint failure (ATM_BATCH_CHECKPOINT_CLOSE_FAILED) passes through tldr, missingValidationPasses, and blockingFindings from the inner tasks close failure via categorizeCheckpointCloseFailure; requiredCommand for missing-evidence now points to evidence missing subcommand (TASK-AAO-0017).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "tasks deliver-and-close macro: bundles delivery commit (auto-stage scope-matching modified files + atm git commit) → historical close (tasks close --historical-delivery) → governance commit (stage task JSON, evidence, closure packet, transition event + atm git commit) into one command. Supports --delivery-commit to skip auto-staging and use a pre-existing commit. Batch guard: ATM_BATCH_CHECKPOINT_REQUIRED when task belongs to an active batch without --from-batch-checkpoint. Dry-run mode emits wouldAutoStage without modifying repo state (TASK-AAO-0056).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/batch.ts",
+      "atom_id": "atm.batch-checkpoint-map",
+      "capability": "batch deliver-and-close macro: wraps tasks deliver-and-close with --from-batch-checkpoint for the active batch head, then advances the batch queue and optionally claims the next task (same post-close bookkeeping as batch checkpoint). Supports --delivery-commit, --message, --reason pass-through to the inner deliver-and-close. Partial-ok uses ATM_BATCH_DELIVER_AND_CLOSE_PARTIAL_OK; batch-complete uses ATM_BATCH_DELIVER_AND_CLOSE_OK (TASK-AAO-0056).",
       "coverage_status": "active"
     }
   ],

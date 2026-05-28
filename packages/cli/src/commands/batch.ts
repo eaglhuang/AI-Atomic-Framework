@@ -22,7 +22,15 @@ export async function runBatch(argv: string[]) {
   const batchHistoricalDeliveryRefs = action === 'checkpoint'
     ? parseBatchHistoricalDeliveryRefs(argv)
     : [];
-  const { options } = parseOptions(action === 'checkpoint' ? stripBatchHistoricalDeliveryArgs(argv) : argv, 'batch');
+  const batchDeliverAndCloseExtras = action === 'deliver-and-close'
+    ? parseBatchDeliverAndCloseExtras(argv)
+    : null;
+  const { options } = parseOptions(
+    action === 'checkpoint' ? stripBatchHistoricalDeliveryArgs(argv)
+    : action === 'deliver-and-close' ? stripBatchDeliverAndCloseExtras(argv)
+    : argv,
+    'batch'
+  );
   if (action === 'status' || action === 'current') {
     const selector = buildBatchSelector(options);
     const compact = options.compact === true || action === 'current';
@@ -337,6 +345,180 @@ export async function runBatch(argv: string[]) {
     });
   }
 
+  if (action === 'deliver-and-close') {
+    const holdNextClaim = options.hold === true;
+    const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
+    if (!active) {
+      throw new CliError('ATM_BATCH_RUN_MISSING', 'batch deliver-and-close requires an active batch run. Start with next --claim on a batch-scoped prompt; batch deliver-and-close bundles the delivery commit, historical close, and governance commit into one command.', { exitCode: 2 });
+    }
+    const consistencyQueue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
+    const consistency = inspectBatchRunConsistency(active, consistencyQueue);
+    if (!consistency.ok) {
+      throw new CliError('ATM_BATCH_STATE_REPAIR_REQUIRED', 'batch deliver-and-close cannot continue because batch-run and task-queue runtime disagree.', {
+        exitCode: 1,
+        details: {
+          batchId: active.batchId,
+          reason: consistency.reason,
+          batchHeadTaskId: consistency.batchHeadTaskId,
+          queueHeadTaskId: consistency.queueHeadTaskId,
+          requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
+        }
+      });
+    }
+    const currentTaskId = active.currentTaskId;
+    if (!currentTaskId) {
+      const completed = releaseBatchRun(options.cwd, active, 'completed');
+      return makeResult({
+        ok: true,
+        command: 'batch',
+        cwd: options.cwd,
+        messages: [message('info', 'ATM_BATCH_COMPLETED', 'Batch run is already completed.', { batchId: completed.batchId, scopeKey: completed.scopeKey })],
+        evidence: { action: 'deliver-and-close', batchRun: completed }
+      });
+    }
+    const deliverAndCloseArgv: string[] = [
+      'deliver-and-close',
+      '--cwd', options.cwd,
+      '--task', currentTaskId,
+      '--actor', resolvedActor.actorId,
+      '--from-batch-checkpoint',
+      '--batch', active.batchId,
+      '--json'
+    ];
+    if (batchDeliverAndCloseExtras?.deliveryCommit) {
+      deliverAndCloseArgv.push('--delivery-commit', batchDeliverAndCloseExtras.deliveryCommit);
+    }
+    if (batchDeliverAndCloseExtras?.deliveryMessage) {
+      deliverAndCloseArgv.push('--message', batchDeliverAndCloseExtras.deliveryMessage);
+    }
+    if (batchDeliverAndCloseExtras?.reason) {
+      deliverAndCloseArgv.push('--reason', batchDeliverAndCloseExtras.reason);
+    }
+    const deliverResult = await runTasks(deliverAndCloseArgv);
+    if (!deliverResult.ok) {
+      const deliverEvidence = deliverResult.evidence as Record<string, unknown>;
+      const phase = typeof deliverEvidence?.phase === 'string' ? deliverEvidence.phase : null;
+      const capturedDeliveryCommitSha = typeof deliverEvidence?.deliveryCommitSha === 'string' ? deliverEvidence.deliveryCommitSha : null;
+      return makeResult({
+        ok: false,
+        command: 'batch',
+        cwd: options.cwd,
+        messages: [
+          message('error', 'ATM_BATCH_DELIVER_AND_CLOSE_FAILED',
+            phase === 'close-failed'
+              ? `Batch deliver-and-close: close phase failed for task ${currentTaskId} after delivery commit was created at ${capturedDeliveryCommitSha}. Fix the close gate and retry.`
+              : `Batch deliver-and-close: deliver phase failed for task ${currentTaskId}; resolve the issue and retry.`, {
+            batchId: active.batchId,
+            closedTaskId: currentTaskId,
+            phase,
+            deliveryCommitSha: capturedDeliveryCommitSha,
+            retryCommand: phase === 'close-failed' && capturedDeliveryCommitSha
+              ? `node atm.mjs batch deliver-and-close --actor ${resolvedActor.actorId} --batch ${active.batchId} --delivery-commit ${capturedDeliveryCommitSha} --json`
+              : `node atm.mjs batch deliver-and-close --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
+          }),
+          ...deliverResult.messages
+        ],
+        evidence: {
+          action: 'deliver-and-close',
+          actorId: resolvedActor.actorId,
+          closedTaskId: currentTaskId,
+          deliverResult: deliverResult.evidence
+        }
+      });
+    }
+    let cleanupResult: unknown = null;
+    try {
+      cleanupResult = await runTasks([
+        'lock', 'cleanup',
+        '--cwd', options.cwd,
+        '--task', currentTaskId,
+        '--actor', resolvedActor.actorId,
+        '--reason', 'batch deliver-and-close cleanup',
+        '--json'
+      ]);
+    } catch {
+      cleanupResult = null;
+    }
+    const deliverQueue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
+    const nextTaskId = deliverQueue?.taskIds[deliverQueue.currentIndex] ?? null;
+    const updated = updateBatchRun(options.cwd, active, {
+      currentIndex: deliverQueue?.currentIndex ?? active.currentIndex,
+      currentTaskId: nextTaskId,
+      status: deliverQueue?.status === 'completed' || !nextTaskId ? 'completed' : 'active',
+      hold: holdNextClaim && nextTaskId
+        ? {
+          schemaId: 'atm.batchHold.v1',
+          status: 'held',
+          afterTaskId: currentTaskId,
+          currentTaskId: nextTaskId,
+          heldByActor: resolvedActor.actorId,
+          heldAt: new Date().toISOString(),
+          resumeCommand: `node atm.mjs batch resume --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
+        }
+        : null
+    });
+    const nextClaim = updated.status === 'active' && !holdNextClaim
+      ? await runNext(['--cwd', options.cwd, '--claim', '--actor', resolvedActor.actorId, '--prompt', active.sourcePrompt, '--json'])
+      : null;
+    if (updated.status === 'completed') {
+      releaseBatchRun(options.cwd, updated, 'completed');
+    }
+    const deliverEvidence = deliverResult.evidence as Record<string, unknown>;
+    const totalTasks = updated.taskIds?.length ?? 0;
+    const currentIndex = updated.currentIndex ?? 0;
+    const remainingTasks = updated.status === 'completed' ? 0 : Math.max(0, totalTasks - currentIndex);
+    const isBatchComplete = updated.status === 'completed';
+    const isPartialOk = !isBatchComplete && !holdNextClaim;
+    const primaryCode = isPartialOk ? 'ATM_BATCH_DELIVER_AND_CLOSE_PARTIAL_OK' : 'ATM_BATCH_DELIVER_AND_CLOSE_OK';
+    const primaryText = isBatchComplete
+      ? `Batch deliver-and-close closed the final task ${currentTaskId} and completed the batch run.`
+      : holdNextClaim
+        ? `Batch deliver-and-close closed task ${currentTaskId} and held before claiming the next queue head.`
+        : `Batch deliver-and-close closed task ${currentTaskId}; ${remainingTasks} task(s) remain — batch is NOT yet complete.`;
+    return makeResult({
+      ok: true,
+      command: 'batch',
+      cwd: options.cwd,
+      messages: [
+        message('info', primaryCode, primaryText, {
+          batchId: updated.batchId,
+          closedTaskId: currentTaskId,
+          nextTaskId: updated.currentTaskId,
+          held: holdNextClaim,
+          deliveryCommitSha: typeof deliverEvidence?.deliveryCommitSha === 'string' ? deliverEvidence.deliveryCommitSha : null,
+          closureCommitSha: typeof deliverEvidence?.closureCommitSha === 'string' ? deliverEvidence.closureCommitSha : null,
+          category: isBatchComplete ? 'batch-complete' : holdNextClaim ? 'held' : 'partial-ok',
+          remainingTasks,
+          totalTasks,
+          batchComplete: isBatchComplete,
+          requiredCommand: isPartialOk
+            ? `node atm.mjs batch deliver-and-close --actor ${resolvedActor.actorId} --batch ${updated.batchId} --json`
+            : null
+        }),
+        ...(isPartialOk
+          ? [message('warning', 'ATM_BATCH_CONTEXT_ACTIVE', 'This is a batch run. Do not switch to per-task normal flow.', {
+            batchId: updated.batchId,
+            currentTaskId: updated.currentTaskId,
+            requiredCommand: `node atm.mjs batch deliver-and-close --actor ${resolvedActor.actorId} --batch ${updated.batchId} --json`
+          })]
+          : [])
+      ],
+      evidence: {
+        action: 'deliver-and-close',
+        actorId: resolvedActor.actorId,
+        closedTaskId: currentTaskId,
+        nextTaskId: updated.currentTaskId,
+        held: holdNextClaim,
+        deliveryCommitSha: typeof deliverEvidence?.deliveryCommitSha === 'string' ? deliverEvidence.deliveryCommitSha : null,
+        closureCommitSha: typeof deliverEvidence?.closureCommitSha === 'string' ? deliverEvidence.closureCommitSha : null,
+        governanceFiles: Array.isArray(deliverEvidence?.governanceFiles) ? deliverEvidence.governanceFiles : [],
+        cleanupResult,
+        batchRun: updated,
+        nextClaim: nextClaim?.evidence ?? null
+      }
+    });
+  }
+
   if (action === 'repair' || action === 'resume') {
     const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
     if (!active) {
@@ -450,6 +632,47 @@ function stripBatchHistoricalDeliveryArgs(argv: readonly string[]) {
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit') {
+      index += 1;
+      continue;
+    }
+    stripped.push(arg);
+  }
+  return stripped;
+}
+
+function parseBatchDeliverAndCloseExtras(argv: readonly string[]): { deliveryCommit: string | null; deliveryMessage: string | null; reason: string | null } {
+  let deliveryCommit: string | null = null;
+  let deliveryMessage: string | null = null;
+  let reason: string | null = null;
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if ((arg === '--delivery-commit' || arg === '--historical-delivery') && index + 1 < argv.length) {
+      deliveryCommit = argv[index + 1];
+      index += 1;
+      continue;
+    }
+    if (arg === '--message' && index + 1 < argv.length) {
+      deliveryMessage = argv[index + 1];
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason' && index + 1 < argv.length) {
+      reason = argv[index + 1];
+      index += 1;
+      continue;
+    }
+  }
+  return { deliveryCommit, deliveryMessage, reason };
+}
+
+function stripBatchDeliverAndCloseExtras(argv: readonly string[]): string[] {
+  const stripped: string[] = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (
+      (arg === '--delivery-commit' || arg === '--historical-delivery' || arg === '--message' || arg === '--reason') &&
+      index + 1 < argv.length
+    ) {
       index += 1;
       continue;
     }

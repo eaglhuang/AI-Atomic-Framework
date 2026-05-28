@@ -721,8 +721,120 @@ try {
   const evidenceDoc = readJson(evidencePath);
   assert(evidenceDoc.evidence.some((entry: any) => entry.details?.action === 'reconcile'), 'evidence must record reconcile transition');
 
+  // TASK-AAO-0056: tasks deliver-and-close macro
+  const deliverMacroRepo = makeHostRepo(tempRoot, 'deliver-macro-repo');
+  initGitRepo(deliverMacroRepo);
+  // Write actor git identity so runAtmGit commit can create governed commits
+  writeJson(path.join(deliverMacroRepo, '.atm', 'runtime', 'identity', 'default.json'), {
+    schemaId: 'atm.identityDefault.v1',
+    specVersion: '0.1.0',
+    actorId: 'validator',
+    gitName: 'ATM Validator',
+    gitEmail: 'validator@example.invalid',
+    editor: null,
+    provider: null,
+    activeSessionId: null,
+    updatedAt: new Date().toISOString()
+  });
+  const deliverMacroTaskId = 'TASK-DELIVER-0001';
+  const deliverMacroTaskPath = path.join(deliverMacroRepo, '.atm', 'history', 'tasks', `${deliverMacroTaskId}.json`);
+  const deliverMacroPlanDir = path.join(deliverMacroRepo, 'docs', 'plan', 'tasks');
+  mkdirSync(deliverMacroPlanDir, { recursive: true });
+  // Create a plan file and import it so the task is in the ledger (status: open → ready via reserve+promote is complex; use ready directly)
+  writeFileSync(path.join(deliverMacroPlanDir, `${deliverMacroTaskId}.task.md`), [
+    '---',
+    `task_id: ${deliverMacroTaskId}`,
+    'title: "Deliver macro test task"',
+    'status: open',
+    'scopePaths:',
+    '  - "src/deliver.ts"',
+    'deliverables:',
+    '  - "src/deliver.ts"',
+    '---',
+    `# ${deliverMacroTaskId}`,
+    'Deliver macro test task for TASK-AAO-0056 validator.',
+    ''
+  ].join('\n'), 'utf8');
+  const deliverMacroImport = await runTasks([
+    'import', '--cwd', deliverMacroRepo,
+    '--from', path.join('docs', 'plan', 'tasks', `${deliverMacroTaskId}.task.md`),
+    '--write', '--json'
+  ]);
+  assert(deliverMacroImport.ok === true, `tasks import must succeed for deliver-and-close setup, got: ${JSON.stringify(deliverMacroImport.messages)}`);
+  // Move task to ready status so next --claim can pick it up
+  const deliverMacroTaskDocRaw = readJson(deliverMacroTaskPath);
+  writeJson(deliverMacroTaskPath, { ...deliverMacroTaskDocRaw, status: 'ready' });
+  // Use next --claim to properly set up the direction lock (tasks claim alone does not embed taskDirectionLock)
+  const deliverMacroClaim = await runNext([
+    '--cwd', deliverMacroRepo,
+    '--claim',
+    '--actor', 'validator',
+    '--prompt', deliverMacroTaskId,
+    '--json'
+  ]);
+  assert(deliverMacroClaim.ok === true, `next --claim must succeed before deliver-and-close, got: ${JSON.stringify(deliverMacroClaim.messages)}`);
+  // Create and commit a real deliverable to satisfy the deliverable gate
+  mkdirSync(path.join(deliverMacroRepo, 'src'), { recursive: true });
+  writeFileSync(path.join(deliverMacroRepo, 'src', 'deliver.ts'), 'export const delivered = true;\n', 'utf8');
+  execFileSync('git', ['add', 'src/deliver.ts'], { cwd: deliverMacroRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'feat: deliver TASK-DELIVER-0001'], { cwd: deliverMacroRepo, stdio: 'ignore' });
+  const deliverMacroCommitSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: deliverMacroRepo, encoding: 'utf8' }).trim();
+  // Write minimal command-backed evidence to satisfy the evidence gate (code task needs commit or test evidence)
+  const deliverMacroEvidencePath = path.join(deliverMacroRepo, '.atm', 'history', 'evidence', `${deliverMacroTaskId}.json`);
+  writeJson(deliverMacroEvidencePath, {
+    schemaId: 'atm.evidence.v1',
+    taskId: deliverMacroTaskId,
+    generatedAt: new Date().toISOString(),
+    evidence: [
+      {
+        evidenceType: 'commit',
+        summary: `Delivery commit for ${deliverMacroTaskId}: ${deliverMacroCommitSha}`,
+        producedBy: 'validator',
+        createdAt: new Date().toISOString(),
+        details: { commitSha: deliverMacroCommitSha, message: 'feat: deliver TASK-DELIVER-0001' }
+      }
+    ]
+  });
+  // Run tasks deliver-and-close with the pre-existing delivery commit (skips Phase 1 auto-stage)
+  const deliverMacroResult = await runTasks([
+    'deliver-and-close',
+    '--cwd', deliverMacroRepo,
+    '--task', deliverMacroTaskId,
+    '--actor', 'validator',
+    '--delivery-commit', deliverMacroCommitSha,
+    '--json'
+  ]);
+  assert(deliverMacroResult.ok === true, `tasks deliver-and-close must succeed, got: ${JSON.stringify(deliverMacroResult.messages)}`);
+  const deliverMacroEvidence = deliverMacroResult.evidence as Record<string, any>;
+  assert(deliverMacroEvidence.action === 'deliver-and-close', 'deliver-and-close evidence action must match');
+  assert(deliverMacroEvidence.deliveryCommitSha === deliverMacroCommitSha, 'deliver-and-close evidence must record the delivery commit SHA');
+  assert(typeof deliverMacroEvidence.closureCommitSha === 'string' && deliverMacroEvidence.closureCommitSha.length > 0, 'deliver-and-close must create a governance commit and record its SHA');
+  // Verify the task was closed properly
+  const deliverMacroTaskDoc = readJson(deliverMacroTaskPath);
+  assert(deliverMacroTaskDoc.status === 'done', `task must be done after deliver-and-close, got: ${deliverMacroTaskDoc.status}`);
+  assert(typeof deliverMacroTaskDoc.closedAt === 'string', 'task closedAt must be set after deliver-and-close');
+  assert(deliverMacroTaskDoc.closedByActor === 'validator', 'task closedByActor must match the actor');
+  // Verify HEAD equals the governance commit SHA (deliver-and-close created the final commit)
+  const deliverMacroHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: deliverMacroRepo, encoding: 'utf8' }).trim();
+  assert(deliverMacroHead === deliverMacroEvidence.closureCommitSha, 'HEAD must equal the governance commit SHA after deliver-and-close');
+  // Verify error path: missing task throws ATM_TASK_NOT_FOUND
+  let deliverMacroDryRunError: string | null = null;
+  try {
+    await runTasks([
+      'deliver-and-close',
+      '--cwd', deliverMacroRepo,
+      '--task', 'TASK-DELIVER-9999',
+      '--actor', 'validator',
+      '--dry-run',
+      '--json'
+    ]);
+  } catch (error: any) {
+    deliverMacroDryRunError = error?.code ?? 'UNKNOWN';
+  }
+  assert(deliverMacroDryRunError === 'ATM_TASK_NOT_FOUND', `deliver-and-close dry-run on missing task must throw ATM_TASK_NOT_FOUND, got: ${deliverMacroDryRunError}`);
+
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, and TASK-AAO-0057 close-gate scoped diff isolation verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, and TASK-AAO-0057 close-gate scoped diff isolation verified)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {
