@@ -149,6 +149,7 @@ function isClosureRequiredValidator(gate: string, taskDeclaredValidators: readon
 /** 依 gate 名稱回傳對應的執行指令（human-readable 提示用） */
 function resolveValidatorExpectedCommand(gate: string): string {
   if (gate === 'typecheck') return 'npm run typecheck';
+  if (gate === 'git diff --check') return 'git diff --check';
   if (gate.startsWith('validate:')) return `npm run ${gate}`;
   if (gate === 'framework-development') return 'node atm.mjs next --json';
   if (gate === 'tasks-audit') return 'node atm.mjs tasks audit --json';
@@ -387,7 +388,9 @@ function buildMissingValidatorFinding(
   actor: string
 ): MissingValidatorFinding {
   const expectedCommand = resolveValidatorExpectedCommand(gate);
-  const requiredCommand = `node atm.mjs evidence run --task ${taskId} --actor ${actor} --command "${expectedCommand}" --validators ${gate} --json`;
+  const escapedExpected = quoteForShell(expectedCommand);
+  const escapedGate = quoteForShell(gate);
+  const requiredCommand = `node atm.mjs evidence run --task ${taskId} --actor ${actor} --command ${escapedExpected} --validators ${escapedGate} --json`;
   if (state === 'absent') {
     return {
       code: 'ATM_EVIDENCE_VALIDATOR_ABSENT',
@@ -894,9 +897,21 @@ function runEvidenceAdd(argv: string[]) {
     taskId: options.taskId,
     includeNonActive: true
   });
+
+  // Auto-link logic for evidence add
+  if (options.validators.length === 0 && options.commandRun) {
+    const autoVal = detectAutoLinkedValidator(options.commandRun.command);
+    if (autoVal) {
+      options.validators = [autoVal];
+    }
+  }
+
   const commandRuns = normalizeEvidenceCommandRuns({
     cwd: options.cwd,
-    inlineRun: options.commandRun,
+    inlineRun: options.commandRun ? {
+      ...options.commandRun,
+      validators: options.validators.length > 0 ? options.validators : undefined
+    } : null,
     fileRuns: options.commandRuns,
     runnerKind: options.runnerKind,
     sourceCommit: options.sourceCommit
@@ -1740,4 +1755,27 @@ function parseIntegerFlag(argv: string[], flag: string) {
   if (raw === null) return null;
   const value = Number.parseInt(raw, 10);
   return Number.isFinite(value) ? value : null;
+}
+
+export function quoteForShell(arg: string): string {
+  if (/^[a-zA-Z0-9.\-_:/]+$/.test(arg)) {
+    return arg;
+  }
+  return `"${arg.replace(/"/g, '\\"')}"`;
+}
+
+export function detectAutoLinkedValidator(command: string): string | null {
+  const trimmed = command.trim();
+  const npmMatch = trimmed.match(/^npm run ([a-z0-9-:]+)$/);
+  if (npmMatch) {
+    const gate = npmMatch[1];
+    if (gate === 'typecheck' || gate.startsWith('validate:')) {
+      return gate;
+    }
+  }
+  const nodeMatch = trimmed.match(/^node --strip-types scripts\/validate-([a-z0-9-]+)\.ts --mode validate$/);
+  if (nodeMatch) {
+    return `validate:${nodeMatch[1]}`;
+  }
+  return null;
 }

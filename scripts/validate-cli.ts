@@ -3,6 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
+import { quoteForShell, detectAutoLinkedValidator } from '../packages/cli/src/commands/evidence.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 import { cliCommandRunners, runCli } from '../packages/cli/src/atm.ts';
 import { commandSpecs, listCommandSpecs } from '../packages/cli/src/commands/command-specs.ts';
@@ -928,6 +929,196 @@ try {
   // we conditionally assert data structure if present, but strictly verify that the code remains ATM_CLI_USAGE.
   const reviewRejectMissingReasonMsg = reviewRejectMissingReason.parsed.messages.find((m: any) => m.code === 'ATM_CLI_USAGE');
   assert(reviewRejectMissingReasonMsg, 'must find ATM_CLI_USAGE message for reject missing reason');
+
+  // TASK-AAO-0063: Regression tests for Evidence requiredCommand quoting and validator auto-link
+  // Part 1: Tokenizer cross-shell consistency test
+  function tokenizeBash(cmd: string): string[] {
+    const args: string[] = [];
+    let current = '';
+    let inDouble = false;
+    let inSingle = false;
+    for (let i = 0; i < cmd.length; i++) {
+      const char = cmd[i];
+      if (inSingle) {
+        if (char === "'") inSingle = false;
+        else current += char;
+      } else if (inDouble) {
+        if (char === '\\' && cmd[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else if (char === '\\' && cmd[i + 1] === '\\') {
+          current += '\\';
+          i++;
+        } else if (char === '"') {
+          inDouble = false;
+        } else {
+          current += char;
+        }
+      } else {
+        if (char === "'") inSingle = true;
+        else if (char === '"') inDouble = true;
+        else if (/\s/.test(char)) {
+          if (current) {
+            args.push(current);
+            current = '';
+          }
+        } else {
+          current += char;
+        }
+      }
+    }
+    if (current) args.push(current);
+    return args;
+  }
+
+  function tokenizeCmd(cmd: string): string[] {
+    const args: string[] = [];
+    let current = '';
+    let inDouble = false;
+    for (let i = 0; i < cmd.length; i++) {
+      const char = cmd[i];
+      if (inDouble) {
+        if (char === '\\' && cmd[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          inDouble = false;
+        } else {
+          current += char;
+        }
+      } else {
+        if (char === '"') inDouble = true;
+        else if (/\s/.test(char)) {
+          if (current) {
+            args.push(current);
+            current = '';
+          }
+        } else {
+          current += char;
+        }
+      }
+    }
+    if (current) args.push(current);
+    return args;
+  }
+
+  function tokenizePowerShell(cmd: string): string[] {
+    const args: string[] = [];
+    let current = '';
+    let inDouble = false;
+    let inSingle = false;
+    for (let i = 0; i < cmd.length; i++) {
+      const char = cmd[i];
+      if (inSingle) {
+        if (char === "'") inSingle = false;
+        else current += char;
+      } else if (inDouble) {
+        if (char === '"' && cmd[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else if (char === '\\' && cmd[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else if (char === '"') {
+          inDouble = false;
+        } else {
+          current += char;
+        }
+      } else {
+        if (char === "'") inSingle = true;
+        else if (char === '"') inDouble = true;
+        else if (/\s/.test(char)) {
+          if (current) {
+            args.push(current);
+            current = '';
+          }
+        } else {
+          current += char;
+        }
+      }
+    }
+    if (current) args.push(current);
+    return args;
+  }
+
+  const testCases = [
+    'npm run typecheck',
+    'npm run validate:cli',
+    'git diff --check',
+    'node --strip-types scripts/validate-cli.ts --mode validate'
+  ];
+
+  for (const tc of testCases) {
+    const escCmd = quoteForShell(tc);
+    const requiredCommand = `node atm.mjs evidence run --task TASK-AAO-0063 --actor Antigravity --command ${escCmd} --validators ${escCmd} --json`;
+    const tokensBash = tokenizeBash(requiredCommand);
+    const tokensCmd = tokenizeCmd(requiredCommand);
+    const tokensPowerShell = tokenizePowerShell(requiredCommand);
+
+    assert(tokensBash.length === tokensCmd.length, `tokens length must match for tc: ${tc}`);
+    assert(tokensBash.length === tokensPowerShell.length, `tokens length must match for tc: ${tc}`);
+    for (let i = 0; i < tokensBash.length; i++) {
+      assert(tokensBash[i] === tokensCmd[i], `token at index ${i} must match for bash vs cmd for tc: ${tc}`);
+      assert(tokensBash[i] === tokensPowerShell[i], `token at index ${i} must match for bash vs powershell for tc: ${tc}`);
+    }
+  }
+
+  // Part 2: Evidence add auto-link tests
+  const autoLinkTempWorkspace = createCliTempWorkspace('validate-cli-autolink');
+  try {
+    initializeGitRepository(autoLinkTempWorkspace);
+
+    // Import task to allow evidence verification
+    const importRes = await runAtm([
+      'tasks', 'import',
+      '--from', path.resolve(root, '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md'),
+      '--write', '--force'
+    ], autoLinkTempWorkspace);
+    assert(importRes.parsed.ok === true, 'import task must succeed');
+
+    // Register active session to satisfy evidence add constraint
+    await runAtm(['next', '--claim', '--actor', 'Antigravity', '--task', 'TASK-AAO-0063'], autoLinkTempWorkspace);
+
+    // 2.1: evidence add without --validators (auto-link check)
+    const addRes1 = await runAtm([
+      'evidence', 'add',
+      '--task', 'TASK-AAO-0063',
+      '--actor', 'Antigravity',
+      '--kind', 'test',
+      '--command', 'npm run validate:cli',
+      '--exit-code', '0',
+      '--stdout-sha256', 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+      '--stderr-sha256', 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+    ], autoLinkTempWorkspace);
+    assert(addRes1.parsed.ok === true, 'evidence add without --validators must succeed');
+    assert(addRes1.parsed.evidence.evidenceCount === 1, 'must have exactly 1 evidence count');
+
+    const evidenceJsonPath = path.join(autoLinkTempWorkspace, '.atm/history/evidence/TASK-AAO-0063.json');
+    const evidenceContent = JSON.parse(readFileSync(evidenceJsonPath, 'utf8'));
+    const firstRecord = evidenceContent.evidence[0];
+    assert(firstRecord.details.validationPasses.includes('validate:cli'), 'auto-link must automatically link validate:cli');
+
+    // 2.2: evidence add with --validators taking precedence
+    const addRes2 = await runAtm([
+      'evidence', 'add',
+      '--task', 'TASK-AAO-0063',
+      '--actor', 'Antigravity',
+      '--kind', 'test',
+      '--command', 'npm run validate:cli',
+      '--exit-code', '0',
+      '--stdout-sha256', 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+      '--stderr-sha256', 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      '--validators', 'typecheck'
+    ], autoLinkTempWorkspace);
+    assert(addRes2.parsed.ok === true, 'evidence add with --validators must succeed');
+
+    const evidenceContentUpdated = JSON.parse(readFileSync(evidenceJsonPath, 'utf8'));
+    const secondRecord = evidenceContentUpdated.evidence[1];
+    assert(secondRecord.details.validationPasses.includes('typecheck'), 'must include typecheck');
+    assert(!secondRecord.details.validationPasses.includes('validate:cli'), 'must not include validate:cli if custom validators provided');
+  } finally {
+    rmSync(autoLinkTempWorkspace, { recursive: true, force: true });
+  }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
