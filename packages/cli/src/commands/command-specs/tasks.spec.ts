@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'tasks',
   summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile', required: true }
   ],
   options: [
     commonCwdOption,
@@ -24,8 +24,8 @@ export default defineCommandSpec({
     { flag: '--reserved-ok', summary: 'Allow tasks release to return a reserved task with no active claim back to open.' },
     { flag: '--staged', summary: 'Run tasks audit in staged/pre-commit mode.' },
     { flag: '--queue', value: 'id', summary: 'Task queue id for tasks queue abandon.' },
-    { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close/scope add.' },
-    { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close lifecycle actions (or set ATM_ACTOR_ID).' },
+    { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close/reconcile/scope add.' },
+    { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close/reconcile lifecycle actions (or set ATM_ACTOR_ID).' },
     { flag: '--title', value: 'text', summary: 'Optional title for tasks reserve when creating a manual task entry.' },
     { flag: '--provider', value: 'id', summary: 'External provider id for tasks mirror.' },
     { flag: '--origin-task', value: 'id', summary: 'External task id for tasks mirror.' },
@@ -37,7 +37,7 @@ export default defineCommandSpec({
     { flag: '--to', value: 'id', summary: 'Target actor id for handoff.' },
     { flag: '--status', value: 'state', summary: 'Target status for tasks close: done|review|blocked|abandoned. done requires real non-.atm deliverables plus evidence.' },
     { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, takeover, or close.' },
-    { flag: '--historical-delivery', value: 'commit', summary: 'Allow tasks close done to verify an earlier delivery commit instead of requiring a current working-tree deliverable diff.' },
+    { flag: '--historical-delivery', value: 'commit', summary: 'Allow tasks close done or tasks reconcile to verify an earlier delivery commit.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -66,6 +66,7 @@ export default defineCommandSpec({
     'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reserved-ok --reason "rollback cleanup" --json',
     'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --json',
     'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --historical-delivery abc123 --json',
-    'node atm.mjs tasks block --task ATM-GOV-0104 --actor codex-main --reason "waiting on target evidence" --json'
+    'node atm.mjs tasks block --task ATM-GOV-0104 --actor codex-main --reason "waiting on target evidence" --json',
+    'node atm.mjs tasks reconcile --task TASK-AAO-0055 --actor codex-main --delivery-commit abc1234 --json'
   ]
 });

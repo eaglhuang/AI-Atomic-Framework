@@ -1062,6 +1062,62 @@ function buildPromptScopedNextResult(input: {
       taskPath: selectedTask.taskPath
     }
   });
+  const sourceStatus = deliveryClassification.sourceStatus;
+  const ledgerStatus = deliveryClassification.ledgerStatus;
+  const isHistoricalDoneStale = sourceStatus?.toLowerCase() === 'done'
+    && (ledgerStatus?.toLowerCase() !== 'done' || !selectedTask.closedAt || !selectedTask.closurePacket);
+
+  if (isHistoricalDoneStale) {
+    const nextAction = {
+      status: 'task-reconcile-suggested',
+      command: `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <id> --delivery-commit <historicalCommitSha> --json`,
+      reason: `task ${selectedTask.workItemId} is marked as done in the planning card but the target ledger is not closed yet; reconcile it using the historical sync channel`,
+      recommendedChannel: 'reconcile',
+      riskLevel: 'low',
+      selectedTask,
+      requiredCommand: `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <id> --delivery-commit <historicalCommitSha> --json`,
+      playbook: {
+        schemaId: 'atm.playbook.v1',
+        channel: 'reconcile',
+        steps: [
+          `Find the historical Git commit SHA that delivered this task's changes (e.g., e26f3a73)`,
+          `Run node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <actorId> --delivery-commit <historicalCommitSha> --json`,
+          `This will automatically generate the closure packet, update the ledger status to done, write task-events, and synchronize the governance record without claiming the task or mutating source files.`
+        ]
+      },
+      allowedCommands: [
+        `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <id> --delivery-commit <historicalCommitSha> --json`,
+        ...allowedGuidanceBootstrapCommands()
+      ],
+      blockedCommands: [
+        'mutating source files during historical reconcile',
+        'manual ledger JSON edit'
+      ]
+    };
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction as any,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_TASK_RECONCILE_SUGGESTED', `Task ${selectedTask.workItemId} is done in planning but ledger is open. Reconcile with historical sync.`, {
+          task: toTaskCandidateView(selectedTask),
+          requiredCommand: nextAction.requiredCommand
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: 'reconcile',
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
   if (deliveryClassification.intent === 'mirror-sync-only'
     && input.taskIntent?.requestedAction !== 'redo'
     && input.taskIntent?.requestedAction !== 'reopen') {

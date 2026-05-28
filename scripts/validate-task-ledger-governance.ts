@@ -649,8 +649,80 @@ try {
   assert(staleClaimRequiredCommand.includes('framework-mode release') && staleClaimRequiredCommand.includes('framework-mode claim'), 'stale lock claim error must include release-then-claim guidance');
   rmSync(staleLockPath, { force: true });
 
+  // Regression: TASK-AAO-0055 historical done task reconcile / reopen closure sync
+  const reconcileRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(reconcileRepo);
+  const reconcileTaskId = 'TASK-RECONCILE-0001';
+
+  const planPath = path.join(reconcileRepo, 'docs', 'plan', 'tasks', `${reconcileTaskId}.task.md`);
+  mkdirSync(path.dirname(planPath), { recursive: true });
+  writeFileSync(planPath, [
+    '---',
+    'task_id: TASK-RECONCILE-0001',
+    'title: "Reconcile test task"',
+    'status: done',
+    'scopePaths:',
+    '  - "src/reconcile-file.ts"',
+    'deliverables:',
+    '  - "src/reconcile-file.ts"',
+    '---',
+    '# TASK-RECONCILE-0001'
+  ].join('\n'), 'utf8');
+
+  // 1. 匯入任務至 ledger
+  const reconcileImport = await runTasks(['import', '--cwd', reconcileRepo, '--from', planPath, '--write', '--json']);
+  assert(reconcileImport.ok === true, 'reconcile import must succeed');
+
+  // 2. 判定 next 診斷：因為是 planning done + ledger open，next 應該主動診斷出 task-reconcile-suggested 並建議 tasks reconcile 路由！
+  const reconcileNext = await runNext(['--cwd', reconcileRepo, '--prompt', reconcileTaskId]);
+  assert(reconcileNext.ok === true, 'next command for reconcile task must succeed');
+  const nextAction = (reconcileNext.evidence as any).nextAction;
+  assert(nextAction.status === 'task-reconcile-suggested', `next status must be task-reconcile-suggested, got ${nextAction.status}`);
+  assert(nextAction.recommendedChannel === 'reconcile', `next channel must be reconcile, got ${nextAction.recommendedChannel}`);
+  assert(nextAction.requiredCommand.includes('tasks reconcile'), 'next requiredCommand must point to tasks reconcile');
+
+  // 3. 在 Git 當中建立一個 commit 作為歷史 commit，並包含 deliverables 檔案！
+  mkdirSync(path.join(reconcileRepo, 'src'), { recursive: true });
+  writeFileSync(path.join(reconcileRepo, 'src', 'reconcile-file.ts'), 'export const reconciled = true;\n', 'utf8');
+  execFileSync('git', ['add', 'src/reconcile-file.ts'], { cwd: reconcileRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'deliver TASK-RECONCILE-0001 changes'], { cwd: reconcileRepo, stdio: 'ignore' });
+  const gitCommitSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: reconcileRepo, encoding: 'utf8' }).trim();
+
+  // 4. 執行 tasks reconcile 子命令！
+  const reconcileResult = await runTasks([
+    'reconcile',
+    '--cwd',
+    reconcileRepo,
+    '--task',
+    reconcileTaskId,
+    '--actor',
+    'validator',
+    '--delivery-commit',
+    gitCommitSha
+  ]);
+  assert(reconcileResult.ok === true, 'tasks reconcile must succeed with a valid historical delivery commit');
+
+  // 5. 驗證 ledger 閉環！
+  const reconciledTaskDoc = readJson(path.join(reconcileRepo, '.atm', 'history', 'tasks', `${reconcileTaskId}.json`));
+  assert(reconciledTaskDoc.status === 'done', 'reconciled task status must be done');
+  assert(typeof reconciledTaskDoc.closedAt === 'string', 'reconciled task closedAt must exist');
+  assert(reconciledTaskDoc.closedByActor === 'validator', 'reconciled task closedByActor must be validator');
+  assert(typeof reconciledTaskDoc.closurePacket === 'string', 'reconciled task closurePacket path must exist');
+
+  // 驗證 closure packet 存在且有效
+  const closurePacketPath = path.resolve(reconcileRepo, reconciledTaskDoc.closurePacket);
+  assert(existsSync(closurePacketPath), 'closure packet must exist');
+  const closurePacket = readJson(closurePacketPath);
+  assert(closurePacket.taskId === reconcileTaskId, 'closure packet taskId must match');
+
+  // 驗證 evidence 檔案已補齊
+  const evidencePath = path.join(reconcileRepo, '.atm', 'history', 'evidence', `${reconcileTaskId}.json`);
+  assert(existsSync(evidencePath), 'reconciled task evidence must exist');
+  const evidenceDoc = readJson(evidencePath);
+  assert(evidenceDoc.evidence.some((entry: any) => entry.details?.action === 'reconcile'), 'evidence must record reconcile transition');
+
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, and TASK-AAO-0057 close-gate scoped diff isolation verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, and TASK-AAO-0057 close-gate scoped diff isolation verified)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {
