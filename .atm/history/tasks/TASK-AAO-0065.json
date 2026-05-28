@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0065",
+  "title": "CLI output-json file writer flag",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0003",
+    "TASK-AAO-0034"
+  ],
+  "acceptance": [
+    "`node atm.mjs <any-cmd> --output-json <path>` writes a valid JSON object to `<path>` and emits nothing to stdout that would break `JSON.parse()` on `<path>`.",
+    "All commands currently accepting `--json` also accept `--output-json <path>`; the flag is defined once in `shared.ts` and wired uniformly.",
+    "Existing `--json` behaviour is unchanged; `validate:cli` shows zero regression.",
+    "A test in `next.spec.ts` and `tasks.spec.ts` each assert that the file at `<path>` parses cleanly and that stdout contains no JSON body when `--output-json` is used."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/shared.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/command-specs/next.spec.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/shared.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/command-specs/next.spec.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Streaming or NDJSON output",
+    "Interactive field selection UI",
+    "Replacing the existing `--json` flag",
+    "Field projection or summary subset selection (see TASK-AAO-0068)",
+    "Stdout clean-mode semantics for existing `--json`"
+  ],
+  "nonGoals": [
+    "Do not break existing `--json` callers",
+    "Do not add `--output-json` semantics that hide errors",
+    "Do not introduce `--fields` or `--summary` on any command (see TASK-AAO-0068)"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Additive flag only; revert removes `--output-json <path>` wiring without touching existing `--json` behaviour.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-router-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "cli-ergonomics",
+    "agent-operability"
+  ],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0065-cli-output-json-file-writer-flag.task.md",
+    "sectionTitle": "TASK-AAO-0065",
+    "headingLine": 59,
+    "hash": "396353545bd6245f"
+  },
+  "importedAt": "2026-05-28T16:53:05.522Z",
+  "lastTransitionId": "2026-05-28T16-59-32-020Z-close-6df181f967c8",
+  "lastTransitionAt": "2026-05-28T16:59:32.020Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-28T16:53:08.980Z",
+  "promotedAt": "2026-05-28T16:53:08.984Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-17b809fdaf62",
+    "claimedAt": "2026-05-28T16:53:08.987Z",
+    "heartbeatAt": "2026-05-28T16:59:32.020Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0065.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-28T16:53:08.987Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260528165308-Antigravity-TASK-AAO-0065-74c81dfeef",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0065.closure-packet.json",
+  "closedAt": "2026-05-28T16:59:32.020Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260528165308-Antigravity-TASK-AAO-0065-74c81dfeef"
+}
