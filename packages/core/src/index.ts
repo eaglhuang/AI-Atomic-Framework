@@ -44,6 +44,8 @@ export interface ActorRecord {
 export interface ActorRegistryDocument {
   readonly schemaId: 'atm.actorRegistry';
   readonly specVersion: '0.1.0';
+  readonly dataVersion?: string;
+  readonly artifactVersion?: string;
   readonly generatedAt: string;
   readonly actors: readonly ActorRecord[];
 }
@@ -65,6 +67,8 @@ export interface ScopeLockSelectorsRecord {
 export interface ScopeLockRecord {
   readonly schemaId?: 'atm.governanceScopeLock';
   readonly specVersion?: '0.1.0' | '0.2.0';
+  readonly dataVersion?: string;
+  readonly artifactVersion?: string;
   readonly migration?: {
     readonly strategy: 'none' | 'additive' | 'breaking';
     readonly fromVersion: string | null;
@@ -211,6 +215,8 @@ export interface TestReportMetrics {
 export interface TestReportDocument {
   readonly schemaId: 'atm.testReport';
   readonly specVersion: '0.1.0';
+  readonly dataVersion?: string;
+  readonly artifactVersion?: string;
   readonly migration: {
     readonly strategy: 'none' | 'additive' | 'breaking';
     readonly fromVersion: string | null;
@@ -304,6 +310,8 @@ export type RegistryMapQualityTargetsRecord = Readonly<Record<string, RegistryMa
 export interface AtomicMapRecord {
   readonly schemaId: 'atm.atomicMap';
   readonly specVersion: '0.1.0' | '0.2.0';
+  readonly dataVersion?: string;
+  readonly artifactVersion?: string;
   readonly migration: {
     readonly strategy: 'none' | 'additive' | 'breaking';
     readonly fromVersion: string | null;
@@ -352,6 +360,8 @@ export interface RegistryEntryRecord {
   readonly ttl?: number | null;
   readonly schemaId: 'atm.atomicSpec';
   readonly specVersion: string;
+  readonly dataVersion?: string;
+  readonly artifactVersion?: string;
   readonly schemaPath: string;
   readonly specPath: string;
   readonly hashLock: {
@@ -390,6 +400,8 @@ export interface RegistryShardingRecord {
 export interface RegistryDocument {
   readonly schemaId: 'atm.registry';
   readonly specVersion: '0.1.0';
+  readonly dataVersion?: string;
+  readonly artifactVersion?: string;
   readonly migration: {
     readonly strategy: 'none' | 'additive' | 'breaking';
     readonly fromVersion: string | null;

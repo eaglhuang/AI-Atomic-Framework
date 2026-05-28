@@ -52,3 +52,5 @@ export function createLocalGovernanceAdapter(config: LocalGovernanceConfig): Gov
     stores: createLocalGovernanceStores({ ...config, layout })
   };
 }
+
+export * from './versioning.ts';
