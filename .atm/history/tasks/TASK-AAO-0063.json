@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0063",
+  "title": "Evidence requiredCommand quoting and validator auto-link",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0015",
+    "TASK-AAO-0017"
+  ],
+  "acceptance": [
+    "`requiredCommand` strings produced by ATM round-trip across cmd.exe, PowerShell, and bash (covered by a unit test that exercises tokenization, not real shells).",
+    "`evidence add --command \"npm run validate:cli\"` records `validators: [\"validate:cli\"]` automatically when `--validators` is omitted.",
+    "Operator-supplied `--validators` always takes precedence over auto-link.",
+    "`npm run typecheck`, `npm run validate:cli`, and `git diff --check` all pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/command-specs/evidence.spec.ts",
+    "scripts/lib/validator-envelope.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/command-specs/evidence.spec.ts",
+    "scripts/lib/validator-envelope.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Validator registry expansion beyond commands already declared in package.json scripts",
+    "Cross-shell execution simulation or sandboxing",
+    "Changing the evidence record schema"
+  ],
+  "nonGoals": [
+    "Do not build a universal shell quoting library",
+    "Do not change `evidence verify` or `evidence list` behaviour",
+    "Do not auto-add `--validators` to evidence records the operator did not request"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the quoting normalization and validator-name lookup; CLI-only changes, no persistent state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-command-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "cli-ergonomics",
+    "agent-operability"
+  ],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md",
+    "sectionTitle": "TASK-AAO-0063",
+    "headingLine": 53,
+    "hash": "f9faceeb294a1793"
+  },
+  "importedAt": "2026-05-28T16:39:45.185Z",
+  "lastTransitionId": "2026-05-28T16-44-20-152Z-close-833ab35feedb",
+  "lastTransitionAt": "2026-05-28T16:44:20.152Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-28T16:39:48.953Z",
+  "promotedAt": "2026-05-28T16:39:48.956Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-594e63e5b9de",
+    "claimedAt": "2026-05-28T16:39:48.958Z",
+    "heartbeatAt": "2026-05-28T16:44:20.152Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0063.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-28T16:39:48.958Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260528163948-Antigravity-TASK-AAO-0063-ede9818d78",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0063.closure-packet.json",
+  "closedAt": "2026-05-28T16:44:20.152Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260528163948-Antigravity-TASK-AAO-0063-ede9818d78"
+}
