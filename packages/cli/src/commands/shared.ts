@@ -174,14 +174,32 @@ export function parseArgsForCommand(
           state.positional.push(arg);
           continue;
         }
-        throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} does not support option ${arg}`, { exitCode: 2 });
+        const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty'])].sort();
+        throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} does not support option ${arg}`, {
+          exitCode: 2,
+          details: {
+            invalidFlags: [arg],
+            missingRequired: [],
+            allowedFlags,
+            suggestedCommand: null
+          }
+        });
       }
 
       const key = optionSpec.flag.replace(/^-+/, '').replace(/-([a-z])/g, (_: any, char: any) => char.toUpperCase());
       if (optionSpec.value) {
         const value = argv[index + 1];
         if (!value || value.startsWith('--') || value === '-h') {
-          throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for ${optionSpec.flag}`, { exitCode: 2 });
+          const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty'])].sort();
+          throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for ${optionSpec.flag}`, {
+            exitCode: 2,
+            details: {
+              invalidFlags: [],
+              missingRequired: [optionSpec.flag],
+              allowedFlags,
+              suggestedCommand: null
+            }
+          });
         }
         if (optionSpec.repeatable) {
           state.options[key] = Array.isArray(state.options[key]) ? [...state.options[key], value] : [value];
@@ -244,6 +262,46 @@ export function formatPrettyResult(result: CommandResult) {
 
 export function quoteCliValue(value: unknown) {
   return `"${String(value ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+const ALLOWED_FLAGS_MAP: Record<string, string[]> = {
+  doctor: ['--ci-profile', '--skip-check'],
+  spec: ['--spec', '--validate'],
+  verify: ['--spec', '--self', '--neutrality', '--agents-md', '--guards', '--evidence'],
+  'self-host-alpha': ['--verify', '--agent'],
+  next: ['--spec', '--claim', '--tasks', '--actor', '--prompt', '--intent', '--task'],
+  batch: ['--batch', '--scope', '--compact', '--hold', '--actor', '--reason'],
+  quickfix: ['--actor', '--prompt', '--files', '--reason'],
+  init: ['--spec', '--dry-run', '--adopt', '--integration', '--task'],
+  bootstrap: ['--spec', '--task'],
+  test: ['--atom', '--map', '--equivalence-fixtures', '--fingerprint-check', '--edge-contracts', '--propagate'],
+  welcome: ['--dry-run'],
+  status: [],
+  validate: ['--spec'],
+  integration: ['--integration']
+};
+
+function getAllowedFlags(commandName: string): string[] {
+  const custom = ALLOWED_FLAGS_MAP[commandName] || [];
+  const defaults = ['--cwd', '--force', '--json', '--pretty'];
+  return [...new Set([...custom, ...defaults])].sort();
+}
+
+function createUsageError(
+  commandName: string,
+  messageText: string,
+  options: { invalidFlags?: string[]; missingRequired?: string[] } = {}
+): CliError {
+  const allowedFlags = getAllowedFlags(commandName);
+  return new CliError('ATM_CLI_USAGE', messageText, {
+    exitCode: 2,
+    details: {
+      invalidFlags: options.invalidFlags ?? [],
+      missingRequired: options.missingRequired ?? [],
+      allowedFlags,
+      suggestedCommand: null
+    }
+  });
 }
 
 type ParsedCliOptions = {
@@ -328,7 +386,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--ci-profile') {
       if (commandName !== 'doctor') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --ci-profile`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --ci-profile`, { invalidFlags: ['--ci-profile'] });
       }
       options.ciProfile = requireOptionValue(argv, index, '--ci-profile', commandName);
       index += 1;
@@ -336,7 +394,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--skip-check') {
       if (commandName !== 'doctor') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --skip-check`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --skip-check`, { invalidFlags: ['--skip-check'] });
       }
       const raw = requireOptionValue(argv, index, '--skip-check', commandName);
       options.skipChecks = options.skipChecks.concat(raw.split(',').map((entry: string) => entry.trim()).filter(Boolean));
@@ -344,13 +402,16 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--spec') {
+      if (!['spec', 'init', 'bootstrap', 'validate'].includes(commandName)) {
+        throw createUsageError(commandName, `${commandName} does not support option --spec`, { invalidFlags: ['--spec'] });
+      }
       options.spec = requireOptionValue(argv, index, '--spec', commandName);
       index += 1;
       continue;
     }
     if (arg === '--validate') {
       if (commandName !== 'spec') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --validate`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --validate`, { invalidFlags: ['--validate'] });
       }
       options.validate = requireOptionValue(argv, index, '--validate', commandName);
       index += 1;
@@ -358,35 +419,35 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--self') {
       if (commandName !== 'verify') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --self`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --self`, { invalidFlags: ['--self'] });
       }
       options.self = true;
       continue;
     }
     if (arg === '--neutrality') {
       if (commandName !== 'verify') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --neutrality`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --neutrality`, { invalidFlags: ['--neutrality'] });
       }
       options.neutrality = true;
       continue;
     }
     if (arg === '--agents-md') {
       if (commandName !== 'verify') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agents-md`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --agents-md`, { invalidFlags: ['--agents-md'] });
       }
       options.agentsMd = true;
       continue;
     }
     if (arg === '--guards') {
       if (commandName !== 'verify') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --guards`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --guards`, { invalidFlags: ['--guards'] });
       }
       options.guards = true;
       continue;
     }
     if (arg === '--evidence') {
       if (commandName !== 'verify') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --evidence`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --evidence`, { invalidFlags: ['--evidence'] });
       }
       options.evidence = requireOptionValue(argv, index, '--evidence', commandName);
       index += 1;
@@ -394,14 +455,14 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--verify') {
       if (commandName !== 'self-host-alpha') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --verify`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --verify`, { invalidFlags: ['--verify'] });
       }
       options.verify = true;
       continue;
     }
     if (arg === '--agent') {
       if (commandName !== 'self-host-alpha') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --agent`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --agent`, { invalidFlags: ['--agent'] });
       }
       options.agent = requireOptionValue(argv, index, '--agent', commandName);
       index += 1;
@@ -409,14 +470,14 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--claim') {
       if (commandName !== 'next') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --claim`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --claim`, { invalidFlags: ['--claim'] });
       }
       options.claim = true;
       continue;
     }
     if (arg === '--tasks') {
       if (commandName !== 'next') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --tasks`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --tasks`, { invalidFlags: ['--tasks'] });
       }
       const raw = requireOptionValue(argv, index, '--tasks', commandName);
       options.tasks = raw.split(',').map((entry: string) => entry.trim()).filter(Boolean);
@@ -425,7 +486,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--batch') {
       if (commandName !== 'batch') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --batch`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --batch`, { invalidFlags: ['--batch'] });
       }
       options.batch = requireOptionValue(argv, index, '--batch', commandName);
       index += 1;
@@ -433,7 +494,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--scope') {
       if (commandName !== 'batch') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --scope`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --scope`, { invalidFlags: ['--scope'] });
       }
       options.scope = requireOptionValue(argv, index, '--scope', commandName);
       index += 1;
@@ -441,21 +502,21 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--compact') {
       if (commandName !== 'batch') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --compact`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --compact`, { invalidFlags: ['--compact'] });
       }
       options.compact = true;
       continue;
     }
     if (arg === '--hold') {
       if (commandName !== 'batch') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --hold`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --hold`, { invalidFlags: ['--hold'] });
       }
       options.hold = true;
       continue;
     }
     if (arg === '--actor') {
       if (!['next', 'batch', 'quickfix'].includes(commandName)) {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --actor`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --actor`, { invalidFlags: ['--actor'] });
       }
       options.agent = requireOptionValue(argv, index, '--actor', commandName);
       index += 1;
@@ -463,7 +524,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--prompt') {
       if (!['next', 'quickfix'].includes(commandName)) {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --prompt`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --prompt`, { invalidFlags: ['--prompt'] });
       }
       options.prompt = requireOptionValue(argv, index, '--prompt', commandName);
       index += 1;
@@ -471,7 +532,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--intent') {
       if (commandName !== 'next') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --intent`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --intent`, { invalidFlags: ['--intent'] });
       }
       options.intent = requireOptionValue(argv, index, '--intent', commandName);
       index += 1;
@@ -479,7 +540,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--files') {
       if (commandName !== 'quickfix') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --files`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --files`, { invalidFlags: ['--files'] });
       }
       const raw = requireOptionValue(argv, index, '--files', commandName);
       options.files = raw.split(',').map((entry: string) => entry.trim()).filter(Boolean);
@@ -488,7 +549,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--reason') {
       if (!['batch', 'quickfix'].includes(commandName)) {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --reason`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --reason`, { invalidFlags: ['--reason'] });
       }
       options.reason = requireOptionValue(argv, index, '--reason', commandName);
       index += 1;
@@ -496,7 +557,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--dry-run') {
       if (commandName !== 'init') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --dry-run`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --dry-run`, { invalidFlags: ['--dry-run'] });
       }
       options.dryRun = true;
       continue;
@@ -507,7 +568,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--adopt') {
       if (commandName !== 'init') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --adopt`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --adopt`, { invalidFlags: ['--adopt'] });
       }
       if (!argv[index + 1] || argv[index + 1].startsWith('--')) {
         options.adopt = 'default';
@@ -519,7 +580,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--integration') {
       if (commandName !== 'init') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --integration`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --integration`, { invalidFlags: ['--integration'] });
       }
       options.integration = requireOptionValue(argv, index, '--integration', commandName);
       index += 1;
@@ -527,7 +588,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--atom') {
       if (commandName !== 'test') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --atom`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --atom`, { invalidFlags: ['--atom'] });
       }
       options.atom = requireOptionValue(argv, index, '--atom', commandName);
       index += 1;
@@ -535,7 +596,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--map') {
       if (commandName !== 'test') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --map`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --map`, { invalidFlags: ['--map'] });
       }
       options.map = requireOptionValue(argv, index, '--map', commandName);
       index += 1;
@@ -543,7 +604,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--equivalence-fixtures') {
       if (commandName !== 'test') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --equivalence-fixtures`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --equivalence-fixtures`, { invalidFlags: ['--equivalence-fixtures'] });
       }
       options.equivalenceFixtures = requireOptionValue(argv, index, '--equivalence-fixtures', commandName);
       index += 1;
@@ -551,21 +612,21 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--fingerprint-check') {
       if (commandName !== 'test') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --fingerprint-check`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --fingerprint-check`, { invalidFlags: ['--fingerprint-check'] });
       }
       options.fingerprintCheck = true;
       continue;
     }
     if (arg === '--edge-contracts') {
       if (!['test'].includes(commandName)) {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --edge-contracts`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --edge-contracts`, { invalidFlags: ['--edge-contracts'] });
       }
       options.edgeContracts = true;
       continue;
     }
     if (arg === '--propagate') {
       if (commandName !== 'test') {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --propagate`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --propagate`, { invalidFlags: ['--propagate'] });
       }
       options.propagate = requireOptionValue(argv, index, '--propagate', commandName);
       index += 1;
@@ -573,7 +634,7 @@ export function parseOptions(argv: string[], commandName: string) {
     }
     if (arg === '--task') {
       if (!['init', 'bootstrap', 'next'].includes(commandName)) {
-        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option --task`, { exitCode: 2 });
+        throw createUsageError(commandName, `${commandName} does not support option --task`, { invalidFlags: ['--task'] });
       }
       options.task = requireOptionValue(argv, index, '--task', commandName);
       index += 1;
@@ -583,7 +644,7 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg.startsWith('--')) {
-      throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option ${arg}`, { exitCode: 2 });
+      throw createUsageError(commandName, `${commandName} does not support option ${arg}`, { invalidFlags: [arg] });
     }
     positional.push(arg);
   }
@@ -659,7 +720,7 @@ function buildOptionMap(options: any) {
 function requireOptionValue(argv: any, optionIndex: any, optionName: any, commandName: any) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
-    throw new CliError('ATM_CLI_USAGE', `${commandName} requires a value for ${optionName}`, { exitCode: 2 });
+    throw createUsageError(commandName, `${commandName} requires a value for ${optionName}`, { missingRequired: [optionName] });
   }
   return value;
 }
