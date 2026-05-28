@@ -363,6 +363,7 @@ async function runTasksReconcile(argv: string[]) {
   // 建立 closure packet（僅在 framework repo 模式下需要）
   let closurePacketPath: string | null = null;
   let packet: ClosurePacket | null = null;
+  const reconcileReason = `Historical reconcile sync against commit ${commitSha}`;
   if (frameworkStatus?.repoRole === 'framework') {
     packet = createClosurePacket({
       cwd: options.cwd,
@@ -372,7 +373,14 @@ async function runTasksReconcile(argv: string[]) {
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
       requiredGates: frameworkStatus?.requiredGates ?? [],
       changedFiles: deliverableGate.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
-      frameworkStatus: frameworkStatus ?? undefined
+      frameworkStatus: frameworkStatus ?? undefined,
+      attestation: {
+        schemaId: 'atm.reconcileAttestation.v1',
+        deliveryCommit: commitSha,
+        reconciledAt: new Date().toISOString(),
+        reconciledByActor: actorId,
+        reason: reconcileReason
+      }
     });
     const validation = validateClosurePacket(packet);
     if (!validation.ok) {
@@ -409,7 +417,7 @@ async function runTasksReconcile(argv: string[]) {
   taskDocument.closedAt = new Date().toISOString();
   taskDocument.closedByActor = actorId;
   taskDocument.closedBySessionId = null;
-  taskDocument.closeReason = `Historical reconcile sync against commit ${commitSha}`;
+  taskDocument.closeReason = reconcileReason;
 
   const transitionPath = writeTaskDocumentWithTransition({
     cwd: options.cwd,

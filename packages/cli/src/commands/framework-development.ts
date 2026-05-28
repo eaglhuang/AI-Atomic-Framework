@@ -116,6 +116,14 @@ export interface ClosurePacketRequiredGatesSnapshot {
   readonly requiredGates: readonly string[];
 }
 
+export interface ClosurePacketReconcileAttestation {
+  readonly schemaId: 'atm.reconcileAttestation.v1';
+  readonly deliveryCommit: string;
+  readonly reconciledAt: string;
+  readonly reconciledByActor: string;
+  readonly reason: string;
+}
+
 export interface ClosurePacket {
   readonly schemaId: 'atm.closurePacket.v1';
   readonly specVersion: '0.1.0';
@@ -134,6 +142,7 @@ export interface ClosurePacket {
   readonly closedAt: string;
   readonly closedByActor: string;
   readonly sessionId: string | null;
+  readonly attestation?: ClosurePacketReconcileAttestation | null;
 }
 
 export interface TaskAuditFinding {
@@ -924,6 +933,18 @@ export function validateClosurePacket(value: unknown): { ok: boolean; missing: r
       missing.push('requiredGatesSnapshot/requiredGates-mismatch');
     }
   }
+  if (packet.attestation !== undefined && packet.attestation !== null) {
+    const att = packet.attestation as Partial<ClosurePacketReconcileAttestation>;
+    if (typeof att !== 'object' || Array.isArray(att)) {
+      missing.push('attestation');
+    } else {
+      if (att.schemaId !== 'atm.reconcileAttestation.v1') missing.push('attestation/schemaId');
+      if (typeof att.deliveryCommit !== 'string' || att.deliveryCommit.trim().length === 0) missing.push('attestation/deliveryCommit');
+      if (typeof att.reconciledAt !== 'string' || att.reconciledAt.trim().length === 0) missing.push('attestation/reconciledAt');
+      if (typeof att.reconciledByActor !== 'string' || att.reconciledByActor.trim().length === 0) missing.push('attestation/reconciledByActor');
+      if (typeof att.reason !== 'string') missing.push('attestation/reason');
+    }
+  }
   if (packet.evidenceFreshness !== 'fresh') {
     missing.push('evidenceFreshness');
   }
@@ -943,6 +964,7 @@ export function createClosurePacket(input: {
   readonly requiredGates?: readonly string[];
   readonly changedFiles?: readonly string[];
   readonly frameworkStatus?: Pick<FrameworkModeStatusReport, 'mode' | 'repoRole' | 'changedFiles' | 'criticalChangedFiles' | 'requiredGates'> | null;
+  readonly attestation?: ClosurePacketReconcileAttestation | null;
 }): ClosurePacket {
   const cwd = path.resolve(input.cwd);
   const targetCommitDelta = readFutureTargetCommitDelta(cwd, input.changedFiles);
@@ -971,7 +993,8 @@ export function createClosurePacket(input: {
     evidencePath: input.evidencePath,
     closedAt: new Date().toISOString(),
     closedByActor: input.actorId,
-    sessionId: normalizeOptionalString(input.sessionId) ?? null
+    sessionId: normalizeOptionalString(input.sessionId) ?? null,
+    attestation: input.attestation ?? null
   };
 }
 

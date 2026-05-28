@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { auditTasks, classifyFrameworkStaleLock, createFrameworkModeStatus, runFrameworkTempClaim } from '../packages/cli/src/commands/framework-development.ts';
+import { auditTasks, classifyFrameworkStaleLock, createFrameworkModeStatus, runFrameworkTempClaim, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
@@ -714,6 +714,20 @@ try {
   assert(existsSync(closurePacketPath), 'closure packet must exist');
   const closurePacket = readJson(closurePacketPath);
   assert(closurePacket.taskId === reconcileTaskId, 'closure packet taskId must match');
+
+  // TASK-AAO-0059: Reconcile closure-packet attestation contract alignment
+  assert(closurePacket.attestation, 'reconciled closure packet must contain attestation');
+  assert(closurePacket.attestation.schemaId === 'atm.reconcileAttestation.v1', 'attestation schemaId must match');
+  assert(closurePacket.attestation.deliveryCommit === gitCommitSha, 'attestation deliveryCommit must match');
+  assert(closurePacket.attestation.reconciledByActor === 'validator', 'attestation reconciledByActor must match');
+  assert(typeof closurePacket.attestation.reconciledAt === 'string', 'attestation reconciledAt must exist');
+  assert(closurePacket.attestation.reason.includes(gitCommitSha), 'attestation reason must describe the sync');
+
+  // 驗證向後相容性：沒有 attestation 的舊 packet 依然可以通過 validateClosurePacket
+  const legacyPacket = { ...closurePacket };
+  delete legacyPacket.attestation;
+  const legacyValidation = validateClosurePacket(legacyPacket);
+  assert(legacyValidation.ok === true, 'validateClosurePacket must accept a legacy closure packet without attestation');
 
   // 驗證 evidence 檔案已補齊
   const evidencePath = path.join(reconcileRepo, '.atm', 'history', 'evidence', `${reconcileTaskId}.json`);
