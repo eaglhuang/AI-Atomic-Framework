@@ -76,12 +76,13 @@ async function runAtmSpawned(args: any, cwd = root, env: Record<string, string> 
     return runAtmInProcess(args, cwd, env);
   }
   const payload = (result.stdout || result.stderr || '').trim();
-  let parsed;
-  try {
-    parsed = JSON.parse(payload);
-  } catch (error: any) {
-    fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
-    parsed = {};
+  let parsed: any = {};
+  if (payload || !args.includes('--output-json')) {
+    try {
+      parsed = JSON.parse(payload);
+    } catch (error: any) {
+      fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
+    }
   }
   return {
     exitCode: result.status ?? 0,
@@ -106,12 +107,13 @@ async function runAtmInProcess(args: any, cwd = root, env: Record<string, string
       stderr: { write(chunk: unknown) { stderr += String(chunk); return true; } } as any
     });
     const payload = (stdout || stderr || '').trim();
-    let parsed;
-    try {
-      parsed = JSON.parse(payload);
-    } catch (error: any) {
-      fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
-      parsed = {};
+    let parsed: any = {};
+    if (payload || !args.includes('--output-json')) {
+      try {
+        parsed = JSON.parse(payload);
+      } catch (error: any) {
+        fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
+      }
     }
     return {
       exitCode,
@@ -1116,6 +1118,37 @@ try {
     const secondRecord = evidenceContentUpdated.evidence[1];
     assert(secondRecord.details.validationPasses.includes('typecheck'), 'must include typecheck');
     assert(!secondRecord.details.validationPasses.includes('validate:cli'), 'must not include validate:cli if custom validators provided');
+
+    // 2.3: --output-json file writer flag tests
+    const outputJsonTestPath = path.join(autoLinkTempWorkspace, 'output-test.json');
+
+    // Test 3.1: tasks status with --output-json
+    const statusRes = await runAtmSpawned(['tasks', 'queue', 'status', '--output-json', outputJsonTestPath], autoLinkTempWorkspace);
+    assert(statusRes.exitCode === 0, 'tasks queue status with --output-json must exit 0');
+    assert(existsSync(outputJsonTestPath), 'output-test.json file must be written');
+
+    const parsedFileContent = JSON.parse(readFileSync(outputJsonTestPath, 'utf8'));
+    assert(parsedFileContent.ok === true, 'parsed output JSON must report ok=true');
+    assert(parsedFileContent.command === 'tasks', 'parsed output JSON command must be tasks');
+
+    // Assert stdout does not contain JSON body
+    const stdoutTrimmed = (statusRes.stdout || '').trim();
+    assert(!stdoutTrimmed.startsWith('{') && !stdoutTrimmed.endsWith('}'), 'stdout must not contain JSON body when --output-json is used');
+
+    // Clear test file
+    rmSync(outputJsonTestPath, { force: true });
+
+    // Test 3.2: next with --output-json
+    const nextRes = await runAtmSpawned(['next', '--output-json', outputJsonTestPath], autoLinkTempWorkspace);
+    assert(existsSync(outputJsonTestPath), 'output-test.json file must be written for next');
+
+    const parsedNextContent = JSON.parse(readFileSync(outputJsonTestPath, 'utf8'));
+    assert(parsedNextContent.command === 'next', 'parsed output JSON command must be next');
+
+    const nextStdoutTrimmed = (nextRes.stdout || '').trim();
+    assert(!nextStdoutTrimmed.startsWith('{') && !nextStdoutTrimmed.endsWith('}'), 'stdout of next must not contain JSON body when --output-json is used');
+
+    rmSync(outputJsonTestPath, { force: true });
   } finally {
     rmSync(autoLinkTempWorkspace, { recursive: true, force: true });
   }

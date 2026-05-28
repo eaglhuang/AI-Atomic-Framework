@@ -195,6 +195,16 @@ const taskIdPattern = /^(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 
 export async function runTasks(argv: string[]): Promise<CommandResult> {
+  const cleanArgv = [];
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--output-json') {
+      i++;
+      continue;
+    }
+    cleanArgv.push(argv[i]);
+  }
+  argv = cleanArgv;
+
   const action = (argv[0] ?? '').toLowerCase();
   if (action === 'close') {
     return await runTasksClose(argv.slice(1));

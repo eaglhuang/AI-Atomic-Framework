@@ -2,6 +2,14 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+let outputJsonPath: string | null = null;
+
+// 在載入時直接全域掃描一次 process.argv 以備不時之需
+const outputJsonIdx = process.argv.indexOf('--output-json');
+if (outputJsonIdx !== -1 && outputJsonIdx + 1 < process.argv.length) {
+  outputJsonPath = process.argv[outputJsonIdx + 1];
+}
+
 export const configRelativePath = path.join('.atm', 'config.json');
 
 /**
@@ -166,6 +174,24 @@ export function parseArgsForCommand(
       }
       continue;
     }
+    if (arg === '--output-json') {
+      const value = argv[index + 1];
+      if (!value || value.startsWith('--') || value === '-h') {
+        const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty', '--output-json'])].sort();
+        throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for --output-json`, {
+          exitCode: 2,
+          details: {
+            invalidFlags: [],
+            missingRequired: ['--output-json'],
+            allowedFlags,
+            suggestedCommand: null
+          }
+        });
+      }
+      outputJsonPath = value;
+      index += 1;
+      continue;
+    }
 
     if (arg.startsWith('--') || arg.startsWith('-')) {
       const optionSpec = optionMap.get(arg);
@@ -174,7 +200,7 @@ export function parseArgsForCommand(
           state.positional.push(arg);
           continue;
         }
-        const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty'])].sort();
+        const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty', '--output-json'])].sort();
         throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} does not support option ${arg}`, {
           exitCode: 2,
           details: {
@@ -190,7 +216,7 @@ export function parseArgsForCommand(
       if (optionSpec.value) {
         const value = argv[index + 1];
         if (!value || value.startsWith('--') || value === '-h') {
-          const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty'])].sort();
+          const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty', '--output-json'])].sort();
           throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for ${optionSpec.flag}`, {
             exitCode: 2,
             details: {
@@ -240,6 +266,22 @@ export function makeHelpResult(spec: any, cwd = process.cwd()) {
 }
 
 export function writeResult(result: CommandResult, stream: { write(s: string): void }, outputFormat = 'json') {
+  if (outputJsonPath) {
+    try {
+      const resolved = path.resolve(outputJsonPath);
+      const dir = path.dirname(resolved);
+      if (!existsSync(dir)) {
+        mkdirSync(dir, { recursive: true });
+      }
+      writeFileSync(resolved, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+    } catch (err) {
+      process.stderr.write(`Error writing output JSON to ${outputJsonPath}: ${err}\n`);
+    }
+    if (outputFormat === 'pretty') {
+      stream.write(formatPrettyResult(result));
+    }
+    return;
+  }
   if (outputFormat === 'pretty') {
     stream.write(formatPrettyResult(result));
     return;
@@ -283,7 +325,7 @@ const ALLOWED_FLAGS_MAP: Record<string, string[]> = {
 
 function getAllowedFlags(commandName: string): string[] {
   const custom = ALLOWED_FLAGS_MAP[commandName] || [];
-  const defaults = ['--cwd', '--force', '--json', '--pretty'];
+  const defaults = ['--cwd', '--force', '--json', '--pretty', '--output-json'];
   return [...new Set([...custom, ...defaults])].sort();
 }
 
@@ -338,6 +380,7 @@ type ParsedCliOptions = {
   files: string[];
   reason?: string;
   skipChecks: string[];
+  outputJson?: string;
 };
 
 export function parseOptions(argv: string[], commandName: string) {
@@ -373,12 +416,19 @@ export function parseOptions(argv: string[], commandName: string) {
     intent: undefined,
     files: [],
     reason: undefined,
-    skipChecks: []
+    skipChecks: [],
+    outputJson: undefined
   };
   const positional = [];
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
+    if (arg === '--output-json') {
+      options.outputJson = requireOptionValue(argv, index, '--output-json', commandName);
+      outputJsonPath = options.outputJson ?? null;
+      index += 1;
+      continue;
+    }
     if (arg === '--cwd') {
       options.cwd = requireOptionValue(argv, index, '--cwd', commandName);
       index += 1;
