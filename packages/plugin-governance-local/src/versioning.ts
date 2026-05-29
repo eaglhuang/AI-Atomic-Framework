@@ -13,7 +13,7 @@
  * Validates whether a version string conforms to ATM's semantic versioning style (e.g. "0.1.0").
  * @param version The version string to validate
  */
-export function isValidVersionString(version: string): boolean {
+export function isValidSemverVersionString(version: string): boolean {
   if (!version) return false;
   // Standard semver regex: major.minor.patch
   const semverRegex = /^\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?(?:\+[a-zA-Z0-9.]+)?$/;
@@ -49,7 +49,7 @@ export function resolveDataAndArtifactVersions(params: {
  * @param a First version string
  * @param b Second version string
  */
-export function compareVersions(a: string, b: string): number {
+export function compareSemverVersions(a: string, b: string): number {
   if (a === b) return 0;
   
   const parsePart = (v: string) => {

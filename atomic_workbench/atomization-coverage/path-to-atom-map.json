@@ -579,6 +579,12 @@
       "atom_id": "atm.batch-checkpoint-map",
       "capability": "batch deliver-and-close macro: wraps tasks deliver-and-close with --from-batch-checkpoint for the active batch head, then advances the batch queue and optionally claims the next task (same post-close bookkeeping as batch checkpoint). Supports --delivery-commit, --message, --reason pass-through to the inner deliver-and-close. Partial-ok uses ATM_BATCH_DELIVER_AND_CLOSE_PARTIAL_OK; batch-complete uses ATM_BATCH_DELIVER_AND_CLOSE_OK (TASK-AAO-0056).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/plugin-governance-local/src/versioning.ts",
+      "atom_id": "atm.task-ledger-governance-map",
+      "capability": "semantic versioning validation and comparison helpers, including isValidSemverVersionString and compareSemverVersions (hygiene patch)",
+      "coverage_status": "active"
     }
   ],
   "summary": {
