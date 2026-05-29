@@ -37,6 +37,18 @@ import {
 import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.ts';
 import { runAtmGit } from './git-governance.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
+import {
+  coerceStatus,
+  extractFrontMatter,
+  extractTaskDeclaredFiles,
+  hashSection,
+  normalizeOptionalString,
+  normalizeYamlScalar,
+  normalizeTaskId,
+  parseMarkdownTableCells,
+  parseYamlList,
+  validateDeliverablesList
+} from './tasks/task-import-validators.ts';
 
 export interface TaskImportSource {
   readonly planPath: string;
@@ -900,6 +912,37 @@ async function runTasksImport(argv: string[]) {
 
   const writtenPaths: string[] = [];
   let evidencePath: string | null = null;
+
+  // TASK-AAO-0064 L1 #4: strict path 驗證
+  // 收集所有 parsed tasks 的 deliverables，執行啟發式路徑污染檢測
+  const strictPathViolations: Array<{ taskId: string; entry: string; reason: string; severity: 'warning' | 'error' }> = [];
+  for (const task of parsed.tasks) {
+    const violations = validateDeliverablesList(task.deliverables ?? [], options.strictPaths);
+    for (const violation of violations) {
+      strictPathViolations.push({ taskId: task.workItemId, ...violation });
+    }
+  }
+  if (strictPathViolations.length > 0) {
+    if (options.strictPaths) {
+      // strict mode → ok=false，回傳 STRICT_PATH_VIOLATION error
+      throw new CliError('STRICT_PATH_VIOLATION', 'tasks import --strict-paths detected contaminated deliverable paths.', {
+        exitCode: 1,
+        details: {
+          violations: strictPathViolations,
+          planPath: relativePathFrom(options.cwd, planAbsolute)
+        }
+      });
+    }
+    // 非 strict → 加 warning diagnostics，繼續執行
+    for (const violation of strictPathViolations) {
+      parsed.diagnostics.push({
+        level: 'warning',
+        code: 'STRICT_PATH_VIOLATION',
+        text: `Task ${violation.taskId}: deliverable entry "${violation.entry}" matched strict-path heuristic (${violation.reason}). Use --strict-paths to escalate to error.`,
+        workItemId: violation.taskId
+      });
+    }
+  }
 
   if (options.write) {
     assertLocalTaskLedgerEnabled(options.cwd, 'import --write');
@@ -3299,19 +3342,7 @@ function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release' | 'han
   };
 }
 
-function extractTaskDeclaredFiles(taskDocument: Record<string, unknown>) {
-  const files = new Set<string>();
-  for (const key of ['scope', 'scopePaths', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles', 'deliverables', 'artifacts', 'outputs']) {
-    collectTaskFileValues(taskDocument[key], files);
-  }
-  const source = taskDocument.source;
-  if (source && typeof source === 'object' && !Array.isArray(source)) {
-    const sourceRecord = source as Record<string, unknown>;
-    collectTaskFileValues(sourceRecord.path, files);
-    collectTaskFileValues(sourceRecord.planPath, files);
-  }
-  return [...files].sort((left, right) => left.localeCompare(right));
-}
+
 
 function evaluateTaskDeliverableGate(input: {
   readonly cwd: string;
@@ -4135,7 +4166,9 @@ function parseImportOptions(argv: string[]) {
     write: false,
     force: false,
     resetOpen: false,
-    reopen: false
+    reopen: false,
+    // TASK-AAO-0064: --strict-paths flag
+    strictPaths: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -4167,6 +4200,10 @@ function parseImportOptions(argv: string[]) {
     }
     if (arg === '--reopen') {
       options.reopen = true;
+      continue;
+    }
+    if (arg === '--strict-paths') {
+      options.strictPaths = true;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {
@@ -4481,11 +4518,26 @@ function parseSingleCard(input: {
   const body = input.planText.slice(frontMatter.endIndex);
   const sections = sliceBodyByHeadings(body);
   const acceptance = collectBulletList(sections, acceptanceHeaders);
+  const frontMatterScopePaths = parseYamlList(frontMatter.data.scopePaths ?? frontMatter.data.scope_paths ?? frontMatter.data.allowed_files ?? frontMatter.data.allowedFiles ?? frontMatter.data.scope);
   const frontMatterDeliverables = parseYamlList(frontMatter.data.deliverables);
-  const deliverables = uniqueStrings([
-    ...frontMatterDeliverables,
-    ...collectBulletList(sections, deliverablesHeaders)
-  ].map(normalizeYamlScalar));
+  const bodyDeliverables = collectBulletList(sections, deliverablesHeaders);
+  // TASK-AAO-0064 L1: frontmatter 優先（frontmatter canonical）
+  // 若 frontmatter 已提供 deliverables，body parser 結果忽略，記錄診斷
+  let deliverables: readonly string[];
+  const cardImportDiagnostics: TaskCardImportDiagnostic[] = [];
+  if (frontMatterDeliverables.length > 0 && bodyDeliverables.length > 0) {
+    deliverables = uniqueStrings(frontMatterDeliverables.map(normalizeYamlScalar));
+    cardImportDiagnostics.push({
+      code: 'IMPORT_BODY_SECTION_IGNORED',
+      severity: 'warning',
+      message: 'Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.',
+      field: 'deliverables'
+    });
+  } else if (frontMatterDeliverables.length > 0) {
+    deliverables = uniqueStrings(frontMatterDeliverables.map(normalizeYamlScalar));
+  } else {
+    deliverables = uniqueStrings(bodyDeliverables.map(normalizeYamlScalar));
+  }
   const notes = collectText(sections, notesHeaders) ?? null;
   const evidenceFrontMatter = frontMatter.data.evidence && typeof frontMatter.data.evidence === 'object' && !Array.isArray(frontMatter.data.evidence)
     ? frontMatter.data.evidence as Record<string, unknown>
@@ -4511,7 +4563,7 @@ function parseSingleCard(input: {
     ?? frontMatter.data.rollback_notes
     ?? rollbackFrontMatter.notes
   );
-  const importDiagnostics: TaskCardImportDiagnostic[] = [];
+  const importDiagnostics: TaskCardImportDiagnostic[] = [...cardImportDiagnostics];
   if (frontMatter.data.allowed_files !== undefined && frontMatter.data.scopePaths === undefined && frontMatter.data.scope_paths === undefined) {
     importDiagnostics.push({
       code: 'ATM_TASK_IMPORT_LEGACY_ALIAS',
@@ -4876,99 +4928,9 @@ interface FrontMatter {
   readonly headingLine: number;
 }
 
-function extractFrontMatter(text: string): FrontMatter | null {
-  const match = /^---\s*\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/.exec(text);
-  if (!match) return null;
-  const block = match[1];
-  const data: Record<string, unknown> = {};
-  let currentKey: string | null = null;
-  let currentObjectKey: string | null = null;
-  let currentObjectListKey: string | null = null;
-  for (const rawLine of block.split(/\r?\n/)) {
-    const line = rawLine;
-    if (/^[A-Za-z_][A-Za-z0-9_]*\s*:/.test(line)) {
-      const colonIndex = line.indexOf(':');
-      const key = line.slice(0, colonIndex).trim();
-      const value = line.slice(colonIndex + 1).trim();
-      currentKey = key;
-      currentObjectKey = value.length === 0 ? key : null;
-      currentObjectListKey = null;
-      data[key] = value;
-      continue;
-    }
-    const objectFieldMatch = /^ {2}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
-    if (currentObjectKey && objectFieldMatch) {
-      const objectValue = data[currentObjectKey];
-      const objectRecord = objectValue && typeof objectValue === 'object' && !Array.isArray(objectValue)
-        ? objectValue as Record<string, unknown>
-        : {};
-      const key = objectFieldMatch[1];
-      const value = objectFieldMatch[2].trim();
-      objectRecord[key] = value;
-      data[currentObjectKey] = objectRecord;
-      currentObjectListKey = value.length === 0 ? key : null;
-      continue;
-    }
-    if (currentObjectKey && currentObjectListKey && /^ {4}-\s+/.test(line)) {
-      const objectRecord = data[currentObjectKey] as Record<string, unknown>;
-      const value = line.replace(/^ {4}-\s+/, '').trim();
-      const existing = objectRecord[currentObjectListKey];
-      objectRecord[currentObjectListKey] = Array.isArray(existing)
-        ? [...existing, value]
-        : typeof existing === 'string' && existing.length > 0
-          ? [existing, value]
-          : [value];
-      data[currentObjectKey] = objectRecord;
-      continue;
-    }
-    if (currentKey && /^\s*-\s+/.test(line)) {
-      const value = line.replace(/^\s*-\s+/, '').trim();
-      const existing = data[currentKey];
-      if (Array.isArray(existing)) {
-        data[currentKey] = [...(existing as readonly string[]), value];
-      } else if (typeof existing === 'string' && existing.length === 0) {
-        data[currentKey] = [value];
-      } else if (typeof existing === 'string') {
-        data[currentKey] = [existing, value];
-      } else {
-        data[currentKey] = [value];
-      }
-    }
-  }
-  const endIndex = match.index! + match[0].length;
-  const headingLineMatch = /\n#\s+(.+)/.exec(text.slice(endIndex));
-  const headingLine = headingLineMatch
-    ? text.slice(0, endIndex + headingLineMatch.index! + 1).split(/\r?\n/).length
-    : text.slice(0, endIndex).split(/\r?\n/).length;
-  return { data, endIndex, headingLine };
-}
 
-function parseYamlList(value: unknown): readonly string[] {
-  if (!value) return [];
-  if (Array.isArray(value)) return value
-    .filter((entry): entry is string => typeof entry === 'string')
-    .map(normalizeYamlScalar)
-    .filter(Boolean);
-  if (typeof value !== 'string') return [];
-  const trimmed = value.trim();
-  if (!trimmed) return [];
-  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-    return trimmed
-      .slice(1, -1)
-      .split(',')
-      .map((entry) => entry.trim().replace(/^['"]|['"]$/g, ''))
-      .filter(Boolean);
-  }
-  return [normalizeYamlScalar(trimmed)].filter(Boolean);
-}
 
-function normalizeOptionalString(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? normalizeYamlScalar(value) : null;
-}
 
-function normalizeYamlScalar(value: string): string {
-  return value.trim().replace(/^['"`]|['"`]$/g, '');
-}
 
 interface HeadingSection {
   readonly heading: string;
@@ -5082,13 +5044,7 @@ function cleanCellText(value: string): string {
     .trim();
 }
 
-function parseMarkdownTableCells(value: string): readonly string[] {
-  return value
-    .trim()
-    .slice(1, -1)
-    .split('|')
-    .map((cell) => cleanCellText(cell));
-}
+
 
 function isMarkdownTableRow(value: string): boolean {
   return value.startsWith('|') && value.endsWith('|');
@@ -5114,29 +5070,11 @@ function normalizeRelativePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
-function coerceStatus(value: string): TaskImportStatus {
-  const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_');
-  if (normalized === 'todo' || normalized === 'planned') return 'planned';
-  if (normalized === 'reserved') return 'reserved';
-  if (normalized === 'ready') return 'ready';
-  if (normalized === 'open' || normalized === 'pending') return 'open';
-  if (normalized === 'in_progress' || normalized === 'wip' || normalized === 'doing') return 'in_progress';
-  if (normalized === 'running') return 'running';
-  if (normalized === 'review') return 'review';
-  if (normalized === 'blocked' || normalized === 'waiting') return 'blocked';
-  if (normalized === 'abandoned') return 'abandoned';
-  if (normalized === 'done' || normalized === 'completed' || normalized === 'closed') return 'done';
-  if (validStatuses.has(normalized as TaskImportStatus)) return normalized as TaskImportStatus;
-  return 'planned';
-}
 
-function normalizeTaskId(raw: string): string {
-  return raw.trim().replace(/`/g, '').toUpperCase();
-}
 
-function hashSection(content: string): string {
-  return createHash('sha256').update(content).digest('hex').slice(0, 16);
-}
+
+
+
 
 function uniqueStrings(values: readonly string[]): readonly string[] {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));

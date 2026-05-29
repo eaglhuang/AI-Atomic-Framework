@@ -212,6 +212,49 @@ async function main() {
         fail('verify must report ATM_TASKS_VERIFY_DEPENDENCY_MISSING when a task references an unknown id.');
       }
     }
+
+    // TASK-AAO-0064 單元測試：驗證 --strict-paths 與 deliverables 優先級 (L1 & L2)
+    const strictTestPath = path.join(tempWorkspace, 'strict-test-plan.md');
+    const fs = await import('node:fs');
+    fs.writeFileSync(strictTestPath, `---
+task_id: TASK-STRICT-0001
+title: Strict Path Verification Test
+status: planned
+scopePaths:
+  - "packages/cli/src/commands/tasks.ts"
+deliverables:
+  - "packages/cli/src/commands/tasks.ts"
+  - "contaminated path containing the word"
+---
+
+## Deliverables
+- Some valid path packages/cli/src/commands/tasks.ts
+- Some other body path.
+`, 'utf8');
+
+    // 1. 驗證預設模式 (dry-run) 下應產生 IMPORT_BODY_SECTION_IGNORED 警告，且 deliverables 僅採用 frontmatter
+    const defaultImportResult = await expectOk('import', ['--from', strictTestPath, '--dry-run', '--cwd', tempWorkspace]);
+    const defaultManifest = (defaultImportResult.evidence as any).manifest;
+    
+    const importedTask = defaultManifest.tasks[0];
+    const hasBodyIgnoredWarning = importedTask.importDiagnostics.some((d: any) => d.code === 'IMPORT_BODY_SECTION_IGNORED');
+    if (!hasBodyIgnoredWarning) {
+      fail('Strict test card: expected IMPORT_BODY_SECTION_IGNORED diagnostic warning but none found.');
+    }
+    
+    if (importedTask.deliverables.length !== 2 || !importedTask.deliverables.includes('contaminated path containing the word')) {
+      fail(`Strict test card: expected deliverables to come only from frontmatter, got ${JSON.stringify(importedTask.deliverables)}.`);
+    }
+
+    // 2. 驗證預設模式下，嚴格路徑違規應只呈報為 warning
+    const hasStrictPathWarning = defaultManifest.diagnostics.some((d: any) => d.code === 'STRICT_PATH_VIOLATION');
+    if (!hasStrictPathWarning) {
+      fail('Strict test card: expected STRICT_PATH_VIOLATION warning in default mode but none found.');
+    }
+
+    // 3. 驗證啟用 --strict-paths 模式下，應直接拋出 STRICT_PATH_VIOLATION 錯誤 (ok=false)
+    await expectThrow('import', ['--from', strictTestPath, '--dry-run', '--strict-paths', '--cwd', tempWorkspace], 'STRICT_PATH_VIOLATION');
+
   } finally {
     rmSync(tempWorkspace, { recursive: true, force: true });
   }
