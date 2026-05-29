@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0079",
+  "title": "framework-commit-range baseline forward roll to merge commit 09215d6",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0078"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    ".atm/history/baselines/framework-commit-range.json"
+  ],
+  "scopePaths": [
+    ".atm/history/baselines/framework-commit-range.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Bypass pre-push hook",
+    "Force push",
+    "Use ATM_FRAMEWORK_PUSH_GUARD_SAFE_MODE"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0079-framework-commit-range-baseline-forward-roll.task.md",
+    "sectionTitle": "TASK-AAO-0079",
+    "headingLine": 23,
+    "hash": "c8484e41cf8bd790"
+  },
+  "importedAt": "2026-05-29T16:52:35.105Z",
+  "lastTransitionId": "2026-05-29T16-56-41-067Z-close-54a1d19aa4f5",
+  "lastTransitionAt": "2026-05-29T16:56:41.067Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "github-copilot",
+  "reservedAt": "2026-05-29T16:52:43.265Z",
+  "promotedAt": "2026-05-29T16:52:43.269Z",
+  "claim": {
+    "actorId": "github-copilot",
+    "leaseId": "lease-30ed48060f4a",
+    "claimedAt": "2026-05-29T16:52:43.271Z",
+    "heartbeatAt": "2026-05-29T16:56:41.066Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0079.json",
+      ".atm/history/baselines/framework-commit-range.json",
+      "package.json",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-29T16:52:43.271Z",
+  "startedByActor": "github-copilot",
+  "startedBySessionId": "session-20260529165243-github-copilot-TASK-AAO-0079-bd9825c9b6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0079",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/baselines/framework-commit-range.json",
+      ".atm/history/evidence/TASK-AAO-0079.*",
+      ".atm/history/task-events/TASK-AAO-0079/**",
+      ".atm/history/tasks/TASK-AAO-0079.json",
+      "package.json",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "990de6810902a222acc0d7a27360b823514558f94e9e1b941778cff0cd9cfe65",
+    "actorId": "github-copilot",
+    "createdAt": "2026-05-29T16:52:43.283Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0079.closure-packet.json",
+  "closedAt": "2026-05-29T16:56:41.066Z",
+  "closedByActor": "github-copilot",
+  "closedBySessionId": "session-20260529165243-github-copilot-TASK-AAO-0079-bd9825c9b6"
+}
