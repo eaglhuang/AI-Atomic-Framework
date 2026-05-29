@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { auditTasks, classifyFrameworkStaleLock, createFrameworkModeStatus, runFrameworkTempClaim, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
+import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
 import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -847,8 +848,10 @@ try {
   }
   assert(deliverMacroDryRunError === 'ATM_TASK_NOT_FOUND', `deliver-and-close dry-run on missing task must throw ATM_TASK_NOT_FOUND, got: ${deliverMacroDryRunError}`);
 
+  await validateTaskLedgerReadersAtomization(tempRoot);
+
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, and TASK-AAO-0057 close-gate scoped diff isolation verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, and TASK-AAO-0061 task-ledger-readers atomization verified)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {
@@ -857,4 +860,41 @@ try {
     process.env.GIT_CEILING_DIRECTORIES = previousGitCeilingDirectories;
   }
   rmSync(tempRoot, { recursive: true, force: true });
+}
+
+async function validateTaskLedgerReadersAtomization(tempRoot: string) {
+  // 1. 驗證 createClaimRecord 與 parseClaimRecord
+  const timestamp = new Date().toISOString();
+  const input = {
+    taskId: 'TASK-ATOM-9999',
+    actorId: 'atom-agent',
+    files: ['src/atom.ts', 'src/sub/helper.ts'],
+    ttlSeconds: 300,
+    timestamp
+  };
+  const record = createClaimRecord(input);
+  assert(record.actorId === 'atom-agent', 'createClaimRecord actorId must match');
+  assert(record.leaseId.startsWith('lease-'), 'createClaimRecord leaseId must start with lease-');
+  assert(record.claimedAt === timestamp, 'createClaimRecord claimedAt must match');
+  assert(record.files.includes('src/atom.ts'), 'createClaimRecord files must preserve normalized relative paths');
+
+  const parsed = parseClaimRecord(record);
+  assert(parsed !== null, 'parseClaimRecord must successfully parse valid claim record');
+  assert(parsed!.actorId === 'atom-agent', 'parseClaimRecord actorId must match');
+  assert(parsed!.ttlSeconds === 300, 'parseClaimRecord ttlSeconds must match');
+
+  // 2. 驗證 isClaimExpired
+  assert(isClaimExpired(record, new Date(Date.parse(timestamp) + 100 * 1000).toISOString()) === false, 'isClaimExpired must be false before TTL expiration');
+  assert(isClaimExpired(record, new Date(Date.parse(timestamp) + 400 * 1000).toISOString()) === true, 'isClaimExpired must be true after TTL expiration');
+
+  // 3. 驗證 listRuntimeLockTaskIds 在 adopter-governed 目錄下運作正常
+  const dummyRepo = makeHostRepo(tempRoot, 'atom-ledger-readers-locks-test');
+  const locksDir = path.join(dummyRepo, '.atm', 'runtime', 'locks');
+  mkdirSync(locksDir, { recursive: true });
+  writeFileSync(path.join(locksDir, 'TASK-LOCK-0001.lock.json'), JSON.stringify({}), 'utf8');
+  writeFileSync(path.join(locksDir, 'TASK-LOCK-0002.lock.json'), JSON.stringify({}), 'utf8');
+
+  const lockTaskIds = listRuntimeLockTaskIds(dummyRepo);
+  assert(lockTaskIds.includes('TASK-LOCK-0001'), 'listRuntimeLockTaskIds must list TASK-LOCK-0001');
+  assert(lockTaskIds.includes('TASK-LOCK-0002'), 'listRuntimeLockTaskIds must list TASK-LOCK-0002');
 }
