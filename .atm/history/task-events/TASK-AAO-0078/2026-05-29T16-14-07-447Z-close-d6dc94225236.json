@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-29T16-14-07-447Z-close-d6dc94225236",
+  "taskId": "TASK-AAO-0078",
+  "action": "close",
+  "actorId": "Antigravity",
+  "sessionId": "session-20260529160445-Antigravity-TASK-AAO-0078-cefd7d19fd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0078.json",
+  "taskSha256": "sha256:6f801d027bdb9e3397b064451c2b318ebd4fe300c6002ae8946ce2fc44c39abb",
+  "createdAt": "2026-05-29T16:14:07.447Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0078 --actor Antigravity --status done --historical-delivery 138adbef808343274436058604981eb7cc550db7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260529160445-Antigravity-TASK-AAO-0078-cefd7d19fd",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0078.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-29T16:14:07.444Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0078-git-head-evidence-jsonl-migration.task.md",
+        ".atm/history/evidence/git-head.json",
+        ".atm/history/evidence/git-head.jsonl",
+        ".gitattributes",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/git-head-evidence.ts",
+        "packages/cli/src/commands/hook.ts",
+        "scripts/validate-git-head-evidence.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-root-drop-release.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/git-head-evidence.ts",
+        "packages/cli/src/commands/hook.ts",
+        "scripts/validate-git-head-evidence.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-root-drop-release.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
