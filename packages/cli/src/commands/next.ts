@@ -10,6 +10,22 @@ import {
   type HumanReviewQueueStatus
 } from '../../../plugin-human-review/src/index.ts';
 import { buildFirstUseUserNotice, type AtmUserNotice } from './first-use-notice.ts';
+import {
+  compareScoredTasks,
+  compareGuidedLegacyQueuePriority,
+  compareIsoDesc,
+  looksLikeTaskArtifact,
+  isLikelyPromptPathHint,
+  pathFieldMatches,
+  looksLikeNamedPlanPrompt,
+  allowsPlanningMirror,
+  statusQueueWeight,
+  humanReviewStatusWeight,
+  decisionResultForStatus,
+  tokenizeForMatch,
+  countTokenOverlap,
+  type NextDecisionTrailEntry
+} from './next/match-and-sort.ts';
 import { runDoctor } from './doctor.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
@@ -1801,14 +1817,7 @@ function hasPromptScopedWorkItems(importedTaskQueue: ImportedTaskQueue) {
   return importedTaskQueue.tasks.some((task) => task.workItemId !== bootstrapTaskId);
 }
 
-function statusQueueWeight(status: string): number {
-  const normalized = normalizeTaskRouteStatus(status);
-  if (normalized === 'ready') return 0;
-  if (normalized === 'open') return 1;
-  if (normalized === 'planned') return 2;
-  if (normalized === 'blocked' || normalized === 'waiting_target_evidence') return 3;
-  return 3;
-}
+
 
 async function prepareImportedTaskForClaim(input: {
   readonly cwd: string;
@@ -2159,11 +2168,7 @@ function assertPromptBatchDoesNotConflict(input: {
   }
 }
 
-function looksLikeNamedPlanPrompt(prompt: string): boolean {
-  const normalized = normalizeSearchText(prompt);
-  if (!/(?:\u8a08\u756b\u66f8|\u8a08\u756b|\u6587\u4ef6|plan|roadmap|spec|document)/i.test(prompt)) return false;
-  return normalized.length >= 10;
-}
+
 
 function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: TaskIntent): ImportedTaskSummary {
   const prompt = normalizeSearchText(intent.userPrompt ?? '');
@@ -2243,12 +2248,7 @@ function applyOrdinalScope(tasks: readonly ImportedTaskSummary[], intent: TaskIn
     .slice(0, intent.ordinalScope.count);
 }
 
-function compareScoredTasks(left: ImportedTaskSummary, right: ImportedTaskSummary): number {
-  const scoreDelta = (right.matchScore ?? 0) - (left.matchScore ?? 0);
-  if (scoreDelta !== 0) return scoreDelta;
-  const statusDelta = statusQueueWeight(left.status) - statusQueueWeight(right.status);
-  return statusDelta !== 0 ? statusDelta : left.workItemId.localeCompare(right.workItemId);
-}
+
 
 function resolveRouteTargetRepo(tasks: readonly ImportedTaskSummary[]): string | null {
   const targets = uniqueSorted(tasks.map((task) => task.targetRepo).filter((entry): entry is string => Boolean(entry)));
@@ -2599,24 +2599,7 @@ function listPendingGitFiles(cwd: string): readonly string[] {
   return uniqueSorted([...stagedOrTracked, ...untracked]);
 }
 
-function looksLikeTaskArtifact(filePath: string, task: ImportedTaskSummary): boolean {
-  const normalized = normalizeOptionalTaskPath(filePath)?.toLowerCase() ?? '';
-  if (!normalized) return false;
-  if (normalized.startsWith('.git/') || normalized.startsWith('node_modules/')) return false;
-  const taskText = [
-    task.workItemId,
-    task.title,
-    task.sourcePlanPath ?? '',
-    ...task.scopePaths,
-    ...task.targetAllowedFiles
-  ].join(' ').toLowerCase();
-  const fileTokens = tokenizeForMatch(normalized);
-  const taskTokens = new Set(tokenizeForMatch(taskText));
-  if (fileTokens.some((token) => taskTokens.has(token))) return true;
-  if (normalized.startsWith('atomic_workbench/') && /\batomization\b|generated|fixture|exclusion|dogfood|coverage/.test(taskText)) return true;
-  if (normalized.startsWith('docs/ai_atomic_framework/') && task.sourcePlanPath?.includes('docs/ai_atomic_framework/')) return true;
-  return false;
-}
+
 
 function listTaskCardFiles(cwd: string): readonly string[] {
   const output = new Set<string>();
@@ -2832,22 +2815,7 @@ function normalizeOptionalString(value: unknown): string | null {
 
 
 
-function allowsPlanningMirror(record: Record<string, unknown>): boolean {
-  for (const key of [
-    'allow_planning_mirror',
-    'allowPlanningMirror',
-    'planning_mirror_required',
-    'planningMirrorRequired',
-    'mirror_required',
-    'mirrorRequired',
-    'import_required',
-    'importRequired'
-  ]) {
-    const value = normalizeOptionalBoolean(record[key]);
-    if (value !== null) return value;
-  }
-  return false;
-}
+
 
 
 
@@ -2873,38 +2841,6 @@ function extractPromptPathHints(prompt: string): readonly string[] {
     .filter(isLikelyPromptPathHint));
 }
 
-function isLikelyPromptPathHint(value: string): boolean {
-  const normalized = value.replace(/\\/g, '/').trim();
-  if (!normalized) return false;
-  if (/^[A-Za-z]:\//.test(normalized) || normalized.startsWith('./') || normalized.startsWith('../') || normalized.startsWith('.atm/') || normalized.startsWith('.github/')) return true;
-  if (/\.md$/i.test(normalized)) return true;
-  return /^(?:app|apps|assets|atomic_workbench|client|config|docs|examples|fixtures|integrations|lib|packages|public|release|schemas|scripts|server|specs|src|templates|tests|tools|ui|web)\//.test(normalized);
-}
-
-function pathFieldMatches(field: string, hint: string): boolean {
-  const normalizedField = normalizeSearchText(field);
-  const normalizedHint = normalizeSearchText(hint);
-  const fieldStem = normalizeSearchText(path.basename(field).replace(/\.[^.]+$/, ''));
-  const hintStem = normalizeSearchText(path.basename(hint).replace(/\.[^.]+$/, ''));
-  return normalizedField.includes(normalizedHint)
-    || normalizedHint.includes(normalizedField)
-    || Boolean(fieldStem && hintStem && (fieldStem.includes(hintStem) || hintStem.includes(fieldStem)));
-}
-
-
-
-function countTokenOverlap(prompt: string, title: string): number {
-  const promptTokens = new Set(tokenizeForMatch(prompt));
-  return tokenizeForMatch(title).filter((token) => promptTokens.has(token)).length;
-}
-
-function tokenizeForMatch(value: string): readonly string[] {
-  return value
-    .toLowerCase()
-    .split(/[^a-z0-9\u4e00-\u9fff]+/u)
-    .map((entry) => entry.trim())
-    .filter((entry) => entry.length >= 3);
-}
 
 function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {
   const safeSegments = plan.segments.filter((s: LegacyRoutePlanSegment) => plan.safeFirstAtoms.includes(s.symbolName));
@@ -3047,13 +2983,7 @@ function isMatchingGuidedLegacyProposal(
     && entry.proposal.behaviorId === criteria.behaviorId;
 }
 
-function compareGuidedLegacyQueuePriority(left: HumanReviewQueueRecord, right: HumanReviewQueueRecord) {
-  const statusDelta = humanReviewStatusWeight(left.status) - humanReviewStatusWeight(right.status);
-  if (statusDelta !== 0) {
-    return statusDelta;
-  }
-  return compareIsoDesc(left.review?.decidedAt ?? left.queuedAt ?? left.proposal.proposedAt, right.review?.decidedAt ?? right.queuedAt ?? right.proposal.proposedAt);
-}
+
 
 function findGuidedLegacyActualPatchEvidence(cwd: string, proposalId: string): GuidedLegacyActualPatchEvidence | null {
   const reportsRoot = path.join(cwd, '.atm', 'history', 'reports');
@@ -3093,21 +3023,6 @@ function findGuidedLegacyActualPatchEvidence(cwd: string, proposalId: string): G
   return matches[0] ?? null;
 }
 
-function humanReviewStatusWeight(status: HumanReviewQueueStatus) {
-  if (status === 'approved') return 0;
-  if (status === 'pending') return 1;
-  if (status === 'blocked') return 2;
-  return 3;
-}
-
-function compareIsoDesc(left: string | undefined, right: string | undefined) {
-  const leftValue = left ?? '';
-  const rightValue = right ?? '';
-  if (leftValue === rightValue) {
-    return 0;
-  }
-  return leftValue > rightValue ? -1 : 1;
-}
 
 function reconcileProposalMissingEvidence(
   missingEvidence: readonly string[],
@@ -3398,13 +3313,7 @@ function buildTeamRecommendation(input: {
   };
 }
 
-interface NextDecisionTrailEntry {
-  readonly check: string;
-  readonly result: 'pass' | 'blocked' | 'info';
-  readonly reason: string;
-  readonly evidencePath?: string;
-  readonly nextCommand?: string;
-}
+
 
 type NextActionLike = {
   status: string;
@@ -3537,12 +3446,7 @@ function buildDecisionTrail(nextAction: NextActionLike): NextDecisionTrailEntry[
   return entries;
 }
 
-function decisionResultForStatus(status: string): NextDecisionTrailEntry['result'] {
-  if (status === 'prompt-guidance-required') return 'info';
-  if (/blocked|required|not-found|selection|repair/i.test(status)) return 'blocked';
-  if (/ready|action|closed|claimed|queue/i.test(status)) return 'pass';
-  return 'info';
-}
+
 
 function readTaskId(value: unknown): string | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
