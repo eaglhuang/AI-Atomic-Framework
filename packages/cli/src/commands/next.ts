@@ -632,7 +632,10 @@ async function claimNextImportedTask(input: {
       '--actor',
       resolvedActor.actorId,
       '--files',
-      claimableTask.taskPath,
+      Array.from(new Set([
+        claimableTask.taskPath,
+        ...(Array.isArray(claimableTask.targetAllowedFiles) ? claimableTask.targetAllowedFiles : [])
+      ])).join(','),
       '--json'
     ]);
   const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'

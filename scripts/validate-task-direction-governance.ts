@@ -55,8 +55,10 @@ async function main() {
     await validateFrameworkDevelopment(tempRoot);
     await validateTaskSelfAllowOnClaim(tempRoot);
     await validateTasksClaimDirectionLockConsistency(tempRoot);
+    await validateNextClaimPromptScopeConsistency(tempRoot);
     if (!process.exitCode) {
       console.log(`[task-direction-governance:${mode}] ok (adopter-governed and framework-development task direction gates verified)`);
+      process.exit(0);
     }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
@@ -566,6 +568,44 @@ function runGit(repo: string, args: string[]) {
   const result = spawnSync('git', args, { cwd: repo, encoding: 'utf8' });
   assert(result.status === 0, `git ${args.join(' ')} must exit 0: ${result.stderr || result.stdout}`);
   return result.stdout.trim();
+}
+
+async function validateNextClaimPromptScopeConsistency(tempRoot: string) {
+  const repo = makeAdopterRepo(tempRoot, 'adopter-next-claim-prompt-scope');
+  writeFileSync(path.join(repo, 'src', 'three.ts'), 'export const three = 3;\n', 'utf8');
+  writeLedgerTask(repo, 'TASK-ADOPT-0003', 'Adopter task three with multi-deliverables', 'src/one.ts', {
+    scopePaths: ['src/one.ts', 'src/two.ts', 'src/three.ts']
+  });
+  writeEvidence(repo, 'TASK-ADOPT-0003');
+  initializeGit(repo);
+
+  const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-ADOPT-0003']);
+  assert(claim.ok === true, 'next claim prompt sync: next --claim must succeed');
+
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', 'TASK-ADOPT-0003.json');
+  assert(existsSync(taskPath), 'next claim prompt sync: task ledger JSON must exist');
+  const taskData = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, any>;
+
+  const claimFiles = taskData.claim?.files ?? [];
+  const allowedFiles = taskData.taskDirectionLock?.allowedFiles ?? [];
+
+  assert(claimFiles.includes('src/one.ts'), 'claim.files must contain src/one.ts');
+  assert(claimFiles.includes('src/two.ts'), 'claim.files must contain src/two.ts');
+  assert(claimFiles.includes('src/three.ts'), 'claim.files must contain src/three.ts');
+
+  assert(allowedFiles.includes('src/one.ts'), 'allowedFiles must contain src/one.ts');
+  assert(allowedFiles.includes('src/two.ts'), 'allowedFiles must contain src/two.ts');
+  assert(allowedFiles.includes('src/three.ts'), 'allowedFiles must contain src/three.ts');
+
+  const hookResult = runIntegrationHookInvocation([
+    'pre-tool',
+    '--cwd', repo,
+    '--editor', 'copilot',
+    '--tool-name', 'Edit',
+    '--prompt', 'TASK-ADOPT-0003',
+    '--files', 'src/one.ts,src/two.ts,src/three.ts'
+  ]);
+  assert(hookResult.ok === true, `pre-tool hook must allow edits to all three deliverables. Messages: ${JSON.stringify(hookResult.messages)}`);
 }
 
 main().catch((error) => {
