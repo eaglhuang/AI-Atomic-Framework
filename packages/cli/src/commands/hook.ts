@@ -839,6 +839,9 @@ function runPrePushHook(cwd: string, base: string | null, head: string | null) {
   const hardFailure = enforcement.hardEnforcement && report.findings.length > 0 && !enforcement.safeModeActive;
   const warnOnly = report.findings.length > 0 && !hardFailure;
   const safeModeMissingMetadata = enforcement.safeModeRequested && !enforcement.safeModeActive;
+  const evidenceMissingDiagnostic = report.evidenceMissingDiagnostic
+    ? [message('info', 'ATM_HOOK_PRE_PUSH_GIT_HEAD_EVIDENCE_MISSING_DIAGNOSTIC', 'ATM pre-push git-head evidence-missing commits after the accepted baseline.', report.evidenceMissingDiagnostic)]
+    : [];
   return makeResult({
     ok: !hardFailure && !safeModeMissingMetadata,
     command: 'hook',
@@ -877,7 +880,8 @@ function runPrePushHook(cwd: string, base: string | null, head: string | null) {
               head: resolvedHead,
               criticalCommitCount: report.criticalCommits.length,
               rangeDecision: enforcement
-            })
+            }),
+      ...evidenceMissingDiagnostic
     ],
     evidence: {
       action: 'pre-push',
@@ -906,26 +910,40 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
       criticalChangedFiles: readCommitChangedFiles(root, commitSha).filter(isAtmCriticalNonDocSurface)
     }))
     .filter((entry) => entry.criticalChangedFiles.length > 0);
+  const legacyBaselineBoundaryCommitSha = legacyBaseline?.acceptedHistoryThroughCommitSha ?? legacyBaseline?.commitSha ?? null;
+  const isAcceptedByLegacyBaseline = (commitSha: string) => legacyBaselineBoundaryCommitSha
+    ? isCommitAcceptedByLegacyBaseline(root, commitSha, legacyBaselineBoundaryCommitSha)
+    : false;
   const enforcedCriticalCommits = legacyBaseline
-    ? criticalCommits.filter((entry) => !isCommitAcceptedByLegacyBaseline(root, entry.commitSha, legacyBaseline.commitSha))
+    ? criticalCommits.filter((entry) => !isAcceptedByLegacyBaseline(entry.commitSha))
     : criticalCommits;
   const evidenceMatches = criticalCommits.map((entry) => inspectCommitGitHeadEvidence(root, entry.commitSha, entry.criticalChangedFiles));
   const closurePacketInspections = enforcedCriticalCommits.flatMap((entry) => {
     const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
     return inspectCommitClosurePackets(root, entry.commitSha, match ?? null);
   });
+  const missingEvidenceMatches = evidenceMatches
+    .filter((entry) => !legacyBaseline || !isAcceptedByLegacyBaseline(entry.commitSha))
+    .filter((entry) => !entry.matched);
+  const evidenceMissingDiagnostic = missingEvidenceMatches.length > 0
+    ? {
+      count: missingEvidenceMatches.length,
+      samples: missingEvidenceMatches.slice(0, 5).map((entry) => ({
+        commitSha: entry.commitSha,
+        message: runGitScalar(root, ['log', '-1', '--format=%s', entry.commitSha]) ?? ''
+      }))
+    }
+    : null;
   const taskAudit = auditTasks(root);
   const findings = [
-    ...evidenceMatches
-      .filter((entry) => !legacyBaseline || !isCommitAcceptedByLegacyBaseline(root, entry.commitSha, legacyBaseline.commitSha))
-      .filter((entry) => !entry.matched)
+    ...missingEvidenceMatches
       .map((entry) => ({
         level: 'error' as const,
         code: 'ATM_COMMIT_RANGE_GIT_HEAD_EVIDENCE_MISSING',
         commitSha: entry.commitSha,
         detail: `Critical framework commit ${entry.commitSha} has no matching git-head evidence.`
       })),
-    ...closurePacketInspections.flatMap((entry) => entry.findings.map((finding) => ({
+    ...closurePacketInspections.flatMap((entry) => legacyBaseline && isAcceptedByLegacyBaseline(entry.commitSha) ? [] : entry.findings.map((finding) => ({
       level: 'error' as const,
       code: finding.code,
       commitSha: entry.commitSha,
@@ -952,6 +970,7 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
       criticalChangedFiles,
       criticalCommits: enforcedCriticalCommits,
       evidenceMatches,
+      evidenceMissingDiagnostic,
       closurePacketInspections,
       taskAudit,
       protectedBranchPatterns,
@@ -1263,7 +1282,7 @@ function readStagedTreeWithoutEvidence(cwd: string): string | null {
         writeFileSync(tempIndex, readFileSync(absoluteIndex));
       }
     }
-    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', gitHeadEvidencePaths.legacyJson, gitHeadEvidencePaths.jsonl], { GIT_INDEX_FILE: tempIndex });
+    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', gitHeadEvidencePaths.legacyJson, gitHeadEvidencePaths.jsonl], { GIT_INDEX_FILE: tempIndex });
     const tree = runGit(cwd, ['write-tree'], { GIT_INDEX_FILE: tempIndex });
     return tree.exitCode === 0 ? tree.stdout.trim() : null;
   } finally {
@@ -1432,7 +1451,7 @@ function readCommitTreeWithoutEvidence(cwd: string, commitSha: string): string |
   try {
     const readTree = runGit(cwd, ['read-tree', commitSha], { GIT_INDEX_FILE: tempIndex });
     if (readTree.exitCode !== 0) return null;
-    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', gitHeadEvidencePath], { GIT_INDEX_FILE: tempIndex });
+    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', gitHeadEvidencePaths.legacyJson, gitHeadEvidencePaths.jsonl], { GIT_INDEX_FILE: tempIndex });
     const tree = runGit(cwd, ['write-tree'], { GIT_INDEX_FILE: tempIndex });
     return tree.exitCode === 0 ? tree.stdout.trim() : null;
   } finally {
