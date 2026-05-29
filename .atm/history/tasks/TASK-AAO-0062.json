@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0062",
+  "title": "Claim direction lock consistency",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0012",
+    "TASK-AAO-0058"
+  ],
+  "acceptance": [
+    "Either:",
+    "(Path A) `tasks claim` produces a lock record that embeds a valid `taskDirectionLock` object, allowing `tasks close` to proceed without `ATM_TASK_DIRECTION_LOCK_REQUIRED`; OR",
+    "(Path B) `ATM_TASK_DIRECTION_LOCK_REQUIRED` envelope adds `data.missingField: \"taskDirectionLock\"`, `data.detectedClaimCommand`, and `data.requiredCommand: \"node atm.mjs next --claim --prompt <task>\"`.",
+    "A regression test in `scripts/validate-task-direction-governance.ts` covers the chosen path.",
+    "`npm run typecheck`, `npm run validate:cli`, and the targeted governance validator all pass.",
+    "No change to the lock-file schema version."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/next.ts",
+    "scripts/validate-task-direction-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/next.ts",
+    "scripts/validate-task-direction-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-direction-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changes to lock-file schema version",
+    "Runtime lock cleanup or expiry policy changes",
+    "Refactoring of `next --claim` itself"
+  ],
+  "nonGoals": [
+    "Do not introduce a new claim subcommand",
+    "Do not change `tasks close` semantics beyond improved error envelope",
+    "Do not silently swallow legacy lock files missing the direction-lock embed"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the direction-lock embed addition to `tasks claim`; runtime lock files are ephemeral, no migration needed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-direction-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "agent-operability",
+    "governance-safety",
+    "cli-ergonomics"
+  ],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0062-claim-direction-lock-consistency.task.md",
+    "sectionTitle": "TASK-AAO-0062",
+    "headingLine": 57,
+    "hash": "9a19f7e76fa1bba0"
+  },
+  "importedAt": "2026-05-29T03:15:41.888Z",
+  "lastTransitionId": "2026-05-29T03-36-05-387Z-close-57815376a920",
+  "lastTransitionAt": "2026-05-29T03:36:05.387Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-29T03:15:50.345Z",
+  "promotedAt": "2026-05-29T03:15:50.349Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-2d28b5066e9f",
+    "claimedAt": "2026-05-29T03:15:50.351Z",
+    "heartbeatAt": "2026-05-29T03:36:05.386Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0062.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-29T03:15:50.351Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260529031550-Antigravity-TASK-AAO-0062-028d1a3c33",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0062.closure-packet.json",
+  "closedAt": "2026-05-29T03:36:05.386Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260529031550-Antigravity-TASK-AAO-0062-028d1a3c33"
+}
