@@ -594,14 +594,20 @@
     },
     {
       "path_pattern": "packages/cli/src/commands/tasks/task-import-validators.ts",
-      "atom_id": "atm.task-ledger-governance-map",
-      "capability": "pure parsing and strict path heuristic validators extracted from tasks.ts (TASK-AAO-0064)",
+      "atom_id": "atm.cli-task-import-validator",
+      "capability": "Pure YAML/frontmatter/path parsing validators for task import pipeline",
       "coverage_status": "active"
     },
     {
       "path_pattern": "packages/cli/src/commands/output-projection.ts",
       "atom_id": "atm.cli-output-projection",
       "capability": "field-level envelope projection for --summary and --fields CLI flags",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/intent-normalizers.ts",
+      "atom_id": "atm.cli-next-intent-resolver",
+      "capability": "Pure parsing/normalization helpers for next.ts intent resolution: frontmatter parse, status/intent/scope normalizers, list splitters",
       "coverage_status": "active"
     }
   ],

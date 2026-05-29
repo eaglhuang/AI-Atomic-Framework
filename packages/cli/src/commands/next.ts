@@ -41,6 +41,22 @@ import {
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
 import { runTasks } from './tasks.ts';
+import {
+  parseMarkdownFrontmatter,
+  normalizeTaskRouteStatus,
+  normalizeOptionalBoolean,
+  normalizeSearchText,
+  normalizeTaskIntent,
+  normalizeOrdinalScope,
+  normalizeTaskIntentSource,
+  normalizeRequestedTaskAction,
+  normalizeOptionalTaskPath,
+  readStringArray,
+  splitListValue,
+  type TaskIntentSource,
+  type RequestedTaskAction,
+  type TaskIntent
+} from './next/intent-normalizers.ts';
 
 export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
@@ -1609,25 +1625,7 @@ function blockedMutationCommands() {
   ];
 }
 
-type TaskIntentSource = 'integration-hook' | 'atm-skill' | 'cli-deterministic';
-type RequestedTaskAction = 'analyze' | 'implement' | 'redo' | 'reopen' | 'close' | 'audit' | 'cleanup';
 type PromptScopedRouteStatus = 'ready' | 'queue' | 'ambiguous' | 'not-found';
-
-interface TaskIntent {
-  readonly schemaId: 'atm.taskIntent.v1';
-  readonly userPrompt: string | null;
-  readonly explicitTaskIds: readonly string[];
-  readonly mentionedTaskIds: readonly string[];
-  readonly mentionedPlanPaths: readonly string[];
-  readonly taskRootHints: readonly string[];
-  readonly targetRepoHints: readonly string[];
-  readonly requestedAction: RequestedTaskAction | null;
-  readonly confidence: number;
-  readonly source: TaskIntentSource;
-  readonly ordinalScope: { readonly kind: 'first'; readonly count: number } | null;
-  readonly queueRequested: boolean;
-  readonly taskScopeMentioned: boolean;
-}
 
 interface PromptScopedTaskRoute {
   readonly status: PromptScopedRouteStatus;
@@ -1927,9 +1925,6 @@ async function prepareImportedTaskForClaim(input: {
   };
 }
 
-function normalizeTaskRouteStatus(status: string) {
-  return String(status ?? '').trim().toLowerCase();
-}
 
 function isClosedTaskStatus(status: string) {
   const normalized = normalizeTaskRouteStatus(status);
@@ -2099,37 +2094,6 @@ function createDeterministicTaskIntent(prompt: string, explicitTaskIds: readonly
   };
 }
 
-function normalizeTaskIntent(value: Record<string, unknown>, fallbackSource: TaskIntentSource): TaskIntent {
-  const userPrompt = normalizeOptionalString(value.userPrompt);
-  const explicitTaskIds = uniqueInOrder([
-    ...readStringArray(value.taskIds),
-    ...readStringArray(value.tasks)
-  ].map((entry) => entry.toUpperCase()));
-  const mentionedTaskIds = uniqueSorted(readStringArray(value.mentionedTaskIds).flatMap((entry) => expandTaskIdReferenceAliases(entry)));
-  const mentionedPlanPaths = readStringArray(value.mentionedPlanPaths);
-  const taskRootHints = readStringArray(value.taskRootHints);
-  const targetRepoHints = readStringArray(value.targetRepoHints);
-  const prompt = userPrompt ?? '';
-  return {
-    schemaId: 'atm.taskIntent.v1',
-    userPrompt,
-    explicitTaskIds,
-    mentionedTaskIds,
-    mentionedPlanPaths,
-    taskRootHints,
-    targetRepoHints,
-    requestedAction: normalizeRequestedTaskAction(value.requestedAction) ?? detectRequestedTaskAction(prompt),
-    confidence: typeof value.confidence === 'number' && Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0.5,
-    source: normalizeTaskIntentSource(value.source) ?? fallbackSource,
-    ordinalScope: normalizeOrdinalScope(value.ordinalScope),
-    queueRequested: value.queueRequested === true || isQueueRequestedPrompt(prompt),
-    taskScopeMentioned: value.taskScopeMentioned === true
-      || explicitTaskIds.length > 0
-      || mentionedTaskIds.length > 0
-      || mentionedPlanPaths.length > 0
-      || taskRootHints.length > 0
-  };
-}
 
 function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskSummary[], taskIntent: TaskIntent | null): PromptScopedTaskRoute | null {
   if (!taskIntent || !taskIntent.taskScopeMentioned) return null;
@@ -2683,16 +2647,6 @@ function resolveQuickfixScope(prompt: string) {
   ]);
 }
 
-function normalizeOptionalTaskPath(value: string | null | undefined) {
-  const normalized = normalizeOptionalString(value);
-  if (!normalized) return null;
-  const candidate = normalized.replace(/^[`"'(]+|[`"'):;,]+$/g, '');
-  if (!candidate) return null;
-  if (/^[A-Za-z]:\//.test(candidate) || candidate.startsWith('http://') || candidate.startsWith('https://')) {
-    return null;
-  }
-  return candidate.replace(/\\/g, '/').replace(/^\.\//, '').trim();
-}
 
 interface PendingTaskArtifactScopeDiagnostic {
   readonly schemaId: 'atm.taskArtifactScopeDiagnostic.v1';
@@ -3003,72 +2957,13 @@ function shouldSkipRecursiveDiscoveryDirectory(directoryPath: string) {
   return segments.some((segment, index) => segment === 'local' && (segments[index + 1] === 'tmp' || segments[index + 1] === 'temp'));
 }
 
-function parseMarkdownFrontmatter(text: string): Record<string, unknown> {
-  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return {};
-  const result: Record<string, unknown> = {};
-  let currentListKey: string | null = null;
-  for (const rawLine of match[1].split(/\r?\n/)) {
-    const listMatch = /^\s*-\s+(.+?)\s*$/.exec(rawLine);
-    if (listMatch && currentListKey) {
-      const current = Array.isArray(result[currentListKey]) ? result[currentListKey] as string[] : [];
-      current.push(listMatch[1].trim());
-      result[currentListKey] = current;
-      continue;
-    }
-    const separatorIndex = rawLine.indexOf(':');
-    if (separatorIndex === -1) {
-      if (rawLine.trim()) currentListKey = null;
-      continue;
-    }
-    const key = rawLine.slice(0, separatorIndex).trim();
-    const value = rawLine.slice(separatorIndex + 1).trim();
-    if (!key) continue;
-    if (!value) {
-      result[key] = [];
-      currentListKey = key;
-      continue;
-    }
-    result[key] = value;
-    currentListKey = null;
-  }
-  return result;
-}
 
-function splitListValue(value: unknown): readonly string[] {
-  if (Array.isArray(value)) {
-    return uniqueSorted(value.flatMap((entry) => splitListValue(entry)));
-  }
-  if (typeof value !== 'string') return [];
-  const trimmed = value.trim();
-  if (!trimmed) return [];
-  const inlineArray = /^\[(.*)\]$/.exec(trimmed);
-  const source = inlineArray ? inlineArray[1] : trimmed;
-  if (source.includes(',') || inlineArray) {
-    return uniqueSorted(source
-      .split(',')
-      .map((entry) => entry.trim().replace(/^['"]|['"]$/g, ''))
-      .filter(Boolean));
-  }
-  return [trimmed.replace(/^['"]|['"]$/g, '')].filter(Boolean);
-}
 
 function normalizeOptionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
-function normalizeOptionalBoolean(value: unknown): boolean | null {
-  if (typeof value === 'boolean') return value;
-  if (typeof value !== 'string') return null;
-  const normalized = value.trim().toLowerCase();
-  if (normalized === 'true' || normalized === 'yes' || normalized === 'required' || normalized === 'allow') return true;
-  if (normalized === 'false' || normalized === 'no' || normalized === 'deny' || normalized === 'forbid') return false;
-  return null;
-}
 
-function readStringArray(value: unknown): readonly string[] {
-  return splitListValue(value);
-}
 
 function allowsPlanningMirror(record: Record<string, unknown>): boolean {
   for (const key of [
@@ -3087,15 +2982,7 @@ function allowsPlanningMirror(record: Record<string, unknown>): boolean {
   return false;
 }
 
-function normalizeTaskIntentSource(value: unknown): TaskIntentSource | null {
-  return value === 'integration-hook' || value === 'atm-skill' || value === 'cli-deterministic' ? value : null;
-}
 
-function normalizeRequestedTaskAction(value: unknown): RequestedTaskAction | null {
-  return value === 'analyze' || value === 'implement' || value === 'redo' || value === 'reopen' || value === 'close' || value === 'audit' || value === 'cleanup'
-    ? value
-    : null;
-}
 
 function detectRequestedTaskAction(prompt: string): RequestedTaskAction | null {
   if (/\u91cd\u505a|redo/i.test(prompt)) return 'redo';
@@ -3108,12 +2995,7 @@ function detectRequestedTaskAction(prompt: string): RequestedTaskAction | null {
   return null;
 }
 
-function normalizeOrdinalScope(value: unknown): { readonly kind: 'first'; readonly count: number } | null {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
-  const record = value as Record<string, unknown>;
-  if (record.kind !== 'first' || typeof record.count !== 'number' || !Number.isInteger(record.count) || record.count < 1) return null;
-  return { kind: 'first', count: Math.min(record.count, 50) };
-}
+
 
 function extractPromptPathHints(prompt: string): readonly string[] {
   const matches = prompt.match(/(?:[A-Za-z]:)?(?:[A-Za-z0-9_%\u4e00-\u9fff() -]+[\\/])+[A-Za-z0-9_%\u4e00-\u9fff(). -]+(?:\.md)?|[A-Za-z0-9_%\u4e00-\u9fff() -]+\.md/gi) ?? [];
@@ -3142,14 +3024,7 @@ function pathFieldMatches(field: string, hint: string): boolean {
     || Boolean(fieldStem && hintStem && (fieldStem.includes(hintStem) || hintStem.includes(fieldStem)));
 }
 
-function normalizeSearchText(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/\\/g, '/')
-    .replace(/%25/g, 'percent')
-    .replace(/[ \t\r\n"'`*_~[\]{}<>:\uFF1A,\uFF0C\u3002.!\uFF01?\uFF1F]+/g, '')
-    .trim();
-}
+
 
 function countTokenOverlap(prompt: string, title: string): number {
   const promptTokens = new Set(tokenizeForMatch(prompt));
