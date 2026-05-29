@@ -1,0 +1,199 @@
+{
+  "taskId": "TASK-AAO-0074",
+  "updatedAt": "2026-05-29T08:03:14.736Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "TASK-AAO-0074 validators passed after extracting view projection helpers",
+      "artifactPaths": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/view-projections.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+      "createdAt": "2026-05-29T08:02:19.900Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check",
+          "npm run typecheck",
+          "npm run validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "cwd": "c:/Users/User/AI-Atomic-Framework",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:c9b3a0c0a78bc5dcc5ae10a2187fb555acc9f513f5ad15f564b9c2e3494b4afa",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-29T08:02:19.943Z"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": "c:/Users/User/AI-Atomic-Framework",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:5617bd28d5b4a33f8c13aff33eb52df8f97040f0179a1b305d0c73abf4155f5a",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-29T08:02:19.943Z"
+          },
+          {
+            "command": "git diff --check",
+            "cwd": "c:/Users/User/AI-Atomic-Framework",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cached": false,
+            "cacheKey": "sha256:59c7f99d99f53bb301e1cb650739e7fda26bf31b4cf13b9021e1bf7fc5047098",
+            "runnerKind": "unknown",
+            "generatedAt": "2026-05-29T08:02:19.943Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:fa9d90706618c2bd029ce7ba310c9a003966224809de2adcee41a8d7f5406f97",
+          "reusedRunCount": 0,
+          "runCount": 3,
+          "sourcePath": "../AppData/Local/Temp/aao0074-evidence/command-runs.json"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+      "createdAt": "2026-05-29T08:02:47.919Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-05-29T08:02:47.960Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ec52e010cca4709d5b6aa5ebff6e8f843d1d749c13a21dfaf8f9a21361590af5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+      "createdAt": "2026-05-29T08:03:02.470Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:073699fa4a5013b0607b6e8ef297c341896969ef44d4d9666fddf123fc76fcb0",
+            "cached": false,
+            "generatedAt": "2026-05-29T08:03:02.507Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b0f12a95116a7c4d36902b9d296cdd697ed8a0b0d9036c727e53bef9994836d4",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "copilot",
+      "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+      "createdAt": "2026-05-29T08:03:14.736Z",
+      "details": {
+        "actorId": "copilot",
+        "sessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-05-29T08:03:14.774Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5dc77d903676579281f5019101db90551751c376f310ba6bc953143c691246ad",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

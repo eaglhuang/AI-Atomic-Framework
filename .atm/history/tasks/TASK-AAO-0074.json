@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0074",
+  "title": "next.ts atomization wave 2B: view projections",
+  "status": "done",
+  "milestone": "M5",
+  "dependencies": [
+    "TASK-AAO-0061",
+    "TASK-AAO-0073"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/view-projections.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/view-projections.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Wave 2C (comparison/validation predicates) — separate card",
+    "normalizeOptionalString cross-module dedup — separate housekeeping card"
+  ],
+  "nonGoals": [
+    "Do not change any function signature or runtime behavior"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-router-map",
+    "mapUpdates": [
+      "path_pattern: \"packages/cli/src/commands/next/view-projections.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0074-next-atomization-wave-2b-view-projections.task.md",
+    "sectionTitle": "TASK-AAO-0074",
+    "headingLine": 40,
+    "hash": "dd8ada57dea02ec5"
+  },
+  "importedAt": "2026-05-29T06:56:46.345Z",
+  "lastTransitionId": "2026-05-29T08-03-17-081Z-close-5a0d3a1a36cb",
+  "lastTransitionAt": "2026-05-29T08:03:17.081Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "copilot",
+  "reservedAt": "2026-05-29T07:56:38.183Z",
+  "promotedAt": "2026-05-29T07:56:38.186Z",
+  "claim": {
+    "actorId": "copilot",
+    "leaseId": "lease-7c8f55eec84a",
+    "claimedAt": "2026-05-29T07:56:38.188Z",
+    "heartbeatAt": "2026-05-29T08:03:17.081Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0074.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/view-projections.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-29T06:56:48.905Z",
+  "startedByActor": "copilot",
+  "startedBySessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0074",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0074.*",
+      ".atm/history/task-events/TASK-AAO-0074/**",
+      ".atm/history/tasks/TASK-AAO-0074.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/view-projections.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0ae0912fe33654125ea65fb1a5a240f0d2d5433ed2b102419da7078a7d6a8d24",
+    "actorId": "copilot",
+    "createdAt": "2026-05-29T07:56:38.200Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0074.closure-packet.json",
+  "closedAt": "2026-05-29T08:03:17.081Z",
+  "closedByActor": "copilot",
+  "closedBySessionId": "session-20260529075638-copilot-TASK-AAO-0074-072d58cc76"
+}
