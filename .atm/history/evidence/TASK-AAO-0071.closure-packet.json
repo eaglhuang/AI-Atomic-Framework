@@ -15,26 +15,20 @@
       "workspace:packages/*"
     ]
   },
-  "targetCommit": "96ec8cbaac201bc5e3cb1a5ae819d84e56be2b20",
-  "governedTreeSha": "09f5278f2050d1cbb91e7d19bdd1a1d193bb2d77",
+  "targetCommit": "7cb7c1b2df70c0054fbbf4a1995d16c7cdda5e94",
+  "governedTreeSha": "b4d2a20ba41767ca785acf144928325a0a842465",
   "targetCommitDelta": {
-    "currentCommitSha": "96ec8cbaac201bc5e3cb1a5ae819d84e56be2b20",
+    "currentCommitSha": "7cb7c1b2df70c0054fbbf4a1995d16c7cdda5e94",
     "parentCommitShas": [
-      "96ec8cbaac201bc5e3cb1a5ae819d84e56be2b20"
+      "7cb7c1b2df70c0054fbbf4a1995d16c7cdda5e94"
     ],
-    "governedTreeSha": "09f5278f2050d1cbb91e7d19bdd1a1d193bb2d77",
+    "governedTreeSha": "b4d2a20ba41767ca785acf144928325a0a842465",
     "changedFiles": [
-      ".atm/history/evidence/TASK-AAO-0071.closure-packet.json",
       ".atm/history/evidence/TASK-AAO-0071.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-45-18-496Z-import-0ee09cc376de.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-45-28-007Z-reserve-1d13f9accb80.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-45-28-011Z-promote-9b34f7e75f2b.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-45-28-023Z-claim-7da3155aba1e.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-48-02-468Z-close-1874c601fd40.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-49-00-432Z-import-b1ac54c37e28.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-49-04-240Z-reserve-d0567b47983c.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-49-04-244Z-promote-a10ade210420.json",
-      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-49-04-254Z-claim-f5eb24421baa.json",
+      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-50-15-337Z-import-b5b70526c833.json",
+      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-50-30-144Z-reserve-151b1abefda1.json",
+      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-50-30-147Z-promote-59e04dfe97ba.json",
+      ".atm/history/task-events/TASK-AAO-0071/2026-05-29T00-50-30-157Z-claim-6bac1fb16829.json",
       ".atm/history/tasks/TASK-AAO-0071.json",
       ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
       ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
@@ -45,7 +39,6 @@
       "next0057.tmp.json",
       "packages/plugin-governance-local/src/index.ts",
       "packages/plugin-governance-local/src/versioning.ts",
-      "stderr2.log",
       "tmp-extract-next.mjs"
     ]
   },
@@ -86,6 +79,8 @@
   ],
   "validationPasses": [
     "git diff --check",
+    "npm run typecheck",
+    "npm run validate:cli",
     "typecheck",
     "validate:cli",
     "validate:git-head-evidence"
@@ -102,7 +97,7 @@
   ],
   "requiredGatesSnapshot": {
     "schemaId": "atm.requiredGatesSnapshot.v1",
-    "generatedAt": "2026-05-29T00:49:43.116Z",
+    "generatedAt": "2026-05-29T00:51:39.454Z",
     "source": "frameworkStatus.requiredGates",
     "ruleVersion": "0.1.0",
     "frameworkMode": "required",
@@ -128,8 +123,8 @@
     ]
   },
   "evidencePath": ".atm/history/evidence/TASK-AAO-0071.json",
-  "closedAt": "2026-05-29T00:49:43.116Z",
+  "closedAt": "2026-05-29T00:51:39.454Z",
   "closedByActor": "Antigravity",
-  "sessionId": "session-20260529004904-Antigravity-TASK-AAO-0071-a573640a03",
+  "sessionId": "session-20260529005030-Antigravity-TASK-AAO-0071-bb8028be1b",
   "attestation": null
 }
