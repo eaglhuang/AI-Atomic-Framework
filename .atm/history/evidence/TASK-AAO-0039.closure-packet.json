@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0039",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "64a71ccba9d60d94dc5cf8f11c99fbbbadc7e034",
+  "governedTreeSha": "5a4a34a026449ac162b0393bbae4a8baf6ad2d6e",
+  "targetCommitDelta": {
+    "currentCommitSha": "64a71ccba9d60d94dc5cf8f11c99fbbbadc7e034",
+    "parentCommitShas": [
+      "64a71ccba9d60d94dc5cf8f11c99fbbbadc7e034"
+    ],
+    "governedTreeSha": "5a4a34a026449ac162b0393bbae4a8baf6ad2d6e",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0039.json",
+      ".atm/history/task-events/TASK-AAO-0039/2026-05-29T06-21-36-650Z-reserve-6c33b2ea6c68.json",
+      ".atm/history/task-events/TASK-AAO-0039/2026-05-29T06-21-36-653Z-promote-48505693eeb8.json",
+      ".atm/history/task-events/TASK-AAO-0039/2026-05-29T06-21-36-671Z-claim-196b56d54fe8.json",
+      ".atm/history/tasks/TASK-AAO-0039.json",
+      ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
+      ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
+      ".playwright-mcp/console-2026-05-28T15-14-55-015Z.log",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/next.ts",
+      "scratch/debug-lite-match.ts",
+      "scratch/debug-planning-route.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:task-ledger-governance",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:921909cca9b5fbc7f18f28b15c8097bbfee401c2c745bffe457313783a0b1ecb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:prompt-scoped-next",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75b0705115c19d98120d0e75580ee9ee500c6e57047e0fbfda5c21606efbe2dc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:prompt-scoped-next",
+    "validate:task-ledger-governance"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-29T06:29:27.242Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0039-planning-only-ledger-audit-boundary.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0039.json",
+  "closedAt": "2026-05-29T06:29:27.242Z",
+  "closedByActor": "Antigravity",
+  "sessionId": "session-20260529062136-Antigravity-TASK-AAO-0039-2679acdaac",
+  "attestation": null
+}

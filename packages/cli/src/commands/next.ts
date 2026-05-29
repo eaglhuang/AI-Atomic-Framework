@@ -1064,6 +1064,41 @@ function buildPromptScopedNextResult(input: {
   });
   const sourceStatus = deliveryClassification.sourceStatus;
   const ledgerStatus = deliveryClassification.ledgerStatus;
+
+  if (deliveryClassification.intent === 'mirror-sync-only'
+    && input.taskIntent?.requestedAction !== 'redo'
+    && input.taskIntent?.requestedAction !== 'reopen') {
+    const nextAction = buildMirrorSyncNextAction({
+      task: selectedTask,
+      classification: deliveryClassification
+    });
+    return makeResult({
+      ok: true,
+      command: 'next',
+      cwd: input.cwd,
+      messages: buildNextMessages(
+        nextAction as any,
+        null,
+        input.integrationBootstrap as any,
+        input.runtimeAdapterReadiness as any,
+        message('info', 'ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED', 'ATM detected a planning-only task; deliverables live in another repo. Sync the ledger mirror instead of running a delivery playbook here.', {
+          task: toTaskCandidateView(selectedTask),
+          classification: deliveryClassification,
+          requiredCommand: nextAction.requiredCommand
+        })
+      ),
+      evidence: {
+        nextAction,
+        recommendedChannel: nextAction.recommendedChannel,
+        deliveryClassification,
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue,
+        integrationBootstrap: input.integrationBootstrap,
+        runtimeAdapterReadiness: input.runtimeAdapterReadiness
+      }
+    });
+  }
+
   const isHistoricalDoneStale = sourceStatus?.toLowerCase() === 'done'
     && (ledgerStatus?.toLowerCase() !== 'done' || !selectedTask.closedAt || !selectedTask.closurePacket);
 
@@ -1111,39 +1146,6 @@ function buildPromptScopedNextResult(input: {
       evidence: {
         nextAction,
         recommendedChannel: 'reconcile',
-        taskIntent: input.taskIntent,
-        importedTaskQueue: input.importedTaskQueue,
-        integrationBootstrap: input.integrationBootstrap,
-        runtimeAdapterReadiness: input.runtimeAdapterReadiness
-      }
-    });
-  }
-  if (deliveryClassification.intent === 'mirror-sync-only'
-    && input.taskIntent?.requestedAction !== 'redo'
-    && input.taskIntent?.requestedAction !== 'reopen') {
-    const nextAction = buildMirrorSyncNextAction({
-      task: selectedTask,
-      classification: deliveryClassification
-    });
-    return makeResult({
-      ok: true,
-      command: 'next',
-      cwd: input.cwd,
-      messages: buildNextMessages(
-        nextAction as any,
-        null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
-        message('info', 'ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED', 'ATM detected a planning-only task; deliverables live in another repo. Sync the ledger mirror instead of running a delivery playbook here.', {
-          task: toTaskCandidateView(selectedTask),
-          classification: deliveryClassification,
-          requiredCommand: nextAction.requiredCommand
-        })
-      ),
-      evidence: {
-        nextAction,
-        recommendedChannel: nextAction.recommendedChannel,
-        deliveryClassification,
         taskIntent: input.taskIntent,
         importedTaskQueue: input.importedTaskQueue,
         integrationBootstrap: input.integrationBootstrap,

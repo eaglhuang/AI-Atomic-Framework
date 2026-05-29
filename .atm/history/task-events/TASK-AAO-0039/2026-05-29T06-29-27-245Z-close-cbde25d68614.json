@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-29T06-29-27-245Z-close-cbde25d68614",
+  "taskId": "TASK-AAO-0039",
+  "action": "close",
+  "actorId": "Antigravity",
+  "sessionId": "session-20260529062136-Antigravity-TASK-AAO-0039-2679acdaac",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0039.json",
+  "taskSha256": "sha256:22550a9bbc4cbcca2ea99f0b34c1d03230292f62341c72f8fa0e6225d6ed847b",
+  "createdAt": "2026-05-29T06:29:27.245Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0039 --actor Antigravity --status done --historical-delivery HEAD",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260529062136-Antigravity-TASK-AAO-0039-2679acdaac",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0039.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-29T06:29:27.242Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0039-planning-only-ledger-audit-boundary.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
