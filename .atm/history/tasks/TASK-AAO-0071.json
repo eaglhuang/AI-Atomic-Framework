@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0071",
+  "title": "ATM versioning semver helper rename hygiene patch",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0070"
+  ],
+  "acceptance": [
+    "一張規劃任務卡 `TASK-AAO-0071` 成功建立於 `3KLife` 專案中，且透過 `node atm.mjs tasks import --from <path> --dry-run --json` 進行測試時回傳 `ok: true`，且無任何 `importDiagnostics`。",
+    "本卡的 `scopePaths` 與 `deliverables` 僅精確列出三個最小範圍檔案：`packages/plugin-governance-local/src/versioning.ts`、`packages/plugin-governance-local/src/index.ts`、`atomic_workbench/atomization-coverage/path-to-atom-map.json`。",
+    "README 索引表中已成功加入 `TASK-AAO-0071` 之記錄，且 `status` 標註為 `planned`（不預先假裝已在 ATM ledger 關閉）。",
+    "代碼實作僅修正 semver 輔助函式的命名（含測試與呼叫面之對齊），無涉及任何 multi-kind 多型邏輯與 stores.ts 變更。"
+  ],
+  "deliverables": [
+    "packages/plugin-governance-local/src/versioning.ts",
+    "packages/plugin-governance-local/src/index.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/plugin-governance-local/src/versioning.ts",
+    "packages/plugin-governance-local/src/index.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "實作 artifactVersionKind 或是任何 polymorphic 多型解析",
+    "將 dataVersion / artifactVersion 串接寫入 stores.ts 或 bootstrap 流程 (Slice 2 範圍)",
+    "修改已關閉的 TASK-AAO-0065 治理帳本歷史",
+    "amend 或修改已提交的歷史 commit 7d6b04c"
+  ],
+  "nonGoals": [
+    "不要實作 artifactVersionKind 多型",
+    "不要把 Slice 2 的 write-path 串接做進來",
+    "不要修改 stores.ts 或是 core 裡的其他合約"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾會將 versioning.ts 的函式名稱還原，並回復 index.ts 匯出名稱。此修正不影響任何寫入儲存的資料庫狀態。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-governance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "hygiene-rename",
+    "framework-maintenance",
+    "refactor"
+  ],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0071-atm-versioning-semver-helper-rename-hygiene.task.md",
+    "sectionTitle": "TASK-AAO-0071",
+    "headingLine": 52,
+    "hash": "5ba76345917c3b57"
+  },
+  "importedAt": "2026-05-29T00:49:00.429Z",
+  "lastTransitionId": "2026-05-29T00-49-43-118Z-close-e44dfc0f2ac1",
+  "lastTransitionAt": "2026-05-29T00:49:43.118Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-29T00:49:04.240Z",
+  "promotedAt": "2026-05-29T00:49:04.244Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-02dd971f8f80",
+    "claimedAt": "2026-05-29T00:49:04.246Z",
+    "heartbeatAt": "2026-05-29T00:49:43.118Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0071.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-29T00:49:04.246Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260529004904-Antigravity-TASK-AAO-0071-a573640a03",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0071.closure-packet.json",
+  "closedAt": "2026-05-29T00:49:43.118Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260529004904-Antigravity-TASK-AAO-0071-a573640a03"
+}
