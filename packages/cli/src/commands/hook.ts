@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, appendFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -18,7 +18,7 @@ import {
 } from './framework-development.ts';
 import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
-import { gitHeadEvidencePath } from './git-head-evidence.ts';
+import { gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.ts';
 import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import {
   diagnoseTaskDirectionLockAllowedFiles,
@@ -360,7 +360,7 @@ export function installGitHooks(cwd: string, options: { frameworkRequired?: bool
 
 function runPreCommitHook(cwd: string) {
   const root = path.resolve(cwd);
-  const stagedFiles = readStagedFiles(root).filter((entry) => entry !== gitHeadEvidencePath);
+  const stagedFiles = readStagedFiles(root).filter((entry) => entry !== gitHeadEvidencePaths.legacyJson && entry !== gitHeadEvidencePaths.jsonl);
   const gitIndexDiagnostic = inspectGitIndexAccess(root);
   const encodingReport = scanEncoding(root, stagedFiles);
   const frameworkStatus = createFrameworkModeStatus({ cwd: root, files: stagedFiles });
@@ -1241,7 +1241,7 @@ function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly string[],
       }
     ]
   };
-  writeFileSync(evidenceAbsolute, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  appendFileSync(evidenceAbsolute, `${JSON.stringify(payload)}\n`, 'utf8');
   const addResult = runGit(cwd, ['add', '--', gitHeadEvidencePath]);
   return {
     evidencePath: gitHeadEvidencePath,
@@ -1263,7 +1263,7 @@ function readStagedTreeWithoutEvidence(cwd: string): string | null {
         writeFileSync(tempIndex, readFileSync(absoluteIndex));
       }
     }
-    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', gitHeadEvidencePath], { GIT_INDEX_FILE: tempIndex });
+    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', gitHeadEvidencePaths.legacyJson, gitHeadEvidencePaths.jsonl], { GIT_INDEX_FILE: tempIndex });
     const tree = runGit(cwd, ['write-tree'], { GIT_INDEX_FILE: tempIndex });
     return tree.exitCode === 0 ? tree.stdout.trim() : null;
   } finally {
@@ -1272,9 +1272,25 @@ function readStagedTreeWithoutEvidence(cwd: string): string | null {
 }
 
 function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalChangedFiles: readonly string[]): CommitEvidenceMatch {
-  const evidenceText = runGitScalar(cwd, ['show', `${commitSha}:${gitHeadEvidencePath}`]);
-  const evidence = evidenceText ? readJsonText(evidenceText) : null;
-  const records = extractEvidenceRecords(evidence);
+  let records: readonly any[] = [];
+  const jsonlText = runGitScalar(cwd, ['show', `${commitSha}:${gitHeadEvidencePaths.jsonl}`]);
+  if (jsonlText) {
+    records = jsonlText
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .flatMap((line) => {
+        try {
+          return extractEvidenceRecords(JSON.parse(line));
+        } catch {
+          return [];
+        }
+      });
+  } else {
+    const legacyText = runGitScalar(cwd, ['show', `${commitSha}:${gitHeadEvidencePaths.legacyJson}`]);
+    const evidence = legacyText ? readJsonText(legacyText) : null;
+    records = extractEvidenceRecords(evidence);
+  }
   const commitTreeSha = runGitScalar(cwd, ['rev-parse', `${commitSha}^{tree}`]);
   const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
   const parentCommitShas = readParentCommitShas(cwd, commitSha);

@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, appendFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
@@ -7,6 +7,7 @@ import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { createFrameworkModeStatus } from './framework-development.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
+import { gitHeadEvidencePath } from './git-head-evidence.ts';
 import {
   generateDiffEvidence,
   mergeDiffEvidenceWithExisting,
@@ -1069,7 +1070,7 @@ function runGitHeadEvidenceBackfill(argv: string[]) {
     throw new CliError('ATM_GIT_TREE_MISSING', 'ATM could not resolve the HEAD tree for git-head evidence backfill.', { exitCode: 2 });
   }
   const nowIso = new Date().toISOString();
-  const evidenceAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', 'git-head.json');
+  const evidenceAbsolute = path.join(options.cwd, gitHeadEvidencePath);
   const payload = {
     schemaVersion: 'atm.gitHeadEvidence.v0.1',
     evidence: [
@@ -1091,7 +1092,7 @@ function runGitHeadEvidenceBackfill(argv: string[]) {
             treeSha,
             parentCommitShas: [head],
             stagedPathCount: 1,
-            evidencePath: normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute)),
+            evidencePath: gitHeadEvidencePath,
             generatedAt: nowIso
           },
           backfill: {
@@ -1104,8 +1105,8 @@ function runGitHeadEvidenceBackfill(argv: string[]) {
     ]
   };
   mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
-  writeFileSync(evidenceAbsolute, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
-  const addResult = runGitCommand(options.cwd, ['add', '--', normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute))]);
+  appendFileSync(evidenceAbsolute, `${JSON.stringify(payload)}\n`, 'utf8');
+  const addResult = runGitCommand(options.cwd, ['add', '--', gitHeadEvidencePath]);
   if (!addResult.ok) {
     throw new CliError('ATM_GIT_ADD_FAILED', 'ATM wrote git-head backfill evidence but could not stage it.', {
       exitCode: 1,

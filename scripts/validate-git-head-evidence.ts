@@ -93,6 +93,15 @@ function commitAll(repo: any, message: any) {
 }
 
 function writeGitEvidence(repo: any, evidence: any) {
+  const evidencePath = path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl');
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  writeFileSync(evidencePath, `${JSON.stringify({
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [evidence]
+  })}\n`, 'utf8');
+}
+
+function writeGitEvidenceLegacy(repo: any, evidence: any) {
   const evidencePath = path.join(repo, '.atm', 'history', 'evidence', 'git-head.json');
   mkdirSync(path.dirname(evidencePath), { recursive: true });
   writeFileSync(evidencePath, `${JSON.stringify({
@@ -152,7 +161,7 @@ try {
   assert(gitCheck(orphan)?.details?.enforcement === 'warning', 'adopter orphan git evidence must be warning enforcement');
 
   const commitSha = runGit(orphanRepo, ['rev-parse', 'HEAD']);
-  writeGitEvidence(orphanRepo, createGitEvidence({ commitSha }));
+  writeGitEvidenceLegacy(orphanRepo, createGitEvidence({ commitSha }));
   const commitMatched = runAtmDoctor(orphanRepo);
   assert(commitMatched.exitCode === 0, 'commitSha evidence doctor must exit 0');
   assert(commitMatched.parsed.ok === true, 'commitSha evidence doctor must report ok=true');
@@ -178,9 +187,10 @@ try {
     parentCommitShas,
     stagedPathCount: 1
   }));
-  runGit(treeRepo, ['add', '.atm/history/evidence/git-head.json']);
+  runGit(treeRepo, ['add', '.atm/history/evidence/git-head.jsonl']);
   runGit(treeRepo, ['commit', '-m', 'change with tree evidence']);
   const treeMatched = runAtmDoctor(treeRepo);
+  console.log('DEBUG: treeMatched =', JSON.stringify(treeMatched, null, 2));
   assert(treeMatched.exitCode === 0, 'tree evidence doctor must exit 0');
   assert(treeMatched.parsed.ok === true, 'tree evidence doctor must report ok=true');
   assert(gitCheck(treeMatched)?.details?.matchedBy === 'treeSha+parentCommitShas', 'tree evidence must match by treeSha+parentCommitShas');

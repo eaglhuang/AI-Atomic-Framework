@@ -110,7 +110,7 @@ try {
   runGit(repo, ['add', 'docs-only.txt']);
   const governedCommit = runGit(repo, ['commit', '-m', 'governed docs change']);
   assert(governedCommit.status === 0, 'governed commit must succeed with hooks installed');
-  assert(existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.json')), 'pre-commit hook must write git-head evidence');
+  assert(existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl')), 'pre-commit hook must write git-head evidence');
 
   const governedDoctor = parsePayload(runCli(repo, ['doctor', '--json']));
   assert(governedDoctor.ok === true, 'doctor must report ok=true after governed commit');
@@ -272,7 +272,7 @@ try {
   runGit(closureRepo, ['add', 'packages/core/src/index.ts']);
   const governedTreeSha = runGit(closureRepo, ['write-tree']);
   const parentCommitSha = runGit(closureRepo, ['rev-parse', 'HEAD']);
-  writeFileSync(path.join(closureRepo, '.atm', 'history', 'evidence', 'git-head.json'), `${JSON.stringify({
+  writeFileSync(path.join(closureRepo, '.atm', 'history', 'evidence', 'git-head.jsonl'), `${JSON.stringify({
     schemaVersion: 'atm.gitHeadEvidence.v0.1',
     evidence: [
       {
@@ -291,7 +291,7 @@ try {
             treeSha: governedTreeSha,
             parentCommitShas: [parentCommitSha],
             stagedPathCount: 1,
-            evidencePath: '.atm/history/evidence/git-head.json',
+            evidencePath: '.atm/history/evidence/git-head.jsonl',
             generatedAt: '2026-01-01T00:00:00.000Z'
           },
           hookContractVersion: 'atm.integration-hooks/v1',
@@ -299,7 +299,7 @@ try {
         }
       }
     ]
-  }, null, 2)}\n`, 'utf8');
+  })}\n`, 'utf8');
   writeFileSync(path.join(closureRepo, '.atm', 'history', 'evidence', 'TASK-X-9001.closure-packet.json'), `${JSON.stringify({
     schemaId: 'atm.closurePacket.v1',
     specVersion: '0.1.0',
@@ -343,7 +343,7 @@ try {
     closedAt: '2026-01-01T00:00:00.000Z',
     closedByActor: 'validate-git-hooks-enforcement'
   }, null, 2)}\n`, 'utf8');
-  runGit(closureRepo, ['add', '.atm/history/evidence/git-head.json', '.atm/history/evidence/TASK-X-9001.closure-packet.json']);
+  runGit(closureRepo, ['add', '.atm/history/evidence/git-head.jsonl', '.atm/history/evidence/TASK-X-9001.closure-packet.json']);
   runGit(closureRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'bypass hooks with mismatched closure packet']);
 
   const closureCommitRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });

@@ -1582,7 +1582,7 @@ function readFutureCommitTreeWithoutEvidence(cwd: string): string | null {
     }
     const addResult = runGitWithEnv(cwd, ['add', '-A', '--', '.'], { GIT_INDEX_FILE: tempIndex });
     if (addResult.status !== 0) return null;
-    runGitWithEnv(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json'], { GIT_INDEX_FILE: tempIndex });
+    runGitWithEnv(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json', '.atm/history/evidence/git-head.jsonl'], { GIT_INDEX_FILE: tempIndex });
     const tree = runGitWithEnv(cwd, ['write-tree'], { GIT_INDEX_FILE: tempIndex });
     return tree.status === 0 ? String(tree.stdout ?? '').trim() : null;
   } finally {

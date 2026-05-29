@@ -3,7 +3,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-export const gitHeadEvidencePath = '.atm/history/evidence/git-head.json';
+export const gitHeadEvidencePaths = {
+  legacyJson: '.atm/history/evidence/git-head.json',
+  jsonl: '.atm/history/evidence/git-head.jsonl'
+};
+export const gitHeadEvidencePath = gitHeadEvidencePaths.jsonl;
 
 export function createGitHeadEvidenceCheck(cwd: any, runtime: any) {
   const workTree = readGitWorkTree(cwd);
@@ -119,7 +123,7 @@ function readGovernedHeadTreeSha(cwd: any, commitSha: any, evidencePath: any) {
     if (!readTree.ok) {
       return null;
     }
-    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', evidencePath], {
+    runGit(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', gitHeadEvidencePaths.legacyJson, gitHeadEvidencePaths.jsonl], {
       GIT_INDEX_FILE: tempIndex
     });
     const writeTree = runGit(cwd, ['write-tree'], {
@@ -168,7 +172,7 @@ function findEvidenceOnlyParentMatch(cwd: any, commitSha: any, parentCommitShas:
 
 function isEvidenceOnlyCommit(cwd: any, commitSha: any) {
   const changedPaths = readCommitChangedPaths(cwd, commitSha);
-  return changedPaths.length > 0 && changedPaths.every((entry) => entry === gitHeadEvidencePath);
+  return changedPaths.length > 0 && changedPaths.every((entry) => entry === gitHeadEvidencePaths.legacyJson || entry === gitHeadEvidencePaths.jsonl);
 }
 
 function readCommitChangedPaths(cwd: any, commitSha: any) {
@@ -195,7 +199,10 @@ function readEvidenceRecords(cwd: any, runtime: any) {
     return [];
   }
   return listJsonFiles(evidenceRoot).flatMap((filePath: any) => {
-    const records = extractEvidenceRecords(readJsonIfPossible(filePath));
+    const isJsonl = filePath.endsWith('.jsonl');
+    const records = isJsonl
+      ? readJsonlObjects(filePath).flatMap(extractEvidenceRecords)
+      : extractEvidenceRecords(readJsonIfPossible(filePath));
     return records.map((record: any, index: any) => ({
       path: toPortablePath(path.relative(cwd, filePath)),
       index,
@@ -239,7 +246,7 @@ function listJsonFiles(directoryPath: any): string[] {
     if (entry.isDirectory()) {
       return listJsonFiles(absolutePath);
     }
-    return entry.isFile() && entry.name.endsWith('.json') ? [absolutePath] : [];
+    return entry.isFile() && (entry.name.endsWith('.json') || entry.name.endsWith('.jsonl')) ? [absolutePath] : [];
   });
 }
 
@@ -248,6 +255,19 @@ function readJsonIfPossible(filePath: any) {
     return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch {
     return null;
+  }
+}
+
+function readJsonlObjects(filePath: string): any[] {
+  try {
+    const content = readFileSync(filePath, 'utf8');
+    return content
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => JSON.parse(line));
+  } catch {
+    return [];
   }
 }
 

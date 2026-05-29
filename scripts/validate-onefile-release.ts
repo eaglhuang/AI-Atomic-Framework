@@ -60,7 +60,7 @@ function refreshOnboarding(entrypointPath: any, cwd: any) {
 function writeGitHeadEvidence(cwd: any) {
   const commitSha = tryReadHeadCommitSha(cwd);
   if (!commitSha) return;
-  const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', 'git-head.json');
+  const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', 'git-head.jsonl');
   mkdirSync(path.dirname(evidencePath), { recursive: true });
   writeFileSync(evidencePath, `${JSON.stringify({
     schemaVersion: 'atm.gitHeadEvidence.v0.1',
@@ -76,7 +76,7 @@ function writeGitHeadEvidence(cwd: any) {
         }
       }
     ]
-  }, null, 2)}\n`, 'utf8');
+  })}\n`, 'utf8');
 }
 
 function writeHostPackageLockSignals(cwd: any) {

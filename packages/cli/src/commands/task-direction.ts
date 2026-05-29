@@ -459,6 +459,7 @@ export function isTaskDirectionPathCandidate(value: string): boolean {
   if (!normalized || normalized.length > 260 || /[\r\n]/.test(normalized)) return false;
   if (/^https?:\/\//i.test(normalized)) return false;
   if (/\s\/|\/\s/.test(normalized)) return false;
+  if (normalized === '.gitattributes') return true;
 
   const knownRoots = [
     '.atm/',
