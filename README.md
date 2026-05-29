@@ -15,15 +15,15 @@
 
 ATM helps people and AI agents work in the same repo without making a mess.
 
-It gives the agent a next safe step, keeps changes inside a declared scope, and leaves evidence behind.
+It tells the agent what to do next, keeps changes inside the right scope, and leaves clear proof of what changed and what passed.
 
-It is not another chat agent or workflow app. It is the governance layer around AI-assisted engineering.
+It is not another chat agent or workflow app. It is the safety layer around AI-assisted engineering.
 
 > For AI agents: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json`. Use `node atm.mjs next --json` only when there is no user prompt.
 
 ## Why ATM Exists
 
-AI-assisted engineering breaks down when the working rules stay implicit:
+AI-assisted engineering breaks down in predictable ways when the working rules stay implicit:
 
 - an agent edits before understanding local constraints;
 - a large request gets handled without a scoped work boundary;
@@ -31,11 +31,9 @@ AI-assisted engineering breaks down when the working rules stay implicit:
 - review sees the final diff, but not the evidence or decision trail;
 - handoff depends on chat history instead of durable project artifacts.
 
-ATM gives repositories a shared operating contract for those moments. The goal is simple: an agent should be able to enter a repository, ask ATM for the next safe action, do the work inside a declared boundary, and leave reviewable proof behind.
+ATM gives repositories a shared operating contract for those moments. The goal is simple: an agent should be able to enter a repository, ask ATM what the next safe action is, do the work inside a declared boundary, and leave reviewable proof behind.
 
 ## What You Get
-
-In practice, ATM gives you a next step, a scope boundary, and evidence you can trust.
 
 | Capability | What it provides |
 | --- | --- |
@@ -55,7 +53,7 @@ In practice, ATM gives you a next step, a scope boundary, and evidence you can t
 npx create-atm test-app --agent claude-code
 ```
 
-`create-atm` bootstraps the repo, renders the ATMChart rule summary, and installs the chosen agent integration. Omit `--agent` to create only the governed project and rule chart.
+`create-atm` creates the project directory, runs the official ATM bootstrap, renders the ATMChart rule summary, and installs the selected agent integration. Omit `--agent` to initialize only the governed ATM project and rule chart.
 
 ### Add ATM to an existing repository
 
@@ -67,7 +65,7 @@ Use one official distribution:
 | `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime. |
 | npm `create-atm` | You want the lowest-friction starter route. |
 
-The bootstrap pattern is simple: add an official ATM distribution to the target repo, make the ATM entry route visible to agents, and let `node atm.mjs next --prompt "<current user prompt>" --json` route the work.
+The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --prompt "<current user prompt>" --json` route user-requested governed work.
 
 ### Give the agent one instruction
 
@@ -75,7 +73,7 @@ The bootstrap pattern is simple: add an official ATM distribution to the target 
 Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
 ```
 
-The first `next` call will usually route to bootstrap or orientation when the repo is not ready yet. After that, governed work keeps coming back through `next`.
+The first `next` call will route to bootstrap or orientation when the repository is not ready yet. After that, governed work keeps returning through `next`.
 
 ## For AI Agents
 
@@ -86,23 +84,6 @@ When you enter an ATM repository for user-requested work:
 3. Read `evidence.nextAction.playbook` before editing, closing, or committing.
 4. Edit only within the allowed scope returned by ATM.
 5. Run the smallest relevant validators and preserve the resulting evidence.
-
-For an explicit task card, keep the normal lifecycle order simple and fixed:
-
-```text
-claim -> implement -> validators -> evidence add -> tasks close -> commit
-```
-
-Use the exact task selector when the user gives a specific task id:
-
-```bash
-node atm.mjs next --task TASK-ABC-0001 --json
-node atm.mjs next --claim --actor <id> --task TASK-ABC-0001 --json
-```
-
-Use `.atm/runtime/task-intent.json` only when a semantic skill or integration
-needs to resolve fuzzy task, plan, or batch scope. Do not overwrite the shared
-runtime intent file for a single exact task id.
 
 Important details for this framework repository:
 
@@ -254,8 +235,6 @@ Runner entrypoints are intentionally split:
 | `node atm.dev.mjs ...` | Source-first runner for ATM framework development. Use this only when you intentionally need current `packages/cli/src/**` behavior before a build. |
 
 Do not ask agents to use `node atm.dev.mjs` for ordinary governance tests. Build first, then verify the frozen entrypoint with `node atm.mjs ...`.
-
-`atm next` reports `evidence.nextAction.runnerMode` so agents can see which entrypoint is active. Treat `node atm.mjs` as the normal frozen route; use `node atm.dev.mjs` only for explicit source-first framework validation, and run `npm run build` when `ATM_RUNNER_SYNC_REQUIRED` says the frozen runner is stale.
 
 Install dependencies, then use the standard engineering checks:
 
