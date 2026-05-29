@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0061",
+  "title": "Big script atomization wave 1: tasks command shared helpers",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0059"
+  ],
+  "acceptance": [
+    "`tasks.ts` line count drops by at least 300 lines (target: <= 4656 lines).",
+    "`tasks.ts` remains the public command entrypoint; this task must not replace the dispatcher/router architecture.",
+    "No function signature changes in any extracted helper.",
+    "`npm run typecheck` reports zero new errors.",
+    "`npm run validate:cli` passes with zero regression vs pre-extraction baseline.",
+    "`node --strip-types scripts/validate-task-ledger-governance.ts --mode validate` passes.",
+    "`git diff --check` passes.",
+    "close / reconcile / deliver-and-close / checkpoint behavior is byte-equivalent to pre-extraction (validated via existing fixtures).",
+    "First commit / first slice must extract only claim/runtime-lock helpers before touching close-gate or historical-delivery helpers.",
+    "Close/reconcile/deliver-and-close behavior must remain unchanged.",
+    "Any extraction touching buildCloseScopedDiffIsolation or evaluateTaskDeliverableGate requires a later task or explicit scope amendment."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+    "packages/cli/src/commands/tasks/task-planning-doc.ts",
+    "packages/cli/src/commands/tasks/task-git-helpers.ts",
+    "packages/cli/src/commands/tasks/task-output-formatters.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+    "packages/cli/src/commands/tasks/task-planning-doc.ts",
+    "packages/cli/src/commands/tasks/task-git-helpers.ts",
+    "packages/cli/src/commands/tasks/task-output-formatters.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "next.ts atomization (deferred to wave 2)",
+    "batch.ts atomization",
+    "Any change to task lifecycle semantics",
+    "Any change to close / reconcile / deliver-and-close behavior",
+    "New public CLI flags or subcommands",
+    "Replacing tasks.ts with a dispatcher/router shell",
+    "buildCloseScopedDiffIsolation",
+    "evaluateTaskDeliverableGate",
+    "inspectHistoricalDelivery",
+    "close/reconcile/deliver-and-close behavior changes"
+  ],
+  "nonGoals": [
+    "Do not change task lifecycle semantics",
+    "Do not change close / checkpoint / reconcile behavior",
+    "Do not modify validate:cli expected outputs",
+    "Do not export new public APIs from tasks.ts (extract-only)",
+    "Do not convert tasks.ts into a router (it stays the public command entrypoint)"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the extraction commits. Pure behavior-preserving refactor — git revert returns to pre-split state with zero behavioral change.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-command-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "big-script-atomization",
+    "atomize-wave-1"
+  ],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0061-big-script-atomization-wave1-tasks-shared-helpers.task.md",
+    "sectionTitle": "TASK-AAO-0061",
+    "headingLine": 67,
+    "hash": "1f710a73e97a1de2"
+  },
+  "importedAt": "2026-05-29T03:48:43.157Z",
+  "lastTransitionId": "2026-05-29T03-52-37-906Z-close-be5d491ce3a2",
+  "lastTransitionAt": "2026-05-29T03:52:37.906Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-29T03:48:46.632Z",
+  "promotedAt": "2026-05-29T03:48:46.636Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-5684b4d5f929",
+    "claimedAt": "2026-05-29T03:48:46.638Z",
+    "heartbeatAt": "2026-05-29T03:52:37.906Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0061.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-29T03:48:46.638Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260529034846-Antigravity-TASK-AAO-0061-deeac4fac3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0061",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0061.*",
+      ".atm/history/task-events/TASK-AAO-0061/**",
+      ".atm/history/tasks/TASK-AAO-0061.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bc5a7cbdba67357cb027f013e0f959398a5d1179fa10e2b8a58943c6119953fc",
+    "actorId": "Antigravity",
+    "createdAt": "2026-05-29T03:48:46.648Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0061.closure-packet.json",
+  "closedAt": "2026-05-29T03:52:37.906Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260529034846-Antigravity-TASK-AAO-0061-deeac4fac3"
+}
