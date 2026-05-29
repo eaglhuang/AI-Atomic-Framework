@@ -54,12 +54,36 @@ async function main() {
     await validateAaoThroughputAgentJourney(tempRoot);
     await validateFrameworkDevelopment(tempRoot);
     await validateTaskSelfAllowOnClaim(tempRoot);
+    await validateTasksClaimDirectionLockConsistency(tempRoot);
     if (!process.exitCode) {
       console.log(`[task-direction-governance:${mode}] ok (adopter-governed and framework-development task direction gates verified)`);
     }
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
+}
+
+/**
+ * TASK-AAO-0062 regression:
+ * tasks claim 產出的 lock 紀錄必須 embed taskDirectionLock，
+ * 使得 tasks close 可以通過 direction lock 檢查。
+ */
+async function validateTasksClaimDirectionLockConsistency(tempRoot: string) {
+  const repo = makeAdopterRepo(tempRoot, 'adopter-tasks-claim-consistency');
+  initializeGit(repo);
+  const claim = await runTasks(['claim', '--cwd', repo, '--task', 'TASK-ADOPT-0001', '--actor', 'adopter-agent', '--files', 'src/one.ts', '--json']);
+  assert(claim.ok === true, 'tasks claim consistency: tasks claim must succeed');
+
+  const lockPath = path.join(repo, '.atm', 'runtime', 'locks', 'TASK-ADOPT-0001.lock.json');
+  assert(existsSync(lockPath), 'tasks claim consistency: locks file must exist after tasks claim');
+  const parsed = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+  assert(parsed.taskDirectionLock !== undefined, 'tasks claim consistency: locks file must embed taskDirectionLock');
+
+  // 修改實質 deliverable 以通過 close 時的 deliverable 門檻
+  writeFileSync(path.join(repo, 'src', 'one.ts'), 'export const one = 99;\n', 'utf8');
+
+  const close = await runTasks(['close', '--cwd', repo, '--task', 'TASK-ADOPT-0001', '--actor', 'adopter-agent', '--status', 'done', '--json']);
+  assert(close.ok === true, `tasks claim consistency: tasks close must succeed. Got: ${JSON.stringify(close.messages)}`);
 }
 
 /**

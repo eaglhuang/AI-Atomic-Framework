@@ -31,7 +31,8 @@ import {
   assertTaskCloseAllowedByDirection,
   findActiveTaskQueue,
   isTaskDirectionPathCandidate,
-  sanitizeTaskDirectionAllowedFiles
+  sanitizeTaskDirectionAllowedFiles,
+  writeTaskDirectionLock
 } from './task-direction.ts';
 import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.ts';
 import { runAtmGit } from './git-governance.ts';
@@ -2304,6 +2305,20 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     taskDocument.startedBySessionId = sessionRecord.session.sessionId;
     const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'running';
+    const directionLock = writeTaskDirectionLock({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId,
+      queue: findActiveTaskQueue(options.cwd),
+      batchId: null,
+      scopeKey: null,
+      allowedFiles: files,
+      planningReadOnlyPaths: Array.isArray(taskDocument.planningReadOnlyPaths) ? taskDocument.planningReadOnlyPaths as string[] : [],
+      planningMirrorPaths: Array.isArray(taskDocument.planningMirrorPaths) ? taskDocument.planningMirrorPaths as string[] : [],
+      allowPlanningMirror: taskDocument.allowPlanningMirror === true,
+      prompt: options.taskId
+    });
+    taskDocument.taskDirectionLock = directionLock;
     const transitionPath = writeTaskDocumentWithTransition({
       cwd: options.cwd,
       taskPath,
@@ -2330,7 +2345,8 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         taskPath: relativeTaskPath,
         transitionPath,
         sessionId: sessionRecord.session.sessionId,
-        session: sessionRecord.session
+        session: sessionRecord.session,
+        taskDirectionLock: directionLock
       }
     });
   }
