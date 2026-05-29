@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-29T07-50-03-203Z-close-a7d9ed9c6bf0",
+  "taskId": "TASK-AAO-0075",
+  "action": "close",
+  "actorId": "Antigravity",
+  "sessionId": "session-20260529072722-Antigravity-TASK-AAO-0075-ae1b8ec2bd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0075.json",
+  "taskSha256": "sha256:47566bb743be23fedb230614fc475eeb0a4d84115030b685027b84f36b1e1eec",
+  "createdAt": "2026-05-29T07:50:03.203Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0075 --actor Antigravity --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260529072722-Antigravity-TASK-AAO-0075-ae1b8ec2bd",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0075.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types scripts/validate-task-direction-governance.ts --mode validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-direction-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-29T07:50:03.200Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0075-next-claim-prompt-ledger-allowedfiles-sync.task.md",
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
