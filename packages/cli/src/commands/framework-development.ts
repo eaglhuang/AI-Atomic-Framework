@@ -781,6 +781,8 @@ export function auditTasks(cwd: string): TaskAuditReport {
     const hasLegacyBaseline = normalizeOptionalString(task.document.ledgerBaselineKind ?? task.document.ledger_baseline_kind) === 'legacy-transition-backfill'
       && hasTransitionEvent;
 
+
+
     if (planningOnlyTask) {
       findings.push({
         level: 'warning',

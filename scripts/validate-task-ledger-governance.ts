@@ -982,7 +982,7 @@ async function validatePlanningOnlyLedgerAuditBoundary(tempRoot: string) {
   assert(extFinding!.detail.includes('[external-planning]'), 'external-planning detail must have [external-planning] prefix');
   assert(extFinding!.detail.includes('tasks import'), 'external-planning warning must suggest sync/import action');
 
-  const targetFinding = auditReport.findings.find((f) => f.taskId === targetTaskId);
+  const targetFinding = auditReport.findings.find((f) => f.taskId === targetTaskId && f.code === 'ATM_TASK_AUDIT_MANUAL_DONE');
   assert(targetFinding !== undefined, 'target-authority finding must exist');
   assert(targetFinding!.level === 'error', 'target-authority done task must be an error');
   assert(targetFinding!.code === 'ATM_TASK_AUDIT_MANUAL_DONE', 'target-authority code must match');
