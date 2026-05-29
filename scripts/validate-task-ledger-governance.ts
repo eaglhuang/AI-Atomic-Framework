@@ -849,9 +849,10 @@ try {
   assert(deliverMacroDryRunError === 'ATM_TASK_NOT_FOUND', `deliver-and-close dry-run on missing task must throw ATM_TASK_NOT_FOUND, got: ${deliverMacroDryRunError}`);
 
   await validateTaskLedgerReadersAtomization(tempRoot);
+  await validatePlanningOnlyLedgerAuditBoundary(tempRoot);
 
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, and TASK-AAO-0061 task-ledger-readers atomization verified)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, and TASK-AAO-0039 planning-only ledger audit boundary covered)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {
@@ -897,4 +898,93 @@ async function validateTaskLedgerReadersAtomization(tempRoot: string) {
   const lockTaskIds = listRuntimeLockTaskIds(dummyRepo);
   assert(lockTaskIds.includes('TASK-LOCK-0001'), 'listRuntimeLockTaskIds must list TASK-LOCK-0001');
   assert(lockTaskIds.includes('TASK-LOCK-0002'), 'listRuntimeLockTaskIds must list TASK-LOCK-0002');
+}
+
+async function validatePlanningOnlyLedgerAuditBoundary(tempRoot: string) {
+  const boundaryRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(boundaryRepo);
+
+  // 1. 測試 `planning-only` done 任務：
+  // 它的 closure_authority === 'planning_repo' 且 target_repo 指向外部 '3KLife'，沒有 closure packet。
+  const planOnlyTaskId = 'TASK-PLAN-ONLY-0001';
+  writeJson(path.join(boundaryRepo, '.atm', 'history', 'tasks', `${planOnlyTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: planOnlyTaskId,
+    title: 'Planning-only done card example',
+    status: 'done',
+    planningRepo: '3KLife',
+    targetRepo: '3KLife',
+    closureAuthority: 'planning_repo',
+    source: {
+      planPath: '../3KLife/docs/plan.md',
+      sectionTitle: planOnlyTaskId,
+      headingLine: 1,
+      hash: 'plan-only-boundary'
+    }
+  });
+
+  // 2. 測試 `external-planning` 外部 target-repo 任務：
+  // 它的 closure_authority === 'target_repo'，但 target_repo 指向外部 '3KLife'，沒有 closure packet。
+  const extTaskId = 'TASK-EXT-0001';
+  writeJson(path.join(boundaryRepo, '.atm', 'history', 'tasks', `${extTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: extTaskId,
+    title: 'External-planning done card example',
+    status: 'done',
+    planningRepo: '3KLife',
+    targetRepo: '3KLife',
+    closureAuthority: 'target_repo',
+    source: {
+      planPath: '../3KLife/docs/plan.md',
+      sectionTitle: extTaskId,
+      headingLine: 10,
+      hash: 'external-planning-boundary'
+    }
+  });
+
+  // 3. 測試本專案的 done 任務 (target-authority)
+  // 它的 closure_authority === 'target_repo'，且 target_repo 指向本 repo 'ai-atomic-framework'，缺少 closure packet。
+  const targetTaskId = 'TASK-TARGET-0001';
+  writeJson(path.join(boundaryRepo, '.atm', 'history', 'tasks', `${targetTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: targetTaskId,
+    title: 'Target-authority done card example',
+    status: 'done',
+    planningRepo: '3KLife',
+    targetRepo: 'ai-atomic-framework',
+    closureAuthority: 'target_repo',
+    source: {
+      planPath: '../3KLife/docs/plan.md',
+      sectionTitle: targetTaskId,
+      headingLine: 20,
+      hash: 'target-authority-boundary'
+    }
+  });
+
+  const auditReport = auditTasks(boundaryRepo);
+
+  // 驗證 ok 應為 false，因為 targetTaskId (本專案的 done 任務) 缺少 closure packet，被列為 error 阻擋！
+  assert(auditReport.ok === false, 'audit must fail because of the missing local target closure packet');
+
+  const planOnlyFinding = auditReport.findings.find((f) => f.taskId === planOnlyTaskId);
+  assert(planOnlyFinding !== undefined, 'planning-only finding must exist');
+  assert(planOnlyFinding!.level === 'warning', 'planning-only done task must be a warning');
+  assert(planOnlyFinding!.code === 'ATM_TASK_AUDIT_PLANNING_ONLY_DONE', 'planning-only code must match');
+  assert(planOnlyFinding!.detail.includes('[planning-only]'), 'planning-only detail must have [planning-only] prefix');
+  assert(planOnlyFinding!.detail.includes('tasks import'), 'planning-only warning must suggest sync/import action');
+
+  const extFinding = auditReport.findings.find((f) => f.taskId === extTaskId);
+  console.log('DEBUG extFinding:', JSON.stringify(extFinding, null, 2));
+  console.log('DEBUG allFindings:', JSON.stringify(auditReport.findings, null, 2));
+  assert(extFinding !== undefined, 'external-planning finding must exist');
+  assert(extFinding!.level === 'warning', 'external-planning done task must be a warning');
+  assert(extFinding!.code === 'ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'external-planning code must match');
+  assert(extFinding!.detail.includes('[external-planning]'), 'external-planning detail must have [external-planning] prefix');
+  assert(extFinding!.detail.includes('tasks import'), 'external-planning warning must suggest sync/import action');
+
+  const targetFinding = auditReport.findings.find((f) => f.taskId === targetTaskId);
+  assert(targetFinding !== undefined, 'target-authority finding must exist');
+  assert(targetFinding!.level === 'error', 'target-authority done task must be an error');
+  assert(targetFinding!.code === 'ATM_TASK_AUDIT_MANUAL_DONE', 'target-authority code must match');
+  assert(targetFinding!.detail.includes('[target-authority]'), 'target-authority detail must have [target-authority] prefix');
 }

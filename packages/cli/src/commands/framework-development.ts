@@ -748,10 +748,13 @@ export function auditTasks(cwd: string): TaskAuditReport {
 
     const lastTransitionId = normalizeOptionalString(task.document.lastTransitionId ?? task.document.last_transition_id);
     const hasTransitionEvent = Boolean(lastTransitionId && transitionEventExists(root, task.taskId, lastTransitionId));
+    const targetRepo = normalizeOptionalString(task.document.target_repo ?? task.document.targetRepo ?? task.document.upstream_repo ?? task.document.upstreamRepo);
+    const isExternalTask = Boolean(targetRepo && !matchesCurrentRepoIdentity(root, targetRepo));
     const transitionRequired = taskLedger.enabled
       && taskLedger.provider === 'atm-local'
       && taskLedger.requireCliTransitions
       && !planningOnlyTask
+      && !isExternalTask
       && (task.status === 'done' || Boolean(originProvider || originTaskId));
     if (transitionRequired && !lastTransitionId) {
       findings.push({
@@ -773,7 +776,6 @@ export function auditTasks(cwd: string): TaskAuditReport {
 
     if (task.status !== 'done') continue;
     const closureAuthority = normalizeClosureAuthority(task.document.closure_authority ?? task.document.closureAuthority);
-    const targetRepo = normalizeOptionalString(task.document.target_repo ?? task.document.targetRepo ?? task.document.upstream_repo ?? task.document.upstreamRepo);
     const closurePacketRef = normalizeOptionalString(task.document.closure_packet ?? task.document.closurePacket);
     const hasCliClosure = Boolean(task.document.closedByActor || task.document.closedByCommand === 'atm tasks close');
     const hasLegacyBaseline = normalizeOptionalString(task.document.ledgerBaselineKind ?? task.document.ledger_baseline_kind) === 'legacy-transition-backfill'
@@ -785,7 +787,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
         code: 'ATM_TASK_AUDIT_PLANNING_ONLY_DONE',
         path: task.relativePath,
         taskId: task.taskId,
-        detail: `Task ${task.taskId} is marked done under planning authority and is not enforced as target-repo closure evidence in this repository.`
+        detail: `[planning-only] Task ${task.taskId} is marked done under planning authority and is not enforced as target-repo closure evidence in this repository. Run "node atm.mjs tasks import" if you need to synchronize it as target-repo work.`
       });
       continue;
     }
@@ -793,11 +795,11 @@ export function auditTasks(cwd: string): TaskAuditReport {
     if (closureAuthority === 'target_repo' && targetRepo && !matchesCurrentRepoIdentity(root, targetRepo)) {
       if (!closurePacketRef) {
         findings.push({
-          level: 'error',
+          level: 'warning',
           code: 'ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET',
           path: task.relativePath,
           taskId: task.taskId,
-          detail: `Task ${task.taskId} is done in a non-target repo without a target closure packet.`
+          detail: `[external-planning] Task ${task.taskId} is done in a non-target repo without a target closure packet. Run "node atm.mjs tasks import" if you need to synchronize it as target-repo work.`
         });
       }
       continue;
@@ -809,7 +811,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
         code: 'ATM_TASK_AUDIT_MANUAL_DONE',
         path: task.relativePath,
         taskId: task.taskId,
-        detail: `Task ${task.taskId} is marked done without ATM CLI closure metadata.`
+        detail: `[target-authority] Task ${task.taskId} is marked done without ATM CLI closure metadata.`
       });
     } else if (hasLegacyBaseline && !hasCliClosure && !closurePacketRef) {
       findings.push({
@@ -817,7 +819,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
         code: 'ATM_TASK_AUDIT_LEGACY_BASELINE_DONE',
         path: task.relativePath,
         taskId: task.taskId,
-        detail: `Task ${task.taskId} is done via a legacy baseline transition; it is traceable but not equivalent to a fresh ATM CLI close.`
+        detail: `[target-authority] Task ${task.taskId} is done via a legacy baseline transition; it is traceable but not equivalent to a fresh ATM CLI close.`
       });
     }
   }
