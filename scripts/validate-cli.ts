@@ -1149,6 +1149,48 @@ try {
     assert(!nextStdoutTrimmed.startsWith('{') && !nextStdoutTrimmed.endsWith('}'), 'stdout of next must not contain JSON body when --output-json is used');
 
     rmSync(outputJsonTestPath, { force: true });
+
+    // Test 4.1: next with --summary
+    const summaryRes = await runAtm(['next', '--json', '--summary', '--task', 'TASK-AAO-0063'], root);
+    assert(summaryRes.exitCode === 0, 'next with --summary must exit 0');
+    assert(summaryRes.parsed.ok === true, 'next with --summary must report ok=true');
+    const summaryEvidence = summaryRes.parsed.evidence;
+    const allowedSummaryFields = ['taskId', 'status', 'claimedByActor', 'allowedFilesCount', 'nextAction'];
+    for (const key of Object.keys(summaryEvidence)) {
+      assert(allowedSummaryFields.includes(key), `summary evidence must not contain key: ${key}`);
+    }
+    if (summaryEvidence.nextAction) {
+      const naKeys = Object.keys(summaryEvidence.nextAction);
+      assert(naKeys.length === 1 && naKeys[0] === 'code', 'nextAction in summary must only contain code');
+    }
+
+    // Test 4.2: next with --fields
+    const fieldsRes = await runAtm(['next', '--json', '--fields', 'taskId,status', '--task', 'TASK-AAO-0063'], root);
+    assert(fieldsRes.exitCode === 0, 'next with --fields must exit 0');
+    assert(fieldsRes.parsed.ok === true, 'next with --fields must report ok=true');
+    const fieldsEvidence = fieldsRes.parsed.evidence;
+    for (const key of Object.keys(fieldsEvidence)) {
+      assert(['taskId', 'status'].includes(key), `fields evidence must not contain key: ${key}`);
+    }
+
+    // Test 4.3: tasks show with --fields
+    const tasksShowRes = await runAtm(['tasks', 'show', '--task', 'TASK-AAO-0063', '--json', '--fields', 'status,title'], root);
+    if (tasksShowRes.exitCode !== 0) {
+      console.error('DEBUG - tasksShowRes failed!', JSON.stringify(tasksShowRes, null, 2));
+    }
+    assert(tasksShowRes.exitCode === 0, 'tasks show with --fields must exit 0');
+    assert(tasksShowRes.parsed.ok === true, 'tasks show with --fields must report ok=true');
+    const showEvidence = tasksShowRes.parsed.evidence;
+    for (const key of Object.keys(showEvidence)) {
+      assert(['status', 'title'].includes(key), `tasks show evidence must not contain key: ${key}`);
+    }
+
+    // Test 4.4: tasks show with unknown fields handling (graceful tolerance)
+    const tasksShowUnknownRes = await runAtm(['tasks', 'show', '--task', 'TASK-AAO-0063', '--json', '--fields', 'status,unknownField'], root);
+    assert(tasksShowUnknownRes.exitCode === 0, 'tasks show with unknown fields must exit 0');
+    const showUnknownEvidence = tasksShowUnknownRes.parsed.evidence;
+    assert('status' in showUnknownEvidence, 'tasks show evidence must contain status');
+    assert(!('unknownField' in showUnknownEvidence), 'tasks show evidence must not contain unknownField');
   } finally {
     rmSync(autoLinkTempWorkspace, { recursive: true, force: true });
   }

@@ -1,13 +1,24 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { projectFields, projectSummary } from './output-projection.ts';
 
 let outputJsonPath: string | null = null;
+let globalSummaryProjection = false;
+let globalFieldsProjection: string[] | null = null;
 
 // 在載入時直接全域掃描一次 process.argv 以備不時之需
 const outputJsonIdx = process.argv.indexOf('--output-json');
 if (outputJsonIdx !== -1 && outputJsonIdx + 1 < process.argv.length) {
   outputJsonPath = process.argv[outputJsonIdx + 1];
+}
+const summaryIdx = process.argv.indexOf('--summary');
+if (summaryIdx !== -1) {
+  globalSummaryProjection = true;
+}
+const fieldsIdx = process.argv.indexOf('--fields');
+if (fieldsIdx !== -1 && fieldsIdx + 1 < process.argv.length) {
+  globalFieldsProjection = process.argv[fieldsIdx + 1].split(',').map((entry) => entry.trim()).filter(Boolean);
 }
 
 export const configRelativePath = path.join('.atm', 'config.json');
@@ -142,6 +153,8 @@ type ParsedCommandArgs = {
   positional: string[];
   helpRequested: boolean;
   outputFormat: 'json' | 'pretty' | null;
+  summary: boolean;
+  fields: string[] | null;
 };
 
 export function parseArgsForCommand(
@@ -153,7 +166,9 @@ export function parseArgsForCommand(
     options: {} as Record<string, unknown>,
     positional: [] as string[],
     helpRequested: false,
-    outputFormat: null as 'json' | 'pretty' | null
+    outputFormat: null as 'json' | 'pretty' | null,
+    summary: false,
+    fields: null as string[] | null
   };
   const allowUnknown = options.allowUnknown === true;
   const optionMap = buildOptionMap(spec?.options ?? []);
@@ -172,6 +187,30 @@ export function parseArgsForCommand(
       if (state.outputFormat !== 'json') {
         state.outputFormat = 'pretty';
       }
+      continue;
+    }
+    if (arg === '--summary') {
+      state.summary = true;
+      globalSummaryProjection = true;
+      continue;
+    }
+    if (arg === '--fields') {
+      const value = argv[index + 1];
+      if (!value || value.startsWith('--') || value === '-h') {
+        const allowedFlags = [...new Set([...(spec?.options ?? []).map((o: any) => o.flag), '--json', '--pretty', '--output-json', '--summary', '--fields'])].sort();
+        throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for --fields`, {
+          exitCode: 2,
+          details: {
+            invalidFlags: [],
+            missingRequired: ['--fields'],
+            allowedFlags,
+            suggestedCommand: null
+          }
+        });
+      }
+      state.fields = value.split(',').map((entry) => entry.trim()).filter(Boolean);
+      globalFieldsProjection = state.fields;
+      index += 1;
       continue;
     }
     if (arg === '--output-json') {
@@ -265,7 +304,22 @@ export function makeHelpResult(spec: any, cwd = process.cwd()) {
   });
 }
 
-export function writeResult(result: CommandResult, stream: { write(s: string): void }, outputFormat = 'json') {
+export function writeResult(
+  result: CommandResult,
+  stream: { write(s: string): void },
+  outputFormat = 'json',
+  projectionOptions?: { summary?: boolean; fields?: string[] | null }
+) {
+  let projectedResult = result;
+  const summary = projectionOptions?.summary ?? globalSummaryProjection;
+  const fields = projectionOptions?.fields ?? globalFieldsProjection;
+
+  if (fields && fields.length > 0) {
+    projectedResult = projectFields(result, fields);
+  } else if (summary) {
+    projectedResult = projectSummary(result);
+  }
+
   if (outputJsonPath) {
     try {
       const resolved = path.resolve(outputJsonPath);
@@ -273,20 +327,20 @@ export function writeResult(result: CommandResult, stream: { write(s: string): v
       if (!existsSync(dir)) {
         mkdirSync(dir, { recursive: true });
       }
-      writeFileSync(resolved, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+      writeFileSync(resolved, `${JSON.stringify(projectedResult, null, 2)}\n`, 'utf8');
     } catch (err) {
       process.stderr.write(`Error writing output JSON to ${outputJsonPath}: ${err}\n`);
     }
     if (outputFormat === 'pretty') {
-      stream.write(formatPrettyResult(result));
+      stream.write(formatPrettyResult(projectedResult));
     }
     return;
   }
   if (outputFormat === 'pretty') {
-    stream.write(formatPrettyResult(result));
+    stream.write(formatPrettyResult(projectedResult));
     return;
   }
-  stream.write(`${JSON.stringify(result, null, 2)}\n`);
+  stream.write(`${JSON.stringify(projectedResult, null, 2)}\n`);
 }
 
 export function formatPrettyResult(result: CommandResult) {
@@ -325,7 +379,7 @@ const ALLOWED_FLAGS_MAP: Record<string, string[]> = {
 
 function getAllowedFlags(commandName: string): string[] {
   const custom = ALLOWED_FLAGS_MAP[commandName] || [];
-  const defaults = ['--cwd', '--force', '--json', '--pretty', '--output-json'];
+  const defaults = ['--cwd', '--force', '--json', '--pretty', '--output-json', '--summary', '--fields'];
   return [...new Set([...custom, ...defaults])].sort();
 }
 
@@ -381,6 +435,8 @@ type ParsedCliOptions = {
   reason?: string;
   skipChecks: string[];
   outputJson?: string;
+  summary: boolean;
+  fields: string[] | null;
 };
 
 export function parseOptions(argv: string[], commandName: string) {
@@ -417,7 +473,9 @@ export function parseOptions(argv: string[], commandName: string) {
     files: [],
     reason: undefined,
     skipChecks: [],
-    outputJson: undefined
+    outputJson: undefined,
+    summary: false,
+    fields: null
   };
   const positional = [];
 
@@ -683,10 +741,22 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--task') {
-      if (!['init', 'bootstrap', 'next'].includes(commandName)) {
+      if (!['init', 'bootstrap', 'next', 'tasks'].includes(commandName)) {
         throw createUsageError(commandName, `${commandName} does not support option --task`, { invalidFlags: ['--task'] });
       }
       options.task = requireOptionValue(argv, index, '--task', commandName);
+      index += 1;
+      continue;
+    }
+    if (arg === '--summary') {
+      options.summary = true;
+      globalSummaryProjection = true;
+      continue;
+    }
+    if (arg === '--fields') {
+      const raw = requireOptionValue(argv, index, '--fields', commandName);
+      options.fields = raw.split(',').map((entry: string) => entry.trim()).filter(Boolean);
+      globalFieldsProjection = options.fields;
       index += 1;
       continue;
     }

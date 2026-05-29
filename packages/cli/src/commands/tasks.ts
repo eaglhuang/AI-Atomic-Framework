@@ -16,7 +16,7 @@ import {
   validateClosurePacket,
   writeClosurePacket
 } from './framework-development.ts';
-import { CliError, makeResult, message, parseJsonText, relativePathFrom, resolveValue, type CommandResult } from './shared.ts';
+import { CliError, makeResult, message, parseJsonText, parseOptions, relativePathFrom, resolveValue, type CommandResult } from './shared.ts';
 import {
   appendTaskTransitionEvent,
   createTaskTransitionId,
@@ -247,6 +247,9 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
   if (action === 'reconcile') {
     return await runTasksReconcile(argv.slice(1));
   }
+  if (action === 'show') {
+    return await runTasksShow(argv.slice(1));
+  }
   if (action === 'deliver-and-close') {
     return await runTasksDeliverAndClose(argv.slice(1));
   }
@@ -260,9 +263,35 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
     return await runTasksScope(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | deliver-and-close | audit | migrate-legacy-ledger).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | show | deliver-and-close | audit | migrate-legacy-ledger).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
+}
+
+async function runTasksShow(argv: string[]): Promise<CommandResult> {
+  const { options } = parseOptions(argv, 'tasks');
+  const taskId = options.task;
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks show requires --task <id>', { exitCode: 2 });
+  }
+  const taskPath = taskPathFor(options.cwd, taskId);
+  if (!existsSync(taskPath)) {
+    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${taskId}.`, {
+      exitCode: 2,
+      details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId }
+    });
+  }
+  const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+  return makeResult({
+    ok: true,
+    command: 'tasks show',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_TASK_SHOW_SUCCESS', `Task details for ${taskId}`)],
+    evidence: {
+      taskId,
+      ...taskDocument
+    }
+  });
 }
 
 async function runTasksReconcile(argv: string[]) {
