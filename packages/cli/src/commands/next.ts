@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import path from 'node:path';
@@ -57,6 +56,14 @@ import {
   type RequestedTaskAction,
   type TaskIntent
 } from './next/intent-normalizers.ts';
+import {
+  dedupeStrings,
+  quoteCliValue,
+  sha256,
+  toTaskCandidateView,
+  uniqueInOrder,
+  uniqueSorted
+} from './next/view-projections.ts';
 
 export async function runNext(argv: any) {
   const { options } = parseOptions(argv, 'next');
@@ -3042,53 +3049,6 @@ function tokenizeForMatch(value: string): readonly string[] {
     .filter((entry) => entry.length >= 3);
 }
 
-function uniqueSorted(values: readonly string[]): string[] {
-  return Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
-}
-
-function uniqueInOrder(values: readonly string[]): string[] {
-  const seen = new Set<string>();
-  const output: string[] = [];
-  for (const value of values.map((entry) => String(entry).trim()).filter(Boolean)) {
-    if (seen.has(value)) continue;
-    seen.add(value);
-    output.push(value);
-  }
-  return output;
-}
-
-function sha256(value: string) {
-  return createHash('sha256').update(value).digest('hex');
-}
-
-function toTaskCandidateView(task: ImportedTaskSummary) {
-  return {
-    workItemId: task.workItemId,
-    title: task.title,
-    status: task.status,
-    closedAt: task.closedAt,
-    closedByActor: task.closedByActor,
-    closurePacket: task.closurePacket,
-    lastTransitionId: task.lastTransitionId,
-    lastTransitionAt: task.lastTransitionAt,
-    taskPath: task.taskPath,
-    format: task.format,
-    sourcePlanPath: task.sourcePlanPath,
-    nearbyPlanPaths: task.nearbyPlanPaths,
-    scopePaths: task.scopePaths,
-    planningContext: {
-      readOnlyPaths: task.planningReadOnlyPaths
-    },
-    targetWork: {
-      allowedFiles: task.targetAllowedFiles,
-      allowPlanningMirror: task.allowPlanningMirror
-    },
-    targetRepo: task.targetRepo,
-    matchScore: task.matchScore ?? 0,
-    matchReasons: task.matchReasons ?? []
-  };
-}
-
 function enrichWithLegacyPlan(cwd: string, base: GuidanceNextAction, plan: LegacyRoutePlan, sessionId: string): GuidanceNextAction {
   const safeSegments = plan.segments.filter((s: LegacyRoutePlanSegment) => plan.safeFirstAtoms.includes(s.symbolName));
   const preferredSegment: LegacyRoutePlanSegment | null =
@@ -3292,10 +3252,6 @@ function compareIsoDesc(left: string | undefined, right: string | undefined) {
   return leftValue > rightValue ? -1 : 1;
 }
 
-function dedupeStrings(values: readonly string[]) {
-  return Array.from(new Set(values));
-}
-
 function reconcileProposalMissingEvidence(
   missingEvidence: readonly string[],
   behavior: string,
@@ -3306,10 +3262,6 @@ function reconcileProposalMissingEvidence(
     return filtered.filter((entry) => entry !== 'human review before apply');
   }
   return filtered;
-}
-
-function quoteCliValue(value: string): string {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
 function mapStatusToSlashCommandId(status: string): string {
