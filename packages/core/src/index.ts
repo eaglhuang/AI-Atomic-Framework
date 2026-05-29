@@ -1,3 +1,15 @@
+/**
+ * Artifact version kind 判別器 — Slice 2 (TASK-AAO-0072)。
+ *
+ * - `semver`  : 語意版本，例如 "1.2.3"，可依 semver 規則排序。
+ * - `git-sha` : 完整或縮短的 Git commit SHA，只能做 identity 比對，不排序。
+ * - `sha256`  : SHA-256 內容摘要，只能做 identity 比對，不排序。
+ * - `opaque`  : 其他沒有排序語意的版本字串。
+ *
+ * `dataVersion` 固定維持 semver；這個型別只套用於 `artifactVersion`。
+ */
+export type ArtifactVersionKind = 'semver' | 'git-sha' | 'sha256' | 'opaque';
+
 export type AtomLifecycleStatus =
   | 'planned'
   | 'reserved'
@@ -132,6 +144,9 @@ export interface EvidenceRecord {
   readonly evidenceId?: string;
   readonly workItemId?: string;
   readonly evidenceKind: 'validation' | 'review' | 'metric' | 'handoff';
+  readonly dataVersion?: string;
+  readonly artifactVersion?: string;
+  readonly artifactVersionKind?: ArtifactVersionKind;
   readonly evidenceType?: 'usage-feedback' | 'quality-baseline' | 'quality-comparison' | 'rollback-proof' | 'human-review-decision';
   readonly signalKind?: EvidenceSignalKind;
   readonly signalScope?: EvidenceSignalScope;

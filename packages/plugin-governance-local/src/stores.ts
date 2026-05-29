@@ -32,6 +32,7 @@ import type {
 } from '@ai-atomic-framework/plugin-sdk';
 import type { LocalGovernanceConfig } from './index';
 import { resolveLocalGovernanceLayout } from './layout.ts';
+import { isArtifactVersionKind, resolveDataAndArtifactVersions, isValidSemverVersionString } from './versioning.ts';
 
 export function createLocalGovernanceStores(config: LocalGovernanceConfig): GovernanceStores {
   const repositoryRoot = path.resolve(config.repositoryRoot);
@@ -323,9 +324,10 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       ensureAllDirectories();
       const filePath = path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`);
       const existing = readEvidenceDocument(filePath);
-      const nextEvidence = [...existing.evidence, evidence];
-      writeJsonFile(filePath, existing.wrapper ? { ...existing.wrapper, evidence: nextEvidence } : nextEvidence);
-      return evidence;
+      const versionedEvidence = materializeEvidenceVersionMetadata(evidence, existing.wrapper);
+      const nextEvidence = [...existing.evidence, versionedEvidence];
+      writeJsonFile(filePath, createEvidenceDocument(existing.wrapper, nextEvidence));
+      return versionedEvidence;
     },
     listEvidence(workItemId) {
       return readEvidenceDocument(path.join(absoluteLayout.evidenceStorePath, `${workItemId}.json`)).evidence;
@@ -714,4 +716,45 @@ function extractFsErrorCode(error: unknown): string | null {
 
 function sanitizeBudgetFileId(budgetId: string): string {
   return String(budgetId || 'context-budget').replace(/\\/g, '/').replace(/[/:]+/g, '-');
+}
+
+function materializeEvidenceVersionMetadata(
+  evidence: EvidenceRecord,
+  wrapper: Record<string, unknown> | null
+): EvidenceRecord {
+  const specVersion = wrapper && typeof wrapper.specVersion === 'string' ? wrapper.specVersion : undefined;
+  const versions = resolveDataAndArtifactVersions({
+    specVersion,
+    dataVersion: evidence.dataVersion,
+    artifactVersion: evidence.artifactVersion
+  });
+
+  let artifactVersionKind = evidence.artifactVersionKind;
+  if (artifactVersionKind !== undefined && artifactVersionKind !== null) {
+    if (!isArtifactVersionKind(artifactVersionKind)) {
+      throw new Error('invalid artifactVersionKind');
+    }
+  } else {
+    if (versions.artifactVersion && isValidSemverVersionString(versions.artifactVersion)) {
+      artifactVersionKind = 'semver';
+    } else {
+      artifactVersionKind = undefined;
+    }
+  }
+
+  const result: EvidenceRecord = {
+    ...evidence,
+    dataVersion: evidence.dataVersion || versions.dataVersion,
+    artifactVersion: evidence.artifactVersion || versions.artifactVersion,
+    ...(artifactVersionKind !== undefined ? { artifactVersionKind } : {})
+  };
+
+  return result;
+}
+
+function createEvidenceDocument(
+  wrapper: Record<string, unknown> | null,
+  nextEvidence: EvidenceRecord[]
+): unknown {
+  return wrapper ? { ...wrapper, evidence: nextEvidence } : nextEvidence;
 }

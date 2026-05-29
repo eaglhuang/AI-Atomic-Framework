@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0072",
+  "title": "ATM version metadata Slice 2 artifactVersionKind and evidence write-path",
+  "status": "running",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0070",
+    "TASK-AAO-0071"
+  ],
+  "acceptance": [
+    "`TASK-AAO-0072` 已在 `3KLife` planning repo 建立，並可作為獨立 Slice 2 卡片存在。",
+    "本卡清楚標示：Slice 2 **只做兩件事** —— 引入 `artifactVersionKind`，以及將 version metadata 單點串接到 `evidenceStore.writeEvidence`。",
+    "本卡清楚標示：`dataVersion` 固定為 semver，**不得**新增 `dataVersionKind`。",
+    "本卡清楚標示：`artifactVersionKind` 的固定值域為 `'semver' | 'git-sha' | 'sha256' | 'opaque'`。",
+    "本卡清楚標示：`compareArtifactVersions` 僅同 kind 可比較、cross-kind 回傳 `null`、identity-only kinds 不排序。",
+    "本卡 `depends_on` 明確包含 `TASK-AAO-0070` 與 `TASK-AAO-0071`。",
+    "本卡的允許修改面嚴格限制於本卡列出的 `allowedFiles`，不得外擴。"
+  ],
+  "deliverables": [
+    "packages/core/src/index.ts",
+    "packages/plugin-governance-local/src/versioning.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "packages/plugin-governance-local/src/index.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "scripts/validate-cli.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/index.ts",
+    "packages/plugin-governance-local/src/versioning.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "packages/plugin-governance-local/src/index.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "scripts/validate-cli.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "將 version metadata 寫入 registryStore.writeRegistryEntry 或任何其他 stores.ts method",
+    "引入 dataVersionKind 或改變 dataVersion 固定 semver 的前提",
+    "擴及 bootstrap / doctor / tasks / atm.mjs / release packaging",
+    "amend 歷史 commit 7d6b04c",
+    "修改 closed TASK-AAO-0065 ledger",
+    "開啟 Slice 3 或任何後續切片",
+    "編輯 AI-Atomic-Framework source tree 以外的其他產品面向"
+  ],
+  "nonGoals": [
+    "不要實作多 consumer write-path",
+    "不要把 Slice 2 變成全域 metadata migration sweep",
+    "不要把 semver hygiene rename 重新併回本卡"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾僅應撤回 Slice 2 引入的 artifactVersionKind 與 evidenceStore.writeEvidence 單一路徑串接，不得藉機擴展到 registry、bootstrap、doctor、tasks、atm.mjs 或 release packaging。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-governance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "framework-contract-slice",
+    "version-metadata",
+    "write-path"
+  ],
+  "notes": "- `TASK-AAO-0070` 是 Slice 1 identity correction；`TASK-AAO-0071` 是 semver helper rename hygiene patch；`TASK-AAO-0072` 則是 **Slice 2**。\n- `TASK-AAO-0072` 不得回頭改寫 0070 / 0071 的範圍，也不得順手開 Slice 3。\n- 若 0071 尚未 implementation landed，0072 只能維持 `planned`，不可 claim。",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0072-atm-version-metadata-artifact-kind-and-evidence-write-path.task.md",
+    "sectionTitle": "TASK-AAO-0072",
+    "headingLine": 62,
+    "hash": "a9fcdc584eda507c"
+  },
+  "importedAt": "2026-05-29T01:14:44.931Z",
+  "lastTransitionId": "2026-05-29T01-15-21-356Z-claim-0e8866f3e273",
+  "lastTransitionAt": "2026-05-29T01:15:21.356Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "augment",
+  "reservedAt": "2026-05-29T01:15:21.344Z",
+  "promotedAt": "2026-05-29T01:15:21.347Z",
+  "claim": {
+    "actorId": "augment",
+    "leaseId": "lease-902445d59ebe",
+    "claimedAt": "2026-05-29T01:15:21.349Z",
+    "heartbeatAt": "2026-05-29T01:15:21.349Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0072.json"
+    ],
+    "state": "active"
+  },
+  "startedAt": "2026-05-29T01:15:21.349Z",
+  "startedByActor": "augment",
+  "startedBySessionId": "session-20260529011521-augment-TASK-AAO-0072-0bccdc5cf2"
+}
