@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-29T05-24-09-780Z-close-5764f4100071",
+  "taskId": "TASK-AAO-0068",
+  "action": "close",
+  "actorId": "Antigravity",
+  "sessionId": "session-20260529051407-Antigravity-TASK-AAO-0068-6910c81e5d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0068.json",
+  "taskSha256": "sha256:b2ae4b63e304e7e868e64d911dbb2bb79f08e000233415aea07f49c608fdb58d",
+  "createdAt": "2026-05-29T05:24:09.780Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0068 --actor Antigravity --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260529051407-Antigravity-TASK-AAO-0068-6910c81e5d",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0068.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-29T05:24:09.777Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0068-next-route-summary-field-projection.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/output-projection.ts",
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/tasks.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/output-projection.ts",
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/tasks.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
