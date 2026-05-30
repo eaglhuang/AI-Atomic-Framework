@@ -55,6 +55,14 @@ export type {
 } from './language-adapter';
 export type { InjectorPlugin, InjectorPluginContext } from './injector-plugin';
 export type {
+  ExternalTaskSourcePlugin,
+  ExternalTaskSourceInput,
+  ParsedExternalTask,
+  ExternalTaskValidationResult,
+  ExternalTaskGenerationIntent,
+  GeneratedExternalTaskCard
+} from './external-task-source';
+export type {
   ArtifactStore,
   ContextBudgetDecision,
   ContextBudgetEvaluationInput,

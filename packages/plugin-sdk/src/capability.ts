@@ -13,6 +13,7 @@ export type CapabilityKind =
   | 'state-store'
   | 'rule-guard'
   | 'evidence-store'
+  | 'external-task-source'
   | 'injector-plugin'
   | 'version-resolver'
   | 'quality-metrics-comparator'
