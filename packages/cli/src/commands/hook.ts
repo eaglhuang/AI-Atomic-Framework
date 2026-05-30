@@ -28,6 +28,7 @@ import {
   type TaskDirectionAllowedFilesDiagnosis
 } from './task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
+import { runContextMapAdvisor } from './hook/context-map-advisor.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -477,6 +478,12 @@ function runPreCommitHook(cwd: string) {
       diagnoses: directionLockAllowedFilesMismatches
     })
     : null;
+
+  try {
+    runContextMapAdvisor(root);
+  } catch {
+    // ignore
+  }
 
   return makeResult({
     ok,
