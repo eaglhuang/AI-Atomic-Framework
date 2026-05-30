@@ -274,3 +274,93 @@ function collectTaskFileValues(value: unknown, files: Set<string>): void {
 function normalizeRelativePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
+
+// ─── Context Map 巢狀結構解析 ─────────────────────────────────────────
+
+export interface ContextFile {
+  readonly path: string;
+  readonly reason: string;
+}
+
+export interface ContextPattern {
+  readonly referencePath: string;
+  readonly referenceTaskId: string;
+  readonly description: string;
+}
+
+export interface ContextMap {
+  readonly primary?: readonly ContextFile[];
+  readonly secondary?: readonly ContextFile[];
+  readonly tests?: readonly ContextFile[];
+  readonly patterns?: readonly ContextPattern[];
+}
+
+export function parseContextMap(raw: unknown): ContextMap | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return undefined;
+  }
+  const obj = raw as Record<string, unknown>;
+  const result: {
+    primary?: ContextFile[];
+    secondary?: ContextFile[];
+    tests?: ContextFile[];
+    patterns?: ContextPattern[];
+  } = {};
+
+  if ('primary' in obj) {
+    result.primary = parseContextFiles(obj.primary);
+  }
+  if ('secondary' in obj) {
+    result.secondary = parseContextFiles(obj.secondary);
+  }
+  if ('tests' in obj) {
+    result.tests = parseContextFiles(obj.tests);
+  }
+  if ('patterns' in obj) {
+    result.patterns = parseContextPatterns(obj.patterns);
+  }
+
+  if (result.primary === undefined && result.secondary === undefined && result.tests === undefined && result.patterns === undefined) {
+    return undefined;
+  }
+
+  return result;
+}
+
+function parseContextFiles(val: unknown): ContextFile[] | undefined {
+  if (!Array.isArray(val)) {
+    return undefined;
+  }
+  const items: ContextFile[] = [];
+  for (const item of val) {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      const i = item as Record<string, unknown>;
+      const path = typeof i.path === 'string' ? i.path.trim() : '';
+      const reason = typeof i.reason === 'string' ? i.reason.trim() : '';
+      if (path && reason) {
+        items.push({ path, reason });
+      }
+    }
+  }
+  return items;
+}
+
+function parseContextPatterns(val: unknown): ContextPattern[] | undefined {
+  if (!Array.isArray(val)) {
+    return undefined;
+  }
+  const items: ContextPattern[] = [];
+  for (const item of val) {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      const i = item as Record<string, unknown>;
+      const referencePath = typeof i.referencePath === 'string' ? i.referencePath.trim() : '';
+      const referenceTaskId = typeof i.referenceTaskId === 'string' ? i.referenceTaskId.trim() : '';
+      const description = typeof i.description === 'string' ? i.description.trim() : '';
+      if (referencePath && referenceTaskId && description) {
+        items.push({ referencePath, referenceTaskId, description });
+      }
+    }
+  }
+  return items;
+}
+

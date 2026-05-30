@@ -23,8 +23,9 @@ export class AtmMarkdownTaskSourcePlugin implements ExternalTaskSourcePlugin {
       taskId,
       frontmatter: frontMatter.data,
       body,
-      sourcePath: input.sourcePath
-    };
+      sourcePath: input.sourcePath,
+      contextMap: frontMatter.data.contextMap
+    } as ParsedExternalTask;
   }
 }
 

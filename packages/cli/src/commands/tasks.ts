@@ -49,7 +49,9 @@ import {
   normalizeTaskId,
   parseMarkdownTableCells,
   parseYamlList,
-  validateDeliverablesList
+  validateDeliverablesList,
+  type ContextMap,
+  parseContextMap
 } from './tasks/task-import-validators.ts';
 
 export interface TaskImportSource {
@@ -98,6 +100,7 @@ export interface TaskImportRecord {
   readonly importDiagnostics?: readonly TaskCardImportDiagnostic[];
   readonly tags: readonly string[];
   readonly notes?: string | null;
+  readonly contextMap?: ContextMap;
   readonly source: TaskImportSource;
   readonly importedAt: string;
 }
@@ -4600,6 +4603,7 @@ function parseSingleCard(input: {
     ?? frontMatter.data.rollback_notes
     ?? rollbackFrontMatter.notes
   );
+  const contextMap = parseContextMap(frontMatter.data.contextMap);
   const importDiagnostics: TaskCardImportDiagnostic[] = [...cardImportDiagnostics];
   if (frontMatter.data.allowed_files !== undefined && frontMatter.data.scopePaths === undefined && frontMatter.data.scope_paths === undefined) {
     importDiagnostics.push({
@@ -4653,6 +4657,7 @@ function parseSingleCard(input: {
     evidenceRequired,
     rollbackStrategy,
     rollbackNotes,
+    contextMap,
     atomizationImpact: {
       ownerAtomOrMap: normalizeOptionalString(
         frontMatter.data.ownerAtomOrMap
@@ -5182,6 +5187,7 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
     frontData.rollbackNotes
     ?? rollbackFrontMatter.notes
   );
+  const contextMap = parseContextMap(frontData.contextMap);
 
   return {
     schemaVersion: 'atm.workItem.v0.2',
@@ -5204,6 +5210,7 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
     evidenceRequired,
     rollbackStrategy,
     rollbackNotes,
+    contextMap,
     atomizationImpact: {
       ownerAtomOrMap: normalizeOptionalString(
         frontData.ownerAtomOrMap

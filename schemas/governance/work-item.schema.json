@@ -62,6 +62,36 @@
       },
       "uniqueItems": true,
       "default": []
+    },
+    "contextMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextFile"
+          }
+        },
+        "secondary": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextFile"
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextFile"
+          }
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contextPattern"
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -79,6 +109,40 @@
         },
         "notes": {
           "type": "string"
+        }
+      }
+    },
+    "contextFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "reason"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "contextPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["referencePath", "referenceTaskId", "description"],
+      "properties": {
+        "referencePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceTaskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }
