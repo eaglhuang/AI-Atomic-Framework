@@ -16,16 +16,24 @@ export class AtmMarkdownTaskSourcePlugin implements ExternalTaskSourcePlugin {
 
   async parse(input: ExternalTaskSourceInput): Promise<ParsedExternalTask | null> {
     const frontMatter = extractFrontMatter(input.raw);
-    if (!frontMatter || typeof frontMatter.data.task_id !== 'string') {
+    if (!frontMatter) {
       return null;
     }
 
-    const taskId = normalizeTaskId(frontMatter.data.task_id);
+    const rawTaskId = frontMatter.data.task_id || frontMatter.data.id;
+    if (typeof rawTaskId !== 'string') {
+      return null;
+    }
+
+    const taskId = normalizeTaskId(rawTaskId);
     const body = input.raw.slice(frontMatter.endIndex);
 
     return {
       taskId,
-      frontmatter: frontMatter.data,
+      frontmatter: {
+        ...frontMatter.data,
+        task_id: rawTaskId
+      },
       body,
       sourcePath: input.sourcePath,
       contextMap: frontMatter.data.contextMap
