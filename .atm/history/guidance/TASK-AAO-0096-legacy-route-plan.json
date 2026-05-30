@@ -1,0 +1,2604 @@
+{
+  "ok": true,
+  "command": "start",
+  "mode": "standalone",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+  "messages": [
+    {
+      "level": "info",
+      "code": "ATM_GUIDANCE_SESSION_STARTED",
+      "text": "Guidance session started.",
+      "data": {
+        "sessionId": "guidance-20260530123250-8e2b8ac23f"
+      }
+    }
+  ],
+  "evidence": {
+    "sessionId": "guidance-20260530123250-8e2b8ac23f",
+    "routeDecision": {
+      "schemaId": "atm.guidanceRouteDecision",
+      "specVersion": "0.1.0",
+      "recommendedRoute": "atomize",
+      "confidence": 0.86,
+      "reasons": [
+        "Legacy route plan is available; proceed with dry-run proposal evidence before mutation.",
+        "Selected safe leaf taskDeliveryPrincipleText for atomize dry-run proposal."
+      ],
+      "routeChoices": [
+        {
+          "route": "atomize",
+          "reason": "safe leaf taskDeliveryPrincipleText"
+        }
+      ],
+      "requiredEvidence": [
+        "LegacyRoutePlan",
+        "atomize dry-run proposal",
+        "human review before apply"
+      ],
+      "blockedBy": [],
+      "nextCommand": "node atm.mjs upgrade --propose --behavior behavior.atomize --dry-run --json"
+    },
+    "guidancePacket": {
+      "schemaId": "atm.guidancePacket",
+      "specVersion": "0.1.0",
+      "sessionId": "guidance-20260530123250-8e2b8ac23f",
+      "readFirst": [
+        "README.md",
+        "docs/ATOM_GENERATOR.md",
+        "docs/LIFECYCLE.md"
+      ],
+      "doNotTouch": [],
+      "nextCommand": "node atm.mjs upgrade --propose --behavior behavior.atomize --dry-run --json",
+      "allowedCommands": [
+        "node atm.mjs orient --cwd . --json",
+        "node atm.mjs start --cwd . --goal \"<goal>\" --json",
+        "node atm.mjs next --cwd . --json",
+        "node atm.mjs explain --why blocked --json",
+        "node atm.mjs upgrade --propose --behavior behavior.atomize --dry-run --json"
+      ],
+      "blockedCommands": [
+        "host mutation without active guidance session",
+        "atomize/infect/split apply without dry-run proposal",
+        "apply without human review approval",
+        "apply without rollback proof or rollback instructions",
+        "direct trunk function rewrite",
+        "release promote while release blockers exist"
+      ],
+      "requiredGates": [],
+      "missingEvidence": [
+        "LegacyRoutePlan",
+        "atomize dry-run proposal",
+        "human review before apply"
+      ],
+      "rollbackHint": "Discard generated guidance proposals and rerun `node atm.mjs orient --cwd . --json` before retrying.",
+      "whyThisRoute": [
+        "Legacy route plan is available; proceed with dry-run proposal evidence before mutation.",
+        "Selected safe leaf taskDeliveryPrincipleText for atomize dry-run proposal."
+      ]
+    },
+    "legacyRoutePlan": {
+      "schemaId": "atm.legacyRoutePlan",
+      "specVersion": "0.1.0",
+      "targetFile": "packages/cli/src/commands/tasks.ts",
+      "segments": [
+        {
+          "symbolName": "runTasks",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 23,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksShow",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 10,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksReconcile",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 41,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksDeliverAndClose",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 30,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksImport",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 31,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksVerify",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 31,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksCreate",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 14,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksMirror",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 19,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksReservation",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 22,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksReset",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 21,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksClose",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 45,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksAudit",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksLock",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksScope",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksScopeAdd",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 21,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksLockCleanup",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 11,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "cleanupTaskLock",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 19,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksQueue",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 11,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksMigrateLegacyLedger",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 17,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksClaimLifecycle",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 35,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "parseReservationOptions",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "evaluateFrameworkDeliveryWindow",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 9,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "buildCloseScopedDiffIsolation",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 7,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "evaluateTaskDeliverableGate",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 19,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "taskDeliveryPrincipleText",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 1,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "inspectHistoricalDelivery",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 8,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "isDeliverableDiffRequired",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 9,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "listChangedFilesForDeliverableGate",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 8,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "listCommittedFilesSinceClaim",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "readGitScalar",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "readGitNameOnly",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "isRealDeliverablePath",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "pathMatchesTaskScope",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 9,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "collectTaskFileValues",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "writeLockCleanupReport",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 9,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "writeTaskDocument",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "taskPathFor",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "readLegacyLedgerTaskFiles",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 17,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "legacyTaskRequiresBaseline",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "writeLegacyBaselineTransition",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 9,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "listTaskFiles",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 10,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "safeTaskFileReadDir",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "safeTaskFileStat",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "shouldSkipTaskFileDiscoveryDirectory",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 7,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "readJsonRecord",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "parseTaskMarkdownFrontmatter",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 7,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "writeTaskMarkdownFrontmatter",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 16,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "isFrontmatterScalar",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 1,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "formatFrontmatterValue",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "normalizeTaskDocumentId",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "normalizeTaskStatus",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "normalizeStringValue",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "sha256",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "assertLocalTaskLedgerEnabled",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "buildTaskTransitionCommand",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "quoteCommandValue",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "writeTaskDocumentWithTransition",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 7,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "verifyPersistedTaskDocument",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 7,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "createClosureTransitionMetadata",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 1,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "normalizeWorkItemStatus",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "inspectTaskVerifyStatus",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "inspectTaskSourceTrace",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 1,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "isLegacyHistoricalTaskDocument",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 1,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "writeTakeoverEvidence",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 13,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "extractErrorCode",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "extractErrorDetails",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "parseImportOptions",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "parseVerifyOptions",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "requireValue",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "parsePlanMarkdown",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 13,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "parseChineseLabeledTaskBlocks",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 11,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "collectChineseLabeledValue",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "collectChineseLabeledList",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "detectPlanHeadings",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "parseTaskTableMetadata",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 14,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "splitPlanIntoTaskSections",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "parseSingleCard",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 16,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "enrichParsedTasksFromSiblingTaskCards",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 18,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "parseTaskSection",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 15,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "createTaskFromTableMetadata",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "writeTaskFiles",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 14,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "writeImportEvidence",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 8,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "sliceBodyByHeadings",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "collectBulletList",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 7,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "collectText",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "collectKeyValue",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "collectKeyValueFromLines",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "extractTaskReference",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "parseDependencyList",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 12,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "collectLabeledText",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 8,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "cleanCellText",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "isMarkdownTableRow",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "isMarkdownTableSeparator",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "normalizeTableHeader",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 5,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "findTableColumnIndex",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 4,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "cellAt",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 1,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "normalizeRelativePath",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 3,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "uniqueStrings",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 6,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "escapeRegExp",
+          "role": "leaf",
+          "riskLevel": "low",
+          "fanOut": 2,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "atomize"
+        },
+        {
+          "symbolName": "parseSingleCardFromPlugin",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 13,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        },
+        {
+          "symbolName": "runTasksNew",
+          "role": "trunk",
+          "riskLevel": "high",
+          "fanOut": 14,
+          "callerDemand": 0,
+          "existingAtomMatch": null,
+          "recommendedBehavior": "leave-in-place"
+        }
+      ],
+      "trunkFunctions": [
+        "runTasks",
+        "runTasksShow",
+        "runTasksReconcile",
+        "runTasksDeliverAndClose",
+        "runTasksImport",
+        "runTasksVerify",
+        "runTasksCreate",
+        "runTasksMirror",
+        "runTasksReservation",
+        "runTasksReset",
+        "runTasksClose",
+        "runTasksAudit",
+        "runTasksLock",
+        "runTasksScope",
+        "runTasksScopeAdd",
+        "runTasksLockCleanup",
+        "cleanupTaskLock",
+        "runTasksQueue",
+        "runTasksMigrateLegacyLedger",
+        "runTasksClaimLifecycle",
+        "parseReservationOptions",
+        "evaluateFrameworkDeliveryWindow",
+        "buildCloseScopedDiffIsolation",
+        "evaluateTaskDeliverableGate",
+        "inspectHistoricalDelivery",
+        "isDeliverableDiffRequired",
+        "listChangedFilesForDeliverableGate",
+        "readGitNameOnly",
+        "isRealDeliverablePath",
+        "pathMatchesTaskScope",
+        "writeLockCleanupReport",
+        "writeTaskDocument",
+        "readLegacyLedgerTaskFiles",
+        "writeLegacyBaselineTransition",
+        "listTaskFiles",
+        "shouldSkipTaskFileDiscoveryDirectory",
+        "parseTaskMarkdownFrontmatter",
+        "writeTaskMarkdownFrontmatter",
+        "normalizeTaskStatus",
+        "writeTaskDocumentWithTransition",
+        "verifyPersistedTaskDocument",
+        "writeTakeoverEvidence",
+        "parseImportOptions",
+        "parseVerifyOptions",
+        "parsePlanMarkdown",
+        "parseChineseLabeledTaskBlocks",
+        "collectChineseLabeledValue",
+        "collectChineseLabeledList",
+        "parseTaskTableMetadata",
+        "splitPlanIntoTaskSections",
+        "parseSingleCard",
+        "enrichParsedTasksFromSiblingTaskCards",
+        "parseTaskSection",
+        "writeTaskFiles",
+        "writeImportEvidence",
+        "sliceBodyByHeadings",
+        "collectBulletList",
+        "collectText",
+        "parseDependencyList",
+        "collectLabeledText",
+        "normalizeTableHeader",
+        "uniqueStrings",
+        "parseSingleCardFromPlugin",
+        "runTasksNew"
+      ],
+      "leafFunctions": [
+        "taskDeliveryPrincipleText",
+        "listCommittedFilesSinceClaim",
+        "readGitScalar",
+        "collectTaskFileValues",
+        "taskPathFor",
+        "legacyTaskRequiresBaseline",
+        "safeTaskFileReadDir",
+        "safeTaskFileStat",
+        "readJsonRecord",
+        "isFrontmatterScalar",
+        "formatFrontmatterValue",
+        "normalizeTaskDocumentId",
+        "normalizeStringValue",
+        "sha256",
+        "assertLocalTaskLedgerEnabled",
+        "buildTaskTransitionCommand",
+        "quoteCommandValue",
+        "createClosureTransitionMetadata",
+        "normalizeWorkItemStatus",
+        "inspectTaskVerifyStatus",
+        "inspectTaskSourceTrace",
+        "isLegacyHistoricalTaskDocument",
+        "extractErrorCode",
+        "extractErrorDetails",
+        "requireValue",
+        "detectPlanHeadings",
+        "createTaskFromTableMetadata",
+        "collectKeyValue",
+        "collectKeyValueFromLines",
+        "extractTaskReference",
+        "cleanCellText",
+        "isMarkdownTableRow",
+        "isMarkdownTableSeparator",
+        "findTableColumnIndex",
+        "cellAt",
+        "normalizeRelativePath",
+        "escapeRegExp"
+      ],
+      "adapterBoundaries": [],
+      "existingAtomMatches": [],
+      "releaseBlockers": [],
+      "safeFirstAtoms": [
+        "taskDeliveryPrincipleText",
+        "listCommittedFilesSinceClaim",
+        "readGitScalar",
+        "collectTaskFileValues",
+        "taskPathFor",
+        "legacyTaskRequiresBaseline",
+        "safeTaskFileReadDir",
+        "safeTaskFileStat",
+        "readJsonRecord",
+        "isFrontmatterScalar",
+        "formatFrontmatterValue",
+        "normalizeTaskDocumentId",
+        "normalizeStringValue",
+        "sha256",
+        "assertLocalTaskLedgerEnabled",
+        "buildTaskTransitionCommand",
+        "quoteCommandValue",
+        "createClosureTransitionMetadata",
+        "normalizeWorkItemStatus",
+        "inspectTaskVerifyStatus",
+        "inspectTaskSourceTrace",
+        "isLegacyHistoricalTaskDocument",
+        "extractErrorCode",
+        "extractErrorDetails",
+        "requireValue",
+        "detectPlanHeadings",
+        "createTaskFromTableMetadata",
+        "collectKeyValue",
+        "collectKeyValueFromLines",
+        "extractTaskReference",
+        "cleanCellText",
+        "isMarkdownTableRow",
+        "isMarkdownTableSeparator",
+        "findTableColumnIndex",
+        "cellAt",
+        "normalizeRelativePath",
+        "escapeRegExp"
+      ],
+      "noTouchZones": [
+        "packages/cli/src/commands/tasks.ts#runTasks",
+        "packages/cli/src/commands/tasks.ts#runTasksShow",
+        "packages/cli/src/commands/tasks.ts#runTasksReconcile",
+        "packages/cli/src/commands/tasks.ts#runTasksDeliverAndClose",
+        "packages/cli/src/commands/tasks.ts#runTasksImport",
+        "packages/cli/src/commands/tasks.ts#runTasksVerify",
+        "packages/cli/src/commands/tasks.ts#runTasksCreate",
+        "packages/cli/src/commands/tasks.ts#runTasksMirror",
+        "packages/cli/src/commands/tasks.ts#runTasksReservation",
+        "packages/cli/src/commands/tasks.ts#runTasksReset",
+        "packages/cli/src/commands/tasks.ts#runTasksClose",
+        "packages/cli/src/commands/tasks.ts#runTasksAudit",
+        "packages/cli/src/commands/tasks.ts#runTasksLock",
+        "packages/cli/src/commands/tasks.ts#runTasksScope",
+        "packages/cli/src/commands/tasks.ts#runTasksScopeAdd",
+        "packages/cli/src/commands/tasks.ts#runTasksLockCleanup",
+        "packages/cli/src/commands/tasks.ts#cleanupTaskLock",
+        "packages/cli/src/commands/tasks.ts#runTasksQueue",
+        "packages/cli/src/commands/tasks.ts#runTasksMigrateLegacyLedger",
+        "packages/cli/src/commands/tasks.ts#runTasksClaimLifecycle",
+        "packages/cli/src/commands/tasks.ts#parseReservationOptions",
+        "packages/cli/src/commands/tasks.ts#evaluateFrameworkDeliveryWindow",
+        "packages/cli/src/commands/tasks.ts#buildCloseScopedDiffIsolation",
+        "packages/cli/src/commands/tasks.ts#evaluateTaskDeliverableGate",
+        "packages/cli/src/commands/tasks.ts#inspectHistoricalDelivery",
+        "packages/cli/src/commands/tasks.ts#isDeliverableDiffRequired",
+        "packages/cli/src/commands/tasks.ts#listChangedFilesForDeliverableGate",
+        "packages/cli/src/commands/tasks.ts#readGitNameOnly",
+        "packages/cli/src/commands/tasks.ts#isRealDeliverablePath",
+        "packages/cli/src/commands/tasks.ts#pathMatchesTaskScope",
+        "packages/cli/src/commands/tasks.ts#writeLockCleanupReport",
+        "packages/cli/src/commands/tasks.ts#writeTaskDocument",
+        "packages/cli/src/commands/tasks.ts#readLegacyLedgerTaskFiles",
+        "packages/cli/src/commands/tasks.ts#writeLegacyBaselineTransition",
+        "packages/cli/src/commands/tasks.ts#listTaskFiles",
+        "packages/cli/src/commands/tasks.ts#shouldSkipTaskFileDiscoveryDirectory",
+        "packages/cli/src/commands/tasks.ts#parseTaskMarkdownFrontmatter",
+        "packages/cli/src/commands/tasks.ts#writeTaskMarkdownFrontmatter",
+        "packages/cli/src/commands/tasks.ts#normalizeTaskStatus",
+        "packages/cli/src/commands/tasks.ts#writeTaskDocumentWithTransition",
+        "packages/cli/src/commands/tasks.ts#verifyPersistedTaskDocument",
+        "packages/cli/src/commands/tasks.ts#writeTakeoverEvidence",
+        "packages/cli/src/commands/tasks.ts#parseImportOptions",
+        "packages/cli/src/commands/tasks.ts#parseVerifyOptions",
+        "packages/cli/src/commands/tasks.ts#parsePlanMarkdown",
+        "packages/cli/src/commands/tasks.ts#parseChineseLabeledTaskBlocks",
+        "packages/cli/src/commands/tasks.ts#collectChineseLabeledValue",
+        "packages/cli/src/commands/tasks.ts#collectChineseLabeledList",
+        "packages/cli/src/commands/tasks.ts#parseTaskTableMetadata",
+        "packages/cli/src/commands/tasks.ts#splitPlanIntoTaskSections",
+        "packages/cli/src/commands/tasks.ts#parseSingleCard",
+        "packages/cli/src/commands/tasks.ts#enrichParsedTasksFromSiblingTaskCards",
+        "packages/cli/src/commands/tasks.ts#parseTaskSection",
+        "packages/cli/src/commands/tasks.ts#writeTaskFiles",
+        "packages/cli/src/commands/tasks.ts#writeImportEvidence",
+        "packages/cli/src/commands/tasks.ts#sliceBodyByHeadings",
+        "packages/cli/src/commands/tasks.ts#collectBulletList",
+        "packages/cli/src/commands/tasks.ts#collectText",
+        "packages/cli/src/commands/tasks.ts#parseDependencyList",
+        "packages/cli/src/commands/tasks.ts#collectLabeledText",
+        "packages/cli/src/commands/tasks.ts#normalizeTableHeader",
+        "packages/cli/src/commands/tasks.ts#uniqueStrings",
+        "packages/cli/src/commands/tasks.ts#parseSingleCardFromPlugin",
+        "packages/cli/src/commands/tasks.ts#runTasksNew"
+      ],
+      "requiredDryRunProposal": true
+    },
+    "shadowMode": false,
+    "effectiveLegacyFlow": "dry-run",
+    "session": {
+      "schemaId": "atm.guidanceSession",
+      "specVersion": "0.1.0",
+      "sessionId": "guidance-20260530123250-8e2b8ac23f",
+      "repositoryRoot": "C:\\Users\\User\\AI-Atomic-Framework",
+      "goal": "wave 3 subcommand module splitting",
+      "createdAt": "2026-05-30T12:32:50.353Z",
+      "updatedAt": "2026-05-30T12:32:50.353Z",
+      "actor": "ATM CLI",
+      "orientation": {
+        "schemaId": "atm.projectOrientationReport",
+        "specVersion": "0.1.0",
+        "repositoryRoot": "C:\\Users\\User\\AI-Atomic-Framework",
+        "detectedLanguages": [
+          "JavaScript",
+          "TypeScript"
+        ],
+        "packageManager": "npm",
+        "testEntrypoints": [
+          "lint: eslint .",
+          "test: node --strip-types scripts/run-validators.ts test",
+          "typecheck: tsc -p tsconfig.json --noEmit",
+          "validate:adapter-local-git: node --strip-types scripts/validate-local-git-adapter.ts --mode validate",
+          "validate:agent-execute: node --strip-types scripts/validate-agent-execute.ts --mode validate",
+          "validate:agent-prompt: node --strip-types scripts/validate-agent-prompt.ts --mode validate",
+          "validate:atm-self-atomization: node --strip-types scripts/validate-atm-self-atomization.ts --mode validate",
+          "validate:atom-callsite-readability: node --strip-types scripts/validate-atom-callsite-readability.ts --mode validate",
+          "validate:atom-id-to-cid: node --strip-types scripts/validate-atom-id-to-cid.ts",
+          "validate:atomization-coverage: node --strip-types scripts/validate-atomization-coverage.ts --mode validate",
+          "validate:behavior-pack: node --strip-types scripts/validate-behavior-pack.ts --mode validate",
+          "validate:behavior-sdk: node --strip-types scripts/validate-behavior-sdk.ts --mode validate",
+          "validate:bootstrap: node --strip-types scripts/validate-bootstrap.ts --mode validate",
+          "validate:charter: node --strip-types scripts/validate-charter.ts --mode validate",
+          "validate:cli: node --strip-types scripts/validate-cli.ts --mode validate",
+          "validate:cli:surface: node --strip-types scripts/validate-cli.ts --mode surface",
+          "validate:conversation-evolution: node --strip-types scripts/validate-conversation-evolution.ts --mode validate",
+          "validate:conversation-feedback: node --strip-types scripts/validate-conversation-feedback.ts --mode validate",
+          "validate:conversation-skill-review: node --strip-types scripts/validate-conversation-skill-review.ts --mode validate",
+          "validate:core-spec-parser: node --strip-types scripts/validate-core-spec-parser.ts --mode validate",
+          "validate:evidence-detector: node --strip-types scripts/validate-evidence-detector.ts --mode validate",
+          "validate:examples: node --strip-types scripts/validate-examples.ts --mode validate",
+          "validate:experience-loop: node --strip-types scripts/validate-experience-loop.ts --mode validate",
+          "validate:external-golden: node --strip-types scripts/validate-external-golden.ts --mode validate",
+          "validate:framework-development-governance: node --strip-types scripts/validate-framework-development-governance.ts --mode validate",
+          "validate:full: node --strip-types scripts/run-validators.ts full --parallel",
+          "validate:generator-provenance: node --strip-types scripts/validate-generator-provenance.ts --mode validate",
+          "validate:git-head-evidence: node --strip-types scripts/validate-git-head-evidence.ts --mode validate",
+          "validate:git-hooks-enforcement: node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate",
+          "validate:governance-commands: node --strip-types scripts/validate-governance-commands.ts --mode validate",
+          "validate:governance-local: node --strip-types scripts/validate-governance-local.ts --mode validate",
+          "validate:guidance: node --strip-types scripts/validate-guidance.ts --mode validate",
+          "validate:guide: node --strip-types scripts/validate-guide.ts --mode validate",
+          "validate:hash-placeholders: node --strip-types scripts/audit-hash-placeholders.ts --mode validate",
+          "validate:human-review: node --strip-types scripts/validate-human-review.ts --mode validate",
+          "validate:integration-adapter: node --strip-types scripts/validate-integration-adapter.ts --mode validate",
+          "validate:internal-release-sync: node --strip-types scripts/validate-internal-release-sync.ts --mode validate",
+          "validate:language-js: node --strip-types scripts/validate-language-js.ts --mode validate",
+          "validate:map-curator: node --strip-types scripts/validate-map-curator.ts --mode validate",
+          "validate:map-generator-provenance: node --strip-types scripts/validate-map-generator-provenance.ts --mode validate",
+          "validate:map-spec-schema: node --strip-types scripts/validate-map-spec-schema.ts --mode validate",
+          "validate:map-template: node --strip-types scripts/validate-map-template.ts --mode validate",
+          "validate:module-boundaries: node --strip-types scripts/validate-module-boundaries.ts --mode validate",
+          "validate:multi-agent-confidence: node --strip-types scripts/validate-multi-agent-confidence.ts --mode validate",
+          "validate:neutrality: node --strip-types scripts/validate-neutrality-scanner.ts --mode validate",
+          "validate:onefile-budget: node --strip-types scripts/validate-onefile-budget.ts",
+          "validate:onefile-release: node --strip-types scripts/validate-onefile-release.ts --mode validate",
+          "validate:plugin-sdk: node --strip-types scripts/validate-plugin-sdk.ts --mode validate",
+          "validate:police-family: node --strip-types scripts/validate-police-family.ts --mode validate",
+          "validate:police: node --strip-types scripts/validate-police.ts --mode validate",
+          "validate:polymorph-template: node --strip-types scripts/validate-polymorph-template.ts --mode validate",
+          "validate:prompt-scoped-next: node --strip-types scripts/validate-prompt-scoped-next.ts",
+          "validate:python-adapter: node --strip-types scripts/validate-python-adapter.ts --mode validate",
+          "validate:quick: node --strip-types scripts/run-validators.ts quick",
+          "validate:quick:cached: node --strip-types scripts/run-validators.ts quick --cache",
+          "validate:registry-catalog: node --strip-types scripts/validate-registry-catalog.ts --mode validate",
+          "validate:registry-core: node --strip-types scripts/validate-registry-core.ts --mode validate",
+          "validate:registry-diff: node --strip-types scripts/validate-registry-diff.ts --mode validate",
+          "validate:registry-index: node --strip-types scripts/validate-registry-index.ts --mode validate",
+          "validate:registry-lineage-backfill: node --strip-types scripts/validate-registry-lineage-backfill.ts --mode validate",
+          "validate:regression-compare: node --strip-types scripts/validate-regression-compare.ts --mode validate",
+          "validate:review-advisory: node --strip-types scripts/validate-review-advisory.ts --mode validate",
+          "validate:rollback-proof: node --strip-types scripts/validate-rollback-proof.ts --mode validate",
+          "validate:rollout-metrics: node --strip-types scripts/validate-rollout-metrics.ts --mode validate",
+          "validate:root-drop-release: node --strip-types scripts/validate-root-drop-release.ts --mode validate",
+          "validate:runner-entrypoints: node scripts/validate-runner-entrypoints.mjs",
+          "validate:scaffold-builder: node --strip-types scripts/validate-scaffold-builder.ts --mode validate",
+          "validate:schemas: node --strip-types scripts/validate-schemas.ts --mode validate",
+          "validate:script-parity: node --strip-types scripts/validate-script-parity.ts --mode validate",
+          "validate:seed-registry: node --strip-types scripts/validate-seed-registry.ts --mode validate",
+          "validate:seed-spec: node --strip-types scripts/validate-seed-spec.ts --mode validate",
+          "validate:self-hosting-alpha: node --strip-types scripts/validate-self-hosting-alpha.ts --mode validate",
+          "validate:semantic-fingerprint: node --strip-types scripts/validate-semantic-fingerprint.ts --mode validate",
+          "validate:skill-templates: node --strip-types scripts/validate-skill-templates.ts --mode validate",
+          "validate:standard: node --strip-types scripts/run-validators.ts standard",
+          "validate:standard:cached: node --strip-types scripts/run-validators.ts standard --cache",
+          "validate:status-machine: node --strip-types scripts/validate-status-machine.ts --mode validate",
+          "validate:task-direction-governance: node --strip-types scripts/validate-task-direction-governance.ts --mode validate",
+          "validate:task-import: node --strip-types scripts/validate-task-import.ts --mode validate",
+          "validate:task-ledger-governance: node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+          "validate:test-facade: node --strip-types scripts/validate-test-facade.ts --mode validate",
+          "validate:test-runner: node --strip-types scripts/validate-test-runner.ts --mode validate",
+          "validate:type-schema-sync: node --strip-types scripts/validate-type-schema-sync.ts --mode validate",
+          "validate:upgrade-proposal: node --strip-types scripts/validate-upgrade-proposal.ts --mode validate",
+          "validate:validator-envelope: node --strip-types scripts/validate-validator-envelope.ts --mode validate"
+        ],
+        "governanceFiles": [
+          ".atm/config.json",
+          ".atm/runtime/current-task.json",
+          ".atm/runtime/project-probe.json",
+          "AGENTS.md",
+          "atomic-registry.json"
+        ],
+        "adapterStatus": {
+          "status": "available",
+          "reason": "at least one adapter is available"
+        },
+        "availableAdapters": [
+          "@ai-atomic-framework/adapter-local-git",
+          "@ai-atomic-framework/language-js",
+          "@ai-atomic-framework/language-python"
+        ],
+        "registryState": {
+          "status": "partial",
+          "paths": [
+            "atomic-registry.json"
+          ],
+          "count": 1
+        },
+        "mapState": {
+          "status": "present",
+          "paths": [
+            "atomic_workbench/maps",
+            ".atm/catalog/shards"
+          ],
+          "count": 10
+        },
+        "atomState": {
+          "status": "present",
+          "paths": [
+            "atomic_workbench/atoms",
+            "packages/core/src"
+          ],
+          "count": 26
+        },
+        "legacyUriSupport": {
+          "supported": true,
+          "scheme": "legacy",
+          "resolver": "@ai-atomic-framework/adapter-local-git"
+        },
+        "hostGates": [],
+        "noTouchZones": [],
+        "mutationPolicy": {
+          "requireSession": true,
+          "requireDryRunProposal": true,
+          "requireReviewBeforeApply": true,
+          "allowUnguidedInDev": true,
+          "allowUnguidedInCI": false
+        },
+        "legacyHotspots": [
+          {
+            "path": "packages/adapter-local-git/src/local-git-adapter.ts",
+            "reason": "source file has 292 lines",
+            "riskLevel": "medium"
+          },
+          {
+            "path": "packages/cli/src/atm.ts",
+            "reason": "source file has 302 lines",
+            "riskLevel": "medium"
+          },
+          {
+            "path": "packages/cli/src/commands/actor-session.ts",
+            "reason": "source file has 261 lines",
+            "riskLevel": "medium"
+          },
+          {
+            "path": "packages/cli/src/commands/actor.ts",
+            "reason": "source file has 278 lines",
+            "riskLevel": "medium"
+          },
+          {
+            "path": "packages/cli/src/commands/agent-pack.ts",
+            "reason": "source file has 379 lines",
+            "riskLevel": "medium"
+          },
+          {
+            "path": "packages/cli/src/commands/atm-chart.ts",
+            "reason": "source file has 853 lines",
+            "riskLevel": "high"
+          },
+          {
+            "path": "scripts/lib/validator-envelope.ts",
+            "reason": "source file has 486 lines",
+            "riskLevel": "medium"
+          }
+        ],
+        "configLegacyHotspots": [],
+        "releaseBlockers": [],
+        "releaseAdvisories": [],
+        "unknowns": []
+      },
+      "routeDecision": {
+        "schemaId": "atm.guidanceRouteDecision",
+        "specVersion": "0.1.0",
+        "recommendedRoute": "atomize",
+        "confidence": 0.86,
+        "reasons": [
+          "Legacy route plan is available; proceed with dry-run proposal evidence before mutation.",
+          "Selected safe leaf taskDeliveryPrincipleText for atomize dry-run proposal."
+        ],
+        "routeChoices": [
+          {
+            "route": "atomize",
+            "reason": "safe leaf taskDeliveryPrincipleText"
+          }
+        ],
+        "requiredEvidence": [
+          "LegacyRoutePlan",
+          "atomize dry-run proposal",
+          "human review before apply"
+        ],
+        "blockedBy": [],
+        "nextCommand": "node atm.mjs upgrade --propose --behavior behavior.atomize --dry-run --json"
+      },
+      "packet": {
+        "schemaId": "atm.guidancePacket",
+        "specVersion": "0.1.0",
+        "sessionId": "guidance-20260530123250-8e2b8ac23f",
+        "readFirst": [
+          "README.md",
+          "docs/ATOM_GENERATOR.md",
+          "docs/LIFECYCLE.md"
+        ],
+        "doNotTouch": [],
+        "nextCommand": "node atm.mjs upgrade --propose --behavior behavior.atomize --dry-run --json",
+        "allowedCommands": [
+          "node atm.mjs orient --cwd . --json",
+          "node atm.mjs start --cwd . --goal \"<goal>\" --json",
+          "node atm.mjs next --cwd . --json",
+          "node atm.mjs explain --why blocked --json",
+          "node atm.mjs upgrade --propose --behavior behavior.atomize --dry-run --json"
+        ],
+        "blockedCommands": [
+          "host mutation without active guidance session",
+          "atomize/infect/split apply without dry-run proposal",
+          "apply without human review approval",
+          "apply without rollback proof or rollback instructions",
+          "direct trunk function rewrite",
+          "release promote while release blockers exist"
+        ],
+        "requiredGates": [],
+        "missingEvidence": [
+          "LegacyRoutePlan",
+          "atomize dry-run proposal",
+          "human review before apply"
+        ],
+        "rollbackHint": "Discard generated guidance proposals and rerun `node atm.mjs orient --cwd . --json` before retrying.",
+        "whyThisRoute": [
+          "Legacy route plan is available; proceed with dry-run proposal evidence before mutation.",
+          "Selected safe leaf taskDeliveryPrincipleText for atomize dry-run proposal."
+        ]
+      },
+      "legacyRoutePlan": {
+        "schemaId": "atm.legacyRoutePlan",
+        "specVersion": "0.1.0",
+        "targetFile": "packages/cli/src/commands/tasks.ts",
+        "segments": [
+          {
+            "symbolName": "runTasks",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 23,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksShow",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 10,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksReconcile",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 41,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksDeliverAndClose",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 30,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksImport",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 31,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksVerify",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 31,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksCreate",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 14,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksMirror",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 19,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksReservation",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 22,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksReset",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 21,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksClose",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 45,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksAudit",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksLock",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksScope",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksScopeAdd",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 21,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksLockCleanup",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 11,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "cleanupTaskLock",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 19,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksQueue",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 11,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksMigrateLegacyLedger",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 17,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksClaimLifecycle",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 35,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "parseReservationOptions",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "evaluateFrameworkDeliveryWindow",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 9,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "buildCloseScopedDiffIsolation",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 7,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "evaluateTaskDeliverableGate",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 19,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "taskDeliveryPrincipleText",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 1,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "inspectHistoricalDelivery",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 8,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "isDeliverableDiffRequired",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 9,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "listChangedFilesForDeliverableGate",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 8,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "listCommittedFilesSinceClaim",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "readGitScalar",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "readGitNameOnly",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "isRealDeliverablePath",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "pathMatchesTaskScope",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 9,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "collectTaskFileValues",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "writeLockCleanupReport",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 9,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "writeTaskDocument",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "taskPathFor",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "readLegacyLedgerTaskFiles",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 17,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "legacyTaskRequiresBaseline",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "writeLegacyBaselineTransition",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 9,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "listTaskFiles",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 10,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "safeTaskFileReadDir",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "safeTaskFileStat",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "shouldSkipTaskFileDiscoveryDirectory",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 7,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "readJsonRecord",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "parseTaskMarkdownFrontmatter",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 7,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "writeTaskMarkdownFrontmatter",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 16,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "isFrontmatterScalar",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 1,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "formatFrontmatterValue",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "normalizeTaskDocumentId",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "normalizeTaskStatus",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "normalizeStringValue",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "sha256",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "assertLocalTaskLedgerEnabled",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "buildTaskTransitionCommand",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "quoteCommandValue",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "writeTaskDocumentWithTransition",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 7,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "verifyPersistedTaskDocument",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 7,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "createClosureTransitionMetadata",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 1,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "normalizeWorkItemStatus",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "inspectTaskVerifyStatus",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "inspectTaskSourceTrace",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 1,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "isLegacyHistoricalTaskDocument",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 1,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "writeTakeoverEvidence",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 13,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "extractErrorCode",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "extractErrorDetails",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "parseImportOptions",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "parseVerifyOptions",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "requireValue",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "parsePlanMarkdown",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 13,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "parseChineseLabeledTaskBlocks",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 11,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "collectChineseLabeledValue",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "collectChineseLabeledList",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "detectPlanHeadings",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "parseTaskTableMetadata",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 14,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "splitPlanIntoTaskSections",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "parseSingleCard",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 16,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "enrichParsedTasksFromSiblingTaskCards",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 18,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "parseTaskSection",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 15,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "createTaskFromTableMetadata",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "writeTaskFiles",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 14,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "writeImportEvidence",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 8,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "sliceBodyByHeadings",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "collectBulletList",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 7,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "collectText",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "collectKeyValue",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "collectKeyValueFromLines",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "extractTaskReference",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "parseDependencyList",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 12,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "collectLabeledText",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 8,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "cleanCellText",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "isMarkdownTableRow",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "isMarkdownTableSeparator",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "normalizeTableHeader",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 5,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "findTableColumnIndex",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 4,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "cellAt",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 1,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "normalizeRelativePath",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 3,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "uniqueStrings",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 6,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "escapeRegExp",
+            "role": "leaf",
+            "riskLevel": "low",
+            "fanOut": 2,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "atomize"
+          },
+          {
+            "symbolName": "parseSingleCardFromPlugin",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 13,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          },
+          {
+            "symbolName": "runTasksNew",
+            "role": "trunk",
+            "riskLevel": "high",
+            "fanOut": 14,
+            "callerDemand": 0,
+            "existingAtomMatch": null,
+            "recommendedBehavior": "leave-in-place"
+          }
+        ],
+        "trunkFunctions": [
+          "runTasks",
+          "runTasksShow",
+          "runTasksReconcile",
+          "runTasksDeliverAndClose",
+          "runTasksImport",
+          "runTasksVerify",
+          "runTasksCreate",
+          "runTasksMirror",
+          "runTasksReservation",
+          "runTasksReset",
+          "runTasksClose",
+          "runTasksAudit",
+          "runTasksLock",
+          "runTasksScope",
+          "runTasksScopeAdd",
+          "runTasksLockCleanup",
+          "cleanupTaskLock",
+          "runTasksQueue",
+          "runTasksMigrateLegacyLedger",
+          "runTasksClaimLifecycle",
+          "parseReservationOptions",
+          "evaluateFrameworkDeliveryWindow",
+          "buildCloseScopedDiffIsolation",
+          "evaluateTaskDeliverableGate",
+          "inspectHistoricalDelivery",
+          "isDeliverableDiffRequired",
+          "listChangedFilesForDeliverableGate",
+          "readGitNameOnly",
+          "isRealDeliverablePath",
+          "pathMatchesTaskScope",
+          "writeLockCleanupReport",
+          "writeTaskDocument",
+          "readLegacyLedgerTaskFiles",
+          "writeLegacyBaselineTransition",
+          "listTaskFiles",
+          "shouldSkipTaskFileDiscoveryDirectory",
+          "parseTaskMarkdownFrontmatter",
+          "writeTaskMarkdownFrontmatter",
+          "normalizeTaskStatus",
+          "writeTaskDocumentWithTransition",
+          "verifyPersistedTaskDocument",
+          "writeTakeoverEvidence",
+          "parseImportOptions",
+          "parseVerifyOptions",
+          "parsePlanMarkdown",
+          "parseChineseLabeledTaskBlocks",
+          "collectChineseLabeledValue",
+          "collectChineseLabeledList",
+          "parseTaskTableMetadata",
+          "splitPlanIntoTaskSections",
+          "parseSingleCard",
+          "enrichParsedTasksFromSiblingTaskCards",
+          "parseTaskSection",
+          "writeTaskFiles",
+          "writeImportEvidence",
+          "sliceBodyByHeadings",
+          "collectBulletList",
+          "collectText",
+          "parseDependencyList",
+          "collectLabeledText",
+          "normalizeTableHeader",
+          "uniqueStrings",
+          "parseSingleCardFromPlugin",
+          "runTasksNew"
+        ],
+        "leafFunctions": [
+          "taskDeliveryPrincipleText",
+          "listCommittedFilesSinceClaim",
+          "readGitScalar",
+          "collectTaskFileValues",
+          "taskPathFor",
+          "legacyTaskRequiresBaseline",
+          "safeTaskFileReadDir",
+          "safeTaskFileStat",
+          "readJsonRecord",
+          "isFrontmatterScalar",
+          "formatFrontmatterValue",
+          "normalizeTaskDocumentId",
+          "normalizeStringValue",
+          "sha256",
+          "assertLocalTaskLedgerEnabled",
+          "buildTaskTransitionCommand",
+          "quoteCommandValue",
+          "createClosureTransitionMetadata",
+          "normalizeWorkItemStatus",
+          "inspectTaskVerifyStatus",
+          "inspectTaskSourceTrace",
+          "isLegacyHistoricalTaskDocument",
+          "extractErrorCode",
+          "extractErrorDetails",
+          "requireValue",
+          "detectPlanHeadings",
+          "createTaskFromTableMetadata",
+          "collectKeyValue",
+          "collectKeyValueFromLines",
+          "extractTaskReference",
+          "cleanCellText",
+          "isMarkdownTableRow",
+          "isMarkdownTableSeparator",
+          "findTableColumnIndex",
+          "cellAt",
+          "normalizeRelativePath",
+          "escapeRegExp"
+        ],
+        "adapterBoundaries": [],
+        "existingAtomMatches": [],
+        "releaseBlockers": [],
+        "safeFirstAtoms": [
+          "taskDeliveryPrincipleText",
+          "listCommittedFilesSinceClaim",
+          "readGitScalar",
+          "collectTaskFileValues",
+          "taskPathFor",
+          "legacyTaskRequiresBaseline",
+          "safeTaskFileReadDir",
+          "safeTaskFileStat",
+          "readJsonRecord",
+          "isFrontmatterScalar",
+          "formatFrontmatterValue",
+          "normalizeTaskDocumentId",
+          "normalizeStringValue",
+          "sha256",
+          "assertLocalTaskLedgerEnabled",
+          "buildTaskTransitionCommand",
+          "quoteCommandValue",
+          "createClosureTransitionMetadata",
+          "normalizeWorkItemStatus",
+          "inspectTaskVerifyStatus",
+          "inspectTaskSourceTrace",
+          "isLegacyHistoricalTaskDocument",
+          "extractErrorCode",
+          "extractErrorDetails",
+          "requireValue",
+          "detectPlanHeadings",
+          "createTaskFromTableMetadata",
+          "collectKeyValue",
+          "collectKeyValueFromLines",
+          "extractTaskReference",
+          "cleanCellText",
+          "isMarkdownTableRow",
+          "isMarkdownTableSeparator",
+          "findTableColumnIndex",
+          "cellAt",
+          "normalizeRelativePath",
+          "escapeRegExp"
+        ],
+        "noTouchZones": [
+          "packages/cli/src/commands/tasks.ts#runTasks",
+          "packages/cli/src/commands/tasks.ts#runTasksShow",
+          "packages/cli/src/commands/tasks.ts#runTasksReconcile",
+          "packages/cli/src/commands/tasks.ts#runTasksDeliverAndClose",
+          "packages/cli/src/commands/tasks.ts#runTasksImport",
+          "packages/cli/src/commands/tasks.ts#runTasksVerify",
+          "packages/cli/src/commands/tasks.ts#runTasksCreate",
+          "packages/cli/src/commands/tasks.ts#runTasksMirror",
+          "packages/cli/src/commands/tasks.ts#runTasksReservation",
+          "packages/cli/src/commands/tasks.ts#runTasksReset",
+          "packages/cli/src/commands/tasks.ts#runTasksClose",
+          "packages/cli/src/commands/tasks.ts#runTasksAudit",
+          "packages/cli/src/commands/tasks.ts#runTasksLock",
+          "packages/cli/src/commands/tasks.ts#runTasksScope",
+          "packages/cli/src/commands/tasks.ts#runTasksScopeAdd",
+          "packages/cli/src/commands/tasks.ts#runTasksLockCleanup",
+          "packages/cli/src/commands/tasks.ts#cleanupTaskLock",
+          "packages/cli/src/commands/tasks.ts#runTasksQueue",
+          "packages/cli/src/commands/tasks.ts#runTasksMigrateLegacyLedger",
+          "packages/cli/src/commands/tasks.ts#runTasksClaimLifecycle",
+          "packages/cli/src/commands/tasks.ts#parseReservationOptions",
+          "packages/cli/src/commands/tasks.ts#evaluateFrameworkDeliveryWindow",
+          "packages/cli/src/commands/tasks.ts#buildCloseScopedDiffIsolation",
+          "packages/cli/src/commands/tasks.ts#evaluateTaskDeliverableGate",
+          "packages/cli/src/commands/tasks.ts#inspectHistoricalDelivery",
+          "packages/cli/src/commands/tasks.ts#isDeliverableDiffRequired",
+          "packages/cli/src/commands/tasks.ts#listChangedFilesForDeliverableGate",
+          "packages/cli/src/commands/tasks.ts#readGitNameOnly",
+          "packages/cli/src/commands/tasks.ts#isRealDeliverablePath",
+          "packages/cli/src/commands/tasks.ts#pathMatchesTaskScope",
+          "packages/cli/src/commands/tasks.ts#writeLockCleanupReport",
+          "packages/cli/src/commands/tasks.ts#writeTaskDocument",
+          "packages/cli/src/commands/tasks.ts#readLegacyLedgerTaskFiles",
+          "packages/cli/src/commands/tasks.ts#writeLegacyBaselineTransition",
+          "packages/cli/src/commands/tasks.ts#listTaskFiles",
+          "packages/cli/src/commands/tasks.ts#shouldSkipTaskFileDiscoveryDirectory",
+          "packages/cli/src/commands/tasks.ts#parseTaskMarkdownFrontmatter",
+          "packages/cli/src/commands/tasks.ts#writeTaskMarkdownFrontmatter",
+          "packages/cli/src/commands/tasks.ts#normalizeTaskStatus",
+          "packages/cli/src/commands/tasks.ts#writeTaskDocumentWithTransition",
+          "packages/cli/src/commands/tasks.ts#verifyPersistedTaskDocument",
+          "packages/cli/src/commands/tasks.ts#writeTakeoverEvidence",
+          "packages/cli/src/commands/tasks.ts#parseImportOptions",
+          "packages/cli/src/commands/tasks.ts#parseVerifyOptions",
+          "packages/cli/src/commands/tasks.ts#parsePlanMarkdown",
+          "packages/cli/src/commands/tasks.ts#parseChineseLabeledTaskBlocks",
+          "packages/cli/src/commands/tasks.ts#collectChineseLabeledValue",
+          "packages/cli/src/commands/tasks.ts#collectChineseLabeledList",
+          "packages/cli/src/commands/tasks.ts#parseTaskTableMetadata",
+          "packages/cli/src/commands/tasks.ts#splitPlanIntoTaskSections",
+          "packages/cli/src/commands/tasks.ts#parseSingleCard",
+          "packages/cli/src/commands/tasks.ts#enrichParsedTasksFromSiblingTaskCards",
+          "packages/cli/src/commands/tasks.ts#parseTaskSection",
+          "packages/cli/src/commands/tasks.ts#writeTaskFiles",
+          "packages/cli/src/commands/tasks.ts#writeImportEvidence",
+          "packages/cli/src/commands/tasks.ts#sliceBodyByHeadings",
+          "packages/cli/src/commands/tasks.ts#collectBulletList",
+          "packages/cli/src/commands/tasks.ts#collectText",
+          "packages/cli/src/commands/tasks.ts#parseDependencyList",
+          "packages/cli/src/commands/tasks.ts#collectLabeledText",
+          "packages/cli/src/commands/tasks.ts#normalizeTableHeader",
+          "packages/cli/src/commands/tasks.ts#uniqueStrings",
+          "packages/cli/src/commands/tasks.ts#parseSingleCardFromPlugin",
+          "packages/cli/src/commands/tasks.ts#runTasksNew"
+        ],
+        "requiredDryRunProposal": true
+      }
+    }
+  }
+}
