@@ -1,0 +1,43 @@
+{
+  "taskId": "TASK-AAO-0099",
+  "candidateRankingReportId": "2026-05-30T14-33-18-080Z",
+  "leaves": [
+    {
+      "name": "normalizeStringValue",
+      "helperFile": "packages/cli/src/commands/tasks/normalizeStringValue-helper.ts",
+      "evidenceFiles": [
+        ".atm/history/reports/smoke-evidence.normalizeStringValue.20260530-223400.log",
+        ".atm/history/reports/smoke-evidence.normalizeStringValue.leaf.20260530-223400.log",
+        ".atm/history/reports/rollback-ready.full.normalizeStringValue.20260530-223400.patch",
+        ".atm/history/reports/rollback-ready-proof.normalizeStringValue.20260530-223400.json",
+        ".atm/history/reports/actual-patch-evidence.normalizeStringValue.20260530-223400.json"
+      ]
+    },
+    {
+      "name": "normalizeTaskDocumentId",
+      "helperFile": "packages/cli/src/commands/tasks/normalizeTaskDocumentId-helper.ts",
+      "evidenceFiles": [
+        ".atm/history/reports/smoke-evidence.normalizeTaskDocumentId.20260530-223400.log",
+        ".atm/history/reports/smoke-evidence.normalizeTaskDocumentId.leaf.20260530-223400.log",
+        ".atm/history/reports/rollback-ready.full.normalizeTaskDocumentId.20260530-223400.patch",
+        ".atm/history/reports/rollback-ready-proof.normalizeTaskDocumentId.20260530-223400.json",
+        ".atm/history/reports/actual-patch-evidence.normalizeTaskDocumentId.20260530-223400.json"
+      ]
+    },
+    {
+      "name": "sha256",
+      "helperFile": "packages/cli/src/commands/tasks/sha256-helper.ts",
+      "evidenceFiles": [
+        ".atm/history/reports/smoke-evidence.sha256.20260530-223400.log",
+        ".atm/history/reports/smoke-evidence.sha256.leaf.20260530-223400.log",
+        ".atm/history/reports/rollback-ready.full.sha256.20260530-223400.patch",
+        ".atm/history/reports/rollback-ready-proof.sha256.20260530-223400.json",
+        ".atm/history/reports/actual-patch-evidence.sha256.20260530-223400.json"
+      ]
+    }
+  ],
+  "batchRollbackProof": {
+    "exitCode": 0,
+    "patchPath": ".atm/history/reports/rollback-ready.batch.TASK-AAO-0099.20260530-223400.patch"
+  }
+}

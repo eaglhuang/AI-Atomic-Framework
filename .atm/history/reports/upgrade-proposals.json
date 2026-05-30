@@ -6,7 +6,7 @@
     "fromVersion": null,
     "notes": "Initial human review queue contract."
   },
-  "generatedAt": "2026-05-20T16:10:01.179Z",
+  "generatedAt": "2026-05-30T14:33:32.429Z",
   "entries": [
     {
       "proposalId": "guided-legacy-atomize-guidance-20260520150716-3126c00ebf",
@@ -47,6 +47,46 @@
         "proposedAt": "2026-05-20T16:10:01.177Z"
       },
       "queuedAt": "2026-05-20T16:10:01.177Z"
+    },
+    {
+      "proposalId": "guided-legacy-atomize-session-task-aao-0099",
+      "atomId": "LEGACY-GUIDED-ATOMIZE",
+      "fromVersion": "legacy",
+      "toVersion": "guided-dry-run",
+      "decompositionDecision": "atomize",
+      "automatedGates": {
+        "allPassed": true,
+        "blockedGateNames": []
+      },
+      "status": "pending",
+      "proposalSnapshotHash": "sha256:9c0ac2e09bd44c306776eae4673753f33153fa984e77521ec6f357760e7584c4",
+      "proposal": {
+        "schemaId": "atm.guidedLegacyDryRunProposal",
+        "specVersion": "0.1.0",
+        "proposalId": "guided-legacy-atomize-session-task-aao-0099",
+        "atomId": "LEGACY-GUIDED-ATOMIZE",
+        "fromVersion": "legacy",
+        "toVersion": "guided-dry-run",
+        "behaviorId": "behavior.atomize",
+        "decompositionDecision": "atomize",
+        "legacyTarget": "legacy://packages/cli/src/commands/tasks.ts#L3229-L3231",
+        "guidanceSession": "session-TASK-AAO-0099",
+        "patchMode": "dry-run",
+        "automatedGates": {
+          "allPassed": true,
+          "blockedGateNames": []
+        },
+        "status": "pending",
+        "reviewRequired": true,
+        "rollbackProofRequired": true,
+        "rollbackInstructions": [
+          "Do not apply generated host changes until human review approves the dry-run proposal.",
+          "Discard generated proposal artifacts to roll back the preview, then rerun atm next before retrying."
+        ],
+        "proposedBy": "ATM CLI",
+        "proposedAt": "2026-05-30T14:33:32.427Z"
+      },
+      "queuedAt": "2026-05-30T14:33:32.427Z"
     }
   ]
 }

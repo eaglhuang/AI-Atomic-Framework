@@ -40,6 +40,9 @@ import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.t
 import { runAtmGit } from './git-governance.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.ts';
+import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/normalize-string-value-helper.ts';
+import { normalizeTaskDocumentId as delegatedNormalizeTaskDocumentId } from './tasks/normalize-task-document-id-helper.ts';
+import { sha256 as delegatedSha256 } from './tasks/sha256-helper.ts';
 import {
   safeTaskFileReadDir,
   safeTaskFileStat,
@@ -3215,7 +3218,7 @@ function formatFrontmatterValue(value: unknown): string {
 }
 
 function normalizeTaskDocumentId(document: Record<string, unknown>, fallback: string): string {
-  return normalizeStringValue(document.workItemId ?? document.id ?? document.task_id ?? document.taskId) ?? fallback;
+  return delegatedNormalizeTaskDocumentId(document, fallback);
 }
 
 function normalizeTaskStatus(value: unknown): string {
@@ -3223,11 +3226,11 @@ function normalizeTaskStatus(value: unknown): string {
 }
 
 function normalizeStringValue(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+  return delegatedNormalizeStringValue(value);
 }
 
 function sha256(value: string): string {
-  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+  return delegatedSha256(value);
 }
 
 function assertLocalTaskLedgerEnabled(cwd: string, action: string) {

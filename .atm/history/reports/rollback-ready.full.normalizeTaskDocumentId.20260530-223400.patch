@@ -1,0 +1,75 @@
+diff --git a/packages/cli/src/commands/tasks.ts b/packages/cli/src/commands/tasks.ts
+index 56e249d..573b3a9 100644
+--- a/packages/cli/src/commands/tasks.ts
++++ b/packages/cli/src/commands/tasks.ts
+@@ -40,6 +40,9 @@ import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.t
+ import { runAtmGit } from './git-governance.ts';
+ import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
+ import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.ts';
++import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/normalize-string-value-helper.ts';
++import { normalizeTaskDocumentId as delegatedNormalizeTaskDocumentId } from './tasks/normalize-task-document-id-helper.ts';
++import { sha256 as delegatedSha256 } from './tasks/sha256-helper.ts';
+ import {
+   safeTaskFileReadDir,
+   safeTaskFileStat,
+@@ -3215,7 +3218,7 @@ function formatFrontmatterValue(value: unknown): string {
+ }
+ 
+ function normalizeTaskDocumentId(document: Record<string, unknown>, fallback: string): string {
+-  return normalizeStringValue(document.workItemId ?? document.id ?? document.task_id ?? document.taskId) ?? fallback;
++  return delegatedNormalizeTaskDocumentId(document, fallback);
+ }
+ 
+ function normalizeTaskStatus(value: unknown): string {
+@@ -3223,11 +3226,11 @@ function normalizeTaskStatus(value: unknown): string {
+ }
+ 
+ function normalizeStringValue(value: unknown): string | null {
+-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
++  return delegatedNormalizeStringValue(value);
+ }
+ 
+ function sha256(value: string): string {
+-  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
++  return delegatedSha256(value);
+ }
+ 
+ function assertLocalTaskLedgerEnabled(cwd: string, action: string) {
+diff --git a/packages/cli/src/commands/tasks/normalize-task-document-id-helper.ts b/packages/cli/src/commands/tasks/normalize-task-document-id-helper.ts
+new file mode 100644
+index 0000000..07a5928
+--- /dev/null
++++ b/packages/cli/src/commands/tasks/normalize-task-document-id-helper.ts
+@@ -0,0 +1,8 @@
++import { normalizeStringValue } from './normalize-string-value-helper.ts';
++
++/**
++ * Helper for `normalizeTaskDocumentId` leaf.
++ */
++export function normalizeTaskDocumentId(document: Record<string, unknown>, fallback: string): string {
++  return normalizeStringValue(document.workItemId ?? document.id ?? document.task_id ?? document.taskId) ?? fallback;
++}
+diff --git a/tests/unit/normalize-task-document-id-helper.unit.test.ts b/tests/unit/normalize-task-document-id-helper.unit.test.ts
+new file mode 100644
+index 0000000..6f3319a
+--- /dev/null
++++ b/tests/unit/normalize-task-document-id-helper.unit.test.ts
+@@ -0,0 +1,18 @@
++/**
++ * Unit tests for `normalizeTaskDocumentId` helper.
++ */
++import assert from 'node:assert/strict';
++import { normalizeTaskDocumentId } from '../../packages/cli/src/commands/tasks/normalize-task-document-id-helper.ts';
++
++// 8+ test cases
++assert.equal(normalizeTaskDocumentId({ workItemId: '123' }, 'fallback'), '123');
++assert.equal(normalizeTaskDocumentId({ id: '456' }, 'fallback'), '456');
++assert.equal(normalizeTaskDocumentId({ task_id: '789' }, 'fallback'), '789');
++assert.equal(normalizeTaskDocumentId({ taskId: 'abc' }, 'fallback'), 'abc');
++assert.equal(normalizeTaskDocumentId({ workItemId: '  123  ' }, 'fallback'), '123');
++assert.equal(normalizeTaskDocumentId({ id: '' }, 'fallback'), 'fallback');
++assert.equal(normalizeTaskDocumentId({}, 'fallback'), 'fallback');
++assert.equal(normalizeTaskDocumentId({ other: 'xyz' }, 'my-fallback'), 'my-fallback');
++assert.equal(normalizeTaskDocumentId({ id: null }, 'fallback'), 'fallback');
++
++console.log('[unit:normalize-task-document-id-helper] ok (9 assertions)');
