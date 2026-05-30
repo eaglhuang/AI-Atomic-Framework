@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0088",
+  "title": "rollback evidence backfill (lift dogfood 89→91)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`atomic-registry.json`: exactly the 3 chosen atoms have `atom-backfill-rollback.md` appended to their `evidence[]`.",
+    "`node atm.mjs atomize score` reports `overall_atomization_score ≥ 91` and `grade: \"A\"`.",
+    "`dogfood-score.json` updated by the score command (not hand-edited).",
+    "`dogfood-score.md` synchronized (or stale state is reported to Captain).",
+    "All validators exit 0."
+  ],
+  "deliverables": [
+    "atomic-registry.json",
+    "atomic_workbench/atomization-coverage/dogfood-score.json",
+    "atomic_workbench/atomization-coverage/dogfood-score.md"
+  ],
+  "scopePaths": [
+    "atomic-registry.json",
+    "atomic_workbench/atomization-coverage/"
+  ],
+  "validators": [
+    "node atm.mjs atomize score",
+    "node atm.mjs hook pre-commit --json",
+    "node atm.mjs hook pre-push --json"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not change atomize score evaluation logic",
+    "Do not manually edit dogfood-score.json or dogfood-score.md",
+    "Do not add rollback evidence to atoms with no semantic relation to backfill"
+  ],
+  "nonGoals": [
+    "Do not use --no-verify or --force to bypass hooks",
+    "Do not perform ownership backfill or other backfill types",
+    "Do not change schemaVersion or .gitignore or baseline"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "null",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0088-rollback-evidence-backfill.task.md",
+    "sectionTitle": "TASK-AAO-0088",
+    "headingLine": 34,
+    "hash": "8c65ffa0c9bd8837"
+  },
+  "importedAt": "2026-05-30T05:41:16.201Z",
+  "lastTransitionId": "2026-05-30T06-06-04-983Z-close-7137ab627d20",
+  "lastTransitionAt": "2026-05-30T06:06:04.983Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-30T05:41:21.059Z",
+  "promotedAt": "2026-05-30T05:41:25.189Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-bd4944048948",
+    "claimedAt": "2026-05-30T05:41:29.422Z",
+    "heartbeatAt": "2026-05-30T06:06:04.983Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "atomic-registry.json",
+      "atomic_workbench/atomization-coverage/dogfood-score.json",
+      "atomic_workbench/atomization-coverage/dogfood-score.md"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-30T05:41:29.422Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260530054129-Antigravity-TASK-AAO-0088-5137ad48f1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0088",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0088.*",
+      ".atm/history/task-events/TASK-AAO-0088/**",
+      ".atm/history/tasks/TASK-AAO-0088.json",
+      "atomic_workbench/atomization-coverage/dogfood-score.json",
+      "atomic_workbench/atomization-coverage/dogfood-score.md",
+      "atomic-registry.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b05ad401eec22b1ac44deb1c0814c1eaf502c21b51582eea34947370d23bf8bc",
+    "actorId": "Antigravity",
+    "createdAt": "2026-05-30T05:41:29.433Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0088.closure-packet.json",
+  "closedAt": "2026-05-30T06:06:04.983Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260530054129-Antigravity-TASK-AAO-0088-5137ad48f1"
+}
