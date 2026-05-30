@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0087",
+  "title": "advisory commit hook reading contextMap.secondary",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0085",
+    "TASK-AAO-0086"
+  ],
+  "acceptance": [
+    "`packages/cli/src/commands/hook.ts` pre-commit handler invokes the new `context-map-advisor` core logic.",
+    "`packages/cli/src/commands/hook/context-map-advisor.ts` is implemented and exports a robust checking function.",
+    "`atomic_workbench/atomization-coverage/path-to-atom-map.json` is updated to register the new advisor file with the atom ID `atm.context-map-advisor-map`.",
+    "The advisor outputs human-readable advisory warnings to stderr listing out-of-scope files and their suggested categories.",
+    "Performance: Advisor executes fast. If it takes longer than 50ms, it should gracefully skip the warning."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/hook/context-map-advisor.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "packages/cli/src/commands/hook/context-map-advisor.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/hook/context-map-advisor.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "packages/cli/src/commands/hook/context-map-advisor.test.ts"
+  ],
+  "validators": [
+    "node atm.mjs hook pre-commit --json",
+    "node atm.mjs atomize score",
+    "npm run test -- tests/cli/context-map-advisor.test.ts"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not make advisor blocking (keep exit 0)",
+    "Do not edit target close or import workflows",
+    "Do not upgrade schemaVersion (keep v0.2)"
+  ],
+  "nonGoals": [
+    "Do not use --no-verify or --force to bypass hooks",
+    "Do not modify the .atm/git-hooks/pre-commit shell script itself"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.context-map-advisor-map",
+    "mapUpdates": [
+      "path_pattern: \"packages/cli/src/commands/hook/context-map-advisor.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0087-advisory-commit-hook-contextmap.task.md",
+    "sectionTitle": "TASK-AAO-0087",
+    "headingLine": 42,
+    "hash": "79316dc654249082"
+  },
+  "importedAt": "2026-05-30T05:31:06.144Z",
+  "lastTransitionId": "2026-05-30T05-37-50-901Z-close-069d30d329af",
+  "lastTransitionAt": "2026-05-30T05:37:50.901Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-30T05:31:14.838Z",
+  "promotedAt": "2026-05-30T05:31:18.207Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-51e06129916f",
+    "claimedAt": "2026-05-30T05:31:20.444Z",
+    "heartbeatAt": "2026-05-30T05:37:50.901Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.ts",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook/context-map-advisor.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-30T05:31:20.444Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260530053120-Antigravity-TASK-AAO-0087-ef5a74aab3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0087",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0087.*",
+      ".atm/history/task-events/TASK-AAO-0087/**",
+      ".atm/history/tasks/TASK-AAO-0087.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.test.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ede66e18c045adc183666d7e0c8d2007d85368b27c819ade65f5cd030ec257e4",
+    "actorId": "Antigravity",
+    "createdAt": "2026-05-30T05:31:20.457Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0087.closure-packet.json",
+  "closedAt": "2026-05-30T05:37:50.901Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260530053120-Antigravity-TASK-AAO-0087-ef5a74aab3"
+}

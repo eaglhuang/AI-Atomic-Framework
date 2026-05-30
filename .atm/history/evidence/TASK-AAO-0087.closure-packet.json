@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0087",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "afee4480d7ac6ca12697eb14cc7c0f88b55dbbd8",
+  "governedTreeSha": "3e34c81aa19aaa89e7861df8f9ed95bc5d048618",
+  "targetCommitDelta": {
+    "currentCommitSha": "afee4480d7ac6ca12697eb14cc7c0f88b55dbbd8",
+    "parentCommitShas": [
+      "afee4480d7ac6ca12697eb14cc7c0f88b55dbbd8"
+    ],
+    "governedTreeSha": "3e34c81aa19aaa89e7861df8f9ed95bc5d048618",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0087.json",
+      ".atm/history/task-events/TASK-AAO-0087/2026-05-30T05-31-06-148Z-import-7768b2d64d04.json",
+      ".atm/history/task-events/TASK-AAO-0087/2026-05-30T05-31-14-839Z-reserve-254f51c711fb.json",
+      ".atm/history/task-events/TASK-AAO-0087/2026-05-30T05-31-18-207Z-promote-8ca907e108fa.json",
+      ".atm/history/task-events/TASK-AAO-0087/2026-05-30T05-31-20-458Z-claim-a4c95e879b93.json",
+      ".atm/history/tasks/TASK-AAO-0087.json",
+      ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
+      ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
+      ".playwright-mcp/console-2026-05-28T15-14-55-015Z.log",
+      "atomic_workbench/atomization-coverage/dogfood-score.json",
+      "atomic_workbench/atomization-coverage/dogfood-score.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.test.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.ts",
+      "scratch/inventory.json",
+      "scratch/test.out"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:689af227101b4b973248574b752695668e7218db0ceb940c2fd9ac0e207e6647",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/hook/context-map-advisor.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ac8ae8df3185401e2781cf831bbdcaf727d4df30fda4b4197fd0164354f2b052",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs atomize score --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4a80af1ead58130f8dfa52e92b25ce2e005414bbe33bee456d66024e1a0b47ec",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs hook pre-commit --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:698403d681ff487d282779f66744a5a02dd2e90ca999bc7ce253f8d371e27d41",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node atm.mjs atomize score",
+    "node atm.mjs hook pre-commit --json",
+    "test -- tests/cli/context-map-advisor.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-30T05:37:50.899Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0087-advisory-commit-hook-contextmap.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.test.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.test.ts",
+      "packages/cli/src/commands/hook/context-map-advisor.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0087.json",
+  "closedAt": "2026-05-30T05:37:50.899Z",
+  "closedByActor": "Antigravity",
+  "sessionId": "session-20260530053120-Antigravity-TASK-AAO-0087-ef5a74aab3",
+  "attestation": null
+}

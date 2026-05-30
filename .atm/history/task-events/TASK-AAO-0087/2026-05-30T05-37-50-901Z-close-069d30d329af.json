@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-30T05-37-50-901Z-close-069d30d329af",
+  "taskId": "TASK-AAO-0087",
+  "action": "close",
+  "actorId": "Antigravity",
+  "sessionId": "session-20260530053120-Antigravity-TASK-AAO-0087-ef5a74aab3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0087.json",
+  "taskSha256": "sha256:47c0c0948b1ef1bfe508de81ed507354a5b277c3006d1d30a6755e6a76abe688",
+  "createdAt": "2026-05-30T05:37:50.901Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0087 --actor Antigravity --status done --historical-delivery afee448",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260530053120-Antigravity-TASK-AAO-0087-ef5a74aab3",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0087.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node atm.mjs atomize score",
+      "node atm.mjs hook pre-commit --json",
+      "test -- tests/cli/context-map-advisor.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-30T05:37:50.899Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0087-advisory-commit-hook-contextmap.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/hook/context-map-advisor.test.ts",
+        "packages/cli/src/commands/hook/context-map-advisor.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/hook/context-map-advisor.test.ts",
+        "packages/cli/src/commands/hook/context-map-advisor.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
