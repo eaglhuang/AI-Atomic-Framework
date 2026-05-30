@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0084",
+  "title": "atm-markdown-task-source reference plugin (Layer 2)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0083"
+  ],
+  "acceptance": [
+    "`packages/atm-markdown-task-source/src/index.ts` is implemented and exports the plugin instance",
+    "`packages/atm-markdown-task-source/package.json` is created with proper TS build directives",
+    "`packages/cli/src/plugin-registry.ts` is created and loads custom task sources from `.atm/config.json`",
+    "`packages/cli/src/commands/tasks.ts` uses plugin parse hook with 100% byte-identical backward compatibility",
+    "`schemas/atm-config.schema.json` is updated with `plugins.externalTaskSources` schema definition",
+    "`tests/plugin-sdk/atm-markdown-task-source.test.ts` passes typecheck and fully tests mock and actual plugin flows"
+  ],
+  "deliverables": [
+    "packages/atm-markdown-task-source/src/index.ts",
+    "packages/atm-markdown-task-source/package.json",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/plugin-registry.ts",
+    "schemas/atm-config.schema.json",
+    "tests/plugin-sdk/atm-markdown-task-source.test.ts"
+  ],
+  "scopePaths": [
+    "packages/atm-markdown-task-source/src/index.ts",
+    "packages/atm-markdown-task-source/package.json",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/plugin-registry.ts",
+    "schemas/atm-config.schema.json",
+    "tests/plugin-sdk/atm-markdown-task-source.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run test -- tests/plugin-sdk/atm-markdown-task-source.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "validate / generate hooks — 漸進加",
+    "Context Map fields — TASK-AAO-0085",
+    "Upstream 3KLife task-card-opener — TASK-AAO-0086",
+    "Modifying tasks.ts to consume plugin — TASK-AAO-0084 中做"
+  ],
+  "nonGoals": [
+    "Do not assume any specific frontmatter format",
+    "Do not bundle reference implementation in this card"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plugin-sdk-map",
+    "mapUpdates": [
+      "path_pattern: \"packages/atm-markdown-task-source/src/index.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0084-atm-markdown-task-source-reference-plugin.task.md",
+    "sectionTitle": "TASK-AAO-0084",
+    "headingLine": 45,
+    "hash": "89e0f1a04a96bf47"
+  },
+  "importedAt": "2026-05-30T04:40:27.700Z",
+  "lastTransitionId": "2026-05-30T04-44-57-012Z-close-f9eb3fd67924",
+  "lastTransitionAt": "2026-05-30T04:44:57.012Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-30T04:40:32.704Z",
+  "promotedAt": "2026-05-30T04:40:32.708Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-1260d93c042e",
+    "claimedAt": "2026-05-30T04:40:32.711Z",
+    "heartbeatAt": "2026-05-30T04:44:57.012Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0084.json",
+      "package.json",
+      "packages/atm-markdown-task-source/package.json",
+      "packages/atm-markdown-task-source/package.json` is created with proper TS build directives",
+      "packages/atm-markdown-task-source/src/index.ts",
+      "packages/atm-markdown-task-source/src/index.ts` is implemented and exports the plugin instance",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks.ts` uses plugin parse hook with 100% byte-identical backward compatibility",
+      "packages/cli/src/plugin-registry.ts",
+      "packages/cli/src/plugin-registry.ts` is created and loads custom task sources from `.atm/config.json",
+      "schemas/atm-config.schema.json",
+      "schemas/atm-config.schema.json` is updated with `plugins.externalTaskSources` schema definition",
+      "scripts/validate-cli.ts",
+      "tests/plugin-sdk/atm-markdown-task-source.test.ts",
+      "tests/plugin-sdk/atm-markdown-task-source.test.ts` passes typecheck and fully tests mock and actual plugin flows"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-30T04:40:32.711Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260530044032-Antigravity-TASK-AAO-0084-87456d7aa7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0084",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0084.*",
+      ".atm/history/task-events/TASK-AAO-0084/**",
+      ".atm/history/tasks/TASK-AAO-0084.json",
+      "package.json",
+      "packages/atm-markdown-task-source/package.json",
+      "packages/atm-markdown-task-source/package.json` is created with proper TS build directives",
+      "packages/atm-markdown-task-source/src/index.ts",
+      "packages/atm-markdown-task-source/src/index.ts` is implemented and exports the plugin instance",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks.ts` uses plugin parse hook with 100% byte-identical backward compatibility",
+      "packages/cli/src/plugin-registry.ts",
+      "packages/cli/src/plugin-registry.ts` is created and loads custom task sources from `.atm/config.json",
+      "schemas/atm-config.schema.json",
+      "schemas/atm-config.schema.json` is updated with `plugins.externalTaskSources` schema definition",
+      "scripts/validate-cli.ts",
+      "tests/plugin-sdk/atm-markdown-task-source.test.ts",
+      "tests/plugin-sdk/atm-markdown-task-source.test.ts` passes typecheck and fully tests mock and actual plugin flows"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4f020ecee4b749a35d6a8727540f072a69a065df176993ebe0fb3f977a04b393",
+    "actorId": "Antigravity",
+    "createdAt": "2026-05-30T04:40:32.723Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0084.closure-packet.json",
+  "closedAt": "2026-05-30T04:44:57.012Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260530044032-Antigravity-TASK-AAO-0084-87456d7aa7"
+}
