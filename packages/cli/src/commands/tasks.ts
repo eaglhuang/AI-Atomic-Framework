@@ -40,6 +40,16 @@ import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.t
 import { runAtmGit } from './git-governance.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
 import {
+  safeTaskFileReadDir,
+  safeTaskFileStat,
+  readJsonRecord,
+  taskPathFor,
+  collectTaskFileValues,
+  normalizeRelativePath,
+  legacyTaskRequiresBaseline,
+  type LegacyLedgerTaskFile
+} from './tasks/task-file-io-helpers.ts';
+import {
   coerceStatus,
   extractFrontMatter,
   extractTaskDeclaredFiles,
@@ -2974,18 +2984,7 @@ function pathMatchesTaskScope(filePath: string, scope: string): boolean {
   return file.startsWith(`${candidate}/`);
 }
 
-function collectTaskFileValues(value: unknown, files: Set<string>) {
-  if (typeof value === 'string') {
-    const normalized = normalizeRelativePath(value);
-    if (normalized) files.add(normalized);
-    return;
-  }
-  if (Array.isArray(value)) {
-    for (const entry of value) {
-      collectTaskFileValues(entry, files);
-    }
-  }
-}
+
 
 
 
@@ -3020,20 +3019,7 @@ function writeTaskDocument(taskPath: string, document: Record<string, unknown>) 
   writeFileSync(taskPath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
 }
 
-function taskPathFor(cwd: string, taskId: string): string {
-  const taskLedger = readTaskLedgerPolicy(cwd);
-  return path.join(cwd, taskLedger.taskRoot, `${taskId}.json`);
-}
 
-interface LegacyLedgerTaskFile {
-  readonly absolutePath: string;
-  readonly relativePath: string;
-  readonly taskId: string;
-  readonly status: string;
-  readonly format: 'json' | 'markdown';
-  readonly document: Record<string, unknown>;
-  readonly rawText?: string;
-}
 
 function readLegacyLedgerTaskFiles(cwd: string): readonly LegacyLedgerTaskFile[] {
   const root = path.resolve(cwd);
@@ -3069,15 +3055,7 @@ function readLegacyLedgerTaskFiles(cwd: string): readonly LegacyLedgerTaskFile[]
   return [...jsonTasks, ...markdownTasks].sort((left, right) => left.relativePath.localeCompare(right.relativePath));
 }
 
-function legacyTaskRequiresBaseline(cwd: string, task: LegacyLedgerTaskFile): boolean {
-  const originProvider = normalizeStringValue(task.document.originProvider ?? task.document.origin_provider);
-  const originTaskId = normalizeStringValue(task.document.originTaskId ?? task.document.origin_task_id);
-  const transitionRequired = task.status === 'done' || Boolean(originProvider || originTaskId);
-  if (!transitionRequired) return false;
-  const lastTransitionId = normalizeStringValue(task.document.lastTransitionId ?? task.document.last_transition_id);
-  if (!lastTransitionId) return true;
-  return !transitionEventExists(cwd, task.taskId, lastTransitionId);
-}
+
 
 function writeLegacyBaselineTransition(input: {
   readonly cwd: string;
@@ -3153,21 +3131,7 @@ function listTaskFiles(directoryPath: string, predicate: (filePath: string) => b
   return output;
 }
 
-function safeTaskFileReadDir(directoryPath: string): readonly Dirent[] {
-  try {
-    return readdirSync(directoryPath, { withFileTypes: true });
-  } catch {
-    return [];
-  }
-}
 
-function safeTaskFileStat(filePath: string) {
-  try {
-    return statSync(filePath);
-  } catch {
-    return null;
-  }
-}
 
 function shouldSkipTaskFileDiscoveryDirectory(directoryPath: string) {
   const normalized = directoryPath.replace(/\\/g, '/');
@@ -3192,14 +3156,7 @@ function shouldSkipTaskFileDiscoveryDirectory(directoryPath: string) {
   return segments.some((segment, index) => segment === 'local' && (segments[index + 1] === 'tmp' || segments[index + 1] === 'temp'));
 }
 
-function readJsonRecord(filePath: string): Record<string, unknown> {
-  try {
-    const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as unknown;
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
-  } catch {
-    return {};
-  }
-}
+
 
 function parseTaskMarkdownFrontmatter(text: string): Record<string, unknown> {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -4478,9 +4435,7 @@ function cellAt(cells: readonly string[], index: number): string {
   return index >= 0 && index < cells.length ? cells[index] : '';
 }
 
-function normalizeRelativePath(value: string): string {
-  return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
-}
+
 
 
 
@@ -4685,3 +4640,13 @@ export {
   parseAuditOptions,
   parseLegacyLedgerMigrationOptions
 } from './tasks/task-option-parsers.ts';
+
+export {
+  safeTaskFileReadDir,
+  safeTaskFileStat,
+  readJsonRecord,
+  taskPathFor,
+  collectTaskFileValues,
+  normalizeRelativePath,
+  legacyTaskRequiresBaseline
+};

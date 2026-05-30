@@ -663,6 +663,12 @@
       "atom_id": "atm.task-option-parsers-map",
       "capability": "Pure option parsing and CLI flags validators for task sub-commands (reconcile, deliver-and-close, scope add, create, mirror, close, reset, audit, queue, lock cleanup, legacy ledger migration, and claim lifecycle)",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-file-io-helpers.ts",
+      "atom_id": "atm.task-file-io-helpers-map",
+      "capability": "Pure file-I/O helpers (safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline) to minimize circular dependencies and improve code readablity",
+      "coverage_status": "active"
     }
   ],
   "summary": {
