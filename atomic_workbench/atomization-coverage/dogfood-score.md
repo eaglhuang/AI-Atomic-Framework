@@ -18,8 +18,8 @@
 
 ## Inventory snapshot
 
-- production source paths: 467
-- owned by registry: 381
+- production source paths: 468
+- owned by registry: 382
 - unowned: 86
 - coverage: 82%
 
