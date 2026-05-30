@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AtmConfig",
+  "description": "Schema for ATM adoption repository-local .atm/config.json configuration",
+  "type": "OBJECT",
+  "properties": {
+    "plugins": {
+      "type": "OBJECT",
+      "properties": {
+        "externalTaskSources": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "required": [
+              "id",
+              "packagePath",
+              "enabled",
+              "mode"
+            ],
+            "properties": {
+              "id": {
+                "type": "STRING"
+              },
+              "packagePath": {
+                "type": "STRING"
+              },
+              "enabled": {
+                "type": "BOOLEAN"
+              },
+              "mode": {
+                "type": "STRING",
+                "enum": [
+                  "advisory",
+                  "enforce",
+                  "disabled"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

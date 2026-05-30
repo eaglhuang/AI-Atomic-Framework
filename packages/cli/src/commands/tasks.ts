@@ -25,6 +25,8 @@ import {
   type TaskTransitionClosureMetadata,
   transitionEventExists
 } from './task-ledger.ts';
+import { readPluginRegistry } from '../plugin-registry.ts';
+import type { ParsedExternalTask } from '@ai-atomic-framework/plugin-sdk';
 import {
   advanceTaskQueueAfterClose,
   abandonTaskQueue,
@@ -868,11 +870,46 @@ async function runTasksImport(argv: string[]) {
 
   const planText = readFileSync(planAbsolute, 'utf8');
   const generatedAt = new Date().toISOString();
-  let parsed = parsePlanMarkdown({
-    planText,
-    planRelativePath: relativePathFrom(options.cwd, planAbsolute),
-    importedAt: generatedAt
-  });
+
+  let parsed: ParsedPlanResult | null = null;
+  const plugins = await readPluginRegistry(options.cwd);
+  const enabledPlugin = plugins.find(p => p.mode !== 'disabled');
+
+  if (enabledPlugin) {
+    const { plugin, mode } = enabledPlugin;
+    try {
+      const input = {
+        cwd: options.cwd,
+        sourcePath: relativePathFrom(options.cwd, planAbsolute),
+        raw: planText
+      };
+      if (typeof plugin.parse === 'function') {
+        const parsedTask = await plugin.parse(input);
+        if (parsedTask) {
+          const record = parseSingleCardFromPlugin(parsedTask, generatedAt);
+          parsed = {
+            tasks: [record],
+            diagnostics: []
+          };
+        }
+      }
+    } catch (err) {
+      if (mode === 'enforce') {
+        throw new CliError('ATM_PLUGIN_ERROR', `Plugin ${plugin.id} parse failed: ${err instanceof Error ? err.message : err}`, { exitCode: 1 });
+      } else {
+        console.warn(`[tasks:import] Warning: Plugin ${plugin.id} parse failed. Falling back to hardcoded parser:`, err);
+      }
+    }
+  }
+
+  if (!parsed) {
+    parsed = parsePlanMarkdown({
+      planText,
+      planRelativePath: relativePathFrom(options.cwd, planAbsolute),
+      importedAt: generatedAt
+    });
+  }
+
   parsed = enrichParsedTasksFromSiblingTaskCards({
     cwd: options.cwd,
     planAbsolute,
@@ -5082,4 +5119,114 @@ function uniqueStrings(values: readonly string[]): readonly string[] {
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: string): TaskImportRecord {
+  const frontData = parsed.frontmatter;
+  const workItemId = normalizeTaskId(parsed.taskId);
+  const title = normalizeOptionalString(frontData.title) ?? workItemId;
+  const status = coerceStatus(typeof frontData.status === 'string' ? frontData.status : 'planned');
+  const milestone = normalizeOptionalString(frontData.milestone);
+  const dependencies = parseYamlList(frontData.depends_on ?? frontData.blocked_by ?? frontData.dependencies);
+  const tags = parseYamlList(frontData.tags);
+  const scopePaths = parseYamlList(frontData.scopePaths ?? frontData.scope_paths ?? frontData.allowed_files ?? frontData.allowedFiles ?? frontData.scope);
+  const validators = parseYamlList(frontData.validators);
+  const planningMirrorPaths = parseYamlList(frontData.planningMirrorPaths ?? frontData.planning_mirror_paths);
+  const planningReadOnlyPaths = parseYamlList(frontData.planningReadOnlyPaths ?? frontData.planning_read_only_paths);
+  const outOfScope = parseYamlList(frontData.outOfScope ?? frontData.out_of_scope ?? frontData.forbidden_files);
+  const nonGoals = parseYamlList(frontData.nonGoals ?? frontData.non_goals);
+  
+  const atomizationImpactFrontMatter = frontData.atomizationImpact && typeof frontData.atomizationImpact === 'object' && !Array.isArray(frontData.atomizationImpact)
+    ? frontData.atomizationImpact as Record<string, unknown>
+    : {};
+  const mapUpdates = parseYamlList(
+    frontData.mapUpdates
+    ?? frontData.map_updates
+    ?? atomizationImpactFrontMatter.mapUpdates
+    ?? atomizationImpactFrontMatter.map_updates
+  );
+
+  const body = parsed.body || '';
+  const sections = sliceBodyByHeadings(body);
+  const acceptance = collectBulletList(sections, acceptanceHeaders);
+  const frontMatterDeliverables = parseYamlList(frontData.deliverables);
+  const bodyDeliverables = collectBulletList(sections, deliverablesHeaders);
+  
+  let deliverables: readonly string[];
+  if (frontMatterDeliverables.length > 0) {
+    deliverables = uniqueStrings(frontMatterDeliverables.map(normalizeYamlScalar));
+  } else {
+    deliverables = uniqueStrings(bodyDeliverables.map(normalizeYamlScalar));
+  }
+  
+  const notes = collectText(sections, notesHeaders) ?? null;
+  const evidenceFrontMatter = frontData.evidence && typeof frontData.evidence === 'object' && !Array.isArray(frontData.evidence)
+    ? frontData.evidence as Record<string, unknown>
+    : {};
+  const rollbackFrontMatter = frontData.rollback && typeof frontData.rollback === 'object' && !Array.isArray(frontData.rollback)
+    ? frontData.rollback as Record<string, unknown>
+    : {};
+    
+  const evidenceRequired = normalizeOptionalString(
+    frontData.evidenceRequired
+    ?? frontData.evidence_required
+    ?? frontData.required
+    ?? evidenceFrontMatter.required
+    ?? evidenceFrontMatter.kind
+  );
+  const rollbackStrategy = normalizeOptionalString(
+    frontData.rollbackStrategy
+    ?? rollbackFrontMatter.strategy
+  );
+  const rollbackNotes = normalizeOptionalString(
+    frontData.rollbackNotes
+    ?? rollbackFrontMatter.notes
+  );
+
+  return {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId,
+    title,
+    status,
+    milestone,
+    dependencies,
+    acceptance,
+    deliverables,
+    scopePaths,
+    validators,
+    planningRepo: normalizeOptionalString(frontData.planning_repo ?? frontData.planningRepo),
+    targetRepo: normalizeOptionalString(frontData.target_repo ?? frontData.targetRepo ?? frontData.upstream_repo ?? frontData.upstreamRepo),
+    closureAuthority: normalizeOptionalString(frontData.closure_authority ?? frontData.closureAuthority),
+    planningReadOnlyPaths,
+    planningMirrorPaths,
+    outOfScope,
+    nonGoals,
+    evidenceRequired,
+    rollbackStrategy,
+    rollbackNotes,
+    atomizationImpact: {
+      ownerAtomOrMap: normalizeOptionalString(
+        frontData.ownerAtomOrMap
+        ?? frontData.owner_atom_or_map
+        ?? atomizationImpactFrontMatter.ownerAtomOrMap
+        ?? atomizationImpactFrontMatter.owner_atom_or_map
+      ),
+      mapUpdates
+    },
+    legacyImportAliases: {
+      ...(frontData.allowed_files ? { allowed_files: parseYamlList(frontData.allowed_files) } : {}),
+      ...(frontData.blocked_by ? { blocked_by: parseYamlList(frontData.blocked_by) } : {}),
+      ...(frontData.upstream_repo ? { upstream_repo: normalizeOptionalString(frontData.upstream_repo) ?? '' } : {})
+    },
+    importDiagnostics: [],
+    tags,
+    notes,
+    source: {
+      planPath: parsed.sourcePath,
+      sectionTitle: workItemId,
+      headingLine: 1, 
+      hash: hashSection(body)
+    },
+    importedAt
+  };
 }

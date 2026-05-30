@@ -1,0 +1,27 @@
+{
+  "name": "@ai-atomic-framework/atm-markdown-task-source",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Reference ExternalTaskSourcePlugin for parsing markdown task cards.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@ai-atomic-framework/core": "0.1.0",
+    "@ai-atomic-framework/plugin-sdk": "0.1.0"
+  },
+  "scripts": {
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/atm-markdown-task-source",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit"
+  },
+  "types": "./dist/index.d.ts"
+}
