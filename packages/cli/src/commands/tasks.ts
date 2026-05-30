@@ -39,6 +39,7 @@ import {
 import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.ts';
 import { runAtmGit } from './git-governance.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
+import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.ts';
 import {
   safeTaskFileReadDir,
   safeTaskFileStat,
@@ -3204,7 +3205,7 @@ function writeTaskMarkdownFrontmatter(filePath: string, text: string, document: 
 }
 
 function isFrontmatterScalar(value: unknown): value is string | number | boolean {
-  return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+  return delegatedIsFrontmatterScalar(value);
 }
 
 function formatFrontmatterValue(value: unknown): string {

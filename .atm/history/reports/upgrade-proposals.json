@@ -1,0 +1,52 @@
+{
+  "schemaId": "atm.humanReviewQueue",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial human review queue contract."
+  },
+  "generatedAt": "2026-05-20T16:10:01.179Z",
+  "entries": [
+    {
+      "proposalId": "guided-legacy-atomize-guidance-20260520150716-3126c00ebf",
+      "atomId": "LEGACY-GUIDED-ATOMIZE",
+      "fromVersion": "legacy",
+      "toVersion": "guided-dry-run",
+      "decompositionDecision": "atomize",
+      "automatedGates": {
+        "allPassed": true,
+        "blockedGateNames": []
+      },
+      "status": "pending",
+      "proposalSnapshotHash": "sha256:524ac97c5a9cc36d91d3f8e834b091e530d94e8ea5f11e1a18df7da56e16a054",
+      "proposal": {
+        "schemaId": "atm.guidedLegacyDryRunProposal",
+        "specVersion": "0.1.0",
+        "proposalId": "guided-legacy-atomize-guidance-20260520150716-3126c00ebf",
+        "atomId": "LEGACY-GUIDED-ATOMIZE",
+        "fromVersion": "legacy",
+        "toVersion": "guided-dry-run",
+        "behaviorId": "behavior.atomize",
+        "decompositionDecision": "atomize",
+        "legacyTarget": "packages/core/src/registry/semantic-fingerprint.ts#createAtomicSpecSemanticFingerprint",
+        "guidanceSession": "guidance-20260520150716-3126c00ebf",
+        "patchMode": "dry-run",
+        "automatedGates": {
+          "allPassed": true,
+          "blockedGateNames": []
+        },
+        "status": "pending",
+        "reviewRequired": true,
+        "rollbackProofRequired": true,
+        "rollbackInstructions": [
+          "Do not apply generated host changes until human review approves the dry-run proposal.",
+          "Discard generated proposal artifacts to roll back the preview, then rerun atm next before retrying."
+        ],
+        "proposedBy": "ATM CLI",
+        "proposedAt": "2026-05-20T16:10:01.177Z"
+      },
+      "queuedAt": "2026-05-20T16:10:01.177Z"
+    }
+  ]
+}

@@ -1,0 +1,963 @@
+{
+  "schemaId": "atm.policeFamilyGateReport",
+  "specVersion": "0.1.0",
+  "profile": "standard",
+  "generatedAt": "2026-05-30T14:06:25.286Z",
+  "families": [
+    {
+      "family": "schema",
+      "mode": "blocker",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": false,
+      "sourceValidator": "atm-candidates-rank"
+    },
+    {
+      "family": "boundary",
+      "mode": "blocker",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": false,
+      "sourceValidator": "atm-candidates-rank"
+    },
+    {
+      "family": "registry-consistency",
+      "mode": "blocker",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": false,
+      "sourceValidator": "atm-candidates-rank"
+    },
+    {
+      "family": "dedup",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": true,
+      "sourceValidator": "runDedupPolice"
+    },
+    {
+      "family": "demand",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": true,
+      "sourceValidator": "runDemandPolice"
+    },
+    {
+      "family": "quality",
+      "mode": "blocker",
+      "status": "skipped",
+      "findings": [],
+      "advisoryOnly": false,
+      "sourceValidator": "runQualityPolice"
+    },
+    {
+      "family": "map-integration",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": true,
+      "sourceValidator": "runMapIntegrationPolice"
+    },
+    {
+      "family": "atomization",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": true,
+      "sourceValidator": "runAtomizationPolice"
+    },
+    {
+      "family": "decomposition",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [
+        {
+          "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-batch.ts",
+          "policeFamily": "decomposition",
+          "severity": "advisory",
+          "trigger": "oversized-source-surface",
+          "scope": "packages/cli/src/commands/batch.ts",
+          "action": "proposal-draft",
+          "routeHint": "behavior.atomize",
+          "readModel": "SourceInventoryReport",
+          "message": "packages/cli/src/commands/batch.ts has 1124 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+          "evidenceRefs": [
+            {
+              "refId": "source-inventory",
+              "refKind": "police-artifact"
+            }
+          ],
+          "metadata": {
+            "lineCount": 1124,
+            "threshold": 1000,
+            "legacyUri": "legacy://packages/cli/src/commands/batch.ts",
+            "language": "Python",
+            "entrypointHint": null,
+            "suggestedRoute": [
+              "behavior.atomize",
+              "behavior.compose"
+            ],
+            "suggestedMapReplacement": true,
+            "decompositionPlanHint": {
+              "legacyUris": [
+                "legacy://packages/cli/src/commands/batch.ts"
+              ],
+              "proposedMembers": [],
+              "entrypoints": []
+            },
+            "suppressionKey": "source-surface::legacy://packages/cli/src/commands/batch.ts::oversized-source-surface::decomposition",
+            "directApplyAllowed": false
+          },
+          "mode": "fast"
+        },
+        {
+          "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-evidence.ts",
+          "policeFamily": "decomposition",
+          "severity": "advisory",
+          "trigger": "oversized-source-surface",
+          "scope": "packages/cli/src/commands/evidence.ts",
+          "action": "proposal-draft",
+          "routeHint": "behavior.atomize",
+          "readModel": "SourceInventoryReport",
+          "message": "packages/cli/src/commands/evidence.ts has 1783 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+          "evidenceRefs": [
+            {
+              "refId": "source-inventory",
+              "refKind": "police-artifact"
+            }
+          ],
+          "metadata": {
+            "lineCount": 1783,
+            "threshold": 1000,
+            "legacyUri": "legacy://packages/cli/src/commands/evidence.ts",
+            "language": "Python",
+            "entrypointHint": null,
+            "suggestedRoute": [
+              "behavior.atomize",
+              "behavior.compose"
+            ],
+            "suggestedMapReplacement": true,
+            "decompositionPlanHint": {
+              "legacyUris": [
+                "legacy://packages/cli/src/commands/evidence.ts"
+              ],
+              "proposedMembers": [],
+              "entrypoints": []
+            },
+            "suppressionKey": "source-surface::legacy://packages/cli/src/commands/evidence.ts::oversized-source-surface::decomposition",
+            "directApplyAllowed": false
+          },
+          "mode": "fast"
+        },
+        {
+          "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-framework-development.ts",
+          "policeFamily": "decomposition",
+          "severity": "advisory",
+          "trigger": "oversized-source-surface",
+          "scope": "packages/cli/src/commands/framework-development.ts",
+          "action": "proposal-draft",
+          "routeHint": "behavior.atomize",
+          "readModel": "SourceInventoryReport",
+          "message": "packages/cli/src/commands/framework-development.ts has 1751 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+          "evidenceRefs": [
+            {
+              "refId": "source-inventory",
+              "refKind": "police-artifact"
+            }
+          ],
+          "metadata": {
+            "lineCount": 1751,
+            "threshold": 1000,
+            "legacyUri": "legacy://packages/cli/src/commands/framework-development.ts",
+            "language": "Python",
+            "entrypointHint": null,
+            "suggestedRoute": [
+              "behavior.atomize",
+              "behavior.compose"
+            ],
+            "suggestedMapReplacement": true,
+            "decompositionPlanHint": {
+              "legacyUris": [
+                "legacy://packages/cli/src/commands/framework-development.ts"
+              ],
+              "proposedMembers": [],
+              "entrypoints": []
+            },
+            "suppressionKey": "source-surface::legacy://packages/cli/src/commands/framework-development.ts::oversized-source-surface::decomposition",
+            "directApplyAllowed": false
+          },
+          "mode": "fast"
+        },
+        {
+          "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-hook.ts",
+          "policeFamily": "decomposition",
+          "severity": "advisory",
+          "trigger": "oversized-source-surface",
+          "scope": "packages/cli/src/commands/hook.ts",
+          "action": "proposal-draft",
+          "routeHint": "behavior.atomize",
+          "readModel": "SourceInventoryReport",
+          "message": "packages/cli/src/commands/hook.ts has 2482 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+          "evidenceRefs": [
+            {
+              "refId": "source-inventory",
+              "refKind": "police-artifact"
+            }
+          ],
+          "metadata": {
+            "lineCount": 2482,
+            "threshold": 1000,
+            "legacyUri": "legacy://packages/cli/src/commands/hook.ts",
+            "language": "Python",
+            "entrypointHint": null,
+            "suggestedRoute": [
+              "behavior.atomize",
+              "behavior.compose"
+            ],
+            "suggestedMapReplacement": true,
+            "decompositionPlanHint": {
+              "legacyUris": [
+                "legacy://packages/cli/src/commands/hook.ts"
+              ],
+              "proposedMembers": [],
+              "entrypoints": []
+            },
+            "suppressionKey": "source-surface::legacy://packages/cli/src/commands/hook.ts::oversized-source-surface::decomposition",
+            "directApplyAllowed": false
+          },
+          "mode": "fast"
+        },
+        {
+          "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-integration-hooks.ts",
+          "policeFamily": "decomposition",
+          "severity": "advisory",
+          "trigger": "oversized-source-surface",
+          "scope": "packages/cli/src/commands/integration-hooks.ts",
+          "action": "proposal-draft",
+          "routeHint": "behavior.atomize",
+          "readModel": "SourceInventoryReport",
+          "message": "packages/cli/src/commands/integration-hooks.ts has 1185 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+          "evidenceRefs": [
+            {
+              "refId": "source-inventory",
+              "refKind": "police-artifact"
+            }
+          ],
+          "metadata": {
+            "lineCount": 1185,
+            "threshold": 1000,
+            "legacyUri": "legacy://packages/cli/src/commands/integration-hooks.ts",
+            "language": "Python",
+            "entrypointHint": null,
+            "suggestedRoute": [
+              "behavior.atomize",
+              "behavior.compose"
+            ],
+            "suggestedMapReplacement": true,
+            "decompositionPlanHint": {
+              "legacyUris": [
+                "legacy://packages/cli/src/commands/integration-hooks.ts"
+              ],
+              "proposedMembers": [],
+              "entrypoints": []
+            },
+            "suppressionKey": "source-surface::legacy://packages/cli/src/commands/integration-hooks.ts::oversized-source-surface::decomposition",
+            "directApplyAllowed": false
+          },
+          "mode": "fast"
+        },
+        {
+          "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-next.ts",
+          "policeFamily": "decomposition",
+          "severity": "advisory",
+          "trigger": "oversized-source-surface",
+          "scope": "packages/cli/src/commands/next.ts",
+          "action": "proposal-draft",
+          "routeHint": "behavior.atomize",
+          "readModel": "SourceInventoryReport",
+          "message": "packages/cli/src/commands/next.ts has 3527 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+          "evidenceRefs": [
+            {
+              "refId": "source-inventory",
+              "refKind": "police-artifact"
+            }
+          ],
+          "metadata": {
+            "lineCount": 3527,
+            "threshold": 1000,
+            "legacyUri": "legacy://packages/cli/src/commands/next.ts",
+            "language": "Python",
+            "entrypointHint": null,
+            "suggestedRoute": [
+              "behavior.atomize",
+              "behavior.compose"
+            ],
+            "suggestedMapReplacement": true,
+            "decompositionPlanHint": {
+              "legacyUris": [
+                "legacy://packages/cli/src/commands/next.ts"
+              ],
+              "proposedMembers": [],
+              "entrypoints": []
+            },
+            "suppressionKey": "source-surface::legacy://packages/cli/src/commands/next.ts::oversized-source-surface::decomposition",
+            "directApplyAllowed": false
+          },
+          "mode": "fast"
+        },
+        {
+          "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-tasks.ts",
+          "policeFamily": "decomposition",
+          "severity": "advisory",
+          "trigger": "oversized-source-surface",
+          "scope": "packages/cli/src/commands/tasks.ts",
+          "action": "proposal-draft",
+          "routeHint": "behavior.atomize",
+          "readModel": "SourceInventoryReport",
+          "message": "packages/cli/src/commands/tasks.ts has 4653 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+          "evidenceRefs": [
+            {
+              "refId": "source-inventory",
+              "refKind": "police-artifact"
+            }
+          ],
+          "metadata": {
+            "lineCount": 4653,
+            "threshold": 1000,
+            "legacyUri": "legacy://packages/cli/src/commands/tasks.ts",
+            "language": "Python",
+            "entrypointHint": null,
+            "suggestedRoute": [
+              "behavior.atomize",
+              "behavior.compose"
+            ],
+            "suggestedMapReplacement": true,
+            "decompositionPlanHint": {
+              "legacyUris": [
+                "legacy://packages/cli/src/commands/tasks.ts"
+              ],
+              "proposedMembers": [],
+              "entrypoints": []
+            },
+            "suppressionKey": "source-surface::legacy://packages/cli/src/commands/tasks.ts::oversized-source-surface::decomposition",
+            "directApplyAllowed": false
+          },
+          "mode": "fast"
+        }
+      ],
+      "advisoryOnly": true,
+      "sourceValidator": "runDecompositionPolice"
+    },
+    {
+      "family": "evolution",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": true,
+      "sourceValidator": "runEvolutionPolice"
+    },
+    {
+      "family": "polymorph",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": true,
+      "sourceValidator": "runPolymorphPolice"
+    },
+    {
+      "family": "rollback",
+      "mode": "advisory",
+      "status": "pass",
+      "findings": [],
+      "advisoryOnly": true,
+      "sourceValidator": "runRollbackPolice"
+    }
+  ],
+  "findings": [
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-batch.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/batch.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/batch.ts has 1124 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1124,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/batch.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/batch.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/batch.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-evidence.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/evidence.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/evidence.ts has 1783 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1783,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/evidence.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/evidence.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/evidence.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-framework-development.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/framework-development.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/framework-development.ts has 1751 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1751,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/framework-development.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/framework-development.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/framework-development.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-hook.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/hook.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/hook.ts has 2482 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 2482,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/hook.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/hook.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/hook.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-integration-hooks.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/integration-hooks.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/integration-hooks.ts has 1185 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1185,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/integration-hooks.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/integration-hooks.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/integration-hooks.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-next.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/next.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/next.ts has 3527 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 3527,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/next.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/next.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/next.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-tasks.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/tasks.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/tasks.ts has 4653 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 4653,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/tasks.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/tasks.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/tasks.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    }
+  ],
+  "advisoryFindings": [
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-batch.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/batch.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/batch.ts has 1124 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1124,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/batch.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/batch.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/batch.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-evidence.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/evidence.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/evidence.ts has 1783 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1783,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/evidence.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/evidence.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/evidence.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-framework-development.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/framework-development.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/framework-development.ts has 1751 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1751,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/framework-development.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/framework-development.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/framework-development.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-hook.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/hook.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/hook.ts has 2482 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 2482,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/hook.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/hook.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/hook.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-integration-hooks.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/integration-hooks.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/integration-hooks.ts has 1185 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 1185,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/integration-hooks.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/integration-hooks.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/integration-hooks.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-next.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/next.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/next.ts has 3527 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 3527,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/next.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/next.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/next.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    },
+    {
+      "findingId": "police.decomposition.oversized-source-surface.packages-cli-src-commands-tasks.ts",
+      "policeFamily": "decomposition",
+      "severity": "advisory",
+      "trigger": "oversized-source-surface",
+      "scope": "packages/cli/src/commands/tasks.ts",
+      "action": "proposal-draft",
+      "routeHint": "behavior.atomize",
+      "readModel": "SourceInventoryReport",
+      "message": "packages/cli/src/commands/tasks.ts has 4653 LOC (threshold 1000); recommend decomposition plan + atomic-map replacement.",
+      "evidenceRefs": [
+        {
+          "refId": "source-inventory",
+          "refKind": "police-artifact"
+        }
+      ],
+      "metadata": {
+        "lineCount": 4653,
+        "threshold": 1000,
+        "legacyUri": "legacy://packages/cli/src/commands/tasks.ts",
+        "language": "Python",
+        "entrypointHint": null,
+        "suggestedRoute": [
+          "behavior.atomize",
+          "behavior.compose"
+        ],
+        "suggestedMapReplacement": true,
+        "decompositionPlanHint": {
+          "legacyUris": [
+            "legacy://packages/cli/src/commands/tasks.ts"
+          ],
+          "proposedMembers": [],
+          "entrypoints": []
+        },
+        "suppressionKey": "source-surface::legacy://packages/cli/src/commands/tasks.ts::oversized-source-surface::decomposition",
+        "directApplyAllowed": false
+      },
+      "mode": "fast"
+    }
+  ],
+  "blockingFindings": [],
+  "ok": true,
+  "canPromote": true,
+  "sharedGates": [
+    {
+      "gate": "evidence-integrity",
+      "status": "pass",
+      "findings": [],
+      "summary": {
+        "total": 0
+      },
+      "sourceValidator": "runEvidenceIntegrityGate"
+    },
+    {
+      "gate": "reversibility",
+      "status": "pass",
+      "findings": [],
+      "summary": {
+        "total": 0,
+        "blocked": 0
+      },
+      "sourceValidator": "runReversibilityGate"
+    },
+    {
+      "gate": "noise-control",
+      "status": "pass",
+      "findings": [],
+      "summary": {
+        "total": 0,
+        "suppressed": 0,
+        "bypassed": 0
+      },
+      "sourceValidator": "runNoiseControlGate"
+    }
+  ]
+}

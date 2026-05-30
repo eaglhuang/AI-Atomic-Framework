@@ -1,0 +1,22 @@
+{
+  "schemaId": "atm.guidanceDriftPoliceReport",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-05-30T14:06:25.286Z",
+  "goal": "MRP pilot leaf extraction on largest TS legacy",
+  "expectedIntent": "legacy-candidate-ranking",
+  "observedIntent": "legacy-atomization",
+  "status": "advisory",
+  "findings": [
+    {
+      "level": "warning",
+      "code": "ATM_GUIDANCE_SKILL_MISS_CANDIDATE",
+      "text": "The original goal did not classify as legacy-candidate-ranking; record a reviewed host-local phrase if this was a legitimate candidate ranking request."
+    }
+  ],
+  "skillMissLearningLoop": {
+    "status": "suggested",
+    "lexiconPath": ".atm/guidance/intent-lexicon.json",
+    "suggestedCommand": "node atm.mjs guide learn --phrase \"MRP pilot leaf extraction on largest TS legacy\" --intent legacy-candidate-ranking --reason \"Guidance Drift Police observed a missed candidate-ranking phrase.\" --status suggested --cwd . --json",
+    "reviewPolicy": "Keep learned phrases host-local until repeated evidence and human review justify promotion."
+  }
+}

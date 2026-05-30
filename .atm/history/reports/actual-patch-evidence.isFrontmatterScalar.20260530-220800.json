@@ -1,0 +1,16 @@
+{
+  "schemaId": "atm.actualPatchEvidence.v1",
+  "generatedAt": "2026-05-30T22:08:32.000+08:00",
+  "taskId": "TASK-AAO-0098",
+  "candidateRankingReportId": "candidate-ranking-2026-05-30T14-06-25-286Z",
+  "targetFile": "packages/cli/src/commands/tasks.ts",
+  "helperFile": "packages/cli/src/commands/tasks/is-frontmatter-scalar-helper.ts",
+  "testFile": "tests/unit/is-frontmatter-scalar-helper.unit.test.ts",
+  "extractionDiffSummary": "Extract function isFrontmatterScalar (type guard for string | number | boolean) to tasks/is-frontmatter-scalar-helper.ts. Update tasks.ts to import and delegate call to helper, maintaining 100% backward compatibility.",
+  "evidenceFiles": {
+    "smokeDryRun": ".atm/history/reports/smoke-evidence.isFrontmatterScalar.20260530-220800.log",
+    "smokeLeaf": ".atm/history/reports/smoke-evidence.isFrontmatterScalar.leaf.20260530-220800.log",
+    "rollbackPatch": ".atm/history/reports/rollback-ready.full.isFrontmatterScalar.20260530-220800.patch",
+    "rollbackProof": ".atm/history/reports/rollback-ready-proof.isFrontmatterScalar.20260530-220800.json"
+  }
+}

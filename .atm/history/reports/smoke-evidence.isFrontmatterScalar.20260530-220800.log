@@ -1,0 +1,299 @@
+{
+  "ok": true,
+  "command": "hook",
+  "mode": "standalone",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+  "messages": [
+    {
+      "level": "info",
+      "code": "ATM_HOOK_PRE_COMMIT_OK",
+      "text": "ATM pre-commit hook passed and staged git-head evidence when needed.",
+      "data": {
+        "stagedFileCount": 6,
+        "criticalChangedFileCount": 3,
+        "evidencePath": ".atm/history/evidence/git-head.jsonl"
+      }
+    }
+  ],
+  "evidence": {
+    "action": "pre-commit",
+    "stagedFiles": [
+      "atomic_workbench/atomization-coverage/dogfood-score.json",
+      "atomic_workbench/atomization-coverage/dogfood-score.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/is-frontmatter-scalar-helper.ts",
+      "tests/unit/is-frontmatter-scalar-helper.unit.test.ts"
+    ],
+    "gitIndexDiagnostic": {
+      "schemaId": "atm.gitIndexDiagnostic.v1",
+      "ok": true,
+      "code": "ATM_GIT_INDEX_OK",
+      "exitCode": 0,
+      "indexLockPath": ".git/index.lock",
+      "indexLockPresent": false,
+      "stderr": "",
+      "detail": "Git index is readable by ATM pre-commit diagnostics.",
+      "requiredCommand": null
+    },
+    "encodingReport": {
+      "schemaId": "atm.encodingHookReport.v1",
+      "inspectedFileCount": 6,
+      "findings": [],
+      "ok": true
+    },
+    "frameworkStatus": {
+      "schemaId": "atm.frameworkDevelopmentStatus",
+      "specVersion": "0.1.0",
+      "generatedAt": "2026-05-30T14:09:13.032Z",
+      "repoRole": "framework",
+      "repoIdentity": {
+        "isFrameworkRepo": true,
+        "score": 5,
+        "root": "C:\\Users\\User\\AI-Atomic-Framework",
+        "name": "ai-atomic-framework",
+        "signals": [
+          "package-name:ai-atomic-framework",
+          "packages/core/src/index.ts",
+          "packages/cli/src/atm.ts",
+          "atomic-registry.json",
+          "workspace:packages/*"
+        ]
+      },
+      "targetRepo": null,
+      "targetRepoIdentity": null,
+      "mode": "required",
+      "closureAuthority": "local",
+      "taskLedgerMode": "framework-development",
+      "taskLedger": {
+        "enabled": true,
+        "configuredMode": "auto",
+        "provider": "atm-local",
+        "mirrorExternalTasks": true,
+        "requireCliTransitions": true,
+        "taskRoot": ".atm/history/tasks",
+        "eventRoot": ".atm/history/task-events",
+        "externalTasks": []
+      },
+      "changedFiles": [
+        "atomic_workbench/atomization-coverage/dogfood-score.json",
+        "atomic_workbench/atomization-coverage/dogfood-score.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/is-frontmatter-scalar-helper.ts",
+        "tests/unit/is-frontmatter-scalar-helper.unit.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/is-frontmatter-scalar-helper.ts",
+        "tests/unit/is-frontmatter-scalar-helper.unit.test.ts"
+      ],
+      "docsOnlyChangedFiles": [
+        "atomic_workbench/atomization-coverage/dogfood-score.json",
+        "atomic_workbench/atomization-coverage/dogfood-score.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "requiredGates": [
+        "framework-development",
+        "tasks-audit",
+        "doctor",
+        "git-head-evidence",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "activeLocks": [
+        ".atm/runtime/locks/ATM-FRAMEWORK-TEMP-antigravity-gemini-3-5-flash.lock.json"
+      ],
+      "staleLocks": [],
+      "pinnedRunner": {
+        "status": "available",
+        "metadataPath": ".atm/runtime/pinned-runner.json",
+        "sourcePath": "release/atm-onefile/atm.mjs",
+        "runnerPath": "atm.mjs",
+        "reason": "A different root atm.mjs already exists. Re-run bootstrap with --force to replace it with the pinned runner."
+      },
+      "blockers": [],
+      "warnings": []
+    },
+    "allowAdopterInfrastructureSync": false,
+    "blockingFrameworkIssues": [],
+    "frameworkClaimCommand": null,
+    "activeDirectionLocks": [],
+    "directionLockPlanningMirrorPaths": [],
+    "directionLockAllowedFilesDiagnoses": [],
+    "directionLockAllowedFilesMismatches": [],
+    "planningMirrorDriftFiles": [],
+    "activeQuickfixLock": null,
+    "directionLockDriftFiles": [],
+    "quickfixDriftFiles": [],
+    "quickfixFileLimitExceeded": false,
+    "quickfixLineLimitExceeded": false,
+    "quickfixChangedLineCount": 0,
+    "commitAttributionReport": {
+      "ok": true,
+      "findings": []
+    },
+    "protectedStateReport": {
+      "ok": true,
+      "files": [],
+      "findings": []
+    },
+    "taskCardStatusReport": {
+      "schemaId": "atm.taskCardStatusPreCommitReport.v1",
+      "inspectedFileCount": 0,
+      "findings": [],
+      "ok": true
+    },
+    "taskAudit": {
+      "schemaId": "atm.taskAuditReport",
+      "specVersion": "0.1.0",
+      "generatedAt": "2026-05-30T14:09:13.382Z",
+      "repoIdentity": {
+        "isFrameworkRepo": true,
+        "score": 5,
+        "root": "C:\\Users\\User\\AI-Atomic-Framework",
+        "name": "ai-atomic-framework",
+        "signals": [
+          "package-name:ai-atomic-framework",
+          "packages/core/src/index.ts",
+          "packages/cli/src/atm.ts",
+          "atomic-registry.json",
+          "workspace:packages/*"
+        ]
+      },
+      "inspectedTaskCount": 102,
+      "inspectedEvidenceCount": 11,
+      "findings": [
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_PLANNING_ONLY_DONE",
+          "path": ".atm/history/tasks/TASK-AAO-0000.json",
+          "taskId": "TASK-AAO-0000",
+          "detail": "[planning-only] Task TASK-AAO-0000 is marked done under planning authority and is not enforced as target-repo closure evidence in this repository. Run \"node atm.mjs tasks import\" if you need to synchronize it as target-repo work."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_PLANNING_ONLY_DONE",
+          "path": ".atm/history/tasks/TASK-AAO-0001.json",
+          "taskId": "TASK-AAO-0001",
+          "detail": "[planning-only] Task TASK-AAO-0001 is marked done under planning authority and is not enforced as target-repo closure evidence in this repository. Run \"node atm.mjs tasks import\" if you need to synchronize it as target-repo work."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_PLANNING_ONLY_DONE",
+          "path": ".atm/history/tasks/TASK-AAO-0036.json",
+          "taskId": "TASK-AAO-0036",
+          "detail": "[planning-only] Task TASK-AAO-0036 is marked done under planning authority and is not enforced as target-repo closure evidence in this repository. Run \"node atm.mjs tasks import\" if you need to synchronize it as target-repo work."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/evidence/git-head-evidence.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/evidence/packages-cli-atomization-wave1.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/evidence/packages-core-atomization-wave1.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/atomization-coverage/atom-backfill-applied.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/atomization-coverage/atom-backfill-proposal.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/atomization-coverage/atom-id-to-cid.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/atomization-coverage/dogfood-score.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/atomization-coverage/exclusion-inventory.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/atomization-coverage/generated-fixture-boundaries.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        },
+        {
+          "level": "warning",
+          "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+          "path": "atomic_workbench/graduation-gate/final-checklist.json",
+          "detail": "Static evidence has no commandRuns/exitCode/stdout hash and is treated as draft evidence only."
+        }
+      ],
+      "ok": true
+    },
+    "commandRuns": [
+      {
+        "command": "npm run typecheck",
+        "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutPreview": "\n> ai-atomic-framework@0.1.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+        "stderrPreview": ""
+      },
+      {
+        "command": "npm run validate:cli",
+        "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:cli\n> node --strip-types scripts/validate-cli.ts --mode validate\n\n[cli:validate] ok (38 commands, standalone fixture verified)\n",
+        "stderrPreview": ""
+      },
+      {
+        "command": "npm run validate:git-head-evidence",
+        "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:0c6ec0af03a71aa093dab2dbf0130e50042d7eca15138ad553e84eadf937cb8c",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdoutPreview": "repoIdentity\": {\n                \"isFrameworkRepo\": false,\n                \"score\": 0,\n                \"root\": \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Temp\\\\atm-git-head-evidence-9iJZZA\\\\tree-parent\",\n                \"name\": null,\n                \"signals\": []\n              },\n              \"required\": false,\n              \"hooksPath\": null,\n              \"expectedHooksPath\": \".atm/git-hooks\",\n              \"hooksPathOk\": false,\n              \"installedHookFiles\": [\n                {\n                  \"path\": \".atm/git-hooks/pre-commit\",\n                  \"present\": false,\n                  \"markerPresent\": false,\n                  \"sha256\": null\n                },\n                {\n                  \"path\": \".atm/git-hooks/pre-push\",\n                  \"present\": false,\n                  \"markerPresent\": false,\n                  \"sha256\": null\n                }\n              ],\n              \"ok\": true\n            },\n            \"ok\": true\n          }\n        ],\n        \"ok\": true\n      },\n      \"runtimeAdapterReadiness\": {\n        "pythonOnlyHost": false,\n        "languageOnlyHost": false,\n        "needsRuntimeAdapterHint": false,\n        "detectedLanguages\": [],\n        "bundledLanguageAdapters": [\n          \"@ai-atomic-framework/language-js\",\n          \"@ai-atomic-framework/language-python\"\n        ],\n        "bundledProjectAdapters": [\n          \"@ai-atomic-framework/adapter-local-git\",\n          \"@ai-atomic-framework/plugin-governance-local\"\n        ],\n        "pythonLanguageAdapterAvailable": true,\n        "missingLanguageAdapters": [],\n        "candidateRankingAllowed": false,\n        "atomBirthApplyDeferred": false,\n        "missingCapability": null,\n        "suggestedAction": null,\n        "explanation": null\n      },\n      \"doctorPolicy\": {\n        \"ciProfile\": null,\n        \"skipChecks\": [],\n        \"skipReason\": null\n      },\n      \"recommendedAction\": \"node atm.mjs next --json\"\n    }\n  }\n}\n[git-head-evidence:validate] ok (doctor git evidence states verified)\n",
+        "stderrPreview": ""
+      }
+    ],
+    "blockingFindings": [],
+    "failureEnvelope": null,
+    "evidenceWrite": {
+      "evidencePath": ".atm/history/evidence/git-head.jsonl",
+      "treeSha": "66f14ea554890d7b7cc3ee1e5864a2f6691041ef",
+      "parentCommitShas": [
+        "503b08ac14eab5f7ee4b19797e00e3bc020f0f6c"
+      ],
+      "gitAddExitCode": 0,
+      "ok": true
+    }
+  }
+}
