@@ -1,0 +1,138 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0083",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b65c5586578aca0fb73b69e828772f4988298cb0",
+  "governedTreeSha": "9f3cfce599957ac7d472c15f630735d14c6b44a0",
+  "targetCommitDelta": {
+    "currentCommitSha": "b65c5586578aca0fb73b69e828772f4988298cb0",
+    "parentCommitShas": [
+      "b65c5586578aca0fb73b69e828772f4988298cb0"
+    ],
+    "governedTreeSha": "9f3cfce599957ac7d472c15f630735d14c6b44a0",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0083.json",
+      ".atm/history/task-events/TASK-AAO-0083/2026-05-30T04-33-58-953Z-import-202d677e32cf.json",
+      ".atm/history/task-events/TASK-AAO-0083/2026-05-30T04-34-06-955Z-reserve-8f2ac5719724.json",
+      ".atm/history/task-events/TASK-AAO-0083/2026-05-30T04-34-06-962Z-promote-8027555fd1b8.json",
+      ".atm/history/task-events/TASK-AAO-0083/2026-05-30T04-34-13-698Z-claim-faed56433f13.json",
+      ".atm/history/tasks/TASK-AAO-0083.json",
+      ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
+      ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
+      ".playwright-mcp/console-2026-05-28T15-14-55-015Z.log",
+      "packages/plugin-sdk/src/capability.ts",
+      "packages/plugin-sdk/src/external-task-source.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "scratch/inventory.json",
+      "scratch/test.out",
+      "tests/plugin-sdk/external-task-source.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run test -- tests/plugin-sdk/external-task-source.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dbd7d62b1ff77dda68be21b46a34e9b77c54f7ae52562fc1723dee629334cf40",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b8bfa153fc31839e7e734dd7fd7d69ce2f7fd72ac908d2637a2e2f5f9c40e01e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-05-30T04:35:11.948Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0083-external-task-source-plugin-interface.task.md",
+      "packages/plugin-sdk/src/capability.ts",
+      "packages/plugin-sdk/src/external-task-source.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "tests/plugin-sdk/external-task-source.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/plugin-sdk/src/capability.ts",
+      "packages/plugin-sdk/src/external-task-source.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "tests/plugin-sdk/external-task-source.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0083.json",
+  "closedAt": "2026-05-30T04:35:11.949Z",
+  "closedByActor": "Antigravity",
+  "sessionId": "session-20260530043413-Antigravity-TASK-AAO-0083-7e901f176f",
+  "attestation": null
+}

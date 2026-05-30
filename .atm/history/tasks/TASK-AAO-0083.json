@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0083",
+  "title": "ExternalTaskSourcePlugin interface (governance Layer 1)",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`packages/plugin-sdk/src/external-task-source.ts` exists and defines the standard extensible interfaces",
+    "`packages/plugin-sdk/src/capability.ts` registers 'external-task-source' within `CapabilityKind` alphabetically",
+    "`packages/plugin-sdk/src/index.ts` exports all new interfaces and types",
+    "`tests/plugin-sdk/external-task-source.test.ts` passes typecheck and implements rigorous mock interface testing",
+    "All hooks (`parse`, `validate`, `generate`) are fully optional"
+  ],
+  "deliverables": [
+    "packages/plugin-sdk/src/external-task-source.ts",
+    "packages/plugin-sdk/src/capability.ts",
+    "packages/plugin-sdk/src/index.ts",
+    "tests/plugin-sdk/external-task-source.test.ts"
+  ],
+  "scopePaths": [
+    "packages/plugin-sdk/src/external-task-source.ts",
+    "packages/plugin-sdk/src/capability.ts",
+    "packages/plugin-sdk/src/index.ts",
+    "tests/plugin-sdk/external-task-source.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run test -- tests/plugin-sdk/external-task-source.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Reference implementation — TASK-AAO-0084",
+    "Context Map schema fields — TASK-AAO-0085",
+    "Upstream 3KLife task-card-opener — TASK-AAO-0086",
+    "Modifying tasks.ts to consume plugin — TASK-AAO-0084 中做"
+  ],
+  "nonGoals": [
+    "Do not assume any specific frontmatter format",
+    "Do not bundle reference implementation in this card"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plugin-sdk-map",
+    "mapUpdates": [
+      "path_pattern: \"packages/plugin-sdk/src/external-task-source.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0083-external-task-source-plugin-interface.task.md",
+    "sectionTitle": "TASK-AAO-0083",
+    "headingLine": 40,
+    "hash": "98ff73e2af01f9d6"
+  },
+  "importedAt": "2026-05-30T04:33:58.949Z",
+  "lastTransitionId": "2026-05-30T04-35-11-951Z-close-e0241dcfd2ee",
+  "lastTransitionAt": "2026-05-30T04:35:11.951Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Antigravity",
+  "reservedAt": "2026-05-30T04:34:06.955Z",
+  "promotedAt": "2026-05-30T04:34:06.962Z",
+  "claim": {
+    "actorId": "Antigravity",
+    "leaseId": "lease-d9ac10b929db",
+    "claimedAt": "2026-05-30T04:34:13.687Z",
+    "heartbeatAt": "2026-05-30T04:35:11.951Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0083.json",
+      "package.json",
+      "packages/plugin-sdk/src/capability.ts",
+      "packages/plugin-sdk/src/capability.ts` registers 'external-task-source' within `CapabilityKind` alphabetically",
+      "packages/plugin-sdk/src/external-task-source.ts",
+      "packages/plugin-sdk/src/external-task-source.ts` exists and defines the standard extensible interfaces",
+      "packages/plugin-sdk/src/index.ts",
+      "packages/plugin-sdk/src/index.ts` exports all new interfaces and types",
+      "scripts/validate-cli.ts",
+      "tests/plugin-sdk/external-task-source.test.ts",
+      "tests/plugin-sdk/external-task-source.test.ts` passes typecheck and implements rigorous mock interface testing"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-30T04:34:13.687Z",
+  "startedByActor": "Antigravity",
+  "startedBySessionId": "session-20260530043413-Antigravity-TASK-AAO-0083-7e901f176f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0083",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0083.*",
+      ".atm/history/task-events/TASK-AAO-0083/**",
+      ".atm/history/tasks/TASK-AAO-0083.json",
+      "package.json",
+      "packages/plugin-sdk/src/capability.ts",
+      "packages/plugin-sdk/src/capability.ts` registers 'external-task-source' within `CapabilityKind` alphabetically",
+      "packages/plugin-sdk/src/external-task-source.ts",
+      "packages/plugin-sdk/src/external-task-source.ts` exists and defines the standard extensible interfaces",
+      "packages/plugin-sdk/src/index.ts",
+      "packages/plugin-sdk/src/index.ts` exports all new interfaces and types",
+      "scripts/validate-cli.ts",
+      "tests/plugin-sdk/external-task-source.test.ts",
+      "tests/plugin-sdk/external-task-source.test.ts` passes typecheck and implements rigorous mock interface testing"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cf7e797d884f87f951c95af6fb402dcb2d82dcf9f14e5f7b019c4e03f7dee404",
+    "actorId": "Antigravity",
+    "createdAt": "2026-05-30T04:34:13.697Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0083.closure-packet.json",
+  "closedAt": "2026-05-30T04:35:11.951Z",
+  "closedByActor": "Antigravity",
+  "closedBySessionId": "session-20260530043413-Antigravity-TASK-AAO-0083-7e901f176f"
+}
