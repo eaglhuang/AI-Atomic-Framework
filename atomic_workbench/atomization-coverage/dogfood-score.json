@@ -1,22 +1,22 @@
 {
   "schemaId": "atm.dogfoodScore.v1",
   "version": "1.2",
-  "overall_atomization_score": 89,
-  "grade": "B",
-  "stage": "dogfood-complete",
+  "overall_atomization_score": 92,
+  "grade": "A",
+  "stage": "dogfood-excellent",
   "scores": {
-    "source_ownership_coverage": 80,
+    "source_ownership_coverage": 82,
     "public_command_coverage": 100,
     "atom_with_test_evidence": 100,
-    "atom_with_rollback_evidence": 0,
+    "atom_with_rollback_evidence": 43,
     "excluded_paths_with_reason": 100,
     "runAtm_with_readable_ref": 100
   },
   "weighted_components": {
-    "source_ownership_coverage": 80,
+    "source_ownership_coverage": 82,
     "public_command_coverage": 100,
     "runtime_behavior_coverage": 100,
-    "evidence_coverage": 75,
+    "evidence_coverage": 86,
     "readable_callsite_coverage": 100,
     "integration_health": 100
   },
@@ -29,31 +29,31 @@
     "integration_health": 0.1
   },
   "trend": "improving",
-  "next_target": 99,
+  "next_target": 100,
   "next_high_roi_area": "atom_with_rollback_evidence",
   "priority_gaps": [
     {
       "area": "atom_with_rollback_evidence",
-      "current": "0%",
+      "current": "43%",
       "target": "70%",
       "task": "TASK-ASA-0010"
     },
     {
       "area": "source_ownership_coverage",
-      "current": "80%",
+      "current": "82%",
       "target": "95%",
       "task": "TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009"
     }
   ],
   "inventory": {
-    "production_source_count": 451,
-    "owned_by_registry": 359,
-    "unowned_count": 92,
-    "coverage_percentage": 80,
+    "production_source_count": 467,
+    "owned_by_registry": 381,
+    "unowned_count": 86,
+    "coverage_percentage": 82,
     "category_breakdown": {
-      "production": 451,
+      "production": 467,
       "generated": 0,
-      "test": 39,
+      "test": 44,
       "fixture": 230,
       "doc": 76
     }
@@ -62,10 +62,10 @@
     "evidence": {
       "atomTotal": 7,
       "withTest": 7,
-      "withRollback": 0,
+      "withRollback": 3,
       "withProvenance": 7,
       "withReport": 7,
-      "coverage": 75
+      "coverage": 86
     },
     "command": {
       "total": 52,
