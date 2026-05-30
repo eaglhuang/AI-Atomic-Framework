@@ -10,7 +10,7 @@ export default defineCommandSpec({
   name: 'tasks',
   summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | show', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | show | new', required: true }
   ],
   options: [
     commonCwdOption,
@@ -38,6 +38,15 @@ export default defineCommandSpec({
     { flag: '--status', value: 'state', summary: 'Target status for tasks close: done|review|blocked|abandoned. done requires real non-.atm deliverables plus evidence.' },
     { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, takeover, or close.' },
     { flag: '--historical-delivery', value: 'commit', summary: 'Allow tasks close done or tasks reconcile to verify an earlier delivery commit.' },
+    { flag: '--template', value: 'name', summary: 'Template key for tasks new.' },
+    { flag: '--task-id', value: 'id', summary: 'Task id for tasks new.' },
+    { flag: '--output', value: 'path', summary: 'Output markdown path for tasks new.' },
+    { flag: '--atom-id', value: 'id', summary: 'Atom id placeholder for tasks new.' },
+    { flag: '--scope-path', value: 'path', summary: 'Scope path placeholder for tasks new.' },
+    { flag: '--test-path', value: 'path', summary: 'Test path placeholder for tasks new.' },
+    { flag: '--depends-on', value: 'id', summary: 'Depends on placeholder for tasks new.' },
+    { flag: '--capability', value: 'text', summary: 'Capability description placeholder for tasks new.' },
+    { flag: '--goal', value: 'text', summary: 'Goal description placeholder for tasks new.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption

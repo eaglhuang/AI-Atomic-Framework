@@ -16,7 +16,7 @@ import {
   validateClosurePacket,
   writeClosurePacket
 } from './framework-development.ts';
-import { CliError, makeResult, message, parseJsonText, parseOptions, relativePathFrom, resolveValue, type CommandResult } from './shared.ts';
+import { CliError, makeResult, message, parseJsonText, parseOptions, parseArgsForCommand, relativePathFrom, resolveValue, type CommandResult } from './shared.ts';
 import {
   appendTaskTransitionEvent,
   createTaskTransitionId,
@@ -270,6 +270,9 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
   if (action === 'deliver-and-close') {
     return await runTasksDeliverAndClose(argv.slice(1));
   }
+  if (action === 'new') {
+    return await runTasksNew(argv.slice(1));
+  }
   if (action === 'import') {
     return await runTasksImport(argv.slice(1));
   }
@@ -280,7 +283,7 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
     return await runTasksScope(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | show | deliver-and-close | audit | migrate-legacy-ledger).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | show | deliver-and-close | audit | migrate-legacy-ledger | new).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -5237,3 +5240,66 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
     importedAt
   };
 }
+
+async function runTasksNew(argv: string[]): Promise<CommandResult> {
+  const spec = (await import('./command-specs/tasks.spec.ts')).default;
+  const parsed = parseArgsForCommand(spec, ['new', ...argv]);
+  
+  const options = parsed.options as any;
+  const cwd = (options.cwd as string) || process.cwd();
+  
+  const template = (options.template as string) || 'aao-l2-split';
+  const taskId = (options.taskId as string) || (options.task as string) || 'TASK-UNKNOWN-0000';
+  const title = (options.title as string) || 'New Task';
+  
+  const outPath = options.output as string;
+  if (!outPath) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks new requires --output <path>', { exitCode: 2 });
+  }
+
+  const intent = {
+    cwd,
+    templateKey: template,
+    fields: {
+      task_id: taskId,
+      title,
+      depends_on: (options.dependsOn as string) || 'TASK-AAO-0000',
+      scope_path: (options.scopePath as string) || 'src/main.ts',
+      test_path: (options.testPath as string) || 'tests/main.test.ts',
+      atom_id: (options.atomId as string) || 'atm.unowned',
+      capability: (options.capability as string) || 'Implementation details',
+      goal: (options.goal as string) || 'Goal description placeholder',
+      sourcePath: outPath
+    }
+  };
+
+  const plugins = await readPluginRegistry(cwd);
+  const generatorPlugin = plugins.find(p => p.mode !== 'disabled' && typeof p.plugin.generate === 'function');
+
+  let resultCard;
+  if (generatorPlugin) {
+    resultCard = await generatorPlugin.plugin.generate!(intent);
+  } else {
+    const defaultPlugin = (await import('../../../atm-markdown-task-source/src/index.ts')).default;
+    resultCard = await defaultPlugin.generate(intent);
+  }
+
+  const targetAbsolute = path.resolve(cwd, outPath);
+  const targetDir = path.dirname(targetAbsolute);
+  mkdirSync(targetDir, { recursive: true });
+  writeFileSync(targetAbsolute, resultCard.content, 'utf8');
+
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd,
+    messages: [message('info', 'ATM_TASKS_NEW_GENERATED', `Generated new task card template at ${outPath}`)],
+    evidence: {
+      ok: true,
+      sourcePath: outPath,
+      taskId: resultCard.taskId,
+      templateUsed: template
+    }
+  });
+}
+
