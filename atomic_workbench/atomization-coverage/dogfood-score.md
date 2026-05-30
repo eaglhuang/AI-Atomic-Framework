@@ -2,7 +2,7 @@
 
 - Overall score: **95 / 100** (Grade A)
 - Stage: `dogfood-excellent`
-- Trend: improving
+- Trend: stable
 - Schema: `atm.dogfoodScore.v1`
 
 ## Component scores
