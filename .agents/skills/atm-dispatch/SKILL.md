@@ -130,14 +130,20 @@ allowedFiles 嚴格白名單：
    - 3KLife-only 設計 → 單代理
    - AAF-only 切片 → 雙代理（仍走 target_repo 開卡慣例）
 
-2. **前置偵察**（一律派 haiku sidecar 不自己讀大檔）
+2. **Task ID 衝突檢查**（**必做** — 0097 雙開教訓）
+   - 派 haiku sidecar 跑：`git log --grep="TASK-AAO-XXXX"` 在兩 repo + 看 `docs/tasks/tasks-aao.json` 既有 entry
+   - 若 task_id 已在 ledger 出現（任何 status）→ **必須**用新號或顯式 cleanup 既有 → 不可重派同號
+   - 若 user 在另一 window 平行派工可能撞號 → 主動 askUser 確認最新使用狀況
+
+3. **前置偵察**（一律派 haiku sidecar 不自己讀大檔）
    - 找參考卡（cite TASK-AAO-XXXX 切片風格）
    - 取得檔案路徑 + 行號 + 受影響範圍
    - 確認新增模組是否需新 atom_id
 
-3. **草擬派工單**含全部段：必讀 / Phase 0 / Phase 1 / Context Map / 禁止清單 / Validators / scope drift 應對 / 7-8 段回報
+4. **草擬派工單**含全部段：必讀 / Phase 0 / Phase 1 / Context Map / 禁止清單 / Validators / scope drift 應對 / 7-8 段回報
+   - **Phase 0 段必加**：「開卡前查 task_id 是否已存在 ledger；若已存在停手回報 Captain」
 
-4. **輸出可轉貼 code block**
+5. **輸出可轉貼 code block**
 
 ---
 
