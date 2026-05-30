@@ -1,14 +1,14 @@
 {
   "schemaId": "atm.dogfoodScore.v1",
   "version": "1.2",
-  "overall_atomization_score": 92,
+  "overall_atomization_score": 95,
   "grade": "A",
   "stage": "dogfood-excellent",
   "scores": {
     "source_ownership_coverage": 82,
     "public_command_coverage": 100,
     "atom_with_test_evidence": 100,
-    "atom_with_rollback_evidence": 43,
+    "atom_with_rollback_evidence": 100,
     "excluded_paths_with_reason": 100,
     "runAtm_with_readable_ref": 100
   },
@@ -16,7 +16,7 @@
     "source_ownership_coverage": 82,
     "public_command_coverage": 100,
     "runtime_behavior_coverage": 100,
-    "evidence_coverage": 86,
+    "evidence_coverage": 100,
     "readable_callsite_coverage": 100,
     "integration_health": 100
   },
@@ -28,16 +28,10 @@
     "readable_callsite_coverage": 0.1,
     "integration_health": 0.1
   },
-  "trend": "stable",
+  "trend": "improving",
   "next_target": 100,
-  "next_high_roi_area": "atom_with_rollback_evidence",
+  "next_high_roi_area": "source_ownership_coverage",
   "priority_gaps": [
-    {
-      "area": "atom_with_rollback_evidence",
-      "current": "43%",
-      "target": "70%",
-      "task": "TASK-ASA-0010"
-    },
     {
       "area": "source_ownership_coverage",
       "current": "82%",
@@ -62,10 +56,10 @@
     "evidence": {
       "atomTotal": 7,
       "withTest": 7,
-      "withRollback": 3,
+      "withRollback": 7,
       "withProvenance": 7,
       "withReport": 7,
-      "coverage": 86
+      "coverage": 100
     },
     "command": {
       "total": 52,

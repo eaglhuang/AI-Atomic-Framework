@@ -1,8 +1,8 @@
 # ATM Self-Atomization Dogfood Score
 
-- Overall score: **92 / 100** (Grade A)
+- Overall score: **95 / 100** (Grade A)
 - Stage: `dogfood-excellent`
-- Trend: stable
+- Trend: improving
 - Schema: `atm.dogfoodScore.v1`
 
 ## Component scores
@@ -12,7 +12,7 @@
 | source_ownership_coverage | 82 | 95 | 80 | ⚠️ at-risk |
 | public_command_coverage | 100 | 95 | 80 | ✅ pass |
 | atom_with_test_evidence | 100 | 80 | 60 | ✅ pass |
-| atom_with_rollback_evidence | 43 | 70 | 50 | ❌ fail |
+| atom_with_rollback_evidence | 100 | 70 | 50 | ✅ pass |
 | excluded_paths_with_reason | 100 | 95 | 90 | ✅ pass |
 | runAtm_with_readable_ref | 100 | 100 | 95 | ✅ pass |
 
@@ -25,12 +25,11 @@
 
 ## Priority gaps
 
-- atom_with_rollback_evidence: 43% → 70% (driven by TASK-ASA-0010)
 - source_ownership_coverage: 82% → 95% (driven by TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009)
 
 ## Next high-ROI area
 
-- atom_with_rollback_evidence
+- source_ownership_coverage
 
 ## Notes
 
