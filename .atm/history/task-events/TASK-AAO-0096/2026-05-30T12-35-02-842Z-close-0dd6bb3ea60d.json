@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-30T12-35-02-842Z-close-0dd6bb3ea60d",
+  "taskId": "TASK-AAO-0096",
+  "action": "close",
+  "actorId": "Antigravity",
+  "sessionId": "session-20260530123230-Antigravity-TASK-AAO-0096-a885b96187",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0096.json",
+  "taskSha256": "sha256:1b5ebd37cec15e21617db7cc556187002c435d6eb7444308d14de5b167f6d1f8",
+  "createdAt": "2026-05-30T12:35:02.842Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0096 --actor Antigravity --status done --historical-delivery dd294ec",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260530123230-Antigravity-TASK-AAO-0096-a885b96187",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0096.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node atm.mjs hook pre-commit --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-30T12:35:02.839Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0096-legacy-route-plan-tasks-ts.task.md",
+        ".atm/history/guidance/TASK-AAO-0096-legacy-route-plan.json",
+        "docs/TASK-AAO-0096-cross-check.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
