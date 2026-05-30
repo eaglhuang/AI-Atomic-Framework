@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-30T05-06-53-870Z-close-6c080213f1db",
+  "taskId": "TASK-AAO-0086",
+  "action": "close",
+  "actorId": "Antigravity",
+  "sessionId": "session-20260530045821-Antigravity-TASK-AAO-0086-e78991df2b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0086.json",
+  "taskSha256": "sha256:644815e461d63042d2034b2f58e3f2c7428012e984c4da6f05e19db4a82d4443",
+  "createdAt": "2026-05-30T05:06:53.870Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0086 --actor Antigravity --status done --historical-delivery 09ce0f622142eaa3138ed69bc12663ebf7f2c602",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260530045821-Antigravity-TASK-AAO-0086-e78991df2b",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0086.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test -- tests/cli/tasks-new.test.ts",
+      "test -- tests/plugin-sdk/atm-markdown-task-source-hooks.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-30T05:06:53.867Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0086-plugin-hooks-tasks-new-cli.task.md",
+        "packages/atm-markdown-task-source/src/index.ts",
+        "packages/atm-markdown-task-source/src/templates.ts",
+        "packages/atm-markdown-task-source/templates/aao-l2-split-template.md",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "tests/cli/tasks-new.test.ts",
+        "tests/plugin-sdk/atm-markdown-task-source-hooks.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/atm-markdown-task-source/src/index.ts",
+        "packages/atm-markdown-task-source/src/templates.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "tests/cli/tasks-new.test.ts",
+        "tests/plugin-sdk/atm-markdown-task-source-hooks.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

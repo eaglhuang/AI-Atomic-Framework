@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0085",
-  "updatedAt": "2026-05-30T04:53:55.222Z",
+  "updatedAt": "2026-05-30T04:54:48.439Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -332,6 +332,48 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:f7f74541baf59e31d466419fa3c648d2a67da67dc80576ddc45f47e174058293",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run test -- tests/cli/work-item-context-map.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Antigravity",
+      "sessionId": "session-20260530044814-Antigravity-TASK-AAO-0085-f4bd41d8bb",
+      "createdAt": "2026-05-30T04:54:48.439Z",
+      "details": {
+        "actorId": "Antigravity",
+        "sessionId": "session-20260530044814-Antigravity-TASK-AAO-0085-f4bd41d8bb",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "test -- tests/cli/work-item-context-map.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run test -- tests/cli/work-item-context-map.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e217fc1f0ef7d16e3701113d006ff2ffeedfc69448fff0ef3bb6d4c3e00a761e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "test -- tests/cli/work-item-context-map.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:482dab271d5f4c75d96a03448582787bde2da00e0a06124a9cb251e4a530f6af",
+            "cached": false,
+            "generatedAt": "2026-05-30T04:54:48.485Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8dee10394ecb75135d47dc470152d93a2bebe0285c8ad68fb804046d0b63733b",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0084",
-  "updatedAt": "2026-05-30T04:44:35.100Z",
+  "updatedAt": "2026-05-30T04:45:05.651Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -332,6 +332,48 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:0dcb93203bfab66cbbcf1176f05903eadc7bc5e84835193c166b4e54eb0bf733",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run test -- tests/plugin-sdk/atm-markdown-task-source.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Antigravity",
+      "sessionId": "session-20260530044032-Antigravity-TASK-AAO-0084-87456d7aa7",
+      "createdAt": "2026-05-30T04:45:05.651Z",
+      "details": {
+        "actorId": "Antigravity",
+        "sessionId": "session-20260530044032-Antigravity-TASK-AAO-0084-87456d7aa7",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "test -- tests/plugin-sdk/atm-markdown-task-source.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run test -- tests/plugin-sdk/atm-markdown-task-source.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5fd62a270ddfdd0454a8e10a68d9809d16ee50073ed803b0db1bc426465f06b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "test -- tests/plugin-sdk/atm-markdown-task-source.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4ae579a1c1d4c36cdd64a750cd6a983887f321549ebc4485c17a40f368b38cdb",
+            "cached": false,
+            "generatedAt": "2026-05-30T04:45:05.734Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:59bc6e10f16463334d61f44f1311034f84cc3cbf2d2b79ab60ad7c0f6a61bb9a",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
