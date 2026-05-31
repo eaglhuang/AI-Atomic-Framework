@@ -44,6 +44,22 @@ import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/n
 import { normalizeTaskDocumentId as delegatedNormalizeTaskDocumentId } from './tasks/normalize-task-document-id-helper.ts';
 import { sha256 as delegatedSha256 } from './tasks/sha256-helper.ts';
 import {
+  assertLocalTaskLedgerEnabled as delegatedAssertLocalTaskLedgerEnabled,
+  buildTaskTransitionCommand as delegatedBuildTaskTransitionCommand,
+  createClosureTransitionMetadata as delegatedCreateClosureTransitionMetadata,
+  normalizeWorkItemStatus as delegatedNormalizeWorkItemStatus,
+  inspectTaskVerifyStatus as delegatedInspectTaskVerifyStatus
+} from './tasks/task-transition-helpers.ts';
+import {
+  readGitScalar as delegatedReadGitScalar,
+  listCommittedFilesSinceClaim as delegatedListCommittedFilesSinceClaim
+} from './tasks/task-git-helpers.ts';
+import {
+  collectKeyValue as delegatedCollectKeyValue,
+  collectKeyValueFromLines as delegatedCollectKeyValueFromLines,
+  createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata
+} from './tasks/task-markdown-helpers.ts';
+import {
   safeTaskFileReadDir,
   safeTaskFileStat,
   readJsonRecord,
@@ -2933,24 +2949,11 @@ function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord 
 }
 
 function listCommittedFilesSinceClaim(cwd: string, claim: TaskClaimRecord | null): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
-  if (!claim?.claimedAt) return { files: [], gitAvailable: false };
-  const baseline = readGitScalar(cwd, ['rev-list', '-1', `--before=${claim.claimedAt}`, 'HEAD']);
-  if (baseline === null) return { files: [], gitAvailable: false };
-  const files = baseline
-    ? readGitNameOnly(cwd, ['diff', '--name-only', `${baseline}..HEAD`])
-    : readGitNameOnly(cwd, ['diff-tree', '--no-commit-id', '--name-only', '-r', '--root', 'HEAD']);
-  return {
-    files,
-    gitAvailable: true
-  };
+  return delegatedListCommittedFilesSinceClaim(cwd, claim);
 }
 
 function readGitScalar(cwd: string, args: readonly string[]): string | null {
-  try {
-    return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-  } catch {
-    return null;
-  }
+  return delegatedReadGitScalar(cwd, args);
 }
 
 function readGitNameOnly(cwd: string, args: readonly string[]): readonly string[] {
@@ -3234,17 +3237,7 @@ function sha256(value: string): string {
 }
 
 function assertLocalTaskLedgerEnabled(cwd: string, action: string) {
-  const taskLedger = readTaskLedgerPolicy(cwd);
-  if (!taskLedger.enabled) {
-    throw new CliError('ATM_TASK_LEDGER_DISABLED', `tasks ${action} cannot write local task files because taskLedger.enabled is false.`, {
-      exitCode: 1,
-      details: {
-        action,
-        provider: taskLedger.provider,
-        taskRoot: taskLedger.taskRoot
-      }
-    });
-  }
+  return delegatedAssertLocalTaskLedgerEnabled(cwd, action);
 }
 
 function buildTaskTransitionCommand(input: {
@@ -3256,26 +3249,7 @@ function buildTaskTransitionCommand(input: {
   readonly batchId?: string | null;
   readonly historicalDeliveryRefs?: readonly string[];
 }): string {
-  const parts = ['node', 'atm.mjs', 'tasks', input.action];
-  if (input.taskId) {
-    parts.push('--task', quoteCommandValue(input.taskId));
-  }
-  if (input.actorId) {
-    parts.push('--actor', quoteCommandValue(input.actorId));
-  }
-  if (input.status) {
-    parts.push('--status', quoteCommandValue(input.status));
-  }
-  if (input.fromBatchCheckpoint) {
-    parts.push('--from-batch-checkpoint');
-  }
-  if (input.batchId) {
-    parts.push('--batch', quoteCommandValue(input.batchId));
-  }
-  for (const ref of input.historicalDeliveryRefs ?? []) {
-    parts.push('--historical-delivery', quoteCommandValue(ref));
-  }
-  return parts.join(' ');
+  return delegatedBuildTaskTransitionCommand(input);
 }
 
 function quoteCommandValue(value: string): string {
@@ -3373,53 +3347,11 @@ function createClosureTransitionMetadata(
   batchId: string | null = null,
   sessionId: string | null = null
 ): TaskTransitionClosureMetadata | null {
-  if (!closurePacket && !closurePacketPath && !batchId && !sessionId) {
-    return null;
-  }
-  return {
-    schemaId: 'atm.taskClosureTransition.v1',
-    batchId,
-    sessionId,
-    closurePacketPath,
-    evidenceFreshness: closurePacket?.evidenceFreshness ?? null,
-    validationPasses: closurePacket?.validationPasses ?? [],
-    requiredGates: closurePacket?.requiredGates ?? [],
-    requiredGatesSnapshot: closurePacket?.requiredGatesSnapshot
-      ? {
-        schemaId: closurePacket.requiredGatesSnapshot.schemaId,
-        generatedAt: closurePacket.requiredGatesSnapshot.generatedAt,
-        source: closurePacket.requiredGatesSnapshot.source,
-        ruleVersion: closurePacket.requiredGatesSnapshot.ruleVersion,
-        frameworkMode: closurePacket.requiredGatesSnapshot.frameworkMode,
-        repoRole: closurePacket.requiredGatesSnapshot.repoRole,
-        changedFiles: [...closurePacket.requiredGatesSnapshot.changedFiles],
-        criticalChangedFiles: [...closurePacket.requiredGatesSnapshot.criticalChangedFiles],
-        requiredGates: [...closurePacket.requiredGatesSnapshot.requiredGates]
-      }
-      : null
-  };
+  return delegatedCreateClosureTransitionMetadata(closurePacketPath, closurePacket, batchId, sessionId);
 }
 
 function normalizeWorkItemStatus(value: unknown): WorkItemRef['status'] {
-  const normalized = String(value ?? '').trim().toLowerCase();
-  if (
-    normalized === 'planned'
-    || normalized === 'reserved'
-    || normalized === 'ready'
-    || normalized === 'locked'
-    || normalized === 'running'
-    || normalized === 'review'
-    || normalized === 'verified'
-    || normalized === 'done'
-    || normalized === 'blocked'
-    || normalized === 'abandoned'
-  ) {
-    return normalized as WorkItemRef['status'];
-  }
-  if (normalized === 'open' || normalized === 'in_progress') {
-    return 'ready';
-  }
-  return 'planned';
+  return delegatedNormalizeWorkItemStatus(value);
 }
 
 function inspectTaskVerifyStatus(value: unknown): {
@@ -3427,26 +3359,7 @@ function inspectTaskVerifyStatus(value: unknown): {
   readonly normalizedStatus: string | null;
   readonly warningCode: string | null;
 } {
-  const normalized = normalizeTaskStatus(value);
-  if (validStatuses.has(normalized as TaskImportStatus)) {
-    return {
-      ok: true,
-      normalizedStatus: normalized,
-      warningCode: null
-    };
-  }
-  if (normalized === 'closed' || normalized === 'completed') {
-    return {
-      ok: true,
-      normalizedStatus: 'done',
-      warningCode: 'ATM_TASKS_VERIFY_LEGACY_STATUS_ALIAS'
-    };
-  }
-  return {
-    ok: false,
-    normalizedStatus: null,
-    warningCode: null
-  };
+  return delegatedInspectTaskVerifyStatus(value);
 }
 
 function inspectTaskSourceTrace(
@@ -4141,26 +4054,9 @@ function createTaskFromTableMetadata(input: {
   readonly planRelativePath: string;
   readonly importedAt: string;
 }): TaskImportRecord {
-  return {
-    schemaVersion: 'atm.workItem.v0.2',
-    workItemId: input.metadata.workItemId,
-    title: input.metadata.title,
-    status: input.metadata.status,
-    milestone: input.metadata.milestone,
-    dependencies: input.metadata.dependencies,
-    acceptance: [],
-    deliverables: input.metadata.deliverables,
-    tags: [],
-    notes: null,
-    source: {
-      planPath: input.planRelativePath,
-      sectionTitle: input.metadata.title,
-      headingLine: input.metadata.headingLine,
-      hash: hashSection(input.metadata.rowText)
-    },
-    importedAt: input.importedAt
-  };
+  return delegatedCreateTaskFromTableMetadata({ ...input, hashSection }) as TaskImportRecord;
 }
+
 
 function writeTaskFiles(input: {
   readonly cwd: string;
@@ -4351,27 +4247,11 @@ function collectText(sections: readonly HeadingSection[], headingNames: readonly
 }
 
 function collectKeyValue(sections: readonly HeadingSection[], key: string): string | null {
-  const keyLower = key.toLowerCase();
-  for (const section of sections) {
-    for (const line of section.lines) {
-      const match = /^\s*[-*]?\s*([A-Za-z][A-Za-z0-9 _-]*?)\s*:\s*(.+?)\s*$/.exec(line);
-      if (match && match[1].toLowerCase() === keyLower) {
-        return match[2];
-      }
-    }
-  }
-  return null;
+  return delegatedCollectKeyValue(sections, key);
 }
 
 function collectKeyValueFromLines(lines: readonly string[], key: string): string | null {
-  const keyLower = key.toLowerCase();
-  for (const line of lines) {
-    const match = /^\s*[-*]?\s*([A-Za-z][A-Za-z0-9 _-]*?)\s*:\s*(.+?)\s*$/.exec(line);
-    if (match && match[1].toLowerCase() === keyLower) {
-      return match[2].trim();
-    }
-  }
-  return null;
+  return delegatedCollectKeyValueFromLines(lines, key);
 }
 
 function extractTaskReference(value: string): string | null {

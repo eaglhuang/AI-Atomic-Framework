@@ -693,13 +693,83 @@
       "atom_id": "atm.sha256-helper-map",
       "capability": "Pure sha256 hashing helper wrapper adding protocol prefixes for cryptographic integrity proofing",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#assertLocalTaskLedgerEnabled",
+      "atom_id": "atm.assert-local-task-ledger-enabled",
+      "capability": "Asserts local task ledger policy is enabled before any write operation, throwing CliError with context on failure",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#buildTaskTransitionCommand",
+      "atom_id": "atm.build-task-transition-command",
+      "capability": "Builds standard 'node atm.mjs tasks <action>' command strings with flag quoting for all transition actions",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#createClosureTransitionMetadata",
+      "atom_id": "atm.create-closure-transition-metadata",
+      "capability": "Packs closure packet, batchId, sessionId into TaskTransitionClosureMetadata; returns null when all inputs are absent",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#normalizeWorkItemStatus",
+      "atom_id": "atm.normalize-work-item-status",
+      "capability": "Normalizes free-form status strings to WorkItemRef status union, aliasing 'open'/'in_progress' to 'ready' and unknown values to 'planned'",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#inspectTaskVerifyStatus",
+      "atom_id": "atm.inspect-task-verify-status",
+      "capability": "Inspects and normalizes task status with legacy alias detection (closed/completed -> done) and structured ok/warningCode output",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-git-helpers.ts#readGitScalar",
+      "atom_id": "atm.read-git-scalar",
+      "capability": "Executes a git command and returns its trimmed scalar output, returning null on any git error or missing repo",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-git-helpers.ts#listCommittedFilesSinceClaim",
+      "atom_id": "atm.list-committed-files-since-claim",
+      "capability": "Lists files committed to git since a task claim timestamp, using rev-list baseline with graceful fallback for non-git environments",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-markdown-helpers.ts#collectKeyValue",
+      "atom_id": "atm.collect-key-value",
+      "capability": "Extracts a single key-value pair from structured markdown heading sections using regex matching with optional bullet prefix support",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-markdown-helpers.ts#collectKeyValueFromLines",
+      "atom_id": "atm.collect-key-value-from-lines",
+      "capability": "Extracts a single key-value pair from raw string line arrays using regex matching with optional bullet prefix support",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-markdown-helpers.ts#createTaskFromTableMetadata",
+      "atom_id": "atm.create-task-from-table-metadata",
+      "capability": "Packs TaskTableMetadata, planRelativePath, and importedAt into a schema-versioned TaskImportRecord-compatible shape with hash-based source identity",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0100"
     }
   ],
   "summary": {
-    "total_production_paths": 57,
-    "mapped_paths": 57,
+    "total_production_paths": 67,
+    "mapped_paths": 67,
     "coverage_percentage": 100,
-    "atoms_defined": 50,
+    "atoms_defined": 60,
     "atoms_with_evidence": 0,
     "debt_items": 30,
     "core_wave1_completed": true
