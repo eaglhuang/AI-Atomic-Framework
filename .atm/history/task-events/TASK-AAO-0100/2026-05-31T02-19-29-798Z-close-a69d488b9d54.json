@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-05-31T02-19-29-798Z-close-a69d488b9d54",
+  "taskId": "TASK-AAO-0100",
+  "action": "close",
+  "actorId": "antigravity-claude-4",
+  "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0100.json",
+  "taskSha256": "sha256:dcf31266d727b0b5f397790627e1b475edc519989a41888f10b6bf46cf411850",
+  "createdAt": "2026-05-31T02:19:29.798Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0100 --actor antigravity-claude-4 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0100.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "10 個 leaf 單元測試全綠",
+      "atm test --map <mapId> 通過",
+      "batch rollback patch exit 0",
+      "node --strip-types tests/unit/*.unit.test.ts",
+      "node atm.mjs atomize score → ≥95/A",
+      "node atm.mjs hook pre-commit --json → ok:true",
+      "npm run build",
+      "npm run typecheck",
+      "npm run validate:cli",
+      "tasks.ts 必須淨縮減（非淨增）— 否則 scope drift",
+      "tasks.ts LOC decrease",
+      "typecheck",
+      "typecheck → exit 0",
+      "validate:cli",
+      "validate:cli → exit 0",
+      "validate:git-head-evidence",
+      "validate:git-head-evidence → exit 0"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-05-31T02:19:29.795Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0100-batch10-loc-ranked-with-map.task.md",
+        ".atm/history/reports/",
+        ".atm/history/reports/candidates/",
+        "1 batch envelope + 1 batch rollback patch",
+        "10 個 helper modules（或 1-3 個 cluster modules，依語意分組）",
+        "10 個 leaf 函數抽取（按 LOC 降序、排除已抽 4 個）",
+        "10 個 unit test files",
+        "10 per-leaf evidence triad（共 50 份）",
+        "atm create-map --from-plan 形成 atm.<cluster>-helpers-map",
+        "atm test --map <mapId> 驗證 map",
+        "atomic_workbench/atomization-coverage/",
+        "atomic_workbench/maps/",
+        "candidates rank 4 報告",
+        "decomposition-plan.json（含 10 atom members + edges + entrypoints）",
+        "packages/cli/src/commands/<top-ranked source>",
+        "ROI metric report（tasks.ts 縮減行數 vs helper LOC）"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/<top-ranked source>"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

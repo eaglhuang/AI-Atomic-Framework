@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0100",
+  "title": "Batch-10 LOC-ranked leaf extraction + atom map formation",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0099"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "candidates rank 4 報告",
+    "10 個 leaf 函數抽取（按 LOC 降序、排除已抽 4 個）",
+    "10 個 helper modules（或 1-3 個 cluster modules，依語意分組）",
+    "10 個 unit test files",
+    "decomposition-plan.json（含 10 atom members + edges + entrypoints）",
+    "atm create-map --from-plan 形成 atm.<cluster>-helpers-map",
+    "atm test --map <mapId> 驗證 map",
+    "10 per-leaf evidence triad（共 50 份）",
+    "1 batch envelope + 1 batch rollback patch",
+    "ROI metric report（tasks.ts 縮減行數 vs helper LOC）"
+  ],
+  "scopePaths": [
+    ".atm/history/reports/candidates/",
+    ".atm/history/reports/",
+    "packages/cli/src/commands/<top-ranked source>",
+    "atomic_workbench/maps/",
+    "atomic_workbench/atomization-coverage/"
+  ],
+  "validators": [
+    "node atm.mjs hook pre-commit --json → ok:true",
+    "node atm.mjs atomize score → ≥95/A",
+    "npm run typecheck → exit 0",
+    "npm run validate:cli → exit 0",
+    "npm run validate:git-head-evidence → exit 0",
+    "10 個 leaf 單元測試全綠",
+    "batch rollback patch exit 0",
+    "atm test --map <mapId> 通過",
+    "tasks.ts 必須淨縮減（非淨增）— 否則 scope drift"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "抽小 leaf（<30 行）— 本卡優先大行數",
+    "形成跨檔 map（限本卡 source 檔內 cluster）",
+    "v2-r2 full lane transitions（map 形成即停、不走 shadow/canary/active）",
+    "重構非選中 leaf 函數"
+  ],
+  "nonGoals": [
+    "dogfood 升 96+",
+    "刪除 tasks.ts 或大規模重排",
+    "走完 4-stage replacement lane"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "- 2026-05-31 | 狀態: in-progress | 驗證: pending | 變更: 開卡完成 (Phase 0) | 阻塞: 無",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0100-batch10-loc-ranked-with-map.task.md",
+    "sectionTitle": "TASK-AAO-0100",
+    "headingLine": 53,
+    "hash": "2e6aec07acd7bade"
+  },
+  "importedAt": "2026-05-31T02:16:03.071Z",
+  "lastTransitionId": "2026-05-31T02-19-29-798Z-close-a69d488b9d54",
+  "lastTransitionAt": "2026-05-31T02:19:29.798Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "antigravity-claude-4",
+  "reservedAt": "2026-05-31T02:17:04.527Z",
+  "promotedAt": "2026-05-31T02:17:06.941Z",
+  "claim": {
+    "actorId": "antigravity-claude-4",
+    "leaseId": "lease-349b63349702",
+    "claimedAt": "2026-05-31T02:17:22.762Z",
+    "heartbeatAt": "2026-05-31T02:19:29.798Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0100.json",
+      ".atm/history/reports/",
+      ".atm/history/reports/candidates/",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage",
+      "atomic_workbench/atomization-coverage/",
+      "atomic_workbench/maps",
+      "atomic_workbench/maps/",
+      "package.json",
+      "packages/cli/src/commands",
+      "packages/cli/src/commands/<top-ranked source>",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-head-evidence.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-05-31T02:17:22.762Z",
+  "startedByActor": "antigravity-claude-4",
+  "startedBySessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0100",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0100.*",
+      ".atm/history/reports/",
+      ".atm/history/reports/candidates/",
+      ".atm/history/task-events/TASK-AAO-0100/**",
+      ".atm/history/tasks/TASK-AAO-0100.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage",
+      "atomic_workbench/atomization-coverage/",
+      "atomic_workbench/maps",
+      "atomic_workbench/maps/",
+      "package.json",
+      "packages/cli/src/commands",
+      "packages/cli/src/commands/<top-ranked source>",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-head-evidence.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1cf433fe40d5d6dbe249b3570e19e1ffe70dbe3e1ca5775b19f643a92712a100",
+    "actorId": "antigravity-claude-4",
+    "createdAt": "2026-05-31T02:17:22.772Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0100.closure-packet.json",
+  "closedAt": "2026-05-31T02:19:29.798Z",
+  "closedByActor": "antigravity-claude-4",
+  "closedBySessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5"
+}

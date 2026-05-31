@@ -1,0 +1,497 @@
+{
+  "taskId": "TASK-AAO-0100",
+  "updatedAt": "2026-05-31T02:19:25.374Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "All 9 unit test files (covering 10 leaf functions in 3 themed clusters) passed: 85 assertions total. buildTaskTransitionCommand 8+, createClosureTransitionMetadata 9, normalizeWorkItemStatus 10, inspectTaskVerifyStatus 9, assertLocalTaskLedgerEnabled 8, readGitScalar 8, listCommittedFilesSinceClaim 8, collectKeyValue+collectKeyValueFromLines 12, createTaskFromTableMetadata 13.",
+      "artifactPaths": [
+        "tests/unit/build-task-transition-command-helper.unit.test.ts",
+        "tests/unit/create-closure-transition-metadata-helper.unit.test.ts",
+        "tests/unit/normalize-work-item-status-helper.unit.test.ts",
+        "tests/unit/inspect-task-verify-status-helper.unit.test.ts",
+        "tests/unit/assert-local-task-ledger-enabled-helper.unit.test.ts",
+        "tests/unit/read-git-scalar-helper.unit.test.ts",
+        "tests/unit/list-committed-files-since-claim-helper.unit.test.ts",
+        "tests/unit/collect-key-value-helper.unit.test.ts",
+        "tests/unit/create-task-from-table-metadata-helper.unit.test.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": null,
+      "createdAt": "2026-05-31T02:08:50.305Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/unit/*.unit.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types <each-test-file>",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b6f3dd5ec36a9b0584dd4ad03abd4eec7040f157be7a989903341f1a006bde18",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/unit/*.unit.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:cc4064de792cec9093942a6ca3fed37302aba9d71b3f8d5533184946df055bc7",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:08:50.341Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:619063cf1c3df6118cc7ecaffc8981fb812a10e8c64f1e57e507b09c1fc828ae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "npm run typecheck passed (exit 0). npm run validate:cli passed: 38 commands, standalone fixture verified. npm run build passed: 26 packages built.",
+      "artifactPaths": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+        "packages/cli/src/commands/tasks/task-git-helpers.ts",
+        "packages/cli/src/commands/tasks/task-markdown-helpers.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": null,
+      "createdAt": "2026-05-31T02:08:57.078Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "npm run build",
+          "npm run typecheck",
+          "npm run validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "npm run typecheck",
+              "npm run validate:cli",
+              "npm run build"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:e8dddbd032cdd5ef8a2ce4a7cda82376c5150617c26efbbc23cd03ede2a4a580",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:08:57.141Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8af8945dedc077a5f0e82ecb31589b9ad0ae98f92a3f754e7647a63baceccc02",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "other",
+      "summary": "ROI positive: tasks.ts reduced from 4652 lines (baseline) to 4532 lines = NET -120 LOC. Helper modules created: task-transition-helpers.ts (160 LOC, 5 functions), task-git-helpers.ts (42 LOC, 2 functions), task-markdown-helpers.ts (115 LOC, 3 functions). Total 317 LOC added in helpers, 237 LOC removed from tasks.ts body. Net extraction: 10 atoms registered in path-to-atom-map.json.",
+      "artifactPaths": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": null,
+      "createdAt": "2026-05-31T02:09:05.668Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": null,
+        "kind": "other",
+        "freshness": "fresh",
+        "validationPasses": [
+          "tasks.ts LOC decrease"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --stat",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "tasks.ts LOC decrease"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:dec8ce5d64695b2ad3df6be3b5a91562a5acaa55bc47de6790d1c0c2a6b3ea6b",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:09:05.709Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:af5096cc3ea396431701758d42a4226d001b8b080e17ddf990fbd71a274b9a87",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:17:40.170Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck",
+          "typecheck → exit 0"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck",
+              "typecheck → exit 0"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:17:40.209Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:187b7ed6f545d81ec2fe56a333e903ab829fa52bbe3c2dfe10cb62be425daf20",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:17:58.153Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli",
+          "validate:cli → exit 0"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli",
+              "validate:cli → exit 0"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:073699fa4a5013b0607b6e8ef297c341896969ef44d4d9666fddf123fc76fcb0",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:17:58.192Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:80376f206612315325abb022da29d9ac902216be83cf0934a65720af3e0adb9a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:18:13.273Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence",
+          "validate:git-head-evidence → exit 0"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:229613de9e946377e796a0216d5e9f2ae902bceb212c78adc4950ce3792755e8",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence",
+              "validate:git-head-evidence → exit 0"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:41bb3548a43b55caff2e5c5ace744f3a7592ab769b71169daccfca27ed34d9fb",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:18:13.312Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3b2dd37d1346d7fa88b6ecb7562e5a9ba74c7b3009992c9ed20f3f9e46542b3e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node scratch/run-leaf-tests.cjs",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:19:12.360Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "10 個 leaf 單元測試全綠"
+        ],
+        "commandRuns": [
+          {
+            "command": "node scratch/run-leaf-tests.cjs",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:920c11c6627c8ec83491e82a9a6f2cadd1e8280957679ede0651b18db1e55cd5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "10 個 leaf 單元測試全綠"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:69f4875f9f173733ed5c9f093d0fe903f94c99520daea020a63303105ff32197",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:19:12.394Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1c4062fd9f184f042a17a56bd75f35bbba87745f052f5b215f68c322ce042976",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs atomize score",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:19:15.649Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs atomize score → ≥95/A"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs atomize score",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7274f9968247a1f3c62034707c94ebaa6f05de01bcbb8a668750d2a53c8a9f9b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs atomize score → ≥95/A"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:9b374b41efdf274c8f8c89e7829f44fd209d317481a629d5cac1b4f5c1c9f9cc",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:19:15.684Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:879fbb7cbf9868e306579a1aece55423e1c641d6c17a88f61464fa414486a859",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs hook pre-commit --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:19:19.239Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs hook pre-commit --json → ok:true"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs hook pre-commit --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f3d5983c7fa6b2dc5d55d687ea3dd56ed3398a1030d020a8d889f16f77ed8d0d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs hook pre-commit --json → ok:true"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:38822f2af6b8dc9699b8bc99d0b7aaba52f155c0e0cde82affb7bdf97e35acc8",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:19:19.274Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:87f6697dea660a1d122ad801caf5e7a051aa686eb0274530915862b0320d397f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff HEAD~1 --stat packages/cli/src/commands/tasks.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:19:22.105Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "tasks.ts 必須淨縮減（非淨增）— 否則 scope drift"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff HEAD~1 --stat packages/cli/src/commands/tasks.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2aeef9890a0634c51467c8d8ca1faead80b10848980e0c51824d73f4c0227ce6",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "tasks.ts 必須淨縮減（非淨增）— 否則 scope drift"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:cc9551827b46bda6c7c88a63c53409c36c1580201ee10e5c2a6178acc41fd056",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:19:22.142Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:51365464c38b0d927f66bb70ddd8b84cb906603a52823e145e41373fc9d8c681",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs tasks verify",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "antigravity-claude-4",
+      "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+      "createdAt": "2026-05-31T02:19:25.374Z",
+      "details": {
+        "actorId": "antigravity-claude-4",
+        "sessionId": "session-20260531021722-antigravity-claude-4-TASK-AAO-0100-43afef5ea5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "atm test --map <mapId> 通過",
+          "batch rollback patch exit 0"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs tasks verify",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6f44b5d0eb184899b627dd6677956fb6f16973dfa136e8c370331877753d80d7",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "atm test --map <mapId> 通過",
+              "batch rollback patch exit 0"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:fcf006e7b96e00ee196587898f67e7619ab6b1dbb4cf53592bdecd01da816f8f",
+            "cached": false,
+            "generatedAt": "2026-05-31T02:19:25.408Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4b710f01c8ad1d729a4274fc14d437ca6a454865a58b7883cdf120d763b04bdf",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
