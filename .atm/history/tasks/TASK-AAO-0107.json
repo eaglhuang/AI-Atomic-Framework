@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0107",
+  "title": "Dependency security CI triage",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0103"
+  ],
+  "acceptance": [
+    "`npm ci` passes on a clean checkout.",
+    "`node --experimental-strip-types scripts/adopter-sentinel.ts --mode validate` passes after install.",
+    "The Node.js 20 Actions deprecation warning is documented as non-root-cause unless a workflow update is actually needed.",
+    "PR #5, #7, #9, #12, and #14 each have a written outcome.",
+    "No feature source changes are included unless they are the minimal compatibility fix required by a dependency update.",
+    "`package-lock.json` changes are intentional and explained, not silently absorbed from an unrelated task."
+  ],
+  "deliverables": [
+    "Lockfile sync that restores npm ci on a clean GitHub Actions runner.",
+    "Dependabot PR triage report for PR #5, #7, #9, #12, and #14.",
+    "A controlled merge/defer/supersede decision for ESLint, @eslint/js, typescript, @types/node, and typescript-eslint updates.",
+    "CI evidence showing adopter-sentinel and standard validators pass after dependency decisions."
+  ],
+  "scopePaths": [
+    "package.json",
+    "package-lock.json",
+    "eslint.config.mjs",
+    ".github/workflows/ci.yml",
+    ".github/workflows/adopter-sentinel.yml",
+    "scripts/adopter-sentinel.ts",
+    "scripts/run-validators.ts",
+    ".atm/history/evidence/TASK-AAO-0107.json",
+    ".atm/history/evidence/TASK-AAO-0107.closure-packet.json",
+    ".atm/history/tasks/TASK-AAO-0107.json"
+  ],
+  "validators": [
+    "npm ci",
+    "npm run typecheck",
+    "npm run lint",
+    "npm run validate:cli",
+    "npm run validate:git-hooks-enforcement",
+    "npm run validate:task-ledger-governance",
+    "node --experimental-strip-types scripts/adopter-sentinel.ts --mode validate",
+    "gh pr list --repo eaglhuang/AI-Atomic-Framework --state open --json number,title,statusCheckRollup"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Feature source changes outside dependency compatibility fixes.",
+    "Blindly merging all Dependabot PRs without validator evidence.",
+    "Major TypeScript or ESLint migration refactors beyond the minimum needed to classify the PR.",
+    "Changing repository visibility or GitHub organization settings.",
+    "Closing unrelated PRs without a documented decision."
+  ],
+  "nonGoals": [
+    "Fix every future Dependabot alert in this single task.",
+    "Treat Node.js 20 action deprecation warnings as the current adopter-sentinel failure root cause."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the dependency/lockfile/CI-triage delivery commit and TASK-AAO-0107 closure ledger. Do not revert unrelated Dependabot branches or task-card drafts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0107-dependency-security-ci-triage.task.md",
+    "sectionTitle": "TASK-AAO-0107",
+    "headingLine": 54,
+    "hash": "991358ec01d4036a"
+  },
+  "importedAt": "2026-06-01T10:41:16.554Z",
+  "lastTransitionId": "2026-06-01T10-50-54-387Z-close-947f9db060e1",
+  "lastTransitionAt": "2026-06-01T10:50:54.387Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "gpt54-mini-002",
+  "reservedAt": "2026-06-01T10:41:31.284Z",
+  "promotedAt": "2026-06-01T10:41:31.288Z",
+  "claim": {
+    "actorId": "gpt54-mini-002",
+    "leaseId": "lease-49ca163ca503",
+    "claimedAt": "2026-06-01T10:41:31.290Z",
+    "heartbeatAt": "2026-06-01T10:50:54.386Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0107.json",
+      ".atm/history/evidence/TASK-AAO-0107.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0107.json",
+      ".github/workflows/adopter-sentinel.yml",
+      ".github/workflows/ci.yml",
+      "eslint.config.mjs",
+      "fixtures/golden/downstream-js-repo/package.json",
+      "package-lock.json",
+      "package.json",
+      "scripts/adopter-sentinel.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-01T10:41:31.290Z",
+  "startedByActor": "gpt54-mini-002",
+  "startedBySessionId": "session-20260601104131-gpt54-mini-002-TASK-AAO-0107-25aa1c801c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0107",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0107.*",
+      ".atm/history/evidence/TASK-AAO-0107.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0107.json",
+      ".atm/history/task-events/TASK-AAO-0107/**",
+      ".atm/history/tasks/TASK-AAO-0107.json",
+      ".github/workflows/adopter-sentinel.yml",
+      ".github/workflows/ci.yml",
+      "eslint.config.mjs",
+      "fixtures/golden/downstream-js-repo/package.json",
+      "package-lock.json",
+      "package.json",
+      "scripts/adopter-sentinel.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5409080b0c471906994146049a706d7dbc05faf32ba004890d19e422af150fa9",
+    "actorId": "gpt54-mini-002",
+    "createdAt": "2026-06-01T10:41:31.304Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0107.closure-packet.json",
+  "closedAt": "2026-06-01T10:50:54.386Z",
+  "closedByActor": "gpt54-mini-002",
+  "closedBySessionId": "session-20260601104131-gpt54-mini-002-TASK-AAO-0107-25aa1c801c"
+}
