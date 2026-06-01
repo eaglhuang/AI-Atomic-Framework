@@ -1,0 +1,140 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0108",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "15d4f384bc7943a23c486c670685c6e76e7bc4c6",
+  "governedTreeSha": "5a1cf660210d20912fb994887663b259eed1724b",
+  "targetCommitDelta": {
+    "currentCommitSha": "15d4f384bc7943a23c486c670685c6e76e7bc4c6",
+    "parentCommitShas": [
+      "15d4f384bc7943a23c486c670685c6e76e7bc4c6"
+    ],
+    "governedTreeSha": "5a1cf660210d20912fb994887663b259eed1724b",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0108.json",
+      ".atm/history/task-events/TASK-AAO-0101/2026-05-31T11-34-38-643Z-import-5682b9378ee3.json",
+      ".atm/history/task-events/TASK-AAO-0101/2026-05-31T11-34-52-757Z-reserve-6dee09fab0be.json",
+      ".atm/history/task-events/TASK-AAO-0101/2026-05-31T11-34-52-760Z-promote-6d436a9d8a28.json",
+      ".atm/history/task-events/TASK-AAO-0101/2026-05-31T11-34-52-776Z-claim-46fa29e922b9.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-10-29-346Z-import-4646e86360ad.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-10-40-520Z-reserve-9edb38667c75.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-10-40-524Z-promote-e58481880382.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-10-40-539Z-claim-7afef517b14f.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-11-26-232Z-scope-amendment-40df8e1d7f61.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-18-34-633Z-import-78df243c85cd.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-18-54-455Z-reserve-343d3fafcf0f.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-18-54-457Z-promote-60b2284ddb97.json",
+      ".atm/history/task-events/TASK-AAO-0108/2026-06-01T13-19-27-884Z-claim-872f4d5525f5.json",
+      ".atm/history/tasks/TASK-AAO-0101.json",
+      ".atm/history/tasks/TASK-AAO-0108.json",
+      ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
+      ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
+      ".playwright-mcp/console-2026-05-28T15-14-55-015Z.log",
+      "atomic_workbench/maps/ATM-MAP-0003/map.integration.test.ts",
+      "atomic_workbench/maps/ATM-MAP-0003/map.spec.json",
+      "atomic_workbench/maps/ATM-MAP-0003/map.test.report.json",
+      "plans/TASK-AAO-0101-tasks-helpers-batch10.plan.json",
+      "plans/TASK-AAO-0102-tasks-helpers-batch10.plan.json",
+      "scratch/claim_output.json",
+      "scratch/claim_output.txt",
+      "scratch/commit2_error.txt",
+      "scratch/find-top-10-leaves.js",
+      "scratch/generate-evidence-TASK-AAO-0099.js",
+      "scratch/inventory.json",
+      "scratch/MRP-0028-test-case.md",
+      "scratch/next_debug.json",
+      "scratch/next_debug.txt",
+      "scratch/package-lock-drift-from-npm-install.patch",
+      "scratch/plan_prev.json",
+      "scratch/run_prev_analyze.cjs",
+      "scratch/run-leaf-tests.cjs",
+      "scratch/tasks_prev.ts",
+      "scratch/test.out"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f73f7f00ee3ae2a67af9a683b45dfdd6ea199a18dc5d4d158cbcc31bfe393f23",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-01T13:19:56.293Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm-temp/TASK-AAO-0108-import.task.md",
+      "atomic_workbench/maps/ATM-MAP-0003/map.integration.test.ts",
+      "atomic_workbench/maps/ATM-MAP-0003/map.spec.json",
+      "atomic_workbench/maps/ATM-MAP-0003/map.test.report.json",
+      "plans/TASK-AAO-0102-tasks-helpers-batch10.plan.json"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0108.json",
+  "closedAt": "2026-06-01T13:19:56.294Z",
+  "closedByActor": "github-copilot-gpt-5.4",
+  "sessionId": "session-20260601131927-github-copilot-gpt-5.4-TASK-AAO-0108-3f378bdd35",
+  "attestation": null
+}
