@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MRP-0028",
+  "title": "Closure Packet Repair UX and Parent Tree Semantics",
+  "status": "done",
+  "milestone": "M28",
+  "dependencies": [
+    "TASK-MRP-0026",
+    "TASK-MRP-0027"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "Closure packet 改描述 delivery parent commit tree，避免 closure packet self-reference hash loop",
+    "tasks close 對 framework done close 增加 clean working tree precondition",
+    "新增 node atm.mjs tasks repair-closure --task <id> --json",
+    "新增 node atm.mjs rescue closure-packet --task <id> --json",
+    "pre-push / commit-range closure drift findings 輸出 suggested fix",
+    "用 local tag broken-closure-packet-self-ref-2026-05-31 驗證 repair UX"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-option-parsers.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/rescue.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "packages/cli/src/commands/command-specs/rescue.spec.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "release/atm-onefile/atm.mjs"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-hooks-enforcement",
+    "npm run validate:task-ledger-governance",
+    "npm run build"
+  ],
+  "planningRepo": null,
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "重做 TASK-AAO-0102 map deliverables",
+    "推送 local broken tag",
+    "清理 3KLife 或 AAF 既有 untracked 檔案",
+    "MRP-0029 batch CLI"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "blocked_by": [
+      "TASK-MRP-0026",
+      "TASK-MRP-0027"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/map-replacement-protocol/tasks/TASK-MRP-0028-closure-packet-repair-ux.task.md",
+    "sectionTitle": "TASK-MRP-0028",
+    "headingLine": 59,
+    "hash": "dc0d5a290e9a69d3"
+  },
+  "importedAt": "2026-05-31T15:56:05.393Z",
+  "lastTransitionId": "2026-06-01T05-42-52-709Z-close-bb65bee0be9d",
+  "lastTransitionAt": "2026-06-01T05:42:52.709Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5",
+  "reservedAt": "2026-06-01T05:38:26.779Z",
+  "promotedAt": "2026-06-01T05:38:26.781Z",
+  "resetReason": "cleanup stale active lock before final close",
+  "claim": {
+    "actorId": "codex-gpt-5",
+    "leaseId": "lease-6cf2fa58e343",
+    "claimedAt": "2026-06-01T05:38:41.906Z",
+    "heartbeatAt": "2026-06-01T05:42:52.709Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MRP-0028.json",
+      "atm.mjs",
+      "package.json",
+      "packages/cli/src/commands/command-specs/rescue.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/guard.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/rescue.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-onefile/atm.mjs",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-01T05:38:41.906Z",
+  "startedByActor": "codex-gpt-5",
+  "startedBySessionId": "session-20260601053841-codex-gpt-5-TASK-MRP-0028-92717f9767",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MRP-0028",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MRP-0028.*",
+      ".atm/history/task-events/TASK-MRP-0028/**",
+      ".atm/history/tasks/TASK-MRP-0028.json",
+      "atm.mjs",
+      "package.json",
+      "packages/cli/src/commands/command-specs/rescue.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/guard.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/rescue.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-onefile/atm.mjs",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0b4f7964192c2a70a8e4776b64f4f905d0b4e4327b3c4a05ab9846e1a6d7a717",
+    "actorId": "codex-gpt-5",
+    "createdAt": "2026-06-01T05:38:41.917Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-MRP-0028.closure-packet.json",
+  "closedAt": "2026-06-01T05:42:52.709Z",
+  "closedByActor": "codex-gpt-5",
+  "closedBySessionId": "session-20260601053841-codex-gpt-5-TASK-MRP-0028-92717f9767"
+}
