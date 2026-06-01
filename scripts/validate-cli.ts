@@ -243,6 +243,18 @@ for (const commandName of publicCommandNames) {
   }
 }
 
+const tasksHelp = await runAtm(['tasks', '--help'], root);
+const tasksUsageText = JSON.stringify(tasksHelp.parsed.evidence?.usage ?? {});
+assert(tasksUsageText.includes('repair-closure'), 'tasks --help CLI surface must list repair-closure');
+assert(tasksUsageText.includes('node atm.mjs tasks repair-closure'), 'tasks --help examples must show tasks repair-closure usage');
+assert(tasksUsageText.includes('--amend'), 'tasks --help must document explicit repair-closure amend opt-in');
+
+const rescueHelp = await runAtm(['rescue', '--help'], root);
+const rescueUsageText = JSON.stringify(rescueHelp.parsed.evidence?.usage ?? {});
+assert(rescueUsageText.includes('closure-packet'), 'rescue --help CLI surface must list closure-packet');
+assert(rescueUsageText.includes('node atm.mjs rescue closure-packet'), 'rescue --help examples must show rescue closure-packet usage');
+assert(rescueUsageText.includes('--amend'), 'rescue --help must document explicit closure-packet amend opt-in');
+
 if (surfaceOnly) {
   if (!process.exitCode) {
     console.log(`[cli:${mode}] ok surface (${publicCommandNames.length} public commands, ${internalCommandNames.length} internal commands, in-process help checks)`);

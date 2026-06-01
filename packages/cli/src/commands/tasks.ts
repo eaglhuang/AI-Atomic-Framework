@@ -11,6 +11,9 @@ import {
   auditTasks,
   createClosurePacket,
   createFrameworkModeStatus,
+  inspectFrameworkCloseWorktree,
+  isTaskCloseGovernanceCriticalPath,
+  repairClosurePacketForTask,
   requireTargetRepoClosureAuthority,
   type ClosurePacket,
   validateClosurePacket,
@@ -310,6 +313,9 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
   if (action === 'reconcile') {
     return await runTasksReconcile(argv.slice(1));
   }
+  if (action === 'repair-closure') {
+    return await runTasksRepairClosure(argv.slice(1));
+  }
   if (action === 'show') {
     return await runTasksShow(argv.slice(1));
   }
@@ -329,7 +335,7 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
     return await runTasksScope(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | show | deliver-and-close | audit | migrate-legacy-ledger | new).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | deliver-and-close | audit | migrate-legacy-ledger | new).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -356,6 +362,65 @@ async function runTasksShow(argv: string[]): Promise<CommandResult> {
     evidence: {
       taskId,
       ...taskDocument
+    }
+  });
+}
+
+interface ParsedRepairClosureOptions {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string | null;
+  readonly dryRun: boolean;
+  readonly amend: boolean;
+}
+
+async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
+  const options = parseRepairClosureOptions(argv);
+  const resolvedActor = options.actorId ? resolveActorId(options.actorId, options.cwd) : null;
+  const result = repairClosurePacketForTask({
+    cwd: options.cwd,
+    taskId: options.taskId,
+    actorId: resolvedActor?.actorId ?? null,
+    dryRun: options.dryRun,
+    amend: options.amend
+  });
+  const stagedOnly = !result.amended;
+  return makeResult({
+    ok: true,
+    command: 'tasks',
+    cwd: options.cwd,
+    messages: [
+      message(
+        'info',
+        options.dryRun ? 'ATM_TASKS_REPAIR_CLOSURE_DRY_RUN' : 'ATM_TASKS_REPAIR_CLOSURE_OK',
+        options.dryRun
+          ? `Dry-run: closure packet ${options.taskId} can be repaired without rewriting HEAD.`
+          : stagedOnly
+            ? `Repaired and staged closure packet follow-up changes for ${options.taskId}. HEAD was not rewritten.`
+            : `Repaired closure packet for ${options.taskId}.`,
+        {
+          taskId: options.taskId,
+          packetPath: result.packetPath,
+          targetCommit: result.targetCommit,
+          governedTreeSha: result.governedTreeSha,
+          amended: result.amended,
+          previousHead: result.previousHead,
+          repairedHead: result.repairedHead,
+          upstreamStatus: result.upstreamStatus,
+          nextActionCommand: result.nextActionCommand,
+          remediation: result.remediation
+        }
+      )
+    ],
+    evidence: {
+      result,
+      nextAction: !options.dryRun && stagedOnly ? {
+        kind: 'governed-commit-required',
+        command: result.nextActionCommand,
+        reason: result.remediation,
+        message: result.commitMessage
+      } : null,
+      suggestedVerification: 'node atm.mjs hook pre-push --base origin/main --head HEAD --json'
     }
   });
 }
@@ -1558,7 +1623,7 @@ async function runTasksClose(argv: string[]) {
   // TASK-AAO-0057: scoped diff isolation — partition framework critical changes
   // into in-scope (must be governed) vs unrelated (advisory, isolated) so that
   // dirty/untracked files outside the task scope never hard-block close.
-  const closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
+  let closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
     ? buildCloseScopedDiffIsolation({
       taskId: options.taskId,
       taskDeclaredFiles,
@@ -1567,6 +1632,38 @@ async function runTasksClose(argv: string[]) {
     })
     : null;
   if (frameworkStatus?.repoRole === 'framework') {
+    const closeWorktree = inspectFrameworkCloseWorktree(options.cwd);
+    const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
+      taskId: options.taskId,
+      taskDeclaredFiles,
+      trackedDirtyFiles: closeWorktree.trackedDirtyFiles
+    });
+    if (closeScopedDiffIsolation) {
+      closeScopedDiffIsolation = {
+        ...closeScopedDiffIsolation,
+        blockingTrackedDirtyFiles: closeDirtyGuard.blockingTrackedDirtyFiles,
+        scopeTrackedDirtyFiles: closeDirtyGuard.scopeTrackedDirtyFiles,
+        governanceTrackedDirtyFiles: closeDirtyGuard.governanceTrackedDirtyFiles,
+        advisoryTrackedDirtyFiles: closeDirtyGuard.advisoryTrackedDirtyFiles,
+        ignoredUntrackedFiles: closeWorktree.ignoredUntrackedFiles
+      };
+    }
+    if (closeDirtyGuard.blockingTrackedDirtyFiles.length > 0) {
+      throw new CliError('ATM_TASK_CLOSE_DIRTY_WORKTREE', `Task ${options.taskId} cannot be closed as done while in-scope or closure-governance tracked changes are still dirty.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          trackedDirtyFiles: closeDirtyGuard.blockingTrackedDirtyFiles,
+          scopeTrackedDirtyFiles: closeDirtyGuard.scopeTrackedDirtyFiles,
+          governanceTrackedDirtyFiles: closeDirtyGuard.governanceTrackedDirtyFiles,
+          advisoryTrackedDirtyFiles: closeDirtyGuard.advisoryTrackedDirtyFiles,
+          unstagedFiles: closeWorktree.unstagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
+          stagedFiles: closeWorktree.stagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
+          ignoredUntrackedFiles: closeWorktree.ignoredUntrackedFiles,
+          remediation: 'Commit this task\'s scoped delivery changes first before closing done. Unrelated tracked dirty files are isolated as advisory and do not block this task. The closure packet describes the delivery parent commit instead of the mutable worktree.'
+        }
+      });
+    }
     const scopedCriticalChangedFiles = frameworkDeliveryWindow?.scopedCriticalChangedFiles ?? [];
     const isolatedUnrelatedChanges = frameworkDeliveryWindow?.unscopedCriticalChangedFiles ?? [];
     if (scopedCriticalChangedFiles.length > 0 && frameworkDeliveryWindow?.ok !== true) {
@@ -2747,6 +2844,22 @@ function evaluateFrameworkDeliveryWindow(input: {
 // Splits framework working-tree changes into three categories so close/checkpoint
 // can isolate unrelated dirty/untracked changes (advisory) while still defending
 // the task's own deliverables and flagging scope-overflow critical changes.
+interface TaskCloseScopedDiffIsolationReport {
+  readonly schemaId: 'atm.taskCloseScopedDiffIsolation.v1';
+  readonly taskId: string;
+  readonly declaredFiles: readonly string[];
+  readonly scopedCriticalChangedFiles: readonly string[];
+  readonly isolatedUnrelatedChanges: readonly string[];
+  readonly declaredButUnchanged: readonly string[];
+  readonly summary: string;
+  readonly advisoryNote: string;
+  readonly blockingTrackedDirtyFiles?: readonly string[];
+  readonly scopeTrackedDirtyFiles?: readonly string[];
+  readonly governanceTrackedDirtyFiles?: readonly string[];
+  readonly advisoryTrackedDirtyFiles?: readonly string[];
+  readonly ignoredUntrackedFiles?: readonly string[];
+}
+
 function buildCloseScopedDiffIsolation(input: {
   readonly taskId: string;
   readonly taskDeclaredFiles: readonly string[];
@@ -2756,7 +2869,7 @@ function buildCloseScopedDiffIsolation(input: {
     readonly unscopedCriticalChangedFiles: readonly string[];
     readonly declaredFiles: readonly string[];
   };
-}) {
+}): TaskCloseScopedDiffIsolationReport {
   const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
   const allChangedFiles = uniqueStrings(input.frameworkChangedFiles.map(normalizeRelativePath).filter(Boolean));
   const scopedCriticalChangedFiles = [...input.frameworkDeliveryWindow.scopedCriticalChangedFiles];
@@ -2777,6 +2890,32 @@ function buildCloseScopedDiffIsolation(input: {
         ? 'all-critical-changes-isolated-as-advisory'
         : 'mixed-in-scope-and-isolated-changes',
     advisoryNote: 'isolatedUnrelatedChanges are framework critical files outside this task scope; they are advisory and do not block close. Address them via their own governed task.'
+  };
+}
+
+function evaluateFrameworkCloseDirtyGuard(input: {
+  readonly taskId: string;
+  readonly taskDeclaredFiles: readonly string[];
+  readonly trackedDirtyFiles: readonly string[];
+}) {
+  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
+  const scopeTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) =>
+    declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
+  );
+  const governanceTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) =>
+    !scopeTrackedDirtyFiles.includes(filePath) && isTaskCloseGovernanceCriticalPath(filePath, input.taskId)
+  );
+  const blockingTrackedDirtyFiles = uniqueStrings([
+    ...scopeTrackedDirtyFiles,
+    ...governanceTrackedDirtyFiles
+  ]);
+  const advisoryTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) => !blockingTrackedDirtyFiles.includes(filePath));
+  return {
+    blockingTrackedDirtyFiles,
+    scopeTrackedDirtyFiles,
+    governanceTrackedDirtyFiles,
+    advisoryTrackedDirtyFiles
   };
 }
 
@@ -3513,6 +3652,60 @@ function parseVerifyOptions(argv: string[]) {
     throw new CliError('ATM_CLI_USAGE', `tasks verify does not support option ${arg}`, { exitCode: 2 });
   }
   return { ...options, cwd: path.resolve(options.cwd) };
+}
+
+function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {
+  const state = {
+    cwd: process.cwd(),
+    taskId: null as string | null,
+    actorId: null as string | null,
+    dryRun: false,
+    amend: false
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      state.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      state.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      state.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      state.dryRun = true;
+      continue;
+    }
+    if (arg === '--amend') {
+      state.amend = true;
+      continue;
+    }
+    if (arg === '--no-amend') {
+      state.amend = false;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks repair-closure does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!state.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks repair-closure requires --task <id>.', { exitCode: 2 });
+  }
+  return {
+    cwd: path.resolve(state.cwd),
+    taskId: state.taskId,
+    actorId: state.actorId,
+    dryRun: state.dryRun,
+    amend: state.amend
+  };
 }
 
 function requireValue(argv: string[], index: number, flag: string): string {

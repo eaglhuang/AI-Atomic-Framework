@@ -1,12 +1,12 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import type { WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom, resolveValue } from './shared.ts';
-import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
+import { createGitHeadEvidenceCheck, gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { listActorWorkSessions } from './actor-session.ts';
 import { readActiveTaskDirectionLocks } from './task-direction.ts';
@@ -143,6 +143,53 @@ export interface ClosurePacket {
   readonly closedByActor: string;
   readonly sessionId: string | null;
   readonly attestation?: ClosurePacketReconcileAttestation | null;
+}
+
+export interface FrameworkCloseWorktreeReport {
+  readonly ok: boolean;
+  readonly trackedDirtyFiles: readonly string[];
+  readonly unstagedFiles: readonly string[];
+  readonly stagedFiles: readonly string[];
+  readonly untrackedFiles: readonly string[];
+  readonly ignoredUntrackedFiles: readonly string[];
+}
+
+export function isTaskCloseGovernanceCriticalPath(filePath: string, taskId: string): boolean {
+  const relativePath = normalizeRelativePath(filePath);
+  const normalizedTaskId = taskId.trim();
+  if (!relativePath || !normalizedTaskId) {
+    return false;
+  }
+  return relativePath === gitHeadEvidencePath
+    || relativePath === `.atm/history/tasks/${normalizedTaskId}.json`
+    || relativePath === `.atm/history/evidence/${normalizedTaskId}.json`
+    || relativePath === `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`
+    || relativePath.startsWith(`.atm/history/task-events/${normalizedTaskId}/`)
+    || relativePath === `.atm/runtime/locks/${normalizedTaskId}.lock.json`;
+}
+
+export type ClosureRepairUpstreamStatus =
+  | 'detached-head'
+  | 'no-upstream'
+  | 'ahead-of-upstream'
+  | 'published-head-blocked';
+
+export interface ClosurePacketRepairResult {
+  readonly taskId: string;
+  readonly packetPath: string;
+  readonly previousHead: string | null;
+  readonly repairedHead: string | null;
+  readonly targetCommit: string | null;
+  readonly governedTreeSha: string | null;
+  readonly changedFiles: readonly string[];
+  readonly gitHeadEvidencePath: string;
+  readonly amended: boolean;
+  readonly dryRun: boolean;
+  readonly changed: boolean;
+  readonly upstreamStatus: ClosureRepairUpstreamStatus | null;
+  readonly nextActionCommand: string | null;
+  readonly commitMessage: string | null;
+  readonly remediation: string | null;
 }
 
 export interface TaskAuditFinding {
@@ -1009,6 +1056,145 @@ export function writeClosurePacket(cwd: string, taskId: string, packet: ClosureP
   return relativePathFrom(cwd, packetPath);
 }
 
+export function inspectFrameworkCloseWorktree(cwd: string): FrameworkCloseWorktreeReport {
+  const unstagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--name-only']).map(normalizeRelativePath).filter(Boolean));
+  const stagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only']).map(normalizeRelativePath).filter(Boolean));
+  const untrackedFiles = uniqueSorted(runGitLines(cwd, ['ls-files', '--others', '--exclude-standard']).map(normalizeRelativePath).filter(Boolean));
+  const trackedDirtyFiles = uniqueSorted([...unstagedFiles, ...stagedFiles]);
+  return {
+    ok: trackedDirtyFiles.length === 0,
+    trackedDirtyFiles,
+    unstagedFiles,
+    stagedFiles,
+    untrackedFiles,
+    ignoredUntrackedFiles: untrackedFiles
+  };
+}
+
+export function repairClosurePacketForTask(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId?: string | null;
+  readonly dryRun?: boolean;
+  readonly amend?: boolean;
+}): ClosurePacketRepairResult {
+  const cwd = path.resolve(input.cwd);
+  const taskId = input.taskId.trim();
+  if (!taskId) {
+    throw new CliError('ATM_CLOSURE_REPAIR_TASK_REQUIRED', 'tasks repair-closure requires --task <id>.', { exitCode: 2 });
+  }
+  const packetPath = resolveClosurePacketPath(cwd, taskId);
+  const packetAbsolutePath = path.join(cwd, packetPath);
+  if (!existsSync(packetAbsolutePath)) {
+    throw new CliError('ATM_CLOSURE_REPAIR_PACKET_NOT_FOUND', `Closure packet not found for ${taskId}.`, {
+      exitCode: 1,
+      details: { taskId, expectedPath: packetPath }
+    });
+  }
+
+  const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath);
+  if (trackedDirtyFiles.length > 0) {
+    throw new CliError('ATM_CLOSURE_REPAIR_DIRTY_WORKTREE', `Cannot repair closure packet for ${taskId} while unrelated tracked worktree changes are present.`, {
+      exitCode: 1,
+      details: {
+        taskId,
+        trackedDirtyFiles,
+        remediation: 'Run repair in an isolated worktree at the broken commit, or commit/stash unrelated changes first.'
+      }
+    });
+  }
+
+  const parsed = readJsonIfExists(packetAbsolutePath) as ClosurePacket | null;
+  const validation = validateClosurePacket(parsed);
+  if (!validation.ok || !parsed) {
+    throw new CliError('ATM_CLOSURE_REPAIR_PACKET_INVALID', `Closure packet for ${taskId} is invalid and cannot be repaired automatically.`, {
+      exitCode: 1,
+      details: { taskId, packetPath, missing: validation.missing }
+    });
+  }
+
+  const commitMessage = buildRepairClosureCommitMessage(taskId);
+  const nextActionCommand = buildRepairClosureNextActionCommand(taskId, input.actorId ?? null);
+  const remediation = 'ATM staged the repaired closure packet and git-head evidence only. Finish by running the governed git commit wrapper; ATM does not provide an amend-capable wrapper for this flow yet.';
+  if (input.amend === true) {
+    throw new CliError('ATM_CLOSURE_REPAIR_AMEND_WRAPPER_UNAVAILABLE', 'tasks repair-closure --amend is not available because ATM only exposes a governed git commit wrapper without amend support.', {
+      exitCode: 1,
+      details: {
+        taskId,
+        remediation,
+        requiredCommand: nextActionCommand,
+        commitMessage
+      }
+    });
+  }
+
+  const headDetails = readGitHeadDetails(cwd);
+  const targetCommit = headDetails.parentCommitShas[0] ?? normalizeOptionalString(parsed.targetCommit);
+  const governedTreeSha = targetCommit ? readCommitTreeWithoutEvidence(cwd, targetCommit) : headDetails.treeSha;
+  const targetChangedFiles = targetCommit
+    ? readRepairCommitChangedFiles(cwd, targetCommit)
+    : parsed.targetCommitDelta.changedFiles.map(normalizeRelativePath).filter(Boolean);
+  const repairedPacket: ClosurePacket = {
+    ...parsed,
+    targetCommit,
+    governedTreeSha,
+    targetCommitDelta: {
+      ...parsed.targetCommitDelta,
+      currentCommitSha: targetCommit,
+      parentCommitShas: headDetails.parentCommitShas,
+      governedTreeSha,
+      changedFiles: uniqueSorted(targetChangedFiles)
+    }
+  };
+  const before = `${JSON.stringify(parsed, null, 2)}\n`;
+  const after = `${JSON.stringify(repairedPacket, null, 2)}\n`;
+  const changed = before !== after;
+  const upstreamStatus = classifyRepairUpstreamStatus(cwd);
+
+  if (input.dryRun) {
+    return {
+      taskId,
+      packetPath,
+      previousHead: headDetails.commitSha,
+      repairedHead: headDetails.commitSha,
+      targetCommit,
+      governedTreeSha,
+      changedFiles: repairedPacket.targetCommitDelta.changedFiles,
+      gitHeadEvidencePath,
+      amended: false,
+      dryRun: true,
+      changed,
+      upstreamStatus,
+      nextActionCommand,
+      commitMessage,
+      remediation
+    };
+  }
+
+  writeFileSync(packetAbsolutePath, after, 'utf8');
+  stageGitPath(cwd, packetPath);
+  appendRepairGitHeadEvidence(cwd, headDetails.parentCommitShas, repairedPacket.commandRuns);
+  stageGitPath(cwd, gitHeadEvidencePath);
+
+  return {
+    taskId,
+    packetPath,
+    previousHead: headDetails.commitSha,
+    repairedHead: headDetails.commitSha,
+    targetCommit,
+    governedTreeSha,
+    changedFiles: repairedPacket.targetCommitDelta.changedFiles,
+    gitHeadEvidencePath,
+    amended: false,
+    dryRun: false,
+    changed,
+    upstreamStatus,
+    nextActionCommand,
+    commitMessage,
+    remediation
+  };
+}
+
 export function requireTargetRepoClosureAuthority(input: {
   readonly cwd: string;
   readonly taskDocument: Record<string, unknown>;
@@ -1180,6 +1366,16 @@ function isDocOnlyPath(relativePath: string): boolean {
     || relativePath.startsWith('docs/')
     || relativePath.startsWith('atomic_workbench/reports/')
     || relativePath.startsWith('atomic_workbench/evidence/');
+}
+
+function buildRepairClosureCommitMessage(taskId: string): string {
+  return `chore(${taskId}): repair closure packet`;
+}
+
+function buildRepairClosureNextActionCommand(taskId: string, actorId: string | null): string {
+  const resolvedActor = normalizeOptionalString(actorId) ?? '<actor-id>';
+  const messageText = buildRepairClosureCommitMessage(taskId).replace(/"/g, '\\"');
+  return `node atm.mjs git commit --actor ${resolvedActor} --task ${taskId} --message "${messageText}" --json`;
 }
 
 function readTaskDocuments(root: string): ReadonlyArray<{ relativePath: string; taskId: string; status: string; document: Record<string, unknown> }> {
@@ -1590,6 +1786,29 @@ function readFutureCommitTreeWithoutEvidence(cwd: string): string | null {
   }
 }
 
+function readCommitTreeWithoutEvidence(cwd: string, commitSha: string): string | null {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-framework-commit-index-'));
+  const tempIndex = path.join(tempDir, 'index');
+  try {
+    const readTree = runGitWithEnv(cwd, ['read-tree', commitSha], { GIT_INDEX_FILE: tempIndex });
+    if (readTree.status !== 0) return null;
+    runGitWithEnv(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', gitHeadEvidencePaths.legacyJson, gitHeadEvidencePaths.jsonl], { GIT_INDEX_FILE: tempIndex });
+    const tree = runGitWithEnv(cwd, ['write-tree'], { GIT_INDEX_FILE: tempIndex });
+    return tree.status === 0 ? String(tree.stdout ?? '').trim() : null;
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
+function readRepairCommitChangedFiles(cwd: string, commitSha: string): readonly string[] {
+  const parentRow = runGitLines(cwd, ['rev-list', '--parents', '-n', '1', commitSha])[0] ?? '';
+  const hasParent = parentRow.split(/\s+/).length > 1;
+  const args = hasParent
+    ? ['diff-tree', '--no-commit-id', '--name-only', '-r', commitSha]
+    : ['show', '--name-only', '--format=', '--root', commitSha];
+  return uniqueSorted(runGitLines(cwd, args).map(normalizeRelativePath).filter(Boolean));
+}
+
 function readJsonIfExists(filePath: string): Record<string, any> | null {
   if (!existsSync(filePath)) return null;
   try {
@@ -1624,6 +1843,84 @@ function runGitWithEnv(cwd: string, args: readonly string[], env: Record<string,
       ...env
     }
   });
+}
+
+function readTrackedChangedFiles(cwd: string): readonly string[] {
+  const changed = [
+    ...runGitLines(cwd, ['diff', '--name-only']),
+    ...runGitLines(cwd, ['diff', '--cached', '--name-only'])
+  ];
+  return uniqueSorted(changed.map(normalizeRelativePath).filter(Boolean));
+}
+
+function runGitProcess(cwd: string, args: readonly string[]) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  return {
+    status: result.status ?? 1,
+    stdout: String(result.stdout ?? ''),
+    stderr: String(result.stderr ?? ''),
+    error: result.error ?? null
+  };
+}
+
+function stageGitPath(cwd: string, relativePath: string) {
+  const result = runGitProcess(cwd, ['add', '--', relativePath]);
+  if (result.status !== 0) {
+    throw new CliError('ATM_CLOSURE_REPAIR_STAGE_FAILED', `Failed to stage ${relativePath}.`, {
+      exitCode: 1,
+      details: { path: relativePath, stdout: result.stdout, stderr: result.stderr }
+    });
+  }
+}
+
+function appendRepairGitHeadEvidence(cwd: string, parentCommitShas: readonly string[], commandRuns: readonly ClosurePacketCommandRun[]) {
+  const generatedAt = new Date().toISOString();
+  const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
+  mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
+  const payload = {
+    schemaId: 'atm.gitHeadEvidence.v1',
+    specVersion: '0.1.0',
+    generatedAt,
+    checks: [
+      {
+        checkId: 'closure-packet-repair',
+        ok: true,
+        severity: 'info',
+        summary: 'Closure packet repair restaged git-head evidence for follow-up governed commit.',
+        details: {
+          git: {
+            treeSha: null,
+            parentCommitShas,
+            stagedPathCount: runGitLines(cwd, ['diff', '--cached', '--name-only']).length,
+            evidencePath: gitHeadEvidencePath,
+            generatedAt
+          },
+          hookContractVersion: 'atm.integration-hooks/v1',
+          runnerVersion: readFrameworkVersion(cwd)
+        },
+        commandRuns
+      }
+    ]
+  };
+  appendFileSync(evidenceAbsolute, `${JSON.stringify(payload)}\n`, 'utf8');
+}
+
+function classifyRepairUpstreamStatus(cwd: string): ClosureRepairUpstreamStatus {
+  const branch = runGitLines(cwd, ['rev-parse', '--abbrev-ref', 'HEAD'])[0] ?? null;
+  if (!branch || branch === 'HEAD') return 'detached-head';
+  const upstream = runGitLines(cwd, ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{upstream}'])[0] ?? null;
+  if (!upstream) return 'no-upstream';
+  const mergeBase = runGitProcess(cwd, ['merge-base', '--is-ancestor', 'HEAD', upstream]);
+  if (mergeBase.status === 0) return 'published-head-blocked';
+  return 'ahead-of-upstream';
+}
+
+function resolveClosurePacketPath(cwd: string, taskId: string): string {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  const taskDocument = readJsonIfExists(taskPath);
+  const declaredPath = normalizeOptionalString(taskDocument?.closurePacket ?? taskDocument?.closure_packet);
+  if (declaredPath) return normalizeRelativePath(declaredPath);
+  return normalizeRelativePath(path.join('.atm', 'history', 'evidence', `${taskId}.closure-packet.json`));
 }
 
 function sameStringSet(left: readonly string[], right: readonly string[]) {

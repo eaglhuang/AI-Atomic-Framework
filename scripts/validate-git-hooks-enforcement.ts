@@ -42,7 +42,7 @@ function runGit(repo: string, args: readonly string[], options: { allowFailure?:
 }
 
 function runCli(repo: string, args: readonly string[], options: { allowFailure?: boolean; env?: Record<string, string>; input?: string } = {}) {
-  return run(process.execPath, ['atm.mjs', ...args], repo, options);
+  return run(process.execPath, ['atm.dev.mjs', ...args], repo, options);
 }
 
 function parsePayload(result: ReturnType<typeof run>) {
@@ -62,7 +62,7 @@ function createCommandRun(command: string, stdoutSha256: string) {
 }
 
 function copyRuntime(sourceRoot: string, targetRoot: string) {
-  for (const entry of ['atm.mjs', 'atomic-registry.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json', 'eslint.config.mjs', 'docs', 'packages', 'scripts', 'schemas', 'specs', 'templates', 'examples']) {
+  for (const entry of ['atm.mjs', 'atm.dev.mjs', 'atomic-registry.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json', 'eslint.config.mjs', 'docs', 'packages', 'scripts', 'schemas', 'specs', 'templates', 'examples']) {
     const sourcePath = path.join(sourceRoot, entry);
     if (!existsSync(sourcePath)) continue;
     cpSync(sourcePath, path.join(targetRoot, entry), { recursive: true });
@@ -351,6 +351,13 @@ try {
   assert(closureCommitRange.status === 1, 'commit-range guard must fail for mismatched closure packet');
   const closureFindings = closureCommitRangePayload.evidence?.report?.findings ?? [];
   assert(closureFindings.some((entry: any) => entry.code === 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH'), 'commit-range guard must detect closure packet tree mismatches against governed commit delta');
+  const closureMismatchFinding = closureFindings.find((entry: any) => entry.code === 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH');
+  const closureMismatchSuggestedFix = closureMismatchFinding?.suggestedFix
+    ?? closureMismatchFinding?.suggested_fix
+    ?? closureMismatchFinding?.data?.suggestedFix
+    ?? closureMismatchFinding?.data?.suggested_fix
+    ?? closureMismatchFinding?.data?.suggestedCommand;
+  assert(typeof closureMismatchSuggestedFix === 'string' && closureMismatchSuggestedFix.includes('closure-packet'), 'closure packet tree mismatch finding must include an actionable suggested fix');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -8,6 +8,7 @@ import {
   reloadAtomsFromCapsules,
   replayLineageFromEvidence
 } from '../../../core/src/rescue/disaster-recovery.ts';
+import { repairClosurePacketForTask } from './framework-development.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 interface RescueOptions {
@@ -17,14 +18,18 @@ interface RescueOptions {
   confirm: boolean;
   iUnderstandThisDeletesState: boolean;
   map?: string;
+  task?: string;
+  amend: boolean;
 }
 
 function parseRescueArgs(argv: string[]): RescueOptions {
-  const cwd = process.cwd();
+  let cwd = process.cwd();
   let dryRun = false;
   let confirm = false;
   let iUnderstandThisDeletesState = false;
   let map: string | undefined;
+  let task: string | undefined;
+  let amend = false;
 
   const positionals: string[] = [];
   for (let i = 0; i < argv.length; i++) {
@@ -35,15 +40,23 @@ function parseRescueArgs(argv: string[]): RescueOptions {
       confirm = true;
     } else if (arg === '--i-understand-this-deletes-state') {
       iUnderstandThisDeletesState = true;
+    } else if ((arg === '--cwd' || arg === '--repo') && argv[i + 1]) {
+      cwd = argv[++i];
     } else if (arg === '--map' && argv[i + 1]) {
       map = argv[++i];
+    } else if (arg === '--task' && argv[i + 1]) {
+      task = argv[++i];
+    } else if (arg === '--amend') {
+      amend = true;
+    } else if (arg === '--no-amend') {
+      amend = false;
     } else if (!arg.startsWith('-')) {
       positionals.push(arg);
     }
   }
 
   const action = positionals[0] ?? 'police';
-  return { cwd, action, dryRun, confirm, iUnderstandThisDeletesState, map };
+  return { cwd, action, dryRun, confirm, iUnderstandThisDeletesState, map, task, amend };
 }
 
 const KNOWN_ACTIONS = [
@@ -51,6 +64,7 @@ const KNOWN_ACTIONS = [
   'diagnose',
   'rebuild-registry',
   'reload-atoms',
+  'closure-packet',
   'rebuild-maps',
   'replay-lineage',
   'clear-cache',
@@ -77,6 +91,8 @@ export async function runRescue(argv: string[]) {
       return runRebuildRegistryAction(options);
     case 'reload-atoms':
       return runReloadAtomsAction(options);
+    case 'closure-packet':
+      return runClosurePacketAction(options);
     case 'rebuild-maps':
       return runRebuildMapsAction(options);
     case 'replay-lineage':
@@ -193,6 +209,61 @@ function runReloadAtomsAction(options: RescueOptions) {
       )
     ],
     evidence: { result }
+  });
+}
+
+function runClosurePacketAction(options: RescueOptions) {
+  if (!options.task) {
+    throw new CliError(
+      'ATM_CLI_USAGE',
+      'rescue closure-packet requires --task <taskId>',
+      { exitCode: 2 }
+    );
+  }
+  const result = repairClosurePacketForTask({
+    cwd: options.cwd,
+    taskId: options.task,
+    dryRun: options.dryRun,
+    amend: options.amend
+  });
+  const stagedOnly = !result.amended;
+  return makeResult({
+    ok: true,
+    command: 'rescue',
+    cwd: options.cwd,
+    messages: [
+      message(
+        'info',
+        options.dryRun ? 'ATM_RESCUE_CLOSURE_PACKET_DRY_RUN' : 'ATM_RESCUE_CLOSURE_PACKET_OK',
+        options.dryRun
+          ? `Dry-run: closure packet ${options.task} can be repaired without rewriting HEAD.`
+          : stagedOnly
+            ? `Repaired and staged closure packet follow-up changes for ${options.task}. HEAD was not rewritten.`
+            : `Repaired closure packet for ${options.task}.`,
+        {
+          taskId: options.task,
+          packetPath: result.packetPath,
+          targetCommit: result.targetCommit,
+          governedTreeSha: result.governedTreeSha,
+          amended: result.amended,
+          previousHead: result.previousHead,
+          repairedHead: result.repairedHead,
+          upstreamStatus: result.upstreamStatus,
+          nextActionCommand: result.nextActionCommand,
+          remediation: result.remediation
+        }
+      )
+    ],
+    evidence: {
+      result,
+      delegatedCommand: `node atm.mjs tasks repair-closure --task ${options.task} --json`,
+      nextAction: !options.dryRun && stagedOnly ? {
+        kind: 'governed-commit-required',
+        command: result.nextActionCommand,
+        reason: result.remediation,
+        message: result.commitMessage
+      } : null
+    }
   });
 }
 

@@ -171,6 +171,7 @@ interface CommitClosurePacketInspection {
   readonly findings: readonly {
     readonly code: string;
     readonly detail: string;
+    readonly suggestedFix?: string;
   }[];
 }
 
@@ -954,7 +955,8 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
       level: 'error' as const,
       code: finding.code,
       commitSha: entry.commitSha,
-      detail: `${entry.packetPath}: ${finding.detail}`
+      detail: `${entry.packetPath}: ${finding.detail}`,
+      suggestedFix: finding.suggestedFix
     }))),
     ...taskAudit.findings
       .filter((entry) => entry.level === 'error')
@@ -1372,7 +1374,7 @@ function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMat
   return closurePacketPaths.map((packetPath) => {
     const packetText = runGitScalar(cwd, ['show', `${commitSha}:${packetPath}`]);
     const packet = packetText ? readJsonText(packetText) : null;
-    const findings: Array<{ readonly code: string; readonly detail: string }> = [];
+    const findings: Array<{ readonly code: string; readonly detail: string; readonly suggestedFix?: string }> = [];
     const validation = validateClosurePacket(packet);
     const taskId = typeof (packet as Record<string, unknown> | null)?.taskId === 'string'
       ? String((packet as Record<string, unknown>).taskId)
@@ -1412,7 +1414,8 @@ function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMat
     if (packetTreeSha && governedTreeSha && packetTreeSha !== governedTreeSha) {
       findings.push({
         code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH',
-        detail: `targetCommitDelta.governedTreeSha ${packetTreeSha} does not match governed tree ${governedTreeSha} for commit ${commitSha}.`
+        detail: `targetCommitDelta.governedTreeSha ${packetTreeSha} does not match governed tree ${governedTreeSha} for commit ${commitSha}.`,
+        suggestedFix: buildClosurePacketRepairSuggestedFix(taskId)
       });
     }
 
@@ -1450,6 +1453,11 @@ function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMat
 
     return { commitSha, packetPath, taskId, findings };
   });
+}
+
+function buildClosurePacketRepairSuggestedFix(taskId: string | null): string {
+  const taskArg = taskId && taskId.trim().length > 0 ? taskId.trim() : '<taskId>';
+  return `Repair the closure-packet metadata with node atm.mjs tasks repair-closure --task ${taskArg} --json or node atm.mjs rescue closure-packet --task ${taskArg} --json, then rerun the governed commit-range check.`;
 }
 
 function readCommitTreeWithoutEvidence(cwd: string, commitSha: string): string | null {

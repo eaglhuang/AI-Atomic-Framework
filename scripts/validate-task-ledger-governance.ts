@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { auditTasks, classifyFrameworkStaleLock, createFrameworkModeStatus, runFrameworkTempClaim, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
+import { auditTasks, classifyFrameworkStaleLock, createClosurePacket, createFrameworkModeStatus, runFrameworkTempClaim, validateClosurePacket, writeClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
@@ -456,9 +456,14 @@ try {
   writeFileSync(path.join(isolationRepo, 'packages', 'cli', 'src', 'commands', 'batch.ts'), 'export const cli = "scoped delivery";\n', 'utf8');
   execFileSync('git', ['add', 'packages/cli/src/commands/batch.ts'], { cwd: isolationRepo, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'scoped delivery commit for isolation fixture'], { cwd: isolationRepo, stdio: 'ignore' });
-  // Unrelated critical change: dirty in the working tree, outside the task scope.
-  const unrelatedRelativePath = 'packages/cli/src/commands/hook.ts';
-  writeFileSync(path.join(isolationRepo, unrelatedRelativePath), 'export const hook = "unrelated dirty change";\n', 'utf8');
+  // Unrelated tracked change: dirty in the working tree, outside the task scope.
+  // This mirrors package-lock/package.json style repo-level churn that must stay advisory.
+  const unrelatedRelativePath = 'package.json';
+  writeJson(path.join(isolationRepo, unrelatedRelativePath), {
+    name: 'ai-atomic-framework',
+    version: '0.0.0',
+    unrelatedDirty: true
+  });
   const isolationClose = await runTasks(['close', '--cwd', isolationRepo, '--task', isolationTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
   assert(isolationClose.ok === true, 'close must succeed when only unrelated critical files are dirty (scoped diff isolation)');
   const isolationDiagnosticRaw = (isolationClose.evidence as Record<string, any>)?.closeScopedDiffIsolation as Record<string, any> | null;
@@ -467,8 +472,138 @@ try {
   assert(isolationDiagnostic.schemaId === 'atm.taskCloseScopedDiffIsolation.v1', 'isolation diagnostic must declare its schema id');
   assert(Array.isArray(isolationDiagnostic.isolatedUnrelatedChanges) && isolationDiagnostic.isolatedUnrelatedChanges.includes(unrelatedRelativePath), 'unrelated dirty critical file must appear in isolatedUnrelatedChanges');
   assert(Array.isArray(isolationDiagnostic.scopedCriticalChangedFiles) && !isolationDiagnostic.scopedCriticalChangedFiles.includes(unrelatedRelativePath), 'unrelated dirty critical file must not be classified as scoped');
+  assert(Array.isArray(isolationDiagnostic.advisoryTrackedDirtyFiles) && isolationDiagnostic.advisoryTrackedDirtyFiles.includes(unrelatedRelativePath), 'unrelated tracked dirty file must be isolated into advisoryTrackedDirtyFiles');
+  assert(!Array.isArray(isolationDiagnostic.blockingTrackedDirtyFiles) || !isolationDiagnostic.blockingTrackedDirtyFiles.includes(unrelatedRelativePath), 'unrelated tracked dirty file must not be promoted into blockingTrackedDirtyFiles');
   assert(Array.isArray(isolationDiagnostic.declaredFiles) && isolationDiagnostic.declaredFiles.includes('packages/cli/src/commands/batch.ts'), 'isolation diagnostic must echo declared scope paths');
   assertLastTransitionHashMatchesDisk(isolationRepo, isolationTaskId);
+
+  // Regression: TASK-MRP-0028 closure packets describe the delivery parent commit,
+  // so tracked dirty framework files must fail before close can write a packet.
+  const dirtyCloseRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(dirtyCloseRepo);
+  execFileSync('git', ['add', '.'], { cwd: dirtyCloseRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial dirty-close fixture'], { cwd: dirtyCloseRepo, stdio: 'ignore' });
+  const dirtyCloseTaskId = 'TEST-TASK-MRP-0028-DIRTY-CLOSE';
+  const dirtyCloseTaskCreate = await runTasks(['create', '--cwd', dirtyCloseRepo, '--task', dirtyCloseTaskId, '--actor', 'validator', '--title', 'Dirty framework close fixture']);
+  assert(dirtyCloseTaskCreate.ok === true, 'dirty-close fixture task create must succeed');
+  const dirtyCloseTaskPath = path.join(dirtyCloseRepo, '.atm', 'history', 'tasks', `${dirtyCloseTaskId}.json`);
+  const dirtyCloseTaskDoc = readJson(dirtyCloseTaskPath);
+  dirtyCloseTaskDoc.status = 'ready';
+  dirtyCloseTaskDoc.scopePaths = ['package.json'];
+  dirtyCloseTaskDoc.deliverables = ['package.json'];
+  writeJson(dirtyCloseTaskPath, dirtyCloseTaskDoc);
+  const dirtyCloseClaim = await runNext(['--cwd', dirtyCloseRepo, '--claim', '--actor', 'validator', '--task', dirtyCloseTaskId]);
+  assert(dirtyCloseClaim.ok === true, 'dirty-close fixture task must be claimable');
+  writeJson(path.join(dirtyCloseRepo, '.atm', 'history', 'evidence', `${dirtyCloseTaskId}.json`), {
+    taskId: dirtyCloseTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'dirty close fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['package.json'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate dirty close fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  writeJson(path.join(dirtyCloseRepo, 'package.json'), { name: 'ai-atomic-framework', version: '0.0.0', delivery: true });
+  execFileSync('git', ['add', 'package.json'], { cwd: dirtyCloseRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'package delivery for dirty close fixture'], { cwd: dirtyCloseRepo, stdio: 'ignore' });
+  writeJson(path.join(dirtyCloseRepo, 'package.json'), { name: 'ai-atomic-framework', version: '0.0.0', delivery: true, dirty: true });
+  const dirtyCloseError = await expectTaskErrorDetails(['close', '--cwd', dirtyCloseRepo, '--task', dirtyCloseTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD'], 'ATM_TASK_CLOSE_DIRTY_WORKTREE');
+  assert((dirtyCloseError.trackedDirtyFiles ?? []).includes('package.json'), 'dirty close error must report tracked dirty files');
+  assert(String(dirtyCloseError.remediation ?? '').includes('delivery parent commit'), 'dirty close remediation must explain parent-commit closure semantics');
+
+  const repairRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(repairRepo);
+  execFileSync('git', ['add', '.'], { cwd: repairRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial repair fixture'], { cwd: repairRepo, stdio: 'ignore' });
+  const repairTaskId = 'TASK-REPAIR-CLOSURE-0001';
+  const repairTaskPath = path.join(repairRepo, '.atm', 'history', 'tasks', `${repairTaskId}.json`);
+  writeJson(repairTaskPath, {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: repairTaskId,
+    title: 'Repair closure fixture',
+    status: 'done',
+    closurePacket: `.atm/history/evidence/${repairTaskId}.closure-packet.json`
+  });
+  writeJson(path.join(repairRepo, '.atm', 'history', 'evidence', `${repairTaskId}.json`), {
+    taskId: repairTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'repair closure fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['package.json'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate repair closure fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+        stderrSha256: 'sha256:2222222222222222222222222222222222222222222222222222222222222222'
+      }]
+    }]
+  });
+  writeJson(path.join(repairRepo, 'package.json'), { name: 'ai-atomic-framework', version: '0.0.0', delivery: true });
+  execFileSync('git', ['add', 'package.json'], { cwd: repairRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'package delivery for repair fixture'], { cwd: repairRepo, stdio: 'ignore' });
+  const repairDeliveryCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repairRepo, encoding: 'utf8' }).trim();
+  const repairClosurePacketPath = `.atm/history/evidence/${repairTaskId}.closure-packet.json`;
+  const repairClosurePacketAbsolute = path.join(repairRepo, repairClosurePacketPath);
+  const createdPacket = createClosurePacket({
+    cwd: repairRepo,
+    taskId: repairTaskId,
+    actorId: 'validator',
+    evidencePath: `.atm/history/evidence/${repairTaskId}.json`,
+    changedFiles: ['package.json']
+  });
+  writeClosurePacket(repairRepo, repairTaskId, createdPacket);
+  const brokenPacket = readJson(repairClosurePacketAbsolute);
+  brokenPacket.targetCommit = 'broken-target-commit';
+  brokenPacket.governedTreeSha = 'broken-governed-tree';
+  brokenPacket.targetCommitDelta = {
+    ...brokenPacket.targetCommitDelta,
+    currentCommitSha: 'broken-current-commit',
+    parentCommitShas: [],
+    governedTreeSha: 'broken-governed-tree',
+    changedFiles: []
+  };
+  writeJson(repairClosurePacketAbsolute, brokenPacket);
+  const noHooksDir = path.join(repairRepo, '.atm-temp-hooks');
+  mkdirSync(noHooksDir, { recursive: true });
+  execFileSync('git', ['add', '.'], { cwd: repairRepo, stdio: 'ignore' });
+  execFileSync('git', ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'broken closure packet fixture'], { cwd: repairRepo, stdio: 'ignore' });
+  const brokenRepairHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repairRepo, encoding: 'utf8' }).trim();
+
+  const repairStageOnlyResult = await runTasks(['repair-closure', '--cwd', repairRepo, '--task', repairTaskId, '--json']);
+  assert(repairStageOnlyResult.ok === true, 'tasks repair-closure must succeed in default stage-only mode');
+  const repairStageOnlyEvidence = repairStageOnlyResult.evidence as Record<string, any>;
+  assert(repairStageOnlyEvidence.result?.amended === false, 'tasks repair-closure must not rewrite HEAD by default');
+  assert(repairStageOnlyEvidence.result?.previousHead === brokenRepairHead, 'tasks repair-closure must report the pre-repair HEAD');
+  assert(repairStageOnlyEvidence.result?.repairedHead === brokenRepairHead, 'tasks repair-closure stage-only mode must leave HEAD unchanged');
+  assert(repairStageOnlyEvidence.nextAction?.kind === 'governed-commit-required', 'tasks repair-closure must return a governed follow-up action');
+  assert(String(repairStageOnlyEvidence.nextAction?.command ?? '').includes(`node atm.mjs git commit --actor <actor-id> --task ${repairTaskId}`), 'tasks repair-closure must recommend the governed git commit wrapper');
+  const repairedPacket = readJson(repairClosurePacketAbsolute);
+  assert(repairedPacket.targetCommit === repairDeliveryCommit, 'tasks repair-closure must realign targetCommit to the delivery parent commit');
+  assert(Array.isArray(repairedPacket.targetCommitDelta?.parentCommitShas) && repairedPacket.targetCommitDelta.parentCommitShas[0] === repairDeliveryCommit, 'tasks repair-closure must realign parent commit shas to HEAD parents');
+  const repairCachedFiles = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: repairRepo, encoding: 'utf8' })
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  assert(repairCachedFiles.includes(repairClosurePacketPath), 'tasks repair-closure must stage the repaired closure packet');
+  assert(repairCachedFiles.includes('.atm/history/evidence/git-head.jsonl'), 'tasks repair-closure must stage git-head evidence for the follow-up governed commit');
+
+  const amendUnavailableDetails = await expectTaskErrorDetails(['repair-closure', '--cwd', repairRepo, '--task', repairTaskId, '--amend'], 'ATM_CLOSURE_REPAIR_AMEND_WRAPPER_UNAVAILABLE');
+  assert(String(amendUnavailableDetails.requiredCommand ?? '').includes(`node atm.mjs git commit --actor <actor-id> --task ${repairTaskId}`), 'repair-closure --amend must redirect to the governed git commit wrapper');
 
   const resetRepo = makeHostRepo(tempRoot, 'reset-release');
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
