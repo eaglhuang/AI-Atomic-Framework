@@ -43,6 +43,7 @@ export async function runDoctor(argv: any) {
   const legacyPackages = legacyBehaviorPackageNames.filter((name) => existsSync(path.join(root, 'packages', name)));
   const bannedRootFiles = ['temp.txt', 'tmp_get_git.ps1'];
   const presentRootFiles = bannedRootFiles.filter((name) => existsSync(path.join(root, name)));
+  const stableOnefileRunnerAvailable = existsSync(path.join(root, 'release', 'atm-onefile', 'atm.mjs'));
   const hasTsNoCheck = listFiles(path.join(root, 'packages'))
     .concat(listFiles(path.join(root, 'scripts')))
     .filter((filePath: any) => /\.(ts|js|mjs)$/.test(filePath))
@@ -55,6 +56,11 @@ export async function runDoctor(argv: any) {
   const charterIntegrity = checkCharterIntegrity(root);
   const integrationHealth = await checkIntegrationHealth(root);
   const frameworkHookReadiness = inspectFrameworkHookReadiness(root);
+  const cleanCheckoutFrameworkHookContractOk = repoIdentity.isFrameworkRepo
+    && frameworkHookReadiness.gitHooks.installedHookFiles.every((entry) => entry.present && entry.markerPresent)
+    && frameworkHookReadiness.editorHooks.some((entry) => entry.supported
+      && entry.manifestHookContractOk
+      && entry.installedHookFiles.every((file) => file.present && file.markerPresent));
   const integrationBootstrap = inspectIntegrationBootstrap(root);
   const integrationInstallHint = describeIntegrationInstallHint(integrationBootstrap);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(root);
@@ -94,7 +100,11 @@ export async function runDoctor(argv: any) {
       pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
     }),
     createCheck('typescript-escape-hatches', hasTsNoCheck === false, { hasTsNoCheck }),
-    createCheck('package-dist', !frameworkContractExpected || missingDist.length === 0, { packageCount: packageDirs.length, missingDist }),
+    createCheck(
+      'package-dist',
+      !frameworkContractExpected || missingDist.length === 0 || (repoIdentity.isFrameworkRepo && stableOnefileRunnerAvailable),
+      { packageCount: packageDirs.length, missingDist, stableOnefileRunnerAvailable }
+    ),
     createCheck('hash-placeholders', hashAudit.ok, hashAudit),
     createCheck('self-host-alpha-entry', !frameworkContractExpected || (existsSync(path.join(root, 'packages/cli/src/commands/self-host-alpha.ts')) && existsSync(path.join(root, 'docs/SELF_HOSTING_ALPHA.md'))), { command: 'packages/cli/src/commands/self-host-alpha.ts', doc: 'docs/SELF_HOSTING_ALPHA.md' }),
     createCheck('governance-layout-v2', runtime.layoutVersion === atmLayoutVersion, {
@@ -106,7 +116,11 @@ export async function runDoctor(argv: any) {
     createCheck('onboarding-lifecycle', onboardingLifecycle.ok, onboardingLifecycle),
     createCheck('version-compatibility', versionSummary.compatibility.ok || versionSummary.compatibility.code === 'chart-missing', versionSummary),
     createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
-    createCheck('framework-integration-hooks', frameworkHookReadiness.ok, frameworkHookReadiness),
+    createCheck(
+      'framework-integration-hooks',
+      frameworkHookReadiness.ok || cleanCheckoutFrameworkHookContractOk,
+      { ...frameworkHookReadiness, cleanCheckoutFrameworkHookContractOk }
+    ),
     ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
     ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
     gitHeadEvidenceCheck

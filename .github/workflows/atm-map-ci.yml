@@ -36,7 +36,7 @@ jobs:
           for mapDir in atomic_workbench/maps/*/; do
             mapId=$(basename "$mapDir")
             echo "Checking fingerprint for $mapId..."
-            npm run --silent -- node packages/cli/src/commands/test.ts --cwd . --map "$mapId" --fingerprint-check --json || {
+            node atm.mjs test --cwd . --map "$mapId" --fingerprint-check --json || {
               echo "Fingerprint check failed for $mapId"
               exit 1
             }
