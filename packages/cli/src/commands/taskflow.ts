@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
+import { loadProfile } from './taskflow/profile-loader.ts';
 
 export function runTaskflow(argv: string[] = []) {
   const spec = getCommandSpec('taskflow');
@@ -25,6 +26,13 @@ export function runTaskflow(argv: string[] = []) {
     );
   }
 
+  let profileData: any = null;
+  const profilePath = parsed.options.profile ? String(parsed.options.profile) : null;
+
+  if (profilePath) {
+    profileData = loadProfile(profilePath);
+  }
+
   // 實作 dry-run 骨架
   const result = makeResult({
     ok: true,
@@ -35,27 +43,37 @@ export function runTaskflow(argv: string[] = []) {
       message(
         'info',
         'ATM_TASKFLOW_OPEN_DRY_RUN_SKELETON_READY',
-        'Taskflow open dry-run skeleton is ready. Write mode is not supported by design.',
+        profileData
+          ? `Taskflow open dry-run with profile "${profileData.name}" is ready. Write mode is not supported by design.`
+          : 'Taskflow open dry-run skeleton is ready. Write mode is not supported by design.',
         { cwd }
       )
     ],
     evidence: {
       wouldDo: [
         {
-          workItemId: 'TASK-AAO-0112',
+          workItemId: 'TASK-AAO-0113',
           action: 'create-dry-run',
           status: 'planned',
           targetRepo: 'AI-Atomic-Framework'
         }
       ],
-      diagnostics: [
+      diagnostics: profileData ? [
+        `Loaded profile: ${profileData.name}`,
+        `Capabilities: supportsDryRun=${profileData.capabilities.supportsDryRun}, supportsWrite=${profileData.capabilities.supportsWrite}`,
+        `Delegation: ${profileData.delegation.hint}`
+      ] : [
         'This is a read-only orchestrator dry-run skeleton.',
         'No physical task cards, ledger records, or json shards will be created or modified by this command.'
       ],
-      decision: {
+      decision: profileData ? {
+        reason: `Delegated to opener defined in profile "${profileData.name}": ${profileData.delegation.hint}`,
+        delegatedTo: profileData.delegation.openerPath ?? 'repo-profile task compiler / task-card-opener.js'
+      } : {
         reason: 'All task ledger mutations remain delegated to the repo-profile specified task opener and compiler.',
         delegatedTo: 'repo-profile task compiler / task-card-opener.js'
-      }
+      },
+      ...(profileData ? { profile: profileData } : {})
     }
   });
 

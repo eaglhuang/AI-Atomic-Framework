@@ -16,6 +16,7 @@ export default defineCommandSpec({
     commonCwdOption,
     { flag: '--dry-run', summary: 'Preview task cards to be opened and ledger updates without writing.' },
     { flag: '--write', summary: 'Perform the task card creation and ledger update.' },
+    { flag: '--profile', value: 'path', summary: 'Path to the taskflow profile JSON file.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
