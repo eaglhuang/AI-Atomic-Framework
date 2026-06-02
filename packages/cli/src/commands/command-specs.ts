@@ -64,6 +64,7 @@ import rollbackSpec from './command-specs/rollback.spec.ts';
 import reviewSpec from './command-specs/review.spec.ts';
 import agentPackSpec from './command-specs/agent-pack.spec.ts';
 import reviewAdvisorySpec from './command-specs/review-advisory.spec.ts';
+import taskflowSpec from './command-specs/taskflow.spec.ts';
 
 function withVisibility(spec: any, visibility: 'public' | 'internal' = 'public') {
   return Object.freeze({
@@ -131,6 +132,7 @@ export const commandSpecs = Object.freeze({
   validate: validateSpec,
   welcome: welcomeSpec,
   verify: verifySpec,
+  taskflow: withVisibility(taskflowSpec, 'internal'),
 });
 
 export function getCommandSpec(commandName: string) {
