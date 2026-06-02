@@ -17,6 +17,12 @@ const profile = process.argv.includes('--profile')
   : null;
 const surfaceOnly = mode === 'surface' || profile === 'surface' || process.argv.includes('--surface');
 const childProcessSmokeEnabled = process.env.ATM_VALIDATE_CLI_CHILD_SMOKE !== '0';
+for (const key of Object.keys(process.env)) {
+  if (key.startsWith('ATM_') && !['ATM_VALIDATE_CLI_CHILD_SMOKE', 'ATM_TEMP_ROOT'].includes(key)) {
+    delete process.env[key];
+  }
+}
+
 const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
 const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');
 const perCommandHelpSnapshots = {
