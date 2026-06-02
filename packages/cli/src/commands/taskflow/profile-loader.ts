@@ -4,14 +4,30 @@ import { CliError } from '../shared.ts';
 
 export interface TaskflowProfileV1 {
   schemaId: 'taskflow.profile.v1';
+  id: string;
   name: string;
+  repoLabel: string;
+  ownerRepo: string;
+  taskIdPrefix: string;
+  taskId: {
+    format: string;
+  };
+  template: {
+    defaultMarkdown: string;
+    namedTemplates?: Record<string, string>;
+  };
   capabilities: {
     supportsDryRun: boolean;
     supportsWrite: boolean;
   };
+  delegationDisplayHint?: string;
   delegation: {
     hint: string;
     openerPath?: string;
+    writerInvocation?: {
+      describeOnly?: boolean;
+      displayHint?: string;
+    };
   };
 }
 
@@ -53,10 +69,66 @@ export function loadProfile(profilePath: string): TaskflowProfileV1 {
   }
 
   // 驗證必要欄位
+  if (!raw.id || typeof raw.id !== 'string') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Missing or invalid "id" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
   if (!raw.name || typeof raw.name !== 'string') {
     throw new CliError(
       'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
       'Missing or invalid "name" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
+  if (!raw.repoLabel || typeof raw.repoLabel !== 'string') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Missing or invalid "repoLabel" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
+  if (!raw.ownerRepo || typeof raw.ownerRepo !== 'string') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Missing or invalid "ownerRepo" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
+  if (!raw.taskIdPrefix || typeof raw.taskIdPrefix !== 'string') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Missing or invalid "taskIdPrefix" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
+  if (!raw.taskId || typeof raw.taskId !== 'object' || typeof raw.taskId.format !== 'string') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Missing or invalid "taskId.format" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
+  if (!raw.template || typeof raw.template !== 'object' || typeof raw.template.defaultMarkdown !== 'string') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Missing or invalid "template.defaultMarkdown" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
+  if (raw.template.namedTemplates && typeof raw.template.namedTemplates !== 'object') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Invalid "template.namedTemplates" field in taskflow profile.',
       { exitCode: 1 }
     );
   }
@@ -85,12 +157,44 @@ export function loadProfile(profilePath: string): TaskflowProfileV1 {
     );
   }
 
+  if (raw.delegationDisplayHint && typeof raw.delegationDisplayHint !== 'string') {
+    throw new CliError(
+      'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+      'Invalid "delegationDisplayHint" field in taskflow profile.',
+      { exitCode: 1 }
+    );
+  }
+
   if (!raw.delegation || typeof raw.delegation !== 'object' || typeof raw.delegation.hint !== 'string') {
     throw new CliError(
       'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
       'Missing or invalid "delegation.hint" field in taskflow profile.',
       { exitCode: 1 }
     );
+  }
+
+  if (raw.delegation.writerInvocation) {
+    if (typeof raw.delegation.writerInvocation !== 'object') {
+      throw new CliError(
+        'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+        'Invalid "delegation.writerInvocation" field in taskflow profile.',
+        { exitCode: 1 }
+      );
+    }
+    if (raw.delegation.writerInvocation.describeOnly !== undefined && typeof raw.delegation.writerInvocation.describeOnly !== 'boolean') {
+      throw new CliError(
+        'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+        'Invalid "delegation.writerInvocation.describeOnly" field in taskflow profile.',
+        { exitCode: 1 }
+      );
+    }
+    if (raw.delegation.writerInvocation.displayHint !== undefined && typeof raw.delegation.writerInvocation.displayHint !== 'string') {
+      throw new CliError(
+        'ATM_TASKFLOW_PROFILE_SCHEMA_INVALID',
+        'Invalid "delegation.writerInvocation.displayHint" field in taskflow profile.',
+        { exitCode: 1 }
+      );
+    }
   }
 
   // 硬性安全限制：supportsWrite 必須為 false

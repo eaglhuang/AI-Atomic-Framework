@@ -5,7 +5,13 @@
   "type": "object",
   "required": [
     "schemaId",
+    "id",
     "name",
+    "repoLabel",
+    "ownerRepo",
+    "taskIdPrefix",
+    "taskId",
+    "template",
     "capabilities",
     "delegation"
   ],
@@ -14,8 +20,44 @@
       "type": "string",
       "enum": ["taskflow.profile.v1"]
     },
+    "id": {
+      "type": "string"
+    },
     "name": {
       "type": "string"
+    },
+    "repoLabel": {
+      "type": "string"
+    },
+    "ownerRepo": {
+      "type": "string"
+    },
+    "taskIdPrefix": {
+      "type": "string"
+    },
+    "taskId": {
+      "type": "object",
+      "required": ["format"],
+      "properties": {
+        "format": {
+          "type": "string"
+        }
+      }
+    },
+    "template": {
+      "type": "object",
+      "required": ["defaultMarkdown"],
+      "properties": {
+        "defaultMarkdown": {
+          "type": "string"
+        },
+        "namedTemplates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
     },
     "capabilities": {
       "type": "object",
@@ -29,6 +71,9 @@
         }
       }
     },
+    "delegationDisplayHint": {
+      "type": "string"
+    },
     "delegation": {
       "type": "object",
       "required": ["hint"],
@@ -38,6 +83,17 @@
         },
         "openerPath": {
           "type": "string"
+        },
+        "writerInvocation": {
+          "type": "object",
+          "properties": {
+            "describeOnly": {
+              "type": "boolean"
+            },
+            "displayHint": {
+              "type": "string"
+            }
+          }
         }
       }
     }

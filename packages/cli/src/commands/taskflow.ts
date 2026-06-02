@@ -33,6 +33,9 @@ export function runTaskflow(argv: string[] = []) {
     profileData = loadProfile(profilePath);
   }
 
+  const taskId = profileData ? `${profileData.taskIdPrefix}-0001` : 'TASK-ADOPTER-0001';
+  const targetRepo = profileData ? profileData.ownerRepo : 'adopter-repo';
+
   // 實作 dry-run 骨架
   const result = makeResult({
     ok: true,
@@ -52,23 +55,26 @@ export function runTaskflow(argv: string[] = []) {
     evidence: {
       wouldDo: [
         {
-          workItemId: 'TASK-AAO-0113',
+          workItemId: taskId,
           action: 'create-dry-run',
           status: 'planned',
-          targetRepo: 'AI-Atomic-Framework'
+          targetRepo: targetRepo
         }
       ],
       diagnostics: profileData ? [
         `Loaded profile: ${profileData.name}`,
         `Capabilities: supportsDryRun=${profileData.capabilities.supportsDryRun}, supportsWrite=${profileData.capabilities.supportsWrite}`,
-        `Delegation: ${profileData.delegation.hint}`
+        `Delegation: ${profileData.delegation.hint}`,
+        `TaskId format: ${profileData.taskId.format}`,
+        `Default markdown template available`
       ] : [
         'This is a read-only orchestrator dry-run skeleton.',
         'No physical task cards, ledger records, or json shards will be created or modified by this command.'
       ],
       decision: profileData ? {
         reason: `Delegated to opener defined in profile "${profileData.name}": ${profileData.delegation.hint}`,
-        delegatedTo: profileData.delegation.openerPath ?? 'repo-profile task compiler / task-card-opener.js'
+        delegatedTo: profileData.delegation.openerPath ?? 'repo-profile task compiler / task-card-opener.js',
+        displayHint: profileData.delegation.writerInvocation?.displayHint ?? 'repo-profile task compiler / task-card-opener.js'
       } : {
         reason: 'All task ledger mutations remain delegated to the repo-profile specified task opener and compiler.',
         delegatedTo: 'repo-profile task compiler / task-card-opener.js'
