@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import type { ActorKind, ActorRecord, ActorRegistryDocument } from '@ai-atomic-framework/core';
 
@@ -189,6 +190,58 @@ function sanitizeOptional(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
+}
+
+export interface GitLocalIdentitySnapshot {
+  readonly name: string | null;
+  readonly email: string | null;
+}
+
+export function readGitLocalConfigValue(cwd: string, key: 'user.name' | 'user.email'): string | null {
+  try {
+    const value = execFileSync('git', ['config', '--local', '--get', key], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    return value || null;
+  } catch {
+    return null;
+  }
+}
+
+export function snapshotGitLocalIdentity(cwd: string): GitLocalIdentitySnapshot {
+  return {
+    name: readGitLocalConfigValue(cwd, 'user.name'),
+    email: readGitLocalConfigValue(cwd, 'user.email')
+  };
+}
+
+export function writeGitLocalIdentity(cwd: string, name: string, email: string): void {
+  execFileSync('git', ['config', '--local', 'user.name', name], { cwd, stdio: ['ignore', 'ignore', 'pipe'] });
+  execFileSync('git', ['config', '--local', 'user.email', email], { cwd, stdio: ['ignore', 'ignore', 'pipe'] });
+}
+
+export function restoreGitLocalIdentity(cwd: string, snapshot: GitLocalIdentitySnapshot): void {
+  if (snapshot.name === null) {
+    try { execFileSync('git', ['config', '--local', '--unset', 'user.name'], { cwd, stdio: ['ignore', 'ignore', 'ignore'] }); } catch {}
+  } else {
+    execFileSync('git', ['config', '--local', 'user.name', snapshot.name], { cwd, stdio: ['ignore', 'ignore', 'pipe'] });
+  }
+  if (snapshot.email === null) {
+    try { execFileSync('git', ['config', '--local', '--unset', 'user.email'], { cwd, stdio: ['ignore', 'ignore', 'ignore'] }); } catch {}
+  } else {
+    execFileSync('git', ['config', '--local', 'user.email', snapshot.email], { cwd, stdio: ['ignore', 'ignore', 'pipe'] });
+  }
+}
+
+export function composeAdoptSlug(editor: string, model: string): string {
+  const normalizedEditor = editor.trim().toLowerCase();
+  const normalizedModel = model.trim().toLowerCase();
+  if (!normalizedEditor || !normalizedModel) {
+    throw new Error('composeAdoptSlug requires non-empty editor and model.');
+  }
+  return `${normalizedEditor}-${normalizedModel}`;
 }
 
 function sanitizeCapabilities(capabilities: unknown): readonly string[] | undefined {

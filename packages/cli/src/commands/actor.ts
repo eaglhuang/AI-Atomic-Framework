@@ -4,12 +4,19 @@ import { CliError, makeResult, message } from './shared.ts';
 import {
   actorIdEnvVar,
   actorRegistryRelativePath,
+  composeAdoptSlug,
   findActorByResolvedId,
   type ResolvedActorId,
   readActorRegistry,
+  readRuntimeIdentityDefault,
   resolveActorId,
+  restoreGitLocalIdentity,
+  runtimeIdentityRelativePath,
   sanitizeActorKind,
-  upsertActorRecord
+  snapshotGitLocalIdentity,
+  upsertActorRecord,
+  writeGitLocalIdentity,
+  writeRuntimeIdentityDefault
 } from './actor-registry.ts';
 
 export async function runActor(argv: string[]) {
@@ -49,6 +56,10 @@ export async function runActor(argv: string[]) {
         registryPath: written.path
       }
     });
+  }
+
+  if (options.action === 'adopt') {
+    return runActorAdopt(options);
   }
 
   if (options.action === 'list') {
@@ -134,16 +145,103 @@ export async function runActor(argv: string[]) {
 
 interface ParsedActorOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'list' | 'resolve' | 'verify-git';
+  readonly action: 'register' | 'list' | 'resolve' | 'verify-git' | 'adopt';
   readonly actorId: string | null;
   readonly actorKind: string | null;
   readonly displayName: string | null;
   readonly provider: string | null;
   readonly editor: string | null;
+  readonly model: string | null;
+  readonly session: string | null;
   readonly gitName: string | null;
   readonly gitEmail: string | null;
   readonly contact: string | null;
   readonly capabilities: readonly string[];
+}
+
+function runActorAdopt(options: ParsedActorOptions) {
+  if (!options.editor) {
+    throw new CliError('ATM_CLI_USAGE', 'actor adopt requires --editor <editor-slug>.', { exitCode: 2 });
+  }
+  if (!options.model) {
+    throw new CliError('ATM_CLI_USAGE', 'actor adopt requires --model <model-slug>.', { exitCode: 2 });
+  }
+  const actorKind = sanitizeActorKind(options.actorKind ?? 'ai-agent');
+  if (!actorKind) {
+    throw new CliError('ATM_CLI_USAGE', 'actor adopt --kind must be human | ai-agent | automation.', { exitCode: 2 });
+  }
+  const slug = composeAdoptSlug(options.editor, options.model);
+  const gitName = options.gitName ?? slug;
+  const gitEmail = options.gitEmail ?? `${slug}@atm.local`;
+  const displayName = options.displayName ?? slug;
+
+  const previousIdentity = readRuntimeIdentityDefault(options.cwd);
+  const previousActorId = previousIdentity?.actorId ?? null;
+  const gitSnapshot = snapshotGitLocalIdentity(options.cwd);
+
+  let actorRegistryPath: string | null = null;
+  let gitConfigChanged = false;
+
+  try {
+    const written = upsertActorRecord(options.cwd, {
+      actorId: slug,
+      actorKind,
+      displayName,
+      provider: options.provider ?? undefined,
+      editor: options.editor,
+      gitName,
+      gitEmail,
+      contact: options.contact ?? undefined,
+      capabilities: options.capabilities
+    });
+    actorRegistryPath = written.path;
+
+    writeGitLocalIdentity(options.cwd, gitName, gitEmail);
+    gitConfigChanged = gitSnapshot.name !== gitName || gitSnapshot.email !== gitEmail;
+
+    writeRuntimeIdentityDefault(options.cwd, {
+      schemaId: 'atm.identityDefault.v1',
+      specVersion: '0.1.0',
+      actorId: slug,
+      gitName,
+      gitEmail,
+      editor: options.editor,
+      provider: options.provider ?? null,
+      activeSessionId: options.session ?? null,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    try { restoreGitLocalIdentity(options.cwd, gitSnapshot); } catch { /* best-effort */ }
+    const errMessage = error instanceof Error ? error.message : String(error);
+    throw new CliError('ATM_ACTOR_ADOPT_FAILED', `actor adopt transaction failed and git config was rolled back: ${errMessage}`, {
+      exitCode: 1,
+      details: {
+        actorId: slug,
+        gitSnapshot
+      }
+    });
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'actor',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_ACTOR_ADOPTED', 'Actor identity adopted; registry, git config, and runtime default are in sync.', {
+      actorId: slug,
+      previousActorId,
+      gitConfigChanged
+    })],
+    evidence: {
+      actorId: slug,
+      previousActorId,
+      gitConfigChanged,
+      runtimeDefaultPath: runtimeIdentityRelativePath,
+      registryPath: actorRegistryPath,
+      editor: options.editor,
+      model: options.model,
+      activeSessionId: options.session ?? null
+    }
+  });
 }
 
 function parseActorArgs(argv: string[]): ParsedActorOptions {
@@ -155,6 +253,8 @@ function parseActorArgs(argv: string[]): ParsedActorOptions {
     displayName: null as string | null,
     provider: null as string | null,
     editor: null as string | null,
+    model: null as string | null,
+    session: null as string | null,
     gitName: null as string | null,
     gitEmail: null as string | null,
     contact: null as string | null,
@@ -193,6 +293,16 @@ function parseActorArgs(argv: string[]): ParsedActorOptions {
       index += 1;
       continue;
     }
+    if (arg === '--model') {
+      state.model = requireValue(argv, index, '--model');
+      index += 1;
+      continue;
+    }
+    if (arg === '--session') {
+      state.session = requireValue(argv, index, '--session');
+      index += 1;
+      continue;
+    }
     if (arg === '--git-name') {
       state.gitName = requireValue(argv, index, '--git-name');
       index += 1;
@@ -228,8 +338,8 @@ function parseActorArgs(argv: string[]): ParsedActorOptions {
     state.action = arg as ParsedActorOptions['action'];
   }
 
-  if (!state.action || !['register', 'list', 'resolve', 'verify-git'].includes(state.action)) {
-    throw new CliError('ATM_CLI_USAGE', 'actor supports: register, list, resolve, verify-git', { exitCode: 2 });
+  if (!state.action || !['register', 'list', 'resolve', 'verify-git', 'adopt'].includes(state.action)) {
+    throw new CliError('ATM_CLI_USAGE', 'actor supports: register, list, resolve, verify-git, adopt', { exitCode: 2 });
   }
 
   return {
@@ -240,6 +350,8 @@ function parseActorArgs(argv: string[]): ParsedActorOptions {
     displayName: state.displayName,
     provider: state.provider,
     editor: state.editor,
+    model: state.model,
+    session: state.session,
     gitName: state.gitName,
     gitEmail: state.gitEmail,
     contact: state.contact,
