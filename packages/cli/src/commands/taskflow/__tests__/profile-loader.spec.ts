@@ -76,4 +76,3 @@ assert.throws(() => {
 });
 
 console.log('[taskflow-profile-loader:test] ok');
-
