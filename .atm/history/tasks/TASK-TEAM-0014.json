@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0014",
+  "title": "Atomic police patrol reports",
+  "status": "planned",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-TEAM-0013"
+  ],
+  "acceptance": [
+    "Patrol output includes run id, patrol team, severity, findings, safe-to-proceed, suggested command, and follow-up.",
+    "Patrols are explicitly read-only and report `mutations: []`.",
+    "The command can run for claim-preflight, close-preflight, big-script, and daily-noon patrol modes.",
+    "Findings distinguish warnings from blockers.",
+    "Patrol reports do not alter `.atm/runtime/**` or `.atm/history/**`."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case patrol-report",
+    "node atm.mjs team patrol --task TASK-TEAM-0014 --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Recurring automation scheduling",
+    "Automatic source mutation by police agents",
+    "Closing tasks from patrol output"
+  ],
+  "nonGoals": [
+    "Do not create a second evidence system",
+    "Do not replace validators with patrol text"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert patrol command/report changes and map updates.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card gives the police team a voice, not a baton.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0014-atomic-police-patrol-reports.task.md",
+    "sectionTitle": "TASK-TEAM-0014",
+    "headingLine": 48,
+    "hash": "d2704649bc20f6c7"
+  },
+  "importedAt": "2026-06-03T04:36:03.232Z",
+  "lastTransitionId": "2026-06-03T04-36-03-237Z-import-e397f414828c",
+  "lastTransitionAt": "2026-06-03T04:36:03.237Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
