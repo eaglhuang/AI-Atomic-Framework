@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0121",
+  "title": "reconcile TASK-AAO-0120 closure target and release pollution",
+  "status": "review",
+  "milestone": "M16",
+  "dependencies": [],
+  "acceptance": [
+    "Only release onefile pollution and TASK-AAO-0120 closure/evidence pollution are addressed.",
+    "TASK-AAO-0120 source is not rewritten.",
+    "TASK-AAO-0120 importer implementation files are not touched.",
+    "Broader scratch or `.playwright-mcp` cleanup is not folded into this card.",
+    "This card stays in 3KLife Phase 0 and only updates the task card, tasks-atm ledger, and shard."
+  ],
+  "deliverables": [],
+  "scopePaths": [
+    "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0121-reconcile-task-aao-0120-closure-target-and-release-pollution.task.md",
+    "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+    "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+    "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
+    "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/README.onefile.md",
+    "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/atm.mjs",
+    "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/release-manifest.json"
+  ],
+  "validators": [],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/AI-Atomic-Framework/packages/**",
+    "C:/Users/User/AI-Atomic-Framework/scripts/**",
+    "C:/Users/User/AI-Atomic-Framework/tests/**",
+    "C:/Users/User/AI-Atomic-Framework/.atm/**",
+    "C:/Users/User/3KLife/.atm/**",
+    "C:/Users/User/3KLife/.tmp/**",
+    "C:/Users/User/3KLife/examples/**"
+  ],
+  "nonGoals": [
+    "Do not mutate AAF source files.",
+    "Do not rewrite TASK-AAO-0120 source.",
+    "Do not touch TASK-AAO-0120 importer implementation files.",
+    "Do not stage or commit unrelated dirty or untracked files."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0121-reconcile-task-aao-0120-closure-target-and-release-pollution.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/README.onefile.md",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/atm.mjs",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/release-manifest.json"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "tags": [],
+  "notes": "TASK-AAO-0120 source functionality is already landed, but the closure target is not clean and the release onefile surface is polluted.\nThis card only reconciles closure, evidence, and release hygiene.\nIt does not rewrite TASK-AAO-0120 source and does not touch TASK-AAO-0120 importer implementation files.\n\nTASK-AAO-0121 depends on TASK-AAO-0120 for sequencing.\nIf scratch or `.playwright-mcp` noise needs a broader sweep, open a separate evidence-hygiene card.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0121-reconcile-task-aao-0120-closure-target-and-release-pollution.task.md",
+    "sectionTitle": "TASK-AAO-0121",
+    "headingLine": 47,
+    "hash": "709a0a2fe1dc7123"
+  },
+  "importedAt": "2026-06-03T04:19:17.674Z",
+  "lastTransitionId": "2026-06-03T04-20-28-452Z-close-440d3b193b5b",
+  "lastTransitionAt": "2026-06-03T04:20:28.452Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "007",
+  "resetReason": "reset import",
+  "reservedAt": "2026-06-03T04:19:33.664Z",
+  "promotedAt": "2026-06-03T04:19:33.669Z",
+  "claim": {
+    "actorId": "007",
+    "leaseId": "lease-8e29416f4ae8",
+    "claimedAt": "2026-06-03T04:19:33.674Z",
+    "heartbeatAt": "2026-06-03T04:20:28.452Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0121.json",
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0121-reconcile-task-aao-0120-closure-target-and-release-pollution.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/atm.mjs",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/README.onefile.md",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/release-manifest.json",
+      "docs/tasks/tasks-atm.json",
+      "docs/tasks/tasks-atm/.shardrc.json",
+      "docs/tasks/tasks-atm/tasks-atm-part",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/README.onefile.md",
+      "release/atm-onefile/release-manifest.json"
+    ],
+    "state": "released",
+    "reason": "awaiting real deliverable diff"
+  },
+  "startedAt": "2026-06-03T04:19:33.674Z",
+  "startedByActor": "007",
+  "startedBySessionId": "session-20260603041933-007-TASK-AAO-0121-517d751404",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0121",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0121.*",
+      ".atm/history/task-events/TASK-AAO-0121/**",
+      ".atm/history/tasks/TASK-AAO-0121.json",
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0121-reconcile-task-aao-0120-closure-target-and-release-pollution.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/atm.mjs",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/README.onefile.md",
+      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/release-manifest.json",
+      "docs/tasks/tasks-atm.json",
+      "docs/tasks/tasks-atm/.shardrc.json",
+      "docs/tasks/tasks-atm/tasks-atm-part",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/README.onefile.md",
+      "release/atm-onefile/release-manifest.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "41aa59133f7a6f2ab3695d0d31c1f6446b7326c0f70de90c92af6c640e472ab9",
+    "actorId": "007",
+    "createdAt": "2026-06-03T04:19:33.712Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-03T04:20:28.452Z",
+  "closedByActor": "007",
+  "closedBySessionId": "session-20260603041933-007-TASK-AAO-0121-517d751404",
+  "closeReason": "awaiting real deliverable diff"
+}
