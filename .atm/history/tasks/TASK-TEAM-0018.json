@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0018",
+  "title": "Team lease fencing and deadlock contract",
+  "status": "planned",
+  "milestone": "M5H",
+  "dependencies": [
+    "TASK-TEAM-0011",
+    "TASK-TEAM-0012",
+    "TASK-TEAM-0013"
+  ],
+  "acceptance": [
+    "Duplicate exclusive owner 仍 fail。",
+    "Stale epoch release / transfer fail，並回傳 agentId、permission、expectedEpoch、actualEpoch。",
+    "Wait-for graph direct cycle fail；acyclic dependency pass。",
+    "Released tombstone re-acquire path 有明確測試，不只測 `released: true`。",
+    "No source path outside task allowedFiles can be authorized through Team lease."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "packages/core/src/governance/scope-lock.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-team-agents.ts",
+    "scripts/validate-governance-local.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "packages/core/src/governance/scope-lock.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-team-agents.ts",
+    "scripts/validate-governance-local.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case fencing-deadlock",
+    "node --strip-types scripts/validate-governance-local.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Subagent spawning",
+    "Pre-tool or pre-commit enforcement",
+    "Symbol-scope lease enforcement before Atomization Planner provides symbol inventory",
+    "Manual edits under .atm/runtime/** or .atm/history/**"
+  ],
+  "nonGoals": [
+    "Do not make Team Agents a second task scheduler",
+    "Do not let leases override task allowedFiles",
+    "Do not replace ATM scope locks or taskDirectionLock"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert team lease fencing helpers, validator cases, and atom map entries. Do not hand-edit .atm/runtime/** tombstones.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0018-team-lease-fencing-deadlock-contract.task.md",
+    "sectionTitle": "TASK-TEAM-0018",
+    "headingLine": 59,
+    "hash": "5f61e58d5675ff61"
+  },
+  "importedAt": "2026-06-03T04:36:12.634Z",
+  "lastTransitionId": "2026-06-03T04-36-12-638Z-import-2fad068d3201",
+  "lastTransitionAt": "2026-06-03T04:36:12.638Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
