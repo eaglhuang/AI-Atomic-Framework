@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-03T01-16-38-530Z-close-37f5fd27812c",
+  "taskId": "TASK-AAO-0120",
+  "action": "close",
+  "actorId": "007",
+  "sessionId": "session-20260603010130-007-TASK-AAO-0120-1adee2d497",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0120.json",
+  "taskSha256": "sha256:9a05c6302e60cf15c295034737583ee23edb99d92debe599b1d0faa0015424d2",
+  "createdAt": "2026-06-03T01:16:38.530Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0120 --actor 007 --status done --historical-delivery 70679a3532b0be27034050dda9bf1a5baf15b866",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260603010130-007-TASK-AAO-0120-1adee2d497",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0120.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-03T01:16:38.527Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0120-section-aware-task-card-scope-extraction-and-outOfScope-subtraction.task.md",
+        "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0120-section-aware-task-card-scope-extraction-and-outOfScope-subtraction.task.md",
+        "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+        "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
+        "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
