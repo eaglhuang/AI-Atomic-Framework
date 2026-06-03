@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0001",
+  "title": "Team agents planning roster reset",
+  "status": "done",
+  "milestone": "M0",
+  "dependencies": [],
+  "acceptance": [
+    "The task index lists `TASK-TEAM-0001` through `TASK-TEAM-0016` in milestone order.",
+    "The plan states that task-card order follows milestones instead of old card numbers.",
+    "Old `TASK-TEAM-0001` to `TASK-TEAM-0004` draft meanings are no longer present.",
+    "All replacement task cards include `scopePaths`, `deliverables`, `validators`, `evidence`, `rollback`, and `atomizationImpact`.",
+    "No framework source files are changed by this planning-only task."
+  ],
+  "deliverables": [
+    "docs/ai_atomic_framework/team-agents/團隊自動化代理分工計畫.md",
+    "docs/ai_atomic_framework/team-agents/tasks/README.md",
+    "docs/ai_atomic_framework/team-agents/tasks/*.task.md"
+  ],
+  "scopePaths": [
+    "docs/ai_atomic_framework/team-agents/團隊自動化代理分工計畫.md",
+    "docs/ai_atomic_framework/team-agents/tasks/README.md",
+    "docs/ai_atomic_framework/team-agents/tasks/*.task.md"
+  ],
+  "validators": [
+    "node atm.mjs tasks import --from \\\"C:/Users/User/3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0001-team-agents-planning-roster-reset.task.md\\\" --dry-run --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "3KLife",
+  "closureAuthority": "planning_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Modifying AI-Atomic-Framework source",
+    "Importing target ledger state",
+    "Hand-editing .atm/runtime/** or .atm/history/**"
+  ],
+  "nonGoals": [
+    "Do not implement Team Agents runtime",
+    "Do not spawn subagents",
+    "Do not change ATM CLI behavior"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the planning docs commit that resets the Team Agents roster.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.planning-bridge-map",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card exists to make the Team Agents lane clean enough for later agents to import and claim without guessing which draft was current.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0001-team-agents-planning-roster-reset.task.md",
+    "sectionTitle": "TASK-TEAM-0001",
+    "headingLine": 47,
+    "hash": "d107b63480ad78f8"
+  },
+  "importedAt": "2026-06-03T04:35:34.163Z",
+  "lastTransitionId": "2026-06-03T04-35-34-166Z-import-5b369969ab62",
+  "lastTransitionAt": "2026-06-03T04:35:34.166Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
