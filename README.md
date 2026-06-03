@@ -1,7 +1,7 @@
 # AI-Atomic-Framework
 
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-0f172a.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-0f172a.svg)](LICENSE)
 [![Node 24](https://img.shields.io/badge/Node-24-1f6feb.svg)](package.json)
 [![npm](https://img.shields.io/badge/npm-create--atm-cb3837.svg)](https://www.npmjs.com/)
 [![6 Agent Integrations](https://img.shields.io/badge/Integrations-6-0ea5e9.svg)](docs/AGENT_PACK_ONBOARDING.md)
