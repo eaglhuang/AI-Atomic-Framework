@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0006",
+  "title": "Patrol report template",
+  "status": "planned",
+  "milestone": "M2",
+  "dependencies": [
+    "TASK-TEAM-0004"
+  ],
+  "acceptance": [
+    "The template includes run id, team, severity, findings, safe-to-proceed, suggested command, and follow-up fields.",
+    "The template clearly says patrols are read-only unless a separate task card grants write permission.",
+    "The validator fails if required patrol sections are missing.",
+    "The template can be used for daily, claim-preflight, close-preflight, and big-script patrol reports."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/templates/patrol-report-template.md",
+    "scripts/validate-team-agents-templates.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/templates/patrol-report-template.md",
+    "scripts/validate-team-agents-templates.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents-templates.ts --task TASK-TEAM-0006",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Scheduling patrols",
+    "Mutating source during patrol",
+    "Changing task close gates"
+  ],
+  "nonGoals": [
+    "Do not implement police agents in this card",
+    "Do not create a second evidence format"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove patrol report template and related validator coverage.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-template-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This is the output contract for later Atomic Police automation.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0006-patrol-report-template.task.md",
+    "sectionTitle": "TASK-TEAM-0006",
+    "headingLine": 77,
+    "hash": "feb3b910c60993e5"
+  },
+  "importedAt": "2026-06-03T04:35:45.094Z",
+  "lastTransitionId": "2026-06-03T04-35-45-098Z-import-49391f4ab4ad",
+  "lastTransitionAt": "2026-06-03T04:35:45.098Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
