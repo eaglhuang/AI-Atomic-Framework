@@ -1632,7 +1632,7 @@ async function runTasksClose(argv: string[]) {
     })
     : null;
   if (frameworkStatus?.repoRole === 'framework') {
-    const closeWorktree = inspectFrameworkCloseWorktree(options.cwd);
+    const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
     const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
       taskId: options.taskId,
       taskDeclaredFiles,
@@ -2933,7 +2933,7 @@ function evaluateTaskDeliverableGate(input: {
 }): TaskDeliverableGateReport {
   const required = isDeliverableDiffRequired(input.taskDocument);
   const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
-  const changedFileReport = listChangedFilesForDeliverableGate(input.cwd, input.claim);
+  const changedFileReport = listChangedFilesForDeliverableGate(input.cwd, input.claim, input.taskId);
   const changedFiles = (changedFileReport.gitAvailable
     ? changedFileReport.files
     : uniqueStrings([
@@ -3060,9 +3060,32 @@ function isDeliverableDiffRequired(taskDocument: Record<string, unknown>): boole
     || /資料|管線|腳本|執行器|報告|產物|審核表|清單|候選|白名單|黑名單|人物|關係/.test(haystack);
 }
 
-function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord | null): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
+function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord | null, taskId: string | null = null): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
   const files = new Set<string>();
   let gitAvailable = false;
+
+  let allowedSet: Set<string> | null = null;
+  if (taskId) {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (existsSync(taskPath)) {
+      try {
+        const taskDoc = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const allowedFiles: string[] = [];
+        if (Array.isArray(taskDoc.targetAllowedFiles)) {
+          allowedFiles.push(...taskDoc.targetAllowedFiles);
+        }
+        if (Array.isArray(taskDoc.scopePaths)) {
+          allowedFiles.push(...taskDoc.scopePaths);
+        }
+        if (allowedFiles.length > 0) {
+          allowedSet = new Set(allowedFiles.map(normalizeRelativePath).filter(Boolean));
+        }
+      } catch {
+        // Ignore read/parse errors
+      }
+    }
+  }
+
   for (const args of [
     ['-C', cwd, 'diff', '--name-only', '--cached'],
     ['-C', cwd, 'diff', '--name-only'],
@@ -3071,9 +3094,19 @@ function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord 
     try {
       const output = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
       gitAvailable = true;
+      const isUntrackedCmd = args.includes('ls-files');
       for (const line of output.split(/\r?\n/)) {
         const normalized = normalizeRelativePath(line);
-        if (normalized) files.add(normalized);
+        if (normalized) {
+          if (isUntrackedCmd && allowedSet) {
+            const isDeliverable = allowedSet.has(normalized)
+              || isTaskCloseGovernanceCriticalPath(normalized, taskId || '');
+            if (!isDeliverable) {
+              continue;
+            }
+          }
+          files.add(normalized);
+        }
       }
     } catch {
       // Sandboxed or non-git hosts use a declared-file existence fallback.

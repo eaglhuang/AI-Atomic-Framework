@@ -1018,7 +1018,7 @@ export function createClosurePacket(input: {
   readonly attestation?: ClosurePacketReconcileAttestation | null;
 }): ClosurePacket {
   const cwd = path.resolve(input.cwd);
-  const targetCommitDelta = readFutureTargetCommitDelta(cwd, input.changedFiles);
+  const targetCommitDelta = readFutureTargetCommitDelta(cwd, input.changedFiles, input.taskId);
   const evidenceContext = readClosureEvidenceContext(cwd, input.taskId);
   const requiredGates = uniqueSorted((input.requiredGates ?? defaultRequiredGates).map((entry) => String(entry).trim()).filter(Boolean));
   const requiredGatesSnapshot = createRequiredGatesSnapshot({
@@ -1056,18 +1056,55 @@ export function writeClosurePacket(cwd: string, taskId: string, packet: ClosureP
   return relativePathFrom(cwd, packetPath);
 }
 
-export function inspectFrameworkCloseWorktree(cwd: string): FrameworkCloseWorktreeReport {
+export function inspectFrameworkCloseWorktree(cwd: string, taskId: string | null = null): FrameworkCloseWorktreeReport {
   const unstagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--name-only']).map(normalizeRelativePath).filter(Boolean));
   const stagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only']).map(normalizeRelativePath).filter(Boolean));
-  const untrackedFiles = uniqueSorted(runGitLines(cwd, ['ls-files', '--others', '--exclude-standard']).map(normalizeRelativePath).filter(Boolean));
+  const rawUntrackedFiles = uniqueSorted(runGitLines(cwd, ['ls-files', '--others', '--exclude-standard']).map(normalizeRelativePath).filter(Boolean));
+
+  let allowedSet: Set<string> | null = null;
+  if (taskId) {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (existsSync(taskPath)) {
+      try {
+        const taskDoc = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const allowedFiles: string[] = [];
+        if (Array.isArray(taskDoc.targetAllowedFiles)) {
+          allowedFiles.push(...taskDoc.targetAllowedFiles);
+        }
+        if (Array.isArray(taskDoc.scopePaths)) {
+          allowedFiles.push(...taskDoc.scopePaths);
+        }
+        if (allowedFiles.length > 0) {
+          allowedSet = new Set(allowedFiles.map(normalizeRelativePath).filter(Boolean));
+        }
+      } catch {
+        // Ignore read/parse errors
+      }
+    }
+  }
+
+  const untrackedFiles: string[] = [];
+  const ignoredUntrackedFiles: string[] = [];
+
+  for (const f of rawUntrackedFiles) {
+    const isDeliverable = !allowedSet
+      || allowedSet.has(f)
+      || isTaskCloseGovernanceCriticalPath(f, taskId || '');
+    if (isDeliverable) {
+      untrackedFiles.push(f);
+    } else {
+      ignoredUntrackedFiles.push(f);
+    }
+  }
+
   const trackedDirtyFiles = uniqueSorted([...unstagedFiles, ...stagedFiles]);
   return {
     ok: trackedDirtyFiles.length === 0,
     trackedDirtyFiles,
     unstagedFiles,
     stagedFiles,
-    untrackedFiles,
-    ignoredUntrackedFiles: untrackedFiles
+    untrackedFiles: uniqueSorted(untrackedFiles),
+    ignoredUntrackedFiles: uniqueSorted(ignoredUntrackedFiles)
   };
 }
 
@@ -1750,13 +1787,48 @@ function createRequiredGatesSnapshot(input: {
   };
 }
 
-function readFutureTargetCommitDelta(cwd: string, preferredChangedFiles: readonly string[] = []): ClosurePacketTargetCommitDelta {
+function readFutureTargetCommitDelta(cwd: string, preferredChangedFiles: readonly string[] = [], taskId: string | null = null): ClosurePacketTargetCommitDelta {
   const gitDetails = readGitHeadDetails(cwd);
+
+  let allowedSet: Set<string> | null = null;
+  if (taskId) {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (existsSync(taskPath)) {
+      try {
+        const taskDoc = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const allowedFiles: string[] = [];
+        if (Array.isArray(taskDoc.targetAllowedFiles)) {
+          allowedFiles.push(...taskDoc.targetAllowedFiles);
+        }
+        if (Array.isArray(taskDoc.scopePaths)) {
+          allowedFiles.push(...taskDoc.scopePaths);
+        }
+        if (allowedFiles.length > 0) {
+          allowedSet = new Set(allowedFiles.map(normalizeRelativePath).filter(Boolean));
+        }
+      } catch {
+        // Ignore read/parse errors
+      }
+    }
+  }
+
+  const diffFiles = runGitLines(cwd, ['diff', '--name-only']).map(normalizeRelativePath).filter(Boolean);
+  const cachedFiles = runGitLines(cwd, ['diff', '--cached', '--name-only']).map(normalizeRelativePath).filter(Boolean);
+  const untrackedFiles = runGitLines(cwd, ['ls-files', '--others', '--exclude-standard']).map(normalizeRelativePath).filter(Boolean);
+
+  const filteredUntrackedFiles = untrackedFiles.filter((f) => {
+    if (!allowedSet) return true;
+    if (allowedSet.has(f)) return true;
+    if (isTaskCloseGovernanceCriticalPath(f, taskId!)) return true;
+    return false;
+  });
+
   const worktreeChangedFiles = uniqueSorted([
-    ...runGitLines(cwd, ['diff', '--name-only']),
-    ...runGitLines(cwd, ['diff', '--cached', '--name-only']),
-    ...runGitLines(cwd, ['ls-files', '--others', '--exclude-standard'])
-  ].map(normalizeRelativePath).filter(Boolean));
+    ...diffFiles,
+    ...cachedFiles,
+    ...filteredUntrackedFiles
+  ]);
+
   return {
     currentCommitSha: gitDetails.commitSha,
     parentCommitShas: gitDetails.commitSha ? [gitDetails.commitSha] : gitDetails.parentCommitShas,

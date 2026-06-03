@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { auditTasks, classifyFrameworkStaleLock, createClosurePacket, createFrameworkModeStatus, runFrameworkTempClaim, validateClosurePacket, writeClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
+import { auditTasks, classifyFrameworkStaleLock, createClosurePacket, createFrameworkModeStatus, inspectFrameworkCloseWorktree, runFrameworkTempClaim, validateClosurePacket, writeClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
@@ -985,6 +985,7 @@ try {
 
   await validateTaskLedgerReadersAtomization(tempRoot);
   await validatePlanningOnlyLedgerAuditBoundary(tempRoot);
+  await validateClosurePacketDirtyTreeHygieneGuard(tempRoot);
 
   if (!process.exitCode) {
     console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, and TASK-AAO-0039 planning-only ledger audit boundary covered)`);
@@ -1122,4 +1123,62 @@ async function validatePlanningOnlyLedgerAuditBoundary(tempRoot: string) {
   assert(targetFinding!.level === 'error', 'target-authority done task must be an error');
   assert(targetFinding!.code === 'ATM_TASK_AUDIT_MANUAL_DONE', 'target-authority code must match');
   assert(targetFinding!.detail.includes('[target-authority]'), 'target-authority detail must have [target-authority] prefix');
+}
+
+async function validateClosurePacketDirtyTreeHygieneGuard(tempRoot: string) {
+  const hygieneRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(hygieneRepo);
+  execFileSync('git', ['add', '.'], { cwd: hygieneRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial hygiene repo'], { cwd: hygieneRepo, stdio: 'ignore' });
+
+  const taskId = 'TASK-HYGIENE-0001';
+  const taskPath = path.join(hygieneRepo, '.atm', 'history', 'tasks', `${taskId}.json`);
+
+  writeJson(taskPath, {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: 'Hygiene guard test task',
+    status: 'ready',
+    targetRepo: 'ai-atomic-framework',
+    closureAuthority: 'target_repo',
+    deliverables: ['packages/cli/src/commands/batch.ts'],
+    scopePaths: ['packages/cli/src/commands/batch.ts']
+  });
+
+  const claimResult = await runNext(['--cwd', hygieneRepo, '--claim', '--actor', 'validator', '--prompt', taskId, '--json']);
+  assert(claimResult.ok === true, 'next --claim must succeed for hygiene test task');
+
+  const taskDoc = readJson(taskPath);
+  const targetAllowedFiles = Array.isArray(taskDoc.targetAllowedFiles) ? [...taskDoc.targetAllowedFiles] : [];
+  targetAllowedFiles.push('packages/cli/src/commands/allowed-untracked.ts');
+  writeJson(taskPath, { ...taskDoc, targetAllowedFiles });
+
+  const deliverableFilePath = path.join(hygieneRepo, 'packages', 'cli', 'src', 'commands', 'batch.ts');
+  const allowedUntrackedFilePath = path.join(hygieneRepo, 'packages', 'cli', 'src', 'commands', 'allowed-untracked.ts');
+  const noiseFilePath = path.join(hygieneRepo, 'scratch', 'noise.json');
+
+  mkdirSync(path.dirname(deliverableFilePath), { recursive: true });
+  writeFileSync(deliverableFilePath, 'export const batch = true;\n', 'utf8');
+
+  mkdirSync(path.dirname(allowedUntrackedFilePath), { recursive: true });
+  writeFileSync(allowedUntrackedFilePath, 'export const allowed = true;\n', 'utf8');
+
+  mkdirSync(path.dirname(noiseFilePath), { recursive: true });
+  writeFileSync(noiseFilePath, '{"noise": true}\n', 'utf8');
+
+  const closeWorktree = inspectFrameworkCloseWorktree(hygieneRepo, taskId);
+  assert(closeWorktree.untrackedFiles.includes('packages/cli/src/commands/allowed-untracked.ts'), 'allowed untracked must be in untrackedFiles');
+  assert(!closeWorktree.untrackedFiles.includes('scratch/noise.json'), 'noise must not be in untrackedFiles');
+  assert(closeWorktree.ignoredUntrackedFiles.includes('scratch/noise.json'), 'noise must be in ignoredUntrackedFiles');
+
+  const packet = createClosurePacket({
+    cwd: hygieneRepo,
+    taskId,
+    actorId: 'validator',
+    evidencePath: `.atm/history/evidence/${taskId}.json`
+  });
+
+  const changedFiles = packet.targetCommitDelta.changedFiles;
+  assert(changedFiles.includes('packages/cli/src/commands/allowed-untracked.ts'), 'changedFiles must include allowed untracked');
+  assert(!changedFiles.includes('scratch/noise.json'), 'changedFiles must exclude untracked noise');
 }
