@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0004",
+  "title": "Team brief/report templates",
+  "status": "planned",
+  "milestone": "M2",
+  "dependencies": [
+    "TASK-TEAM-0003"
+  ],
+  "acceptance": [
+    "`team-brief` includes goal, roles, allowed files, do-not-touch paths, assigned work, expected report, stop conditions, and Atomization Plan.",
+    "`agent-report` includes role, status, files read, files changed, commands run, findings, blockers, and recommendation.",
+    "`team-summary` includes decision, implementation summary, validators, evidence, risk, and close-ready state.",
+    "The validator fails when a required section is missing.",
+    "The templates remain readable as plain Markdown."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/templates/team-brief-template.md",
+    "docs/governance/team-agents/templates/agent-report-template.md",
+    "docs/governance/team-agents/templates/team-summary-template.md",
+    "scripts/validate-team-agents-templates.ts",
+    "package.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/templates/team-brief-template.md",
+    "docs/governance/team-agents/templates/agent-report-template.md",
+    "docs/governance/team-agents/templates/team-summary-template.md",
+    "scripts/validate-team-agents-templates.ts",
+    "package.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents-templates.ts --task TASK-TEAM-0004",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Team runtime writes",
+    "Subagent spawning",
+    "Task close or checkpoint changes"
+  ],
+  "nonGoals": [
+    "Do not create a second task registry",
+    "Do not make templates authoritative over ATM task cards"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove the templates, validation script, npm script wiring, and atom map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-template-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card is deliberately template-first; later cards can consume these files from CLI output.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0004-team-brief-report-templates.task.md",
+    "sectionTitle": "TASK-TEAM-0004",
+    "headingLine": 85,
+    "hash": "c928ee0d58110acc"
+  },
+  "importedAt": "2026-06-03T04:35:40.829Z",
+  "lastTransitionId": "2026-06-03T04-35-40-834Z-import-747a80b61c5f",
+  "lastTransitionAt": "2026-06-03T04:35:40.834Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
