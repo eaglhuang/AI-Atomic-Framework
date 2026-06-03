@@ -1665,7 +1665,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
   const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
   const jsonTasks = existsSync(taskStorePath) ? readdirSync(taskStorePath)
     .filter((entry) => entry.endsWith('.json'))
-    .flatMap((entry): ImportedTaskSummary[] => {
+    .flatMap((entry): ImportedTaskSummaryWithOutOfScope[] => {
       const filePath = path.join(taskStorePath, entry);
       try {
         const parsed = parseJsonText(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
@@ -1686,6 +1686,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           ? parsed.claim as Record<string, unknown>
           : {};
         const source = parsed.source && typeof parsed.source === 'object' ? parsed.source as Record<string, unknown> : {};
+        const outOfScope = readStringArray(parsed.outOfScope ?? parsed.out_of_scope ?? parsed.forbidden_files ?? parsed.forbiddenFiles);
         return [finalizeImportedTaskSummary({
           workItemId,
           title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim() : workItemId,
@@ -1709,6 +1710,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
             ...extractDeclaredTaskPathsFromDocument(parsed),
             ...extractLinkedSourceTaskArtifactPaths(cwd, normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path))
           ]),
+          outOfScope,
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
           planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
           allowPlanningMirror: allowsPlanningMirror(parsed),
@@ -1728,7 +1730,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     ])
     : [];
   const markdownTasks = markdownTaskFiles
-    .map((filePath): ImportedTaskSummary | null => {
+    .map((filePath): ImportedTaskSummaryWithOutOfScope | null => {
       const rawText = readFileSync(filePath, 'utf8');
       const parsed = parseMarkdownFrontmatter(rawText);
       const workItemId = normalizeOptionalString(parsed.task_id ?? parsed.taskId ?? parsed.workItemId ?? parsed.id)
@@ -1736,6 +1738,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
       if (!workItemId) return null;
       const dependencies = splitListValue(parsed.dependencies ?? parsed.depends_on ?? parsed.dependsOn ?? parsed.blocked_by ?? parsed.blockedBy);
       const relativeTaskPath = path.relative(cwd, filePath).replace(/\\/g, '/');
+      const outOfScope = splitListValue(parsed.outOfScope ?? parsed.out_of_scope ?? parsed.forbidden_files ?? parsed.forbiddenFiles);
       return finalizeImportedTaskSummary({
         workItemId,
         title: normalizeOptionalString(parsed.title ?? parsed.name) ?? workItemId,
@@ -1759,6 +1762,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           ...splitListValue(parsed.paths),
           ...extractTaskArtifactPathsFromMarkdown(cwd, rawText)
         ]),
+        outOfScope,
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
         planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
         allowPlanningMirror: allowsPlanningMirror(parsed),
@@ -1766,7 +1770,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         activeClaimActorId: null
       });
     })
-    .filter((entry): entry is ImportedTaskSummary => entry !== null);
+    .filter((entry): entry is ImportedTaskSummaryWithOutOfScope => entry !== null);
   const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
 
   const tasks = allTasks
@@ -2326,7 +2330,11 @@ function dedupeTasks(tasks: readonly ImportedTaskSummary[]): readonly ImportedTa
   return output;
 }
 
-function finalizeImportedTaskSummary(task: Omit<ImportedTaskSummary, 'planningReadOnlyPaths' | 'planningMirrorPaths' | 'targetAllowedFiles'>): ImportedTaskSummary {
+interface ImportedTaskSummaryWithOutOfScope extends ImportedTaskSummary {
+  readonly outOfScope?: readonly string[];
+}
+
+function finalizeImportedTaskSummary(task: Omit<ImportedTaskSummary, 'planningReadOnlyPaths' | 'planningMirrorPaths' | 'targetAllowedFiles'> & { readonly outOfScope?: readonly string[] }): ImportedTaskSummaryWithOutOfScope {
   const partition = partitionTaskScope(task);
   return {
     ...task,

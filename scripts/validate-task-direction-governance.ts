@@ -56,12 +56,15 @@ async function main() {
     await validateTaskSelfAllowOnClaim(tempRoot);
     await validateTasksClaimDirectionLockConsistency(tempRoot);
     await validateNextClaimPromptScopeConsistency(tempRoot);
+    await validateOutOfScopeSubtraction(tempRoot);
     if (!process.exitCode) {
       console.log(`[task-direction-governance:${mode}] ok (adopter-governed and framework-development task direction gates verified)`);
       process.exit(0);
     }
   } finally {
-    rmSync(tempRoot, { recursive: true, force: true });
+    try {
+      rmSync(tempRoot, { recursive: true, force: true });
+    } catch {}
   }
 }
 
@@ -606,6 +609,91 @@ async function validateNextClaimPromptScopeConsistency(tempRoot: string) {
     '--files', 'src/one.ts,src/two.ts,src/three.ts'
   ]);
   assert(hookResult.ok === true, `pre-tool hook must allow edits to all three deliverables. Messages: ${JSON.stringify(hookResult.messages)}`);
+}
+
+async function validateOutOfScopeSubtraction(tempRoot: string) {
+  const repo = makeAdopterRepo(tempRoot, 'adopter-out-of-scope-subtraction');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', 'TASK-ADOPT-0004.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-ADOPT-0004',
+    title: 'outOfScope subtraction test',
+    status: 'ready',
+    dependencies: [],
+    scopePaths: ['src/one.ts', 'src/two.ts', 'src/three.ts'],
+    outOfScope: ['src/two.ts'],
+    source: {
+      planPath: 'docs/plan.md',
+      sectionTitle: 'outOfScope subtraction test',
+      headingLine: 1,
+      hash: 'TASK-ADOPT-0004'
+    }
+  });
+  writeEvidence(repo, 'TASK-ADOPT-0004');
+  initializeGit(repo);
+
+  const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-ADOPT-0004']);
+  assert(claim.ok === true, 'outOfScope subtraction: next --claim must succeed');
+
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', 'TASK-ADOPT-0004.json');
+  assert(existsSync(taskPath), 'outOfScope subtraction: task ledger JSON must exist');
+  const taskData = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, any>;
+
+  const claimFiles = taskData.claim?.files ?? [];
+  const allowedFiles = taskData.taskDirectionLock?.allowedFiles ?? [];
+
+  assert(allowedFiles.includes('src/one.ts'), 'allowedFiles must contain src/one.ts');
+  assert(!allowedFiles.includes('src/two.ts'), 'allowedFiles must NOT contain src/two.ts (subtracted)');
+  assert(allowedFiles.includes('src/three.ts'), 'allowedFiles must contain src/three.ts');
+
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', 'TASK-ADOPT-0005.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-ADOPT-0005',
+    title: 'outOfScope undefined test',
+    status: 'ready',
+    dependencies: [],
+    scopePaths: ['src/one.ts', 'src/two.ts'],
+    source: {
+      planPath: 'docs/plan.md',
+      sectionTitle: 'outOfScope undefined test',
+      headingLine: 1,
+      hash: 'TASK-ADOPT-0005'
+    }
+  });
+  writeEvidence(repo, 'TASK-ADOPT-0005');
+  const claim2 = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-ADOPT-0005']);
+  assert(claim2.ok === true, 'outOfScope undefined: next --claim must succeed');
+  const taskPath2 = path.join(repo, '.atm', 'history', 'tasks', 'TASK-ADOPT-0005.json');
+  const taskData2 = JSON.parse(readFileSync(taskPath2, 'utf8')) as Record<string, any>;
+  const allowedFiles2 = taskData2.taskDirectionLock?.allowedFiles ?? [];
+  assert(allowedFiles2.includes('src/one.ts'), 'allowedFiles2 must contain src/one.ts');
+  assert(allowedFiles2.includes('src/two.ts'), 'allowedFiles2 must contain src/two.ts');
+
+  const markdownText = `---
+task_id: TASK-ADOPT-0006
+title: markdown outOfScope test
+status: ready
+scopePaths:
+  - src/one.ts
+  - src/two.ts
+forbidden_files:
+  - src/two.ts
+---
+forbidden paths in prose like src/two.ts
+`;
+  mkdirSync(path.join(repo, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks'), { recursive: true });
+  writeFileSync(path.join(repo, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks', 'TASK-ADOPT-0006.task.md'), markdownText, 'utf8');
+
+  const imp = await runTasks(['import', '--cwd', repo, '--from', 'docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-ADOPT-0006.task.md', '--write', '--json']);
+  assert(imp.ok === true, 'markdown outOfScope import: must succeed');
+
+  const claim3 = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-ADOPT-0006']);
+  assert(claim3.ok === true, 'markdown outOfScope: next --claim must succeed');
+  const taskPath3 = path.join(repo, '.atm', 'history', 'tasks', 'TASK-ADOPT-0006.json');
+  const taskData3 = JSON.parse(readFileSync(taskPath3, 'utf8')) as Record<string, any>;
+  const allowedFiles3 = taskData3.taskDirectionLock?.allowedFiles ?? [];
+
+  assert(allowedFiles3.includes('src/one.ts'), 'allowedFiles3 must contain src/one.ts');
+  assert(!allowedFiles3.includes('src/two.ts'), 'allowedFiles3 must NOT contain src/two.ts');
 }
 
 main().catch((error) => {

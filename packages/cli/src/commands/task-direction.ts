@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, relativePathFrom } from './shared.ts';
+import { isPathAllowedByScope } from './work-channels.ts';
 
 export interface TaskDirectionTask {
   readonly workItemId: string;
@@ -12,6 +13,7 @@ export interface TaskDirectionTask {
   readonly scopePaths: readonly string[];
   readonly targetRepo: string | null;
   readonly allowPlanningMirror: boolean;
+  readonly outOfScope?: readonly string[];
 }
 
 export interface TaskScopePartition {
@@ -434,8 +436,19 @@ export function partitionTaskScope(task: TaskDirectionTask): TaskScopePartition 
   const allowedFiles = targetCandidates.filter((entry) => {
     if (planningReadOnlyPaths.includes(entry)) return false;
     if (!task.allowPlanningMirror && isPlanningMirrorPath(entry, planningMirrorPaths)) return false;
+    if (task.outOfScope && isPathAllowedByScope(entry, task.outOfScope)) {
+      return false;
+    }
     return true;
   });
+
+  if (task.outOfScope && task.outOfScope.length > 0) {
+    const intersections = targetCandidates.filter((entry) => isPathAllowedByScope(entry, task.outOfScope!));
+    if (intersections.length > 0) {
+      console.warn(`[ATM-WARNING] Task ${task.workItemId} scope paths intersect with outOfScope: ${intersections.join(', ')}. These files are subtracted from targetAllowedFiles.`);
+    }
+  }
+
   return {
     planningContext: {
       readOnlyPaths: planningReadOnlyPaths

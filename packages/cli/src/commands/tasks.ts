@@ -39,7 +39,7 @@ import {
   sanitizeTaskDirectionAllowedFiles,
   writeTaskDirectionLock
 } from './task-direction.ts';
-import { findActiveBatchRunForTask, readActiveBatchRun } from './work-channels.ts';
+import { findActiveBatchRunForTask, readActiveBatchRun, isPathAllowedByScope } from './work-channels.ts';
 import { runAtmGit } from './git-governance.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.ts';
@@ -4071,6 +4071,18 @@ function parseSingleCard(input: {
       alias: 'upstream_repo',
       canonical: 'target_repo'
     });
+  }
+
+  if (scopePaths.length > 0 && outOfScope.length > 0) {
+    const intersections = scopePaths.filter((p) => isPathAllowedByScope(p, outOfScope));
+    if (intersections.length > 0) {
+      importDiagnostics.push({
+        code: 'ATM_TASK_SCOPE_OUT_OF_SCOPE_INTERSECTION',
+        severity: 'warning',
+        message: `Task scope paths intersect with outOfScope: ${intersections.join(', ')}. These files will be subtracted from targetAllowedFiles.`,
+        field: 'scopePaths'
+      });
+    }
   }
 
   return {
