@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0003",
+  "title": "Atomization planner required role",
+  "status": "planned",
+  "milestone": "M1",
+  "dependencies": [],
+  "acceptance": [
+    "Every default `team plan` includes an `Atomization Planner` role.",
+    "The JSON output includes primary atom, related atoms, command surface, large-script risk, map update need, and split recommendation fields.",
+    "Large known files such as `tasks.ts`, `next.ts`, `evidence.ts`, and `hook.ts` produce a high-risk planning note.",
+    "The role does not receive write or lifecycle permissions.",
+    "Missing atomization planning is reported as a planning blocker, not as a validator pass."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/atomization-planner.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/atomization-planner.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node atm.mjs team plan --task TASK-TEAM-0003 --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Refactoring existing atom maps beyond required ownership entries",
+    "Creating automatic task splitting",
+    "Changing batch checkpoint semantics"
+  ],
+  "nonGoals": [
+    "Do not replace human task-card authoring",
+    "Do not allow planner output to bypass scope locks"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the Atomization Planner role requirement and map updates.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This role is mandatory because it protects ATM's atomization model before implementation begins.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0003-atomization-planner-required-role.task.md",
+    "sectionTitle": "TASK-TEAM-0003",
+    "headingLine": 75,
+    "hash": "04432497ace08395"
+  },
+  "importedAt": "2026-06-03T04:35:38.643Z",
+  "lastTransitionId": "2026-06-03T04-35-38-648Z-import-c4c8ec214fb5",
+  "lastTransitionAt": "2026-06-03T04:35:38.648Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
