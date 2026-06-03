@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0002",
+  "title": "Minimal task crew briefing contract",
+  "status": "planned",
+  "milestone": "M1",
+  "dependencies": [
+    "TASK-TEAM-0001"
+  ],
+  "acceptance": [
+    "`team plan` identifies `Task Captain`, `Atomization Planner`, `Code Builder`, and `Check Runner` for a small task.",
+    "The output distinguishes required roles from optional roles.",
+    "The briefing contract includes allowed files, do-not-touch paths, expected reports, and stop conditions.",
+    "No subagents are spawned and no team runtime file is written.",
+    "The atomization map covers any new docs, scripts, or command surface touched by this card."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/minimal-task-crew.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/minimal-task-crew.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node atm.mjs team plan --task TASK-TEAM-0002 --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Creating a full subagent runtime",
+    "Changing task close or batch checkpoint behavior",
+    "Writing .atm/runtime/** outside documented team commands"
+  ],
+  "nonGoals": [
+    "Do not implement permission lease enforcement",
+    "Do not add Atomic Police patrol automation"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the crew contract docs and CLI contract changes together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card is the first framework-side Team Agents implementation card. It should stay small enough to review in isolation.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0002-minimal-task-crew-briefing-contract.task.md",
+    "sectionTitle": "TASK-TEAM-0002",
+    "headingLine": 73,
+    "hash": "029dc4c003aca407"
+  },
+  "importedAt": "2026-06-03T04:35:36.541Z",
+  "lastTransitionId": "2026-06-03T04-35-36-545Z-import-4f356d6b02dc",
+  "lastTransitionAt": "2026-06-03T04:35:36.545Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
