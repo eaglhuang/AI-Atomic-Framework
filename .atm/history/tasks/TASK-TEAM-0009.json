@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0009",
+  "title": "Team plan dry-run resolver",
+  "status": "planned",
+  "milestone": "M4",
+  "dependencies": [
+    "TASK-TEAM-0007",
+    "TASK-TEAM-0008"
+  ],
+  "acceptance": [
+    "`team plan --task <id> --json` returns a stable team plan object.",
+    "The response includes `dryRun: true`, `runtimeWritten: false`, and `agentsSpawned: false`.",
+    "The response includes recipe id, channel hint, planned agents, planned permission leases, sizing rationale, and atomization plan.",
+    "Missing or invalid task ids return actionable errors.",
+    "CLI help documents the command and examples."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case plan-resolver",
+    "node atm.mjs team plan --task TASK-TEAM-0009 --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Starting team runtime",
+    "Spawning subagents",
+    "Changing next routing"
+  ],
+  "nonGoals": [
+    "Do not write .atm/runtime/**",
+    "Do not implement patrol automation"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert team plan resolver changes and validation fixtures.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card is the safe bridge between planning documents and future runtime automation.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0009-team-plan-dry-run-resolver.task.md",
+    "sectionTitle": "TASK-TEAM-0009",
+    "headingLine": 49,
+    "hash": "7d9adf5e10f43120"
+  },
+  "importedAt": "2026-06-03T04:35:51.814Z",
+  "lastTransitionId": "2026-06-03T04-35-51-821Z-import-7d5bbc75669a",
+  "lastTransitionAt": "2026-06-03T04:35:51.821Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
