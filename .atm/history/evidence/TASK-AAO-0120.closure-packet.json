@@ -15,15 +15,22 @@
       "workspace:packages/*"
     ]
   },
-  "targetCommit": "70679a3532b0be27034050dda9bf1a5baf15b866",
-  "governedTreeSha": "5da541e9cdd15f8a976ad5443c3ed4f0a5e7393f",
+  "targetCommit": "4febc2635aeaf3d4a202f956c3a336f87048ee11",
+  "governedTreeSha": "8f6c19a5c5b8b68fb5235a5e9d2342ca8f94f8ec",
   "targetCommitDelta": {
-    "currentCommitSha": "70679a3532b0be27034050dda9bf1a5baf15b866",
+    "currentCommitSha": "4febc2635aeaf3d4a202f956c3a336f87048ee11",
     "parentCommitShas": [
-      "70679a3532b0be27034050dda9bf1a5baf15b866"
+      "4febc2635aeaf3d4a202f956c3a336f87048ee11"
     ],
-    "governedTreeSha": "5da541e9cdd15f8a976ad5443c3ed4f0a5e7393f",
+    "governedTreeSha": "8f6c19a5c5b8b68fb5235a5e9d2342ca8f94f8ec",
     "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-AAO-0120.closure-packet.json",
+      ".atm/history/task-events/TASK-AAO-0121/2026-06-03T04-12-45-483Z-import-4fa734e15452.json",
+      ".atm/history/task-events/TASK-AAO-0121/2026-06-03T04-12-56-329Z-reserve-88ea6c1a36c3.json",
+      ".atm/history/task-events/TASK-AAO-0121/2026-06-03T04-12-56-336Z-promote-dd229dcdef13.json",
+      ".atm/history/task-events/TASK-AAO-0121/2026-06-03T04-12-56-371Z-claim-ed7b5e99d235.json",
+      ".atm/history/tasks/TASK-AAO-0121.json",
       ".playwright-mcp/console-2026-05-27T05-19-32-529Z.log",
       ".playwright-mcp/console-2026-05-27T07-35-17-971Z.log",
       ".playwright-mcp/console-2026-05-28T15-14-55-015Z.log",
@@ -36,12 +43,8 @@
       ".playwright-mcp/page-2026-06-02T06-27-15-976Z.yml",
       ".playwright-mcp/page-2026-06-02T06-27-22-375Z.yml",
       ".playwright-mcp/page-2026-06-02T06-38-08-887Z.yml",
+      "claim_out.json",
       "packages/cli/src/commands/next.ts",
-      "packages/cli/src/commands/task-direction.ts",
-      "packages/cli/src/commands/tasks.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/README.onefile.md",
-      "release/atm-onefile/release-manifest.json",
       "scratch/claim_output.json",
       "scratch/claim_output.txt",
       "scratch/cli-validate-err.log",
@@ -75,8 +78,7 @@
       "scratch/tasks_prev.ts",
       "scratch/test.out",
       "scratch/validate-out-utf8.log",
-      "scratch/validate-out.log",
-      "scripts/validate-task-direction-governance.ts"
+      "scratch/validate-out.log"
     ]
   },
   "closedByCommand": "atm tasks close",
@@ -123,7 +125,7 @@
   ],
   "requiredGatesSnapshot": {
     "schemaId": "atm.requiredGatesSnapshot.v1",
-    "generatedAt": "2026-06-03T01:16:38.527Z",
+    "generatedAt": "2026-06-03T04:13:28.653Z",
     "source": "frameworkStatus.requiredGates",
     "ruleVersion": "0.1.0",
     "frameworkMode": "required",
@@ -156,8 +158,14 @@
     ]
   },
   "evidencePath": ".atm/history/evidence/TASK-AAO-0120.json",
-  "closedAt": "2026-06-03T01:16:38.527Z",
+  "closedAt": "2026-06-03T04:13:28.653Z",
   "closedByActor": "007",
-  "sessionId": "session-20260603010130-007-TASK-AAO-0120-1adee2d497",
-  "attestation": null
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "70679a3532b0be27034050dda9bf1a5baf15b866",
+    "reconciledAt": "2026-06-03T04:13:27.390Z",
+    "reconciledByActor": "007",
+    "reason": "Historical reconcile sync against commit 70679a3532b0be27034050dda9bf1a5baf15b866"
+  }
 }
