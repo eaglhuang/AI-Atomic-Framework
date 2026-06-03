@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0019",
+  "title": "Team sandbox attestation and closure contract",
+  "status": "planned",
+  "milestone": "M6H",
+  "dependencies": [
+    "TASK-TEAM-0016",
+    "TASK-TEAM-0018"
+  ],
+  "acceptance": [
+    "Closure packet with valid teamAttestation passes governance validation.",
+    "Closure packet without teamAttestation still passes when existing evidence is valid.",
+    "Failed validator + valid teamAttestation still fails close/evidence validation.",
+    "Missing command-backed evidence + valid teamAttestation still fails.",
+    "Schema/docs explicitly state `node:vm` / `isolated-vm` are not secure sandbox boundaries for untrusted code."
+  ],
+  "deliverables": [
+    "schemas/governance/closure-packet.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-team-agents.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "schemas/governance/closure-packet.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-team-agents.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case sandbox-attestation",
+    "node --strip-types scripts/validate-task-ledger-governance.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Replacing command-backed evidence with team summaries",
+    "Removing stdoutSha256/stderrSha256 from commandRuns",
+    "Declaring node:vm or isolated-vm as a secure sandbox",
+    "Introducing Docker or Deno runtime adoption without a separate runtime decision card",
+    "Auto-closing tasks from Team Agents reports"
+  ],
+  "nonGoals": [
+    "Do not create a second closure packet format",
+    "Do not make sandbox attestation mandatory for local draft Team runs",
+    "Do not change task close semantics"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert attestation schema/validator additions and atom map entries. Do not remove legacy commandRuns hash fields.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-closure-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0019-team-sandbox-attestation-closure-contract.task.md",
+    "sectionTitle": "TASK-TEAM-0019",
+    "headingLine": 59,
+    "hash": "caabfd8760a717db"
+  },
+  "importedAt": "2026-06-03T04:36:14.772Z",
+  "lastTransitionId": "2026-06-03T04-36-14-776Z-import-0be33920fa49",
+  "lastTransitionAt": "2026-06-03T04:36:14.776Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
