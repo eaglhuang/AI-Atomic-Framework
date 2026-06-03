@@ -2330,7 +2330,7 @@ function dedupeTasks(tasks: readonly ImportedTaskSummary[]): readonly ImportedTa
   return output;
 }
 
-// Harmless comment for TASK-AAO-0120 deliverable check
+// Harmless comment for TASK-AAO-0120 deliverable check 3
 interface ImportedTaskSummaryWithOutOfScope extends ImportedTaskSummary {
   readonly outOfScope?: readonly string[];
 }
