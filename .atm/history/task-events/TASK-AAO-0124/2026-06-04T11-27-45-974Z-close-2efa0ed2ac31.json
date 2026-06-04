@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-04T11-27-45-974Z-close-2efa0ed2ac31",
+  "taskId": "TASK-AAO-0124",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260604111736-codex-gpt-5.4-mini-TASK-AAO-0124-ef142b742a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0124.json",
+  "taskSha256": "sha256:ca0e21282a1817e2a907924cc7168caa46fe4a89ce5fd42b6cb603328ee5dca1",
+  "createdAt": "2026-06-04T11:27:45.974Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0124 --actor codex-gpt-5.4-mini --status done --historical-delivery f97449a5c1a6d7af5907fd715ab5578dd6e430d3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260604111736-codex-gpt-5.4-mini-TASK-AAO-0124-ef142b742a",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0124.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-04T11:27:45.971Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0124-normalize-absolute-and-relative-paths-in-task-direction-and-hook-scope-checks.task.md",
+        ".atm/history/evidence/TASK-AAO-0124.*",
+        ".atm/history/task-events/TASK-AAO-0124/**",
+        ".atm/history/tasks/TASK-AAO-0124.json",
+        "docs/tasks/tasks-atm.json",
+        "docs/tasks/tasks-atm/.shardrc.json",
+        "docs/tasks/tasks-atm/tasks-atm-part-54.json",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

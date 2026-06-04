@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0124",
+  "title": "normalize absolute and relative paths in task direction and hook scope checks",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [],
+  "scopePaths": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/framework-development.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "validators": [],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/3KLife/.atm/**",
+    "C:/Users/User/3KLife/.tmp/**",
+    "C:/Users/User/3KLife/release/**",
+    "release/**",
+    "scratch / .playwright-mcp / claim_out.json",
+    "any direct runtime lock edits"
+  ],
+  "nonGoals": [
+    "Do not mutate AAF source in Phase 0.",
+    "Do not repair 007 runtime lock hand edits.",
+    "Do not repair TEAM import dirty.",
+    "Do not repair TASK-AAO-0113 closure packet.",
+    "Do not fold the 007 hook.ts drift remediation into this card."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "tags": [],
+  "notes": "TASK-AAO-0123 fixed the import refresh guard that must not overwrite an active claim or its lock state.\nWhile working that chain, we exposed a different ATM framework bug: `allowedFiles` in 3KLife task cards can be absolute paths, while git changed-files / pre-commit / close comparisons commonly work with relative paths.\nWhen those paths are compared without normalization, legal changes can be misread as scope drift.\n\nThis card fixes the path normalization rule itself.\nIt is not a backdoor approval for `007` hook.ts drift, and it is not a cleanup pass for TEAM import dirty.\nIt also does not touch TASK-AAO-0113 closure packet repair.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0124-normalize-absolute-and-relative-paths-in-task-direction-and-hook-scope-checks.task.md",
+    "sectionTitle": "TASK-AAO-0124",
+    "headingLine": 50,
+    "hash": "f9a59ba900fd5af6"
+  },
+  "importedAt": "2026-06-04T11:17:22.969Z",
+  "lastTransitionId": "2026-06-04T11-27-45-974Z-close-2efa0ed2ac31",
+  "lastTransitionAt": "2026-06-04T11:27:45.974Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-04T11:17:36.716Z",
+  "promotedAt": "2026-06-04T11:17:36.720Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-46bf2799e538",
+    "claimedAt": "2026-06-04T11:17:36.722Z",
+    "heartbeatAt": "2026-06-04T11:27:45.974Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0124.json",
+      "docs/tasks/tasks-atm.json",
+      "docs/tasks/tasks-atm/.shardrc.json",
+      "docs/tasks/tasks-atm/tasks-atm-part-54.json",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-04T11:17:36.722Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260604111736-codex-gpt-5.4-mini-TASK-AAO-0124-ef142b742a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0124",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0124.*",
+      ".atm/history/task-events/TASK-AAO-0124/**",
+      ".atm/history/tasks/TASK-AAO-0124.json",
+      "docs/tasks/tasks-atm.json",
+      "docs/tasks/tasks-atm/.shardrc.json",
+      "docs/tasks/tasks-atm/tasks-atm-part-54.json",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bd9b479806fa318a8d6f8564e25f8f63d189c56fdccef39795274eb0c0de28c6",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-04T11:17:36.744Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0124.closure-packet.json",
+  "closedAt": "2026-06-04T11:27:45.974Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260604111736-codex-gpt-5.4-mini-TASK-AAO-0124-ef142b742a"
+}
