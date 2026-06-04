@@ -12,6 +12,15 @@ const skillFiles = [
   'integrations/codex-skills/atm-dispatch/SKILL.md'
 ];
 
+const entryGateFiles = [
+  'README.md',
+  'AGENTS.md',
+  'docs/AGENT_PACK_ONBOARDING.md',
+  'templates/root-drop/AGENTS.md',
+  'templates/skills/atm-governance-router.skill.md',
+  'integrations/codex-skills/atm-governance-router/SKILL.md'
+];
+
 const requiredPhrases = [
   'Skill used: atm-dispatch',
   'Delegation mode',
@@ -20,7 +29,18 @@ const requiredPhrases = [
   'External dispatch is opt-in',
   'External write is forbidden',
   '審稿 / planning-only / checklist',
-  'Captain 必須先套用本 `atm-dispatch` skill'
+  'Captain must apply atm-dispatch before any dispatch, sidecar delegation, review, condition review, or closeout'
+];
+
+const requiredEntryGatePhrases = [
+  'Captain/dispatch entry gate',
+  'ai-role-router',
+  'atm-dispatch',
+  'Skill used: atm-dispatch',
+  'Delegation mode',
+  'Internal sidecar is the default',
+  'External dispatch is opt-in',
+  'external write is forbidden'
 ];
 
 const forbiddenPhrases = [
@@ -54,6 +74,14 @@ function readJson(relativePath: string): unknown {
   return JSON.parse(readText(relativePath));
 }
 
+function normalizeText(text: string): string {
+  return text.replace(/\s+/g, ' ').toLowerCase();
+}
+
+function hasPhrase(content: string, phrase: string): boolean {
+  return normalizeText(content).includes(normalizeText(phrase));
+}
+
 const skillContents: string[] = [];
 
 for (const relativePath of skillFiles) {
@@ -66,10 +94,23 @@ for (const relativePath of skillFiles) {
   const content = readText(relativePath);
   skillContents.push(content);
   for (const phrase of requiredPhrases) {
-    check(content.includes(phrase), `${relativePath} missing required dispatch protocol phrase: ${phrase}`);
+    check(hasPhrase(content, phrase), `${relativePath} missing required dispatch protocol phrase: ${phrase}`);
   }
   for (const phrase of forbiddenPhrases) {
     check(!content.includes(phrase), `${relativePath} must not contain forbidden dispatch protocol phrase: ${phrase}`);
+  }
+}
+
+for (const relativePath of entryGateFiles) {
+  const absolutePath = path.join(root, relativePath);
+  check(existsSync(absolutePath), `missing Captain/dispatch entry gate file: ${relativePath}`);
+  if (!existsSync(absolutePath)) {
+    continue;
+  }
+
+  const content = readText(relativePath);
+  for (const phrase of requiredEntryGatePhrases) {
+    check(hasPhrase(content, phrase), `${relativePath} missing Captain/dispatch entry gate phrase: ${phrase}`);
   }
 }
 

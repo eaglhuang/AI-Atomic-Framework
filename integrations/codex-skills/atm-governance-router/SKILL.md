@@ -14,6 +14,18 @@ refactor, split, atomize, infect, migrate, or modernize existing source code.
 The goal is to keep the user request natural while still routing the work
 through ATM evidence before choosing a local implementation path.
 
+## Captain/Dispatch Entry Gate
+
+If the user asks for Captain, Coordinator, dispatch, task cards, sidecars,
+subagents, delegation, condition review, or closeout work, first route the
+request through `ai-role-router` when available, then through `atm-dispatch`
+before drafting instructions, delegating work, or reviewing another agent.
+
+State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal
+sidecar is the default for review, preflight, grep, checklist, planning-only
+checks, and post-report verification. External dispatch is opt-in, and external
+write is forbidden unless the user explicitly grants write authority and scope.
+
 ## Delivery Principle
 
 The objective is to deliver the task content, not to close task cards. A task

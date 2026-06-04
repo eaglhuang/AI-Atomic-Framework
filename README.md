@@ -21,6 +21,16 @@ It is not another chat agent or workflow app. It is the safety layer around AI-a
 
 > For AI agents: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json`. Use `node atm.mjs next --json` only when there is no user prompt.
 
+Captain/dispatch entry gate: if the user asks for Captain, Coordinator,
+dispatch, task cards, sidecars, subagents, delegation, condition review, or
+closeout work, first route the request through `ai-role-router` when available,
+then through `atm-dispatch` before drafting instructions, delegating work, or
+reviewing another agent. State `Skill used: atm-dispatch` and the chosen
+`Delegation mode`. Internal sidecar is the default for review, preflight,
+grep, checklist, planning-only checks, and post-report verification. External
+dispatch is opt-in, and external write is forbidden unless the user explicitly
+grants write authority and scope.
+
 ## Why ATM Exists
 
 AI-assisted engineering breaks down in predictable ways when the working rules stay implicit:

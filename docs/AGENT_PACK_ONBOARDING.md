@@ -6,6 +6,14 @@ The goal is simple: a new agent should learn the local ATM route before editing 
 
 Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF.
 
+Agent entry files must preserve the Captain/dispatch entry gate: Captain,
+dispatch, sidecar, subagent, condition-review, and closeout requests route
+through `ai-role-router` when available and then `atm-dispatch` before any
+delegation or review. They must require `Skill used: atm-dispatch` and
+`Delegation mode`, keep `Internal sidecar is the default`, keep `External
+dispatch is opt-in`, and state that external write is forbidden unless the user
+explicitly grants write authority and scope.
+
 ## Public Contract
 
 Agent pack onboarding is made of four cooperating surfaces:

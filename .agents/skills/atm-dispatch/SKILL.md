@@ -19,6 +19,7 @@ charter-invariants-injected: true
 - Internal sidecar is the default for review, preflight, grep, checklist, planning-only checks, and post-report verification.
 - External dispatch is opt-in: 只有 user 明確要求轉交外部 AI / 外部工具時，才輸出可轉貼外包派工單。
 - External write is forbidden unless user explicitly grants write authority and scope.
+- Captain must apply atm-dispatch before any dispatch, sidecar delegation, review, condition review, or closeout.
 - Captain 不得發布自由格式派工單取代本 `atm-dispatch` skill 的判卡、scope、validator 與收口流程。
 
 ---
