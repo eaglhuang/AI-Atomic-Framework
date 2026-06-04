@@ -449,7 +449,7 @@ async function runTasksReconcile(argv: string[]) {
     });
   }
 
-  const taskDeclaredFiles = extractTaskDeclaredFiles(taskDocument);
+  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
   const deliverableGate = evaluateTaskDeliverableGate({
     cwd: options.cwd,
     taskId: options.taskId,
@@ -684,7 +684,7 @@ async function runTasksDeliverAndClose(argv: string[]): Promise<CommandResult> {
     }
     deliveryCommitSha = resolved;
   } else {
-    const taskDeclaredFiles = extractTaskDeclaredFiles(taskDocument);
+    const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
     const declaredPaths = sanitizeTaskDirectionAllowedFiles(taskDeclaredFiles);
     const modifiedUnstaged = readGitNameOnly(options.cwd, ['diff', '--name-only']).filter((f) =>
       declaredPaths.length === 0 || declaredPaths.some((d) => pathMatchesTaskScope(f, d))
@@ -1599,7 +1599,7 @@ async function runTasksClose(argv: string[]) {
     assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId);
   }
 
-  const taskDeclaredFiles = extractTaskDeclaredFiles(taskDocument);
+  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
   const activeFrameworkStatus = options.status === 'done'
     ? createFrameworkModeStatus({ cwd: options.cwd })
     : null;
@@ -3001,6 +3001,27 @@ function taskDeliveryPrincipleText() {
   return 'The goal is to deliver the requested task content, not to close task cards. done is only the record after real deliverables and validators exist.';
 }
 
+function extractTaskCloseDeclaredFiles(taskDocument: Record<string, unknown>): readonly string[] {
+  const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
+    ? taskDocument.taskDirectionLock as Record<string, unknown>
+    : {};
+  const claim = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
+    ? taskDocument.claim as Record<string, unknown>
+    : {};
+  return uniqueStrings([
+    ...extractStringList(taskDirectionLock.allowedFiles),
+    ...extractStringList(claim.files),
+    ...extractStringList(taskDocument.targetAllowedFiles),
+    ...extractTaskDeclaredFiles(taskDocument)
+  ]);
+}
+
+function extractStringList(value: unknown): readonly string[] {
+  return Array.isArray(value)
+    ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
+    : [];
+}
+
 function inspectHistoricalDelivery(input: {
   readonly cwd: string;
   readonly requestedRef: string;
@@ -3075,13 +3096,7 @@ function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord 
     if (existsSync(taskPath)) {
       try {
         const taskDoc = JSON.parse(readFileSync(taskPath, 'utf8'));
-        const allowedFiles: string[] = [];
-        if (Array.isArray(taskDoc.targetAllowedFiles)) {
-          allowedFiles.push(...taskDoc.targetAllowedFiles);
-        }
-        if (Array.isArray(taskDoc.scopePaths)) {
-          allowedFiles.push(...taskDoc.scopePaths);
-        }
+        const allowedFiles = extractTaskCloseDeclaredFiles(taskDoc as Record<string, unknown>);
         if (allowedFiles.length > 0) {
           allowedSet = new Set(allowedFiles.map(normalizeRelativePath).filter(Boolean));
         }

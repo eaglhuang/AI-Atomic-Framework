@@ -124,6 +124,15 @@ export interface ClosurePacketReconcileAttestation {
   readonly reason: string;
 }
 
+export interface ClosurePacketRepairMetadata {
+  readonly schemaId: 'atm.closurePacketRepair.v1';
+  readonly repairedAt: string;
+  readonly repairedByCommand: 'atm tasks repair-closure';
+  readonly originalPacketCommitSha: string | null;
+  readonly repairedTargetCommitSha: string | null;
+  readonly evidencePath: string;
+}
+
 export interface ClosurePacket {
   readonly schemaId: 'atm.closurePacket.v1';
   readonly specVersion: '0.1.0';
@@ -143,6 +152,7 @@ export interface ClosurePacket {
   readonly closedByActor: string;
   readonly sessionId: string | null;
   readonly attestation?: ClosurePacketReconcileAttestation | null;
+  readonly repair?: ClosurePacketRepairMetadata | null;
 }
 
 export interface FrameworkCloseWorktreeReport {
@@ -1166,21 +1176,32 @@ export function repairClosurePacketForTask(input: {
   }
 
   const headDetails = readGitHeadDetails(cwd);
-  const targetCommit = headDetails.parentCommitShas[0] ?? normalizeOptionalString(parsed.targetCommit);
-  const governedTreeSha = targetCommit ? readCommitTreeWithoutEvidence(cwd, targetCommit) : headDetails.treeSha;
-  const targetChangedFiles = targetCommit
-    ? readRepairCommitChangedFiles(cwd, targetCommit)
+  const closureCommitSha = readLatestCommitChangingPath(cwd, packetPath) ?? headDetails.commitSha;
+  const closureCommitDetails = closureCommitSha ? readGitCommitDetails(cwd, closureCommitSha) : headDetails;
+  const targetCommit = closureCommitDetails.parentCommitShas[0] ?? normalizeOptionalString(parsed.targetCommit);
+  const governedTreeSha = closureCommitSha ? readCommitTreeWithoutEvidence(cwd, closureCommitSha) : headDetails.treeSha;
+  const targetChangedFiles = closureCommitSha
+    ? readRepairCommitChangedFiles(cwd, closureCommitSha)
     : parsed.targetCommitDelta.changedFiles.map(normalizeRelativePath).filter(Boolean);
+  const repairedAt = new Date().toISOString();
   const repairedPacket: ClosurePacket = {
     ...parsed,
     targetCommit,
     governedTreeSha,
     targetCommitDelta: {
       ...parsed.targetCommitDelta,
-      currentCommitSha: targetCommit,
-      parentCommitShas: headDetails.parentCommitShas,
+      currentCommitSha: closureCommitSha ?? targetCommit,
+      parentCommitShas: closureCommitDetails.parentCommitShas,
       governedTreeSha,
       changedFiles: uniqueSorted(targetChangedFiles)
+    },
+    repair: {
+      schemaId: 'atm.closurePacketRepair.v1',
+      repairedAt,
+      repairedByCommand: 'atm tasks repair-closure',
+      originalPacketCommitSha: closureCommitSha,
+      repairedTargetCommitSha: targetCommit,
+      evidencePath: gitHeadEvidencePath
     }
   };
   const before = `${JSON.stringify(parsed, null, 2)}\n`;
@@ -1210,7 +1231,11 @@ export function repairClosurePacketForTask(input: {
 
   writeFileSync(packetAbsolutePath, after, 'utf8');
   stageGitPath(cwd, packetPath);
-  appendRepairGitHeadEvidence(cwd, headDetails.parentCommitShas, repairedPacket.commandRuns);
+  appendRepairGitHeadEvidence(cwd, {
+    commitSha: closureCommitSha,
+    treeSha: governedTreeSha,
+    parentCommitShas: closureCommitDetails.parentCommitShas
+  }, repairedPacket.commandRuns);
   stageGitPath(cwd, gitHeadEvidencePath);
 
   return {
@@ -1764,6 +1789,17 @@ function readGitHeadDetails(cwd: string): { commitSha: string | null; treeSha: s
   return { commitSha, treeSha, parentCommitShas };
 }
 
+function readGitCommitDetails(cwd: string, commitSha: string): { commitSha: string; treeSha: string | null; parentCommitShas: readonly string[] } {
+  const treeSha = runGitLines(cwd, ['rev-parse', `${commitSha}^{tree}`])[0] ?? null;
+  const parentCommitShas = runGitLines(cwd, ['rev-list', '--parents', '-n', '1', commitSha])[0]?.split(/\s+/).slice(1).filter(Boolean) ?? [];
+  return { commitSha, treeSha, parentCommitShas };
+}
+
+function readLatestCommitChangingPath(cwd: string, relativePath: string): string | null {
+  const normalized = normalizeRelativePath(relativePath);
+  return runGitLines(cwd, ['log', '-n', '1', '--format=%H', '--', normalized])[0] ?? null;
+}
+
 function createRequiredGatesSnapshot(input: {
   readonly cwd: string;
   readonly changedFiles: readonly string[];
@@ -1945,7 +1981,11 @@ function stageGitPath(cwd: string, relativePath: string) {
   }
 }
 
-function appendRepairGitHeadEvidence(cwd: string, parentCommitShas: readonly string[], commandRuns: readonly ClosurePacketCommandRun[]) {
+function appendRepairGitHeadEvidence(cwd: string, gitDetails: {
+  readonly commitSha: string | null;
+  readonly treeSha: string | null;
+  readonly parentCommitShas: readonly string[];
+}, commandRuns: readonly ClosurePacketCommandRun[]) {
   const generatedAt = new Date().toISOString();
   const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
   mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
@@ -1961,8 +2001,9 @@ function appendRepairGitHeadEvidence(cwd: string, parentCommitShas: readonly str
         summary: 'Closure packet repair restaged git-head evidence for follow-up governed commit.',
         details: {
           git: {
-            treeSha: null,
-            parentCommitShas,
+            commitSha: gitDetails.commitSha,
+            treeSha: gitDetails.treeSha,
+            parentCommitShas: gitDetails.parentCommitShas,
             stagedPathCount: runGitLines(cwd, ['diff', '--cached', '--name-only']).length,
             evidencePath: gitHeadEvidencePath,
             generatedAt

@@ -345,6 +345,7 @@ try {
   }, null, 2)}\n`, 'utf8');
   runGit(closureRepo, ['add', '.atm/history/evidence/git-head.jsonl', '.atm/history/evidence/TASK-X-9001.closure-packet.json']);
   runGit(closureRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'bypass hooks with mismatched closure packet']);
+  const mismatchedClosureCommitSha = String(runGit(closureRepo, ['rev-parse', 'HEAD']).stdout || '').trim();
 
   const closureCommitRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
   const closureCommitRangePayload = parsePayload(closureCommitRange);
@@ -358,6 +359,16 @@ try {
     ?? closureMismatchFinding?.data?.suggested_fix
     ?? closureMismatchFinding?.data?.suggestedCommand;
   assert(typeof closureMismatchSuggestedFix === 'string' && closureMismatchSuggestedFix.includes('closure-packet'), 'closure packet tree mismatch finding must include an actionable suggested fix');
+
+  const repairPayload = parsePayload(runCli(closureRepo, ['tasks', 'repair-closure', '--task', 'TASK-X-9001', '--json']));
+  assert(repairPayload.ok === true, 'tasks repair-closure must stage a repaired closure packet');
+  const repairedPacketPath = path.join(closureRepo, '.atm', 'history', 'evidence', 'TASK-X-9001.closure-packet.json');
+  const repairedPacket = JSON.parse(readFileSync(repairedPacketPath, 'utf8'));
+  assert(repairedPacket.repair?.schemaId === 'atm.closurePacketRepair.v1', 'repaired closure packet must carry explicit repair metadata');
+  assert(repairedPacket.repair?.originalPacketCommitSha === mismatchedClosureCommitSha, 'repair metadata must identify the original packet commit');
+  runGit(closureRepo, ['commit', '--no-verify', '-m', 'repair mismatched closure packet']);
+  const repairedClosureRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~2', '--head', 'HEAD', '--json'], { allowFailure: true });
+  assert(repairedClosureRange.status === 0, `commit-range guard must accept an explicit closure packet repair follow-up\nstdout:\n${repairedClosureRange.stdout}\nstderr:\n${repairedClosureRange.stderr}`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -94,7 +94,7 @@ interface CommitEvidenceMatch {
   readonly criticalChangedFiles: readonly string[];
   readonly evidencePath: string;
   readonly matched: boolean;
-  readonly matchedBy: 'commitSha' | 'treeSha+parentCommitShas' | null;
+  readonly matchedBy: 'commitSha' | 'treeSha+parentCommitShas' | 'evidenceOnlyParentCommitSha' | null;
   readonly gitDetails: ReturnType<typeof normalizeGitDetails>;
   readonly commandRuns: readonly ComparableCommandRun[];
   readonly validationPasses: readonly string[];
@@ -925,10 +925,10 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
   const enforcedCriticalCommits = legacyBaseline
     ? criticalCommits.filter((entry) => !isAcceptedByLegacyBaseline(entry.commitSha))
     : criticalCommits;
-  const evidenceMatches = criticalCommits.map((entry) => inspectCommitGitHeadEvidence(root, entry.commitSha, entry.criticalChangedFiles));
+  const evidenceMatches = criticalCommits.map((entry) => inspectCommitGitHeadEvidence(root, entry.commitSha, entry.criticalChangedFiles, head));
   const closurePacketInspections = enforcedCriticalCommits.flatMap((entry) => {
     const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
-    return inspectCommitClosurePackets(root, entry.commitSha, match ?? null);
+    return inspectCommitClosurePackets(root, entry.commitSha, match ?? null, head);
   });
   const missingEvidenceMatches = evidenceMatches
     .filter((entry) => !legacyBaseline || !isAcceptedByLegacyBaseline(entry.commitSha))
@@ -1299,11 +1299,10 @@ function readStagedTreeWithoutEvidence(cwd: string): string | null {
   }
 }
 
-function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalChangedFiles: readonly string[]): CommitEvidenceMatch {
-  let records: readonly any[] = [];
-  const jsonlText = runGitScalar(cwd, ['show', `${commitSha}:${gitHeadEvidencePaths.jsonl}`]);
+function readGitHeadEvidenceRecordsAtRef(cwd: string, ref: string): readonly any[] {
+  const jsonlText = runGitScalar(cwd, ['show', `${ref}:${gitHeadEvidencePaths.jsonl}`]);
   if (jsonlText) {
-    records = jsonlText
+    return jsonlText
       .split(/\r?\n/)
       .map((line) => line.trim())
       .filter(Boolean)
@@ -1314,11 +1313,17 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
           return [];
         }
       });
-  } else {
-    const legacyText = runGitScalar(cwd, ['show', `${commitSha}:${gitHeadEvidencePaths.legacyJson}`]);
-    const evidence = legacyText ? readJsonText(legacyText) : null;
-    records = extractEvidenceRecords(evidence);
   }
+  const legacyText = runGitScalar(cwd, ['show', `${ref}:${gitHeadEvidencePaths.legacyJson}`]);
+  const evidence = legacyText ? readJsonText(legacyText) : null;
+  return extractEvidenceRecords(evidence);
+}
+
+function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalChangedFiles: readonly string[], headRef = 'HEAD'): CommitEvidenceMatch {
+  const records = [
+    ...readGitHeadEvidenceRecordsAtRef(cwd, commitSha),
+    ...readGitHeadEvidenceRecordsAtRef(cwd, headRef)
+  ];
   const commitTreeSha = runGitScalar(cwd, ['rev-parse', `${commitSha}^{tree}`]);
   const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
   const parentCommitShas = readParentCommitShas(cwd, commitSha);
@@ -1334,6 +1339,18 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
         evidencePath: gitHeadEvidencePath,
         matched: true,
         matchedBy: 'commitSha',
+        gitDetails: git,
+        commandRuns,
+        validationPasses
+      };
+    }
+    if (!git.commitSha && git.parentCommitShas.length === 1 && git.parentCommitShas[0] === commitSha) {
+      return {
+        commitSha,
+        criticalChangedFiles,
+        evidencePath: gitHeadEvidencePath,
+        matched: true,
+        matchedBy: 'evidenceOnlyParentCommitSha',
         gitDetails: git,
         commandRuns,
         validationPasses
@@ -1364,95 +1381,149 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
   };
 }
 
-function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMatch: CommitEvidenceMatch | null): readonly CommitClosurePacketInspection[] {
+function inspectCommitClosurePackets(cwd: string, commitSha: string, evidenceMatch: CommitEvidenceMatch | null, headRef = 'HEAD'): readonly CommitClosurePacketInspection[] {
   const commitChangedFiles = readCommitChangedFiles(cwd, commitSha);
   const closurePacketPaths = commitChangedFiles.filter((entry) => entry.startsWith('.atm/history/evidence/') && entry.endsWith('.closure-packet.json'));
   if (closurePacketPaths.length === 0) return [];
-  const parentCommitShas = readParentCommitShas(cwd, commitSha);
-  const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
-  const commitChangedSet = new Set(commitChangedFiles.map((entry) => normalizeRelativePath(entry)));
   return closurePacketPaths.map((packetPath) => {
     const packetText = runGitScalar(cwd, ['show', `${commitSha}:${packetPath}`]);
     const packet = packetText ? readJsonText(packetText) : null;
-    const findings: Array<{ readonly code: string; readonly detail: string; readonly suggestedFix?: string }> = [];
-    const validation = validateClosurePacket(packet);
-    const taskId = typeof (packet as Record<string, unknown> | null)?.taskId === 'string'
-      ? String((packet as Record<string, unknown>).taskId)
-      : null;
-    if (!validation.ok) {
-      findings.push({
-        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_INVALID',
-        detail: `closure packet contract is incomplete (${validation.missing.join(', ')})`
-      });
-      return { commitSha, packetPath, taskId, findings };
-    }
+    const directInspection = inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, evidenceMatch);
+    if (directInspection.findings.length === 0) return directInspection;
 
-    const normalizedPacket = packet as Record<string, unknown>;
-    const packetTargetCommit = normalizeOptionalText(normalizedPacket.targetCommit);
-    const packetTreeSha = normalizeOptionalText((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.governedTreeSha ?? normalizedPacket.governedTreeSha);
-    const packetParentCommitShas = normalizeStringArray((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.parentCommitShas);
-    const packetChangedFiles = normalizeStringArray((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.changedFiles).map(normalizeRelativePath).filter(Boolean);
-    const invalidChangedFiles = packetChangedFiles.filter((entry) => !commitChangedSet.has(entry));
-    if (invalidChangedFiles.length > 0) {
-      findings.push({
-        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_CHANGED_FILES_MISMATCH',
-        detail: `targetCommitDelta.changedFiles includes files not present in commit ${commitSha}: ${invalidChangedFiles.join(', ')}`
-      });
-    }
-    if (!sameStringSet(packetParentCommitShas, parentCommitShas)) {
-      findings.push({
-        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_PARENT_MISMATCH',
-        detail: `targetCommitDelta.parentCommitShas does not match commit parents for ${commitSha}.`
-      });
-    }
-    if (packetTargetCommit && !parentCommitShas.includes(packetTargetCommit)) {
-      findings.push({
-        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TARGET_COMMIT_MISMATCH',
-        detail: `targetCommit ${packetTargetCommit} is not a parent of commit ${commitSha}.`
-      });
-    }
-    if (packetTreeSha && governedTreeSha && packetTreeSha !== governedTreeSha) {
-      findings.push({
-        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH',
-        detail: `targetCommitDelta.governedTreeSha ${packetTreeSha} does not match governed tree ${governedTreeSha} for commit ${commitSha}.`,
-        suggestedFix: buildClosurePacketRepairSuggestedFix(taskId)
-      });
-    }
-
-    if (evidenceMatch?.matched) {
-      const evidenceTreeSha = normalizeOptionalText(evidenceMatch.gitDetails?.treeSha);
-      if (packetTreeSha && evidenceTreeSha && packetTreeSha !== evidenceTreeSha) {
-        findings.push({
-          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_GIT_HEAD_TREE_MISMATCH',
-          detail: `closure packet governedTreeSha ${packetTreeSha} is not the same tree recorded by git-head evidence (${evidenceTreeSha}).`
-        });
-      }
-      if (evidenceMatch.gitDetails && !sameStringSet(packetParentCommitShas, evidenceMatch.gitDetails.parentCommitShas)) {
-        findings.push({
-          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_GIT_HEAD_PARENT_MISMATCH',
-          detail: 'closure packet parent commit set does not match git-head evidence parent commit set.'
-        });
-      }
-      const packetCommandRuns = normalizeCommandRuns((normalizedPacket.commandRuns as unknown[] | undefined) ?? []);
-      const missingCommandRuns = packetCommandRuns.filter((entry) => !evidenceMatch.commandRuns.some((candidate) => sameComparableCommandRun(candidate, entry)));
-      if (missingCommandRuns.length > 0) {
-        findings.push({
-          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_COMMAND_RUN_MISMATCH',
-          detail: `closure packet commandRuns are not fully backed by git-head evidence (${missingCommandRuns.map((entry) => entry.command).join(', ')}).`
-        });
-      }
-      const requiredValidationPasses = requiredValidationPassesForClosure(normalizeStringArray(normalizedPacket.requiredGates));
-      const missingValidationPasses = requiredValidationPasses.filter((entry) => !evidenceMatch.validationPasses.includes(entry));
-      if (missingValidationPasses.length > 0) {
-        findings.push({
-          code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_VALIDATION_MISMATCH',
-          detail: `git-head evidence does not prove all required validation passes (${missingValidationPasses.join(', ')}).`
-        });
+    const repairMetadata = extractClosurePacketRepairMetadata(packet);
+    if (repairMetadata?.originalPacketCommitSha && repairMetadata.originalPacketCommitSha !== commitSha) {
+      const repairEvidenceMatch = inspectCommitGitHeadEvidence(cwd, repairMetadata.originalPacketCommitSha, [], headRef);
+      const repairInspection = inspectClosurePacketAgainstCommit(cwd, repairMetadata.originalPacketCommitSha, packetPath, packet, repairEvidenceMatch);
+      if (repairInspection.findings.length === 0) {
+        return { commitSha, packetPath, taskId: repairInspection.taskId, findings: [] };
       }
     }
 
-    return { commitSha, packetPath, taskId, findings };
+    const headPacketText = runGitScalar(cwd, ['show', `${headRef}:${packetPath}`]);
+    const headPacket = headPacketText && headPacketText !== packetText ? readJsonText(headPacketText) : null;
+    const headRepairMetadata = extractClosurePacketRepairMetadata(headPacket);
+    const headRepairTargetCommit = extractClosurePacketTargetCommitSha(headPacket);
+    if (headRepairMetadata?.originalPacketCommitSha === commitSha && headRepairTargetCommit === commitSha) {
+      const repairEvidenceMatch = inspectCommitGitHeadEvidence(cwd, commitSha, [], headRef);
+      const repairInspection = inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, headPacket, repairEvidenceMatch);
+      if (repairInspection.findings.length === 0) {
+        return { commitSha, packetPath, taskId: repairInspection.taskId, findings: [] };
+      }
+    }
+
+    return directInspection;
   });
+}
+
+function extractClosurePacketRepairMetadata(packet: unknown): {
+  readonly schemaId: 'atm.closurePacketRepair.v1';
+  readonly originalPacketCommitSha: string | null;
+  readonly repairedTargetCommitSha: string | null;
+} | null {
+  if (!packet || typeof packet !== 'object' || Array.isArray(packet)) return null;
+  const repair = (packet as Record<string, unknown>).repair;
+  if (!repair || typeof repair !== 'object' || Array.isArray(repair)) return null;
+  const record = repair as Record<string, unknown>;
+  const schemaId = normalizeOptionalText(record.schemaId);
+  if (schemaId !== 'atm.closurePacketRepair.v1') return null;
+  return {
+    schemaId,
+    originalPacketCommitSha: normalizeOptionalText(record.originalPacketCommitSha),
+    repairedTargetCommitSha: normalizeOptionalText(record.repairedTargetCommitSha)
+  };
+}
+
+function extractClosurePacketTargetCommitSha(packet: unknown): string | null {
+  if (!packet || typeof packet !== 'object' || Array.isArray(packet)) return null;
+  const delta = (packet as Record<string, unknown>).targetCommitDelta;
+  if (!delta || typeof delta !== 'object' || Array.isArray(delta)) return null;
+  return normalizeOptionalText((delta as Record<string, unknown>).currentCommitSha);
+}
+
+function inspectClosurePacketAgainstCommit(cwd: string, commitSha: string, packetPath: string, packet: unknown, evidenceMatch: CommitEvidenceMatch | null): CommitClosurePacketInspection {
+  const commitChangedFiles = readCommitChangedFiles(cwd, commitSha);
+  const parentCommitShas = readParentCommitShas(cwd, commitSha);
+  const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
+  const commitChangedSet = new Set(commitChangedFiles.map((entry) => normalizeRelativePath(entry)));
+  const findings: Array<{ readonly code: string; readonly detail: string; readonly suggestedFix?: string }> = [];
+  const validation = validateClosurePacket(packet);
+  const taskId = typeof (packet as Record<string, unknown> | null)?.taskId === 'string'
+    ? String((packet as Record<string, unknown>).taskId)
+    : null;
+  if (!validation.ok) {
+    findings.push({
+      code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_INVALID',
+      detail: `closure packet contract is incomplete (${validation.missing.join(', ')})`
+    });
+    return { commitSha, packetPath, taskId, findings };
+  }
+
+  const normalizedPacket = packet as Record<string, unknown>;
+  const packetTargetCommit = normalizeOptionalText(normalizedPacket.targetCommit);
+  const packetTreeSha = normalizeOptionalText((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.governedTreeSha ?? normalizedPacket.governedTreeSha);
+  const packetParentCommitShas = normalizeStringArray((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.parentCommitShas);
+  const packetChangedFiles = normalizeStringArray((normalizedPacket.targetCommitDelta as Record<string, unknown>)?.changedFiles).map(normalizeRelativePath).filter(Boolean);
+  const invalidChangedFiles = packetChangedFiles.filter((entry) => !commitChangedSet.has(entry));
+  if (invalidChangedFiles.length > 0) {
+    findings.push({
+      code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_CHANGED_FILES_MISMATCH',
+      detail: `targetCommitDelta.changedFiles includes files not present in commit ${commitSha}: ${invalidChangedFiles.join(', ')}`
+    });
+  }
+  if (!sameStringSet(packetParentCommitShas, parentCommitShas)) {
+    findings.push({
+      code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_PARENT_MISMATCH',
+      detail: `targetCommitDelta.parentCommitShas does not match commit parents for ${commitSha}.`
+    });
+  }
+  if (packetTargetCommit && !parentCommitShas.includes(packetTargetCommit)) {
+    findings.push({
+      code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TARGET_COMMIT_MISMATCH',
+      detail: `targetCommit ${packetTargetCommit} is not a parent of commit ${commitSha}.`
+    });
+  }
+  if (packetTreeSha && governedTreeSha && packetTreeSha !== governedTreeSha) {
+    findings.push({
+      code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_TREE_MISMATCH',
+      detail: `targetCommitDelta.governedTreeSha ${packetTreeSha} does not match governed tree ${governedTreeSha} for commit ${commitSha}.`,
+      suggestedFix: buildClosurePacketRepairSuggestedFix(taskId)
+    });
+  }
+
+  if (evidenceMatch?.matched) {
+    const evidenceTreeSha = normalizeOptionalText(evidenceMatch.gitDetails?.treeSha);
+    if (packetTreeSha && evidenceTreeSha && packetTreeSha !== evidenceTreeSha) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_GIT_HEAD_TREE_MISMATCH',
+        detail: `closure packet governedTreeSha ${packetTreeSha} is not the same tree recorded by git-head evidence (${evidenceTreeSha}).`
+      });
+    }
+    if (evidenceMatch.gitDetails && !sameStringSet(packetParentCommitShas, evidenceMatch.gitDetails.parentCommitShas)) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_GIT_HEAD_PARENT_MISMATCH',
+        detail: 'closure packet parent commit set does not match git-head evidence parent commit set.'
+      });
+    }
+    const packetCommandRuns = normalizeCommandRuns((normalizedPacket.commandRuns as unknown[] | undefined) ?? []);
+    const missingCommandRuns = packetCommandRuns.filter((entry) => !evidenceMatch.commandRuns.some((candidate) => sameComparableCommandRun(candidate, entry)));
+    if (missingCommandRuns.length > 0) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_COMMAND_RUN_MISMATCH',
+        detail: `closure packet commandRuns are not fully backed by git-head evidence (${missingCommandRuns.map((entry) => entry.command).join(', ')}).`
+      });
+    }
+    const requiredValidationPasses = requiredValidationPassesForClosure(normalizeStringArray(normalizedPacket.requiredGates));
+    const missingValidationPasses = requiredValidationPasses.filter((entry) => !evidenceMatch.validationPasses.includes(entry));
+    if (missingValidationPasses.length > 0) {
+      findings.push({
+        code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_VALIDATION_MISMATCH',
+        detail: `git-head evidence does not prove all required validation passes (${missingValidationPasses.join(', ')}).`
+      });
+    }
+  }
+
+  return { commitSha, packetPath, taskId, findings };
 }
 
 function buildClosurePacketRepairSuggestedFix(taskId: string | null): string {
@@ -1711,6 +1782,7 @@ function extractEvidenceRecords(value: unknown): readonly any[] {
   if (!value || typeof value !== 'object') return [];
   const candidate = value as Record<string, unknown>;
   if (Array.isArray(candidate.evidence)) return candidate.evidence.filter((entry) => entry && typeof entry === 'object');
+  if (Array.isArray(candidate.checks)) return candidate.checks.filter((entry) => entry && typeof entry === 'object');
   return candidate.evidenceKind || candidate.details ? [candidate] : [];
 }
 

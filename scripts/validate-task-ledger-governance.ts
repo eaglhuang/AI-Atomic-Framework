@@ -371,6 +371,48 @@ try {
   const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', committedFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
   assert(committedClose.ok === true, 'deliverable gate must accept a scoped historical delivery commit');
 
+  const lockScopedFixtureTaskId = 'TEST-TASK-0003';
+  const lockScopedTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', lockScopedFixtureTaskId, '--actor', 'validator', '--title', 'Build claim scoped runner fixture']);
+  assert(lockScopedTask.ok === true, 'claim-scoped deliverable fixture task create must succeed');
+  const lockScopedTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', `${lockScopedFixtureTaskId}.json`);
+  const lockScopedTaskDoc = readJson(lockScopedTaskPath);
+  lockScopedTaskDoc.scopePaths = ['docs/planning-only.task.md'];
+  lockScopedTaskDoc.source = { planPath: '../planning/docs/planning-only.task.md' };
+  writeJson(lockScopedTaskPath, lockScopedTaskDoc);
+  const lockScopedClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', lockScopedFixtureTaskId]);
+  assert(lockScopedClaim.ok === true, 'next --claim must create a direction lock for the planning-only fixture');
+  const lockScopedClaimedTaskDoc = readJson(lockScopedTaskPath);
+  lockScopedClaimedTaskDoc.taskDirectionLock = {
+    ...(lockScopedClaimedTaskDoc.taskDirectionLock ?? {}),
+    allowedFiles: ['src/claim-scoped-runner.ts']
+  };
+  lockScopedClaimedTaskDoc.claim = {
+    ...(lockScopedClaimedTaskDoc.claim ?? {}),
+    files: ['src/claim-scoped-runner.ts']
+  };
+  writeJson(lockScopedTaskPath, lockScopedClaimedTaskDoc);
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', `${lockScopedFixtureTaskId}.json`), {
+    taskId: lockScopedFixtureTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'claim-scoped deliverable evidence exists',
+      producedBy: 'validator',
+      artifactPaths: ['src/claim-scoped-runner.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate claim scoped fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  mkdirSync(path.join(deliverableRepo, 'src'), { recursive: true });
+  writeFileSync(path.join(deliverableRepo, 'src', 'claim-scoped-runner.ts'), 'export const claimScopedRunner = true;\n', 'utf8');
+  const lockScopedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', lockScopedFixtureTaskId, '--actor', 'validator', '--status', 'done']);
+  assert(lockScopedClose.ok === true, 'deliverable gate must accept claim/taskDirectionLock allowed files when planning scopePaths are read-only');
+
   const frameworkBatchRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(frameworkBatchRepo);
   execFileSync('git', ['add', '.'], { cwd: frameworkBatchRepo, stdio: 'ignore' });
