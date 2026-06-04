@@ -306,6 +306,65 @@ deliverables:
       fail(`TASK-AAO-0123 regression: active actor/session fields were removed or overwritten.`);
     }
 
+    // TASK-AAO-0128: 驗證 TASK-TEAM-0026 類型的 route pollution guard
+    const pollutionTestPlanPath = path.join(tempWorkspace, 'pollution-test-plan.md');
+    writeFileSync(pollutionTestPlanPath, `---
+task_id: TASK-TEAM-0026
+title: TEAM safe mirror/import ledger reconciliation lane
+status: planned
+scopePaths:
+  - "packages/cli/src/commands/next.ts"
+  - "packages/cli/src/commands/tasks.ts"
+outOfScope:
+  - "packages/cli/src/commands/team.ts"
+  - "scripts/validate-team-agents.ts"
+  - "docs/tasks/**"
+---
+
+## Goal
+Avoid route scope pollution from prose text.
+Here are some forbidden paths in text:
+- packages/cli/src/commands/team.ts
+- scripts/validate-team-agents.ts
+- docs/tasks/tasks-team.json
+`, 'utf8');
+
+    await expectOk('import', ['--from', pollutionTestPlanPath, '--write', '--cwd', tempWorkspace]);
+
+    const pollutionNextResult = await runNext(['--cwd', tempWorkspace, '--prompt', 'TASK-TEAM-0026']);
+    const pollutionQueue = (pollutionNextResult.evidence as {
+      importedTaskQueue?: {
+        selectedTask?: {
+          workItemId: string;
+          targetAllowedFiles: readonly string[];
+          scopePaths: readonly string[];
+        } | null
+      }
+    }).importedTaskQueue;
+
+    const selectedTask = pollutionQueue?.selectedTask;
+    if (!selectedTask || selectedTask.workItemId !== 'TASK-TEAM-0026') {
+      fail(`TASK-AAO-0128 regression: failed to route TASK-TEAM-0026`);
+    }
+
+    const allowed = selectedTask?.targetAllowedFiles ?? [];
+    const forbiddenPatterns = [
+      'packages/cli/src/commands/team.ts',
+      'scripts/validate-team-agents.ts',
+      'docs/tasks',
+      'packages/cli/src/commands'
+    ];
+
+    for (const pat of forbiddenPatterns) {
+      if (allowed.some((f) => f === pat || f.startsWith(pat + '/'))) {
+        // packages/cli/src/commands/next.ts and tasks.ts are explicitly allowed, so bypass them
+        if (pat === 'packages/cli/src/commands' && (allowed.every((f) => f === 'packages/cli/src/commands/next.ts' || f === 'packages/cli/src/commands/tasks.ts' || f.startsWith('.atm/')))) {
+          continue;
+        }
+        fail(`TASK-AAO-0128 regression: TASK-TEAM-0026 targetAllowedFiles contains polluted path: ${pat}. Allowed files: ${JSON.stringify(allowed)}`);
+      }
+    }
+
   } finally {
     rmSync(tempWorkspace, { recursive: true, force: true });
   }

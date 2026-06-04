@@ -1702,14 +1702,32 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
           format: 'json',
           sourcePlanPath: normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path),
           nearbyPlanPaths: [],
-          scopePaths: uniqueSorted([
-            ...readStringArray(parsed.scope),
-            ...readStringArray(parsed.scopePaths),
-            ...readStringArray(parsed.files),
-            ...readStringArray(claimRecord.files),
-            ...extractDeclaredTaskPathsFromDocument(parsed),
-            ...extractLinkedSourceTaskArtifactPaths(cwd, normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path))
-          ]),
+          scopePaths: (() => {
+            const explicit = uniqueSorted([
+              ...readStringArray(parsed.scope),
+              ...readStringArray(parsed.scopePaths),
+              ...readStringArray(parsed.files)
+            ].map((p) => {
+              const norm = p.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+              return path.isAbsolute(norm) ? path.relative(cwd, norm).replace(/\\/g, '/') : norm;
+            }));
+            const claimFiles = readStringArray(claimRecord.files);
+            const rawScope = explicit.length > 0
+              ? uniqueSorted([
+                ...explicit,
+                ...claimFiles.filter((file) => isPathAllowedByScope(file, explicit))
+              ])
+              : uniqueSorted([
+                ...extractDeclaredTaskPathsFromDocument(parsed),
+                ...extractLinkedSourceTaskArtifactPaths(cwd, normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path))
+              ].map((p) => {
+                const norm = p.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+                return path.isAbsolute(norm) ? path.relative(cwd, norm).replace(/\\/g, '/') : norm;
+              }));
+            return outOfScope.length > 0
+              ? rawScope.filter((entry) => !isPathAllowedByScope(entry, outOfScope))
+              : rawScope;
+          })(),
           outOfScope,
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
           planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
@@ -1754,14 +1772,29 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
         format: 'markdown',
         sourcePlanPath: normalizeOptionalString(parsed.plan_path ?? parsed.planPath ?? parsed.source_plan ?? parsed.sourcePlan ?? parsed.related_plan ?? parsed.relatedPlan),
         nearbyPlanPaths: findNearbyPlanPaths(cwd, filePath),
-        scopePaths: uniqueSorted([
-          ...splitListValue(parsed.scope ?? parsed.scope_paths ?? parsed.scopePaths),
-          ...splitListValue(parsed.files ?? parsed.file_paths ?? parsed.filePaths),
-          ...splitListValue(parsed.allowed_files ?? parsed.allowedFiles),
-          ...splitListValue(parsed.deliverables),
-          ...splitListValue(parsed.paths),
-          ...extractTaskArtifactPathsFromMarkdown(cwd, rawText)
-        ]),
+        scopePaths: (() => {
+          const explicit = uniqueSorted([
+            ...splitListValue(parsed.scope ?? parsed.scope_paths ?? parsed.scopePaths),
+            ...splitListValue(parsed.files ?? parsed.file_paths ?? parsed.filePaths),
+            ...splitListValue(parsed.allowed_files ?? parsed.allowedFiles),
+            ...splitListValue(parsed.deliverables),
+            ...splitListValue(parsed.paths)
+          ].map((p) => {
+            const norm = p.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+            return path.isAbsolute(norm) ? path.relative(cwd, norm).replace(/\\/g, '/') : norm;
+          }));
+          const rawScope = explicit.length > 0
+            ? explicit
+            : uniqueSorted([
+              ...extractTaskArtifactPathsFromMarkdown(cwd, rawText)
+            ].map((p) => {
+              const norm = p.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+              return path.isAbsolute(norm) ? path.relative(cwd, norm).replace(/\\/g, '/') : norm;
+            }));
+          return outOfScope.length > 0
+            ? rawScope.filter((entry) => !isPathAllowedByScope(entry, outOfScope))
+            : rawScope;
+        })(),
         outOfScope,
         targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
         planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),

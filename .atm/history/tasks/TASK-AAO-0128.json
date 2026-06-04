@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0128",
+  "title": "task-card route scope pollution guard for clean single-card import",
+  "status": "running",
+  "milestone": "M16",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [],
+  "scopePaths": [
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/next.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/task-direction.ts",
+    "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-import.ts",
+    "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-ledger-governance.ts"
+  ],
+  "validators": [],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/AI-Atomic-Framework/.atm/history/**",
+    "C:/Users/User/AI-Atomic-Framework/release/**",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/team.ts",
+    "C:/Users/User/AI-Atomic-Framework/scripts/validate-team-agents.ts",
+    "TASK-TEAM-0026 implementation/mirror files"
+  ],
+  "nonGoals": [
+    "Do not mutate AAF source in Phase 0.",
+    "Do not repair TASK-TEAM-0026 itself.",
+    "Do not fold TEAM implementation or mirror reconciliation into this card.",
+    "Do not fold release runner sync into this card.",
+    "Do not let nearby plan prose or permission examples become route-visible scope."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/next.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/task-direction.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-import.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-ledger-governance.ts"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "tags": [],
+  "notes": "`TASK-TEAM-0026` has a clean single-card dry run, but `atm next --prompt TASK-TEAM-0026` can still absorb paths from the surrounding TEAM plan, including `packages/cli/src/commands/**` and `docs/tasks/*`, into route-visible scope.\nThat makes the claim look legal while the imported `allowedFiles` are polluted.\n\nThis card fixes the route/import pollution rule itself.\nIt is not a TEAM-0026 implementation card, and it is not a TEAM mirror reconciliation card.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0128-task-card-route-scope-pollution-guard-for-clean-single-card-import.task.md",
+    "sectionTitle": "TASK-AAO-0128",
+    "headingLine": 49,
+    "hash": "731c3036cd489c62"
+  },
+  "importedAt": "2026-06-04T14:18:38.419Z",
+  "lastTransitionId": "2026-06-04T14-18-51-368Z-claim-7b6e3ed2671b",
+  "lastTransitionAt": "2026-06-04T14:18:51.368Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "007",
+  "reservedAt": "2026-06-04T14:18:51.349Z",
+  "promotedAt": "2026-06-04T14:18:51.352Z",
+  "claim": {
+    "actorId": "007",
+    "leaseId": "lease-8cbe7a0d5c45",
+    "claimedAt": "2026-06-04T14:18:51.354Z",
+    "heartbeatAt": "2026-06-04T14:18:51.354Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0128.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "active"
+  },
+  "startedAt": "2026-06-04T14:18:51.354Z",
+  "startedByActor": "007",
+  "startedBySessionId": "session-20260604141851-007-TASK-AAO-0128-f013726a35",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0128",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0128.*",
+      ".atm/history/task-events/TASK-AAO-0128/**",
+      ".atm/history/tasks/TASK-AAO-0128.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "df7fbfa95bc245cf2b85d5dcbc0b0481fb07fd2633e081a312f4d0bbae272b95",
+    "actorId": "007",
+    "createdAt": "2026-06-04T14:18:51.367Z",
+    "status": "active"
+  }
+}
