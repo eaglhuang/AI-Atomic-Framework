@@ -22,6 +22,8 @@
       "validators": [
         "validate-product-charter",
         "validate-package-skeleton",
+        "validate-terminology",
+        "validate-captain-dispatch-protocol",
         "validate-behavior-pack",
         "audit-hash-placeholders"
       ]
@@ -75,6 +77,8 @@
         "validate-charter",
         "validate-integration-adapter",
         "validate-skill-templates",
+        "validate-terminology",
+        "validate-captain-dispatch-protocol",
         "validate-script-parity",
         "validate-version-compatibility",
         "validate-breaking-changes",
@@ -166,6 +170,8 @@
     { "name": "validate-charter", "entry": "scripts/validate-charter.ts", "tags": ["charter", "contract"], "slow": false },
     { "name": "validate-integration-adapter", "entry": "scripts/validate-integration-adapter.ts", "tags": ["integration", "adapter"], "slow": false },
     { "name": "validate-skill-templates", "entry": "scripts/validate-skill-templates.ts", "tags": ["integration", "templates"], "slow": false },
+    { "name": "validate-terminology", "entry": "scripts/validate-terminology.ts", "tags": ["docs", "terminology", "governance"], "slow": false },
+    { "name": "validate-captain-dispatch-protocol", "entry": "scripts/validate-captain-dispatch-protocol.ts", "tags": ["dispatch", "governance", "skills"], "slow": false },
     { "name": "validate-script-parity", "entry": "scripts/validate-script-parity.ts", "tags": ["scripts", "parity", "windows"], "slow": true },
     { "name": "validate-version-compatibility", "entry": "scripts/validate-version-compatibility.ts", "tags": ["version", "compatibility", "release"], "slow": false },
     { "name": "validate-breaking-changes", "entry": "scripts/validate-breaking-changes.ts", "tags": ["version", "breaking", "release"], "slow": false },

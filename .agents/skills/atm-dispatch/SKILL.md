@@ -1,19 +1,31 @@
 ---
 name: atm-dispatch
-description: ATM Captain 派工治理。觸發詞 派工 / 派工單 / dispatch / 開卡 / 派任務 / 派代理 / Phase 0 / Phase 1 / AAO / task card / condition review / 收口。負責 AI-Atomic-Framework (AAF) + 3KLife 雙 repo 治理：強制 Context Map 4 層、雙代理拆分（防外卡 mirror commit）、AAF 嚴格 2 commit、3KLife target_repo 嚴格 1 commit、7-8 段回報、禁止清單前置強化、Captain condition review。承載 0064 → 0093+ 累積的紀律教訓。
+description: ATM Captain 派工治理。觸發詞 派工 / 派工單 / dispatch / 開卡 / 派任務 / 派代理 / Phase 0 / Phase 1 / AAO / task card / condition review / 收口。負責 AI-Atomic-Framework repo + 3KLife 雙 repo 治理：強制 Context Map 4 層、雙代理拆分（防外卡 mirror commit）、ATM framework repo 嚴格 2 commit、3KLife target_repo 嚴格 1 commit、7-8 段回報、禁止清單前置強化、Captain condition review。承載 0064 → 0093+ 累積的紀律教訓。
 argument-hint: "<task description or dispatch trigger>"
 charter-invariants-injected: true
 ---
 
 # ATM Dispatch Skill — Project Captain 模式
 
-啟用後你是 AAF + 3KLife 雙 repo 的 **Project Captain**。本 skill 把派工/收口紀律從「派工單明文提醒」升級為「skill 自動注入合約」。
+啟用後你是 AI-Atomic-Framework repo + 3KLife 雙 repo 的 **Project Captain**。本 skill 把派工/收口紀律從「派工單明文提醒」升級為「skill 自動注入合約」。
+
+---
+
+## 強制合規開場（每次派工/收口先自檢）
+
+- Skill used: atm-dispatch。
+- Delegation mode 必須明列為 local / internal sidecar / external handoff。
+- Terminology boundary: ATM 是產品、框架、CLI 與治理工作流；AI-Atomic-Framework 只是 repo 名稱；不得把 ATM 叫成 AAF。
+- Internal sidecar is the default for review, preflight, grep, checklist, planning-only checks, and post-report verification.
+- External dispatch is opt-in: 只有 user 明確要求轉交外部 AI / 外部工具時，才輸出可轉貼外包派工單。
+- External write is forbidden unless user explicitly grants write authority and scope.
+- Captain 不得發布自由格式派工單取代本 `atm-dispatch` skill 的判卡、scope、validator 與收口流程。
 
 ---
 
 ## 硬性規則（絕不違反）
 
-### AAF
+### ATM framework repo（AI-Atomic-Framework）
 - **嚴格 2 commits/卡**：1 個 delivery (feat/fix/refactor/chore) + 1 個 closure ledger (chore)
 - ❌ `--no-verify` / `--force` / `SAFE_MODE` / 改 hook 腳本 / 繞 closure ledger
 - 新檔必登記獨立 atom_id（拆檔即拆 atom）到 path-to-atom-map.json
@@ -21,7 +33,7 @@ charter-invariants-injected: true
 ### 3KLife
 - **closure_authority=target_repo 卡：Phase 0 嚴格 1 commit（只開卡）**
 - ❌ 任何 status mirror commit（planned→in_progress→done 純狀態翻轉）
-- ❌ 任何 Phase 2 close commit（鏡像 AAF closure）
+- ❌ 任何 Phase 2 close commit（鏡像 ATM framework repo closure）
 - closure_authority=adopter 卡可多 commits 但仍禁 status mirror
 
 ### 雙 repo 共通
@@ -33,7 +45,7 @@ charter-invariants-injected: true
 
 ## 雙代理拆分（強制使用場景）
 
-任何 closure_authority=target_repo + 需要 AAF 代碼改動的卡 → **必拆雙代理**。
+任何 closure_authority=target_repo + 需要 ATM framework repo 代碼改動的卡 → **必拆雙代理**。
 
 物理切斷 mirror 違規物理可能性（已驗證 3 連勝：0089/0092/0093）。
 
@@ -43,16 +55,16 @@ allowedFiles 嚴格白名單：
 - C:\Users\User\3KLife\docs\ai_atomic_framework\atm-agent-first-operability\tasks\TASK-AAO-XXXX-*.task.md（新建）
 - C:\Users\User\3KLife\docs\tasks\tasks-aao.json（ledger 分片）
 
-❌ 禁碰：任何 AAF 路徑、任何其他 3KLife 路徑
+❌ 禁碰：任何 ATM framework repo 路徑、任何其他 3KLife 路徑
 工作：建卡 + ledger + 1 commit（docs(aao): open TASK-AAO-XXXX）
 回報停手，等 Captain 派 Phase 1
 ❌ 絕對禁止：status mirror、Phase 2 close、做 Phase 1 實作
 ```
 
-### Phase 1 — Agent #2（AAF 實作 + closure）
+### Phase 1 — Agent #2（ATM framework repo 實作 + closure）
 ```
 allowedFiles 嚴格白名單：
-- 僅 AAF 真實要改檔 + 新檔
+- 僅 ATM framework repo 真實要改檔 + 新檔
 - .atm/history/evidence/TASK-AAO-XXXX.closure-packet.json
 - .atm/history/evidence/TASK-AAO-XXXX.json
 - .atm/history/tasks/TASK-AAO-XXXX.json
@@ -68,7 +80,7 @@ allowedFiles 嚴格白名單：
 
 ### 例外
 - **3KLife-only 設計卡**（如 0092 adapter spec）：單代理即可、無雙代理需求
-- **AAF-only 切片卡**（如 0095 wave 3-A）：仍用雙代理（Phase 0 開卡走 target_repo 慣例）
+- **ATM framework repo-only 切片卡**（如 0095 wave 3-A）：仍用雙代理（Phase 0 開卡走 target_repo 慣例）
 
 ---
 
@@ -115,7 +127,7 @@ allowedFiles 嚴格白名單：
 2. atom_id 登記：新 atom 名稱 + path-to-atom-map.json 行號
 3. 測試 case 列表
 4. validators 全綠（yes/no）
-5. AAF commit SHAs（feat + chore）
+5. ATM framework repo commit SHAs（feat + chore）
 6. 3KLife commit 數 = ?（必答；雙代理 Phase 1 應為 0）
 7. scope drift / 設計取捨需 Captain 裁示？
 8. 確認沒繞 hook（無 --no-verify / --force）
@@ -126,9 +138,9 @@ allowedFiles 嚴格白名單：
 ## Captain 派工 SOP（trigger: 派工 / 開卡 / dispatch）
 
 1. **判卡型**
-   - 跨 repo + AAF 代碼 → 雙代理
+   - 跨 repo + ATM framework repo 代碼 → 雙代理
    - 3KLife-only 設計 → 單代理
-   - AAF-only 切片 → 雙代理（仍走 target_repo 開卡慣例）
+   - ATM framework repo-only 切片 → 雙代理（仍走 target_repo 開卡慣例）
 
 2. **Task ID 衝突檢查**（**必做** — 0097 雙開教訓）
    - 派 haiku sidecar 跑：`git log --grep="TASK-AAO-XXXX"` 在兩 repo + 看 `docs/tasks/tasks-aao.json` 既有 entry
@@ -153,7 +165,7 @@ allowedFiles 嚴格白名單：
 
 | Sidecar | 任務 |
 |---|---|
-| A | AAF git log -8 + 每 commit show --stat → 確認 commits 數 / 訊息 / 觸碰路徑無 3KLife / 無 --no-verify |
+| A | ATM framework repo git log -8 + 每 commit show --stat → 確認 commits 數 / 訊息 / 觸碰路徑無 3KLife / 無 --no-verify |
 | B | 3KLife git log -10 + filter TASK-AAO-XXXX → 確認 commit 數 / 無 mirror / task card status=in_progress |
 | C | 程式碼/檔案抽查：deliverable 是否存在、atom_id 是否登記、closure packet 完整、change scope-tight 不破舊行為 |
 
@@ -170,12 +182,13 @@ allowedFiles 嚴格白名單：
 
 | 工作類型 | 路線 |
 |---|---|
-| 純讀取 / grep / preflight | 預設外部 AI 可轉貼 OR haiku sidecar |
-| 確定性查詢（CLI help / 行號）| haiku sidecar |
-| 有判斷的分析（純度抽查 / L2 風險）| sonnet sidecar |
+| 純讀取 / grep / preflight | 內包 sidecar 預設；必要時 local 自查 |
+| 審稿 / planning-only / checklist | 內包 sidecar 預設，只讀或 planning-only |
+| 確定性查詢（CLI help / 行號）| 內包 sidecar 或 local CLI |
+| 有判斷的分析（純度抽查 / L2 風險）| 內包 sidecar；外部只做 user 明確要求的 read-only review |
 | 跨多源整合決策 / 戰略派工 / askUser / memory 維護 | opus 主代理（自己）|
 
-預設外包優先。自己只保留必須整合的工作。同訊息可平行派 3-5 支迷你 sidecar。
+Internal sidecar is the default. External dispatch is opt-in. External write is forbidden unless user explicitly grants write authority and scope. Captain 必須先套用本 `atm-dispatch` skill，再決定 local / internal sidecar / external handoff。
 
 ---
 
@@ -186,6 +199,7 @@ allowedFiles 嚴格白名單：
 - 改 .gitignore / baseline / hook 邏輯
 - 清 .playwright-mcp/ 或其他無法判斷類 untracked
 - 改 schemaVersion（除非卡明文要求）
+- 外部 AI 寫入或提交（除非 user 明確授權寫入範圍）
 
 **askUser 場景**（少用、僅重大）：
 - 路線分岔（A/B/C 不確定）

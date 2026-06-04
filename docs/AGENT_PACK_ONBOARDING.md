@@ -4,6 +4,8 @@ Agent pack onboarding is ATM's first-touch experience for a repository that want
 
 The goal is simple: a new agent should learn the local ATM route before editing files, see the active rule summary, and keep all governed actions moving through `node atm.mjs next --json`.
 
+Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF.
+
 ## Public Contract
 
 Agent pack onboarding is made of four cooperating surfaces:

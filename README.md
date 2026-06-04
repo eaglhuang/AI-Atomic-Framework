@@ -33,6 +33,8 @@ AI-assisted engineering breaks down in predictable ways when the working rules s
 
 ATM gives repositories a shared operating contract for those moments. The goal is simple: an agent should be able to enter a repository, ask ATM what the next safe action is, do the work inside a declared boundary, and leave reviewable proof behind.
 
+ATM is not just an atom runner. It is the route, scope, evidence, close, and handoff contract around AI-assisted work.
+
 ## What You Get
 
 | Capability | What it provides |
@@ -66,6 +68,8 @@ Use one official distribution:
 | npm `create-atm` | You want the lowest-friction starter route. |
 
 The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --prompt "<current user prompt>" --json` route user-requested governed work.
+
+The release-bundle root-drop bootstrap workflow keeps that entry route portable for repositories that prefer a checked-in distribution over an npm starter.
 
 ### Give the agent one instruction
 
@@ -144,6 +148,8 @@ ATM keeps the governance layer explicit:
 ## Framework Repo vs Adopter Repo
 
 This repository is the public ATM framework repository, not an adopter project workspace.
+
+Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF or use AAF as a shorthand for the framework.
 
 | Repository type | What to do | What not to do |
 | --- | --- | --- |

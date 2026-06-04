@@ -5,6 +5,8 @@ records evidence, and lets `atm doctor` detect missing governance signals after 
 fact. For normal adopter repositories it does not make commits impossible by
 itself.
 
+Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF.
+
 Host repositories can choose stronger enforcement without changing ATM core
 contracts. The special exception is the ATM framework repository itself: when a
 change touches framework critical non-doc source surfaces, framework-development

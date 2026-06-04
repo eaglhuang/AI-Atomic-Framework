@@ -2,6 +2,8 @@
 
 This repository uses the default ATM bootstrap pack.
 
+Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF or use AAF as a shorthand for the framework.
+
 Start with this line when a user has given you a concrete request:
 
 Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, "node atm.mjs next --json" is read-only status. In this framework repository, `node atm.mjs` is the stable frozen runner entrypoint; use `node atm.dev.mjs` only when explicitly validating unbuilt source changes to ATM itself. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state.
@@ -63,7 +65,7 @@ Python-only runtime self-check:
 
 ## Framework Orientation
 
-This is the **AI-Atomic-Framework (ATM)** repository — a governance framework for AI-assisted engineering work. If you are a new agent working on this repo, complete the bootstrap step above first, then use the references below.
+This is the **AI-Atomic-Framework** repository for **ATM** — a governance framework for AI-assisted engineering work. If you are a new agent working on this repo, complete the bootstrap step above first, then use the references below.
 
 | Entry point | Purpose |
 |---|---|
