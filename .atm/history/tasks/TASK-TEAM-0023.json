@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0023",
+  "title": "Team knowledge retention and disk budget guard",
+  "status": "running",
+  "milestone": "M5K",
+  "dependencies": [
+    "TASK-TEAM-0021"
+  ],
+  "acceptance": [
+    "`team knowledge stats` reports shard and runtime cache footprint.",
+    "`team knowledge compact --dry-run` can identify stale / superseded / archive-candidate shards without mutating canonical source by default.",
+    "Runtime budget breaches produce explicit diagnostics.",
+    "Optional embedding cache, if present, is treated as runtime-only and prunable.",
+    "The feature does not delete or rewrite task evidence or task cards."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team-knowledge.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-governance-local.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "tags": [],
+  "notes": "This card is the anti-bloat line. Knowledge that cannot be compacted, measured, and pruned will eventually stop being queried.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0023-team-knowledge-retention-disk-budget-guard.task.md",
+    "sectionTitle": "TASK-TEAM-0023",
+    "headingLine": 79,
+    "hash": "7c0c4b22998bd466"
+  },
+  "importedAt": "2026-06-04T05:12:47.189Z",
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team-knowledge.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-governance-local.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-governance-local.ts",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "node atm.mjs team knowledge stats --json",
+    "node atm.mjs team knowledge compact --dry-run --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Deleting canonical lesson shards automatically without human review",
+    "External object storage or remote vector DB",
+    "Changing evidence or closure semantics"
+  ],
+  "nonGoals": [
+    "Do not make vector retrieval mandatory",
+    "Do not store generated caches in committed deliverables"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert retention/compact/stats/budget logic and map updates.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-knowledge-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "lastTransitionId": "2026-06-04T05-47-10-875Z-claim-cb18aa9fa7c9",
+  "lastTransitionAt": "2026-06-04T05:47:10.875Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "007",
+  "reservedAt": "2026-06-04T05:47:10.857Z",
+  "promotedAt": "2026-06-04T05:47:10.859Z",
+  "claim": {
+    "actorId": "007",
+    "leaseId": "lease-f02a5cf74ee7",
+    "claimedAt": "2026-06-04T05:47:10.862Z",
+    "heartbeatAt": "2026-06-04T05:47:10.862Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0023.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/team-knowledge.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-governance-local.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active"
+  },
+  "startedAt": "2026-06-04T05:47:10.862Z",
+  "startedByActor": "007",
+  "startedBySessionId": "session-20260604054710-007-TASK-TEAM-0023-ce396fd0cd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0023",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0023.*",
+      ".atm/history/task-events/TASK-TEAM-0023/**",
+      ".atm/history/tasks/TASK-TEAM-0023.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/team-knowledge.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-governance-local.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "475f215cea12a037325396e1ea373cab3995002cd430724b00bb84564f338baf",
+    "actorId": "007",
+    "createdAt": "2026-06-04T05:47:10.874Z",
+    "status": "active"
+  }
+}
