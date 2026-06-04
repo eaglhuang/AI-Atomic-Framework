@@ -643,8 +643,8 @@ try {
     .filter(Boolean);
   assert(repairCachedFiles.includes(repairClosurePacketPath), 'tasks repair-closure must stage the repaired closure packet');
   assert(repairCachedFiles.includes('.atm/history/evidence/git-head.jsonl'), 'tasks repair-closure must stage git-head evidence for the follow-up governed commit');
-  assert(repairCachedFiles.includes(`.atm/history/tasks/${repairTaskId}.json`), 'tasks repair-closure must stage the repaired task ledger context');
-  assert(repairCachedFiles.some((entry) => entry.startsWith(`.atm/history/task-events/${repairTaskId}/`) && entry.includes('-repair-closure-')), 'tasks repair-closure must stage a repair-closure task transition event');
+  assert(!repairCachedFiles.includes(`.atm/history/tasks/${repairTaskId}.json`), 'tasks repair-closure must not mutate historical task JSON just to provide repair context');
+  assert(repairCachedFiles.some((entry) => entry.startsWith(`.atm/history/task-events/${repairTaskId}/`) && entry.includes('-repair-closure-')), 'tasks repair-closure must stage a repair-closure task transition event as evidence context');
   execFileSync('git', ['commit', '--no-verify', '-m', 'repair closure packet fixture'], { cwd: repairRepo, stdio: 'ignore' });
 
   const amendUnavailableDetails = await expectTaskErrorDetails(['repair-closure', '--cwd', repairRepo, '--task', repairTaskId, '--amend'], 'ATM_CLOSURE_REPAIR_AMEND_WRAPPER_UNAVAILABLE');

@@ -445,19 +445,20 @@ function writeRepairClosureTransition(input: {
   if (!existsSync(taskPath)) return null;
   const taskDocument = readJsonRecord(taskPath);
   const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
-  const transitionPath = writeTaskDocumentWithTransition({
+  const transition = appendTaskTransitionEvent({
     cwd: input.cwd,
-    taskPath,
     taskId: input.taskId,
-    taskDocument,
     action: 'repair-closure',
     actorId: input.actorId,
     sessionId: typeof taskDocument.closedBySessionId === 'string' ? taskDocument.closedBySessionId : null,
-    previousStatus,
+    fromStatus: previousStatus,
+    toStatus: previousStatus,
+    taskPath,
+    taskDocument,
     command: input.command
   });
-  execFileSync('git', ['-C', input.cwd, 'add', '--', relativePathFrom(input.cwd, taskPath), transitionPath], { stdio: 'ignore' });
-  return transitionPath;
+  execFileSync('git', ['-C', input.cwd, 'add', '--', transition.eventPath], { stdio: 'ignore' });
+  return transition.eventPath;
 }
 
 async function runTasksReconcile(argv: string[]) {
