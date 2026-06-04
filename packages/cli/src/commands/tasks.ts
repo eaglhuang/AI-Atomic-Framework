@@ -2983,7 +2983,7 @@ function evaluateTaskDeliverableGate(input: {
       ...declaredFiles.filter((filePath) => existsSync(path.resolve(input.cwd, filePath)))
     ])
   );
-  const deliverableFiles = changedFiles.filter((filePath) => isRealDeliverablePath(filePath));
+  const deliverableFiles = changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, declaredFiles));
   const enforceDeclaredScope = declaredFiles.some((filePath) =>
     !filePath.startsWith('.atm/') && filePath !== normalizeRelativePath((input.taskDocument.source as { planPath?: string } | undefined)?.planPath ?? '')
   );
@@ -3098,7 +3098,7 @@ function inspectHistoricalDelivery(input: {
     };
   }
   const changedFiles = readGitNameOnly(input.cwd, ['show', '--pretty=format:', '--name-only', commitSha, '--']);
-  const deliverableCandidates = changedFiles.filter((filePath) => isRealDeliverablePath(filePath));
+  const deliverableCandidates = changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
   const deliverableFiles = input.enforceDeclaredScope
     ? deliverableCandidates.filter((filePath) => input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
     : deliverableCandidates;
@@ -3211,6 +3211,18 @@ function isRealDeliverablePath(filePath: string): boolean {
   if (normalized.startsWith('.git/')) return false;
   if (/^(node_modules|dist|build|coverage|release|scratch|temp|tmp|\.atm-temp)\//.test(normalized)) return false;
   return isTaskDirectionPathCandidate(normalized);
+}
+
+function isDeliverableGateCandidate(filePath: string, declaredFiles: readonly string[]): boolean {
+  return isRealDeliverablePath(filePath) || isDeclaredRunnerOutputPath(filePath, declaredFiles);
+}
+
+function isDeclaredRunnerOutputPath(filePath: string, declaredFiles: readonly string[]): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  if (!normalized) return false;
+  if (normalized.startsWith('.atm/') || normalized.startsWith('.git/')) return false;
+  if (!normalized.startsWith('release/atm-onefile/') && !normalized.startsWith('release/atm-root-drop/')) return false;
+  return declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
 }
 
 function pathMatchesTaskScope(filePath: string, scope: string): boolean {

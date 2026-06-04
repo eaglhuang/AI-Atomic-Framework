@@ -371,6 +371,72 @@ try {
   const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', committedFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
   assert(committedClose.ok === true, 'deliverable gate must accept a scoped historical delivery commit');
 
+  const runnerReleaseFixtureTaskId = 'TEST-TASK-0004';
+  const runnerReleaseTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', runnerReleaseFixtureTaskId, '--actor', 'validator', '--title', 'Committed runner release fixture']);
+  assert(runnerReleaseTask.ok === true, 'runner release fixture task create must succeed');
+  const runnerReleaseTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', `${runnerReleaseFixtureTaskId}.json`);
+  const runnerReleaseTaskDoc = readJson(runnerReleaseTaskPath);
+  runnerReleaseTaskDoc.scopePaths = ['release/atm-onefile/atm.mjs', 'release/atm-onefile/release-manifest.json'];
+  runnerReleaseTaskDoc.deliverables = ['release/atm-onefile/atm.mjs', 'release/atm-onefile/release-manifest.json'];
+  writeJson(runnerReleaseTaskPath, runnerReleaseTaskDoc);
+  const runnerReleaseClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', runnerReleaseFixtureTaskId]);
+  assert(runnerReleaseClaim.ok === true, 'next --claim must create a direction lock for the runner release fixture task');
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', `${runnerReleaseFixtureTaskId}.json`), {
+    taskId: runnerReleaseFixtureTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'runner release fixture deliverable evidence exists',
+      producedBy: 'validator',
+      artifactPaths: ['release/atm-onefile/atm.mjs', 'release/atm-onefile/release-manifest.json'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate runner release fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  mkdirSync(path.join(deliverableRepo, 'release', 'atm-onefile'), { recursive: true });
+  writeFileSync(path.join(deliverableRepo, 'release', 'atm-onefile', 'atm.mjs'), 'export const runner = true;\n', 'utf8');
+  writeJson(path.join(deliverableRepo, 'release', 'atm-onefile', 'release-manifest.json'), { runner: true });
+  execFileSync('git', ['add', 'release/atm-onefile/atm.mjs', 'release/atm-onefile/release-manifest.json'], { cwd: deliverableRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'add scoped runner release deliverables'], { cwd: deliverableRepo, stdio: 'ignore' });
+  const runnerReleaseClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', runnerReleaseFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
+  assert(runnerReleaseClose.ok === true, 'deliverable gate must accept declared runner release historical delivery files');
+
+  const undeclaredReleaseFixtureTaskId = 'TEST-TASK-0005';
+  const undeclaredReleaseTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', undeclaredReleaseFixtureTaskId, '--actor', 'validator', '--title', 'Undeclared release noise fixture']);
+  assert(undeclaredReleaseTask.ok === true, 'undeclared release fixture task create must succeed');
+  const undeclaredReleaseTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', `${undeclaredReleaseFixtureTaskId}.json`);
+  const undeclaredReleaseTaskDoc = readJson(undeclaredReleaseTaskPath);
+  undeclaredReleaseTaskDoc.scopePaths = ['src/ordinary-deliverable.ts'];
+  undeclaredReleaseTaskDoc.deliverables = ['src/ordinary-deliverable.ts'];
+  undeclaredReleaseTaskDoc.source = { planPath: '../planning/ordinary-deliverable.task.md' };
+  writeJson(undeclaredReleaseTaskPath, undeclaredReleaseTaskDoc);
+  const undeclaredReleaseClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', undeclaredReleaseFixtureTaskId]);
+  assert(undeclaredReleaseClaim.ok === true, 'next --claim must create a direction lock for the undeclared release fixture task');
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', `${undeclaredReleaseFixtureTaskId}.json`), {
+    taskId: undeclaredReleaseFixtureTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'undeclared release fixture evidence exists',
+      producedBy: 'validator',
+      artifactPaths: ['src/ordinary-deliverable.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate undeclared release fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  const undeclaredReleaseError = await expectTaskErrorDetails(['close', '--cwd', deliverableRepo, '--task', undeclaredReleaseFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD'], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+  assert(undeclaredReleaseError.historicalDeliveries?.[0]?.reason === 'no-scoped-deliverable-files', 'undeclared release historical delivery must remain excluded from deliverable credit');
+
   const lockScopedFixtureTaskId = 'TEST-TASK-0003';
   const lockScopedTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', lockScopedFixtureTaskId, '--actor', 'validator', '--title', 'Build claim scoped runner fixture']);
   assert(lockScopedTask.ok === true, 'claim-scoped deliverable fixture task create must succeed');
