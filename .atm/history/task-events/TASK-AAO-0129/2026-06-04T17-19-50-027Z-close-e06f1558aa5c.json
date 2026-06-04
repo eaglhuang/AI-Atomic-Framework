@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-04T17-19-50-027Z-close-e06f1558aa5c",
+  "taskId": "TASK-AAO-0129",
+  "action": "close",
+  "actorId": "007",
+  "sessionId": null,
+  "fromStatus": "open",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0129.json",
+  "taskSha256": "sha256:2aa8a3b3d887dcc17643c3effa2a332e26089525680e7eb9a44bd004db7201c1",
+  "createdAt": "2026-06-04T17:19:50.027Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0129 --actor 007 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0129.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "taskflow-dryrun-test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-04T17:19:50.025Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0129-taskflow-open-task-plan-generation-and-opener-delegation-dry-run.task.md",
+        ".atm/history/tasks/TASK-AAO-0129.json",
+        "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0129-taskflow-open-task-plan-generation-and-opener-delegation-dry-run.task.md",
+        "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+        "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-41.json",
+        "C:/Users/User/AI-Atomic-Framework/docs/specs/taskflow-profile-v1.md",
+        "C:/Users/User/AI-Atomic-Framework/fixtures/taskflow-profile/**",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow.ts",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow/__tests__/**",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow/profile-loader.ts",
+        "C:/Users/User/AI-Atomic-Framework/schemas/taskflow-profile.v1.json",
+        "packages/cli/src/commands/taskflow.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

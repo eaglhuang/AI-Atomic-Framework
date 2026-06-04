@@ -1,0 +1,148 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0129",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "3eb9a20e7e38d38b9624cc39d4e68abb47fe6fc5",
+  "governedTreeSha": "b5acd989afc55f00738cba63299e170d817567e2",
+  "targetCommitDelta": {
+    "currentCommitSha": "3eb9a20e7e38d38b9624cc39d4e68abb47fe6fc5",
+    "parentCommitShas": [
+      "3eb9a20e7e38d38b9624cc39d4e68abb47fe6fc5"
+    ],
+    "governedTreeSha": "b5acd989afc55f00738cba63299e170d817567e2",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0129.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0129.json",
+      ".atm/history/task-events/TASK-AAO-0129/2026-06-04T17-05-43-092Z-import-7ec57b4a1a93.json",
+      ".atm/history/task-events/TASK-AAO-0129/2026-06-04T17-19-50-027Z-close-e06f1558aa5c.json",
+      ".atm/history/task-events/TASK-AAO-0129/2026-06-04T17-22-59-865Z-reserve-32d0d12c6544.json",
+      ".atm/history/task-events/TASK-AAO-0129/2026-06-04T17-22-59-867Z-promote-3a6d2573324d.json",
+      ".atm/history/task-events/TASK-AAO-0129/2026-06-04T17-22-59-883Z-claim-89287a1741a2.json",
+      ".atm/history/tasks/TASK-AAO-0129.json",
+      "packages/cli/src/commands/taskflow.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b1a84d729fc9905bc7a76c80e2ffe6f87d9d79e3bb6e4187d1f163d4484f17d0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f3c65aa5ce2611f440a48d21d6f821b4a9ca0313d9457b623d6326e3a87c34da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "taskflow-dryrun-test",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-04T17:23:17.457Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0129-taskflow-open-task-plan-generation-and-opener-delegation-dry-run.task.md",
+      ".atm/history/evidence/TASK-AAO-0129.*",
+      ".atm/history/task-events/TASK-AAO-0129/**",
+      ".atm/history/tasks/TASK-AAO-0129.json",
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0129-taskflow-open-task-plan-generation-and-opener-delegation-dry-run.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-41.json",
+      "C:/Users/User/AI-Atomic-Framework/docs/specs/taskflow-profile-v1.md",
+      "C:/Users/User/AI-Atomic-Framework/fixtures/taskflow-profile/**",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow/__tests__/**",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow/profile-loader.ts",
+      "C:/Users/User/AI-Atomic-Framework/schemas/taskflow-profile.v1.json",
+      "docs/specs/taskflow-profile-v1.md",
+      "docs/tasks/tasks-atm.json",
+      "docs/tasks/tasks-atm/tasks-atm-part-41.json",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "schemas/taskflow-profile.v1.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "schemas/taskflow-profile.v1.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0129.json",
+  "closedAt": "2026-06-04T17:23:17.457Z",
+  "closedByActor": "007",
+  "sessionId": "session-20260604172259-007-TASK-AAO-0129-436cbbebff",
+  "attestation": null
+}
