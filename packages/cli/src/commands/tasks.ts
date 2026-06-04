@@ -1647,6 +1647,7 @@ async function runTasksClose(argv: string[]) {
     : null;
   const frameworkDeliveryWindow = options.status === 'done'
     ? evaluateFrameworkDeliveryWindow({
+      cwd: options.cwd,
       taskId: options.taskId,
       actorId,
       batchId: options.batchId ?? owningBatch?.batchId ?? null,
@@ -1661,6 +1662,7 @@ async function runTasksClose(argv: string[]) {
   // dirty/untracked files outside the task scope never hard-block close.
   let closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
     ? buildCloseScopedDiffIsolation({
+      cwd: options.cwd,
       taskId: options.taskId,
       taskDeclaredFiles,
       frameworkChangedFiles: activeFrameworkStatus?.changedFiles ?? [],
@@ -1670,6 +1672,7 @@ async function runTasksClose(argv: string[]) {
   if (frameworkStatus?.repoRole === 'framework') {
     const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
     const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
+      cwd: options.cwd,
       taskId: options.taskId,
       taskDeclaredFiles,
       trackedDirtyFiles: closeWorktree.trackedDirtyFiles
@@ -2819,6 +2822,7 @@ function parseReservationOptions(action: 'reserve' | 'promote', argv: string[]) 
 
 
 function evaluateFrameworkDeliveryWindow(input: {
+  readonly cwd: string;
   readonly taskId: string;
   readonly actorId: string;
   readonly batchId: string | null;
@@ -2828,7 +2832,7 @@ function evaluateFrameworkDeliveryWindow(input: {
   readonly historicalDeliveryRefs: readonly string[];
 }) {
   const criticalChangedFiles = uniqueStrings(input.criticalChangedFiles.map(normalizeRelativePath).filter(Boolean));
-  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
   const scopedCriticalChangedFiles = criticalChangedFiles.filter((filePath) =>
     declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
   );
@@ -2897,6 +2901,7 @@ interface TaskCloseScopedDiffIsolationReport {
 }
 
 function buildCloseScopedDiffIsolation(input: {
+  readonly cwd: string;
   readonly taskId: string;
   readonly taskDeclaredFiles: readonly string[];
   readonly frameworkChangedFiles: readonly string[];
@@ -2906,7 +2911,7 @@ function buildCloseScopedDiffIsolation(input: {
     readonly declaredFiles: readonly string[];
   };
 }): TaskCloseScopedDiffIsolationReport {
-  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
   const allChangedFiles = uniqueStrings(input.frameworkChangedFiles.map(normalizeRelativePath).filter(Boolean));
   const scopedCriticalChangedFiles = [...input.frameworkDeliveryWindow.scopedCriticalChangedFiles];
   const isolatedUnrelatedChanges = [...input.frameworkDeliveryWindow.unscopedCriticalChangedFiles];
@@ -2930,11 +2935,12 @@ function buildCloseScopedDiffIsolation(input: {
 }
 
 function evaluateFrameworkCloseDirtyGuard(input: {
+  readonly cwd: string;
   readonly taskId: string;
   readonly taskDeclaredFiles: readonly string[];
   readonly trackedDirtyFiles: readonly string[];
 }) {
-  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
   const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
   const scopeTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) =>
     declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
@@ -2968,12 +2974,7 @@ function evaluateTaskDeliverableGate(input: {
   readonly historicalDeliveryRefs?: readonly string[];
 }): TaskDeliverableGateReport {
   const required = isDeliverableDiffRequired(input.taskDocument);
-  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles).map((file) => {
-    if (path.isAbsolute(file)) {
-      return normalizeRelativePath(relativePathFrom(input.cwd, file));
-    }
-    return file;
-  });
+  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
   const changedFileReport = listChangedFilesForDeliverableGate(input.cwd, input.claim, input.taskId);
   const changedFiles = (changedFileReport.gitAvailable
     ? changedFileReport.files
@@ -3058,6 +3059,16 @@ function extractStringList(value: unknown): readonly string[] {
     : [];
 }
 
+function normalizeTaskScopePaths(cwd: string, values: readonly string[]): readonly string[] {
+  return sanitizeTaskDirectionAllowedFiles(values.map((entry) => {
+    const normalized = normalizeRelativePath(entry);
+    if (!normalized) return '';
+    return path.isAbsolute(normalized)
+      ? normalizeRelativePath(relativePathFrom(cwd, normalized))
+      : normalized;
+  }));
+}
+
 function inspectHistoricalDelivery(input: {
   readonly cwd: string;
   readonly requestedRef: string;
@@ -3134,7 +3145,7 @@ function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord 
         const taskDoc = JSON.parse(readFileSync(taskPath, 'utf8'));
         const allowedFiles = extractTaskCloseDeclaredFiles(taskDoc as Record<string, unknown>);
         if (allowedFiles.length > 0) {
-          allowedSet = new Set(allowedFiles.map(normalizeRelativePath).filter(Boolean));
+          allowedSet = new Set(normalizeTaskScopePaths(cwd, allowedFiles));
         }
       } catch {
         // Ignore read/parse errors

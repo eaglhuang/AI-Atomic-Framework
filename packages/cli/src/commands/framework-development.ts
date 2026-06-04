@@ -1085,7 +1085,7 @@ export function inspectFrameworkCloseWorktree(cwd: string, taskId: string | null
           allowedFiles.push(...taskDoc.scopePaths);
         }
         if (allowedFiles.length > 0) {
-          allowedSet = new Set(allowedFiles.map(normalizeRelativePath).filter(Boolean));
+          allowedSet = new Set(allowedFiles.map((entry) => normalizeProjectRelativePath(cwd, entry)).filter(Boolean));
         }
       } catch {
         // Ignore read/parse errors
@@ -1840,7 +1840,7 @@ function readFutureTargetCommitDelta(cwd: string, preferredChangedFiles: readonl
           allowedFiles.push(...taskDoc.scopePaths);
         }
         if (allowedFiles.length > 0) {
-          allowedSet = new Set(allowedFiles.map(normalizeRelativePath).filter(Boolean));
+          allowedSet = new Set(allowedFiles.map((entry) => normalizeProjectRelativePath(cwd, entry)).filter(Boolean));
         }
       } catch {
         // Ignore read/parse errors
@@ -1932,6 +1932,14 @@ function normalizeOptionalString(value: unknown): string | null {
 
 function normalizeRelativePath(value: string): string {
   return String(value).replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function normalizeProjectRelativePath(cwd: string, value: string): string {
+  const normalized = normalizeRelativePath(value);
+  if (!normalized) return '';
+  return path.isAbsolute(normalized)
+    ? normalizeRelativePath(relativePathFrom(cwd, normalized))
+    : normalized;
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {

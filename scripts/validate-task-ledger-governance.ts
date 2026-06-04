@@ -382,13 +382,14 @@ try {
   const lockScopedClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', lockScopedFixtureTaskId]);
   assert(lockScopedClaim.ok === true, 'next --claim must create a direction lock for the planning-only fixture');
   const lockScopedClaimedTaskDoc = readJson(lockScopedTaskPath);
+  const absoluteClaimScopedRunner = path.join(deliverableRepo, 'src', 'claim-scoped-runner.ts');
   lockScopedClaimedTaskDoc.taskDirectionLock = {
     ...(lockScopedClaimedTaskDoc.taskDirectionLock ?? {}),
-    allowedFiles: ['src/claim-scoped-runner.ts']
+    allowedFiles: [absoluteClaimScopedRunner]
   };
   lockScopedClaimedTaskDoc.claim = {
     ...(lockScopedClaimedTaskDoc.claim ?? {}),
-    files: ['src/claim-scoped-runner.ts']
+    files: [absoluteClaimScopedRunner]
   };
   writeJson(lockScopedTaskPath, lockScopedClaimedTaskDoc);
   writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', `${lockScopedFixtureTaskId}.json`), {
@@ -411,7 +412,7 @@ try {
   mkdirSync(path.join(deliverableRepo, 'src'), { recursive: true });
   writeFileSync(path.join(deliverableRepo, 'src', 'claim-scoped-runner.ts'), 'export const claimScopedRunner = true;\n', 'utf8');
   const lockScopedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', lockScopedFixtureTaskId, '--actor', 'validator', '--status', 'done']);
-  assert(lockScopedClose.ok === true, 'deliverable gate must accept claim/taskDirectionLock allowed files when planning scopePaths are read-only');
+  assert(lockScopedClose.ok === true, 'deliverable gate must accept absolute claim/taskDirectionLock allowed files when planning scopePaths are read-only');
 
   const frameworkBatchRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(frameworkBatchRepo);
@@ -1196,7 +1197,7 @@ async function validateClosurePacketDirtyTreeHygieneGuard(tempRoot: string) {
 
   const taskDoc = readJson(taskPath);
   const targetAllowedFiles = Array.isArray(taskDoc.targetAllowedFiles) ? [...taskDoc.targetAllowedFiles] : [];
-  targetAllowedFiles.push('packages/cli/src/commands/allowed-untracked.ts');
+  targetAllowedFiles.push(path.join(hygieneRepo, 'packages', 'cli', 'src', 'commands', 'allowed-untracked.ts'));
   writeJson(taskPath, { ...taskDoc, targetAllowedFiles });
 
   const deliverableFilePath = path.join(hygieneRepo, 'packages', 'cli', 'src', 'commands', 'batch.ts');
