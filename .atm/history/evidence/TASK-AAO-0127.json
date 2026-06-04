@@ -1,0 +1,174 @@
+{
+  "taskId": "TASK-AAO-0127",
+  "updatedAt": "2026-06-04T12:14:15.136Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run build",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+      "createdAt": "2026-06-04T12:13:38.790Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "build"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run build",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b9d4ecbbb049a43cd497417786e3f97968c0786ed2e76d5086f92de3c74b0d8e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "build"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:e72185a6cd819fb85731d9b6f5e01550fe4cd8674b727dfcc625f2d8e0b6a4d2",
+            "cached": false,
+            "generatedAt": "2026-06-04T12:13:38.874Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b4bda6cf058da16f2b66c8966215549bc7af7d76c9e1334db5bbc0afde8f4aed",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --name-status",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+      "createdAt": "2026-06-04T12:13:54.486Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "diff-name-status"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --name-status",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b99ca3f5d236f7dc64d41390e87d7750293b15da03d323e53771a05407e969cf",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "diff-name-status"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:8f7e99cdc068118cfff7b8726c7a5b8e20429b1efcb1e72ff2ddc07bd510c519",
+            "cached": false,
+            "generatedAt": "2026-06-04T12:13:54.542Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0f7c253b18beda109dbcc74539607247f4317ce356348601fbfa3aef00120c5c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+      "createdAt": "2026-06-04T12:13:54.631Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "diff-check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "diff-check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-04T12:13:54.681Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:53aedda9444ce08df6193bde2cff828b5fa2e5b94ffa908923a663dea74b99f7",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: stable runner route check for TASK-AAO-0127",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+      "createdAt": "2026-06-04T12:14:15.136Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "runner-sync"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs next --prompt 'TASK-AAO-0127 frozen runner alignment after TASK-AAO-0126' --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:8eb1e510ff16457af3a5626049341f83fe3b183c6f23d3b433595a43dfd4aa87",
+            "stderrSha256": "sha256:7b6310f5413669b380283591eeaa6c75e8144c9ff27854420cb4068831cba4c3",
+            "validators": [
+              "runner-sync"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:244ec234ba98951dca1719a24dff03b01fea8944636e97a849634c2a3f24bd7a",
+            "cached": false,
+            "generatedAt": "2026-06-04T12:14:15.173Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:12145435dbfcae867781732f3b842decd15c15297ac86eceee74bfd10fb19ad9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
