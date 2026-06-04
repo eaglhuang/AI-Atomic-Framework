@@ -1327,11 +1327,15 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
   const commitTreeSha = runGitScalar(cwd, ['rev-parse', `${commitSha}^{tree}`]);
   const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
   const parentCommitShas = readParentCommitShas(cwd, commitSha);
-  for (const record of records) {
+  const candidates = records.flatMap((record) => {
     const git = normalizeGitDetails(record?.details?.git);
-    if (!git) continue;
+    if (!git) return [];
     const commandRuns = normalizeCommandRuns(record?.commandRuns ?? record?.details?.commandRuns);
     const validationPasses = inferValidationPassesFromCommandRuns(commandRuns);
+    return [{ git, commandRuns, validationPasses }];
+  });
+  for (const candidate of candidates) {
+    const { git, commandRuns, validationPasses } = candidate;
     if (git.commitSha === commitSha) {
       return {
         commitSha,
@@ -1344,6 +1348,9 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
         validationPasses
       };
     }
+  }
+  for (const candidate of candidates) {
+    const { git, commandRuns, validationPasses } = candidate;
     if (!git.commitSha && git.parentCommitShas.length === 1 && git.parentCommitShas[0] === commitSha) {
       return {
         commitSha,
@@ -1356,6 +1363,9 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
         validationPasses
       };
     }
+  }
+  for (const candidate of candidates) {
+    const { git, commandRuns, validationPasses } = candidate;
     if (git.treeSha && (git.treeSha === governedTreeSha || git.treeSha === commitTreeSha) && sameStringSet(git.parentCommitShas, parentCommitShas)) {
       return {
         commitSha,
