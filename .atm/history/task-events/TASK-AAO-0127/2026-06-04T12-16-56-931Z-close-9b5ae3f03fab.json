@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-04T12-16-56-931Z-close-9b5ae3f03fab",
+  "taskId": "TASK-AAO-0127",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0127.json",
+  "taskSha256": "sha256:795ab2bb070a7ec8ebaa4cdcc32a58753fddfb7bd42f05fb74b8ade84a7903f7",
+  "createdAt": "2026-06-04T12:16:56.931Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0127 --actor codex-gpt-5.4-mini --status done --historical-delivery 005f799b8271a9acd9022ea026d0fcd088de40bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260604121314-codex-gpt-5.4-mini-TASK-AAO-0127-dc66c87fca",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0127.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "diff-check",
+      "diff-name-status",
+      "runner-sync",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-04T12:16:56.926Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0127-frozen-runner-alignment-after-task-aao-0126.task.md",
+        ".atm/history/evidence/TASK-AAO-0127.*",
+        ".atm/history/task-events/TASK-AAO-0127/**",
+        ".atm/history/tasks/TASK-AAO-0127.json",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
