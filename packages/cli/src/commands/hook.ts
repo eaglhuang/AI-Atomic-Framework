@@ -2444,7 +2444,14 @@ function buildIdentitySetRequiredCommand(cwd: string, actorId: string) {
 
 function isPathAllowedByTaskDirection(filePath: string, allowedFiles: readonly string[]): boolean {
   const normalizedFile = normalizeRelativePath(filePath).toLowerCase();
-  return allowedFiles.some((candidate) => matchesTaskDirectionPath(normalizedFile, normalizeRelativePath(candidate).toLowerCase()));
+  const cwd = process.cwd();
+  return allowedFiles.some((candidate) => {
+    let relCandidate = candidate;
+    if (path.isAbsolute(candidate)) {
+      relCandidate = relativePathFrom(cwd, candidate);
+    }
+    return matchesTaskDirectionPath(normalizedFile, normalizeRelativePath(relCandidate).toLowerCase());
+  });
 }
 
 function matchesTaskDirectionPath(filePath: string, allowedPath: string): boolean {

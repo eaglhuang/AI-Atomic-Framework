@@ -1,0 +1,135 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0123",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "ac36ce187a7e90625dec0bae8b27af2d4cdf4b11",
+  "governedTreeSha": "49d0926a9969628323623c82101345e1d66bbec6",
+  "targetCommitDelta": {
+    "currentCommitSha": "ac36ce187a7e90625dec0bae8b27af2d4cdf4b11",
+    "parentCommitShas": [
+      "ac36ce187a7e90625dec0bae8b27af2d4cdf4b11"
+    ],
+    "governedTreeSha": "49d0926a9969628323623c82101345e1d66bbec6",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0123.json",
+      ".atm/history/task-events/TASK-AAO-0123/2026-06-04T07-41-09-680Z-import-676e9b6d19da.json",
+      ".atm/history/task-events/TASK-AAO-0123/2026-06-04T07-42-19-205Z-reserve-1dab9f963787.json",
+      ".atm/history/task-events/TASK-AAO-0123/2026-06-04T07-42-19-211Z-promote-c5faccdd7f4b.json",
+      ".atm/history/task-events/TASK-AAO-0123/2026-06-04T07-42-19-235Z-claim-1dfc3894dc8e.json",
+      ".atm/history/tasks/TASK-AAO-0123.json",
+      ".atm/history/tasks/TASK-TEAM-0001.json",
+      ".atm/history/tasks/TASK-TEAM-0002.json",
+      ".atm/history/tasks/TASK-TEAM-0003.json",
+      ".atm/history/tasks/TASK-TEAM-0004.json",
+      ".atm/history/tasks/TASK-TEAM-0005.json",
+      ".atm/history/tasks/TASK-TEAM-0006.json",
+      ".atm/history/tasks/TASK-TEAM-0007.json",
+      ".atm/history/tasks/TASK-TEAM-0008.json",
+      ".atm/history/tasks/TASK-TEAM-0009.json",
+      ".atm/history/tasks/TASK-TEAM-0010.json",
+      ".atm/history/tasks/TASK-TEAM-0011.json",
+      ".atm/history/tasks/TASK-TEAM-0012.json",
+      ".atm/history/tasks/TASK-TEAM-0013.json",
+      ".atm/history/tasks/TASK-TEAM-0014.json",
+      ".atm/history/tasks/TASK-TEAM-0015.json",
+      ".atm/history/tasks/TASK-TEAM-0016.json",
+      ".atm/history/tasks/TASK-TEAM-0017.json",
+      ".atm/history/tasks/TASK-TEAM-0018.json",
+      ".atm/history/tasks/TASK-TEAM-0019.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:c88fdce660c99b04a7d05e49ce4fbad4ae5e3fec9e021beb345138d65ab71695",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8c5636e69750e0d47a063f088cffa098f8040469c6e7109db460b113e07e8911",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate-task-import",
+    "validate-task-ledger-governance",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-04T07:46:58.215Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0123-protect-active-claims-from-task-import-refresh-overwrite.task.md",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/next.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/task-direction.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-import.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-ledger-governance.ts"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0123.json",
+  "closedAt": "2026-06-04T07:46:58.216Z",
+  "closedByActor": "007",
+  "sessionId": "session-20260604074219-007-TASK-AAO-0123-abe1541fc5",
+  "attestation": null
+}

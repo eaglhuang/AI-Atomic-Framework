@@ -2932,7 +2932,12 @@ function evaluateTaskDeliverableGate(input: {
   readonly historicalDeliveryRefs?: readonly string[];
 }): TaskDeliverableGateReport {
   const required = isDeliverableDiffRequired(input.taskDocument);
-  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles);
+  const declaredFiles = sanitizeTaskDirectionAllowedFiles(input.taskDeclaredFiles).map((file) => {
+    if (path.isAbsolute(file)) {
+      return normalizeRelativePath(relativePathFrom(input.cwd, file));
+    }
+    return file;
+  });
   const changedFileReport = listChangedFilesForDeliverableGate(input.cwd, input.claim, input.taskId);
   const changedFiles = (changedFileReport.gitAvailable
     ? changedFileReport.files
@@ -4372,6 +4377,14 @@ function writeTaskFiles(input: {
     if (existsSync(filePath) && !input.force) {
       continue;
     }
+    let existingDocument: Record<string, unknown> | null = null;
+    if (existsSync(filePath)) {
+      try {
+        existingDocument = JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+      } catch {
+        // ignore
+      }
+    }
     const taskDocument = {
       ...task,
       ...(input.resetOpen ? { status: 'open' as const } : {}),
@@ -4383,6 +4396,19 @@ function writeTaskFiles(input: {
       delete taskDocument.closedByActor;
       delete taskDocument.closurePacket;
       delete taskDocument.closeReason;
+    } else if (existingDocument) {
+      const currentClaim = parseClaimRecord(existingDocument.claim);
+      const hasActiveClaim = currentClaim && currentClaim.state === 'active';
+      if (hasActiveClaim) {
+        taskDocument.claim = existingDocument.claim;
+        if (existingDocument.status) taskDocument.status = existingDocument.status;
+        if (existingDocument.owner) taskDocument.owner = existingDocument.owner;
+        if (existingDocument.startedAt) taskDocument.startedAt = existingDocument.startedAt;
+        if (existingDocument.startedBySessionId) taskDocument.startedBySessionId = existingDocument.startedBySessionId;
+      }
+      if (existingDocument.taskDirectionLock) {
+        taskDocument.taskDirectionLock = existingDocument.taskDirectionLock;
+      }
     }
     writeTaskDocumentWithTransition({
       cwd: input.cwd,

@@ -986,6 +986,7 @@ try {
   await validateTaskLedgerReadersAtomization(tempRoot);
   await validatePlanningOnlyLedgerAuditBoundary(tempRoot);
   await validateClosurePacketDirtyTreeHygieneGuard(tempRoot);
+  await validateTaskImportRefreshClaimPreservation(tempRoot);
 
   if (!process.exitCode) {
     console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, and TASK-AAO-0039 planning-only ledger audit boundary covered)`);
@@ -1181,4 +1182,52 @@ async function validateClosurePacketDirtyTreeHygieneGuard(tempRoot: string) {
   const changedFiles = packet.targetCommitDelta.changedFiles;
   assert(changedFiles.includes('packages/cli/src/commands/allowed-untracked.ts'), 'changedFiles must include allowed untracked');
   assert(!changedFiles.includes('scratch/noise.json'), 'changedFiles must exclude untracked noise');
+}
+
+async function validateTaskImportRefreshClaimPreservation(tempRoot: string) {
+  const repo = makeHostRepo(tempRoot, 'import-refresh-claim-preservation');
+  initGitRepo(repo);
+
+  const taskId = 'TASK-REFRESH-0001';
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`);
+
+  const planPath = path.join(repo, 'docs', 'plan', 'tasks', `${taskId}.task.md`);
+  mkdirSync(path.dirname(planPath), { recursive: true });
+  writeFileSync(planPath, [
+    '---',
+    `task_id: ${taskId}`,
+    'title: "Refresh preservation test task"',
+    'status: open',
+    'scopePaths:',
+    '  - "src/dummy.ts"',
+    'deliverables:',
+    '  - "src/dummy.ts"',
+    '---',
+    `# ${taskId}`,
+    ''
+  ].join('\n'), 'utf8');
+
+  const importResult = await runTasks(['import', '--cwd', repo, '--from', planPath, '--write', '--json']);
+  assert(importResult.ok === true, 'import must succeed');
+
+  const taskDoc = readJson(taskPath);
+  writeJson(taskPath, { ...taskDoc, status: 'ready' });
+
+  const claimResult = await runNext(['--cwd', repo, '--claim', '--actor', 'validator', '--prompt', taskId, '--json']);
+  assert(claimResult.ok === true, 'claim must succeed');
+
+  const claimedDoc = readJson(taskPath);
+  assert(claimedDoc.status === 'running', 'claimed status must be running');
+  assert(claimedDoc.claim && claimedDoc.claim.state === 'active', 'active claim record must exist');
+  assert(claimedDoc.taskDirectionLock, 'taskDirectionLock must exist');
+
+  const refreshResult = await runTasks(['import', '--cwd', repo, '--from', planPath, '--write', '--force', '--json']);
+  assert(refreshResult.ok === true, 'import refresh must succeed');
+
+  const refreshedDoc = readJson(taskPath);
+  assert(refreshedDoc.status === 'running', 'running status must be preserved after refresh');
+  assert(refreshedDoc.claim && refreshedDoc.claim.state === 'active', 'active claim must be preserved after refresh');
+  assert(refreshedDoc.taskDirectionLock, 'taskDirectionLock must be preserved after refresh');
+  assert(refreshedDoc.owner === 'validator', 'owner validator must be preserved after refresh');
+  assert(refreshedDoc.startedBySessionId === claimedDoc.startedBySessionId, 'startedBySessionId must be preserved after refresh');
 }

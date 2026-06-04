@@ -3095,8 +3095,51 @@ function buildMirrorSyncNextAction(input: {
   readonly classification: TaskDeliveryClassification;
 }) {
   const sourcePath = input.task.sourcePlanPath ?? '<source-task-card-path>';
+  const hasActiveClaim = typeof input.task.activeClaimActorId === 'string' && input.task.activeClaimActorId.length > 0;
   const importCommand = `node atm.mjs tasks import --from ${quoteCliValue(sourcePath)} --write --force --json`;
   const dryRunCommand = `node atm.mjs tasks import --from ${quoteCliValue(sourcePath)} --dry-run --json`;
+
+  if (hasActiveClaim) {
+    return {
+      status: 'task-mirror-sync-blocked',
+      command: dryRunCommand,
+      reason: `Task ${input.task.workItemId} has an active claim by actor ${input.task.activeClaimActorId}. Mirror-sync write is blocked to prevent claim/lock overwrite.`,
+      recommendedChannel: 'mirror-sync' as const,
+      riskLevel: 'high' as const,
+      requiredCommand: null,
+      deliveryClassification: input.classification,
+      mirrorSync: {
+        schemaId: 'atm.taskMirrorSync.v1',
+        taskId: input.task.workItemId,
+        targetRepo: input.classification.targetRepo,
+        closureAuthority: input.classification.closureAuthority,
+        planningRepo: input.classification.planningRepo,
+        ledgerStatus: input.classification.ledgerStatus,
+        sourceStatus: input.classification.sourceStatus,
+        statusDivergence: input.classification.statusDivergence,
+        sourcePlanPath: input.task.sourcePlanPath,
+        ledgerMirrorPath: input.task.taskPath,
+        recommendedCommandSequence: [
+          `# WARNING: Active claim exists for ${input.task.activeClaimActorId}`,
+          `# Release or handoff the task before performing a forced mirror write.`,
+          dryRunCommand
+        ],
+        doNotDeliverHere: true
+      },
+      allowedCommands: [
+        dryRunCommand,
+        'node atm.mjs tasks audit --task <task-id> --json',
+        'node atm.mjs framework-mode status --json'
+      ],
+      blockedCommands: [
+        importCommand,
+        'editing or staging this task\'s deliverables in the current repo',
+        'node atm.mjs next --claim for this task in the current repo',
+        'node atm.mjs tasks close for this task in the current repo'
+      ]
+    };
+  }
+
   return {
     status: 'task-mirror-sync-required',
     command: input.classification.statusDivergence ? importCommand : dryRunCommand,

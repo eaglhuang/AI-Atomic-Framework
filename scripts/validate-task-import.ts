@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -254,6 +254,57 @@ deliverables:
 
     // 3. 驗證啟用 --strict-paths 模式下，應直接拋出 STRICT_PATH_VIOLATION 錯誤 (ok=false)
     await expectThrow('import', ['--from', strictTestPath, '--dry-run', '--strict-paths', '--cwd', tempWorkspace], 'STRICT_PATH_VIOLATION');
+
+    // TASK-AAO-0123: 驗證 import refresh 時保護 active claim 與 taskDirectionLock
+    const activeTaskId = 'SANGUO-AUTO-0001';
+    const activeTaskPath = path.join(tempWorkspace, '.atm', 'history', 'tasks', `${activeTaskId}.json`);
+    const originalTaskJson = JSON.parse(readFileSync(activeTaskPath, 'utf8'));
+    const mockClaim = {
+      schemaId: 'atm.claimLeaseRecord.v1',
+      claimLeaseId: 'lease-test-1234',
+      leaseId: 'lease-test-1234',
+      taskId: activeTaskId,
+      actorId: 'test-agent',
+      sessionId: 'session-test-5678',
+      claimedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      files: ['src/dummy.ts'],
+      state: 'active'
+    };
+    const mockLock = {
+      schemaId: 'atm.taskDirectionLock.v1',
+      taskId: activeTaskId,
+      actorId: 'test-agent',
+      allowedFiles: ['src/dummy.ts'],
+      planningReadOnlyPaths: [],
+      planningMirrorPaths: []
+    };
+    const claimedTaskJson = {
+      ...originalTaskJson,
+      status: 'running',
+      owner: 'test-agent',
+      startedAt: new Date().toISOString(),
+      startedBySessionId: 'session-test-5678',
+      claim: mockClaim,
+      taskDirectionLock: mockLock
+    };
+    writeFileSync(activeTaskPath, JSON.stringify(claimedTaskJson, null, 2), 'utf8');
+
+    await expectOk('import', ['--from', npcPlan, '--write', '--force', '--cwd', tempWorkspace]);
+
+    const refreshedTaskJson = JSON.parse(readFileSync(activeTaskPath, 'utf8'));
+    if (refreshedTaskJson.status !== 'running') {
+      fail(`TASK-AAO-0123 regression: status running was overwritten to ${refreshedTaskJson.status}`);
+    }
+    if (!refreshedTaskJson.claim || refreshedTaskJson.claim.claimLeaseId !== 'lease-test-1234') {
+      fail(`TASK-AAO-0123 regression: active claim was removed or overwritten during refresh.`);
+    }
+    if (!refreshedTaskJson.taskDirectionLock || refreshedTaskJson.taskDirectionLock.taskId !== activeTaskId) {
+      fail(`TASK-AAO-0123 regression: taskDirectionLock was removed or overwritten during refresh.`);
+    }
+    if (refreshedTaskJson.owner !== 'test-agent' || refreshedTaskJson.startedBySessionId !== 'session-test-5678') {
+      fail(`TASK-AAO-0123 regression: active actor/session fields were removed or overwritten.`);
+    }
 
   } finally {
     rmSync(tempWorkspace, { recursive: true, force: true });
