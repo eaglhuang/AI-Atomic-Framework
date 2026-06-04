@@ -1,0 +1,132 @@
+{
+  "taskId": "TASK-AAO-0125",
+  "updatedAt": "2026-06-04T11:38:03.714Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run build",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260604113409-codex-gpt-5.4-mini-TASK-AAO-0125-b936ef240e",
+      "createdAt": "2026-06-04T11:37:36.574Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260604113409-codex-gpt-5.4-mini-TASK-AAO-0125-b936ef240e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "build"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run build",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b9d4ecbbb049a43cd497417786e3f97968c0786ed2e76d5086f92de3c74b0d8e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "build"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:e72185a6cd819fb85731d9b6f5e01550fe4cd8674b727dfcc625f2d8e0b6a4d2",
+            "cached": false,
+            "generatedAt": "2026-06-04T11:37:36.638Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:71418bb2d6dfb08b46613d3dc96fcde6860b87db01860c5c434522997dc016ed",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs next --prompt TASK-AAO-0125",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260604113409-codex-gpt-5.4-mini-TASK-AAO-0125-b936ef240e",
+      "createdAt": "2026-06-04T11:37:53.095Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260604113409-codex-gpt-5.4-mini-TASK-AAO-0125-b936ef240e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "runner-sync"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs next --prompt TASK-AAO-0125",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:625a63a332af641314048a53ff4bcdbe6b6fbaef13e92a317008cf84628c4ded",
+            "stderrSha256": "sha256:7b6310f5413669b380283591eeaa6c75e8144c9ff27854420cb4068831cba4c3",
+            "validators": [
+              "runner-sync"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:8b6c72983a78c2ea4af61bd8d64a7edb6672814b8c7b7a2948e34467715f67ba",
+            "cached": false,
+            "generatedAt": "2026-06-04T11:37:53.158Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:35c0b29c44494b9d79fc0a53f793b47f30e1d9dd5f284a711d10c8450ab0aa85",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260604113409-codex-gpt-5.4-mini-TASK-AAO-0125-b936ef240e",
+      "createdAt": "2026-06-04T11:38:03.714Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260604113409-codex-gpt-5.4-mini-TASK-AAO-0125-b936ef240e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "diff-check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "diff-check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-04T11:38:03.753Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5b631aae520164726fa0e11d88d816eb6764b18235118f5b2b544b34f7a131b0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
