@@ -384,6 +384,15 @@ async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
     dryRun: options.dryRun,
     amend: options.amend
   });
+  let transitionPath: string | null = null;
+  if (!options.dryRun) {
+    transitionPath = writeRepairClosureTransition({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId: resolvedActor?.actorId ?? null,
+      command: `node atm.mjs tasks repair-closure --task ${options.taskId}${resolvedActor?.actorId ? ` --actor ${resolvedActor.actorId}` : ''} --json`
+    });
+  }
   const stagedOnly = !result.amended;
   return makeResult({
     ok: true,
@@ -414,6 +423,7 @@ async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
     ],
     evidence: {
       result,
+      transitionPath,
       nextAction: !options.dryRun && stagedOnly ? {
         kind: 'governed-commit-required',
         command: result.nextActionCommand,
@@ -423,6 +433,31 @@ async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
       suggestedVerification: 'node atm.mjs hook pre-push --base origin/main --head HEAD --json'
     }
   });
+}
+
+function writeRepairClosureTransition(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string | null;
+  readonly command: string;
+}): string | null {
+  const taskPath = taskPathFor(input.cwd, input.taskId);
+  if (!existsSync(taskPath)) return null;
+  const taskDocument = readJsonRecord(taskPath);
+  const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
+  const transitionPath = writeTaskDocumentWithTransition({
+    cwd: input.cwd,
+    taskPath,
+    taskId: input.taskId,
+    taskDocument,
+    action: 'repair-closure',
+    actorId: input.actorId,
+    sessionId: typeof taskDocument.closedBySessionId === 'string' ? taskDocument.closedBySessionId : null,
+    previousStatus,
+    command: input.command
+  });
+  execFileSync('git', ['-C', input.cwd, 'add', '--', relativePathFrom(input.cwd, taskPath), transitionPath], { stdio: 'ignore' });
+  return transitionPath;
 }
 
 async function runTasksReconcile(argv: string[]) {
