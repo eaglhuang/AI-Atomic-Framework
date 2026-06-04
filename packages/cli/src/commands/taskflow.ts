@@ -53,6 +53,30 @@ export function runTaskflow(argv: string[] = []) {
       )
     ],
     evidence: {
+      wouldCreate: false,
+      wouldValidate: true,
+      wouldDelegate: true,
+      profileRepoLabel: profileData ? profileData.repoLabel : 'adopter-repo',
+      taskIdPrefix: profileData ? profileData.taskIdPrefix : 'TASK-ADOPTER',
+      templateHint: profileData ? (profileData.template.defaultMarkdown ? 'defaultMarkdown' : 'none') : 'none',
+      delegationDisplayHint: profileData ? (profileData.delegationDisplayHint ?? profileData.delegation.hint) : 'repo-profile task compiler / task-card-opener.js',
+      taskPlanReport: {
+        profileRepoLabel: profileData ? profileData.repoLabel : 'adopter-repo',
+        taskIdPrefix: profileData ? profileData.taskIdPrefix : 'TASK-ADOPTER',
+        templateHint: profileData ? (profileData.template.defaultMarkdown ? 'defaultMarkdown' : 'none') : 'none',
+        delegationDisplayHint: profileData ? (profileData.delegationDisplayHint ?? profileData.delegation.hint) : 'repo-profile task compiler / task-card-opener.js',
+        delegation: profileData ? {
+          hint: profileData.delegation.hint,
+          openerPath: profileData.delegation.openerPath,
+          writerInvocation: profileData.delegation.writerInvocation ? {
+            describeOnly: true,
+            displayHint: profileData.delegation.writerInvocation.displayHint
+          } : null
+        } : null,
+        wouldCreate: false,
+        wouldValidate: true,
+        wouldDelegate: true
+      },
       wouldDo: [
         {
           workItemId: taskId,
