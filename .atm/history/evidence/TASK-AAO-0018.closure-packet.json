@@ -1,0 +1,139 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0018",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework.worktrees\\aao-0018-neutrality-redelivery-clean9",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "92f0013e333be96252827ec9a36dd5d32b48c2b1",
+  "governedTreeSha": "27c0f7093aa28acd3c4b573fee20c232df6b1c06",
+  "targetCommitDelta": {
+    "currentCommitSha": "92f0013e333be96252827ec9a36dd5d32b48c2b1",
+    "parentCommitShas": [
+      "92f0013e333be96252827ec9a36dd5d32b48c2b1"
+    ],
+    "governedTreeSha": "27c0f7093aa28acd3c4b573fee20c232df6b1c06",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0018.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-44-03-559Z-reserve-0f6a4e2aa82c.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-44-03-561Z-promote-5ccd83110e1f.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-44-09-750Z-reset-0f7f015a640c.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-44-13-605Z-reserve-aa9909e166a2.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-44-13-607Z-promote-1e99ebb0f76e.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-44-52-583Z-claim-76dd9195a08b.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-50-03-057Z-reserve-53c5495310d6.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-50-03-060Z-promote-5383a4ef3dd7.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-50-14-343Z-claim-2c2e4a1cbbe5.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-56-51-272Z-reserve-83f768256a3d.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-56-51-274Z-promote-099fecc5ae26.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-57-12-317Z-reset-d05bed617f9a.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-57-16-278Z-reserve-9614bb4632ed.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-57-16-281Z-promote-0290c432251a.json",
+      ".atm/history/task-events/TASK-AAO-0018/2026-06-05T05-57-33-569Z-block-739b53b6fe5a.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-neutrality-staged.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:neutrality",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b8b1cf82e8926928003ab1f46c4660413ac676ceaefacea7391f1f28501c008c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2e89a341891d27b4e3d6a74d56ecb9f53302fcfd77d43e6238b38be42b3a6b18",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:neutrality"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-05T05:59:09.457Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0018-neutrality-staged-only.task.md",
+      ".atm/history/evidence/TASK-AAO-0018.*",
+      ".atm/history/task-events/TASK-AAO-0018/**",
+      ".atm/history/tasks/TASK-AAO-0018.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-neutrality-staged.ts",
+      "scripts/validate-neutrality*.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-neutrality-staged.ts",
+      "scripts/validate-neutrality*.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0018.json",
+  "closedAt": "2026-06-05T05:59:09.457Z",
+  "closedByActor": "007",
+  "sessionId": "session-20260605055749-007-TASK-AAO-0018-0a38c21b48",
+  "attestation": null
+}
