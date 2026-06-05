@@ -1,1 +1,0 @@
-process.stdout.write('PASS fixture completed.\n');
