@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-05T14-22-47-414Z-close-c692d41f682a",
+  "taskId": "TASK-TEAM-0003",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260605140939-codex-gpt-5.4-mini-TASK-TEAM-0003-49be69ae1d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0003.json",
+  "taskSha256": "sha256:0e96ad4d4f9197270735308de6202d5559099fbb408c141e144deedd100b8bdc",
+  "createdAt": "2026-06-05T14:22:47.414Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0003 --actor codex-gpt-5.4-mini --status done --historical-delivery 2c421179e0148965d98696060fb3889d4aa05b33",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260605140939-codex-gpt-5.4-mini-TASK-TEAM-0003-49be69ae1d",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "git-diff-check",
+      "node atm.mjs team plan --task TASK-TEAM-0003 --json",
+      "team-plan",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-05T14:22:47.411Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0003-atomization-planner-required-role.task.md",
+        ".atm/history/evidence/TASK-TEAM-0003.*",
+        ".atm/history/task-events/TASK-TEAM-0003/**",
+        ".atm/history/tasks/TASK-TEAM-0003.json",
+        "atm.mjs",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/atomization-planner.md",
+        "package.json",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "criticalChangedFiles": [
+        "atm.mjs",
+        "package.json",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
