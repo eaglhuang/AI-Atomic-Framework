@@ -1,12 +1,12 @@
-# AtomicCharter — generic-repository
+# AtomicCharter — ai-atomic-framework
 
 > **Framework authority level.** The rules in this charter are enforced by ATM at the
 > framework layer. Host project rules and profiles are secondary. Conflicts must be
 > resolved through a governed charter waiver proposal (`behavior.evolve` +
 > `charterWaiver` + `HumanReviewDecision`), not by silent override.
 
-**Charter version**: 1.0.0  
-**Last amended**: 2026-06-05T00:00:00.000Z  
+**Charter version**: 2.0.0
+**Last amended**: 2026-05-19T00:00:00.000Z
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
 
 ---
@@ -38,7 +38,7 @@ See `charter-invariants.json` for the machine-readable form used by ATM guards.
 | INV-ATM-003 | Schema-validated promotion only | gate |
 | INV-ATM-004 | No competing highest authority | doctor |
 | INV-ATM-005 | Host rule amendments require waiver flow | waiver-required |
-| INV-ATM-006 | Framework work tracking stays downstream | doctor |
+| INV-ATM-006 | Framework work tracking stays target-local | doctor |
 | INV-ATM-007 | Public framework docs remain English-only | doctor |
 
 ---

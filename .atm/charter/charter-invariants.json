@@ -4,8 +4,8 @@
   "specVersion": "0.1.0",
   "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial installation by atm init." },
   "charterVersion": "2.0.0",
-  "projectName": "generic-repository",
-  "lastAmendedAt": "2026-06-05T00:00:00.000Z",
+  "projectName": "ai-atomic-framework",
+  "lastAmendedAt": "2026-05-19T00:00:00.000Z",
   "invariants": [
     {
       "id": "INV-ATM-001",
@@ -54,12 +54,12 @@
     },
     {
       "id": "INV-ATM-006",
-      "title": "Framework work tracking stays downstream",
-      "rule": "The framework repository must not host coordinating implementation task cards, planning queues, or project-specific work tracking artifacts beyond ATM's own bootstrap/runtime-managed files. Upstream planning cards belong in the coordinating host workspace and may feed evidence back upstream without becoming framework-resident work tracking.",
+      "title": "Framework work tracking stays target-local",
+      "rule": "The framework repository must not host downstream adopter planning queues or project-specific work tracking artifacts. ATM framework-development tasks may live in the framework repository only as ATM-managed .atm/history/tasks ledger records with CLI transition evidence.",
       "enforcement": "doctor",
       "breakingChange": true,
-      "tags": ["framework-boundary", "work-tracking", "downstream-coordination"],
-      "rationale": "ATM is an open-source governance framework, not the coordinating project workspace. Keeping implementation task tracking downstream prevents the framework repository from becoming host-specific or duplicating a second planning system."
+      "tags": ["framework-boundary", "work-tracking", "task-ledger"],
+      "rationale": "ATM should not absorb adopter project management, but framework-development needs target-local task evidence so AI agents cannot close framework work from a separate planning workspace without target repository authority."
     },
     {
       "id": "INV-ATM-007",
