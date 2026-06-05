@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.welcomeLineage",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Tracks first-touch welcome lifecycle events for ATM onboarding."
+  },
+  "firstWelcomedAt": "2026-06-05T14:04:03.601Z",
+  "lastWelcomedAt": "2026-06-05T14:04:03.601Z",
+  "welcomeCount": 1,
+  "atmChartPath": ".atm/memory/atm-chart.md",
+  "sourceGuardsSha256": "sha256:5943cbd95c16aa9f974259aae2162170b876c0806375c6cf386d03f7018c44a7",
+  "installedIntegrations": [],
+  "integrationHealthOk": true,
+  "lastNextAction": {
+    "status": "ready",
+    "command": "npm test",
+    "reason": "runtime state, governance state, and engineering checks are all green",
+    "allowedCommands": [
+      "node atm.mjs orient --cwd . --json",
+      "node atm.mjs start --cwd . --goal \"<goal>\" --json",
+      "node atm.mjs next --prompt \"<current user prompt>\" --json",
+      "node atm.mjs next --cwd . --json",
+      "node atm.mjs explain --why blocked --json"
+    ],
+    "blockedCommands": [
+      "host mutation without active guidance session",
+      "manual task lifecycle loop without prompt-scoped next",
+      "batch task closure without batch checkpoint",
+      "atomize/infect/split apply without dry-run proposal",
+      "apply without human review approval"
+    ],
+    "decisionTrail": [
+      {
+        "check": "route-status",
+        "result": "pass",
+        "reason": "runtime state, governance state, and engineering checks are all green",
+        "nextCommand": "npm test"
+      },
+      {
+        "check": "allowed-commands",
+        "result": "info",
+        "reason": "5 allowed command(s) are exposed for the route."
+      },
+      {
+        "check": "blocked-commands",
+        "result": "info",
+        "reason": "5 blocked command pattern(s) are exposed for the route."
+      }
+    ],
+    "runnerMode": {
+      "schemaId": "atm.runnerMode.v1",
+      "mode": "frozen",
+      "entrypoint": "C:/Users/User/AppData/Local/Temp/atm-onefile-cache/a57c076ec611bf45165b748d64c384a28af2bab82750979d0074b3fe49ca6b1f/atm.mjs",
+      "normalGovernanceCommand": "node atm.mjs ...",
+      "sourceFirstCommand": "node atm.dev.mjs ...",
+      "sourceFirstOnlyWhen": "explicit source-first framework validation is requested for unbuilt source changes",
+      "syncCommand": "npm run build",
+      "frozenRunnerSources": [
+        "release/atm-onefile/atm.mjs",
+        "packages/cli/dist/atm.js"
+      ],
+      "guidance": "Use node atm.mjs for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run npm run build and rerun the frozen entrypoint."
+    }
+  }
+}
