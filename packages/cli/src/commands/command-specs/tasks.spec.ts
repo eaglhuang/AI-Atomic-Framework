@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'tasks',
-  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
+  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, run read-only tasks parallel advisor checks, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | new', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | new', required: true }
   ],
   options: [
     commonCwdOption,
@@ -25,6 +25,7 @@ export default defineCommandSpec({
     { flag: '--staged', summary: 'Run tasks audit in staged/pre-commit mode.' },
     { flag: '--queue', value: 'id', summary: 'Task queue id for tasks queue abandon.' },
     { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close/reconcile/repair-closure/scope add.' },
+    { flag: '--with', value: 'id', summary: 'Second task id for tasks parallel pair analysis.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close/reconcile lifecycle actions (or set ATM_ACTOR_ID).' },
     { flag: '--title', value: 'text', summary: 'Optional title for tasks reserve when creating a manual task entry.' },
     { flag: '--provider', value: 'id', summary: 'External provider id for tasks mirror.' },
@@ -65,6 +66,9 @@ export default defineCommandSpec({
     'node atm.mjs tasks scope add --task ATM-GOV-0101 --actor codex-main --add packages/cli/src/commands/foo.ts,packages/cli/src/commands/bar.ts --json',
     'node atm.mjs tasks queue status --json',
     'node atm.mjs tasks queue abandon --queue queue-abc123 --actor codex-main --json',
+    'node atm.mjs tasks parallel --task TASK-AAO-0130 --with TASK-AAO-0131 --json',
+    'node atm.mjs tasks parallel --task TASK-AAO-0130 --queue --json',
+    'node atm.mjs tasks parallel --queue --report --json',
     'node atm.mjs tasks lock cleanup --all-stale --actor codex-main --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --dry-run --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --apply --json',
