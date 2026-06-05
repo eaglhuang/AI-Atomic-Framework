@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0002",
+  "title": "Minimal task crew briefing contract",
+  "status": "done",
+  "milestone": "M1",
+  "dependencies": [
+    "TASK-TEAM-0001"
+  ],
+  "acceptance": [
+    "`team plan` identifies `Task Captain`, `Atomization Planner`, `Code Builder`, and `Check Runner` for a small task.",
+    "The output distinguishes required roles from optional roles.",
+    "The briefing contract includes allowed files, do-not-touch paths, expected reports, and stop conditions.",
+    "No subagents are spawned and no team runtime file is written.",
+    "The atomization map covers any new docs, scripts, or command surface touched by this card."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/minimal-task-crew.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/minimal-task-crew.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node atm.mjs team plan --task TASK-TEAM-0002 --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Creating a full subagent runtime",
+    "Changing task close or batch checkpoint behavior",
+    "Writing .atm/runtime/** outside documented team commands"
+  ],
+  "nonGoals": [
+    "Do not implement permission lease enforcement",
+    "Do not add Atomic Police patrol automation"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the crew contract docs and CLI contract changes together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card is the first framework-side Team Agents implementation card. It should stay small enough to review in isolation.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0002-minimal-task-crew-briefing-contract.task.md",
+    "sectionTitle": "TASK-TEAM-0002",
+    "headingLine": 73,
+    "hash": "029dc4c003aca407"
+  },
+  "importedAt": "2026-06-03T04:35:36.541Z",
+  "lastTransitionId": "2026-06-05T15-06-19-963Z-close-f45237f77149",
+  "lastTransitionAt": "2026-06-05T15:06:19.963Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-05T14:53:47.129Z",
+  "promotedAt": "2026-06-05T14:53:47.132Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-b14c5ad144c3",
+    "claimedAt": "2026-06-05T14:53:47.134Z",
+    "heartbeatAt": "2026-06-05T15:06:19.963Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0002.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/minimal-task-crew.md",
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-05T14:53:47.134Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260605145347-codex-gpt-5.4-mini-TASK-TEAM-0002-1382bdb579",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0002",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0002.*",
+      ".atm/history/task-events/TASK-TEAM-0002/**",
+      ".atm/history/tasks/TASK-TEAM-0002.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/minimal-task-crew.md",
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "001d4ae2413086e76eddf5431c4ee7291e3c9a70c619148a26e851a036159d89",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-05T14:53:47.149Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0002.closure-packet.json",
+  "closedAt": "2026-06-05T15:06:19.963Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260605145347-codex-gpt-5.4-mini-TASK-TEAM-0002-1382bdb579"
+}

@@ -19,6 +19,7 @@ export default defineCommandSpec({
     commonHelpOption
   ],
   examples: [
+    'node atm.mjs team plan --task TASK-TEAM-0002 --json',
     'node atm.mjs team plan --task TASK-TEAM-0003 --json',
     'node atm.mjs team validate --task TASK-AAO-0005 --recipe atm.default.normal.typescript --json',
     'node atm.mjs team start --task TASK-AAO-0005 --actor codex-main --json',

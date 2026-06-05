@@ -1,0 +1,150 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0002",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": null,
+  "governedTreeSha": null,
+  "targetCommitDelta": {
+    "currentCommitSha": null,
+    "parentCommitShas": [],
+    "governedTreeSha": null,
+    "changedFiles": [
+      "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0002-minimal-task-crew-briefing-contract.task.md",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/minimal-task-crew.md",
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-cli.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atm.mjs team plan --task TASK-TEAM-0002 --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a5c2f45965366255f39164348da597b5bb2c1af7a1918a40941c3dfe9c6cbe8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cea145f07201ca77b2ea9c785d411446144f26f5a6e4f86f3e11c885147a930e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:01cbceef86029c9bbc1907fd6d28377066d0d7be65540b2e86f25378cf58364d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node atm.mjs team plan --task TASK-TEAM-0002 --json",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-05T15:06:19.961Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0002-minimal-task-crew-briefing-contract.task.md",
+      ".atm/history/evidence/TASK-TEAM-0002.*",
+      ".atm/history/task-events/TASK-TEAM-0002/**",
+      ".atm/history/tasks/TASK-TEAM-0002.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/minimal-task-crew.md",
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "criticalChangedFiles": [
+      "atm.mjs",
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0002.json",
+  "closedAt": "2026-06-05T15:06:19.961Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260605145347-codex-gpt-5.4-mini-TASK-TEAM-0002-1382bdb579",
+  "attestation": null
+}

@@ -50,6 +50,14 @@ type PermissionLease = {
   paths?: string[];
 };
 
+type TeamCrewRole = {
+  role: string;
+  agentId: string;
+  required: boolean;
+  permissions: string[];
+  description: string;
+};
+
 const teamPermissionCatalog: TeamPermissionDefinition[] = [
   { id: 'task.lifecycle', mode: 'exclusive' },
   { id: 'git.write', mode: 'exclusive' },
@@ -529,11 +537,15 @@ function buildTeamPlan(input: {
   const coordinator = input.recipe.agents.find((agent) => agent.role === 'coordinator') ?? null;
   const fileWriteOwner = input.recipe.agents.find((agent) => agent.permissions.includes('file.write')) ?? null;
   const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
+  const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation);
   return {
     schemaId: 'atm.teamPlan.v1',
     recipeId: input.recipe.recipeId,
     channelHint: 'normal',
     agents: input.recipe.agents,
+    requiredRoles: crewBriefingContract.requiredRoles,
+    optionalRoles: crewBriefingContract.optionalRoles,
+    briefingContract: crewBriefingContract,
     atomizationPlannerRole: {
       role: 'atomizationPlanner',
       agentIds: input.recipe.agents.filter((agent) => agent.role === 'atomizationPlanner').map((agent) => agent.agentId),
@@ -558,6 +570,90 @@ function buildTeamPlan(input: {
       'Do not hand-edit .atm/runtime team state.'
     ],
     validation: input.validation
+  };
+}
+
+function buildMinimalTaskCrewBriefingContract(task: any, writePaths: string[], validation: { ok: boolean; findings: PermissionFinding[] }) {
+  const requiredRoles: TeamCrewRole[] = [
+    {
+      role: 'Task Captain',
+      agentId: 'coordinator',
+      required: true,
+      permissions: ['task.lifecycle', 'git.write', 'evidence.write'],
+      description: 'Owns coordination, delivery closure, and final report routing.'
+    },
+    {
+      role: 'Atomization Planner',
+      agentId: 'atomization-planner',
+      required: true,
+      permissions: ['file.read'],
+      description: 'Checks scope shape, atomization risk, and allowed-file boundaries.'
+    },
+    {
+      role: 'Code Builder',
+      agentId: 'implementer',
+      required: true,
+      permissions: ['file.write'],
+      description: 'Implements the scoped task deliverables only inside allowed files.'
+    },
+    {
+      role: 'Check Runner',
+      agentId: 'validator',
+      required: true,
+      permissions: ['exec.validator'],
+      description: 'Runs the required validators and reports pass or fail evidence.'
+    }
+  ];
+
+  const optionalRoles: TeamCrewRole[] = [
+    {
+      role: 'Reader',
+      agentId: 'reader',
+      required: false,
+      permissions: ['file.read'],
+      description: 'Gathers source context when the task needs discovery.'
+    },
+    {
+      role: 'Evidence Collector',
+      agentId: 'evidence-collector',
+      required: false,
+      permissions: ['file.read'],
+      description: 'Packages command-backed evidence for the report.'
+    },
+    {
+      role: 'Scope Guardian',
+      agentId: 'scope-guardian',
+      required: false,
+      permissions: ['file.read'],
+      description: 'Watches for out-of-scope file drift.'
+    }
+  ];
+
+  return {
+    schemaId: 'atm.teamCrewBriefingContract.v1',
+    taskId: String(task?.workItemId ?? task?.taskId ?? 'unknown-task'),
+    taskTitle: String(task?.title ?? task?.workItemId ?? task?.taskId ?? 'unknown-task'),
+    allowedFiles: uniqueStrings(writePaths),
+    doNotTouch: [
+      '.atm/runtime/**',
+      '.atm/history/**',
+      'planning repository files',
+      'unrelated source surfaces outside the task scope'
+    ],
+    expectedReports: [
+      'team plan --task <id> --json',
+      'validation result with safe-to-start or blocking findings',
+      'team run record only if the coordinator chooses to start'
+    ],
+    stopConditions: [
+      'scope must stay within declared allowed files',
+      'required roles must each be uniquely represented',
+      'validators must not report blocking permission conflicts',
+      'a broader or stronger lane must stop the plan'
+    ],
+    requiredRoles,
+    optionalRoles,
+    validation
   };
 }
 
