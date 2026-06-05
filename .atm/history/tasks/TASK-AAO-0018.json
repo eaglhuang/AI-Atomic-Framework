@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0018",
   "title": "Neutrality scanner staged-only mode",
-  "status": "planned",
+  "status": "running",
   "milestone": "M7",
   "dependencies": [
     "TASK-AAO-0009"
@@ -59,7 +59,58 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {},
-  "lastTransitionId": "2026-05-26T06-04-11-214Z-import-365ec8397f64",
-  "lastTransitionAt": "2026-05-26T06:04:11.214Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-05T05-57-49-336Z-claim-d4a32fcba1c3",
+  "lastTransitionAt": "2026-06-05T05:57:49.336Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "007",
+  "reservedAt": "2026-06-05T05:57:16.278Z",
+  "promotedAt": "2026-06-05T05:57:16.281Z",
+  "resetReason": "rollback cleanup",
+  "closedAt": "2026-06-05T05:57:33.568Z",
+  "closedByActor": "007",
+  "closedBySessionId": "session-20260605055014-007-TASK-AAO-0018-5b0dedc1e4",
+  "closeReason": "waiting on cleanup",
+  "claim": {
+    "actorId": "007",
+    "leaseId": "lease-e89b9996a7d3",
+    "claimedAt": "2026-06-05T05:57:49.330Z",
+    "heartbeatAt": "2026-06-05T05:57:49.330Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0018.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-neutrality*.ts"
+    ],
+    "state": "active"
+  },
+  "startedAt": "2026-06-05T05:57:49.330Z",
+  "startedByActor": "007",
+  "startedBySessionId": "session-20260605055749-007-TASK-AAO-0018-0a38c21b48",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0018",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0018.*",
+      ".atm/history/task-events/TASK-AAO-0018/**",
+      ".atm/history/tasks/TASK-AAO-0018.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-neutrality*.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "adc06c9041e59f6a7e494bfdccadd67b50a0661085dc685c459cb3fbd4d85d18",
+    "actorId": "007",
+    "createdAt": "2026-06-05T05:57:49.335Z",
+    "status": "active"
+  }
 }
