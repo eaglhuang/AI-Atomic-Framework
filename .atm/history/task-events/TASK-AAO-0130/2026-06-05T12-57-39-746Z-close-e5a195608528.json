@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-05T12-57-39-746Z-close-e5a195608528",
+  "taskId": "TASK-AAO-0130",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260605093948-codex-gpt-5.4-mini-TASK-AAO-0130-c7ee3216ee",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0130.json",
+  "taskSha256": "sha256:45137159db48d668af0c2dec1b6d945de80bf5d448fbb70416b554fcb7b825e3",
+  "createdAt": "2026-06-05T12:57:39.746Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0130 --actor codex-gpt-5.4-mini --status done --historical-delivery 5cd54bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260605093948-codex-gpt-5.4-mini-TASK-AAO-0130-c7ee3216ee",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0130.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-parallel-advisor"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-05T12:57:39.743Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0130-cid-first-parallel-conflict-advisor-cli-mvp.task.md",
+        ".atm/history/evidence/TASK-AAO-0130.*",
+        ".atm/history/task-events/TASK-AAO-0130/**",
+        ".atm/history/tasks/TASK-AAO-0130.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+        "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-parallel-advisor.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-parallel-advisor.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-parallel-advisor.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
