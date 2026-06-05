@@ -29,6 +29,10 @@ import {
 } from './task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
 import { runContextMapAdvisor } from './hook/context-map-advisor.ts';
+import {
+  loadNeutralityPolicy,
+  scanNeutralityText
+} from '../../../plugin-rule-guard/src/neutrality-scanner.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -361,10 +365,59 @@ export function installGitHooks(cwd: string, options: { frameworkRequired?: bool
 }
 
 function runPreCommitHook(cwd: string) {
+  for (const key of Object.keys(process.env)) {
+    if (key.toLowerCase().startsWith('git')) {
+      delete process.env[key];
+    }
+  }
   const root = path.resolve(cwd);
   const stagedFiles = readStagedFiles(root).filter((entry) => entry !== gitHeadEvidencePaths.legacyJson && entry !== gitHeadEvidencePaths.jsonl);
   const gitIndexDiagnostic = inspectGitIndexAccess(root);
   const encodingReport = scanEncoding(root, stagedFiles);
+  // Staged-only neutrality check
+  let neutralityPolicy;
+  try {
+    neutralityPolicy = loadNeutralityPolicy({ repositoryRoot: root });
+  } catch {
+    // Gracefully ignore when policy file is not present.
+  }
+  const neutralityViolations = [];
+  if (neutralityPolicy) {
+    const isProtectedTargetLocal = (relativePath: string, policy: any) => {
+      if (policy.protectedFiles.includes(relativePath)) {
+        return true;
+      }
+      return policy.protectedScopes.some((scope: any) => {
+        const normalizedPath = relativePath.replace(/\\/g, '/');
+        const includeMatch = scope.pathPrefix
+          ? normalizedPath.startsWith(scope.pathPrefix)
+          : normalizedPath === scope.path || normalizedPath.startsWith(`${scope.path}/`);
+        if (!includeMatch) {
+          return false;
+        }
+        if (Array.isArray(scope.excludePrefixes) && scope.excludePrefixes.some((prefix: any) => normalizedPath.startsWith(prefix))) {
+          return false;
+        }
+        if (!Array.isArray(scope.extensions) || scope.extensions.length === 0) {
+          return true;
+        }
+        return scope.extensions.some((extension: any) => normalizedPath.endsWith(extension));
+      });
+    };
+    const neutralityProtectedFiles = stagedFiles.filter((file) => isProtectedTargetLocal(file, neutralityPolicy));
+    for (const file of neutralityProtectedFiles) {
+      const content = readGitObjectText(root, `:${file}`) ?? '';
+      const scanResult = scanNeutralityText({ relativePath: file, content }, { policy: neutralityPolicy });
+      if (!scanResult.ok) {
+        neutralityViolations.push(...scanResult.violations);
+      }
+    }
+  }
+  const neutralityReport = {
+    ok: neutralityViolations.length === 0,
+    findings: neutralityViolations
+  };
+
   const frameworkStatus = createFrameworkModeStatus({ cwd: root, files: stagedFiles });
   const allowAdopterInfrastructureSync = isAdopterInfrastructureSyncCommit(
     stagedFiles.length > 0 ? stagedFiles : frameworkStatus.changedFiles
@@ -443,7 +496,8 @@ function runPreCommitHook(cwd: string) {
     && protectedStateReport.ok
     && taskCardStatusReport.ok
     && taskAudit.ok
-    && failedValidatorRuns.length === 0;
+    && failedValidatorRuns.length === 0
+    && neutralityReport.ok;
   const evidenceWrite = ok && stagedFiles.length > 0
     ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
     : null;
@@ -463,7 +517,8 @@ function runPreCommitHook(cwd: string) {
     protectedStateFindings: protectedStateReport.findings,
     taskCardStatusFindings: taskCardStatusReport.findings,
     taskAuditFindings: taskAudit.findings,
-    failedValidatorRuns
+    failedValidatorRuns,
+    neutralityReport
   });
   const failureEnvelope = ok
     ? null
@@ -544,7 +599,8 @@ function runPreCommitHook(cwd: string) {
       commandRuns,
       blockingFindings,
       failureEnvelope,
-      evidenceWrite
+      evidenceWrite,
+      neutralityReport
     }
   });
 }
@@ -566,6 +622,7 @@ function buildPreCommitBlockingFindings(input: {
   readonly taskCardStatusFindings: readonly TaskCardStatusFinding[];
   readonly taskAuditFindings: ReturnType<typeof auditTasks>['findings'];
   readonly failedValidatorRuns: readonly CommandRunReport[];
+  readonly neutralityReport: { readonly ok: boolean; readonly findings: readonly any[] };
 }): readonly PreCommitBlockingFinding[] {
   const findings: PreCommitBlockingFinding[] = [];
   if (!input.gitIndexDiagnostic.ok) {
@@ -702,6 +759,16 @@ function buildPreCommitBlockingFindings(input: {
         stdoutSha256: run.stdoutSha256,
         stderrSha256: run.stderrSha256
       }
+    });
+  }
+  for (const violation of input.neutralityReport.findings) {
+    findings.push({
+      code: 'ATM_NEUTRALITY_VIOLATION',
+      source: 'police',
+      file: violation.file,
+      detail: `Neutrality ${violation.kind} violation (${violation.matchedRule}) at line ${violation.line ?? 'N/A'}.`,
+      classification: 'current-task',
+      requiredCommand: null
     });
   }
   return findings;
