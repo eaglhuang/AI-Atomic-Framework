@@ -5,7 +5,7 @@ framework_version: 0.1.0
 template_version: 0.1.0
 min_framework_version: 0.0.0
 source_guards_path: .atm/runtime/default-guards.json
-source_guards_sha256: sha256:b5942cbfd35217cf0ab17cc6cd6f1a45d76842b813472ab1518ef2a4e358a232
+source_guards_sha256: sha256:bbdb1ec184600eaf013bc5be2a3b8754da5c860a7aa3c6e96efe4283cf6898ae
 source_schema_sha256s: {"governance/default-guards":"sha256:8d3a6d2b99a51890653ab36669cb725dc4cec7c914abd4145794861a7841d888","charter/charter-invariants":"sha256:15557a166f149d74567acf10676997e4ea89943075846ad3dab641d1b072a381","integrations/install-manifest":"sha256:b5f67b165601fd9da11864de78252141f74c540f55d9a6fd7c40f1e8afffeecc","agent-prompt":"sha256:1ff8806e3c104f17a0d7d8bbf6b436fffa0200357c8434896665fc208bfb7028","upgrade/upgrade-proposal":"sha256:971755cd4e3262c488a2ba7c98e6ddb2640a90686b960de8e167a0854953ed87"}
 ---
 # ATMChart
