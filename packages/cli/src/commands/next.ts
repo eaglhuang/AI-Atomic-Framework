@@ -1128,8 +1128,10 @@ function buildPromptScopedNextResult(input: {
   if (deliveryClassification.intent === 'mirror-sync-only'
     && input.taskIntent?.requestedAction !== 'redo'
     && input.taskIntent?.requestedAction !== 'reopen') {
+    const mirrorSyncTask = withMirrorSyncOnlyTarget(selectedTask);
+    const mirrorSyncQueue = withMirrorSyncOnlyTargetQueue(input.importedTaskQueue, selectedTask.workItemId);
     const nextAction = buildMirrorSyncNextAction({
-      task: selectedTask,
+      task: mirrorSyncTask,
       classification: deliveryClassification
     });
     return makeResult({
@@ -1142,7 +1144,7 @@ function buildPromptScopedNextResult(input: {
         input.integrationBootstrap as any,
         input.runtimeAdapterReadiness as any,
         message('info', 'ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED', 'ATM detected a planning-only task; deliverables live in another repo. Sync the ledger mirror instead of running a delivery playbook here.', {
-          task: toTaskCandidateView(selectedTask),
+          task: toTaskCandidateView(mirrorSyncTask),
           classification: deliveryClassification,
           requiredCommand: nextAction.requiredCommand
         })
@@ -1152,7 +1154,7 @@ function buildPromptScopedNextResult(input: {
         recommendedChannel: nextAction.recommendedChannel,
         deliveryClassification,
         taskIntent: input.taskIntent,
-        importedTaskQueue: input.importedTaskQueue,
+        importedTaskQueue: mirrorSyncQueue,
         integrationBootstrap: input.integrationBootstrap,
         runtimeAdapterReadiness: input.runtimeAdapterReadiness
       }
@@ -2375,6 +2377,29 @@ function finalizeImportedTaskSummary(task: Omit<ImportedTaskSummary, 'planningRe
     planningReadOnlyPaths: partition.planningContext.readOnlyPaths,
     planningMirrorPaths: partition.targetWork.planningMirrorPaths,
     targetAllowedFiles: partition.targetWork.allowedFiles
+  };
+}
+
+function withMirrorSyncOnlyTarget<T extends ImportedTaskSummary>(task: T): T {
+  return {
+    ...task,
+    targetAllowedFiles: []
+  };
+}
+
+function withMirrorSyncOnlyTargetQueue(queue: ImportedTaskQueue, taskId: string): ImportedTaskQueue {
+  const rewrite = (task: ImportedTaskSummary) => task.workItemId === taskId ? withMirrorSyncOnlyTarget(task) : task;
+  return {
+    ...queue,
+    selectedTask: queue.selectedTask ? rewrite(queue.selectedTask) : queue.selectedTask,
+    claimableTask: queue.claimableTask && queue.claimableTask.workItemId === taskId ? null : queue.claimableTask,
+    tasks: queue.tasks.map(rewrite),
+    promptScope: queue.promptScope
+      ? {
+        ...queue.promptScope,
+        selectedTasks: queue.promptScope.selectedTasks.map(rewrite)
+      }
+      : queue.promptScope
   };
 }
 
