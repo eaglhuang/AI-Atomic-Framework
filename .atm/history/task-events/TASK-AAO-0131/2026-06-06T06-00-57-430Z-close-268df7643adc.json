@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-06T06-00-57-430Z-close-268df7643adc",
+  "taskId": "TASK-AAO-0131",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260606054851-codex-gpt-5.4-mini-TASK-AAO-0131-ae4afc5f07",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0131.json",
+  "taskSha256": "sha256:9a37590fffbea4739f55f54e7092f124537891621b742c09af79502c2b027129",
+  "createdAt": "2026-06-06T06:00:57.430Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0131 --actor codex-gpt-5.4-mini --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260606054851-codex-gpt-5.4-mini-TASK-AAO-0131-ae4afc5f07",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0131.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-direction-governance",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-06T06:00:57.428Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0131-route-hygiene-follow-up-planning-artifact-synthetic-alias-scope-guard.task.md",
+        ".atm/history/evidence/TASK-AAO-0131.*",
+        ".atm/history/task-events/TASK-AAO-0131/**",
+        ".atm/history/tasks/TASK-AAO-0131.json",
+        "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0131-route-hygiene-follow-up-planning-artifact-synthetic-alias-scope-guard.task.md",
+        "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+        "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-14.json",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/next.ts",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/task-direction.ts",
+        "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+        "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-import.ts",
+        "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-ledger-governance.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
