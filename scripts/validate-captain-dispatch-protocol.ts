@@ -22,6 +22,8 @@ const entryGateFiles = [
 ];
 
 const requiredPhrases = [
+  'ATM Captain Dispatch Standard',
+  'Every dispatch card sent or handed off to worker 001 through 007 MUST start',
   'Skill used: atm-dispatch',
   'Delegation mode',
   'Terminology boundary:',
@@ -36,6 +38,8 @@ const requiredEntryGatePhrases = [
   'Captain/dispatch entry gate',
   'ai-role-router',
   'atm-dispatch',
+  'ATM Captain Dispatch Standard',
+  'must start with exactly `ATM Captain Dispatch Standard`',
   'Skill used: atm-dispatch',
   'Delegation mode',
   'Internal sidecar is the default',
