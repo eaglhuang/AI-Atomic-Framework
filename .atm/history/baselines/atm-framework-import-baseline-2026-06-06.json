@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.redteamBaseline.v1",
+  "generatedAt": "2026-06-06T01:55:11.643Z",
+  "name": "atm-framework-import-baseline-2026-06-06",
+  "frameworkVersion": "0.1.0",
+  "commitSha": "61ff50794bf47b62de2027496d57a63c3bddb8fb",
+  "head": "61ff50794bf47b62de2027496d57a63c3bddb8fb",
+  "branch": "main",
+  "summary": {
+    "headMatchesBaseline": true,
+    "workingTreeClean": true,
+    "gitHooksOk": true,
+    "validatorsOk": false
+  },
+  "gitHooks": {
+    "schemaId": "atm.gitHooksInspection.v1",
+    "generatedAt": "2026-06-06T01:55:11.643Z",
+    "repoIdentity": {
+      "isFrameworkRepo": true,
+      "score": 5,
+      "root": "C:\\Users\\User\\AI-Atomic-Framework",
+      "name": "ai-atomic-framework",
+      "signals": [
+        "package-name:ai-atomic-framework",
+        "packages/core/src/index.ts",
+        "packages/cli/src/atm.ts",
+        "atomic-registry.json",
+        "workspace:packages/*"
+      ]
+    },
+    "required": true,
+    "hooksPath": ".atm/git-hooks",
+    "expectedHooksPath": ".atm/git-hooks",
+    "hooksPathOk": true,
+    "installedHookFiles": [
+      {
+        "path": ".atm/git-hooks/pre-commit",
+        "present": true,
+        "markerPresent": true,
+        "sha256": "sha256:709c123ac5767ce08d1ede576a5d664dc6c5238c8b7c50f5cf37b758577fe5e8"
+      },
+      {
+        "path": ".atm/git-hooks/pre-push",
+        "present": true,
+        "markerPresent": true,
+        "sha256": "sha256:5d1beee657a722876cc02613c78a946e0091a7f5125e1a64ac5c0095df1eb472"
+      }
+    ],
+    "ok": true
+  },
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutPreview": "\n> ai-atomic-framework@0.1.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+      "stderrPreview": ""
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:2c777be2083cf8910225df8380596fc53331d3a920c023ab1fb9535781de2a8e",
+      "stderrSha256": "sha256:5ead773ce75edd816a75f8d502cd70a8a21c017b0db804fba249fdeb2bbca9ad",
+      "stdoutPreview": "\n> ai-atomic-framework@0.1.0 validate:cli\n> node --strip-types scripts/validate-cli.ts --mode validate\n\n",
+      "stderrPreview": "DEBUG - tasksShowRes failed! {\n  \"exitCode\": 2,\n  \"stdout\": \"\",\n  \"stderr\": \"{\\n  \\\"ok\\\": false,\\n  \\\"command\\\": \\\"tasks\\\",\\n  \\\"mode\\\": \\\"standalone\\\",\\n  \\\"cwd\\\": \\\"C:\\\\\\\\Users\\\\\\\\User\\\\\\\\AI-Atomic-Framework\\\",\\n  \\\"messages\\\": [\\n    {\\n      \\\"level\\\": \\\"error\\\",\\n      \\\"code\\\": \\\"ATM_TASK_NOT_FOUND\\\",\\n      \\\"text\\\": \\\"Task file not found for TASK-AAO-0063.\\\",\\n      \\\"data\\\": {\\n        \\\"taskPath\\\": \\\".atm/history/tasks/TASK-AAO-0063.json\\\",\\n        \\\"taskId\\\": \\\"TASK-AAO-0063\\\"\\n      }\\n    }\\n  ],\\n  \\\"evidence\\\": {}\\n}\\n\",\n  \"parsed\": {\n    \"ok\": false,\n    \"command\": \"tasks\",\n    \"mode\": \"standalone\",\n    \"cwd\": \"C:\\\\Users\\\\User\\\\AI-Atomic-Framework\",\n    \"messages\": [\n      {\n        \"level\": \"error\",\n        \"code\": \"ATM_TASK_NOT_FOUND\",\n        \"text\": \"Task file not foun"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4d6a914dedbcb33e91f94fc115db7746d278f3b3ed5e15f5c0c2d47d678ce513",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutPreview": "{\n  \"ok\": true,\n  \"command\": \"doctor\",\n  \"mode\": \"standalone\",\n  \"cwd\": \"C:\\\\Users\\\\User\\\\AI-Atomic-Framework\",\n  \"messages\": [\n    {\n      \"level\": \"info\",\n      \"code\": \"ATM_DOCTOR_OK\",\n      \"text\": \"ATM engineering and runtime signals are ready.\",\n      \"data\": {}\n    }\n  ],\n  \"evidence\": {\n    \"checks\": [\n      {\n        \"name\": \"package-manager\",\n        \"ok\": true,\n        \"details\": {\n          \"official\": \"npm\",\n          \"packageLock\": true,\n          \"packageManagerField\": null,\n          \"pnpmWorkspace\": false\n        }\n      },\n      {\n        \"name\": \"public-script-contract\",\n        \"ok\": true,\n        \"details\": {\n          \"build\": \"tsc -p tsconfig.build.json && node --strip-types scripts/build-package-dist.ts && node --strip-types scripts/build-root-drop-release.ts && nod",
+      "stderrPreview": ""
+    }
+  ],
+  "ok": false
+}
