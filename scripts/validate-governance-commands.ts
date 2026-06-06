@@ -50,6 +50,77 @@ function sha256(buffer: Buffer | string) {
   return `sha256:${createHash('sha256').update(buffer).digest('hex')}`;
 }
 
+function writeHistoricalRestorePacket(repo: string, taskId: string, options: { status?: string; owner?: string } = {}) {
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`);
+  const evidencePath = path.join(repo, '.atm', 'history', 'evidence', `${taskId}.json`);
+  const closurePacketPath = path.join(repo, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
+  const eventId = `2026-01-02T00-00-00-000Z-close-${taskId.toLowerCase()}`;
+  const eventPath = path.join(repo, '.atm', 'history', 'task-events', taskId, `${eventId}.json`);
+  mkdirSync(path.dirname(taskPath), { recursive: true });
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  mkdirSync(path.dirname(eventPath), { recursive: true });
+  writeFileSync(taskPath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: 'Historical ledger restore fixture',
+    status: options.status ?? 'done',
+    owner: options.owner ?? 'legacy-agent',
+    lastTransitionId: eventId,
+    lastTransitionAt: '2026-01-02T00:00:00.000Z',
+    closedAt: '2026-01-02T00:00:00.000Z',
+    closedByActor: 'legacy-agent',
+    closedBySessionId: 'session-legacy-restore',
+    claim: {
+      actorId: 'legacy-agent',
+      leaseId: 'lease-legacy-restore',
+      state: 'active'
+    }
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(evidencePath, `${JSON.stringify({
+    taskId,
+    updatedAt: '2026-01-02T00:00:00.000Z',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        evidenceType: 'test',
+        summary: 'historical restore fixture evidence',
+        producedBy: 'legacy-agent',
+        sessionId: 'session-legacy-restore',
+        createdAt: '2026-01-02T00:00:00.000Z'
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(closurePacketPath, `${JSON.stringify({
+    schemaId: 'atm.closurePacket.v1',
+    specVersion: '0.1.0',
+    taskId,
+    targetCommit: '0123456789abcdef0123456789abcdef01234567',
+    evidencePath: `.atm/history/evidence/${taskId}.json`,
+    closedAt: '2026-01-02T00:00:00.000Z',
+    closedByActor: 'legacy-agent'
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(eventPath, `${JSON.stringify({
+    schemaId: 'atm.taskTransition.v1',
+    specVersion: '0.1.0',
+    transitionId: eventId,
+    taskId,
+    action: 'close',
+    actorId: 'legacy-agent',
+    fromStatus: 'running',
+    toStatus: options.status ?? 'done',
+    taskPath: `.atm/history/tasks/${taskId}.json`,
+    taskSha256: sha256(readFileSync(taskPath)),
+    createdAt: '2026-01-02T00:00:00.000Z',
+    command: `node atm.mjs tasks close --task ${taskId} --actor legacy-agent --status done --json`
+  }, null, 2)}\n`, 'utf8');
+  return [
+    `.atm/history/tasks/${taskId}.json`,
+    `.atm/history/evidence/${taskId}.json`,
+    `.atm/history/evidence/${taskId}.closure-packet.json`,
+    `.atm/history/task-events/${taskId}/${eventId}.json`
+  ];
+}
+
 const tempRoot = createTempWorkspace('atm-governance-commands-');
 try {
   const repo = path.join(tempRoot, 'repo');
@@ -378,6 +449,44 @@ try {
   rmSync(mirrorTaskPath, { force: true });
   rmSync(path.dirname(mirrorEventPath), { recursive: true, force: true });
   rmSync(mirrorReportPath, { force: true });
+
+  const restoreTaskId = 'ATM-GOV-RESTORE';
+  const restoreFiles = writeHistoricalRestorePacket(repo, restoreTaskId);
+  assert(runGit(repo, ['add', ...restoreFiles]).exitCode === 0, 'historical ledger restore packet must stage');
+  const restoreCheck = runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--task', restoreTaskId, '--no-trailers', '--json']);
+  assert(restoreCheck.exitCode === 0, 'historical ledger restore git check must accept a complete staged restore packet');
+  assert(restoreCheck.parsed.ok === true, 'historical ledger restore git check must report ok=true');
+  assert(restoreCheck.parsed.evidence?.sessionId === null, 'historical ledger restore git check must not require a legacy session');
+  const restoreCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', restoreTaskId, '--message', 'atm: restore closed ledger packet', '--json']);
+  assert(restoreCommit.exitCode === 0, 'historical ledger restore git commit must not require a fake legacy claim or session');
+  assert(restoreCommit.parsed.ok === true, 'historical ledger restore git commit must report ok=true');
+  assert(restoreCommit.parsed.evidence?.sessionId === null, 'historical ledger restore git commit must not inherit a legacy session');
+  assert(!(restoreCommit.parsed.evidence?.trailers ?? []).some((entry: string) => entry.startsWith('ATM-Session: ') || entry.startsWith('ATM-Claim: ')), 'historical ledger restore must not write stale claim or session trailers');
+
+  const mixedRestoreTaskId = 'ATM-GOV-RESTORE-MIXED';
+  const mixedRestoreFiles = writeHistoricalRestorePacket(repo, mixedRestoreTaskId);
+  const mixedSourcePath = path.join(repo, 'src', 'restore-bypass.ts');
+  mkdirSync(path.dirname(mixedSourcePath), { recursive: true });
+  writeFileSync(mixedSourcePath, 'export const restoreBypass = true;\n', 'utf8');
+  assert(runGit(repo, ['add', ...mixedRestoreFiles, 'src/restore-bypass.ts']).exitCode === 0, 'mixed historical restore fixture must stage');
+  const mixedRestoreCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', mixedRestoreTaskId, '--message', 'atm: reject mixed restore packet', '--json']);
+  assert(mixedRestoreCommit.exitCode === 1, 'historical ledger restore must reject packets mixed with source files');
+  assert(mixedRestoreCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_SESSION_REQUIRED', 'mixed restore packet must fall back to normal active-task session enforcement');
+  runGit(repo, ['reset', '--mixed', 'HEAD']);
+  rmSync(mixedSourcePath, { force: true });
+
+  const openRestoreTaskId = 'ATM-GOV-RESTORE-OPEN';
+  const openRestoreFiles = writeHistoricalRestorePacket(repo, openRestoreTaskId, { status: 'running' });
+  assert(runGit(repo, ['add', ...openRestoreFiles]).exitCode === 0, 'non-done restore fixture must stage');
+  writeHistoricalRestorePacket(repo, openRestoreTaskId, { status: 'done' });
+  const openRestoreCheck = runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--task', openRestoreTaskId, '--no-trailers', '--json']);
+  assert(openRestoreCheck.exitCode === 0 || openRestoreCheck.exitCode === 1, 'non-done staged restore git check must return a governance result');
+  assert(openRestoreCheck.parsed.ok === false, 'git check must reject non-done staged restore packets even if the working tree was later edited to done');
+  assert((openRestoreCheck.parsed.evidence?.violations ?? []).some((entry: any) => entry.code === 'task-owner-mismatch' || entry.code === 'claim-owner-mismatch'), 'rejected non-done staged restore git check must fall back to normal owner/claim governance');
+  const openRestoreCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', openRestoreTaskId, '--message', 'atm: reject open restore packet', '--json']);
+  assert(openRestoreCommit.exitCode === 1, 'historical ledger restore must reject non-done staged task ledgers');
+  assert(openRestoreCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_SESSION_REQUIRED', 'non-done restore packet must fall back to normal active-task session enforcement');
+  runGit(repo, ['reset', '--mixed', 'HEAD']);
 
   assert(runGit(repo, ['config', 'user.name', 'Missing Identity']).exitCode === 0, 'fixture git user.name must be configurable for identity repair command validation');
   assert(runGit(repo, ['config', 'user.email', 'missing-identity@example.com']).exitCode === 0, 'fixture git user.email must be configurable for identity repair command validation');

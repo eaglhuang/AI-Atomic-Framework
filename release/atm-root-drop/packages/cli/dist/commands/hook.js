@@ -1788,6 +1788,14 @@ function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
             findings
         };
     }
+    const stagedTaskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+    if (stagedTaskIds.length === 1 && inspectHistoricalLedgerRestoreStagedArtifacts(cwd, stagedTaskIds[0], stagedFiles).ok) {
+        return {
+            ok: findings.length === 0,
+            files: protectedFiles,
+            findings
+        };
+    }
     const stagedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
     for (const file of protectedFiles) {
         const normalized = normalizeRelativePath(file);
@@ -2020,15 +2028,17 @@ function inspectCommitAttribution(cwd, stagedFiles) {
     const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${effectiveTaskId}.json`));
     const claim = parseHookTaskClaim(task?.claim);
     const mirrorSyncOnly = inspectMirrorSyncOnlyStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
-    const claimForSession = mirrorSyncOnly.ok ? null : claim;
-    const session = mirrorSyncOnly.ok && !sessionId ? null : resolveActorWorkSession(cwd, {
+    const historicalLedgerRestore = inspectHistoricalLedgerRestoreStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok;
+    const claimForSession = bypassesActiveSession ? null : claim;
+    const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, {
         sessionId,
         actorId,
         taskId: effectiveTaskId,
         claimLeaseId: claimLeaseId ?? claimForSession?.leaseId ?? null,
         includeNonActive: true
     });
-    if (!session && !mirrorSyncOnly.ok) {
+    if (!session && !bypassesActiveSession) {
         findings.push({
             code: 'ATM_COMMIT_SESSION_MISSING',
             source: 'commit-attribution',
@@ -2186,6 +2196,76 @@ function inspectMirrorSyncOnlyStagedArtifacts(cwd, taskId, stagedFiles) {
         ok: hasTaskLedger && hasImportEvent && hasImportReport,
         reason: hasTaskLedger && hasImportEvent && hasImportReport ? null : 'incomplete-mirror-sync-artifacts'
     };
+}
+function inspectHistoricalLedgerRestoreStagedArtifacts(cwd, taskId, stagedFiles) {
+    if (stagedFiles.length === 0) {
+        return { ok: false, reason: 'no-staged-files' };
+    }
+    const normalizedTaskId = taskId.toLowerCase();
+    const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
+    const expectedEvidencePath = `.atm/history/evidence/${taskId}.json`.toLowerCase();
+    const expectedClosurePacketPath = `.atm/history/evidence/${taskId}.closure-packet.json`.toLowerCase();
+    let hasTaskLedger = false;
+    let hasEvidenceBundle = false;
+    let hasClosurePacket = false;
+    let hasTaskEvent = false;
+    for (const file of stagedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (lower === expectedTaskPath) {
+            hasTaskLedger = true;
+            continue;
+        }
+        if (lower === expectedEvidencePath) {
+            hasEvidenceBundle = true;
+            continue;
+        }
+        if (lower === expectedClosurePacketPath) {
+            hasClosurePacket = true;
+            continue;
+        }
+        if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json')) {
+            hasTaskEvent = true;
+            continue;
+        }
+        return { ok: false, reason: `unexpected-staged-file:${normalized}` };
+    }
+    if (!hasTaskLedger)
+        return { ok: false, reason: 'missing-task-ledger' };
+    if (!hasEvidenceBundle)
+        return { ok: false, reason: 'missing-evidence-bundle' };
+    if (!hasClosurePacket)
+        return { ok: false, reason: 'missing-closure-packet' };
+    if (!hasTaskEvent)
+        return { ok: false, reason: 'missing-task-event' };
+    const taskDocument = readStagedJsonFile(cwd, `.atm/history/tasks/${taskId}.json`);
+    if (!taskDocument || taskDocument.status !== 'done')
+        return { ok: false, reason: 'task-not-done' };
+    if (typeof taskDocument.workItemId === 'string' && taskDocument.workItemId !== taskId) {
+        return { ok: false, reason: 'task-id-mismatch' };
+    }
+    const evidence = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.json`);
+    if (!evidence || evidence.taskId !== taskId) {
+        return { ok: false, reason: 'evidence-task-id-mismatch' };
+    }
+    const closurePacket = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.closure-packet.json`);
+    if (!closurePacket || closurePacket.taskId !== taskId) {
+        return { ok: false, reason: 'closure-packet-task-id-mismatch' };
+    }
+    for (const eventPath of stagedFiles.filter((file) => normalizeRelativePath(file).toLowerCase().startsWith(`.atm/history/task-events/${normalizedTaskId}/`))) {
+        const event = readStagedJsonFile(cwd, eventPath);
+        const command = typeof event?.command === 'string' ? event.command.trim() : '';
+        if (!event || event.schemaId !== 'atm.taskTransition.v1' || event.taskId !== taskId || typeof event.transitionId !== 'string' || !command.startsWith('node atm.mjs ')) {
+            return { ok: false, reason: `task-event-invalid:${normalizeRelativePath(eventPath)}` };
+        }
+    }
+    return { ok: true, reason: null };
+}
+function readStagedJsonFile(cwd, relativeFile) {
+    const result = runGit(cwd, ['show', `:${normalizeRelativePath(relativeFile)}`]);
+    if (result.exitCode !== 0)
+        return null;
+    return readJsonText(result.stdout);
 }
 function taskImportReportReferencesTask(cwd, file, taskId) {
     try {

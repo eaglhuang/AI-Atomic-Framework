@@ -50,4 +50,3 @@ Atomization Planner output is advisory only.
 - It must not open tasks.
 - It must not split tasks automatically.
 - It must not mutate task lifecycle state.
-

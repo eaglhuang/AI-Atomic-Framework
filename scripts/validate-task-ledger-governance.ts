@@ -701,6 +701,7 @@ try {
   assert(repairStageOnlyEvidence.result?.repairedHead === brokenRepairHead, 'tasks repair-closure stage-only mode must leave HEAD unchanged');
   assert(repairStageOnlyEvidence.nextAction?.kind === 'governed-commit-required', 'tasks repair-closure must return a governed follow-up action');
   assert(String(repairStageOnlyEvidence.nextAction?.command ?? '').includes(`node atm.mjs git commit --actor <actor-id> --task ${repairTaskId}`), 'tasks repair-closure must recommend the governed git commit wrapper');
+  assert(!String(repairStageOnlyEvidence.nextAction?.command ?? '').includes('--no-verify'), 'tasks repair-closure must not recommend --no-verify as the standard historical ledger restore path');
   const repairedPacket = readJson(repairClosurePacketAbsolute);
   assert(repairedPacket.targetCommit === repairDeliveryCommit, 'tasks repair-closure must realign targetCommit to the delivery parent commit');
   assert(Array.isArray(repairedPacket.targetCommitDelta?.parentCommitShas) && repairedPacket.targetCommitDelta.parentCommitShas[0] === repairDeliveryCommit, 'tasks repair-closure must realign parent commit shas to HEAD parents');

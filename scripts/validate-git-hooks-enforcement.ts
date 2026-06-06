@@ -61,6 +61,76 @@ function createCommandRun(command: string, stdoutSha256: string) {
   };
 }
 
+function writeHistoricalRestorePacket(repo: string, taskId: string, status = 'done') {
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`);
+  const evidencePath = path.join(repo, '.atm', 'history', 'evidence', `${taskId}.json`);
+  const closurePacketPath = path.join(repo, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
+  const eventId = `2026-01-02T00-00-00-000Z-close-${taskId.toLowerCase()}`;
+  const eventPath = path.join(repo, '.atm', 'history', 'task-events', taskId, `${eventId}.json`);
+  mkdirSync(path.dirname(taskPath), { recursive: true });
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  mkdirSync(path.dirname(eventPath), { recursive: true });
+  writeFileSync(taskPath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: 'Historical restore hook fixture',
+    status,
+    owner: 'legacy-agent',
+    lastTransitionId: eventId,
+    lastTransitionAt: '2026-01-02T00:00:00.000Z',
+    closedAt: status === 'done' ? '2026-01-02T00:00:00.000Z' : null,
+    closedByActor: status === 'done' ? 'legacy-agent' : null,
+    closedBySessionId: status === 'done' ? 'session-legacy-restore' : null,
+    claim: {
+      actorId: 'legacy-agent',
+      leaseId: 'lease-legacy-restore',
+      state: 'active'
+    }
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(evidencePath, `${JSON.stringify({
+    taskId,
+    updatedAt: '2026-01-02T00:00:00.000Z',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        summary: 'historical restore hook fixture',
+        producedBy: 'legacy-agent',
+        sessionId: 'session-legacy-restore',
+        createdAt: '2026-01-02T00:00:00.000Z'
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(closurePacketPath, `${JSON.stringify({
+    schemaId: 'atm.closurePacket.v1',
+    specVersion: '0.1.0',
+    taskId,
+    targetCommit: '0123456789abcdef0123456789abcdef01234567',
+    evidencePath: `.atm/history/evidence/${taskId}.json`,
+    closedAt: '2026-01-02T00:00:00.000Z',
+    closedByActor: 'legacy-agent'
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(eventPath, `${JSON.stringify({
+    schemaId: 'atm.taskTransition.v1',
+    specVersion: '0.1.0',
+    transitionId: eventId,
+    taskId,
+    action: 'close',
+    actorId: 'legacy-agent',
+    fromStatus: 'running',
+    toStatus: status,
+    taskPath: `.atm/history/tasks/${taskId}.json`,
+    taskSha256: 'sha256:fixture',
+    createdAt: '2026-01-02T00:00:00.000Z',
+    command: `node atm.mjs tasks close --task ${taskId} --actor legacy-agent --status done --json`
+  }, null, 2)}\n`, 'utf8');
+  return [
+    `.atm/history/tasks/${taskId}.json`,
+    `.atm/history/evidence/${taskId}.json`,
+    `.atm/history/evidence/${taskId}.closure-packet.json`,
+    `.atm/history/task-events/${taskId}/${eventId}.json`
+  ];
+}
+
 function copyRuntime(sourceRoot: string, targetRoot: string) {
   for (const entry of ['atm.mjs', 'atm.dev.mjs', 'atomic-registry.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json', 'eslint.config.mjs', 'docs', 'packages', 'scripts', 'schemas', 'specs', 'templates', 'examples']) {
     const sourcePath = path.join(sourceRoot, entry);
@@ -267,6 +337,59 @@ try {
   assert(parsePayload(runCli(closureRepo, ['welcome', '--cwd', closureRepo, '--json'])).ok === true, 'closure-cross-check welcome must report ok=true');
   runGit(closureRepo, ['add', '.']);
   runGit(closureRepo, ['commit', '--no-verify', '-m', 'initial baseline']);
+
+  const restoreIdentity = parsePayload(runCli(closureRepo, ['identity', 'set', '--cwd', closureRepo, '--actor', 'restore-operator', '--git-name', 'Restore Operator', '--git-email', 'restore@example.invalid', '--json']));
+  assert(restoreIdentity.ok === true, 'historical restore hook fixture identity must be configurable');
+  const restoreHookTaskId = 'TASK-X-RESTORE';
+  const restoreHookFiles = writeHistoricalRestorePacket(closureRepo, restoreHookTaskId);
+  runGit(closureRepo, ['add', ...restoreHookFiles]);
+  const restoreHook = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], {
+    env: {
+      ATM_COMMIT_ACTOR_ID: 'restore-operator',
+      ATM_COMMIT_TASK_ID: restoreHookTaskId,
+      GIT_AUTHOR_NAME: 'Restore Operator',
+      GIT_AUTHOR_EMAIL: 'restore@example.invalid'
+    }
+  });
+  assert(restoreHook.status === 0, 'pre-commit hook must accept a complete done historical ledger restore packet without a fake legacy session');
+  runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+
+  const mixedRestoreHookTaskId = 'TASK-X-RESTORE-MIXED';
+  const mixedRestoreHookFiles = writeHistoricalRestorePacket(closureRepo, mixedRestoreHookTaskId);
+  writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'restore-bypass.ts'), 'export const restoreBypass = true;\n', 'utf8');
+  runGit(closureRepo, ['add', ...mixedRestoreHookFiles, 'packages/core/src/restore-bypass.ts']);
+  const mixedRestoreHook = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], {
+    allowFailure: true,
+    env: {
+      ATM_COMMIT_ACTOR_ID: 'restore-operator',
+      ATM_COMMIT_TASK_ID: mixedRestoreHookTaskId,
+      GIT_AUTHOR_NAME: 'Restore Operator',
+      GIT_AUTHOR_EMAIL: 'restore@example.invalid'
+    }
+  });
+  assert(mixedRestoreHook.status === 1, 'pre-commit hook must reject historical restore packets mixed with source files');
+  const mixedRestoreHookPayload = parsePayload(mixedRestoreHook);
+  assert((mixedRestoreHookPayload.evidence?.commitAttributionReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_COMMIT_SESSION_MISSING'), 'mixed restore hook refusal must fall back to normal active-task session enforcement');
+  runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+  rmSync(path.join(closureRepo, 'packages', 'core', 'src', 'restore-bypass.ts'), { force: true });
+
+  const openRestoreHookTaskId = 'TASK-X-RESTORE-OPEN';
+  const openRestoreHookFiles = writeHistoricalRestorePacket(closureRepo, openRestoreHookTaskId, 'running');
+  runGit(closureRepo, ['add', ...openRestoreHookFiles]);
+  writeHistoricalRestorePacket(closureRepo, openRestoreHookTaskId, 'done');
+  const openRestoreHook = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], {
+    allowFailure: true,
+    env: {
+      ATM_COMMIT_ACTOR_ID: 'restore-operator',
+      ATM_COMMIT_TASK_ID: openRestoreHookTaskId,
+      GIT_AUTHOR_NAME: 'Restore Operator',
+      GIT_AUTHOR_EMAIL: 'restore@example.invalid'
+    }
+  });
+  assert(openRestoreHook.status === 1, 'pre-commit hook must reject historical restore packets whose staged task ledger is not done');
+  const openRestoreHookPayload = parsePayload(openRestoreHook);
+  assert((openRestoreHookPayload.evidence?.commitAttributionReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_COMMIT_SESSION_MISSING'), 'non-done restore hook refusal must fall back to normal active-task session enforcement');
+  runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
 
   writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'index.ts'), 'export const bypass = "closure-cross-check";\n', 'utf8');
   runGit(closureRepo, ['add', 'packages/core/src/index.ts']);

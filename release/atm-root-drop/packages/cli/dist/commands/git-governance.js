@@ -58,13 +58,15 @@ export function evaluateGitGovernanceCheck(input) {
     const taskDocument = input.taskId ? readTaskDocument(cwd, input.taskId) : null;
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
     const stagedMirrorSync = input.taskId ? inspectMirrorSyncOnlyStagedArtifacts(cwd, input.taskId) : null;
-    const claimForTrailers = stagedMirrorSync?.ok ? null : claim;
+    const stagedHistoricalRestore = input.taskId ? inspectHistoricalLedgerRestoreStagedArtifacts(cwd, input.taskId) : null;
+    const bypassesActiveSession = stagedMirrorSync?.ok || stagedHistoricalRestore?.ok;
+    const claimForTrailers = bypassesActiveSession ? null : claim;
     const session = resolveGitGovernanceSession(cwd, {
         sessionId: input.sessionId ?? null,
         actorId,
         taskId: input.taskId,
         claimLeaseId: claimForTrailers?.leaseId ?? null,
-        allowImplicitSession: Boolean(input.taskId && !stagedMirrorSync?.ok)
+        allowImplicitSession: Boolean(input.taskId && !bypassesActiveSession)
     });
     const trailers = parseTrailers(readHeadCommitMessage(cwd));
     const violations = [];
@@ -86,13 +88,13 @@ export function evaluateGitGovernanceCheck(input) {
             detail: `git user.email is ${gitEmail ?? 'unset'}, expected ${profile.gitEmail}.`
         });
     }
-    if (taskDocument && taskDocument.owner && String(taskDocument.owner) !== actorId) {
+    if (!stagedHistoricalRestore?.ok && taskDocument && taskDocument.owner && String(taskDocument.owner) !== actorId) {
         violations.push({
             code: 'task-owner-mismatch',
             detail: `Task owner is ${String(taskDocument.owner)}, not ${actorId}.`
         });
     }
-    if (claim && claim.state === 'active' && claim.actorId !== actorId) {
+    if (!stagedHistoricalRestore?.ok && claim && claim.state === 'active' && claim.actorId !== actorId) {
         violations.push({
             code: 'claim-owner-mismatch',
             detail: `Task claim owner is ${claim.actorId}, not ${actorId}.`
@@ -223,15 +225,17 @@ function runGitCommit(options) {
     const taskDocument = options.taskId ? readTaskDocument(options.cwd, options.taskId) : null;
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
     const stagedMirrorSync = options.taskId ? inspectMirrorSyncOnlyStagedArtifacts(options.cwd, options.taskId) : null;
-    const claimForTrailers = stagedMirrorSync?.ok ? null : claim;
+    const stagedHistoricalRestore = options.taskId ? inspectHistoricalLedgerRestoreStagedArtifacts(options.cwd, options.taskId) : null;
+    const bypassesActiveSession = stagedMirrorSync?.ok || stagedHistoricalRestore?.ok;
+    const claimForTrailers = bypassesActiveSession ? null : claim;
     const session = resolveGitGovernanceSession(options.cwd, {
         sessionId: options.sessionId ?? null,
         actorId,
         taskId: options.taskId,
         claimLeaseId: claimForTrailers?.leaseId ?? null,
-        allowImplicitSession: Boolean(options.taskId && !stagedMirrorSync?.ok)
+        allowImplicitSession: Boolean(options.taskId && !bypassesActiveSession)
     });
-    if (options.taskId && !session && !stagedMirrorSync?.ok) {
+    if (options.taskId && !session && !bypassesActiveSession) {
         throw new CliError('ATM_GIT_COMMIT_SESSION_REQUIRED', `git commit requires an active or recent ATM work session for ${options.taskId}.`, {
             exitCode: 1,
             details: {
@@ -504,6 +508,87 @@ function inspectMirrorSyncOnlyStagedArtifacts(cwd, taskId) {
     if (!hasImportReport)
         return { ok: false, taskId, stagedFiles, reason: 'missing-task-import-report' };
     return { ok: true, taskId, stagedFiles, reason: null };
+}
+function inspectHistoricalLedgerRestoreStagedArtifacts(cwd, taskId) {
+    const stagedFiles = readStagedFiles(cwd);
+    if (stagedFiles.length === 0) {
+        return { ok: false, taskId, stagedFiles, reason: 'no-staged-files' };
+    }
+    const normalizedTaskId = taskId.toLowerCase();
+    const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
+    const expectedEvidencePath = `.atm/history/evidence/${taskId}.json`.toLowerCase();
+    const expectedClosurePacketPath = `.atm/history/evidence/${taskId}.closure-packet.json`.toLowerCase();
+    let hasTaskLedger = false;
+    let hasEvidenceBundle = false;
+    let hasClosurePacket = false;
+    let hasTaskEvent = false;
+    for (const file of stagedFiles) {
+        const normalized = normalizeRelativePath(file);
+        const lower = normalized.toLowerCase();
+        if (lower === expectedTaskPath) {
+            hasTaskLedger = true;
+            continue;
+        }
+        if (lower === expectedEvidencePath) {
+            hasEvidenceBundle = true;
+            continue;
+        }
+        if (lower === expectedClosurePacketPath) {
+            hasClosurePacket = true;
+            continue;
+        }
+        if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json')) {
+            hasTaskEvent = true;
+            continue;
+        }
+        return { ok: false, taskId, stagedFiles, reason: `unexpected-staged-file:${normalized}` };
+    }
+    if (!hasTaskLedger)
+        return { ok: false, taskId, stagedFiles, reason: 'missing-task-ledger' };
+    if (!hasEvidenceBundle)
+        return { ok: false, taskId, stagedFiles, reason: 'missing-evidence-bundle' };
+    if (!hasClosurePacket)
+        return { ok: false, taskId, stagedFiles, reason: 'missing-closure-packet' };
+    if (!hasTaskEvent)
+        return { ok: false, taskId, stagedFiles, reason: 'missing-task-event' };
+    const taskDocument = readStagedJsonFile(cwd, `.atm/history/tasks/${taskId}.json`);
+    if (!taskDocument)
+        return { ok: false, taskId, stagedFiles, reason: 'task-ledger-invalid' };
+    if (taskDocument.status !== 'done')
+        return { ok: false, taskId, stagedFiles, reason: 'task-not-done' };
+    if (typeof taskDocument.workItemId === 'string' && taskDocument.workItemId !== taskId) {
+        return { ok: false, taskId, stagedFiles, reason: 'task-id-mismatch' };
+    }
+    const evidence = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.json`);
+    if (!evidence || evidence.taskId !== taskId) {
+        return { ok: false, taskId, stagedFiles, reason: 'evidence-task-id-mismatch' };
+    }
+    const closurePacket = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.closure-packet.json`);
+    if (!closurePacket || closurePacket.taskId !== taskId) {
+        return { ok: false, taskId, stagedFiles, reason: 'closure-packet-task-id-mismatch' };
+    }
+    for (const eventPath of stagedFiles.filter((file) => normalizeRelativePath(file).toLowerCase().startsWith(`.atm/history/task-events/${normalizedTaskId}/`))) {
+        const event = readStagedJsonFile(cwd, eventPath);
+        const command = typeof event?.command === 'string' ? event.command.trim() : '';
+        if (!event || event.schemaId !== 'atm.taskTransition.v1' || event.taskId !== taskId || typeof event.transitionId !== 'string' || !command.startsWith('node atm.mjs ')) {
+            return { ok: false, taskId, stagedFiles, reason: `task-event-invalid:${normalizeRelativePath(eventPath)}` };
+        }
+    }
+    return { ok: true, taskId, stagedFiles, reason: null };
+}
+function readStagedJsonFile(cwd, relativeFile) {
+    try {
+        const content = execFileSync('git', ['show', `:${normalizeRelativePath(relativeFile)}`], {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore']
+        });
+        const parsed = JSON.parse(content);
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+    }
+    catch {
+        return null;
+    }
 }
 function readStagedFiles(cwd) {
     try {

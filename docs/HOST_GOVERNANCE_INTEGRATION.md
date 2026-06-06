@@ -115,6 +115,44 @@ The check passes without blocking when a repository is not Git-backed, has not
 adopted ATM yet, or has no commits. In those cases the `git-head-evidence` check
 reports a non-blocking status such as `not-git`, `not-adopted`, or `no-commits`.
 
+## Historical Ledger Restore Boundary
+
+Historical ledger restore is a narrow repair path for re-committing an already
+closed ATM task packet when the packet was lost, removed from history, or
+restored from an archival source. It is not a general `.atm/history/**`
+allow-list and it is not a replacement for normal active-task delivery.
+
+A standard restore commit uses the governed wrapper:
+
+```shell
+node atm.mjs git commit --actor <current-operator> --task <closed-task> --message "atm: restore <closed-task> historical ledger packet" --json
+```
+
+The staged packet is accepted only when all staged files belong to one closed
+task and match the restore shape:
+
+- `.atm/history/tasks/<task>.json`
+- `.atm/history/evidence/<task>.json`
+- `.atm/history/evidence/<task>.closure-packet.json`
+- `.atm/history/task-events/<task>/*.json`
+
+The task ledger must already be `status: "done"`. The task, evidence, closure
+packet, and task-event metadata must all point to the same task id. Any staged
+source file, runtime file, unrelated task ledger, incomplete packet, or
+non-`done` task returns to the normal active-task claim/session checks instead
+of using the restore exception.
+
+Keep provenance and attribution separate. Historical fields inside the restored
+packet, such as old owners, claim ids, session ids, task-event actors, or
+closure actors, remain archival provenance and should not be rewritten to the
+current operator. Git author identity and ATM commit trailers must represent the
+current operator honestly; do not impersonate the historical actor to satisfy a
+restore.
+
+`--no-verify` remains an emergency-only bypass for maintainer-controlled
+recovery. It should not be documented or used as the standard historical ledger
+restore flow.
+
 When the check applies, evidence can match the latest commit in either of these
 ways:
 
