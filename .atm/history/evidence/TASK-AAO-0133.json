@@ -1,0 +1,84 @@
+{
+  "taskId": "TASK-AAO-0133",
+  "updatedAt": "2026-06-06T06:06:44.808Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run build",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+      "createdAt": "2026-06-06T06:05:29.419Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "build"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run build",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f33c99b04829097e8043b843fc9662d36079995652a4500545592521875d719f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "build"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:924a009a9a95af7137d31a13ac61569be0d7b0328c776ea578e284c48c6b4bb3",
+            "cached": false,
+            "generatedAt": "2026-06-06T06:05:29.470Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d553c20ba9460f3eb635e7f4d240c3e9a81fc56032ac6c7fab96aba6e8bda1f0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs next --prompt \" TASK-AAO-0131 route hygiene follow-up planning artifact synthetic alias scope guard\\",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+      "createdAt": "2026-06-06T06:06:44.808Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+        "kind": "test",
+        "freshness": "fresh",
+        "commandRuns": [
+          {
+            "command": "node atm.mjs next --prompt \" TASK-AAO-0131 route hygiene follow-up planning artifact synthetic alias scope guard\\",
+            "exitCode": 1,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ff7493d1815680c3bf3335d94f850648f72b9d4c297a5bf4db82f3230c77a55",
+            "cached": false,
+            "generatedAt": "2026-06-06T06:06:44.872Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5072ee7857dad89d8c5285cc010a5a6ac0610ff1a0dce4b21c046e8ff193fdfa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
