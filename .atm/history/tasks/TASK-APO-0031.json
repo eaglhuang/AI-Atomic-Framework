@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-APO-0031",
+  "title": "Standardize historical ledger restore without no-verify",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`node atm.mjs git commit --actor <id> --task <closed-task> --message \"...\"`",
+    "Pre-commit and git-governance diagnostics distinguish historical ledger",
+    "Non-restore ledger-only diffs remain blocked; the exception must stay narrower",
+    "Regression coverage proves both the happy path and refusal cases in",
+    "Public host guidance documents when this governed restore path is valid and",
+    "`npm run typecheck`, `npm run validate:cli`, `npm run validate:governance-commands`,"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "scripts/validate-governance-commands.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "docs/HOST_GOVERNANCE_INTEGRATION.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "scripts/validate-governance-commands.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "docs/HOST_GOVERNANCE_INTEGRATION.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:governance-commands",
+    "npm run validate:git-hooks-enforcement",
+    "npm run validate:task-ledger-governance"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Reopening or re-delivering already closed historical tasks",
+    "Editing .atm/runtime identity/session state to fake a new claim for old work",
+    "Allowing arbitrary ledger-only commits that are not provable historical restore packets",
+    "Rewriting original closed-task actor, session, or closure provenance fields"
+  ],
+  "nonGoals": [
+    "Do not weaken normal governed task commit requirements for active tasks",
+    "Do not make --no-verify the recommended repair path",
+    "Do not introduce a second task store or alternate closure lifecycle"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the historical-ledger-restore commit attribution exception, validator fixtures, and docs if the flow broadens ledger-only commit permissions beyond the intended closed-history repair window.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "governance",
+    "git",
+    "task-ledger",
+    "historical-ledger-restore"
+  ],
+  "notes": "- Reuse the existing staged-shape classification pattern used by mirror-sync-only\n  commits where possible, but add a distinct classifier for closed historical\n  ledger restore packets.\n- Treat the historical task's original actor/session/claim fields as provenance,\n  not as a requirement to recreate or impersonate that old session.\n- Keep the current commit author/trailers truthful to the present operator while\n  allowing the restored packet to reference its original closed-task provenance.\n- Reject staged packets that omit required restore members such as the task JSON,\n  evidence JSON, closure packet, or task-events import/claim/close trail when\n  the restore flow requires them.",
+  "source": {
+    "planPath": "TASK-APO-0031-historical-ledger-restore-standard-flow.task.md",
+    "sectionTitle": "TASK-APO-0031",
+    "headingLine": 68,
+    "hash": "53a56f7c236a8ac0"
+  },
+  "importedAt": "2026-06-06T04:01:49.528Z",
+  "lastTransitionId": "2026-06-06T04-30-23-286Z-close-ce77405a7a17",
+  "lastTransitionAt": "2026-06-06T04:30:23.286Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-06T04:01:56.833Z",
+  "promotedAt": "2026-06-06T04:01:56.836Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-9e83ea8761e5",
+    "claimedAt": "2026-06-06T04:01:56.839Z",
+    "heartbeatAt": "2026-06-06T04:30:23.286Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-APO-0031.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-06T04:01:56.839Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260606040156-codex-gpt-5.4-mini-TASK-APO-0031-2303897f39",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-APO-0031",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-APO-0031.*",
+      ".atm/history/task-events/TASK-APO-0031/**",
+      ".atm/history/tasks/TASK-APO-0031.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7f729b1b9020af5724113c45861ad6a03e5f249b34fbd4c03b192d5f582f8239",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-06T04:01:56.857Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-APO-0031.closure-packet.json",
+  "closedAt": "2026-06-06T04:30:23.286Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260606040156-codex-gpt-5.4-mini-TASK-APO-0031-2303897f39"
+}
