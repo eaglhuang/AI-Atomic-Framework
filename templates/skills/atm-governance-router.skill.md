@@ -25,12 +25,10 @@ subagents, delegation, condition review, or closeout work, first route the
 request through `ai-role-router` when available, then through `atm-dispatch`
 before drafting instructions, delegating work, or reviewing another agent.
 
-Any worker dispatch card must use the single `ATM Captain Dispatch Standard`
-format and must start with exactly `ATM Captain Dispatch Standard`, followed by
-`Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is
-the default for review, preflight, grep, checklist, planning-only checks, and
-post-report verification. External dispatch is opt-in, and external write is
-forbidden unless the user explicitly grants write authority and scope.
+State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal
+sidecar is the default for review, preflight, grep, checklist, planning-only
+checks, and post-report verification. External dispatch is opt-in, and external
+write is forbidden unless the user explicitly grants write authority and scope.
 
 ## Delivery Principle
 

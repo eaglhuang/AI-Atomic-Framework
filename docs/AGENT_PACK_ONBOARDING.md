@@ -9,12 +9,10 @@ Terminology boundary: ATM is the product, framework, CLI, and governance workflo
 Agent entry files must preserve the Captain/dispatch entry gate: Captain,
 dispatch, sidecar, subagent, condition-review, and closeout requests route
 through `ai-role-router` when available and then `atm-dispatch` before any
-delegation or review. They must require the single `ATM Captain Dispatch
-Standard` worker dispatch format and any worker dispatch card must start with
-exactly `ATM Captain Dispatch Standard`, followed by `Skill used: atm-dispatch`
-and `Delegation mode`. They must keep `Internal sidecar is the default`, keep
-`External dispatch is opt-in`, and state that external write is forbidden unless
-the user explicitly grants write authority and scope.
+delegation or review. They must require `Skill used: atm-dispatch` and
+`Delegation mode`, keep `Internal sidecar is the default`, keep `External
+dispatch is opt-in`, and state that external write is forbidden unless the user
+explicitly grants write authority and scope.
 
 ## Public Contract
 
