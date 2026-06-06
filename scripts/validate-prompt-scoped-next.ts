@@ -4,6 +4,7 @@ import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runQuickfix } from '../packages/cli/src/commands/quickfix.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
+import { runTeam } from '../packages/cli/src/commands/team.ts';
 import { listActiveBatchRuns } from '../packages/cli/src/commands/work-channels.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -68,7 +69,7 @@ async function main() {
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0000-doc-finalize-bridge-index.task.md'), 'TASK-AAO-0000', 'AAO docs baseline', { status: 'done' });
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0001-report-overlap-matrix-routing.task.md'), 'TASK-AAO-0001', 'AAO overlap routing', {
       relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md',
-      files: 'packages/cli/src/commands/next.ts docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0001-report-overlap-matrix-routing.task.md'
+      files: 'packages/cli/src/commands/next.ts, docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0001-report-overlap-matrix-routing.task.md'
     });
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0002-cli-spec-runner-ssot-drift-guard.task.md'), 'TASK-AAO-0002', 'AAO CLI spec drift guard', {
       relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
@@ -232,7 +233,8 @@ target_repo: AI-Atomic-Framework
 - atm-dogfood-score.md
 `, 'utf8');
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DOG-0003.json'), 'TASK-DOG-0003', 'Dogfood score report', 'scripts/src/atomize-score.js', {
-      sourcePlanPath: 'docs/plan/tasks/TASK-DOG-0003.task.md'
+      sourcePlanPath: 'docs/plan/tasks/TASK-DOG-0003.task.md',
+      scopePaths: []
     });
     const dogfoodRoute = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-DOG-0003']);
     const dogfoodAllowedFiles = (dogfoodRoute.evidence.nextAction as any).selectedTask?.targetAllowedFiles ?? [];
@@ -271,7 +273,8 @@ target_repo: AI-Atomic-Framework
 - npm run validate:atomization-coverage
 `, 'utf8');
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-COVERAGE-0004.json'), 'TASK-COVERAGE-0004', 'Coverage guard and validate', 'atm.mjs', {
-      sourcePlanPath: 'docs/plan/tasks/TASK-COVERAGE-0004.task.md'
+      sourcePlanPath: 'docs/plan/tasks/TASK-COVERAGE-0004.task.md',
+      scopePaths: []
     });
     const coverageRoute = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-COVERAGE-0004']);
     const coverageAllowedFiles = (coverageRoute.evidence.nextAction as any).selectedTask?.targetAllowedFiles ?? [];
@@ -531,6 +534,43 @@ scopePaths:
     assert(noPrompt.ok === false, 'next without prompt must not proceed when non-bootstrap tasks exist');
     assert(noPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING'), 'next without prompt must require the current user prompt for task routing');
     assert((noPrompt.evidence.nextAction as any).batchInstruction?.includes('recommendedChannel=batch'), 'next without prompt must explain that batch needs the original prompt');
+
+    // Regression: Parallel CID advisor preflight and team validation integration tests
+    writeFileSync(path.join(atomizationCoverageDir, 'path-to-atom-map.json'), JSON.stringify({
+      mappings: [
+        {
+          path_pattern: 'src/conflict-file.ts',
+          atom_id: 'atom-conflict',
+          capability: 'conflict'
+        }
+      ]
+    }, null, 2), 'utf8');
+
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-CONFLICT-0001.json'), 'TASK-CONFLICT-0001', 'Active conflict task', 'src/conflict-file.ts', {
+      status: 'running',
+      claimActorId: 'other-actor'
+    });
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-CONFLICT-0002.json'), 'TASK-CONFLICT-0002', 'Blocked conflict task', 'src/conflict-file.ts', {
+      status: 'ready'
+    });
+
+    const conflictClaimBlocked = await runNext([
+      '--cwd', tempRoot,
+      '--claim',
+      '--actor', 'prompt-scope-test',
+      '--prompt', 'TASK-CONFLICT-0002'
+    ]).catch((error: any) => ({ ok: false, error }));
+    const conflictClaimError = (conflictClaimBlocked as any).error;
+    assert(conflictClaimError && conflictClaimError.code === 'ATM_NEXT_CLAIM_BLOCKED', 'next --claim on CID conflict task must throw ATM_NEXT_CLAIM_BLOCKED');
+    assert(conflictClaimError.details?.conflictWithTaskId === 'TASK-CONFLICT-0001', 'details must report conflict task id');
+    assert(conflictClaimError.details?.verdict === 'blocked-cid-conflict', 'details must report verdict blocked-cid-conflict');
+
+    const teamPlanResult = await runTeam(['plan', '--task', 'TASK-CONFLICT-0002', '--cwd', tempRoot, '--json']);
+    assert(teamPlanResult.ok === false, 'team plan with CID conflict must fail validation');
+    const teamEvidence = teamPlanResult.evidence as any;
+    assert(teamEvidence?.validation?.ok === false, 'validation ok must be false');
+    assert(teamEvidence?.validation?.findings?.some((f: any) => f.code === 'blocked-cid-conflict'), 'findings must include blocked-cid-conflict');
+    assert(teamEvidence?.teamPlan?.briefingContract?.parallelAdvisory?.verdict === 'blocked-cid-conflict', 'briefing contract must carry parallelAdvisory');
   } finally {
     if (previousGitCeilingDirectories === undefined) {
       delete process.env.GIT_CEILING_DIRECTORIES;
@@ -565,6 +605,8 @@ function writeLedgerTask(filePath: string, taskId: string, title: string, scopeP
     dependencies: options.dependencies ?? [],
     acceptance: ['bootstrap output reviewed by human gate'],
     scope: options.scopePaths ?? [scopePath],
+    scopePaths: options.scopePaths ?? [scopePath],
+    deliverables: options.scopePaths ?? [scopePath],
     ...(options.closurePacket ? { closurePacket: options.closurePacket } : {}),
     ...(options.closedAt ? { closedAt: options.closedAt } : {}),
     ...(options.closedByActor ? { closedByActor: options.closedByActor } : {}),

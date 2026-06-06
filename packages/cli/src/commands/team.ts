@@ -10,6 +10,7 @@ import {
   writeJsonFile
 } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
+import { runTasks } from './tasks.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -149,7 +150,7 @@ export async function runTeam(argv: string[]) {
     throw new CliError('ATM_TEAM_TASK_REQUIRED', `team ${action} requires --task <id>.`, { exitCode: 2 });
   }
 
-  const context = buildTeamPlanningContext({
+  const context = await buildTeamPlanningContext({
     cwd,
     taskId,
     requestedRecipeId: String(parsed.options.recipe ?? '').trim()
@@ -272,7 +273,7 @@ export async function runTeam(argv: string[]) {
   });
 }
 
-function buildTeamPlanningContext(input: {
+async function buildTeamPlanningContext(input: {
   cwd: string;
   taskId: string;
   requestedRecipeId: string;
@@ -286,6 +287,36 @@ function buildTeamPlanningContext(input: {
   });
   const recipeValidation = validateTeamRecipe(recipe);
   const writePaths = deriveWritePaths(task);
+
+  const parallelFindings: PermissionFinding[] = [];
+  try {
+    const parallelResult = await runTasks([
+      'parallel',
+      '--task',
+      input.taskId,
+      '--queue',
+      '--cwd',
+      input.cwd,
+      '--json'
+    ]);
+    if (parallelResult && parallelResult.ok && parallelResult.evidence && Array.isArray(parallelResult.evidence.candidates)) {
+      for (const candidate of parallelResult.evidence.candidates) {
+        const finding = candidate.finding;
+        if (finding && Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0) {
+          // Consumer-side compensation: override verdict to 'blocked-cid-conflict'
+          parallelFindings.push({
+            level: 'error',
+            code: 'blocked-cid-conflict',
+            detail: `Parallel advisor identified a CID logic conflict with task ${candidate.taskId} on atom(s): ${finding.overlappingAtomIds.join(', ')}`,
+            paths: finding.overlappingFiles
+          });
+        }
+      }
+    }
+  } catch (err) {
+    // Best-effort check
+  }
+
   const teamPlan = buildTeamPlan({
     task,
     recipe,
@@ -293,14 +324,27 @@ function buildTeamPlanningContext(input: {
     validation: recipeValidation
   });
   const leaseValidation = validatePermissionLeases(teamPlan.suggestedPermissionLeases);
-  const validation = mergeValidation(recipeValidation, leaseValidation);
+  const validation = mergeValidation(
+    recipeValidation,
+    leaseValidation,
+    { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings }
+  );
+
+  // Re-build teamPlan with merged validation so briefingContract gets the CID findings
+  const finalTeamPlan = buildTeamPlan({
+    task,
+    recipe,
+    writePaths,
+    validation
+  });
+
   return {
     task,
     recipes,
     recipe,
     validation,
     teamPlan: {
-      ...teamPlan,
+      ...finalTeamPlan,
       validation
     }
   };
@@ -629,6 +673,14 @@ function buildMinimalTaskCrewBriefingContract(task: any, writePaths: string[], v
     }
   ];
 
+  const cidConflicts = validation.findings.filter((f) => f.code === 'blocked-cid-conflict');
+  const parallelAdvisory = cidConflicts.length > 0 ? {
+    schemaId: 'atm.parallelAdvisory.v1',
+    verdict: 'blocked-cid-conflict',
+    reasons: cidConflicts.map((c) => c.detail),
+    conflicts: cidConflicts
+  } : null;
+
   return {
     schemaId: 'atm.teamCrewBriefingContract.v1',
     taskId: String(task?.workItemId ?? task?.taskId ?? 'unknown-task'),
@@ -653,7 +705,8 @@ function buildMinimalTaskCrewBriefingContract(task: any, writePaths: string[], v
     ],
     requiredRoles,
     optionalRoles,
-    validation
+    validation,
+    ...(parallelAdvisory ? { parallelAdvisory } : {})
   };
 }
 
