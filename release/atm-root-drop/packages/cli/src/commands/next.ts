@@ -608,6 +608,46 @@ async function claimNextImportedTask(input: {
       }
     });
   }
+  let parallelAdvisory: any = undefined;
+  // Parallel preflight check
+  try {
+    const parallelResult = await runTasks([
+      'parallel',
+      '--task',
+      claimableTask.workItemId,
+      '--queue',
+      '--cwd',
+      input.cwd,
+      '--json'
+    ]);
+    if (parallelResult && parallelResult.ok && parallelResult.evidence && Array.isArray(parallelResult.evidence.candidates)) {
+      for (const candidate of parallelResult.evidence.candidates) {
+        const finding = candidate.finding;
+        if (finding) {
+          if (Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0) {
+            // Consumer-side compensation: override verdict to 'blocked-cid-conflict'
+            throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `Claim blocked due to parallel CID logic conflict with task ${candidate.taskId} on atom(s): ${finding.overlappingAtomIds.join(', ')}.`, {
+              exitCode: 1,
+              details: {
+                taskId: claimableTask.workItemId,
+                conflictWithTaskId: candidate.taskId,
+                overlappingAtomIds: finding.overlappingAtomIds,
+                verdict: 'blocked-cid-conflict'
+              }
+            });
+          }
+          if (finding.verdict !== 'parallel-safe' && !parallelAdvisory) {
+            parallelAdvisory = finding;
+          }
+        }
+      }
+    }
+  } catch (err) {
+    if (err instanceof CliError && err.code === 'ATM_NEXT_CLAIM_BLOCKED') {
+      throw err;
+    }
+    // Other parallel errors are handled as best-effort
+  }
   const claimDeliveryClassification = classifyTaskDelivery({
     cwd: input.cwd,
     task: {
@@ -765,7 +805,8 @@ async function claimNextImportedTask(input: {
     channel: recommendedChannel,
     reason: recommendedChannel === 'batch'
       ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
-      : 'This task can use an optional team run for role/permission coordination.'
+      : 'This task can use an optional team run for role/permission coordination.',
+    parallelAdvisory
   });
   const nextAction = {
     status: 'ready',
@@ -3398,6 +3439,7 @@ function buildTeamRecommendation(input: {
   readonly actorId: string;
   readonly channel: 'normal' | 'batch';
   readonly reason: string;
+  readonly parallelAdvisory?: any;
 }) {
   const recipeId = input.channel === 'batch'
     ? 'atm.default.batch'
@@ -3415,6 +3457,7 @@ function buildTeamRecommendation(input: {
     validateCommand: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
     startCommand: `node atm.mjs team start --task ${quotedTask} --actor ${input.actorId} --recipe ${recipeId} --json`,
     statusCommand: 'node atm.mjs team status --compact --json',
+    ...(input.parallelAdvisory ? { parallelAdvisory: input.parallelAdvisory } : {}),
     constraints: [
       'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
       'Team agents are not spawned by this recommendation.',

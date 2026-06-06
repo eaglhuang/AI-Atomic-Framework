@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0013",
+  "title": "CID-first advisor team/next preflight integration",
+  "status": "done",
+  "milestone": "P0",
+  "dependencies": [
+    "TASK-CID-0005"
+  ],
+  "acceptance": [
+    "A CID conflict exposed by the existing advisor blocks claim preflight with `ATM_NEXT_CLAIM_BLOCKED`.",
+    "`team` preflight reports the advisor finding as consumer-side validation context.",
+    "The validator proves the prompt-scoped next route still targets the intended task and does not fall back to stale global state.",
+    "`git diff --name-only` is limited to the four allowed source/validator files plus ATM-generated closure evidence when closing in AI-Atomic-Framework.",
+    "No diff touches `tasks.ts`, `.atm/runtime/**`, broker/steward surfaces, or `CID-0010/0012` implementation files."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-prompt-scoped-next.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-prompt-scoped-next.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-prompt-scoped-next.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing tasks parallel advisor verdict logic in packages/cli/src/commands/tasks.ts",
+    "Editing packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "Creating Write Broker, Neutral Write Steward, break-glass, or lease-epoch primitives",
+    "Pulling TASK-CID-0010 or TASK-CID-0012 implementation concerns into this card",
+    "Manual mutation of .atm/history/** or .atm/runtime/**",
+    "Reopening or merging the evidence-only 007/task-cid-0005-team-0026 branch"
+  ],
+  "nonGoals": [
+    "Do not reimplement the CID-first advisor core landed by TASK-AAO-0130",
+    "Do not create a second scheduler or broker registry",
+    "Do not make Team Agents own git.write or task.lifecycle beyond the existing coordinator rules"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the consumer integration commit and its closure ledger commit. Do not roll back TASK-AAO-0130 advisor-core work.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-router-map / atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "`TASK-AAO-0130` already landed the read-only CID-first parallel advisor MVP on `main`. The remaining gap is consumption-layer wiring: `next.ts` and `team.ts` must surface existing advisor findings in preflight behavior, and the prompt-scoped validator must prove the route stays narrow.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0013-cid-first-advisor-team-next-preflight-integration.task.md",
+    "sectionTitle": "TASK-CID-0013",
+    "headingLine": 53,
+    "hash": "ad193a668073d43c"
+  },
+  "importedAt": "2026-06-06T13:35:57.229Z",
+  "lastTransitionId": "2026-06-06T13-48-42-247Z-close-0d872e676812",
+  "lastTransitionAt": "2026-06-06T13:48:42.247Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "007",
+  "reservedAt": "2026-06-06T13:36:06.413Z",
+  "promotedAt": "2026-06-06T13:36:06.417Z",
+  "claim": {
+    "actorId": "007",
+    "leaseId": "lease-1907b19011a1",
+    "claimedAt": "2026-06-06T13:36:06.419Z",
+    "heartbeatAt": "2026-06-06T13:48:42.247Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0013.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-06T13:36:06.419Z",
+  "startedByActor": "007",
+  "startedBySessionId": "session-20260606133606-007-TASK-CID-0013-d68eb3ec72",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0013",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0013.*",
+      ".atm/history/task-events/TASK-CID-0013/**",
+      ".atm/history/tasks/TASK-CID-0013.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ac7b606b3d7f65c2ee71485df3eeb8054b7df84c46d9c365b3a8d0a290026166",
+    "actorId": "007",
+    "createdAt": "2026-06-06T13:36:06.440Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-CID-0013.closure-packet.json",
+  "closedAt": "2026-06-06T13:48:42.247Z",
+  "closedByActor": "007",
+  "closedBySessionId": "session-20260606133606-007-TASK-CID-0013-d68eb3ec72"
+}
