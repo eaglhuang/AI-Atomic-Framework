@@ -1,0 +1,16 @@
+{
+  "schemaId": "atm.police.lifecycleNotice",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Lifecycle notice fixture"
+  },
+  "noticeId": "notice.ATM-CORE-0001.migration",
+  "atomId": "ATM-CORE-0001",
+  "callerIds": [
+    "ATM-CORE-0020"
+  ],
+  "recommendedAction": "migrate-callers-before-sweep",
+  "reason": "TTL expired but callers still reference ATM-CORE-0001; migrate callers first."
+}

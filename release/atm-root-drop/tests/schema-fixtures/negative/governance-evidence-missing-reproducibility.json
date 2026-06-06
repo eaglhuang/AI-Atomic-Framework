@@ -1,0 +1,24 @@
+{
+  "schemaId": "atm.evidence.usageFeedback",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Negative evidence fixture missing reproducibility."
+  },
+  "evidenceId": "EV-NEG-0001",
+  "workItemId": "ATM-FIXTURE-0199",
+  "evidenceKind": "metric",
+  "evidenceType": "usage-feedback",
+  "summary": "This fixture should fail because reproducibility is required.",
+  "artifactPaths": [
+    ".atm/artifacts/failure.json"
+  ],
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "details": {
+    "feedbackSource": "agent",
+    "usageSignals": {
+      "sessions": 1
+    }
+  }
+}

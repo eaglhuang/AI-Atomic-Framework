@@ -1,0 +1,23 @@
+{
+  "action": "behavior.atomize",
+  "input": {
+    "entryType": "atom",
+    "atomId": "ATM-CORE-0001",
+    "action": "behavior.atomize",
+    "requestedBy": "atm-test",
+    "payload": {
+      "joinMap": true,
+      "membershipMapId": "ATM-MAP-0001",
+      "target": {
+        "kind": "atom"
+      }
+    }
+  },
+  "expect": {
+    "ok": true,
+    "issues": [],
+    "requiresProposalEnvelope": true,
+    "decompositionDecision": "atom-extract",
+    "canonicalMembershipMapId": "ATM-MAP-0001"
+  }
+}

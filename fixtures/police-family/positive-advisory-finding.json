@@ -1,0 +1,27 @@
+{
+  "description": "Advisory police finding enters ReviewAdvisory without deterministic fail.",
+  "finding": {
+    "id": "finding.police.dedup.fingerprint-overlap",
+    "severity": "low",
+    "trigger": "machine-finding",
+    "scope": "registry",
+    "action": "monitor",
+    "routeHint": "human-review.supplemental",
+    "message": "Dedup advisory: semantic fingerprint overlap detected between ATM-CORE-0001 and ATM-CORE-0002.",
+    "evidenceRefs": ["police-family.dedup.fingerprint-snapshot"],
+    "metadata": {
+      "policeFinding": {
+        "findingId": "police-family.dedup.overlap.ATM-CORE-0001",
+        "policeFamily": "dedup",
+        "severity": "advisory",
+        "trigger": "semantic-fingerprint-overlap",
+        "message": "Semantic fingerprint overlap detected"
+      }
+    }
+  },
+  "expected": {
+    "triggerIsMachineFinding": true,
+    "advisoryDoesNotFail": true,
+    "actionIsMonitorOrNeedsReview": true
+  }
+}

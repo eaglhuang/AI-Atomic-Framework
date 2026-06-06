@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/evolution-scan-report.schema.json",
+  "title": "ATM Evidence-Driven Evolution Scan Report v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "scanId",
+    "generatedAt",
+    "repositoryRoot",
+    "scanMode",
+    "detectorReports",
+    "observation",
+    "proposalDrafts",
+    "empty"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.evolutionScanReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "scanId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repositoryRoot": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scanMode": {
+      "const": "dry-run"
+    },
+    "detectorReports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/detectorSummary"
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detectorReportCount", "candidateGroupCount", "proposalDraftCount", "skippedGroupIds", "notes"],
+      "properties": {
+        "detectorReportCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidateGroupCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "proposalDraftCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skippedGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "proposalDrafts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/proposalDraftBundleItem"
+      }
+    },
+    "empty": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "detectorSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "detectorName", "candidateGroupCount", "proposalCandidateGroupIds", "empty"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detectorName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidateGroupCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "proposalCandidateGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "empty": {
+          "type": "boolean"
+        }
+      }
+    },
+    "proposalDraftBundleItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groupIds", "detectorReportPaths", "proposal"],
+      "properties": {
+        "groupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "detectorReportPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "proposal": {
+          "$ref": "https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json"
+        }
+      }
+    }
+  }
+}

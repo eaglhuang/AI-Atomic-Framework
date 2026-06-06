@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/evidence/usage-feedback.schema.json",
+  "title": "ATM Usage Feedback Evidence v0.1",
+  "required": ["schemaId", "specVersion", "migration"],
+  "allOf": [
+    {
+      "$ref": "https://schemas.ai-atomic-framework.dev/governance/evidence.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["details"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.evidence.usageFeedback"
+        },
+        "evidenceType": {
+          "const": "usage-feedback"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["feedbackSource", "usageSignals"],
+          "properties": {
+            "feedbackSource": {
+              "enum": ["agent", "adapter", "user", "sensor"]
+            },
+            "usageSignals": {
+              "type": "object",
+              "additionalProperties": true,
+              "required": ["sessions"],
+              "properties": {
+                "sessions": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "tokens": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "interactions": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

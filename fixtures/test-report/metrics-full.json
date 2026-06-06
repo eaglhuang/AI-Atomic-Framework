@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.testReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "0.1.0",
+    "notes": "Metrics full fixture covering all standard quality fields."
+  },
+  "atomId": "ATM-FIXTURE-1002",
+  "ok": true,
+  "exitCode": 0,
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "repositoryRoot": "fixtures/test-report",
+  "specPath": "fixtures/test-report/metrics-full.atom.json",
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "canonicalization": "json-stable-v1"
+  },
+  "validation": {
+    "evidenceRequired": true,
+    "commandCount": 2
+  },
+  "runnerContract": {
+    "executionMode": "delegated",
+    "evidenceRequired": true,
+    "commands": [
+      {
+        "commandId": "validation-1",
+        "commandKind": "test",
+        "command": "npm test",
+        "required": true
+      },
+      {
+        "commandId": "validation-2",
+        "commandKind": "lint",
+        "command": "npm run lint",
+        "required": true
+      }
+    ]
+  },
+  "results": [
+    {
+      "commandId": "validation-1",
+      "commandKind": "test",
+      "command": "npm test",
+      "required": true,
+      "exitCode": 0,
+      "ok": true,
+      "durationMs": 21,
+      "stdout": "ok",
+      "stderr": "",
+      "signal": null
+    },
+    {
+      "commandId": "validation-2",
+      "commandKind": "lint",
+      "command": "npm run lint",
+      "required": true,
+      "exitCode": 0,
+      "ok": true,
+      "durationMs": 13,
+      "stdout": "ok",
+      "stderr": "",
+      "signal": null
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "durationMs": 34
+  },
+  "metrics": {
+    "latency": 34,
+    "errorRate": 0,
+    "coverage": 0.92,
+    "edgeCaseCount": 3
+  },
+  "artifacts": [
+    {
+      "artifactPath": "fixtures/test-report/metrics-full.report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "metric",
+      "summary": "Metrics-full report includes all standard quality metrics.",
+      "artifactPaths": [
+        "fixtures/test-report/metrics-full.report.json"
+      ]
+    }
+  ]
+}

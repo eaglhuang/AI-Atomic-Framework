@@ -1,0 +1,36 @@
+{
+  "inputSpecPath": "fixtures/agent-prompt/minimal.input.json",
+  "snapshotPath": "fixtures/agent-execute/dry-run.snapshot.json",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "expectedPromptPath": "atomic_workbench/atoms/ATM-AGENT-0001/prompt.md",
+  "expectedEvidencePath": "atomic_workbench/atoms/ATM-AGENT-0001/execution-evidence.json",
+  "expectedArtifactPath": "atomic_workbench/atoms/ATM-AGENT-0001/agent-execute.snapshot.json",
+  "expectedLogPath": "atomic_workbench/atoms/ATM-AGENT-0001/agent-execute.log",
+  "expectedProposedTouchedFile": "atomic_workbench/atoms/ATM-AGENT-0001/atom.test.ts",
+  "hostSentinelPath": "host-target.txt",
+  "hostSentinelBefore": "seed\n",
+  "hostSentinelAfter": "applied\n",
+  "expectedValidationPasses": [
+    {
+      "passId": "baseline-fixtures-x-new-code",
+      "fixtureSet": "baseline"
+    },
+    {
+      "passId": "new-fixtures-x-new-code",
+      "fixtureSet": "candidate"
+    }
+  ],
+  "expectedValidationSummaries": {
+    "baseline-fixtures-x-new-code": "Baseline fixtures validated against the candidate code.",
+    "new-fixtures-x-new-code": "New fixtures validated against the candidate code."
+  },
+  "expectedLogPreview": [
+    "DRY-RUN: captured candidate patch",
+    "VALIDATION: baseline + candidate fixture passes recorded"
+  ],
+  "acceptance": [
+    "dry-run is the default execution mode and must not mutate the host target",
+    "evolution mode records two independent validation passes and writes execution evidence",
+    "apply mode only mutates the host target when the explicit apply callback is enabled"
+  ]
+}

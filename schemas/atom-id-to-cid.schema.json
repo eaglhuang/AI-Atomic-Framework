@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AtomIdToCidSidecar",
+  "description": "Schema for content-addressed atom CID mappings keyed by atom_id",
+  "type": "OBJECT",
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "mappings"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "STRING",
+      "enum": ["atm.atomIdToCid.v1"]
+    },
+    "generatedAt": {
+      "type": "STRING",
+      "format": "date-time"
+    },
+    "mappings": {
+      "type": "ARRAY",
+      "items": {
+        "type": "OBJECT",
+        "required": [
+          "atom_id",
+          "atom_cid",
+          "sourcePath"
+        ],
+        "properties": {
+          "atom_id": {
+            "type": "STRING"
+          },
+          "atom_cid": {
+            "type": "STRING",
+            "pattern": "^atom:cid:[a-zA-Z0-9_-]+$"
+          },
+          "sourcePath": {
+            "type": "STRING"
+          }
+        }
+      }
+    }
+  }
+}

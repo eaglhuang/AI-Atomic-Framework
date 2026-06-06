@@ -1,0 +1,30 @@
+{
+  "name": "@ai-atomic-framework/agent-pack-claude-code",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Claude Code agent pack for ATM — installs governed slash commands into .claude/commands/.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "templates"
+  ],
+  "scripts": {
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/agent-pack-claude-code",
+    "test": "node --strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ai-atomic-framework/agent-pack-sdk": "0.1.0",
+    "typescript": "^5.9.3"
+  },
+  "types": "./dist/index.d.ts"
+}

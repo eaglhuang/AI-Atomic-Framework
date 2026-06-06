@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.invalid/schemas/experience-loop/skill-amendment.schema.json",
+  "title": "ATM Skill Amendment Proposal",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "targetSkillId",
+    "rationale",
+    "proposedChangeSummary",
+    "confidence",
+    "evidenceRefs",
+    "lifecycleMode",
+    "status",
+    "generatedAt"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "atm.skillAmendmentProposal.v0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "targetSkillId": { "type": "string", "minLength": 1 },
+    "rationale": { "type": "string", "minLength": 1 },
+    "proposedChangeSummary": { "type": "string", "minLength": 1 },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "lifecycleMode": { "const": "evolution" },
+    "status": { "enum": ["candidate", "suppressed"] },
+    "generatedAt": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

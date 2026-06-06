@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.injectPlan",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive inject plan fixture."
+  },
+  "planId": "inject-plan.fixture.0001",
+  "behaviorId": "behavior.infect",
+  "target": {
+    "atomId": "ATM-FIXTURE-0001",
+    "atomVersion": "1.0.0",
+    "logicalName": "atom.case.fixture-inject"
+  },
+  "legacyInjectionPoints": [
+    {
+      "legacyUri": "legacy://repo/src/legacy-source.ts#L10-L20",
+      "callSymbol": "legacyHelper",
+      "mode": "dry-run",
+      "notes": "Fixture-only inject seam."
+    }
+  ],
+  "dryRunPatch": {
+    "patchId": "patch.fixture.inject.001",
+    "patchMode": "dry-run",
+    "applyToHostProject": false,
+    "operations": [
+      {
+        "op": "replace-call",
+        "file": "src/legacy-source.ts",
+        "before": "legacyHelper(input)",
+        "after": "atomBridge(input)"
+      }
+    ]
+  },
+  "noApplyGuarantee": {
+    "noApply": true,
+    "legacyRuntimeMutated": false,
+    "guaranteeStatement": "Fixture confirms plan-only behavior."
+  },
+  "alpha0GateEvidence": {
+    "schema": "tests/schema-fixtures/positive/hello-world.atom.json",
+    "registry": "tests/schema-fixtures/positive/minimal-registry.json",
+    "hashLock": "tests/schema-fixtures/positive/hello-world.atom.json#hashLock",
+    "cli": "tests/cli-fixtures/cli-mvp.fixture.json",
+    "helloWorld": "examples/hello-world/atoms/hello-world.atom.json",
+    "minimalEvidence": "tests/schema-fixtures/positive/minimal-execution-evidence.json"
+  },
+  "neutralityScopeCheck": {
+    "neutralityPassed": true,
+    "scopePassed": true,
+    "scanner": "deterministic-neutrality",
+    "scopeBoundary": [
+      "src/legacy-source.ts"
+    ]
+  },
+  "rollbackSymmetry": {
+    "rollbackPlanId": "rollback-plan.fixture.0001",
+    "reverseBehaviorId": "behavior.rollback-infect",
+    "contractSymmetric": true
+  }
+}

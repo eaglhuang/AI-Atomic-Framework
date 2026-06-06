@@ -1,0 +1,21 @@
+{
+  "description": "Adopter Neutrality Check: protected fixture references host-only asset path that should not leak into upstream.",
+  "input": {
+    "protectedFiles": [
+      {
+        "filePath": "fixtures/public/example.json",
+        "scope": "protected-public-fixtures",
+        "content": "{\"assetPath\":\"adopter-host-only-asset/scenes/loader\"}"
+      }
+    ],
+    "bannedTerms": [
+      { "term": "adopter-host-only-asset", "termClass": "adopter-host-only-asset", "suggestedAction": "move-asset-path-to-adopter-overlay" }
+    ],
+    "profile": "full"
+  },
+  "expected": {
+    "trigger": "adopter-neutrality-violation",
+    "matchedTermClass": "adopter-host-only-asset",
+    "severity": "block"
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/conversation-review-findings-report.schema.json",
+  "title": "ATM Conversation Review Findings Report v0.1",
+  "description": "Draft-only report for conversation-derived review findings before any skill, atom, or registry mutation is proposed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "generatedAt",
+    "reviewerName",
+    "sourceTranscript",
+    "privacy",
+    "summary",
+    "findings",
+    "draftOnly"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.conversationReviewFindingsReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reviewerName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "window": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceTranscript": {
+      "$ref": "#/$defs/sourceTranscript"
+    },
+    "privacy": {
+      "$ref": "#/$defs/privacy"
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "findings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "draftOnly": {
+      "$ref": "#/$defs/draftOnly"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sourceTranscript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transcriptId", "artifactPaths"],
+      "properties": {
+        "transcriptId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifactPaths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "redactionReportPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["redacted", "containsSensitiveInput", "redactionReportPaths"],
+      "properties": {
+        "redacted": {
+          "const": true
+        },
+        "containsSensitiveInput": {
+          "type": "boolean"
+        },
+        "redactionReportPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "containsSensitiveInput": {
+                "const": true
+              }
+            },
+            "required": ["containsSensitiveInput"]
+          },
+          "then": {
+            "properties": {
+              "redactionReportPaths": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totalFindings", "draftCount", "observationCount", "findingKinds"],
+      "properties": {
+        "totalFindings": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "draftCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "findingKinds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/findingKind"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "findingId",
+        "findingKind",
+        "signalKind",
+        "signalScope",
+        "confidence",
+        "sourceTranscriptRefs",
+        "evidenceRefs",
+        "recommendedTarget",
+        "recommendation",
+        "rationale",
+        "patchDraft"
+      ],
+      "properties": {
+        "findingId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "findingKind": {
+          "$ref": "#/$defs/findingKind"
+        },
+        "signalKind": {
+          "enum": ["user-correction", "recurring-failure", "loaded-but-wrong", "novel-technique", "workflow-success", "metric-regression", "rollback-success"]
+        },
+        "signalScope": {
+          "enum": ["host-local", "repo", "atom", "atom-map", "global"]
+        },
+        "atomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "atomMapId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "skillId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sourceTranscriptRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "recommendedTarget": {
+          "enum": ["host-local-overlay", "skill-patch-draft", "atom-patch-draft", "atom-map-patch-draft", "observation-only"]
+        },
+        "recommendation": {
+          "enum": ["draft-host-local-preference", "draft-skill-patch", "draft-atom-patch", "draft-atom-map-patch", "observation-only"]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "patchDraft": {
+          "$ref": "#/$defs/patchDraft"
+        }
+      }
+    },
+    "findingKind": {
+      "enum": ["style-format-correction", "workflow-adjustment", "non-trivial-debug-path", "stale-or-wrong-skill"]
+    },
+    "patchDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["draftKind", "patchMode", "mutatesFiles", "mutatesRegistry", "requiresHumanReview", "summary"],
+      "properties": {
+        "draftKind": {
+          "enum": ["host-local-overlay", "skill-patch", "atom-patch", "atom-map-patch", "observation"]
+        },
+        "patchMode": {
+          "const": "dry-run"
+        },
+        "mutatesFiles": {
+          "const": false
+        },
+        "mutatesRegistry": {
+          "const": false
+        },
+        "requiresHumanReview": {
+          "const": true
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "patchFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "draftOnly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["appliesAutomatically", "mutatesRegistry", "mutatesSkillFiles", "requiresHumanReview"],
+      "properties": {
+        "appliesAutomatically": {
+          "const": false
+        },
+        "mutatesRegistry": {
+          "const": false
+        },
+        "mutatesSkillFiles": {
+          "const": false
+        },
+        "requiresHumanReview": {
+          "const": true
+        }
+      }
+    }
+  }
+}

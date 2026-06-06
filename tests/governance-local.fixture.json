@@ -1,0 +1,140 @@
+{
+  "bootstrapTaskTitle": "Bootstrap local governance bundle",
+  "timestamp": "2026-05-07T00:00:00.000Z",
+  "actor": "vs-code-gpt-5.4",
+  "hostFiles": {
+    "README.md": "# Governance Host\n\nStandalone governance host for ATM local bundle smoke.\n",
+    "index.html": "<!doctype html><html><body><h1>Governance Host</h1></body></html>\n",
+    "assets/css/site.css": "body { font-family: serif; }\n",
+    "docs/guide.md": "# Guide\n\nLocal governance document index smoke target.\n"
+  },
+  "expectedPaths": [
+    "AGENTS.md",
+    ".atm/config.json",
+    ".atm/runtime/profile/default.md",
+    ".atm/runtime/current-task.json",
+    ".atm/runtime/project-probe.json",
+    ".atm/runtime/default-guards.json",
+    ".atm/runtime/budget",
+    ".atm/runtime/budget/default-policy.json",
+    ".atm/history/handoff/INITIAL_SUMMARY.md",
+    ".atm/history/handoff/BOOTSTRAP-0001.json",
+    ".atm/history/handoff/BOOTSTRAP-0001.md",
+    ".atm/history/tasks/BOOTSTRAP-0001.json",
+    ".atm/runtime/locks/BOOTSTRAP-0001.lock.json",
+    ".atm/history/evidence/BOOTSTRAP-0001.json",
+    ".atm/history/reports/context-budget/bootstrap-bootstrap-BOOTSTRAP-0001.json",
+    ".atm/history/reports/continuation/BOOTSTRAP-0001.json",
+    ".atm/history/artifacts",
+    ".atm/history/logs",
+    ".atm/history/reports",
+    ".atm/catalog/index",
+    ".atm/catalog/shards",
+    ".atm/runtime/rules",
+    ".atm/catalog/registry"
+  ],
+  "workItem": {
+    "workItemId": "ATM-PLUGIN-0008",
+    "title": "Local governance bundle smoke",
+    "status": "planned"
+  },
+  "lockFiles": [
+    "docs/guide.md",
+    "src/host.js"
+  ],
+  "document": {
+    "path": "docs/guide.md",
+    "metadata": {
+      "documentId": "doc_local_governance_0001",
+      "title": "Governance Guide"
+    }
+  },
+  "shard": {
+    "path": ".atm/catalog/shards/local/part-01.json",
+    "value": {
+      "id": "part-01",
+      "items": [
+        "task",
+        "lock",
+        "evidence"
+      ]
+    },
+    "indexPath": ".atm/catalog/shards/index.json"
+  },
+  "artifact": {
+    "artifactPath": ".atm/history/artifacts/ATM-PLUGIN-0008/smoke.json",
+    "artifactKind": "report",
+    "producedBy": "validate-governance-local"
+  },
+  "runReport": {
+    "reportId": "governance-local-smoke",
+    "report": {
+      "ok": true,
+      "checks": [
+        "task",
+        "lock",
+        "document-index",
+        "shard",
+        "artifact",
+        "log",
+        "report",
+        "state",
+        "rule-guard",
+        "evidence",
+        "context-budget",
+        "context-summary"
+      ]
+    }
+  },
+  "state": {
+    "markdownPath": ".atm/runtime/state/HANDOFF.md",
+    "markdownContent": "# Handoff\n\n- governance local smoke complete\n",
+    "jsonPath": ".atm/runtime/state/smoke.json",
+    "jsonValue": {
+      "ready": true,
+      "surface": "governance-local"
+    }
+  },
+  "ruleGuard": {
+    "guardId": "governance-local-smoke",
+    "context": {
+      "mode": "smoke",
+      "bundle": "default"
+    }
+  },
+  "evidence": {
+    "evidenceKind": "validation",
+    "summary": "Local governance bundle smoke passed.",
+    "artifactPaths": [
+      ".atm/history/reports/governance-local-smoke.json"
+    ]
+  },
+  "summary": {
+    "workItemId": "ATM-PLUGIN-0008",
+    "summary": "Local governance bundle ready for the next agent run.",
+    "nextActions": [
+      "Run root validation.",
+      "Commit the bundle package."
+    ],
+    "summaryMarkdownPath": ".atm/history/handoff/ATM-PLUGIN-0008.md"
+  },
+  "contextBudget": {
+    "policy": {
+      "policyId": "default-policy",
+      "generatedAt": "2026-05-07T00:00:00.000Z",
+      "unit": "tokens",
+      "warningTokens": 12000,
+      "summarizeTokens": 20000,
+      "hardStopTokens": 28000,
+      "maxInlineArtifacts": 2,
+      "defaultSummary": "Summarize large tool output before continuing."
+    },
+    "evaluation": {
+      "budgetId": "context-heavy-turn",
+      "workItemId": "ATM-PLUGIN-0008",
+      "estimatedTokens": 24000,
+      "inlineArtifacts": 3,
+      "requestedSummary": "Reduce inline artifacts before the next turn."
+    }
+  }
+}

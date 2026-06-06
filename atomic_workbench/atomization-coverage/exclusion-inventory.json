@@ -1,0 +1,226 @@
+[
+  {
+    "path": "dist/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-build-release",
+    "provenance": "npm run build typescript compiler output",
+    "valid_until": "permanent",
+    "notes": "TypeScript compiler output; gitignored, never tracked"
+  },
+  {
+    "path": "build/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-build-release",
+    "provenance": "npm run build intermediate files",
+    "valid_until": "permanent",
+    "notes": "Build intermediate artifacts; gitignored"
+  },
+  {
+    "path": "release/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-build-release",
+    "provenance": "npm run build:root-drop-release / build:onefile-release",
+    "valid_until": "permanent",
+    "notes": "Release bundles; produced by build scripts, not hand-authored source"
+  },
+  {
+    "path": "**/*.gen.ts",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "atom generator or TypeScript codegen",
+    "valid_until": "permanent",
+    "notes": "Auto-generated type definitions"
+  },
+  {
+    "path": "**/*.gen.json",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "configuration/registry generators",
+    "valid_until": "permanent",
+    "notes": "Auto-generated configuration JSON"
+  },
+  {
+    "path": "fixtures/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "test fixture data, mocks, and golden files",
+    "valid_until": "permanent",
+    "notes": "171 tracked files; used by test suites, not production logic"
+  },
+  {
+    "path": "tests/fixtures/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "test-scoped fixture data",
+    "valid_until": "permanent",
+    "notes": "Nested fixtures inside tests/ directory"
+  },
+  {
+    "path": "tests/cli-fixtures/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "CLI help snapshot and test fixture data",
+    "valid_until": "permanent",
+    "notes": "CLI command help snapshot expectations"
+  },
+  {
+    "path": "tests/guidance-fixtures/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "guidance validation test fixtures",
+    "valid_until": "permanent",
+    "notes": "Downstream adopter config fixtures for guidance tests"
+  },
+  {
+    "path": "tests/core-spec-parser-fixtures/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "core spec parser test fixture data",
+    "valid_until": "permanent",
+    "notes": "Atomic spec parse/validate fixtures"
+  },
+  {
+    "path": "tests/language-js-fixtures/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "language-js adapter test fixtures",
+    "valid_until": "permanent",
+    "notes": "JavaScript language binding test data"
+  },
+  {
+    "path": "tests/neutrality-fixtures/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "neutrality scanner test fixtures",
+    "valid_until": "permanent",
+    "notes": "Positive/negative neutrality policy test cases"
+  },
+  {
+    "path": "tests/known-bad/**",
+    "reason": "fixture",
+    "owner_atom_id": null,
+    "provenance": "known-bad input regression test data",
+    "valid_until": "permanent",
+    "notes": "Intentionally broken inputs for error-handling tests"
+  },
+  {
+    "path": "tests/**/*.snapshot",
+    "reason": "snapshot",
+    "owner_atom_id": null,
+    "provenance": "regression test snapshot output",
+    "valid_until": "permanent",
+    "notes": "Not currently tracked; placeholder for future snapshot tests"
+  },
+  {
+    "path": "tests/**/*.snap",
+    "reason": "snapshot",
+    "owner_atom_id": null,
+    "provenance": "vitest snapshot files",
+    "valid_until": "permanent",
+    "notes": "Not currently tracked; placeholder for future vitest snapshots"
+  },
+  {
+    "path": "__snapshots__/**",
+    "reason": "snapshot",
+    "owner_atom_id": null,
+    "provenance": "jest/vitest snapshot directories",
+    "valid_until": "permanent",
+    "notes": "Not currently tracked; placeholder for snapshot directories"
+  },
+  {
+    "path": "atomic_workbench/generators/**/outputs/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "atomic workbench generator tool outputs",
+    "valid_until": "permanent",
+    "notes": "Generator pipeline output artifacts"
+  },
+  {
+    "path": "atomic_workbench/generators/**/artifacts/**",
+    "reason": "generated",
+    "owner_atom_id": "atom-generator",
+    "provenance": "atomic workbench generator tool artifacts",
+    "valid_until": "permanent",
+    "notes": "Generator pipeline intermediate artifacts"
+  },
+  {
+    "path": "examples/**",
+    "reason": "example",
+    "owner_atom_id": null,
+    "provenance": "example implementations for adopters",
+    "valid_until": "permanent",
+    "notes": "39 tracked files; reference examples, not production source"
+  },
+  {
+    "path": "samples/**",
+    "reason": "example",
+    "owner_atom_id": null,
+    "provenance": "sample applications",
+    "valid_until": "permanent",
+    "notes": "Placeholder; currently no tracked files"
+  },
+  {
+    "path": "specs/samples/**",
+    "reason": "example",
+    "owner_atom_id": null,
+    "provenance": "specification examples and reference implementations",
+    "valid_until": "permanent",
+    "notes": "Spec reference implementations"
+  },
+  {
+    "path": "docs/**/*.md",
+    "reason": "doc",
+    "owner_atom_id": null,
+    "provenance": "documentation markdown files",
+    "valid_until": "permanent",
+    "notes": "69 tracked files; narrative documentation, not runtime source"
+  },
+  {
+    "path": "tests/**/*.test.ts",
+    "reason": "test-only",
+    "owner_atom_id": null,
+    "provenance": "unit/integration test source",
+    "valid_until": "permanent",
+    "notes": "Test implementation files; validate production code but not shipped"
+  },
+  {
+    "path": "tests/**/*.spec.ts",
+    "reason": "test-only",
+    "owner_atom_id": null,
+    "provenance": "test specification source",
+    "valid_until": "permanent",
+    "notes": "Spec-style test files"
+  },
+  {
+    "path": "scripts/internal/**",
+    "reason": "internal-only",
+    "owner_atom_id": null,
+    "provenance": "internal utilities not part of public contract",
+    "valid_until": "permanent",
+    "notes": "Internal-only tooling scripts"
+  },
+  {
+    "path": ".atm-temp/**",
+    "reason": "generated",
+    "owner_atom_id": null,
+    "provenance": "ATM runtime temporary files and self-hosting alpha workdirs",
+    "valid_until": "permanent",
+    "notes": "Gitignored; ephemeral runtime state"
+  },
+  {
+    "path": "node_modules/**",
+    "reason": "generated",
+    "owner_atom_id": null,
+    "provenance": "npm install dependency tree",
+    "valid_until": "permanent",
+    "notes": "Gitignored; package manager output"
+  },
+  {
+    "path": ".atm/runtime/**",
+    "reason": "generated",
+    "owner_atom_id": null,
+    "provenance": "ATM runtime locks, queues, batch state",
+    "valid_until": "permanent",
+    "notes": "Gitignored; ephemeral governance runtime state"
+  }
+]

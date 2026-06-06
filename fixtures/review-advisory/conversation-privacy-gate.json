@@ -1,0 +1,71 @@
+{
+  "description": "M12 fixture: sensitive conversation-derived drafts without redaction reports must be blocked by ReviewAdvisory machine findings.",
+  "input": {
+    "reportId": "review-advisory.conversation.privacy-gate",
+    "generatedAt": "2026-05-17T03:10:00.000Z",
+    "patchDraftReport": {
+      "schemaId": "atm.conversationPatchDraftReport",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Synthetic privacy gate report for advisory coverage."
+      },
+      "generatedAt": "2026-05-17T03:09:00.000Z",
+      "bridgeName": "deterministic-conversation-patch-draft-bridge",
+      "sourceFindingsReport": {
+        "schemaId": "atm.conversationReviewFindingsReport",
+        "transcriptId": "transcript.conv-review.privacy.001",
+        "findingIds": ["finding.conv-review.privacy.001"]
+      },
+      "privacy": {
+        "redacted": true,
+        "containsSensitiveInput": true,
+        "redactionReportPaths": []
+      },
+      "summary": {
+        "totalFindings": 1,
+        "totalDrafts": 1,
+        "hostLocalDraftCount": 0,
+        "skillDraftCount": 0,
+        "atomDraftCount": 0,
+        "atomMapDraftCount": 0,
+        "observationCount": 1,
+        "humanReviewRequiredCount": 1
+      },
+      "drafts": [
+        {
+          "draftId": "draft.conversation.privacy.001",
+          "sourceFindingId": "finding.conv-review.privacy.001",
+          "findingKind": "workflow-adjustment",
+          "draftKind": "observation",
+          "draftSurface": "observation",
+          "operation": "observe-only",
+          "patchMode": "dry-run",
+          "appliesAutomatically": false,
+          "mutatesFiles": false,
+          "mutatesRegistry": false,
+          "mutatesSkillFiles": false,
+          "requiresHumanReview": true,
+          "summary": "Sensitive conversation note cannot proceed without redaction report.",
+          "rationale": "The source transcript was sensitive but lacks a redaction report path.",
+          "sourceTranscriptRefs": ["transcript.conv-review.privacy.001#turn-001"],
+          "evidenceRefs": ["evidence.conv-review.privacy.001"],
+          "notes": ["Synthetic privacy gate fixture."]
+        }
+      ],
+      "draftOnly": {
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true
+      }
+    }
+  },
+  "expected": {
+    "status": "warn",
+    "needsReview": true,
+    "blockedRouteHints": ["conversation-review.blocked.missing-redaction-report"]
+  }
+}

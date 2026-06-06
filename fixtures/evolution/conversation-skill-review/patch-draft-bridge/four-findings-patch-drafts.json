@@ -1,0 +1,223 @@
+{
+  "description": "M11 patch draft bridge fixture covering host-local overlay, atom patch, debug-path skill patch, and stale skill repair draft.",
+  "input": {
+    "findingsReportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+    "generatedAt": "2026-05-17T01:00:00.000Z",
+    "sourceReportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+    "proposedBy": "ATM Conversation Patch Draft Bridge",
+    "atomVersionById": {
+      "ATM-CORE-0001": "0.1.0"
+    }
+  },
+  "expectedReport": {
+    "schemaId": "atm.conversationPatchDraftReport",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Deterministic bridge from conversation review findings to dry-run patch drafts."
+    },
+    "generatedAt": "2026-05-17T01:00:00.000Z",
+    "bridgeName": "deterministic-conversation-patch-draft-bridge",
+    "sourceFindingsReport": {
+      "schemaId": "atm.conversationReviewFindingsReport",
+      "artifactPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+      "transcriptId": "transcript.conv-review.001",
+      "sessionId": "session.conv-review.001",
+      "findingIds": [
+        "finding.conv-review.debug-path.001",
+        "finding.conv-review.stale-skill.001",
+        "finding.conv-review.style-format.001",
+        "finding.conv-review.workflow.001"
+      ]
+    },
+    "privacy": {
+      "redacted": true,
+      "containsSensitiveInput": true,
+      "redactionReportPaths": ["artifacts/conversation-review/transcript-001.redaction.json"]
+    },
+    "summary": {
+      "totalFindings": 4,
+      "totalDrafts": 4,
+      "hostLocalDraftCount": 1,
+      "skillDraftCount": 2,
+      "atomDraftCount": 1,
+      "atomMapDraftCount": 0,
+      "observationCount": 0,
+      "humanReviewRequiredCount": 4
+    },
+    "drafts": [
+      {
+        "draftId": "draft.conversation.finding.conv-review.style-format.001",
+        "sourceFindingId": "finding.conv-review.style-format.001",
+        "findingKind": "style-format-correction",
+        "draftKind": "host-local-overlay",
+        "draftSurface": "host-local-overlay",
+        "operation": "record-host-local-preference",
+        "patchMode": "dry-run",
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true,
+        "summary": "Draft a host-local output-shape preference; do not promote to an atom contract.",
+        "rationale": "User repeatedly asked for shorter answers with a fixed checklist shape.",
+        "sourceTranscriptRefs": ["transcript.conv-review.001#turn-004"],
+        "evidenceRefs": ["evidence.conv.session.conv-review.001.user-correction.none"],
+        "notes": ["Style and format corrections stay host-local by default."]
+      },
+      {
+        "draftId": "draft.conversation.finding.conv-review.workflow.001",
+        "sourceFindingId": "finding.conv-review.workflow.001",
+        "findingKind": "workflow-adjustment",
+        "draftKind": "atom-patch",
+        "draftSurface": "atom-spec",
+        "operation": "repair-workflow",
+        "patchMode": "dry-run",
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true,
+        "summary": "Draft an atom evolution proposal that adds the missing preflight step.",
+        "rationale": "User identified a missing preflight step that changed the correct workflow order.",
+        "sourceTranscriptRefs": ["transcript.conv-review.001#turn-011"],
+        "evidenceRefs": ["evidence.conv.session.conv-review.001.user-correction.ATM-CORE-0001"],
+        "atomId": "ATM-CORE-0001",
+        "upgradeProposalDraft": {
+          "schemaId": "atm.upgradeProposal",
+          "specVersion": "0.1.0",
+          "migration": {
+            "strategy": "additive",
+            "fromVersion": "0.1.0",
+            "notes": "Conversation-derived atom patch draft; dry-run only until human review."
+          },
+          "proposalId": "proposal.atm-core-0001.conversation.finding.conv-review.workflow.001",
+          "atomId": "ATM-CORE-0001",
+          "fromVersion": "0.1.0",
+          "toVersion": "0.1.1",
+          "lifecycleMode": "evolution",
+          "behaviorId": "behavior.evolve",
+          "target": {
+            "kind": "atom"
+          },
+          "decompositionDecision": "atom-bump",
+          "proposalSource": "evidence-driven",
+          "targetSurface": "atom-spec",
+          "baseAtomVersion": "0.1.0",
+          "baseEvidenceWatermark": "evidence.watermark.2026-05-17T00-00-00Z",
+          "reversibility": "rollback-safe",
+          "evidenceGate": {
+            "requiredSignals": ["user-correction"],
+            "matchedEvidenceIds": ["evidence.conv.session.conv-review.001.user-correction.ATM-CORE-0001"],
+            "rejectedEvidenceIds": [],
+            "notes": "Derived from conversation finding finding.conv-review.workflow.001."
+          },
+          "reviewTemplate": "review.template.atom-bump",
+          "automatedGates": {
+            "nonRegression": {
+              "passed": true,
+              "reportId": "conversation-patch-draft.nonRegression",
+              "reportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+              "summary": "pass (conversation patch bridge did not re-run non-regression)"
+            },
+            "qualityComparison": {
+              "passed": true,
+              "reportId": "conversation-patch-draft.qualityComparison",
+              "reportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+              "summary": "pass (conversation patch bridge did not re-run quality comparison)"
+            },
+            "registryCandidate": {
+              "passed": true,
+              "reportId": "conversation-patch-draft.registryCandidate",
+              "reportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+              "summary": "pass (conversation patch bridge did not re-run registry candidate)"
+            },
+            "staleProposal": {
+              "passed": true,
+              "reportId": "conversation-patch-draft.staleProposal",
+              "reportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+              "summary": "pass (base version supplied by bridge input)"
+            },
+            "privacy": {
+              "passed": true,
+              "reportId": "conversation-patch-draft.privacy",
+              "reportPath": "fixtures/evolution/conversation-skill-review/four-findings-report.json",
+              "summary": "pass (source findings report is redacted)"
+            },
+            "allPassed": true,
+            "blockedGateNames": []
+          },
+          "humanReview": "pending",
+          "status": "pending",
+          "inputs": [
+            {
+              "kind": "evolution-evidence",
+              "path": "fixtures/evolution/conversation-skill-review/four-findings-report.json#/findings/finding.conv-review.workflow.001",
+              "schemaId": "atm.conversationReviewFindingsReport",
+              "reportId": "finding.conv-review.workflow.001",
+              "summary": "conversation review finding input"
+            },
+            {
+              "kind": "redaction-report",
+              "path": "artifacts/conversation-review/transcript-001.redaction.json",
+              "schemaId": "atm.redactionReport",
+              "summary": "redaction report input for conversation-derived proposal"
+            }
+          ],
+          "proposedBy": "ATM Conversation Patch Draft Bridge",
+          "proposedAt": "2026-05-17T01:00:00.000Z"
+        },
+        "notes": ["Atom workflow adjustment produced a schema-valid UpgradeProposal draft."]
+      },
+      {
+        "draftId": "draft.conversation.finding.conv-review.debug-path.001",
+        "sourceFindingId": "finding.conv-review.debug-path.001",
+        "findingKind": "non-trivial-debug-path",
+        "draftKind": "skill-patch",
+        "draftSurface": "skill",
+        "operation": "capture-debug-path",
+        "patchMode": "dry-run",
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true,
+        "summary": "Draft a reusable troubleshooting path as a skill pitfall note.",
+        "rationale": "A multi-step failed attempt sequence ended in a reusable debugging path.",
+        "sourceTranscriptRefs": ["transcript.conv-review.001#turn-018", "transcript.conv-review.001#turn-026"],
+        "evidenceRefs": ["evidence.conv.session.conv-review.001.novel-technique.none"],
+        "patchFiles": [".agents/skills/example-skill/SKILL.md"],
+        "notes": ["Reusable debugging path should be reviewed as a skill SOP or pitfall draft."]
+      },
+      {
+        "draftId": "draft.conversation.finding.conv-review.stale-skill.001",
+        "sourceFindingId": "finding.conv-review.stale-skill.001",
+        "findingKind": "stale-or-wrong-skill",
+        "draftKind": "skill-patch",
+        "draftSurface": "skill",
+        "operation": "repair-stale-skill",
+        "patchMode": "dry-run",
+        "appliesAutomatically": false,
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "mutatesSkillFiles": false,
+        "requiresHumanReview": true,
+        "summary": "Draft a skill repair proposal for the stale command sequence.",
+        "rationale": "The loaded skill produced an outdated command sequence that the user corrected.",
+        "sourceTranscriptRefs": ["transcript.conv-review.001#turn-033"],
+        "evidenceRefs": ["evidence.conv.session.conv-review.001.loaded-but-wrong.none"],
+        "patchFiles": [".agents/skills/atm-upgrade-scan/SKILL.md"],
+        "skillId": "atm-upgrade-scan",
+        "notes": ["Stale or wrong skill findings must cite skillId and evidence refs before review."]
+      }
+    ],
+    "draftOnly": {
+      "appliesAutomatically": false,
+      "mutatesFiles": false,
+      "mutatesRegistry": false,
+      "mutatesSkillFiles": false,
+      "requiresHumanReview": true
+    }
+  }
+}

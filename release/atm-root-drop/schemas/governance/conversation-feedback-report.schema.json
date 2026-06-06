@@ -1,0 +1,331 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/conversation-feedback-report.schema.json",
+  "title": "ATM Conversation Feedback Report v0.1",
+  "description": "Immediate acknowledgement and user-choice report for conversation-derived criticism findings. This report records feedback prompts and suppression decisions without mutating files, skills, atoms, maps, or registry state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "generatedAt",
+    "rendererName",
+    "sourceFindingsReport",
+    "privacy",
+    "summary",
+    "events",
+    "draftOnly"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.conversationFeedbackReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rendererName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceFindingsReport": {
+      "$ref": "#/$defs/sourceFindingsReport"
+    },
+    "privacy": {
+      "$ref": "#/$defs/privacy"
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "draftOnly": {
+      "$ref": "#/$defs/draftOnly"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sourceFindingsReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaId", "transcriptId", "findingIds"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.conversationReviewFindingsReport"
+        },
+        "artifactPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transcriptId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "findingIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["redacted", "containsSensitiveInput", "redactionReportPaths"],
+      "properties": {
+        "redacted": {
+          "const": true
+        },
+        "containsSensitiveInput": {
+          "type": "boolean"
+        },
+        "redactionReportPaths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "containsSensitiveInput": {
+                "const": true
+              }
+            },
+            "required": ["containsSensitiveInput"]
+          },
+          "then": {
+            "properties": {
+              "redactionReportPaths": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalFindings",
+        "totalEvents",
+        "recordedEvidenceCount",
+        "promptCount",
+        "draftNowCount",
+        "deferredCount",
+        "suppressedCount",
+        "overrideCount"
+      ],
+      "properties": {
+        "totalFindings": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "totalEvents": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "recordedEvidenceCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "promptCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "draftNowCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deferredCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "suppressedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overrideCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eventId",
+        "sourceFindingId",
+        "findingKind",
+        "targetSurface",
+        "patternTags",
+        "suppressionKey",
+        "occurrenceCount",
+        "userChoice",
+        "promptAction",
+        "shouldAskAgain",
+        "feedbackMessage",
+        "sourceTranscriptRefs",
+        "evidenceRefs",
+        "nextSteps"
+      ],
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceFindingId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "findingKind": {
+          "enum": ["style-format-correction", "workflow-adjustment", "non-trivial-debug-path", "stale-or-wrong-skill"]
+        },
+        "targetSurface": {
+          "enum": ["host-local-overlay", "skill", "atom-spec", "atom-map", "observation"]
+        },
+        "targetId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "patternTags": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "suppressionKey": {
+          "type": "string",
+          "pattern": "^surface=[^|]+\\|target=[^|]+\\|kind=[^|]+\\|tags=[^|]+$"
+        },
+        "occurrenceCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "userChoice": {
+          "enum": ["Y", "N", "X", "none"]
+        },
+        "promptAction": {
+          "enum": ["ask-user", "create-dry-run-draft", "record-only-ask-later", "record-only-suppressed", "override-review-advisory"]
+        },
+        "shouldAskAgain": {
+          "type": "boolean"
+        },
+        "overrideReason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feedbackMessage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceTranscriptRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "nextSteps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "promptAction": {
+                "const": "override-review-advisory"
+              }
+            },
+            "required": ["promptAction"]
+          },
+          "then": {
+            "required": ["overrideReason"]
+          }
+        }
+      ]
+    },
+    "draftOnly": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["appliesAutomatically", "mutatesFiles", "mutatesRegistry", "mutatesSkillFiles", "requiresHumanReview"],
+      "properties": {
+        "appliesAutomatically": {
+          "const": false
+        },
+        "mutatesFiles": {
+          "const": false
+        },
+        "mutatesRegistry": {
+          "const": false
+        },
+        "mutatesSkillFiles": {
+          "const": false
+        },
+        "requiresHumanReview": {
+          "const": true
+        }
+      }
+    }
+  }
+}

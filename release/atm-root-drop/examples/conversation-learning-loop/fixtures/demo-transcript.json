@@ -1,0 +1,51 @@
+{
+  "description": "M14 conversation learning loop demo transcript covering findings, feedback choices, and dry-run draft routing.",
+  "input": {
+    "generatedAt": "2026-05-17T03:00:00.000Z",
+    "transcript": {
+      "schemaId": "atm.conversationTranscript",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Conversation learning loop demo transcript."
+      },
+      "transcriptId": "transcript.conversation-learning.001",
+      "sessionId": "session.conversation-learning.001",
+      "window": "2026-W20",
+      "redacted": true,
+      "containsSensitiveInput": true,
+      "artifactPaths": ["examples/conversation-learning-loop/artifacts/demo-transcript.redacted.jsonl"],
+      "redactionReportPaths": ["examples/conversation-learning-loop/artifacts/demo-transcript.redaction.json"],
+      "turns": [
+        {
+          "turnId": "turn-001",
+          "role": "user",
+          "content": "Please be shorter next time and keep the answer in checklist format.",
+          "confidence": 0.91
+        },
+        {
+          "turnId": "turn-002",
+          "role": "user",
+          "content": "You missed step order; the missing preflight belongs before the scan.",
+          "atomId": "ATM-CORE-0001",
+          "confidence": 0.89
+        },
+        {
+          "turnId": "turn-003",
+          "role": "user",
+          "content": "After several failed attempts, the final fix created a reusable debugging path.",
+          "skillId": "debug-loop",
+          "confidence": 0.86
+        },
+        {
+          "turnId": "turn-004",
+          "role": "user",
+          "content": "The loaded skill used a wrong command sequence; atm-upgrade-scan is outdated.",
+          "skillId": "atm-upgrade-scan",
+          "confidence": 0.93
+        }
+      ]
+    }
+  }
+}

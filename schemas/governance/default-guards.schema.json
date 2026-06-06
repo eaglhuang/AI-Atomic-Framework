@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/default-guards.schema.json",
+  "title": "ATM Default Guards v0.1",
+  "description": "Machine-readable starter guard set written into a host repository during ATM bootstrap.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "schemaVersion",
+    "migration",
+    "generatedAt",
+    "repositoryKind",
+    "guards"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.defaultGuards"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "schemaVersion": {
+      "const": "atm.defaultGuards.v0.1"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repositoryKind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "versionContract": {
+      "$ref": "#/$defs/versionContract"
+    },
+    "guards": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/guard"
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "fromVersion",
+        "notes"
+      ],
+      "properties": {
+        "strategy": {
+          "enum": [
+            "none",
+            "additive",
+            "breaking"
+          ]
+        },
+        "fromVersion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "versionContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "atmChartVersion",
+        "minFrameworkVersion",
+        "templateVersion"
+      ],
+      "properties": {
+        "atmChartVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+        },
+        "minFrameworkVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+        },
+        "templateVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+        }
+      }
+    },
+    "guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]+$"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -eu
+# ATM_INTEGRATION_HOOK_CONTRACT_V1
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+node atm.mjs hook pre-commit --json

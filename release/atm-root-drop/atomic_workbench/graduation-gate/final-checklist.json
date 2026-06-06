@@ -1,0 +1,111 @@
+{
+  "schemaId": "atm.atmSelfAtomizationGraduationChecklist.v1",
+  "specVersion": "1.0.0",
+  "generatedAt": "2026-05-26T02:00:00.000Z",
+  "generatedBy": "TASK-ASA-0016",
+  "criteria": [
+    {
+      "name": "source_ownership_coverage",
+      "description": "Every production source path has atom/map ownership",
+      "source": "dogfood-score.scores.source_ownership_coverage",
+      "threshold": { "fail": 80, "pass": 95 }
+    },
+    {
+      "name": "public_command_coverage",
+      "description": "Every public CLI command has command-spec coverage",
+      "source": "dogfood-score.scores.public_command_coverage",
+      "threshold": { "fail": 80, "pass": 95 }
+    },
+    {
+      "name": "atom_with_test_evidence",
+      "description": "Atoms have test evidence attached",
+      "source": "dogfood-score.scores.atom_with_test_evidence",
+      "threshold": { "fail": 60, "pass": 80 }
+    },
+    {
+      "name": "atom_with_rollback_evidence",
+      "description": "Atoms have rollback evidence attached",
+      "source": "dogfood-score.scores.atom_with_rollback_evidence",
+      "threshold": { "fail": 50, "pass": 70 }
+    },
+    {
+      "name": "excluded_paths_with_reason",
+      "description": "All excluded paths have explicit reasons",
+      "source": "dogfood-score.scores.excluded_paths_with_reason",
+      "threshold": { "fail": 90, "pass": 95 }
+    },
+    {
+      "name": "runAtm_with_readable_ref",
+      "description": "All runAtm callsites use semantic readable refs",
+      "source": "dogfood-score.scores.runAtm_with_readable_ref",
+      "threshold": { "fail": 95, "pass": 100 }
+    },
+    {
+      "name": "overall_atomization_score",
+      "description": "Overall weighted atomization score",
+      "source": "dogfood-score.overall_atomization_score",
+      "threshold": { "fail": 70, "pass": 85 }
+    },
+    {
+      "name": "top_level_maps_catalog_exists",
+      "description": "Top-level maps catalog exists with 7 maps",
+      "source": "report-exists:atomic_workbench/maps/top-level-maps-catalog.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "exclusion_inventory_exists",
+      "description": "Exclusion inventory documents all excluded paths",
+      "source": "report-exists:atomic_workbench/atomization-coverage/exclusion-inventory.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "path_to_atom_map_exists",
+      "description": "Path-to-atom mapping exists with granular coverage",
+      "source": "report-exists:atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "release_build_atomization_report",
+      "description": "Release builders are atomized and traceable",
+      "source": "report-exists:atomic_workbench/reports/release-build-atomization.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "integration_agent_pack_enforcement",
+      "description": "Integration adapters enforce atomization at agent loop",
+      "source": "report-exists:atomic_workbench/reports/integration-agent-pack-enforcement.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "validator_to_atom_relationship",
+      "description": "Each validator is linked to the atom it produces evidence for",
+      "source": "report-exists:atomic_workbench/reports/validator-to-atom-relationship.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "behavior_pack_atomization",
+      "description": "Behavior pack atoms with trigger/evidence/gate/rollback",
+      "source": "report-exists:atomic_workbench/reports/behavior-pack-atomization.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "git_head_evidence_policy",
+      "description": "Git HEAD evidence attachment policy documented",
+      "source": "report-exists:atomic_workbench/reports/git-head-evidence-policy.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    },
+    {
+      "name": "release_readiness_evidence_bundle",
+      "description": "Release readiness evidence bundle compiled",
+      "source": "report-exists:atomic_workbench/reports/release-readiness-evidence-bundle.json",
+      "requiredState": "pass-or-explicit-exclusion"
+    }
+  ],
+  "ciIntegration": {
+    "command": "npm run validate:atm-self-atomization",
+    "blocksRelease": true,
+    "addedToValidatorOrchestrator": "scripts/run-validators.ts full preset",
+    "evidenceArtifact": ".atm/history/evidence/atm-self-atomization-graduation.json"
+  },
+  "graduationDecisionRecord": "atomic_workbench/graduation-gate/graduation-decision-record.md"
+}

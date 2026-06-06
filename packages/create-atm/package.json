@@ -1,0 +1,32 @@
+{
+  "name": "create-atm",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Create an ATM governance framework starter project with optional agent pack onboarding.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "create-atm": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/create-atm",
+    "test": "node --strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@ai-atomic-framework/cli": "0.1.0"
+  },
+  "types": "./dist/index.d.ts"
+}

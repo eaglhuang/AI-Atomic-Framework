@@ -1,0 +1,55 @@
+{
+  "schemaId": "atm.infectAdapter",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive infect adapter fixture."
+  },
+  "adapterName": "@ai-atomic-framework/adapter-local-git",
+  "lifecycleMode": "evolution",
+  "ok": false,
+  "operation": "adapter",
+  "mode": "dry-run",
+  "dryRun": true,
+  "noop": false,
+  "messages": [
+    "behavior.infect adapter blocked dry-run patch contract because neutrality violations were detected."
+  ],
+  "evidence": [],
+  "lockRecords": [],
+  "artifacts": [],
+  "registryPath": ".atm/registry",
+  "resolvedLegacyUri": {
+    "uri": "legacy://repo/src/legacy-source.ts#L5-L8",
+    "scheme": "legacy",
+    "repositoryAlias": "repo",
+    "relativePath": "src/legacy-source.ts",
+    "lineStart": 5,
+    "lineEnd": 8,
+    "fragment": "L5-L8",
+    "absolutePath": "C:/tmp/repo/src/legacy-source.ts",
+    "exists": false
+  },
+  "dryRunPatch": {
+    "contractId": "adapter-infect:legacy___repo_src_legacy-source.ts_L5-L8",
+    "behaviorId": "behavior.infect",
+    "dryRun": true,
+    "applyToHostProject": false,
+    "hostMutationAllowed": false,
+    "patchMode": "dry-run",
+    "proposalSource": "ATM-2-0020",
+    "decompositionDecision": "atom-extract",
+    "patchFiles": [
+      "atomic_workbench/maps/ATM-FIXTURE-0001.map.json"
+    ]
+  },
+  "neutrality": {
+    "ok": false,
+    "violationCount": 1,
+    "bannedTerms": [
+      "adopter-private-token"
+    ],
+    "scannedPath": "src/legacy-source.ts"
+  }
+}

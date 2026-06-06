@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Negative fixture with invalid inputMutation."
+  },
+  "id": "atom.invalid-performance-budget",
+  "title": "Invalid Performance Budget Atom",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [".js"]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": ["filesystem"]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "canonicalization": "json-stable-v1"
+  },
+  "performanceBudget": {
+    "hotPath": true,
+    "inputMutation": "mutate-in-place"
+  }
+}

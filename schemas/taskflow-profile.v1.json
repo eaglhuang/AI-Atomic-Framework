@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TaskflowProfileV1",
+  "description": "Schema for ATM taskflow profile adapter specification v1",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "id",
+    "name",
+    "repoLabel",
+    "ownerRepo",
+    "taskIdPrefix",
+    "taskId",
+    "template",
+    "capabilities",
+    "delegation"
+  ],
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "enum": ["taskflow.profile.v1"]
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "repoLabel": {
+      "type": "string"
+    },
+    "ownerRepo": {
+      "type": "string"
+    },
+    "taskIdPrefix": {
+      "type": "string"
+    },
+    "taskId": {
+      "type": "object",
+      "required": ["format"],
+      "properties": {
+        "format": {
+          "type": "string"
+        }
+      }
+    },
+    "template": {
+      "type": "object",
+      "required": ["defaultMarkdown"],
+      "properties": {
+        "defaultMarkdown": {
+          "type": "string"
+        },
+        "namedTemplates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["supportsDryRun", "supportsWrite"],
+      "properties": {
+        "supportsDryRun": {
+          "type": "boolean"
+        },
+        "supportsWrite": {
+          "type": "boolean"
+        }
+      }
+    },
+    "delegationDisplayHint": {
+      "type": "string"
+    },
+    "delegation": {
+      "type": "object",
+      "required": ["hint"],
+      "properties": {
+        "hint": {
+          "type": "string"
+        },
+        "openerPath": {
+          "type": "string"
+        },
+        "writerInvocation": {
+          "type": "object",
+          "properties": {
+            "describeOnly": {
+              "type": "boolean"
+            },
+            "displayHint": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

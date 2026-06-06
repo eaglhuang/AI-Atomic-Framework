@@ -1,0 +1,182 @@
+{
+  "description": "Adopter-managed map member lineage fixture for registry-diff and onefile smoke.",
+  "atomId": "ATM-NPCBRAIN-0002",
+  "fromVersion": "0.1.0",
+  "toVersion": "0.1.1",
+  "registryDocument": {
+    "schemaId": "atm.registry",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Adopter lineage fixture."
+    },
+    "registryId": "registry.adopter-lineage",
+    "generatedAt": "2026-05-20T00:00:00.000Z",
+    "entries": [
+      {
+        "schemaId": "atm.atomicMap",
+        "specVersion": "0.2.0",
+        "schemaPath": "schemas/registry/atomic-map.schema.json",
+        "mapId": "ATM-MAP-0001",
+        "mapVersion": "0.1.0",
+        "members": [
+          {
+            "atomId": "ATM-NPCBRAIN-0002",
+            "version": "0.1.0",
+            "role": "domain-step",
+            "versionLineage": {
+              "currentVersion": "0.1.1",
+              "versions": [
+                {
+                  "version": "0.1.0",
+                  "specHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+                  "codeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+                  "testHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+                  "timestamp": "2026-05-19T00:00:00.000Z"
+                },
+                {
+                  "version": "0.1.1",
+                  "specHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                  "codeHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+                  "testHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+                  "timestamp": "2026-05-20T00:00:00.000Z"
+                }
+              ],
+              "sourceRef": "atomic_workbench/maps/ATM-MAP-0001/lineage-log.json",
+              "advisory": "Backfilled from adopter lineage evidence.",
+              "updatedAt": "2026-05-20T00:00:00.000Z"
+            }
+          },
+          {
+            "atomId": "ATM-NPCBRAIN-0003",
+            "version": "0.1.0",
+            "role": "validator"
+          }
+        ],
+        "edges": [
+          {
+            "from": "ATM-NPCBRAIN-0002",
+            "to": "ATM-NPCBRAIN-0003",
+            "binding": "external-summary",
+            "edgeKind": "data-flow"
+          }
+        ],
+        "entrypoints": [
+          "ATM-NPCBRAIN-0002"
+        ],
+        "qualityTargets": {
+          "promoteGateRequired": true,
+          "requiredChecks": 1
+        },
+        "mapHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "replacement": {
+          "legacyUris": [
+            "legacy://pipelines/sanguo-rag/run_full_roster_convergence_loop.py#full-roster-convergence-orchestrator"
+          ],
+          "mode": "active",
+          "evidenceRefs": [
+            "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+            "atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json"
+          ]
+        },
+        "status": "active",
+        "governance": {
+          "tier": "standard"
+        },
+        "lineageLogRef": "atomic_workbench/maps/ATM-MAP-0001/lineage-log.json",
+        "location": {
+          "specPath": "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
+          "codePaths": [],
+          "testPaths": [
+            "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.ts"
+          ],
+          "reportPath": "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+          "workbenchPath": "atomic_workbench/maps/ATM-MAP-0001"
+        },
+        "evidence": [
+          "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+          "atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json",
+          "atomic_workbench/maps/ATM-MAP-0001/lineage-log.json"
+        ]
+      }
+    ]
+  },
+  "missingLineageRegistryDocument": {
+    "schemaId": "atm.registry",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Adopter lineage fixture without member lineage."
+    },
+    "registryId": "registry.adopter-lineage",
+    "generatedAt": "2026-05-20T00:00:00.000Z",
+    "entries": [
+      {
+        "schemaId": "atm.atomicMap",
+        "specVersion": "0.2.0",
+        "schemaPath": "schemas/registry/atomic-map.schema.json",
+        "mapId": "ATM-MAP-0001",
+        "mapVersion": "0.1.0",
+        "members": [
+          {
+            "atomId": "ATM-NPCBRAIN-0002",
+            "version": "0.1.0",
+            "role": "domain-step"
+          },
+          {
+            "atomId": "ATM-NPCBRAIN-0003",
+            "version": "0.1.0",
+            "role": "validator"
+          }
+        ],
+        "edges": [
+          {
+            "from": "ATM-NPCBRAIN-0002",
+            "to": "ATM-NPCBRAIN-0003",
+            "binding": "external-summary",
+            "edgeKind": "data-flow"
+          }
+        ],
+        "entrypoints": [
+          "ATM-NPCBRAIN-0002"
+        ],
+        "qualityTargets": {
+          "promoteGateRequired": true,
+          "requiredChecks": 1
+        },
+        "mapHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "replacement": {
+          "legacyUris": [
+            "legacy://pipelines/sanguo-rag/run_full_roster_convergence_loop.py#full-roster-convergence-orchestrator"
+          ],
+          "mode": "active",
+          "evidenceRefs": [
+            "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+            "atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json"
+          ]
+        },
+        "status": "active",
+        "governance": {
+          "tier": "standard"
+        },
+        "lineageLogRef": "atomic_workbench/maps/ATM-MAP-0001/lineage-log.json",
+        "location": {
+          "specPath": "atomic_workbench/maps/ATM-MAP-0001/map.spec.json",
+          "codePaths": [],
+          "testPaths": [
+            "atomic_workbench/maps/ATM-MAP-0001/map.integration.test.ts"
+          ],
+          "reportPath": "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+          "workbenchPath": "atomic_workbench/maps/ATM-MAP-0001"
+        },
+        "evidence": [
+          "atomic_workbench/maps/ATM-MAP-0001/map.test.report.json",
+          "atomic_workbench/maps/ATM-MAP-0001/map.equivalence.report.json",
+          "atomic_workbench/maps/ATM-MAP-0001/lineage-log.json"
+        ]
+      }
+    ]
+  }
+}

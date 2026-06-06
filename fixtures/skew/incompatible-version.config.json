@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "atm.skewMatrix.v0.1",
+  "description": "Negative fixture: CLI version is outside the alpha supported minor window and must fail validation.",
+  "releaseTrain": {
+    "frameworkVersion": "0.0.0",
+    "atmChartVersion": "0.1.0",
+    "agentTemplateVersion": "0.1.0"
+  },
+  "supportedMinorWindow": ["0.0"],
+  "axes": {
+    "cli": [
+      {
+        "id": "cli-future",
+        "packagePath": "packages/cli",
+        "version": "9.0.0"
+      }
+    ],
+    "pluginSdk": [
+      {
+        "id": "plugin-sdk-current",
+        "packagePath": "packages/plugin-sdk",
+        "version": "0.0.0"
+      }
+    ],
+    "adapters": [
+      {
+        "id": "local-git",
+        "kind": "plugin-adapter",
+        "packagePath": "packages/adapter-local-git",
+        "version": "0.0.0",
+        "smoke": "validate-local-git-adapter"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "future-cli-plugin-sdk-local-git",
+      "cli": "cli-future",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "local-git",
+      "expected": "pass"
+    }
+  ]
+}

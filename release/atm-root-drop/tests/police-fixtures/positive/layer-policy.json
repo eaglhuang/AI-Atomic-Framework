@@ -1,0 +1,36 @@
+{
+  "schemaId": "atm.layerPolicy",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial layer policy fixture."
+  },
+  "rules": [
+    {
+      "fromLayer": "core",
+      "allowedToLayers": ["core"],
+      "explanation": "Core stays implementation-neutral."
+    },
+    {
+      "fromLayer": "compute",
+      "allowedToLayers": ["core", "compute"],
+      "explanation": "Compute atoms may use core contracts and peer compute atoms."
+    },
+    {
+      "fromLayer": "effect",
+      "allowedToLayers": ["core", "compute", "effect"],
+      "explanation": "Effect atoms may call stable compute contracts."
+    },
+    {
+      "fromLayer": "adapter",
+      "allowedToLayers": ["core"],
+      "explanation": "Adapters depend on core contracts, not the reverse."
+    },
+    {
+      "fromLayer": "plugin",
+      "allowedToLayers": ["core", "plugin"],
+      "explanation": "Plugins may depend on core contracts and peer plugin contracts."
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+# Changelog
+
+## 2026-05-20
+
+- Added root `node atm.mjs --version` support with a deterministic JSON result envelope and CLI validation coverage, keeping the README quick reference aligned with release artifacts.
+
+## 2026-05-17
+
+- Closed replacement evidence gating for M10: added `atm.propagationReport` and `atm.retirementProof`, required propagation/review/human approval before `canary -> active`, and allowed `legacy-retired` promotion through rollback proof or caller/entrypoint-cleared retirement proof.
+- Added ScopeLock 0.2.0 map selectors and polymorph impact gating: `scope-lock` now round-trips `0.1.0` and `0.2.0`, `upgrade --propose --replacement-mode active` can require `--polymorph-impact-report`, and active map proposals now validate impacted instance maps for template-bound members.
+- Hardened spec-based map provisioning: `create-map --spec <path>` now validates `atm.atomicMap` JSON Schema, preserves `0.2.0` replacement metadata, emits machine-readable `nextActionHint`, and includes Windows PowerShell path smoke coverage.
+- Added decomposition-plan map provisioning: `atm.decompositionPlan` schema, `create-map --from-plan <path>`, sample checkout-mini plan, and CLI smoke coverage including spec round-trip into canonical map workspaces.
+- Added `replacement-lane transition` for atomic maps: explicit `draft -> shadow -> canary -> active -> legacy-retired` validation, lineage transition logging, and registry-status-independent replacement mode updates.
+- Added map upgrade evidence gates: `upgrade --propose --target map` now supports `--replacement-mode`, `--equivalence-report`, and `--rollback-proof`, and blocks `active` / `legacy-retired` proposals without the required evidence.
+- Delivered M9/M10 integration rollout proof: framework-neutral agent onboarding flow example, multi-agent charter/first-command results, integration rollout metrics schema, and adapter rollout sample validation.
+- Delivered M7/M8 agent entry hardening: framework-neutral skill templates, multi-agent skill compiler output, source template validation, POSIX/PowerShell root-drop wrappers, and script parity validation.
+- Delivered M6 integration lifecycle CLI: `atm integration list/add/verify/remove`, `atm init --integration <id>`, per-adapter manifests, and `atm doctor` integration drift checks.
+- Added `test --map --equivalence-fixtures <path>` with delegated map/legacy executor comparison, report output, known-divergence handling, and CLI coverage.
+- Delivered atomic map schema 0.2.0 replacement surface support with member roles, edge kinds, replacement metadata, hash-boundary tests, and 0.1.0 compatibility fixtures.
+- Added the map equivalence report schema, fixtures, schema validation coverage, and `atm spec --validate` support for map equivalence reports.
+- Delivered M5 agent adapters for Claude Code, GitHub Copilot, Cursor, and Gemini, each with seven ATM entrypoints, charter invariant placeholders, first-command routing, and shared manifest validation.
+- Delivered M4 Integration Adapter contract: `packages/integrations-core`, install manifest schema, Codex skills reference adapter validation, and `validate:integration-adapter` in the standard suite.
+
+## 2026-05-12
+
+- Delivered ATM v0.2 phase-3 portable onefile pipeline.
+- Removed remaining `@ts-nocheck` debt across core governance flows.
+- Converged npm-first tooling and governance entrypoints.
+
+## 2026-05-11
+
+- Added adopter-local workbench localization migration guidance.
+- Removed adopter-derived artifacts from protected upstream surfaces.
+- Added polymorphic template and dimension contracts (ATM-2-0032).
+- Added non-blocking review advisory provider flow (ATM-2-0035).
+- Delivered case-study pilots ATM-4-0004 and ATM-4-0008.
+- Implemented map evolution routing (ATM-2-0024).
+
+## 2026-05-10
+
+- Added inject rollback dry-run plans in case-study fixtures.
+
+## 2026-05-09
+
+- Added legacy dry-run adapter contract.
+- Implemented lifecycle police plugin (ATM-2-0031).
+- Completed consolidated behavior pack delivery (ATM-2-0029).
+- Backfilled missing semantic fingerprints.
+- Completed atomic map provenance family ATM-2-0043 to ATM-2-0046.
+- Implemented AtomBehavior Plugin SDK with evolve delegation guard (ATM-2-0028).
+- Implemented atom/map status state machine with governance tiers (ATM-2-0027).
+
+## 2026-05-08
+
+- Refreshed generator provenance evidence.
+- Added semantic fingerprint extension (ATM-2-0026).
+- Finalized review gate command flow (ATM-2-0021).
+
+## 2026-05-07
+
+- Added registry version-history scaffolding: `currentVersion`, `versions[]`, an in-memory upcast helper, and legacy/versioned fixtures.
+
+## 2026-05-06
+
+- Phase B1 complete: the seed now has committed self-description, committed self-verification, and governed registry status.
+- Legacy planning ID ATM-CORE-0001 remains as metadata, while ATM-CORE-0002 now governs the retained hand-written seed source.

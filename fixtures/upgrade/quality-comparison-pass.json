@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.police.qualityComparisonReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Upgrade proposal quality comparison pass fixture."
+  },
+  "reportId": "police.upgrade-quality-pass.fixture",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "lifecycleMode": "evolution",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "1.0.0",
+  "toVersion": "1.1.0",
+  "metrics": [
+    {
+      "name": "errorRate",
+      "baseline": 0.02,
+      "current": 0.01,
+      "delta": -0.01,
+      "direction": "lower-is-better",
+      "tolerance": 0,
+      "passed": true
+    },
+    {
+      "name": "coverage",
+      "baseline": 0.9,
+      "current": 0.95,
+      "delta": 0.05,
+      "direction": "higher-is-better",
+      "tolerance": 0,
+      "passed": true
+    },
+    {
+      "name": "latency",
+      "baseline": 45,
+      "current": 44,
+      "delta": -1,
+      "direction": "lower-is-better",
+      "tolerance": 50,
+      "passed": true
+    },
+    {
+      "name": "edgeCaseCount",
+      "baseline": 2,
+      "current": 3,
+      "delta": 1,
+      "direction": "higher-is-better",
+      "tolerance": 0,
+      "passed": true
+    }
+  ],
+  "regressed": false,
+  "passed": true,
+  "mapImpactScope": {
+    "affectedMapIds": ["ATM-MAP-0001"],
+    "propagationStatus": [
+      {
+        "mapId": "ATM-MAP-0001",
+        "integrationTestPassed": true,
+        "message": "All map tests green."
+      }
+    ]
+  }
+}

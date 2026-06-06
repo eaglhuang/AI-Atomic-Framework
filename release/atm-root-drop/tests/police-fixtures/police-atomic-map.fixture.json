@@ -1,0 +1,27 @@
+{
+  "mapId": "ATM-MAP-9101",
+  "mapVersion": "0.1.0",
+  "members": [
+    { "atomId": "ATM-POLICE-0001", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0002", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0003", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0004", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0005", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0006", "version": "0.1.0" },
+    { "atomId": "ATM-POLICE-0007", "version": "0.1.0" }
+  ],
+  "edges": [
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0001", "binding": "emits-report-contract" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0002", "binding": "validates-report-shapes" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0003", "binding": "checks-map-dag" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0004", "binding": "checks-import-policy" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0005", "binding": "checks-forbidden-patterns" },
+    { "from": "ATM-POLICE-0007", "to": "ATM-POLICE-0006", "binding": "checks-promote-gate" }
+  ],
+  "entrypoints": ["ATM-POLICE-0007"],
+  "qualityTargets": {
+    "cycleCount": 0,
+    "requiredChecks": 6,
+    "evolutionPromoteGate": "all-required-reports-pass"
+  }
+}

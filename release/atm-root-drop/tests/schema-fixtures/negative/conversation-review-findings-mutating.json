@@ -1,0 +1,55 @@
+{
+  "schemaId": "atm.conversationReviewFindingsReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Invalid fixture: conversation findings must remain draft-only."
+  },
+  "generatedAt": "2026-05-17T00:00:00.000Z",
+  "reviewerName": "deterministic-conversation-skill-reviewer",
+  "sourceTranscript": {
+    "transcriptId": "transcript.conv-review.invalid",
+    "artifactPaths": ["artifacts/conversation-review/transcript-invalid.redacted.jsonl"]
+  },
+  "privacy": {
+    "redacted": true,
+    "containsSensitiveInput": false,
+    "redactionReportPaths": []
+  },
+  "summary": {
+    "totalFindings": 1,
+    "draftCount": 1,
+    "observationCount": 0,
+    "findingKinds": ["workflow-adjustment"]
+  },
+  "findings": [
+    {
+      "findingId": "finding.conv-review.invalid.001",
+      "findingKind": "workflow-adjustment",
+      "signalKind": "user-correction",
+      "signalScope": "atom",
+      "atomId": "ATM-CORE-0001",
+      "confidence": 0.8,
+      "sourceTranscriptRefs": ["transcript.conv-review.invalid#turn-001"],
+      "evidenceRefs": ["evidence.conv.invalid.user-correction.ATM-CORE-0001"],
+      "recommendedTarget": "atom-patch-draft",
+      "recommendation": "draft-atom-patch",
+      "rationale": "Invalid because the report claims it can apply automatically.",
+      "patchDraft": {
+        "draftKind": "atom-patch",
+        "patchMode": "dry-run",
+        "mutatesFiles": false,
+        "mutatesRegistry": false,
+        "requiresHumanReview": true,
+        "summary": "Invalid mutating report."
+      }
+    }
+  ],
+  "draftOnly": {
+    "appliesAutomatically": true,
+    "mutatesRegistry": false,
+    "mutatesSkillFiles": false,
+    "requiresHumanReview": true
+  }
+}

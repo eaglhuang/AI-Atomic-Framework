@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/infect-adapter.schema.json",
+  "title": "ATM Infect Adapter Contract v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "adapterName",
+    "lifecycleMode",
+    "ok",
+    "operation",
+    "mode",
+    "dryRun",
+    "noop",
+    "messages",
+    "evidence",
+    "lockRecords",
+    "artifacts",
+    "registryPath",
+    "resolvedLegacyUri",
+    "dryRunPatch",
+    "neutrality"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.infectAdapter"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "../governance/adapter-report.schema.json#/$defs/migration"
+    },
+    "adapterName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lifecycleMode": {
+      "enum": ["birth", "evolution"]
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "operation": {
+      "const": "adapter"
+    },
+    "mode": {
+      "const": "dry-run"
+    },
+    "dryRun": {
+      "const": true
+    },
+    "noop": {
+      "const": false
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "lockRecords": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "registryPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resolvedLegacyUri": {
+      "$ref": "#/$defs/resolvedLegacyUri"
+    },
+    "dryRunPatch": {
+      "$ref": "#/$defs/dryRunPatch"
+    },
+    "neutrality": {
+      "$ref": "#/$defs/neutrality"
+    }
+  },
+  "$defs": {
+    "resolvedLegacyUri": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uri",
+        "scheme",
+        "repositoryAlias",
+        "relativePath",
+        "lineStart",
+        "lineEnd",
+        "fragment",
+        "absolutePath",
+        "exists"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^legacy://"
+        },
+        "scheme": {
+          "const": "legacy"
+        },
+        "repositoryAlias": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relativePath": {
+          "type": "string"
+        },
+        "lineStart": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "lineEnd": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "fragment": {
+          "type": ["string", "null"]
+        },
+        "absolutePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exists": {
+          "type": "boolean"
+        }
+      }
+    },
+    "dryRunPatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contractId",
+        "behaviorId",
+        "dryRun",
+        "applyToHostProject",
+        "hostMutationAllowed",
+        "patchMode",
+        "proposalSource",
+        "decompositionDecision",
+        "patchFiles"
+      ],
+      "properties": {
+        "contractId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "behaviorId": {
+          "const": "behavior.infect"
+        },
+        "dryRun": {
+          "const": true
+        },
+        "applyToHostProject": {
+          "const": false
+        },
+        "hostMutationAllowed": {
+          "const": false
+        },
+        "patchMode": {
+          "const": "dry-run"
+        },
+        "proposalSource": {
+          "const": "ATM-2-0020"
+        },
+        "decompositionDecision": {
+          "const": "atom-extract"
+        },
+        "patchFiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "neutrality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "violationCount", "bannedTerms", "scannedPath"],
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "violationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bannedTerms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scannedPath": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

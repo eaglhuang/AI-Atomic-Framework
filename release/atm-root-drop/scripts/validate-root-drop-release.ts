@@ -1,0 +1,202 @@
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { buildRootDropRelease } from './build-root-drop-release.ts';
+import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const governanceRouterSkillRelativePath = path.join('integrations', 'codex-skills', 'atm-governance-router', 'SKILL.md');
+const mode = process.argv.includes('--mode')
+  ? process.argv[process.argv.indexOf('--mode') + 1]
+  : 'validate';
+const adopterLineageFixture = JSON.parse(readFileSync(path.join(root, 'tests/registry-fixtures/adopter-lineage.fixture.json'), 'utf8'));
+
+function fail(message: any) {
+  console.error(`[root-drop-release:${mode}] ${message}`);
+  process.exitCode = 1;
+}
+
+function assert(condition: any, message: any) {
+  if (!condition) {
+    fail(message);
+  }
+}
+
+function runAtm(cwd: any, args: any) {
+  const result = spawnSync(process.execPath, [path.join(cwd, 'atm.mjs'), ...args], {
+    cwd,
+    encoding: 'utf8'
+  });
+  const payload = (result.stdout || result.stderr || '').trim();
+  return {
+    exitCode: result.status ?? 0,
+    parsed: payload ? JSON.parse(payload) : {}
+  };
+}
+
+function runGit(cwd: any, args: any) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  assert(result.status === 0, `git ${args.join(' ')} must exit 0`);
+  return result.stdout.trim();
+}
+
+function tryReadHeadCommitSha(cwd: any) {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' });
+  return result.status === 0 ? result.stdout.trim() : null;
+}
+
+function refreshOnboarding(cwd: any) {
+  const atmChart = runAtm(cwd, ['atm-chart', 'render', '--cwd', '.', '--json']);
+  assert(atmChart.exitCode === 0, 'blank root-drop repo atm-chart render must exit 0 after bootstrap');
+  assert(atmChart.parsed.ok === true, 'blank root-drop repo atm-chart render must report ok=true after bootstrap');
+
+  const welcome = runAtm(cwd, ['welcome', '--cwd', '.', '--json']);
+  assert(welcome.exitCode === 0, 'blank root-drop repo welcome must exit 0 after bootstrap');
+  assert(welcome.parsed.ok === true, 'blank root-drop repo welcome must report ok=true after bootstrap');
+}
+
+function installFrameworkHooks(cwd: any, label: string) {
+  const install = runAtm(cwd, ['integration', 'hooks', 'install', 'copilot', '--json']);
+  assert(install.exitCode === 0, `${label} framework hook install must exit 0`);
+  assert(install.parsed.ok === true, `${label} framework hook install must report ok=true`);
+}
+
+function writeGitHeadEvidence(cwd: any) {
+  const commitSha = tryReadHeadCommitSha(cwd);
+  if (!commitSha) return;
+  const evidencePath = path.join(cwd, '.atm', 'history', 'evidence', 'git-head.jsonl');
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  writeFileSync(evidencePath, `${JSON.stringify({
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        summary: 'Release validator covered the current Git HEAD before doctor.',
+        artifactPaths: [],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        producedBy: 'validate-root-drop-release',
+        details: {
+          git: { commitSha }
+        }
+      }
+    ]
+  })}\n`, 'utf8');
+}
+
+function writeAdopterBackfillFixture(cwd: any) {
+  const lineageLogPath = path.join(cwd, 'atomic_workbench', 'maps', 'ATM-MAP-0001', 'lineage-log.json');
+  mkdirSync(path.dirname(lineageLogPath), { recursive: true });
+  writeFileSync(path.join(cwd, 'atomic-registry.json'), `${JSON.stringify(adopterLineageFixture.missingLineageRegistryDocument, null, 2)}\n`, 'utf8');
+  writeFileSync(lineageLogPath, `${JSON.stringify({
+    schemaId: 'atm.mapLineageLog',
+    specVersion: '0.1.0',
+    canonicalMapId: 'ATM-MAP-0001',
+    generatedAt: '2026-05-20T00:00:00.000Z',
+    versionLineage: adopterLineageFixture.registryDocument.entries[0].members[0].versionLineage
+  }, null, 2)}\n`, 'utf8');
+}
+
+const tempRoot = createTempWorkspace('atm-root-drop-release-');
+try {
+  const release = buildRootDropRelease({
+    repositoryRoot: root,
+    releaseRoot: path.join(tempRoot, 'release', 'atm-root-drop')
+  });
+  const manifest = JSON.parse(readFileSync(release.manifestPath, 'utf8'));
+  assert(existsSync(release.entrypointPath), 'release bundle must emit atm.mjs');
+  assert(existsSync(path.join(release.releaseRoot, 'packages', 'cli', 'dist', 'atm.mjs')), 'release bundle must include CLI dist entrypoint');
+  assert(existsSync(path.join(release.releaseRoot, governanceRouterSkillRelativePath)), 'release bundle must include ATM governance router skill');
+  assert(manifest.entries.includes('integrations'), 'release manifest must include integrations');
+  assert(manifest.entrypoint === 'atm.mjs', 'release manifest must preserve atm.mjs entrypoint');
+
+  const bundleRepo = path.join(tempRoot, 'bundle-repo');
+  mkdirSync(bundleRepo, { recursive: true });
+  cpSync(release.releaseRoot, bundleRepo, { recursive: true });
+  initializeGitRepository(bundleRepo);
+  installFrameworkHooks(bundleRepo, 'release bundle');
+
+  const bundleDoctor = runAtm(bundleRepo, ['doctor', '--json']);
+  assert(bundleDoctor.exitCode === 0, 'release bundle doctor must exit 0');
+  assert(bundleDoctor.parsed.ok === true, 'release bundle doctor must report ok=true');
+
+  const bundleSelfHost = runAtm(bundleRepo, ['self-host-alpha', '--verify', '--json']);
+  assert(bundleSelfHost.exitCode === 0, 'release bundle self-host-alpha must exit 0');
+  assert(bundleSelfHost.parsed.ok === true, 'release bundle self-host-alpha must report ok=true');
+
+  const registrySmokeRepo = path.join(tempRoot, 'registry-backfill-smoke');
+  mkdirSync(registrySmokeRepo, { recursive: true });
+  cpSync(release.releaseRoot, registrySmokeRepo, { recursive: true });
+  initializeGitRepository(registrySmokeRepo);
+  writeAdopterBackfillFixture(registrySmokeRepo);
+  const registryBackfill = runAtm(registrySmokeRepo, [
+    'registry',
+    'lineage',
+    'backfill',
+    '--atom',
+    adopterLineageFixture.atomId,
+    '--from',
+    adopterLineageFixture.fromVersion,
+    '--to',
+    adopterLineageFixture.toVersion,
+    '--map',
+    'ATM-MAP-0001',
+    '--registry',
+    'atomic-registry.json',
+    '--lineage-log',
+    'atomic_workbench/maps/ATM-MAP-0001/lineage-log.json',
+    '--dry-run',
+    '--json'
+  ]);
+  assert(registryBackfill.exitCode === 0, 'root-drop registry lineage backfill dry-run must exit 0');
+  assert(registryBackfill.parsed.ok === true, 'root-drop registry lineage backfill dry-run must report ok=true');
+  assert(registryBackfill.parsed.evidence?.patch?.registry?.operations?.[0]?.op === 'add', 'root-drop registry lineage backfill must emit an add patch');
+  assert(registryBackfill.parsed.evidence?.registryDiff?.driftSummary?.totalChanged === 3, 'root-drop registry lineage backfill must trigger registry-diff output');
+
+  const blankRepo = path.join(tempRoot, 'blank-repo');
+  mkdirSync(blankRepo, { recursive: true });
+  cpSync(release.releaseRoot, blankRepo, { recursive: true });
+  initializeGitRepository(blankRepo);
+
+  const nextBeforeBootstrap = runAtm(blankRepo, ['next', '--json']);
+  assert(nextBeforeBootstrap.exitCode === 1, 'blank root-drop repo next must exit 1 before bootstrap');
+  assert(nextBeforeBootstrap.parsed.evidence?.nextAction?.status === 'needs-bootstrap', 'blank root-drop repo must recommend bootstrap first');
+
+  const orient = runAtm(blankRepo, ['orient', '--cwd', '.', '--json']);
+  assert(orient.exitCode === 0, 'blank root-drop repo orient must exit 0');
+  assert(orient.parsed.ok === true, 'blank root-drop repo orient must report ok=true');
+  assert(orient.parsed.evidence?.orientation?.schemaId === 'atm.projectOrientationReport', 'blank root-drop repo orient must emit orientation report');
+
+  const start = runAtm(blankRepo, ['start', '--cwd', '.', '--goal', 'Bootstrap release bundle repo', '--json']);
+  assert(start.exitCode === 0, 'blank root-drop repo start must exit 0');
+  assert(start.parsed.ok === true, 'blank root-drop repo start must report ok=true');
+  assert(start.parsed.evidence?.guidancePacket?.nextCommand, 'blank root-drop repo start must emit guidance packet');
+
+  const explain = runAtm(blankRepo, ['explain', '--cwd', '.', '--why', 'blocked', '--json']);
+  assert(explain.exitCode === 0, 'blank root-drop repo explain must exit 0 with active guidance session');
+  assert(explain.parsed.ok === true, 'blank root-drop repo explain must report ok=true');
+
+  const bootstrap = runAtm(blankRepo, ['bootstrap', '--cwd', '.', '--task', 'Bootstrap ATM in this repository', '--json']);
+  assert(bootstrap.exitCode === 0, 'blank root-drop repo bootstrap must exit 0');
+  assert(bootstrap.parsed.ok === true, 'blank root-drop repo bootstrap must report ok=true');
+  installFrameworkHooks(blankRepo, 'blank root-drop repo');
+  refreshOnboarding(blankRepo);
+  writeGitHeadEvidence(blankRepo);
+
+  const installSkill = runAtm(blankRepo, ['guide', 'install-skill', '--cwd', '.', '--target', 'host', '--json']);
+  assert(installSkill.exitCode === 0, 'blank root-drop repo guide install-skill must exit 0');
+  assert(installSkill.parsed.ok === true, 'blank root-drop repo guide install-skill must report ok=true');
+  assert(existsSync(path.join(blankRepo, '.agents', 'skills', 'atm-governance-router', 'SKILL.md')),
+    'blank root-drop repo guide install-skill must install the governance router skill');
+
+  const doctorAfterBootstrap = runAtm(blankRepo, ['doctor', '--json']);
+  assert(doctorAfterBootstrap.exitCode === 0, 'blank root-drop repo doctor must exit 0 after bootstrap');
+  assert(doctorAfterBootstrap.parsed.ok === true, 'blank root-drop repo doctor must report ok=true after bootstrap');
+  assert(doctorAfterBootstrap.parsed.evidence.layoutVersion === 2, 'blank root-drop repo doctor must report layoutVersion=2');
+} finally {
+  rmSync(tempRoot, { recursive: true, force: true });
+}
+
+if (!process.exitCode) {
+  console.log('[root-drop-release:' + mode + '] ok (release bundle build, self-host, and blank-repo bootstrap verified)');
+}

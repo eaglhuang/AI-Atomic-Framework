@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.testReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Metrics absent fixture for backwards-compatible test reports."
+  },
+  "atomId": "ATM-FIXTURE-1001",
+  "ok": true,
+  "exitCode": 0,
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "repositoryRoot": "fixtures/test-report",
+  "specPath": "fixtures/test-report/metrics-absent.atom.json",
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "canonicalization": "json-stable-v1"
+  },
+  "validation": {
+    "evidenceRequired": false,
+    "commandCount": 1
+  },
+  "runnerContract": {
+    "executionMode": "delegated",
+    "evidenceRequired": false,
+    "commands": [
+      {
+        "commandId": "validation-1",
+        "commandKind": "test",
+        "command": "npm test",
+        "required": true
+      }
+    ]
+  },
+  "results": [
+    {
+      "commandId": "validation-1",
+      "commandKind": "test",
+      "command": "npm test",
+      "required": true,
+      "exitCode": 0,
+      "ok": true,
+      "durationMs": 18,
+      "stdout": "ok",
+      "stderr": "",
+      "signal": null
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "durationMs": 18
+  },
+  "artifacts": [
+    {
+      "artifactPath": "fixtures/test-report/metrics-absent.report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Metrics-absent report remains schema-valid for backwards compatibility.",
+      "artifactPaths": [
+        "fixtures/test-report/metrics-absent.report.json"
+      ]
+    }
+  ]
+}

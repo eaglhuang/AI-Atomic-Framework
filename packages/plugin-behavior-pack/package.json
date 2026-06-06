@@ -1,0 +1,28 @@
+{
+  "name": "@ai-atomic-framework/plugin-behavior-pack",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Consolidated reference behavior pack for ATM behavior action ids.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@ai-atomic-framework/plugin-sdk": "0.1.0"
+  },
+  "scripts": {
+    "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/plugin-behavior-pack",
+    "test": "node --strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
+  }
+}

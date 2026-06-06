@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/behavior/behavior-proposal.schema.json",
+  "title": "ATM Behavior Proposal v0.1",
+  "description": "Describes a proposal to execute an AtomBehavior action through the governance flow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "proposalId",
+    "action",
+    "entryType",
+    "requestedBy",
+    "requestedAt"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.behaviorProposal"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "proposalId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "transition.propose",
+        "transition.promote",
+        "transition.quarantine",
+        "behavior.split",
+        "behavior.merge",
+        "behavior.dedup-merge",
+        "behavior.evolve",
+        "behavior.sweep",
+        "behavior.expire",
+        "behavior.polymorphize",
+        "behavior.compose",
+        "behavior.infect",
+        "behavior.atomize"
+      ]
+    },
+    "entryType": {
+      "type": "string",
+      "enum": ["atom", "map"]
+    },
+    "atomId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mapId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requestedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "delegationTarget": {
+      "type": "string",
+      "description": "For behavior.evolve: must be ATM-2-0020:ProposeAtomicUpgrade"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

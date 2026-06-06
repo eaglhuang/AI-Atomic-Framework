@@ -1,0 +1,14 @@
+{
+  "description": "Non-lifecycle police cannot issue quarantine writer action. Only lifecycle police (via LIFECYCLE_POLICE_WRITER) may quarantine.",
+  "finding": {
+    "findingId": "police-family.dedup.quarantine-attempt",
+    "policeFamily": "dedup",
+    "severity": "blocker",
+    "action": "quarantine",
+    "message": "Dedup police attempted quarantine action on duplicate atom"
+  },
+  "expected": {
+    "quarantineMustBeRejected": true,
+    "reason": "Only lifecycle police (via LIFECYCLE_POLICE_WRITER) may issue quarantine action"
+  }
+}

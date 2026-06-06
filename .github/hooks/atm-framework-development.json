@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.copilotFrameworkDevelopmentHooks.v1",
+  "hookContractVersion": "atm.integration-hooks/v1",
+  "hookProvider": "atm-framework-development-hooks/v1",
+  "marker": "ATM_INTEGRATION_HOOK_CONTRACT_V1",
+  "frameworkDevelopmentWakeMode": "auto",
+  "mandatoryForFrameworkRepo": true,
+  "hooks": [
+    {
+      "event": "sessionStart",
+      "command": "node atm.mjs integration hook pre-agent --editor copilot --json",
+      "blocking": false
+    },
+    {
+      "event": "userPromptSubmitted",
+      "command": "node atm.mjs integration hook pre-agent --editor copilot --json",
+      "blocking": false
+    },
+    {
+      "event": "preToolUse",
+      "command": "node atm.mjs integration hook pre-tool --editor copilot --json",
+      "blocking": true
+    }
+  ]
+}

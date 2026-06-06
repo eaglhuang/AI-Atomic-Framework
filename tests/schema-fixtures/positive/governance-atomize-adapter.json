@@ -1,0 +1,55 @@
+{
+  "schemaId": "atm.atomizeAdapter",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Positive atomize adapter fixture."
+  },
+  "adapterName": "@ai-atomic-framework/adapter-local-git",
+  "lifecycleMode": "evolution",
+  "ok": true,
+  "operation": "adapter",
+  "mode": "dry-run",
+  "dryRun": true,
+  "noop": false,
+  "messages": [
+    "behavior.atomize adapter prepared dry-run patch contract without host mutation."
+  ],
+  "evidence": [],
+  "lockRecords": [],
+  "artifacts": [],
+  "registryPath": ".atm/registry",
+  "resolvedLegacyUri": {
+    "uri": "legacy://repo/src/legacy-source.ts#L5-L8",
+    "scheme": "legacy",
+    "repositoryAlias": "repo",
+    "relativePath": "src/legacy-source.ts",
+    "lineStart": 5,
+    "lineEnd": 8,
+    "fragment": "L5-L8",
+    "absolutePath": "C:/tmp/repo/src/legacy-source.ts",
+    "exists": false
+  },
+  "dryRunPatch": {
+    "contractId": "adapter-atomize:legacy___repo_src_legacy-source.ts_L5-L8",
+    "behaviorId": "behavior.atomize",
+    "dryRun": true,
+    "applyToHostProject": false,
+    "hostMutationAllowed": false,
+    "patchMode": "dry-run",
+    "proposalSource": "ATM-2-0020",
+    "decompositionDecision": "atom-extract",
+    "patchFiles": [
+      "atomic_workbench/atoms/ATM-FIXTURE-0001/atom.source.mjs"
+    ]
+  },
+  "neutrality": {
+    "ok": true,
+    "violationCount": 0,
+    "bannedTerms": [
+      "adopter-private-token"
+    ],
+    "scannedPath": "src/legacy-source.ts"
+  }
+}

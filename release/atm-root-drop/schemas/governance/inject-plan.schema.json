@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/inject-plan.schema.json",
+  "title": "ATM Injection Plan v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "planId",
+    "behaviorId",
+    "target",
+    "legacyInjectionPoints",
+    "dryRunPatch",
+    "noApplyGuarantee",
+    "alpha0GateEvidence",
+    "neutralityScopeCheck",
+    "rollbackSymmetry"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.injectPlan"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "../governance/adapter-report.schema.json#/$defs/migration"
+    },
+    "planId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "behaviorId": {
+      "const": "behavior.infect"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomId", "atomVersion", "logicalName"],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+        },
+        "atomVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "logicalName": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "legacyInjectionPoints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["legacyUri", "callSymbol", "mode", "notes"],
+        "properties": {
+          "legacyUri": {
+            "type": "string",
+            "pattern": "^legacy://"
+          },
+          "callSymbol": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mode": {
+            "const": "dry-run"
+          },
+          "notes": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "dryRunPatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["patchId", "patchMode", "applyToHostProject", "operations"],
+      "properties": {
+        "patchId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "patchMode": {
+          "const": "dry-run"
+        },
+        "applyToHostProject": {
+          "const": false
+        },
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["op", "file", "before", "after"],
+            "properties": {
+              "op": {
+                "enum": ["replace-call", "insert-wrapper", "inject-import"]
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "before": {
+                "type": "string",
+                "minLength": 1
+              },
+              "after": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "noApplyGuarantee": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["noApply", "legacyRuntimeMutated", "guaranteeStatement"],
+      "properties": {
+        "noApply": {
+          "const": true
+        },
+        "legacyRuntimeMutated": {
+          "const": false
+        },
+        "guaranteeStatement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "alpha0GateEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "registry", "hashLock", "cli", "helloWorld", "minimalEvidence"],
+      "properties": {
+        "schema": { "type": "string", "minLength": 1 },
+        "registry": { "type": "string", "minLength": 1 },
+        "hashLock": { "type": "string", "minLength": 1 },
+        "cli": { "type": "string", "minLength": 1 },
+        "helloWorld": { "type": "string", "minLength": 1 },
+        "minimalEvidence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "neutralityScopeCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["neutralityPassed", "scopePassed", "scanner", "scopeBoundary"],
+      "properties": {
+        "neutralityPassed": { "const": true },
+        "scopePassed": { "const": true },
+        "scanner": { "type": "string", "minLength": 1 },
+        "scopeBoundary": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "rollbackSymmetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rollbackPlanId", "reverseBehaviorId", "contractSymmetric"],
+      "properties": {
+        "rollbackPlanId": { "type": "string", "minLength": 1 },
+        "reverseBehaviorId": { "const": "behavior.rollback-infect" },
+        "contractSymmetric": { "const": true }
+      }
+    }
+  }
+}

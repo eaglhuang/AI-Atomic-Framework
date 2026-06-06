@@ -1,0 +1,26 @@
+{
+  "description": "Evolution Police: stale baseAtomVersion converts to stale-evolution-draft warning requiring human review.",
+  "input": {
+    "evidencePatterns": [
+      {
+        "targetSurface": "atom:ATM-CORE-0004",
+        "signalKind": "evidence-evolution-signal",
+        "atomId": "ATM-CORE-0004",
+        "patternTags": ["regression"],
+        "recurrence": 3,
+        "confidence": 0.78,
+        "hasRegressionEvidence": true,
+        "baseAtomVersion": "1.0.0",
+        "currentAtomVersion": "1.2.3"
+      }
+    ]
+  },
+  "expected": {
+    "findingCount": 1,
+    "trigger": "stale-evolution-draft",
+    "severity": "warning",
+    "action": "request-human-review",
+    "routeHint": "review.stale-base",
+    "reason": "baseAtomVersion (1.0.0) is stale compared to currentAtomVersion (1.2.3)"
+  }
+}

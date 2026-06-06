@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.executionEvidence",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": null,
+    "notes": "Invalid ExecuteAgentTask evidence fixture missing validation passes."
+  },
+  "atomId": "ATM-AGENT-0001",
+  "lifecycleMode": "evolution",
+  "executionMode": "dry-run",
+  "ok": true,
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "evidencePath": "atomic_workbench/atoms/ATM-AGENT-0001/execution-evidence.json",
+  "effectNode": {
+    "nodeKind": "effect",
+    "nodeName": "ExecuteAgentTask",
+    "defaultMode": "dry-run",
+    "applyFlag": "--apply",
+    "proposalDelegatedTo": "ATM-2-0020"
+  },
+  "prompt": {
+    "promptPath": "atomic_workbench/atoms/ATM-AGENT-0001/prompt.md",
+    "allowedFiles": [
+      "atomic_workbench/atoms/ATM-AGENT-0001/prompt.md"
+    ],
+    "validationCommands": [
+      "npm test"
+    ]
+  },
+  "agentRun": {
+    "proposedChangeCount": 1,
+    "appliedChanges": false,
+    "hostProjectMutated": false,
+    "touchedFiles": [
+      "atomic_workbench/atoms/ATM-AGENT-0001/atom.test.ts"
+    ],
+    "appliedTouchedFiles": [],
+    "summary": "Dry-run captured a candidate patch without mutating the host project.",
+    "artifactPath": "atomic_workbench/atoms/ATM-AGENT-0001/agent-execute.snapshot.json",
+    "logPath": "atomic_workbench/atoms/ATM-AGENT-0001/agent-execute.log"
+  },
+  "logSummary": {
+    "lineCount": 2,
+    "preview": [
+      "DRY-RUN: captured candidate patch",
+      "VALIDATION: baseline + candidate fixture passes recorded"
+    ],
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "artifacts": [
+    {
+      "artifactPath": "atomic_workbench/atoms/ATM-AGENT-0001/agent-execute.snapshot.json",
+      "artifactKind": "snapshot",
+      "producedBy": "@ai-atomic-framework/core:execute-agent-task"
+    },
+    {
+      "artifactPath": "atomic_workbench/atoms/ATM-AGENT-0001/agent-execute.log",
+      "artifactKind": "log",
+      "producedBy": "@ai-atomic-framework/core:execute-agent-task"
+    },
+    {
+      "artifactPath": "atomic_workbench/atoms/ATM-AGENT-0001/execution-evidence.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:execute-agent-task"
+    }
+  ]
+}

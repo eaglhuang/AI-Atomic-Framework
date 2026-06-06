@@ -1,0 +1,32 @@
+{
+  "schemaId": "atm.mapLineageLog",
+  "specVersion": "0.1.0",
+  "sourceMapId": "ATM-MAP-NEUTRALITY-0001",
+  "canonicalMapId": "ATM-MAP-0002",
+  "generatedAt": "2026-05-08T17:08:05.696Z",
+  "ownerAtom": "ATM-CORE-0003",
+  "ownerVersion": "0.1.0",
+  "sourcePaths": {
+    "mapPath": "tests/fixtures/map-generator-provenance/ATM-MAP-NEUTRALITY-0001/legacy-map.json",
+    "reportPath": "tests/fixtures/map-generator-provenance/ATM-MAP-NEUTRALITY-0001/legacy-report.json"
+  },
+  "legacyMapVersion": "0.1.0-local",
+  "legacySchemaVersion": "atm.local-atomic-map.v0",
+  "legacyMemberIds": [
+    "ATM-CORE-0003-A",
+    "ATM-CORE-0003-B",
+    "ATM-CORE-0003-C",
+    "ATM-CORE-0003-D",
+    "ATM-CORE-0003-E"
+  ],
+  "legacyCaseNames": [
+    "clean",
+    "term-violation",
+    "path-violation",
+    "mixed-violation"
+  ],
+  "notes": [
+    "Legacy local map preserved as archived lineage evidence.",
+    "Canonical backfill collapses the pre-atomized local member graph to the owner atom so the active registry entry stays valid under atm.atomicMap."
+  ]
+}

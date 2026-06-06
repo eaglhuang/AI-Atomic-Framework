@@ -1,0 +1,74 @@
+{
+  "description": "Registry contract pass: register mock behaviors and verify BehaviorRegistry resolve/list contract.",
+  "behaviorContracts": [
+    {
+      "behaviorId": "mock-split-behavior",
+      "actionCategories": ["behavior.split"],
+      "executeOutput": {
+        "ok": true,
+        "registryTransition": {
+          "fromStatus": "active",
+          "toStatus": "active",
+          "governanceTier": "standard",
+          "notes": "split atom into two distinct atoms"
+        },
+        "issues": [],
+        "evidence": []
+      }
+    },
+    {
+      "behaviorId": "mock-evolve-behavior-correct",
+      "actionCategories": ["behavior.evolve"],
+      "executeOutput": {
+        "ok": true,
+        "delegatedTo": "ATM-2-0020:ProposeAtomicUpgrade",
+        "issues": [],
+        "evidence": []
+      }
+    },
+    {
+      "behaviorId": "mock-sweep-behavior",
+      "actionCategories": ["behavior.sweep"],
+      "executeOutput": {
+        "ok": true,
+        "registryTransition": {
+          "fromStatus": "active",
+          "toStatus": "deprecated",
+          "governanceTier": "standard",
+          "notes": "zero-caller sweep to deprecated"
+        },
+        "issues": [],
+        "evidence": []
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "registry-contract-pass",
+      "description": "BehaviorRegistry registers behaviors and resolves the correct one for a given action",
+      "register": ["mock-split-behavior", "mock-evolve-behavior-correct", "mock-sweep-behavior"],
+      "resolveAction": "behavior.split",
+      "expect": {
+        "resolved": true,
+        "resolvedBehaviorId": "mock-split-behavior",
+        "registeredCount": 3,
+        "listedActionsInclude": ["behavior.split", "behavior.evolve", "behavior.sweep"]
+      }
+    },
+    {
+      "name": "evolve-correct-delegation-passes",
+      "description": "executeGuarded allows behavior.evolve that correctly delegates to ProposeAtomicUpgrade",
+      "register": ["mock-evolve-behavior-correct"],
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-CORE-0001",
+        "action": "behavior.evolve",
+        "requestedBy": "test-agent"
+      },
+      "expect": {
+        "ok": true,
+        "issues": []
+      }
+    }
+  ]
+}

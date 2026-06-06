@@ -1,0 +1,28 @@
+{
+  "command": "orient",
+  "summary": "Inspect a repository and emit an ATM guidance orientation report.",
+  "positional": [],
+  "options": [
+    {
+      "flag": "--cwd",
+      "value": "path",
+      "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--json",
+      "summary": "Force machine-readable JSON output."
+    },
+    {
+      "flag": "--pretty",
+      "summary": "Force human-readable pretty output."
+    },
+    {
+      "flag": "--help",
+      "alias": "-h",
+      "summary": "Show command help."
+    }
+  ],
+  "examples": [
+    "node atm.mjs orient --cwd . --json"
+  ]
+}

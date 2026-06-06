@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/polymorphism/dimension-spec.schema.json",
+  "title": "ATM Polymorphic Dimension Spec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "dimensionSpecId",
+    "templateId",
+    "dimensionValues"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.dimensionSpec"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "dimensionSpecId": {
+      "type": "string",
+      "pattern": "^ATM-DIMSPEC-\\d{4}$"
+    },
+    "templateId": {
+      "type": "string",
+      "pattern": "^ATM-POLY-\\d{4}$"
+    },
+    "variantKey": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "dimensionValues": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parameter": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          }
+        },
+        "type": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "language": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "quality": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "output-shape": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "behavior-variant": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "minProperties": 1
+    },
+    "lazyInstanceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "registryMaterialization"
+      ],
+      "properties": {
+        "strategy": {
+          "const": "lazy"
+        },
+        "registryMaterialization": {
+          "const": "none"
+        },
+        "runtimeInstanceId": {
+          "type": "string",
+          "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}@[a-z0-9.-]+$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy",
+        "fromVersion",
+        "notes"
+      ],
+      "properties": {
+        "strategy": {
+          "enum": [
+            "none",
+            "additive",
+            "breaking"
+          ]
+        },
+        "fromVersion": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

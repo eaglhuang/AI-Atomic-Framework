@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "atm.skewMatrix.v0.1",
+  "description": "Alpha version-skew smoke matrix for current CLI, Plugin SDK, and adapter surfaces.",
+  "releaseTrain": {
+    "frameworkVersion": "0.1.0",
+    "atmChartVersion": "0.1.0",
+    "agentTemplateVersion": "0.1.0"
+  },
+  "supportedMinorWindow": ["0.1"],
+  "axes": {
+    "cli": [
+      {
+        "id": "cli-current",
+        "packagePath": "packages/cli",
+        "version": "0.1.0"
+      }
+    ],
+    "pluginSdk": [
+      {
+        "id": "plugin-sdk-current",
+        "packagePath": "packages/plugin-sdk",
+        "version": "0.1.0"
+      }
+    ],
+    "adapters": [
+      {
+        "id": "local-git",
+        "kind": "plugin-adapter",
+        "packagePath": "packages/adapter-local-git",
+        "version": "0.1.0",
+        "smoke": "validate-local-git-adapter"
+      },
+      {
+        "id": "claude-code",
+        "kind": "integration-adapter",
+        "packagePath": "packages/integration-claude-code",
+        "version": "0.1.0",
+        "smoke": "validate-integration-adapter"
+      },
+      {
+        "id": "codex",
+        "kind": "integration-adapter",
+        "packagePath": "packages/integration-codex",
+        "version": "0.1.0",
+        "smoke": "validate-integration-adapter"
+      },
+      {
+        "id": "copilot",
+        "kind": "integration-adapter",
+        "packagePath": "packages/integration-copilot",
+        "version": "0.1.0",
+        "smoke": "validate-integration-adapter"
+      },
+      {
+        "id": "cursor",
+        "kind": "integration-adapter",
+        "packagePath": "packages/integration-cursor",
+        "version": "0.1.0",
+        "smoke": "validate-integration-adapter"
+      },
+      {
+        "id": "gemini",
+        "kind": "integration-adapter",
+        "packagePath": "packages/integration-gemini",
+        "version": "0.1.0",
+        "smoke": "validate-integration-adapter"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "cli-plugin-sdk-local-git-current",
+      "cli": "cli-current",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "local-git",
+      "expected": "pass"
+    },
+    {
+      "id": "cli-plugin-sdk-claude-code-current",
+      "cli": "cli-current",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "claude-code",
+      "expected": "pass"
+    },
+    {
+      "id": "cli-plugin-sdk-codex-current",
+      "cli": "cli-current",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "codex",
+      "expected": "pass"
+    },
+    {
+      "id": "cli-plugin-sdk-copilot-current",
+      "cli": "cli-current",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "copilot",
+      "expected": "pass"
+    },
+    {
+      "id": "cli-plugin-sdk-cursor-current",
+      "cli": "cli-current",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "cursor",
+      "expected": "pass"
+    },
+    {
+      "id": "cli-plugin-sdk-gemini-current",
+      "cli": "cli-current",
+      "pluginSdk": "plugin-sdk-current",
+      "adapter": "gemini",
+      "expected": "pass"
+    }
+  ]
+}

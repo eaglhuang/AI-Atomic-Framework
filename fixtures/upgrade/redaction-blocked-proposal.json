@@ -1,0 +1,103 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "1.1.0",
+    "notes": "Blocked evidence-driven proposal fixture: proposal considered sensitive inputs but no redaction report is attached. Privacy gate activated."
+  },
+  "proposalId": "proposal.atm-core-0001.from-1.1.0.to-1.1.1.atom.redaction-blocked",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "1.1.0",
+  "toVersion": "1.1.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.evolve",
+  "target": {
+    "kind": "atom"
+  },
+  "decompositionDecision": "atom-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-spec",
+  "baseAtomVersion": "1.1.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T00-00-00Z",
+  "reversibility": "rollback-safe",
+  "evidenceGate": {
+    "requiredSignals": ["recurring-failure", "user-correction"],
+    "matchedEvidenceIds": [
+      "evidence.atm-core-0001.recurring-failure.004",
+      "evidence.atm-core-0001.user-correction.003"
+    ],
+    "notes": "Evidence references inputs that may have contained sensitive content (user file paths and credentials). A redaction report must be attached before this proposal can be promoted."
+  },
+  "reviewTemplate": "review.template.atom-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "police.non-regression.fixture",
+      "reportPath": "tests/police-fixtures/positive/non-regression-report.json",
+      "summary": "pass (baseline fixtures passed)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "police.upgrade-quality-pass.fixture",
+      "reportPath": "fixtures/upgrade/quality-comparison-pass.json",
+      "summary": "pass (quality metrics improved)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "police.registry-candidate.fixture",
+      "reportPath": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "summary": "pass (candidate can promote)"
+    },
+    "staleProposal": {
+      "passed": true,
+      "reportId": "stale-proposal.redaction-blocked.fixture",
+      "reportPath": "fixtures/upgrade/redaction-blocked-proposal.json",
+      "summary": "pass (base atom version and evidence watermark are current)"
+    },
+    "privacy": {
+      "passed": false,
+      "reportId": "privacy.redaction-blocked.fixture",
+      "reportPath": "fixtures/upgrade/redaction-blocked-proposal.json",
+      "summary": "blocked (proposal considered sensitive inputs but no redaction-report input is attached)"
+    },
+    "allPassed": false,
+    "blockedGateNames": ["privacy"]
+  },
+  "humanReview": "pending",
+  "status": "blocked",
+  "inputs": [
+    {
+      "kind": "hash-diff",
+      "path": "fixtures/upgrade/hash-diff-report.json",
+      "schemaId": "atm.hashDiffReport",
+      "summary": "hash-diff input"
+    },
+    {
+      "kind": "evolution-evidence",
+      "path": "fixtures/upgrade/redaction-blocked-proposal.json#/evidenceGate",
+      "schemaId": "atm.evolutionEvidenceGate",
+      "summary": "evidence-driven evolution signal input with potential sensitive content"
+    },
+    {
+      "kind": "non-regression",
+      "path": "tests/police-fixtures/positive/non-regression-report.json",
+      "schemaId": "atm.nonRegressionReport",
+      "summary": "non-regression input"
+    },
+    {
+      "kind": "registry-candidate",
+      "path": "tests/police-fixtures/positive/registry-candidate-report.json",
+      "schemaId": "atm.registryCandidateReport",
+      "summary": "registry candidate input"
+    },
+    {
+      "kind": "quality-comparison",
+      "path": "fixtures/upgrade/quality-comparison-pass.json",
+      "schemaId": "atm.qualityComparisonReport",
+      "summary": "quality comparison input"
+    }
+  ],
+  "proposedBy": "evidence-detector.v1",
+  "proposedAt": "2026-05-15T10:00:00.000Z"
+}

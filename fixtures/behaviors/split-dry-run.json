@@ -1,0 +1,31 @@
+{
+  "action": "behavior.split",
+  "input": {
+    "entryType": "atom",
+    "atomId": "ATM-CORE-0001",
+    "action": "behavior.split",
+    "requestedBy": "atm-test",
+    "payload": {
+      "demandTrigger": {
+        "reportId": "caller-distribution.core-0001"
+      },
+      "produceMap": true,
+      "members": [
+        { "atomId": "ATM-CORE-0001", "version": "0.1.0" },
+        { "atomId": "ATM-CORE-0002", "version": "0.1.0" }
+      ],
+      "edges": [
+        { "from": "ATM-CORE-0001", "to": "ATM-CORE-0002", "binding": "split-link" }
+      ],
+      "entrypoints": ["ATM-CORE-0001"],
+      "qualityTargets": {
+        "requiredChecks": 1
+      }
+    }
+  },
+  "expect": {
+    "ok": true,
+    "issues": [],
+    "delegatesMapGeneration": true
+  }
+}

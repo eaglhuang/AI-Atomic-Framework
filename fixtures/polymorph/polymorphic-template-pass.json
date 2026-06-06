@@ -1,0 +1,30 @@
+{
+  "schemaId": "atm.polymorphicTemplate",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Template baseline"
+  },
+  "templateId": "ATM-POLY-0001",
+  "templateAtomId": "ATM-CORE-0001",
+  "status": "active",
+  "dimensions": [
+    "parameter",
+    "type",
+    "language",
+    "quality",
+    "output-shape",
+    "behavior-variant"
+  ],
+  "defaultDimensionSpec": "ATM-DIMSPEC-0001",
+  "lazyInstantiation": {
+    "registryExpansion": "none",
+    "instantiateOn": "runtime",
+    "instanceStatus": "validated"
+  },
+  "propagationPolicy": {
+    "templateUpgradeAction": "behavior.evolve",
+    "inheritanceMode": "auto-propagate-all-instances"
+  }
+}

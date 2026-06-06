@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Atom Evolution Loop example spec."
+  },
+  "id": "ATM-EXAMPLE-0003",
+  "logicalName": "atom.example.evolution-target",
+  "title": "Atom Evolution Loop Example",
+  "description": "Example atom demonstrating the evidence → proposal → review → decision lifecycle.",
+  "language": {
+    "primary": "typescript",
+    "sourceExtensions": [
+      ".ts"
+    ],
+    "tooling": [
+      "node"
+    ]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-git",
+    "storage": "local-fs",
+    "capabilities": [
+      "filesystem",
+      "evidence-store"
+    ]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:67f03b7d7c55848f194b05c962afe7b159df416b7945edeaedc3730ef9b640a5",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "none",
+    "hostCoupling": "forbidden"
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "name": "result",
+      "kind": "json",
+      "required": true
+    }
+  ]
+}

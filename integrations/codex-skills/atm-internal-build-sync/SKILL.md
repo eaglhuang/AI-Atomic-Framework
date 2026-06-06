@@ -1,0 +1,74 @@
+---
+name: atm-internal-build-sync
+description: Build the ATM framework runner and sync it to explicit internal adopter repositories with skip/exclude controls.
+argument-hint: "<ATM context>"
+charter-invariants-injected: true
+---
+
+
+# ATM Internal Build Sync
+
+Use this skill when the user asks to build an ATM framework version and sync the
+fresh runner into internal repositories.
+
+## First Command
+
+```bash
+node atm.mjs next --prompt "$ARGUMENTS" --json
+```
+
+Then inspect framework-development mode before release mutation:
+
+```bash
+node atm.mjs framework-mode status --json
+node atm.mjs guard framework-development --json
+```
+
+## Sync Command
+
+Pass every target repository explicitly. Do not bake adopter repository names
+into framework source.
+
+```bash
+node atm.mjs internal-release sync --repo <repo-a> --repo <repo-b> --json
+```
+
+To intentionally skip one repository, match either its basename or full path:
+
+```bash
+node atm.mjs internal-release sync --repo <repo-a> --repo <repo-b> --skip <repo-b-name> --json
+```
+
+Useful switches:
+
+- `--dry-run`: show what would be copied without writing target repos.
+- `--no-build`: reuse the existing `release/atm-onefile/atm.mjs`.
+- `--no-verify`: copy without running target `doctor`, `framework-mode status`, and `tasks audit`.
+- `--allow-verify-failure`: copy and report verification failures without failing the command.
+
+## Required Evidence
+
+Capture the command JSON evidence, including:
+
+- `sourceSha256`
+- each target `previousSha256` and `newSha256`
+- skipped targets and skip reason
+- target verification command hashes and exit codes
+
+Do not manually copy `atm.mjs` to target repositories when this command is
+available.
+
+- `INV-ATM-001` — **No second registry** (enforcement: `gate`, breaking change: yes)
+  Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
+- `INV-ATM-002` — **Lock before edit** (enforcement: `doctor`, breaking change: no)
+  Rule: No governed file mutation may occur without a valid ScopeLock recorded in .atm/locks/ for the current WorkItem. Agents must call atm lock before editing files.
+- `INV-ATM-003` — **Schema-validated promotion only** (enforcement: `gate`, breaking change: yes)
+  Rule: An UpgradeProposal must pass all automatedGates (including JSON Schema validation) before promotion. Direct registry mutation that bypasses the UpgradeProposal path is forbidden.
+- `INV-ATM-004` — **No competing highest authority** (enforcement: `doctor`, breaking change: yes)
+  Rule: No host project rule, profile, or configuration may declare itself to have authority equal to or higher than the AtomicCharter. Any rule that contradicts an invariant must go through a charter waiver proposal.
+- `INV-ATM-005` — **Host rule amendments require waiver flow** (enforcement: `waiver-required`, breaking change: no)
+  Rule: When a host project rule conflicts with a charter invariant, the host must submit a behavior.evolve UpgradeProposal with a charterWaiver field and a linked HumanReviewDecision. Silent override is not permitted.
+- `INV-ATM-006` — **Framework work tracking stays target-local** (enforcement: `doctor`, breaking change: yes)
+  Rule: The framework repository must not host downstream adopter planning queues or project-specific work tracking artifacts. ATM framework-development tasks may live in the framework repository only as ATM-managed .atm/history/tasks ledger records with CLI transition evidence.
+- `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
+  Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.

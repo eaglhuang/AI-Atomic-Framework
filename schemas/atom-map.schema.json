@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/atom-map.schema.json",
+  "title": "ATM Atomic Map v0.1",
+  "description": "Schema for atomic map spec files under atomic_workbench/maps/<map-id>/map.spec.json. Owner atom/map: atm.atom-map-spec-map. Introduced by TASK-AAO-0023.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "mapId",
+    "mapVersion",
+    "members",
+    "edges",
+    "entrypoints",
+    "qualityTargets",
+    "mapHash",
+    "semanticFingerprint"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.atomicMap"
+    },
+    "specVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "mapId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(ATM-[A-Z][A-Z0-9-]*-\\d{4}|map-[a-z0-9][a-z0-9-]*-\\d{4})$",
+      "description": "Either legacy ATM-XXX-####-style id or the new map-<slug>-#### form introduced by TASK-ASA-0007."
+    },
+    "mapName": {
+      "type": "string",
+      "pattern": "^atm\\.[a-z0-9]+(?:[.-][a-z0-9]+)*-map$",
+      "description": "Optional human-facing top-level map identifier (e.g. atm.bootstrap-runtime-map)."
+    },
+    "mapVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[A-Za-z0-9.-]+)?$"
+    },
+    "capability": {
+      "type": "string",
+      "minLength": 1
+    },
+    "members": {
+      "type": "array",
+      "minItems": 0,
+      "items": { "$ref": "#/$defs/mapMember" }
+    },
+    "edges": {
+      "type": "array",
+      "minItems": 0,
+      "items": { "$ref": "#/$defs/mapEdge" }
+    },
+    "entrypoints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "qualityTargets": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": true,
+      "description": "Schema kept open here because different map families track different quality dimensions. Producers must still self-document the shape they emit."
+    },
+    "sourcePathPatterns": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "ownsUnattachedPaths": { "type": "boolean" },
+    "reviewStatus": {
+      "type": "string",
+      "enum": ["generatedDraft", "partial", "active", "deprecated"]
+    },
+    "lineageLogRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mapHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "semanticFingerprint": {
+      "type": "string",
+      "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$",
+      "description": "Allow the legacy sf:sha256:<hash> prefix used in ATM-MAP-0002 while also accepting the bare sha256: form used by newer maps."
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["strategy"],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "mapMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomId", "version"],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[A-Za-z0-9.-]+)?$"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["generatedDraft", "partial", "active", "deprecated"]
+        },
+        "role": {
+          "type": "string"
+        }
+      }
+    },
+    "mapEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "binding"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "binding": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/registry/rollback-proof.schema.json",
+  "title": "ATM Rollback Proof v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "proofId",
+    "targetKind",
+    "fromVersion",
+    "toVersion",
+    "behaviorId",
+    "reverseBehaviorId",
+    "rollbackContractSymmetric",
+    "hashesVerified",
+    "verifiedAt",
+    "statusReverted",
+    "semanticFingerprintReverted",
+    "verificationStatus"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.rollbackProof"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "proofId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "targetKind": {
+      "enum": ["atom", "map"]
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+    },
+    "mapId": {
+      "type": "string",
+      "pattern": "^ATM-MAP-[A-Z0-9-]+$"
+    },
+    "fromVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "toVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "behaviorId": {
+      "type": "string",
+      "pattern": "^behavior\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "reverseBehaviorId": {
+      "type": "string",
+      "pattern": "^behavior\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "rollbackContractSymmetric": {
+      "type": "boolean"
+    },
+    "hashesVerified": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spec", "code", "test", "allVerified"],
+      "properties": {
+        "spec": { "type": "boolean" },
+        "code": { "type": "boolean" },
+        "test": { "type": "boolean" },
+        "allVerified": { "type": "boolean" }
+      }
+    },
+    "verifiedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "statusReverted": {
+      "type": "boolean"
+    },
+    "semanticFingerprintReverted": {
+      "type": "boolean"
+    },
+    "verificationStatus": {
+      "enum": ["passed", "failed"]
+    },
+    "failureReason": {
+      "type": "string"
+    },
+    "memberAtomProofs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["atomId", "version", "expected", "actual", "matched"],
+        "properties": {
+          "atomId": {
+            "type": "string",
+            "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$"
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          },
+          "expected": {
+            "$ref": "#/$defs/hashTriplet"
+          },
+          "actual": {
+            "$ref": "#/$defs/hashTriplet"
+          },
+          "matched": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "mapGeneratorProvenance": {
+      "type": "boolean"
+    },
+    "mapWorkbenchResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonicalPath", "legacyPath", "selectedPath", "selectedSource"],
+      "properties": {
+        "canonicalPath": { "type": "string", "minLength": 1 },
+        "legacyPath": { "type": "string", "minLength": 1 },
+        "selectedPath": { "type": "string", "minLength": 1 },
+        "selectedSource": { "enum": ["canonical", "legacy"] }
+      }
+    }
+  },
+  "$defs": {
+    "hashTriplet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["specHash", "codeHash", "testHash"],
+      "properties": {
+        "specHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "codeHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "testHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "targetKind": { "const": "atom" } }
+      },
+      "then": {
+        "required": ["atomId"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "targetKind": { "const": "map" } }
+      },
+      "then": {
+        "required": ["mapId", "memberAtomProofs", "mapGeneratorProvenance", "mapWorkbenchResolution"]
+      }
+    }
+  ]
+}

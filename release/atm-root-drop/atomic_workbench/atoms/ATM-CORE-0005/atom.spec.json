@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": null,
+    "notes": "Born from guided atomize dry-run proposal guided-legacy-atomize-guidance-20260520150716-3126c00ebf. The production source remains in place for the readability pilot."
+  },
+  "id": "ATM-CORE-0005",
+  "logicalName": "atom.core-atomic-spec-semantic-fingerprint",
+  "title": "AtomicSpecSemanticFingerprint",
+  "description": "Readable atom wrapper around packages/core/src/registry/semantic-fingerprint.ts#createAtomicSpecSemanticFingerprint.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [
+      ".mjs",
+      ".ts"
+    ],
+    "tooling": [
+      "node"
+    ]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=24",
+    "environment": "local"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs",
+    "storage": "local-fs",
+    "capabilities": [
+      "filesystem",
+      "schema-validator",
+      "test-runner",
+      "evidence-store"
+    ]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "languageAdapter": "language-js",
+    "lifecycleMode": "birth"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:d7a08f9ad6e06f5fa11f0164f8fecf5e66f1da9728ab77e8877b94a232baa66b",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "forbidden"
+  },
+  "inputs": [
+    {
+      "name": "atomicSpecShape",
+      "kind": "json",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "semanticFingerprint",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": [
+      "node --experimental-strip-types \"atomic_workbench/atoms/ATM-CORE-0005/atom.source.mjs\" --self-check",
+      "node --experimental-strip-types \"atomic_workbench/atoms/ATM-CORE-0005/atom.test.ts\"",
+      "node --experimental-strip-types scripts/validate-core-spec-parser.ts --mode validate"
+    ],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 10000
+  },
+  "semanticFingerprint": "sf:sha256:0eb9218b6692dd96159027dbd3cfc4c68bc45ab1bd69bd2bebcb3380ad110417",
+  "deployScope": "all-env",
+  "mutabilityPolicy": "mutable",
+  "tags": [
+    "atomize",
+    "semantic-fingerprint",
+    "readability-pilot"
+  ]
+}

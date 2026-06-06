@@ -1,0 +1,60 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ATM governance layers</title>
+  <desc id="desc">A five-layer pyramid-style diagram showing ATM governance from soft guidance at the top to hard enforcement at the bottom.</desc>
+  <defs>
+    <linearGradient id="bg" x1="120" y1="60" x2="1080" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF8ED"/>
+      <stop offset="1" stop-color="#F4FBF7"/>
+    </linearGradient>
+    <filter id="shadow" x="120" y="116" width="960" height="534" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .eyebrow { font: 700 18px 'Segoe UI', Arial, sans-serif; letter-spacing: 0.12em; fill: #C2410C; }
+      .headline { font: 700 60px 'Segoe UI', Arial, sans-serif; fill: #0F172A; }
+      .sub { font: 400 24px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .layer-title { font: 700 30px 'Segoe UI', Arial, sans-serif; fill: #0F172A; }
+      .layer-body { font: 700 17px 'Segoe UI', Arial, sans-serif; letter-spacing: 0.08em; fill: #475569; }
+      .badge { font: 700 18px 'Segoe UI', Arial, sans-serif; fill: #0F172A; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" rx="32" fill="url(#bg)"/>
+
+  <text x="120" y="86" class="eyebrow">ATM GOVERNANCE MODEL</text>
+  <text x="120" y="156" class="headline">How ATM holds the line.</text>
+  <text x="120" y="206" class="sub">ATM guides, validates, and records. The host owns the hard stop.</text>
+
+  <g filter="url(#shadow)">
+    <polygon points="340,270 860,270 812,346 388,346" fill="#FED7AA"/>
+    <polygon points="300,356 900,356 842,432 358,432" fill="#FDE68A"/>
+    <polygon points="258,442 942,442 872,518 328,518" fill="#BFDBFE"/>
+    <polygon points="214,528 986,528 902,604 298,604" fill="#A7F3D0"/>
+    <polygon points="170,614 1030,614 930,690 270,690" fill="#86EFAC"/>
+  </g>
+
+  <g>
+    <text x="600" y="314" text-anchor="middle" class="layer-title">Prompt Layer</text>
+    <text x="600" y="340" text-anchor="middle" class="layer-body">ROUTE</text>
+
+    <text x="600" y="400" text-anchor="middle" class="layer-title">Tool Layer</text>
+    <text x="600" y="426" text-anchor="middle" class="layer-body">GUARD WRITES</text>
+
+    <text x="600" y="486" text-anchor="middle" class="layer-title">Git Layer</text>
+    <text x="600" y="512" text-anchor="middle" class="layer-body">BLOCK COMMIT / PUSH</text>
+
+    <text x="600" y="572" text-anchor="middle" class="layer-title">CI Layer</text>
+    <text x="600" y="598" text-anchor="middle" class="layer-body">BLOCK MERGE</text>
+
+    <text x="600" y="658" text-anchor="middle" class="layer-title">Permission Layer</text>
+    <text x="600" y="684" text-anchor="middle" class="layer-body">HOST ENFORCED</text>
+  </g>
+
+  <g>
+    <rect x="948" y="278" width="132" height="42" rx="21" fill="#FFF7ED"/>
+    <text x="1014" y="306" text-anchor="middle" class="badge">SOFTER</text>
+
+    <rect x="936" y="634" width="144" height="42" rx="21" fill="#F0FDF4"/>
+    <text x="1008" y="662" text-anchor="middle" class="badge">HARDER</text>
+  </g>
+</svg>

@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/registry/hash-diff-report.schema.json",
+  "title": "ATM Hash Diff Report",
+  "description": "Describes the hash delta between two versions of an atom, including spec, code, and test hash drifts, optional semantic fingerprint delta, and lineage continuity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "atomId",
+    "fromVersion",
+    "toVersion",
+    "generatedAt",
+    "deltas",
+    "driftSummary"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.hashDiffReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "atomId": {
+      "type": "string",
+      "pattern": "^ATM-[A-Z][A-Z0-9]*-\\d{4}$",
+      "description": "The canonical Atomic ID of the atom being compared."
+    },
+    "fromVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "The baseline version."
+    },
+    "toVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "The target version being compared against the baseline."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deltas": {
+      "$ref": "#/$defs/hashDeltas"
+    },
+    "driftSummary": {
+      "$ref": "#/$defs/driftSummary"
+    },
+    "semanticFingerprintDelta": {
+      "$ref": "#/$defs/semanticFingerprintDelta"
+    },
+    "lineageContinuity": {
+      "type": "boolean",
+      "description": "Whether the lineage chain between fromVersion and toVersion is unbroken. True if all intermediate versions exist in the registry."
+    }
+  },
+  "$defs": {
+    "hashDeltas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["specHash", "codeHash", "testHash"],
+      "properties": {
+        "specHash": {
+          "$ref": "#/$defs/hashDelta"
+        },
+        "codeHash": {
+          "$ref": "#/$defs/hashDelta"
+        },
+        "testHash": {
+          "$ref": "#/$defs/hashDelta"
+        }
+      }
+    },
+    "hashDelta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "changed"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "changed": {
+          "type": "boolean",
+          "description": "True if from !== to."
+        }
+      }
+    },
+    "driftSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totalChanged", "changedFields", "driftReason"],
+      "properties": {
+        "totalChanged": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "Number of hash fields that changed (0-3)."
+        },
+        "changedFields": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": ["specHash", "codeHash", "testHash"]
+          },
+          "description": "List of field names that changed."
+        },
+        "driftReason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable explanation of why the hashes differ. Required for all reports."
+        }
+      }
+    },
+    "semanticFingerprintDelta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "changed"],
+      "properties": {
+        "from": {
+          "type": ["string", "null"],
+          "description": "Semantic fingerprint of the fromVersion. Null if not computed."
+        },
+        "to": {
+          "type": ["string", "null"],
+          "description": "Semantic fingerprint of the toVersion. Null if not computed."
+        },
+        "changed": {
+          "type": "boolean",
+          "description": "True if the semantic fingerprint changed between versions."
+        }
+      }
+    }
+  }
+}

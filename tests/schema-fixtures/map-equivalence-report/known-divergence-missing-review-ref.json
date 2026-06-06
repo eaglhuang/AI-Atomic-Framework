@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.mapEquivalenceReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Invalid fixture missing known divergence review reference."
+  },
+  "mapId": "ATM-MAP-0003",
+  "legacyUris": ["legacy://samples/checkout-mini"],
+  "fixtures": [
+    {
+      "fixtureId": "fixture.checkout.basic",
+      "path": "fixtures/equivalence/checkout-basic.json"
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "case.checkout.rounding",
+      "input": { "cart": [] },
+      "expected": { "total": 0 },
+      "actual": { "total": 0 },
+      "metric": {
+        "name": "roundingParity",
+        "baseline": 1,
+        "current": 1,
+        "delta": 0,
+        "direction": "higher-is-better",
+        "passed": true
+      },
+      "evidenceRefs": ["evidence://map-equivalence/case.checkout.rounding"],
+      "passed": true,
+      "knownDivergence": true
+    }
+  ],
+  "knownDivergences": [
+    {
+      "caseId": "case.checkout.rounding",
+      "reason": "Known rounding exception.",
+      "justification": "The exception has been reviewed.",
+      "reviewer": "reviewer.fixture"
+    }
+  ],
+  "summary": {
+    "totalCases": 1,
+    "passedCases": 1,
+    "failedCases": 0,
+    "knownDivergenceCount": 1
+  },
+  "metrics": {
+    "errorRate": 0,
+    "coverage": 1
+  },
+  "artifacts": [],
+  "evidence": [],
+  "passed": true
+}

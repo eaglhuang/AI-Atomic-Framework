@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Atomic spec fixture with semantic fingerprint and governance metadata."
+  },
+  "id": "ATM-FIXTURE-0001",
+  "logicalName": "atom.semantic-fingerprint",
+  "title": "Semantic Fingerprint Atom",
+  "description": "Fixture atom that carries semantic fingerprint and hot/cold governance metadata.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [
+      ".js"
+    ],
+    "tooling": [
+      "node"
+    ]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": [
+      "filesystem",
+      "git",
+      "schema-validator",
+      "evidence-store"
+    ]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js",
+    "lifecycleMode": "birth"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "canonicalization": "json-stable-v1"
+  },
+  "semanticFingerprint": "sf:sha256:3b18bdffa3e61f32887d7454937604217188003f22593120c02781a35418eb46",
+  "lineage": {
+    "bornBy": "codex-gpt-5.5",
+    "parentRefs": [
+      "legacy://atom.hello-world",
+      "urn:atm:atom:ATM-FIXTURE-0001@0.0.1"
+    ],
+    "bornAt": "2026-05-08T00:00:00.000Z"
+  },
+  "ttl": {
+    "expiresAt": "2026-12-31T23:59:59.000Z"
+  },
+  "deployScope": "all-env",
+  "mutabilityPolicy": "mutable",
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "adapter-only"
+  },
+  "inputs": [
+    {
+      "name": "goal",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "evidence",
+      "kind": "evidence",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": [
+      "npm test"
+    ],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": [
+    "alpha0",
+    "semantic-fingerprint"
+  ]
+}

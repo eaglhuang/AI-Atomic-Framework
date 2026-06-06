@@ -1,0 +1,47 @@
+export const defaultGuardCatalog = Object.freeze([
+    {
+        id: 'preserve-host-workflow',
+        summary: 'Do not invent a build step, package manager, or runtime workflow that the host repository does not already use.'
+    },
+    {
+        id: 'lock-before-edit',
+        summary: 'Create or respect a scope lock before editing files outside the bootstrap pack.'
+    },
+    {
+        id: 'evidence-after-change',
+        summary: 'Record validation evidence and a short context summary before declaring the task done.'
+    },
+    {
+        id: 'protect-context-budget',
+        summary: 'When estimated context load exceeds the repository policy, summarize or offload before continuing.'
+    },
+    {
+        id: 'framework-work-tracking-stays-downstream',
+        summary: 'Do not create or keep coordinating implementation task cards or project planning queues inside the framework repository; keep them in the coordinating host workspace and feed upstream only neutral evidence, fixtures, schemas, or validators.'
+    },
+    {
+        id: 'public-framework-docs-remain-english-only',
+        summary: 'Keep contributor-facing framework documentation English-only and repository-neutral; move non-English notes or local planning guidance to the coordinating host workspace.'
+    }
+]);
+export function createDefaultGuards(projectProbe) {
+    const generatedAt = typeof projectProbe.generatedAt === 'string' && projectProbe.generatedAt.trim().length > 0
+        ? projectProbe.generatedAt
+        : new Date().toISOString();
+    const repositoryKind = typeof projectProbe.repositoryKind === 'string' && projectProbe.repositoryKind.trim().length > 0
+        ? projectProbe.repositoryKind
+        : 'generic-repository';
+    return {
+        schemaId: 'atm.defaultGuards',
+        specVersion: '0.1.0',
+        schemaVersion: 'atm.defaultGuards.v0.1',
+        migration: {
+            strategy: 'none',
+            fromVersion: null,
+            notes: 'Initial default guard surface seeded during ATM bootstrap.'
+        },
+        generatedAt,
+        repositoryKind,
+        guards: defaultGuardCatalog.map((guard) => ({ ...guard }))
+    };
+}

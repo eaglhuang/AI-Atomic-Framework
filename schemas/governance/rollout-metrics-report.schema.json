@@ -1,0 +1,526 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/rollout-metrics-report.schema.json",
+  "title": "ATM Rollout Metrics Report v0.1",
+  "description": "Tracks proposal precision, acceptance rates, stale rates, false-positive review results, blocked-reason distributions, curator merge accuracy, rollback rates, optional conversation learning metrics, optional framework integration metrics, optional cost/budget usage, and configuration parameters for the ATM atom evolution rollout.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "reportId",
+    "generatedAt",
+    "window",
+    "proposalMetrics",
+    "curatorMetrics",
+    "configuration"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.rolloutMetricsReport"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "reportId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this metrics report."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp when this report was generated."
+    },
+    "window": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Time window this report covers (e.g. '2026-W20', '2026-05', '2026-05-15')."
+    },
+    "proposalMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalProposed",
+        "accepted",
+        "blocked",
+        "pending",
+        "stale",
+        "precisionRate",
+        "acceptanceRate",
+        "staleRate",
+        "blockedReasonCounts",
+        "falsePositiveReview",
+        "promotionLatencyP50Ms",
+        "promotionLatencyP95Ms"
+      ],
+      "properties": {
+        "totalProposed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total proposals generated in this window."
+        },
+        "accepted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals that passed all gates and were accepted by human review."
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals blocked by one or more automated gates."
+        },
+        "pending": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals still awaiting review or promotion decision in this window."
+        },
+        "stale": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Proposals that were blocked specifically by the staleProposal gate."
+        },
+        "precisionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Proposal precision estimate from human false-positive sampling: (reviewed - confirmedFalsePositive) / reviewed."
+        },
+        "acceptanceRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "accepted / totalProposed — proposal acceptance rate (可量測)."
+        },
+        "staleRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "stale / totalProposed — stale proposal rate (可量測)."
+        },
+        "blockedReasonCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "Map of gate name → count of proposals it blocked (可分類)."
+        },
+        "falsePositiveReview": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reviewed",
+            "confirmedFalsePositive",
+            "falsePositiveRate",
+            "reasonCounts"
+          ],
+          "properties": {
+            "reviewed": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of proposals sampled by human review for false-positive classification."
+            },
+            "confirmedFalsePositive": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Sampled proposals confirmed as false positives."
+            },
+            "falsePositiveRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "confirmedFalsePositive / reviewed."
+            },
+            "reasonCounts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "description": "False-positive reason → count from sampled human review."
+            }
+          }
+        },
+        "promotionLatencyP50Ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Median promotion latency in milliseconds (optional)."
+        },
+        "promotionLatencyP95Ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "95th-percentile promotion latency in milliseconds (optional)."
+        }
+      }
+    },
+    "curatorMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mergeProposalsTotal",
+        "humanReviewSampled",
+        "mergeAccuracyEstimate"
+      ],
+      "properties": {
+        "mergeProposalsTotal": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total map-curator merge proposals in this window."
+        },
+        "humanReviewSampled": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many merge proposals were sampled for human review (curator merge accuracy 可由 human review 抽查)."
+        },
+        "mergeAccuracyEstimate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Estimated merge accuracy based on human review sample."
+        },
+        "rollbackCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many promoted changes were rolled back in this window."
+        },
+        "rollbackRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "rollbackCount / mergeProposalsTotal."
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dailyProposalCap"
+      ],
+      "properties": {
+        "dailyProposalCap": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum proposals allowed per day — daily proposal cap (可配置)."
+        },
+        "dryRunEnabled": {
+          "type": "boolean",
+          "description": "Whether the evolution pipeline ran in dry-run mode."
+        },
+        "confidenceThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum confidence score required to auto-propose."
+        }
+      }
+    },
+    "conversationMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalFindings",
+        "acknowledgedFindings",
+        "reviewedFindings",
+        "confirmedFalsePositiveFindings",
+        "findingPrecision",
+        "feedbackPromptCount",
+        "userChoiceCounts",
+        "patchDraftsCreated",
+        "patchDraftsAccepted",
+        "patchDraftAcceptanceRate",
+        "skillRepairDrafts",
+        "skillRepairAccepted",
+        "skillRepairRate",
+        "privacyBlockedFindings",
+        "privacyBlockRate"
+      ],
+      "properties": {
+        "totalFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total conversation review findings generated in the rollout window."
+        },
+        "acknowledgedFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Findings with immediate user-visible feedback events."
+        },
+        "reviewedFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Findings sampled for precision review."
+        },
+        "confirmedFalsePositiveFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Reviewed findings confirmed as false positives."
+        },
+        "findingPrecision": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "(reviewedFindings - confirmedFalsePositiveFindings) / reviewedFindings."
+        },
+        "feedbackPromptCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many immediate user-choice prompts were shown."
+        },
+        "userChoiceCounts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["Y", "N", "X"],
+          "properties": {
+            "Y": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "N": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "X": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "patchDraftsCreated": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation-derived patch drafts created after user choice or recurrence."
+        },
+        "patchDraftsAccepted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation-derived patch drafts accepted by review."
+        },
+        "patchDraftAcceptanceRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "patchDraftsAccepted / patchDraftsCreated."
+        },
+        "skillRepairDrafts": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation-derived skill repair drafts created."
+        },
+        "skillRepairAccepted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Skill repair drafts accepted by review."
+        },
+        "skillRepairRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "skillRepairAccepted / skillRepairDrafts."
+        },
+        "privacyBlockedFindings": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Conversation findings blocked because privacy/redaction requirements were not satisfied."
+        },
+        "privacyBlockRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "privacyBlockedFindings / totalFindings."
+        }
+      }
+    },
+    "integrationMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adaptersTotal",
+        "installSucceeded",
+        "installFailed",
+        "adapterInstallSuccessRate",
+        "driftChecked",
+        "drifted",
+        "integrationDriftRate",
+        "charterChecks",
+        "charterViolations",
+        "charterViolationRate",
+        "charterConflictCounts",
+        "adapterResults"
+      ],
+      "properties": {
+        "adaptersTotal": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total integration adapters measured in this rollout window."
+        },
+        "installSucceeded": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Adapters that installed successfully."
+        },
+        "installFailed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Adapters that failed install or init."
+        },
+        "adapterInstallSuccessRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "installSucceeded / adaptersTotal — adapter-install-success rate."
+        },
+        "driftChecked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Installed adapters checked against their install manifests."
+        },
+        "drifted": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Adapters whose generated files drifted from manifest hashes."
+        },
+        "integrationDriftRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "drifted / driftChecked — integration-drift rate."
+        },
+        "charterChecks": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Integration or host rule checks that evaluated AtomicCharter compatibility."
+        },
+        "charterViolations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Charter conflicts detected in the integration rollout window."
+        },
+        "charterViolationRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "charterViolations / charterChecks — charter-violation rate."
+        },
+        "charterConflictCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "Charter conflict category -> count."
+        },
+        "adapterResults": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "adapterId",
+              "agentLabel",
+              "installed",
+              "verified",
+              "firstCommand",
+              "charterInjected",
+              "driftDetected",
+              "charterViolationDetected"
+            ],
+            "properties": {
+              "adapterId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "agentLabel": {
+                "type": "string",
+                "minLength": 1
+              },
+              "installed": {
+                "type": "boolean"
+              },
+              "verified": {
+                "type": "boolean"
+              },
+              "firstCommand": {
+                "const": "node atm.mjs next --json"
+              },
+              "charterInjected": {
+                "type": "boolean"
+              },
+              "driftDetected": {
+                "type": "boolean"
+              },
+              "charterViolationDetected": {
+                "type": "boolean"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "costBudgetMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "budgetLimit",
+        "actualUsage",
+        "remainingBudget",
+        "overBudget"
+      ],
+      "properties": {
+        "unit": {
+          "enum": ["tokens", "credits", "usd", "milliseconds"],
+          "description": "Host-provided cost or budget unit."
+        },
+        "budgetLimit": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Configured rollout budget for this window."
+        },
+        "actualUsage": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Observed usage consumed by rollout activity in this window."
+        },
+        "remainingBudget": {
+          "type": "number",
+          "minimum": 0,
+          "description": "budgetLimit - actualUsage, floored at 0."
+        },
+        "overBudget": {
+          "type": "boolean",
+          "description": "True when actualUsage exceeds budgetLimit."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

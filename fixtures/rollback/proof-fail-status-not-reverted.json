@@ -1,0 +1,28 @@
+{
+  "schemaId": "atm.rollbackProof",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial rollback proof contract."
+  },
+  "proofId": "rollback-proof.atom.ATM-FIXTURE-0001.1.1.0.to.1.0.0.status-not-reverted",
+  "targetKind": "atom",
+  "atomId": "ATM-FIXTURE-0001",
+  "fromVersion": "1.1.0",
+  "toVersion": "1.0.0",
+  "behaviorId": "behavior.evolve",
+  "reverseBehaviorId": "behavior.rollback-evolve",
+  "rollbackContractSymmetric": true,
+  "hashesVerified": {
+    "spec": true,
+    "code": true,
+    "test": true,
+    "allVerified": true
+  },
+  "verifiedAt": "2026-01-03T00:02:00.000Z",
+  "statusReverted": false,
+  "semanticFingerprintReverted": true,
+  "verificationStatus": "failed",
+  "failureReason": "status was not reverted to the target version snapshot."
+}
