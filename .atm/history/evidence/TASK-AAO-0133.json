@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0133",
-  "updatedAt": "2026-06-06T06:06:44.808Z",
+  "updatedAt": "2026-06-06T06:09:48.856Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -74,6 +74,216 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:5072ee7857dad89d8c5285cc010a5a6ac0610ff1a0dce4b21c046e8ff193fdfa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+      "createdAt": "2026-06-06T06:08:57.742Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-06T06:08:57.814Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bf349d634e98b1e59dc809a29700f4d0b60193cda3e0566bc972e3f5885f13b2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+      "createdAt": "2026-06-06T06:09:18.976Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2a4196625bf16d3e6294599e21a517489bc0a8c48db7c8e220025b3a1bcf37b5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:073699fa4a5013b0607b6e8ef297c341896969ef44d4d9666fddf123fc76fcb0",
+            "cached": false,
+            "generatedAt": "2026-06-06T06:09:19.023Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1a710401994b62d5018671b6176a22fdb0307f440ae07604116d081b694be4cd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+      "createdAt": "2026-06-06T06:09:37.305Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d7f66cd45d769c6f1b6842abfc87a396fc5391e2a1dfd8849dd2434ad6bc2f24",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:9ddb8d27ef2e479cf6e7df9f5d7d607c495f2b1b50b64538e8514e321dee7f02",
+            "cached": false,
+            "generatedAt": "2026-06-06T06:09:37.343Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:06097c07c33a152774a38e40583dfa2dce388a204f57b00d8e442d6671334431",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node release/atm-onefile/atm.mjs next --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+      "createdAt": "2026-06-06T06:09:48.694Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:onefile-release"
+        ],
+        "commandRuns": [
+          {
+            "command": "node release/atm-onefile/atm.mjs next --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:55b4d55fb061c9ca300a00186b5f0aa86f76e9535c6a7703f565e59e56b965df",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:onefile-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:17f1a914683bbd18c72c4fa11e50bf0b256ff7d18cd872d79a54258bda1cf5bf",
+            "cached": false,
+            "generatedAt": "2026-06-06T06:09:48.731Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:98f63fa9151ad2c85191c6b51be1c1842dc629b9d2cefc4206d14ed6b06b2ad1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node release/atm-root-drop/atm.mjs next --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+      "createdAt": "2026-06-06T06:09:48.856Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260606060506-codex-gpt-5.4-mini-TASK-AAO-0133-fb9e2a81d3",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:root-drop-release"
+        ],
+        "commandRuns": [
+          {
+            "command": "node release/atm-root-drop/atm.mjs next --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:90fe339070b14eadfab17eba0b7c99d469cb911ab868fa4668d5bd6eae9e1924",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:root-drop-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:a0cbba01d9eadce169ce03f76768eccc754cc72c610d7383eeb9f643d9cfad54",
+            "cached": false,
+            "generatedAt": "2026-06-06T06:09:48.896Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3844ed0357fe09fa57068736f019b11b9f5fdae49aa2e9d9dc840ee58235791c",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
