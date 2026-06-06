@@ -15,21 +15,30 @@
       "workspace:packages/*"
     ]
   },
-  "targetCommit": null,
-  "governedTreeSha": null,
+  "targetCommit": "8659c399872d3657460dd407c172e31b1c9a6605",
+  "governedTreeSha": "25e8ba94d9e1482c7647e266eea2e6b382b598e3",
   "targetCommitDelta": {
-    "currentCommitSha": null,
-    "parentCommitShas": [],
-    "governedTreeSha": null,
+    "currentCommitSha": "8659c399872d3657460dd407c172e31b1c9a6605",
+    "parentCommitShas": [
+      "1ba09878cd95400e22b7c3d4f4a25bca2c7f5965"
+    ],
+    "governedTreeSha": "25e8ba94d9e1482c7647e266eea2e6b382b598e3",
     "changedFiles": [
-      "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0002-minimal-task-crew-briefing-contract.task.md",
-      "atm.mjs",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-TEAM-0002.closure-packet.json",
+      ".atm/history/evidence/TASK-TEAM-0002.json",
+      ".atm/history/task-events/TASK-TEAM-0002/2026-06-03T04-23-56-146Z-import-4987c6d7aaf0.json",
+      ".atm/history/task-events/TASK-TEAM-0002/2026-06-03T04-26-35-914Z-import-98c8fa1e73e8.json",
+      ".atm/history/task-events/TASK-TEAM-0002/2026-06-03T04-35-36-545Z-import-4f356d6b02dc.json",
+      ".atm/history/task-events/TASK-TEAM-0002/2026-06-05T14-53-47-129Z-reserve-517e670e35ca.json",
+      ".atm/history/task-events/TASK-TEAM-0002/2026-06-05T14-53-47-132Z-promote-fd6cbeed1765.json",
+      ".atm/history/task-events/TASK-TEAM-0002/2026-06-05T14-53-47-149Z-claim-5e6f117b4e97.json",
+      ".atm/history/task-events/TASK-TEAM-0002/2026-06-05T15-06-19-963Z-close-f45237f77149.json",
+      ".atm/history/tasks/TASK-TEAM-0002.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "docs/governance/team-agents/minimal-task-crew.md",
-      "package.json",
       "packages/cli/src/commands/command-specs/team.spec.ts",
-      "packages/cli/src/commands/team.ts",
-      "scripts/validate-cli.ts"
+      "packages/cli/src/commands/team.ts"
     ]
   },
   "closedByCommand": "atm tasks close",
@@ -146,5 +155,13 @@
   "closedAt": "2026-06-05T15:06:19.961Z",
   "closedByActor": "codex-gpt-5.4-mini",
   "sessionId": "session-20260605145347-codex-gpt-5.4-mini-TASK-TEAM-0002-1382bdb579",
-  "attestation": null
+  "attestation": null,
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-06-05T15:15:32.550Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "8659c399872d3657460dd407c172e31b1c9a6605",
+    "repairedTargetCommitSha": "8659c399872d3657460dd407c172e31b1c9a6605",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
+  }
 }
