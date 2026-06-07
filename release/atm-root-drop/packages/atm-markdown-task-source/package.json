@@ -21,7 +21,9 @@
   },
   "scripts": {
     "build": "node --strip-types ../../scripts/build-package-dist.ts --package packages/atm-markdown-task-source",
-    "typecheck": "tsc -p ../../tsconfig.json --noEmit"
+    "test": "node --strip-types ../../scripts/validate-package-skeleton.ts --mode test",
+    "typecheck": "tsc -p ../../tsconfig.json --noEmit",
+    "lint": "eslint ."
   },
   "types": "./dist/index.d.ts"
 }

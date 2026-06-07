@@ -2280,10 +2280,7 @@ interface ParallelAdvisorFinding {
   readonly verdict:
     | 'parallel-safe'
     | 'blocked-cid-conflict'
-    | 'blocked-shared-validator'
-    | 'blocked-shared-generator'
-    | 'blocked-shared-projection'
-    | 'blocked-shared-artifact'
+    | 'blocked-shared-surface'
     | 'blocked-active-lease'
     | 'insufficient-atom-map'
     | 'needs-physical-split';
@@ -2530,20 +2527,14 @@ function analyzeParallelPair(left: ParallelAdvisorTaskRef, right: ParallelAdviso
   const activeLeaseConflicts = overlappingFiles.filter((entry) => /\.atm\/history\//i.test(entry));
 
   let verdict: ParallelAdvisorFinding['verdict'] = 'parallel-safe';
-  if (overlappingFiles.length > 0) {
-    verdict = 'needs-physical-split';
-  } else if (overlappingAtomIds.length > 0) {
+  if (overlappingAtomIds.length > 0) {
     verdict = 'blocked-cid-conflict';
-  } else if (sharedValidators.length > 0) {
-    verdict = 'blocked-shared-validator';
-  } else if (sharedGenerators.length > 0) {
-    verdict = 'blocked-shared-generator';
-  } else if (sharedProjections.length > 0) {
-    verdict = 'blocked-shared-projection';
-  } else if (sharedArtifacts.length > 0) {
-    verdict = 'blocked-shared-artifact';
+  } else if (sharedValidators.length > 0 || sharedGenerators.length > 0 || sharedProjections.length > 0 || sharedArtifacts.length > 0) {
+    verdict = 'blocked-shared-surface';
   } else if (activeLeaseConflicts.length > 0) {
     verdict = 'blocked-active-lease';
+  } else if (overlappingFiles.length > 0) {
+    verdict = 'needs-physical-split';
   } else if (left.allowedFiles.length === 0 || right.allowedFiles.length === 0) {
     verdict = 'insufficient-atom-map';
   }

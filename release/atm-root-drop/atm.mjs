@@ -55,7 +55,7 @@ function newestMtimeInTree(entryPath) {
   if (!stat) return 0;
   if (stat.isFile()) return stat.mtimeMs;
   if (!stat.isDirectory()) return 0;
-  let newest = stat.mtimeMs;
+  let newest = 0;
   for (const child of readdirSync(entryPath, { withFileTypes: true })) {
     if (child.name === 'dist' || child.name === 'node_modules') continue;
     newest = Math.max(newest, newestMtimeInTree(path.join(entryPath, child.name)));

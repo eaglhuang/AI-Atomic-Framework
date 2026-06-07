@@ -6,7 +6,10 @@ import { evaluateSeedGovernance, frameworkRepoRoot, registryFilePath, validateRe
 export function runStatus(argv: any) {
   const { options } = parseOptions(argv, 'status');
   const configPath = configPathFor(options.cwd);
-  const frameworkRepository = path.resolve(options.cwd) === frameworkRepoRoot && existsSync(registryFilePath);
+  const frameworkRepository = (
+    path.resolve(options.cwd) === frameworkRepoRoot ||
+    existsSync(path.join(options.cwd, 'packages/core/seed.js'))
+  ) && existsSync(registryFilePath);
 
   if (frameworkRepository) {
     const registryValidation = validateRegistryDocumentAgainstSchema(options.cwd, registryFilePath, {

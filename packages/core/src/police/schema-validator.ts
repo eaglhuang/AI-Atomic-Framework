@@ -5,8 +5,15 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
 export function createSchemaValidator() {
-  const Ajv2020 = require('ajv/dist/2020.js');
-  const addFormats = require('ajv-formats');
+  let Ajv2020, addFormats;
+  try {
+    Ajv2020 = require('ajv/dist/2020.js');
+    addFormats = require('ajv-formats');
+  } catch {
+    const cwdRequire = createRequire(path.join(process.cwd(), 'package.json'));
+    Ajv2020 = cwdRequire('ajv/dist/2020.js');
+    addFormats = cwdRequire('ajv-formats');
+  }
   const AjvConstructor = Ajv2020.default ?? Ajv2020;
   const addFormatsPlugin = addFormats.default ?? addFormats;
   const ajv = new AjvConstructor({ allErrors: true, strict: false });

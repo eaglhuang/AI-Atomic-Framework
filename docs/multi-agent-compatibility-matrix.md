@@ -4,17 +4,17 @@
 
 This matrix is generated from built-in agent-pack metadata and advisory confidence profiles. It exists to prevent drift between the installed pack registry, the public compatibility table, and the multi-agent confidence workflow.
 
-Source metadata SHA-256: `674540f805cfc2b500fd2f2300d81312d91b69a85f8cc86a6769677f7b7b2da8`
+Source metadata SHA-256: `c7ce60e4577fecdfea4b5170cf7dc5001c04f1b04ab68aeef48e0fbc459183ca`
 
 ## Agent Pack Registry Matrix
 
 | Agent | Pack ID | Agent Target | Managed Target Roots | File Formats | Managed Files | First Command | Source Hash |
 | --- | --- | --- | --- | --- | ---: | --- | --- |
-| Claude Code | `claude-code` | `claude-code` | `.claude/commands` | Markdown | 6 | `node atm.mjs next --json` | `1d4354afc8e888fd` |
-| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 9 | `node atm.mjs next --json` | `5a6bf03bf00a9a9b` |
-| GitHub Copilot Agent | `copilot` | `copilot` | `.github`, `.github/instructions`, `.github/prompts` | Markdown | 19 | `node atm.mjs next --json` | `d8ec2d82ab5ebe4e` |
-| Gemini | `gemini` | `gemini` | `.gemini/commands` | TOML | 9 | `node atm.mjs next --json` | `d930a009bccfc093` |
-| Windsurf | `windsurf` | `windsurf` | `.windsurf/workflows` | Markdown | 9 | `node atm.mjs next --json` | `ff5d7796e1fce459` |
+| Claude Code | `claude-code` | `claude-code` | `.claude/commands` | Markdown | 6 | `node atm.mjs next --json` | `f9c6396a995afefc` |
+| Cursor | `cursor` | `cursor` | `.cursor/rules/skills` | Markdown | 10 | `node atm.mjs next --json` | `cbbdcc0ee689df81` |
+| GitHub Copilot Agent | `copilot` | `copilot` | `.github/instructions`, `.github/prompts` | Markdown | 20 | `node atm.mjs next --json` | `2bdd0db7bb1aed59` |
+| Gemini | `gemini` | `gemini` | `.gemini/commands` | TOML | 10 | `node atm.mjs next --json` | `e199d81065bdddb9` |
+| Windsurf | `windsurf` | `windsurf` | `.windsurf/workflows` | Markdown | 10 | `node atm.mjs next --json` | `0502866e3fc064ea` |
 
 Every generated agent entry routes the first operational action back to `node atm.mjs next --json`; agent packs are onboarding wrappers, not a second governance protocol.
 

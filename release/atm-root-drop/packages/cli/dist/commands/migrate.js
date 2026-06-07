@@ -112,7 +112,13 @@ function runApply(options, cwd) {
 function runVerify(options, cwd, root) {
     const fixturePath = options.fixture;
     if (fixturePath) {
-        const fixtureAbs = path.isAbsolute(fixturePath) ? fixturePath : path.resolve(root, fixturePath);
+        let fixtureAbs = path.isAbsolute(fixturePath) ? fixturePath : path.resolve(root, fixturePath);
+        if (!existsSync(path.join(fixtureAbs, 'before')) || !existsSync(path.join(fixtureAbs, 'after'))) {
+            const fallbackAbs = path.isAbsolute(fixturePath) ? fixturePath : path.resolve(cwd, fixturePath);
+            if (existsSync(path.join(fallbackAbs, 'before')) && existsSync(path.join(fallbackAbs, 'after'))) {
+                fixtureAbs = fallbackAbs;
+            }
+        }
         const beforeDir = path.join(fixtureAbs, 'before');
         const afterDir = path.join(fixtureAbs, 'after');
         if (!existsSync(beforeDir) || !existsSync(afterDir)) {
@@ -120,7 +126,8 @@ function runVerify(options, cwd, root) {
         }
         const index = loadMigrationIndex();
         const fixtureRel = path.relative(root, fixtureAbs).replace(/\\/g, '/');
-        const matchedEntry = index.migrations.find((m) => fixtureRel === m.fixture || fixtureAbs.endsWith(m.fixture));
+        const normalizedFixtureAbs = fixtureAbs.replace(/\\/g, '/');
+        const matchedEntry = index.migrations.find((m) => fixtureRel === m.fixture || normalizedFixtureAbs.endsWith(m.fixture));
         if (!matchedEntry) {
             throw new CliError('ATM_MIGRATE_FIXTURE_NOT_INDEXED', `Fixture ${fixturePath} is not referenced in the migration index`, { exitCode: 1 });
         }

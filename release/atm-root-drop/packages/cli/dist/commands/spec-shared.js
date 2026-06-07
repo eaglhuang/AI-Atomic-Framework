@@ -90,8 +90,16 @@ function validateSupportedReportAgainstSchema(document, options) {
     });
 }
 function loadJsonSchemaValidatorModules() {
-    const ajvModule = requireFromSpecShared('ajv/dist/2020.js');
-    const formatsModule = requireFromSpecShared('ajv-formats');
+    let ajvModule, formatsModule;
+    try {
+        ajvModule = requireFromSpecShared('ajv/dist/2020.js');
+        formatsModule = requireFromSpecShared('ajv-formats');
+    }
+    catch {
+        const cwdRequire = createRequire(path.join(process.cwd(), 'package.json'));
+        ajvModule = cwdRequire('ajv/dist/2020.js');
+        formatsModule = cwdRequire('ajv-formats');
+    }
     return {
         Ajv2020: ajvModule.default ?? ajvModule,
         addFormats: formatsModule.default ?? formatsModule

@@ -6,10 +6,10 @@ import {
   saveRegistry,
   registerIntent,
   releaseTask,
-  cleanupStale,
-  calculateBrokerDecision
-} from '../../../core/src/index.ts';
-import type { WriteIntent } from '../../../core/src/index.ts';
+  cleanupStale
+} from '../../../core/src/broker/registry.ts';
+import { calculateBrokerDecision } from '../../../core/src/broker/decision.ts';
+import type { WriteIntent } from '../../../core/src/broker/types.ts';
 
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);

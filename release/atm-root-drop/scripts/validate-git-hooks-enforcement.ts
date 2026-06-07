@@ -47,7 +47,12 @@ function runCli(repo: string, args: readonly string[], options: { allowFailure?:
 
 function parsePayload(result: ReturnType<typeof run>) {
   const payload = (result.stdout || result.stderr || '').trim();
-  return payload ? JSON.parse(payload) : {};
+  try {
+    return payload ? JSON.parse(payload) : {};
+  } catch (error) {
+    console.error('PARSE PAYLOAD FAILED. Raw payload:', payload);
+    throw error;
+  }
 }
 
 function createCommandRun(command: string, stdoutSha256: string) {
@@ -493,7 +498,11 @@ try {
   const repairedClosureRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~2', '--head', 'HEAD', '--json'], { allowFailure: true });
   assert(repairedClosureRange.status === 0, `commit-range guard must accept an explicit closure packet repair follow-up\nstdout:\n${repairedClosureRange.stdout}\nstderr:\n${repairedClosureRange.stderr}`);
 } finally {
-  rmSync(tempRoot, { recursive: true, force: true });
+  if (!process.exitCode) {
+    rmSync(tempRoot, { recursive: true, force: true });
+  } else {
+    console.log('TEST FAILED. Keeping temp directory:', tempRoot);
+  }
 }
 
 if (!process.exitCode) {

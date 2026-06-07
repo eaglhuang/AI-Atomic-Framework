@@ -79,8 +79,16 @@ export function parseAtomicSpecDocument(specDocument, options = {}) {
     }
     let ajv;
     try {
-        const Ajv2020 = require('ajv/dist/2020.js');
-        const addFormats = require('ajv-formats');
+        let Ajv2020, addFormats;
+        try {
+            Ajv2020 = require('ajv/dist/2020.js');
+            addFormats = require('ajv-formats');
+        }
+        catch {
+            const cwdRequire = createRequire(path.join(process.cwd(), 'package.json'));
+            Ajv2020 = cwdRequire('ajv/dist/2020.js');
+            addFormats = cwdRequire('ajv-formats');
+        }
         const AjvConstructor = Ajv2020.default ?? Ajv2020;
         const addFormatsPlugin = addFormats.default ?? addFormats;
         ajv = new AjvConstructor({ allErrors: true, strict: false });
