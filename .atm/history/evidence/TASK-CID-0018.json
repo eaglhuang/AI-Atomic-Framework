@@ -1,0 +1,116 @@
+{
+  "taskId": "TASK-CID-0018",
+  "updatedAt": "2026-06-07T07:22:01.437Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck, validate:cli, validate-broker-proposal, and git diff --check passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "007",
+      "sessionId": "session-20260607064154-007-TASK-CID-0018-74f1dd6dba",
+      "createdAt": "2026-06-07T07:13:58.248Z",
+      "details": {
+        "actorId": "007",
+        "sessionId": "session-20260607064154-007-TASK-CID-0018-74f1dd6dba",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git-diff-check",
+          "typecheck",
+          "validate-broker-proposal",
+          "validate:cli"
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate-broker-proposal passed: broker proposal create/list/show/validate CLI subcommands verified, direct validateBrokerProposal checks for 5 negative cases all passed. Fixed ajv dynamic require and parseBrokerArgs positional proposalId handling.",
+      "artifactPaths": [
+        "packages/core/src/broker/proposal.ts",
+        "packages/cli/src/commands/broker.ts",
+        "scripts/validate-broker-proposal.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "007",
+      "sessionId": "session-20260607064154-007-TASK-CID-0018-74f1dd6dba",
+      "createdAt": "2026-06-07T07:21:32.842Z",
+      "details": {
+        "actorId": "007",
+        "sessionId": "session-20260607064154-007-TASK-CID-0018-74f1dd6dba",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-broker-proposal"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-broker-proposal.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "stderrSha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "validators": [
+              "validate-broker-proposal"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:808a5aff4e1289919b57c4fe738fd315fdaf05953fcd10b3deea270f90d52be1",
+            "cached": false,
+            "generatedAt": "2026-06-07T07:21:32.891Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:06e3a1c7b9ab45a69869f66306ea9fe235a14aab641f81ead3f9db3be2fdead5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "npm run typecheck passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "007",
+      "sessionId": "session-20260607064154-007-TASK-CID-0018-74f1dd6dba",
+      "createdAt": "2026-06-07T07:22:01.437Z",
+      "details": {
+        "actorId": "007",
+        "sessionId": "session-20260607064154-007-TASK-CID-0018-74f1dd6dba",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5098B124E7F8A0C08AC224DE3000A9407CEA1369551AE9838DFEA3A197D0F69A",
+            "stderrSha256": "sha256:E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:bc675f9c997c6a1fa794f559faf09c3c56fff789cb6a600e0d686729941c9918",
+            "cached": false,
+            "generatedAt": "2026-06-07T07:22:01.483Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6e2d691fa99b69a6d52c2a5bfb215d0e31f5bb1d06ce9e83984b324367c2f3f8",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

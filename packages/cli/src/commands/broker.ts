@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from './shared.ts';
 import {
@@ -9,6 +9,16 @@ import {
   cleanupStale
 } from '../../../core/src/broker/registry.ts';
 import { calculateBrokerDecision } from '../../../core/src/broker/decision.ts';
+import {
+  defaultBrokerProposalStoreRelativePath,
+  findBrokerProposal,
+  listBrokerProposalSummaries,
+  loadBrokerProposalStore,
+  readBrokerProposalFile,
+  saveBrokerProposalStore,
+  upsertBrokerProposalStore,
+  validateBrokerProposal
+} from '../../../core/src/broker/proposal.ts';
 import type { WriteIntent } from '../../../core/src/broker/types.ts';
 
 export async function runBroker(argv: string[]) {
@@ -136,24 +146,175 @@ export async function runBroker(argv: string[]) {
     });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup', { exitCode: 2 });
+  if (options.action === 'proposal') {
+    if (!options.proposalAction) {
+      throw new CliError('ATM_CLI_USAGE', 'broker proposal requires an action: create | list | show | validate.', { exitCode: 2 });
+    }
+
+    const storePath = path.join(options.cwd, options.proposalStorePath ?? defaultBrokerProposalStoreRelativePath);
+
+    if (options.proposalAction === 'create') {
+      if (options.proposalId) {
+        throw new CliError('ATM_CLI_USAGE', 'broker proposal create does not accept a proposal id.', { exitCode: 2 });
+      }
+      if (!options.proposalFile) {
+        throw new CliError('ATM_CLI_USAGE', 'broker proposal create requires --proposal-file <path>.', { exitCode: 2 });
+      }
+
+      const proposal = readBrokerProposalFile(path.resolve(options.cwd, options.proposalFile));
+      const validation = validateBrokerProposal(proposal, { cwd: options.cwd });
+      if (!validation.ok) {
+        throw new CliError('ATM_BROKER_PROPOSAL_INVALID', 'Broker proposal failed validation.', {
+          exitCode: 1,
+          details: { proposalId: proposal.proposalId, issues: validation.issues }
+        });
+      }
+
+      const updatedStore = upsertBrokerProposalStore(loadBrokerProposalStore(storePath), proposal);
+      saveBrokerProposalStore(storePath, updatedStore);
+
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message('info', 'ATM_BROKER_PROPOSAL_CREATED', `Stored broker proposal ${proposal.proposalId}.`, { proposalId: proposal.proposalId })
+        ],
+        evidence: {
+          action: 'proposal-create',
+          storePath: relativeStorePath(options.cwd, storePath),
+          proposal,
+          validation,
+          proposals: listBrokerProposalSummaries(updatedStore)
+        }
+      });
+    }
+
+    if (options.proposalAction === 'list') {
+      if (options.proposalFile || options.proposalId) {
+        throw new CliError('ATM_CLI_USAGE', 'broker proposal list does not accept a proposal file or proposal id.', { exitCode: 2 });
+      }
+
+      const store = loadBrokerProposalStore(storePath);
+      const proposals = listBrokerProposalSummaries(store);
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [message('info', 'ATM_BROKER_PROPOSAL_LISTED', `Listed ${proposals.length} broker proposal(s).`, { proposalCount: proposals.length })],
+        evidence: {
+          action: 'proposal-list',
+          storePath: relativeStorePath(options.cwd, storePath),
+          proposals
+        }
+      });
+    }
+
+    if (options.proposalAction === 'show') {
+      if (options.proposalFile) {
+        throw new CliError('ATM_CLI_USAGE', 'broker proposal show does not accept --proposal-file.', { exitCode: 2 });
+      }
+      if (!options.proposalId) {
+        throw new CliError('ATM_CLI_USAGE', 'broker proposal show requires <proposal-id>.', { exitCode: 2 });
+      }
+
+      const store = loadBrokerProposalStore(storePath);
+      const proposal = findBrokerProposal(store, options.proposalId);
+      if (!proposal) {
+        throw new CliError('ATM_BROKER_PROPOSAL_NOT_FOUND', `Broker proposal not found: ${options.proposalId}`, {
+          exitCode: 2,
+          details: {
+            proposalId: options.proposalId,
+            storePath: relativeStorePath(options.cwd, storePath)
+          }
+        });
+      }
+
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [message('info', 'ATM_BROKER_PROPOSAL_SHOWN', `Loaded broker proposal ${options.proposalId}.`, { proposalId: options.proposalId })],
+        evidence: {
+          action: 'proposal-show',
+          storePath: relativeStorePath(options.cwd, storePath),
+          proposal
+        }
+      });
+    }
+
+    if (options.proposalAction === 'validate') {
+      if (options.proposalFile && options.proposalId) {
+        throw new CliError('ATM_CLI_USAGE', 'broker proposal validate accepts either --proposal-file or <proposal-id>, not both.', { exitCode: 2 });
+      }
+      if (!options.proposalFile && !options.proposalId) {
+        throw new CliError('ATM_CLI_USAGE', 'broker proposal validate requires a proposal file or <proposal-id>.', { exitCode: 2 });
+      }
+
+      const proposal = options.proposalFile
+        ? readBrokerProposalFile(path.resolve(options.cwd, options.proposalFile))
+        : findBrokerProposal(loadBrokerProposalStore(storePath), options.proposalId as string);
+      if (!proposal) {
+        throw new CliError('ATM_BROKER_PROPOSAL_NOT_FOUND', `Broker proposal not found: ${options.proposalId}`, {
+          exitCode: 2,
+          details: {
+            proposalId: options.proposalId,
+            storePath: relativeStorePath(options.cwd, storePath)
+          }
+        });
+      }
+
+      const validation = validateBrokerProposal(proposal, { cwd: options.cwd });
+      if (!validation.ok) {
+        throw new CliError('ATM_BROKER_PROPOSAL_INVALID', 'Broker proposal failed validation.', {
+          exitCode: 1,
+          details: { proposalId: proposal.proposalId, issues: validation.issues }
+        });
+      }
+
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [message('info', 'ATM_BROKER_PROPOSAL_VALIDATED', `Validated broker proposal ${proposal.proposalId}.`, { proposalId: proposal.proposalId })],
+        evidence: {
+          action: 'proposal-validate',
+          storePath: relativeStorePath(options.cwd, storePath),
+          proposal,
+          validation
+        }
+      });
+    }
+
+    throw new CliError('ATM_CLI_USAGE', 'broker proposal supports: create, list, show, validate.', { exitCode: 2 });
+  }
+
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal', { exitCode: 2 });
 }
 
 interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'decision' | 'status' | 'release' | 'cleanup' | null;
+  readonly action: 'register' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | null;
+  readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly task: string | null;
   readonly intentFile: string | null;
   readonly ttlSeconds: number;
+  readonly proposalFile: string | null;
+  readonly proposalId: string | null;
+  readonly proposalStorePath: string | null;
 }
 
 function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
   const state = {
     cwd: process.cwd(),
     action: null as ParsedBrokerOptions['action'],
+    proposalAction: null as ParsedBrokerOptions['proposalAction'],
     task: null as string | null,
     intentFile: null as string | null,
-    ttlSeconds: 1800
+    ttlSeconds: 1800,
+    proposalFile: null as string | null,
+    proposalId: null as string | null,
+    proposalStorePath: null as string | null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -179,21 +340,45 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--proposal-file') {
+      state.proposalFile = requireValue(argv, index, '--proposal-file');
+      index += 1;
+      continue;
+    }
+    if (arg === '--proposal-id') {
+      state.proposalId = requireValue(argv, index, '--proposal-id');
+      index += 1;
+      continue;
+    }
+    if (arg === '--store') {
+      state.proposalStorePath = requireValue(argv, index, '--store');
+      index += 1;
+      continue;
+    }
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `broker does not support option ${arg}`, { exitCode: 2 });
     }
-    if (state.action) {
-      throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action.', { exitCode: 2 });
+    if (!state.action) {
+      state.action = arg as ParsedBrokerOptions['action'];
+    } else if (state.action === 'proposal' && !state.proposalAction) {
+      state.proposalAction = arg as ParsedBrokerOptions['proposalAction'];
+    } else if (state.action === 'proposal' && state.proposalAction && !state.proposalId) {
+      state.proposalId = arg;
+    } else {
+      throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
     }
-    state.action = arg as ParsedBrokerOptions['action'];
   }
 
   return {
     cwd: path.resolve(state.cwd),
     action: state.action,
+    proposalAction: state.proposalAction,
     task: state.task,
     intentFile: state.intentFile,
-    ttlSeconds: state.ttlSeconds
+    ttlSeconds: state.ttlSeconds,
+    proposalFile: state.proposalFile,
+    proposalId: state.proposalId,
+    proposalStorePath: state.proposalStorePath
   };
 }
 
@@ -203,4 +388,8 @@ function requireValue(argv: string[], optionIndex: number, optionName: string) {
     throw new CliError('ATM_CLI_USAGE', `broker requires a value for ${optionName}`, { exitCode: 2 });
   }
   return value;
+}
+
+function relativeStorePath(cwd: string, storePath: string): string {
+  return path.relative(cwd, storePath) || path.basename(storePath);
 }
