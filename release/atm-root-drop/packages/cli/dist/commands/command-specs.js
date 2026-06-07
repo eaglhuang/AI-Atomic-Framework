@@ -57,6 +57,7 @@ import reviewSpec from './command-specs/review.spec.js';
 import agentPackSpec from './command-specs/agent-pack.spec.js';
 import reviewAdvisorySpec from './command-specs/review-advisory.spec.js';
 import taskflowSpec from './command-specs/taskflow.spec.js';
+import brokerSpec from './command-specs/broker.spec.js';
 function withVisibility(spec, visibility = 'public') {
     return Object.freeze({
         ...spec,
@@ -123,6 +124,7 @@ export const commandSpecs = Object.freeze({
     welcome: welcomeSpec,
     verify: verifySpec,
     taskflow: withVisibility(taskflowSpec, 'internal'),
+    broker: brokerSpec,
 });
 export function getCommandSpec(commandName) {
     return commandName in commandSpecs

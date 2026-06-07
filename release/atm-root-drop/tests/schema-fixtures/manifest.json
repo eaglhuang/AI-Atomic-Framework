@@ -254,6 +254,31 @@
       "name": "dimension spec valid",
       "schema": "dimension-spec",
       "path": "../../fixtures/polymorph/dimension-spec-pass.json"
+    },
+    {
+      "name": "governance write intent",
+      "schema": "write-intent",
+      "path": "positive/governance-write-intent.json"
+    },
+    {
+      "name": "governance patch proposal",
+      "schema": "patch-proposal",
+      "path": "positive/governance-patch-proposal.json"
+    },
+    {
+      "name": "governance broker decision",
+      "schema": "broker-decision",
+      "path": "positive/governance-broker-decision.json"
+    },
+    {
+      "name": "governance merge plan",
+      "schema": "merge-plan",
+      "path": "positive/governance-merge-plan.json"
+    },
+    {
+      "name": "governance break glass handoff",
+      "schema": "break-glass-handoff",
+      "path": "positive/governance-break-glass-handoff.json"
     }
   ],
   "negative": [
@@ -395,6 +420,40 @@
       "path": "negative/decomposition-plan-missing-legacy-uris.json",
       "expectedKeyword": "required",
       "expectedMissingProperty": "legacyUris"
+    },
+    {
+      "name": "invalid write intent missing task id",
+      "schema": "write-intent",
+      "path": "negative/invalid-write-intent-missing-task-id.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "taskId"
+    },
+    {
+      "name": "invalid patch proposal missing anchor",
+      "schema": "patch-proposal",
+      "path": "negative/invalid-patch-proposal-missing-anchor.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "anchors"
+    },
+    {
+      "name": "invalid broker decision missing verdict",
+      "schema": "broker-decision",
+      "path": "negative/invalid-broker-decision-missing-verdict.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "verdict"
+    },
+    {
+      "name": "invalid merge plan overlapping conflicts",
+      "schema": "merge-plan",
+      "path": "negative/invalid-merge-plan-overlapping-conflicts.json",
+      "expectedKeyword": "enum"
+    },
+    {
+      "name": "invalid break glass handoff missing approval",
+      "schema": "break-glass-handoff",
+      "path": "negative/invalid-break-glass-handoff-missing-approval.json",
+      "expectedKeyword": "required",
+      "expectedMissingProperty": "captainApproval"
     }
   ]
 }

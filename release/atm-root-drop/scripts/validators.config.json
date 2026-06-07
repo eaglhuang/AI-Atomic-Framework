@@ -94,7 +94,8 @@
         "validate-policy-self-version",
         "validate-deprecation-policy",
         "adopter-sentinel",
-        "validate-police-family"
+        "validate-police-family",
+        "validate-broker-registry"
       ]
     },
     "full": {
@@ -206,6 +207,7 @@
     { "name": "validate-bridge-minor", "entry": "scripts/validate-bridge-minor.ts", "tags": ["release", "versioning", "experimental"], "slow": false },
     { "name": "validate-policy-self-version", "entry": "scripts/validate-policy-self-version.ts", "tags": ["release", "policy", "versioning"], "slow": false },
     { "name": "validate-deprecation-policy", "entry": "scripts/validate-deprecation-policy.ts", "tags": ["release", "deprecation", "canary"], "slow": false },
-    { "name": "adopter-sentinel", "entry": "scripts/adopter-sentinel.ts", "tags": ["telemetry", "sentinel"], "slow": true }
+    { "name": "adopter-sentinel", "entry": "scripts/adopter-sentinel.ts", "tags": ["telemetry", "sentinel"], "slow": true },
+    { "name": "validate-broker-registry", "entry": "scripts/validate-broker-registry.ts", "tags": ["broker", "registry", "logic"], "slow": false }
   ]
 }

@@ -27,6 +27,7 @@ const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
 const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');
 const perCommandHelpSnapshots = {
   explain: readJson('tests/cli-fixtures/help-snapshots/explain.json'),
+  broker: readJson('tests/cli-fixtures/help-snapshots/broker.json'),
   next: readJson('tests/cli-fixtures/help-snapshots/next.json'),
   orient: readJson('tests/cli-fixtures/help-snapshots/orient.json'),
   start: readJson('tests/cli-fixtures/help-snapshots/start.json'),

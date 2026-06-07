@@ -63,6 +63,7 @@ import { CliError, makeHelpResult, makeResult, message, readFrameworkVersion, wr
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.js';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.js';
 import { runIdentity } from './commands/identity.js';
+import { runBroker } from './commands/broker.js';
 export const cliCommandRunners = {
     atomize: runAtomize,
     'atm-chart': runATMChart,
@@ -122,7 +123,8 @@ export const cliCommandRunners = {
     cache: runCache,
     'health-report': runHealthReport,
     identity: runIdentity,
-    taskflow: runTaskflow
+    taskflow: runTaskflow,
+    broker: runBroker
 };
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
     const [commandName, ...rawCommandArgs] = argv;

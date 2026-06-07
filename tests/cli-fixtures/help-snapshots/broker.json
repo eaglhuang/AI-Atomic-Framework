@@ -1,0 +1,53 @@
+{
+  "command": "broker",
+  "summary": "Manage write intents, check parallel safety, and inspect local write-broker registry.",
+  "positional": [
+    {
+      "name": "action",
+      "summary": "register | decision | status | release | cleanup",
+      "required": true
+    }
+  ],
+  "options": [
+    {
+      "flag": "--cwd",
+      "value": "path",
+      "summary": "Run the command against a specific repository root."
+    },
+    {
+      "flag": "--task",
+      "value": "id",
+      "summary": "Task ID to register or release."
+    },
+    {
+      "flag": "--intent-file",
+      "value": "path",
+      "summary": "Path to WriteIntent JSON payload."
+    },
+    {
+      "flag": "--ttl-seconds",
+      "value": "number",
+      "summary": "TTL lease duration in seconds for registering write intent."
+    },
+    {
+      "flag": "--json",
+      "summary": "Force machine-readable JSON output."
+    },
+    {
+      "flag": "--pretty",
+      "summary": "Force human-readable pretty output."
+    },
+    {
+      "flag": "--help",
+      "alias": "-h",
+      "summary": "Show command help."
+    }
+  ],
+  "examples": [
+    "node atm.mjs broker register --task TASK-GOV-0100 --intent-file intent.json --json",
+    "node atm.mjs broker decision --intent-file intent.json --json",
+    "node atm.mjs broker status --json",
+    "node atm.mjs broker release --task TASK-GOV-0100 --json",
+    "node atm.mjs broker cleanup --json"
+  ]
+}

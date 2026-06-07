@@ -63,6 +63,7 @@ import { CliError, makeHelpResult, makeResult, message, readFrameworkVersion, wr
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 import { runIdentity } from './commands/identity.ts';
+import { runBroker } from './commands/broker.ts';
 
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
   atomize: runAtomize,
@@ -123,7 +124,8 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   cache: runCache,
   'health-report': runHealthReport,
   identity: runIdentity,
-  taskflow: runTaskflow
+  taskflow: runTaskflow,
+  broker: runBroker
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {

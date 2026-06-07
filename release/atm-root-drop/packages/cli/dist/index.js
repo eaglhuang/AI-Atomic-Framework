@@ -19,6 +19,13 @@ export const plannedCliCommands = [
         outputFormat: 'pretty+json'
     },
     {
+        commandName: 'broker',
+        summary: 'Manage write intents, check parallel safety, and inspect local write-broker registry',
+        implemented: true,
+        standaloneMode: true,
+        outputFormat: 'pretty+json'
+    },
+    {
         commandName: 'batch',
         summary: 'Checkpoint or inspect a prompt-scoped ATM batch run',
         implemented: true,

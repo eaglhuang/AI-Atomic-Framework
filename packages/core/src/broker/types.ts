@@ -60,7 +60,7 @@ export interface PatchProposal {
 }
 
 export interface ConflictDetail {
-  readonly kind: 'cid' | 'file-range' | 'generator' | 'projection' | 'validator' | 'artifact' | 'lease';
+  readonly kind: 'cid' | 'file-range' | 'generator' | 'projection' | 'validator' | 'registry' | 'artifact' | 'lease';
   readonly detail: string;
 }
 
@@ -118,3 +118,33 @@ export interface BreakGlassHandoff {
   readonly acceptanceSplit: BreakGlassAcceptanceSplit;
   readonly rollback: string;
 }
+
+export interface ActiveWriteIntent {
+  readonly intentId: string;
+  readonly taskId: string;
+  readonly teamRunId: string | null;
+  readonly actorId: string;
+  readonly baseCommit: string;
+  readonly resourceKeys: {
+    readonly files: readonly string[];
+    readonly atomIds: readonly string[];
+    readonly atomCids: readonly string[];
+    readonly generators: readonly string[];
+    readonly projections: readonly string[];
+    readonly registries: readonly string[];
+    readonly validators: readonly string[];
+    readonly artifacts: readonly string[];
+  };
+  readonly leaseEpoch: number;
+  readonly lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
+  readonly expiresAt?: string;
+}
+
+export interface WriteBrokerRegistryDocument {
+  readonly schemaId: 'atm.writeBrokerRegistry.v1';
+  readonly specVersion: '0.1.0';
+  readonly repoId: string;
+  readonly workspaceId: string;
+  readonly activeIntents: readonly ActiveWriteIntent[];
+}
+
