@@ -1,0 +1,155 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0017",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5c4e5f7c167b8087f7c14102ddf973ec7a034b11",
+  "governedTreeSha": "31660edd18191d179c793f1bb421411ba91563e1",
+  "targetCommitDelta": {
+    "currentCommitSha": "5c4e5f7c167b8087f7c14102ddf973ec7a034b11",
+    "parentCommitShas": [
+      "5c4e5f7c167b8087f7c14102ddf973ec7a034b11"
+    ],
+    "governedTreeSha": "31660edd18191d179c793f1bb421411ba91563e1",
+    "changedFiles": [
+      "package.json",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-parallel-advisor.ts",
+      "scripts/validators.config.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-parallel-advisor.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:66444cbf1bf607fe9e2870f6cfeb2ebea56e7e6463b76850436ad47056b92e91",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a73b3d0027d708db8e8f820d90b585ab3ef38eb8a41768c77d722b2800075ca0",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cfed7f86c2e55dd496512304fbf070d89c2343cd32a4a43716f9e3a706b95e92",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:task-parallel-advisor",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:55ded436cddf7600391d83bcb461c9c3d2e94fa19f1c36365d312cce77ada30b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:task-parallel-advisor"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-07T06:31:39.023Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0017-cid-advisor-broker-decision-model.task.md",
+      ".atm/history/evidence/TASK-CID-0017.*",
+      ".atm/history/task-events/TASK-CID-0017/**",
+      ".atm/history/tasks/TASK-CID-0017.json",
+      "package.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/advisor.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "scripts/validate-task-parallel-advisor.ts",
+      "scripts/validators.config.json"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/advisor.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/index.ts",
+      "scripts/validate-task-parallel-advisor.ts",
+      "scripts/validators.config.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0017.json",
+  "closedAt": "2026-06-07T06:31:39.023Z",
+  "closedByActor": "007",
+  "sessionId": "session-20260607063126-007-TASK-CID-0017-7c1c31f7e1",
+  "attestation": null
+}
