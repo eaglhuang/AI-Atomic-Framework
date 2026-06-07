@@ -137,7 +137,7 @@ function writeHistoricalRestorePacket(repo: string, taskId: string, status = 'do
 }
 
 function copyRuntime(sourceRoot: string, targetRoot: string) {
-  for (const entry of ['atm.mjs', 'atm.dev.mjs', 'atomic-registry.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json', 'eslint.config.mjs', 'docs', 'packages', 'scripts', 'schemas', 'specs', 'templates', 'examples']) {
+  for (const entry of ['.github', 'atm.mjs', 'atm.dev.mjs', 'atomic-registry.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json', 'eslint.config.mjs', 'docs', 'packages', 'scripts', 'schemas', 'specs', 'templates', 'examples']) {
     const sourcePath = path.join(sourceRoot, entry);
     if (!existsSync(sourcePath)) continue;
     cpSync(sourcePath, path.join(targetRoot, entry), { recursive: true });
