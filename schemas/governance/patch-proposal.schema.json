@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/patch-proposal.schema.json",
+  "title": "ATM Patch Proposal v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "proposalId",
+    "taskId",
+    "actorId",
+    "baseCommit",
+    "fileBeforeHash",
+    "targetFile",
+    "atomRefs",
+    "anchors",
+    "intent",
+    "patch",
+    "validators",
+    "rollback"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.patchProposal.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "proposalId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseCommit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fileBeforeHash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "targetFile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "atomRefs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/proposalAtomRef"
+      }
+    },
+    "anchors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/patchAnchor"
+      }
+    },
+    "intent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "patch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validators": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rollback": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "proposalAtomRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomId", "atomCid"],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "atomCid": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "patchAnchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "hint"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

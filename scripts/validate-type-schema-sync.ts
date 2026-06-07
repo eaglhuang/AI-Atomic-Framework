@@ -14,14 +14,23 @@ type JsonSchema = {
 
 const coreSource = ts.createSourceFile('index.ts', readText('packages/core/src/index.ts'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 const rollbackSource = ts.createSourceFile('rollback-types.ts', readText('packages/core/src/registry/rollback-types.ts'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+const brokerSource = ts.createSourceFile('types.ts', readText('packages/core/src/broker/types.ts'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+
 const registrySchema = readJson<JsonSchema>('schemas/registry.schema.json');
 const evidenceSchema = readJson<JsonSchema>('schemas/governance/evidence.schema.json');
 const governanceBundleSchema = readJson<JsonSchema>('schemas/governance/governance-bundle.schema.json');
 const rollbackSchema = readJson<JsonSchema>('schemas/registry/rollback-proof.schema.json');
 const testReportSchema = readJson<JsonSchema>('schemas/test-report.schema.json');
+
+const writeIntentSchema = readJson<JsonSchema>('schemas/governance/write-intent.schema.json');
+const patchProposalSchema = readJson<JsonSchema>('schemas/governance/patch-proposal.schema.json');
+const brokerDecisionSchema = readJson<JsonSchema>('schemas/governance/broker-decision.schema.json');
+const mergePlanSchema = readJson<JsonSchema>('schemas/governance/merge-plan.schema.json');
+const breakGlassHandoffSchema = readJson<JsonSchema>('schemas/governance/break-glass-handoff.schema.json');
+
 const typeAliases = new Map<string, ts.TypeAliasDeclaration>();
 
-for (const sourceFile of [coreSource, rollbackSource]) {
+for (const sourceFile of [coreSource, rollbackSource, brokerSource]) {
   for (const statement of sourceFile.statements) {
     if (ts.isTypeAliasDeclaration(statement)) {
       typeAliases.set(statement.name.text, statement);
@@ -193,4 +202,86 @@ assertArrayEquals(
   'RollbackProof required properties vs rollback-proof schema'
 );
 
-ok('registry, evidence, rollback, and test-report contracts are synchronized');
+const writeIntentRequired = getInterfaceRequiredProperties(findInterface(brokerSource, 'WriteIntent'));
+const patchProposalRequired = getInterfaceRequiredProperties(findInterface(brokerSource, 'PatchProposal'));
+const brokerDecisionRequired = getInterfaceRequiredProperties(findInterface(brokerSource, 'BrokerDecision'));
+const mergePlanRequired = getInterfaceRequiredProperties(findInterface(brokerSource, 'MergePlan'));
+const breakGlassHandoffRequired = getInterfaceRequiredProperties(findInterface(brokerSource, 'BreakGlassHandoff'));
+
+assertArrayEquals(writeIntentRequired, writeIntentSchema.required ?? [], 'WriteIntent required properties vs write-intent schema');
+assertArrayEquals(patchProposalRequired, patchProposalSchema.required ?? [], 'PatchProposal required properties vs patch-proposal schema');
+assertArrayEquals(brokerDecisionRequired, brokerDecisionSchema.required ?? [], 'BrokerDecision required properties vs broker-decision schema');
+assertArrayEquals(mergePlanRequired, mergePlanSchema.required ?? [], 'MergePlan required properties vs merge-plan schema');
+assertArrayEquals(breakGlassHandoffRequired, breakGlassHandoffSchema.required ?? [], 'BreakGlassHandoff required properties vs break-glass-handoff schema');
+
+const writeIntentOperation = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'WriteIntentAtomRef'), 'operation').type);
+assertArrayEquals(
+  writeIntentOperation,
+  writeIntentSchema.$defs?.atomRef?.properties?.operation?.enum ?? [],
+  'WriteIntentAtomRef.operation enum vs write-intent schema enum'
+);
+
+const writeIntentRequestedLane = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'WriteIntent'), 'requestedLane').type);
+assertArrayEquals(
+  writeIntentRequestedLane,
+  writeIntentSchema.properties?.requestedLane?.enum ?? [],
+  'WriteIntent.requestedLane enum vs write-intent schema enum'
+);
+
+const conflictKind = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'ConflictDetail'), 'kind').type);
+assertArrayEquals(
+  conflictKind,
+  brokerDecisionSchema.$defs?.conflictDetail?.properties?.kind?.enum ?? [],
+  'ConflictDetail.kind enum vs broker-decision schema enum'
+);
+
+const brokerDecisionVerdict = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'BrokerDecision'), 'verdict').type);
+assertArrayEquals(
+  brokerDecisionVerdict,
+  brokerDecisionSchema.properties?.verdict?.enum ?? [],
+  'BrokerDecision.verdict enum vs broker-decision schema enum'
+);
+
+const brokerDecisionLane = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'BrokerDecision'), 'lane').type);
+assertArrayEquals(
+  brokerDecisionLane,
+  brokerDecisionSchema.properties?.lane?.enum ?? [],
+  'BrokerDecision.lane enum vs broker-decision schema enum'
+);
+
+const brokerDecisionApplyMethod = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'BrokerDecision'), 'applyMethod').type);
+assertArrayEquals(
+  brokerDecisionApplyMethod,
+  brokerDecisionSchema.properties?.applyMethod?.enum ?? [],
+  'BrokerDecision.applyMethod enum vs broker-decision schema enum'
+);
+
+const mergePlanVerdict = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'MergePlan'), 'verdict').type);
+assertArrayEquals(
+  mergePlanVerdict,
+  mergePlanSchema.properties?.verdict?.enum ?? [],
+  'MergePlan.verdict enum vs merge-plan schema enum'
+);
+
+const mergePlanApplyMethod = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'MergePlan'), 'applyMethod').type);
+assertArrayEquals(
+  mergePlanApplyMethod,
+  mergePlanSchema.properties?.applyMethod?.enum ?? [],
+  'MergePlan.applyMethod enum vs merge-plan schema enum'
+);
+
+const breakGlassReason = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'BreakGlassHandoff'), 'reason').type);
+assertArrayEquals(
+  breakGlassReason,
+  breakGlassHandoffSchema.properties?.reason?.enum ?? [],
+  'BreakGlassHandoff.reason enum vs break-glass-handoff schema enum'
+);
+
+const breakGlassCidCheckVerdict = getStringUnionValues(getInterfaceProperty(findInterface(brokerSource, 'BreakGlassCidCheck'), 'verdict').type);
+assertArrayEquals(
+  breakGlassCidCheckVerdict,
+  breakGlassHandoffSchema.$defs?.cidCheck?.properties?.verdict?.enum ?? [],
+  'BreakGlassCidCheck.verdict enum vs break-glass-handoff schema enum'
+);
+
+ok('registry, evidence, rollback, test-report, and broker contracts are synchronized');
