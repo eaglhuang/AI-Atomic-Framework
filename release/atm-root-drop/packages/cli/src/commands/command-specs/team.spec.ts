@@ -3,9 +3,9 @@ import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption
 
 export default defineCommandSpec({
   name: 'team',
-  summary: 'Plan, start, or validate scoped ATM team agents for a task. Validates permissions, leases, and runs parallel CID advisor preflight checks.',
+  summary: 'Plan, start, or validate scoped ATM team agents for a task. Validates permissions, leases, parallel CID advisor preflight, and broker lane routing for steward/composer paths.',
   positional: [
-    { name: 'action', summary: 'Team action. Supports: plan, start, status, validate. Both plan and start run parallel CID advisor checks.' }
+    { name: 'action', summary: 'Team action. Supports: plan, start, status, validate. Plan and start evaluate broker lanes and fail closed on blocked CID conflicts before a run starts.' }
   ],
   options: [
     commonCwdOption,

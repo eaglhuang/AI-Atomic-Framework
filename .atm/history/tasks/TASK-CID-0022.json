@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0022",
+  "title": "Next claim and closeout broker integration",
+  "status": "planned",
+  "milestone": "P0",
+  "dependencies": [
+    "TASK-CID-0016",
+    "TASK-CID-0017",
+    "TASK-CID-0021"
+  ],
+  "acceptance": [
+    "Claim preflight registers or checks broker intent before work starts.",
+    "Blocked broker lanes fail closed through `next --claim`.",
+    "Release, handoff, and closeout transitions clear broker runtime state so stale intent does not poison later work.",
+    "Prompt-scoped next validation still holds after the broker lifecycle hooks are added.",
+    "The broker lifecycle validator is registered through `package.json` and `scripts/validators.config.json`.",
+    "This card does not add new Team role semantics beyond the existing integration lane."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/lifecycle.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+    "package.json",
+    "scripts/validators.config.json",
+    "scripts/validate-prompt-scoped-next.ts",
+    "scripts/validate-broker-lifecycle.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/lifecycle.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+    "package.json",
+    "scripts/validators.config.json",
+    "scripts/validate-prompt-scoped-next.ts",
+    "scripts/validate-broker-lifecycle.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-prompt-scoped-next.ts",
+    "node --strip-types scripts/validate-broker-lifecycle.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Adding a second scheduler",
+    "Changing Team role orchestration beyond what TASK-CID-0021 already defined",
+    "Manual mutation of .atm/history/** or .atm/runtime/**"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the lifecycle integration commit if claim gating or broker cleanup leaves stale registry state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-broker-lifecycle-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Compact captain cadence applies here too. Internal sidecars may inspect lifecycle edge cases and stale-intent cleanup evidence, but the formal worker roster remains `005` / `006` / `007`.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0022-next-claim-and-closeout-broker-integration.task.md",
+    "sectionTitle": "TASK-CID-0022",
+    "headingLine": 59,
+    "hash": "cba45b5fb7facad2"
+  },
+  "importedAt": "2026-06-08T08:56:32.635Z",
+  "lastTransitionId": "2026-06-08T08-56-32-640Z-import-d9b7d8bd84ff",
+  "lastTransitionAt": "2026-06-08T08:56:32.640Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
