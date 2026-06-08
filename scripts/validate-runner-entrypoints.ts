@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 
-const stableRunner = readFileSync('atm.mjs', 'utf8');
-const devRunner = readFileSync('atm.dev.mjs', 'utf8');
-const cliFixture = JSON.parse(readFileSync('tests/cli-fixtures/cli-mvp.fixture.json', 'utf8'));
+const stableRunner: string = readFileSync('atm.mjs', 'utf8');
+const devRunner: string = readFileSync('atm.dev.mjs', 'utf8');
+const cliFixture: { entrypoint?: string } = JSON.parse(readFileSync('tests/cli-fixtures/cli-mvp.fixture.json', 'utf8')) as { entrypoint?: string };
 
 assert.match(stableRunner, /release['"], ['"]atm-onefile['"], ['"]atm\.mjs/, 'atm.mjs should prefer the frozen onefile release runner.');
 assert.match(stableRunner, /packages['"], ['"]cli['"], ['"]dist['"], ['"]atm\.js/, 'atm.mjs should allow the built dist runner.');
