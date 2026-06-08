@@ -10,6 +10,7 @@ import {
 } from '../../../core/src/broker/registry.ts';
 import { calculateBrokerDecision } from '../../../core/src/broker/decision.ts';
 import { composeBrokerProposals } from '../../../core/src/broker/compose.ts';
+import { applyStewardPlan, planStewardApply } from '../../../core/src/broker/steward.ts';
 import {
   defaultBrokerProposalStoreRelativePath,
   findBrokerProposal,
@@ -20,7 +21,7 @@ import {
   upsertBrokerProposalStore,
   validateBrokerProposal
 } from '../../../core/src/broker/proposal.ts';
-import type { PatchProposal, WriteIntent } from '../../../core/src/broker/types.ts';
+import type { MergePlan, PatchProposal, WriteIntent } from '../../../core/src/broker/types.ts';
 
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
@@ -292,6 +293,100 @@ export async function runBroker(argv: string[]) {
     throw new CliError('ATM_CLI_USAGE', 'broker proposal supports: create, list, show, validate.', { exitCode: 2 });
   }
 
+  if (options.action === 'steward') {
+    if (!options.stewardAction) {
+      throw new CliError('ATM_CLI_USAGE', 'broker steward requires an action: plan | apply.', { exitCode: 2 });
+    }
+    if (!options.mergePlanFile) {
+      throw new CliError('ATM_CLI_USAGE', 'broker steward requires --merge-plan-file <path>.', { exitCode: 2 });
+    }
+
+    const mergePlanPath = path.resolve(options.cwd, options.mergePlanFile);
+    if (!existsSync(mergePlanPath)) {
+      throw new CliError('ATM_FILE_NOT_FOUND', `Merge plan file not found: ${options.mergePlanFile}`, { exitCode: 1 });
+    }
+    const mergePlan = JSON.parse(readFileSync(mergePlanPath, 'utf8')) as MergePlan;
+    const proposals = loadComposeProposals(options);
+    const stewardId = options.stewardId ?? 'neutral-write-steward';
+    const scopeFiles = options.scopeFiles.length > 0
+      ? options.scopeFiles
+      : [...new Set(proposals.map((proposal) => proposal.targetFile))];
+
+    if (options.stewardAction === 'plan') {
+      const planResult = planStewardApply({
+        cwd: options.cwd,
+        stewardId,
+        mergePlan,
+        proposals,
+        scopeFiles
+      });
+      return makeResult({
+        ok: planResult.ok,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message(
+            planResult.ok ? 'info' : 'error',
+            planResult.ok ? 'ATM_BROKER_STEWARD_PLANNED' : 'ATM_BROKER_STEWARD_PLAN_BLOCKED',
+            planResult.ok
+              ? `Steward plan '${planResult.plan.mergePlanId}' is ready to apply.`
+              : 'Steward plan blocked by validation issues.',
+            { mergePlanId: mergePlan.mergePlanId, issueCount: planResult.plan.issues.length }
+          )
+        ],
+        evidence: {
+          action: 'steward-plan',
+          stewardId,
+          plan: planResult.plan,
+          mergePlan,
+          proposalCount: proposals.length
+        }
+      });
+    }
+
+    if (options.stewardAction === 'apply') {
+      const evidenceOutPath = options.evidenceOutPath
+        ? path.resolve(options.cwd, options.evidenceOutPath)
+        : null;
+      const applyResult = applyStewardPlan({
+        cwd: options.cwd,
+        stewardId,
+        mergePlan,
+        proposals,
+        scopeFiles,
+        evidenceOutPath
+      });
+      return makeResult({
+        ok: applyResult.ok,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message(
+            applyResult.ok ? 'info' : 'error',
+            applyResult.ok ? 'ATM_BROKER_STEWARD_APPLIED' : 'ATM_BROKER_STEWARD_APPLY_BLOCKED',
+            applyResult.ok
+              ? `Steward applied merge plan '${mergePlan.mergePlanId}' to scoped files.`
+              : 'Steward apply blocked; no scoped file writes were performed.',
+            {
+              mergePlanId: mergePlan.mergePlanId,
+              appliedFileCount: applyResult.evidence.appliedFiles.length
+            }
+          )
+        ],
+        evidence: {
+          action: 'steward-apply',
+          stewardId,
+          applyEvidence: applyResult.evidence,
+          evidenceOutPath: evidenceOutPath ? path.relative(options.cwd, evidenceOutPath) : null,
+          mergePlan,
+          proposalCount: proposals.length
+        }
+      });
+    }
+
+    throw new CliError('ATM_CLI_USAGE', 'broker steward supports: plan, apply.', { exitCode: 2 });
+  }
+
   if (options.action === 'compose') {
     const proposals = loadComposeProposals(options);
     const composeResult = composeBrokerProposals(proposals);
@@ -325,19 +420,24 @@ export async function runBroker(argv: string[]) {
     });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward', { exitCode: 2 });
 }
 
 interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | null;
+  readonly action: 'register' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | 'steward' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
+  readonly stewardAction: 'plan' | 'apply' | null;
   readonly task: string | null;
   readonly intentFile: string | null;
   readonly ttlSeconds: number;
   readonly proposalFiles: readonly string[];
   readonly proposalIds: readonly string[];
   readonly proposalStorePath: string | null;
+  readonly mergePlanFile: string | null;
+  readonly scopeFiles: readonly string[];
+  readonly stewardId: string | null;
+  readonly evidenceOutPath: string | null;
 }
 
 function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
@@ -345,13 +445,18 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     cwd: process.cwd(),
     action: null as ParsedBrokerOptions['action'],
     proposalAction: null as ParsedBrokerOptions['proposalAction'],
+    stewardAction: null as ParsedBrokerOptions['stewardAction'],
     task: null as string | null,
     intentFile: null as string | null,
     ttlSeconds: 1800,
     proposalFiles: [] as string[],
     proposalIds: [] as string[],
     proposalIdPositional: null as string | null,
-    proposalStorePath: null as string | null
+    proposalStorePath: null as string | null,
+    mergePlanFile: null as string | null,
+    scopeFiles: [] as string[],
+    stewardId: null as string | null,
+    evidenceOutPath: null as string | null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -392,6 +497,26 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--merge-plan-file') {
+      state.mergePlanFile = requireValue(argv, index, '--merge-plan-file');
+      index += 1;
+      continue;
+    }
+    if (arg === '--scope-file') {
+      state.scopeFiles.push(requireValue(argv, index, '--scope-file'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--steward-id') {
+      state.stewardId = requireValue(argv, index, '--steward-id');
+      index += 1;
+      continue;
+    }
+    if (arg === '--evidence-out') {
+      state.evidenceOutPath = requireValue(argv, index, '--evidence-out');
+      index += 1;
+      continue;
+    }
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `broker does not support option ${arg}`, { exitCode: 2 });
     }
@@ -401,6 +526,8 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       state.proposalAction = arg as ParsedBrokerOptions['proposalAction'];
     } else if (state.action === 'proposal' && state.proposalAction && !state.proposalIdPositional) {
       state.proposalIdPositional = arg;
+    } else if (state.action === 'steward' && !state.stewardAction) {
+      state.stewardAction = arg as ParsedBrokerOptions['stewardAction'];
     } else {
       throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
     }
@@ -416,12 +543,17 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     cwd: path.resolve(state.cwd),
     action: state.action,
     proposalAction: state.proposalAction,
+    stewardAction: state.stewardAction,
     task: state.task,
     intentFile: state.intentFile,
     ttlSeconds: state.ttlSeconds,
     proposalFiles: state.proposalFiles,
     proposalIds,
-    proposalStorePath: state.proposalStorePath
+    proposalStorePath: state.proposalStorePath,
+    mergePlanFile: state.mergePlanFile,
+    scopeFiles: state.scopeFiles,
+    stewardId: state.stewardId,
+    evidenceOutPath: state.evidenceOutPath
   };
 }
 
