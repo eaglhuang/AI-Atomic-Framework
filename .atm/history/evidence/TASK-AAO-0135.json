@@ -1,0 +1,216 @@
+{
+  "taskId": "TASK-AAO-0135",
+  "updatedAt": "2026-06-08T16:48:48.966Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer",
+      "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+      "createdAt": "2026-06-08T16:45:42.780Z",
+      "details": {
+        "actorId": "cursor-composer",
+        "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-08T16:45:42.906Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7c755a2676c97505840f817608a75f9ad20ae1210ea4b0f33c066fb703087344",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-task-import.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer",
+      "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+      "createdAt": "2026-06-08T16:45:58.588Z",
+      "details": {
+        "actorId": "cursor-composer",
+        "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:task-import"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-task-import.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5978a12bcfbed4dcaf96038554055174138e5b209731fc37dd0b772d23f28d6f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:task-import"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:b741320a9acfb0bd24845718a178e28745647b4824f7bc1481fe2d1a02fc65cd",
+            "cached": false,
+            "generatedAt": "2026-06-08T16:45:58.670Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5262fa89d4c9e1766133e4e6c2299e007f0b2e344e3f68d723b872fd197affae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer",
+      "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+      "createdAt": "2026-06-08T16:46:16.779Z",
+      "details": {
+        "actorId": "cursor-composer",
+        "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:aecc4aa949df5315f3fdfcee4fe107e1ea000bd53d2581acdc02f2016d6c1537",
+            "cached": false,
+            "generatedAt": "2026-06-08T16:46:16.931Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:48fa95bef95042abab0dc4836159a0eab41b45095d7af41c2da7c7820c5021af",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-task-ledger-governance.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer",
+      "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+      "createdAt": "2026-06-08T16:46:26.530Z",
+      "details": {
+        "actorId": "cursor-composer",
+        "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:task-ledger-governance"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-task-ledger-governance.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b7d6e5c7c20940b9b154d9aced80a0fcb60e231a3fe14051ddf7a41702be4121",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:task-ledger-governance"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6b15ab3aa74b027a1979c10e549705338708dc6fee8236da60673d2f2dbf9b12",
+            "cached": false,
+            "generatedAt": "2026-06-08T16:46:26.655Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:11dbcb3acca3b4a1e26839bd59a8a944f877fa9c1a3617466f0bb29719351189",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer",
+      "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+      "createdAt": "2026-06-08T16:48:48.966Z",
+      "details": {
+        "actorId": "cursor-composer",
+        "sessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:eef351e48302aad392b352c62a87c19acd5c3bc0316a4e69d97671c8609382d8",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:c869898b4330bb5d5bc9d0633290f77dea124f39f74731b40d25794f6b8c1d34",
+            "cached": false,
+            "generatedAt": "2026-06-08T16:48:49.005Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5b4f4e86c640e18bb4a072876bce96d712994f0d18230a89a1a76ce6f865d4a7",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
