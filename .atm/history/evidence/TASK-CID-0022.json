@@ -1,0 +1,56 @@
+{
+  "taskId": "TASK-CID-0022",
+  "updatedAt": "2026-06-08T12:39:12.141Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "broker lifecycle validator passed after claim preflight and cleanup hooks were wired",
+      "artifactPaths": [
+        "packages/core/src/broker/lifecycle.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "package.json",
+        "scripts/validators.config.json",
+        "scripts/validate-broker-lifecycle.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "001",
+      "sessionId": "session-20260608123035-001-TASK-CID-0022-33ea7a5def",
+      "createdAt": "2026-06-08T12:39:12.141Z",
+      "details": {
+        "actorId": "001",
+        "sessionId": "session-20260608123035-001-TASK-CID-0022-33ea7a5def",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/validate-broker-lifecycle.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-broker-lifecycle.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:74de6f0e6ffbeda19289d4e65e7a4b50b527738abd906cc850f2a51b433f006e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/validate-broker-lifecycle.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:68a53de8881ffd6704bc55f82e99ddac09da168186d46e857f0ddf588197a005",
+            "cached": false,
+            "generatedAt": "2026-06-08T12:39:12.191Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5483edccb8fa626c6611910da998ffb92b18fd8ca6ca396c369a2852ecc809b2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

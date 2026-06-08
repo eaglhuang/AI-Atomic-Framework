@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0022",
   "title": "Next claim and closeout broker integration",
-  "status": "planned",
+  "status": "running",
   "milestone": "P0",
   "dependencies": [
     "TASK-CID-0016",
@@ -77,7 +77,63 @@
     "hash": "cba45b5fb7facad2"
   },
   "importedAt": "2026-06-08T08:56:32.635Z",
-  "lastTransitionId": "2026-06-08T08-56-32-640Z-import-d9b7d8bd84ff",
-  "lastTransitionAt": "2026-06-08T08:56:32.640Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-08T12-30-35-864Z-claim-2e5a4b5586dd",
+  "lastTransitionAt": "2026-06-08T12:30:35.864Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "001",
+  "reservedAt": "2026-06-08T12:30:35.837Z",
+  "promotedAt": "2026-06-08T12:30:35.840Z",
+  "claim": {
+    "actorId": "001",
+    "leaseId": "lease-cae62dbfa3b0",
+    "claimedAt": "2026-06-08T12:30:35.843Z",
+    "heartbeatAt": "2026-06-08T12:30:35.843Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0022.json",
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "scripts/validate-broker-lifecycle.ts",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validators.config.json"
+    ],
+    "state": "active"
+  },
+  "startedAt": "2026-06-08T12:30:35.843Z",
+  "startedByActor": "001",
+  "startedBySessionId": "session-20260608123035-001-TASK-CID-0022-33ea7a5def",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0022",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0022.*",
+      ".atm/history/task-events/TASK-CID-0022/**",
+      ".atm/history/tasks/TASK-CID-0022.json",
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "scripts/validate-broker-lifecycle.ts",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validators.config.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4cbd217af7d1e4155d4d4bcac8230af15bb5bc2935dd720c752bb2c9e51589f9",
+    "actorId": "001",
+    "createdAt": "2026-06-08T12:30:35.864Z",
+    "status": "active"
+  }
 }

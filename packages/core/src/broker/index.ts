@@ -7,4 +7,4 @@ export * from './compose.ts';
 export * from './apply-evidence.ts';
 export * from './steward.ts';
 export * from './team-lane.ts';
-
+export * from './lifecycle.ts';
