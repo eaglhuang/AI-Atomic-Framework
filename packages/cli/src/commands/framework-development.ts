@@ -184,6 +184,13 @@ export type ClosureRepairUpstreamStatus =
   | 'ahead-of-upstream'
   | 'published-head-blocked';
 
+export interface ClosurePacketValidationIssue {
+  readonly path: string;
+  readonly kind: 'missing' | 'invalidFormat';
+  readonly formatExpected?: string;
+  readonly actualValue?: string;
+}
+
 export interface ClosurePacketRepairResult {
   readonly taskId: string;
   readonly packetPath: string;
@@ -200,6 +207,70 @@ export interface ClosurePacketRepairResult {
   readonly nextActionCommand: string | null;
   readonly commitMessage: string | null;
   readonly remediation: string | null;
+  readonly scopeWarnings?: readonly string[];
+  readonly upstreamEvidenceNormalized?: boolean;
+}
+
+const SHA256_DIGEST_PATTERN = /^sha256:([a-fA-F0-9]{64})$/;
+const SHA256_LOWER_PATTERN = /^sha256:[a-f0-9]{64}$/;
+const SHA256_FORMAT_EXPECTED = '^sha256:[a-f0-9]{64}$';
+
+export function normalizeSha256DigestValue(value: string): string {
+  const trimmed = value.trim();
+  const match = SHA256_DIGEST_PATTERN.exec(trimmed);
+  if (!match) return trimmed;
+  return `sha256:${match[1].toLowerCase()}`;
+}
+
+export function normalizeSha256FieldsDeep<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((entry) => normalizeSha256FieldsDeep(entry)) as T;
+  }
+  if (value && typeof value === 'object') {
+    const next: Record<string, unknown> = {};
+    for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+      next[key] = normalizeSha256FieldsDeep(entry);
+    }
+    return next as T;
+  }
+  if (typeof value === 'string' && SHA256_DIGEST_PATTERN.test(value.trim())) {
+    return normalizeSha256DigestValue(value) as T;
+  }
+  return value;
+}
+
+function summarizeSha256ActualValue(value: unknown): string {
+  const text = String(value ?? '');
+  return text.length > 80 ? `${text.slice(0, 77)}...` : text;
+}
+
+function pushSha256ValidationIssue(
+  issues: { missing: string[]; invalidFormat: ClosurePacketValidationIssue[] },
+  fieldPath: string,
+  raw: unknown
+) {
+  if (raw === undefined || raw === null || (typeof raw === 'string' && raw.trim() === '')) {
+    issues.missing.push(fieldPath);
+    return;
+  }
+  const text = String(raw).trim();
+  if (!SHA256_DIGEST_PATTERN.test(text)) {
+    issues.invalidFormat.push({
+      path: fieldPath,
+      kind: 'invalidFormat',
+      formatExpected: SHA256_FORMAT_EXPECTED,
+      actualValue: summarizeSha256ActualValue(text)
+    });
+    return;
+  }
+  if (!SHA256_LOWER_PATTERN.test(text)) {
+    issues.invalidFormat.push({
+      path: fieldPath,
+      kind: 'invalidFormat',
+      formatExpected: SHA256_FORMAT_EXPECTED,
+      actualValue: summarizeSha256ActualValue(text)
+    });
+  }
 }
 
 export interface TaskAuditFinding {
@@ -939,11 +1010,16 @@ export function auditTasks(cwd: string): TaskAuditReport {
   };
 }
 
-export function validateClosurePacket(value: unknown): { ok: boolean; missing: readonly string[] } {
+export function validateClosurePacket(value: unknown): {
+  ok: boolean;
+  missing: readonly string[];
+  invalidFormat: readonly ClosurePacketValidationIssue[];
+} {
   const packet = value as Partial<ClosurePacket> | null;
   const missing: string[] = [];
+  const invalidFormat: ClosurePacketValidationIssue[] = [];
   if (!packet || typeof packet !== 'object' || Array.isArray(packet)) {
-    return { ok: false, missing: ['object'] };
+    return { ok: false, missing: ['object'], invalidFormat };
   }
   if (packet.schemaId !== 'atm.closurePacket.v1') missing.push('schemaId');
   if (packet.closedByCommand !== 'atm tasks close') missing.push('closedByCommand');
@@ -963,8 +1039,8 @@ export function validateClosurePacket(value: unknown): { ok: boolean; missing: r
     for (const [index, run] of packet.commandRuns.entries()) {
       if (typeof run.command !== 'string' || run.command.trim().length === 0) missing.push(`commandRuns/${index}/command`);
       if (typeof run.exitCode !== 'number') missing.push(`commandRuns/${index}/exitCode`);
-      if (!/^sha256:[a-f0-9]{64}$/.test(String(run.stdoutSha256 ?? ''))) missing.push(`commandRuns/${index}/stdoutSha256`);
-      if (!/^sha256:[a-f0-9]{64}$/.test(String(run.stderrSha256 ?? ''))) missing.push(`commandRuns/${index}/stderrSha256`);
+      pushSha256ValidationIssue({ missing, invalidFormat }, `commandRuns/${index}/stdoutSha256`, run.stdoutSha256);
+      pushSha256ValidationIssue({ missing, invalidFormat }, `commandRuns/${index}/stderrSha256`, run.stderrSha256);
     }
   }
   if (!Array.isArray(packet.validationPasses) || packet.validationPasses.length === 0) {
@@ -1009,7 +1085,75 @@ export function validateClosurePacket(value: unknown): { ok: boolean; missing: r
   if (packet.evidenceFreshness !== 'fresh') {
     missing.push('evidenceFreshness');
   }
-  return { ok: missing.length === 0, missing };
+  return { ok: missing.length === 0 && invalidFormat.length === 0, missing, invalidFormat };
+}
+
+export function normalizeUpstreamEvidenceForTask(cwd: string, taskId: string): { evidencePath: string; changed: boolean } {
+  const evidenceAbsolute = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+  const evidencePath = relativePathFrom(cwd, evidenceAbsolute);
+  if (!existsSync(evidenceAbsolute)) {
+    return { evidencePath, changed: false };
+  }
+  const parsed = readJsonIfExists(evidenceAbsolute);
+  if (!parsed) return { evidencePath, changed: false };
+  const normalized = normalizeSha256FieldsDeep(parsed);
+  const before = `${JSON.stringify(parsed, null, 2)}\n`;
+  const after = `${JSON.stringify(normalized, null, 2)}\n`;
+  if (before !== after) {
+    writeFileSync(evidenceAbsolute, after, 'utf8');
+    return { evidencePath, changed: true };
+  }
+  return { evidencePath, changed: false };
+}
+
+function collectTaskScopeFiles(cwd: string, scopeTaskId: string): Set<string> {
+  const scopeFiles = new Set<string>();
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${scopeTaskId}.json`);
+  const taskDocument = readJsonIfExists(taskPath);
+  if (!taskDocument) return scopeFiles;
+  const pushPath = (value: unknown) => {
+    if (typeof value !== 'string' || value.trim().length === 0) return;
+    const normalized = normalizeProjectRelativePath(cwd, value);
+    if (normalized) scopeFiles.add(normalized);
+  };
+  for (const entry of ['scopePaths', 'deliverables', 'targetAllowedFiles'] as const) {
+    if (Array.isArray(taskDocument[entry])) {
+      for (const value of taskDocument[entry]) pushPath(value);
+    }
+  }
+  const claim = taskDocument.claim;
+  if (claim && typeof claim === 'object' && !Array.isArray(claim) && Array.isArray((claim as Record<string, unknown>).files)) {
+    for (const value of (claim as Record<string, unknown>).files as unknown[]) pushPath(value);
+  }
+  const directionLock = taskDocument.taskDirectionLock;
+  if (directionLock && typeof directionLock === 'object' && !Array.isArray(directionLock) && Array.isArray((directionLock as Record<string, unknown>).allowedFiles)) {
+    for (const value of (directionLock as Record<string, unknown>).allowedFiles as unknown[]) pushPath(value);
+  }
+  return scopeFiles;
+}
+
+function pathOverlapsTaskScope(filePath: string, scopeFiles: Set<string>): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  if (!normalized || scopeFiles.size === 0) return false;
+  for (const scopePath of scopeFiles) {
+    if (normalized === scopePath) return true;
+    if (scopePath.endsWith('/**') && normalized.startsWith(scopePath.slice(0, -3))) return true;
+    if (normalized.startsWith(`${scopePath}/`)) return true;
+  }
+  return false;
+}
+
+function refreshPacketFromEvidenceContext(cwd: string, taskId: string, packet: ClosurePacket): ClosurePacket {
+  const context = readClosureEvidenceContext(cwd, taskId);
+  if (context.commandRuns.length === 0) {
+    return normalizeSha256FieldsDeep(packet);
+  }
+  return normalizeSha256FieldsDeep({
+    ...packet,
+    commandRuns: context.commandRuns,
+    validationPasses: context.validationPasses.length > 0 ? context.validationPasses : packet.validationPasses,
+    evidenceFreshness: context.evidenceFreshness
+  });
 }
 
 export function requiredValidationPassesForClosure(requiredGates: readonly string[]) {
@@ -1062,7 +1206,8 @@ export function createClosurePacket(input: {
 export function writeClosurePacket(cwd: string, taskId: string, packet: ClosurePacket) {
   const packetPath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
   mkdirSync(path.dirname(packetPath), { recursive: true });
-  writeFileSync(packetPath, `${JSON.stringify(packet, null, 2)}\n`, 'utf8');
+  const normalizedPacket = normalizeSha256FieldsDeep(packet);
+  writeFileSync(packetPath, `${JSON.stringify(normalizedPacket, null, 2)}\n`, 'utf8');
   return relativePathFrom(cwd, packetPath);
 }
 
@@ -1124,6 +1269,7 @@ export function repairClosurePacketForTask(input: {
   readonly actorId?: string | null;
   readonly dryRun?: boolean;
   readonly amend?: boolean;
+  readonly scopeTaskId?: string | null;
 }): ClosurePacketRepairResult {
   const cwd = path.resolve(input.cwd);
   const taskId = input.taskId.trim();
@@ -1139,24 +1285,56 @@ export function repairClosurePacketForTask(input: {
     });
   }
 
+  const upstreamEvidence = normalizeUpstreamEvidenceForTask(cwd, taskId);
+  const scopeTaskId = normalizeOptionalString(input.scopeTaskId);
+  const scopeFiles = scopeTaskId ? collectTaskScopeFiles(cwd, scopeTaskId) : null;
   const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath);
-  if (trackedDirtyFiles.length > 0) {
+  const scopeWarnings: string[] = [];
+  const blockingDirtyFiles = scopeFiles
+    ? trackedDirtyFiles.filter((entry) => {
+      if (pathOverlapsTaskScope(entry, scopeFiles) || isTaskCloseGovernanceCriticalPath(entry, taskId)) {
+        return true;
+      }
+      scopeWarnings.push(entry);
+      return false;
+    })
+    : trackedDirtyFiles;
+  if (blockingDirtyFiles.length > 0) {
     throw new CliError('ATM_CLOSURE_REPAIR_DIRTY_WORKTREE', `Cannot repair closure packet for ${taskId} while unrelated tracked worktree changes are present.`, {
       exitCode: 1,
       details: {
         taskId,
-        trackedDirtyFiles,
-        remediation: 'Run repair in an isolated worktree at the broken commit, or commit/stash unrelated changes first.'
+        trackedDirtyFiles: blockingDirtyFiles,
+        scopeWarnings: scopeWarnings.length > 0 ? scopeWarnings : undefined,
+        remediation: scopeTaskId
+          ? 'Use --scope to downgrade unrelated dirty files to warnings, or run repair in an isolated worktree.'
+          : 'Run repair in an isolated worktree at the broken commit, or commit/stash unrelated changes first.'
       }
     });
   }
 
-  const parsed = readJsonIfExists(packetAbsolutePath) as ClosurePacket | null;
-  const validation = validateClosurePacket(parsed);
+  let parsed = readJsonIfExists(packetAbsolutePath) as ClosurePacket | null;
+  if (parsed) {
+    parsed = refreshPacketFromEvidenceContext(cwd, taskId, parsed);
+    if (!input.dryRun) {
+      writeFileSync(packetAbsolutePath, `${JSON.stringify(parsed, null, 2)}\n`, 'utf8');
+    }
+  }
+  let validation = validateClosurePacket(parsed);
+  if ((!validation.ok || !parsed) && parsed) {
+    parsed = normalizeSha256FieldsDeep(parsed);
+    validation = validateClosurePacket(parsed);
+  }
   if (!validation.ok || !parsed) {
     throw new CliError('ATM_CLOSURE_REPAIR_PACKET_INVALID', `Closure packet for ${taskId} is invalid and cannot be repaired automatically.`, {
       exitCode: 1,
-      details: { taskId, packetPath, missing: validation.missing }
+      details: {
+        taskId,
+        packetPath,
+        missing: validation.missing,
+        invalidFormat: validation.invalidFormat,
+        upstreamEvidenceNormalized: upstreamEvidence.changed
+      }
     });
   }
 
@@ -1209,6 +1387,11 @@ export function repairClosurePacketForTask(input: {
   const changed = before !== after;
   const upstreamStatus = classifyRepairUpstreamStatus(cwd);
 
+  const repairExtras = {
+    scopeWarnings: scopeWarnings.length > 0 ? uniqueSorted(scopeWarnings) : undefined,
+    upstreamEvidenceNormalized: upstreamEvidence.changed
+  };
+
   if (input.dryRun) {
     return {
       taskId,
@@ -1225,7 +1408,8 @@ export function repairClosurePacketForTask(input: {
       upstreamStatus,
       nextActionCommand,
       commitMessage,
-      remediation
+      remediation,
+      ...repairExtras
     };
   }
 
@@ -1253,7 +1437,8 @@ export function repairClosurePacketForTask(input: {
     upstreamStatus,
     nextActionCommand,
     commitMessage,
-    remediation
+    remediation,
+    ...repairExtras
   };
 }
 

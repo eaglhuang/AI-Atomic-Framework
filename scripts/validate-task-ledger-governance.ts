@@ -4,7 +4,20 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { auditTasks, classifyFrameworkStaleLock, createClosurePacket, createFrameworkModeStatus, inspectFrameworkCloseWorktree, runFrameworkTempClaim, validateClosurePacket, writeClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
+import {
+  auditTasks,
+  classifyFrameworkStaleLock,
+  createClosurePacket,
+  createFrameworkModeStatus,
+  inspectFrameworkCloseWorktree,
+  normalizeSha256DigestValue,
+  normalizeSha256FieldsDeep,
+  normalizeUpstreamEvidenceForTask,
+  repairClosurePacketForTask,
+  runFrameworkTempClaim,
+  validateClosurePacket,
+  writeClosurePacket
+} from '../packages/cli/src/commands/framework-development.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
@@ -977,6 +990,108 @@ try {
   delete legacyPacket.attestation;
   const legacyValidation = validateClosurePacket(legacyPacket);
   assert(legacyValidation.ok === true, 'validateClosurePacket must accept a legacy closure packet without attestation');
+
+  // TASK-AAO-0135: validateClosurePacket invalidFormat vs missing + repair-closure upstream evidence fix
+  const upperStdout = 'sha256:ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789';
+  const lowerStdout = normalizeSha256DigestValue(upperStdout);
+  const invalidPacket = {
+    ...legacyPacket,
+    commandRuns: [{
+      command: 'npm run typecheck',
+      cwd: '.',
+      exitCode: 0,
+      stdoutSha256: upperStdout,
+      stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      runnerVersion: 'test'
+    }]
+  } as Record<string, unknown>;
+  const upperValidation = validateClosurePacket(invalidPacket);
+  assert(upperValidation.ok === false, 'validateClosurePacket must reject uppercase sha256 before normalization');
+  assert(upperValidation.invalidFormat.some((entry) => entry.path.includes('stdoutSha256')), 'uppercase sha256 must report invalidFormat');
+  const normalizedPacket = normalizeSha256FieldsDeep(invalidPacket);
+  assert(validateClosurePacket(normalizedPacket).ok === true, 'normalized closure packet must validate');
+
+  const missingPacket = {
+    ...legacyPacket,
+    commandRuns: [{
+      command: 'npm run typecheck',
+      cwd: '.',
+      exitCode: 0,
+      stdoutSha256: '',
+      stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      runnerVersion: 'test'
+    }]
+  };
+  const missingValidation = validateClosurePacket(missingPacket);
+  assert(missingValidation.ok === false, 'validateClosurePacket must reject empty sha256');
+  assert(missingValidation.missing.some((entry) => entry.includes('stdoutSha256')), 'empty sha256 must report missing');
+  assert(missingValidation.invalidFormat.length === 0, 'empty sha256 must not be classified as invalidFormat');
+
+  const repair0135TaskId = 'TASK-REPAIR-0135';
+  const repair0135Repo = makeHostRepo(tempRoot, 'repair-closure-0135-repo');
+  initGitRepo(repair0135Repo);
+  writeJson(path.join(repair0135Repo, '.atm', 'history', 'tasks', `${repair0135TaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: repair0135TaskId,
+    status: 'done',
+    scopePaths: ['packages/cli/src/commands/framework-development.ts'],
+    deliverables: ['packages/cli/src/commands/framework-development.ts']
+  });
+  const repairEvidencePath = path.join(repair0135Repo, '.atm', 'history', 'evidence', `${repair0135TaskId}.json`);
+  const repairPacketPath = path.join(repair0135Repo, '.atm', 'history', 'evidence', `${repair0135TaskId}.closure-packet.json`);
+  mkdirSync(path.dirname(repairEvidencePath), { recursive: true });
+  const repairValidationPasses = ['typecheck', 'validate:cli', 'validate:git-head-evidence'];
+  writeJson(repairEvidencePath, {
+    taskId: repair0135TaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      summary: 'uppercase sha256 evidence',
+      evidenceFreshness: 'fresh',
+      validationPasses: repairValidationPasses,
+      commandRuns: [{
+        command: 'npm run typecheck',
+        cwd: '.',
+        exitCode: 0,
+        stdoutSha256: upperStdout,
+        stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+      }]
+    }]
+  });
+  writeJson(repairPacketPath, {
+    ...invalidPacket,
+    requiredGates: repairValidationPasses,
+    validationPasses: repairValidationPasses,
+    requiredGatesSnapshot: {
+      ...(invalidPacket.requiredGatesSnapshot as Record<string, unknown>),
+      requiredGates: repairValidationPasses
+    }
+  });
+  const unrelatedPath = path.join(repair0135Repo, 'packages', 'cli', 'src', 'commands', 'unrelated.ts');
+  mkdirSync(path.dirname(unrelatedPath), { recursive: true });
+  writeFileSync(unrelatedPath, 'export const unrelated = 1;\n', 'utf8');
+  execFileSync('git', ['add', 'packages/cli/src/commands/unrelated.ts'], { cwd: repair0135Repo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed unrelated file for repair-closure scope test'], { cwd: repair0135Repo, stdio: 'ignore' });
+  writeFileSync(unrelatedPath, 'export const unrelated = 2;\n', 'utf8');
+
+  let repairThrew = false;
+  try {
+    repairClosurePacketForTask({ cwd: repair0135Repo, taskId: repair0135TaskId, dryRun: true });
+  } catch {
+    repairThrew = true;
+  }
+  assert(repairThrew === true, 'repair-closure without --scope must fail-closed on unrelated dirty files');
+
+  const repairDryRun = repairClosurePacketForTask({
+    cwd: repair0135Repo,
+    taskId: repair0135TaskId,
+    dryRun: true,
+    scopeTaskId: repair0135TaskId
+  });
+  assert(repairDryRun.changed === true, 'repair-closure with --scope must repair uppercase sha256 evidence/packet');
+  assert((repairDryRun.scopeWarnings ?? []).includes('packages/cli/src/commands/unrelated.ts'), 'repair-closure --scope must downgrade unrelated dirty to warnings');
+  const normalizedEvidence = readJson(repairEvidencePath);
+  const normalizedRun = normalizedEvidence.evidence?.[0]?.commandRuns?.[0];
+  assert(normalizedRun?.stdoutSha256 === lowerStdout, 'repair-closure must normalize upstream evidence sha256 to lowercase');
 
   // 驗證 evidence 檔案已補齊
   const evidencePath = path.join(reconcileRepo, '.atm', 'history', 'evidence', `${reconcileTaskId}.json`);

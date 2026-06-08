@@ -23,6 +23,60 @@ export function isTaskCloseGovernanceCriticalPath(filePath, taskId) {
         || relativePath.startsWith(`.atm/history/task-events/${normalizedTaskId}/`)
         || relativePath === `.atm/runtime/locks/${normalizedTaskId}.lock.json`;
 }
+const SHA256_DIGEST_PATTERN = /^sha256:([a-fA-F0-9]{64})$/;
+const SHA256_LOWER_PATTERN = /^sha256:[a-f0-9]{64}$/;
+const SHA256_FORMAT_EXPECTED = '^sha256:[a-f0-9]{64}$';
+export function normalizeSha256DigestValue(value) {
+    const trimmed = value.trim();
+    const match = SHA256_DIGEST_PATTERN.exec(trimmed);
+    if (!match)
+        return trimmed;
+    return `sha256:${match[1].toLowerCase()}`;
+}
+export function normalizeSha256FieldsDeep(value) {
+    if (Array.isArray(value)) {
+        return value.map((entry) => normalizeSha256FieldsDeep(entry));
+    }
+    if (value && typeof value === 'object') {
+        const next = {};
+        for (const [key, entry] of Object.entries(value)) {
+            next[key] = normalizeSha256FieldsDeep(entry);
+        }
+        return next;
+    }
+    if (typeof value === 'string' && SHA256_DIGEST_PATTERN.test(value.trim())) {
+        return normalizeSha256DigestValue(value);
+    }
+    return value;
+}
+function summarizeSha256ActualValue(value) {
+    const text = String(value ?? '');
+    return text.length > 80 ? `${text.slice(0, 77)}...` : text;
+}
+function pushSha256ValidationIssue(issues, fieldPath, raw) {
+    if (raw === undefined || raw === null || (typeof raw === 'string' && raw.trim() === '')) {
+        issues.missing.push(fieldPath);
+        return;
+    }
+    const text = String(raw).trim();
+    if (!SHA256_DIGEST_PATTERN.test(text)) {
+        issues.invalidFormat.push({
+            path: fieldPath,
+            kind: 'invalidFormat',
+            formatExpected: SHA256_FORMAT_EXPECTED,
+            actualValue: summarizeSha256ActualValue(text)
+        });
+        return;
+    }
+    if (!SHA256_LOWER_PATTERN.test(text)) {
+        issues.invalidFormat.push({
+            path: fieldPath,
+            kind: 'invalidFormat',
+            formatExpected: SHA256_FORMAT_EXPECTED,
+            actualValue: summarizeSha256ActualValue(text)
+        });
+    }
+}
 const frameworkModeSpecVersion = '0.1.0';
 const defaultRequiredGates = [
     'framework-development',
@@ -683,8 +737,9 @@ export function auditTasks(cwd) {
 export function validateClosurePacket(value) {
     const packet = value;
     const missing = [];
+    const invalidFormat = [];
     if (!packet || typeof packet !== 'object' || Array.isArray(packet)) {
-        return { ok: false, missing: ['object'] };
+        return { ok: false, missing: ['object'], invalidFormat };
     }
     if (packet.schemaId !== 'atm.closurePacket.v1')
         missing.push('schemaId');
@@ -716,10 +771,8 @@ export function validateClosurePacket(value) {
                 missing.push(`commandRuns/${index}/command`);
             if (typeof run.exitCode !== 'number')
                 missing.push(`commandRuns/${index}/exitCode`);
-            if (!/^sha256:[a-f0-9]{64}$/.test(String(run.stdoutSha256 ?? '')))
-                missing.push(`commandRuns/${index}/stdoutSha256`);
-            if (!/^sha256:[a-f0-9]{64}$/.test(String(run.stderrSha256 ?? '')))
-                missing.push(`commandRuns/${index}/stderrSha256`);
+            pushSha256ValidationIssue({ missing, invalidFormat }, `commandRuns/${index}/stdoutSha256`, run.stdoutSha256);
+            pushSha256ValidationIssue({ missing, invalidFormat }, `commandRuns/${index}/stderrSha256`, run.stderrSha256);
         }
     }
     if (!Array.isArray(packet.validationPasses) || packet.validationPasses.length === 0) {
@@ -777,7 +830,82 @@ export function validateClosurePacket(value) {
     if (packet.evidenceFreshness !== 'fresh') {
         missing.push('evidenceFreshness');
     }
-    return { ok: missing.length === 0, missing };
+    return { ok: missing.length === 0 && invalidFormat.length === 0, missing, invalidFormat };
+}
+export function normalizeUpstreamEvidenceForTask(cwd, taskId) {
+    const evidenceAbsolute = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+    const evidencePath = relativePathFrom(cwd, evidenceAbsolute);
+    if (!existsSync(evidenceAbsolute)) {
+        return { evidencePath, changed: false };
+    }
+    const parsed = readJsonIfExists(evidenceAbsolute);
+    if (!parsed)
+        return { evidencePath, changed: false };
+    const normalized = normalizeSha256FieldsDeep(parsed);
+    const before = `${JSON.stringify(parsed, null, 2)}\n`;
+    const after = `${JSON.stringify(normalized, null, 2)}\n`;
+    if (before !== after) {
+        writeFileSync(evidenceAbsolute, after, 'utf8');
+        return { evidencePath, changed: true };
+    }
+    return { evidencePath, changed: false };
+}
+function collectTaskScopeFiles(cwd, scopeTaskId) {
+    const scopeFiles = new Set();
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${scopeTaskId}.json`);
+    const taskDocument = readJsonIfExists(taskPath);
+    if (!taskDocument)
+        return scopeFiles;
+    const pushPath = (value) => {
+        if (typeof value !== 'string' || value.trim().length === 0)
+            return;
+        const normalized = normalizeProjectRelativePath(cwd, value);
+        if (normalized)
+            scopeFiles.add(normalized);
+    };
+    for (const entry of ['scopePaths', 'deliverables', 'targetAllowedFiles']) {
+        if (Array.isArray(taskDocument[entry])) {
+            for (const value of taskDocument[entry])
+                pushPath(value);
+        }
+    }
+    const claim = taskDocument.claim;
+    if (claim && typeof claim === 'object' && !Array.isArray(claim) && Array.isArray(claim.files)) {
+        for (const value of claim.files)
+            pushPath(value);
+    }
+    const directionLock = taskDocument.taskDirectionLock;
+    if (directionLock && typeof directionLock === 'object' && !Array.isArray(directionLock) && Array.isArray(directionLock.allowedFiles)) {
+        for (const value of directionLock.allowedFiles)
+            pushPath(value);
+    }
+    return scopeFiles;
+}
+function pathOverlapsTaskScope(filePath, scopeFiles) {
+    const normalized = normalizeRelativePath(filePath);
+    if (!normalized || scopeFiles.size === 0)
+        return false;
+    for (const scopePath of scopeFiles) {
+        if (normalized === scopePath)
+            return true;
+        if (scopePath.endsWith('/**') && normalized.startsWith(scopePath.slice(0, -3)))
+            return true;
+        if (normalized.startsWith(`${scopePath}/`))
+            return true;
+    }
+    return false;
+}
+function refreshPacketFromEvidenceContext(cwd, taskId, packet) {
+    const context = readClosureEvidenceContext(cwd, taskId);
+    if (context.commandRuns.length === 0) {
+        return normalizeSha256FieldsDeep(packet);
+    }
+    return normalizeSha256FieldsDeep({
+        ...packet,
+        commandRuns: context.commandRuns,
+        validationPasses: context.validationPasses.length > 0 ? context.validationPasses : packet.validationPasses,
+        evidenceFreshness: context.evidenceFreshness
+    });
 }
 export function requiredValidationPassesForClosure(requiredGates) {
     return uniqueSorted(requiredGates.filter((gate) => gate === 'typecheck' || gate.startsWith('validate:')));
@@ -817,7 +945,8 @@ export function createClosurePacket(input) {
 export function writeClosurePacket(cwd, taskId, packet) {
     const packetPath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
     mkdirSync(path.dirname(packetPath), { recursive: true });
-    writeFileSync(packetPath, `${JSON.stringify(packet, null, 2)}\n`, 'utf8');
+    const normalizedPacket = normalizeSha256FieldsDeep(packet);
+    writeFileSync(packetPath, `${JSON.stringify(normalizedPacket, null, 2)}\n`, 'utf8');
     return relativePathFrom(cwd, packetPath);
 }
 export function inspectFrameworkCloseWorktree(cwd, taskId = null) {
@@ -883,23 +1012,55 @@ export function repairClosurePacketForTask(input) {
             details: { taskId, expectedPath: packetPath }
         });
     }
+    const upstreamEvidence = normalizeUpstreamEvidenceForTask(cwd, taskId);
+    const scopeTaskId = normalizeOptionalString(input.scopeTaskId);
+    const scopeFiles = scopeTaskId ? collectTaskScopeFiles(cwd, scopeTaskId) : null;
     const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath);
-    if (trackedDirtyFiles.length > 0) {
+    const scopeWarnings = [];
+    const blockingDirtyFiles = scopeFiles
+        ? trackedDirtyFiles.filter((entry) => {
+            if (pathOverlapsTaskScope(entry, scopeFiles) || isTaskCloseGovernanceCriticalPath(entry, taskId)) {
+                return true;
+            }
+            scopeWarnings.push(entry);
+            return false;
+        })
+        : trackedDirtyFiles;
+    if (blockingDirtyFiles.length > 0) {
         throw new CliError('ATM_CLOSURE_REPAIR_DIRTY_WORKTREE', `Cannot repair closure packet for ${taskId} while unrelated tracked worktree changes are present.`, {
             exitCode: 1,
             details: {
                 taskId,
-                trackedDirtyFiles,
-                remediation: 'Run repair in an isolated worktree at the broken commit, or commit/stash unrelated changes first.'
+                trackedDirtyFiles: blockingDirtyFiles,
+                scopeWarnings: scopeWarnings.length > 0 ? scopeWarnings : undefined,
+                remediation: scopeTaskId
+                    ? 'Use --scope to downgrade unrelated dirty files to warnings, or run repair in an isolated worktree.'
+                    : 'Run repair in an isolated worktree at the broken commit, or commit/stash unrelated changes first.'
             }
         });
     }
-    const parsed = readJsonIfExists(packetAbsolutePath);
-    const validation = validateClosurePacket(parsed);
+    let parsed = readJsonIfExists(packetAbsolutePath);
+    if (parsed) {
+        parsed = refreshPacketFromEvidenceContext(cwd, taskId, parsed);
+        if (!input.dryRun) {
+            writeFileSync(packetAbsolutePath, `${JSON.stringify(parsed, null, 2)}\n`, 'utf8');
+        }
+    }
+    let validation = validateClosurePacket(parsed);
+    if ((!validation.ok || !parsed) && parsed) {
+        parsed = normalizeSha256FieldsDeep(parsed);
+        validation = validateClosurePacket(parsed);
+    }
     if (!validation.ok || !parsed) {
         throw new CliError('ATM_CLOSURE_REPAIR_PACKET_INVALID', `Closure packet for ${taskId} is invalid and cannot be repaired automatically.`, {
             exitCode: 1,
-            details: { taskId, packetPath, missing: validation.missing }
+            details: {
+                taskId,
+                packetPath,
+                missing: validation.missing,
+                invalidFormat: validation.invalidFormat,
+                upstreamEvidenceNormalized: upstreamEvidence.changed
+            }
         });
     }
     const commitMessage = buildRepairClosureCommitMessage(taskId);
@@ -949,6 +1110,10 @@ export function repairClosurePacketForTask(input) {
     const after = `${JSON.stringify(repairedPacket, null, 2)}\n`;
     const changed = before !== after;
     const upstreamStatus = classifyRepairUpstreamStatus(cwd);
+    const repairExtras = {
+        scopeWarnings: scopeWarnings.length > 0 ? uniqueSorted(scopeWarnings) : undefined,
+        upstreamEvidenceNormalized: upstreamEvidence.changed
+    };
     if (input.dryRun) {
         return {
             taskId,
@@ -965,7 +1130,8 @@ export function repairClosurePacketForTask(input) {
             upstreamStatus,
             nextActionCommand,
             commitMessage,
-            remediation
+            remediation,
+            ...repairExtras
         };
     }
     writeFileSync(packetAbsolutePath, after, 'utf8');
@@ -991,7 +1157,8 @@ export function repairClosurePacketForTask(input) {
         upstreamStatus,
         nextActionCommand,
         commitMessage,
-        remediation
+        remediation,
+        ...repairExtras
     };
 }
 export function requireTargetRepoClosureAuthority(input) {

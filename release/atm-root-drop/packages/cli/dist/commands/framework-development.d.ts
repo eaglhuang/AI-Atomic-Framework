@@ -129,6 +129,12 @@ export interface FrameworkCloseWorktreeReport {
 }
 export declare function isTaskCloseGovernanceCriticalPath(filePath: string, taskId: string): boolean;
 export type ClosureRepairUpstreamStatus = 'detached-head' | 'no-upstream' | 'ahead-of-upstream' | 'published-head-blocked';
+export interface ClosurePacketValidationIssue {
+    readonly path: string;
+    readonly kind: 'missing' | 'invalidFormat';
+    readonly formatExpected?: string;
+    readonly actualValue?: string;
+}
 export interface ClosurePacketRepairResult {
     readonly taskId: string;
     readonly packetPath: string;
@@ -145,7 +151,11 @@ export interface ClosurePacketRepairResult {
     readonly nextActionCommand: string | null;
     readonly commitMessage: string | null;
     readonly remediation: string | null;
+    readonly scopeWarnings?: readonly string[];
+    readonly upstreamEvidenceNormalized?: boolean;
 }
+export declare function normalizeSha256DigestValue(value: string): string;
+export declare function normalizeSha256FieldsDeep<T>(value: T): T;
 export interface TaskAuditFinding {
     readonly level: 'error' | 'warning';
     readonly code: string;
@@ -204,6 +214,11 @@ export declare function auditTasks(cwd: string): TaskAuditReport;
 export declare function validateClosurePacket(value: unknown): {
     ok: boolean;
     missing: readonly string[];
+    invalidFormat: readonly ClosurePacketValidationIssue[];
+};
+export declare function normalizeUpstreamEvidenceForTask(cwd: string, taskId: string): {
+    evidencePath: string;
+    changed: boolean;
 };
 export declare function requiredValidationPassesForClosure(requiredGates: readonly string[]): readonly string[];
 export declare function createClosurePacket(input: {
@@ -225,6 +240,7 @@ export declare function repairClosurePacketForTask(input: {
     readonly actorId?: string | null;
     readonly dryRun?: boolean;
     readonly amend?: boolean;
+    readonly scopeTaskId?: string | null;
 }): ClosurePacketRepairResult;
 export declare function requireTargetRepoClosureAuthority(input: {
     readonly cwd: string;

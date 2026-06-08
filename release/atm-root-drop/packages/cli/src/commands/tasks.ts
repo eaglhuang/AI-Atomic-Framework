@@ -14,6 +14,7 @@ import {
   createFrameworkModeStatus,
   inspectFrameworkCloseWorktree,
   isTaskCloseGovernanceCriticalPath,
+  normalizeSha256FieldsDeep,
   repairClosurePacketForTask,
   requireTargetRepoClosureAuthority,
   type ClosurePacket,
@@ -376,6 +377,7 @@ interface ParsedRepairClosureOptions {
   readonly actorId: string | null;
   readonly dryRun: boolean;
   readonly amend: boolean;
+  readonly scopeTaskId: string | null;
 }
 
 async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
@@ -386,7 +388,8 @@ async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
     taskId: options.taskId,
     actorId: resolvedActor?.actorId ?? null,
     dryRun: options.dryRun,
-    amend: options.amend
+    amend: options.amend,
+    scopeTaskId: options.scopeTaskId
   });
   let transitionPath: string | null = null;
   if (!options.dryRun) {
@@ -569,7 +572,7 @@ async function runTasksReconcile(argv: string[]) {
         }
       ]
     };
-    writeFileSync(evidencePath, `${JSON.stringify(envelope, null, 2)}\n`, 'utf8');
+    writeFileSync(evidencePath, `${JSON.stringify(normalizeSha256FieldsDeep(envelope), null, 2)}\n`, 'utf8');
   }
 
   // 建立 closure packet（僅在 framework repo 模式下需要）
@@ -601,6 +604,7 @@ async function runTasksReconcile(argv: string[]) {
         details: {
           taskId: options.taskId,
           missing: validation.missing,
+          invalidFormat: validation.invalidFormat,
           tldr: missingReport.tldr,
           missingValidationPasses: missingReport.missingValidationPasses,
           blockingFindings: missingReport.blockingFindings
@@ -1028,6 +1032,7 @@ async function runTasksImport(argv: string[]) {
       cwd: options.cwd,
       tasks: parsed.tasks,
       force: options.force,
+      forceOverwriteClaims: options.forceOverwriteClaims,
       resetOpen: options.resetOpen,
       reopen: options.reopen
     });
@@ -1050,6 +1055,14 @@ async function runTasksImport(argv: string[]) {
       writtenPaths
     });
   }
+
+  const activeClaimSkips = collectActiveClaimImportSkips(options.cwd, parsed.tasks, {
+    force: options.force,
+    forceOverwriteClaims: options.forceOverwriteClaims,
+    resetOpen: options.resetOpen,
+    reopen: options.reopen
+  });
+  parsed.diagnostics.push(...activeClaimSkips);
 
   const manifest: TaskImportManifest = {
     schemaId: 'atm.taskImportManifest',
@@ -1818,6 +1831,7 @@ async function runTasksClose(argv: string[]) {
           taskId: options.taskId,
           closurePacketPath: existingClosurePacketPath,
           missing: validation.missing,
+          invalidFormat: validation.invalidFormat,
           tldr: missingReport.tldr,
           missingValidationPasses: missingReport.missingValidationPasses,
           blockingFindings: missingReport.blockingFindings
@@ -1845,6 +1859,7 @@ async function runTasksClose(argv: string[]) {
         details: {
           taskId: options.taskId,
           missing: validation.missing,
+          invalidFormat: validation.invalidFormat,
           tldr: missingReport.tldr,
           missingValidationPasses: missingReport.missingValidationPasses,
           blockingFindings: missingReport.blockingFindings
@@ -4044,6 +4059,7 @@ function parseImportOptions(argv: string[]) {
     dryRun: false,
     write: false,
     force: false,
+    forceOverwriteClaims: false,
     resetOpen: false,
     reopen: false,
     // TASK-AAO-0064: --strict-paths flag
@@ -4071,6 +4087,10 @@ function parseImportOptions(argv: string[]) {
     }
     if (arg === '--force') {
       options.force = true;
+      continue;
+    }
+    if (arg === '--force-overwrite-claims') {
+      options.forceOverwriteClaims = true;
       continue;
     }
     if (arg === '--reset-open') {
@@ -4115,6 +4135,7 @@ function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {
     cwd: process.cwd(),
     taskId: null as string | null,
     actorId: null as string | null,
+    scopeTaskId: null as string | null,
     dryRun: false,
     amend: false
   };
@@ -4132,6 +4153,11 @@ function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {
     }
     if (arg === '--actor') {
       state.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--scope') {
+      state.scopeTaskId = requireValue(argv, index, '--scope');
       index += 1;
       continue;
     }
@@ -4159,6 +4185,7 @@ function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {
     cwd: path.resolve(state.cwd),
     taskId: state.taskId,
     actorId: state.actorId,
+    scopeTaskId: state.scopeTaskId,
     dryRun: state.dryRun,
     amend: state.amend
   };
@@ -4719,10 +4746,83 @@ function createTaskFromTableMetadata(input: {
 }
 
 
+function hasProtectedActiveClaim(document: Record<string, unknown> | null): boolean {
+  if (!document) return false;
+  const claim = parseClaimRecord(document.claim);
+  return Boolean(claim && (claim.state === 'active' || claim.state === 'handoff'));
+}
+
+function importWouldOverwriteTask(input: {
+  readonly current: Record<string, unknown>;
+  readonly task: TaskImportRecord;
+  readonly force: boolean;
+  readonly resetOpen: boolean;
+  readonly reopen: boolean;
+}): boolean {
+  const currentHash = (input.current.source as { hash?: string } | undefined)?.hash ?? (input.current.hash as string | undefined) ?? '';
+  if (input.resetOpen || input.reopen) return true;
+  if (input.force) return currentHash !== input.task.source.hash;
+  return currentHash !== input.task.source.hash;
+}
+
+function shouldSkipImportForActiveClaim(options: {
+  readonly force: boolean;
+  readonly forceOverwriteClaims: boolean;
+  readonly resetOpen: boolean;
+  readonly reopen: boolean;
+  readonly wouldOverwrite: boolean;
+}): boolean {
+  if (!options.wouldOverwrite || options.forceOverwriteClaims || options.force || options.resetOpen || options.reopen) {
+    return false;
+  }
+  return true;
+}
+
+function collectActiveClaimImportSkips(
+  cwd: string,
+  tasks: readonly TaskImportRecord[],
+  options: {
+    readonly force: boolean;
+    readonly forceOverwriteClaims: boolean;
+    readonly resetOpen: boolean;
+    readonly reopen: boolean;
+  }
+): TaskImportDiagnostic[] {
+  const diagnostics: TaskImportDiagnostic[] = [];
+  const taskLedger = readTaskLedgerPolicy(cwd);
+  const taskStoreDirectory = path.join(cwd, taskLedger.taskRoot);
+  for (const task of tasks) {
+    const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
+    if (!existsSync(filePath)) continue;
+    try {
+      const existingDocument = JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+      if (!hasProtectedActiveClaim(existingDocument)) continue;
+      const wouldOverwrite = importWouldOverwriteTask({
+        current: existingDocument,
+        task,
+        force: options.force,
+        resetOpen: options.resetOpen,
+        reopen: options.reopen
+      });
+      if (!shouldSkipImportForActiveClaim({ ...options, wouldOverwrite })) continue;
+      diagnostics.push({
+        level: 'warning',
+        code: 'IMPORT_SKIPPED_ACTIVE_CLAIM',
+        text: `Task ${task.workItemId} has an active claim; import skipped to avoid overwriting claim state.`,
+        workItemId: task.workItemId
+      });
+    } catch {
+      // ignore unreadable existing task files during preview
+    }
+  }
+  return diagnostics;
+}
+
 function writeTaskFiles(input: {
   readonly cwd: string;
   readonly tasks: readonly TaskImportRecord[];
   readonly force: boolean;
+  readonly forceOverwriteClaims: boolean;
   readonly resetOpen: boolean;
   readonly reopen: boolean;
 }): { writtenPaths: string[]; diagnostics: TaskImportDiagnostic[] } {
@@ -4769,6 +4869,29 @@ function writeTaskFiles(input: {
             continue;
           }
         }
+        const existingDocument = current as Record<string, unknown>;
+        const wouldOverwrite = importWouldOverwriteTask({
+          current: existingDocument,
+          task,
+          force: input.force,
+          resetOpen: input.resetOpen,
+          reopen: input.reopen
+        });
+        if (hasProtectedActiveClaim(existingDocument) && shouldSkipImportForActiveClaim({
+          force: input.force,
+          forceOverwriteClaims: input.forceOverwriteClaims,
+          resetOpen: input.resetOpen,
+          reopen: input.reopen,
+          wouldOverwrite
+        })) {
+          diagnostics.push({
+            level: 'warning',
+            code: 'IMPORT_SKIPPED_ACTIVE_CLAIM',
+            text: `Task ${task.workItemId} has an active claim; import skipped to avoid overwriting claim state.`,
+            workItemId: task.workItemId
+          });
+          continue;
+        }
         diagnostics.push({
           level: 'error',
           code: 'ATM_TASKS_IMPORT_DRIFT',
@@ -4803,6 +4926,33 @@ function writeTaskFiles(input: {
         // ignore
       }
     }
+    const wouldOverwrite = existingDocument
+      ? importWouldOverwriteTask({
+        current: existingDocument,
+        task,
+        force: input.force,
+        resetOpen: input.resetOpen,
+        reopen: input.reopen
+      })
+      : true;
+    if (existingDocument && hasProtectedActiveClaim(existingDocument) && shouldSkipImportForActiveClaim({
+      force: input.force,
+      forceOverwriteClaims: input.forceOverwriteClaims,
+      resetOpen: input.resetOpen,
+      reopen: input.reopen,
+      wouldOverwrite
+    })) {
+      diagnostics.push({
+        level: 'warning',
+        code: 'IMPORT_SKIPPED_ACTIVE_CLAIM',
+        text: `Task ${task.workItemId} has an active claim; import skipped to avoid overwriting claim state.`,
+        workItemId: task.workItemId
+      });
+      continue;
+    }
+    const displacedClaim = existingDocument && input.forceOverwriteClaims && hasProtectedActiveClaim(existingDocument)
+      ? parseClaimRecord(existingDocument.claim)
+      : null;
     const taskDocument = {
       ...task,
       ...(input.resetOpen ? { status: 'open' as const } : {}),
@@ -4814,10 +4964,9 @@ function writeTaskFiles(input: {
       delete taskDocument.closedByActor;
       delete taskDocument.closurePacket;
       delete taskDocument.closeReason;
-    } else if (existingDocument) {
+    } else if (existingDocument && hasProtectedActiveClaim(existingDocument) && input.force && !input.forceOverwriteClaims) {
       const currentClaim = parseClaimRecord(existingDocument.claim);
-      const hasActiveClaim = currentClaim && currentClaim.state === 'active';
-      if (hasActiveClaim) {
+      if (currentClaim) {
         taskDocument.claim = existingDocument.claim;
         if (existingDocument.status) taskDocument.status = existingDocument.status;
         if (existingDocument.owner) taskDocument.owner = existingDocument.owner;
@@ -4828,15 +4977,41 @@ function writeTaskFiles(input: {
         taskDocument.taskDirectionLock = existingDocument.taskDirectionLock;
       }
     }
-    writeTaskDocumentWithTransition({
+    const previousStatus = typeof existingDocument?.status === 'string' ? existingDocument.status : null;
+    const transitionPath = writeTaskDocumentWithTransition({
       cwd: input.cwd,
       taskPath: filePath,
       taskId: task.workItemId,
       taskDocument,
       action: 'import',
       actorId: null,
-      previousStatus: null
+      previousStatus
     });
+    if (displacedClaim) {
+      const displacedAt = new Date().toISOString();
+      appendTaskTransitionEvent({
+        cwd: input.cwd,
+        taskId: task.workItemId,
+        action: 'claim-displaced-by-import',
+        actorId: null,
+        sessionId: null,
+        fromStatus: previousStatus,
+        toStatus: typeof taskDocument.status === 'string' ? taskDocument.status : null,
+        taskPath: filePath,
+        taskDocument: {
+          ...taskDocument,
+          displacedClaim: {
+            actorId: displacedClaim.actorId,
+            leaseId: displacedClaim.leaseId,
+            state: displacedClaim.state,
+            reason: 'import overwrite with --force-overwrite-claims',
+            importTransitionPath: transitionPath
+          }
+        },
+        command: 'node atm.mjs tasks import --write --force-overwrite-claims',
+        createdAt: displacedAt
+      });
+    }
     writtenPaths.push(relativePathFrom(input.cwd, filePath));
   }
   return { writtenPaths, diagnostics };

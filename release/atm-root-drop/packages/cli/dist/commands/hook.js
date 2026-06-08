@@ -1205,9 +1205,12 @@ function inspectClosurePacketAgainstCommit(cwd, commitSha, packetPath, packet, e
         ? String(packet.taskId)
         : null;
     if (!validation.ok) {
+        const invalidFormatSummary = validation.invalidFormat.length > 0
+            ? `; invalidFormat=${validation.invalidFormat.map((entry) => entry.path).join(', ')}`
+            : '';
         findings.push({
             code: 'ATM_COMMIT_RANGE_CLOSURE_PACKET_INVALID',
-            detail: `closure packet contract is incomplete (${validation.missing.join(', ')})`
+            detail: `closure packet contract is incomplete (${validation.missing.join(', ')}${invalidFormatSummary})`
         });
         return { commitSha, packetPath, taskId, findings };
     }

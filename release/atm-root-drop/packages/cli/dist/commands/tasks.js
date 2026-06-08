@@ -7,7 +7,7 @@ import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../
 import { resolveActorId } from './actor-registry.js';
 import { resolveActorWorkSession, updateActorWorkSessionState, upsertActorWorkSession } from './actor-session.js';
 import { computeMissingValidatorReport, verifyTaskEvidence } from './evidence.js';
-import { auditTasks, createClosurePacket, createFrameworkModeStatus, inspectFrameworkCloseWorktree, isTaskCloseGovernanceCriticalPath, repairClosurePacketForTask, requireTargetRepoClosureAuthority, validateClosurePacket, writeClosurePacket } from './framework-development.js';
+import { auditTasks, createClosurePacket, createFrameworkModeStatus, inspectFrameworkCloseWorktree, isTaskCloseGovernanceCriticalPath, normalizeSha256FieldsDeep, repairClosurePacketForTask, requireTargetRepoClosureAuthority, validateClosurePacket, writeClosurePacket } from './framework-development.js';
 import { CliError, makeResult, message, parseJsonText, parseOptions, parseArgsForCommand, relativePathFrom, resolveValue } from './shared.js';
 import { appendTaskTransitionEvent, createTaskTransitionId, defaultMirrorTaskId, readTaskLedgerPolicy } from './task-ledger.js';
 import { readPluginRegistry } from '../plugin-registry.js';
@@ -145,7 +145,8 @@ async function runTasksRepairClosure(argv) {
         taskId: options.taskId,
         actorId: resolvedActor?.actorId ?? null,
         dryRun: options.dryRun,
-        amend: options.amend
+        amend: options.amend,
+        scopeTaskId: options.scopeTaskId
     });
     let transitionPath = null;
     if (!options.dryRun) {
@@ -307,7 +308,7 @@ async function runTasksReconcile(argv) {
                 }
             ]
         };
-        writeFileSync(evidencePath, `${JSON.stringify(envelope, null, 2)}\n`, 'utf8');
+        writeFileSync(evidencePath, `${JSON.stringify(normalizeSha256FieldsDeep(envelope), null, 2)}\n`, 'utf8');
     }
     // 建立 closure packet（僅在 framework repo 模式下需要）
     let closurePacketPath = null;
@@ -338,6 +339,7 @@ async function runTasksReconcile(argv) {
                 details: {
                     taskId: options.taskId,
                     missing: validation.missing,
+                    invalidFormat: validation.invalidFormat,
                     tldr: missingReport.tldr,
                     missingValidationPasses: missingReport.missingValidationPasses,
                     blockingFindings: missingReport.blockingFindings
@@ -742,6 +744,7 @@ async function runTasksImport(argv) {
             cwd: options.cwd,
             tasks: parsed.tasks,
             force: options.force,
+            forceOverwriteClaims: options.forceOverwriteClaims,
             resetOpen: options.resetOpen,
             reopen: options.reopen
         });
@@ -764,6 +767,13 @@ async function runTasksImport(argv) {
             writtenPaths
         });
     }
+    const activeClaimSkips = collectActiveClaimImportSkips(options.cwd, parsed.tasks, {
+        force: options.force,
+        forceOverwriteClaims: options.forceOverwriteClaims,
+        resetOpen: options.resetOpen,
+        reopen: options.reopen
+    });
+    parsed.diagnostics.push(...activeClaimSkips);
     const manifest = {
         schemaId: 'atm.taskImportManifest',
         specVersion: '0.1.0',
@@ -1508,6 +1518,7 @@ async function runTasksClose(argv) {
                     taskId: options.taskId,
                     closurePacketPath: existingClosurePacketPath,
                     missing: validation.missing,
+                    invalidFormat: validation.invalidFormat,
                     tldr: missingReport.tldr,
                     missingValidationPasses: missingReport.missingValidationPasses,
                     blockingFindings: missingReport.blockingFindings
@@ -1536,6 +1547,7 @@ async function runTasksClose(argv) {
                 details: {
                     taskId: options.taskId,
                     missing: validation.missing,
+                    invalidFormat: validation.invalidFormat,
                     tldr: missingReport.tldr,
                     missingValidationPasses: missingReport.missingValidationPasses,
                     blockingFindings: missingReport.blockingFindings
@@ -3508,6 +3520,7 @@ function parseImportOptions(argv) {
         dryRun: false,
         write: false,
         force: false,
+        forceOverwriteClaims: false,
         resetOpen: false,
         reopen: false,
         // TASK-AAO-0064: --strict-paths flag
@@ -3535,6 +3548,10 @@ function parseImportOptions(argv) {
         }
         if (arg === '--force') {
             options.force = true;
+            continue;
+        }
+        if (arg === '--force-overwrite-claims') {
+            options.forceOverwriteClaims = true;
             continue;
         }
         if (arg === '--reset-open') {
@@ -3578,6 +3595,7 @@ function parseRepairClosureOptions(argv) {
         cwd: process.cwd(),
         taskId: null,
         actorId: null,
+        scopeTaskId: null,
         dryRun: false,
         amend: false
     };
@@ -3595,6 +3613,11 @@ function parseRepairClosureOptions(argv) {
         }
         if (arg === '--actor') {
             state.actorId = requireValue(argv, index, '--actor');
+            index += 1;
+            continue;
+        }
+        if (arg === '--scope') {
+            state.scopeTaskId = requireValue(argv, index, '--scope');
             index += 1;
             continue;
         }
@@ -3622,6 +3645,7 @@ function parseRepairClosureOptions(argv) {
         cwd: path.resolve(state.cwd),
         taskId: state.taskId,
         actorId: state.actorId,
+        scopeTaskId: state.scopeTaskId,
         dryRun: state.dryRun,
         amend: state.amend
     };
@@ -4124,6 +4148,60 @@ function parseTaskSection(input) {
 function createTaskFromTableMetadata(input) {
     return delegatedCreateTaskFromTableMetadata({ ...input, hashSection });
 }
+function hasProtectedActiveClaim(document) {
+    if (!document)
+        return false;
+    const claim = parseClaimRecord(document.claim);
+    return Boolean(claim && (claim.state === 'active' || claim.state === 'handoff'));
+}
+function importWouldOverwriteTask(input) {
+    const currentHash = input.current.source?.hash ?? input.current.hash ?? '';
+    if (input.resetOpen || input.reopen)
+        return true;
+    if (input.force)
+        return currentHash !== input.task.source.hash;
+    return currentHash !== input.task.source.hash;
+}
+function shouldSkipImportForActiveClaim(options) {
+    if (!options.wouldOverwrite || options.forceOverwriteClaims || options.force || options.resetOpen || options.reopen) {
+        return false;
+    }
+    return true;
+}
+function collectActiveClaimImportSkips(cwd, tasks, options) {
+    const diagnostics = [];
+    const taskLedger = readTaskLedgerPolicy(cwd);
+    const taskStoreDirectory = path.join(cwd, taskLedger.taskRoot);
+    for (const task of tasks) {
+        const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
+        if (!existsSync(filePath))
+            continue;
+        try {
+            const existingDocument = JSON.parse(readFileSync(filePath, 'utf8'));
+            if (!hasProtectedActiveClaim(existingDocument))
+                continue;
+            const wouldOverwrite = importWouldOverwriteTask({
+                current: existingDocument,
+                task,
+                force: options.force,
+                resetOpen: options.resetOpen,
+                reopen: options.reopen
+            });
+            if (!shouldSkipImportForActiveClaim({ ...options, wouldOverwrite }))
+                continue;
+            diagnostics.push({
+                level: 'warning',
+                code: 'IMPORT_SKIPPED_ACTIVE_CLAIM',
+                text: `Task ${task.workItemId} has an active claim; import skipped to avoid overwriting claim state.`,
+                workItemId: task.workItemId
+            });
+        }
+        catch {
+            // ignore unreadable existing task files during preview
+        }
+    }
+    return diagnostics;
+}
 function writeTaskFiles(input) {
     const writtenPaths = [];
     const diagnostics = [];
@@ -4168,6 +4246,29 @@ function writeTaskFiles(input) {
                         continue;
                     }
                 }
+                const existingDocument = current;
+                const wouldOverwrite = importWouldOverwriteTask({
+                    current: existingDocument,
+                    task,
+                    force: input.force,
+                    resetOpen: input.resetOpen,
+                    reopen: input.reopen
+                });
+                if (hasProtectedActiveClaim(existingDocument) && shouldSkipImportForActiveClaim({
+                    force: input.force,
+                    forceOverwriteClaims: input.forceOverwriteClaims,
+                    resetOpen: input.resetOpen,
+                    reopen: input.reopen,
+                    wouldOverwrite
+                })) {
+                    diagnostics.push({
+                        level: 'warning',
+                        code: 'IMPORT_SKIPPED_ACTIVE_CLAIM',
+                        text: `Task ${task.workItemId} has an active claim; import skipped to avoid overwriting claim state.`,
+                        workItemId: task.workItemId
+                    });
+                    continue;
+                }
                 diagnostics.push({
                     level: 'error',
                     code: 'ATM_TASKS_IMPORT_DRIFT',
@@ -4204,6 +4305,33 @@ function writeTaskFiles(input) {
                 // ignore
             }
         }
+        const wouldOverwrite = existingDocument
+            ? importWouldOverwriteTask({
+                current: existingDocument,
+                task,
+                force: input.force,
+                resetOpen: input.resetOpen,
+                reopen: input.reopen
+            })
+            : true;
+        if (existingDocument && hasProtectedActiveClaim(existingDocument) && shouldSkipImportForActiveClaim({
+            force: input.force,
+            forceOverwriteClaims: input.forceOverwriteClaims,
+            resetOpen: input.resetOpen,
+            reopen: input.reopen,
+            wouldOverwrite
+        })) {
+            diagnostics.push({
+                level: 'warning',
+                code: 'IMPORT_SKIPPED_ACTIVE_CLAIM',
+                text: `Task ${task.workItemId} has an active claim; import skipped to avoid overwriting claim state.`,
+                workItemId: task.workItemId
+            });
+            continue;
+        }
+        const displacedClaim = existingDocument && input.forceOverwriteClaims && hasProtectedActiveClaim(existingDocument)
+            ? parseClaimRecord(existingDocument.claim)
+            : null;
         const taskDocument = {
             ...task,
             ...(input.resetOpen ? { status: 'open' } : {}),
@@ -4216,10 +4344,9 @@ function writeTaskFiles(input) {
             delete taskDocument.closurePacket;
             delete taskDocument.closeReason;
         }
-        else if (existingDocument) {
+        else if (existingDocument && hasProtectedActiveClaim(existingDocument) && input.force && !input.forceOverwriteClaims) {
             const currentClaim = parseClaimRecord(existingDocument.claim);
-            const hasActiveClaim = currentClaim && currentClaim.state === 'active';
-            if (hasActiveClaim) {
+            if (currentClaim) {
                 taskDocument.claim = existingDocument.claim;
                 if (existingDocument.status)
                     taskDocument.status = existingDocument.status;
@@ -4234,15 +4361,41 @@ function writeTaskFiles(input) {
                 taskDocument.taskDirectionLock = existingDocument.taskDirectionLock;
             }
         }
-        writeTaskDocumentWithTransition({
+        const previousStatus = typeof existingDocument?.status === 'string' ? existingDocument.status : null;
+        const transitionPath = writeTaskDocumentWithTransition({
             cwd: input.cwd,
             taskPath: filePath,
             taskId: task.workItemId,
             taskDocument,
             action: 'import',
             actorId: null,
-            previousStatus: null
+            previousStatus
         });
+        if (displacedClaim) {
+            const displacedAt = new Date().toISOString();
+            appendTaskTransitionEvent({
+                cwd: input.cwd,
+                taskId: task.workItemId,
+                action: 'claim-displaced-by-import',
+                actorId: null,
+                sessionId: null,
+                fromStatus: previousStatus,
+                toStatus: typeof taskDocument.status === 'string' ? taskDocument.status : null,
+                taskPath: filePath,
+                taskDocument: {
+                    ...taskDocument,
+                    displacedClaim: {
+                        actorId: displacedClaim.actorId,
+                        leaseId: displacedClaim.leaseId,
+                        state: displacedClaim.state,
+                        reason: 'import overwrite with --force-overwrite-claims',
+                        importTransitionPath: transitionPath
+                    }
+                },
+                command: 'node atm.mjs tasks import --write --force-overwrite-claims',
+                createdAt: displacedAt
+            });
+        }
         writtenPaths.push(relativePathFrom(input.cwd, filePath));
     }
     return { writtenPaths, diagnostics };
