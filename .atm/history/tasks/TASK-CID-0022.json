@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0022",
   "title": "Next claim and closeout broker integration",
-  "status": "running",
+  "status": "done",
   "milestone": "P0",
   "dependencies": [
     "TASK-CID-0016",
@@ -77,8 +77,8 @@
     "hash": "cba45b5fb7facad2"
   },
   "importedAt": "2026-06-08T08:56:32.635Z",
-  "lastTransitionId": "2026-06-08T12-30-35-864Z-claim-2e5a4b5586dd",
-  "lastTransitionAt": "2026-06-08T12:30:35.864Z",
+  "lastTransitionId": "2026-06-08T12-54-48-162Z-close-21a33aaa6f4c",
+  "lastTransitionAt": "2026-06-08T12:54:48.162Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "001",
   "reservedAt": "2026-06-08T12:30:35.837Z",
@@ -87,7 +87,7 @@
     "actorId": "001",
     "leaseId": "lease-cae62dbfa3b0",
     "claimedAt": "2026-06-08T12:30:35.843Z",
-    "heartbeatAt": "2026-06-08T12:30:35.843Z",
+    "heartbeatAt": "2026-06-08T12:54:48.162Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0022.json",
@@ -101,7 +101,8 @@
       "scripts/validate-prompt-scoped-next.ts",
       "scripts/validators.config.json"
     ],
-    "state": "active"
+    "state": "released",
+    "reason": "reconciled"
   },
   "startedAt": "2026-06-08T12:30:35.843Z",
   "startedByActor": "001",
@@ -135,5 +136,10 @@
     "actorId": "001",
     "createdAt": "2026-06-08T12:30:35.864Z",
     "status": "active"
-  }
+  },
+  "closurePacket": ".atm/history/evidence/TASK-CID-0022.closure-packet.json",
+  "closedAt": "2026-06-08T12:54:48.162Z",
+  "closedByActor": "001",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 531346d893793396596a76a3dc00baa7878e1f87"
 }
