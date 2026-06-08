@@ -1,0 +1,146 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0021",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "792aafcea03800608eef8f0377720f264823a844",
+  "governedTreeSha": "59f8b4c05c15875f2f838b7e3243b760b0aeaaa7",
+  "targetCommitDelta": {
+    "currentCommitSha": "792aafcea03800608eef8f0377720f264823a844",
+    "parentCommitShas": [
+      "792aafcea03800608eef8f0377720f264823a844"
+    ],
+    "governedTreeSha": "59f8b4c05c15875f2f838b7e3243b760b0aeaaa7",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0021.json",
+      ".atm/history/task-events/TASK-CID-0021/2026-06-08T16-22-07-817Z-import-7c5191bcf682.json",
+      ".atm/history/task-events/TASK-CID-0021/2026-06-08T16-22-20-422Z-reserve-2cd8eb79101b.json",
+      ".atm/history/task-events/TASK-CID-0021/2026-06-08T16-22-20-425Z-promote-9f3a07c08887.json",
+      ".atm/history/task-events/TASK-CID-0021/2026-06-08T16-22-20-445Z-claim-dd49b7ba5db3.json",
+      ".atm/history/tasks/TASK-CID-0021.json",
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "scripts/validate-team-brokered-write.ts",
+      "scripts/validators.config.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:team-brokered-write",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:615d8003cd80d2b7380f261574f49d073a54f7e5a68a48e4e2caf33f1758d819",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4cf1b0975d1d04ae04689c084a25ad104a2076c7493193d697636c0293adfa5c",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-brokered-write"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-08T16:23:25.593Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0021-team-agents-brokered-write-runtime-integration.task.md",
+      ".atm/history/evidence/TASK-CID-0021.*",
+      ".atm/history/task-events/TASK-CID-0021/**",
+      ".atm/history/tasks/TASK-CID-0021.json",
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "scripts/validate-team-brokered-write.ts",
+      "scripts/validators.config.json"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "scripts/validate-team-brokered-write.ts",
+      "scripts/validators.config.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0021.json",
+  "closedAt": "2026-06-08T16:23:25.593Z",
+  "closedByActor": "008",
+  "sessionId": "session-20260608162220-008-TASK-CID-0021-6b9ff01274",
+  "attestation": null
+}
