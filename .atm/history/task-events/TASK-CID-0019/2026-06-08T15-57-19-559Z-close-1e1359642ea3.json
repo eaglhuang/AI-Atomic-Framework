@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-08T15-57-19-559Z-close-1e1359642ea3",
+  "taskId": "TASK-CID-0019",
+  "action": "close",
+  "actorId": "008",
+  "sessionId": "session-20260608155527-008-TASK-CID-0019-98e38c0bd0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0019.json",
+  "taskSha256": "sha256:537762527868b10c900a84234c25eb75a98c3aef308b59f3aee1bf7bc6ef342a",
+  "createdAt": "2026-06-08T15:57:19.559Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0019 --actor 008 --status done --historical-delivery 733d6a885a21e2acff636b0463bb470850dad0fa",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260608155527-008-TASK-CID-0019-98e38c0bd0",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0019.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:broker-compose",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-08T15:57:19.556Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0019-deterministic-composer-and-merge-plan.task.md",
+        ".atm/history/evidence/TASK-CID-0019.*",
+        ".atm/history/task-events/TASK-CID-0019/**",
+        ".atm/history/tasks/TASK-CID-0019.json",
+        "package.json",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/merge-plan.ts",
+        "scripts/validate-broker-compose.ts",
+        "scripts/validators.config.json",
+        "tests/cli-fixtures/help-snapshots/broker.json"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/merge-plan.ts",
+        "scripts/validate-broker-compose.ts",
+        "scripts/validators.config.json",
+        "tests/cli-fixtures/help-snapshots/broker.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

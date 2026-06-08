@@ -1,0 +1,152 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0019",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0db14918c675983e2afd9043aa499bc755327a1f",
+  "governedTreeSha": "c2233a875655035785621f0d93d1d2c7c42f98cc",
+  "targetCommitDelta": {
+    "currentCommitSha": "0db14918c675983e2afd9043aa499bc755327a1f",
+    "parentCommitShas": [
+      "0db14918c675983e2afd9043aa499bc755327a1f"
+    ],
+    "governedTreeSha": "c2233a875655035785621f0d93d1d2c7c42f98cc",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0019.json",
+      ".atm/history/task-events/TASK-CID-0019/2026-06-08T15-55-17-433Z-import-15582dd84d59.json",
+      ".atm/history/task-events/TASK-CID-0019/2026-06-08T15-55-27-949Z-reserve-4634c7fa5855.json",
+      ".atm/history/task-events/TASK-CID-0019/2026-06-08T15-55-27-953Z-promote-a0e6be7c2a9f.json",
+      ".atm/history/task-events/TASK-CID-0019/2026-06-08T15-55-27-989Z-claim-4d9c0780fbfa.json",
+      ".atm/history/tasks/TASK-CID-0019.json",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/merge-plan.ts",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validators.config.json",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:broker-compose",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c11a51131311e621e9ade6c7cba7f122e8eb1c912eeb3f363506b94a72ed73b",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a6bcc3557b728c2813ccf14275078dc382bdedc66f41834f0e870ac3b6746a34",
+      "stderrSha256": "sha256:8d7492de11bb27bb8c19f0821fab03e25d052f80007ca1c287e96ba3907457fd",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:broker-compose",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-08T15:57:19.556Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0019-deterministic-composer-and-merge-plan.task.md",
+      ".atm/history/evidence/TASK-CID-0019.*",
+      ".atm/history/task-events/TASK-CID-0019/**",
+      ".atm/history/tasks/TASK-CID-0019.json",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/merge-plan.ts",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validators.config.json",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/merge-plan.ts",
+      "scripts/validate-broker-compose.ts",
+      "scripts/validators.config.json",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0019.json",
+  "closedAt": "2026-06-08T15:57:19.556Z",
+  "closedByActor": "008",
+  "sessionId": "session-20260608155527-008-TASK-CID-0019-98e38c0bd0",
+  "attestation": null
+}
