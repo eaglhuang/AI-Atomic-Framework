@@ -1,0 +1,204 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0018",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f41bad992f1626ae7188e94064e91db5288f9aa1",
+  "governedTreeSha": "a4128121a7af7e2e59e86edcc1235a266c9a42c5",
+  "targetCommitDelta": {
+    "currentCommitSha": "f41bad992f1626ae7188e94064e91db5288f9aa1",
+    "parentCommitShas": [
+      "f41bad992f1626ae7188e94064e91db5288f9aa1"
+    ],
+    "governedTreeSha": "a4128121a7af7e2e59e86edcc1235a266c9a42c5",
+    "changedFiles": [
+      ".atm/history/task-events/TASK-CID-0018/2026-06-07T12-32-44-512Z-handoff-4dfab2a3f03d.json",
+      ".atm/history/task-events/TASK-CID-0018/2026-06-07T14-46-45-826Z-import-db95aee55bab.json",
+      ".atm/history/task-events/TASK-CID-0018/2026-06-07T14-47-41-413Z-reserve-999b2b0db0b3.json",
+      ".atm/history/task-events/TASK-CID-0018/2026-06-07T14-47-41-416Z-promote-b5102e230e19.json",
+      ".atm/history/task-events/TASK-CID-0018/2026-06-07T14-47-41-437Z-claim-d7ff3a4f5d35.json",
+      ".atm/history/tasks/TASK-CID-0018.json",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/proposal.ts",
+      "release/atm-onefile/atm.mjs",
+      "scripts/validate-broker-proposal.ts",
+      "scripts/validate-framework-development-governance.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validators.config.json",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-broker-proposal.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "stderrSha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5098B124E7F8A0C08AC224DE3000A9407CEA1369551AE9838DFEA3A197D0F69A",
+      "stderrSha256": "sha256:E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:broker-proposal",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c08486df81f580f042f9ae1b5f51a3aa828c3664687f4b2eddfb67fad3476f3c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-proposal.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e83167b3ab87efa40f00101fd573340e0a904f529fefbde9be45612574a6898d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74b41b7d4ae909f16b343d27e3f5f3ea6842ae3719c08649b4f8f2afc28c1e03",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:14200c018c0f2291d5416aa2c064796227cfb9e05c1d1fba3096647a8ac1f357",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5fa09141a69f3f914918d073f0934f4be5bd9969da5ad56033cee50160466cfa",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "git-diff-check",
+    "typecheck",
+    "validate-broker-proposal",
+    "validate:broker-proposal",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-07T14:48:07.852Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0018-patch-proposal-capsule-runtime.task.md",
+      ".atm/history/evidence/TASK-CID-0018.*",
+      ".atm/history/task-events/TASK-CID-0018/**",
+      ".atm/history/tasks/TASK-CID-0018.json",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/proposal.ts",
+      "scripts/validate-broker-proposal.ts",
+      "scripts/validate-framework-development-governance.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validators.config.json",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/proposal.ts",
+      "scripts/validate-broker-proposal.ts",
+      "scripts/validate-framework-development-governance.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validators.config.json",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0018.json",
+  "closedAt": "2026-06-07T14:48:07.852Z",
+  "closedByActor": "008",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "66a6c9a828922ef1e4dbaa1a852de1589d9f6ced",
+    "reconciledAt": "2026-06-07T14:48:06.853Z",
+    "reconciledByActor": "008",
+    "reason": "Historical reconcile sync against commit 66a6c9a828922ef1e4dbaa1a852de1589d9f6ced"
+  }
+}
