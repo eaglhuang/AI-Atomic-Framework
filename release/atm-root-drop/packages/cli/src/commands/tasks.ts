@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, wri
 import path from 'node:path';
 import type { TaskClaimRecord, WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
+import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../../core/src/broker/lifecycle.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, updateActorWorkSessionState, upsertActorWorkSession } from './actor-session.ts';
 import { computeMissingValidatorReport, verifyTaskEvidence } from './evidence.ts';
@@ -2888,6 +2889,11 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       sessionId: sessionRecord?.session.sessionId ?? null,
       previousStatus
     });
+    clearBrokerRuntimeStateForTask({
+      cwd: options.cwd,
+      taskId: options.taskId
+    });
+    removeBrokerRegistryIfEmpty(options.cwd);
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -2943,6 +2949,11 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       sessionId: sessionRecord?.session.sessionId ?? null,
       previousStatus
     });
+    clearBrokerRuntimeStateForTask({
+      cwd: options.cwd,
+      taskId: options.taskId
+    });
+    removeBrokerRegistryIfEmpty(options.cwd);
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -3001,6 +3012,11 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       sessionId: sessionRecord?.session.sessionId ?? null,
       previousStatus
     });
+    clearBrokerRuntimeStateForTask({
+      cwd: options.cwd,
+      taskId: options.taskId
+    });
+    removeBrokerRegistryIfEmpty(options.cwd);
     return makeResult({
       ok: true,
       command: 'tasks',

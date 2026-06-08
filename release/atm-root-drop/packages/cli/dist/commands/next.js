@@ -13,6 +13,7 @@ import { resolveActorId } from './actor-registry.js';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.js';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.js';
 import { classifyTaskDelivery } from './task-intent.js';
+import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/dist/broker/lifecycle.js';
 import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, writeTaskDirectionLock } from './task-direction.js';
 import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, writeBatchRun, writeQuickfixLock } from './work-channels.js';
 import { decideActiveBatchClaimTask } from './next-active-batch.js';
@@ -563,6 +564,22 @@ async function claimNextImportedTask(input) {
         cwd: input.cwd,
         task: claimableTask
     });
+    const brokerClaimCheck = inspectBrokerClaimLifecycle({
+        cwd: input.cwd,
+        taskId: claimableTask.workItemId,
+        actorId: resolvedActor.actorId
+    });
+    if (!brokerClaimCheck.ok) {
+        throw new CliError('ATM_BROKER_LIFECYCLE_BLOCKED', brokerClaimCheck.reason ?? `Task ${claimableTask.workItemId} cannot claim because broker runtime state is blocked.`, {
+            exitCode: 1,
+            details: {
+                taskId: claimableTask.workItemId,
+                actorId: resolvedActor.actorId,
+                registryPath: brokerClaimCheck.registryPath,
+                blockingIntent: brokerClaimCheck.blockingIntent
+            }
+        });
+    }
     const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
     const claimPreparation = alreadyClaimedByActor
         ? {
@@ -680,6 +697,14 @@ async function claimNextImportedTask(input) {
         guidanceSessionId: null
     }).session;
     const recommendedChannel = batchRun?.status === 'active' ? 'batch' : 'normal';
+    recordBrokerClaimIntent({
+        cwd: input.cwd,
+        taskId: claimableTask.workItemId,
+        actorId: resolvedActor.actorId,
+        lane: recommendedChannel === 'batch' ? 'serial' : 'direct-brokered',
+        targetFiles: directionLock.allowedFiles,
+        ttlSeconds: 1800
+    });
     const teamRecommendation = buildTeamRecommendation({
         taskId: claimableTask.workItemId,
         actorId: resolvedActor.actorId,

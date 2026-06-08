@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// @ts-nocheck
 import {
   closeSync,
   copyFileSync,
@@ -17,6 +16,230 @@ import {
 import path from 'node:path';
 import process from 'node:process';
 
+type Role = 'captain' | 'worker' | 'all';
+type FrontMatter = Record<string, unknown>;
+type YamlRecord = Record<string, string | string[]>;
+
+interface AgentRef {
+  id: string;
+  model: string;
+}
+
+interface MailboxOptions {
+  root: string;
+  agents: AgentRef[];
+  captainModel: string;
+  workerModel: string;
+  role: Role;
+  agentId: string | null;
+  completeActive: boolean;
+  reportStatus: string;
+  reportSummary: string | null;
+  reportEvidence: string[];
+  reportFile: string | null;
+  staleMinutes: number;
+  maxDispatch: number;
+  captainNoReportLimit: number;
+  captainNoDispatchMinutes: number;
+  workerNoDispatchLimit: number;
+  workerNoReportMinutes: number;
+  clearStopLoss: boolean;
+  reset: boolean;
+  seedDemo: boolean;
+  simulateWorkers: boolean;
+  assertClean: boolean;
+  json: boolean;
+  help: boolean;
+}
+
+interface AgentLayout {
+  root: string;
+  inbox: string;
+  active: string;
+  done: string;
+  reports: string;
+  handoff: string;
+  stopLoss: string;
+}
+
+interface CaptainLayout {
+  root: string;
+  inbox: string;
+  outbox: string;
+  reports: string;
+  queue: string;
+  archive: string;
+  handoff: string;
+  stopLoss: string;
+}
+
+interface MailboxLayout {
+  root: string;
+  state: string;
+  ledger: string;
+  lock: string;
+  captain: CaptainLayout;
+  agents: Map<string, AgentLayout>;
+}
+
+interface CaptainStopLossState {
+  noReportCycles: number;
+  noDispatchSince: string | null;
+  paused: boolean;
+  stoppedAt: string | null;
+  lastTrigger: string | null;
+  lastStopLossReportPath: string | null;
+}
+
+interface WorkerStopLossState {
+  noDispatchCycles: number;
+  activeSince: string | null;
+  paused: boolean;
+  stoppedAt: string | null;
+  lastTrigger: string | null;
+  lastStopLossReportPath: string | null;
+}
+
+interface StopLossState {
+  captain: CaptainStopLossState;
+  workers: Record<string, WorkerStopLossState>;
+}
+
+interface DispatchRecord {
+  id?: string;
+  sourceJobId?: string;
+  title?: string;
+  assignee?: string;
+  assigneeModel?: string;
+  captainModel?: string;
+  status?: string;
+  createdAt?: string;
+  claimedAt?: string;
+  completedAt?: string;
+  reportedAt?: string;
+  outboxPath?: string;
+  agentInboxPath?: string;
+  archivedQueuePath?: string;
+  activePath?: string;
+  donePath?: string;
+  agentReportPath?: string;
+  captainInboxReportPath?: string;
+  reportPath?: string;
+}
+
+interface Ledger {
+  schemaVersion: number;
+  captain: { id: string; model: string };
+  agents: AgentRef[];
+  dispatches: Record<string, DispatchRecord>;
+  stopLoss: StopLossState;
+}
+
+interface QueueJob {
+  id: string;
+  title: string;
+  sourceKind: string;
+  sourceFrontMatterRaw: string | null;
+  assignee: string | null;
+  objective: string;
+  status: string;
+  owner: string;
+  priority: string;
+  dependsOn: string[];
+  relatedPlan: string | null;
+  planningRepo: string;
+  targetRepo: string;
+  closureAuthority: string;
+  scope: string[];
+  deliverables: string[];
+  validators: string[];
+  evidenceRequired: string;
+  rollbackStrategy: string;
+  atomizationOwner: string;
+  atomizationMapUpdates: string[];
+  workModel: string | null;
+  outOfScope: string[];
+  sourceBody: string | null;
+}
+
+interface ParsedMarkdown {
+  frontMatter: FrontMatter;
+  heading: string | null;
+  body: string;
+  rawFrontMatter: string | null;
+}
+
+interface AgentBacklog {
+  inbox: number;
+  active: number;
+  done: number;
+  reports: number;
+}
+
+interface BacklogSnapshot {
+  captain: {
+    queue: number;
+    inbox: number;
+    outbox: number;
+    reports: number;
+  };
+  agents: Record<string, AgentBacklog>;
+}
+
+interface WorkerReportOptions {
+  status?: string;
+  summary?: string | null;
+  evidence?: string[];
+  reportMarkdown?: string;
+}
+
+interface MailboxSummary {
+  ok: boolean;
+  root: string;
+  cycleStartedAt: string;
+  cycleFinishedAt?: string;
+  captain: { id: string; model: string };
+  agents: AgentRef[];
+  role: Role;
+  decisionPacket: {
+    skillUsed: string;
+    delegationMode: string;
+    basis: string[];
+    nextAction: string | null;
+  };
+  seededDemoJobs: string[];
+  cycleInputBacklog: BacklogSnapshot | null;
+  dispatched: Array<{ dispatchId: string; assignee: string; assigneeModel: string; title: string }>;
+  claimed: Array<{ dispatchId: string; agentId: string; activePath: string }>;
+  completed: Array<{ dispatchId: string; agentId: string; donePath: string; reportPath: string }>;
+  reportsReceived: Array<{ phase: string; dispatchId: string | undefined; agentId: string; reportPath: string }>;
+  idleAgents: string[];
+  busyAgents: Array<{ agentId: string; active: string[] }>;
+  staleUnclaimed: Array<{ agentId: string; dispatchId: string; ageMinutes: number; path: string }>;
+  backlog: BacklogSnapshot | null;
+  stopLoss: {
+    shouldStop: boolean;
+    paused: boolean;
+    cleared: boolean;
+    actor: string;
+    automationId: string;
+    trigger: string | null;
+    reason: string | null;
+    reportPath: string | null;
+    thresholds: {
+      captainNoReportLimit: number;
+      captainNoDispatchMinutes: number;
+      workerNoDispatchLimit: number;
+      workerNoReportMinutes: number;
+    };
+    counters: Record<string, unknown>;
+    activeDispatches: Array<{ dispatchId: string; path: string; since: string; ageMinutes: number | null }>;
+  };
+  handoffPath: string | null;
+  readyForNextCycle: boolean;
+  errors: string[];
+}
+
 const DEFAULT_ROOT = path.join('.atm-temp', 'captain-dispatch-mailbox');
 const DEFAULT_CAPTAIN_MODEL = 'codex-5.4';
 const DEFAULT_WORKER_MODEL = 'gpt-5.4-mini';
@@ -27,13 +250,35 @@ const DEFAULT_CAPTAIN_NO_DISPATCH_MINUTES = 10;
 const DEFAULT_WORKER_NO_DISPATCH_LIMIT = 10;
 const DEFAULT_WORKER_NO_REPORT_MINUTES = 15;
 
-function parseArgs(argv) {
-  const options = {
+function fmString(fm: FrontMatter, ...keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = fm[key];
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return normalizeYamlScalar(value);
+    }
+  }
+  return undefined;
+}
+
+function resolveDispatchId(fm: FrontMatter, fallback: string): string {
+  return fmString(fm, 'dispatch_id', 'dispatchId') || fallback;
+}
+
+function requireAgentLayout(layout: MailboxLayout, agentId: string): AgentLayout {
+  const agentLayout = layout.agents.get(agentId);
+  if (!agentLayout) {
+    throw new Error(`Unknown agent layout: ${agentId}`);
+  }
+  return agentLayout;
+}
+
+function parseArgs(argv: string[]): MailboxOptions {
+  const options: MailboxOptions = {
     root: DEFAULT_ROOT,
     agents: DEFAULT_AGENTS.map((id) => ({ id, model: DEFAULT_WORKER_MODEL })),
     captainModel: DEFAULT_CAPTAIN_MODEL,
     workerModel: DEFAULT_WORKER_MODEL,
-    role: 'all',
+    role: 'all' as Role,
     agentId: null,
     completeActive: false,
     reportStatus: 'done',
@@ -67,7 +312,7 @@ function parseArgs(argv) {
       options.workerModel = requireValue(argv, index += 1, '--worker-model');
       options.agents = options.agents.map((agent) => ({ ...agent, model: options.workerModel }));
     } else if (arg === '--role') {
-      options.role = requireValue(argv, index += 1, '--role');
+      options.role = requireValue(argv, index += 1, '--role') as Role;
     } else if (arg === '--agent-id') {
       options.agentId = requireValue(argv, index += 1, '--agent-id');
     } else if (arg === '--complete-active') {
@@ -145,7 +390,7 @@ function parseArgs(argv) {
   return options;
 }
 
-function requireValue(argv, index, flag) {
+function requireValue(argv: string[], index: number, flag: string): string {
   const value = argv[index];
   if (!value || value.startsWith('--')) {
     throw new Error(`${flag} requires a value`);
@@ -153,7 +398,7 @@ function requireValue(argv, index, flag) {
   return value;
 }
 
-function parseAgents(value, defaultModel) {
+function parseAgents(value: string, defaultModel: string): AgentRef[] {
   return value.split(',')
     .map((entry) => entry.trim())
     .filter(Boolean)
@@ -164,7 +409,7 @@ function parseAgents(value, defaultModel) {
     });
 }
 
-function assertSafeId(value, label) {
+function assertSafeId(value: string, label: string): void {
   if (!/^[A-Za-z0-9_-]+$/.test(value || '')) {
     throw new Error(`${label} must use only letters, numbers, "_" or "-": ${value}`);
   }
@@ -207,7 +452,7 @@ function printHelp() {
   ].join('\n'));
 }
 
-function resolveLayout(root, agents) {
+function resolveLayout(root: string, agents: AgentRef[]): MailboxLayout {
   const captain = {
     root: path.join(root, 'captain'),
     inbox: path.join(root, 'captain', 'inbox'),
@@ -241,7 +486,7 @@ function resolveLayout(root, agents) {
   };
 }
 
-function ensureLayout(layout) {
+function ensureLayout(layout: MailboxLayout): void {
   const dirs = [
     layout.root,
     layout.state,
@@ -270,7 +515,7 @@ function ensureLayout(layout) {
   }
 }
 
-function acquireLock(layout) {
+function acquireLock(layout: MailboxLayout): () => void {
   mkdirSync(layout.root, { recursive: true });
 
   if (existsSync(layout.lock)) {
@@ -299,7 +544,7 @@ function acquireLock(layout) {
   };
 }
 
-function readLedger(layout, options) {
+function readLedger(layout: MailboxLayout, options: MailboxOptions): Ledger {
   if (!existsSync(layout.ledger)) {
     return createLedger(options);
   }
@@ -313,7 +558,7 @@ function readLedger(layout, options) {
   };
 }
 
-function createLedger(options) {
+function createLedger(options: MailboxOptions): Ledger {
   return {
     schemaVersion: 1,
     captain: { id: 'captain', model: options.captainModel },
@@ -323,8 +568,8 @@ function createLedger(options) {
   };
 }
 
-function createStopLossState(options) {
-  const workers = {};
+function createStopLossState(options: MailboxOptions): StopLossState {
+  const workers: Record<string, WorkerStopLossState> = {};
   for (const agent of options.agents) {
     workers[agent.id] = createWorkerStopLossState();
   }
@@ -341,7 +586,7 @@ function createStopLossState(options) {
   };
 }
 
-function createWorkerStopLossState() {
+function createWorkerStopLossState(): WorkerStopLossState {
   return {
     noDispatchCycles: 0,
     activeSince: null,
@@ -352,14 +597,14 @@ function createWorkerStopLossState() {
   };
 }
 
-function normalizeStopLoss(rawStopLoss, options) {
+function normalizeStopLoss(rawStopLoss: Partial<StopLossState> | undefined, options: MailboxOptions): StopLossState {
   const defaults = createStopLossState(options);
-  const captainRaw = rawStopLoss?.captain || {};
+  const captainRaw = (rawStopLoss?.captain ?? {}) as Partial<CaptainStopLossState>;
   const captainNoReportCycles = Number(captainRaw.noReportCycles);
-  const workers = {};
+  const workers: Record<string, WorkerStopLossState> = {};
 
   for (const agent of options.agents) {
-    const workerRaw = rawStopLoss?.workers?.[agent.id] || {};
+    const workerRaw = (rawStopLoss?.workers?.[agent.id] ?? {}) as Partial<WorkerStopLossState>;
     const workerNoDispatchCycles = Number(workerRaw.noDispatchCycles);
     workers[agent.id] = {
       ...defaults.workers[agent.id],
@@ -384,12 +629,12 @@ function normalizeStopLoss(rawStopLoss, options) {
   };
 }
 
-function writeLedger(layout, ledger) {
+function writeLedger(layout: MailboxLayout, ledger: Ledger): void {
   mkdirSync(path.dirname(layout.ledger), { recursive: true });
   writeFileSync(layout.ledger, `${JSON.stringify(ledger, null, 2)}\n`, 'utf8');
 }
 
-function seedDemoQueue(layout) {
+function seedDemoQueue(layout: MailboxLayout): string[] {
   const existing = listFiles(layout.captain.queue);
   if (existing.length > 0) {
     return [];
@@ -422,15 +667,15 @@ function seedDemoQueue(layout) {
   return demoJobs.map((job) => job.id);
 }
 
-function receiveCaptainReports(layout, ledger, summary, phase) {
+function receiveCaptainReports(layout: MailboxLayout, ledger: Ledger, summary: MailboxSummary, phase: string): void {
   for (const reportPath of listFiles(layout.captain.inbox, ['.md'])) {
     const report = parseMarkdownFile(reportPath);
-    const dispatchId = report.frontMatter.dispatch_id || report.frontMatter.dispatchId;
-    const agentId = report.frontMatter.agent || report.frontMatter.assignee || 'unknown';
-    const taskId = normalizeOptionalString(report.frontMatter.task_id || report.frontMatter.source_job_id) || dispatchId || path.basename(reportPath, '.md');
-    const fromAgent = normalizeOptionalString(report.frontMatter.from_agent || report.frontMatter.agent) || agentId;
-    const toAgent = normalizeOptionalString(report.frontMatter.to_agent || report.frontMatter.reply_to) || 'captain';
-    const completedAt = normalizeOptionalString(report.frontMatter.completed_at)
+    const dispatchId = resolveDispatchId(report.frontMatter, path.basename(reportPath, '.md'));
+    const agentId = fmString(report.frontMatter, 'agent', 'assignee') || 'unknown';
+    const taskId = normalizeOptionalString(fmString(report.frontMatter, 'task_id', 'source_job_id')) || dispatchId;
+    const fromAgent = normalizeOptionalString(fmString(report.frontMatter, 'from_agent', 'agent')) || agentId;
+    const toAgent = normalizeOptionalString(fmString(report.frontMatter, 'to_agent', 'reply_to')) || 'captain';
+    const completedAt = normalizeOptionalString(fmString(report.frontMatter, 'completed_at'))
       || new Date(statSync(reportPath).mtimeMs).toISOString();
     const archivePath = uniquePath(path.join(
       layout.captain.reports,
@@ -456,7 +701,7 @@ function receiveCaptainReports(layout, ledger, summary, phase) {
   }
 }
 
-function dispatchQueuedWork(layout, ledger, options, summary) {
+function dispatchQueuedWork(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
   const queueFiles = listFiles(layout.captain.queue, ['.json', '.md']).slice(0, options.maxDispatch);
   for (const queuePath of queueFiles) {
     const job = loadQueueJob(queuePath);
@@ -470,7 +715,7 @@ function dispatchQueuedWork(layout, ledger, options, summary) {
     const dispatchId = createDispatchId(job, agent, now);
     const dispatchFileName = buildDispatchFileName(job.id, 'captain', agent.id, now);
     const outboxPath = path.join(layout.captain.outbox, dispatchFileName);
-    const agentInboxPath = path.join(layout.agents.get(agent.id).inbox, dispatchFileName);
+    const agentInboxPath = path.join(requireAgentLayout(layout, agent.id).inbox, dispatchFileName);
     const markdown = renderDispatchMarkdown({
       dispatchId,
       job,
@@ -511,9 +756,9 @@ function dispatchQueuedWork(layout, ledger, options, summary) {
   }
 }
 
-function pollWorkers(layout, ledger, options, summary) {
+function pollWorkers(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
   for (const agent of options.agents) {
-    const agentLayout = layout.agents.get(agent.id);
+    const agentLayout = requireAgentLayout(layout, agent.id);
     const activeFiles = listFiles(agentLayout.active, ['.md']);
     if (activeFiles.length > 0) {
       summary.busyAgents.push({ agentId: agent.id, active: activeFiles.map(toPortablePath) });
@@ -528,7 +773,7 @@ function pollWorkers(layout, ledger, options, summary) {
 
     const inboxPath = inboxFiles[0];
     const dispatch = parseMarkdownFile(inboxPath);
-    const dispatchId = dispatch.frontMatter.dispatch_id || dispatch.frontMatter.dispatchId || path.basename(inboxPath, '.md');
+    const dispatchId = resolveDispatchId(dispatch.frontMatter, path.basename(inboxPath, '.md'));
     const activePath = uniquePath(path.join(agentLayout.active, path.basename(inboxPath)));
     renameSync(inboxPath, activePath);
 
@@ -549,13 +794,13 @@ function pollWorkers(layout, ledger, options, summary) {
   }
 }
 
-function pollOneWorker(layout, ledger, options, summary) {
+function pollOneWorker(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
   const agent = options.agents.find((entry) => entry.id === options.agentId);
   if (!agent) {
     throw new Error(`Unknown worker agent: ${options.agentId}`);
   }
 
-  const agentLayout = layout.agents.get(agent.id);
+  const agentLayout = requireAgentLayout(layout, agent.id);
   const activeFiles = listFiles(agentLayout.active, ['.md']);
   if (options.completeActive) {
     if (activeFiles.length === 0) {
@@ -564,18 +809,18 @@ function pollOneWorker(layout, ledger, options, summary) {
     }
     const activePath = activeFiles[0];
     const dispatch = parseMarkdownFile(activePath);
-    const dispatchId = dispatch.frontMatter.dispatch_id || dispatch.frontMatter.dispatchId || path.basename(activePath, '.md');
-    let explicitReport = null;
+    const dispatchId = resolveDispatchId(dispatch.frontMatter, path.basename(activePath, '.md'));
+    let explicitReport: { status: string; markdown: string } | { error: string } | null = null;
     if (options.reportFile) {
       explicitReport = loadWorkerReportFile(options.reportFile, {
         dispatchId,
-        taskId: normalizeOptionalString(dispatch.frontMatter.task_id || dispatch.frontMatter.source_job_id) || dispatchId,
+        taskId: normalizeOptionalString(fmString(dispatch.frontMatter, 'task_id', 'source_job_id')) || dispatchId,
         fromAgent: agent.id,
-        toAgent: normalizeOptionalString(dispatch.frontMatter.reply_to) || 'captain',
+        toAgent: normalizeOptionalString(fmString(dispatch.frontMatter, 'reply_to')) || 'captain',
         agentModel: agent.model,
         defaultStatus: options.reportStatus
       });
-      if (explicitReport.error) {
+      if ('error' in explicitReport) {
         summary.errors.push(explicitReport.error);
         return;
       }
@@ -605,7 +850,7 @@ function pollOneWorker(layout, ledger, options, summary) {
 
   const inboxPath = inboxFiles[0];
   const dispatch = parseMarkdownFile(inboxPath);
-  const dispatchId = dispatch.frontMatter.dispatch_id || dispatch.frontMatter.dispatchId || path.basename(inboxPath, '.md');
+  const dispatchId = resolveDispatchId(dispatch.frontMatter, path.basename(inboxPath, '.md'));
   const activePath = uniquePath(path.join(agentLayout.active, path.basename(inboxPath)));
   renameSync(inboxPath, activePath);
 
@@ -625,7 +870,7 @@ function pollOneWorker(layout, ledger, options, summary) {
   }
 }
 
-function completeSimulatedWorker(layout, ledger, agent, agentLayout, activePath, dispatch, dispatchId, summary, reportOptions = {}) {
+function completeSimulatedWorker(layout: MailboxLayout, ledger: Ledger, agent: AgentRef, agentLayout: AgentLayout, activePath: string, dispatch: ParsedMarkdown, dispatchId: string, summary: MailboxSummary, reportOptions: WorkerReportOptions = {}): void {
   const now = new Date().toISOString();
   const status = reportOptions.status || 'done';
   const evidence = reportOptions.evidence || [
@@ -633,13 +878,13 @@ function completeSimulatedWorker(layout, ledger, agent, agentLayout, activePath,
     'Active card was moved to the agent done folder.',
     'This report was copied to the captain inbox.'
   ];
-  const taskId = normalizeOptionalString(dispatch.frontMatter.task_id || dispatch.frontMatter.source_job_id) || dispatchId;
-  const fromAgent = normalizeOptionalString(dispatch.frontMatter.to_agent) || agent.id;
-  const toAgent = normalizeOptionalString(dispatch.frontMatter.reply_to || dispatch.frontMatter.from_agent) || 'captain';
+  const taskId = normalizeOptionalString(fmString(dispatch.frontMatter, 'task_id', 'source_job_id')) || dispatchId;
+  const fromAgent = normalizeOptionalString(fmString(dispatch.frontMatter, 'to_agent')) || agent.id;
+  const toAgent = normalizeOptionalString(fmString(dispatch.frontMatter, 'reply_to', 'from_agent')) || 'captain';
   const reportFileName = buildReportFileName(taskId, fromAgent, toAgent, now);
   const localReportPath = uniquePath(path.join(agentLayout.reports, reportFileName));
   const captainInboxReportPath = uniquePath(path.join(layout.captain.inbox, reportFileName));
-  const title = dispatch.frontMatter.title || dispatch.heading || dispatchId;
+  const title = fmString(dispatch.frontMatter, 'title') || dispatch.heading || dispatchId;
   const bodySummary = reportOptions.summary || `Completed simulated work for "${title}".`;
   const defaultReportBody = ensureReportBody([
     bodySummary,
@@ -698,7 +943,7 @@ function completeSimulatedWorker(layout, ledger, agent, agentLayout, activePath,
   });
 }
 
-function isThinDoneReport(status, summary) {
+function isThinDoneReport(status: string, summary: string | null): boolean {
   if (String(status).toLowerCase() !== 'done') {
     return false;
   }
@@ -706,19 +951,19 @@ function isThinDoneReport(status, summary) {
   return normalized.length < 20 || ['ok', 'okay', 'done', 'completed', 'pass'].includes(normalized);
 }
 
-function scanUnclaimed(layout, options) {
+function scanUnclaimed(layout: MailboxLayout, options: MailboxOptions): MailboxSummary['staleUnclaimed'] {
   const staleMs = options.staleMinutes * 60 * 1000;
   const now = Date.now();
-  const stale = [];
+  const stale: MailboxSummary['staleUnclaimed'] = [];
   for (const agent of options.agents) {
-    const agentLayout = layout.agents.get(agent.id);
+    const agentLayout = requireAgentLayout(layout, agent.id);
     for (const filePath of listFiles(agentLayout.inbox, ['.md'])) {
       const ageMs = now - statSync(filePath).mtimeMs;
       if (ageMs >= staleMs) {
         const parsed = parseMarkdownFile(filePath);
         stale.push({
           agentId: agent.id,
-          dispatchId: parsed.frontMatter.dispatch_id || parsed.frontMatter.dispatchId || path.basename(filePath, '.md'),
+          dispatchId: resolveDispatchId(parsed.frontMatter, path.basename(filePath, '.md')),
           ageMinutes: Number((ageMs / 60000).toFixed(2)),
           path: toPortablePath(filePath)
         });
@@ -728,10 +973,10 @@ function scanUnclaimed(layout, options) {
   return stale;
 }
 
-function computeBacklog(layout, options) {
-  const agents = {};
+function computeBacklog(layout: MailboxLayout, options: MailboxOptions): BacklogSnapshot {
+  const agents: Record<string, AgentBacklog> = {};
   for (const agent of options.agents) {
-    const agentLayout = layout.agents.get(agent.id);
+    const agentLayout = requireAgentLayout(layout, agent.id);
     agents[agent.id] = {
       inbox: listFiles(agentLayout.inbox, ['.md']).length,
       active: listFiles(agentLayout.active, ['.md']).length,
@@ -751,16 +996,18 @@ function computeBacklog(layout, options) {
   };
 }
 
-function isActorStopLossPaused(ledger, options) {
+function isActorStopLossPaused(ledger: Ledger, options: MailboxOptions): boolean {
   if (options.role === 'worker') {
-    return Boolean(ledger.stopLoss?.workers?.[options.agentId]?.paused);
+    return options.agentId ? Boolean(ledger.stopLoss?.workers?.[options.agentId]?.paused) : false;
   }
   return Boolean(ledger.stopLoss?.captain?.paused);
 }
 
-function clearActorStopLoss(ledger, options, summary) {
+function clearActorStopLoss(ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
   if (options.role === 'worker') {
-    ledger.stopLoss.workers[options.agentId] = createWorkerStopLossState();
+    if (options.agentId) {
+      ledger.stopLoss.workers[options.agentId] = createWorkerStopLossState();
+    }
   } else {
     ledger.stopLoss.captain = createStopLossState(options).captain;
   }
@@ -773,9 +1020,9 @@ function clearActorStopLoss(ledger, options, summary) {
   summary.stopLoss.counters = {};
 }
 
-function markAlreadyPausedStopLoss(layout, ledger, options, summary) {
+function markAlreadyPausedStopLoss(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
   const state = options.role === 'worker'
-    ? ledger.stopLoss.workers[options.agentId]
+    ? (options.agentId ? ledger.stopLoss.workers[options.agentId] : createWorkerStopLossState())
     : ledger.stopLoss.captain;
   summary.stopLoss.shouldStop = true;
   summary.stopLoss.paused = true;
@@ -783,12 +1030,12 @@ function markAlreadyPausedStopLoss(layout, ledger, options, summary) {
   summary.stopLoss.reason = `${summary.stopLoss.actor} is already paused by stop-loss; no mailbox work was processed.`;
   summary.stopLoss.reportPath = state.lastStopLossReportPath;
   summary.stopLoss.counters = buildStopLossCounters(layout, ledger, options, state);
-  summary.stopLoss.activeDispatches = options.role === 'worker'
+  summary.stopLoss.activeDispatches = options.role === 'worker' && options.agentId
     ? getWorkerActiveDispatches(layout, ledger, options.agentId)
     : [];
 }
 
-function evaluateStopLoss(layout, ledger, options, summary) {
+function evaluateStopLoss(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
   if (options.role === 'worker') {
     evaluateWorkerStopLoss(layout, ledger, options, summary);
     return;
@@ -797,7 +1044,7 @@ function evaluateStopLoss(layout, ledger, options, summary) {
   evaluateCaptainStopLoss(layout, ledger, options, summary);
 }
 
-function evaluateCaptainStopLoss(layout, ledger, options, summary) {
+function evaluateCaptainStopLoss(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
   const state = ledger.stopLoss.captain;
   const hadQueuedWorkAtStart = (summary.cycleInputBacklog?.captain?.queue || 0) > 0 || summary.seededDemoJobs.length > 0;
   const hadActiveWorkAtStart = Object.values(summary.cycleInputBacklog?.agents || {}).some((agentBacklog) => (agentBacklog?.active || 0) > 0);
@@ -846,7 +1093,10 @@ function evaluateCaptainStopLoss(layout, ledger, options, summary) {
   }
 }
 
-function evaluateWorkerStopLoss(layout, ledger, options, summary) {
+function evaluateWorkerStopLoss(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary): void {
+  if (!options.agentId) {
+    return;
+  }
   const state = ledger.stopLoss.workers[options.agentId];
   const activeDispatches = getWorkerActiveDispatches(layout, ledger, options.agentId);
   const completedThisWorker = summary.completed.some((entry) => entry.agentId === options.agentId);
@@ -894,7 +1144,7 @@ function evaluateWorkerStopLoss(layout, ledger, options, summary) {
   }
 }
 
-function recordStopLossTrigger(layout, ledger, options, summary, state, trigger, reason) {
+function recordStopLossTrigger(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, summary: MailboxSummary, state: CaptainStopLossState | WorkerStopLossState, trigger: string, reason: string): void {
   if (summary.stopLoss.shouldStop) {
     return;
   }
@@ -913,9 +1163,9 @@ function recordStopLossTrigger(layout, ledger, options, summary, state, trigger,
   summary.stopLoss.reportPath = reportPath;
 }
 
-function writeStopLossReport(layout, options, summary, generatedAt) {
-  const reportDir = options.role === 'worker'
-    ? layout.agents.get(options.agentId).stopLoss
+function writeStopLossReport(layout: MailboxLayout, options: MailboxOptions, summary: MailboxSummary, generatedAt: string): string {
+  const reportDir = options.role === 'worker' && options.agentId
+    ? requireAgentLayout(layout, options.agentId).stopLoss
     : layout.captain.stopLoss;
   const fileName = `${generatedAt.replace(/[-:.TZ]/g, '').slice(0, 14)}--${sanitizeFileName(summary.stopLoss.actor)}--${sanitizeFileName(summary.stopLoss.trigger)}.stop-loss.md`;
   const reportPath = uniquePath(path.join(reportDir, fileName));
@@ -968,29 +1218,31 @@ function writeStopLossReport(layout, options, summary, generatedAt) {
   return portableReportPath;
 }
 
-function buildStopLossCounters(layout, ledger, options, state) {
-  if (options.role === 'worker') {
+function buildStopLossCounters(layout: MailboxLayout, ledger: Ledger, options: MailboxOptions, state: CaptainStopLossState | WorkerStopLossState): Record<string, unknown> {
+  if (options.role === 'worker' && options.agentId) {
+    const workerState = state as WorkerStopLossState;
     const activeDispatches = getWorkerActiveDispatches(layout, ledger, options.agentId);
     return {
-      noDispatchCycles: state.noDispatchCycles,
+      noDispatchCycles: workerState.noDispatchCycles,
       noDispatchLimit: options.workerNoDispatchLimit,
-      activeSince: state.activeSince,
-      activeMinutes: elapsedMinutesSince(state.activeSince),
+      activeSince: workerState.activeSince,
+      activeMinutes: elapsedMinutesSince(workerState.activeSince),
       noReportMinutesLimit: options.workerNoReportMinutes,
       activeDispatchCount: activeDispatches.length
     };
   }
 
+  const captainState = state as CaptainStopLossState;
   return {
-    noReportCycles: state.noReportCycles,
+    noReportCycles: captainState.noReportCycles,
     noReportLimit: options.captainNoReportLimit,
-    noDispatchSince: state.noDispatchSince,
-    noDispatchMinutes: elapsedMinutesSince(state.noDispatchSince),
+    noDispatchSince: captainState.noDispatchSince,
+    noDispatchMinutes: elapsedMinutesSince(captainState.noDispatchSince),
     noDispatchMinutesLimit: options.captainNoDispatchMinutes
   };
 }
 
-function getWorkerActiveDispatches(layout, ledger, agentId) {
+function getWorkerActiveDispatches(layout: MailboxLayout, ledger: Ledger, agentId: string): MailboxSummary['stopLoss']['activeDispatches'] {
   const agentLayout = layout.agents.get(agentId);
   if (!agentLayout) {
     return [];
@@ -998,7 +1250,7 @@ function getWorkerActiveDispatches(layout, ledger, agentId) {
 
   return listFiles(agentLayout.active, ['.md']).map((filePath) => {
     const dispatch = parseMarkdownFile(filePath);
-    const dispatchId = dispatch.frontMatter.dispatch_id || dispatch.frontMatter.dispatchId || path.basename(filePath, '.md');
+    const dispatchId = resolveDispatchId(dispatch.frontMatter, path.basename(filePath, '.md'));
     const ledgerDispatch = ledger.dispatches[dispatchId] || {};
     const since = ledgerDispatch.claimedAt || new Date(statSync(filePath).mtimeMs).toISOString();
     return {
@@ -1010,7 +1262,7 @@ function getWorkerActiveDispatches(layout, ledger, agentId) {
   }).sort((left, right) => Date.parse(left.since) - Date.parse(right.since));
 }
 
-function elapsedMinutesSince(isoTimestamp) {
+function elapsedMinutesSince(isoTimestamp: string | null): number | null {
   if (!isoTimestamp) {
     return null;
   }
@@ -1021,10 +1273,10 @@ function elapsedMinutesSince(isoTimestamp) {
   return Number(Math.max(0, (Date.now() - timestampMs) / 60000).toFixed(2));
 }
 
-function writeCaptainHandoff(layout, ledger, summary) {
+function writeCaptainHandoff(layout: MailboxLayout, ledger: Ledger, summary: MailboxSummary): string {
   const handoffPath = path.join(layout.captain.handoff, 'latest-handoff.md');
   const activeDispatches = Object.values(ledger.dispatches)
-    .filter((dispatch) => !['done'].includes(dispatch.status))
+    .filter((dispatch) => !['done'].includes(dispatch.status || ''))
     .sort((left, right) => String(left.createdAt).localeCompare(String(right.createdAt)));
   const markdown = [
     '# Captain Mailbox Handoff',
@@ -1076,11 +1328,11 @@ function writeCaptainHandoff(layout, ledger, summary) {
   return toPortablePath(handoffPath);
 }
 
-function writeWorkerHandoff(layout, options, summary) {
-  const agentLayout = layout.agents.get(options.agentId);
-  if (!agentLayout) {
+function writeWorkerHandoff(layout: MailboxLayout, options: MailboxOptions, summary: MailboxSummary): string | null {
+  if (!options.agentId) {
     return null;
   }
+  const agentLayout = requireAgentLayout(layout, options.agentId);
 
   const handoffPath = path.join(agentLayout.handoff, 'latest-handoff.md');
   const markdown = [
@@ -1119,7 +1371,7 @@ function writeWorkerHandoff(layout, options, summary) {
   return toPortablePath(handoffPath);
 }
 
-function loadQueueJob(queuePath) {
+function loadQueueJob(queuePath: string): QueueJob {
   if (path.extname(queuePath).toLowerCase() === '.json') {
     const parsed = JSON.parse(readFileSync(queuePath, 'utf8'));
     return normalizeJob({
@@ -1140,7 +1392,7 @@ function loadQueueJob(queuePath) {
   }, queuePath);
 }
 
-function normalizeJob(raw, queuePath) {
+function normalizeJob(raw: Record<string, unknown>, queuePath: string): QueueJob {
   const id = normalizeOptionalString(raw.task_id || raw.taskId || raw.id || raw.job_id)
     || path.basename(queuePath, path.extname(queuePath));
   const title = normalizeOptionalString(raw.title) || id;
@@ -1167,19 +1419,19 @@ function normalizeJob(raw, queuePath) {
     scope,
     deliverables,
     validators,
-    evidenceRequired: String(raw.evidence_required || raw.evidenceRequired || raw.evidence?.required || 'command-backed'),
-    rollbackStrategy: String(raw.rollback_strategy || raw.rollbackStrategy || raw.rollback?.strategy || 'revert-commit'),
-    atomizationOwner: raw.atomization_owner || raw.atomizationOwner || raw.atomizationImpact?.ownerAtomOrMap
-      ? String(raw.atomization_owner || raw.atomizationOwner || raw.atomizationImpact?.ownerAtomOrMap)
+    evidenceRequired: String(raw.evidence_required || raw.evidenceRequired || (raw.evidence as Record<string, unknown> | undefined)?.required || 'command-backed'),
+    rollbackStrategy: String(raw.rollback_strategy || raw.rollbackStrategy || (raw.rollback as Record<string, unknown> | undefined)?.strategy || 'revert-commit'),
+    atomizationOwner: raw.atomization_owner || raw.atomizationOwner || (raw.atomizationImpact as Record<string, unknown> | undefined)?.ownerAtomOrMap
+      ? String(raw.atomization_owner || raw.atomizationOwner || (raw.atomizationImpact as Record<string, unknown> | undefined)?.ownerAtomOrMap)
       : 'mailbox-dispatch-runtime',
-    atomizationMapUpdates: normalizeStringList(raw.mapUpdates ?? raw.map_updates ?? raw.atomizationImpact?.mapUpdates, []),
+    atomizationMapUpdates: normalizeStringList(raw.mapUpdates ?? raw.map_updates ?? (raw.atomizationImpact as Record<string, unknown> | undefined)?.mapUpdates, []),
     workModel: raw.work_model || raw.workModel ? String(raw.work_model || raw.workModel) : null,
     outOfScope,
     sourceBody: raw.sourceBody ? String(raw.sourceBody).trim() : null
   };
 }
 
-function normalizeStringList(value, fallback = []) {
+function normalizeStringList(value: unknown, fallback: string[] = []): string[] {
   if (Array.isArray(value)) {
     const normalized = value.map((entry) => String(entry).trim()).filter(Boolean);
     return normalized.length > 0 ? normalized : fallback;
@@ -1193,26 +1445,26 @@ function normalizeStringList(value, fallback = []) {
   return fallback;
 }
 
-function resolveAssignee(job, agents, layout) {
+function resolveAssignee(job: QueueJob, agents: AgentRef[], layout: MailboxLayout): AgentRef | null {
   if (job.assignee) {
     return agents.find((agent) => agent.id === job.assignee) || null;
   }
 
   return [...agents].sort((left, right) => {
-    const leftLayout = layout.agents.get(left.id);
-    const rightLayout = layout.agents.get(right.id);
+    const leftLayout = requireAgentLayout(layout, left.id);
+    const rightLayout = requireAgentLayout(layout, right.id);
     const leftLoad = listFiles(leftLayout.inbox, ['.md']).length + listFiles(leftLayout.active, ['.md']).length;
     const rightLoad = listFiles(rightLayout.inbox, ['.md']).length + listFiles(rightLayout.active, ['.md']).length;
     return leftLoad - rightLoad || left.id.localeCompare(right.id);
   })[0];
 }
 
-function createDispatchId(job, agent, isoTimestamp) {
+function createDispatchId(job: QueueJob, agent: AgentRef, isoTimestamp: string): string {
   const stamp = formatTimestampTag(isoTimestamp);
   return `${sanitizeFileName(job.id)}--captain-to-${sanitizeFileName(agent.id)}--${stamp}`;
 }
 
-function renderDispatchMarkdown({ dispatchId, job, agent, captainModel, createdAt }) {
+function renderDispatchMarkdown({ dispatchId, job, agent, captainModel, createdAt }: { dispatchId: string; job: QueueJob; agent: AgentRef; captainModel: string; createdAt: string }): string {
   if (job.sourceKind === 'markdown' && job.sourceFrontMatterRaw) {
     const body = ensureDispatchBody(job.sourceBody, {
       taskId: job.id,
@@ -1370,45 +1622,45 @@ function renderDispatchMarkdown({ dispatchId, job, agent, captainModel, createdA
   ].join('\n'), { fromAgent: 'captain', toAgent: agent.id, taskId: job.id, dispatchId });
 }
 
-function renderYamlList(items, indent = '  ') {
+function renderYamlList(items: string[] | null | undefined, indent = '  '): string[] {
   if (!items || items.length === 0) {
     return [`${indent}- none`];
   }
   return items.map((item) => `${indent}- ${quoteYamlValue(item)}`);
 }
 
-function renderMarkdownList(items) {
+function renderMarkdownList(items: string[] | null | undefined): string[] {
   if (!items || items.length === 0) {
     return ['- None'];
   }
   return items.map((item) => `- ${item}`);
 }
 
-function quoteYamlValue(value) {
+function quoteYamlValue(value: unknown): string {
   return `"${escapeFrontMatterValue(value)}"`;
 }
 
-function formatTimestampTag(isoTimestamp) {
+function formatTimestampTag(isoTimestamp: string): string {
   const parsedMs = Date.parse(isoTimestamp || '');
   const safeIso = Number.isFinite(parsedMs) ? new Date(parsedMs).toISOString() : new Date().toISOString();
   const compact = safeIso.replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
   return compact.replace('T', '-');
 }
 
-function buildDispatchFileName(taskId, fromAgent, toAgent, isoTimestamp) {
+function buildDispatchFileName(taskId: string, fromAgent: string, toAgent: string, isoTimestamp: string): string {
   return `${sanitizeFileName(taskId)}--${sanitizeFileName(fromAgent)}-to-${sanitizeFileName(toAgent)}--${formatTimestampTag(isoTimestamp)}.dispatch.md`;
 }
 
-function buildArchiveFileName(taskId, fromAgent, toAgent, isoTimestamp, extension = '.md') {
+function buildArchiveFileName(taskId: string, fromAgent: string, toAgent: string, isoTimestamp: string, extension = '.md'): string {
   const normalizedExtension = extension.startsWith('.') ? extension : `.${extension}`;
   return `${sanitizeFileName(taskId)}--${sanitizeFileName(fromAgent)}-to-${sanitizeFileName(toAgent)}--${formatTimestampTag(isoTimestamp)}.queue${normalizedExtension}`;
 }
 
-function buildReportFileName(taskId, fromAgent, toAgent, isoTimestamp) {
+function buildReportFileName(taskId: string, fromAgent: string, toAgent: string, isoTimestamp: string): string {
   return `${sanitizeFileName(taskId)}--${sanitizeFileName(fromAgent)}-to-${sanitizeFileName(toAgent)}--${formatTimestampTag(isoTimestamp)}.report.md`;
 }
 
-function finalizeDispatchMarkdown(markdown, options) {
+function finalizeDispatchMarkdown(markdown: string, options: { fromAgent: string; toAgent: string; taskId: string; dispatchId: string }): string {
   const lines = String(markdown || '').split('\n');
   let inFrontMatter = false;
   let frontMatterBoundaries = 0;
@@ -1432,7 +1684,7 @@ function finalizeDispatchMarkdown(markdown, options) {
   return lines.join('\n');
 }
 
-function parseMarkdownFile(filePath) {
+function parseMarkdownFile(filePath: string): ParsedMarkdown {
   const text = readFileSync(filePath, 'utf8');
   const frontMatter = {};
   let rawFrontMatter = null;
@@ -1449,14 +1701,14 @@ function parseMarkdownFile(filePath) {
   return { frontMatter, heading, body, rawFrontMatter };
 }
 
-function extractFrontMatter(text) {
+function extractFrontMatter(text: string): { data: FrontMatter; raw: string; endIndex: number } | null {
   const match = /^---\s*\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/.exec(text);
   if (!match) {
     return null;
   }
 
   const raw = match[1];
-  const data = {};
+  const data: FrontMatter = {};
   let currentKey = null;
   let currentObjectKey = null;
   let currentObjectListKey = null;
@@ -1477,8 +1729,8 @@ function extractFrontMatter(text) {
     const objectFieldMatch = /^ {2}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
     if (currentObjectKey && objectFieldMatch) {
       const objectValue = data[currentObjectKey];
-      const objectRecord = objectValue && typeof objectValue === 'object' && !Array.isArray(objectValue)
-        ? objectValue
+      const objectRecord: YamlRecord = objectValue && typeof objectValue === 'object' && !Array.isArray(objectValue)
+        ? objectValue as YamlRecord
         : {};
       const key = objectFieldMatch[1];
       const value = normalizeYamlScalar(objectFieldMatch[2].trim());
@@ -1489,7 +1741,7 @@ function extractFrontMatter(text) {
     }
 
     if (currentObjectKey && currentObjectListKey && /^ {4}-\s+/.test(line)) {
-      const objectRecord = data[currentObjectKey];
+      const objectRecord = data[currentObjectKey] as YamlRecord;
       const value = normalizeYamlScalar(line.replace(/^ {4}-\s+/, '').trim());
       const existing = objectRecord[currentObjectListKey];
       objectRecord[currentObjectListKey] = Array.isArray(existing)
@@ -1523,15 +1775,15 @@ function extractFrontMatter(text) {
   };
 }
 
-function normalizeYamlScalar(value) {
+function normalizeYamlScalar(value: unknown): string {
   return String(value || '').trim().replace(/^['"`]|['"`]$/g, '');
 }
 
-function normalizeOptionalString(value) {
+function normalizeOptionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? normalizeYamlScalar(value) : null;
 }
 
-function sanitizeFrontMatterBlock(rawFrontMatter, keysToRemove) {
+function sanitizeFrontMatterBlock(rawFrontMatter: string | null | undefined, keysToRemove: Set<string>): string {
   const keptLines = [];
   let skipCurrentTopLevel = false;
 
@@ -1553,7 +1805,7 @@ function sanitizeFrontMatterBlock(rawFrontMatter, keysToRemove) {
   return keptLines.join('\n').trim();
 }
 
-function ensureDispatchBody(body, options) {
+function ensureDispatchBody(body: string | null | undefined, options: { fromAgent: string; toAgent: string; taskId: string; dispatchId: string; workModel: string }): string {
   const sections = [];
   const trimmed = String(body || '').trim();
 
@@ -1597,7 +1849,7 @@ function ensureDispatchBody(body, options) {
   return sections.join('\n').trim();
 }
 
-function ensureReportBody(body, options) {
+function ensureReportBody(body: string | null | undefined, options: { fromAgent: string; toAgent: string; taskId: string; dispatchId: string }): string {
   const sections = [];
   const trimmed = String(body || '').trim();
 
@@ -1621,7 +1873,7 @@ function ensureReportBody(body, options) {
   return sections.join('\n').trim();
 }
 
-function isThinReportBody(body) {
+function isThinReportBody(body: string | null | undefined): boolean {
   const normalized = String(body || '').trim().toLowerCase();
   if (!normalized) {
     return true;
@@ -1633,18 +1885,18 @@ function isThinReportBody(body) {
   return ['ok', 'okay', 'done', 'completed', 'pass', 'looks good'].includes(compact);
 }
 
-function loadWorkerReportFile(reportFilePath, options) {
+function loadWorkerReportFile(reportFilePath: string, options: { dispatchId: string; taskId: string; fromAgent: string; toAgent: string; agentModel: string; defaultStatus: string }): { status: string; markdown: string } | { error: string } {
   const resolvedPath = path.resolve(reportFilePath);
   if (!existsSync(resolvedPath)) {
     return { error: `Worker report file does not exist: ${resolvedPath}` };
   }
 
   const parsed = parseMarkdownFile(resolvedPath);
-  const reportStatus = normalizeOptionalString(parsed.frontMatter.status) || options.defaultStatus;
-  const fromAgent = normalizeOptionalString(parsed.frontMatter.from_agent || parsed.frontMatter.agent) || options.fromAgent;
-  const toAgent = normalizeOptionalString(parsed.frontMatter.to_agent || parsed.frontMatter.reply_to) || options.toAgent;
-  const taskId = normalizeOptionalString(parsed.frontMatter.task_id || parsed.frontMatter.source_job_id) || options.taskId;
-  const dispatchId = normalizeOptionalString(parsed.frontMatter.dispatch_id) || options.dispatchId;
+  const reportStatus = normalizeOptionalString(fmString(parsed.frontMatter, 'status')) || options.defaultStatus;
+  const fromAgent = normalizeOptionalString(fmString(parsed.frontMatter, 'from_agent', 'agent')) || options.fromAgent;
+  const toAgent = normalizeOptionalString(fmString(parsed.frontMatter, 'to_agent', 'reply_to')) || options.toAgent;
+  const taskId = normalizeOptionalString(fmString(parsed.frontMatter, 'task_id', 'source_job_id')) || options.taskId;
+  const dispatchId = normalizeOptionalString(fmString(parsed.frontMatter, 'dispatch_id')) || options.dispatchId;
   const reportBody = ensureReportBody(parsed.body, { fromAgent, toAgent, taskId, dispatchId });
 
   if (String(reportStatus).toLowerCase() === 'done' && isThinReportBody(reportBody)) {
@@ -1672,7 +1924,7 @@ function loadWorkerReportFile(reportFilePath, options) {
     markdown
   };
 }
-function listFiles(dir, extensions = null) {
+function listFiles(dir: string, extensions: string[] | null = null): string[] {
   if (!existsSync(dir)) {
     return [];
   }
@@ -1690,7 +1942,7 @@ function listFiles(dir, extensions = null) {
     .sort((left, right) => statSync(left).mtimeMs - statSync(right).mtimeMs || left.localeCompare(right));
 }
 
-function uniquePath(targetPath) {
+function uniquePath(targetPath: string): string {
   if (!existsSync(targetPath)) {
     return targetPath;
   }
@@ -1704,26 +1956,26 @@ function uniquePath(targetPath) {
   }
 }
 
-function sanitizeFileName(value) {
+function sanitizeFileName(value: unknown): string {
   return String(value || 'item')
     .replace(/[^A-Za-z0-9._-]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 80) || 'item';
 }
 
-function escapeFrontMatterValue(value) {
+function escapeFrontMatterValue(value: unknown): string {
   return String(value).replace(/\r?\n/g, ' ').replace(/"/g, '\\"');
 }
 
-function toPortablePath(filePath) {
+function toPortablePath(filePath: string): string {
   return filePath.split(path.sep).join('/');
 }
 
-function buildDecisionBasis(summary, options) {
-  const basis = [];
+function buildDecisionBasis(summary: MailboxSummary, options: MailboxOptions): string[] {
+  const basis: string[] = [];
   if (summary.stopLoss.shouldStop) {
     basis.push(`Stop-loss triggered for ${summary.stopLoss.actor}: ${summary.stopLoss.reason}`);
-  } else if (summary.stopLoss.cleared) {
+  } else if (summary.stopLoss.cleared && summary.stopLoss.reason) {
     basis.push(summary.stopLoss.reason);
   } else if (summary.stopLoss.paused) {
     basis.push(`${summary.stopLoss.actor} is paused by stop-loss; no mailbox work was processed.`);
@@ -1754,7 +2006,7 @@ function buildDecisionBasis(summary, options) {
       basis.push(`Worker ${options.agentId} claimed the next inbox dispatch because it had no active work.`);
     } else if (summary.busyAgents.length > 0) {
       basis.push(`Worker ${options.agentId} already has active work, so it did not claim another dispatch.`);
-    } else if (summary.idleAgents.includes(options.agentId)) {
+    } else if (options.agentId && summary.idleAgents.includes(options.agentId)) {
       basis.push(`Worker ${options.agentId} inbox was empty and it had no active work.`);
     }
   }
@@ -1766,7 +2018,7 @@ function buildDecisionBasis(summary, options) {
   return basis;
 }
 
-function chooseNextAction(summary, options) {
+function chooseNextAction(summary: MailboxSummary, options: MailboxOptions): string {
   if (summary.stopLoss.shouldStop || summary.stopLoss.paused) {
     return 'pause-automation-stop-loss';
   }
@@ -1785,7 +2037,7 @@ function chooseNextAction(summary, options) {
   return 'continue-polling';
 }
 
-function emitSummary(summary, json) {
+function emitSummary(summary: MailboxSummary, json: boolean): void {
   if (json) {
     console.log(JSON.stringify(summary, null, 2));
     return;
@@ -1807,7 +2059,7 @@ function emitSummary(summary, json) {
   }
 }
 
-function createSummary(root, options) {
+function createSummary(root: string, options: MailboxOptions): MailboxSummary {
   return {
     ok: true,
     root: toPortablePath(root),

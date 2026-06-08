@@ -34,6 +34,7 @@ import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.ts';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
 import { classifyTaskDelivery, type TaskDeliveryClassification } from './task-intent.ts';
+import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/src/broker/lifecycle.ts';
 import {
   buildAllowedFilesForTask,
   createOrRefreshTaskQueue,
@@ -682,6 +683,22 @@ async function claimNextImportedTask(input: {
     cwd: input.cwd,
     task: claimableTask
   });
+  const brokerClaimCheck = inspectBrokerClaimLifecycle({
+    cwd: input.cwd,
+    taskId: claimableTask.workItemId,
+    actorId: resolvedActor.actorId
+  });
+  if (!brokerClaimCheck.ok) {
+    throw new CliError('ATM_BROKER_LIFECYCLE_BLOCKED', brokerClaimCheck.reason ?? `Task ${claimableTask.workItemId} cannot claim because broker runtime state is blocked.`, {
+      exitCode: 1,
+      details: {
+        taskId: claimableTask.workItemId,
+        actorId: resolvedActor.actorId,
+        registryPath: brokerClaimCheck.registryPath,
+        blockingIntent: brokerClaimCheck.blockingIntent
+      }
+    });
+  }
   const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
   const claimPreparation = alreadyClaimedByActor
     ? {
@@ -799,6 +816,14 @@ async function claimNextImportedTask(input: {
     guidanceSessionId: null
   }).session;
   const recommendedChannel = batchRun?.status === 'active' ? 'batch' : 'normal';
+  recordBrokerClaimIntent({
+    cwd: input.cwd,
+    taskId: claimableTask.workItemId,
+    actorId: resolvedActor.actorId,
+    lane: recommendedChannel === 'batch' ? 'serial' : 'direct-brokered',
+    targetFiles: directionLock.allowedFiles,
+    ttlSeconds: 1800
+  });
   const teamRecommendation = buildTeamRecommendation({
     taskId: claimableTask.workItemId,
     actorId: resolvedActor.actorId,

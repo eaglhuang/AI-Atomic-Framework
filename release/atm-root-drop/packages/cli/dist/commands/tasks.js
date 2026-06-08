@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/dist/index.js';
+import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../../../core/dist/broker/lifecycle.js';
 import { resolveActorId } from './actor-registry.js';
 import { resolveActorWorkSession, updateActorWorkSessionState, upsertActorWorkSession } from './actor-session.js';
 import { computeMissingValidatorReport, verifyTaskEvidence } from './evidence.js';
@@ -2507,6 +2508,11 @@ async function runTasksClaimLifecycle(action, argv) {
             sessionId: sessionRecord?.session.sessionId ?? null,
             previousStatus
         });
+        clearBrokerRuntimeStateForTask({
+            cwd: options.cwd,
+            taskId: options.taskId
+        });
+        removeBrokerRegistryIfEmpty(options.cwd);
         return makeResult({
             ok: true,
             command: 'tasks',
@@ -2561,6 +2567,11 @@ async function runTasksClaimLifecycle(action, argv) {
             sessionId: sessionRecord?.session.sessionId ?? null,
             previousStatus
         });
+        clearBrokerRuntimeStateForTask({
+            cwd: options.cwd,
+            taskId: options.taskId
+        });
+        removeBrokerRegistryIfEmpty(options.cwd);
         return makeResult({
             ok: true,
             command: 'tasks',
@@ -2618,6 +2629,11 @@ async function runTasksClaimLifecycle(action, argv) {
             sessionId: sessionRecord?.session.sessionId ?? null,
             previousStatus
         });
+        clearBrokerRuntimeStateForTask({
+            cwd: options.cwd,
+            taskId: options.taskId
+        });
+        removeBrokerRegistryIfEmpty(options.cwd);
         return makeResult({
             ok: true,
             command: 'tasks',
