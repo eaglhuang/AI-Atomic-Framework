@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'broker',
-  summary: 'Manage write intents, proposal capsules, and inspect the local write-broker registry.',
+  summary: 'Manage write intents, proposal capsules, compose merge plans, and inspect the local write-broker registry.',
   positional: [
-    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal', required: true },
+    { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose', required: true },
     { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
     { name: 'proposal-id', summary: 'Proposal id for show / validate.', required: false }
   ],
@@ -19,7 +19,8 @@ export default defineCommandSpec({
     { flag: '--task', value: 'id', summary: 'Task ID to register or release.' },
     { flag: '--intent-file', value: 'path', summary: 'Path to WriteIntent JSON payload.' },
     { flag: '--ttl-seconds', value: 'number', summary: 'TTL lease duration in seconds for registering write intent.' },
-    { flag: '--proposal-file', value: 'path', summary: 'Path to PatchProposal JSON payload.' },
+    { flag: '--proposal-file', value: 'path', summary: 'Path to PatchProposal JSON payload. Repeatable for compose.' },
+    { flag: '--proposal-id', value: 'id', summary: 'Proposal id for compose or proposal show / validate.' },
     { flag: '--store', value: 'path', summary: 'Path to broker proposal store JSON.' },
     commonJsonOption,
     commonPrettyOption,
@@ -34,7 +35,9 @@ export default defineCommandSpec({
     'node atm.mjs broker proposal create --proposal-file proposal.json --json',
     'node atm.mjs broker proposal list --json',
     'node atm.mjs broker proposal show proposal-123 --json',
-    'node atm.mjs broker proposal validate proposal-123 --json'
+    'node atm.mjs broker proposal validate proposal-123 --json',
+    'node atm.mjs broker compose --proposal-file proposal-a.json --proposal-file proposal-b.json --json',
+    'node atm.mjs broker compose --store .atm/runtime/broker-proposals.json --proposal-id proposal-a --proposal-id proposal-b --json'
   ]
 });
 
