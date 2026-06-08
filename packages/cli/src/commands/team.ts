@@ -11,6 +11,12 @@ import {
 } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
 import { runTasks } from './tasks.ts';
+import {
+  buildTeamBrokerEvidence,
+  brokerLaneToFindings,
+  evaluateTeamBrokerLane
+} from '../../../core/src/broker/team-lane.ts';
+import type { TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -153,7 +159,8 @@ export async function runTeam(argv: string[]) {
   const context = await buildTeamPlanningContext({
     cwd,
     taskId,
-    requestedRecipeId: String(parsed.options.recipe ?? '').trim()
+    requestedRecipeId: String(parsed.options.recipe ?? '').trim(),
+    actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim()
   });
   const { task, recipes, recipe, validation, teamPlan } = context;
   const ok = validation.findings.every((finding) => finding.level !== 'error');
@@ -182,7 +189,8 @@ export async function runTeam(argv: string[]) {
         recipeSources: recipes.sources,
         permissionCatalog: teamPermissionCatalog,
         validation,
-        suggestedPermissionLeases: teamPlan.suggestedPermissionLeases
+        suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
+        brokerLane: teamPlan.brokerLane
       }
     });
   }
@@ -211,7 +219,8 @@ export async function runTeam(argv: string[]) {
           task: summarizeTask(taskId, task),
           recipe,
           validation,
-          teamPlan
+          teamPlan,
+          brokerLane: teamPlan.brokerLane
         }
       });
     }
@@ -240,7 +249,8 @@ export async function runTeam(argv: string[]) {
         runtimeWritten: true,
         agentsSpawned: false,
         teamRunPath: `.atm/runtime/team-runs/${teamRun.teamRunId}.json`,
-        teamRun
+        teamRun,
+        brokerLane: teamPlan.brokerLane
       }
     });
   }
@@ -268,7 +278,8 @@ export async function runTeam(argv: string[]) {
       recipeSources: recipes.sources,
       permissionCatalog: teamPermissionCatalog,
       validation,
-      teamPlan
+      teamPlan,
+      brokerLane: teamPlan.brokerLane
     }
   });
 }
@@ -277,6 +288,7 @@ async function buildTeamPlanningContext(input: {
   cwd: string;
   taskId: string;
   requestedRecipeId: string;
+  actorId: string;
 }) {
   const task = readTask(input.cwd, input.taskId);
   const recipes = loadTeamRecipes(input.cwd);
@@ -317,25 +329,34 @@ async function buildTeamPlanningContext(input: {
     // Best-effort check
   }
 
-  const teamPlan = buildTeamPlan({
+  const brokerLaneResult = evaluateTeamBrokerLane({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    actorId: input.actorId,
     task,
-    recipe,
-    writePaths,
-    validation: recipeValidation
+    writePaths
   });
-  const leaseValidation = validatePermissionLeases(teamPlan.suggestedPermissionLeases);
+  const brokerLane = buildTeamBrokerEvidence(brokerLaneResult);
+  const brokerFindings = brokerLaneToFindings(brokerLaneResult).map((finding) => ({
+    level: finding.level,
+    code: finding.code,
+    detail: finding.detail,
+    paths: finding.paths
+  })) satisfies PermissionFinding[];
+  const leaseValidation = validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths));
   const validation = mergeValidation(
     recipeValidation,
     leaseValidation,
-    { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings }
+    { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings },
+    { ok: brokerFindings.every((f) => f.level !== 'error'), findings: brokerFindings }
   );
 
-  // Re-build teamPlan with merged validation so briefingContract gets the CID findings
   const finalTeamPlan = buildTeamPlan({
     task,
     recipe,
     writePaths,
-    validation
+    validation,
+    brokerLane
   });
 
   return {
@@ -345,7 +366,8 @@ async function buildTeamPlanningContext(input: {
     validation,
     teamPlan: {
       ...finalTeamPlan,
-      validation
+      validation,
+      brokerLane
     }
   };
 }
@@ -572,20 +594,37 @@ function mergeValidation(...reports: { ok: boolean; findings: PermissionFinding[
   };
 }
 
+function buildSuggestedPermissionLeases(recipe: TeamRecipe, writePaths: string[]): PermissionLease[] {
+  const coordinator = recipe.agents.find((agent) => agent.role === 'coordinator') ?? null;
+  const fileWriteOwner = recipe.agents.find((agent) => agent.permissions.includes('file.write')) ?? null;
+  return [
+    ...(coordinator ? [
+      { permission: 'task.lifecycle', agentId: coordinator.agentId },
+      { permission: 'git.write', agentId: coordinator.agentId },
+      { permission: 'evidence.write', agentId: coordinator.agentId }
+    ] : []),
+    ...(fileWriteOwner ? [{
+      permission: 'file.write',
+      agentId: fileWriteOwner.agentId,
+      paths: writePaths
+    }] : [])
+  ] satisfies PermissionLease[];
+}
+
 function buildTeamPlan(input: {
   task: any;
   recipe: TeamRecipe;
   writePaths: string[];
   validation: { ok: boolean; findings: PermissionFinding[] };
+  brokerLane: TeamBrokerLaneEvidence;
 }) {
-  const coordinator = input.recipe.agents.find((agent) => agent.role === 'coordinator') ?? null;
-  const fileWriteOwner = input.recipe.agents.find((agent) => agent.permissions.includes('file.write')) ?? null;
   const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
-  const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation);
+  const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
   return {
     schemaId: 'atm.teamPlan.v1',
     recipeId: input.recipe.recipeId,
     channelHint: 'normal',
+    brokerLane: input.brokerLane,
     agents: input.recipe.agents,
     requiredRoles: crewBriefingContract.requiredRoles,
     optionalRoles: crewBriefingContract.optionalRoles,
@@ -596,18 +635,7 @@ function buildTeamPlan(input: {
       permissions: input.recipe.agents.find((agent) => agent.role === 'atomizationPlanner')?.permissions ?? []
     },
     atomizationChecklist,
-    suggestedPermissionLeases: [
-      ...(coordinator ? [
-        { permission: 'task.lifecycle', agentId: coordinator.agentId },
-        { permission: 'git.write', agentId: coordinator.agentId },
-        { permission: 'evidence.write', agentId: coordinator.agentId }
-      ] : []),
-      ...(fileWriteOwner ? [{
-        permission: 'file.write',
-        agentId: fileWriteOwner.agentId,
-        paths: input.writePaths
-      }] : [])
-    ] satisfies PermissionLease[],
+    suggestedPermissionLeases: buildSuggestedPermissionLeases(input.recipe, input.writePaths),
     nextSteps: [
       'Review this dry-run plan.',
       'Run team start when you want a runtime team run record.',
@@ -617,7 +645,12 @@ function buildTeamPlan(input: {
   };
 }
 
-function buildMinimalTaskCrewBriefingContract(task: any, writePaths: string[], validation: { ok: boolean; findings: PermissionFinding[] }) {
+function buildMinimalTaskCrewBriefingContract(
+  task: any,
+  writePaths: string[],
+  validation: { ok: boolean; findings: PermissionFinding[] },
+  brokerLane: TeamBrokerLaneEvidence
+) {
   const requiredRoles: TeamCrewRole[] = [
     {
       role: 'Task Captain',
@@ -680,6 +713,24 @@ function buildMinimalTaskCrewBriefingContract(task: any, writePaths: string[], v
     reasons: cidConflicts.map((c) => c.detail),
     conflicts: cidConflicts
   } : null;
+  const brokerAdvisory = brokerLane.chosenLane === 'neutral-steward' ? {
+    schemaId: 'atm.teamBrokerAdvisory.v1',
+    verdict: 'steward-lane',
+    stewardId: brokerLane.stewardId,
+    composerPath: brokerLane.composerPath,
+    decision: brokerLane.decision
+  } : brokerLane.safeToStart ? {
+    schemaId: 'atm.teamBrokerAdvisory.v1',
+    verdict: brokerLane.decision.verdict,
+    chosenLane: brokerLane.chosenLane,
+    decision: brokerLane.decision
+  } : {
+    schemaId: 'atm.teamBrokerAdvisory.v1',
+    verdict: brokerLane.decision.verdict,
+    chosenLane: brokerLane.chosenLane,
+    blockedReasons: brokerLane.blockedReasons,
+    decision: brokerLane.decision
+  };
 
   return {
     schemaId: 'atm.teamCrewBriefingContract.v1',
@@ -706,6 +757,7 @@ function buildMinimalTaskCrewBriefingContract(task: any, writePaths: string[], v
     requiredRoles,
     optionalRoles,
     validation,
+    brokerAdvisory,
     ...(parallelAdvisory ? { parallelAdvisory } : {})
   };
 }
@@ -795,6 +847,7 @@ function writeTeamRun(input: {
     agents: input.recipe.agents,
     permissionLeases: input.teamPlan.suggestedPermissionLeases,
     validation: input.validation,
+    brokerLane: input.teamPlan.brokerLane,
     createdAt: now,
     updatedAt: now
   };
