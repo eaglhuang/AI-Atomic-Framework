@@ -343,10 +343,95 @@
       "source_task": "TASK-AAO-0100"
     },
     {
-      "path_pattern": "packages/cli/src/commands/team.ts",
-      "atom_id": "atm.team-agents-map",
-      "capability": "team plan recipes, atomization-planner advisory output, and permission lease planning",
-      "coverage_status": "active"
+      "path_pattern": "packages/cli/src/commands/team.ts#runTeam",
+      "atom_id": "team.cli-entry",
+      "capability": "Team CLI entry router for plan, start, status, and validate actions.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
+      "atom_id": "team.recipe-permission-model",
+      "capability": "Recipe catalog validation and scoped permission lease planning.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildMinimalTaskCrewBriefingContract",
+      "atom_id": "team.plan-crew-briefing-contract",
+      "capability": "Minimal crew briefing contract with required roles, stop conditions, and parallel advisory.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildAtomizationChecklist",
+      "atom_id": "team.plan-atomization-planner",
+      "capability": "Atomization planner advisory checklist for scope shape and split recommendations.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
+      "atom_id": "team.plan-broker-lane",
+      "capability": "Broker lane evaluation and steward/composer routing for team plan/start.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#writeTeamRun",
+      "atom_id": "team.start-runtime-state",
+      "capability": "Team run runtime record writer under .atm/runtime/team-runs.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamStatusResult",
+      "atom_id": "team.status-runtime-read",
+      "capability": "Read-only team run status surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecCommandSurface",
+      "atom_id": "team.spec.command-surface",
+      "capability": "Team command spec surface: summary, positional args, and shared options.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecCrewBriefing",
+      "atom_id": "team.spec.crew-briefing",
+      "capability": "Command-spec examples and notes for crew briefing plan output.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecAtomizationPlanner",
+      "atom_id": "team.spec.atomization-planner",
+      "capability": "Command-spec examples and notes for atomization planner advisory output.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecPermissionValidation",
+      "atom_id": "team.spec.permission-validation",
+      "capability": "Command-spec examples for recipe permission and lease validation.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecBrokerLane",
+      "atom_id": "team.spec.broker-lane",
+      "capability": "Command-spec notes for broker lane and blocked CID conflict preflight.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecRuntimeStatus",
+      "atom_id": "team.spec.runtime-status",
+      "capability": "Command-spec examples for read-only team run status.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
     },
     {
       "path_pattern": "packages/cli/src/commands/work-channels.ts",

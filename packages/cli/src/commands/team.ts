@@ -90,6 +90,44 @@ const atomizationRiskHotFiles = new Set([
 
 const atomizationPlanningThreshold = 3;
 
+export const TEAM_ATOM_BOUNDARIES = {
+  'team.cli-entry': {
+    anchor: 'packages/cli/src/commands/team.ts#runTeam',
+    capability: 'Team CLI entry router for plan, start, status, and validate actions.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  },
+  'team.recipe-permission-model': {
+    anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
+    capability: 'Recipe catalog validation and scoped permission lease planning.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  },
+  'team.plan-crew-briefing-contract': {
+    anchor: 'packages/cli/src/commands/team.ts#buildMinimalTaskCrewBriefingContract',
+    capability: 'Minimal crew briefing contract with required roles, stop conditions, and parallel advisory.',
+    downstreamTasks: ['TASK-TEAM-0002']
+  },
+  'team.plan-atomization-planner': {
+    anchor: 'packages/cli/src/commands/team.ts#buildAtomizationChecklist',
+    capability: 'Atomization planner advisory checklist for scope shape and split recommendations.',
+    downstreamTasks: ['TASK-TEAM-0003']
+  },
+  'team.plan-broker-lane': {
+    anchor: 'packages/cli/src/commands/team.ts#planTeamBrokerLane',
+    capability: 'Broker lane evaluation and steward/composer routing for team plan/start.',
+    downstreamTasks: ['TASK-TEAM-0001', 'TASK-CID-0021']
+  },
+  'team.start-runtime-state': {
+    anchor: 'packages/cli/src/commands/team.ts#writeTeamRun',
+    capability: 'Team run runtime record writer under .atm/runtime/team-runs.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  },
+  'team.status-runtime-read': {
+    anchor: 'packages/cli/src/commands/team.ts#buildTeamStatusResult',
+    capability: 'Read-only team run status surface.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  }
+} as const;
+
 const builtInRecipes: TeamRecipe[] = [
   {
     schemaId: 'atm.teamRecipe.v1',
@@ -297,8 +335,8 @@ async function buildTeamPlanningContext(input: {
     requestedRecipeId: input.requestedRecipeId,
     task
   });
-  const recipeValidation = validateTeamRecipe(recipe);
   const writePaths = deriveWritePaths(task);
+  const permissionValidation = validateTeamPermissionModel(recipe, writePaths);
 
   const parallelFindings: PermissionFinding[] = [];
   try {
@@ -329,26 +367,18 @@ async function buildTeamPlanningContext(input: {
     // Best-effort check
   }
 
-  const brokerLaneResult = evaluateTeamBrokerLane({
+  const brokerLanePlan = planTeamBrokerLane({
     cwd: input.cwd,
     taskId: input.taskId,
     actorId: input.actorId,
     task,
     writePaths
   });
-  const brokerLane = buildTeamBrokerEvidence(brokerLaneResult);
-  const brokerFindings = brokerLaneToFindings(brokerLaneResult).map((finding) => ({
-    level: finding.level,
-    code: finding.code,
-    detail: finding.detail,
-    paths: finding.paths
-  })) satisfies PermissionFinding[];
-  const leaseValidation = validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths));
+  const brokerLane = brokerLanePlan.evidence;
   const validation = mergeValidation(
-    recipeValidation,
-    leaseValidation,
+    permissionValidation,
     { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings },
-    { ok: brokerFindings.every((f) => f.level !== 'error'), findings: brokerFindings }
+    { ok: brokerLanePlan.findings.every((f) => f.level !== 'error'), findings: brokerLanePlan.findings }
   );
 
   const finalTeamPlan = buildTeamPlan({
@@ -468,6 +498,33 @@ function inferTaskLanguage(task: any) {
   if (paths.some((entry) => entry.endsWith('.py') || entry.includes('pipelines/'))) return 'python';
   if (paths.some((entry) => entry.endsWith('.cs'))) return 'csharp';
   return 'typescript';
+}
+
+export function validateTeamPermissionModel(recipe: TeamRecipe, writePaths: string[]) {
+  return mergeValidation(
+    validateTeamRecipe(recipe),
+    validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths))
+  );
+}
+
+export function planTeamBrokerLane(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  task: any;
+  writePaths: string[];
+}) {
+  const brokerLaneResult = evaluateTeamBrokerLane(input);
+  return {
+    result: brokerLaneResult,
+    evidence: buildTeamBrokerEvidence(brokerLaneResult),
+    findings: brokerLaneToFindings(brokerLaneResult).map((finding) => ({
+      level: finding.level,
+      code: finding.code,
+      detail: finding.detail,
+      paths: finding.paths
+    })) satisfies PermissionFinding[]
+  };
 }
 
 function validateTeamRecipe(recipe: TeamRecipe) {
@@ -645,7 +702,7 @@ function buildTeamPlan(input: {
   };
 }
 
-function buildMinimalTaskCrewBriefingContract(
+export function buildMinimalTaskCrewBriefingContract(
   task: any,
   writePaths: string[],
   validation: { ok: boolean; findings: PermissionFinding[] },
@@ -762,7 +819,7 @@ function buildMinimalTaskCrewBriefingContract(
   };
 }
 
-function buildAtomizationChecklist(task: any, writePaths: string[]) {
+export function buildAtomizationChecklist(task: any, writePaths: string[]) {
   const primaryAtom: string = String(task?.atomizationImpact?.ownerAtomOrMap ?? task?.atomizationImpact?.owner_atom_or_map ?? 'atm.team-agents-map');
   const relatedAtoms = uniqueStrings([
     primaryAtom,
@@ -820,7 +877,7 @@ function evaluateLargeScriptRisk(writePaths: string[]) {
   };
 }
 
-function writeTeamRun(input: {
+export function writeTeamRun(input: {
   cwd: string;
   actorId: string;
   taskId: string;
@@ -857,7 +914,7 @@ function writeTeamRun(input: {
   return teamRun;
 }
 
-function buildTeamStatusResult(input: {
+export function buildTeamStatusResult(input: {
   cwd: string;
   requestedTeamRunId: string;
   compact: boolean;
