@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0137",
+  "title": "write-path atomicity and operator diagnostics: close transaction, runner stale fail-closed, status triangulation, scratch gitignore",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0135"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/framework-development.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    ".gitignore",
+    "tests/**"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/framework-development.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    ".gitignore",
+    "tests/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm test -- --grep \"tasks.*close.*transaction|runner.*stale|tasks status|gitignore"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/AI-Atomic-Framework/.atm/history/**",
+    "C:/Users/User/AI-Atomic-Framework/.atm/runtime/**",
+    "C:/Users/User/AI-Atomic-Framework/release/**",
+    "unrelated source surfaces",
+    "scratch / unrelated dirty"
+  ],
+  "nonGoals": [
+    "Do not introduce a second transaction model alongside existing close/reconcile.",
+    "Do not block read-only ATM commands when runner is stale.",
+    "Do not change the live-ledger SSOT designation.",
+    "Do not silently auto-rollback on close failure (must surface diagnostic first).",
+    "Do not mutate AAF source in Phase 0.",
+    "Do not start before TASK-AAO-0135 lands; transaction wrapper sits on top of 0135's normalize util."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-closure-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0137-write-path-atomicity-and-operator-diagnostics.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-aao.json",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/framework-development.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/next.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "C:/Users/User/AI-Atomic-Framework/.gitignore",
+      "C:/Users/User/AI-Atomic-Framework/tests/**",
+      "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "blocked_by": [
+      "TASK-AAO-0135"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0137-write-path-atomicity-and-operator-diagnostics.task.md",
+    "sectionTitle": "TASK-AAO-0137",
+    "headingLine": 88,
+    "hash": "9eb355fac4ab2db8"
+  },
+  "importedAt": "2026-06-09T01:39:21.222Z",
+  "lastTransitionId": "2026-06-09T01-45-11-475Z-close-52de8a6a1f50",
+  "lastTransitionAt": "2026-06-09T01:45:11.475Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain-claude-sonnet-46",
+  "reservedAt": "2026-06-09T01:39:35.987Z",
+  "promotedAt": "2026-06-09T01:39:42.509Z",
+  "claim": {
+    "actorId": "captain-claude-sonnet-46",
+    "leaseId": "lease-50389892ca8b",
+    "claimedAt": "2026-06-09T01:39:47.158Z",
+    "heartbeatAt": "2026-06-09T01:45:11.473Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      ".gitignore",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-09T01:39:47.158Z",
+  "startedByActor": "captain-claude-sonnet-46",
+  "startedBySessionId": "session-20260609013947-captain-claude-sonnet-46-TASK-AAO-0137-6949806367",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0137",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0137.*",
+      ".atm/history/task-events/TASK-AAO-0137/**",
+      ".atm/history/tasks/TASK-AAO-0137.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "12211f897704af43d15eac14917269274a4dba577fc7b5f4d0a76a6bf8ae17a3",
+    "actorId": "captain-claude-sonnet-46",
+    "createdAt": "2026-06-09T01:39:47.187Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-09T01:45:11.473Z",
+  "closedByActor": "captain-claude-sonnet-46",
+  "closedBySessionId": "session-20260609013947-captain-claude-sonnet-46-TASK-AAO-0137-6949806367",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0137.closure-packet.json"
+}

@@ -1,0 +1,180 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0137",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9aa7ed619107a13ec966c5c1f053e36b3021060c",
+  "governedTreeSha": "6902727a904912b2745ebae69cf20e168c4791bf",
+  "targetCommitDelta": {
+    "currentCommitSha": "9aa7ed619107a13ec966c5c1f053e36b3021060c",
+    "parentCommitShas": [
+      "9aa7ed619107a13ec966c5c1f053e36b3021060c"
+    ],
+    "governedTreeSha": "6902727a904912b2745ebae69cf20e168c4791bf",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0137.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-39-21-227Z-import-2d686340fe93.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-39-35-988Z-reserve-1d74811815d1.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-39-42-510Z-promote-504736fb221a.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-39-47-187Z-claim-911fe7cc8185.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-41-57-810Z-scope-amendment-5519c6c82e1f.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-42-16-190Z-scope-amendment-8fbaf4cf9d4a.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-42-43-068Z-scope-amendment-8f7bf3fd8fc5.json",
+      ".atm/history/task-events/TASK-AAO-0137/2026-06-09T01-42-55-527Z-scope-amendment-fc875ca51af2.json",
+      ".atm/history/tasks/TASK-AAO-0137.json",
+      ".gitignore",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/next.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.js",
+      "release/atm-root-drop/packages/cli/dist/commands/task-direction.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/next.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared.ts",
+      "release/atm-root-drop/packages/cli/src/commands/task-direction.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-task-ledger-governance.ts",
+      "release/atm-root-drop/scripts/validators.config.json",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/next.json",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:978f585c92f8fcdbb3dd03b71a7d501ba00b7856b455ef77a65f34fa7252dd2d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:task-ledger-governance",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1476240ba3c6ec5fa64f92a88ffd73381b8d73df32f172177f015f45646d3c95",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "npm test -- --grep tasks.*close.*transaction|runner.*stale|tasks",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-09T01:45:11.472Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0137-write-path-atomicity-and-operator-diagnostics.task.md",
+      ".atm/history/evidence/TASK-AAO-0137.*",
+      ".atm/history/task-events/TASK-AAO-0137/**",
+      ".atm/history/tasks/TASK-AAO-0137.json",
+      ".gitignore",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/**",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/**",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0137.json",
+  "closedAt": "2026-06-09T01:45:11.472Z",
+  "closedByActor": "captain-claude-sonnet-46",
+  "sessionId": "session-20260609013947-captain-claude-sonnet-46-TASK-AAO-0137-6949806367",
+  "attestation": null
+}
