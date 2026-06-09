@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0023",
+  "title": "End-to-end brokered write acceptance harness",
+  "status": "done",
+  "milestone": "P0",
+  "dependencies": [
+    "TASK-CID-0017",
+    "TASK-CID-0020",
+    "TASK-CID-0021",
+    "TASK-CID-0022"
+  ],
+  "acceptance": [
+    "A dedicated `validate:brokered-write` script exists in `package.json`.",
+    "The harness proves that same-file CID-disjoint work can go through proposal -> merge plan -> steward final patch.",
+    "The harness proves that same atom/CID conflicts fail closed.",
+    "The harness proves that stale hash/base-commit cases fail closed.",
+    "Team, Next, and Tasks surfaces use one consistent broker verdict model.",
+    "The final harness is registered through both `package.json` and `scripts/validators.config.json`."
+  ],
+  "deliverables": [
+    "package.json",
+    "scripts/validators.config.json",
+    "scripts/validate-brokered-write.ts",
+    "scripts/fixtures/brokered-write/disjoint-same-file.scenario.json",
+    "scripts/fixtures/brokered-write/conflict-same-atom.scenario.json",
+    "scripts/fixtures/brokered-write/hash-mismatch.scenario.json"
+  ],
+  "scopePaths": [
+    "package.json",
+    "scripts/validators.config.json",
+    "scripts/validate-brokered-write.ts",
+    "scripts/fixtures/brokered-write/disjoint-same-file.scenario.json",
+    "scripts/fixtures/brokered-write/conflict-same-atom.scenario.json",
+    "scripts/fixtures/brokered-write/hash-mismatch.scenario.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-brokered-write.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Adding remote shared-broker infrastructure",
+    "Changing the broker runtime contract itself",
+    "Manual mutation of .atm/history/** or .atm/runtime/**"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the end-to-end harness commit if the acceptance model proves flaky or produces non-deterministic verdicts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.brokered-write-acceptance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "This is the final gate card for the completion pack, so it should still aim for one main `007` implementation wave and one `005` / `006` closeout wave. Internal sidecars may verify scenario coverage and evidence completeness, but they are not formal worker identities.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0023-end-to-end-brokered-write-acceptance-harness.task.md",
+    "sectionTitle": "TASK-CID-0023",
+    "headingLine": 53,
+    "hash": "6eac932389e86f18"
+  },
+  "importedAt": "2026-06-09T01:11:07.324Z",
+  "lastTransitionId": "2026-06-09T01-13-14-275Z-close-9b2cff9570e9",
+  "lastTransitionAt": "2026-06-09T01:13:14.275Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "008",
+  "reservedAt": "2026-06-09T01:11:22.796Z",
+  "promotedAt": "2026-06-09T01:11:22.800Z",
+  "claim": {
+    "actorId": "008",
+    "leaseId": "lease-b0d2541b6337",
+    "claimedAt": "2026-06-09T01:11:22.802Z",
+    "heartbeatAt": "2026-06-09T01:13:14.274Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0023.json",
+      "package.json",
+      "scripts/fixtures/brokered-write/conflict-same-atom.scenario.json",
+      "scripts/fixtures/brokered-write/disjoint-same-file.scenario.json",
+      "scripts/fixtures/brokered-write/hash-mismatch.scenario.json",
+      "scripts/validate-brokered-write.ts",
+      "scripts/validators.config.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-09T01:11:22.802Z",
+  "startedByActor": "008",
+  "startedBySessionId": "session-20260609011122-008-TASK-CID-0023-4e2dfb020a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0023",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0023.*",
+      ".atm/history/task-events/TASK-CID-0023/**",
+      ".atm/history/tasks/TASK-CID-0023.json",
+      "package.json",
+      "scripts/fixtures/brokered-write/conflict-same-atom.scenario.json",
+      "scripts/fixtures/brokered-write/disjoint-same-file.scenario.json",
+      "scripts/fixtures/brokered-write/hash-mismatch.scenario.json",
+      "scripts/validate-brokered-write.ts",
+      "scripts/validators.config.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5079890cc067cdcf19264cb5439407be99dac960fb71c7f6177bad1f0c46af24",
+    "actorId": "008",
+    "createdAt": "2026-06-09T01:11:22.822Z",
+    "status": "active"
+  },
+  "closurePacket": ".atm/history/evidence/TASK-CID-0023.closure-packet.json",
+  "closedAt": "2026-06-09T01:13:14.274Z",
+  "closedByActor": "008",
+  "closedBySessionId": "session-20260609011122-008-TASK-CID-0023-4e2dfb020a"
+}
