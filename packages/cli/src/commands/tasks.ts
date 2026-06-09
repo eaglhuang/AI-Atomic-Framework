@@ -15,6 +15,7 @@ import {
   inspectFrameworkCloseWorktree,
   isTaskCloseGovernanceCriticalPath,
   normalizeSha256FieldsDeep,
+  registerCloseCommitWindow,
   repairClosurePacketForTask,
   requireTargetRepoClosureAuthority,
   type ClosurePacket,
@@ -648,6 +649,23 @@ async function runTasksReconcile(argv: string[]) {
     command: `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`
   });
 
+  // TASK-AAO-0136: open a short-lived close-commit-window so the next
+  // `git commit --task <id>` can land the staged close artifacts even though
+  // the task direction lock has now released. Window expires after 30s.
+  const closeCommitWindowAllowedFiles = [
+    relativePathFrom(options.cwd, taskPath),
+    transitionPath,
+    ...(closurePacketPath ? [closurePacketPath] : [])
+  ];
+  const closeCommitWindowPathReconcile = registerCloseCommitWindow({
+    cwd: options.cwd,
+    taskId: options.taskId,
+    actorId,
+    allowedFiles: closeCommitWindowAllowedFiles,
+    transitionId: transitionPath.split(/[\\/]/).pop()?.replace(/\.json$/, '') ?? null,
+    action: 'reconcile'
+  });
+
   return makeResult({
     ok: true,
     command: 'tasks',
@@ -655,7 +673,8 @@ async function runTasksReconcile(argv: string[]) {
     messages: [message('info', 'ATM_TASKS_RECONCILED', `Task ${options.taskId} successfully reconciled and closed as done.`, {
       taskId: options.taskId,
       actorId,
-      deliveryCommit: commitSha
+      deliveryCommit: commitSha,
+      closeCommitWindowPath: closeCommitWindowPathReconcile
     })],
     evidence: {
       action: 'reconcile',
@@ -665,6 +684,8 @@ async function runTasksReconcile(argv: string[]) {
       taskPath: relativePathFrom(options.cwd, taskPath),
       closurePacketPath,
       transitionPath,
+      closeCommitWindowPath: closeCommitWindowPathReconcile,
+      closeCommitWindowAllowedFiles,
       deliverableGate: deliverableGate as unknown as Record<string, unknown> | null
     }
   });
@@ -1921,6 +1942,23 @@ async function runTasksClose(argv: string[]) {
       reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
     });
   }
+  // TASK-AAO-0136: register close-commit-window for done closes so the captain's
+  // follow-up `git commit --task <id>` can land closure-packet + transition + ledger
+  // even though the direction lock has now released.
+  const closeCommitWindowPathFromClose = options.status === 'done'
+    ? registerCloseCommitWindow({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId,
+      allowedFiles: [
+        relativePathFrom(options.cwd, taskPath),
+        transitionPath,
+        ...(closurePacketPath ? [closurePacketPath] : [])
+      ],
+      transitionId: transitionPath.split(/[\\/]/).pop()?.replace(/\.json$/, '') ?? null,
+      action: 'close'
+    })
+    : null;
   const taskQueue = options.status === 'done'
     ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
     : null;
@@ -1931,7 +1969,8 @@ async function runTasksClose(argv: string[]) {
     messages: [message('info', 'ATM_TASKS_CLOSED', `Task ${options.taskId} moved to ${options.status}.`, {
       taskId: options.taskId,
       actorId,
-      status: options.status
+      status: options.status,
+      closeCommitWindowPath: closeCommitWindowPathFromClose
     })],
     evidence: {
       action: 'close',
@@ -1942,6 +1981,7 @@ async function runTasksClose(argv: string[]) {
       evidenceGate,
       closurePacketPath,
       transitionPath,
+      closeCommitWindowPath: closeCommitWindowPathFromClose,
       deliverableGate: deliverableGate as unknown as Record<string, unknown> | null,
       // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
       // critical changes were in-scope vs isolated as advisory unrelated changes.

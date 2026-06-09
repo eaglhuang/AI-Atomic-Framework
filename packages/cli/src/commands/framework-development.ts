@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import type { WorkItemRef } from '@ai-atomic-framework/core';
@@ -1211,6 +1211,101 @@ export function writeClosurePacket(cwd: string, taskId: string, packet: ClosureP
   return relativePathFrom(cwd, packetPath);
 }
 
+// =========================================================================
+// TASK-AAO-0136: close-commit-window short-lived lock.
+// After tasks close / tasks reconcile writes the closure packet, ledger
+// update, and close transition event, register a 30-second window that
+// allows the next `git commit --task <id>` invocation to land those staged
+// artifacts even though the regular task direction lock has already been
+// released by the close itself.
+// =========================================================================
+
+export const CLOSE_COMMIT_WINDOW_TTL_SECONDS = 30;
+export const CLOSE_COMMIT_WINDOW_SCHEMA_ID = 'atm.closeCommitWindow.v1';
+
+export interface CloseCommitWindowRecord {
+  readonly schemaId: typeof CLOSE_COMMIT_WINDOW_SCHEMA_ID;
+  readonly specVersion: '0.1.0';
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly createdAt: string;
+  readonly expiresAt: string;
+  readonly ttlSeconds: number;
+  readonly allowedFiles: readonly string[];
+  readonly transitionId: string | null;
+  readonly transitionAction: 'close' | 'reconcile';
+}
+
+function closeCommitWindowPath(cwd: string, taskId: string): string {
+  return path.join(cwd, '.atm', 'runtime', 'locks', `close-commit-window-${taskId}.lock.json`);
+}
+
+export function registerCloseCommitWindow(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly allowedFiles: readonly string[];
+  readonly transitionId: string | null;
+  readonly action: 'close' | 'reconcile';
+}): string {
+  const now = new Date();
+  const record: CloseCommitWindowRecord = {
+    schemaId: CLOSE_COMMIT_WINDOW_SCHEMA_ID,
+    specVersion: '0.1.0',
+    taskId: input.taskId,
+    actorId: input.actorId,
+    createdAt: now.toISOString(),
+    expiresAt: new Date(now.getTime() + CLOSE_COMMIT_WINDOW_TTL_SECONDS * 1000).toISOString(),
+    ttlSeconds: CLOSE_COMMIT_WINDOW_TTL_SECONDS,
+    allowedFiles: uniqueSorted(input.allowedFiles.map(normalizeRelativePath).filter(Boolean)),
+    transitionId: input.transitionId,
+    transitionAction: input.action
+  };
+  const lockPath = closeCommitWindowPath(input.cwd, input.taskId);
+  mkdirSync(path.dirname(lockPath), { recursive: true });
+  writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+  return relativePathFrom(input.cwd, lockPath);
+}
+
+export function readActiveCloseCommitWindows(cwd: string): readonly CloseCommitWindowRecord[] {
+  const locksDir = path.join(cwd, '.atm', 'runtime', 'locks');
+  if (!existsSync(locksDir)) return [];
+  const now = new Date();
+  const records: CloseCommitWindowRecord[] = [];
+  for (const entry of readdirSync(locksDir)) {
+    if (!entry.startsWith('close-commit-window-') || !entry.endsWith('.lock.json')) continue;
+    const filePath = path.join(locksDir, entry);
+    try {
+      const raw = JSON.parse(readFileSync(filePath, 'utf8'));
+      if (raw?.schemaId !== CLOSE_COMMIT_WINDOW_SCHEMA_ID) continue;
+      const expiresAt = new Date(String(raw.expiresAt ?? ''));
+      if (Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() <= now.getTime()) {
+        try { unlinkSync(filePath); } catch { /* ignore */ }
+        continue;
+      }
+      records.push(raw as CloseCommitWindowRecord);
+    } catch {
+      // skip malformed
+    }
+  }
+  return records;
+}
+
+export function findCloseCommitWindowCoveringPaths(
+  cwd: string,
+  candidatePaths: readonly string[]
+): CloseCommitWindowRecord | null {
+  if (candidatePaths.length === 0) return null;
+  const windows = readActiveCloseCommitWindows(cwd);
+  const normalizedPaths = candidatePaths.map(normalizeRelativePath).filter(Boolean);
+  for (const win of windows) {
+    const allowed = new Set(win.allowedFiles);
+    const covers = normalizedPaths.every((p) => allowed.has(p));
+    if (covers) return win;
+  }
+  return null;
+}
+
 export function inspectFrameworkCloseWorktree(cwd: string, taskId: string | null = null): FrameworkCloseWorktreeReport {
   const unstagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--name-only']).map(normalizeRelativePath).filter(Boolean));
   const stagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only']).map(normalizeRelativePath).filter(Boolean));
@@ -1884,10 +1979,48 @@ function matchesCurrentRepoIdentity(root: string, targetRepo: string): boolean {
   const target = targetRepo.trim().toLowerCase().replace(/\\/g, '/');
   const rootNormalized = root.replace(/\\/g, '/').toLowerCase();
   const basename = path.basename(root).toLowerCase();
-  return target === rootNormalized
+  if (target === rootNormalized
     || target === identity.name?.toLowerCase()
     || target === basename
-    || target.endsWith(`/${basename}`);
+    || target.endsWith(`/${basename}`)) {
+    return true;
+  }
+  // TASK-AAO-0136: framework-mode worktree identity inheritance.
+  // When ATM runs inside a git worktree (e.g. an isolated maintenance worktree
+  // created via `git worktree add`), the basename is the worktree directory
+  // name, not the main repo name. Resolve the main repo path via git and retry
+  // the match — a worktree inherits its main repo's framework identity.
+  const mainRepoPath = resolveMainRepoPath(root);
+  if (mainRepoPath && mainRepoPath !== root) {
+    const mainNormalized = mainRepoPath.replace(/\\/g, '/').toLowerCase();
+    const mainBasename = path.basename(mainRepoPath).toLowerCase();
+    if (target === mainNormalized
+      || target === mainBasename
+      || target.endsWith(`/${mainBasename}`)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// TASK-AAO-0136: derive main worktree path for a git worktree.
+// Returns null if cwd is not a git repo, or IS the main worktree.
+function resolveMainRepoPath(cwd: string): string | null {
+  try {
+    const result = spawnSync('git', ['rev-parse', '--git-common-dir'], { cwd, encoding: 'utf8' });
+    if (result.status !== 0) return null;
+    const gitCommonDir = result.stdout.trim();
+    if (!gitCommonDir) return null;
+    const absoluteGitCommonDir = path.isAbsolute(gitCommonDir)
+      ? gitCommonDir
+      : path.resolve(cwd, gitCommonDir);
+    // Main repo path is the parent of the common .git directory.
+    const mainRepoPath = path.dirname(absoluteGitCommonDir);
+    if (path.resolve(mainRepoPath) === path.resolve(cwd)) return null;
+    return mainRepoPath;
+  } catch {
+    return null;
+  }
 }
 
 function hasActiveFrameworkTaskLock(activeLocks: readonly string[]): boolean {
