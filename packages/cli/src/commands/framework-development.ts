@@ -1212,6 +1212,174 @@ export function writeClosurePacket(cwd: string, taskId: string, packet: ClosureP
 }
 
 // =========================================================================
+// TASK-AAO-0137: runner stale detection, write-path gate, close transaction.
+// =========================================================================
+
+export type AtmTasksWriteAction =
+  | 'tasks-close'
+  | 'tasks-reconcile'
+  | 'tasks-import-write'
+  | 'tasks-repair-closure-write';
+
+const FROZEN_RUNNER_ENTRYPOINTS = new Set([
+  'atm.mjs',
+  'release/atm-onefile/atm.mjs',
+  'packages/cli/dist/atm.js',
+  'release/atm-root-drop/atm.mjs'
+]);
+
+function newestFrameworkSourceMtime(rootDir: string): number {
+  let newest = 0;
+  for (const entryPath of [
+    path.join(rootDir, 'packages', 'cli', 'src'),
+    path.join(rootDir, 'scripts')
+  ]) {
+    newest = Math.max(newest, newestMtimeInTree(entryPath));
+  }
+  return newest;
+}
+
+function newestMtimeInTree(entryPath: string): number {
+  let stat: ReturnType<typeof statSync> | null = null;
+  try {
+    stat = statSync(entryPath);
+  } catch {
+    return 0;
+  }
+  if (stat.isFile()) return stat.mtimeMs;
+  if (!stat.isDirectory()) return 0;
+  let newest = 0;
+  for (const child of readdirSync(entryPath, { withFileTypes: true })) {
+    if (child.name === 'dist' || child.name === 'node_modules') continue;
+    newest = Math.max(newest, newestMtimeInTree(path.join(entryPath, child.name)));
+  }
+  return newest;
+}
+
+function resolveFrozenRunnerPath(rootDir: string): string | null {
+  const onefile = path.join(rootDir, 'release', 'atm-onefile', 'atm.mjs');
+  if (existsSync(onefile)) return onefile;
+  const dist = path.join(rootDir, 'packages', 'cli', 'dist', 'atm.js');
+  return existsSync(dist) ? dist : null;
+}
+
+function classifyCliEntrypoint(cwd: string): string | null {
+  const entrypointPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+  if (!entrypointPath) return null;
+  const relative = path.relative(path.resolve(cwd), entrypointPath).replace(/\\/g, '/');
+  if (relative && !relative.startsWith('..')) return relative;
+  return entrypointPath.replace(/\\/g, '/');
+}
+
+export function isRunnerSyncRequired(cwd: string): boolean {
+  const rootDir = path.resolve(cwd);
+  const entrypoint = classifyCliEntrypoint(rootDir);
+  if (!entrypoint || !FROZEN_RUNNER_ENTRYPOINTS.has(entrypoint)) return false;
+  const runnerPath = resolveFrozenRunnerPath(rootDir);
+  if (!runnerPath) return false;
+  const newestSource = newestFrameworkSourceMtime(rootDir);
+  const runnerMtime = statSync(runnerPath).mtimeMs;
+  return newestSource > runnerMtime;
+}
+
+export function runnerStaleWarningMessage(): string {
+  return 'ATM_RUNNER_SYNC_REQUIRED: stable atm.mjs is older than framework source files. Run `npm run build` before using the frozen runner, or use `node atm.dev.mjs ...` for source-first framework validation.';
+}
+
+export function assertRunnerFreshForWriteAction(input: {
+  readonly cwd: string;
+  readonly action: AtmTasksWriteAction;
+  readonly allowStaleRunner: boolean;
+}): { readonly warning: string | null } {
+  if (!isRunnerSyncRequired(input.cwd)) return { warning: null };
+  if (input.allowStaleRunner) {
+    return { warning: runnerStaleWarningMessage() };
+  }
+  throw new CliError('ATM_RUNNER_STALE_WRITE_REFUSED', `ATM refused ${input.action} because the frozen runner is older than framework source files.`, {
+    exitCode: 1,
+    details: {
+      action: input.action,
+      syncCommand: 'npm run build',
+      sourceFirstCommand: 'node atm.dev.mjs ...',
+      remediation: 'Run npm run build before write actions through node atm.mjs, or pass --allow-stale-runner only for disaster recovery.'
+    }
+  });
+}
+
+export function closeJournalPath(cwd: string, taskId: string): string {
+  return path.join(cwd, '.atm-temp', `close-journal-${taskId}.json`);
+}
+
+export interface TaskCloseTransactionResult {
+  readonly transitionPath: string;
+  readonly closurePacketPath: string | null;
+}
+
+export async function executeTaskCloseTransaction(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly taskPath: string;
+  readonly phase: 'close' | 'reconcile';
+  readonly previousTaskContent: string;
+  readonly createdClosurePacketAbsolute: string | null;
+  readonly runWrites: () => TaskCloseTransactionResult | Promise<TaskCloseTransactionResult>;
+}): Promise<TaskCloseTransactionResult> {
+  const journalPath = closeJournalPath(input.cwd, input.taskId);
+  mkdirSync(path.dirname(journalPath), { recursive: true });
+  writeFileSync(journalPath, `${JSON.stringify({
+    schemaId: 'atm.closeJournal.v1',
+    taskId: input.taskId,
+    phase: input.phase,
+    status: 'staging',
+    startedAt: new Date().toISOString()
+  }, null, 2)}\n`, 'utf8');
+
+  const rolledBackArtifacts: string[] = [];
+  let transitionAbsolute: string | null = null;
+  try {
+    const result = await input.runWrites();
+    transitionAbsolute = path.resolve(input.cwd, result.transitionPath);
+    writeFileSync(journalPath, `${JSON.stringify({
+      schemaId: 'atm.closeJournal.v1',
+      taskId: input.taskId,
+      phase: input.phase,
+      status: 'committed',
+      committedAt: new Date().toISOString(),
+      transitionPath: result.transitionPath,
+      closurePacketPath: result.closurePacketPath
+    }, null, 2)}\n`, 'utf8');
+    unlinkSync(journalPath);
+    return result;
+  } catch (error) {
+    if (transitionAbsolute && existsSync(transitionAbsolute)) {
+      unlinkSync(transitionAbsolute);
+      rolledBackArtifacts.push(relativePathFrom(input.cwd, transitionAbsolute));
+    }
+    if (input.createdClosurePacketAbsolute && existsSync(input.createdClosurePacketAbsolute)) {
+      unlinkSync(input.createdClosurePacketAbsolute);
+      rolledBackArtifacts.push(relativePathFrom(input.cwd, input.createdClosurePacketAbsolute));
+    }
+    writeFileSync(input.taskPath, input.previousTaskContent, 'utf8');
+    rolledBackArtifacts.push(relativePathFrom(input.cwd, input.taskPath));
+    try {
+      if (existsSync(journalPath)) unlinkSync(journalPath);
+    } catch {
+      // best-effort journal cleanup
+    }
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new CliError('ATM_TASK_CLOSE_TRANSACTION_FAILED', `Task ${input.taskId} close transaction failed and was rolled back.`, {
+      exitCode: 1,
+      details: {
+        taskId: input.taskId,
+        phase: input.phase,
+        rolledBackArtifacts,
+        reason
+      }
+    });
+  }
+}
+
+// =========================================================================
 // TASK-AAO-0136: close-commit-window short-lived lock.
 // After tasks close / tasks reconcile writes the closure packet, ledger
 // update, and close transition event, register a 30-second window that
