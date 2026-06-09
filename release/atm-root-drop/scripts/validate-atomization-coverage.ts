@@ -21,6 +21,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { execSync } from 'node:child_process';
+import {
+  loadPathToAtomMap,
+  validateProjectionMatchesShards
+} from '../atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js';
 
 interface DogfoodScore {
   schemaId?: string;
@@ -111,7 +115,7 @@ function isProductionPath(filePath: string): boolean {
 }
 
 interface CoverageViolation {
-  kind: 'threshold' | 'unowned-new-source' | 'invalid-exclusion-reason' | 'missing-artifact';
+  kind: 'threshold' | 'unowned-new-source' | 'invalid-exclusion-reason' | 'missing-artifact' | 'shard-merge';
   detail: string;
   data?: Record<string, unknown>;
 }
@@ -174,7 +178,18 @@ export function validateAtomizationCoverage(options: ValidateOptions): CoverageV
     }
   }
 
-  const pathMap = readJson<PathToAtomMap>(mapPath);
+  let pathMap: PathToAtomMap | null = null;
+  try {
+    pathMap = loadPathToAtomMap(repo) as PathToAtomMap;
+  } catch (error) {
+    violations.push({
+      kind: 'shard-merge',
+      detail: `path-to-atom-map owner shard merge failed: ${error instanceof Error ? error.message : String(error)}`,
+      data: { path: mapPath }
+    });
+    remediation.push('Fix duplicate path_pattern ownership in path-to-atom-map owner shards or restore projection.');
+  }
+
   if (!pathMap || !Array.isArray(pathMap.mappings)) {
     violations.push({
       kind: 'missing-artifact',
@@ -182,6 +197,16 @@ export function validateAtomizationCoverage(options: ValidateOptions): CoverageV
       data: { path: mapPath }
     });
     remediation.push('TASK-ASA-0001 must produce path-to-atom-map.json with mappings array.');
+  } else {
+    const shardEquivalence = validateProjectionMatchesShards(repo);
+    if (!shardEquivalence.ok && !shardEquivalence.skipped) {
+      violations.push({
+        kind: 'shard-merge',
+        detail: `path-to-atom-map projection is not equivalent to owner shard merge: ${shardEquivalence.detail ?? shardEquivalence.reason}`,
+        data: { reason: shardEquivalence.reason }
+      });
+      remediation.push('Rebuild projection via node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js <repo> write-projection');
+    }
   }
 
   const scoreValues = score?.scores ?? {};

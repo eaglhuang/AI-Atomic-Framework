@@ -2619,9 +2619,13 @@ function resolveAtomizationCoverageArtifactPath(fileName: string) {
     'dogfood-score.md',
     'exclusion-inventory.json',
     'generated-fixture-boundaries.json',
-    'path-to-atom-map.json'
+    'path-to-atom-map.json',
+    'manifest.json'
   ]);
   if (!atomizationCoverageArtifacts.has(basename)) return null;
+  if (basename === 'manifest.json') {
+    return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json';
+  }
   return `atomic_workbench/atomization-coverage/${basename}`;
 }
 

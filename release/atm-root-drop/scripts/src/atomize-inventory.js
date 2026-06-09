@@ -15,6 +15,7 @@
 import { execSync } from 'child_process';
 import { resolve, posix } from 'path';
 import { existsSync, readFileSync } from 'fs';
+import { loadPathToAtomMap } from '../../atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js';
 
 const PRODUCTION_GLOBS = [
   /^packages\/[^/]+\/src\/.+\.(ts|js|mts|cts|tsx)$/,
@@ -120,7 +121,6 @@ export async function atomizeInventory(options) {
 
   const taxonomyPath = resolve(fullPath, 'docs', 'ATOMIZATION_COVERAGE_TAXONOMY.md');
   const exclusionPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'exclusion-inventory.json');
-  const pathMapPath = resolve(fullPath, 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json');
   const registryPath = resolve(fullPath, 'atomic-registry.json');
 
   if (!existsSync(taxonomyPath)) {
@@ -134,9 +134,12 @@ export async function atomizeInventory(options) {
   const exclusions = existsSync(exclusionPath)
     ? JSON.parse(readFileSync(exclusionPath, 'utf-8'))
     : [];
-  const pathMap = existsSync(pathMapPath)
-    ? JSON.parse(readFileSync(pathMapPath, 'utf-8'))
-    : { mappings: [] };
+  let pathMap = { mappings: [] };
+  try {
+    pathMap = loadPathToAtomMap(fullPath);
+  } catch {
+    pathMap = { mappings: [] };
+  }
   const registry = existsSync(registryPath)
     ? JSON.parse(readFileSync(registryPath, 'utf-8'))
     : { entries: [] };
