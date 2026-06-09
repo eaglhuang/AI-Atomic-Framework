@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0027",
+  "title": "Team command atom boundary preflight",
+  "status": "done",
+  "milestone": "M1P",
+  "dependencies": [
+    "TASK-TEAM-0001",
+    "TASK-AAO-0106"
+  ],
+  "acceptance": [
+    "`TASK-AAO-0106` remains the canonical path-to-atom-map sharding card.",
+    "`TASK-TEAM-0002` owns the crew briefing atoms without also owning the atomization planner atoms.",
+    "`TASK-TEAM-0003` owns the atomization planner atoms without also owning the crew briefing atoms.",
+    "The first live parallel test can distinguish same-file different-atom PASS from same-atom `FALLBACK_SERIALIZE`.",
+    "If the path map is not yet sharded, concurrent map writers are forbidden and a single steward lane is documented."
+  ],
+  "deliverables": [
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/team.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/team.spec.ts",
+    "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "C:/Users/User/AI-Atomic-Framework/docs/governance/team-agents/team-atom-boundaries.md"
+  ],
+  "scopePaths": [
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/team.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/team.spec.ts",
+    "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "C:/Users/User/AI-Atomic-Framework/docs/governance/team-agents/team-atom-boundaries.md"
+  ],
+  "validators": [
+    "npm.cmd run typecheck",
+    "npm.cmd run validate:cli",
+    "node scripts/validate-atomization-coverage.ts",
+    "node atm.mjs team plan --task TASK-TEAM-0002 --json",
+    "node atm.mjs team plan --task TASK-TEAM-0003 --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Team runtime implementation beyond atom-boundary-safe stubs",
+    "Changing task lifecycle semantics",
+    "Closing TASK-TEAM-0002 or TASK-TEAM-0003",
+    "Creating a duplicate path-to-atom-map sharding task",
+    "Bypassing TASK-AAO-0106 for shared path-map ownership",
+    "N=4 same-file disjoint proof",
+    "Cross-file disjoint multi-lane proof",
+    "Post-apply per-proposal validator execution proof"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert Team command/spec atom-boundary changes and path-map rows together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "Split coarse Team command ownership into behavior-level atoms before the first parallel Team Agents proof.",
+      "Coordinate path-to-atom-map ownership through TASK-AAO-0106 owner shards before touching shared map rows."
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This is the preflight card that makes the parallel test meaningful. Without it, Team Agents parallel validation mostly measures that the atom boundary is too coarse.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0027-team-command-atom-boundary-preflight.task.md",
+    "sectionTitle": "TASK-TEAM-0027",
+    "headingLine": 106,
+    "hash": "65965df056d402bc"
+  },
+  "importedAt": "2026-06-09T12:32:01.141Z",
+  "lastTransitionId": "2026-06-09T12-43-34-274Z-close-fd96efbb3e00",
+  "lastTransitionAt": "2026-06-09T12:43:34.274Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "008",
+  "reservedAt": "2026-06-09T12:35:44.187Z",
+  "promotedAt": "2026-06-09T12:35:44.192Z",
+  "claim": {
+    "actorId": "008",
+    "leaseId": "lease-62206e757a44",
+    "claimedAt": "2026-06-09T12:35:44.195Z",
+    "heartbeatAt": "2026-06-09T12:43:34.272Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0027.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-atom-boundaries.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-09T12:35:44.195Z",
+  "startedByActor": "008",
+  "startedBySessionId": "session-20260609123544-008-TASK-TEAM-0027-88b2edfc7b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0027",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0027.*",
+      ".atm/history/task-events/TASK-TEAM-0027/**",
+      ".atm/history/tasks/TASK-TEAM-0027.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-atom-boundaries.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1586b7ae1981d76d30140d0d0a9df37a521e75cf569ac024af0d3a36e24530a1",
+    "actorId": "008",
+    "createdAt": "2026-06-09T12:35:44.217Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-09T12:43:34.272Z",
+  "closedByActor": "008",
+  "closedBySessionId": "session-20260609123544-008-TASK-TEAM-0027-88b2edfc7b",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0027.closure-packet.json"
+}
