@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.pathToAtomMapOwnerShard.v1",
+  "owner": "platform",
+  "mappings": [
+    {
+      "path_pattern": ".atm/history/evidence/git-head.jsonl",
+      "atom_id": "atm.git-head-evidence-jsonl",
+      "capability": "Append-only JSONL evidence log with git union merge driver, replaces single-file git-head.json hotspot to eliminate push merge conflicts",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "docs/governance/batch-playbook.md",
+      "atom_id": "atom-integration-playbook",
+      "capability": "Canonical batch / normal / fast playbook reference shared by all editor integrations",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "docs/governance/batch-playbook.md",
+      "atom_id": "atm.batch-playbook-map",
+      "capability": "State-aware batch playbook exposing three distinct states (queue-preview / queue-head-active / repair-required) embedded in atm.channelPlaybook.v1 response (TASK-AAO-0014)",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/minimal-task-crew.md",
+      "atom_id": "atm.team-agents-map",
+      "capability": "Minimal task crew briefing contract for team plan results, including required and optional roles, allowed files, do-not-touch paths, expected reports, and stop conditions",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "integrations/claude/**",
+      "atom_id": "atom-claude-adapter",
+      "capability": "Claude editor integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "integrations/codex/**",
+      "atom_id": "atom-codex-adapter",
+      "capability": "Codex editor integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "integrations/copilot/**",
+      "atom_id": "atom-copilot-adapter",
+      "capability": "GitHub Copilot integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "integrations/cursor/**",
+      "atom_id": "atom-cursor-adapter",
+      "capability": "Cursor editor integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "schemas/atom-map.schema.json",
+      "atom_id": "atom-atom-map-spec",
+      "capability": "JSON Schema (atm.atomicMap) that every atomic_workbench/maps/**/map.spec.json must conform to",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "templates/agent-pack/**",
+      "atom_id": "atom-integration-playbook",
+      "capability": "Reusable playbook fragments included by every editor adapter skill manifest",
+      "coverage_status": "active"
+    }
+  ]
+}

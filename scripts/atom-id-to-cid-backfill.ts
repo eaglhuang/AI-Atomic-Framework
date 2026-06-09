@@ -2,6 +2,7 @@ import { existsSync, readdirSync, statSync, readFileSync, writeFileSync, mkdirSy
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { computeAtomCid } from '../packages/core/src/registry/atom-capsule.ts';
+import { loadPathToAtomMap } from '../atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js';
 
 interface AtomBundle {
   canonicalSourceCode: string;
@@ -75,13 +76,13 @@ function main() {
   const isWrite = process.argv.includes('--write');
   const isJsonOutput = process.argv.includes('--json');
 
-  const pathToAtomMapPath = path.resolve(root, 'atomic_workbench/atomization-coverage/path-to-atom-map.json');
-  if (!existsSync(pathToAtomMapPath)) {
-    console.error(`[backfill] Error: path-to-atom-map.json not found at ${pathToAtomMapPath}`);
+  let mapData;
+  try {
+    mapData = loadPathToAtomMap(root);
+  } catch (error) {
+    console.error(`[backfill] Error: path-to-atom-map load failed: ${error instanceof Error ? error.message : String(error)}`);
     process.exit(1);
   }
-
-  const mapData = JSON.parse(readFileSync(pathToAtomMapPath, 'utf8'));
   const mappingsList = mapData.mappings || [];
 
   // Group path patterns by atom_id

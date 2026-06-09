@@ -1,28 +1,31 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadPathToAtomMap } from '../atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-function fail(message: string) {
+function fail(message: string): never {
   console.error(`[validate:atom-id-to-cid] Error: ${message}`);
   process.exit(1);
 }
 
 function main() {
   const sidecarPath = path.resolve(root, 'atomic_workbench/atomization-coverage/atom-id-to-cid.json');
-  const pathToAtomMapPath = path.resolve(root, 'atomic_workbench/atomization-coverage/path-to-atom-map.json');
-
   if (!existsSync(sidecarPath)) {
     fail(`atom-id-to-cid.json not found at ${sidecarPath}. Run backfill script first.`);
   }
-  if (!existsSync(pathToAtomMapPath)) {
-    fail(`path-to-atom-map.json not found at ${pathToAtomMapPath}`);
-  }
 
   const sidecarData = JSON.parse(readFileSync(sidecarPath, 'utf8'));
-  const mapData = JSON.parse(readFileSync(pathToAtomMapPath, 'utf8'));
-
+  let mapData: ReturnType<typeof loadPathToAtomMap> | undefined;
+  try {
+    mapData = loadPathToAtomMap(root);
+  } catch (error) {
+    fail(`path-to-atom-map load failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (!mapData) {
+    fail('path-to-atom-map load returned empty document');
+  }
   // 1. Verify schemaVersion
   if (sidecarData.schemaVersion !== 'atm.atomIdToCid.v1') {
     fail(`schemaVersion must be 'atm.atomIdToCid.v1'. Got: ${sidecarData.schemaVersion}`);

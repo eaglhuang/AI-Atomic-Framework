@@ -1,0 +1,120 @@
+{
+  "schemaId": "atm.pathToAtomMapOwnerShard.v1",
+  "owner": "plugins",
+  "mappings": [
+    {
+      "path_pattern": "packages/adapter-*/src/**",
+      "atom_id": "atom-bootstrap-runtime",
+      "capability": "Bootstrap runtime loading and environment preparation",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/adapters/*/src/**",
+      "atom_id": "atom-integration-adapters",
+      "capability": "editor/platform integration",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/agent-pack-*/src/**",
+      "atom_id": "atom-agent-pack-claude-code",
+      "capability": "Editor-local agent pack workspace orchestration and capability bindings",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/language-bindings/*/src/**",
+      "atom_id": "atom-language-bindings",
+      "capability": "Python/JavaScript language support",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/**",
+      "atom_id": "atom-behavior-atomize",
+      "capability": "Behavior pack execution and atomization workflows",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/**",
+      "atom_id": "atom-behavior-pack-entrypoint",
+      "capability": "behavior pack fallback ownership",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/atomize.ts",
+      "atom_id": "atom-behavior-atomize",
+      "capability": "atomize behavior: convert source modules to atom spec proposals",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/compose.ts",
+      "atom_id": "atom-behavior-compose",
+      "capability": "compose behavior: combine atoms into a higher-level map",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/dedup-merge.ts",
+      "atom_id": "atom-behavior-dedup-merge",
+      "capability": "dedup-merge behavior: deduplicate and merge similar atoms",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/evolve.ts",
+      "atom_id": "atom-behavior-evolve",
+      "capability": "evolve behavior: propose evolutions to atom contracts",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/expire.ts",
+      "atom_id": "atom-behavior-expire",
+      "capability": "expire behavior: mark atoms as deprecated / expired",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/index.ts",
+      "atom_id": "atom-behavior-pack-entrypoint",
+      "capability": "behavior pack entrypoint and public exports",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/infect.ts",
+      "atom_id": "atom-behavior-infect",
+      "capability": "infect behavior (alpha): bulk-propagate atom contract changes",
+      "coverage_status": "alpha"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/merge.ts",
+      "atom_id": "atom-behavior-merge",
+      "capability": "merge behavior: combine two atoms into one",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/polymorphize.ts",
+      "atom_id": "atom-behavior-polymorphize",
+      "capability": "polymorphize behavior: replace concrete atom with polymorph template",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/split.ts",
+      "atom_id": "atom-behavior-split",
+      "capability": "split behavior: split one atom into multiple smaller atoms",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-behavior-pack/src/sweep.ts",
+      "atom_id": "atom-behavior-sweep",
+      "capability": "sweep behavior: clean up dangling atoms and stale references",
+      "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/plugin-governance-local/src/versioning.ts",
+      "atom_id": "atm.task-ledger-governance-map",
+      "capability": "semantic versioning validation and comparison helpers, including isValidSemverVersionString and compareSemverVersions (hygiene patch)",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/plugins/*/src/**",
+      "atom_id": "atom-plugin-framework",
+      "capability": "plugin loading and execution",
+      "coverage_status": "partial"
+    }
+  ]
+}
