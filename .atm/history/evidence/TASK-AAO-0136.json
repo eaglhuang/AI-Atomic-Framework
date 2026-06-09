@@ -1,0 +1,44 @@
+{
+  "taskId": "TASK-AAO-0136",
+  "updatedAt": "2026-06-09T01:28:23.614Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for TASK-AAO-0136 against commit 6d5049ac508ed46c4519eedc77c3d3032b636a94.",
+      "artifactPaths": [
+        ".atm/history/evidence/TASK-AAO-0136.*",
+        ".atm/history/task-events/TASK-AAO-0136/**",
+        ".atm/history/tasks/TASK-AAO-0136.json",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "tests/cli-fixtures/help-snapshots/tasks.json",
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0136-multi-captain-commit-ergonomics.task.md",
+        "tests/**"
+      ],
+      "producedBy": "captain-claude-sonnet-46",
+      "createdAt": "2026-06-09T01:28:23.614Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 6d5049ac508ed46c4519eedc77c3d3032b636a94",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:5fcf3047619ee4c9f467afe16428cd57da3843f1bc9d273a4ea7e0f8311c8b95",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "6d5049ac508ed46c4519eedc77c3d3032b636a94"
+      }
+    }
+  ]
+}
