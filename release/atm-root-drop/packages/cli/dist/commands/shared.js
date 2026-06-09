@@ -5,6 +5,15 @@ import { projectFields, projectSummary } from './output-projection.js';
 let outputJsonPath = null;
 let globalSummaryProjection = false;
 let globalFieldsProjection = null;
+export function setOutputJsonPath(resolvedPath) {
+    outputJsonPath = resolvedPath;
+}
+export function resolveNextDefaultOutputPath(cwd) {
+    const dir = path.join(path.resolve(cwd), '.atm-temp');
+    mkdirSync(dir, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    return path.join(dir, `next-${stamp}.json`);
+}
 // 在載入時直接全域掃描一次 process.argv 以備不時之需
 const outputJsonIdx = process.argv.indexOf('--output-json');
 if (outputJsonIdx !== -1 && outputJsonIdx + 1 < process.argv.length) {

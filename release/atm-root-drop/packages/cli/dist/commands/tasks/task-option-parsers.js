@@ -14,12 +14,46 @@ function normalizeRelativePath(value) {
 function uniqueStrings(values) {
     return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
 }
+export function parseAllowStaleRunnerFlag(argv) {
+    return argv.includes('--allow-stale-runner');
+}
+export function parseStatusOptions(argv) {
+    const options = {
+        cwd: process.cwd(),
+        taskId: ''
+    };
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg === '--cwd' || arg === '--repo') {
+            options.cwd = requireValue(argv, index, arg);
+            index += 1;
+            continue;
+        }
+        if (arg === '--task') {
+            options.taskId = requireValue(argv, index, '--task');
+            index += 1;
+            continue;
+        }
+        if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
+            continue;
+        }
+        throw new CliError('ATM_CLI_USAGE', `tasks status does not support option ${arg}`, { exitCode: 2 });
+    }
+    if (!options.taskId) {
+        throw new CliError('ATM_CLI_USAGE', 'tasks status requires --task <work-item-id>.', { exitCode: 2 });
+    }
+    return {
+        cwd: path.resolve(options.cwd),
+        taskId: options.taskId.trim()
+    };
+}
 export function parseReconcileOptions(argv) {
     const options = {
         cwd: process.cwd(),
         taskId: '',
         actorId: null,
-        deliveryCommit: ''
+        deliveryCommit: '',
+        allowStaleRunner: parseAllowStaleRunnerFlag(argv)
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -43,7 +77,7 @@ export function parseReconcileOptions(argv) {
             index += 1;
             continue;
         }
-        if (arg === '--json' || arg === '--pretty') {
+        if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
             continue;
         }
         throw new CliError('ATM_CLI_USAGE', `tasks reconcile does not support option ${arg}`, { exitCode: 2 });
@@ -320,7 +354,8 @@ export function parseCloseOptions(argv) {
         reason: null,
         fromBatchCheckpoint: false,
         batchId: null,
-        historicalDeliveryRefs: []
+        historicalDeliveryRefs: [],
+        allowStaleRunner: parseAllowStaleRunnerFlag(argv)
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -367,7 +402,7 @@ export function parseCloseOptions(argv) {
             index += 1;
             continue;
         }
-        if (arg === '--json' || arg === '--pretty') {
+        if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
             continue;
         }
         throw new CliError('ATM_CLI_USAGE', `tasks close does not support option ${arg}`, { exitCode: 2 });

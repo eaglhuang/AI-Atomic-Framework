@@ -1,9 +1,15 @@
 import type { TaskImportStatus } from '../tasks.ts';
+export declare function parseAllowStaleRunnerFlag(argv: readonly string[]): boolean;
+export declare function parseStatusOptions(argv: string[]): {
+    cwd: string;
+    taskId: string;
+};
 export declare function parseReconcileOptions(argv: string[]): {
     cwd: string;
     taskId: string;
     deliveryCommit: string;
     actorId: string | null;
+    allowStaleRunner: boolean;
 };
 export declare function parseDeliverAndCloseOptions(argv: string[]): {
     cwd: string;
@@ -50,6 +56,7 @@ export declare function parseCloseOptions(argv: string[]): {
     reason: string | null;
     fromBatchCheckpoint: boolean;
     batchId: string | null;
+    allowStaleRunner: boolean;
 };
 export declare function parseResetOptions(argv: string[]): {
     cwd: string;

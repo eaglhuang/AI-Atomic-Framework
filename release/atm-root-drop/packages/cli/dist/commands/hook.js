@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, appendFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { auditTasks, buildFrameworkTempClaimCommand, buildFrameworkStaleCleanupCommand, createFrameworkModeStatus, detectFrameworkRepoIdentity, isFrameworkStaleLockReleasable, isAdopterInfrastructureSyncCommit, isAtmCriticalNonDocSurface, requiredValidationPassesForClosure, validateClosurePacket } from './framework-development.js';
+import { auditTasks, buildFrameworkTempClaimCommand, buildFrameworkStaleCleanupCommand, createFrameworkModeStatus, detectFrameworkRepoIdentity, isFrameworkStaleLockReleasable, isAdopterInfrastructureSyncCommit, isAtmCriticalNonDocSurface, readActiveCloseCommitWindows, requiredValidationPassesForClosure, validateClosurePacket } from './framework-development.js';
 import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-registry.js';
 import { resolveActorWorkSession } from './actor-session.js';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.js';
@@ -14,6 +14,12 @@ import { runContextMapAdvisor } from './hook/context-map-advisor.js';
 export const hookContractVersion = 'atm.integration-hooks/v1';
 export const hookProvider = 'atm-framework-development-hooks/v1';
 export const hookMarker = 'ATM_INTEGRATION_HOOK_CONTRACT_V1';
+// TASK-AAO-0136: task-audit codes that always block regardless of scope.
+// These represent contract drift severe enough to surface even when not in staged files.
+const INVARIANT_TASK_AUDIT_CODES = new Set([
+    'ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET',
+    'ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST'
+]);
 const textFileExtensions = new Set([
     '.cjs',
     '.css',
@@ -185,12 +191,18 @@ function runPreCommitHook(cwd) {
         : [];
     const directionLockPlanningMirrorPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
     const directionLockAllowsPlanningMirror = activeDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
+    // TASK-AAO-0136: collect close-commit-window allowedFiles (short-lived locks
+    // opened by tasks close / tasks reconcile). These authorize landing the close
+    // artifacts after the regular direction lock has already released.
+    const activeCloseCommitWindows = readActiveCloseCommitWindows(root);
+    const closeCommitWindowAllowedFiles = uniqueSorted(activeCloseCommitWindows.flatMap((win) => win.allowedFiles));
     const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
         ? stagedFiles
             .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
             .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
             .filter((entry) => !isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles))
             .filter((entry) => !isPathAllowedByTaskDirection(entry, frameworkTempClaimAllowedFiles))
+            .filter((entry) => !isPathAllowedByTaskDirection(entry, closeCommitWindowAllowedFiles))
         : [];
     const planningMirrorDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync && directionLockPlanningMirrorPaths.length > 0 && !directionLockAllowsPlanningMirror
         ? stagedFiles
@@ -227,6 +239,16 @@ function runPreCommitHook(cwd) {
         : blockingFrameworkIssues.includes('framework-stale-lock-cleanup-required') && releasableStaleLock
             ? buildFrameworkStaleCleanupCommand(releasableStaleLock, frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit')
             : null;
+    // TASK-AAO-0136: only staged or invariant audit findings block the commit;
+    // tree-wide pre-existing audit findings get demoted to advisory warnings.
+    const stagedFilesSet = new Set(stagedFiles);
+    const blockingTaskAuditFindings = taskAudit.findings.filter((entry) => {
+        if (entry.level !== 'error')
+            return false;
+        if (INVARIANT_TASK_AUDIT_CODES.has(entry.code))
+            return true;
+        return 'path' in entry && typeof entry.path === 'string' && stagedFilesSet.has(entry.path);
+    });
     const ok = encodingReport.ok
         && gitIndexDiagnostic.ok
         && blockingFrameworkIssues.length === 0
@@ -238,11 +260,13 @@ function runPreCommitHook(cwd) {
         && commitAttributionReport.ok
         && protectedStateReport.ok
         && taskCardStatusReport.ok
-        && taskAudit.ok
+        && blockingTaskAuditFindings.length === 0
         && failedValidatorRuns.length === 0;
     const evidenceWrite = ok && stagedFiles.length > 0
         ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
         : null;
+    // TASK-AAO-0136: collect tree-wide advisory findings (warnings only, not blockers).
+    const advisoryFindings = [];
     const blockingFindings = buildPreCommitBlockingFindings({
         encodingReport,
         gitIndexDiagnostic,
@@ -259,7 +283,9 @@ function runPreCommitHook(cwd) {
         protectedStateFindings: protectedStateReport.findings,
         taskCardStatusFindings: taskCardStatusReport.findings,
         taskAuditFindings: taskAudit.findings,
-        failedValidatorRuns
+        failedValidatorRuns,
+        stagedFiles,
+        advisoryFindingsSink: advisoryFindings
     });
     const failureEnvelope = ok
         ? null
@@ -289,7 +315,8 @@ function runPreCommitHook(cwd) {
                 ? message('info', 'ATM_HOOK_PRE_COMMIT_OK', 'ATM pre-commit hook passed and staged git-head evidence when needed.', {
                     stagedFileCount: stagedFiles.length,
                     criticalChangedFileCount: frameworkStatus.criticalChangedFiles.length,
-                    evidencePath: evidenceWrite?.evidencePath ?? null
+                    evidencePath: evidenceWrite?.evidencePath ?? null,
+                    advisoryTreeWideFindingsCount: advisoryFindings.length
                 })
                 : message('error', 'ATM_HOOK_PRE_COMMIT_FAILED', 'ATM pre-commit hook blocked this commit.', {
                     encodingFindings: encodingReport.findings.length,
@@ -305,11 +332,19 @@ function runPreCommitHook(cwd) {
                     taskAuditFindings: taskAudit.findings.length,
                     failedValidators: failedValidatorRuns.map((entry) => entry.command),
                     gitIndexDiagnostic,
+                    // TASK-AAO-0136: blockingStagedFindings is the operator-facing split.
+                    blockingStagedFindings: blockingFindings,
                     blockingFindings,
+                    advisoryTreeWideFindings: advisoryFindings,
                     failureEnvelope,
                     nextStep: blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand ?? frameworkClaimCommand
                 }),
-            ...(directionLockAllowedFilesWarning ? [directionLockAllowedFilesWarning] : [])
+            ...(directionLockAllowedFilesWarning ? [directionLockAllowedFilesWarning] : []),
+            ...(advisoryFindings.length > 0
+                ? [message('warn', 'ATM_HOOK_PRE_COMMIT_TREE_WIDE_ADVISORY', `Pre-commit found ${advisoryFindings.length} tree-wide task-audit finding(s) that do not affect this commit. Surfaced as advisory only.`, {
+                        advisoryTreeWideFindings: advisoryFindings
+                    })]
+                : [])
         ],
         evidence: {
             action: 'pre-commit',
@@ -457,14 +492,36 @@ function buildPreCommitBlockingFindings(input) {
             data: finding
         });
     }
+    // TASK-AAO-0136: scope-classify task-audit findings.
+    //   staged   -> blocking (current-task) — the author's commit ships the offending change
+    //   tree-wide -> advisory warning — pre-existing tree state, do not block other commits
+    // INV-ATM-* invariant violations still block regardless of scope.
+    const stagedSet = new Set(input.stagedFiles);
     for (const finding of input.taskAuditFindings.filter((entry) => entry.level === 'error')) {
-        findings.push({
-            code: finding.code,
-            source: 'task-audit',
-            file: 'path' in finding && typeof finding.path === 'string' ? finding.path : undefined,
-            detail: finding.detail,
-            classification: 'current-task'
-        });
+        const findingPath = 'path' in finding && typeof finding.path === 'string' ? finding.path : undefined;
+        const isInvariantViolation = INVARIANT_TASK_AUDIT_CODES.has(finding.code);
+        const isStaged = findingPath ? stagedSet.has(findingPath) : false;
+        const scope = isStaged ? 'staged' : 'tree-wide';
+        if (scope === 'staged' || isInvariantViolation) {
+            findings.push({
+                code: finding.code,
+                source: 'task-audit',
+                file: findingPath,
+                detail: finding.detail,
+                classification: 'current-task',
+                scope
+            });
+        }
+        else {
+            input.advisoryFindingsSink.push({
+                code: finding.code,
+                source: 'task-audit',
+                file: findingPath,
+                detail: finding.detail,
+                scope: 'tree-wide',
+                taskId: 'taskId' in finding && typeof finding.taskId === 'string' ? finding.taskId : undefined
+            });
+        }
     }
     for (const run of input.failedValidatorRuns) {
         findings.push({

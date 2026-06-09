@@ -233,6 +233,54 @@ export declare function createClosurePacket(input: {
     readonly attestation?: ClosurePacketReconcileAttestation | null;
 }): ClosurePacket;
 export declare function writeClosurePacket(cwd: string, taskId: string, packet: ClosurePacket): string;
+export type AtmTasksWriteAction = 'tasks-close' | 'tasks-reconcile' | 'tasks-import-write' | 'tasks-repair-closure-write';
+export declare function isRunnerSyncRequired(cwd: string): boolean;
+export declare function runnerStaleWarningMessage(): string;
+export declare function assertRunnerFreshForWriteAction(input: {
+    readonly cwd: string;
+    readonly action: AtmTasksWriteAction;
+    readonly allowStaleRunner: boolean;
+}): {
+    readonly warning: string | null;
+};
+export declare function closeJournalPath(cwd: string, taskId: string): string;
+export interface TaskCloseTransactionResult {
+    readonly transitionPath: string;
+    readonly closurePacketPath: string | null;
+}
+export declare function executeTaskCloseTransaction(input: {
+    readonly cwd: string;
+    readonly taskId: string;
+    readonly taskPath: string;
+    readonly phase: 'close' | 'reconcile';
+    readonly previousTaskContent: string;
+    readonly createdClosurePacketAbsolute: string | null;
+    readonly runWrites: () => TaskCloseTransactionResult | Promise<TaskCloseTransactionResult>;
+}): Promise<TaskCloseTransactionResult>;
+export declare const CLOSE_COMMIT_WINDOW_TTL_SECONDS = 30;
+export declare const CLOSE_COMMIT_WINDOW_SCHEMA_ID = "atm.closeCommitWindow.v1";
+export interface CloseCommitWindowRecord {
+    readonly schemaId: typeof CLOSE_COMMIT_WINDOW_SCHEMA_ID;
+    readonly specVersion: '0.1.0';
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly createdAt: string;
+    readonly expiresAt: string;
+    readonly ttlSeconds: number;
+    readonly allowedFiles: readonly string[];
+    readonly transitionId: string | null;
+    readonly transitionAction: 'close' | 'reconcile';
+}
+export declare function registerCloseCommitWindow(input: {
+    readonly cwd: string;
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly allowedFiles: readonly string[];
+    readonly transitionId: string | null;
+    readonly action: 'close' | 'reconcile';
+}): string;
+export declare function readActiveCloseCommitWindows(cwd: string): readonly CloseCommitWindowRecord[];
+export declare function findCloseCommitWindowCoveringPaths(cwd: string, candidatePaths: readonly string[]): CloseCommitWindowRecord | null;
 export declare function inspectFrameworkCloseWorktree(cwd: string, taskId?: string | null): FrameworkCloseWorktreeReport;
 export declare function repairClosurePacketForTask(input: {
     readonly cwd: string;

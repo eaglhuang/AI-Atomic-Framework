@@ -5,11 +5,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  assertRunnerFreshForWriteAction,
   auditTasks,
   classifyFrameworkStaleLock,
   createClosurePacket,
   createFrameworkModeStatus,
+  executeTaskCloseTransaction,
   inspectFrameworkCloseWorktree,
+  isRunnerSyncRequired,
   normalizeSha256DigestValue,
   normalizeSha256FieldsDeep,
   normalizeUpstreamEvidenceForTask,
@@ -18,6 +21,7 @@ import {
   validateClosurePacket,
   writeClosurePacket
 } from '../packages/cli/src/commands/framework-development.ts';
+import { resolveNextDefaultOutputPath } from '../packages/cli/src/commands/shared.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
@@ -1211,13 +1215,90 @@ try {
   }
   assert(deliverMacroDryRunError === 'ATM_TASK_NOT_FOUND', `deliver-and-close dry-run on missing task must throw ATM_TASK_NOT_FOUND, got: ${deliverMacroDryRunError}`);
 
+  // TASK-AAO-0137: close transaction rollback, runner stale gate, tasks status triangulation, scratch gitignore
+  const txRepo = makeHostRepo(tempRoot, 'close-tx-0137-repo');
+  initGitRepo(txRepo);
+  const txTaskId = 'TASK-CLOSE-TX-0137';
+  const txTaskPath = path.join(txRepo, '.atm', 'history', 'tasks', `${txTaskId}.json`);
+  writeJson(txTaskPath, { schemaVersion: 'atm.workItem.v0.2', workItemId: txTaskId, status: 'running' });
+  const txBackup = readFileSync(txTaskPath, 'utf8');
+  const txPacketPath = path.join(txRepo, '.atm', 'history', 'evidence', `${txTaskId}.closure-packet.json`);
+  let txFailed = false;
+  try {
+    await executeTaskCloseTransaction({
+      cwd: txRepo,
+      taskId: txTaskId,
+      taskPath: txTaskPath,
+      phase: 'close',
+      previousTaskContent: txBackup,
+      createdClosurePacketAbsolute: txPacketPath,
+      runWrites: () => {
+        writeFileSync(txPacketPath, '{}\n', 'utf8');
+        writeJson(txTaskPath, { schemaVersion: 'atm.workItem.v0.2', workItemId: txTaskId, status: 'done' });
+        throw new Error('injected tasks close transaction failure');
+      }
+    });
+  } catch (error: any) {
+    txFailed = error?.code === 'ATM_TASK_CLOSE_TRANSACTION_FAILED';
+  }
+  assert(txFailed === true, 'TASK-AAO-0137 regression: close transaction failure must surface ATM_TASK_CLOSE_TRANSACTION_FAILED');
+  assert(readFileSync(txTaskPath, 'utf8') === txBackup, 'TASK-AAO-0137 regression: close transaction rollback must restore live ledger');
+  assert(!existsSync(txPacketPath), 'TASK-AAO-0137 regression: close transaction rollback must remove staged closure packet');
+
+  const previousArgv1 = process.argv[1];
+  process.argv[1] = path.join(root, 'atm.mjs');
+  if (isRunnerSyncRequired(root)) {
+    let staleRefused = false;
+    try {
+      assertRunnerFreshForWriteAction({ cwd: root, action: 'tasks-reconcile', allowStaleRunner: false });
+    } catch (error: any) {
+      staleRefused = error?.code === 'ATM_RUNNER_STALE_WRITE_REFUSED';
+    }
+    assert(staleRefused === true, 'TASK-AAO-0137 regression: stale runner must refuse write actions');
+    const showResult = await runTasks(['show', '--cwd', root, '--task', 'TASK-AAO-0136', '--json']);
+    assert(showResult.ok === true, 'TASK-AAO-0137 regression: tasks show must pass under stale runner');
+    assert(showResult.messages?.some((entry) => entry.code === 'ATM_RUNNER_SYNC_REQUIRED') === true, 'TASK-AAO-0137 regression: tasks show must warn on stale runner');
+  }
+  process.argv[1] = previousArgv1;
+
+  const statusResult = await runTasks(['status', '--cwd', root, '--task', 'TASK-AAO-0136', '--json']);
+  assert(statusResult.ok === true, 'TASK-AAO-0137 regression: tasks status must succeed');
+  const statusEvidence = statusResult.evidence as Record<string, any>;
+  assert(statusEvidence.ssot === 'liveLedger', 'TASK-AAO-0137 regression: tasks status must mark liveLedger as SSOT');
+  assert(statusEvidence.liveLedger?.status === 'done', 'TASK-AAO-0137 regression: tasks status liveLedger must reflect ledger');
+
+  const divergeRepo = makeHostRepo(tempRoot, 'status-diverge-0137-repo');
+  initGitRepo(divergeRepo);
+  const divergeTaskId = 'TASK-STATUS-DIVERGE-0137';
+  const divergePlanPath = path.join(divergeRepo, 'docs', 'plan', `${divergeTaskId}.task.md`);
+  mkdirSync(path.dirname(divergePlanPath), { recursive: true });
+  writeFileSync(divergePlanPath, ['---', `task_id: ${divergeTaskId}`, 'status: done', '---', `# ${divergeTaskId}`].join('\n'), 'utf8');
+  const divergeTaskPath = path.join(divergeRepo, '.atm', 'history', 'tasks', `${divergeTaskId}.json`);
+  writeJson(divergeTaskPath, {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: divergeTaskId,
+    status: 'running',
+    source: { planPath: divergePlanPath, sectionTitle: divergeTaskId, headingLine: 1, hash: 'abc123' }
+  });
+  const divergeStatus = await runTasks(['status', '--cwd', divergeRepo, '--task', divergeTaskId, '--json']);
+  assert(divergeStatus.ok === true, 'TASK-AAO-0137 regression: divergent tasks status must succeed');
+  const divergeEvidence = divergeStatus.evidence as Record<string, any>;
+  assert(Array.isArray(divergeEvidence.divergence) && divergeEvidence.divergence.length > 0, 'TASK-AAO-0137 regression: frontmatter=done / ledger=running must produce divergence');
+  assert(typeof divergeEvidence.recommendation === 'string' && divergeEvidence.recommendation.includes('reconcile'), 'TASK-AAO-0137 regression: divergence must recommend reconcile');
+
+  const nextDefaultOutput = resolveNextDefaultOutputPath(root);
+  assert(nextDefaultOutput.replace(/\\/g, '/').includes('.atm-temp/next-'), 'TASK-AAO-0137 regression: next default output must live under .atm-temp');
+  const gitignoreText = readFileSync(path.join(root, '.gitignore'), 'utf8');
+  assert(gitignoreText.includes('next-output.json'), 'TASK-AAO-0137 regression: gitignore must include next-output.json');
+  assert(gitignoreText.includes('*.atm-scratch.*'), 'TASK-AAO-0137 regression: gitignore must include *.atm-scratch.*');
+
   await validateTaskLedgerReadersAtomization(tempRoot);
   await validatePlanningOnlyLedgerAuditBoundary(tempRoot);
   await validateClosurePacketDirtyTreeHygieneGuard(tempRoot);
   await validateTaskImportRefreshClaimPreservation(tempRoot);
 
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, and TASK-AAO-0039 planning-only ledger audit boundary covered)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, TASK-AAO-0039 planning-only ledger audit boundary covered, and TASK-AAO-0137 write-path atomicity + operator diagnostics covered)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {

@@ -7,7 +7,7 @@ import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../
 import { resolveActorId } from './actor-registry.js';
 import { resolveActorWorkSession, updateActorWorkSessionState, upsertActorWorkSession } from './actor-session.js';
 import { computeMissingValidatorReport, verifyTaskEvidence } from './evidence.js';
-import { auditTasks, createClosurePacket, createFrameworkModeStatus, inspectFrameworkCloseWorktree, isTaskCloseGovernanceCriticalPath, normalizeSha256FieldsDeep, repairClosurePacketForTask, requireTargetRepoClosureAuthority, validateClosurePacket, writeClosurePacket } from './framework-development.js';
+import { assertRunnerFreshForWriteAction, auditTasks, createClosurePacket, createFrameworkModeStatus, executeTaskCloseTransaction, inspectFrameworkCloseWorktree, isRunnerSyncRequired, isTaskCloseGovernanceCriticalPath, normalizeSha256FieldsDeep, registerCloseCommitWindow, repairClosurePacketForTask, requireTargetRepoClosureAuthority, runnerStaleWarningMessage, validateClosurePacket, writeClosurePacket } from './framework-development.js';
 import { CliError, makeResult, message, parseJsonText, parseOptions, parseArgsForCommand, relativePathFrom, resolveValue } from './shared.js';
 import { appendTaskTransitionEvent, createTaskTransitionId, defaultMirrorTaskId, readTaskLedgerPolicy } from './task-ledger.js';
 import { readPluginRegistry } from '../plugin-registry.js';
@@ -24,7 +24,7 @@ import { readGitScalar as delegatedReadGitScalar, listCommittedFilesSinceClaim a
 import { collectKeyValue as delegatedCollectKeyValue, collectKeyValueFromLines as delegatedCollectKeyValueFromLines, createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata } from './tasks/task-markdown-helpers.js';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.js';
 import { coerceStatus, extractFrontMatter, extractTaskDeclaredFiles, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, parseMarkdownTableCells, parseYamlList, validateDeliverablesList, parseContextMap } from './tasks/task-import-validators.js';
-import { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions } from './tasks/task-option-parsers.js';
+import { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
 const validStatuses = new Set(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
 const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria', '驗收', '驗收條件'];
 const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes', '交付物', '產物', '輸出'];
@@ -92,6 +92,9 @@ export async function runTasks(argv) {
     if (action === 'show') {
         return await runTasksShow(argv.slice(1));
     }
+    if (action === 'status') {
+        return await runTasksStatus(argv.slice(1));
+    }
     if (action === 'deliver-and-close') {
         return await runTasksDeliverAndClose(argv.slice(1));
     }
@@ -108,7 +111,7 @@ export async function runTasks(argv) {
         return await runTasksScope(argv.slice(1));
     }
     if (!action) {
-        throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | deliver-and-close | audit | migrate-legacy-ledger | new).', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | deliver-and-close | audit | migrate-legacy-ledger | new).', { exitCode: 2 });
     }
     throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -126,20 +129,172 @@ async function runTasksShow(argv) {
         });
     }
     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    const messages = [message('info', 'ATM_TASK_SHOW_SUCCESS', `Task details for ${taskId}`)];
+    if (isRunnerSyncRequired(options.cwd)) {
+        messages.push(message('warn', 'ATM_RUNNER_SYNC_REQUIRED', runnerStaleWarningMessage()));
+    }
     return makeResult({
         ok: true,
         command: 'tasks show',
         cwd: options.cwd,
-        messages: [message('info', 'ATM_TASK_SHOW_SUCCESS', `Task details for ${taskId}`)],
+        messages,
         evidence: {
             taskId,
             ...taskDocument
         }
     });
 }
+function resolvePlanningCardPath(cwd, taskDocument) {
+    const source = taskDocument.source;
+    if (source?.planPath) {
+        const resolved = path.resolve(cwd, source.planPath);
+        if (existsSync(resolved))
+            return resolved;
+    }
+    const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan;
+    if (typeof relatedPlan === 'string' && relatedPlan.trim()) {
+        const resolved = path.resolve(cwd, relatedPlan);
+        if (existsSync(resolved))
+            return resolved;
+    }
+    const aliases = taskDocument.legacyImportAliases;
+    const planningFile = aliases?.allowed_files?.find((entry) => entry.endsWith('.task.md') && existsSync(entry));
+    return planningFile ?? null;
+}
+function readLastTransitionEventRecord(cwd, taskId, transitionId) {
+    if (!transitionId)
+        return null;
+    const policy = readTaskLedgerPolicy(cwd);
+    const eventPath = path.join(cwd, policy.eventRoot, taskId, `${transitionId}.json`);
+    if (!existsSync(eventPath))
+        return null;
+    return JSON.parse(readFileSync(eventPath, 'utf8'));
+}
+function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
+    const claim = parseClaimRecord(taskDocument.claim);
+    const liveLedger = {
+        status: typeof taskDocument.status === 'string' ? taskDocument.status : null,
+        claimState: claim?.state ?? null,
+        lastTransitionId: typeof taskDocument.lastTransitionId === 'string' ? taskDocument.lastTransitionId : null,
+        lastTransitionAt: typeof taskDocument.lastTransitionAt === 'string' ? taskDocument.lastTransitionAt : null
+    };
+    const lastTransitionEventRecord = readLastTransitionEventRecord(cwd, taskId, liveLedger.lastTransitionId);
+    const lastTransitionEvent = lastTransitionEventRecord ? {
+        action: typeof lastTransitionEventRecord.action === 'string' ? lastTransitionEventRecord.action : null,
+        actorId: typeof lastTransitionEventRecord.actorId === 'string' ? lastTransitionEventRecord.actorId : null,
+        createdAt: typeof lastTransitionEventRecord.createdAt === 'string' ? lastTransitionEventRecord.createdAt : null,
+        fromStatus: typeof lastTransitionEventRecord.fromStatus === 'string' ? lastTransitionEventRecord.fromStatus : null,
+        toStatus: typeof lastTransitionEventRecord.toStatus === 'string' ? lastTransitionEventRecord.toStatus : null
+    } : null;
+    const planningCardPath = resolvePlanningCardPath(cwd, taskDocument);
+    let planningFrontmatter = { status: null, source: null };
+    if (planningCardPath) {
+        const frontMatter = extractFrontMatter(readFileSync(planningCardPath, 'utf8'));
+        if (frontMatter) {
+            planningFrontmatter = {
+                status: typeof frontMatter.data.status === 'string' ? frontMatter.data.status : null,
+                source: relativePathFrom(cwd, planningCardPath)
+            };
+        }
+    }
+    const divergence = [];
+    if (planningFrontmatter.status && planningFrontmatter.status !== liveLedger.status) {
+        divergence.push({
+            field: 'status',
+            liveLedger: liveLedger.status,
+            planningFrontmatter: planningFrontmatter.status,
+            lastTransitionEvent: lastTransitionEvent?.toStatus ?? null
+        });
+    }
+    if (lastTransitionEvent?.toStatus && lastTransitionEvent.toStatus !== liveLedger.status) {
+        const existing = divergence.find((entry) => entry.field === 'status');
+        if (!existing) {
+            divergence.push({
+                field: 'status',
+                liveLedger: liveLedger.status,
+                lastTransitionEvent: lastTransitionEvent.toStatus
+            });
+        }
+    }
+    const recommendation = divergence.length > 0
+        ? (planningFrontmatter.status === 'done' && liveLedger.status !== 'done'
+            ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
+            : `node atm.mjs tasks import --from <plan.md> --write --json`)
+        : null;
+    return {
+        ssot: 'liveLedger',
+        liveLedger,
+        lastTransitionEvent,
+        planningFrontmatter,
+        divergence,
+        recommendation
+    };
+}
+async function recordStaleRunnerOverride(input) {
+    const taskPath = taskPathFor(input.cwd, input.taskId);
+    if (!existsSync(taskPath))
+        return null;
+    const taskDocument = readJsonRecord(taskPath);
+    const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
+    appendTaskTransitionEvent({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        action: 'allow-stale-runner',
+        actorId: input.actorId,
+        sessionId: null,
+        fromStatus: previousStatus,
+        toStatus: previousStatus,
+        taskPath,
+        taskDocument,
+        command: input.command
+    });
+    return true;
+}
+async function runTasksStatus(argv) {
+    const options = parseStatusOptions(argv);
+    const taskPath = taskPathFor(options.cwd, options.taskId);
+    if (!existsSync(taskPath)) {
+        throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
+            exitCode: 2,
+            details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
+        });
+    }
+    const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    const triangulation = buildTaskStatusTriangulation(options.cwd, options.taskId, taskDocument);
+    const messages = [message('info', 'ATM_TASK_STATUS_TRIANGULATED', `Task status triangulation for ${options.taskId}.`, triangulation)];
+    if (isRunnerSyncRequired(options.cwd)) {
+        messages.push(message('warn', 'ATM_RUNNER_SYNC_REQUIRED', runnerStaleWarningMessage()));
+    }
+    return makeResult({
+        ok: true,
+        command: 'tasks status',
+        cwd: options.cwd,
+        messages,
+        evidence: {
+            taskId: options.taskId,
+            ...triangulation
+        }
+    });
+}
 async function runTasksRepairClosure(argv) {
     const options = parseRepairClosureOptions(argv);
     const resolvedActor = options.actorId ? resolveActorId(options.actorId, options.cwd) : null;
+    if (!options.dryRun) {
+        const staleGate = assertRunnerFreshForWriteAction({
+            cwd: options.cwd,
+            action: 'tasks-repair-closure-write',
+            allowStaleRunner: options.allowStaleRunner
+        });
+        if (options.allowStaleRunner && staleGate.warning) {
+            await recordStaleRunnerOverride({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                actorId: resolvedActor?.actorId ?? null,
+                action: 'tasks-repair-closure-write',
+                command: `node atm.mjs tasks repair-closure --task ${options.taskId} --allow-stale-runner --json`
+            });
+        }
+    }
     const result = repairClosurePacketForTask({
         cwd: options.cwd,
         taskId: options.taskId,
@@ -229,6 +384,21 @@ async function runTasksReconcile(argv) {
         });
     }
     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    const previousTaskContent = readFileSync(taskPath, 'utf8');
+    const staleGate = assertRunnerFreshForWriteAction({
+        cwd: options.cwd,
+        action: 'tasks-reconcile',
+        allowStaleRunner: options.allowStaleRunner
+    });
+    if (options.allowStaleRunner && staleGate.warning) {
+        await recordStaleRunnerOverride({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            action: 'tasks-reconcile',
+            command: `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --allow-stale-runner --json`
+        });
+    }
     const commitSha = readGitScalar(options.cwd, ['rev-parse', '--verify', `${options.deliveryCommit}^{commit}`]);
     if (!commitSha) {
         throw new CliError('ATM_COMMIT_NOT_FOUND', `Delivery commit not found in Git: ${options.deliveryCommit}`, {
@@ -313,9 +483,11 @@ async function runTasksReconcile(argv) {
     // 建立 closure packet（僅在 framework repo 模式下需要）
     let closurePacketPath = null;
     let packet = null;
+    let pendingReconcilePacket = null;
+    let createdClosurePacketAbsolute = null;
     const reconcileReason = `Historical reconcile sync against commit ${commitSha}`;
     if (frameworkStatus?.repoRole === 'framework') {
-        packet = createClosurePacket({
+        pendingReconcilePacket = createClosurePacket({
             cwd: options.cwd,
             taskId: options.taskId,
             actorId,
@@ -332,7 +504,7 @@ async function runTasksReconcile(argv) {
                 reason: reconcileReason
             }
         });
-        const validation = validateClosurePacket(packet);
+        const validation = validateClosurePacket(pendingReconcilePacket);
         if (!validation.ok) {
             const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
             throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet is invalid.`, {
@@ -346,13 +518,11 @@ async function runTasksReconcile(argv) {
                 }
             });
         }
-        closurePacketPath = writeClosurePacket(options.cwd, options.taskId, packet);
-        taskDocument.closurePacket = closurePacketPath;
+        packet = pendingReconcilePacket;
+        createdClosurePacketAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.closure-packet.json`);
     }
     const currentClaim = parseClaimRecord(taskDocument.claim);
     if (currentClaim && currentClaim.state === 'active') {
-        const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
-        await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, currentClaim.actorId));
         taskDocument.claim = {
             ...currentClaim,
             heartbeatAt: new Date().toISOString(),
@@ -367,17 +537,56 @@ async function runTasksReconcile(argv) {
     taskDocument.closedByActor = actorId;
     taskDocument.closedBySessionId = null;
     taskDocument.closeReason = reconcileReason;
-    const transitionPath = writeTaskDocumentWithTransition({
+    const reconcileCommand = `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`;
+    const reconcileWriteResult = await executeTaskCloseTransaction({
         cwd: options.cwd,
-        taskPath,
         taskId: options.taskId,
-        taskDocument,
-        action: 'close',
+        taskPath,
+        phase: 'reconcile',
+        previousTaskContent,
+        createdClosurePacketAbsolute,
+        runWrites: () => {
+            if (pendingReconcilePacket) {
+                closurePacketPath = writeClosurePacket(options.cwd, options.taskId, pendingReconcilePacket);
+                packet = pendingReconcilePacket;
+                taskDocument.closurePacket = closurePacketPath;
+            }
+            const transitionPath = writeTaskDocumentWithTransition({
+                cwd: options.cwd,
+                taskPath,
+                taskId: options.taskId,
+                taskDocument,
+                action: 'close',
+                actorId,
+                sessionId: null,
+                previousStatus,
+                closureMetadata: closurePacketPath && packet ? createClosureTransitionMetadata(closurePacketPath, packet, null, null) : null,
+                command: reconcileCommand
+            });
+            return { transitionPath, closurePacketPath };
+        }
+    });
+    const transitionPath = reconcileWriteResult.transitionPath;
+    closurePacketPath = reconcileWriteResult.closurePacketPath ?? closurePacketPath;
+    if (currentClaim && currentClaim.state === 'active') {
+        const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+        await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, currentClaim.actorId));
+    }
+    // TASK-AAO-0136: open a short-lived close-commit-window so the next
+    // `git commit --task <id>` can land the staged close artifacts even though
+    // the task direction lock has now released. Window expires after 30s.
+    const closeCommitWindowAllowedFiles = [
+        relativePathFrom(options.cwd, taskPath),
+        transitionPath,
+        ...(closurePacketPath ? [closurePacketPath] : [])
+    ];
+    const closeCommitWindowPathReconcile = registerCloseCommitWindow({
+        cwd: options.cwd,
+        taskId: options.taskId,
         actorId,
-        sessionId: null,
-        previousStatus,
-        closureMetadata: closurePacketPath && packet ? createClosureTransitionMetadata(closurePacketPath, packet, null, null) : null,
-        command: `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`
+        allowedFiles: closeCommitWindowAllowedFiles,
+        transitionId: transitionPath.split(/[\\/]/).pop()?.replace(/\.json$/, '') ?? null,
+        action: 'reconcile'
     });
     return makeResult({
         ok: true,
@@ -386,7 +595,8 @@ async function runTasksReconcile(argv) {
         messages: [message('info', 'ATM_TASKS_RECONCILED', `Task ${options.taskId} successfully reconciled and closed as done.`, {
                 taskId: options.taskId,
                 actorId,
-                deliveryCommit: commitSha
+                deliveryCommit: commitSha,
+                closeCommitWindowPath: closeCommitWindowPathReconcile
             })],
         evidence: {
             action: 'reconcile',
@@ -396,6 +606,8 @@ async function runTasksReconcile(argv) {
             taskPath: relativePathFrom(options.cwd, taskPath),
             closurePacketPath,
             transitionPath,
+            closeCommitWindowPath: closeCommitWindowPathReconcile,
+            closeCommitWindowAllowedFiles,
             deliverableGate: deliverableGate
         }
     });
@@ -623,6 +835,23 @@ async function runTasksImport(argv) {
     }
     if (options.dryRun === options.write) {
         throw new CliError('ATM_CLI_USAGE', 'tasks import requires exactly one of --dry-run or --write.', { exitCode: 2 });
+    }
+    if (options.write) {
+        const staleGate = assertRunnerFreshForWriteAction({
+            cwd: options.cwd,
+            action: 'tasks-import-write',
+            allowStaleRunner: options.allowStaleRunner
+        });
+        if (options.allowStaleRunner && staleGate.warning) {
+            const importTaskId = options.from.match(/TASK-[A-Z]+-\d+/i)?.[0] ?? 'import-batch';
+            await recordStaleRunnerOverride({
+                cwd: options.cwd,
+                taskId: importTaskId,
+                actorId: null,
+                action: 'tasks-import-write',
+                command: `node atm.mjs tasks import --from ${options.from} --write --allow-stale-runner --json`
+            });
+        }
     }
     const planAbsolute = path.resolve(options.cwd, options.from);
     if (!existsSync(planAbsolute) || !statSync(planAbsolute).isFile()) {
@@ -1277,6 +1506,21 @@ async function runTasksClose(argv) {
         });
     }
     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    const previousTaskContent = readFileSync(taskPath, 'utf8');
+    const staleGate = assertRunnerFreshForWriteAction({
+        cwd: options.cwd,
+        action: 'tasks-close',
+        allowStaleRunner: options.allowStaleRunner
+    });
+    if (options.allowStaleRunner && staleGate.warning) {
+        await recordStaleRunnerOverride({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            action: 'tasks-close',
+            command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --allow-stale-runner --json`
+        });
+    }
     const currentClaim = parseClaimRecord(taskDocument.claim);
     const activeSession = resolveActorWorkSession(options.cwd, {
         actorId,
@@ -1496,6 +1740,8 @@ async function runTasksClose(argv) {
     }
     let closurePacketPath = null;
     let closurePacket = null;
+    let pendingClosurePacket = null;
+    let createdClosurePacketAbsolute = null;
     const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
         ? taskDocument.closurePacket
         : typeof taskDocument.closure_packet === 'string'
@@ -1529,7 +1775,7 @@ async function runTasksClose(argv) {
         closurePacketPath = existingClosurePacketPath;
     }
     else if (options.status === 'done' && frameworkStatus?.repoRole === 'framework') {
-        const packet = createClosurePacket({
+        pendingClosurePacket = createClosurePacket({
             cwd: options.cwd,
             taskId: options.taskId,
             actorId,
@@ -1539,7 +1785,7 @@ async function runTasksClose(argv) {
             changedFiles: deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
             frameworkStatus
         });
-        const validation = validateClosurePacket(packet);
+        const validation = validateClosurePacket(pendingClosurePacket);
         if (!validation.ok) {
             // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
             const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
@@ -1554,13 +1800,10 @@ async function runTasksClose(argv) {
                 }
             });
         }
-        closurePacketPath = writeClosurePacket(options.cwd, options.taskId, packet);
-        closurePacket = packet;
-        taskDocument.closurePacket = closurePacketPath;
+        closurePacket = pendingClosurePacket;
+        createdClosurePacketAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.closure-packet.json`);
     }
     if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
-        const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
-        await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
         taskDocument.claim = {
             ...currentClaim,
             heartbeatAt: new Date().toISOString(),
@@ -1577,28 +1820,51 @@ async function runTasksClose(argv) {
     if (options.reason) {
         taskDocument.closeReason = options.reason;
     }
-    const transitionPath = writeTaskDocumentWithTransition({
-        cwd: options.cwd,
-        taskPath,
-        taskId: options.taskId,
-        taskDocument,
+    const closeTransitionCommand = buildTaskTransitionCommand({
         action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
+        taskId: options.taskId,
         actorId,
-        sessionId: activeSession?.sessionId ?? null,
-        previousStatus,
-        closureMetadata: options.status === 'done'
-            ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null)
-            : null,
-        command: buildTaskTransitionCommand({
-            action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
-            taskId: options.taskId,
-            actorId,
-            status: options.status,
-            fromBatchCheckpoint: options.fromBatchCheckpoint,
-            batchId: owningBatch?.batchId ?? options.batchId,
-            historicalDeliveryRefs: options.historicalDeliveryRefs
-        })
+        status: options.status,
+        fromBatchCheckpoint: options.fromBatchCheckpoint,
+        batchId: owningBatch?.batchId ?? options.batchId,
+        historicalDeliveryRefs: options.historicalDeliveryRefs
     });
+    const closeWriteResult = await executeTaskCloseTransaction({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        taskPath,
+        phase: 'close',
+        previousTaskContent,
+        createdClosurePacketAbsolute,
+        runWrites: () => {
+            if (pendingClosurePacket) {
+                closurePacketPath = writeClosurePacket(options.cwd, options.taskId, pendingClosurePacket);
+                closurePacket = pendingClosurePacket;
+                taskDocument.closurePacket = closurePacketPath;
+            }
+            const transitionPath = writeTaskDocumentWithTransition({
+                cwd: options.cwd,
+                taskPath,
+                taskId: options.taskId,
+                taskDocument,
+                action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
+                actorId,
+                sessionId: activeSession?.sessionId ?? null,
+                previousStatus,
+                closureMetadata: options.status === 'done'
+                    ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null)
+                    : null,
+                command: closeTransitionCommand
+            });
+            return { transitionPath, closurePacketPath };
+        }
+    });
+    const transitionPath = closeWriteResult.transitionPath;
+    closurePacketPath = closeWriteResult.closurePacketPath ?? closurePacketPath;
+    if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
+        const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+        await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
+    }
     if (activeSession?.sessionId) {
         updateActorWorkSessionState({
             cwd: options.cwd,
@@ -1607,6 +1873,23 @@ async function runTasksClose(argv) {
             reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
         });
     }
+    // TASK-AAO-0136: register close-commit-window for done closes so the captain's
+    // follow-up `git commit --task <id>` can land closure-packet + transition + ledger
+    // even though the direction lock has now released.
+    const closeCommitWindowPathFromClose = options.status === 'done'
+        ? registerCloseCommitWindow({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            actorId,
+            allowedFiles: [
+                relativePathFrom(options.cwd, taskPath),
+                transitionPath,
+                ...(closurePacketPath ? [closurePacketPath] : [])
+            ],
+            transitionId: transitionPath.split(/[\\/]/).pop()?.replace(/\.json$/, '') ?? null,
+            action: 'close'
+        })
+        : null;
     const taskQueue = options.status === 'done'
         ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
         : null;
@@ -1617,7 +1900,8 @@ async function runTasksClose(argv) {
         messages: [message('info', 'ATM_TASKS_CLOSED', `Task ${options.taskId} moved to ${options.status}.`, {
                 taskId: options.taskId,
                 actorId,
-                status: options.status
+                status: options.status,
+                closeCommitWindowPath: closeCommitWindowPathFromClose
             })],
         evidence: {
             action: 'close',
@@ -1628,6 +1912,7 @@ async function runTasksClose(argv) {
             evidenceGate,
             closurePacketPath,
             transitionPath,
+            closeCommitWindowPath: closeCommitWindowPathFromClose,
             deliverableGate: deliverableGate,
             // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
             // critical changes were in-scope vs isolated as advisory unrelated changes.
@@ -3524,7 +3809,8 @@ function parseImportOptions(argv) {
         resetOpen: false,
         reopen: false,
         // TASK-AAO-0064: --strict-paths flag
-        strictPaths: false
+        strictPaths: false,
+        allowStaleRunner: parseAllowStaleRunnerFlag(argv)
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -3566,7 +3852,7 @@ function parseImportOptions(argv) {
             options.strictPaths = true;
             continue;
         }
-        if (arg === '--json' || arg === '--pretty') {
+        if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
             continue;
         }
         throw new CliError('ATM_CLI_USAGE', `tasks import does not support option ${arg}`, { exitCode: 2 });
@@ -3597,7 +3883,8 @@ function parseRepairClosureOptions(argv) {
         actorId: null,
         scopeTaskId: null,
         dryRun: false,
-        amend: false
+        amend: false,
+        allowStaleRunner: parseAllowStaleRunnerFlag(argv)
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -3633,7 +3920,7 @@ function parseRepairClosureOptions(argv) {
             state.amend = false;
             continue;
         }
-        if (arg === '--json' || arg === '--pretty') {
+        if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
             continue;
         }
         throw new CliError('ATM_CLI_USAGE', `tasks repair-closure does not support option ${arg}`, { exitCode: 2 });
@@ -3647,6 +3934,7 @@ function parseRepairClosureOptions(argv) {
         actorId: state.actorId,
         scopeTaskId: state.scopeTaskId,
         dryRun: state.dryRun,
+        allowStaleRunner: state.allowStaleRunner,
         amend: state.amend
     };
 }
@@ -4688,5 +4976,5 @@ async function runTasksNew(argv) {
         }
     });
 }
-export { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseHistoricalDeliveryRefs, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions } from './tasks/task-option-parsers.js';
+export { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseHistoricalDeliveryRefs, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
 export { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline };

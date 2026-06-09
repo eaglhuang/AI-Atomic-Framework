@@ -374,7 +374,7 @@ export function isTaskDirectionPathCandidate(value) {
         return false;
     if (/\s\/|\/\s/.test(normalized))
         return false;
-    if (normalized === '.gitattributes')
+    if (normalized === '.gitattributes' || normalized === '.gitignore')
         return true;
     const knownRoots = [
         '.atm/',

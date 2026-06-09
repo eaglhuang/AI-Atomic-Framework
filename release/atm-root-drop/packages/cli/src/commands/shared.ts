@@ -7,6 +7,17 @@ let outputJsonPath: string | null = null;
 let globalSummaryProjection = false;
 let globalFieldsProjection: string[] | null = null;
 
+export function setOutputJsonPath(resolvedPath: string | null): void {
+  outputJsonPath = resolvedPath;
+}
+
+export function resolveNextDefaultOutputPath(cwd: string): string {
+  const dir = path.join(path.resolve(cwd), '.atm-temp');
+  mkdirSync(dir, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  return path.join(dir, `next-${stamp}.json`);
+}
+
 // 在載入時直接全域掃描一次 process.argv 以備不時之需
 const outputJsonIdx = process.argv.indexOf('--output-json');
 if (outputJsonIdx !== -1 && outputJsonIdx + 1 < process.argv.length) {

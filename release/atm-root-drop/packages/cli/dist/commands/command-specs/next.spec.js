@@ -11,12 +11,14 @@ export default defineCommandSpec({
         { flag: '--task', value: 'id', summary: 'Route directly to one task id without writing a shared task-intent file.' },
         { flag: '--tasks', value: 'csv', summary: 'Freeze an explicit comma-separated task id range for a batch claim.' },
         { flag: '--intent', value: 'path', summary: 'Read an atm.taskIntent.v1 JSON file produced by a trusted skill or integration hook.' },
+        { flag: '--output', value: 'path', summary: 'Write JSON output to a file. When passed without a path, defaults to .atm-temp/next-<timestamp>.json.' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption
     ],
     examples: [
         'node atm.mjs next --json',
+        'node atm.mjs next --json --output',
         'node atm.mjs next --prompt "implement TASK-ABC-0001" --json',
         'node atm.mjs next --task TASK-ABC-0001 --json',
         'node atm.mjs next --prompt "quick fix tsconfig.json typo" --json',

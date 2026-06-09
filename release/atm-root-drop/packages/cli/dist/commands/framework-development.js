@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/dist/index.js';
@@ -949,6 +949,224 @@ export function writeClosurePacket(cwd, taskId, packet) {
     writeFileSync(packetPath, `${JSON.stringify(normalizedPacket, null, 2)}\n`, 'utf8');
     return relativePathFrom(cwd, packetPath);
 }
+const FROZEN_RUNNER_ENTRYPOINTS = new Set([
+    'atm.mjs',
+    'release/atm-onefile/atm.mjs',
+    'packages/cli/dist/atm.js',
+    'release/atm-root-drop/atm.mjs'
+]);
+function newestFrameworkSourceMtime(rootDir) {
+    let newest = 0;
+    for (const entryPath of [
+        path.join(rootDir, 'packages', 'cli', 'src'),
+        path.join(rootDir, 'scripts')
+    ]) {
+        newest = Math.max(newest, newestMtimeInTree(entryPath));
+    }
+    return newest;
+}
+function newestMtimeInTree(entryPath) {
+    let stat = null;
+    try {
+        stat = statSync(entryPath);
+    }
+    catch {
+        return 0;
+    }
+    if (stat.isFile())
+        return stat.mtimeMs;
+    if (!stat.isDirectory())
+        return 0;
+    let newest = 0;
+    for (const child of readdirSync(entryPath, { withFileTypes: true })) {
+        if (child.name === 'dist' || child.name === 'node_modules')
+            continue;
+        newest = Math.max(newest, newestMtimeInTree(path.join(entryPath, child.name)));
+    }
+    return newest;
+}
+function resolveFrozenRunnerPath(rootDir) {
+    const onefile = path.join(rootDir, 'release', 'atm-onefile', 'atm.mjs');
+    if (existsSync(onefile))
+        return onefile;
+    const dist = path.join(rootDir, 'packages', 'cli', 'dist', 'atm.js');
+    return existsSync(dist) ? dist : null;
+}
+function classifyCliEntrypoint(cwd) {
+    const entrypointPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+    if (!entrypointPath)
+        return null;
+    const relative = path.relative(path.resolve(cwd), entrypointPath).replace(/\\/g, '/');
+    if (relative && !relative.startsWith('..'))
+        return relative;
+    return entrypointPath.replace(/\\/g, '/');
+}
+export function isRunnerSyncRequired(cwd) {
+    const rootDir = path.resolve(cwd);
+    const entrypoint = classifyCliEntrypoint(rootDir);
+    if (!entrypoint || !FROZEN_RUNNER_ENTRYPOINTS.has(entrypoint))
+        return false;
+    const runnerPath = resolveFrozenRunnerPath(rootDir);
+    if (!runnerPath)
+        return false;
+    const newestSource = newestFrameworkSourceMtime(rootDir);
+    const runnerMtime = statSync(runnerPath).mtimeMs;
+    return newestSource > runnerMtime;
+}
+export function runnerStaleWarningMessage() {
+    return 'ATM_RUNNER_SYNC_REQUIRED: stable atm.mjs is older than framework source files. Run `npm run build` before using the frozen runner, or use `node atm.dev.mjs ...` for source-first framework validation.';
+}
+export function assertRunnerFreshForWriteAction(input) {
+    if (!isRunnerSyncRequired(input.cwd))
+        return { warning: null };
+    if (input.allowStaleRunner) {
+        return { warning: runnerStaleWarningMessage() };
+    }
+    throw new CliError('ATM_RUNNER_STALE_WRITE_REFUSED', `ATM refused ${input.action} because the frozen runner is older than framework source files.`, {
+        exitCode: 1,
+        details: {
+            action: input.action,
+            syncCommand: 'npm run build',
+            sourceFirstCommand: 'node atm.dev.mjs ...',
+            remediation: 'Run npm run build before write actions through node atm.mjs, or pass --allow-stale-runner only for disaster recovery.'
+        }
+    });
+}
+export function closeJournalPath(cwd, taskId) {
+    return path.join(cwd, '.atm-temp', `close-journal-${taskId}.json`);
+}
+export async function executeTaskCloseTransaction(input) {
+    const journalPath = closeJournalPath(input.cwd, input.taskId);
+    mkdirSync(path.dirname(journalPath), { recursive: true });
+    writeFileSync(journalPath, `${JSON.stringify({
+        schemaId: 'atm.closeJournal.v1',
+        taskId: input.taskId,
+        phase: input.phase,
+        status: 'staging',
+        startedAt: new Date().toISOString()
+    }, null, 2)}\n`, 'utf8');
+    const rolledBackArtifacts = [];
+    let transitionAbsolute = null;
+    try {
+        const result = await input.runWrites();
+        transitionAbsolute = path.resolve(input.cwd, result.transitionPath);
+        writeFileSync(journalPath, `${JSON.stringify({
+            schemaId: 'atm.closeJournal.v1',
+            taskId: input.taskId,
+            phase: input.phase,
+            status: 'committed',
+            committedAt: new Date().toISOString(),
+            transitionPath: result.transitionPath,
+            closurePacketPath: result.closurePacketPath
+        }, null, 2)}\n`, 'utf8');
+        unlinkSync(journalPath);
+        return result;
+    }
+    catch (error) {
+        if (transitionAbsolute && existsSync(transitionAbsolute)) {
+            unlinkSync(transitionAbsolute);
+            rolledBackArtifacts.push(relativePathFrom(input.cwd, transitionAbsolute));
+        }
+        if (input.createdClosurePacketAbsolute && existsSync(input.createdClosurePacketAbsolute)) {
+            unlinkSync(input.createdClosurePacketAbsolute);
+            rolledBackArtifacts.push(relativePathFrom(input.cwd, input.createdClosurePacketAbsolute));
+        }
+        writeFileSync(input.taskPath, input.previousTaskContent, 'utf8');
+        rolledBackArtifacts.push(relativePathFrom(input.cwd, input.taskPath));
+        try {
+            if (existsSync(journalPath))
+                unlinkSync(journalPath);
+        }
+        catch {
+            // best-effort journal cleanup
+        }
+        const reason = error instanceof Error ? error.message : String(error);
+        throw new CliError('ATM_TASK_CLOSE_TRANSACTION_FAILED', `Task ${input.taskId} close transaction failed and was rolled back.`, {
+            exitCode: 1,
+            details: {
+                taskId: input.taskId,
+                phase: input.phase,
+                rolledBackArtifacts,
+                reason
+            }
+        });
+    }
+}
+// =========================================================================
+// TASK-AAO-0136: close-commit-window short-lived lock.
+// After tasks close / tasks reconcile writes the closure packet, ledger
+// update, and close transition event, register a 30-second window that
+// allows the next `git commit --task <id>` invocation to land those staged
+// artifacts even though the regular task direction lock has already been
+// released by the close itself.
+// =========================================================================
+export const CLOSE_COMMIT_WINDOW_TTL_SECONDS = 30;
+export const CLOSE_COMMIT_WINDOW_SCHEMA_ID = 'atm.closeCommitWindow.v1';
+function closeCommitWindowPath(cwd, taskId) {
+    return path.join(cwd, '.atm', 'runtime', 'locks', `close-commit-window-${taskId}.lock.json`);
+}
+export function registerCloseCommitWindow(input) {
+    const now = new Date();
+    const record = {
+        schemaId: CLOSE_COMMIT_WINDOW_SCHEMA_ID,
+        specVersion: '0.1.0',
+        taskId: input.taskId,
+        actorId: input.actorId,
+        createdAt: now.toISOString(),
+        expiresAt: new Date(now.getTime() + CLOSE_COMMIT_WINDOW_TTL_SECONDS * 1000).toISOString(),
+        ttlSeconds: CLOSE_COMMIT_WINDOW_TTL_SECONDS,
+        allowedFiles: uniqueSorted(input.allowedFiles.map(normalizeRelativePath).filter(Boolean)),
+        transitionId: input.transitionId,
+        transitionAction: input.action
+    };
+    const lockPath = closeCommitWindowPath(input.cwd, input.taskId);
+    mkdirSync(path.dirname(lockPath), { recursive: true });
+    writeFileSync(lockPath, `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+    return relativePathFrom(input.cwd, lockPath);
+}
+export function readActiveCloseCommitWindows(cwd) {
+    const locksDir = path.join(cwd, '.atm', 'runtime', 'locks');
+    if (!existsSync(locksDir))
+        return [];
+    const now = new Date();
+    const records = [];
+    for (const entry of readdirSync(locksDir)) {
+        if (!entry.startsWith('close-commit-window-') || !entry.endsWith('.lock.json'))
+            continue;
+        const filePath = path.join(locksDir, entry);
+        try {
+            const raw = JSON.parse(readFileSync(filePath, 'utf8'));
+            if (raw?.schemaId !== CLOSE_COMMIT_WINDOW_SCHEMA_ID)
+                continue;
+            const expiresAt = new Date(String(raw.expiresAt ?? ''));
+            if (Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() <= now.getTime()) {
+                try {
+                    unlinkSync(filePath);
+                }
+                catch { /* ignore */ }
+                continue;
+            }
+            records.push(raw);
+        }
+        catch {
+            // skip malformed
+        }
+    }
+    return records;
+}
+export function findCloseCommitWindowCoveringPaths(cwd, candidatePaths) {
+    if (candidatePaths.length === 0)
+        return null;
+    const windows = readActiveCloseCommitWindows(cwd);
+    const normalizedPaths = candidatePaths.map(normalizeRelativePath).filter(Boolean);
+    for (const win of windows) {
+        const allowed = new Set(win.allowedFiles);
+        const covers = normalizedPaths.every((p) => allowed.has(p));
+        if (covers)
+            return win;
+    }
+    return null;
+}
 export function inspectFrameworkCloseWorktree(cwd, taskId = null) {
     const unstagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--name-only']).map(normalizeRelativePath).filter(Boolean));
     const stagedFiles = uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only']).map(normalizeRelativePath).filter(Boolean));
@@ -1596,10 +1814,51 @@ function matchesCurrentRepoIdentity(root, targetRepo) {
     const target = targetRepo.trim().toLowerCase().replace(/\\/g, '/');
     const rootNormalized = root.replace(/\\/g, '/').toLowerCase();
     const basename = path.basename(root).toLowerCase();
-    return target === rootNormalized
+    if (target === rootNormalized
         || target === identity.name?.toLowerCase()
         || target === basename
-        || target.endsWith(`/${basename}`);
+        || target.endsWith(`/${basename}`)) {
+        return true;
+    }
+    // TASK-AAO-0136: framework-mode worktree identity inheritance.
+    // When ATM runs inside a git worktree (e.g. an isolated maintenance worktree
+    // created via `git worktree add`), the basename is the worktree directory
+    // name, not the main repo name. Resolve the main repo path via git and retry
+    // the match — a worktree inherits its main repo's framework identity.
+    const mainRepoPath = resolveMainRepoPath(root);
+    if (mainRepoPath && mainRepoPath !== root) {
+        const mainNormalized = mainRepoPath.replace(/\\/g, '/').toLowerCase();
+        const mainBasename = path.basename(mainRepoPath).toLowerCase();
+        if (target === mainNormalized
+            || target === mainBasename
+            || target.endsWith(`/${mainBasename}`)) {
+            return true;
+        }
+    }
+    return false;
+}
+// TASK-AAO-0136: derive main worktree path for a git worktree.
+// Returns null if cwd is not a git repo, or IS the main worktree.
+function resolveMainRepoPath(cwd) {
+    try {
+        const result = spawnSync('git', ['rev-parse', '--git-common-dir'], { cwd, encoding: 'utf8' });
+        if (result.status !== 0)
+            return null;
+        const gitCommonDir = result.stdout.trim();
+        if (!gitCommonDir)
+            return null;
+        const absoluteGitCommonDir = path.isAbsolute(gitCommonDir)
+            ? gitCommonDir
+            : path.resolve(cwd, gitCommonDir);
+        // Main repo path is the parent of the common .git directory.
+        const mainRepoPath = path.dirname(absoluteGitCommonDir);
+        if (path.resolve(mainRepoPath) === path.resolve(cwd))
+            return null;
+        return mainRepoPath;
+    }
+    catch {
+        return null;
+    }
 }
 function hasActiveFrameworkTaskLock(activeLocks) {
     return activeLocks.some((entry) => {

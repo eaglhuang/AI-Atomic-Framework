@@ -1,3 +1,5 @@
+export declare function setOutputJsonPath(resolvedPath: string | null): void;
+export declare function resolveNextDefaultOutputPath(cwd: string): string;
 export declare const configRelativePath: string;
 /**
  * Fallback framework version returned when no package.json is reachable from

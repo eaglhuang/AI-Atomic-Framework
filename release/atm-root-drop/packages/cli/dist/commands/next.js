@@ -17,12 +17,23 @@ import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../c
 import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, writeTaskDirectionLock } from './task-direction.js';
 import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, writeBatchRun, writeQuickfixLock } from './work-channels.js';
 import { decideActiveBatchClaimTask } from './next-active-batch.js';
-import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.js';
+import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
 import { runTasks } from './tasks.js';
 import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText, normalizeTaskIntent, normalizeOptionalTaskPath, readStringArray, splitListValue } from './next/intent-normalizers.js';
 import { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards } from './next/route-predicates.js';
 import { dedupeStrings, quoteCliValue, sha256, toTaskCandidateView, uniqueInOrder, uniqueSorted } from './next/view-projections.js';
 export async function runNext(argv) {
+    const outputFlagIndex = argv.indexOf('--output');
+    if (outputFlagIndex !== -1) {
+        const nextArg = argv[outputFlagIndex + 1];
+        if (!nextArg || nextArg.startsWith('--')) {
+            const cwd = process.cwd();
+            setOutputJsonPath(resolveNextDefaultOutputPath(cwd));
+        }
+        else {
+            setOutputJsonPath(path.resolve(nextArg));
+        }
+    }
     const { options } = parseOptions(argv, 'next');
     const integrationBootstrap = inspectIntegrationBootstrap(options.cwd);
     const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);

@@ -55,7 +55,7 @@ import {
   writeQuickfixLock
 } from './work-channels.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
-import { CliError, makeResult, message, parseJsonText, parseOptions } from './shared.ts';
+import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
 import { runTasks } from './tasks.ts';
 import {
   parseMarkdownFrontmatter,
@@ -101,6 +101,16 @@ import {
 } from './next/view-projections.ts';
 
 export async function runNext(argv: any) {
+  const outputFlagIndex = argv.indexOf('--output');
+  if (outputFlagIndex !== -1) {
+    const nextArg = argv[outputFlagIndex + 1];
+    if (!nextArg || nextArg.startsWith('--')) {
+      const cwd = process.cwd();
+      setOutputJsonPath(resolveNextDefaultOutputPath(cwd));
+    } else {
+      setOutputJsonPath(path.resolve(nextArg));
+    }
+  }
   const { options } = parseOptions(argv, 'next');
   const integrationBootstrap = inspectIntegrationBootstrap(options.cwd);
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);
