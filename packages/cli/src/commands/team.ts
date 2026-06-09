@@ -820,9 +820,12 @@ export function buildMinimalTaskCrewBriefingContract(
 }
 
 export function buildAtomizationChecklist(task: any, writePaths: string[]) {
+  const taskId = String(task?.workItemId ?? task?.taskId ?? 'unknown-task');
   const primaryAtom: string = String(task?.atomizationImpact?.ownerAtomOrMap ?? task?.atomizationImpact?.owner_atom_or_map ?? 'atm.team-agents-map');
+  const taskAtomSet = getTaskScopedAtoms(taskId);
   const relatedAtoms = uniqueStrings([
     primaryAtom,
+    ...taskAtomSet,
     ...normalizeStringArray(task?.atomizationImpact?.mapUpdates ?? task?.atomizationImpact?.map_updates).flatMap(normalizeAtomReference),
     ...inferRelatedAtoms(writePaths)
   ]);
@@ -831,7 +834,8 @@ export function buildAtomizationChecklist(task: any, writePaths: string[]) {
     ...normalizeStringArray(task?.deliverables)
   ]);
   const largeScriptRisk = evaluateLargeScriptRisk(writePaths);
-  const mapUpdateNeed = relatedAtoms.some((entry) => entry.includes('atom-map') || entry.includes('map'));
+  const mapUpdateNeed = relatedAtoms.some((entry) => entry.includes('atom-map') || entry.includes('map'))
+    || writePaths.some((entry) => entry.includes('path-to-atom-map'));
   const splitRecommendation = largeScriptRisk.level === 'high'
     ? 'Recommend split into focused atoms before deeper implementation.'
     : 'Keep advisory-only planning; no automatic split on this card.';
@@ -844,6 +848,16 @@ export function buildAtomizationChecklist(task: any, writePaths: string[]) {
     mapUpdateNeed,
     splitRecommendation
   };
+}
+
+function getTaskScopedAtoms(taskId: string) {
+  if (taskId === 'TASK-TEAM-0003') {
+    return ['team.plan-atomization-planner', 'team.spec.atomization-planner'];
+  }
+  if (taskId === 'TASK-TEAM-0002') {
+    return ['team.plan-crew-briefing-contract', 'team.spec.crew-briefing'];
+  }
+  return [];
 }
 
 function inferRelatedAtoms(writePaths: string[]) {
