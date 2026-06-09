@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-09T10-14-47-824Z-close-bfcbdb75d96f",
+  "taskId": "TASK-AAO-0106",
+  "action": "close",
+  "actorId": "008",
+  "sessionId": "session-20260609100429-008-TASK-AAO-0106-c385849a94",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0106.json",
+  "taskSha256": "sha256:29a4cb999ee14c02a963fbd6e822a4d3cc9b3471420368b52e8da9e8cbbc362f",
+  "createdAt": "2026-06-09T10:14:47.824Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0106 --actor 008 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260609100429-008-TASK-AAO-0106-c385849a94",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0106.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "git diff --check",
+      "node atm.mjs doctor --json",
+      "node atm.mjs hook pre-commit --json",
+      "typecheck",
+      "validate-atomization-coverage",
+      "validate:atomization-coverage",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-09T10:14:47.821Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0106-path-to-atom-map-owner-shards.task.md",
+        ".atm/history/evidence/TASK-AAO-0106.*",
+        ".atm/history/task-events/TASK-AAO-0106/**",
+        ".atm/history/tasks/TASK-AAO-0106.json",
+        "合併結果與現行單檔語意等價的 validator",
+        "重複 path/glob ownership 明確報錯",
+        "atomic_workbench/atomization-coverage/**",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "CLI / scripts 對 owner shards 的讀取支援",
+        "packages/cli/src/commands/next.ts",
+        "path-to-atom-map owner shards layout 與 merge 規則",
+        "scripts/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "scripts/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

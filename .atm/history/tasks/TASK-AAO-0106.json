@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0106",
+  "title": "Path-to-atom-map owner shards",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0102"
+  ],
+  "acceptance": [
+    "owner shards 可 deterministic merge 成單一 projection，且結果對目前單檔 `path-to-atom-map.json` 語意等價。",
+    "CLI / validator / score / inventory 工具可讀取 shards 或 merge 後結果，不要求人工手併。",
+    "若同一 path 或 glob 被多個 owner shard 重複宣告，流程必須明確報錯，不得 silent override。",
+    "merge 後 projection 仍相容於現有 `validate-atomization-coverage`、`validate-atom-id-to-cid` 與 inventory / score 腳本。",
+    "單檔 projection 只作 generated output 或 compatibility surface，不再作多人直接編輯真相來源。"
+  ],
+  "deliverables": [
+    "path-to-atom-map owner shards layout 與 merge 規則",
+    "合併結果與現行單檔語意等價的 validator",
+    "重複 path/glob ownership 明確報錯",
+    "CLI / scripts 對 owner shards 的讀取支援"
+  ],
+  "scopePaths": [
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/**",
+    "packages/cli/src/commands/next.ts",
+    "scripts/**"
+  ],
+  "validators": [
+    "node atm.mjs doctor --json",
+    "node atm.mjs hook pre-commit --json",
+    "node scripts/validate-atomization-coverage.ts",
+    "node scripts/validate-atom-id-to-cid.ts"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "atomic-registry.json",
+    "docs/ai_atomic_framework/**",
+    "docs/tasks/**",
+    "release/**",
+    "atm.mjs",
+    "package-lock.json",
+    "atomic_workbench/registry-catalog.md",
+    "atomic_workbench/atomization-coverage/validator-to-atom-relationship.json",
+    "merged projection / generated snapshot（不可手改，只可由 shard merge 流程重建）"
+  ],
+  "nonGoals": [
+    "不處理 registry external-parts reader / writer / merge",
+    "不改 catalog projection",
+    "不修改與 owner shards 無關的 tasks / evidence / batch UX"
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/**",
+      "packages/cli/src/commands/next.ts",
+      "scripts/validate-atomization-coverage.ts",
+      "scripts/validate-atom-id-to-cid.ts",
+      "scripts/atom-id-to-cid-backfill.ts",
+      "scripts/src/atomize-inventory.js",
+      "scripts/src/atomize-score.js"
+    ]
+  },
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0106-path-to-atom-map-owner-shards.task.md",
+    "sectionTitle": "TASK-AAO-0106",
+    "headingLine": 60,
+    "hash": "cadf0347040b457c"
+  },
+  "importedAt": "2026-06-09T10:03:48.657Z",
+  "lastTransitionId": "2026-06-09T10-14-47-824Z-close-bfcbdb75d96f",
+  "lastTransitionAt": "2026-06-09T10:14:47.824Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "008",
+  "reservedAt": "2026-06-09T10:04:29.740Z",
+  "promotedAt": "2026-06-09T10:04:29.744Z",
+  "claim": {
+    "actorId": "008",
+    "leaseId": "lease-cd049518efae",
+    "claimedAt": "2026-06-09T10:04:29.747Z",
+    "heartbeatAt": "2026-06-09T10:14:47.822Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0106.json",
+      "atomic_workbench/atomization-coverage/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/next.ts",
+      "scripts/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-09T10:04:29.747Z",
+  "startedByActor": "008",
+  "startedBySessionId": "session-20260609100429-008-TASK-AAO-0106-c385849a94",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0106",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0106.*",
+      ".atm/history/task-events/TASK-AAO-0106/**",
+      ".atm/history/tasks/TASK-AAO-0106.json",
+      "atomic_workbench/atomization-coverage/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/next.ts",
+      "scripts/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "998d3b0d41052f90b92724af1e379d68b1af9c91b7eb2490e5e19c501c70f462",
+    "actorId": "008",
+    "createdAt": "2026-06-09T10:04:29.765Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-09T10:14:47.822Z",
+  "closedByActor": "008",
+  "closedBySessionId": "session-20260609100429-008-TASK-AAO-0106-c385849a94",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0106.closure-packet.json"
+}
