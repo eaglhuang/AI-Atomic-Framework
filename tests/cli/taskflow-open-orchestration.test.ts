@@ -23,7 +23,9 @@ try {
   assert.equal(dryRun.evidence.openerMode, 'delegated-governed');
   assert.equal(dryRun.evidence.delegationContract.generationSurface, 'tasks-new');
   assert.equal(dryRun.evidence.orchestrationPlan.wouldInvokeTasksNew, true);
+  assert.equal(dryRun.evidence.orchestrationPlan.wouldInvokeTasksImport, true);
   assert.ok(dryRun.evidence.orchestrationPlan.tasksNewCommand.includes('tasks new'));
+  assert.ok(dryRun.evidence.orchestrationPlan.tasksImportCommand.includes('tasks import'));
   assert.ok(dryRun.evidence.orchestrationPlan.tasksNewCommand.includes('--task-id TASK-GOVERNED-0002'));
   assert.equal(dryRun.evidence.writeSupport.requested, false);
   assert.equal(dryRun.evidence.writeSupport.allowed, false);
@@ -45,12 +47,19 @@ try {
   assert.equal(writeResult.evidence.generation.surface, 'tasks-new');
   assert.equal(writeResult.evidence.generation.taskId, 'TASK-GOVERNED-0001');
   assert.equal(writeResult.evidence.hostPolicyDecision.sources.taskId, 'host-policy');
+  assert.equal(writeResult.evidence.runtimeImport.result.ok, true);
 
   const targetAbsolute = path.join(tempDir, outPath);
   assert.ok(existsSync(targetAbsolute));
   const generatedText = readFileSync(targetAbsolute, 'utf8');
   assert.ok(generatedText.includes('task_id: TASK-GOVERNED-0001'));
   assert.ok(generatedText.includes('title: "Governed Orchestration Write"'));
+
+  const runtimeTaskPath = path.join(tempDir, '.atm/history/tasks/TASK-GOVERNED-0001.json');
+  assert.ok(existsSync(runtimeTaskPath));
+  const runtimeTask = JSON.parse(readFileSync(runtimeTaskPath, 'utf8'));
+  assert.equal(runtimeTask.workItemId, 'TASK-GOVERNED-0001');
+  assert.equal(runtimeTask.status, 'planned');
 
   await assert.rejects(
     () => runTaskflow(['open', '--cwd', tempDir, '--write']),

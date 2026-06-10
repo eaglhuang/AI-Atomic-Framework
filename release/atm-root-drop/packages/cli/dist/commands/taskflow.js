@@ -1,7 +1,7 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
-import { generateTaskCard, runTasksRosterUpdate } from './tasks.js';
+import { generateTaskCard, runTasks, runTasksRosterUpdate } from './tasks.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
@@ -29,6 +29,9 @@ function buildRosterSyncCommand(input) {
     parts.push('--json');
     return parts.join(' ');
 }
+function buildTasksImportCommand(input) {
+    return `node atm.mjs tasks import --from ${input.fromPath} --write --json`;
+}
 function buildOrchestrationPlan(input) {
     const resolvedTaskId = input.hostPolicyDecision?.taskId ?? input.taskId ?? null;
     const resolvedOutputPath = input.hostPolicyDecision?.outputPath ?? input.outputPath ?? null;
@@ -44,6 +47,9 @@ function buildOrchestrationPlan(input) {
     }
     if (input.openerMode === 'template-only-fallback') {
         followUpSteps.push('operator-supply-task-id-and-output');
+    }
+    if (resolvedOutputPath) {
+        followUpSteps.push('import-into-runtime');
     }
     const rosterSyncPolicy = input.delegationContract.policy.rosterSyncPolicy;
     const rosterIndexPath = input.rosterIndexPath ?? input.delegationContract.policy.rosterSync.indexPath;
@@ -61,12 +67,16 @@ function buildOrchestrationPlan(input) {
     return {
         generationSurface: 'tasks-new',
         wouldInvokeTasksNew: true,
+        wouldInvokeTasksImport: Boolean(resolvedOutputPath),
         tasksNewCommand: buildTasksNewCommand({
             taskId: resolvedTaskId,
             outputPath: resolvedOutputPath,
             template: input.template,
             title: input.title
         }),
+        tasksImportCommand: resolvedOutputPath
+            ? buildTasksImportCommand({ fromPath: resolvedOutputPath })
+            : null,
         hostOpenerInvocation: input.delegationContract.displayHint,
         rosterSyncPolicy,
         rosterIndexPath,
@@ -194,8 +204,32 @@ export async function runTaskflow(argv = []) {
             outputPath: resolved.outputPath
         });
         const targetAbsolute = path.resolve(cwd, resolved.outputPath);
+        const hadExistingTarget = existsSync(targetAbsolute);
+        const previousTargetContent = hadExistingTarget ? readFileSync(targetAbsolute, 'utf8') : null;
         mkdirSync(path.dirname(targetAbsolute), { recursive: true });
         writeFileSync(targetAbsolute, generated.content, 'utf8');
+        let runtimeImport = null;
+        try {
+            const runtimeImportResult = await runTasks([
+                'import',
+                '--cwd', cwd,
+                '--from', resolved.outputPath,
+                '--write'
+            ]);
+            runtimeImport = {
+                command: buildTasksImportCommand({ fromPath: resolved.outputPath }),
+                result: runtimeImportResult
+            };
+        }
+        catch (error) {
+            if (hadExistingTarget && previousTargetContent !== null) {
+                writeFileSync(targetAbsolute, previousTargetContent, 'utf8');
+            }
+            else if (existsSync(targetAbsolute)) {
+                rmSync(targetAbsolute, { force: true });
+            }
+            throw error;
+        }
         const effectiveRosterIndex = rosterIndexPath ?? delegationContract.policy.rosterSync.indexPath;
         let rosterSync = null;
         if (delegationContract.policy.rosterSyncPolicy === 'inline' && effectiveRosterIndex) {
@@ -223,7 +257,7 @@ export async function runTaskflow(argv = []) {
                 cwd,
                 mode: 'write',
                 messages: [
-                    message('info', 'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED', `taskflow open orchestrated tasks new generation at ${resolved.outputPath}.`, { openerMode, generationSurface: 'tasks-new' })
+                    message('info', 'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED', `taskflow open orchestrated tasks new generation at ${resolved.outputPath}.`, { openerMode, generationSurface: 'tasks-new', runtimeImported: true })
                 ],
                 evidence: {
                     openerMode,
@@ -238,6 +272,7 @@ export async function runTaskflow(argv = []) {
                         sourcePath: generated.sourcePath,
                         templateUsed: generated.templateUsed
                     },
+                    runtimeImport,
                     rosterSync,
                     ...(profileData ? { profile: profileData } : {})
                 }

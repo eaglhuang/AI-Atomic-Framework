@@ -22,7 +22,8 @@ The `taskflow.profile.v1` schema specifies the capabilities and delegation confi
 | `writeSupport` | Whether `--write` may execute as the governed entry |
 | `delegationContract` | Host opener availability and generation surface (`tasks-new`) |
 | `diagnostics` | Codes, messages, and missing prerequisites |
-| `orchestrationPlan` | Dry-run plan including the `tasks new` command that would run |
+| `orchestrationPlan` | Dry-run plan including the `tasks new` and `tasks import` commands that would run |
+| `runtimeImport` | Write-mode runtime import result returned from `tasks import --write` |
 
 ### Opener mode rules
 
@@ -34,7 +35,7 @@ The `taskflow.profile.v1` schema specifies the capabilities and delegation confi
 - `taskflow open --write` is allowed only in `delegated-governed` mode.
 - When host-opener policy is configured, ATM may allocate `--task-id` and resolve `--output` from profile policy instead of requiring explicit operator input.
 - When prerequisites fail, ATM fails closed with `ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK`.
-- Governed write orchestrates `tasks new`; it does not introduce a second markdown generator.
+- Governed write orchestrates `tasks new`, then immediately imports the generated card into ATM runtime via `tasks import --write`.
 
 ### Host-neutral policy fields (`delegation.policy`)
 
@@ -53,6 +54,7 @@ Roster synchronization uses `node atm.mjs tasks roster update` as the only offic
 1. **Profile write flag**: `capabilities.supportsWrite` in the profile must remain `false`. ATM rejects profiles that attempt to declare direct profile write permission.
 2. **Schema ID Verification**: Every profile must contain a `"schemaId"` field exactly equal to `"taskflow.profile.v1"`.
 3. **Generation surface**: Markdown generation always flows through `tasks new` / `generateTaskCard`; `taskflow open` does not render templates directly.
+4. **Runtime continuity**: `taskflow open --write` is not complete until the generated task card has been imported into `.atm/history/tasks` through `tasks import --write`.
 
 ## JSON Schema
 

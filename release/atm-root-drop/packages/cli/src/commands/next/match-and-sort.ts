@@ -54,12 +54,69 @@ export function looksLikeTaskArtifact(filePath: string, task: ImportedTaskSummar
     ...task.scopePaths,
     ...task.targetAllowedFiles
   ].join(' ').toLowerCase();
-  const fileTokens = tokenizeForMatch(normalized);
-  const taskTokens = new Set(tokenizeForMatch(taskText));
-  if (fileTokens.some((token) => taskTokens.has(token))) return true;
-  if (normalized.startsWith('atomic_workbench/') && /\batomization\b|generated|fixture|exclusion|dogfood|coverage/.test(taskText)) return true;
+  const fileTokens = tokenizeTaskArtifactMatch(normalized);
+  const taskTokens = new Set(tokenizeTaskArtifactMatch(taskText));
+  const overlappingTokens = uniqueTaskArtifactTokens(fileTokens.filter((token) => taskTokens.has(token)));
+  if (overlappingTokens.length >= 2) return true;
+  const fileStem = normalizeSearchText(path.basename(normalized).replace(/\.[^.]+$/, ''));
+  const taskPathStems = [
+    ...task.scopePaths,
+    ...task.targetAllowedFiles
+  ]
+    .map((entry) => normalizeSearchText(path.basename(entry).replace(/\.[^.]+$/, '')))
+    .filter(Boolean);
+  if (fileStem && taskPathStems.some((entry) => entry === fileStem)) return true;
+  if (
+    normalized.startsWith('atomic_workbench/')
+    && overlappingTokens.length >= 1
+    && /\bgenerated\b|\bfixture\b|\bexclusion\b|\bdogfood\b|\bcoverage\b/.test(taskText)
+  ) return true;
   if (normalized.startsWith('docs/ai_atomic_framework/') && task.sourcePlanPath?.includes('docs/ai_atomic_framework/')) return true;
   return false;
+}
+
+const genericTaskArtifactTokens = new Set([
+  'docs',
+  'doc',
+  'packages',
+  'package',
+  'scripts',
+  'script',
+  'src',
+  'dist',
+  'build',
+  'release',
+  'root',
+  'drop',
+  'tests',
+  'test',
+  'spec',
+  'specs',
+  'command',
+  'commands',
+  'json',
+  'md',
+  'ts',
+  'tsx',
+  'js',
+  'jsx',
+  'dts',
+  'index',
+  'readme',
+  'file',
+  'files',
+  'path',
+  'paths'
+]);
+
+function tokenizeTaskArtifactMatch(value: string): readonly string[] {
+  return tokenizeForMatch(value)
+    .filter((token) => token.length >= 4)
+    .filter((token) => !genericTaskArtifactTokens.has(token));
+}
+
+function uniqueTaskArtifactTokens(values: readonly string[]) {
+  return Array.from(new Set(values));
 }
 
 export function isLikelyPromptPathHint(value: string): boolean {

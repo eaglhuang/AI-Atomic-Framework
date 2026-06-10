@@ -41,6 +41,7 @@ import {
   findActiveTaskQueue,
   isTaskDirectionPathCandidate,
   partitionTaskScope,
+  readActiveTaskDirectionLocks,
   type TaskQueueRecord,
   writeTaskDirectionLock
 } from './task-direction.ts';
@@ -2665,6 +2666,7 @@ function resolveQuickfixScope(prompt: string) {
 interface PendingTaskArtifactScopeDiagnostic {
   readonly schemaId: 'atm.taskArtifactScopeDiagnostic.v1';
   readonly ignoredUntrackedFiles: readonly string[];
+  readonly advisoryTrackedFiles: readonly string[];
 }
 
 /**
@@ -2684,14 +2686,24 @@ function checkPendingTaskArtifactScopeExpansion(input: {
 }): PendingTaskArtifactScopeDiagnostic {
   const allowedFiles = buildAllowedFilesForTask(input.task);
   const { stagedOrTracked, untracked } = listPendingGitFilesByKind(input.cwd);
+  const foreignDirectionLocks = readActiveTaskDirectionLocks(input.cwd)
+    .filter((lock) => lock.taskId !== input.task.workItemId);
   const outsideScope = (entry: string) =>
     !entry.startsWith('.atm/') && !isPathAllowedByScope(entry, allowedFiles);
+  const isAdvisoryOutsideScopePath = (entry: string) =>
+    isAdvisoryPendingTaskArtifactPath(entry)
+    || foreignDirectionLocks.some((lock) => isPathAllowedByScope(entry, lock.allowedFiles));
 
+  const advisoryTrackedFiles = stagedOrTracked
+    .filter(outsideScope)
+    .filter(isAdvisoryOutsideScopePath);
   const stagedExpansion = stagedOrTracked
     .filter(outsideScope)
+    .filter((entry) => !isAdvisoryOutsideScopePath(entry))
     .filter((entry) => looksLikeTaskArtifact(entry, input.task));
   const untrackedExpansion = untracked
     .filter(outsideScope)
+    .filter((entry) => !isAdvisoryOutsideScopePath(entry))
     .filter((entry) => looksLikeTaskArtifact(entry, input.task));
 
   if (stagedExpansion.length > 0) {
@@ -2703,6 +2715,7 @@ function checkPendingTaskArtifactScopeExpansion(input: {
         details: {
           taskId: input.task.workItemId,
           outsideAllowedFiles: stagedExpansion,
+          advisoryTrackedFiles,
           ignoredUntrackedFiles: untrackedExpansion,
           allowedFiles,
           requiredAction: 'Add these real deliverables to the task card frontmatter scope/deliverables (then re-import) or run `node atm.mjs tasks scope --add <paths>`; do not edit runtime locks.',
@@ -2714,8 +2727,17 @@ function checkPendingTaskArtifactScopeExpansion(input: {
 
   return {
     schemaId: 'atm.taskArtifactScopeDiagnostic.v1',
-    ignoredUntrackedFiles: untrackedExpansion
+    ignoredUntrackedFiles: untrackedExpansion,
+    advisoryTrackedFiles
   };
+}
+
+function isAdvisoryPendingTaskArtifactPath(filePath: string): boolean {
+  const normalized = normalizeOptionalTaskPath(filePath)?.replace(/\\/g, '/') ?? '';
+  if (!normalized) return false;
+  return normalized === 'atomic_workbench/atomization-coverage/path-to-atom-map.json'
+    || normalized.startsWith('release/atm-root-drop/')
+    || normalized.startsWith('release/atm-onefile/');
 }
 
 function listPendingGitFilesByKind(cwd: string): {
