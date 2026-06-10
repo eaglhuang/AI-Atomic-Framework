@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-06-09
+
+- Added protected-branch and current-head git-head evidence backfills, plus frozen runner artifact sync.
+- Delivered TASK-AAO-0135~0137 brokered-write and captain ergonomics work, including acceptance harnesses and write-path atomicity.
+- Continued TASK-CID-0020~0023 ledger persistence and evidence refresh work across brokered-write, team, and historical-close flows.
+
+## 2026-06-08
+
+- Completed TASK-CID-0019~0022 broker lifecycle work, including neutral write steward, team brokered-write, and lifecycle integration lanes.
+- Reconciled CID ledgers, backfilled git-head evidence, and stabilized dirty-state handling for the brokered flows.
+- Fixed runner entrypoint validation and removed mailbox script `ts-nocheck` debt to keep doctor and root-drop checks unblocked.
+
+## 2026-06-07
+
+- Added broker proposal runtime support and hardened the parallel advisor and validator paths.
+- Closed TASK-CID-0017 and TASK-CID-0018 with refreshed evidence, closure metadata, and handoff capture.
+- Synced release-manifest and onefile outputs for TASK-AAO-0134 while preserving the claim lifecycle artifacts.
+
 ## 2026-06-06
 
 - Restored TASK-AAO-0063 ledger artifacts and added the historical ledger restore task card.
