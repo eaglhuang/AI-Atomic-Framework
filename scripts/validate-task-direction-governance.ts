@@ -384,8 +384,20 @@ async function validateAdopterGoverned(tempRoot: string) {
     '.atm/history/evidence/TASK-ADOPT-0001.json',
     '.atm/history/task-events/TASK-ADOPT-0001'
   ]);
-  const checkpointCommit = runHook(['pre-commit', '--cwd', repo]);
-  assert(checkpointCommit.ok === true, 'batch checkpoint commit must pass even after the direction lock advances to the next queue head');
+  let checkpointCommit: ReturnType<typeof runHook>;
+  process.env.ATM_COMMIT_ACTOR_ID = 'adopter-agent';
+  process.env.ATM_COMMIT_TASK_ID = 'TASK-ADOPT-0001';
+  process.env.GIT_AUTHOR_NAME = 'ATM Test';
+  process.env.GIT_AUTHOR_EMAIL = 'atm-test@example.invalid';
+  try {
+    checkpointCommit = runHook(['pre-commit', '--cwd', repo]);
+  } finally {
+    delete process.env.ATM_COMMIT_ACTOR_ID;
+    delete process.env.ATM_COMMIT_TASK_ID;
+    delete process.env.GIT_AUTHOR_NAME;
+    delete process.env.GIT_AUTHOR_EMAIL;
+  }
+  assert(checkpointCommit.ok === true, `batch checkpoint commit must pass even after the direction lock advances to the next queue head. Got: ${JSON.stringify((checkpointCommit.evidence as any)?.blockingFindings ?? checkpointCommit.messages ?? [])}`);
   assert(((checkpointCommit.evidence as any).directionLockDriftFiles ?? []).length === 0, 'checkpointed task deliverables must not be reported as drift against the next task lock');
 
   const syncRepo = makeAdopterRepo(tempRoot, 'adopter-infra-sync-with-lock');
