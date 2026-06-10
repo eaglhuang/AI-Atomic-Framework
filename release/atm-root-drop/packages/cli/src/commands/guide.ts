@@ -293,6 +293,7 @@ function buildCreateAtomGuide() {
       logicalName: 'atom.core-atom-generator',
       role: 'The governed provisioning facade for atom birth.'
     },
+    canonicalRoute: 'node atm.mjs create --dry-run',
     readFirst: ['README.md', 'docs/ATOM_GENERATOR.md', 'docs/SELF_HOSTING_ALPHA.md'],
     commandTemplates: commandTemplates.createAtom,
     channels: [

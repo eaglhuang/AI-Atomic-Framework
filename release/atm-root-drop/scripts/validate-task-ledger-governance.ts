@@ -1296,6 +1296,7 @@ try {
   await validatePlanningOnlyLedgerAuditBoundary(tempRoot);
   await validateClosurePacketDirtyTreeHygieneGuard(tempRoot);
   await validateTaskImportRefreshClaimPreservation(tempRoot);
+  await validateTaskImportDispatchMetadataPreservation(tempRoot);
 
   if (!process.exitCode) {
     console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, TASK-AAO-0039 planning-only ledger audit boundary covered, and TASK-AAO-0137 write-path atomicity + operator diagnostics covered)`);
@@ -1491,6 +1492,57 @@ async function validateClosurePacketDirtyTreeHygieneGuard(tempRoot: string) {
   const changedFiles = packet.targetCommitDelta.changedFiles;
   assert(changedFiles.includes('packages/cli/src/commands/allowed-untracked.ts'), 'changedFiles must include allowed untracked');
   assert(!changedFiles.includes('scratch/noise.json'), 'changedFiles must exclude untracked noise');
+}
+
+async function validateTaskImportDispatchMetadataPreservation(tempRoot: string) {
+  const repo = makeHostRepo(tempRoot, 'dispatch-metadata-preservation');
+  initGitRepo(repo);
+
+  const planPath = path.join(repo, 'docs', 'plan', 'TASK-LEDGER-DISPATCH-0001.task.md');
+  mkdirSync(path.dirname(planPath), { recursive: true });
+  writeFileSync(planPath, [
+    '---',
+    'task_id: TASK-LEDGER-DISPATCH-0001',
+    'title: "Ledger dispatch metadata preservation"',
+    'status: open',
+    'assignee: "008"',
+    'scopePaths:',
+    '  - "packages/cli/src/commands/tasks.ts"',
+    'deliverables:',
+    '  - "packages/cli/src/commands/tasks.ts"',
+    'dispatch_pattern:',
+    '  shape: "dual-agent (Phase 0 planner + Phase 1 builder)"',
+    '  phase_1:',
+    '    lane: "external builder 008"',
+    '    forbidden_files:',
+    '      - ".atm/runtime/**"',
+    'condition_review:',
+    '  - "ledger JSON preserves dispatchPattern"',
+    '  - "mailboxAssignee resolves from assignee"',
+    '---',
+    '# TASK-LEDGER-DISPATCH-0001',
+    ''
+  ].join('\n'), 'utf8');
+
+  const dryRun = await runTasks(['import', '--cwd', repo, '--from', planPath, '--dry-run', '--json']);
+  assert(dryRun.ok === true, 'dispatch metadata dry-run must succeed');
+  const dryTask = ((dryRun.evidence as Record<string, any>).manifest.tasks as Array<Record<string, any>>)[0];
+  assert(dryTask.dispatchPattern?.shape?.includes('dual-agent'), 'dry-run must preserve dispatchPattern.shape');
+  assert(dryTask.conditionReview?.length === 2, 'dry-run must preserve conditionReview');
+  assert(dryTask.mailboxAssignee === '008', 'dry-run must preserve mailboxAssignee');
+
+  const writeResult = await runTasks(['import', '--cwd', repo, '--from', planPath, '--write', '--json']);
+  assert(writeResult.ok === true, 'dispatch metadata write must succeed');
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', 'TASK-LEDGER-DISPATCH-0001.json');
+  const written = readJson(taskPath);
+  assert(written.dispatchPattern?.phase1?.lane === 'external builder 008', 'write must persist dispatchPattern.phase1.lane');
+  assert(Array.isArray(written.conditionReview) && written.conditionReview.length === 2, 'write must persist conditionReview');
+  assert(written.mailboxAssignee === '008', 'write must persist mailboxAssignee');
+
+  const refreshResult = await runTasks(['import', '--cwd', repo, '--from', planPath, '--write', '--force', '--json']);
+  assert(refreshResult.ok === true, 'dispatch metadata refresh must succeed');
+  const refreshed = readJson(taskPath);
+  assert(refreshed.dispatchPattern?.phase1?.forbiddenFiles?.includes('.atm/runtime/**'), 'refresh must keep phase1 forbidden_files');
 }
 
 async function validateTaskImportRefreshClaimPreservation(tempRoot: string) {

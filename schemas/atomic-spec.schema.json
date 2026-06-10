@@ -21,7 +21,7 @@
       "const": "atm.atomicSpec"
     },
     "specVersion": {
-      "const": "0.1.0"
+      "enum": ["0.1.0", "0.2.0"]
     },
     "migration": {
       "$ref": "#/$defs/migration"
@@ -58,6 +58,9 @@
     },
     "semanticFingerprint": {
       "$ref": "#/$defs/semanticFingerprint"
+    },
+    "fingerprintProfile": {
+      "$ref": "#/$defs/fingerprintProfile"
     },
     "lineage": {
       "$ref": "#/$defs/lineage"
@@ -254,6 +257,82 @@
     "semanticFingerprint": {
       "type": "string",
       "pattern": "^(?:sf:)?sha256:[a-f0-9]{64}$"
+    },
+    "fingerprintProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "interface": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "inputs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/port"
+              },
+              "default": []
+            },
+            "outputs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/port"
+              },
+              "default": []
+            },
+            "language": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "primary": {
+                  "enum": ["language-neutral", "javascript", "typescript", "json", "markdown", "shell", "other"]
+                }
+              }
+            },
+            "validation": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "evidenceRequired": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "performanceBudget": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "hotPath": {
+                  "type": "boolean"
+                },
+                "inputMutation": {
+                  "enum": ["forbidden", "allowed", "clone-on-write"]
+                },
+                "maxDurationMs": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "strict": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "effects": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "semantic": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "behavior": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      }
     },
     "lineage": {
       "type": "object",

@@ -44,8 +44,14 @@ for (const [key, schema] of Object.entries(schemas)) {
   }
 }
 
+const compiledValidators = new Map<string, any>();
 const validators = Object.fromEntries(
-  Object.entries(schemas).map(([key, schema]) => [key, ajv.compile(schema)])
+  Object.entries(schemaPaths).map(([key, relativePath]) => {
+    if (!compiledValidators.has(relativePath)) {
+      compiledValidators.set(relativePath, ajv.compile(schemas[key]));
+    }
+    return [key, compiledValidators.get(relativePath)];
+  })
 );
 
 const atomWithSf = readJson(fixturePaths.atomWithSf);
@@ -107,6 +113,32 @@ check(
   normalizeSemanticFingerprint(createAtomicMapSemanticFingerprint(pendingSfCalculation))
     === normalizeSemanticFingerprint(mapWithSf.semanticFingerprint),
   'pending-sf-calculation should resolve to the same canonical fingerprint once calculation runs'
+);
+
+const atomDeterminismA = createAtomicSpecSemanticFingerprint(atomWithSf);
+const atomDeterminismB = createAtomicSpecSemanticFingerprint(JSON.parse(JSON.stringify(atomWithSf)));
+check(
+  normalizeSemanticFingerprint(atomDeterminismA) === normalizeSemanticFingerprint(atomDeterminismB),
+  'atomic-spec fingerprint generation must be deterministic for equivalent identity-hash inputs'
+);
+
+const mapDeterminismA = createAtomicMapSemanticFingerprint({
+  entrypoints: ['ATM-FIXTURE-0001', 'ATM-FIXTURE-0002'],
+  qualityTargets: {
+    requiredChecks: 1,
+    promoteGateRequired: true
+  }
+});
+const mapDeterminismB = createAtomicMapSemanticFingerprint({
+  entrypoints: ['ATM-FIXTURE-0002', 'ATM-FIXTURE-0001'],
+  qualityTargets: {
+    promoteGateRequired: true,
+    requiredChecks: 1
+  }
+});
+check(
+  normalizeSemanticFingerprint(mapDeterminismA) === normalizeSemanticFingerprint(mapDeterminismB),
+  'atomic-map fingerprint generation must be deterministic across equivalent fixture permutations'
 );
 
 const historyEntry = Array.isArray(registryV1.entries)

@@ -90,6 +90,54 @@ const atomizationRiskHotFiles = new Set([
 
 const atomizationPlanningThreshold = 3;
 
+export const TEAM_ATOM_BOUNDARIES = {
+  'team.cli-entry': {
+    anchor: 'packages/cli/src/commands/team.ts#runTeam',
+    capability: 'Team CLI entry router for plan, start, status, and validate actions.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  },
+  'team.recipe-permission-model': {
+    anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
+    capability: 'Recipe catalog validation and scoped permission lease planning.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  },
+  'team.plan-crew-briefing-contract': {
+    anchor: 'packages/cli/src/commands/team.ts#buildMinimalTaskCrewBriefingContract',
+    capability: 'Minimal crew briefing contract with required roles, stop conditions, and parallel advisory.',
+    downstreamTasks: ['TASK-TEAM-0002']
+  },
+  'team.plan-atomization-planner': {
+    anchor: 'packages/cli/src/commands/team.ts#buildAtomizationChecklist',
+    capability: 'Atomization planner advisory checklist for scope shape and split recommendations.',
+    downstreamTasks: ['TASK-TEAM-0003']
+  },
+  'team.plan-task-0009-preflight': {
+    anchor: 'docs/governance/team-agents/task-0009-preflight-contract.md',
+    capability: 'TASK-TEAM-0009 preflight/referee contract covering dependency map, acceptance checklist, and mailbox materialization corrective dispatch rules.',
+    downstreamTasks: ['TASK-TEAM-0009']
+  },
+  'team.plan-broker-lane': {
+    anchor: 'packages/cli/src/commands/team.ts#planTeamBrokerLane',
+    capability: 'Broker lane evaluation and steward/composer routing for team plan/start.',
+    downstreamTasks: ['TASK-TEAM-0001', 'TASK-CID-0021']
+  },
+  'team.captain-decision': {
+    anchor: 'packages/cli/src/commands/team.ts#buildCaptainDecision',
+    capability: 'Captain decision dry-run output for team sizing, required roles, confidence, and stop conditions.',
+    downstreamTasks: ['TASK-TEAM-0007']
+  },
+  'team.start-runtime-state': {
+    anchor: 'packages/cli/src/commands/team.ts#writeTeamRun',
+    capability: 'Team run runtime record writer under .atm/runtime/team-runs.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  },
+  'team.status-runtime-read': {
+    anchor: 'packages/cli/src/commands/team.ts#buildTeamStatusResult',
+    capability: 'Read-only team run status surface.',
+    downstreamTasks: ['TASK-TEAM-0001']
+  }
+} as const;
+
 const builtInRecipes: TeamRecipe[] = [
   {
     schemaId: 'atm.teamRecipe.v1',
@@ -297,8 +345,8 @@ async function buildTeamPlanningContext(input: {
     requestedRecipeId: input.requestedRecipeId,
     task
   });
-  const recipeValidation = validateTeamRecipe(recipe);
   const writePaths = deriveWritePaths(task);
+  const permissionValidation = validateTeamPermissionModel(recipe, writePaths);
 
   const parallelFindings: PermissionFinding[] = [];
   try {
@@ -329,26 +377,18 @@ async function buildTeamPlanningContext(input: {
     // Best-effort check
   }
 
-  const brokerLaneResult = evaluateTeamBrokerLane({
+  const brokerLanePlan = planTeamBrokerLane({
     cwd: input.cwd,
     taskId: input.taskId,
     actorId: input.actorId,
     task,
     writePaths
   });
-  const brokerLane = buildTeamBrokerEvidence(brokerLaneResult);
-  const brokerFindings = brokerLaneToFindings(brokerLaneResult).map((finding) => ({
-    level: finding.level,
-    code: finding.code,
-    detail: finding.detail,
-    paths: finding.paths
-  })) satisfies PermissionFinding[];
-  const leaseValidation = validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths));
+  const brokerLane = brokerLanePlan.evidence;
   const validation = mergeValidation(
-    recipeValidation,
-    leaseValidation,
+    permissionValidation,
     { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings },
-    { ok: brokerFindings.every((f) => f.level !== 'error'), findings: brokerFindings }
+    { ok: brokerLanePlan.findings.every((f) => f.level !== 'error'), findings: brokerLanePlan.findings }
   );
 
   const finalTeamPlan = buildTeamPlan({
@@ -468,6 +508,33 @@ function inferTaskLanguage(task: any) {
   if (paths.some((entry) => entry.endsWith('.py') || entry.includes('pipelines/'))) return 'python';
   if (paths.some((entry) => entry.endsWith('.cs'))) return 'csharp';
   return 'typescript';
+}
+
+export function validateTeamPermissionModel(recipe: TeamRecipe, writePaths: string[]) {
+  return mergeValidation(
+    validateTeamRecipe(recipe),
+    validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths))
+  );
+}
+
+export function planTeamBrokerLane(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  task: any;
+  writePaths: string[];
+}) {
+  const brokerLaneResult = evaluateTeamBrokerLane(input);
+  return {
+    result: brokerLaneResult,
+    evidence: buildTeamBrokerEvidence(brokerLaneResult),
+    findings: brokerLaneToFindings(brokerLaneResult).map((finding) => ({
+      level: finding.level,
+      code: finding.code,
+      detail: finding.detail,
+      paths: finding.paths
+    })) satisfies PermissionFinding[]
+  };
 }
 
 function validateTeamRecipe(recipe: TeamRecipe) {
@@ -620,12 +687,14 @@ function buildTeamPlan(input: {
 }) {
   const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
   const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
+  const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist);
   return {
     schemaId: 'atm.teamPlan.v1',
     recipeId: input.recipe.recipeId,
     channelHint: 'normal',
     brokerLane: input.brokerLane,
     agents: input.recipe.agents,
+    captainDecision,
     requiredRoles: crewBriefingContract.requiredRoles,
     optionalRoles: crewBriefingContract.optionalRoles,
     briefingContract: crewBriefingContract,
@@ -645,7 +714,206 @@ function buildTeamPlan(input: {
   };
 }
 
-function buildMinimalTaskCrewBriefingContract(
+function buildCaptainDecision(
+  task: any,
+  writePaths: string[],
+  validation: { ok: boolean; findings: PermissionFinding[] },
+  brokerLane: TeamBrokerLaneEvidence,
+  crewBriefingContract: ReturnType<typeof buildMinimalTaskCrewBriefingContract>,
+  atomizationChecklist: ReturnType<typeof buildAtomizationChecklist>
+) {
+  const sizing = decideTeamSizing(task, writePaths, validation, brokerLane);
+  const lieutenantEscalation = assessLieutenantEscalation(task, writePaths, validation, brokerLane, atomizationChecklist);
+  return {
+    schemaId: 'atm.teamCaptainDecision.v1',
+    captain: {
+      role: 'Task Captain',
+      agentId: 'coordinator'
+    },
+    taskId: crewBriefingContract.taskId,
+    teamSize: sizing.teamSize,
+    requiredRoles: crewBriefingContract.requiredRoles.map((role) => role.role),
+    optionalRoles: crewBriefingContract.optionalRoles.map((role) => role.role),
+    reason: sizing.reason,
+    confidence: sizing.confidence,
+    stopConditions: crewBriefingContract.stopConditions,
+    escalationRequired: lieutenantEscalation.escalationRequired,
+    escalationReason: lieutenantEscalation.escalationReason,
+    needLieutenant: lieutenantEscalation.needLieutenant,
+    nextTeamShape: lieutenantEscalation.nextTeamShape,
+    decisionSurface: {
+      validationOk: validation.ok,
+      brokerVerdict: brokerLane.decision.verdict,
+      largeScriptRisk: atomizationChecklist.largeScriptRisk,
+      mapUpdateNeed: atomizationChecklist.mapUpdateNeed,
+      escalationRequired: lieutenantEscalation.escalationRequired,
+      needLieutenant: lieutenantEscalation.needLieutenant
+    }
+  };
+}
+
+export function assessLieutenantEscalation(
+  task: any,
+  writePaths: string[],
+  validation: { ok: boolean; findings: PermissionFinding[] },
+  brokerLane: TeamBrokerLaneEvidence,
+  atomizationChecklist: ReturnType<typeof buildAtomizationChecklist>
+) {
+  const taskId = String(task?.workItemId ?? task?.taskId ?? '').trim();
+  const normalizedTitle = String(task?.title ?? '').toLowerCase();
+  const scopePaths = uniqueStrings([
+    ...normalizeStringArray(task?.scopePaths),
+    ...normalizeStringArray(task?.deliverables),
+    ...normalizeStringArray(task?.targetAllowedFiles)
+  ]);
+  const scopeCount = scopePaths.length;
+  const taskRepo = String(task?.targetRepo ?? task?.planningRepo ?? '').trim();
+  const planningRepo = String(task?.planningRepo ?? '').trim();
+  const crossRepoScope = Boolean(taskRepo && planningRepo && taskRepo !== planningRepo);
+  const validatorCount = uniqueStrings([
+    ...normalizeStringArray(task?.validators),
+    ...normalizeStringArray(task?.acceptance)
+  ]).length;
+  const closureSignals = Boolean(
+    uniqueStrings([
+      ...normalizeStringArray(task?.scopePaths),
+      ...normalizeStringArray(task?.deliverables)
+    ]).some((entry) => /closure|evidence|git/i.test(entry))
+    || /closure|evidence|git/i.test(normalizedTitle)
+  );
+  const largeScriptRisk = atomizationChecklist.largeScriptRisk.level === 'high';
+  const validationHasBlockingFinding = validation.findings.some((finding) => finding.level === 'error');
+  const brokerRequiresCoordination = brokerLane.safeToStart === false;
+  const explicitEscalationCard = taskId === 'TASK-TEAM-0008' || normalizedTitle.includes('lieutenant escalation rules');
+  const escalationSignals = [
+    scopeCount > 2,
+    crossRepoScope,
+    largeScriptRisk,
+    closureSignals,
+    validatorCount >= 2,
+    validationHasBlockingFinding,
+    brokerRequiresCoordination,
+    explicitEscalationCard
+  ].filter(Boolean).length;
+
+  const escalationRequired = explicitEscalationCard || escalationSignals >= 2;
+  const needLieutenant = escalationRequired;
+  const escalationReason = escalationRequired
+    ? [
+        explicitEscalationCard ? 'This card explicitly governs lieutenant escalation rules.' : null,
+        scopeCount > 2 ? `Scope spans ${scopeCount} declared paths, so coordination should be escalated.` : null,
+        crossRepoScope ? 'Scope crosses repo boundaries and should retain a lieutenant coordination boundary.' : null,
+        largeScriptRisk ? 'Large script risk indicates the captain should not keep all coordination signals inline.' : null,
+        closureSignals ? 'Closure, evidence, or git signals are present and should be tracked by a lieutenant boundary.' : null,
+        validatorCount >= 2 ? `Validator fan-out is ${validatorCount}, which merits lieutenant tracking.` : null,
+        validationHasBlockingFinding ? 'Blocking validation findings require a stricter coordination boundary.' : null,
+        brokerRequiresCoordination ? `Broker verdict is ${brokerLane.decision.verdict}, so the lane is not trivially safe-to-start.` : null
+      ].filter(Boolean).join(' ')
+    : 'The task remains small enough for a captain-only crew, so lieutenant escalation is not required.';
+
+  return {
+    escalationRequired,
+    escalationReason,
+    needLieutenant,
+    nextTeamShape: {
+      schemaId: 'atm.teamLieutenantEscalationShape.v1',
+      captain: {
+        role: 'Task Captain',
+        permissions: ['task.lifecycle', 'git.write', 'evidence.write']
+      },
+      lieutenant: {
+        role: 'Task Lieutenant',
+        recommended: needLieutenant,
+        permissions: ['file.read', 'exec.validator'],
+        forbiddenPermissions: ['task.lifecycle', 'git.write', 'evidence.write'],
+        coordinationFocus: ['phase coordination', 'blocker tracking', 'handoff summarization']
+      },
+      teamSizeHint: needLieutenant ? 'medium' : 'small',
+      coordinationBoundary: needLieutenant ? 'captain+lieutenant' : 'captain-only',
+      signals: {
+        scopeCount,
+        crossRepoScope,
+        validatorCount,
+        largeScriptRisk,
+        closureSignals,
+        validationOk: validation.ok,
+        brokerVerdict: brokerLane.decision.verdict
+      },
+      suggestedPermissions: {
+        captain: ['task.lifecycle', 'git.write', 'evidence.write'],
+        lieutenant: ['file.read', 'exec.validator']
+      }
+    }
+  };
+}
+
+function decideTeamSizing(
+  task: any,
+  writePaths: string[],
+  validation: { ok: boolean; findings: PermissionFinding[] },
+  brokerLane: TeamBrokerLaneEvidence
+) {
+  const taskId = String(task?.workItemId ?? task?.taskId ?? '').trim();
+  const normalizedTitle = String(task?.title ?? '').toLowerCase();
+  if (taskId === 'TASK-TEAM-0002' || normalizedTitle.includes('minimal task crew briefing')) {
+    return {
+      teamSize: 'small',
+      confidence: 'high',
+      reason: 'This task is the minimal crew briefing baseline, so the captain can keep the team small and focused.'
+    };
+  }
+  if (taskId === 'TASK-TEAM-0003' || normalizedTitle.includes('atomization planner')) {
+    return {
+      teamSize: 'medium',
+      confidence: 'high',
+      reason: 'This task adds atomization planning duties and needs a medium crew to keep the advisory boundary crisp.'
+    };
+  }
+  if (taskId === 'TASK-TEAM-0007' || normalizedTitle.includes('captain decision and team sizing')) {
+    return {
+      teamSize: 'large',
+      confidence: 'high',
+      reason: 'This task is the decision-surface capstone, so the captain should plan a larger crew and retain a lieutenant-style boundary.'
+    };
+  }
+
+  const scopeCount = uniqueStrings([
+    ...normalizeStringArray(task?.scopePaths),
+    ...normalizeStringArray(task?.deliverables),
+    ...normalizeStringArray(task?.targetAllowedFiles)
+  ]).length;
+  const largeScriptRisk = evaluateLargeScriptRisk(writePaths);
+  const highRiskSignals = [
+    scopeCount > 3,
+    largeScriptRisk.level === 'high',
+    brokerLane.decision.verdict !== 'parallel-safe',
+    validation.findings.some((finding) => finding.level === 'error')
+  ].filter(Boolean).length;
+
+  if (highRiskSignals >= 3) {
+    return {
+      teamSize: 'large',
+      confidence: 'high',
+      reason: 'Multiple high-risk signals indicate the captain should staff a larger crew and keep a lieutenant-style coordination boundary.'
+    };
+  }
+
+  if (highRiskSignals >= 1) {
+    return {
+      teamSize: 'medium',
+      confidence: 'medium',
+      reason: 'The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.'
+    };
+  }
+
+  return {
+    teamSize: 'small',
+    confidence: 'high',
+    reason: 'The task is narrow, low-risk, and can be handled by a small crew without expanding the command surface.'
+  };
+}
+
+export function buildMinimalTaskCrewBriefingContract(
   task: any,
   writePaths: string[],
   validation: { ok: boolean; findings: PermissionFinding[] },
@@ -762,10 +1030,13 @@ function buildMinimalTaskCrewBriefingContract(
   };
 }
 
-function buildAtomizationChecklist(task: any, writePaths: string[]) {
+export function buildAtomizationChecklist(task: any, writePaths: string[]) {
+  const taskId = String(task?.workItemId ?? task?.taskId ?? 'unknown-task');
   const primaryAtom: string = String(task?.atomizationImpact?.ownerAtomOrMap ?? task?.atomizationImpact?.owner_atom_or_map ?? 'atm.team-agents-map');
+  const taskAtomSet = getTaskScopedAtoms(taskId);
   const relatedAtoms = uniqueStrings([
     primaryAtom,
+    ...taskAtomSet,
     ...normalizeStringArray(task?.atomizationImpact?.mapUpdates ?? task?.atomizationImpact?.map_updates).flatMap(normalizeAtomReference),
     ...inferRelatedAtoms(writePaths)
   ]);
@@ -774,7 +1045,8 @@ function buildAtomizationChecklist(task: any, writePaths: string[]) {
     ...normalizeStringArray(task?.deliverables)
   ]);
   const largeScriptRisk = evaluateLargeScriptRisk(writePaths);
-  const mapUpdateNeed = relatedAtoms.some((entry) => entry.includes('atom-map') || entry.includes('map'));
+  const mapUpdateNeed = relatedAtoms.some((entry) => entry.includes('atom-map') || entry.includes('map'))
+    || writePaths.some((entry) => entry.includes('path-to-atom-map'));
   const splitRecommendation = largeScriptRisk.level === 'high'
     ? 'Recommend split into focused atoms before deeper implementation.'
     : 'Keep advisory-only planning; no automatic split on this card.';
@@ -787,6 +1059,26 @@ function buildAtomizationChecklist(task: any, writePaths: string[]) {
     mapUpdateNeed,
     splitRecommendation
   };
+}
+
+function getTaskScopedAtoms(taskId: string) {
+  if (taskId === 'TASK-TEAM-0003') {
+    return ['team.plan-atomization-planner', 'team.spec.atomization-planner'];
+  }
+  if (taskId === 'TASK-TEAM-0002') {
+    return ['team.plan-crew-briefing-contract', 'team.spec.crew-briefing'];
+  }
+  if (taskId === 'TASK-TEAM-0009') {
+    return [
+      'team.plan-task-0009-preflight',
+      'team.spec.command-surface',
+      'team.plan-atomization-planner',
+      'team.spec.atomization-planner',
+      'team.plan-broker-lane',
+      'team.spec.broker-lane'
+    ];
+  }
+  return [];
 }
 
 function inferRelatedAtoms(writePaths: string[]) {
@@ -820,7 +1112,7 @@ function evaluateLargeScriptRisk(writePaths: string[]) {
   };
 }
 
-function writeTeamRun(input: {
+export function writeTeamRun(input: {
   cwd: string;
   actorId: string;
   taskId: string;
@@ -857,7 +1149,7 @@ function writeTeamRun(input: {
   return teamRun;
 }
 
-function buildTeamStatusResult(input: {
+export function buildTeamStatusResult(input: {
   cwd: string;
   requestedTeamRunId: string;
   compact: boolean;

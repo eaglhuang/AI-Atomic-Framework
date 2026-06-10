@@ -1,4 +1,6 @@
 import { computeSha256ForContent } from '../hash-lock/hash-lock.js';
+// CID.Interface = the contract/interface + execution-constraint fingerprint.
+// The function shape stays deterministic; only the public semantics naming is clarified here.
 export function createAtomicSpecSemanticFingerprint(input) {
     return createSemanticFingerprint({
         inputs: normalizeSpecPorts(input.inputs),

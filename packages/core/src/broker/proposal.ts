@@ -254,7 +254,7 @@ function readGitHeadCommit(cwd: string): string | null {
 }
 
 function hashFileContents(filePath: string): string {
-  return crypto.createHash('sha256').update(readFileSync(filePath)).digest('hex');
+  return `sha256:${crypto.createHash('sha256').update(readFileSync(filePath)).digest('hex')}`;
 }
 
 function getBrokerProposalSchemaValidator(): ValidateFunction<PatchProposal> {

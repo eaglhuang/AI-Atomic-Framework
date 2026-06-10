@@ -1,0 +1,59 @@
+# CID Semantics
+
+This document is the canonical CID semantics reference for `TASK-CID-0002`.
+
+## Core rule
+
+`semanticFingerprint` is a deterministic, normalized **contract/interface + execution-constraint fingerprint**.
+
+It is not an AST identity, not an embedding, and not a proxy for hidden semantic intent.
+
+## Axioms
+
+### A1. Identity vs advisory
+
+`semanticFingerprint` governs the interface contract and execution constraints that must remain stable for compatibility and validation. It does not claim to encode every possible meaning of the implementation.
+
+### A2. Necessary, not sufficient
+
+Matching `semanticFingerprint` is necessary for interface-level CID compatibility, but it is not sufficient to prove broader behavioral equivalence.
+
+## Five-slot profile
+
+`fingerprintProfile` is additive and optional.
+
+Only the `interface` slot is populated in this card.
+
+The profile reserves four additional slots for later work:
+
+- `strict`
+- `effects`
+- `semantic`
+- `behavior`
+
+Those slots are declared now so successor work can attach new CID dimensions without changing the existing identity hash contract.
+
+## Current scope
+
+The current CID semantics scope covers:
+
+- ports
+- `language.primary`
+- `validation.evidenceRequired`
+- `performanceBudget`
+
+The scope intentionally does not include AST semantics, LLM embeddings, or effect tracking.
+
+## Canonical mapping
+
+- `semanticFingerprint` maps to `CID.Interface`
+- `fingerprintProfile.interface` is the additive schema home for the existing contract/interface and execution-constraint surface
+
+## Compatibility promise
+
+The schema change is additive:
+
+- `fingerprintProfile` is optional
+- `additionalProperties: false` remains in force
+- existing fixtures and registry entries must continue to validate unchanged
+

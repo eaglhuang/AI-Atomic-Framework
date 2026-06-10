@@ -63,3 +63,33 @@ export declare function createTaskFromTableMetadata(input: {
     readonly importedAt: string;
     readonly hashSection: (text: string) => string;
 }): TaskImportRecordShape;
+/** Compact phase fence preserved for sidecar / mailbox materialization kickoff. */
+export interface TaskDispatchPhase {
+    readonly lane?: string | null;
+    readonly allowedFiles?: readonly string[];
+    readonly forbiddenFiles?: readonly string[];
+    readonly allowedFilesStrict?: boolean;
+    readonly commitBudget?: number | null;
+    readonly commitLayout?: readonly string[];
+    readonly output?: string | null;
+}
+/** Canonical dispatch metadata shape written to task ledger JSON. */
+export interface TaskDispatchPattern {
+    readonly shape?: string | null;
+    readonly rationale?: string | null;
+    readonly parallelWith?: string | null;
+    readonly phase0?: TaskDispatchPhase;
+    readonly phase1?: TaskDispatchPhase;
+}
+export interface TaskDispatchMetadata {
+    readonly dispatchPattern?: TaskDispatchPattern;
+    readonly conditionReview?: readonly string[];
+    readonly mailboxAssignee?: string | null;
+}
+export declare const MAX_DISPATCH_METADATA_BYTES = 8192;
+/**
+ * Parse bounded dispatch metadata from a task-card markdown document.
+ * Uses block-aware YAML parsing because flat extractFrontMatter corrupts nested dispatch_pattern trees.
+ */
+export declare function parseDispatchMetadataFromPlanText(planText: string): TaskDispatchMetadata;
+export declare function assertDispatchMetadataMaterializable(metadata: TaskDispatchMetadata, workItemId: string): readonly string[];

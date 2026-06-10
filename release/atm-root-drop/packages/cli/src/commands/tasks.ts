@@ -67,7 +67,10 @@ import {
 import {
   collectKeyValue as delegatedCollectKeyValue,
   collectKeyValueFromLines as delegatedCollectKeyValueFromLines,
-  createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata
+  createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata,
+  parseDispatchMetadataFromPlanText,
+  type TaskDispatchMetadata,
+  type TaskDispatchPattern
 } from './tasks/task-markdown-helpers.ts';
 import {
   safeTaskFileReadDir,
@@ -159,6 +162,9 @@ export interface TaskImportRecord {
   readonly tags: readonly string[];
   readonly notes?: string | null;
   readonly contextMap?: ContextMap;
+  readonly dispatchPattern?: TaskDispatchPattern;
+  readonly conditionReview?: readonly string[];
+  readonly mailboxAssignee?: string | null;
   readonly source: TaskImportSource;
   readonly importedAt: string;
 }
@@ -4827,6 +4833,17 @@ function parseSingleCard(input: {
     ?? rollbackFrontMatter.notes
   );
   const contextMap = parseContextMap(frontMatter.data.contextMap);
+  let dispatchMetadata: TaskDispatchMetadata = {};
+  try {
+    dispatchMetadata = parseDispatchMetadataFromPlanText(input.planText);
+  } catch (error) {
+    cardImportDiagnostics.push({
+      code: 'ATM_TASK_IMPORT_DISPATCH_METADATA_TOO_LARGE',
+      severity: 'error',
+      message: error instanceof Error ? error.message : String(error),
+      field: 'dispatchPattern'
+    });
+  }
   const importDiagnostics: TaskCardImportDiagnostic[] = [...cardImportDiagnostics];
   if (frontMatter.data.allowed_files !== undefined && frontMatter.data.scopePaths === undefined && frontMatter.data.scope_paths === undefined) {
     importDiagnostics.push({
@@ -4893,6 +4910,11 @@ function parseSingleCard(input: {
     rollbackStrategy,
     rollbackNotes,
     contextMap,
+    ...(dispatchMetadata.dispatchPattern ? { dispatchPattern: dispatchMetadata.dispatchPattern } : {}),
+    ...(dispatchMetadata.conditionReview && dispatchMetadata.conditionReview.length > 0
+      ? { conditionReview: dispatchMetadata.conditionReview }
+      : {}),
+    ...(dispatchMetadata.mailboxAssignee ? { mailboxAssignee: dispatchMetadata.mailboxAssignee } : {}),
     atomizationImpact: {
       ownerAtomOrMap: normalizeOptionalString(
         frontMatter.data.ownerAtomOrMap

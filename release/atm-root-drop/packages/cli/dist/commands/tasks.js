@@ -21,7 +21,7 @@ import { normalizeTaskDocumentId as delegatedNormalizeTaskDocumentId } from './t
 import { sha256 as delegatedSha256 } from './tasks/sha256-helper.js';
 import { assertLocalTaskLedgerEnabled as delegatedAssertLocalTaskLedgerEnabled, buildTaskTransitionCommand as delegatedBuildTaskTransitionCommand, createClosureTransitionMetadata as delegatedCreateClosureTransitionMetadata, normalizeWorkItemStatus as delegatedNormalizeWorkItemStatus, inspectTaskVerifyStatus as delegatedInspectTaskVerifyStatus } from './tasks/task-transition-helpers.js';
 import { readGitScalar as delegatedReadGitScalar, listCommittedFilesSinceClaim as delegatedListCommittedFilesSinceClaim } from './tasks/task-git-helpers.js';
-import { collectKeyValue as delegatedCollectKeyValue, collectKeyValueFromLines as delegatedCollectKeyValueFromLines, createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata } from './tasks/task-markdown-helpers.js';
+import { collectKeyValue as delegatedCollectKeyValue, collectKeyValueFromLines as delegatedCollectKeyValueFromLines, createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata, parseDispatchMetadataFromPlanText } from './tasks/task-markdown-helpers.js';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.js';
 import { coerceStatus, extractFrontMatter, extractTaskDeclaredFiles, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, parseMarkdownTableCells, parseYamlList, validateDeliverablesList, parseContextMap } from './tasks/task-import-validators.js';
 import { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
@@ -4232,6 +4232,18 @@ function parseSingleCard(input) {
         ?? frontMatter.data.rollback_notes
         ?? rollbackFrontMatter.notes);
     const contextMap = parseContextMap(frontMatter.data.contextMap);
+    let dispatchMetadata = {};
+    try {
+        dispatchMetadata = parseDispatchMetadataFromPlanText(input.planText);
+    }
+    catch (error) {
+        cardImportDiagnostics.push({
+            code: 'ATM_TASK_IMPORT_DISPATCH_METADATA_TOO_LARGE',
+            severity: 'error',
+            message: error instanceof Error ? error.message : String(error),
+            field: 'dispatchPattern'
+        });
+    }
     const importDiagnostics = [...cardImportDiagnostics];
     if (frontMatter.data.allowed_files !== undefined && frontMatter.data.scopePaths === undefined && frontMatter.data.scope_paths === undefined) {
         importDiagnostics.push({
@@ -4296,6 +4308,11 @@ function parseSingleCard(input) {
         rollbackStrategy,
         rollbackNotes,
         contextMap,
+        ...(dispatchMetadata.dispatchPattern ? { dispatchPattern: dispatchMetadata.dispatchPattern } : {}),
+        ...(dispatchMetadata.conditionReview && dispatchMetadata.conditionReview.length > 0
+            ? { conditionReview: dispatchMetadata.conditionReview }
+            : {}),
+        ...(dispatchMetadata.mailboxAssignee ? { mailboxAssignee: dispatchMetadata.mailboxAssignee } : {}),
         atomizationImpact: {
             ownerAtomOrMap: normalizeOptionalString(frontMatter.data.ownerAtomOrMap
                 ?? frontMatter.data.owner_atom_or_map

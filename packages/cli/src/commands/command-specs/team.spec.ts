@@ -37,6 +37,12 @@ export const teamSpecAtomizationPlanner = {
   examples: ['node atm.mjs team plan --task TASK-TEAM-0003 --json']
 };
 
+export const teamSpecTask0009Preflight = {
+  summary:
+    'Plan examples for TASK-TEAM-0009 preflight / referee output (uses team plan dry-run resolver for the next integration gate).',
+  examples: ['node atm.mjs team plan --task TASK-TEAM-0009 --json']
+};
+
 export const teamSpecPermissionValidation = {
   summary: 'Validate recipe permissions and scoped leases before team start.',
   examples: ['node atm.mjs team validate --task TASK-AAO-0005 --recipe atm.default.normal.typescript --json']
@@ -46,6 +52,18 @@ export const teamSpecBrokerLane = {
   summary:
     'Plan and start evaluate broker lanes; blocked CID conflicts fail closed before a run starts (team.plan-broker-lane).',
   examples: ['node atm.mjs team plan --task TASK-TEAM-0002 --json', 'node atm.mjs team start --task TASK-AAO-0005 --actor codex-main --json']
+};
+
+export const teamSpecCaptainDecision = {
+  summary:
+    'Plan examples for captain decision dry-run output that includes team sizing, confidence, and stop conditions (TASK-TEAM-0007 owns the decision surface).',
+  examples: ['node atm.mjs team plan --task TASK-TEAM-0007 --json']
+};
+
+export const teamSpecLieutenantEscalation = {
+  summary:
+    'Plan examples for lieutenant escalation dry-run output that includes escalationRequired, escalationReason, needLieutenant, and nextTeamShape (TASK-TEAM-0008 owns the escalation surface).',
+  examples: ['node atm.mjs team plan --task TASK-TEAM-0008 --json']
 };
 
 export const teamSpecRuntimeStatus = {
@@ -58,6 +76,9 @@ export default defineCommandSpec({
   examples: [
     ...teamSpecCrewBriefing.examples,
     ...teamSpecAtomizationPlanner.examples,
+    ...teamSpecTask0009Preflight.examples,
+    ...teamSpecCaptainDecision.examples,
+    ...teamSpecLieutenantEscalation.examples,
     ...teamSpecPermissionValidation.examples,
     'node atm.mjs team start --task TASK-AAO-0005 --actor codex-main --json',
     ...teamSpecRuntimeStatus.examples

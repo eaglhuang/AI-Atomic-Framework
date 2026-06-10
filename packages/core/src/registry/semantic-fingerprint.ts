@@ -23,6 +23,8 @@ export interface AtomicMapSemanticFingerprintInput {
   readonly qualityTargets?: Readonly<Record<string, string | number | boolean>>;
 }
 
+// CID.Interface = the contract/interface + execution-constraint fingerprint.
+// The function shape stays deterministic; only the public semantics naming is clarified here.
 export function createAtomicSpecSemanticFingerprint(input: AtomicSpecSemanticFingerprintInput): string {
   return createSemanticFingerprint({
     inputs: normalizeSpecPorts(input.inputs),

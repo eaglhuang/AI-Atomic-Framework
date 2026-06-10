@@ -50,3 +50,18 @@ Atomization Planner output is advisory only.
 - It must not open tasks.
 - It must not split tasks automatically.
 - It must not mutate task lifecycle state.
+
+## TEAM-R1 Implementation Notes
+
+- The planner must continue to return advisory-only fields and **not** grant lifecycle permissions:
+  - no `task.lifecycle`
+  - no `git.write`
+  - no `evidence.write`
+  - no `file.write`
+- Team plan output for `TASK-TEAM-0003` should expose all required fields for the bounded lane:
+  - `primaryAtom`
+  - `relatedAtoms`
+  - `commandSurface`
+  - `largeScriptRisk`
+  - `mapUpdateNeed`
+  - `splitRecommendation`

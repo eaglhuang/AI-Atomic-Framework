@@ -1,4 +1,5 @@
 import { type CommandResult } from './shared.ts';
+import { type TaskDispatchPattern } from './tasks/task-markdown-helpers.ts';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.ts';
 import { type ContextMap } from './tasks/task-import-validators.ts';
 export interface TaskImportSource {
@@ -46,6 +47,9 @@ export interface TaskImportRecord {
     readonly tags: readonly string[];
     readonly notes?: string | null;
     readonly contextMap?: ContextMap;
+    readonly dispatchPattern?: TaskDispatchPattern;
+    readonly conditionReview?: readonly string[];
+    readonly mailboxAssignee?: string | null;
     readonly source: TaskImportSource;
     readonly importedAt: string;
 }

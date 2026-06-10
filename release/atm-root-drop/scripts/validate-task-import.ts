@@ -43,8 +43,9 @@ async function main() {
   const duplicatePlan = path.join(root, 'fixtures/task-plan-import/duplicate-plan.md');
   const governanceTablePlan = path.join(root, 'fixtures/task-plan-import/governance-table-plan.md');
   const chineseBootstrapPlan = path.join(root, 'fixtures/task-plan-import/chinese-bootstrap-plan.md');
+  const dispatchMetadataCard = path.join(root, 'fixtures/task-plan-import/dispatch-metadata-card.md');
 
-  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan, governanceTablePlan, chineseBootstrapPlan]) {
+  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan, governanceTablePlan, chineseBootstrapPlan, dispatchMetadataCard]) {
     if (!existsSync(fixturePath)) {
       fail(`missing fixture: ${path.relative(root, fixturePath)}`);
       return;
@@ -137,6 +138,66 @@ async function main() {
   }
   assertImportedTaskContract(singleTask, 'single-card dry-run');
 
+  const dispatchMetadataResult = await expectOk('import', ['--from', dispatchMetadataCard, '--dry-run', '--cwd', root]);
+  const dispatchMetadataTask = (dispatchMetadataResult.evidence as {
+    manifest: {
+      tasks: ReadonlyArray<{
+        workItemId: string;
+        dispatchPattern?: {
+          shape?: string;
+          phase0?: { lane?: string; allowedFiles?: readonly string[]; commitBudget?: number };
+          phase1?: { lane?: string; forbiddenFiles?: readonly string[]; commitBudget?: number; allowedFilesStrict?: boolean };
+        };
+        conditionReview?: readonly string[];
+        mailboxAssignee?: string | null;
+      }>;
+    };
+  }).manifest.tasks[0];
+  if (!dispatchMetadataTask || dispatchMetadataTask.workItemId !== 'TASK-FIXTURE-DISPATCH-0001') {
+    fail(`dispatch-metadata fixture expected TASK-FIXTURE-DISPATCH-0001, got ${JSON.stringify(dispatchMetadataTask)}.`);
+  }
+  if (!dispatchMetadataTask.dispatchPattern?.shape?.includes('dual-agent')) {
+    fail(`dispatch-metadata fixture must preserve dispatchPattern.shape, got ${JSON.stringify(dispatchMetadataTask.dispatchPattern)}.`);
+  }
+  if (dispatchMetadataTask.dispatchPattern?.phase0?.lane !== 'helper (read-only sidecar)') {
+    fail(`dispatch-metadata fixture must preserve phase0 lane, got ${JSON.stringify(dispatchMetadataTask.dispatchPattern?.phase0)}.`);
+  }
+  if (!dispatchMetadataTask.dispatchPattern?.phase0?.allowedFiles?.includes('docs/ai_atomic_framework/team-agents/tasks/TASK-FIXTURE-DISPATCH-0001.task.md')) {
+    fail(`dispatch-metadata fixture must preserve phase0 allowedFiles, got ${JSON.stringify(dispatchMetadataTask.dispatchPattern?.phase0)}.`);
+  }
+  if (dispatchMetadataTask.dispatchPattern?.phase1?.lane !== 'external builder 008') {
+    fail(`dispatch-metadata fixture must preserve phase1 lane, got ${JSON.stringify(dispatchMetadataTask.dispatchPattern?.phase1)}.`);
+  }
+  if (!dispatchMetadataTask.dispatchPattern?.phase1?.forbiddenFiles?.includes('C:/Users/User/3KLife/**')) {
+    fail(`dispatch-metadata fixture must preserve phase1 forbiddenFiles, got ${JSON.stringify(dispatchMetadataTask.dispatchPattern?.phase1)}.`);
+  }
+  if (dispatchMetadataTask.dispatchPattern?.phase1?.allowedFilesStrict !== true) {
+    fail(`dispatch-metadata fixture must preserve phase1 allowedFilesStrict=true, got ${JSON.stringify(dispatchMetadataTask.dispatchPattern?.phase1)}.`);
+  }
+  if (!dispatchMetadataTask.conditionReview?.some((entry) => entry.includes('dry-run manifest preserves dispatchPattern'))) {
+    fail(`dispatch-metadata fixture must preserve conditionReview, got ${JSON.stringify(dispatchMetadataTask.conditionReview)}.`);
+  }
+  if (dispatchMetadataTask.mailboxAssignee !== '008') {
+    fail(`dispatch-metadata fixture must resolve mailboxAssignee=008, got ${JSON.stringify(dispatchMetadataTask.mailboxAssignee)}.`);
+  }
+
+  const team0025Card = path.resolve(root, '../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0025-task-import-dispatch-metadata-preservation.task.md');
+  if (existsSync(team0025Card)) {
+    const team0025Result = await expectOk('import', ['--from', team0025Card, '--dry-run', '--cwd', root]);
+    const team0025Task = (team0025Result.evidence as {
+      manifest: { tasks: ReadonlyArray<{ workItemId: string; dispatchPattern?: { shape?: string; phase1?: { forbiddenFiles?: readonly string[] } }; conditionReview?: readonly string[] }> };
+    }).manifest.tasks.find((task) => task.workItemId === 'TASK-TEAM-0025');
+    if (!team0025Task?.dispatchPattern?.shape?.includes('dual-agent')) {
+      fail(`TASK-TEAM-0025 dry-run must preserve dispatchPattern.shape, got ${JSON.stringify(team0025Task?.dispatchPattern)}.`);
+    }
+    if (!team0025Task?.dispatchPattern?.phase1?.forbiddenFiles?.includes('C:/Users/User/3KLife/**')) {
+      fail(`TASK-TEAM-0025 dry-run must preserve phase1 forbidden_files fence, got ${JSON.stringify(team0025Task?.dispatchPattern?.phase1)}.`);
+    }
+    if (!team0025Task?.conditionReview || team0025Task.conditionReview.length < 2) {
+      fail(`TASK-TEAM-0025 dry-run must preserve conditionReview checklist, got ${JSON.stringify(team0025Task?.conditionReview)}.`);
+    }
+  }
+
   // Duplicate plan should throw.
   await expectThrow('import', ['--from', duplicatePlan, '--dry-run', '--cwd', root], 'ATM_TASKS_PLAN_PARSE_FAILED');
 
@@ -160,6 +221,16 @@ async function main() {
     const locksDir = path.join(tempWorkspace, '.atm', 'runtime', 'locks');
     if (existsSync(locksDir) && readdirSync(locksDir).length > 0) {
       fail('tasks import must not create runtime locks.');
+    }
+
+    const dispatchWriteResult = await expectOk('import', ['--from', dispatchMetadataCard, '--write', '--cwd', tempWorkspace]);
+    const dispatchWritten = (dispatchWriteResult.evidence as { writtenPaths: readonly string[] }).writtenPaths;
+    if (dispatchWritten.length !== 1 || !dispatchWritten[0].endsWith('TASK-FIXTURE-DISPATCH-0001.json')) {
+      fail(`dispatch-metadata write expected TASK-FIXTURE-DISPATCH-0001.json, got ${JSON.stringify(dispatchWritten)}.`);
+    }
+    const dispatchWrittenTask = JSON.parse(readFileSync(path.join(tempWorkspace, '.atm', 'history', 'tasks', 'TASK-FIXTURE-DISPATCH-0001.json'), 'utf8'));
+    if (!dispatchWrittenTask.dispatchPattern?.phase1?.lane || !dispatchWrittenTask.conditionReview?.length) {
+      fail(`dispatch-metadata write must persist dispatchPattern and conditionReview, got ${JSON.stringify(dispatchWrittenTask)}.`);
     }
 
     const singleWriteResult = await expectOk('import', ['--from', singleCard, '--write', '--cwd', tempWorkspace]);
