@@ -143,7 +143,10 @@ export const pythonLanguageRuntime = {
 
 export {
   createPythonLanguageAdapter,
+  createPythonAtomizationPlanningAdapter,
   detectPythonProjectProfile,
+  discoverPythonAtomCandidates,
+  planPythonAtomizeFromCandidate,
   scanPythonImports,
   scanPythonEntrypoints,
   planPythonAtomize,
