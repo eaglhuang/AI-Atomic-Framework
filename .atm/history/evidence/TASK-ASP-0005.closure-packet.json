@@ -1,0 +1,172 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASP-0005",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9fd1bcc232b35fb59aaaf85ae70cd1e9e8a1c252",
+  "governedTreeSha": "802651dc1357b60ad1336a2df5fcc006183f96ef",
+  "targetCommitDelta": {
+    "currentCommitSha": "9fd1bcc232b35fb59aaaf85ae70cd1e9e8a1c252",
+    "parentCommitShas": [
+      "9fd1bcc232b35fb59aaaf85ae70cd1e9e8a1c252"
+    ],
+    "governedTreeSha": "802651dc1357b60ad1336a2df5fcc006183f96ef",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ASP-0005.json",
+      ".atm/history/task-events/TASK-ASP-0005/2026-06-10T12-17-13-961Z-import-73be735d3a90.json",
+      ".atm/history/task-events/TASK-ASP-0005/2026-06-10T13-20-03-262Z-reserve-252ee80951c9.json",
+      ".atm/history/task-events/TASK-ASP-0005/2026-06-10T13-20-03-265Z-promote-7ed0c725c57a.json",
+      ".atm/history/task-events/TASK-ASP-0005/2026-06-10T13-20-03-292Z-claim-7243955062d0.json",
+      ".atm/history/task-events/TASK-ASP-0005/2026-06-10T13-55-54-523Z-scope-amendment-7b3e13976af6.json",
+      ".atm/history/tasks/TASK-ASP-0005.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/baseline-agent-cost-report.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/coordination.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/corpus-index.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/README.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0001-atomization-planning-sdk-contract.task.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0002-js-adapter-candidate-discovery.task.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0003-python-adapter-sdk-promotion.task.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0004-broker-candidate-bridge.task.md",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0005-3klife-coordination-baseline.task.md",
+      "docs/specs/taskflow-profile-v1.md",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/taskflow/profile-loader.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.js",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.js",
+      "release/atm-root-drop/packages/language-python/src/index.ts",
+      "release/atm-root-drop/packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
+      "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/taskflow-profile.v1.json",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git -C ../3KLife show --name-only --oneline afa17a12",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:56af7d9de763173292303500eb80e5faad062978d035e368203ab7e4abed9b50",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0fc927e97a8c12019d3565ef2e053c3553b7f9dc04d3bca420e9e392f13920e8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da25ca9eec8f2c8cddbec8ef8cf3ac3403ff47bcc5409f76ac64a1cdbdabaefb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "3klife-delivery-commit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-10T13:58:50.328Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0005-3klife-coordination-baseline.task.md",
+      ".atm/history/evidence/TASK-ASP-0005.*",
+      ".atm/history/task-events/TASK-ASP-0005/**",
+      ".atm/history/tasks/TASK-ASP-0005.json",
+      "20 TS files from `assets/scripts/",
+      "5 Python files (if available in `tools_python/` or NPC brain sibling)",
+      "Compare candidate count vs manual ground truth",
+      "Decision log of cross-repo trade-offs",
+      "docs/ai_atomic_framework/adapter-guided-atomization-sdk/**",
+      "docs/ai_atomic_framework/atm-core-broker-survey.md",
+      "docs/ai_atomic_framework/atomic-cost-reduction-plan.md",
+      "docs/ai_atomic_framework/vision-paper-semantic-admission.md",
+      "LLM calls per atom (sampled)",
+      "Report precision / recall",
+      "Retry rate",
+      "Run `atm candidates discover` against 3KLife corpus",
+      "Sync table of AAF task status",
+      "Token usage per atom (sampled)",
+      "Wall-clock time per atom (sampled)"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASP-0005.json",
+  "closedAt": "2026-06-10T13:58:50.328Z",
+  "closedByActor": "cursor-asp-runner",
+  "sessionId": "session-20260610132003-cursor-asp-runner-TASK-ASP-0005-463b808997",
+  "attestation": null
+}
