@@ -1,0 +1,86 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-10T17-55-06-873Z-close-cf83df481aaf",
+  "taskId": "TASK-CID-0024",
+  "action": "close",
+  "actorId": "008",
+  "sessionId": "session-20260610161036-008-TASK-CID-0024-4f22cba8a8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0024.json",
+  "taskSha256": "sha256:7641815f35a738fc8b38e92d275ed65c4279603aa551ddfc71ea6876ce2a501c",
+  "createdAt": "2026-06-10T17:55:06.873Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0024 --actor 008 --status done --historical-delivery 1fca56b6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260610161036-008-TASK-CID-0024-4f22cba8a8",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0024.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement",
+      "validate:governance-commands",
+      "validate:task-direction-governance",
+      "validate:task-ledger-governance",
+      "validateSameFileParallelClaimAdmission",
+      "validateSameFilePreCommitOwnership"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-10T17:55:06.868Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0024-same-file-parallel-claim-shared-delivery-closeout.task.md",
+        ".atm/history/evidence/TASK-CID-0024.*",
+        ".atm/history/task-events/TASK-CID-0024/**",
+        ".atm/history/tasks/TASK-CID-0024.json",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-task-direction-governance.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-task-direction-governance.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0024",
   "title": "Same-file parallel claim and shared delivery closeout follow-up",
-  "status": "running",
+  "status": "done",
   "milestone": "P1",
   "dependencies": [
     "TASK-CID-0022",
@@ -83,8 +83,8 @@
     "hash": "51c344836d1dc8c8"
   },
   "importedAt": "2026-06-10T15:20:32.028Z",
-  "lastTransitionId": "2026-06-10T16-10-36-772Z-claim-96834aeaec3f",
-  "lastTransitionAt": "2026-06-10T16:10:36.772Z",
+  "lastTransitionId": "2026-06-10T17-55-06-873Z-close-cf83df481aaf",
+  "lastTransitionAt": "2026-06-10T17:55:06.873Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "008",
   "reservedAt": "2026-06-10T16:10:36.729Z",
@@ -93,7 +93,7 @@
     "actorId": "008",
     "leaseId": "lease-a90fb6f68379",
     "claimedAt": "2026-06-10T16:10:36.739Z",
-    "heartbeatAt": "2026-06-10T16:10:36.739Z",
+    "heartbeatAt": "2026-06-10T17:55:06.869Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0024.json",
@@ -107,7 +107,8 @@
       "scripts/validate-task-direction-governance.ts",
       "scripts/validate-task-ledger-governance.ts"
     ],
-    "state": "active"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-10T16:10:36.739Z",
   "startedByActor": "008",
@@ -141,5 +142,9 @@
     "actorId": "008",
     "createdAt": "2026-06-10T16:10:36.771Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-10T17:55:06.869Z",
+  "closedByActor": "008",
+  "closedBySessionId": "session-20260610161036-008-TASK-CID-0024-4f22cba8a8",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0024.closure-packet.json"
 }
