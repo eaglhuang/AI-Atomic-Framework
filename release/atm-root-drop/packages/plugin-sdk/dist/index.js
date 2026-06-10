@@ -1,4 +1,5 @@
 export { AtomLifecycleMode } from './lifecycle.js';
+export { isAtomCandidate, isAtomizationPlan } from './atomization-planning.js';
 export { defaultGovernanceLayout } from './governance/index.js';
 export { EVOLVE_DELEGATION_TARGET } from './behavior.js';
 export { BehaviorRegistry } from './behavior-registry.js';

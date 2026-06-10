@@ -385,6 +385,49 @@ try {
   runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
   runGit(closureRepo, ['checkout', '--', 'packages/core/src/reconcile-close-window.ts']);
 
+  // TASK-CID-0024: same-file parallel claims must be claimable side by side,
+  // pre-commit must not fail purely because one staged file is covered by
+  // multiple active claims, and ambiguous mixed staged content without
+  // steward/broker evidence must still be rejected.
+  const sameFileTaskA = 'TASK-X-SAME-A';
+  const sameFileTaskB = 'TASK-X-SAME-B';
+  for (const sameFileTaskId of [sameFileTaskA, sameFileTaskB]) {
+    assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--title', `Same-file claim fixture ${sameFileTaskId}`, '--json'])).ok === true, `${sameFileTaskId} reserve must report ok=true`);
+    assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--json'])).ok === true, `${sameFileTaskId} promote must report ok=true`);
+  }
+  writeFileSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), '# shared fixture\n', 'utf8');
+  writeFileSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), '# a only fixture\n', 'utf8');
+  writeFileSync(path.join(closureRepo, 'docs', 'same-file-b-only.md'), '# b only fixture\n', 'utf8');
+  assert(parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', sameFileTaskA, '--actor', 'fixture-agent', '--files', 'docs/same-file-shared.md,docs/same-file-a-only.md', '--json'])).ok === true, 'same-file claim A must report ok=true');
+  const sameFileClaimB = parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', sameFileTaskB, '--actor', 'fixture-agent', '--files', 'docs/same-file-shared.md,docs/same-file-b-only.md', '--json']));
+  assert(sameFileClaimB.ok === true, 'same-file claim B must be claimable in parallel with claim A on the same file');
+
+  const sameFileHookEnv = {
+    ATM_COMMIT_ACTOR_ID: 'fixture-agent',
+    ATM_COMMIT_TASK_ID: sameFileTaskA,
+    GIT_AUTHOR_NAME: 'Fixture Agent',
+    GIT_AUTHOR_EMAIL: 'fixture-agent@example.com'
+  };
+  runGit(closureRepo, ['add', 'docs/same-file-shared.md']);
+  const sameFileOwnedHook = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], { allowFailure: true, env: sameFileHookEnv });
+  assert(sameFileOwnedHook.status === 0, `pre-commit hook must not fail purely because the staged file has multiple active same-file claims\nstdout:\n${sameFileOwnedHook.stdout}\nstderr:\n${sameFileOwnedHook.stderr}`);
+  const sameFileOwnedPayload = parsePayload(sameFileOwnedHook);
+  assert((sameFileOwnedPayload.evidence?.sameFileClaimReport?.multiClaimFiles ?? []).some((entry: any) => entry.file === 'docs/same-file-shared.md'), 'pre-commit evidence must record the same-file multi-claim coverage');
+  runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+
+  runGit(closureRepo, ['add', 'docs/same-file-b-only.md']);
+  const sameFileAmbiguousHook = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], { allowFailure: true, env: sameFileHookEnv });
+  assert(sameFileAmbiguousHook.status === 1, 'pre-commit hook must reject mixed staged content owned by another active write claim without steward/broker evidence');
+  const sameFileAmbiguousPayload = parsePayload(sameFileAmbiguousHook);
+  assert((sameFileAmbiguousPayload.evidence?.sameFileClaimReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS' && entry.file === 'docs/same-file-b-only.md'), 'ambiguous staged ownership must emit ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS');
+  runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+  for (const sameFileTaskId of [sameFileTaskA, sameFileTaskB]) {
+    assert(parsePayload(runCli(closureRepo, ['tasks', 'release', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--reason', 'same-file fixture cleanup', '--json'])).ok === true, `${sameFileTaskId} release must report ok=true`);
+  }
+  rmSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), { force: true });
+  rmSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), { force: true });
+  rmSync(path.join(closureRepo, 'docs', 'same-file-b-only.md'), { force: true });
+
   const mixedRestoreHookTaskId = 'TASK-X-RESTORE-MIXED';
   const mixedRestoreHookFiles = writeHistoricalRestorePacket(closureRepo, mixedRestoreHookTaskId);
   writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'restore-bypass.ts'), 'export const restoreBypass = true;\n', 'utf8');

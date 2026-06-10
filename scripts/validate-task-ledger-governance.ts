@@ -139,6 +139,21 @@ async function assertTasksRosterUpdateContract() {
   }
 }
 
+async function assertTasksNewRejectsRootOutput() {
+  const repo = makeHostRepo(tempRoot, 'tasks-new-root-output');
+  initGitRepo(repo);
+
+  await expectTaskError([
+    'new',
+    '--cwd', repo,
+    '--task-id', 'TASK-ROOT-0001',
+    '--title', 'Root output must be rejected',
+    '--output', 'TASK-ROOT-0001.task.md'
+  ], 'ATM_CLI_USAGE');
+
+  assert(!existsSync(path.join(repo, 'TASK-ROOT-0001.task.md')), 'tasks new must not create a root-level task card');
+}
+
 function assertTaskflowHostOpenerFallbackContract() {
   const validProfilePath = path.join(root, 'fixtures/taskflow-profile/valid.profile.json');
   const governedProfilePath = path.join(root, 'fixtures/taskflow-profile/governed-invocable.profile.json');
@@ -265,6 +280,7 @@ process.env.GIT_CEILING_DIRECTORIES = [process.cwd(), previousGitCeilingDirector
 try {
   assertSandboxDiagnosticsAreActionable();
   assertTaskflowHostOpenerFallbackContract();
+  await assertTasksNewRejectsRootOutput();
   await assertTasksRosterUpdateContract();
 
   const hostRepo = makeHostRepo(tempRoot, 'ordinary-adopter');
@@ -453,6 +469,48 @@ try {
   execFileSync('git', ['commit', '-m', 'add committed bootstrap deliverable'], { cwd: deliverableRepo, stdio: 'ignore' });
   const committedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', committedFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
   assert(committedClose.ok === true, 'deliverable gate must accept a scoped historical delivery commit');
+
+  // TASK-CID-0024: closeout-only / no-more-mutation claim + historical
+  // delivery closeout. When the scoped deliverable already landed in an
+  // earlier (shared steward style) commit, a closeout-only claim must be
+  // admitted and the task must close against that historical delivery commit
+  // without a second source mutation.
+  const closeoutOnlyFixtureTaskId = 'TEST-TASK-0006';
+  const closeoutOnlyTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', closeoutOnlyFixtureTaskId, '--actor', 'validator', '--title', 'Closeout-only historical delivery fixture']);
+  assert(closeoutOnlyTask.ok === true, 'closeout-only fixture task create must succeed');
+  const closeoutOnlyTaskPath = path.join(deliverableRepo, '.atm', 'history', 'tasks', `${closeoutOnlyFixtureTaskId}.json`);
+  const closeoutOnlyTaskDoc = readJson(closeoutOnlyTaskPath);
+  closeoutOnlyTaskDoc.scopePaths = ['pipelines/sanguo-rag/closeout_only_bootstrap.py'];
+  closeoutOnlyTaskDoc.deliverables = ['pipelines/sanguo-rag/closeout_only_bootstrap.py'];
+  writeJson(closeoutOnlyTaskPath, closeoutOnlyTaskDoc);
+  writeFileSync(path.join(deliverableRepo, 'pipelines', 'sanguo-rag', 'closeout_only_bootstrap.py'), 'print("closeout only bootstrap")\n', 'utf8');
+  execFileSync('git', ['add', 'pipelines/sanguo-rag/closeout_only_bootstrap.py'], { cwd: deliverableRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'add closeout-only deliverable via shared steward style commit'], { cwd: deliverableRepo, stdio: 'ignore' });
+  const closeoutOnlyClaim = await runNext(['--cwd', deliverableRepo, '--claim', '--actor', 'validator', '--prompt', closeoutOnlyFixtureTaskId, '--claim-intent', 'closeout-only']);
+  assert(closeoutOnlyClaim.ok === true, 'next --claim --claim-intent closeout-only must be admitted when the deliverable already landed');
+  const closeoutOnlyLedger = readJson(closeoutOnlyTaskPath);
+  assert(closeoutOnlyLedger.claim?.intent === 'closeout-only', 'closeout-only claim must persist claim.intent in the task ledger');
+  writeJson(path.join(deliverableRepo, '.atm', 'history', 'evidence', `${closeoutOnlyFixtureTaskId}.json`), {
+    taskId: closeoutOnlyFixtureTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'closeout-only fixture deliverable already landed in a governed commit',
+      producedBy: 'validator',
+      artifactPaths: ['pipelines/sanguo-rag/closeout_only_bootstrap.py'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate closeout-only fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  const closeoutOnlyClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', closeoutOnlyFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
+  assert(closeoutOnlyClose.ok === true, 'closeout-only claim must close done against the historical shared delivery commit');
+  const closeoutOnlyGate = (closeoutOnlyClose.evidence as any)?.deliverableGate ?? {};
+  assert(closeoutOnlyGate.reason === 'historical-delivery-diff-present', 'closeout-only historical close must report historical-delivery-diff-present');
 
   const runnerReleaseFixtureTaskId = 'TEST-TASK-0004';
   const runnerReleaseTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', runnerReleaseFixtureTaskId, '--actor', 'validator', '--title', 'Committed runner release fixture']);

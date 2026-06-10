@@ -23,6 +23,11 @@ import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText
 import { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards } from './next/route-predicates.js';
 import { dedupeStrings, quoteCliValue, sha256, toTaskCandidateView, uniqueInOrder, uniqueSorted } from './next/view-projections.js';
 export async function runNext(argv) {
+    // TASK-CID-0024: --claim-intent is a next-only claim flag; extract it before
+    // the shared option parser so the rest of the surface stays unchanged.
+    const claimIntentExtraction = extractClaimIntentFlag(Array.isArray(argv) ? argv : []);
+    argv = claimIntentExtraction.argv;
+    const claimIntent = claimIntentExtraction.claimIntent;
     const outputFlagIndex = argv.indexOf('--output');
     if (outputFlagIndex !== -1) {
         const nextArg = argv[outputFlagIndex + 1];
@@ -74,6 +79,7 @@ export async function runNext(argv) {
         return withRunnerMode(await claimNextImportedTask({
             cwd: options.cwd,
             actor: options.agent,
+            claimIntent,
             taskIntent,
             importedTaskQueue,
             integrationBootstrap,
@@ -158,6 +164,32 @@ export async function runNext(argv) {
             lastHandoffAt: runtime.lastHandoffAt
         }
     }), options.cwd);
+}
+function extractClaimIntentFlag(argv) {
+    const remaining = [];
+    let claimIntent = 'write';
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg === '--claim-intent') {
+            const raw = String(argv[index + 1] ?? '').trim().toLowerCase();
+            const normalized = raw === 'no-more-mutation' ? 'closeout-only' : raw;
+            if (normalized !== 'write' && normalized !== 'closeout-only') {
+                throw new CliError('ATM_CLI_USAGE', 'next --claim requires --claim-intent to be one of: write, closeout-only, no-more-mutation.', {
+                    exitCode: 2,
+                    details: { claimIntent: raw, allowedValues: ['write', 'closeout-only', 'no-more-mutation'] }
+                });
+            }
+            claimIntent = normalized;
+            index += 1;
+            continue;
+        }
+        if (arg === '--closeout-only' || arg === '--no-more-mutation') {
+            claimIntent = 'closeout-only';
+            continue;
+        }
+        remaining.push(arg);
+    }
+    return { argv: remaining, claimIntent };
 }
 function withRunnerMode(result, cwd) {
     const runnerMode = describeRunnerMode(cwd);
@@ -335,6 +367,7 @@ function buildCrossRepoFrameworkNextResult(input) {
     });
 }
 async function claimNextImportedTask(input) {
+    const claimIntent = input.claimIntent ?? 'write';
     const promptText = input.taskIntent?.userPrompt?.trim() ?? '';
     const quickfixScope = promptText ? resolveQuickfixScope(promptText) : [];
     if (!input.importedTaskQueue.claimableTask
@@ -517,16 +550,44 @@ async function claimNextImportedTask(input) {
                 const finding = candidate.finding;
                 if (finding) {
                     if (Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0) {
-                        // Consumer-side compensation: override verdict to 'blocked-cid-conflict'
-                        throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `Claim blocked due to parallel CID logic conflict with task ${candidate.taskId} on atom(s): ${finding.overlappingAtomIds.join(', ')}.`, {
-                            exitCode: 1,
-                            details: {
-                                taskId: claimableTask.workItemId,
+                        // TASK-CID-0024: same-file / same-atom overlap only blocks the
+                        // claim when the overlapping task is actively write-claimed by
+                        // another actor. Queued-but-idle overlaps and closeout-only
+                        // counterparts are admitted with an advisory so same-file
+                        // CID-disjoint parallel work stops being serialized by default.
+                        const conflictActorId = typeof candidate.activeClaimActorId === 'string' && candidate.activeClaimActorId.trim().length > 0
+                            ? candidate.activeClaimActorId
+                            : null;
+                        const conflictIntent = typeof candidate.activeClaimIntent === 'string' ? candidate.activeClaimIntent : null;
+                        const activeWriteConflict = Boolean(conflictActorId)
+                            && conflictActorId !== resolvedActor.actorId
+                            && conflictIntent !== 'closeout-only';
+                        if (claimIntent !== 'closeout-only' && activeWriteConflict) {
+                            throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `Claim blocked due to parallel CID logic conflict with actively claimed task ${candidate.taskId} on atom(s): ${finding.overlappingAtomIds.join(', ')}.`, {
+                                exitCode: 1,
+                                details: {
+                                    taskId: claimableTask.workItemId,
+                                    conflictWithTaskId: candidate.taskId,
+                                    conflictClaimActorId: conflictActorId,
+                                    overlappingAtomIds: finding.overlappingAtomIds,
+                                    verdict: 'blocked-cid-conflict',
+                                    closeoutOnlyHint: `If ${claimableTask.workItemId} already delivered its scoped files and only needs governed closeout, rerun next --claim with --claim-intent closeout-only.`
+                                }
+                            });
+                        }
+                        if (!parallelAdvisory) {
+                            parallelAdvisory = {
+                                ...finding,
+                                verdict: 'parallel-safe-with-cid-overlap-advisory',
                                 conflictWithTaskId: candidate.taskId,
-                                overlappingAtomIds: finding.overlappingAtomIds,
-                                verdict: 'blocked-cid-conflict'
-                            }
-                        });
+                                conflictClaimActorId: conflictActorId,
+                                admitted: true,
+                                admissionReason: claimIntent === 'closeout-only'
+                                    ? 'closeout-only-claim-intent'
+                                    : 'cid-overlap-without-active-write-claim'
+                            };
+                        }
+                        continue;
                     }
                     if (finding.verdict !== 'parallel-safe' && !parallelAdvisory) {
                         parallelAdvisory = finding;
@@ -621,6 +682,8 @@ async function claimNextImportedTask(input) {
             claimableTask.workItemId,
             '--actor',
             resolvedActor.actorId,
+            '--claim-intent',
+            claimIntent,
             '--files',
             Array.from(new Set([
                 claimableTask.taskPath,
@@ -730,6 +793,7 @@ async function claimNextImportedTask(input) {
         command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
         reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
         recommendedChannel,
+        claimIntent,
         riskLevel: recommendedChannel === 'batch' ? 'high' : 'medium',
         playbook: buildChannelPlaybook({
             channel: recommendedChannel,
@@ -789,6 +853,7 @@ async function claimNextImportedTask(input) {
             taskId: claimableTask.workItemId,
             actorId: resolvedActor.actorId,
             recommendedChannel: nextAction.recommendedChannel,
+            claimIntent,
             batchCheckpointCommand: nextAction.recommendedChannel === 'batch'
                 ? 'node atm.mjs batch checkpoint --actor <id> --json'
                 : null,
@@ -802,6 +867,7 @@ async function claimNextImportedTask(input) {
         })),
         evidence: {
             nextAction,
+            claimIntent,
             claimPreparation,
             claimResult: claimResult.evidence,
             taskDirectionLock: directionLock,

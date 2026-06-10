@@ -1,6 +1,7 @@
 import { type TaskIntentSource, type RequestedTaskAction } from './next/intent-normalizers.ts';
 import { type ImportedTaskSummary, type PromptScopedRouteStatus } from './next/route-predicates.ts';
 export declare function runNext(argv: any): Promise<import("./shared.ts").CommandResult>;
+export type NextClaimIntent = 'write' | 'closeout-only';
 export interface PromptScopedTaskContext {
     readonly taskIntent: {
         readonly userPrompt: string | null;

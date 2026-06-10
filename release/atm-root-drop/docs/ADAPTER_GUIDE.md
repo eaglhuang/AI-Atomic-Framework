@@ -18,6 +18,19 @@ For legacy strangler flows, `ProjectAdapter` also owns `resolveLegacyUri`, `runA
 
 When an adapter adopts a map-managed atom, it should use `node atm.mjs registry lineage backfill` to backfill `members[].versionLineage` on the owning map record from real lineage evidence. That lineage contract lets `registry-diff` and onefile smoke checks resolve adopter-owned atoms even when there is no standalone atom entry, while keeping dry-run patches and apply-mode evidence gates deterministic.
 
+## Atomization Planning (Optional)
+
+`packages/plugin-sdk/src/atomization-planning.ts` defines the optional `AtomizationPlanningAdapter` capability for language adapters that can discover atom candidates and propose dry-run atomization plans:
+
+- `discoverAtomCandidates(request)` returns `AtomCandidate` records (kind: `function` / `class` / `module` / `route` / `command` / `schema` / `unknown`) with a confidence level and a declared detection method.
+- `planAtomize(request)` returns an `AtomizationPlan` that is always `dryRun: true`: it lists `patchFiles`, ordered `AtomizationPlanStep`s, required evidence, and rollback notes, but never mutates the host project.
+
+Implement this contract when your adapter can cheaply enumerate extractable units; skip it otherwise. The contract is additive: `LanguageAdapter` is unchanged, ATM core feature-detects the capability before use, and adapters that do not implement it remain fully valid.
+
+The detection method may be `regex`, `scanner`, `compiler-api`, `ast`, `lsp`, or `llm-assisted` — none is mandatory. A line-oriented scanner with honest `confidence` values is an acceptable first implementation; record the method on each candidate so downstream consumers can weigh precision accordingly.
+
+Schema shapes can be checked at plugin boundaries with the exported `isAtomCandidate` and `isAtomizationPlan` runtime guards. The reference implementation is the Python adapter (`createPythonAtomizationPlanningAdapter` in `packages/language-python`).
+
 ## Governance Stores
 
 The SDK defines interface-only stores for tasks, locks, document indexes, shards, artifacts, logs, run reports, markdown/json state, rule guards, evidence, registries, context summaries, and `ContextBudgetGuard`. Implementations can use files, databases, or hosted services, but Plugin SDK does not prescribe storage.

@@ -104,4 +104,5 @@ export declare function parseClaimLifecycleOptions(action: 'claim' | 'renew' | '
     handoffTo: string | null;
     reason: string | null;
     reservedOk: boolean;
+    claimIntent: "write" | "closeout-only";
 };

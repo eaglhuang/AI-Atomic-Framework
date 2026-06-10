@@ -116,4 +116,4 @@ export declare const pythonLanguageRuntime: {
     readonly supportsInfectDryRun: true;
     readonly resultFormat: "PythonLanguageAdapterValidationReport";
 };
-export { createPythonLanguageAdapter, detectPythonProjectProfile, scanPythonImports, scanPythonEntrypoints, planPythonAtomize, validatePythonComputeAtom, createPythonCommandRunnerContract } from './language-python-adapter.ts';
+export { createPythonLanguageAdapter, createPythonAtomizationPlanningAdapter, detectPythonProjectProfile, discoverPythonAtomCandidates, planPythonAtomizeFromCandidate, scanPythonImports, scanPythonEntrypoints, planPythonAtomize, validatePythonComputeAtom, createPythonCommandRunnerContract } from './language-python-adapter.ts';

@@ -1,3 +1,4 @@
+import type { AtomCandidate, AtomCandidateDiscoveryRequest, AtomizationPlan, AtomizationPlanRequest, AtomizationPlanningAdapter } from '@ai-atomic-framework/plugin-sdk';
 import type { PythonAtomizePlan, PythonAtomizePlanRequest, PythonCommandRunnerContract, PythonEntrypointRecord, PythonImportPolicy, PythonImportRecord, PythonLanguageAdapter, PythonLanguageAdapterValidationReport, PythonLanguageAdapterValidationRequest, PythonProjectProfile, PythonSourceFile } from './index.ts';
 export declare function createPythonLanguageAdapter(policyOverrides?: Partial<PythonImportPolicy>): PythonLanguageAdapter;
 export declare function detectPythonProjectProfile(repositoryRoot: string): PythonProjectProfile;
@@ -5,4 +6,7 @@ export declare function validatePythonComputeAtom(request: PythonLanguageAdapter
 export declare function scanPythonImports(sourceFile: PythonSourceFile): readonly PythonImportRecord[];
 export declare function scanPythonEntrypoints(sourceFile: PythonSourceFile): readonly PythonEntrypointRecord[];
 export declare function planPythonAtomize(request: PythonAtomizePlanRequest): PythonAtomizePlan;
+export declare function discoverPythonAtomCandidates(request: AtomCandidateDiscoveryRequest): readonly AtomCandidate[];
+export declare function planPythonAtomizeFromCandidate(request: AtomizationPlanRequest): AtomizationPlan;
+export declare function createPythonAtomizationPlanningAdapter(): AtomizationPlanningAdapter;
 export declare function createPythonCommandRunnerContract(profile: PythonProjectProfile): PythonCommandRunnerContract;

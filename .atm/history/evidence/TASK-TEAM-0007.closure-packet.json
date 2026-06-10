@@ -1,0 +1,105 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0007",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "3c7df06717ce8a268989758b54ad1c3b24eb7378",
+  "governedTreeSha": "10bda3da8aeb60d64a7a73d3559a9c75c7430b4c",
+  "targetCommitDelta": {
+    "currentCommitSha": "3c7df06717ce8a268989758b54ad1c3b24eb7378",
+    "parentCommitShas": [
+      "3c7df06717ce8a268989758b54ad1c3b24eb7378"
+    ],
+    "governedTreeSha": "10bda3da8aeb60d64a7a73d3559a9c75c7430b4c",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0007.json",
+      ".atm/history/task-events/TASK-TEAM-0007/2026-06-10T12-05-00-000Z-close-manual.json",
+      ".atm/history/tasks/TASK-TEAM-0007.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show 3c7df06717ce8a268989758b54ad1c3b24eb7378",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0b8c5ca9118d863c7fa17164e835315cbc3f5b8a4b8cf5141ab22a88c88978f4",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-10T12:28:06.127Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0007-captain-decision-and-team-sizing-dry-run.task.md",
+      ".atm/history/evidence/TASK-TEAM-0007.*",
+      ".atm/history/task-events/TASK-TEAM-0007/**",
+      ".atm/history/tasks/TASK-TEAM-0007.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0007.json",
+  "closedAt": "2026-06-10T12:28:06.127Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "3c7df06717ce8a268989758b54ad1c3b24eb7378",
+    "reconciledAt": "2026-06-10T12:28:05.221Z",
+    "reconciledByActor": "codex-gpt-5.4-mini",
+    "reason": "Historical reconcile sync against commit 3c7df06717ce8a268989758b54ad1c3b24eb7378"
+  }
+}

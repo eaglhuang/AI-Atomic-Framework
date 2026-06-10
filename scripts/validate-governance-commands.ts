@@ -699,6 +699,21 @@ try {
   assert(runGit(repo, ['reset', '--hard', 'HEAD']).exitCode === 0, 'historical delivery close fixture must restore tracked files after staged close artifacts validation');
   assert(runGit(repo, ['clean', '-fd', '--', '.atm/history/task-events/ATM-GOV-0111', '.atm/history/evidence/ATM-GOV-0111.closure-packet.json']).exitCode === 0, 'historical delivery close fixture must clean untracked close artifacts after validation');
 
+  // TASK-CID-0024: closeout-only / no-more-mutation claim intent CLI surface.
+  const closeoutIntentReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--title', 'Closeout-only claim intent surface test', '--json']);
+  assert(closeoutIntentReserve.exitCode === 0, 'closeout-only claim intent tasks reserve must exit 0');
+  const closeoutIntentPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--json']);
+  assert(closeoutIntentPromote.exitCode === 0, 'closeout-only claim intent tasks promote must exit 0');
+  const invalidClaimIntent = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--claim-intent', 'sneaky-write', '--json']);
+  assert(invalidClaimIntent.exitCode === 2, 'tasks claim with an unknown --claim-intent value must fail closed with a usage error');
+  const closeoutIntentClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--claim-intent', 'no-more-mutation', '--json']);
+  assert(closeoutIntentClaim.exitCode === 0, 'tasks claim --claim-intent no-more-mutation must exit 0');
+  assert(closeoutIntentClaim.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim must normalize no-more-mutation to closeout-only in evidence');
+  const closeoutIntentTask = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0112.json'), 'utf8'));
+  assert(closeoutIntentTask.claim?.intent === 'closeout-only', 'tasks claim must persist claim.intent=closeout-only in the task ledger');
+  const closeoutIntentRelease = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--reason', 'closeout-only claim intent surface test cleanup', '--json']);
+  assert(closeoutIntentRelease.exitCode === 0, 'closeout-only claim intent tasks release must exit 0');
+
   const artifactOnlyReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--title', 'Artifact-only closure guard', '--json']);
   assert(artifactOnlyReserve.exitCode === 0, 'artifact-only tasks reserve must exit 0');
   const artifactOnlyPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--json']);

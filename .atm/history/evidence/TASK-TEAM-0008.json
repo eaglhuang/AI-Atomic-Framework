@@ -1,0 +1,38 @@
+{
+  "taskId": "TASK-TEAM-0008",
+  "updatedAt": "2026-06-10T15:24:52.972Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for TASK-TEAM-0008 against commit 3c7df06717ce8a268989758b54ad1c3b24eb7378.",
+      "artifactPaths": [
+        "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0008-task-lieutenant-escalation-rules.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "producedBy": "002",
+      "createdAt": "2026-06-10T15:24:52.972Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 3c7df06717ce8a268989758b54ad1c3b24eb7378",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:0b8c5ca9118d863c7fa17164e835315cbc3f5b8a4b8cf5141ab22a88c88978f4",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "3c7df06717ce8a268989758b54ad1c3b24eb7378"
+      }
+    }
+  ]
+}

@@ -16,4 +16,4 @@ export const pythonLanguageRuntime = {
     supportsInfectDryRun: true,
     resultFormat: 'PythonLanguageAdapterValidationReport'
 };
-export { createPythonLanguageAdapter, detectPythonProjectProfile, scanPythonImports, scanPythonEntrypoints, planPythonAtomize, validatePythonComputeAtom, createPythonCommandRunnerContract } from './language-python-adapter.js';
+export { createPythonLanguageAdapter, createPythonAtomizationPlanningAdapter, detectPythonProjectProfile, discoverPythonAtomCandidates, planPythonAtomizeFromCandidate, scanPythonImports, scanPythonEntrypoints, planPythonAtomize, validatePythonComputeAtom, createPythonCommandRunnerContract } from './language-python-adapter.js';

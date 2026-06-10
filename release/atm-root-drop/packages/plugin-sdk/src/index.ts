@@ -53,6 +53,19 @@ export type {
   LanguageProjectProfile,
   LanguageSourceFile
 } from './language-adapter';
+export type {
+  AtomCandidate,
+  AtomCandidateConfidence,
+  AtomCandidateDetectionMethod,
+  AtomCandidateDiscoveryFilters,
+  AtomCandidateDiscoveryRequest,
+  AtomCandidateKind,
+  AtomizationPlan,
+  AtomizationPlanRequest,
+  AtomizationPlanStep,
+  AtomizationPlanningAdapter
+} from './atomization-planning';
+export { isAtomCandidate, isAtomizationPlan } from './atomization-planning';
 export type { InjectorPlugin, InjectorPluginContext } from './injector-plugin';
 export type {
   ExternalTaskSourcePlugin,

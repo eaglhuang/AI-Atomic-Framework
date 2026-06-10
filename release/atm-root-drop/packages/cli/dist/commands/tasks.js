@@ -2437,6 +2437,8 @@ function runTasksParallel(argv) {
             taskId: candidate.taskId,
             title: candidate.title,
             status: candidate.status,
+            activeClaimActorId: candidate.activeClaimActorId,
+            activeClaimIntent: candidate.activeClaimIntent,
             finding: analyzeParallelPair(anchor, candidate)
         }));
         return makeResult({
@@ -2565,7 +2567,15 @@ function taskDocumentToParallelAdvisorTask(cwd, taskDocument) {
         .filter((value) => Boolean(value)));
     const validators = uniqueStrings(parseYamlList(taskDocument.validators).map((entry) => entry.trim()).filter(Boolean));
     const atomIds = uniqueStrings(allowedFiles.flatMap((entry) => findAtomIdsForPath(cwd, entry)));
-    return { taskId, title, status, allowedFiles, validators, atomIds };
+    const claimRecord = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
+        ? taskDocument.claim
+        : null;
+    const claimState = normalizeOptionalString(claimRecord?.state);
+    const activeClaimActorId = claimState === 'active' ? normalizeOptionalString(claimRecord?.actorId) : null;
+    const activeClaimIntent = claimState === 'active'
+        ? (normalizeOptionalString(claimRecord?.intent) ?? 'write')
+        : null;
+    return { taskId, title, status, allowedFiles, validators, atomIds, activeClaimActorId, activeClaimIntent };
 }
 function collectParallelAdvisorTaskFiles(taskDocument) {
     const files = new Set();
@@ -2819,13 +2829,19 @@ async function runTasksClaimLifecycle(action, argv) {
                 }
             });
         }
-        const claim = createClaimRecord({
-            taskId: options.taskId,
-            actorId,
-            files,
-            ttlSeconds: options.ttlSeconds,
-            timestamp: nowIso
-        });
+        // TASK-CID-0024: persist the declared claim intent so downstream gates
+        // (next --claim parallel preflight, hook pre-commit ownership checks) can
+        // distinguish mutating write claims from non-mutating closeout-only claims.
+        const claim = {
+            ...createClaimRecord({
+                taskId: options.taskId,
+                actorId,
+                files,
+                ttlSeconds: options.ttlSeconds,
+                timestamp: nowIso
+            }),
+            intent: options.claimIntent
+        };
         try {
             await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
         }
@@ -2885,12 +2901,14 @@ async function runTasksClaimLifecycle(action, argv) {
             cwd: options.cwd,
             messages: [message('info', 'ATM_TASKS_CLAIM_ACQUIRED', `Claim acquired for ${options.taskId}.`, {
                     taskId: options.taskId,
-                    actorId
+                    actorId,
+                    claimIntent: options.claimIntent
                 })],
             evidence: {
                 action,
                 taskId: options.taskId,
                 actorId,
+                claimIntent: options.claimIntent,
                 claim,
                 taskPath: relativeTaskPath,
                 transitionPath,
@@ -5355,6 +5373,23 @@ export async function generateTaskCard(input) {
         templateUsed: template
     };
 }
+function assertTaskCardOutputPathIsNested(cwd, outputPath) {
+    const absoluteCwd = path.resolve(cwd);
+    const absoluteOutput = path.resolve(absoluteCwd, outputPath);
+    const relativeOutput = path.relative(absoluteCwd, absoluteOutput).replace(/\\/g, '/');
+    if (relativeOutput === '..' || relativeOutput.startsWith('../')) {
+        throw new CliError('ATM_CLI_USAGE', 'tasks new must write task cards inside the repository; use docs/tasks/<name>.task.md or another nested task directory.', {
+            exitCode: 2,
+            details: { outputPath }
+        });
+    }
+    if (path.posix.dirname(relativeOutput) === '.' && relativeOutput.endsWith('.task.md')) {
+        throw new CliError('ATM_CLI_USAGE', 'tasks new must not write task cards at the repository root; use docs/tasks/<name>.task.md or another nested task directory.', {
+            exitCode: 2,
+            details: { outputPath }
+        });
+    }
+}
 async function runTasksNew(argv) {
     const spec = (await import('./command-specs/tasks.spec.js')).default;
     const parsed = parseArgsForCommand(spec, ['new', ...argv]);
@@ -5367,6 +5402,7 @@ async function runTasksNew(argv) {
     if (!outPath) {
         throw new CliError('ATM_CLI_USAGE', 'tasks new requires --output <path>', { exitCode: 2 });
     }
+    assertTaskCardOutputPathIsNested(cwd, outPath);
     const resultCard = await generateTaskCard({
         cwd,
         templateKey: template,

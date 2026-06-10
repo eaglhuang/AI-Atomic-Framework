@@ -31,6 +31,7 @@ import {
 } from './task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
 import { runContextMapAdvisor } from './hook/context-map-advisor.ts';
+import { readBrokerLifecycleState } from '../../../core/src/broker/lifecycle.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -126,6 +127,25 @@ interface TaskCardStatusFinding {
   readonly reason: 'planning-card-done-without-ledger-closure';
   readonly detail: string;
   readonly requiredCommand: string;
+}
+
+// TASK-CID-0024: staged same-file claim ownership diagnostics.
+interface SameFileClaimOwnershipFinding {
+  readonly code: 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS' | 'ATM_PRE_COMMIT_CLOSEOUT_ONLY_CLAIM_MUTATION';
+  readonly file: string;
+  readonly committingTaskId: string | null;
+  readonly writeClaimTaskIds: readonly string[];
+  readonly detail: string;
+  readonly requiredCommand: string | null;
+}
+
+interface SameFileClaimOwnershipReport {
+  readonly ok: boolean;
+  readonly committingTaskId: string | null;
+  readonly committingClaimIntent: string | null;
+  readonly multiClaimFiles: readonly { readonly file: string; readonly writeClaimTaskIds: readonly string[] }[];
+  readonly stewardCoveredFiles: readonly string[];
+  readonly findings: readonly SameFileClaimOwnershipFinding[];
 }
 
 interface PreCommitBlockingFinding {
@@ -447,6 +467,21 @@ function runPreCommitHook(cwd: string) {
   const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
   const taskCardStatusReport = inspectTaskCardStatusChanges(root, stagedFiles);
   const commitAttributionReport = inspectCommitAttribution(root, stagedFiles);
+  // TASK-CID-0024: same-file parallel claims are first-class. Multiple active
+  // claims covering one staged file must not block by themselves; only
+  // ambiguous staged ownership without steward/broker evidence blocks.
+  const sameFileClaimReport = allowAdopterInfrastructureSync
+    ? { ok: true, committingTaskId: null, committingClaimIntent: null, multiClaimFiles: [], stewardCoveredFiles: [], findings: [] } satisfies SameFileClaimOwnershipReport
+    : inspectSameFileClaimOwnership({
+      cwd: root,
+      stagedFiles,
+      activeDirectionLocks,
+      exemptAllowedFileSets: [
+        checkpointClosedTaskAllowedFiles,
+        closeCommitWindowAllowedFiles,
+        frameworkTempClaimAllowedFiles
+      ]
+    });
   const taskAudit = auditTasks(root);
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
     ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
@@ -479,6 +514,7 @@ function runPreCommitHook(cwd: string) {
     && commitAttributionReport.ok
     && protectedStateReport.ok
     && taskCardStatusReport.ok
+    && sameFileClaimReport.ok
     && blockingTaskAuditFindings.length === 0
     && failedValidatorRuns.length === 0;
   const evidenceWrite = ok && stagedFiles.length > 0
@@ -501,6 +537,7 @@ function runPreCommitHook(cwd: string) {
     commitAttributionFindings: commitAttributionReport.findings,
     protectedStateFindings: protectedStateReport.findings,
     taskCardStatusFindings: taskCardStatusReport.findings,
+    sameFileClaimFindings: sameFileClaimReport.findings,
     taskAuditFindings: taskAudit.findings,
     failedValidatorRuns,
     stagedFiles,
@@ -550,6 +587,7 @@ function runPreCommitHook(cwd: string) {
           quickfixChangedLineCount,
           protectedStateFindings: protectedStateReport.findings,
           taskCardStatusFindings: taskCardStatusReport.findings,
+          sameFileClaimFindings: sameFileClaimReport.findings,
           taskAuditFindings: taskAudit.findings.length,
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
           gitIndexDiagnostic,
@@ -590,6 +628,7 @@ function runPreCommitHook(cwd: string) {
       commitAttributionReport,
       protectedStateReport,
       taskCardStatusReport,
+      sameFileClaimReport,
       taskAudit,
       commandRuns,
       blockingFindings,
@@ -614,6 +653,7 @@ function buildPreCommitBlockingFindings(input: {
   readonly commitAttributionFindings: readonly PreCommitBlockingFinding[];
   readonly protectedStateFindings: readonly ProtectedStateFinding[];
   readonly taskCardStatusFindings: readonly TaskCardStatusFinding[];
+  readonly sameFileClaimFindings: readonly SameFileClaimOwnershipFinding[];
   readonly taskAuditFindings: ReturnType<typeof auditTasks>['findings'];
   readonly failedValidatorRuns: readonly CommandRunReport[];
   readonly stagedFiles: readonly string[];
@@ -726,6 +766,17 @@ function buildPreCommitBlockingFindings(input: {
     findings.push({
       code: 'ATM_TASK_CARD_STATUS_DONE_REQUIRES_LEDGER_CLOSURE',
       source: 'task-card-status',
+      file: finding.file,
+      detail: finding.detail,
+      requiredCommand: finding.requiredCommand,
+      classification: 'current-task',
+      data: finding
+    });
+  }
+  for (const finding of input.sameFileClaimFindings) {
+    findings.push({
+      code: finding.code,
+      source: 'same-file-claim-ownership',
       file: finding.file,
       detail: finding.detail,
       requiredCommand: finding.requiredCommand,
@@ -2041,6 +2092,111 @@ function writePrePushSafeModeReport(cwd: string, input: {
   };
   writeFileSync(absolutePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
   return relativePathFrom(root, absolutePath);
+}
+
+// TASK-CID-0024: decide staged ownership when multiple active claims may cover
+// the same file. Multiple same-file claims alone never block; a finding is
+// produced only when:
+//   1. the staged file is covered by active write claims that do NOT include
+//      the committing task (mixed staged content) and no steward/broker
+//      evidence covers the file, or
+//   2. the committing task claimed closeout-only / no-more-mutation but stages
+//      real source mutations anyway (the intent is non-mutating by contract).
+function inspectSameFileClaimOwnership(input: {
+  readonly cwd: string;
+  readonly stagedFiles: readonly string[];
+  readonly activeDirectionLocks: ReturnType<typeof readActiveTaskDirectionLocks>;
+  readonly exemptAllowedFileSets: readonly (readonly string[])[];
+}): SameFileClaimOwnershipReport {
+  const inferredTaskIds = inferTaskIdsFromStagedFiles(input.stagedFiles);
+  const committingTaskId = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID)
+    ?? (inferredTaskIds.length === 1 ? inferredTaskIds[0] : null);
+  const claimIntentByTaskId = new Map<string, string>();
+  const readClaimIntent = (taskId: string): string => {
+    const cached = claimIntentByTaskId.get(taskId);
+    if (cached) return cached;
+    const taskDocument = readJsonFile(path.join(input.cwd, '.atm', 'history', 'tasks', `${taskId}.json`));
+    const claim = taskDocument?.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
+      ? taskDocument.claim as Record<string, unknown>
+      : null;
+    const intent = normalizeOptionalText(claim?.intent) ?? 'write';
+    claimIntentByTaskId.set(taskId, intent);
+    return intent;
+  };
+  const writeLocks = input.activeDirectionLocks.filter((lock) => readClaimIntent(lock.taskId) !== 'closeout-only');
+  const committingClaimIntent = committingTaskId ? readClaimIntent(committingTaskId) : null;
+  const stewardCoveredFiles = collectStewardBrokerCoveredFiles(input.cwd);
+  const stewardCoveredSet = new Set(stewardCoveredFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
+  const findings: SameFileClaimOwnershipFinding[] = [];
+  const multiClaimFiles: { file: string; writeClaimTaskIds: readonly string[] }[] = [];
+  for (const stagedFile of input.stagedFiles) {
+    const normalized = normalizeRelativePath(stagedFile);
+    if (!normalized || normalized.startsWith('.atm/')) continue;
+    if (isTaskDirectionPreCommitExempt(normalized)) continue;
+    if (input.exemptAllowedFileSets.some((allowed) => allowed.length > 0 && isPathAllowedByTaskDirection(normalized, allowed))) continue;
+    const coveringWriteLocks = writeLocks.filter((lock) => isPathAllowedByTaskDirection(normalized, lock.allowedFiles));
+    if (coveringWriteLocks.length === 0) {
+      // No active write claim covers this file; direction-lock drift owns it.
+      // Still enforce the closeout-only non-mutation contract for the
+      // committing task itself.
+      if (committingClaimIntent === 'closeout-only'
+        && input.activeDirectionLocks.some((lock) => lock.taskId === committingTaskId && isPathAllowedByTaskDirection(normalized, lock.allowedFiles))) {
+        findings.push({
+          code: 'ATM_PRE_COMMIT_CLOSEOUT_ONLY_CLAIM_MUTATION',
+          file: normalized,
+          committingTaskId,
+          writeClaimTaskIds: [],
+          detail: `Task ${committingTaskId} holds a closeout-only / no-more-mutation claim but stages source mutation ${normalized}. Re-claim with a write intent before shipping new source changes.`,
+          requiredCommand: committingTaskId
+            ? `node atm.mjs next --claim --actor <id> --task ${committingTaskId} --claim-intent write --json`
+            : null
+        });
+      }
+      continue;
+    }
+    const writeClaimTaskIds = uniqueSorted(coveringWriteLocks.map((lock) => lock.taskId));
+    if (writeClaimTaskIds.length > 1) {
+      multiClaimFiles.push({ file: normalized, writeClaimTaskIds });
+    }
+    const committingOwnsFile = Boolean(committingTaskId) && writeClaimTaskIds.includes(committingTaskId as string);
+    if (committingOwnsFile) continue;
+    const ambiguous = committingTaskId ? writeClaimTaskIds.length >= 1 : writeClaimTaskIds.length >= 2;
+    if (!ambiguous) continue;
+    if (stewardCoveredSet.has(normalized.toLowerCase())) continue;
+    findings.push({
+      code: 'ATM_PRE_COMMIT_STAGED_OWNERSHIP_AMBIGUOUS',
+      file: normalized,
+      committingTaskId,
+      writeClaimTaskIds,
+      detail: committingTaskId
+        ? `Staged file ${normalized} belongs to active write claim(s) ${writeClaimTaskIds.join(', ')} but the committing task ${committingTaskId} does not own it, and no steward/broker evidence covers it. Remove it from this commit or route it through the steward lane.`
+        : `Staged file ${normalized} is covered by multiple active write claims (${writeClaimTaskIds.join(', ')}) and ATM cannot prove which task owns this commit. Commit through node atm.mjs git commit --task <id> or provide steward/broker evidence.`,
+      requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json'
+    });
+  }
+  return {
+    ok: findings.length === 0,
+    committingTaskId,
+    committingClaimIntent,
+    multiClaimFiles,
+    stewardCoveredFiles,
+    findings
+  };
+}
+
+// TASK-CID-0024: files currently covered by an active steward/composer broker
+// intent count as steward/broker evidence for staged ownership decisions.
+function collectStewardBrokerCoveredFiles(cwd: string): readonly string[] {
+  try {
+    const state = readBrokerLifecycleState(cwd);
+    return uniqueSorted(state.activeIntents
+      .filter((intent) => intent.lane === 'neutral-steward' || intent.lane === 'deterministic-composer')
+      .flatMap((intent) => intent.resourceKeys?.files ?? [])
+      .map((entry) => normalizeRelativePath(entry))
+      .filter(Boolean));
+  } catch {
+    return [];
+  }
 }
 
 function isTaskDirectionPreCommitExempt(value: string): boolean {
