@@ -1,0 +1,197 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-APO-0030-python-language-adapter-plugin",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1ae2b5b3a9b725cb4547bcda4e5a6521c4d13f24",
+  "governedTreeSha": "a5f5a717c34ea5deee5d21da6b33f17ec7219ab7",
+  "targetCommitDelta": {
+    "currentCommitSha": "1ae2b5b3a9b725cb4547bcda4e5a6521c4d13f24",
+    "parentCommitShas": [
+      "1ae2b5b3a9b725cb4547bcda4e5a6521c4d13f24"
+    ],
+    "governedTreeSha": "a5f5a717c34ea5deee5d21da6b33f17ec7219ab7",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0008.closure-packet.json",
+      ".atm/history/evidence/TASK-TEAM-0008.json",
+      ".atm/history/task-events/TASK-TEAM-0008/2026-06-10T15-24-54-448Z-close-6f9809d957be.json",
+      ".atm/history/tasks/TASK-TEAM-0008.json",
+      "fixtures/golden/downstream-js-repo/package.json",
+      "fixtures/python-adapter/synthetic-adopter/requirements.txt",
+      "package-lock.json",
+      "package.json",
+      "packages/language-python/package.json",
+      "packages/language-python/README.md",
+      "packages/language-python/src/index.ts",
+      "packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/docs/ADAPTER_GUIDE.md",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.js",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.js",
+      "release/atm-root-drop/packages/language-python/src/index.ts",
+      "release/atm-root-drop/packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
+      "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/validate-guidance.ts",
+      "scripts/validate-guide.ts",
+      "scripts/validate-plugin-sdk.ts",
+      "scripts/validate-python-adapter.ts",
+      "scripts/validate-skew-matrix.ts",
+      "tests/package-skeleton.fixture.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:python-adapter",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ae93ddc734fb51faa775620ae1a0c1ff52f0e557bad68b38cee947ab09d1a205",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:guidance",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e2dc57890066c9175a4b7ce834eaef1ea9c560dd02d9f125a1834bd946c7907c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:guide",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9cc3c5320b60dc76b136133985a2f5636b5a5f7e9d2d0d9bda1594c8aafaf891",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:plugin-sdk",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:80d519381c9c6c194a31cd8e5d4a486b95559d6f86eb5413a73d78ca349ec369",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:44ecb7cb55ec7338e3f9783e1b290ec3da8bba39bb26035fa40e0493b7b11835",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:80865563d0c00296b8655c0c9c7b4ed5ea087fabb8008eee30a616ed0563f651",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:guidance",
+    "validate:guide",
+    "validate:plugin-sdk",
+    "validate:python-adapter"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-10T15:31:10.554Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-APO-0030-PYTHON-LANGUAGE-ADAPTER-PLUGIN.*",
+      ".atm/history/task-events/TASK-APO-0030-PYTHON-LANGUAGE-ADAPTER-PLUGIN/**",
+      ".atm/history/tasks/TASK-APO-0030-PYTHON-LANGUAGE-ADAPTER-PLUGIN.json",
+      "fixtures/golden/downstream-js-repo/package.json",
+      "fixtures/python-adapter/synthetic-adopter/requirements.txt",
+      "package-lock.json",
+      "package.json",
+      "packages/language-python/**",
+      "scripts/validate-guidance.ts",
+      "scripts/validate-guide.ts",
+      "scripts/validate-plugin-sdk.ts",
+      "scripts/validate-python-adapter.ts",
+      "scripts/validate-skew-matrix.ts",
+      "TASK-APO-0030-python-language-adapter-plugin.task.md",
+      "tests/package-skeleton.fixture.json"
+    ],
+    "criticalChangedFiles": [
+      "package-lock.json",
+      "package.json",
+      "packages/language-python/**",
+      "scripts/validate-guidance.ts",
+      "scripts/validate-guide.ts",
+      "scripts/validate-plugin-sdk.ts",
+      "scripts/validate-python-adapter.ts",
+      "scripts/validate-skew-matrix.ts",
+      "tests/package-skeleton.fixture.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-APO-0030-python-language-adapter-plugin.json",
+  "closedAt": "2026-06-10T15:31:10.554Z",
+  "closedByActor": "cursor-asp-runner",
+  "sessionId": null,
+  "attestation": null
+}

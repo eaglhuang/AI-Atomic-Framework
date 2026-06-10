@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-10T15-29-17-641Z-close-ef0d74ea6233",
+  "taskId": "TASK-APO-0030-python-language-adapter-plugin",
+  "action": "close",
+  "actorId": "cursor-asp-runner",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-APO-0030-python-language-adapter-plugin.json",
+  "taskSha256": "sha256:03f5e186b773da6c286a141b8b8417c1b69a39b7228e5499c31bbb53bccfca55",
+  "createdAt": "2026-06-10T15:29:17.641Z",
+  "command": "node atm.mjs tasks close --task TASK-APO-0030-python-language-adapter-plugin --actor cursor-asp-runner --status done --from-batch-checkpoint --batch batch-d95420db3166 --historical-delivery 3bb286fc",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-d95420db3166",
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-APO-0030-python-language-adapter-plugin.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:guidance",
+      "validate:guide",
+      "validate:plugin-sdk",
+      "validate:python-adapter"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-10T15:29:17.637Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-APO-0030-PYTHON-LANGUAGE-ADAPTER-PLUGIN.*",
+        ".atm/history/task-events/TASK-APO-0030-PYTHON-LANGUAGE-ADAPTER-PLUGIN/**",
+        ".atm/history/tasks/TASK-APO-0030-PYTHON-LANGUAGE-ADAPTER-PLUGIN.json",
+        "fixtures/golden/downstream-js-repo/package.json",
+        "fixtures/python-adapter/synthetic-adopter/requirements.txt",
+        "package-lock.json",
+        "package.json",
+        "packages/language-python/**",
+        "scripts/validate-guidance.ts",
+        "scripts/validate-guide.ts",
+        "scripts/validate-plugin-sdk.ts",
+        "scripts/validate-python-adapter.ts",
+        "scripts/validate-skew-matrix.ts",
+        "TASK-APO-0030-python-language-adapter-plugin.task.md",
+        "tests/package-skeleton.fixture.json"
+      ],
+      "criticalChangedFiles": [
+        "package-lock.json",
+        "package.json",
+        "packages/language-python/**",
+        "scripts/validate-guidance.ts",
+        "scripts/validate-guide.ts",
+        "scripts/validate-plugin-sdk.ts",
+        "scripts/validate-python-adapter.ts",
+        "scripts/validate-skew-matrix.ts",
+        "tests/package-skeleton.fixture.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
