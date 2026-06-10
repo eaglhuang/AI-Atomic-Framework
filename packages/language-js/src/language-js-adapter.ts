@@ -1,5 +1,13 @@
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import type {
+  AtomCandidate,
+  AtomCandidateConfidence,
+  AtomCandidateDiscoveryRequest,
+  AtomCandidateKind,
+  AtomizationPlanningAdapter
+} from '@ai-atomic-framework/plugin-sdk';
 
 export const defaultJavaScriptImportPolicy: Readonly<{ forbiddenSpecifiers: string[]; allowedSpecifiers: string[] }> = Object.freeze({
   forbiddenSpecifiers: ['fs', 'node:fs', 'child_process', 'node:child_process'],
@@ -71,6 +79,199 @@ export function validateComputeAtom(request: any, profile = createUnknownProfile
       }
     ]
   };
+}
+
+const confidenceRank: Record<AtomCandidateConfidence, number> = { high: 3, medium: 2, low: 1 };
+
+interface JsCandidatePattern {
+  readonly pattern: RegExp;
+  readonly kind: AtomCandidateKind;
+  readonly confidence: AtomCandidateConfidence;
+  readonly note: string;
+}
+
+/**
+ * Line-scanner detection patterns (TASK-ASP-0002). Intentionally regex-only:
+ * no AST, compiler API, or LSP dependency. Order matters — the first match
+ * on a line wins, so more specific exported forms come first.
+ */
+const jsCandidatePatterns: readonly JsCandidatePattern[] = [
+  {
+    pattern: /^export\s+default\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/,
+    kind: 'function',
+    confidence: 'high',
+    note: 'export default function'
+  },
+  {
+    pattern: /^export\s+(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*[(<]/,
+    kind: 'function',
+    confidence: 'high',
+    note: 'export function'
+  },
+  {
+    pattern: /^export\s+(?:abstract\s+)?class\s+([A-Za-z_$][\w$]*)/,
+    kind: 'class',
+    confidence: 'high',
+    note: 'export class'
+  },
+  {
+    pattern: /^export\s+const\s+([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*(?::[^=]+)?=>/,
+    kind: 'function',
+    confidence: 'medium',
+    note: 'export const arrow function'
+  },
+  {
+    pattern: /^(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*[(<]/,
+    kind: 'function',
+    confidence: 'low',
+    note: 'top-level non-exported function'
+  },
+  {
+    pattern: /^module\.exports\.([A-Za-z_$][\w$]*)\s*=/,
+    kind: 'module',
+    confidence: 'medium',
+    note: 'CommonJS named export'
+  },
+  {
+    pattern: /^exports\.([A-Za-z_$][\w$]*)\s*=/,
+    kind: 'module',
+    confidence: 'medium',
+    note: 'CommonJS named export'
+  }
+];
+
+export function discoverJavaScriptAtomCandidates(
+  request: AtomCandidateDiscoveryRequest
+): readonly AtomCandidate[] {
+  const candidates: AtomCandidate[] = [];
+
+  for (const sourceFile of request.sourceFiles) {
+    const filePath = normalizePath(sourceFile.filePath);
+    const lines = sourceFile.sourceText.split(/\r?\n/);
+
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+      const line = lines[lineIndex];
+      if (!line || !/^\S/.test(line)) continue;
+
+      for (const { pattern, kind, confidence, note } of jsCandidatePatterns) {
+        const match = pattern.exec(line);
+        if (!match) continue;
+        candidates.push(createJsCandidate({
+          kind,
+          symbol: match[1],
+          filePath,
+          lineStart: lineIndex + 1,
+          lineEnd: findJsBlockEnd(lines, lineIndex),
+          confidence,
+          note
+        }));
+        break;
+      }
+    }
+  }
+
+  return applyJsCandidateFilters(candidates, request);
+}
+
+/**
+ * Optional SDK capability for the JS/TS adapter. `planAtomize` is
+ * intentionally deferred (TASK-ASP-0004 covers the broker bridge), so it
+ * throws an explicit not-implemented error instead of guessing a plan.
+ */
+export function createJavaScriptAtomizationPlanningAdapter(): AtomizationPlanningAdapter {
+  return {
+    discoverAtomCandidates(request: AtomCandidateDiscoveryRequest) {
+      return discoverJavaScriptAtomCandidates(request);
+    },
+    planAtomize() {
+      throw new Error(
+        'ATM_JS_PLAN_ATOMIZE_NOT_IMPLEMENTED: the JS adapter only implements discoverAtomCandidates; planAtomize is deferred to the broker candidate-to-WriteIntent bridge (TASK-ASP-0004).'
+      );
+    }
+  };
+}
+
+function createJsCandidate(input: {
+  readonly kind: AtomCandidateKind;
+  readonly symbol: string;
+  readonly filePath: string;
+  readonly lineStart: number;
+  readonly lineEnd: number | null;
+  readonly confidence: AtomCandidateConfidence;
+  readonly note: string;
+}): AtomCandidate {
+  const contract = `${input.filePath}:${input.kind}:${input.symbol}`;
+  const shortHash = createHash('sha256').update(contract).digest('hex').slice(0, 8);
+  return {
+    candidateId: `js:${input.kind}:${input.symbol}:${shortHash}`,
+    kind: input.kind,
+    symbol: input.symbol,
+    filePath: input.filePath,
+    lineStart: input.lineStart,
+    lineEnd: input.lineEnd,
+    confidence: input.confidence,
+    detectionMethod: 'scanner',
+    suggestedAtomId: `ATM-JS-${shortHash}`,
+    suggestedSourcePaths: [input.filePath],
+    notes: [input.note]
+  };
+}
+
+/**
+ * Best-effort block-end detection: balance curly braces starting from the
+ * declaration line. Single-expression arrow consts without braces end on the
+ * line that closes the statement (best effort: first line whose brace depth
+ * returns to zero, or the declaration line itself when no brace opens).
+ */
+function findJsBlockEnd(lines: readonly string[], startIndex: number): number | null {
+  let depth = 0;
+  let sawOpeningBrace = false;
+  for (let lineIndex = startIndex; lineIndex < lines.length; lineIndex += 1) {
+    const line = stripJsLineNoise(lines[lineIndex]);
+    for (const character of line) {
+      if (character === '{') {
+        depth += 1;
+        sawOpeningBrace = true;
+      } else if (character === '}') {
+        depth -= 1;
+      }
+    }
+    if (sawOpeningBrace && depth <= 0) {
+      return lineIndex + 1;
+    }
+    if (!sawOpeningBrace && /;\s*$/.test(line)) {
+      return lineIndex + 1;
+    }
+  }
+  return sawOpeningBrace ? null : startIndex + 1;
+}
+
+/** Remove string literals and line comments so braces inside them do not skew the balance counter. */
+function stripJsLineNoise(line: string): string {
+  return line
+    .replace(/'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`/g, "''")
+    .replace(/\/\/.*$/, '');
+}
+
+function applyJsCandidateFilters(
+  candidates: readonly AtomCandidate[],
+  request: AtomCandidateDiscoveryRequest
+): readonly AtomCandidate[] {
+  const filters = request.filters;
+  if (!filters) return candidates;
+  return candidates.filter((candidate) => {
+    if (filters.kinds && !filters.kinds.includes(candidate.kind)) return false;
+    if (filters.minConfidence && confidenceRank[candidate.confidence] < confidenceRank[filters.minConfidence]) {
+      return false;
+    }
+    if (
+      filters.filePathPrefixes
+      && !filters.filePathPrefixes.some((prefix) => candidate.filePath.startsWith(normalizePath(prefix)))
+    ) {
+      return false;
+    }
+    return true;
+  });
 }
 
 export function scanImports(sourceFile: any) {
