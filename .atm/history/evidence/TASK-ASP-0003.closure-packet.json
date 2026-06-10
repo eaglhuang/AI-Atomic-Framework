@@ -1,0 +1,148 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASP-0003",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6b9eb3954fb104d3f82fb41c90c752ac17c64ca0",
+  "governedTreeSha": "9fa77ecbbbb414fc8d07faff430f30a3c69be5c6",
+  "targetCommitDelta": {
+    "currentCommitSha": "6b9eb3954fb104d3f82fb41c90c752ac17c64ca0",
+    "parentCommitShas": [
+      "6b9eb3954fb104d3f82fb41c90c752ac17c64ca0"
+    ],
+    "governedTreeSha": "9fa77ecbbbb414fc8d07faff430f30a3c69be5c6",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ASP-0003.json",
+      ".atm/history/task-events/TASK-ASP-0003/2026-06-10T12-17-13-957Z-import-4e2eb19feb33.json",
+      ".atm/history/task-events/TASK-ASP-0003/2026-06-10T13-29-31-831Z-reserve-2dbe7c5bed30.json",
+      ".atm/history/task-events/TASK-ASP-0003/2026-06-10T13-29-31-835Z-promote-c92658603fe1.json",
+      ".atm/history/task-events/TASK-ASP-0003/2026-06-10T13-29-31-863Z-claim-f6af78f148df.json",
+      ".atm/history/tasks/TASK-ASP-0003.json",
+      "packages/language-python/src/index.ts",
+      "packages/language-python/src/language-python-adapter.ts",
+      "packages/language-python/test/atomization-planning.test.ts",
+      "packages/language-python/test/fixtures/classes.py",
+      "packages/language-python/test/fixtures/cli_main.py",
+      "packages/language-python/test/fixtures/mixed.py",
+      "packages/language-python/test/fixtures/module_only.py",
+      "packages/language-python/test/fixtures/simple_functions.py",
+      "packages/plugin-sdk/src/atomization-planning.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.js",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.js",
+      "release/atm-root-drop/packages/language-python/src/index.ts",
+      "release/atm-root-drop/packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
+      "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/language-python/test/atomization-planning.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4b9be64fc1f0fee3a91e052b88ca0906296aabb29dedc597f27bb08c31319b1f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:41f71fffae52b67246afd0280cc4395b9c617773ac6ffc2d5425cc6a4a1f423f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "atomization-planning-test",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-10T13:39:15.987Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0003-python-adapter-sdk-promotion.task.md",
+      ".atm/history/evidence/TASK-ASP-0003.*",
+      ".atm/history/task-events/TASK-ASP-0003/**",
+      ".atm/history/tasks/TASK-ASP-0003.json",
+      "if __name__ == \"__main__\":` → kind=`command`, confidence=`high",
+      "Module-level (Python file as a whole) → kind=`module`, confidence=`medium",
+      "packages/language-python/src/**",
+      "packages/language-python/test/**",
+      "packages/plugin-sdk/src/**",
+      "Top-level `class <name>` → kind=`class`, confidence=`high",
+      "Top-level `def <name>(...)` → kind=`function`, confidence=`high"
+    ],
+    "criticalChangedFiles": [
+      "packages/language-python/src/**",
+      "packages/language-python/test/**",
+      "packages/plugin-sdk/src/**"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASP-0003.json",
+  "closedAt": "2026-06-10T13:39:15.988Z",
+  "closedByActor": "cursor-asp-runner",
+  "sessionId": "session-20260610132931-cursor-asp-runner-TASK-ASP-0003-4755abf1ec",
+  "attestation": null
+}

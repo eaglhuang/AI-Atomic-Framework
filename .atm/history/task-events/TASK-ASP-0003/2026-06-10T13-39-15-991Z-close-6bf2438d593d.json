@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-10T13-39-15-991Z-close-6bf2438d593d",
+  "taskId": "TASK-ASP-0003",
+  "action": "close",
+  "actorId": "cursor-asp-runner",
+  "sessionId": "session-20260610132931-cursor-asp-runner-TASK-ASP-0003-4755abf1ec",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ASP-0003.json",
+  "taskSha256": "sha256:3e59f01fc0147ae6f4cd5810394c8c4511bb712221549ec21203bc484792258d",
+  "createdAt": "2026-06-10T13:39:15.991Z",
+  "command": "node atm.mjs tasks close --task TASK-ASP-0003 --actor cursor-asp-runner --status done --from-batch-checkpoint --batch batch-d95420db3166",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-d95420db3166",
+    "sessionId": "session-20260610132931-cursor-asp-runner-TASK-ASP-0003-4755abf1ec",
+    "closurePacketPath": ".atm/history/evidence/TASK-ASP-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "atomization-planning-test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-10T13:39:15.987Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0003-python-adapter-sdk-promotion.task.md",
+        ".atm/history/evidence/TASK-ASP-0003.*",
+        ".atm/history/task-events/TASK-ASP-0003/**",
+        ".atm/history/tasks/TASK-ASP-0003.json",
+        "if __name__ == \"__main__\":` → kind=`command`, confidence=`high",
+        "Module-level (Python file as a whole) → kind=`module`, confidence=`medium",
+        "packages/language-python/src/**",
+        "packages/language-python/test/**",
+        "packages/plugin-sdk/src/**",
+        "Top-level `class <name>` → kind=`class`, confidence=`high",
+        "Top-level `def <name>(...)` → kind=`function`, confidence=`high"
+      ],
+      "criticalChangedFiles": [
+        "packages/language-python/src/**",
+        "packages/language-python/test/**",
+        "packages/plugin-sdk/src/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
