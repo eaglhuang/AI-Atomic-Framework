@@ -1,0 +1,166 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASP-0002",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8a58d1d90f519f371c34670762941941c2d79535",
+  "governedTreeSha": "7c2e8c4487290881b8325459d7bd9fa798fc0117",
+  "targetCommitDelta": {
+    "currentCommitSha": "8a58d1d90f519f371c34670762941941c2d79535",
+    "parentCommitShas": [
+      "8a58d1d90f519f371c34670762941941c2d79535"
+    ],
+    "governedTreeSha": "7c2e8c4487290881b8325459d7bd9fa798fc0117",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ASP-0002.json",
+      ".atm/history/task-events/TASK-ASP-0002/2026-06-10T12-17-13-955Z-import-fbd9bd2cf010.json",
+      ".atm/history/task-events/TASK-ASP-0002/2026-06-10T14-28-29-937Z-reserve-3eb1d0a73068.json",
+      ".atm/history/task-events/TASK-ASP-0002/2026-06-10T14-28-29-939Z-promote-d014cfca7686.json",
+      ".atm/history/task-events/TASK-ASP-0002/2026-06-10T14-28-29-982Z-claim-c340caf3aeaf.json",
+      ".atm/history/tasks/TASK-ASP-0002.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/match-and-sort.ts",
+      "packages/language-js/src/language-js-adapter.ts",
+      "packages/language-js/test/atomization-planning.test.ts",
+      "packages/language-js/test/fixtures/arrow-consts.ts",
+      "packages/language-js/test/fixtures/commonjs-exports.js",
+      "packages/language-js/test/fixtures/exported-classes.ts",
+      "packages/language-js/test/fixtures/exported-functions.ts",
+      "packages/language-js/test/fixtures/mixed.ts",
+      "packages/language-js/test/fixtures/plain-functions.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ADAPTER_GUIDE.md",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/match-and-sort.js",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/match-and-sort.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.js",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.js",
+      "release/atm-root-drop/packages/language-python/src/index.ts",
+      "release/atm-root-drop/packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
+      "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-task-direction-governance.ts",
+      "scripts/validate-task-direction-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/language-js/test/atomization-planning.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9a2e8e38a11f5ce1db384e81e77b70554f0b408adae515c1b44885f92f6df626",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:language-js",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e80647e5c1d961fb792484aeef19da9012f562713a640e169425d35cfb3596e3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4ab93419a7d2ca8203642f6c194ffd8df87d402c32845fd9437269271b7a7f68",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "language-js-tests",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:language-js"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-10T14:36:05.238Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0002-js-adapter-candidate-discovery.task.md",
+      ".atm/history/evidence/TASK-ASP-0002.*",
+      ".atm/history/task-events/TASK-ASP-0002/**",
+      ".atm/history/tasks/TASK-ASP-0002.json",
+      "export class <name>` → kind=`class`, confidence=`high",
+      "export const <name> = (...) =>` → kind=`function`, confidence=`medium",
+      "export default function <name>(...)` → kind=`function`, confidence=`high",
+      "export function <name>(...)` → kind=`function`, confidence=`high",
+      "function <name>()` (non-exported, top-level) → kind=`function`, confidence=`low",
+      "module.exports.foo = ...` (CommonJS) → kind=`module`, confidence=`medium",
+      "packages/language-js/src/**",
+      "packages/language-js/test/**",
+      "packages/plugin-sdk/src/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/language-js/src/**",
+      "packages/language-js/test/**",
+      "packages/plugin-sdk/src/**"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASP-0002.json",
+  "closedAt": "2026-06-10T14:36:05.239Z",
+  "closedByActor": "cursor-asp-runner",
+  "sessionId": "session-20260610142829-cursor-asp-runner-TASK-ASP-0002-960ee189b5",
+  "attestation": null
+}

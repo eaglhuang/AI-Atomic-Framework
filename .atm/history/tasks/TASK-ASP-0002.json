@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ASP-0002",
+  "title": "JS Adapter Candidate Discovery (Function + Class + Module)",
+  "status": "done",
+  "milestone": "ASP-M1",
+  "dependencies": [
+    "TASK-ASP-0001"
+  ],
+  "acceptance": [
+    "`language-js-adapter.ts` exports an `AtomizationPlanningAdapter` implementation",
+    "`discoverAtomCandidates()` returns candidates for: exported functions, exported classes, arrow function consts, CommonJS exports",
+    "Confidence levels respect detection certainty (regex match → medium/high; deep heuristic → low)",
+    "No new external dependencies added to `package.json`",
+    "At least 5 fixture files tested with expected candidate counts",
+    "Existing `validateComputeAtom()` test suite still passes"
+  ],
+  "deliverables": [
+    "export function <name>(...)` → kind=`function`, confidence=`high",
+    "export default function <name>(...)` → kind=`function`, confidence=`high",
+    "export class <name>` → kind=`class`, confidence=`high",
+    "export const <name> = (...) =>` → kind=`function`, confidence=`medium",
+    "function <name>()` (non-exported, top-level) → kind=`function`, confidence=`low",
+    "module.exports.foo = ...` (CommonJS) → kind=`module`, confidence=`medium"
+  ],
+  "tags": [],
+  "notes": "JS adapter (`packages/language-js/`) currently scans imports and entrypoint exports but does not output function / class candidate lists. To enable broker-driven function-level parallelism, JS adapter must implement `discoverAtomCandidates()` from the new SDK contract (TASK-ASP-0001).\n\nThis task uses **only lightweight regex / line scanning**. AST or LSP integration is deferred to future work.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0002-js-adapter-candidate-discovery.task.md",
+    "sectionTitle": "TASK-ASP-0002",
+    "headingLine": 34,
+    "hash": "9e898f101b81aad5"
+  },
+  "importedAt": "2026-06-10T12:17:13.945Z",
+  "scopePaths": [
+    "packages/language-js/src/**",
+    "packages/language-js/test/**",
+    "packages/plugin-sdk/src/**"
+  ],
+  "validators": [],
+  "planningRepo": null,
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": null,
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "packages/core/src/broker/**",
+    "packages/language-python/**",
+    "assets/**",
+    "library/**"
+  ],
+  "nonGoals": [
+    "Do not introduce AST or LSP dependencies (no ts-morph, no typescript compiler API).",
+    "Do not implement the `planAtomize()` method in this task (defer to ASP-0004 or follow-up).",
+    "Do not modify the broker.",
+    "Do not lower confidence for legitimate ES module syntax."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "packages/language-js/src/**",
+      "packages/language-js/test/**",
+      "packages/plugin-sdk/src/**"
+    ],
+    "blocked_by": [
+      "TASK-ASP-0001"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "lastTransitionId": "2026-06-10T14-36-05-243Z-close-3eb26ac0cdd8",
+  "lastTransitionAt": "2026-06-10T14:36:05.243Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-asp-runner",
+  "reservedAt": "2026-06-10T14:28:29.936Z",
+  "promotedAt": "2026-06-10T14:28:29.939Z",
+  "claim": {
+    "actorId": "cursor-asp-runner",
+    "leaseId": "lease-ea40be1c7e8d",
+    "claimedAt": "2026-06-10T14:28:29.944Z",
+    "heartbeatAt": "2026-06-10T14:36:05.240Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ASP-0002.json",
+      "packages/language-js/src/**",
+      "packages/language-js/test/**",
+      "packages/plugin-sdk/src/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-10T14:28:29.944Z",
+  "startedByActor": "cursor-asp-runner",
+  "startedBySessionId": "session-20260610142829-cursor-asp-runner-TASK-ASP-0002-960ee189b5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ASP-0002",
+    "batchId": "batch-d95420db3166",
+    "scopeKey": "tasks-d26ff8efb05f",
+    "queueId": "queue-6f740642bb94ec75",
+    "queueIndex": 3,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ASP-0002.*",
+      ".atm/history/task-events/TASK-ASP-0002/**",
+      ".atm/history/tasks/TASK-ASP-0002.json",
+      "packages/language-js/src/**",
+      "packages/language-js/test/**",
+      "packages/plugin-sdk/src/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0b89ea54efffd5646f873b0795708bc199cff61954a002ccb1c51be45dea1ef4",
+    "actorId": "cursor-asp-runner",
+    "createdAt": "2026-06-10T14:28:29.980Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-10T14:36:05.240Z",
+  "closedByActor": "cursor-asp-runner",
+  "closedBySessionId": "session-20260610142829-cursor-asp-runner-TASK-ASP-0002-960ee189b5",
+  "closurePacket": ".atm/history/evidence/TASK-ASP-0002.closure-packet.json"
+}
