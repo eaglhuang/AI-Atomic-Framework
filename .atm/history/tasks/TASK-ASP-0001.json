@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ASP-0001",
+  "title": "AtomizationPlanningAdapter SDK Contract",
+  "status": "done",
+  "milestone": "ASP-M1",
+  "dependencies": [],
+  "acceptance": [
+    "`packages/plugin-sdk/src/atomization-planning.ts` exists and is exported from `index.ts`",
+    "All five schemas are exported as types",
+    "`AtomizationPlanningAdapter` is exported as optional interface",
+    "Existing `LanguageAdapter` consumers are NOT broken (compile + tests pass)",
+    "At least one unit test validates the schema shape",
+    "`docs/ADAPTER_GUIDE.md` has a new section explaining when to implement this contract",
+    "Document explicitly states: detection method may be regex / scanner / compiler-api / ast / lsp — none is mandatory"
+  ],
+  "deliverables": [
+    "AtomCandidate` (kind, symbol, filePath, lineStart/lineEnd, confidence, detectionMethod, optional suggestedAtomId, suggestedSourcePaths, notes)",
+    "AtomCandidateDiscoveryRequest` (sourceFiles, optional filters)",
+    "AtomizationPlanRequest` (atomId, target candidate, sourceFiles, dryRun: true)",
+    "AtomizationPlan` (atomId, dryRun: true, target, patchFiles, steps, evidenceRequired, rollbackNotes, messages)",
+    "AtomizationPlanStep` (stepKind, description, optional patchHint)"
+  ],
+  "tags": [],
+  "notes": "ATM core broker already supports CID conflict detection, shared surface coordination, and same-file CID-disjoint routing (see `packages/core/src/broker/decision.ts`). What is missing is an **optional SDK contract** for language adapters to:\n\n1. Discover atom candidates from source files (function / class / module / route / command level)\n2. Propose dry-run atomization plans for a selected candidate\n\nThe current `LanguageAdapter` interface only has `detectProjectProfile()` and `validateComputeAtom()`. Atomization-related logic exists only inside Python adapter as `planPythonAtomize()`, which is private and not reusable.\n\nThis task formalizes the contract as **optional** so existing adapters remain valid without implementing it.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0001-atomization-planning-sdk-contract.task.md",
+    "sectionTitle": "TASK-ASP-0001",
+    "headingLine": 36,
+    "hash": "1436331cfee6b4c8"
+  },
+  "importedAt": "2026-06-10T12:17:13.945Z",
+  "scopePaths": [
+    "packages/plugin-sdk/src/atomization-planning.ts",
+    "packages/plugin-sdk/src/index.ts",
+    "packages/plugin-sdk/test/atomization-planning.test.ts",
+    "docs/ADAPTER_GUIDE.md"
+  ],
+  "validators": [],
+  "planningRepo": null,
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": null,
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "packages/core/src/broker/**",
+    "packages/language-js/**",
+    "packages/language-python/**",
+    "assets/**",
+    "library/**"
+  ],
+  "nonGoals": [
+    "Do not modify existing LanguageAdapter interface (additive only).",
+    "Do not require AST parsing in the contract definition.",
+    "Do not implement candidate discovery for any specific language here.",
+    "Do not change broker decision logic."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "packages/plugin-sdk/src/atomization-planning.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "packages/plugin-sdk/test/atomization-planning.test.ts",
+      "docs/ADAPTER_GUIDE.md"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "lastTransitionId": "2026-06-10T14-28-27-714Z-close-b9d8582d1fb2",
+  "lastTransitionAt": "2026-06-10T14:28:27.714Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-asp-runner",
+  "reservedAt": "2026-06-10T14:25:06.080Z",
+  "promotedAt": "2026-06-10T14:25:06.085Z",
+  "claim": {
+    "actorId": "cursor-asp-runner",
+    "leaseId": "lease-3461fdbecbcf",
+    "claimedAt": "2026-06-10T14:25:06.089Z",
+    "heartbeatAt": "2026-06-10T14:28:27.711Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ASP-0001.json",
+      "docs/ADAPTER_GUIDE.md",
+      "packages/plugin-sdk/src/atomization-planning.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "packages/plugin-sdk/test/atomization-planning.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-10T14:25:06.089Z",
+  "startedByActor": "cursor-asp-runner",
+  "startedBySessionId": "session-20260610142506-cursor-asp-runner-TASK-ASP-0001-47dae9e7e4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ASP-0001",
+    "batchId": "batch-d95420db3166",
+    "scopeKey": "tasks-d26ff8efb05f",
+    "queueId": "queue-6f740642bb94ec75",
+    "queueIndex": 2,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ASP-0001.*",
+      ".atm/history/task-events/TASK-ASP-0001/**",
+      ".atm/history/tasks/TASK-ASP-0001.json",
+      "docs/ADAPTER_GUIDE.md",
+      "packages/plugin-sdk/src/atomization-planning.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "packages/plugin-sdk/test/atomization-planning.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0b79cdd5785fafcedb56b37b55abfc4f25012a129393ec9a47c375af63c54324",
+    "actorId": "cursor-asp-runner",
+    "createdAt": "2026-06-10T14:25:06.142Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-10T14:28:27.711Z",
+  "closedByActor": "cursor-asp-runner",
+  "closedBySessionId": "session-20260610142506-cursor-asp-runner-TASK-ASP-0001-47dae9e7e4",
+  "closurePacket": ".atm/history/evidence/TASK-ASP-0001.closure-packet.json"
+}

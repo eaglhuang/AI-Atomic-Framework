@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-10T14-28-27-714Z-close-b9d8582d1fb2",
+  "taskId": "TASK-ASP-0001",
+  "action": "close",
+  "actorId": "cursor-asp-runner",
+  "sessionId": "session-20260610142506-cursor-asp-runner-TASK-ASP-0001-47dae9e7e4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ASP-0001.json",
+  "taskSha256": "sha256:cb57076434837f523ed045a08728efcfccaec442c08ccea2e48b055cdbb6ec29",
+  "createdAt": "2026-06-10T14:28:27.714Z",
+  "command": "node atm.mjs tasks close --task TASK-ASP-0001 --actor cursor-asp-runner --status done --from-batch-checkpoint --batch batch-d95420db3166",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-d95420db3166",
+    "sessionId": "session-20260610142506-cursor-asp-runner-TASK-ASP-0001-47dae9e7e4",
+    "closurePacketPath": ".atm/history/evidence/TASK-ASP-0001.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "plugin-sdk-tests",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:plugin-sdk"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-10T14:28:27.709Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0001-atomization-planning-sdk-contract.task.md",
+        ".atm/history/evidence/TASK-ASP-0001.*",
+        ".atm/history/task-events/TASK-ASP-0001/**",
+        ".atm/history/tasks/TASK-ASP-0001.json",
+        "AtomCandidate` (kind, symbol, filePath, lineStart/lineEnd, confidence, detectionMethod, optional suggestedAtomId, suggestedSourcePaths, notes)",
+        "AtomCandidateDiscoveryRequest` (sourceFiles, optional filters)",
+        "AtomizationPlan` (atomId, dryRun: true, target, patchFiles, steps, evidenceRequired, rollbackNotes, messages)",
+        "AtomizationPlanRequest` (atomId, target candidate, sourceFiles, dryRun: true)",
+        "AtomizationPlanStep` (stepKind, description, optional patchHint)",
+        "docs/ADAPTER_GUIDE.md",
+        "packages/plugin-sdk/src/atomization-planning.ts",
+        "packages/plugin-sdk/src/index.ts",
+        "packages/plugin-sdk/test/atomization-planning.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/plugin-sdk/src/atomization-planning.ts",
+        "packages/plugin-sdk/src/index.ts",
+        "packages/plugin-sdk/test/atomization-planning.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
