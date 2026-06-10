@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, resolveActorId, writeRuntimeIdentityDefault } from './actor-registry.js';
 import { resolveActorWorkSession } from './actor-session.js';
+import { findCloseCommitWindowCoveringPaths } from './framework-development.js';
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.js';
 export async function runAtmGit(argv) {
     const options = parseGitOptions(argv);
@@ -59,7 +60,8 @@ export function evaluateGitGovernanceCheck(input) {
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
     const stagedMirrorSync = input.taskId ? inspectMirrorSyncOnlyStagedArtifacts(cwd, input.taskId) : null;
     const stagedHistoricalRestore = input.taskId ? inspectHistoricalLedgerRestoreStagedArtifacts(cwd, input.taskId) : null;
-    const bypassesActiveSession = stagedMirrorSync?.ok || stagedHistoricalRestore?.ok;
+    const stagedCloseCommitWindow = input.taskId ? inspectCloseCommitWindowStagedArtifacts(cwd, input.taskId) : null;
+    const bypassesActiveSession = stagedMirrorSync?.ok || stagedHistoricalRestore?.ok || stagedCloseCommitWindow?.ok;
     const claimForTrailers = bypassesActiveSession ? null : claim;
     const session = resolveGitGovernanceSession(cwd, {
         sessionId: input.sessionId ?? null,
@@ -226,7 +228,8 @@ function runGitCommit(options) {
     const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
     const stagedMirrorSync = options.taskId ? inspectMirrorSyncOnlyStagedArtifacts(options.cwd, options.taskId) : null;
     const stagedHistoricalRestore = options.taskId ? inspectHistoricalLedgerRestoreStagedArtifacts(options.cwd, options.taskId) : null;
-    const bypassesActiveSession = stagedMirrorSync?.ok || stagedHistoricalRestore?.ok;
+    const stagedCloseCommitWindow = options.taskId ? inspectCloseCommitWindowStagedArtifacts(options.cwd, options.taskId) : null;
+    const bypassesActiveSession = stagedMirrorSync?.ok || stagedHistoricalRestore?.ok || stagedCloseCommitWindow?.ok;
     const claimForTrailers = bypassesActiveSession ? null : claim;
     const session = resolveGitGovernanceSession(options.cwd, {
         sessionId: options.sessionId ?? null,
@@ -573,6 +576,20 @@ function inspectHistoricalLedgerRestoreStagedArtifacts(cwd, taskId) {
         if (!event || event.schemaId !== 'atm.taskTransition.v1' || event.taskId !== taskId || typeof event.transitionId !== 'string' || !command.startsWith('node atm.mjs ')) {
             return { ok: false, taskId, stagedFiles, reason: `task-event-invalid:${normalizeRelativePath(eventPath)}` };
         }
+    }
+    return { ok: true, taskId, stagedFiles, reason: null };
+}
+function inspectCloseCommitWindowStagedArtifacts(cwd, taskId) {
+    const stagedFiles = readStagedFiles(cwd);
+    if (stagedFiles.length === 0) {
+        return { ok: false, taskId, stagedFiles, reason: 'no-staged-files' };
+    }
+    const windowRecord = findCloseCommitWindowCoveringPaths(cwd, stagedFiles);
+    if (!windowRecord) {
+        return { ok: false, taskId, stagedFiles, reason: 'no-covering-window' };
+    }
+    if (windowRecord.taskId !== taskId) {
+        return { ok: false, taskId, stagedFiles, reason: `window-task-mismatch:${windowRecord.taskId}` };
     }
     return { ok: true, taskId, stagedFiles, reason: null };
 }

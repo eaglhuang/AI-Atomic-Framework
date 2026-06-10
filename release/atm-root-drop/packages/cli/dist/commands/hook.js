@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, appendFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { auditTasks, buildFrameworkTempClaimCommand, buildFrameworkStaleCleanupCommand, createFrameworkModeStatus, detectFrameworkRepoIdentity, isFrameworkStaleLockReleasable, isAdopterInfrastructureSyncCommit, isAtmCriticalNonDocSurface, readActiveCloseCommitWindows, requiredValidationPassesForClosure, validateClosurePacket } from './framework-development.js';
+import { auditTasks, buildFrameworkTempClaimCommand, buildFrameworkStaleCleanupCommand, createFrameworkModeStatus, detectFrameworkRepoIdentity, findCloseCommitWindowCoveringPaths, isFrameworkStaleLockReleasable, isAdopterInfrastructureSyncCommit, isAtmCriticalNonDocSurface, readActiveCloseCommitWindows, requiredValidationPassesForClosure, validateClosurePacket } from './framework-development.js';
 import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-registry.js';
 import { resolveActorWorkSession } from './actor-session.js';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.js';
@@ -2089,7 +2089,8 @@ function inspectCommitAttribution(cwd, stagedFiles) {
     const claim = parseHookTaskClaim(task?.claim);
     const mirrorSyncOnly = inspectMirrorSyncOnlyStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
     const historicalLedgerRestore = inspectHistoricalLedgerRestoreStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
-    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok;
+    const closeCommitWindow = inspectCloseCommitWindowStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok;
     const claimForSession = bypassesActiveSession ? null : claim;
     const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, {
         sessionId,
@@ -2169,6 +2170,19 @@ function inspectCommitAttribution(cwd, stagedFiles) {
         ok: findings.length === 0,
         findings
     };
+}
+function inspectCloseCommitWindowStagedArtifacts(cwd, taskId, stagedFiles) {
+    if (stagedFiles.length === 0) {
+        return { ok: false, reason: 'no-staged-files' };
+    }
+    const windowRecord = findCloseCommitWindowCoveringPaths(cwd, stagedFiles);
+    if (!windowRecord) {
+        return { ok: false, reason: 'no-covering-window' };
+    }
+    if (windowRecord.taskId !== taskId) {
+        return { ok: false, reason: `window-task-mismatch:${windowRecord.taskId}` };
+    }
+    return { ok: true, reason: null };
 }
 function isStaticEvidenceArtifactPath(value) {
     const normalized = normalizeRelativePath(value).toLowerCase();

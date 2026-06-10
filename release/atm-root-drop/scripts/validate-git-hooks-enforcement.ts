@@ -359,6 +359,32 @@ try {
   assert(restoreHook.status === 0, 'pre-commit hook must accept a complete done historical ledger restore packet without a fake legacy session');
   runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
 
+  const reconcileIdentity = parsePayload(runCli(closureRepo, ['identity', 'set', '--cwd', closureRepo, '--actor', 'fixture-agent', '--git-name', 'Fixture Agent', '--git-email', 'fixture-agent@example.com', '--json']));
+  assert(reconcileIdentity.ok === true, 'reconcile close-commit-window hook fixture identity must be configurable');
+  const reconcileHookTaskId = 'TASK-X-RECONCILE';
+  assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--title', 'Reconcile hook close window regression', '--json'])).ok === true, 'reconcile hook reserve must report ok=true');
+  assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--json'])).ok === true, 'reconcile hook promote must report ok=true');
+  writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'reconcile-close-window.ts'), 'export const reconcileCloseWindow = true;\n', 'utf8');
+  assert(parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--files', 'packages/core/src/reconcile-close-window.ts', '--json'])).ok === true, 'reconcile hook claim must report ok=true');
+  runGit(closureRepo, ['add', 'packages/core/src/reconcile-close-window.ts']);
+  const reconcileDeliveryCommit = parsePayload(runCli(closureRepo, ['git', 'commit', '--cwd', closureRepo, '--actor', 'fixture-agent', '--task', reconcileHookTaskId, '--message', 'feat: reconcile hook fixture delivery', '--json']));
+  assert(reconcileDeliveryCommit.ok === true, 'reconcile hook fixture delivery commit must report ok=true');
+  const reconcileDeliverySha = String(reconcileDeliveryCommit.evidence?.commitSha ?? '');
+  assert(reconcileDeliverySha.length > 0, 'reconcile hook fixture delivery commit must return commit sha');
+  const reconcileClose = parsePayload(runCli(closureRepo, ['tasks', 'reconcile', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--json']));
+  assert(reconcileClose.ok === true, 'reconcile hook close step must report ok=true');
+  const reconcilePreCommit = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], {
+    env: {
+      ATM_COMMIT_ACTOR_ID: 'fixture-agent',
+      ATM_COMMIT_TASK_ID: reconcileHookTaskId,
+      GIT_AUTHOR_NAME: 'Fixture Agent',
+      GIT_AUTHOR_EMAIL: 'fixture-agent@example.com'
+    }
+  });
+  assert(reconcilePreCommit.status === 0, 'pre-commit hook must accept reconcile close packets covered by an active close-commit-window without a session id');
+  runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+  runGit(closureRepo, ['checkout', '--', 'packages/core/src/reconcile-close-window.ts']);
+
   const mixedRestoreHookTaskId = 'TASK-X-RESTORE-MIXED';
   const mixedRestoreHookFiles = writeHistoricalRestorePacket(closureRepo, mixedRestoreHookTaskId);
   writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'restore-bypass.ts'), 'export const restoreBypass = true;\n', 'utf8');

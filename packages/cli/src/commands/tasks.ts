@@ -856,6 +856,13 @@ async function runTasksReconcile(argv: string[]) {
   });
   const transitionPath = reconcileWriteResult.transitionPath;
   closurePacketPath = reconcileWriteResult.closurePacketPath ?? closurePacketPath;
+  const reconcileEvidencePath = relativePathFrom(options.cwd, evidencePath);
+  stageTaskCloseArtifacts(options.cwd, [
+    relativePathFrom(options.cwd, taskPath),
+    reconcileEvidencePath,
+    transitionPath,
+    closurePacketPath
+  ]);
   if (currentClaim && currentClaim.state === 'active') {
     const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
     await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, currentClaim.actorId));
@@ -866,6 +873,7 @@ async function runTasksReconcile(argv: string[]) {
   // the task direction lock has now released. Window expires after 30s.
   const closeCommitWindowAllowedFiles = [
     relativePathFrom(options.cwd, taskPath),
+    reconcileEvidencePath,
     transitionPath,
     ...(closurePacketPath ? [closurePacketPath] : [])
   ];
@@ -2196,6 +2204,13 @@ async function runTasksClose(argv: string[]) {
   });
   const transitionPath = closeWriteResult.transitionPath;
   closurePacketPath = closeWriteResult.closurePacketPath ?? closurePacketPath;
+  const closeEvidencePath = `.atm/history/evidence/${options.taskId}.json`;
+  stageTaskCloseArtifacts(options.cwd, [
+    relativePathFrom(options.cwd, taskPath),
+    closeEvidencePath,
+    transitionPath,
+    closurePacketPath
+  ]);
   if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
     const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
     await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
@@ -2218,6 +2233,7 @@ async function runTasksClose(argv: string[]) {
       actorId,
       allowedFiles: [
         relativePathFrom(options.cwd, taskPath),
+        closeEvidencePath,
         transitionPath,
         ...(closurePacketPath ? [closurePacketPath] : [])
       ],
@@ -4220,6 +4236,15 @@ function writeTaskDocumentWithTransition(input: {
     action: input.action
   });
   return transition.eventPath;
+}
+
+function stageTaskCloseArtifacts(cwd: string, files: readonly (string | null | undefined)[]) {
+  const normalizedFiles = uniqueStrings(files.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean));
+  if (normalizedFiles.length === 0) return;
+  execFileSync('git', ['add', '--', ...normalizedFiles], {
+    cwd,
+    stdio: ['ignore', 'ignore', 'pipe']
+  });
 }
 
 function verifyPersistedTaskDocument(input: {

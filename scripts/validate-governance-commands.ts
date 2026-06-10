@@ -463,6 +463,30 @@ try {
   assert(restoreCommit.parsed.evidence?.sessionId === null, 'historical ledger restore git commit must not inherit a legacy session');
   assert(!(restoreCommit.parsed.evidence?.trailers ?? []).some((entry: string) => entry.startsWith('ATM-Session: ') || entry.startsWith('ATM-Claim: ')), 'historical ledger restore must not write stale claim or session trailers');
 
+  const reconcileTaskId = 'ATM-GOV-RECONCILE';
+  const reconcileReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--title', 'Reconcile close window regression', '--json']);
+  assert(reconcileReserve.exitCode === 0, 'reconcile fixture reserve must exit 0');
+  const reconcilePromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--json']);
+  assert(reconcilePromote.exitCode === 0, 'reconcile fixture promote must exit 0');
+  const reconcileSourcePath = path.join(repo, 'src', 'reconcile-close-window.ts');
+  mkdirSync(path.dirname(reconcileSourcePath), { recursive: true });
+  writeFileSync(reconcileSourcePath, 'export const reconcileCloseWindow = true;\n', 'utf8');
+  const reconcileClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--files', 'src/reconcile-close-window.ts', '--json']);
+  assert(reconcileClaim.exitCode === 0, 'reconcile fixture claim must exit 0');
+  assert(runGit(repo, ['add', 'src/reconcile-close-window.ts']).exitCode === 0, 'reconcile fixture source file must stage');
+  const reconcileDeliveryCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'feat: reconcile delivery fixture', '--json']);
+  assert(reconcileDeliveryCommit.exitCode === 0, 'reconcile fixture delivery commit must exit 0');
+  const reconcileDeliverySha = String(reconcileDeliveryCommit.parsed.evidence?.commitSha ?? '');
+  assert(reconcileDeliverySha.length > 0, 'reconcile fixture delivery commit must return commit sha');
+  const reconcileClose = runAtm(['tasks', 'reconcile', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--json']);
+  assert(reconcileClose.exitCode === 0, 'tasks reconcile must exit 0 for close-commit-window regression fixture');
+  assert(reconcileClose.parsed.ok === true, 'tasks reconcile must report ok=true for close-commit-window regression fixture');
+  const reconcileCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'chore: reconcile closure packet commit', '--json']);
+  assert(reconcileCommit.exitCode === 0, 'close-commit-window reconcile packet must commit without reopening a dead session');
+  assert(reconcileCommit.parsed.ok === true, 'close-commit-window reconcile packet commit must report ok=true');
+  assert(reconcileCommit.parsed.evidence?.sessionId === null, 'close-commit-window reconcile packet commit must not require a revived session');
+  assert(!(reconcileCommit.parsed.evidence?.trailers ?? []).some((entry: string) => entry.startsWith('ATM-Session: ') || entry.startsWith('ATM-Claim: ')), 'close-commit-window reconcile packet commit must not write stale claim or session trailers');
+
   const mixedRestoreTaskId = 'ATM-GOV-RESTORE-MIXED';
   const mixedRestoreFiles = writeHistoricalRestorePacket(repo, mixedRestoreTaskId);
   const mixedSourcePath = path.join(repo, 'src', 'restore-bypass.ts');
@@ -529,7 +553,7 @@ try {
     '--stderr-sha256',
     'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
     '--validators',
-    'typecheck,validate:cli',
+    'typecheck,validate:cli,validate:git-head-evidence',
     '--json'
   ]);
   assert(addEvidence.exitCode === 0, 'evidence add must exit 0');
@@ -624,7 +648,7 @@ try {
     '--stderr-sha256',
     'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
     '--validators',
-    'typecheck',
+    'typecheck,validate:cli,validate:git-head-evidence',
     '--json'
   ]);
   assert(historicalEvidence.exitCode === 0, 'historical delivery evidence add must exit 0');
@@ -637,6 +661,8 @@ try {
   const historicalCloseGate = historicalClose.parsed.evidence?.deliverableGate ?? {};
   assert(historicalCloseGate.reason === 'historical-delivery-diff-present', 'historical delivery close must report historical-delivery-diff-present');
   assert((historicalCloseGate.deliverableFiles ?? []).includes('src/historical-delivery.ts'), 'historical delivery close must include scoped historical deliverable file');
+  assert(runGit(repo, ['reset', '--hard', 'HEAD']).exitCode === 0, 'historical delivery close fixture must restore tracked files after staged close artifacts validation');
+  assert(runGit(repo, ['clean', '-fd', '--', '.atm/history/task-events/ATM-GOV-0111', '.atm/history/evidence/ATM-GOV-0111.closure-packet.json']).exitCode === 0, 'historical delivery close fixture must clean untracked close artifacts after validation');
 
   const artifactOnlyReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--title', 'Artifact-only closure guard', '--json']);
   assert(artifactOnlyReserve.exitCode === 0, 'artifact-only tasks reserve must exit 0');

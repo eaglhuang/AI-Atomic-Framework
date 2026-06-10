@@ -9,6 +9,7 @@ import {
   buildFrameworkStaleCleanupCommand,
   createFrameworkModeStatus,
   detectFrameworkRepoIdentity,
+  findCloseCommitWindowCoveringPaths,
   type FrameworkStaleLockInfo,
   isFrameworkStaleLockReleasable,
   isAdopterInfrastructureSyncCommit,
@@ -2405,7 +2406,8 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
   const claim = parseHookTaskClaim(task?.claim);
   const mirrorSyncOnly = inspectMirrorSyncOnlyStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
   const historicalLedgerRestore = inspectHistoricalLedgerRestoreStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
-  const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok;
+  const closeCommitWindow = inspectCloseCommitWindowStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+  const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok;
   const claimForSession = bypassesActiveSession ? null : claim;
   const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, {
     sessionId,
@@ -2485,6 +2487,24 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
     ok: findings.length === 0,
     findings
   };
+}
+
+function inspectCloseCommitWindowStagedArtifacts(
+  cwd: string,
+  taskId: string,
+  stagedFiles: readonly string[]
+): { readonly ok: boolean; readonly reason: string | null } {
+  if (stagedFiles.length === 0) {
+    return { ok: false, reason: 'no-staged-files' };
+  }
+  const windowRecord = findCloseCommitWindowCoveringPaths(cwd, stagedFiles);
+  if (!windowRecord) {
+    return { ok: false, reason: 'no-covering-window' };
+  }
+  if (windowRecord.taskId !== taskId) {
+    return { ok: false, reason: `window-task-mismatch:${windowRecord.taskId}` };
+  }
+  return { ok: true, reason: null };
 }
 
 function isStaticEvidenceArtifactPath(value: string): boolean {
