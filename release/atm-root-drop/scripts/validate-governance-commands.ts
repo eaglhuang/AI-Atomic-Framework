@@ -121,6 +121,41 @@ function writeHistoricalRestorePacket(repo: string, taskId: string, options: { s
   ];
 }
 
+function makeHostRepo(parent: string, name: string, config: Record<string, unknown> = {}) {
+  const repo = path.join(parent, name);
+  mkdirSync(repo, { recursive: true });
+  writeJson(path.join(repo, 'package.json'), { name, type: 'module' });
+  writeJson(path.join(repo, '.atm', 'config.json'), {
+    schemaVersion: 'atm.config.v0.1',
+    layoutVersion: 2,
+    paths: {
+      tasks: '.atm/history/tasks',
+      taskEvents: '.atm/history/task-events'
+    },
+    taskLedger: {
+      enabled: true,
+      mode: 'auto',
+      mirrorExternalTasks: true,
+      requireCliTransitions: true,
+      provider: 'atm-local',
+      ...(config.taskLedger as Record<string, unknown> | undefined ?? {})
+    }
+  });
+  return repo;
+}
+
+function initGitRepo(repo: string) {
+  const init = runGit(repo, ['init']);
+  assert(init.exitCode === 0, 'fixture git init must succeed');
+  assert(runGit(repo, ['config', 'user.name', 'bootstrap']).exitCode === 0, 'fixture git user.name must be configured');
+  assert(runGit(repo, ['config', 'user.email', 'bootstrap@example.com']).exitCode === 0, 'fixture git user.email must be configured');
+}
+
+function writeJson(filePath: string, value: unknown) {
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
 const tempRoot = createTempWorkspace('atm-governance-commands-');
 try {
   const repo = path.join(tempRoot, 'repo');
@@ -699,6 +734,54 @@ try {
   assert(artifactOnlyVerify.parsed.ok === false, 'artifact-only close evidence must report ok=false');
   assert(artifactOnlyVerify.parsed.evidence.missing.includes('fresh-evidence-required'), 'artifact-only close evidence must require fresh evidence');
   assert(artifactOnlyVerify.parsed.evidence.missing.includes('artifact-only-evidence-not-allowed'), 'artifact-only close evidence must reject artifact-only closure');
+
+  const residueRepo = makeHostRepo(tempRoot, 'residue-status-fixture');
+  initGitRepo(residueRepo);
+  const residuePlanPath = path.join(residueRepo, 'docs', 'fixtures', 'ATM-GOV-RESIDUE-0001.task.md');
+  mkdirSync(path.dirname(residuePlanPath), { recursive: true });
+  writeFileSync(residuePlanPath, [
+    '---',
+    'task_id: ATM-GOV-RESIDUE-0001',
+    'title: "Residue status fixture"',
+    'status: done',
+    '---',
+    '# ATM-GOV-RESIDUE-0001',
+    ''
+  ].join('\n'), 'utf8');
+  writeJson(path.join(residueRepo, '.atm', 'history', 'tasks', 'ATM-GOV-RESIDUE-0001.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'ATM-GOV-RESIDUE-0001',
+    title: 'Residue status fixture',
+    status: 'running',
+    planningRepo: '3KLife',
+    targetRepo: 'AI-Atomic-Framework',
+    closureAuthority: 'target_repo',
+    closedAt: '2026-06-10T00:00:00.000Z',
+    closurePacket: '.atm/history/evidence/ATM-GOV-RESIDUE-0001.closure-packet.json',
+    claim: {
+      actorId: 'fixture-agent',
+      leaseId: 'lease-residue-0001',
+      state: 'active'
+    },
+    source: {
+      planPath: residuePlanPath,
+      sectionTitle: 'ATM-GOV-RESIDUE-0001',
+      headingLine: 1,
+      hash: 'residue-status-fixture'
+    }
+  });
+  const residueStatus = runAtm(['tasks', 'status', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
+  assert(residueStatus.exitCode === 0, 'tasks status residue fixture must exit 0');
+  assert(residueStatus.parsed.ok === true, 'tasks status residue fixture must report ok=true');
+  assert(residueStatus.parsed.evidence.residueClassification.bucket === 'complete-but-unfinalized', 'tasks status residue fixture must classify complete-but-unfinalized');
+  assert(String(residueStatus.parsed.evidence.residueClassification.nextCommand ?? '').includes('tasks reconcile'), 'tasks status residue fixture must point to reconcile');
+  assert(String(residueStatus.parsed.evidence.residueClassification.nextCommand ?? '').includes('ATM-GOV-RESIDUE-0001'), 'tasks status residue fixture must materialize task id in next command');
+
+  const residueFinalize = runAtm(['tasks', 'finalize', 'diagnose', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
+  assert(residueFinalize.exitCode === 0, 'tasks finalize diagnose residue fixture must exit 0');
+  assert(residueFinalize.parsed.evidence.schemaId === 'atm.taskResidueDiagnosis.v1', 'tasks finalize diagnose must emit atm.taskResidueDiagnosis.v1');
+  assert(residueFinalize.parsed.evidence.bucket === 'complete-but-unfinalized', 'tasks finalize diagnose must classify complete-but-unfinalized');
+  assert(residueFinalize.parsed.evidence.autoMutationAllowed === false, 'tasks finalize diagnose must not allow auto mutation');
 
   const staticEvidenceArtifactPath = path.join(repo, 'atomic_workbench', 'evidence', 'ATM-GOV-IMPERSONATE.json');
   mkdirSync(path.dirname(staticEvidenceArtifactPath), { recursive: true });

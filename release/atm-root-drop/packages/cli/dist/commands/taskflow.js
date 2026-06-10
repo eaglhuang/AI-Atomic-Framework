@@ -1,8 +1,94 @@
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
+import { generateTaskCard, runTasksRosterUpdate } from './tasks.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
-import { loadProfile } from './taskflow/profile-loader.js';
-export function runTaskflow(argv = []) {
+import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
+import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
+function buildTasksNewCommand(input) {
+    const parts = ['node atm.mjs tasks new'];
+    if (input.template) {
+        parts.push(`--template ${input.template}`);
+    }
+    if (input.taskId) {
+        parts.push(`--task-id ${input.taskId}`);
+    }
+    if (input.title) {
+        parts.push(`--title ${JSON.stringify(input.title)}`);
+    }
+    if (input.outputPath) {
+        parts.push(`--output ${input.outputPath}`);
+    }
+    return parts.join(' ');
+}
+function buildRosterSyncCommand(input) {
+    const parts = ['node atm.mjs tasks roster update', `--index ${input.indexPath}`, `--from ${input.fromPath}`];
+    if (input.dryRun) {
+        parts.push('--dry-run');
+    }
+    parts.push('--json');
+    return parts.join(' ');
+}
+function buildOrchestrationPlan(input) {
+    const resolvedTaskId = input.hostPolicyDecision?.taskId ?? input.taskId ?? null;
+    const resolvedOutputPath = input.hostPolicyDecision?.outputPath ?? input.outputPath ?? null;
+    const followUpSteps = ['generate-via-tasks-new'];
+    if (input.delegationContract.hostOpenerAvailable) {
+        followUpSteps.unshift('resolve-delegation');
+    }
+    if (input.hostPolicyDecision?.sources.taskId === 'host-policy') {
+        followUpSteps.push('allocate-task-id-via-host-policy');
+    }
+    if (input.hostPolicyDecision?.sources.outputPath === 'host-policy') {
+        followUpSteps.push('resolve-output-path-via-host-policy');
+    }
+    if (input.openerMode === 'template-only-fallback') {
+        followUpSteps.push('operator-supply-task-id-and-output');
+    }
+    const rosterSyncPolicy = input.delegationContract.policy.rosterSyncPolicy;
+    const rosterIndexPath = input.rosterIndexPath ?? input.delegationContract.policy.rosterSync.indexPath;
+    let rosterFollowUpCommand = null;
+    if (rosterSyncPolicy === 'follow-up-command' && rosterIndexPath && resolvedOutputPath) {
+        rosterFollowUpCommand = buildRosterSyncCommand({
+            indexPath: rosterIndexPath,
+            fromPath: resolvedOutputPath
+        });
+        followUpSteps.push('roster-sync-follow-up-command');
+    }
+    else if (rosterSyncPolicy === 'inline' && rosterIndexPath && resolvedOutputPath) {
+        followUpSteps.push('roster-sync-inline');
+    }
+    return {
+        generationSurface: 'tasks-new',
+        wouldInvokeTasksNew: true,
+        tasksNewCommand: buildTasksNewCommand({
+            taskId: resolvedTaskId,
+            outputPath: resolvedOutputPath,
+            template: input.template,
+            title: input.title
+        }),
+        hostOpenerInvocation: input.delegationContract.displayHint,
+        rosterSyncPolicy,
+        rosterIndexPath,
+        rosterFollowUpCommand,
+        followUpRequired: input.openerMode === 'template-only-fallback'
+            || !resolvedTaskId
+            || !resolvedOutputPath
+            || (rosterSyncPolicy === 'follow-up-command' && Boolean(rosterFollowUpCommand)),
+        followUpSteps,
+        targetRepo: input.profile?.ownerRepo ?? 'adopter-repo',
+        profileRepoLabel: input.profile?.repoLabel ?? 'adopter-repo',
+        policyDecision: {
+            allocateTaskId: input.delegationContract.policy.allocateTaskId,
+            resolveCanonicalOutputPath: input.delegationContract.policy.resolveCanonicalOutputPath,
+            rosterSyncPolicy,
+            rosterSyncIndexPath: rosterIndexPath,
+            fallbackBehavior: input.delegationContract.policy.fallbackBehavior
+        },
+        hostPolicyDecision: input.hostPolicyDecision ?? null
+    };
+}
+export async function runTaskflow(argv = []) {
     const spec = getCommandSpec('taskflow');
     if (!spec) {
         throw new CliError('ATM_CLI_HELP_NOT_FOUND', 'No help spec found for taskflow.', { exitCode: 2 });
@@ -13,79 +99,173 @@ export function runTaskflow(argv = []) {
     if (action !== 'open') {
         throw new CliError('ATM_CLI_USAGE', `Unknown taskflow action: ${action}. Only "open" is supported.`, { exitCode: 2 });
     }
-    const write = !!parsed.options.write;
-    if (write) {
-        throw new CliError('ATM_TASKFLOW_WRITE_MODE_NOT_SUPPORTED', 'The write mode is not supported for taskflow in this version. ATM taskflow acts as an orchestrator only and does not write to task card, ledger, or shard files.', { exitCode: 1 });
-    }
-    let profileData = null;
+    const writeRequested = !!parsed.options.write;
     const profilePath = parsed.options.profile ? String(parsed.options.profile) : null;
+    const taskId = parsed.options.taskId ? String(parsed.options.taskId) : null;
+    const outputPath = parsed.options.output ? String(parsed.options.output) : null;
+    const rosterIndexPath = parsed.options.rosterIndex ? String(parsed.options.rosterIndex) : null;
+    const template = parsed.options.template ? String(parsed.options.template) : 'aao-l2-split';
+    const title = parsed.options.title ? String(parsed.options.title) : 'New Task';
+    let profileData = null;
     if (profilePath) {
         profileData = loadProfile(profilePath);
     }
-    const taskId = profileData ? `${profileData.taskIdPrefix}-0001` : 'TASK-ADOPTER-0001';
-    const targetRepo = profileData ? profileData.ownerRepo : 'adopter-repo';
-    // 實作 dry-run 骨架
+    const prerequisiteInput = {
+        profile: profileData,
+        taskIdSupplied: taskId !== null,
+        outputPathSupplied: outputPath !== null,
+        writeRequested
+    };
+    const delegationContract = buildDelegationContract(profileData);
+    const openerMode = resolveOpenerMode(prerequisiteInput);
+    const writeSupport = resolveWriteSupport(prerequisiteInput);
+    const diagnostics = buildTaskflowOpenDiagnostics(prerequisiteInput);
+    let hostPolicyDecision = null;
+    if (profileData && canResolveHostOpenerPolicy({
+        cwd,
+        profile: profileData,
+        delegationContract,
+        taskId,
+        outputPath
+    })) {
+        try {
+            hostPolicyDecision = resolveHostOpenerPolicyDecision({
+                cwd,
+                profile: profileData,
+                delegationContract,
+                taskId,
+                outputPath
+            });
+            diagnostics.messages.push(...hostPolicyDecision.diagnostics);
+        }
+        catch (error) {
+            if (writeRequested || taskId || outputPath) {
+                throw error;
+            }
+        }
+    }
+    const orchestrationPlan = buildOrchestrationPlan({
+        profile: profileData,
+        openerMode,
+        delegationContract,
+        taskId: hostPolicyDecision?.taskId ?? taskId,
+        outputPath: hostPolicyDecision?.outputPath ?? outputPath,
+        template,
+        title,
+        rosterIndexPath,
+        hostPolicyDecision
+    });
+    if (writeRequested && !writeSupport.allowed) {
+        throw new CliError('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK', openerMode === 'template-only-fallback'
+            ? 'taskflow open --write is not available in template-only-fallback mode. Load an invocable host opener profile or use tasks new for explicit template generation.'
+            : 'taskflow open --write prerequisites are incomplete. Supply --task-id/--output or configure host-opener numbering and output-path policy.', {
+            exitCode: 1,
+            details: {
+                openerMode,
+                writeSupport,
+                delegationContract,
+                diagnostics,
+                orchestrationPlan,
+                recommendedCommand: buildTasksNewCommand({
+                    taskId: hostPolicyDecision?.taskId ?? taskId,
+                    outputPath: hostPolicyDecision?.outputPath ?? outputPath,
+                    template,
+                    title
+                })
+            }
+        });
+    }
+    if (writeRequested && writeSupport.allowed) {
+        if (!profileData) {
+            throw new CliError('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK', 'taskflow open --write requires a governed profile.', { exitCode: 1 });
+        }
+        const resolved = hostPolicyDecision ?? resolveHostOpenerPolicyDecision({
+            cwd,
+            profile: profileData,
+            delegationContract,
+            taskId,
+            outputPath
+        });
+        const generated = await generateTaskCard({
+            cwd,
+            templateKey: template,
+            taskId: resolved.taskId,
+            title,
+            outputPath: resolved.outputPath
+        });
+        const targetAbsolute = path.resolve(cwd, resolved.outputPath);
+        mkdirSync(path.dirname(targetAbsolute), { recursive: true });
+        writeFileSync(targetAbsolute, generated.content, 'utf8');
+        const effectiveRosterIndex = rosterIndexPath ?? delegationContract.policy.rosterSync.indexPath;
+        let rosterSync = null;
+        if (delegationContract.policy.rosterSyncPolicy === 'inline' && effectiveRosterIndex) {
+            const rosterResult = await runTasksRosterUpdate([
+                '--cwd', cwd,
+                '--index', effectiveRosterIndex,
+                '--from', resolved.outputPath
+            ]);
+            rosterSync = {
+                mode: 'inline',
+                command: buildRosterSyncCommand({ indexPath: effectiveRosterIndex, fromPath: resolved.outputPath }),
+                result: rosterResult
+            };
+        }
+        else if (delegationContract.policy.rosterSyncPolicy === 'follow-up-command' && effectiveRosterIndex) {
+            rosterSync = {
+                mode: 'follow-up-command',
+                command: buildRosterSyncCommand({ indexPath: effectiveRosterIndex, fromPath: resolved.outputPath })
+            };
+        }
+        return {
+            ...makeResult({
+                ok: true,
+                command: 'taskflow open',
+                cwd,
+                mode: 'write',
+                messages: [
+                    message('info', 'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED', `taskflow open orchestrated tasks new generation at ${resolved.outputPath}.`, { openerMode, generationSurface: 'tasks-new' })
+                ],
+                evidence: {
+                    openerMode,
+                    writeSupport,
+                    delegationContract,
+                    diagnostics,
+                    orchestrationPlan,
+                    hostPolicyDecision: resolved,
+                    generation: {
+                        surface: 'tasks-new',
+                        taskId: generated.taskId,
+                        sourcePath: generated.sourcePath,
+                        templateUsed: generated.templateUsed
+                    },
+                    rosterSync,
+                    ...(profileData ? { profile: profileData } : {})
+                }
+            }),
+            schemaId: 'atm.taskflowOpenResult.v1',
+            writeEnabled: true
+        };
+    }
     const result = makeResult({
         ok: true,
         command: 'taskflow open',
         cwd,
         mode: 'dry-run',
         messages: [
-            message('info', 'ATM_TASKFLOW_OPEN_DRY_RUN_SKELETON_READY', profileData
-                ? `Taskflow open dry-run with profile "${profileData.name}" is ready. Write mode is not supported by design.`
-                : 'Taskflow open dry-run skeleton is ready. Write mode is not supported by design.', { cwd })
+            message(openerMode === 'delegated-governed' ? 'info' : 'warn', openerMode === 'delegated-governed'
+                ? 'ATM_TASKFLOW_OPEN_ORCHESTRATION_READY'
+                : 'ATM_TASKFLOW_OPEN_TEMPLATE_ONLY_FALLBACK', openerMode === 'delegated-governed'
+                ? 'taskflow open dry-run orchestration plan is ready for delegated governed entry.'
+                : 'taskflow open is in template-only-fallback mode. tasks new remains the explicit low-level generator.', { cwd, openerMode })
         ],
         evidence: {
-            wouldCreate: false,
-            wouldValidate: true,
-            wouldDelegate: true,
-            profileRepoLabel: profileData ? profileData.repoLabel : 'adopter-repo',
-            taskIdPrefix: profileData ? profileData.taskIdPrefix : 'TASK-ADOPTER',
-            templateHint: profileData ? (profileData.template.defaultMarkdown ? 'defaultMarkdown' : 'none') : 'none',
-            delegationDisplayHint: profileData ? (profileData.delegationDisplayHint ?? profileData.delegation.hint) : 'repo-profile task compiler / task-card-opener.js',
-            taskPlanReport: {
-                profileRepoLabel: profileData ? profileData.repoLabel : 'adopter-repo',
-                taskIdPrefix: profileData ? profileData.taskIdPrefix : 'TASK-ADOPTER',
-                templateHint: profileData ? (profileData.template.defaultMarkdown ? 'defaultMarkdown' : 'none') : 'none',
-                delegationDisplayHint: profileData ? (profileData.delegationDisplayHint ?? profileData.delegation.hint) : 'repo-profile task compiler / task-card-opener.js',
-                delegation: profileData ? {
-                    hint: profileData.delegation.hint,
-                    openerPath: profileData.delegation.openerPath,
-                    writerInvocation: profileData.delegation.writerInvocation ? {
-                        describeOnly: true,
-                        displayHint: profileData.delegation.writerInvocation.displayHint
-                    } : null
-                } : null,
-                wouldCreate: false,
-                wouldValidate: true,
-                wouldDelegate: true
-            },
-            wouldDo: [
-                {
-                    workItemId: taskId,
-                    action: 'create-dry-run',
-                    status: 'planned',
-                    targetRepo: targetRepo
-                }
-            ],
-            diagnostics: profileData ? [
-                `Loaded profile: ${profileData.name}`,
-                `Capabilities: supportsDryRun=${profileData.capabilities.supportsDryRun}, supportsWrite=${profileData.capabilities.supportsWrite}`,
-                `Delegation: ${profileData.delegation.hint}`,
-                `TaskId format: ${profileData.taskId.format}`,
-                `Default markdown template available`
-            ] : [
-                'This is a read-only orchestrator dry-run skeleton.',
-                'No physical task cards, ledger records, or json shards will be created or modified by this command.'
-            ],
-            decision: profileData ? {
-                reason: `Delegated to opener defined in profile "${profileData.name}": ${profileData.delegation.hint}`,
-                delegatedTo: profileData.delegation.openerPath ?? 'repo-profile task compiler / task-card-opener.js',
-                displayHint: profileData.delegation.writerInvocation?.displayHint ?? 'repo-profile task compiler / task-card-opener.js'
-            } : {
-                reason: 'All task ledger mutations remain delegated to the repo-profile specified task opener and compiler.',
-                delegatedTo: 'repo-profile task compiler / task-card-opener.js'
-            },
+            openerMode,
+            writeSupport,
+            delegationContract,
+            diagnostics,
+            orchestrationPlan,
+            hostPolicyDecision,
+            fallbackBehavior: delegationContract.policy.fallbackBehavior,
             ...(profileData ? { profile: profileData } : {})
         }
     });

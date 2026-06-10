@@ -20,7 +20,8 @@ export function parseAllowStaleRunnerFlag(argv) {
 export function parseStatusOptions(argv) {
     const options = {
         cwd: process.cwd(),
-        taskId: ''
+        taskId: '',
+        residueOnly: false
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -34,6 +35,10 @@ export function parseStatusOptions(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--residue') {
+            options.residueOnly = true;
+            continue;
+        }
         if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
             continue;
         }
@@ -44,8 +49,13 @@ export function parseStatusOptions(argv) {
     }
     return {
         cwd: path.resolve(options.cwd),
-        taskId: options.taskId.trim()
+        taskId: options.taskId.trim(),
+        residueOnly: options.residueOnly
     };
+}
+export function parseFinalizeDiagnoseOptions(argv) {
+    const statusOptions = parseStatusOptions(argv);
+    return statusOptions;
 }
 export function parseReconcileOptions(argv) {
     const options = {

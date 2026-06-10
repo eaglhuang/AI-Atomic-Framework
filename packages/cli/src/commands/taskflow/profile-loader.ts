@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../shared.ts';
 
+export type TaskflowOpenerMode = 'delegated-governed' | 'template-only-fallback';
+
 export interface TaskflowProfileV1 {
   schemaId: 'taskflow.profile.v1';
   id: string;
@@ -24,10 +26,304 @@ export interface TaskflowProfileV1 {
   delegation: {
     hint: string;
     openerPath?: string;
+    policy?: {
+      allocateTaskId?: {
+        mode: 'host-opener' | 'fallback';
+        prefix?: string;
+        format?: string;
+      };
+      resolveCanonicalOutputPath?: {
+        mode: 'host-opener' | 'fallback';
+        pattern?: string;
+        directory?: string;
+      };
+      rosterSyncPolicy?: 'inline' | 'follow-up-command' | 'none';
+      rosterSync?: {
+        indexPath?: string;
+      };
+      fallbackBehavior?: {
+        mode: 'template-only-fallback' | 'governed-fallback';
+        reason: string;
+        missingPrerequisites?: string[];
+      };
+    };
     writerInvocation?: {
       describeOnly?: boolean;
       displayHint?: string;
     };
+  };
+}
+
+export interface TaskflowDelegationContract {
+  hostOpenerAvailable: boolean;
+  openerPath: string | null;
+  describeOnly: boolean;
+  invocable: boolean;
+  hint: string;
+  displayHint: string | null;
+  generationSurface: 'tasks-new';
+  policy: {
+    allocateTaskId: {
+      mode: 'host-opener' | 'fallback';
+      prefix: string | null;
+      format: string | null;
+    };
+    resolveCanonicalOutputPath: {
+      mode: 'host-opener' | 'fallback';
+      pattern: string | null;
+      directory: string | null;
+    };
+    rosterSyncPolicy: 'inline' | 'follow-up-command' | 'none';
+    rosterSync: {
+      indexPath: string | null;
+    };
+    fallbackBehavior: {
+      mode: 'template-only-fallback' | 'governed-fallback';
+      reason: string;
+      missingPrerequisites: string[];
+    };
+  };
+}
+
+export interface TaskflowOpenDiagnostics {
+  codes: string[];
+  messages: string[];
+  missingPrerequisites: string[];
+}
+
+export interface TaskflowWriteSupport {
+  requested: boolean;
+  allowed: boolean;
+  reason: string;
+}
+
+export interface TaskflowOpenPrerequisiteInput {
+  profile: TaskflowProfileV1 | null;
+  taskIdSupplied: boolean;
+  outputPathSupplied: boolean;
+  writeRequested: boolean;
+}
+
+export function buildDelegationContract(profile: TaskflowProfileV1 | null): TaskflowDelegationContract {
+  const openerPath = profile?.delegation?.openerPath?.trim() || null;
+  const hostOpenerAvailable = openerPath !== null;
+  const describeOnly = profile?.delegation?.writerInvocation?.describeOnly !== false;
+  const invocable = hostOpenerAvailable && !describeOnly;
+  const policy = normalizePolicy(profile?.delegation?.policy ?? null, describeOnly, hostOpenerAvailable);
+
+  return {
+    hostOpenerAvailable,
+    openerPath,
+    describeOnly,
+    invocable,
+    hint: profile?.delegation?.hint ?? 'No host opener profile loaded.',
+    displayHint: profile?.delegation?.writerInvocation?.displayHint
+      ?? profile?.delegationDisplayHint
+      ?? null,
+    generationSurface: 'tasks-new',
+    policy
+  };
+}
+
+export function collectMissingPrerequisites(input: TaskflowOpenPrerequisiteInput): string[] {
+  const missing: string[] = [];
+  if (!input.profile) {
+    missing.push('profile');
+  }
+  if (!input.profile?.delegation?.openerPath?.trim()) {
+    missing.push('delegation.openerPath');
+  }
+  if (input.profile && input.profile.delegation.writerInvocation?.describeOnly !== false) {
+    missing.push('delegation.writerInvocation.invoke');
+  }
+  const delegation = buildDelegationContract(input.profile);
+  if (input.writeRequested) {
+    if (!input.taskIdSupplied && delegation.policy.allocateTaskId.mode !== 'host-opener') {
+      missing.push('task-id');
+    }
+    if (!input.outputPathSupplied && delegation.policy.resolveCanonicalOutputPath.mode !== 'host-opener') {
+      missing.push('output');
+    }
+  }
+  return missing;
+}
+
+export function canAutoResolveHostOpenerInputs(input: TaskflowOpenPrerequisiteInput): boolean {
+  const delegation = buildDelegationContract(input.profile);
+  if (!delegation.invocable) {
+    return false;
+  }
+  const canAllocate = input.taskIdSupplied || delegation.policy.allocateTaskId.mode === 'host-opener';
+  const canResolvePath = input.outputPathSupplied || delegation.policy.resolveCanonicalOutputPath.mode === 'host-opener';
+  return canAllocate && canResolvePath;
+}
+
+export function resolveOpenerMode(input: TaskflowOpenPrerequisiteInput): TaskflowOpenerMode {
+  const delegation = buildDelegationContract(input.profile);
+  if (!delegation.invocable) {
+    return 'template-only-fallback';
+  }
+  if (input.writeRequested && !canAutoResolveHostOpenerInputs(input)) {
+    return 'template-only-fallback';
+  }
+  return 'delegated-governed';
+}
+
+export function buildTaskflowOpenDiagnostics(input: TaskflowOpenPrerequisiteInput): TaskflowOpenDiagnostics {
+  const delegation = buildDelegationContract(input.profile);
+  const openerMode = resolveOpenerMode(input);
+  const missingPrerequisites = collectMissingPrerequisites(input);
+  const codes: string[] = [];
+  const messages: string[] = [];
+
+  if (!input.profile) {
+    codes.push('ATM_TASKFLOW_PROFILE_MISSING');
+    messages.push('No taskflow profile was loaded; taskflow open is running in template-only-fallback mode.');
+  } else {
+    codes.push('ATM_TASKFLOW_PROFILE_LOADED');
+    messages.push(`Loaded profile: ${input.profile.name}`);
+  }
+
+  if (!delegation.hostOpenerAvailable) {
+    codes.push('ATM_TASKFLOW_HOST_OPENER_UNAVAILABLE');
+    messages.push('Host opener path is not declared in the profile.');
+  } else if (delegation.describeOnly) {
+    codes.push('ATM_TASKFLOW_HOST_OPENER_DESCRIBE_ONLY');
+    messages.push('Host opener is declared but writerInvocation is describe-only; governed write remains unavailable until an invocable opener contract is configured.');
+  } else {
+    codes.push('ATM_TASKFLOW_HOST_OPENER_INVOCABLE');
+    messages.push(`Host opener is available at ${delegation.openerPath}.`);
+  }
+
+  if (openerMode === 'template-only-fallback') {
+    codes.push('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK');
+    messages.push('taskflow open is in template-only-fallback mode. Use tasks new for explicit template generation or supply a governed profile contract.');
+  } else {
+    codes.push('ATM_TASKFLOW_DELEGATED_GOVERNED');
+    messages.push('taskflow open can orchestrate through the delegated governed entry contract.');
+  }
+
+  if (delegation.policy.fallbackBehavior.missingPrerequisites.length > 0) {
+    messages.push(`Fallback prerequisites: ${delegation.policy.fallbackBehavior.missingPrerequisites.join(', ')}`);
+  }
+
+  if (input.writeRequested && missingPrerequisites.includes('task-id')) {
+    codes.push('ATM_TASKFLOW_WRITE_TASK_ID_REQUIRED');
+    messages.push('Governed write requires --task-id or a host-opener numbering policy.');
+  }
+  if (input.writeRequested && missingPrerequisites.includes('output')) {
+    codes.push('ATM_TASKFLOW_WRITE_OUTPUT_REQUIRED');
+    messages.push('Governed write requires --output or a host-opener canonical output-path policy.');
+  }
+  if (delegation.policy.allocateTaskId.mode === 'host-opener') {
+    codes.push('ATM_TASKFLOW_HOST_POLICY_NUMBERING_READY');
+    messages.push('Host-neutral numbering policy is configured for delegated allocation.');
+  }
+  if (delegation.policy.resolveCanonicalOutputPath.mode === 'host-opener') {
+    codes.push('ATM_TASKFLOW_HOST_POLICY_PATH_READY');
+    messages.push('Host-neutral canonical output-path policy is configured.');
+  }
+
+  messages.push(`Generation surface: ${delegation.generationSurface}`);
+
+  return { codes, messages, missingPrerequisites };
+}
+
+export function resolveWriteSupport(input: TaskflowOpenPrerequisiteInput): TaskflowWriteSupport {
+  const openerMode = resolveOpenerMode({
+    ...input,
+    writeRequested: false
+  });
+  const delegation = buildDelegationContract(input.profile);
+  const missingPrerequisites = collectMissingPrerequisites(input);
+
+  if (!input.writeRequested) {
+    return {
+      requested: false,
+      allowed: false,
+      reason: 'Write was not requested; taskflow open returned an orchestration plan only.'
+    };
+  }
+
+  if (!delegation.invocable) {
+    return {
+      requested: true,
+      allowed: false,
+      reason: 'Delegated host opener prerequisites are not satisfied; taskflow open must remain in template-only-fallback mode.'
+    };
+  }
+
+  if (!canAutoResolveHostOpenerInputs(input)) {
+    return {
+      requested: true,
+      allowed: false,
+      reason: 'Governed write prerequisites are incomplete; supply --task-id/--output or configure host-opener numbering and output-path policy.'
+    };
+  }
+
+  if (openerMode !== 'delegated-governed') {
+    return {
+      requested: true,
+      allowed: false,
+      reason: 'Delegated governed opener mode is not active.'
+    };
+  }
+
+  return {
+    requested: true,
+    allowed: true,
+    reason: 'Delegated governed write prerequisites are satisfied; taskflow open may orchestrate tasks new as the generation surface.'
+  };
+}
+
+function normalizePolicy(
+  policy: TaskflowProfileV1['delegation']['policy'] | null,
+  describeOnly: boolean,
+  hostOpenerAvailable: boolean
+): TaskflowDelegationContract['policy'] {
+  const allocateTaskId = policy?.allocateTaskId ?? {
+    mode: 'fallback' as const,
+    prefix: null,
+    format: null
+  };
+  const resolveCanonicalOutputPath = policy?.resolveCanonicalOutputPath ?? {
+    mode: 'fallback' as const,
+    pattern: null,
+    directory: null
+  };
+  const rosterSyncPolicy = policy?.rosterSyncPolicy ?? 'follow-up-command';
+  const rosterSyncIndexPath = policy?.rosterSync?.indexPath?.trim() || null;
+  const fallbackBehavior = policy?.fallbackBehavior ?? {
+    mode: 'template-only-fallback' as const,
+    reason: hostOpenerAvailable && describeOnly
+      ? 'Host opener is describe-only, so taskflow open falls back to template-only mode.'
+      : hostOpenerAvailable
+        ? 'Host opener policy is missing explicit governed write instructions.'
+        : 'Host opener is unavailable.'
+  };
+
+  return {
+    allocateTaskId: {
+      mode: allocateTaskId.mode ?? 'fallback',
+      prefix: allocateTaskId.prefix?.trim() || null,
+      format: allocateTaskId.format?.trim() || null
+    },
+    resolveCanonicalOutputPath: {
+      mode: resolveCanonicalOutputPath.mode ?? 'fallback',
+      pattern: resolveCanonicalOutputPath.pattern?.trim() || null,
+      directory: resolveCanonicalOutputPath.directory?.trim() || null
+    },
+    rosterSyncPolicy,
+    rosterSync: {
+      indexPath: rosterSyncIndexPath
+    },
+    fallbackBehavior: {
+      mode: fallbackBehavior.mode ?? 'template-only-fallback',
+      reason: String(fallbackBehavior.reason ?? 'Fallback behavior is unspecified.'),
+      missingPrerequisites: Array.isArray(fallbackBehavior.missingPrerequisites)
+        ? fallbackBehavior.missingPrerequisites.map((entry) => String(entry).trim()).filter(Boolean)
+        : []
+    }
   };
 }
 

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { loadProfile } from '../profile-loader.ts';
+import { buildDelegationContract, loadProfile } from '../profile-loader.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../../../../../../');
@@ -25,6 +25,11 @@ assert.equal(valid.delegation.hint, 'All task ledger mutations remain delegated 
 assert.equal(valid.delegation.openerPath, 'tools/task-card-opener.js');
 assert.equal(valid.delegation.writerInvocation?.describeOnly, true);
 assert.equal(valid.delegation.writerInvocation?.displayHint, 'node tools/task-card-opener.js --task ${taskId} --dry-run');
+
+const validContract = buildDelegationContract(valid);
+assert.equal(validContract.policy.allocateTaskId.mode, 'fallback');
+assert.equal(validContract.policy.resolveCanonicalOutputPath.mode, 'fallback');
+assert.equal(validContract.policy.rosterSyncPolicy, 'follow-up-command');
 
 // 2. 測試 missing schemaId 的 profile 讀取
 const invalidPath = path.join(rootDir, 'fixtures/taskflow-profile/invalid-missing-schema-id.profile.json');
@@ -50,7 +55,13 @@ const invalidWriteProfile = {
     supportsWrite: true
   },
   delegation: {
-    hint: 'Delegation hint'
+    hint: 'Delegation hint',
+    policy: {
+      allocateTaskId: { mode: 'host-opener', prefix: 'TASK-INVALID', format: 'TASK-INVALID-NNNN' },
+      resolveCanonicalOutputPath: { mode: 'host-opener', pattern: 'docs/tasks/${taskId}.task.md', directory: 'docs/tasks' },
+      rosterSyncPolicy: 'inline',
+      fallbackBehavior: { mode: 'template-only-fallback', reason: 'fallback' }
+    }
   }
 };
 

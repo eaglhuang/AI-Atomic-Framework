@@ -84,6 +84,71 @@
         "openerPath": {
           "type": "string"
         },
+        "policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allocateTaskId": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "enum": ["host-opener", "fallback"]
+                },
+                "prefix": {
+                  "type": "string"
+                },
+                "format": {
+                  "type": "string"
+                }
+              }
+            },
+            "resolveCanonicalOutputPath": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "enum": ["host-opener", "fallback"]
+                },
+                "pattern": {
+                  "type": "string"
+                },
+                "directory": {
+                  "type": "string"
+                }
+              }
+            },
+            "rosterSyncPolicy": {
+              "enum": ["inline", "follow-up-command", "none"]
+            },
+            "rosterSync": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "indexPath": {
+                  "type": "string"
+                }
+              }
+            },
+            "fallbackBehavior": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["reason"],
+              "properties": {
+                "mode": {
+                  "enum": ["template-only-fallback", "governed-fallback"]
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "missingPrerequisites": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
         "writerInvocation": {
           "type": "object",
           "properties": {

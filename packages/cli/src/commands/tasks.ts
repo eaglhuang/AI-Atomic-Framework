@@ -104,6 +104,7 @@ import {
   parseMirrorOptions,
   parseCloseOptions,
   parseStatusOptions,
+  parseFinalizeDiagnoseOptions,
   parseResetOptions,
   parseLockCleanupOptions,
   parseClaimLifecycleOptions,
@@ -340,8 +341,14 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
   if (action === 'status') {
     return await runTasksStatus(argv.slice(1));
   }
+  if (action === 'finalize') {
+    return await runTasksFinalize(argv.slice(1));
+  }
   if (action === 'deliver-and-close') {
     return await runTasksDeliverAndClose(argv.slice(1));
+  }
+  if (action === 'roster') {
+    return await runTasksRoster(argv.slice(1));
   }
   if (action === 'new') {
     return await runTasksNew(argv.slice(1));
@@ -356,7 +363,7 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
     return await runTasksScope(argv.slice(1));
   }
   if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | deliver-and-close | audit | migrate-legacy-ledger | new).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).', { exitCode: 2 });
   }
   throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
 }
@@ -461,6 +468,15 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
       });
     }
   }
+  const residueClassification = buildResidueClassification({
+    cwd,
+    taskId,
+    taskDocument,
+    liveLedger,
+    planningFrontmatter,
+    lastTransitionEvent,
+    divergence
+  });
   const recommendation = divergence.length > 0
     ? (planningFrontmatter.status === 'done' && liveLedger.status !== 'done'
       ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
@@ -472,7 +488,139 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
     lastTransitionEvent,
     planningFrontmatter,
     divergence,
-    recommendation
+    recommendation,
+    residueClassification
+  };
+}
+
+export type TaskResidueBucket =
+  | 'complete-but-unfinalized'
+  | 'planning-mirror-only'
+  | 'interrupted-close'
+  | 'stale-import'
+  | 'ambiguous-manual-review';
+
+export interface TaskResidueClassification {
+  bucket: TaskResidueBucket;
+  truth: string;
+  residue: string;
+  reason: string;
+  nextCommandTemplate: string;
+  nextCommand: string;
+  autoMutationAllowed: false;
+}
+
+function materializeResidueNextCommand(template: string, taskId: string, planningCardPath: string | null): string {
+  const planPath = planningCardPath ?? '<plan.md>';
+  return template
+    .replaceAll('<id>', taskId)
+    .replaceAll('<plan.md>', planPath);
+}
+
+function buildResidueClassification(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+  liveLedger: { status: string | null; claimState: string | null; lastTransitionId: string | null; lastTransitionAt: string | null };
+  planningFrontmatter: { status: string | null; source: string | null };
+  lastTransitionEvent: { action: string | null; actorId: string | null; createdAt: string | null; fromStatus: string | null; toStatus: string | null } | null;
+  divergence: Array<{ field: string; liveLedger: string | null; planningFrontmatter?: string | null; lastTransitionEvent?: string | null }>;
+}): TaskResidueClassification {
+  const base = classifyTaskResidue(input);
+  return {
+    ...base,
+    nextCommandTemplate: base.nextCommand,
+    nextCommand: materializeResidueNextCommand(base.nextCommand, input.taskId, input.planningFrontmatter.source),
+    autoMutationAllowed: false
+  };
+}
+
+function classifyTaskResidue(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+  liveLedger: { status: string | null; claimState: string | null; lastTransitionId: string | null; lastTransitionAt: string | null };
+  planningFrontmatter: { status: string | null; source: string | null };
+  lastTransitionEvent: { action: string | null; actorId: string | null; createdAt: string | null; fromStatus: string | null; toStatus: string | null } | null;
+  divergence: Array<{ field: string; liveLedger: string | null; planningFrontmatter?: string | null; lastTransitionEvent?: string | null }>;
+}): Omit<TaskResidueClassification, 'nextCommandTemplate' | 'autoMutationAllowed'> & { nextCommand: string } {
+  const closurePacket = normalizeOptionalString(input.taskDocument.closurePacket ?? input.taskDocument.closure_packet);
+  const closedAt = normalizeOptionalString(input.taskDocument.closedAt ?? input.taskDocument.closed_at);
+  const hasHistoricalCloseArtifacts = Boolean(closurePacket || closedAt || input.lastTransitionEvent?.action === 'close');
+  const planningDone = input.planningFrontmatter.status === 'done';
+  const liveDone = input.liveLedger.status === 'done';
+  const activeClaim = input.liveLedger.claimState === 'active';
+  const mirrorPath = normalizeOptionalString(input.planningFrontmatter.source);
+  const planningMirrorOnly = Boolean(
+    planningDone
+    && liveDone
+    && (normalizeOptionalString(input.taskDocument.planningRepo ?? input.taskDocument.planning_repo) === normalizeOptionalString(input.taskDocument.targetRepo ?? input.taskDocument.target_repo))
+  );
+
+  if (planningDone && !liveDone) {
+    return {
+      bucket: hasHistoricalCloseArtifacts || activeClaim
+        ? 'complete-but-unfinalized'
+        : 'stale-import',
+      truth: 'planning-mirror says done, live ledger has not finished finalization',
+      residue: hasHistoricalCloseArtifacts || activeClaim
+        ? 'There is enough close-path residue to point the operator at reconcile or repair.'
+        : 'The imported planning mirror is ahead of the live ledger.',
+      nextCommand: hasHistoricalCloseArtifacts || activeClaim
+        ? 'node atm.mjs tasks reconcile --task <id> --actor <actor> --delivery-commit <sha> --json'
+        : 'node atm.mjs tasks import --from <plan.md> --write --json',
+      reason: hasHistoricalCloseArtifacts || activeClaim
+        ? 'Historical close artifacts or an active claim remain, so the task is substantively done but not finalized.'
+        : 'Planning mirror is done, but the live ledger still needs import reconciliation.'
+    };
+  }
+
+  if (liveDone && !planningDone) {
+    return {
+      bucket: mirrorPath ? 'planning-mirror-only' : 'stale-import',
+      truth: 'live ledger is done, but the planning mirror has not converged',
+      residue: mirrorPath ? 'Only the planning mirror remains to be refreshed or retired.' : 'The imported ledger is ahead of the planning mirror.',
+      nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --force --json',
+      reason: mirrorPath ? 'The task appears complete in the target ledger, but the planning mirror still needs a governed refresh.' : 'The ledger is ahead of the planning mirror and should be re-imported from the authoritative plan.'
+    };
+  }
+
+  if (planningDone && liveDone && activeClaim) {
+    return {
+      bucket: 'interrupted-close',
+      truth: 'both mirrors say done, but the live claim state is still active',
+      residue: 'The close was interrupted before the claim fully released.',
+      nextCommand: 'node atm.mjs tasks repair-closure --task <id> --json',
+      reason: 'A done/done task still carries an active claim, so the finalization flow needs repair rather than a new close.'
+    };
+  }
+
+  if (planningMirrorOnly) {
+    return {
+      bucket: 'planning-mirror-only',
+      truth: 'planning mirror and live ledger align as done, but the task is still within a planning-mirror authority shape',
+      residue: 'The residue lives in the planning mirror rather than the live ledger.',
+      nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --json',
+      reason: 'This task is planning-mirror-owned, so the operator should refresh the mirrored source of truth instead of forcing close.'
+    };
+  }
+
+  if (input.divergence.length > 0) {
+    return {
+      bucket: 'ambiguous-manual-review',
+      truth: 'the status surfaces disagree, but the operator path is not unique',
+      residue: 'There are multiple possible governed next steps and the system should fail closed.',
+      nextCommand: 'node atm.mjs tasks status --task <id> --json',
+      reason: 'The divergence pattern is not enough to choose a single governed operator action.'
+    };
+  }
+
+  return {
+    bucket: 'ambiguous-manual-review',
+    truth: 'no residue bucket is clearly dominant',
+    residue: 'The state is too quiet to classify as a governed residue bucket without more evidence.',
+    nextCommand: 'node atm.mjs tasks status --task <id> --json',
+    reason: 'The current status triangulation does not expose a decisive residue path.'
   };
 }
 
@@ -502,18 +650,55 @@ async function recordStaleRunnerOverride(input: {
   return true;
 }
 
-async function runTasksStatus(argv: string[]): Promise<CommandResult> {
-  const options = parseStatusOptions(argv);
-  const taskPath = taskPathFor(options.cwd, options.taskId);
+function loadTaskDocumentOrThrow(cwd: string, taskId: string): { taskPath: string; taskDocument: Record<string, unknown> } {
+  const taskPath = taskPathFor(cwd, taskId);
   if (!existsSync(taskPath)) {
-    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
+    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${taskId}.`, {
       exitCode: 2,
-      details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
+      details: { taskPath: relativePathFrom(cwd, taskPath), taskId }
     });
   }
-  const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+  return {
+    taskPath,
+    taskDocument: JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
+  };
+}
+
+function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>) {
+  const triangulation = buildTaskStatusTriangulation(cwd, taskId, taskDocument);
+  const residue = triangulation.residueClassification;
+  return {
+    schemaId: 'atm.taskResidueDiagnosis.v1' as const,
+    taskId,
+    bucket: residue.bucket,
+    truth: residue.truth,
+    residue: residue.residue,
+    reason: residue.reason,
+    nextCommand: residue.nextCommand,
+    nextCommandTemplate: residue.nextCommandTemplate,
+    autoMutationAllowed: residue.autoMutationAllowed,
+    diagnostics: {
+      codes: [`ATM_TASK_RESIDUE_${residue.bucket.toUpperCase().replace(/-/g, '_')}`],
+      messages: [residue.reason, `Recommended next command: ${residue.nextCommand}`]
+    },
+    triangulation
+  };
+}
+
+async function runTasksStatus(argv: string[]): Promise<CommandResult> {
+  const options = parseStatusOptions(argv);
+  const { taskDocument } = loadTaskDocumentOrThrow(options.cwd, options.taskId);
   const triangulation = buildTaskStatusTriangulation(options.cwd, options.taskId, taskDocument);
-  const messages = [message('info', 'ATM_TASK_STATUS_TRIANGULATED', `Task status triangulation for ${options.taskId}.`, triangulation)];
+  const messages = [
+    message(
+      options.residueOnly ? 'info' : 'info',
+      options.residueOnly ? 'ATM_TASK_RESIDUE_DIAGNOSED' : 'ATM_TASK_STATUS_TRIANGULATED',
+      options.residueOnly
+        ? `Residue diagnosis for ${options.taskId}: ${triangulation.residueClassification.bucket}.`
+        : `Task status triangulation for ${options.taskId}.`,
+      triangulation
+    )
+  ];
   if (isRunnerSyncRequired(options.cwd)) {
     messages.push(message('warn', 'ATM_RUNNER_SYNC_REQUIRED', runnerStaleWarningMessage()));
   }
@@ -522,10 +707,48 @@ async function runTasksStatus(argv: string[]): Promise<CommandResult> {
     command: 'tasks status',
     cwd: options.cwd,
     messages,
-    evidence: {
-      taskId: options.taskId,
-      ...triangulation
-    }
+    evidence: options.residueOnly
+      ? buildResidueDiagnosisEvidence(options.cwd, options.taskId, taskDocument)
+      : {
+        taskId: options.taskId,
+        ...triangulation
+      }
+  });
+}
+
+async function runTasksFinalize(argv: string[]): Promise<CommandResult> {
+  const subAction = (argv[0] ?? '').toLowerCase();
+  if (subAction !== 'diagnose') {
+    throw new CliError('ATM_CLI_USAGE', 'tasks finalize requires diagnose.', { exitCode: 2 });
+  }
+  return runTasksFinalizeDiagnose(argv.slice(1));
+}
+
+async function runTasksFinalizeDiagnose(argv: string[]): Promise<CommandResult> {
+  const options = parseFinalizeDiagnoseOptions(argv);
+  const { taskDocument } = loadTaskDocumentOrThrow(options.cwd, options.taskId);
+  const evidence = buildResidueDiagnosisEvidence(options.cwd, options.taskId, taskDocument);
+  const messages = [
+    message(
+      evidence.bucket === 'ambiguous-manual-review' ? 'warn' : 'info',
+      'ATM_TASK_FINALIZE_DIAGNOSED',
+      `Residue bucket ${evidence.bucket} for ${options.taskId}.`,
+      {
+        truth: evidence.truth,
+        residue: evidence.residue,
+        nextCommand: evidence.nextCommand
+      }
+    )
+  ];
+  if (isRunnerSyncRequired(options.cwd)) {
+    messages.push(message('warn', 'ATM_RUNNER_SYNC_REQUIRED', runnerStaleWarningMessage()));
+  }
+  return makeResult({
+    ok: true,
+    command: 'tasks finalize diagnose',
+    cwd: options.cwd,
+    messages,
+    evidence
   });
 }
 
@@ -5654,6 +5877,282 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
   };
 }
 
+interface RosterRowLocation {
+  readonly headerLineIndex: number;
+  readonly rowLineIndex: number;
+  readonly headers: readonly string[];
+}
+
+function formatRosterDepends(depends: readonly string[]): string {
+  if (depends.length === 0) return 'none';
+  return depends.map((entry) => `\`${entry}\``).join(', ');
+}
+
+function formatRosterMultiline(values: readonly string[]): string {
+  if (values.length === 0) return '';
+  return values.join('<br>');
+}
+
+function extractTaskIdFromRosterCell(cell: string): string | null {
+  const linkMatch = /\[([A-Z][A-Z0-9-]+)\]/i.exec(cell);
+  if (linkMatch) return normalizeTaskId(linkMatch[1]);
+  const plainMatch = /(TASK|ATM)-[A-Z0-9]+-\d{4,5}/i.exec(cell);
+  return plainMatch ? normalizeTaskId(plainMatch[0]) : null;
+}
+
+function findRosterRowLocation(lines: readonly string[], taskId: string): RosterRowLocation | null {
+  const normalizedTaskId = normalizeTaskId(taskId);
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const headerLine = lines[index].trim();
+    const separatorLine = lines[index + 1].trim();
+    if (!isMarkdownTableRow(headerLine) || !isMarkdownTableSeparator(separatorLine)) {
+      continue;
+    }
+    const headers = parseMarkdownTableCells(headerLine).map((cell) => normalizeTableHeader(cell));
+    const taskIdIndex = findTableColumnIndex(headers, ['task id', 'task', 'work item id', 'id']);
+    if (taskIdIndex < 0) {
+      continue;
+    }
+    let rowIndex = index + 2;
+    while (rowIndex < lines.length) {
+      const rawLine = lines[rowIndex];
+      const trimmed = rawLine.trim();
+      if (!isMarkdownTableRow(trimmed) || isMarkdownTableSeparator(trimmed)) {
+        break;
+      }
+      const cells = parseMarkdownTableCells(trimmed);
+      const rowTaskId = extractTaskIdFromRosterCell(cellAt(cells, taskIdIndex));
+      if (rowTaskId === normalizedTaskId) {
+        return { headerLineIndex: index, rowLineIndex: rowIndex, headers };
+      }
+      rowIndex += 1;
+    }
+  }
+  return null;
+}
+
+function buildRosterRowFromFrontmatter(input: {
+  readonly taskId: string;
+  readonly frontmatter: Record<string, unknown>;
+  readonly existingRow: string;
+  readonly headers: readonly string[];
+  readonly taskFileRelativeLink: string;
+}): string {
+  const existingCells = parseMarkdownTableCells(input.existingRow);
+  const title = normalizeOptionalString(input.frontmatter.title) ?? input.taskId;
+  const status = coerceStatus(typeof input.frontmatter.status === 'string' ? input.frontmatter.status : 'open');
+  const depends = parseYamlList(input.frontmatter.depends_on ?? input.frontmatter.blocked_by ?? input.frontmatter.dependencies);
+  const scopePaths = parseYamlList(input.frontmatter.scopePaths ?? input.frontmatter.scope_paths ?? input.frontmatter.allowed_files);
+  const validators = parseYamlList(input.frontmatter.validators);
+
+  const cells = [...existingCells];
+  const setCell = (candidates: readonly string[], value: string) => {
+    const index = findTableColumnIndex(input.headers, candidates);
+    if (index >= 0) {
+      cells[index] = value;
+    }
+  };
+
+  const taskIdIndex = findTableColumnIndex(input.headers, ['task id', 'task', 'work item id', 'id']);
+  if (taskIdIndex >= 0) {
+    cells[taskIdIndex] = `[${input.taskId}](${input.taskFileRelativeLink})`;
+  }
+  setCell(['title', 'name'], title);
+  setCell(['status', 'state'], status);
+  setCell(['depends', 'blocked by', 'depends on', 'dependencies'], formatRosterDepends(depends));
+  setCell(['target surface', 'scopepaths', 'scope paths', 'scope'], formatRosterMultiline(scopePaths));
+  setCell(['primary validators', 'validators'], formatRosterMultiline(validators));
+
+  return `| ${cells.join(' | ')} |`;
+}
+
+export async function runTasksRosterUpdate(argv: string[]): Promise<CommandResult> {
+  let cwd = process.cwd();
+  let indexPath = '';
+  let fromPath = '';
+  let dryRun = false;
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if ((arg === '--cwd' || arg === '--repo') && argv[index + 1]) {
+      cwd = path.resolve(argv[++index]);
+    } else if (arg === '--index' && argv[index + 1]) {
+      indexPath = argv[++index];
+    } else if (arg === '--from' && argv[index + 1]) {
+      fromPath = argv[++index];
+    } else if (arg === '--dry-run') {
+      dryRun = true;
+    } else if (arg === '--help' || arg === '-h') {
+      throw new CliError('ATM_CLI_USAGE', 'tasks roster update requires --index <readme-path> --from <task-file> [--dry-run] --json', { exitCode: 2 });
+    }
+  }
+
+  if (!indexPath || !fromPath) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks roster update requires --index <readme-path> --from <task-file>.', { exitCode: 2 });
+  }
+
+  const indexAbsolute = path.resolve(cwd, indexPath);
+  const fromAbsolute = path.resolve(cwd, fromPath);
+  if (!existsSync(indexAbsolute)) {
+    throw new CliError('ATM_TASK_ROSTER_INDEX_NOT_FOUND', `Roster index not found: ${indexPath}`, { exitCode: 2 });
+  }
+  if (!existsSync(fromAbsolute)) {
+    throw new CliError('ATM_TASK_ROSTER_SOURCE_NOT_FOUND', `Task file not found: ${fromPath}`, { exitCode: 2 });
+  }
+
+  const taskText = readFileSync(fromAbsolute, 'utf8');
+  const frontMatter = extractFrontMatter(taskText);
+  const rawTaskId = typeof frontMatter?.data.task_id === 'string'
+    ? frontMatter.data.task_id
+    : typeof frontMatter?.data.id === 'string'
+      ? frontMatter.data.id
+      : null;
+  if (!frontMatter || !rawTaskId) {
+    throw new CliError('ATM_TASK_ROSTER_SOURCE_INVALID', `Task file ${fromPath} is missing task_id frontmatter.`, { exitCode: 2 });
+  }
+  const taskId = normalizeTaskId(rawTaskId);
+
+  const original = readFileSync(indexAbsolute, 'utf8');
+  const originalHash = createHash('sha256').update(original).digest('hex');
+  const lines = original.split(/\r?\n/);
+  const location = findRosterRowLocation(lines, taskId);
+  if (!location) {
+    return makeResult({
+      ok: false,
+      command: 'tasks roster update',
+      cwd,
+      messages: [message('error', 'ATM_TASK_ROSTER_ROW_NOT_FOUND', `Task id ${taskId} was not found in roster index ${indexPath}.`)],
+      evidence: {
+        taskId,
+        indexPath,
+        fromPath,
+        dryRun
+      }
+    });
+  }
+
+  const taskFileRelativeLink = path.relative(path.dirname(indexAbsolute), fromAbsolute).replace(/\\/g, '/');
+  const existingRow = lines[location.rowLineIndex];
+  const updatedRow = buildRosterRowFromFrontmatter({
+    taskId,
+    frontmatter: frontMatter.data,
+    existingRow,
+    headers: location.headers,
+    taskFileRelativeLink: taskFileRelativeLink.startsWith('.') ? taskFileRelativeLink : `./${taskFileRelativeLink}`
+  });
+
+  const updatedLines = [...lines];
+  updatedLines[location.rowLineIndex] = updatedRow;
+  const updated = updatedLines.join('\n');
+
+  if (dryRun) {
+    const afterHash = createHash('sha256').update(original).digest('hex');
+    return makeResult({
+      ok: true,
+      command: 'tasks roster update',
+      cwd,
+      mode: 'dry-run',
+      messages: [message('info', 'ATM_TASK_ROSTER_UPDATE_DRY_RUN', `Roster row diff prepared for ${taskId}.`)],
+      evidence: {
+        taskId,
+        indexPath,
+        fromPath,
+        dryRun: true,
+        beforeHash: `sha256:${originalHash}`,
+        afterHash: `sha256:${afterHash}`,
+        unchanged: existingRow === updatedRow,
+        diff: {
+          before: existingRow,
+          after: updatedRow
+        }
+      }
+    });
+  }
+
+  writeFileSync(indexAbsolute, updated, 'utf8');
+  return makeResult({
+    ok: true,
+    command: 'tasks roster update',
+    cwd,
+    mode: 'write',
+    messages: [message('info', 'ATM_TASK_ROSTER_UPDATE_WRITTEN', `Roster row updated for ${taskId} in ${indexPath}.`)],
+    evidence: {
+      taskId,
+      indexPath,
+      fromPath,
+      dryRun: false,
+      beforeHash: `sha256:${originalHash}`,
+      afterHash: `sha256:${createHash('sha256').update(updated).digest('hex')}`,
+      diff: {
+        before: existingRow,
+        after: updatedRow
+      }
+    }
+  });
+}
+
+async function runTasksRoster(argv: string[]): Promise<CommandResult> {
+  const subAction = (argv[0] ?? '').toLowerCase();
+  if (subAction !== 'update') {
+    throw new CliError('ATM_CLI_USAGE', 'tasks roster requires update.', { exitCode: 2 });
+  }
+  return runTasksRosterUpdate(argv.slice(1));
+}
+
+export interface GenerateTaskCardInput {
+  cwd: string;
+  templateKey?: string;
+  taskId: string;
+  title?: string;
+  outputPath: string;
+  dependsOn?: string;
+  scopePath?: string;
+  testPath?: string;
+  atomId?: string;
+  capability?: string;
+  goal?: string;
+}
+
+export interface GeneratedTaskCardResult {
+  taskId: string;
+  content: string;
+  sourcePath: string;
+  templateUsed: string;
+}
+
+export async function generateTaskCard(input: GenerateTaskCardInput): Promise<GeneratedTaskCardResult> {
+  const template = input.templateKey || 'aao-l2-split';
+  const intent = {
+    cwd: input.cwd,
+    templateKey: template,
+    fields: {
+      task_id: input.taskId,
+      title: input.title || 'New Task',
+      depends_on: input.dependsOn || 'TASK-AAO-0000',
+      scope_path: input.scopePath || 'src/main.ts',
+      test_path: input.testPath || 'tests/main.test.ts',
+      atom_id: input.atomId || 'atm.unowned',
+      capability: input.capability || 'Implementation details',
+      goal: input.goal || 'Goal description placeholder',
+      sourcePath: input.outputPath
+    }
+  };
+
+  const plugins = await readPluginRegistry(input.cwd);
+  const generatorPlugin = plugins.find(p => p.mode !== 'disabled' && typeof p.plugin.generate === 'function');
+
+  const resultCard = generatorPlugin
+    ? await generatorPlugin.plugin.generate!(intent)
+    : await (await import('../../../atm-markdown-task-source/src/index.ts')).default.generate(intent);
+
+  return {
+    taskId: resultCard.taskId,
+    content: resultCard.content,
+    sourcePath: input.outputPath,
+    templateUsed: template
+  };
+}
+
 async function runTasksNew(argv: string[]): Promise<CommandResult> {
   const spec = (await import('./command-specs/tasks.spec.ts')).default;
   const parsed = parseArgsForCommand(spec, ['new', ...argv]);
@@ -5670,32 +6169,19 @@ async function runTasksNew(argv: string[]): Promise<CommandResult> {
     throw new CliError('ATM_CLI_USAGE', 'tasks new requires --output <path>', { exitCode: 2 });
   }
 
-  const intent = {
+  const resultCard = await generateTaskCard({
     cwd,
     templateKey: template,
-    fields: {
-      task_id: taskId,
-      title,
-      depends_on: (options.dependsOn as string) || 'TASK-AAO-0000',
-      scope_path: (options.scopePath as string) || 'src/main.ts',
-      test_path: (options.testPath as string) || 'tests/main.test.ts',
-      atom_id: (options.atomId as string) || 'atm.unowned',
-      capability: (options.capability as string) || 'Implementation details',
-      goal: (options.goal as string) || 'Goal description placeholder',
-      sourcePath: outPath
-    }
-  };
-
-  const plugins = await readPluginRegistry(cwd);
-  const generatorPlugin = plugins.find(p => p.mode !== 'disabled' && typeof p.plugin.generate === 'function');
-
-  let resultCard;
-  if (generatorPlugin) {
-    resultCard = await generatorPlugin.plugin.generate!(intent);
-  } else {
-    const defaultPlugin = (await import('../../../atm-markdown-task-source/src/index.ts')).default;
-    resultCard = await defaultPlugin.generate(intent);
-  }
+    taskId,
+    title,
+    outputPath: outPath,
+    dependsOn: options.dependsOn as string | undefined,
+    scopePath: options.scopePath as string | undefined,
+    testPath: options.testPath as string | undefined,
+    atomId: options.atomId as string | undefined,
+    capability: options.capability as string | undefined,
+    goal: options.goal as string | undefined
+  });
 
   const targetAbsolute = path.resolve(cwd, outPath);
   const targetDir = path.dirname(targetAbsolute);
@@ -5711,7 +6197,8 @@ async function runTasksNew(argv: string[]): Promise<CommandResult> {
       ok: true,
       sourcePath: outPath,
       taskId: resultCard.taskId,
-      templateUsed: template
+      templateUsed: template,
+      generatorSurface: 'tasks-new'
     }
   });
 }
@@ -5723,6 +6210,7 @@ export {
   parseMirrorOptions,
   parseCloseOptions,
   parseStatusOptions,
+  parseFinalizeDiagnoseOptions,
   parseResetOptions,
   parseLockCleanupOptions,
   parseClaimLifecycleOptions,

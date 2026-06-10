@@ -21,6 +21,7 @@ import {
   validateClosurePacket,
   writeClosurePacket
 } from '../packages/cli/src/commands/framework-development.ts';
+import { loadProfile, buildDelegationContract, resolveOpenerMode } from '../packages/cli/src/commands/taskflow/profile-loader.ts';
 import { resolveNextDefaultOutputPath } from '../packages/cli/src/commands/shared.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
@@ -95,6 +96,68 @@ function assertSandboxDiagnosticsAreActionable() {
   const indexFinding = indexPermissionEnvelope.blockingFindings.find((finding) => finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED');
   assert(indexFinding?.classification === 'environment', '.git/index.lock permission denied must be an environment finding');
   assert((indexFinding?.data as any)?.notTaskEvidenceFailure === true, '.git/index.lock permission denied must not be treated as task evidence failure');
+}
+
+async function assertTasksRosterUpdateContract() {
+  const fixtureDir = path.join(root, 'fixtures/tasks-roster');
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-roster-sync-'));
+  try {
+    const indexPath = path.join(tempDir, 'README.md');
+    const taskPath = path.join(tempDir, 'TASK-ROSTER-0001.task.md');
+    writeFileSync(indexPath, readFileSync(path.join(fixtureDir, 'README.md'), 'utf8'), 'utf8');
+    writeFileSync(taskPath, readFileSync(path.join(fixtureDir, 'TASK-ROSTER-0001.task.md'), 'utf8'), 'utf8');
+    const beforeHash = createHash('sha256').update(readFileSync(indexPath, 'utf8')).digest('hex');
+
+    const dryRun = await runTasks([
+      'roster',
+      'update',
+      '--cwd', tempDir,
+      '--index', 'README.md',
+      '--from', 'TASK-ROSTER-0001.task.md',
+      '--dry-run',
+      '--json'
+    ]);
+    assert(dryRun.ok === true, 'tasks roster update dry-run must succeed');
+    assert(dryRun.evidence.dryRun === true, 'tasks roster update dry-run must report dryRun=true');
+    const afterDryRunHash = createHash('sha256').update(readFileSync(indexPath, 'utf8')).digest('hex');
+    assert(beforeHash === afterDryRunHash, 'tasks roster update dry-run must not write README');
+
+    const writeResult = await runTasks([
+      'roster',
+      'update',
+      '--cwd', tempDir,
+      '--index', 'README.md',
+      '--from', 'TASK-ROSTER-0001.task.md',
+      '--json'
+    ]);
+    assert(writeResult.ok === true, 'tasks roster update write must succeed');
+    const updated = readFileSync(indexPath, 'utf8');
+    assert(updated.includes('updated roster title'), 'tasks roster update write must refresh title cell');
+    assert(updated.includes('TASK-ROSTER-0000'), 'tasks roster update write must refresh depends cell');
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
+function assertTaskflowHostOpenerFallbackContract() {
+  const validProfilePath = path.join(root, 'fixtures/taskflow-profile/valid.profile.json');
+  const governedProfilePath = path.join(root, 'fixtures/taskflow-profile/governed-invocable.profile.json');
+  const validProfile = loadProfile(validProfilePath);
+  const governedProfile = loadProfile(governedProfilePath);
+
+  const templateOnlyContract = buildDelegationContract(validProfile);
+  assert(templateOnlyContract.policy.allocateTaskId.mode === 'fallback', 'describe-only profile must default allocateTaskId to fallback');
+  assert(templateOnlyContract.policy.resolveCanonicalOutputPath.mode === 'fallback', 'describe-only profile must default resolveCanonicalOutputPath to fallback');
+  assert(templateOnlyContract.policy.rosterSyncPolicy === 'follow-up-command', 'describe-only profile must default rosterSyncPolicy to follow-up-command');
+  assert(templateOnlyContract.policy.fallbackBehavior.mode === 'template-only-fallback', 'describe-only profile must use template-only fallback behavior');
+  assert(resolveOpenerMode({ profile: validProfile, taskIdSupplied: false, outputPathSupplied: false, writeRequested: false }) === 'template-only-fallback', 'describe-only profile must remain in template-only-fallback mode');
+
+  const governedContract = buildDelegationContract(governedProfile);
+  assert(governedContract.policy.allocateTaskId.mode === 'host-opener', 'governed profile must expose host-opener task-id policy');
+  assert(governedContract.policy.resolveCanonicalOutputPath.mode === 'host-opener', 'governed profile must expose host-opener canonical path policy');
+  assert(governedContract.policy.rosterSyncPolicy === 'follow-up-command', 'governed profile must preserve roster sync policy');
+  assert(governedContract.policy.fallbackBehavior.reason.length > 0, 'governed profile must expose fallback behavior reason');
+  assert(resolveOpenerMode({ profile: governedProfile, taskIdSupplied: false, outputPathSupplied: false, writeRequested: false }) === 'delegated-governed', 'governed profile must remain delegated-governed when invocable');
 }
 
 function initGitRepo(repo: string) {
@@ -201,8 +264,11 @@ process.env.GIT_CEILING_DIRECTORIES = [process.cwd(), previousGitCeilingDirector
 
 try {
   assertSandboxDiagnosticsAreActionable();
+  assertTaskflowHostOpenerFallbackContract();
+  await assertTasksRosterUpdateContract();
 
   const hostRepo = makeHostRepo(tempRoot, 'ordinary-adopter');
+  initGitRepo(hostRepo);
   const hostStatus = createFrameworkModeStatus({ cwd: hostRepo, files: ['src/index.ts'] });
   assert(hostStatus.taskLedgerMode === 'adopter-governed', 'ordinary adopter repo must use adopter-governed task ledger mode');
 
@@ -1297,6 +1363,7 @@ try {
   await validateClosurePacketDirtyTreeHygieneGuard(tempRoot);
   await validateTaskImportRefreshClaimPreservation(tempRoot);
   await validateTaskImportDispatchMetadataPreservation(tempRoot);
+  await validateTaskResidueClassification(tempRoot);
 
   if (!process.exitCode) {
     console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, TASK-AAO-0039 planning-only ledger audit boundary covered, and TASK-AAO-0137 write-path atomicity + operator diagnostics covered)`);
@@ -1591,4 +1658,174 @@ async function validateTaskImportRefreshClaimPreservation(tempRoot: string) {
   assert(refreshedDoc.taskDirectionLock, 'taskDirectionLock must be preserved after refresh');
   assert(refreshedDoc.owner === 'validator', 'owner validator must be preserved after refresh');
   assert(refreshedDoc.startedBySessionId === claimedDoc.startedBySessionId, 'startedBySessionId must be preserved after refresh');
+}
+
+async function validateTaskResidueClassification(tempRoot: string) {
+  const repo = makeHostRepo(tempRoot, 'residue-classification');
+  initGitRepo(repo);
+
+  function writePlanningCard(planRelativePath: string, taskId: string, status: string) {
+    const planPath = path.join(repo, planRelativePath);
+    mkdirSync(path.dirname(planPath), { recursive: true });
+    writeFileSync(planPath, [
+      '---',
+      `task_id: ${taskId}`,
+      'title: "Residue classification fixture"',
+      `status: ${status}`,
+      '---',
+      `# ${taskId}`,
+      ''
+    ].join('\n'), 'utf8');
+    return planPath;
+  }
+
+  const completeTaskId = 'TASK-RESIDUE-0001';
+  const completePlanPath = writePlanningCard('docs/fixtures/residue-complete.task.md', completeTaskId, 'done');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${completeTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: completeTaskId,
+    title: 'Complete but unfinalized fixture',
+    status: 'running',
+    planningRepo: '3KLife',
+    targetRepo: 'AI-Atomic-Framework',
+    closureAuthority: 'target_repo',
+    closedAt: '2026-06-10T00:00:00.000Z',
+    closurePacket: '.atm/history/evidence/TASK-RESIDUE-0001.closure-packet.json',
+    claim: {
+      actorId: 'fixture-agent',
+      leaseId: 'lease-0001',
+      claimedAt: '2026-06-10T00:00:00.000Z',
+      heartbeatAt: '2026-06-10T00:00:00.000Z',
+      state: 'active',
+      files: ['.atm/history/tasks/TASK-RESIDUE-0001.json']
+    },
+    lastTransitionId: 'transition-0001',
+    lastTransitionAt: '2026-06-10T00:00:00.000Z',
+    source: {
+      planPath: completePlanPath,
+      sectionTitle: completeTaskId,
+      headingLine: 1,
+      hash: 'complete-unfinalized'
+    }
+  });
+  mkdirSync(path.join(repo, '.atm', 'history', 'task-events', completeTaskId), { recursive: true });
+  writeFileSync(path.join(repo, '.atm', 'history', 'task-events', completeTaskId, 'transition-0001.json'), JSON.stringify({
+    schemaId: 'atm.taskTransition.v1',
+    specVersion: '0.1.0',
+    transitionId: 'transition-0001',
+    taskId: completeTaskId,
+    action: 'close',
+    actorId: 'fixture-agent',
+    fromStatus: 'running',
+    toStatus: 'running',
+    taskPath: `.atm/history/tasks/${completeTaskId}.json`,
+    taskSha256: sha256File(path.join(repo, '.atm', 'history', 'tasks', `${completeTaskId}.json`)),
+    createdAt: '2026-06-10T00:00:00.000Z'
+  }, null, 2), 'utf8');
+
+  const completeStatus = await runTasks(['status', '--cwd', repo, '--task', completeTaskId, '--json']);
+  assert(completeStatus.ok === true, 'complete-but-unfinalized status must succeed');
+  const completeResidue = completeStatus.evidence.residueClassification as any;
+  assert(completeResidue.bucket === 'complete-but-unfinalized', 'complete-but-unfinalized bucket must be reported');
+  assert(String(completeResidue.nextCommand).includes('tasks reconcile'), 'complete-but-unfinalized next command must point to reconcile');
+  assert(String(completeResidue.nextCommand).includes(completeTaskId), 'complete-but-unfinalized next command must materialize task id');
+  assert(completeResidue.autoMutationAllowed === false, 'complete-but-unfinalized must not allow auto mutation');
+
+  const mirrorTaskId = 'TASK-RESIDUE-0002';
+  const mirrorPlanPath = writePlanningCard('docs/fixtures/residue-mirror.task.md', mirrorTaskId, 'done');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${mirrorTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: mirrorTaskId,
+    title: 'Planning mirror only fixture',
+    status: 'done',
+    planningRepo: 'AI-Atomic-Framework',
+    targetRepo: 'AI-Atomic-Framework',
+    closureAuthority: 'planning_repo',
+    source: {
+      planPath: mirrorPlanPath,
+      sectionTitle: mirrorTaskId,
+      headingLine: 1,
+      hash: 'planning-mirror-only'
+    }
+  });
+  const mirrorStatus = await runTasks(['status', '--cwd', repo, '--task', mirrorTaskId, '--json']);
+  assert(mirrorStatus.ok === true, 'planning-mirror-only status must succeed');
+  const mirrorResidue = mirrorStatus.evidence.residueClassification as any;
+  assert(mirrorResidue.bucket === 'planning-mirror-only', 'planning-mirror-only bucket must be reported');
+  assert(String(mirrorResidue.nextCommand).includes('tasks import'), 'planning-mirror-only next command must point to import');
+
+  const interruptedTaskId = 'TASK-RESIDUE-0003';
+  const interruptedPlanPath = writePlanningCard('docs/fixtures/residue-interrupted.task.md', interruptedTaskId, 'done');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${interruptedTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: interruptedTaskId,
+    title: 'Interrupted close fixture',
+    status: 'done',
+    planningRepo: '3KLife',
+    targetRepo: 'AI-Atomic-Framework',
+    closureAuthority: 'target_repo',
+    closedAt: '2026-06-10T00:00:00.000Z',
+    claim: {
+      actorId: 'fixture-agent',
+      leaseId: 'lease-0003',
+      claimedAt: '2026-06-10T00:00:00.000Z',
+      heartbeatAt: '2026-06-10T00:00:00.000Z',
+      state: 'active',
+      files: ['.atm/history/tasks/TASK-RESIDUE-0003.json']
+    },
+    source: {
+      planPath: interruptedPlanPath,
+      sectionTitle: interruptedTaskId,
+      headingLine: 1,
+      hash: 'interrupted-close'
+    }
+  });
+  const interruptedStatus = await runTasks(['status', '--cwd', repo, '--task', interruptedTaskId, '--json']);
+  assert(interruptedStatus.ok === true, 'interrupted-close status must succeed');
+  const interruptedResidue = interruptedStatus.evidence.residueClassification as any;
+  assert(interruptedResidue.bucket === 'interrupted-close', 'interrupted-close bucket must be reported');
+  assert(String(interruptedResidue.nextCommand).includes('repair-closure'), 'interrupted-close next command must point to repair-closure');
+  assert(String(interruptedResidue.nextCommand).includes(interruptedTaskId), 'interrupted-close next command must materialize task id');
+
+  const staleTaskId = 'TASK-RESIDUE-0004';
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${staleTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: staleTaskId,
+    title: 'Stale import fixture',
+    status: 'done',
+    planningRepo: '3KLife',
+    targetRepo: 'AI-Atomic-Framework',
+    closureAuthority: 'target_repo',
+    source: {
+      planPath: path.join(repo, 'docs', 'fixtures', 'missing-residue-stale.task.md'),
+      sectionTitle: staleTaskId,
+      headingLine: 1,
+      hash: 'stale-import'
+    }
+  });
+  const staleStatus = await runTasks(['status', '--cwd', repo, '--task', staleTaskId, '--json']);
+  assert(staleStatus.ok === true, 'stale-import status must succeed');
+  const staleResidue = staleStatus.evidence.residueClassification as any;
+  assert(staleResidue.bucket === 'stale-import', 'stale-import bucket must be reported');
+  assert(String(staleResidue.nextCommand).includes('--force'), 'stale-import next command must point to force import');
+
+  const ambiguousTaskId = 'TASK-RESIDUE-0005';
+  writePlanningCard('docs/fixtures/residue-ambiguous.task.md', ambiguousTaskId, 'open');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${ambiguousTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: ambiguousTaskId,
+    title: 'Ambiguous review fixture',
+    status: 'blocked',
+    source: {
+      planPath: path.join(repo, 'docs', 'fixtures', 'residue-ambiguous.task.md'),
+      sectionTitle: ambiguousTaskId,
+      headingLine: 1,
+      hash: 'ambiguous-review'
+    }
+  });
+  const ambiguousStatus = await runTasks(['status', '--cwd', repo, '--task', ambiguousTaskId, '--json']);
+  assert(ambiguousStatus.ok === true, 'ambiguous-manual-review status must succeed');
+  const ambiguousResidue = ambiguousStatus.evidence.residueClassification as any;
+  assert(ambiguousResidue.bucket === 'ambiguous-manual-review', 'ambiguous-manual-review bucket must be reported');
+  assert(String(ambiguousResidue.nextCommand).includes('tasks status'), 'ambiguous-manual-review next command must point to status');
 }

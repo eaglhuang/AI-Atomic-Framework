@@ -134,6 +134,16 @@ export interface TaskLegacyLedgerMigrationSkip {
     readonly reason: string;
 }
 export declare function runTasks(argv: string[]): Promise<CommandResult>;
+export type TaskResidueBucket = 'complete-but-unfinalized' | 'planning-mirror-only' | 'interrupted-close' | 'stale-import' | 'ambiguous-manual-review';
+export interface TaskResidueClassification {
+    bucket: TaskResidueBucket;
+    truth: string;
+    residue: string;
+    reason: string;
+    nextCommandTemplate: string;
+    nextCommand: string;
+    autoMutationAllowed: false;
+}
 export interface ParsedPlanResult {
     readonly tasks: readonly TaskImportRecord[];
     readonly diagnostics: TaskImportDiagnostic[];
@@ -143,5 +153,26 @@ export declare function parsePlanMarkdown(input: {
     readonly planRelativePath: string;
     readonly importedAt: string;
 }): ParsedPlanResult;
-export { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseHistoricalDeliveryRefs, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.ts';
+export declare function runTasksRosterUpdate(argv: string[]): Promise<CommandResult>;
+export interface GenerateTaskCardInput {
+    cwd: string;
+    templateKey?: string;
+    taskId: string;
+    title?: string;
+    outputPath: string;
+    dependsOn?: string;
+    scopePath?: string;
+    testPath?: string;
+    atomId?: string;
+    capability?: string;
+    goal?: string;
+}
+export interface GeneratedTaskCardResult {
+    taskId: string;
+    content: string;
+    sourcePath: string;
+    templateUsed: string;
+}
+export declare function generateTaskCard(input: GenerateTaskCardInput): Promise<GeneratedTaskCardResult>;
+export { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseHistoricalDeliveryRefs, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.ts';
 export { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline };

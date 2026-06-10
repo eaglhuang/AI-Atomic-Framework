@@ -6,44 +6,53 @@ import { runTaskflow } from '../../taskflow.ts';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../../../../../../');
 
-// 1. 測試 open --dry-run 無 profile
-const res1 = runTaskflow(['open', '--dry-run']) as any;
+const res1 = await runTaskflow(['open', '--dry-run']) as any;
 assert.equal(res1.ok, true);
 assert.equal(res1.mode, 'dry-run');
 assert.equal(res1.schemaId, 'atm.taskflowOpenResult.v1');
 assert.equal(res1.writeEnabled, false);
-// 檢查無 profile 時的 adopter-neutral 預設值，不含有 hard-code 的 TASK-AAO-0113 等
-assert.equal(res1.evidence.wouldDo[0].workItemId, 'TASK-ADOPTER-0001');
-assert.equal(res1.evidence.wouldDo[0].targetRepo, 'adopter-repo');
+assert.equal(res1.evidence.openerMode, 'template-only-fallback');
+assert.equal(res1.evidence.delegationContract.hostOpenerAvailable, false);
+assert.equal(res1.evidence.delegationContract.generationSurface, 'tasks-new');
+assert.equal(res1.evidence.orchestrationPlan.wouldInvokeTasksNew, true);
+assert.ok(res1.evidence.diagnostics.codes.includes('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK'));
 
-// 2. 測試 open --dry-run 有 valid profile
 const validProfilePath = path.join(rootDir, 'fixtures/taskflow-profile/valid.profile.json');
-const res2 = runTaskflow(['open', '--dry-run', '--profile', validProfilePath]) as any;
+const res2 = await runTaskflow(['open', '--dry-run', '--profile', validProfilePath]) as any;
 assert.equal(res2.ok, true);
 assert.equal(res2.mode, 'dry-run');
 assert.equal(res2.evidence.profile.schemaId, 'taskflow.profile.v1');
 assert.equal(res2.evidence.profile.id, 'adopter-profile-v1');
-assert.equal(res2.evidence.profile.name, 'Adopter Planning Repo Profile');
-// 斷言 de-hardcoded 動態值是否來自 profile
-assert.equal(res2.evidence.wouldDo[0].workItemId, 'TASK-ADOPTER-0001'); // 根據 taskIdPrefix 產生
-assert.equal(res2.evidence.wouldDo[0].targetRepo, 'adopter-repo'); // 根據 ownerRepo 產生
-assert.ok(res2.evidence.diagnostics.some((d: string) => d.includes('Loaded profile: Adopter Planning Repo Profile')));
-assert.equal(res2.evidence.decision.delegatedTo, 'tools/task-card-opener.js');
-assert.equal(res2.evidence.decision.displayHint, 'node tools/task-card-opener.js --task ${taskId} --dry-run');
+assert.equal(res2.evidence.openerMode, 'template-only-fallback');
+assert.equal(res2.evidence.delegationContract.hostOpenerAvailable, true);
+assert.equal(res2.evidence.delegationContract.describeOnly, true);
+assert.equal(res2.evidence.delegationContract.openerPath, 'tools/task-card-opener.js');
+assert.equal(res2.evidence.delegationContract.policy.allocateTaskId.mode, 'fallback');
+assert.equal(res2.evidence.delegationContract.policy.rosterSyncPolicy, 'follow-up-command');
+assert.equal(res2.evidence.orchestrationPlan.generationSurface, 'tasks-new');
+assert.ok(res2.evidence.diagnostics.messages.some((entry: string) => entry.includes('describe-only')));
 
-// 3. 測試 open --write 被拒絕
-assert.throws(() => {
-  runTaskflow(['open', '--write']);
-}, (err: any) => {
-  return err.code === 'ATM_TASKFLOW_WRITE_MODE_NOT_SUPPORTED';
-});
+const governedProfilePath = path.join(rootDir, 'fixtures/taskflow-profile/governed-invocable.profile.json');
+const res3 = await runTaskflow(['open', '--dry-run', '--profile', governedProfilePath]) as any;
+assert.equal(res3.evidence.openerMode, 'delegated-governed');
+assert.equal(res3.evidence.delegationContract.invocable, true);
+assert.equal(res3.evidence.writeSupport.allowed, false);
+assert.equal(res3.evidence.hostPolicyDecision.taskId, 'TASK-GOVERNED-0001');
+assert.equal(res3.evidence.hostPolicyDecision.outputPath, 'docs/tasks/TASK-GOVERNED-0001.task.md');
+assert.equal(res3.evidence.orchestrationPlan.policyDecision.allocateTaskId.mode, 'host-opener');
+assert.equal(res3.evidence.orchestrationPlan.policyDecision.resolveCanonicalOutputPath.mode, 'host-opener');
+assert.equal(res3.evidence.orchestrationPlan.policyDecision.rosterSyncPolicy, 'follow-up-command');
+assert.equal(res3.evidence.fallbackBehavior.mode, 'template-only-fallback');
 
-// 4. 測試 open --dry-run 有 invalid profile 被拒絕
+await assert.rejects(
+  () => runTaskflow(['open', '--write']),
+  (err: any) => err.code === 'ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK'
+);
+
 const invalidProfilePath = path.join(rootDir, 'fixtures/taskflow-profile/invalid-missing-schema-id.profile.json');
-assert.throws(() => {
-  runTaskflow(['open', '--dry-run', '--profile', invalidProfilePath]);
-}, (err: any) => {
-  return err.code === 'ATM_TASKFLOW_PROFILE_INVALID_SCHEMA_ID';
-});
+await assert.rejects(
+  () => runTaskflow(['open', '--dry-run', '--profile', invalidProfilePath]),
+  (err: any) => err.code === 'ATM_TASKFLOW_PROFILE_INVALID_SCHEMA_ID'
+);
 
 console.log('[taskflow-dryrun:test] ok');

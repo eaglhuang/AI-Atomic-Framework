@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'tasks',
-  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, run read-only tasks parallel advisor checks, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, compact dispatchPattern / conditionReview / mailboxAssignee dispatch metadata, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
+  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, run read-only tasks parallel advisor checks, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. tasks new is the low-level template generator only; taskflow open is the official governed opener orchestration entry. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, compact dispatchPattern / conditionReview / mailboxAssignee dispatch metadata, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | new', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | finalize | roster | new', required: true }
   ],
   options: [
     commonCwdOption,
@@ -25,7 +25,8 @@ export default defineCommandSpec({
     { flag: '--reserved-ok', summary: 'Allow tasks release to return a reserved task with no active claim back to open.' },
     { flag: '--staged', summary: 'Run tasks audit in staged/pre-commit mode.' },
     { flag: '--queue', value: 'id', summary: 'Task queue id for tasks queue abandon.' },
-    { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close/reconcile/repair-closure/status/scope add.' },
+    { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close/reconcile/repair-closure/status/finalize diagnose/scope add.' },
+    { flag: '--residue', summary: 'For tasks status, return residue-focused diagnosis evidence only.' },
     { flag: '--allow-stale-runner', summary: 'Allow write actions while the frozen runner is older than framework source (disaster recovery only).' },
     { flag: '--with', value: 'id', summary: 'Second task id for tasks parallel pair analysis.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close/reconcile lifecycle actions (or set ATM_ACTOR_ID).' },
@@ -53,6 +54,8 @@ export default defineCommandSpec({
     { flag: '--depends-on', value: 'id', summary: 'Depends on placeholder for tasks new.' },
     { flag: '--capability', value: 'text', summary: 'Capability description placeholder for tasks new.' },
     { flag: '--goal', value: 'text', summary: 'Goal description placeholder for tasks new.' },
+    { flag: '--index', value: 'path', summary: 'Roster README path for tasks roster update.' },
+    { flag: '--from', value: 'path', summary: 'Task markdown path for tasks roster update.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -87,6 +90,10 @@ export default defineCommandSpec({
     'node atm.mjs tasks repair-closure --task TASK-AAO-0102 --json',
     'node atm.mjs tasks block --task ATM-GOV-0104 --actor codex-main --reason "waiting on target evidence" --json',
     'node atm.mjs tasks reconcile --task TASK-AAO-0055 --actor codex-main --delivery-commit abc1234 --json',
-    'node atm.mjs tasks status --task TASK-AAO-0137 --json'
+    'node atm.mjs tasks status --task TASK-AAO-0137 --json',
+    'node atm.mjs tasks status --task TASK-AAO-0137 --residue --json',
+    'node atm.mjs tasks finalize diagnose --task TASK-AAO-0137 --json',
+    'node atm.mjs tasks roster update --index docs/tasks/README.md --from docs/tasks/TASK-ADOPTER-0001.task.md --dry-run --json',
+    'node atm.mjs tasks roster update --index docs/tasks/README.md --from docs/tasks/TASK-ADOPTER-0001.task.md --json'
   ]
 });

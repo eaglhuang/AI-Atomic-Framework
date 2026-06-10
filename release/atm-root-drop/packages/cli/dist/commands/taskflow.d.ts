@@ -1,4 +1,4 @@
-export declare function runTaskflow(argv?: string[]): {
+export declare function runTaskflow(argv?: string[]): Promise<{
     schemaId: string;
     writeEnabled: boolean;
     ok: boolean;
@@ -7,4 +7,4 @@ export declare function runTaskflow(argv?: string[]): {
     cwd: string;
     messages: import("./shared.ts").CommandMessage[];
     evidence: Record<string, unknown>;
-};
+}>;
