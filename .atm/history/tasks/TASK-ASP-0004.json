@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-ASP-0004",
+  "title": "Broker Candidate-to-WriteIntent Bridge",
+  "status": "done",
+  "milestone": "ASP-M1",
+  "dependencies": [
+    "TASK-ASP-0001"
+  ],
+  "acceptance": [
+    "`candidate-bridge.ts` is exported from `packages/core/src/broker/index.ts`",
+    "`candidatesToWriteIntent()` generates valid `WriteIntent` per schema",
+    "Deterministic atomCid: same candidate produces same atomCid across runs",
+    "Tests verify intersection with existing `calculateBrokerDecision()`: e.g., two candidates with same filePath produce `needs-physical-split` verdict",
+    "Bridge does not modify candidate input (read-only)",
+    "At least 3 test scenarios: parallel-safe, CID conflict, file overlap",
+    "No new external dependencies"
+  ],
+  "deliverables": [
+    "Input: `AtomCandidate[]`, context (taskId, actorId, baseCommit, optional sharedSurfaces)",
+    "Output: well-formed `WriteIntent` with deterministic atomId generation"
+  ],
+  "tags": [],
+  "notes": "After ASP-0001/0002/0003, language adapters emit `AtomCandidate`. To feed broker's existing `calculateBrokerDecision()`, we need a convenience function that converts `AtomCandidate` + atomization context into a `WriteIntent`.\n\nCurrently callers must construct `WriteIntent` manually with `atomRefs`, `targetFiles`, `sharedSurfaces` — which is verbose and error-prone. This task provides a thin bridge function.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0004-broker-candidate-bridge.task.md",
+    "sectionTitle": "TASK-ASP-0004",
+    "headingLine": 105,
+    "hash": "34e506e673114026"
+  },
+  "importedAt": "2026-06-10T12:17:13.945Z",
+  "scopePaths": [
+    "packages/core/src/broker/candidate-bridge.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+    "docs/BROKER_GUIDE.md"
+  ],
+  "validators": [],
+  "planningRepo": null,
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": null,
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "packages/core/src/broker/decision.ts",
+    "packages/core/src/broker/proposal.ts",
+    "packages/core/src/broker/steward.ts",
+    "packages/plugin-sdk/src/language-adapter.ts",
+    "packages/language-js/**",
+    "packages/language-python/**",
+    "assets/**",
+    "library/**"
+  ],
+  "nonGoals": [
+    "Do not modify `decision.ts` conflict logic.",
+    "Do not modify `WriteIntent` schema (additive helpers only).",
+    "Do not invoke any LLM at conversion time.",
+    "Do not require knowledge of language-specific semantics."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "docs/BROKER_GUIDE.md"
+    ],
+    "blocked_by": [
+      "TASK-ASP-0001"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "lastTransitionId": "2026-06-10T14-42-31-622Z-close-10dd7f8239cc",
+  "lastTransitionAt": "2026-06-10T14:42:31.622Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-asp-runner",
+  "reservedAt": "2026-06-10T14:36:07.586Z",
+  "promotedAt": "2026-06-10T14:36:07.590Z",
+  "claim": {
+    "actorId": "cursor-asp-runner",
+    "leaseId": "lease-46a2f7fdd50e",
+    "claimedAt": "2026-06-10T14:36:07.594Z",
+    "heartbeatAt": "2026-06-10T14:42:31.620Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-ASP-0004.json",
+      "docs/BROKER_GUIDE.md",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/index.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-10T14:36:07.594Z",
+  "startedByActor": "cursor-asp-runner",
+  "startedBySessionId": "session-20260610143607-cursor-asp-runner-TASK-ASP-0004-2d103323b1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-ASP-0004",
+    "batchId": "batch-d95420db3166",
+    "scopeKey": "tasks-d26ff8efb05f",
+    "queueId": "queue-6f740642bb94ec75",
+    "queueIndex": 4,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-ASP-0004.*",
+      ".atm/history/task-events/TASK-ASP-0004/**",
+      ".atm/history/tasks/TASK-ASP-0004.json",
+      "docs/BROKER_GUIDE.md",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/index.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7c0d3dff187bd8967348df1efb84ef85f86e42e1d16572f4a554b24c2b2fda24",
+    "actorId": "cursor-asp-runner",
+    "createdAt": "2026-06-10T14:36:07.623Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-10T14:42:31.620Z",
+  "closedByActor": "cursor-asp-runner",
+  "closedBySessionId": "session-20260610143607-cursor-asp-runner-TASK-ASP-0004-2d103323b1",
+  "closurePacket": ".atm/history/evidence/TASK-ASP-0004.closure-packet.json"
+}

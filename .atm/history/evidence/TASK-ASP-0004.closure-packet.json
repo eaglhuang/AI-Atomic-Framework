@@ -1,0 +1,153 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-ASP-0004",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "14359be3151577ec3cb1ffeca0083c0236671bb8",
+  "governedTreeSha": "d0ad982c3b38587f9135eb8f2449958eff9c30f6",
+  "targetCommitDelta": {
+    "currentCommitSha": "14359be3151577ec3cb1ffeca0083c0236671bb8",
+    "parentCommitShas": [
+      "14359be3151577ec3cb1ffeca0083c0236671bb8"
+    ],
+    "governedTreeSha": "d0ad982c3b38587f9135eb8f2449958eff9c30f6",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-ASP-0004.json",
+      ".atm/history/task-events/TASK-ASP-0004/2026-06-10T12-17-13-959Z-import-65e1cf531a83.json",
+      ".atm/history/task-events/TASK-ASP-0004/2026-06-10T14-36-07-586Z-reserve-cac347b08541.json",
+      ".atm/history/task-events/TASK-ASP-0004/2026-06-10T14-36-07-590Z-promote-dc9da7d5b0d0.json",
+      ".atm/history/task-events/TASK-ASP-0004/2026-06-10T14-36-07-624Z-claim-b14951afd56b.json",
+      ".atm/history/tasks/TASK-ASP-0004.json",
+      "docs/BROKER_GUIDE.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/match-and-sort.ts",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/index.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/ADAPTER_GUIDE.md",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/match-and-sort.js",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/match-and-sort.ts",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.js",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.js",
+      "release/atm-root-drop/packages/language-python/src/index.ts",
+      "release/atm-root-drop/packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
+      "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-task-direction-governance.ts",
+      "scripts/validate-task-direction-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2e9049d55722db187373a4fc2ebd6bfa60c7ccd1407ea4bef259f1dd855835dc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d917ad08aba83c0f5638269c17841113fbaa3b3cd4148a37e2cb9e57513ab168",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "broker-candidate-bridge-tests",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-10T14:42:31.619Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0004-broker-candidate-bridge.task.md",
+      ".atm/history/evidence/TASK-ASP-0004.*",
+      ".atm/history/task-events/TASK-ASP-0004/**",
+      ".atm/history/tasks/TASK-ASP-0004.json",
+      "docs/BROKER_GUIDE.md",
+      "Input: `AtomCandidate[]`, context (taskId, actorId, baseCommit, optional sharedSurfaces)",
+      "Output: well-formed `WriteIntent` with deterministic atomId generation",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/index.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/index.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-ASP-0004.json",
+  "closedAt": "2026-06-10T14:42:31.619Z",
+  "closedByActor": "cursor-asp-runner",
+  "sessionId": "session-20260610143607-cursor-asp-runner-TASK-ASP-0004-2d103323b1",
+  "attestation": null
+}

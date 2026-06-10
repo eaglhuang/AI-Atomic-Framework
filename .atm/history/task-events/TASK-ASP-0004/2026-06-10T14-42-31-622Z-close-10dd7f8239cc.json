@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-10T14-42-31-622Z-close-10dd7f8239cc",
+  "taskId": "TASK-ASP-0004",
+  "action": "close",
+  "actorId": "cursor-asp-runner",
+  "sessionId": "session-20260610143607-cursor-asp-runner-TASK-ASP-0004-2d103323b1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-ASP-0004.json",
+  "taskSha256": "sha256:24a8ebb9f3b41e17a03337fbf68d3e0c3931276cca98a6d824813505eeaec52e",
+  "createdAt": "2026-06-10T14:42:31.622Z",
+  "command": "node atm.mjs tasks close --task TASK-ASP-0004 --actor cursor-asp-runner --status done --from-batch-checkpoint --batch batch-d95420db3166",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-d95420db3166",
+    "sessionId": "session-20260610143607-cursor-asp-runner-TASK-ASP-0004-2d103323b1",
+    "closurePacketPath": ".atm/history/evidence/TASK-ASP-0004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "broker-candidate-bridge-tests",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-10T14:42:31.619Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/adapter-guided-atomization-sdk/tasks/TASK-ASP-0004-broker-candidate-bridge.task.md",
+        ".atm/history/evidence/TASK-ASP-0004.*",
+        ".atm/history/task-events/TASK-ASP-0004/**",
+        ".atm/history/tasks/TASK-ASP-0004.json",
+        "docs/BROKER_GUIDE.md",
+        "Input: `AtomCandidate[]`, context (taskId, actorId, baseCommit, optional sharedSurfaces)",
+        "Output: well-formed `WriteIntent` with deterministic atomId generation",
+        "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+        "packages/core/src/broker/candidate-bridge.ts",
+        "packages/core/src/broker/index.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+        "packages/core/src/broker/candidate-bridge.ts",
+        "packages/core/src/broker/index.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
