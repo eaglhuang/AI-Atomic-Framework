@@ -1,4 +1,6 @@
-import type { WriteIntent, WriteBrokerRegistryDocument, BrokerDecision, ConflictDetail } from './types.ts';
+import type { ActiveWriteIntent, BrokerDecision, ConflictDetail, DecompositionRequest, DecompositionTargetFunction, LineRange, WriteBrokerRegistryDocument, WriteIntent } from './types.ts';
+import { DEFAULT_AGR_LAYER2_THRESHOLDS, shouldTriggerLayer2 } from './policy.ts';
+import { intersectRanges, normalizeLineRange, rangesOverlap, type Layer2Conflict, type VirtualAtomCandidate } from './agr.ts';
 
 export function calculateBrokerDecision(
   newIntent: WriteIntent,
@@ -24,23 +26,23 @@ export function calculateBrokerDecision(
         conflicts.push({ kind: 'generator', detail: `Shared generator conflict: '${g}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const p of active.resourceKeys.projections) {
-      if (newProjections.has(p)) {
+    for (const p of newProjections) {
+      if (active.resourceKeys.projections.includes(p)) {
         conflicts.push({ kind: 'projection', detail: `Shared projection conflict: '${p}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const r of active.resourceKeys.registries) {
-      if (newRegistries.has(r)) {
+    for (const r of newRegistries) {
+      if (active.resourceKeys.registries.includes(r)) {
         conflicts.push({ kind: 'registry', detail: `Shared registry conflict: '${r}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const v of active.resourceKeys.validators) {
-      if (newValidators.has(v)) {
+    for (const v of newValidators) {
+      if (active.resourceKeys.validators.includes(v)) {
         conflicts.push({ kind: 'validator', detail: `Shared validator conflict: '${v}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const a of active.resourceKeys.artifacts) {
-      if (newArtifacts.has(a)) {
+    for (const a of newArtifacts) {
+      if (active.resourceKeys.artifacts.includes(a)) {
         conflicts.push({ kind: 'artifact', detail: `Shared artifact conflict: '${a}' is in use by task '${active.taskId}'` });
       }
     }
@@ -68,7 +70,12 @@ export function calculateBrokerDecision(
   const newReadAtomCids = new Set((newIntent.readAtoms ?? []).map((ref) => ref.atomCid));
   const seenConflictKeys = new Set<string>();
 
-  const pushCidConflict = (kind: 'write' | 'read', resourceKind: 'ID' | 'CID', resourceValue: string, activeTaskId: string) => {
+  const pushCidConflict = (
+    kind: 'write' | 'read',
+    resourceKind: 'ID' | 'CID',
+    resourceValue: string,
+    activeTaskId: string
+  ) => {
     const conflictKey = `${kind}:${resourceKind}:${resourceValue}:${activeTaskId}`;
     if (seenConflictKeys.has(conflictKey)) {
       return;
@@ -84,7 +91,7 @@ export function calculateBrokerDecision(
 
   for (const active of registry.activeIntents) {
     if (active.taskId === taskId) {
-      continue; // 同一個 task 內部不視為碰撞
+      continue;
     }
 
     for (const refId of active.resourceKeys.atomIds) {
@@ -121,24 +128,10 @@ export function calculateBrokerDecision(
     };
   }
 
-  // 3. 檢查 Physical File overlap (同檔但 CID disjoint)
-  const newFiles = new Set(newIntent.targetFiles);
-  const overlappingFiles: string[] = [];
-
-  for (const active of registry.activeIntents) {
-    if (active.taskId === taskId) {
-      continue;
-    }
-
-    for (const f of active.resourceKeys.files) {
-      if (newFiles.has(f)) {
-        overlappingFiles.push(f);
-      }
-    }
-  }
-
-  if (overlappingFiles.length > 0) {
-    return {
+  // 3. 檢查 physical file overlap (同檔但CID disjoint)
+  const fileOverlapResult = evaluatePhysicalOverlap(newIntent, registry.activeIntents);
+  if (fileOverlapResult != null) {
+    const decision: BrokerDecision = {
       schemaId: 'atm.brokerDecision.v1',
       specVersion: '0.1.0',
       migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -146,13 +139,19 @@ export function calculateBrokerDecision(
       taskId,
       verdict: 'needs-physical-split',
       lane: 'deterministic-composer',
-      conflicts: overlappingFiles.map(f => ({
-        kind: 'file-range',
-        detail: `Physical file overlap on '${f}'`
-      })),
+      conflicts: fileOverlapResult.conflicts,
       applyMethod: 'patch-apply',
-      reason: 'File overlap detected but CIDs are disjoint; routed to deterministic-composer'
+      reason: fileOverlapResult.reason
     };
+
+    if (fileOverlapResult.decompositionRequest) {
+      return {
+        ...decision,
+        decompositionRequest: fileOverlapResult.decompositionRequest
+      };
+    }
+
+    return decision;
   }
 
   // 4. 無衝突
@@ -167,5 +166,143 @@ export function calculateBrokerDecision(
     conflicts: [],
     applyMethod: 'none',
     reason: 'Parallel safe'
+  };
+}
+
+interface PhysicalOverlapResult {
+  readonly conflicts: ConflictDetail[];
+  readonly reason: string;
+  readonly decompositionRequest?: DecompositionRequest;
+}
+
+function evaluatePhysicalOverlap(newIntent: WriteIntent, activeIntents: readonly ActiveWriteIntent[]): PhysicalOverlapResult | null {
+  const newIntentRanges = toVirtualAtoms(newIntent);
+  const unresolvedOverlaps = new Set<string>();
+  const conflicts: ConflictDetail[] = [];
+  const layer2Conflicts: Layer2Conflict[] = [];
+
+  for (const activeIntent of activeIntents) {
+    if (activeIntent.taskId === newIntent.taskId) {
+      continue;
+    }
+
+    const activeRanges = toVirtualAtomRangesFromActiveIntent(activeIntent);
+    for (const newFile of newIntent.targetFiles) {
+      if (!activeIntent.resourceKeys.files.includes(newFile)) {
+        continue;
+      }
+
+      const newCandidates = newIntentRanges.filter((entry) => entry.sourceRange.filePath === newFile);
+      const activeCandidates = activeRanges.filter((entry) => entry.sourceRange.filePath === newFile);
+
+      if (newCandidates.length === 0 || activeCandidates.length === 0) {
+        unresolvedOverlaps.add(newFile);
+        continue;
+      }
+
+      for (const newAtom of newCandidates) {
+        for (const activeAtom of activeCandidates) {
+          if (!rangesOverlap(newAtom.sourceRange, activeAtom.sourceRange)) {
+            continue;
+          }
+
+          const conflictRegion = intersectRanges(newAtom.sourceRange, activeAtom.sourceRange);
+          layer2Conflicts.push({
+            leftAtom: newAtom,
+            rightAtom: activeAtom,
+            conflictRegion
+          });
+        }
+      }
+    }
+  }
+
+  if (layer2Conflicts.length > 0) {
+    const layer2Decision = shouldTriggerLayer2(layer2Conflicts, DEFAULT_AGR_LAYER2_THRESHOLDS);
+    if (layer2Decision.trigger) {
+      const conflictRegion = layer2Decision.conflictRegion;
+      return {
+        conflicts: [buildLayer2ConflictDetail(conflictRegion)],
+        reason: 'Layer 2 decomposition suggestion generated from bounded overlap conflicts.',
+        decompositionRequest: buildDecompositionRequest(layer2Decision.targetFunction, conflictRegion)
+      };
+    }
+
+    const reason = `Layer 2 trigger skipped: ${layer2Decision.reason}`;
+    return {
+      conflicts: layer2Conflicts.map((conflict) => buildLayer2ConflictDetail(conflict.conflictRegion)),
+      reason
+    };
+  }
+
+  if (unresolvedOverlaps.size > 0) {
+    return {
+      conflicts: [...unresolvedOverlaps].map((filePath) => ({
+        kind: 'file-range',
+        detail: `Physical file overlap on '${filePath}'`
+      })),
+      reason: 'Physical file overlap detected but no bounded overlap evidence; routed to deterministic-composer.'
+    };
+  }
+
+  return null;
+}
+
+function toVirtualAtoms(intent: WriteIntent): VirtualAtomCandidate[] {
+  return intent.atomRefs
+    .filter((ref) => ref.sourceRange && ref.sourceRange.filePath && ref.sourceRange.lineStart > 0 && ref.sourceRange.lineEnd > 0)
+    .map((ref) => ({
+      atomId: ref.atomId,
+      atomCid: ref.atomCid,
+      symbol: ref.atomId,
+      sourceRange: normalizeLineRange({
+        filePath: ref.sourceRange?.filePath ?? '',
+        lineStart: ref.sourceRange?.lineStart ?? 0,
+        lineEnd: ref.sourceRange?.lineEnd ?? 0
+      })
+    }));
+}
+
+function toVirtualAtomRangesFromActiveIntent(intent: ActiveWriteIntent): VirtualAtomCandidate[] {
+  const cidToAtomId = new Map<string, string[]>();
+  for (let index = 0; index < intent.resourceKeys.atomIds.length; index += 1) {
+    const atomId = intent.resourceKeys.atomIds[index];
+    const atomCid = intent.resourceKeys.atomCids[index];
+    if (!atomId || !atomCid) {
+      continue;
+    }
+    const list = cidToAtomId.get(atomCid) ?? [];
+    list.push(atomId);
+    cidToAtomId.set(atomCid, list);
+  }
+
+  return (intent.resourceKeys.atomRanges ?? [])
+    .filter((range) => range.filePath && range.lineStart > 0 && range.lineEnd > 0)
+    .map((range) => {
+      const sourceAtomId = cidToAtomId.get(range.atomCid)?.[0] ?? range.atomCid;
+      return {
+        atomId: sourceAtomId,
+        atomCid: range.atomCid,
+        symbol: sourceAtomId,
+        sourceRange: normalizeLineRange(range)
+      };
+    });
+}
+
+function buildLayer2ConflictDetail(region: LineRange): ConflictDetail {
+  return {
+    kind: 'file-range',
+    detail: `Layer2 overlap detected on '${region.filePath}' in lines [${region.lineStart}-${region.lineEnd}]`
+  };
+}
+
+function buildDecompositionRequest(
+  targetFunction: DecompositionTargetFunction,
+  conflictRegion: LineRange
+): DecompositionRequest {
+  return {
+    targetFunction,
+    conflictRegion,
+    constraint: 'preserve-signature'
   };
 }

@@ -8,6 +8,30 @@ export interface WriteIntentAtomRef {
   readonly atomId: string;
   readonly atomCid: string;
   readonly operation: 'create' | 'modify' | 'delete';
+  readonly sourceRange?: {
+    readonly filePath: string;
+    readonly lineStart: number;
+    readonly lineEnd: number;
+  };
+}
+
+export interface LineRange {
+  readonly filePath: string;
+  readonly lineStart: number;
+  readonly lineEnd: number;
+}
+
+export interface DecompositionTargetFunction {
+  readonly atomId: string;
+  readonly atomCid: string;
+  readonly symbol: string;
+  readonly sourceRange: LineRange;
+}
+
+export interface DecompositionRequest {
+  readonly targetFunction: DecompositionTargetFunction;
+  readonly conflictRegion: LineRange;
+  readonly constraint: 'preserve-signature';
 }
 
 export interface SharedSurfacesRecord {
@@ -74,6 +98,7 @@ export interface BrokerDecision {
   readonly verdict: 'parallel-safe' | 'needs-physical-split' | 'blocked-cid-conflict' | 'blocked-shared-surface' | 'serial' | 'blocked-active-lease';
   readonly lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
   readonly conflicts: readonly ConflictDetail[];
+  readonly decompositionRequest?: DecompositionRequest | null;
   readonly stewardId?: string | null;
   readonly applyMethod: 'patch-apply' | 'ast-rewrite' | 'git-three-way-fallback' | 'steward-authored-final-patch' | 'none';
   readonly reason: string;
@@ -135,6 +160,12 @@ export interface ActiveWriteIntent {
     readonly registries: readonly string[];
     readonly validators: readonly string[];
     readonly artifacts: readonly string[];
+    readonly atomRanges?: readonly {
+      readonly filePath: string;
+      readonly lineStart: number;
+      readonly lineEnd: number;
+      readonly atomCid: string;
+    }[];
   };
   readonly leaseEpoch: number;
   readonly lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
@@ -148,4 +179,3 @@ export interface WriteBrokerRegistryDocument {
   readonly workspaceId: string;
   readonly activeIntents: readonly ActiveWriteIntent[];
 }
-

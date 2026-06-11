@@ -23,6 +23,14 @@ function toActiveIntent(intent: WriteIntent, intentId: string): ActiveWriteInten
       files: intent.targetFiles,
       atomIds: intent.atomRefs.map((ref) => ref.atomId),
       atomCids: intent.atomRefs.map((ref) => ref.atomCid),
+      atomRanges: intent.atomRefs
+        .map((ref) => ref.sourceRange && {
+          filePath: ref.sourceRange.filePath,
+          lineStart: ref.sourceRange.lineStart,
+          lineEnd: ref.sourceRange.lineEnd,
+          atomCid: ref.atomCid
+        })
+        .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry)),
       generators: intent.sharedSurfaces.generators,
       projections: intent.sharedSurfaces.projections,
       registries: intent.sharedSurfaces.registries,
@@ -158,9 +166,29 @@ function testFileOverlapScenario() {
   console.log('ok: file overlap scenario (same file, disjoint CIDs -> needs-physical-split)');
 }
 
+function testFileOverlapWithSyntacticSeparationScenario() {
+  const active = makeIntent({
+    targetFiles: ['src/shared-module.ts'],
+    atomRefs: [{ atomId: 'atom-a', atomCid: 'cid-a', operation: 'modify', sourceRange: { filePath: 'src/shared-module.ts', lineStart: 1, lineEnd: 10 } }]
+  });
+  const overlappingIntent = makeIntent({
+    taskId: 'TASK-B',
+    actorId: 'agent-b',
+    targetFiles: ['src/shared-module.ts'],
+    atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify', sourceRange: { filePath: 'src/shared-module.ts', lineStart: 20, lineEnd: 30 } }]
+  });
+
+  const decision = calculateBrokerDecision(overlappingIntent, registryWith([toActiveIntent(active, 'intent-a')]));
+  assert.equal(decision.verdict, 'parallel-safe');
+  assert.equal(decision.lane, 'direct-brokered');
+  assert.equal(decision.conflicts.length, 0);
+  console.log('ok: same-file syntactic-separation scenario stays parallel-safe');
+}
+
 testParallelSafeScenario();
 testReadSetConflictScenario();
 testSharedSurfaceWinsOverReadSetScenario();
 testCidConflictScenario();
 testFileOverlapScenario();
+testFileOverlapWithSyntacticSeparationScenario();
 console.log('all broker decision tests passed');
