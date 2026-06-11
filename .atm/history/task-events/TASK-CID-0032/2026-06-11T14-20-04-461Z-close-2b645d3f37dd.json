@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-11T14-20-04-461Z-close-2b645d3f37dd",
+  "taskId": "TASK-CID-0032",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260611094922-codex-main-TASK-CID-0032-f3708ca239",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0032.json",
+  "taskSha256": "sha256:a82554122a46ae40dee6ed51b1af5e05093ae5bf97d762305bb6b7c1f4d2c519",
+  "createdAt": "2026-06-11T14:20:04.461Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0032 --actor codex-main --status done --historical-delivery 768e72ef05264d0a27a1f44463d28330fb90f596",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260611094922-codex-main-TASK-CID-0032-f3708ca239",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0032.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-11T14:20:04.458Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0032-broker-augmented-decision-rule-and-read-set-contract.task.md",
+        ".atm/history/evidence/TASK-CID-0032.*",
+        ".atm/history/task-events/TASK-CID-0032/**",
+        ".atm/history/tasks/TASK-CID-0032.json",
+        "packages/core/src/broker/__tests__/decision.test.ts",
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/decision.test.ts",
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

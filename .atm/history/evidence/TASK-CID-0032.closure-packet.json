@@ -1,0 +1,169 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0032",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "768e72ef05264d0a27a1f44463d28330fb90f596",
+  "governedTreeSha": "27fb37d724ca6e30075f407b0d8635d78761c757",
+  "targetCommitDelta": {
+    "currentCommitSha": "768e72ef05264d0a27a1f44463d28330fb90f596",
+    "parentCommitShas": [
+      "768e72ef05264d0a27a1f44463d28330fb90f596"
+    ],
+    "governedTreeSha": "27fb37d724ca6e30075f407b0d8635d78761c757",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-CID-0032.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/BROKER_GUIDE.md",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/types.ts",
+      "packages/language-js/src/index.ts",
+      "packages/language-js/src/language-js-adapter.ts",
+      "packages/language-js/test/atomization-planning.test.ts",
+      "packages/language-python/src/index.ts",
+      "packages/language-python/src/language-python-adapter.ts",
+      "packages/language-python/test/atomization-planning.test.ts",
+      "packages/plugin-sdk/src/atomization-planning.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "packages/plugin-sdk/src/language-adapter.ts",
+      "packages/plugin-sdk/test/atomization-planning.test.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/specs/taskflow-profile-v1.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/taskflow.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.js",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/index.ts",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.js",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.js",
+      "release/atm-root-drop/packages/language-python/src/index.ts",
+      "release/atm-root-drop/packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
+      "release/atm-root-drop/packages/plugin-sdk/dist/language-adapter.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
+      "release/atm-root-drop/packages/plugin-sdk/src/language-adapter.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-task-ledger-governance.ts",
+      "release/atm-root-drop/scripts/validators.config.json",
+      "scripts/validate-broker-steward.ts",
+      "scripts/validators.config.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:960b36d98d9a1a280317e565ded61c7dbbc09a0b8376388af70c26e7838a7683",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-11T14:20:04.458Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0032-broker-augmented-decision-rule-and-read-set-contract.task.md",
+      ".atm/history/evidence/TASK-CID-0032.*",
+      ".atm/history/task-events/TASK-CID-0032/**",
+      ".atm/history/tasks/TASK-CID-0032.json",
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/decision.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0032.json",
+  "closedAt": "2026-06-11T14:20:04.459Z",
+  "closedByActor": "codex-main",
+  "sessionId": "session-20260611094922-codex-main-TASK-CID-0032-f3708ca239",
+  "attestation": null
+}
