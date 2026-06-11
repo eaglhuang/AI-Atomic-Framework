@@ -9,7 +9,6 @@ import { detectFrameworkRepoIdentity, detectFrameworkStaleLocks } from './framew
 import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
-import { inspectFrameworkHookReadiness } from './integration-hooks.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 
@@ -55,7 +54,7 @@ export async function runDoctor(argv: any) {
     .map((entry) => packageDirLabel(root, entry.packageDir));
   const charterIntegrity = checkCharterIntegrity(root);
   const integrationHealth = await checkIntegrationHealth(root);
-  const frameworkHookReadiness = inspectFrameworkHookReadiness(root);
+  const frameworkHookReadiness = (await import('./integration-hooks.ts')).inspectFrameworkHookReadiness(root);
   const cleanCheckoutFrameworkHookContractOk = repoIdentity.isFrameworkRepo
     && frameworkHookReadiness.gitHooks.installedHookFiles.every((entry) => entry.present && entry.markerPresent)
     && frameworkHookReadiness.editorHooks.some((entry) => entry.supported
