@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-11T17-32-20-836Z-close-387653bb8b12",
+  "taskId": "TASK-CID-0035",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260611172005-codex-main-TASK-CID-0035-26199e7d41",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0035.json",
+  "taskSha256": "sha256:735946249d980c220b19d42d2228ae7b904732a87accb005615f2a45b9749b2e",
+  "createdAt": "2026-06-11T17:32:20.836Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0035 --actor codex-main --status done --historical-delivery aa907d0428b47dd9e5fdec45de6b262448d0ca6c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260611172005-codex-main-TASK-CID-0035-26199e7d41",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0035.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate-broker-steward",
+      "validate:broker-steward",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-11T17:32:20.831Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0035-agr-aware-neutral-writer-and-steward-orchestration.task.md",
+        ".atm/history/evidence/TASK-CID-0035.*",
+        ".atm/history/task-events/TASK-CID-0035/**",
+        ".atm/history/tasks/TASK-CID-0035.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/agr-layer2.test.ts",
+        "packages/core/src/broker/agr.ts",
+        "packages/core/src/broker/policy.ts",
+        "packages/core/src/broker/steward.ts",
+        "scripts/validate-broker-steward.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/agr-layer2.test.ts",
+        "packages/core/src/broker/agr.ts",
+        "packages/core/src/broker/policy.ts",
+        "packages/core/src/broker/steward.ts",
+        "scripts/validate-broker-steward.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
