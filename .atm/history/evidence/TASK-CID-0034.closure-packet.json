@@ -1,0 +1,193 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0034",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4c5fecc5ef0cb5f709211a0ac12d1a77c52fd922",
+  "governedTreeSha": "23edf630ec6883d8987272731cf3b8cc444f5066",
+  "targetCommitDelta": {
+    "currentCommitSha": "4c5fecc5ef0cb5f709211a0ac12d1a77c52fd922",
+    "parentCommitShas": [
+      "4c5fecc5ef0cb5f709211a0ac12d1a77c52fd922"
+    ],
+    "governedTreeSha": "23edf630ec6883d8987272731cf3b8cc444f5066",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/tasks/TASK-CID-0032.json",
+      ".atm/history/tasks/TASK-CID-0036.json",
+      "docs/BROKER_GUIDE.md",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/language-js/src/index.ts",
+      "packages/language-js/src/language-js-adapter.ts",
+      "packages/language-js/test/atomization-planning.test.ts",
+      "packages/language-python/src/index.ts",
+      "packages/language-python/src/language-python-adapter.ts",
+      "packages/language-python/test/atomization-planning.test.ts",
+      "packages/plugin-sdk/src/atomization-planning.ts",
+      "packages/plugin-sdk/src/index.ts",
+      "packages/plugin-sdk/src/language-adapter.ts",
+      "packages/plugin-sdk/test/atomization-planning.test.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/specs/taskflow-profile-v1.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/git.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/taskflow.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/git.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/index.js",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.d.ts",
+      "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
+      "release/atm-root-drop/packages/language-js/src/index.ts",
+      "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/index.js",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.d.ts",
+      "release/atm-root-drop/packages/language-python/dist/language-python-adapter.js",
+      "release/atm-root-drop/packages/language-python/src/index.ts",
+      "release/atm-root-drop/packages/language-python/src/language-python-adapter.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
+      "release/atm-root-drop/packages/plugin-sdk/dist/language-adapter.d.ts",
+      "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
+      "release/atm-root-drop/packages/plugin-sdk/src/language-adapter.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-task-ledger-governance.ts",
+      "release/atm-root-drop/scripts/validators.config.json",
+      "scripts/validate-broker-steward.ts",
+      "scripts/validators.config.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-broker-steward.ts --mode validate && npm run typecheck && npm run validate:cli && git diff --check -- packages/core/src/broker/candidate-bridge.ts packages/core/src/broker/__tests__/candidate-bridge.test.ts packages/core/src/broker/registry.ts packages/core/src/broker/steward.ts packages/core/src/broker/team-lane.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20cedce6121644e2cf8c6c8322c4fd9389c599dfb60f0b9e6c6e417568585f17",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-steward.ts --mode validate && npm run typecheck && npm run validate:cli && git diff --check -- packages/core/src/broker/__tests__/candidate-bridge.test.ts packages/core/src/broker/candidate-bridge.ts packages/core/src/broker/registry.ts packages/core/src/broker/steward.ts packages/core/src/broker/team-lane.ts scripts/validate-broker-steward.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7d86f534ee0b35c4f0f8cb66d61934cf619225537ad6d6a86f6ff7cb4eb525ca",
+      "stderrSha256": "sha256:f88560af22d776c5ab8b1815587b543f3fdd694fbaeb65caef16ea5af7ebecdb",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:broker-steward",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d10a1cd1ea1967efc684fc31c8ed12cd195d154d88e977b73a027968743b4c9f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:65b58c227fc7e7325b92d7eb7e4a7ac53f096196abb3a91fa62287c27f2d4eb3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "git-diff-check",
+    "typecheck",
+    "validate-broker-steward",
+    "validate:broker-steward",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-11T15:05:38.591Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0034-mid-execution-registration-and-virtual-atom-in-use-registry.task.md",
+      ".atm/history/evidence/TASK-CID-0034.*",
+      ".atm/history/task-events/TASK-CID-0034/**",
+      ".atm/history/tasks/TASK-CID-0034.json",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "scripts/validate-broker-steward.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "scripts/validate-broker-steward.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0034.json",
+  "closedAt": "2026-06-11T15:05:38.591Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+  "attestation": null
+}
