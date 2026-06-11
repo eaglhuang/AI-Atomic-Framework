@@ -27,6 +27,7 @@ export interface WriteIntent {
   readonly baseCommit: string;
   readonly targetFiles: readonly string[];
   readonly atomRefs: readonly WriteIntentAtomRef[];
+  readonly readAtoms?: readonly WriteIntentAtomRef[];
   readonly sharedSurfaces: SharedSurfacesRecord;
   readonly requestedLane: 'auto' | 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
 }
