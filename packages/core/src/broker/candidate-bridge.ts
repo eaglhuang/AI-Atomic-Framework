@@ -84,8 +84,9 @@ export function candidatesToWriteIntent(
 
 /**
  * Deterministic atom CID: SHA-256 over the canonical candidate contract
- * `(kind || symbol || sortedSourcePaths || detectionMethod)`. The same
- * candidate always produces the same CID across runs and processes.
+ * `(kind || symbol || sourcePaths || detectionMethod)`, where `sourcePaths`
+ * is the deduplicated, sorted union of `filePath` and `suggestedSourcePaths`.
+ * The same candidate always produces the same CID across runs and processes.
  */
 export function computeCandidateAtomCid(candidate: BridgeAtomCandidate): string {
   const sourcePaths = [...new Set(

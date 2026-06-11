@@ -3,13 +3,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { computeAtomCid } from '../packages/core/src/registry/atom-capsule.ts';
 import { loadPathToAtomMap } from '../atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js';
-
-interface AtomBundle {
-  canonicalSourceCode: string;
-  inputSchema: unknown;
-  outputSchema: unknown;
-  policeConfig: unknown;
-}
+import {
+  ATOM_ID_TO_CID_SCHEMA_VERSION,
+  buildPlaceholderAtomBundle,
+  buildPlaceholderAtomSourcePath,
+  buildResolvedAtomBundle,
+  type AtomIdToCidMapping
+} from './lib/atom-id-to-cid.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -96,7 +96,7 @@ function main() {
     atomGroups.get(atom_id)!.push(path_pattern);
   }
 
-  const resultMappings: Array<{ atom_id: string; atom_cid: string; sourcePath: string }> = [];
+  const resultMappings: AtomIdToCidMapping[] = [];
   const failures: string[] = [];
 
   // Process each unique atom_id
@@ -128,20 +128,15 @@ function main() {
     }
 
     if (!resolvedSourcePath) {
-      // Generate a deterministic placeholder CID for unattached atoms
-      const sourcePath = `placeholder:unattached/${atomId}`;
-      const sourceContent = `placeholder:unattached atom capsule for ${atomId}`;
-      const bundle: AtomBundle = {
-        canonicalSourceCode: sourceContent,
-        inputSchema: null,
-        outputSchema: null,
-        policeConfig: null
-      };
+      // Generate a deterministic placeholder CID for unattached atoms.
+      const sourcePath = buildPlaceholderAtomSourcePath(atomId);
+      const bundle = buildPlaceholderAtomBundle(atomId);
       const atomCid = computeAtomCid(bundle);
       resultMappings.push({
         atom_id: atomId,
         atom_cid: atomCid,
-        sourcePath
+        sourcePath,
+        sourceKind: 'placeholder'
       });
       continue;
     }
@@ -150,17 +145,13 @@ function main() {
     try {
       const fullSourcePath = path.resolve(root, resolvedSourcePath);
       const sourceContent = readFileSync(fullSourcePath, 'utf8');
-      const bundle: AtomBundle = {
-        canonicalSourceCode: sourceContent,
-        inputSchema: null,
-        outputSchema: null,
-        policeConfig: null
-      };
+      const bundle = buildResolvedAtomBundle(sourceContent);
       const atomCid = computeAtomCid(bundle);
       resultMappings.push({
         atom_id: atomId,
         atom_cid: atomCid,
-        sourcePath: resolvedSourcePath
+        sourcePath: resolvedSourcePath,
+        sourceKind: 'source'
       });
     } catch (err) {
       console.error(`[backfill] Error processing ${atomId} via ${resolvedSourcePath}:`, err);
@@ -169,7 +160,7 @@ function main() {
   }
 
   const outputObj = {
-    schemaVersion: 'atm.atomIdToCid.v1',
+    schemaVersion: ATOM_ID_TO_CID_SCHEMA_VERSION,
     generatedAt: new Date().toISOString(),
     mappings: resultMappings
   };

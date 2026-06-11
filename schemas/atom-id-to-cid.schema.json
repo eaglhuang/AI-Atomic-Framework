@@ -11,7 +11,7 @@
   "properties": {
     "schemaVersion": {
       "type": "STRING",
-      "enum": ["atm.atomIdToCid.v1"]
+      "enum": ["atm.atomIdToCid.v2"]
     },
     "generatedAt": {
       "type": "STRING",
@@ -24,7 +24,8 @@
         "required": [
           "atom_id",
           "atom_cid",
-          "sourcePath"
+          "sourcePath",
+          "sourceKind"
         ],
         "properties": {
           "atom_id": {
@@ -36,6 +37,10 @@
           },
           "sourcePath": {
             "type": "STRING"
+          },
+          "sourceKind": {
+            "type": "STRING",
+            "enum": ["source", "placeholder"]
           }
         }
       }

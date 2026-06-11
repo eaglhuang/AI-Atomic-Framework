@@ -2,6 +2,12 @@
 
 This guide documents the write-broker surface that coordinates concurrent agent writes: `WriteIntent`, `calculateBrokerDecision()`, and the candidate bridge.
 
+CID terminology used by this guide:
+
+- `Candidate CID` is the broker admission identifier for a discovered candidate.
+- `Capsule CID` is the content-addressed version anchor for atom capsule export/import/rescue flows.
+- `Synthetic broker atomCid` is the internal lane bookkeeping value emitted by `team-lane.ts`; it is not a capsule CID and not a candidate CID.
+
 ## Write Intents and Decisions
 
 `packages/core/src/broker/types.ts` defines `WriteIntent` (task, actor, base commit, target files, atom refs, shared surfaces, requested lane) and `BrokerDecision`. `calculateBrokerDecision(newIntent, registry)` in `decision.ts` checks the new intent against all active intents and returns one of four primary verdicts:
@@ -30,12 +36,14 @@ const decision = calculateBrokerDecision(intent, registry);
 
 Behavior:
 
-- **Deterministic `atomCid`** — SHA-256 of the canonical candidate contract `(kind || symbol || sortedSourcePaths || detectionMethod)`. The same candidate yields the same CID across runs, which is what lets the broker detect two agents claiming the same semantic unit.
-- **`atomId`** — uses the candidate's `suggestedAtomId` when present, otherwise falls back to `ATM-AUTO-<cid-prefix>`.
-- **`targetFiles`** — deduplicated, sorted union of each candidate's `filePath` and `suggestedSourcePaths`.
-- **`sharedSurfaces`** — empty by default; pass `ctx.sharedSurfaces` to declare generators, projections, registries, validators, or artifacts.
-- **`requestedLane`** — `'auto'` by default (the broker decides); override with `ctx.requestedLane`.
-- **Read-only and pure** — the bridge never mutates candidate input, never calls an LLM, and needs no language-specific semantics.
+- **Deterministic `atomCid`** - SHA-256 of the canonical candidate contract `(kind || symbol || sourcePaths || detectionMethod)`, where `sourcePaths` is the deduplicated, sorted union of the candidate's `filePath` and `suggestedSourcePaths`. The same candidate yields the same CID across runs, which is what lets the broker detect two agents claiming the same semantic unit.
+- **`atomId`** - uses the candidate's `suggestedAtomId` when present, otherwise falls back to `ATM-AUTO-<cid-prefix>`.
+- **`targetFiles`** - deduplicated, sorted union of each candidate's `filePath` and `suggestedSourcePaths`.
+- **`sharedSurfaces`** - empty by default; pass `ctx.sharedSurfaces` to declare generators, projections, registries, validators, or artifacts.
+- **`requestedLane`** - `'auto'` by default (the broker decides); override with `ctx.requestedLane`.
+- **Read-only and pure** - the bridge never mutates candidate input, never calls an LLM, and needs no language-specific semantics.
+
+For the separate team-lane bookkeeping path, see `packages/core/src/broker/team-lane.ts`: it derives a synthetic broker `atomCid` from `taskId` slugification so lane evidence can stay stable without pretending to be a content-addressed capsule ID.
 
 Because `@ai-atomic-framework/plugin-sdk` depends on core, the bridge declares a structural `BridgeAtomCandidate` mirror instead of importing the SDK type; plugin-sdk `AtomCandidate` values are directly assignable (covered by `__tests__/candidate-bridge.test.ts`).
 

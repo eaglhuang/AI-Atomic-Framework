@@ -2,6 +2,8 @@
 
 This document is the canonical CID semantics reference for `TASK-CID-0002`.
 
+It covers `semanticFingerprint` / `CID.Interface` only. For broker admission `Candidate CID`, capsule export/import `Capsule CID`, and the synthetic broker `atomCid` used by `team-lane.ts`, see `docs/BROKER_GUIDE.md` and `packages/core/src/registry/atom-capsule.ts`.
+
 ## Core rule
 
 `semanticFingerprint` is a deterministic, normalized **contract/interface + execution-constraint fingerprint**.
@@ -56,4 +58,3 @@ The schema change is additive:
 - `fingerprintProfile` is optional
 - `additionalProperties: false` remains in force
 - existing fixtures and registry entries must continue to validate unchanged
-
