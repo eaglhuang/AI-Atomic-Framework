@@ -1,0 +1,53 @@
+{
+  "id": "registry-cid-disjoint-file-overlap",
+  "description": "Registry admission sees same-file overlap with disjoint atom CIDs and routes to deterministic composer.",
+  "kind": "registry",
+  "relevantModes": ["agrOff", "layer1", "layer2Adr"],
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["src/registry-target.ts"],
+      "atomRefs": [{ "atomId": "ATM-AGR-05-B", "atomCid": "cid-agr-05-b", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": [], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "local-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-agr-05-a",
+          "taskId": "TASK-CID-0037-A",
+          "teamRunId": null,
+          "actorId": "001",
+          "baseCommit": "commit-base",
+          "resourceKeys": {
+            "files": ["src/registry-target.ts"],
+            "atomIds": ["ATM-AGR-05-A"],
+            "atomCids": ["cid-agr-05-a"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": [],
+            "artifacts": []
+          },
+          "leaseEpoch": 1,
+          "lane": "direct-brokered"
+        }
+      ]
+    }
+  },
+  "groundTruth": { "safeToParallelize": true, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "brokerVerdict": "needs-physical-split", "validatorOutcome": "pass" },
+    "layer1": { "brokerVerdict": "needs-physical-split", "validatorOutcome": "pass" },
+    "layer2Adr": { "brokerVerdict": "needs-physical-split", "validatorOutcome": "pass" }
+  }
+}

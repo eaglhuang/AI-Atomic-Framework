@@ -1,0 +1,48 @@
+{
+  "id": "layer1-no-refinement-available",
+  "description": "When no Layer 1 refinement exists, Layer 1 mode must match AGR-off outcomes.",
+  "kind": "compose",
+  "relevantModes": ["agrOff", "layer1"],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.11.a",
+      "taskId": "TASK-CID-0037-A",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/legacy.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-11", "atomCid": "cid-agr-11-shared" }],
+      "anchors": [{ "kind": "line", "hint": "legacy" }],
+      "intent": "Legacy patch A.",
+      "patch": "--- a/src/legacy.ts\n+++ b/src/legacy.ts\n@@ -1,1 +1,1 @@\n-export const legacy = 1;\n+export const legacy = 2;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert legacy A."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.11.b",
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/legacy.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-11", "atomCid": "cid-agr-11-shared" }],
+      "anchors": [{ "kind": "line", "hint": "legacy" }],
+      "intent": "Legacy patch B.",
+      "patch": "--- a/src/legacy.ts\n+++ b/src/legacy.ts\n@@ -2,1 +2,1 @@\n-export const tail = 1;\n+export const tail = 2;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert legacy B."
+    }
+  ],
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" },
+    "layer1": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" },
+    "layer2Adr": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" }
+  }
+}

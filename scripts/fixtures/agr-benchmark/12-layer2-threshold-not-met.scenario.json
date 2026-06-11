@@ -1,0 +1,56 @@
+{
+  "id": "layer2-threshold-not-met",
+  "description": "Layer 1 partially refines but Layer 2 threshold is not met, so the conflict stays blocked.",
+  "kind": "compose",
+  "relevantModes": ["agrOff", "layer1", "layer2Adr"],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.12.a",
+      "taskId": "TASK-CID-0037-A",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/dense.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-12", "atomCid": "cid-dense-fn" }],
+      "anchors": [{ "kind": "line", "hint": "dense" }],
+      "intent": "Dense function edit A.",
+      "patch": "--- a/src/dense.ts\n+++ b/src/dense.ts\n@@ -2,1 +2,1 @@\n-  return a + b;\n+  return a + b + 1;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert dense A."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.12.b",
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/dense.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-12", "atomCid": "cid-dense-fn" }],
+      "anchors": [{ "kind": "line", "hint": "dense" }],
+      "intent": "Dense function edit B.",
+      "patch": "--- a/src/dense.ts\n+++ b/src/dense.ts\n@@ -3,1 +3,1 @@\n-}\n+  // still conflicting body\n+}\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert dense B."
+    }
+  ],
+  "layer1Refinement": {
+    "proposal.agr.12.a": [{ "atomId": "ATM-AGR-12", "atomCid": "cid-dense-fn" }],
+    "proposal.agr.12.b": [{ "atomId": "ATM-AGR-12", "atomCid": "cid-dense-fn" }]
+  },
+  "layer2Refinement": {
+    "proposal.agr.12.a": [{ "atomId": "ATM-AGR-12", "atomCid": "cid-dense-fn" }],
+    "proposal.agr.12.b": [{ "atomId": "ATM-AGR-12", "atomCid": "cid-dense-fn" }]
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" },
+    "layer1": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" },
+    "layer2Adr": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" }
+  }
+}

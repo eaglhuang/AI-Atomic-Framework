@@ -1,0 +1,48 @@
+{
+  "id": "compose-overlapping-hunks",
+  "description": "Disjoint atom CIDs but overlapping patch ranges force steward routing under AGR-off.",
+  "kind": "compose",
+  "relevantModes": ["agrOff", "layer1", "layer2Adr"],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.04.a",
+      "taskId": "TASK-CID-0037-A",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/shared.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-04-A", "atomCid": "cid-agr-04-a" }],
+      "anchors": [{ "kind": "line", "hint": "shared" }],
+      "intent": "Edit shared block line 2.",
+      "patch": "--- a/src/shared.ts\n+++ b/src/shared.ts\n@@ -2,1 +2,1 @@\n-const value = 1;\n+const value = 2;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert line 2."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.04.b",
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/shared.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-04-B", "atomCid": "cid-agr-04-b" }],
+      "anchors": [{ "kind": "line", "hint": "shared" }],
+      "intent": "Edit overlapping shared block line 2.",
+      "patch": "--- a/src/shared.ts\n+++ b/src/shared.ts\n@@ -2,1 +2,1 @@\n-const value = 1;\n+const value = 99;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert line 2."
+    }
+  ],
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "composeVerdict": "needs-steward", "validatorOutcome": "pass" },
+    "layer1": { "composeVerdict": "needs-steward", "validatorOutcome": "pass" },
+    "layer2Adr": { "composeVerdict": "needs-steward", "validatorOutcome": "pass" }
+  }
+}

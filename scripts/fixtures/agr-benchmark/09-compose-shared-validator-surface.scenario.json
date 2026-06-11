@@ -1,0 +1,48 @@
+{
+  "id": "compose-shared-validator-surface",
+  "description": "Compose path remains blocked when proposals share the same validator surface even if atom CIDs differ.",
+  "kind": "compose",
+  "relevantModes": ["agrOff", "layer1", "layer2Adr"],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.09.a",
+      "taskId": "TASK-CID-0037-A",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/a.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-09-A", "atomCid": "cid-agr-09-a" }],
+      "anchors": [{ "kind": "line", "hint": "a" }],
+      "intent": "Touch validator surface A.",
+      "patch": "--- a/src/a.ts\n+++ b/src/a.ts\n@@ -1,1 +1,1 @@\n-export const a = 1;\n+export const a = 2;\n",
+      "validators": ["npm run validate:cli"],
+      "rollback": "Revert A."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.09.b",
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/b.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-09-B", "atomCid": "cid-agr-09-b" }],
+      "anchors": [{ "kind": "line", "hint": "b" }],
+      "intent": "Touch same validator surface from another file.",
+      "patch": "--- a/src/b.ts\n+++ b/src/b.ts\n@@ -1,1 +1,1 @@\n-export const b = 1;\n+export const b = 2;\n",
+      "validators": ["npm run validate:cli"],
+      "rollback": "Revert B."
+    }
+  ],
+  "groundTruth": { "safeToParallelize": true, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "composeVerdict": "parallel-safe", "validatorOutcome": "pass" },
+    "layer1": { "composeVerdict": "parallel-safe", "validatorOutcome": "pass" },
+    "layer2Adr": { "composeVerdict": "parallel-safe", "validatorOutcome": "pass" }
+  }
+}

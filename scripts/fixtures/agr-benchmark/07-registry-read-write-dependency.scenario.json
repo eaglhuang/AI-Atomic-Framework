@@ -1,0 +1,54 @@
+{
+  "id": "registry-read-write-dependency",
+  "description": "AGR-off labels the case parallel-safe, but Layer 2 + ADR must serialize because the writer reads an atom in active use.",
+  "kind": "registry",
+  "relevantModes": ["agrOff", "layer1", "layer2Adr"],
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["src/consumer.ts"],
+      "atomRefs": [{ "atomId": "ATM-AGR-07-B", "atomCid": "cid-agr-07-b", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": [], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "readAtoms": ["cid-agr-07-a"],
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "local-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-agr-07-a",
+          "taskId": "TASK-CID-0037-A",
+          "teamRunId": null,
+          "actorId": "001",
+          "baseCommit": "commit-base",
+          "resourceKeys": {
+            "files": ["src/provider.ts"],
+            "atomIds": ["ATM-AGR-07-A"],
+            "atomCids": ["cid-agr-07-a"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": [],
+            "artifacts": []
+          },
+          "leaseEpoch": 1,
+          "lane": "direct-brokered"
+        }
+      ]
+    }
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "brokerVerdict": "parallel-safe", "validatorOutcome": "pass" },
+    "layer1": { "brokerVerdict": "parallel-safe", "validatorOutcome": "pass" },
+    "layer2Adr": { "brokerVerdict": "serial", "validatorOutcome": "pass" }
+  }
+}
