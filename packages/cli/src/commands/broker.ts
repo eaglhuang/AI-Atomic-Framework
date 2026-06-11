@@ -355,35 +355,74 @@ export async function runBroker(argv: string[]) {
       const evidenceOutPath = options.evidenceOutPath
         ? path.resolve(options.cwd, options.evidenceOutPath)
         : null;
-      const applyResult = applyStewardPlan({
-        cwd: options.cwd,
-        stewardId,
-        mergePlan,
-        proposals,
-        scopeFiles,
-        evidenceOutPath
-      });
+      const taskId = options.task ?? proposals[0]?.taskId ?? null;
+      const actorId = options.actorId ?? proposals[0]?.actorId ?? null;
+      const taskPath = taskId ? path.join(options.cwd, '.atm', 'history', 'tasks', `${taskId}.json`) : null;
+      const hasRuntimeActivationInputs = Boolean(taskId && actorId && taskPath && existsSync(taskPath));
+
+      const directApplyResult = hasRuntimeActivationInputs
+        ? null
+        : applyStewardPlan({
+            cwd: options.cwd,
+            stewardId,
+            mergePlan,
+            proposals,
+            scopeFiles,
+            evidenceOutPath
+          });
+      const runtimeActivationHandshake = hasRuntimeActivationInputs
+        ? buildTeamBrokerRuntimeActivationHandshake({
+            cwd: options.cwd,
+            taskId: taskId as string,
+            actorId: actorId as string,
+            task: JSON.parse(readFileSync(taskPath as string, 'utf8')) as Record<string, unknown>,
+            writePaths: scopeFiles,
+            registryPath
+          }).evidence
+        : null;
+      const scopedWriteExecution = hasRuntimeActivationInputs && runtimeActivationHandshake
+        ? executeBrokerScopedWrite({
+            cwd: options.cwd,
+            stewardId,
+            mergePlan,
+            proposals,
+            scopeFiles,
+            handshake: runtimeActivationHandshake,
+            evidenceOutPath
+          })
+        : null;
+      const applyEvidence = hasRuntimeActivationInputs
+        ? scopedWriteExecution?.evidence.applyEvidence ?? null
+        : directApplyResult?.evidence ?? null;
+      const ok = hasRuntimeActivationInputs
+        ? scopedWriteExecution?.ok ?? false
+        : directApplyResult?.ok ?? false;
+      const appliedFileCount = hasRuntimeActivationInputs
+        ? scopedWriteExecution?.evidence.applyEvidence?.appliedFiles.length ?? 0
+        : directApplyResult?.evidence.appliedFiles.length ?? 0;
+
       return makeResult({
-        ok: applyResult.ok,
+        ok,
         command: 'broker',
         cwd: options.cwd,
         messages: [
           message(
-            applyResult.ok ? 'info' : 'error',
-            applyResult.ok ? 'ATM_BROKER_STEWARD_APPLIED' : 'ATM_BROKER_STEWARD_APPLY_BLOCKED',
-            applyResult.ok
+            ok ? 'info' : 'error',
+            ok ? 'ATM_BROKER_STEWARD_APPLIED' : 'ATM_BROKER_STEWARD_APPLY_BLOCKED',
+            ok
               ? `Steward applied merge plan '${mergePlan.mergePlanId}' to scoped files.`
               : 'Steward apply blocked; no scoped file writes were performed.',
             {
               mergePlanId: mergePlan.mergePlanId,
-              appliedFileCount: applyResult.evidence.appliedFiles.length
+              appliedFileCount
             }
           )
         ],
         evidence: {
           action: 'steward-apply',
           stewardId,
-          applyEvidence: applyResult.evidence,
+          applyEvidence,
+          scopedWriteExecution: scopedWriteExecution?.evidence ?? null,
           evidenceOutPath: evidenceOutPath ? path.relative(options.cwd, evidenceOutPath) : null,
           mergePlan,
           proposalCount: proposals.length

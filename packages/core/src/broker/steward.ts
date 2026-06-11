@@ -7,8 +7,8 @@ import type { StewardApplyEvidence } from './apply-evidence.ts';
 import { sortProposalsForCompose } from './merge-plan.ts';
 import { validateBrokerProposal } from './proposal.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
-import type { MergePlan, PatchProposal } from './types.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
+import type { DecompositionRequest, MergePlan, PatchProposal } from './types.ts';
 
 export type StewardValidationCode =
   | 'scope-lock-mismatch'
@@ -58,6 +58,7 @@ export interface BrokerScopedWriteExecutionEvidence {
   readonly mergePlanId: string;
   readonly allowedFiles: readonly string[];
   readonly handshake: TeamBrokerRuntimeActivationHandshakeEvidence;
+  readonly decompositionRequest: DecompositionRequest | null;
   readonly virtualAtomInUseRegistry: VirtualAtomInUseRegistryDocument;
   readonly applyEvidence: StewardApplyEvidence | null;
   readonly verdict: 'applied' | 'blocked';
@@ -169,6 +170,7 @@ export function executeBrokerScopedWrite(input: {
     .sort((left, right) => left.localeCompare(right));
   const scopeFiles = [...new Set(input.scopeFiles.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
+  const decompositionRequest = input.handshake.brokerLane.decision.decompositionRequest ?? null;
 
   if (!input.handshake.scopedWriteExecution.approved) {
     return {
@@ -180,6 +182,7 @@ export function executeBrokerScopedWrite(input: {
         mergePlanId: input.mergePlan.mergePlanId,
         allowedFiles,
         handshake: input.handshake,
+        decompositionRequest,
         virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
         applyEvidence: null,
         verdict: 'blocked',
@@ -200,6 +203,7 @@ export function executeBrokerScopedWrite(input: {
         mergePlanId: input.mergePlan.mergePlanId,
         allowedFiles,
         handshake: input.handshake,
+        decompositionRequest,
         virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
         applyEvidence: null,
         verdict: 'blocked',
@@ -226,6 +230,7 @@ export function executeBrokerScopedWrite(input: {
       mergePlanId: input.mergePlan.mergePlanId,
       allowedFiles,
       handshake: input.handshake,
+      decompositionRequest,
       virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
       applyEvidence: applyResult.evidence,
       verdict: applyResult.ok ? 'applied' : 'blocked',
