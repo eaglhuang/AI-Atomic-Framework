@@ -10,7 +10,7 @@ import {
   runFrameworkMode,
   validateClosurePacket
 } from '../packages/cli/src/commands/framework-development.ts';
-import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
+import { runIntegrationHookInvocationInProcess } from '../packages/cli/src/commands/integration-hooks.ts';
 import { writeTaskDirectionLock } from '../packages/cli/src/commands/task-direction.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 
@@ -101,11 +101,11 @@ try {
   const frameworkGuard = runFrameworkDevelopmentGuard(frameworkRepo, ['packages/core/src/index.ts']);
   assert(frameworkGuard.ok === false, 'framework-development guard must fail without an active framework claim');
 
-  const preToolBlock = runIntegrationHookInvocation(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'packages/core/src/index.ts']);
+  const preToolBlock = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'packages/core/src/index.ts']);
   assert(preToolBlock.ok === false, 'pre-tool hook must block critical framework edits without an active claim');
   assert(preToolBlock.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED'), 'pre-tool block must report the framework claim requirement');
 
-  const preToolDocsOnly = runIntegrationHookInvocation(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'docs/plan.md']);
+  const preToolDocsOnly = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'docs/plan.md']);
   assert(preToolDocsOnly.ok === true, 'pre-tool hook must allow framework docs-only edits without hard framework claim');
 
   const promptScopedRepo = makeHostRepo(tempRoot, 'prompt-scope-repo');
@@ -125,7 +125,7 @@ try {
     'Deliverables:',
     '- src/scope.ts'
   ].join('\n'), 'utf8');
-  const preToolPromptScopedNeedsClaim = runIntegrationHookInvocation([
+  const preToolPromptScopedNeedsClaim = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', promptScopedRepo,
     '--editor', 'copilot',
@@ -143,7 +143,7 @@ try {
     allowedFiles: ['docs/plan/tasks/TASK-SCOPE-0001.task.md', 'src/scope.ts'],
     prompt: 'TASK-SCOPE-0001'
   });
-  const preToolPromptScopedOk = runIntegrationHookInvocation([
+  const preToolPromptScopedOk = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', promptScopedRepo,
     '--editor', 'copilot',
@@ -152,7 +152,7 @@ try {
     '--files', 'src/scope.ts'
   ]);
   assert(preToolPromptScopedOk.ok === true, 'pre-tool hook must allow in-scope edits after a task direction lock exists');
-  const preToolPromptScopedDrift = runIntegrationHookInvocation([
+  const preToolPromptScopedDrift = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', promptScopedRepo,
     '--editor', 'copilot',
@@ -162,7 +162,7 @@ try {
   ]);
   assert(preToolPromptScopedDrift.ok === false, 'pre-tool hook must block prompt-scoped out-of-scope edits');
   assert(preToolPromptScopedDrift.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'prompt-scoped drift block must report ATM_TOOL_SCOPE_DRIFT_BLOCKED');
-  const preToolStaticEvidenceBlock = runIntegrationHookInvocation([
+  const preToolStaticEvidenceBlock = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', promptScopedRepo,
     '--editor', 'copilot',
@@ -200,17 +200,17 @@ try {
   assert(adopterInfraSync.closureAuthority === 'none', 'host repo ATM runner sync must not demand target repo closure authority');
   assert(adopterInfraSync.warnings.includes('adopter-infrastructure-sync'), 'host repo ATM runner sync should record an adopter infrastructure sync warning');
 
-  const preToolCrossRepo = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(frameworkRepo, 'packages', 'core', 'src', 'index.ts')]);
+  const preToolCrossRepo = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(frameworkRepo, 'packages', 'core', 'src', 'index.ts')]);
   assert(preToolCrossRepo.ok === false, 'pre-tool hook must block cross-repo critical framework edits without target claim');
 
-  const preToolCrossRepoTaskCard = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(planningRepo, 'docs', 'framework-plan', 'TASK-FRAMEWORK-0001.task.md')]);
+  const preToolCrossRepoTaskCard = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--files', path.join(planningRepo, 'docs', 'framework-plan', 'TASK-FRAMEWORK-0001.task.md')]);
   assert(preToolCrossRepoTaskCard.ok === false, 'pre-tool hook must block planning repo task-card edits when framework closure authority belongs to the target repo');
   assert(preToolCrossRepoTaskCard.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_CLOSURE_REQUIRED'), 'planning task-card block must report target repo closure requirement');
 
-  const preToolCrossRepoTaskCardRead = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--tool-name', 'Read', '--files', path.join(planningRepo, 'docs', 'framework-plan', 'TASK-FRAMEWORK-0001.task.md')]);
+  const preToolCrossRepoTaskCardRead = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--tool-name', 'Read', '--files', path.join(planningRepo, 'docs', 'framework-plan', 'TASK-FRAMEWORK-0001.task.md')]);
   assert(preToolCrossRepoTaskCardRead.ok === true, 'pre-tool hook must allow read-only inspection of planning task cards');
 
-  const preToolCrossRepoCommit = runIntegrationHookInvocation(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--command', 'git commit -m "close tasks"']);
+  const preToolCrossRepoCommit = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', planningRepo, '--editor', 'copilot', '--command', 'git commit -m "close tasks"']);
   assert(preToolCrossRepoCommit.ok === false, 'pre-tool hook must block planning repo commits while framework closure authority belongs to the target repo');
   assert(preToolCrossRepoCommit.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_TARGET_REPO_COMMIT_BLOCKED'), 'planning repo commit block must report target repo closure requirement');
 

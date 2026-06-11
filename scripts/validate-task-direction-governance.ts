@@ -5,7 +5,7 @@ import path from 'node:path';
 import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runFrameworkTempClaim } from '../packages/cli/src/commands/framework-development.ts';
 import { runHook } from '../packages/cli/src/commands/hook.ts';
-import { runIntegrationHookInvocation } from '../packages/cli/src/commands/integration-hooks.ts';
+import { runIntegrationHookInvocationInProcess } from '../packages/cli/src/commands/integration-hooks.ts';
 import { runLock } from '../packages/cli/src/commands/lock.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { buildTaskSelfAllowPaths, readActiveTaskDirectionLocks } from '../packages/cli/src/commands/task-direction.ts';
@@ -172,7 +172,7 @@ async function validateAaoThroughputAgentJourney(tempRoot: string) {
   assert((compactBeforeWork.evidence as any).batchRun === undefined, 'compact current must omit full batchRun payload');
   assert((compactBeforeWork.evidence as any).taskQueue === undefined, 'compact current must omit full taskQueue payload');
 
-  const preWriteDrift = runIntegrationHookInvocation([
+  const preWriteDrift = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -265,7 +265,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert((route.evidence.taskQueue as any)?.schemaId === 'atm.taskQueuePreview.v1', 'adopter prompt route must stay read-only and only expose atm.taskQueuePreview.v1');
   assert((route.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0001', 'adopter queue head must be first task');
 
-  const beforeClaim = runIntegrationHookInvocation([
+  const beforeClaim = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -284,7 +284,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   const adopterBatchId = (claim.evidence.batchRun as any)?.batchId;
   assert(typeof adopterBatchId === 'string' && adopterBatchId.length > 0, 'adopter claim must create a batchId for checkpoint status');
 
-  const inScope = runIntegrationHookInvocation([
+  const inScope = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -299,7 +299,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   const reclaimedLocks = readActiveTaskDirectionLocks(repo);
   assert(reclaimedLocks.some((lock) => lock.taskId === 'TASK-ADOPT-0001'), 're-claimed released lock must be visible as an active direction lock');
 
-  const outOfScope = runIntegrationHookInvocation([
+  const outOfScope = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -323,7 +323,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   fixtureStep('adopter-cross-repo claim');
   const crossClaim = await runNext(['--cwd', crossRepo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-CROSS-PLAN-0001']);
   assert(crossClaim.ok === true, 'cross planning fixture must claim successfully');
-  const mirrorBlock = runIntegrationHookInvocation([
+  const mirrorBlock = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', crossRepo,
     '--editor', 'copilot',
@@ -341,7 +341,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(preCommitMirror.ok === false, 'pre-commit must block staged planning mirror files');
   assert(((preCommitMirror.evidence as any).planningMirrorDriftFiles ?? []).includes('docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-CROSS-PLAN-0001.task.md'), 'pre-commit evidence must report planning mirror drift files');
 
-  const staticEvidenceBlock = runIntegrationHookInvocation([
+  const staticEvidenceBlock = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -352,7 +352,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(staticEvidenceBlock.ok === false, 'adopter queue must block direct static evidence artifact edits');
   assert(staticEvidenceBlock.messages.some((entry) => entry.code === 'ATM_STATIC_EVIDENCE_IMPERSONATION_BLOCKED'), 'adopter static evidence edit must report impersonation block');
 
-  const runtimeLockEditBlock = runIntegrationHookInvocation([
+  const runtimeLockEditBlock = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -448,7 +448,7 @@ async function validateFrameworkDevelopment(tempRoot: string) {
   const route = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert(route.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'framework prompt must resolve to a scoped task queue');
 
-  const beforeClaim = runIntegrationHookInvocation([
+  const beforeClaim = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -471,7 +471,7 @@ async function validateFrameworkDevelopment(tempRoot: string) {
     createdAt: new Date().toISOString(),
     status: 'active'
   });
-  const directionOnlyBlock = runIntegrationHookInvocation([
+  const directionOnlyBlock = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -485,7 +485,7 @@ async function validateFrameworkDevelopment(tempRoot: string) {
   const taskClaim = await runNext(['--cwd', repo, '--claim', '--actor', 'framework-agent', '--prompt', prompt]);
   assert(taskClaim.ok === true, 'framework next --claim must claim queue head and write direction lock');
 
-  const withFrameworkTaskClaim = runIntegrationHookInvocation([
+  const withFrameworkTaskClaim = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -497,7 +497,7 @@ async function validateFrameworkDevelopment(tempRoot: string) {
 
   await runFrameworkTempClaim(repo, 'framework-agent', ['packages/core/src/one.ts'], 'test framework hard gate');
 
-  const withFrameworkClaim = runIntegrationHookInvocation([
+  const withFrameworkClaim = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -507,7 +507,7 @@ async function validateFrameworkDevelopment(tempRoot: string) {
   ]);
   assert(withFrameworkClaim.ok === true, 'framework critical in-scope edit must pass with both direction lock and framework claim');
 
-  const frameworkScopeDrift = runIntegrationHookInvocation([
+  const frameworkScopeDrift = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
@@ -644,7 +644,7 @@ async function validateNextClaimPromptScopeConsistency(tempRoot: string) {
   assert(allowedFiles.includes('src/two.ts'), 'allowedFiles must contain src/two.ts');
   assert(allowedFiles.includes('src/three.ts'), 'allowedFiles must contain src/three.ts');
 
-  const hookResult = runIntegrationHookInvocation([
+  const hookResult = runIntegrationHookInvocationInProcess([
     'pre-tool',
     '--cwd', repo,
     '--editor', 'copilot',
