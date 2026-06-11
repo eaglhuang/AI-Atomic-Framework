@@ -4,6 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   createPythonAtomizationPlanningAdapter,
+  createPythonLanguageAdapter,
+  defaultPythonLanguageAdapterManifest,
   discoverPythonAtomCandidates,
   planPythonAtomizeFromCandidate
 } from '../src/language-python-adapter.ts';
@@ -132,6 +134,14 @@ async function testPlanAtomize() {
     dryRun: true
   });
   assert.deepEqual(adapterPlan, plan, 'adapter facade must match the direct plan function');
+
+  const languageAdapter = createPythonLanguageAdapter();
+  assert.deepEqual(languageAdapter.manifest, defaultPythonLanguageAdapterManifest);
+  assert.deepEqual(languageAdapter.manifest.symbolCanonicalization, {
+    policy: 'declaration-name',
+    reExportAliasBehavior: 'not-supported',
+    decoratorResolutionStance: 'not-supported'
+  });
   console.log('ok: planAtomize dry-run wraps legacy planPythonAtomize');
 }
 

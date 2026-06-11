@@ -47,10 +47,15 @@ export type {
 } from './project-adapter';
 export type {
   LanguageAdapter,
+  LanguageAdapterAliasResolutionStance,
+  LanguageAdapterCanonicalizationPolicy,
+  LanguageAdapterDecoratorResolutionStance,
   LanguageAdapterMessage,
+  LanguageAdapterManifest,
   LanguageAdapterReport,
   LanguageAdapterValidationRequest,
   LanguageProjectProfile,
+  LanguageAdapterSymbolCanonicalizationManifest,
   LanguageSourceFile
 } from './language-adapter';
 export type {
@@ -60,12 +65,19 @@ export type {
   AtomCandidateDiscoveryFilters,
   AtomCandidateDiscoveryRequest,
   AtomCandidateKind,
+  EnclosingUnit,
+  EnclosingUnitConfidenceClass,
+  EnclosingUnitFileRange,
+  EnclosingUnitKind,
   AtomizationPlan,
   AtomizationPlanRequest,
   AtomizationPlanStep,
-  AtomizationPlanningAdapter
+  AtomizationPlanningAdapter,
+  VirtualAtom,
+  VirtualAtomDetectionMethod,
+  VirtualAtomLayer
 } from './atomization-planning';
-export { isAtomCandidate, isAtomizationPlan } from './atomization-planning';
+export { isAtomCandidate, isAtomizationPlan, isEnclosingUnit, isVirtualAtom } from './atomization-planning';
 export type { InjectorPlugin, InjectorPluginContext } from './injector-plugin';
 export type {
   ExternalTaskSourcePlugin,

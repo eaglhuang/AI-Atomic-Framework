@@ -4,6 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   createJavaScriptAtomizationPlanningAdapter,
+  createJavaScriptLanguageAdapter,
+  defaultJavaScriptLanguageAdapterManifest,
   discoverJavaScriptAtomCandidates
 } from '../src/language-js-adapter.ts';
 
@@ -130,6 +132,14 @@ async function testAdapterShape() {
     /ATM_JS_PLAN_ATOMIZE_NOT_IMPLEMENTED/,
     'planAtomize must fail loudly until TASK-ASP-0004 lands the bridge'
   );
+
+  const languageAdapter = createJavaScriptLanguageAdapter();
+  assert.deepEqual(languageAdapter.manifest, defaultJavaScriptLanguageAdapterManifest);
+  assert.deepEqual(languageAdapter.manifest.symbolCanonicalization, {
+    policy: 'declaration-name',
+    reExportAliasBehavior: 'syntactic-only',
+    decoratorResolutionStance: 'not-supported'
+  });
   console.log('ok: AtomizationPlanningAdapter shape (planAtomize deferred)');
 }
 

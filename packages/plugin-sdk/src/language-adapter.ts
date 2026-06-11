@@ -13,6 +13,23 @@ export interface LanguageProjectProfile {
   readonly commands?: Readonly<Record<string, string>>;
 }
 
+export type LanguageAdapterCanonicalizationPolicy = 'declaration-name' | 'entrypoint-name';
+
+export type LanguageAdapterAliasResolutionStance = 'not-supported' | 'syntactic-only' | 'semantic';
+
+export type LanguageAdapterDecoratorResolutionStance = 'not-supported' | 'syntactic-only' | 'semantic';
+
+export interface LanguageAdapterSymbolCanonicalizationManifest {
+  readonly policy: LanguageAdapterCanonicalizationPolicy;
+  readonly reExportAliasBehavior: LanguageAdapterAliasResolutionStance;
+  readonly decoratorResolutionStance: LanguageAdapterDecoratorResolutionStance;
+}
+
+export interface LanguageAdapterManifest {
+  readonly symbolCanonicalization: LanguageAdapterSymbolCanonicalizationManifest;
+  readonly notes?: readonly string[];
+}
+
 export interface LanguageAdapterValidationRequest {
   readonly atomId: string;
   readonly lifecycleMode: AtomLifecycleModeValue;
@@ -39,6 +56,7 @@ export interface LanguageAdapterReport {
 export interface LanguageAdapter<Profile = LanguageProjectProfile, Request = LanguageAdapterValidationRequest, Report = LanguageAdapterReport> {
   readonly adapterName: string;
   readonly languageIds: readonly string[];
+  readonly manifest: LanguageAdapterManifest;
   detectProjectProfile(repositoryRoot: string): Promise<Profile> | Profile;
   validateComputeAtom(request: Request): Promise<Report> | Report;
 }

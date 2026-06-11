@@ -30,6 +30,42 @@ export type AtomCandidateDetectionMethod =
   | 'lsp'
   | 'llm-assisted';
 
+export type EnclosingUnitKind =
+  | 'function'
+  | 'var-decl'
+  | 'statement'
+  | 'class-method'
+  | 'unknown';
+
+export type EnclosingUnitConfidenceClass = AtomCandidateConfidence;
+
+export type VirtualAtomDetectionMethod = 'agr-layer1' | 'agr-layer2';
+
+export type VirtualAtomLayer = 1 | 2;
+
+export interface EnclosingUnitFileRange {
+  readonly file: string;
+  readonly lineStart: number;
+  readonly lineEnd: number;
+}
+
+export interface EnclosingUnit {
+  readonly kind: EnclosingUnitKind;
+  readonly symbol: string;
+  readonly fileRange: EnclosingUnitFileRange;
+  readonly confidenceClass: EnclosingUnitConfidenceClass;
+}
+
+export interface VirtualAtom {
+  readonly kind: EnclosingUnitKind;
+  readonly symbol: string;
+  readonly sourcePaths: readonly string[];
+  readonly detectionMethod: VirtualAtomDetectionMethod;
+  readonly layer: VirtualAtomLayer;
+  readonly confidenceClass: EnclosingUnitConfidenceClass;
+  readonly atomCid: string;
+}
+
 export interface AtomCandidate {
   readonly candidateId: string;
   readonly kind: AtomCandidateKind;
@@ -88,6 +124,7 @@ export interface AtomizationPlanningAdapter {
     request: AtomCandidateDiscoveryRequest
   ): Promise<readonly AtomCandidate[]> | readonly AtomCandidate[];
   planAtomize(request: AtomizationPlanRequest): Promise<AtomizationPlan> | AtomizationPlan;
+  enclose?(file: string, line: number): EnclosingUnit | null;
 }
 
 const atomCandidateKinds: readonly AtomCandidateKind[] = [
@@ -110,6 +147,67 @@ const atomCandidateDetectionMethods: readonly AtomCandidateDetectionMethod[] = [
   'lsp',
   'llm-assisted'
 ];
+
+const enclosingUnitKinds: readonly EnclosingUnitKind[] = [
+  'function',
+  'var-decl',
+  'statement',
+  'class-method',
+  'unknown'
+];
+
+const virtualAtomDetectionMethods: readonly VirtualAtomDetectionMethod[] = ['agr-layer1', 'agr-layer2'];
+
+const virtualAtomLayers: readonly VirtualAtomLayer[] = [1, 2];
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0;
+}
+
+function isFileRange(value: unknown): value is EnclosingUnitFileRange {
+  if (typeof value !== 'object' || value === null) return false;
+  const record = value as Record<string, unknown>;
+  if (!isNonEmptyString(record.file)) return false;
+  if (typeof record.lineStart !== 'number' || typeof record.lineEnd !== 'number') return false;
+  if (!Number.isFinite(record.lineStart) || !Number.isFinite(record.lineEnd)) return false;
+  if (record.lineStart < 1 || record.lineEnd < record.lineStart) return false;
+  return true;
+}
+
+export function isEnclosingUnit(value: unknown): value is EnclosingUnit {
+  if (typeof value !== 'object' || value === null) return false;
+  const record = value as Record<string, unknown>;
+  if (!enclosingUnitKinds.includes(record.kind as EnclosingUnitKind)) return false;
+  if (!isNonEmptyString(record.symbol)) return false;
+  if (!isFileRange(record.fileRange)) return false;
+  if (!atomCandidateConfidences.includes(record.confidenceClass as EnclosingUnitConfidenceClass)) {
+    return false;
+  }
+  return true;
+}
+
+export function isVirtualAtom(value: unknown): value is VirtualAtom {
+  if (typeof value !== 'object' || value === null) return false;
+  const record = value as Record<string, unknown>;
+  if (!enclosingUnitKinds.includes(record.kind as EnclosingUnitKind)) return false;
+  if (!isNonEmptyString(record.symbol)) return false;
+  if (
+    !Array.isArray(record.sourcePaths)
+    || record.sourcePaths.length === 0
+    || record.sourcePaths.some((entry) => !isNonEmptyString(entry))
+  ) {
+    return false;
+  }
+  if (!virtualAtomDetectionMethods.includes(record.detectionMethod as VirtualAtomDetectionMethod)) {
+    return false;
+  }
+  if (!virtualAtomLayers.includes(record.layer as VirtualAtomLayer)) return false;
+  if (!atomCandidateConfidences.includes(record.confidenceClass as EnclosingUnitConfidenceClass)) {
+    return false;
+  }
+  if (!isNonEmptyString(record.atomCid)) return false;
+  return true;
+}
 
 /**
  * Runtime schema guard for `AtomCandidate`, usable by adapters and tests to

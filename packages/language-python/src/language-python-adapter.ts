@@ -20,6 +20,7 @@ import type {
   PythonImportPolicy,
   PythonImportRecord,
   PythonLanguageAdapter,
+  PythonLanguageAdapterManifest,
   PythonLanguageAdapterMessage,
   PythonLanguageAdapterValidationReport,
   PythonLanguageAdapterValidationRequest,
@@ -31,6 +32,18 @@ import type {
 
 const PIPELINE_FOLDER_HINTS = ['pipelines', 'jobs', 'tasks', 'workflows', 'flows'];
 
+export const defaultPythonLanguageAdapterManifest: PythonLanguageAdapterManifest = {
+  symbolCanonicalization: {
+    policy: 'declaration-name',
+    reExportAliasBehavior: 'not-supported',
+    decoratorResolutionStance: 'not-supported'
+  },
+  notes: [
+    'The Python adapter canonicalizes declared function/class/module symbols only; it does not resolve alias provenance semantically.',
+    'Decorator semantics are not resolved by this adapter.'
+  ]
+};
+
 export function createPythonLanguageAdapter(
   policyOverrides: Partial<PythonImportPolicy> = {}
 ): PythonLanguageAdapter {
@@ -38,6 +51,7 @@ export function createPythonLanguageAdapter(
   return {
     adapterName: '@ai-atomic-framework/language-python',
     languageIds: ['python'],
+    manifest: defaultPythonLanguageAdapterManifest,
     supportsAtomizeDryRun: true,
     supportsInfectDryRun: true,
     async detectProjectProfile(repositoryRoot: string) {

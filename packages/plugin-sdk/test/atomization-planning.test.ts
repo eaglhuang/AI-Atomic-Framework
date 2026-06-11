@@ -5,9 +5,11 @@ import type {
   AtomizationPlan,
   AtomizationPlanRequest,
   AtomizationPlanStep,
-  AtomizationPlanningAdapter
+  AtomizationPlanningAdapter,
+  EnclosingUnit,
+  VirtualAtom
 } from '../src/atomization-planning.ts';
-import { isAtomCandidate, isAtomizationPlan } from '../src/atomization-planning.ts';
+import { isAtomCandidate, isAtomizationPlan, isEnclosingUnit, isVirtualAtom } from '../src/atomization-planning.ts';
 
 const candidate: AtomCandidate = {
   candidateId: 'demo:function:loadRows:deadbeef',
@@ -40,6 +42,27 @@ const plan: AtomizationPlan = {
   messages: [{ level: 'info', code: 'DEMO_OK', text: 'plan built' }]
 };
 
+const enclosingUnit: EnclosingUnit = {
+  kind: 'function',
+  symbol: 'loadRows',
+  fileRange: {
+    file: 'src/load-rows.ts',
+    lineStart: 3,
+    lineEnd: 9
+  },
+  confidenceClass: 'high'
+};
+
+const virtualAtom: VirtualAtom = {
+  kind: 'function',
+  symbol: 'loadRows',
+  sourcePaths: ['src/load-rows.ts'],
+  detectionMethod: 'agr-layer1',
+  layer: 1,
+  confidenceClass: 'high',
+  atomCid: 'atom:cid:demo-load-rows'
+};
+
 function testCandidateSchemaGuard() {
   assert.equal(isAtomCandidate(candidate), true, 'well-formed candidate must pass the schema guard');
 
@@ -69,6 +92,20 @@ function testPlanSchemaGuard() {
   console.log('ok: AtomizationPlan schema guard');
 }
 
+function testLayer1SchemaGuards() {
+  assert.equal(isEnclosingUnit(enclosingUnit), true, 'well-formed enclosing unit must pass the schema guard');
+  assert.equal(isEnclosingUnit({ ...enclosingUnit, kind: 'route' }), false, 'unknown enclosing kind must fail');
+  assert.equal(isEnclosingUnit({ ...enclosingUnit, fileRange: { ...enclosingUnit.fileRange, lineEnd: 2 } }), false);
+  assert.equal(isEnclosingUnit({ ...enclosingUnit, confidenceClass: 'certain' }), false, 'confidence class must stay bounded');
+
+  assert.equal(isVirtualAtom(virtualAtom), true, 'well-formed virtual atom must pass the schema guard');
+  assert.equal(isVirtualAtom({ ...virtualAtom, detectionMethod: 'guess' }), false, 'unknown virtual-atom detection method must fail');
+  assert.equal(isVirtualAtom({ ...virtualAtom, layer: 3 }), false, 'layer must be 1 or 2');
+  assert.equal(isVirtualAtom({ ...virtualAtom, sourcePaths: [] }), false, 'virtual atom must keep at least one source path');
+  assert.equal(isVirtualAtom({ ...virtualAtom, atomCid: '' }), false, 'virtual atom CID handoff must be present');
+  console.log('ok: EnclosingUnit and VirtualAtom schema guards');
+}
+
 async function testOptionalAdapterShape() {
   const adapter: AtomizationPlanningAdapter = {
     discoverAtomCandidates(request: AtomCandidateDiscoveryRequest) {
@@ -78,8 +115,26 @@ async function testOptionalAdapterShape() {
     planAtomize(request: AtomizationPlanRequest) {
       assert.equal(request.dryRun, true);
       return { ...plan, atomId: request.atomId };
+    },
+    enclose(file: string, line: number) {
+      assert.equal(file, 'src/load-rows.ts');
+      assert.equal(line, 3);
+      return enclosingUnit;
     }
   };
+
+  const backwardCompatibleAdapter: AtomizationPlanningAdapter = {
+    discoverAtomCandidates(request: AtomCandidateDiscoveryRequest) {
+      assert.ok(Array.isArray(request.sourceFiles));
+      return [candidate];
+    },
+    planAtomize(request: AtomizationPlanRequest) {
+      assert.equal(request.dryRun, true);
+      return { ...plan, atomId: request.atomId };
+    }
+  };
+
+  assert.equal(typeof backwardCompatibleAdapter.enclose, 'undefined', 'enclose remains optional for older adapters');
 
   const discovered = await adapter.discoverAtomCandidates({
     sourceFiles: [{ filePath: 'src/load-rows.ts', sourceText: 'export function loadRows() {}', languageId: 'ts' }]
@@ -95,10 +150,15 @@ async function testOptionalAdapterShape() {
   });
   assert.equal(planned.atomId, 'ATM-DEMO-0001');
   assert.ok(isAtomizationPlan(planned));
+
+  const enclosing = adapter.enclose?.('src/load-rows.ts', 3);
+  assert.ok(enclosing);
+  assert.ok(isEnclosingUnit(enclosing));
   console.log('ok: AtomizationPlanningAdapter optional interface shape');
 }
 
 testCandidateSchemaGuard();
 testPlanSchemaGuard();
+testLayer1SchemaGuards();
 await testOptionalAdapterShape();
 console.log('all plugin-sdk atomization-planning tests passed');

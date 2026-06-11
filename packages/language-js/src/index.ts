@@ -1,5 +1,8 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
-import type { LanguageAdapter as SdkLanguageAdapter } from '@ai-atomic-framework/plugin-sdk';
+import type {
+  LanguageAdapter as SdkLanguageAdapter,
+  LanguageAdapterManifest as SdkLanguageAdapterManifest
+} from '@ai-atomic-framework/plugin-sdk';
 
 export const languageJsPackage = {
   packageName: '@ai-atomic-framework/language-js',
@@ -60,6 +63,8 @@ export interface JavaScriptValidationCommand {
 
 export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
 
+export type JavaScriptLanguageAdapterManifest = SdkLanguageAdapterManifest;
+
 export interface JavaScriptValidationReport {
   readonly ok: boolean;
   readonly profile: JavaScriptProjectProfile;
@@ -72,6 +77,9 @@ export interface JavaScriptValidationReport {
 export interface JavaScriptLanguageAdapter extends LanguageAdapter<JavaScriptProjectProfile, LanguageAdapterValidationRequest, JavaScriptValidationReport> {
   readonly adapterName: '@ai-atomic-framework/language-js';
   readonly languageIds: readonly ['javascript', 'typescript'];
+  readonly manifest: JavaScriptLanguageAdapterManifest;
+  scanImports(sourceFile: JavaScriptSourceFile): readonly JavaScriptImportRecord[];
+  createCommandRunnerContract(profile: JavaScriptProjectProfile): TestCommandRunnerContract;
 }
 
 export const defaultJavaScriptImportPolicy: JavaScriptImportPolicy = {
@@ -85,3 +93,14 @@ export const languageJsRuntime = {
   supportsDelegatedTestCommands: true,
   resultFormat: 'JavaScriptValidationReport'
 } as const;
+
+export {
+  defaultJavaScriptLanguageAdapterManifest,
+  createJavaScriptLanguageAdapter,
+  createJavaScriptAtomizationPlanningAdapter,
+  discoverJavaScriptAtomCandidates,
+  detectProjectProfile,
+  validateComputeAtom,
+  scanImports,
+  createCommandRunnerContract
+} from './language-js-adapter.ts';

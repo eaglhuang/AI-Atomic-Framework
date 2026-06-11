@@ -1,5 +1,8 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
-import type { LanguageAdapter as SdkLanguageAdapter } from '@ai-atomic-framework/plugin-sdk';
+import type {
+  LanguageAdapter as SdkLanguageAdapter,
+  LanguageAdapterManifest as SdkLanguageAdapterManifest
+} from '@ai-atomic-framework/plugin-sdk';
 
 export const pythonLanguageAdapterPackage = {
   packageName: '@ai-atomic-framework/language-python',
@@ -119,10 +122,13 @@ export interface PythonValidationCommand {
 
 export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
 
+export type PythonLanguageAdapterManifest = SdkLanguageAdapterManifest;
+
 export interface PythonLanguageAdapter
   extends LanguageAdapter<PythonProjectProfile, PythonLanguageAdapterValidationRequest, PythonLanguageAdapterValidationReport> {
   readonly adapterName: '@ai-atomic-framework/language-python';
   readonly languageIds: readonly ['python'];
+  readonly manifest: PythonLanguageAdapterManifest;
   readonly supportsAtomizeDryRun: true;
   readonly supportsInfectDryRun: true;
 }
@@ -142,6 +148,7 @@ export const pythonLanguageRuntime = {
 } as const;
 
 export {
+  defaultPythonLanguageAdapterManifest,
   createPythonLanguageAdapter,
   createPythonAtomizationPlanningAdapter,
   detectPythonProjectProfile,

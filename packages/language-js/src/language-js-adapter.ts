@@ -8,17 +8,41 @@ import type {
   AtomCandidateKind,
   AtomizationPlanningAdapter
 } from '@ai-atomic-framework/plugin-sdk';
+import type {
+  JavaScriptLanguageAdapter,
+  JavaScriptLanguageAdapterManifest,
+  JavaScriptImportRecord,
+  JavaScriptProjectProfile,
+  JavaScriptSourceFile,
+  JavaScriptValidationReport,
+  TestCommandRunnerContract
+} from './index.ts';
 
 export const defaultJavaScriptImportPolicy: Readonly<{ forbiddenSpecifiers: string[]; allowedSpecifiers: string[] }> = Object.freeze({
   forbiddenSpecifiers: ['fs', 'node:fs', 'child_process', 'node:child_process'],
   allowedSpecifiers: []
 });
 
-export function createJavaScriptLanguageAdapter(policyOverrides: Partial<{ forbiddenSpecifiers: string[]; allowedSpecifiers: string[] }> = {}) {
+export const defaultJavaScriptLanguageAdapterManifest: JavaScriptLanguageAdapterManifest = {
+  symbolCanonicalization: {
+    policy: 'declaration-name',
+    reExportAliasBehavior: 'syntactic-only',
+    decoratorResolutionStance: 'not-supported'
+  },
+  notes: [
+    'The JS adapter canonicalizes by declared symbol name and inspects re-export syntax, but it does not resolve alias provenance semantically.',
+    'Decorator semantics are not resolved by this adapter.'
+  ]
+};
+
+export function createJavaScriptLanguageAdapter(
+  policyOverrides: Partial<{ forbiddenSpecifiers: string[]; allowedSpecifiers: string[] }> = {}
+): JavaScriptLanguageAdapter {
   const defaultPolicy = mergePolicy(defaultJavaScriptImportPolicy, policyOverrides);
   return {
     adapterName: '@ai-atomic-framework/language-js',
     languageIds: ['javascript', 'typescript'],
+    manifest: defaultJavaScriptLanguageAdapterManifest,
     detectProjectProfile,
     scanImports,
     validateComputeAtom: (request: any, profile = createUnknownProfile()) => validateComputeAtom(request, profile, defaultPolicy),
@@ -26,21 +50,25 @@ export function createJavaScriptLanguageAdapter(policyOverrides: Partial<{ forbi
   };
 }
 
-export function detectProjectProfile(repositoryRoot: any) {
+export function detectProjectProfile(repositoryRoot: string): JavaScriptProjectProfile {
   const packageJsonPath = path.join(repositoryRoot, 'package.json');
   const packageJson = existsSync(packageJsonPath)
     ? JSON.parse(readFileSync(packageJsonPath, 'utf8'))
     : {};
   const scripts = packageJson.scripts || {};
   return {
-    packageManager: detectPackageManager(repositoryRoot),
+    packageManager: detectPackageManager(repositoryRoot) as JavaScriptProjectProfile['packageManager'],
     testCommand: scripts.test ? createPackageManagerCommand(repositoryRoot, 'test') : null,
     typecheckCommand: scripts.typecheck ? createPackageManagerCommand(repositoryRoot, 'typecheck') : null,
     lintCommand: scripts.lint ? createPackageManagerCommand(repositoryRoot, 'lint') : null
   };
 }
 
-export function validateComputeAtom(request: any, profile = createUnknownProfile(), basePolicy = defaultJavaScriptImportPolicy) {
+export function validateComputeAtom(
+  request: any,
+  profile: JavaScriptProjectProfile = createUnknownProfile(),
+  basePolicy = defaultJavaScriptImportPolicy
+): JavaScriptValidationReport {
   const policy = mergePolicy(basePolicy, request.importPolicy);
   const imports = request.sourceFiles.flatMap((sourceFile: any) => scanImports(sourceFile));
   const messages: any[] = [];
@@ -274,10 +302,10 @@ function applyJsCandidateFilters(
   });
 }
 
-export function scanImports(sourceFile: any) {
-  const records = [];
+export function scanImports(sourceFile: JavaScriptSourceFile): readonly JavaScriptImportRecord[] {
+  const records: JavaScriptImportRecord[] = [];
   const lines = sourceFile.sourceText.split(/\r?\n/);
-  const patterns = [
+  const patterns: ReadonlyArray<{ readonly kind: JavaScriptImportRecord['statementKind']; readonly pattern: RegExp }> = [
     { kind: 'static-import', pattern: /\bimport\s+(?:type\s+)?(?:[^'";]+?\s+from\s+)?['"]([^'"]+)['"]/g },
     { kind: 're-export', pattern: /\bexport\s+[^'";]*\s+from\s+['"]([^'"]+)['"]/g },
     { kind: 'dynamic-import', pattern: /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g },
@@ -304,12 +332,12 @@ export function scanImports(sourceFile: any) {
   return records;
 }
 
-export function createCommandRunnerContract(profile: any) {
+export function createCommandRunnerContract(profile: JavaScriptProjectProfile): TestCommandRunnerContract {
   const commands = [
     createCommand('test', profile.testCommand, true),
     createCommand('typecheck', profile.typecheckCommand, false),
     createCommand('lint', profile.lintCommand, false)
-  ].filter(Boolean);
+  ].filter(Boolean) as { commandKind: 'test' | 'typecheck' | 'lint'; command: string; required: boolean }[];
 
   return {
     executionMode: 'delegated',
@@ -318,7 +346,7 @@ export function createCommandRunnerContract(profile: any) {
   };
 }
 
-function createPackageManagerCommand(repositoryRoot: any, scriptName: any) {
+function createPackageManagerCommand(repositoryRoot: string, scriptName: string) {
   const manager = detectPackageManager(repositoryRoot);
   if (manager === 'pnpm') {
     return `pnpm run ${scriptName}`;
@@ -329,7 +357,7 @@ function createPackageManagerCommand(repositoryRoot: any, scriptName: any) {
   return `npm run ${scriptName}`;
 }
 
-function detectPackageManager(repositoryRoot: any) {
+function detectPackageManager(repositoryRoot: string): JavaScriptProjectProfile['packageManager'] {
   if (existsSync(path.join(repositoryRoot, 'pnpm-lock.yaml'))) {
     return 'pnpm';
   }
@@ -348,7 +376,7 @@ function hasEntrypointExport(sourceText: any) {
     || /\bexport\s+default\s+(?:async\s+)?\(/.test(sourceText);
 }
 
-function createUnknownProfile() {
+function createUnknownProfile(): JavaScriptProjectProfile {
   return {
     packageManager: 'unknown',
     testCommand: null,

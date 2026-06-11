@@ -43,7 +43,56 @@ Behavior:
 - **`requestedLane`** - `'auto'` by default (the broker decides); override with `ctx.requestedLane`.
 - **Read-only and pure** - the bridge never mutates candidate input, never calls an LLM, and needs no language-specific semantics.
 
+## Adapter Symbol Canonicalization Manifest
+
+`packages/plugin-sdk/src/language-adapter.ts` now exposes `LanguageAdapter.manifest.symbolCanonicalization` so language adapters can declare their symbol-identity boundaries explicitly instead of having the broker guess.
+
+The manifest fields are:
+
+- `policy` - the adapter's canonical naming policy, currently declared-name based for both JS and Python.
+- `reExportAliasBehavior` - whether the adapter only sees alias syntax or can resolve alias provenance semantically.
+- `decoratorResolutionStance` - whether decorator semantics are unsupported, syntax-only, or fully semantic.
+
+Broker rules for using this manifest:
+
+- Treat the manifest as an honesty contract, not as extra candidate hash input.
+- Do not widen symbol identity beyond what the adapter declares.
+- Do not assume re-export alias resolution or decorator resolution is available unless the manifest explicitly says so.
+- If the manifest says `syntactic-only` or `not-supported`, keep CID/AGR reasoning at the declared symbol surface and do not infer semantic equivalence across alias or decorator forms.
+
+Current adapter declarations:
+
+- JS adapter: `policy = declaration-name`, `reExportAliasBehavior = syntactic-only`, `decoratorResolutionStance = not-supported`.
+- Python adapter: `policy = declaration-name`, `reExportAliasBehavior = not-supported`, `decoratorResolutionStance = not-supported`.
+
 For the separate team-lane bookkeeping path, see `packages/core/src/broker/team-lane.ts`: it derives a synthetic broker `atomCid` from `taskId` slugification so lane evidence can stay stable without pretending to be a content-addressed capsule ID.
+
+## Enclose Capability Preflight
+
+`enclose(file, line)` is an optional `AtomizationPlanningAdapter` capability. The broker must feature-detect it before attempting any Layer 1 virtual-atom refinement.
+
+Capability states used by this guide:
+
+| State | Meaning | Broker posture |
+|---|---|---|
+| `full` | Adapter returns a valid `EnclosingUnit` for the requested locus. | May use the enclosure as Layer 1 evidence. |
+| `partial` | Adapter can still discover candidates or produce dry-run plans, but `enclose()` is absent or returns `null` for some loci. | Treat as advisory only; do not infer a safe virtual atom boundary from it. |
+| `unsupported` | The adapter does not expose a usable enclosure path for the requested locus. | Fail closed and fall back to the existing broker decision path. |
+
+Current adapter support matrix:
+
+| Adapter | discoverAtomCandidates | planAtomize | enclose | State |
+|---|---|---|---|---|
+| JS | yes | yes | no | `partial` |
+| Python | yes | yes | no | `partial` |
+| Any adapter without `AtomizationPlanningAdapter` | no | no | no | `unsupported` |
+
+Fail-closed rules:
+
+- Do not promote an adapter to `parallel-safe` just because `enclose()` is missing or returned `null`.
+- Use enclosure evidence only to refine a Layer 1 boundary; never widen symbol identity or CID scope from an absent capability.
+- If the broker already has a stronger verdict, keep that verdict: atom/CID overlap remains `blocked-cid-conflict`, shared-surface overlap remains `blocked-shared-surface`, and ambiguous same-file overlap stays on the deterministic-composer path (`needs-physical-split`) instead of being upgraded to optimistic parallel admission.
+- Record missing or null enclosure as evidence of the fallback path so the lane remains auditable.
 
 Because `@ai-atomic-framework/plugin-sdk` depends on core, the bridge declares a structural `BridgeAtomCandidate` mirror instead of importing the SDK type; plugin-sdk `AtomCandidate` values are directly assignable (covered by `__tests__/candidate-bridge.test.ts`).
 
