@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-CID-0034",
-  "updatedAt": "2026-06-11T15:00:57.198Z",
+  "updatedAt": "2026-06-11T15:03:30.247Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -147,6 +147,132 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:f0bbfd96173853d8de6e2900e335931c4f7137f89ac66f2686594a1007e1966d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+      "createdAt": "2026-06-11T15:03:11.969Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-11T15:03:12.035Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:44266ad8d5013ab71e8a222b86ce0c9a25ff773b55610a28bc5e68e9e303101d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:broker-steward",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+      "createdAt": "2026-06-11T15:03:15.062Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:broker-steward"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:broker-steward",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d10a1cd1ea1967efc684fc31c8ed12cd195d154d88e977b73a027968743b4c9f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:broker-steward"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:f71344ce4956f48fe47baa4207cb7f46d5fdaad5cf405ed5b02b9978c60abd08",
+            "cached": false,
+            "generatedAt": "2026-06-11T15:03:15.399Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:38b4e978d1e7c895f0f6a11f1202cc2d8fb61083471db3549a960684b89decfa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+      "createdAt": "2026-06-11T15:03:30.247Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:65b58c227fc7e7325b92d7eb7e4a7ac53f096196abb3a91fa62287c27f2d4eb3",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:47f34709ce5d43d6ad78908f1cc09a014eb4cb2ce3a17ab7ce8c91ac28e105e8",
+            "cached": false,
+            "generatedAt": "2026-06-11T15:03:30.549Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:006ed24bf8b36756f619c6c2c6e2406a7bed651488223e3c49ac5c2bcba9d773",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
