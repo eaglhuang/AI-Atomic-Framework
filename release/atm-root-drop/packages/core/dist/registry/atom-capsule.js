@@ -15,27 +15,36 @@ export class AtomCapsuleError extends Error {
 }
 const CID_PREFIX = 'atom:cid:';
 const CACHE_DIR = path.join(os.homedir(), '.atm', 'capsule-cache');
-export function computeAtomCid(bundle) {
-    // Only bundle content enters the hash (not provenance)
-    const canonical = JSON.stringify({
+export function createAtomBundle(canonicalSourceCode, extras = {}) {
+    return {
+        canonicalSourceCode,
+        inputSchema: extras.inputSchema ?? null,
+        outputSchema: extras.outputSchema ?? null,
+        policeConfig: extras.policeConfig ?? null
+    };
+}
+export function serializeAtomBundle(bundle) {
+    // Fixed-field JSON on purpose: this preserves the current capsule contract
+    // without claiming a generalized canonical JSON encoder.
+    return JSON.stringify({
         canonicalSourceCode: bundle.canonicalSourceCode,
         inputSchema: bundle.inputSchema,
         outputSchema: bundle.outputSchema,
         policeConfig: bundle.policeConfig
     });
-    const compressed = brotliCompressSync(Buffer.from(canonical, 'utf-8'));
+}
+function compressAtomBundle(bundle) {
+    return brotliCompressSync(Buffer.from(serializeAtomBundle(bundle), 'utf-8'));
+}
+export function computeAtomCid(bundle) {
+    // Only bundle content enters the hash (not provenance)
+    const compressed = compressAtomBundle(bundle);
     const hash = createHash('sha256').update(compressed).digest('base64url');
     return `${CID_PREFIX}${hash}`;
 }
 export function exportAtomCapsule(bundle) {
     const cid = computeAtomCid(bundle);
-    const canonical = JSON.stringify({
-        canonicalSourceCode: bundle.canonicalSourceCode,
-        inputSchema: bundle.inputSchema,
-        outputSchema: bundle.outputSchema,
-        policeConfig: bundle.policeConfig
-    });
-    const compressed = brotliCompressSync(Buffer.from(canonical, 'utf-8'));
+    const compressed = compressAtomBundle(bundle);
     return {
         cid,
         bundle,

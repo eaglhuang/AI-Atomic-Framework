@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import { exportAtomCapsule, importAtomCapsule, validateCidFormat, cidToShortId, AtomCapsuleError } from '../../../core/dist/registry/atom-capsule.js';
+import { createAtomBundle, exportAtomCapsule, importAtomCapsule, validateCidFormat, cidToShortId, AtomCapsuleError } from '../../../core/dist/registry/atom-capsule.js';
 import { loadCapsuleRegistry, saveCapsuleRegistry, upsertCapsuleEntry, linkCapsuleChain, markCapsuleRolledBack, listAdvisoryCids, syncRegistries, getGlobalRegistryPath, getRepoRegistryPath } from '../../../core/dist/registry/capsule-registry.js';
 import { CliError, makeResult, message } from './shared.js';
 function parseCapsuleArgs(argv) {
@@ -89,12 +89,7 @@ async function runExport(cwd, options) {
         throw new CliError('ATM_CLI_USAGE', 'atom-capsule export requires --source <path-to-source-file>', { exitCode: 2 });
     }
     const sourceCode = readFileSync(path.resolve(cwd, sourceFile), 'utf-8');
-    const bundle = {
-        canonicalSourceCode: sourceCode,
-        inputSchema: null,
-        outputSchema: null,
-        policeConfig: null
-    };
+    const bundle = createAtomBundle(sourceCode);
     const capsule = exportAtomCapsule(bundle);
     const shortId = cidToShortId(capsule.cid);
     // Write to Capsule Registry (global + repo)

@@ -19,6 +19,12 @@ export interface HookFileInspection {
     readonly markerPresent: boolean;
     readonly sha256: string | null;
 }
+interface ProtectedStateFinding {
+    readonly file: string;
+    readonly reason: 'runtime-state-must-not-be-committed' | 'task-transition-json-invalid' | 'task-transition-command-invalid' | 'task-file-missing-transition' | 'task-file-transition-mismatch' | 'evidence-file-missing-task-context' | 'static-evidence-artifact-without-cli-context' | 'batch-close-must-use-checkpoint' | 'batch-commit-before-checkpoint';
+    readonly detail: string;
+    readonly requiredCommand?: string;
+}
 export declare function runHook(argv: string[]): import("./shared.ts").CommandResult;
 export declare function runGitHooks(argv: string[]): import("./shared.ts").CommandResult;
 export declare function runCommitRangeGuard(argv: string[]): import("./shared.ts").CommandResult;
@@ -38,3 +44,9 @@ export declare function installGitHooks(cwd: string, options?: {
     ok: boolean;
     inspection: GitHookInspectionReport;
 };
+export declare function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]): {
+    ok: boolean;
+    files: readonly string[];
+    findings: ProtectedStateFinding[];
+};
+export {};

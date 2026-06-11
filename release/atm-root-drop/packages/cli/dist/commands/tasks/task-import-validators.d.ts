@@ -45,10 +45,15 @@ export declare function parseMarkdownTableCells(value: string): readonly string[
  */
 export declare function coerceStatus(value: string): 'planned' | 'open' | 'in_progress' | 'reserved' | 'ready' | 'running' | 'review' | 'blocked' | 'abandoned' | 'done';
 /**
- * 正規化任務 ID（去引號、轉大寫）。
- * 對應 tasks.ts L5133（原 normalizeTaskId）。
+ * 正規化任務 ID（去空白與反引號包裝）。保留 authored casing。
+ * TASK-AAO-0139: 不再 force-uppercase；比對請用 taskIdsEqual。
  */
 export declare function normalizeTaskId(raw: string): string;
+/** Case-insensitive task-id equality while preserving stored casing. */
+export declare function taskIdsEqual(left: string, right: string): boolean;
+/** Find a staged relative path that matches expected path ignoring case. */
+export declare function findCaseInsensitiveRelativePath(paths: Iterable<string>, expected: string): string | null;
+export declare function taskIdsInclude(ids: readonly string[], taskId: string): boolean;
 /**
  * 計算區段內容的 sha256 前綴 hash（16 字元）。
  * 對應 tasks.ts L5137（原 hashSection）。

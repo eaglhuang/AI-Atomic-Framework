@@ -23,7 +23,7 @@ import { assertLocalTaskLedgerEnabled as delegatedAssertLocalTaskLedgerEnabled, 
 import { readGitScalar as delegatedReadGitScalar, listCommittedFilesSinceClaim as delegatedListCommittedFilesSinceClaim } from './tasks/task-git-helpers.js';
 import { collectKeyValue as delegatedCollectKeyValue, collectKeyValueFromLines as delegatedCollectKeyValueFromLines, createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata, parseDispatchMetadataFromPlanText } from './tasks/task-markdown-helpers.js';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.js';
-import { coerceStatus, extractFrontMatter, extractTaskDeclaredFiles, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, parseMarkdownTableCells, parseYamlList, validateDeliverablesList, parseContextMap } from './tasks/task-import-validators.js';
+import { coerceStatus, extractFrontMatter, extractTaskDeclaredFiles, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, taskIdsEqual, parseMarkdownTableCells, parseYamlList, validateDeliverablesList, parseContextMap } from './tasks/task-import-validators.js';
 import { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
 const validStatuses = new Set(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
 const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria', '驗收', '驗收條件'];
@@ -3911,7 +3911,7 @@ function verifyPersistedTaskDocument(input) {
     }
     const persistedTaskId = normalizeTaskDocumentId(persisted, path.basename(input.taskPath, '.json'));
     const persistedStatus = typeof persisted.status === 'string' ? persisted.status : null;
-    if (persistedTaskId !== input.taskId || persistedStatus !== input.expectedStatus) {
+    if (!taskIdsEqual(persistedTaskId, input.taskId) || persistedStatus !== input.expectedStatus) {
         throw new CliError('ATM_TASK_LEDGER_WRITE_MISMATCH', `Task ${input.taskId} persisted an unexpected state after ${input.action}.`, {
             details: {
                 taskId: input.taskId,

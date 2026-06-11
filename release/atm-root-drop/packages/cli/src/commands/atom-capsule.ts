@@ -2,6 +2,7 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import {
   type AtomBundle,
+  createAtomBundle,
   exportAtomCapsule,
   importAtomCapsule,
   validateCidFormat,
@@ -104,12 +105,7 @@ async function runExport(cwd: string, options: CapsuleOptions) {
   }
 
   const sourceCode = readFileSync(path.resolve(cwd, sourceFile), 'utf-8');
-  const bundle: AtomBundle = {
-    canonicalSourceCode: sourceCode,
-    inputSchema: null,
-    outputSchema: null,
-    policeConfig: null
-  };
+  const bundle: AtomBundle = createAtomBundle(sourceCode);
 
   const capsule = exportAtomCapsule(bundle);
   const shortId = cidToShortId(capsule.cid);

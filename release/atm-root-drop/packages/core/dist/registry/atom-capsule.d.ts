@@ -21,6 +21,8 @@ export declare class AtomCapsuleError extends Error {
     readonly details: Record<string, unknown>;
     constructor(code: string, message: string, details?: Record<string, unknown>);
 }
+export declare function createAtomBundle(canonicalSourceCode: string, extras?: Partial<Omit<AtomBundle, 'canonicalSourceCode'>>): AtomBundle;
+export declare function serializeAtomBundle(bundle: AtomBundle): string;
 export declare function computeAtomCid(bundle: AtomBundle): string;
 export declare function exportAtomCapsule(bundle: AtomBundle): AtomCapsule;
 export declare function importAtomCapsule(cid: string, compressedPayload: string, options?: {

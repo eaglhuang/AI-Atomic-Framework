@@ -165,11 +165,28 @@ export function coerceStatus(value) {
     return 'planned';
 }
 /**
- * 正規化任務 ID（去引號、轉大寫）。
- * 對應 tasks.ts L5133（原 normalizeTaskId）。
+ * 正規化任務 ID（去空白與反引號包裝）。保留 authored casing。
+ * TASK-AAO-0139: 不再 force-uppercase；比對請用 taskIdsEqual。
  */
 export function normalizeTaskId(raw) {
-    return raw.trim().replace(/`/g, '').toUpperCase();
+    return raw.trim().replace(/`/g, '');
+}
+/** Case-insensitive task-id equality while preserving stored casing. */
+export function taskIdsEqual(left, right) {
+    return normalizeTaskId(left).toLowerCase() === normalizeTaskId(right).toLowerCase();
+}
+/** Find a staged relative path that matches expected path ignoring case. */
+export function findCaseInsensitiveRelativePath(paths, expected) {
+    const target = expected.replace(/\\/g, '/').toLowerCase();
+    for (const entry of paths) {
+        const normalized = entry.replace(/\\/g, '/');
+        if (normalized.toLowerCase() === target)
+            return normalized;
+    }
+    return null;
+}
+export function taskIdsInclude(ids, taskId) {
+    return ids.some((id) => taskIdsEqual(id, taskId));
 }
 /**
  * 計算區段內容的 sha256 前綴 hash（16 字元）。
