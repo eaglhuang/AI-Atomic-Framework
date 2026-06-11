@@ -41,7 +41,7 @@ export default defineCommandSpec({
         { flag: '--no-amend', summary: 'Compatibility alias for the default stage-only tasks repair-closure flow.' },
         { flag: '--template', value: 'name', summary: 'Template key for tasks new.' },
         { flag: '--task-id', value: 'id', summary: 'Task id for tasks new.' },
-        { flag: '--output', value: 'path', summary: 'Output markdown path for tasks new. Must be nested under a directory, not the repository root.' },
+        { flag: '--output', value: 'path', summary: 'Output markdown path for tasks new.' },
         { flag: '--atom-id', value: 'id', summary: 'Atom id placeholder for tasks new.' },
         { flag: '--scope-path', value: 'path', summary: 'Scope path placeholder for tasks new.' },
         { flag: '--test-path', value: 'path', summary: 'Test path placeholder for tasks new.' },

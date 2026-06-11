@@ -507,10 +507,13 @@ try {
       }]
     }]
   });
-  const closeoutOnlyClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', closeoutOnlyFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
+  const closeoutOnlyDeliverySha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: deliverableRepo, encoding: 'utf8' }).trim();
+  const closeoutOnlyClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', closeoutOnlyFixtureTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', closeoutOnlyDeliverySha]);
   assert(closeoutOnlyClose.ok === true, 'closeout-only claim must close done against the historical shared delivery commit');
   const closeoutOnlyGate = (closeoutOnlyClose.evidence as any)?.deliverableGate ?? {};
-  assert(closeoutOnlyGate.reason === 'historical-delivery-diff-present', 'closeout-only historical close must report historical-delivery-diff-present');
+  assert(closeoutOnlyGate.ok === true, 'closeout-only historical close deliverable gate must be ok');
+  assert((closeoutOnlyGate.deliverableFiles ?? []).includes('pipelines/sanguo-rag/closeout_only_bootstrap.py'), 'closeout-only historical close must credit the scoped deliverable file');
+  assert((closeoutOnlyGate.historicalDeliveries ?? []).some((entry: any) => entry.ok === true), 'closeout-only historical close must accept the shared delivery commit');
 
   const runnerReleaseFixtureTaskId = 'TEST-TASK-0004';
   const runnerReleaseTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', runnerReleaseFixtureTaskId, '--actor', 'validator', '--title', 'Committed runner release fixture']);

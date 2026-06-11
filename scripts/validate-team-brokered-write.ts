@@ -5,11 +5,13 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_TEAM_STEWARD_ID,
+  buildTeamBrokerRuntimeActivationHandshake,
   evaluateTeamBrokerLane,
   registerIntent,
   saveRegistry
 } from '../packages/core/src/broker/index.ts';
 import type { WriteBrokerRegistryDocument, WriteIntent } from '../packages/core/src/broker/types.ts';
+import { runBroker } from '../packages/cli/src/commands/broker.ts';
 import { runTeam } from '../packages/cli/src/commands/team.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
@@ -29,6 +31,19 @@ function readJson(relativePath: string) {
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+async function runAtm(args: string[], cwd = root) {
+  const normalizedArgs = args.filter((arg) => arg !== 'broker' && arg !== '--json');
+  try {
+    const parsed = await runBroker([...normalizedArgs, '--cwd', cwd]);
+    return { exitCode: 0, parsed };
+  } catch (error: any) {
+    return {
+      exitCode: typeof error?.exitCode === 'number' ? error.exitCode : 1,
+      parsed: { ok: false, evidence: error?.details ?? {} }
+    };
+  }
 }
 
 function commitText(cwd: string, message: string) {
@@ -210,6 +225,31 @@ try {
   const overlapTeamRun = overlapRunEvidence.teamRun as Record<string, unknown>;
   check(Boolean(overlapTeamRun?.brokerLane), 'team run record must include brokerLane evidence');
   check((overlapTeamRun.brokerLane as Record<string, unknown>)?.chosenLane === 'neutral-steward', 'team run brokerLane must record steward path');
+
+  const runtimeHandshake = buildTeamBrokerRuntimeActivationHandshake({
+    cwd: tempRoot,
+    taskId: overlapTaskId,
+    actorId: 'team-planner',
+    task: overlapTask,
+    writePaths: [sharedFile]
+  });
+  check(runtimeHandshake.ok === true, 'broker runtime activation handshake must approve steward lane input');
+  check(runtimeHandshake.evidence.activationState === 'activated', 'broker runtime activation handshake must report activated state');
+  check(runtimeHandshake.evidence.runtimeBoundary.gitWrite === false, 'broker runtime activation handshake must deny git.write');
+  check(runtimeHandshake.evidence.runtimeBoundary.taskLifecycle === false, 'broker runtime activation handshake must deny task.lifecycle');
+  check(runtimeHandshake.evidence.scopedWriteExecution.approved === true, 'broker runtime activation handshake must approve scoped write execution');
+  check(runtimeHandshake.evidence.scopedWriteExecution.allowedFiles.includes(sharedFile), 'broker runtime activation handshake must carry allowed files');
+
+  const runtimeCliHandshake = await runAtm([
+    'broker', 'runtime', 'activate',
+    '--task', overlapTaskId,
+    '--actor', 'team-planner',
+    '--scope-file', sharedFile
+  ], tempRoot);
+  check(runtimeCliHandshake.exitCode === 0 && runtimeCliHandshake.parsed.ok === true, `broker runtime activate CLI must approve handshake: ${JSON.stringify(runtimeCliHandshake.parsed)}`);
+  const runtimeEvidence = runtimeCliHandshake.parsed.evidence as Record<string, unknown>;
+  check((runtimeEvidence.handshake as Record<string, unknown>)?.activationState === 'activated', 'broker runtime activate CLI evidence must include activated handshake');
+  check(((runtimeEvidence.handshake as Record<string, unknown>)?.runtimeBoundary as Record<string, unknown> | undefined)?.gitWrite === false, 'broker runtime activate CLI evidence must keep git.write denied');
 
   console.log(`[team-brokered-write:${mode}] ok`);
 } finally {

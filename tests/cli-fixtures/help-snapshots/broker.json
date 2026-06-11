@@ -1,10 +1,10 @@
 {
   "command": "broker",
-  "summary": "Manage write intents, proposal capsules, compose merge plans, steward apply, and inspect the local write-broker registry.",
+  "summary": "Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, and inspect the local write-broker registry.",
   "positional": [
     {
       "name": "action",
-      "summary": "register | decision | status | release | cleanup | proposal | compose | steward",
+      "summary": "register | decision | status | release | cleanup | proposal | compose | steward | runtime",
       "required": true
     },
     {
@@ -15,6 +15,11 @@
     {
       "name": "steward-action",
       "summary": "plan | apply",
+      "required": false
+    },
+    {
+      "name": "runtime-action",
+      "summary": "activate",
       "required": false
     },
     {
@@ -33,6 +38,11 @@
       "flag": "--task",
       "value": "id",
       "summary": "Task ID to register or release."
+    },
+    {
+      "flag": "--actor",
+      "value": "id",
+      "summary": "Actor id for runtime activate."
     },
     {
       "flag": "--intent-file",
@@ -62,7 +72,7 @@
     {
       "flag": "--scope-file",
       "value": "path",
-      "summary": "Scoped file-write target allowed for steward apply. Repeatable."
+      "summary": "Scoped file-write target allowed for steward apply or runtime activate. Repeatable."
     },
     {
       "flag": "--steward-id",
@@ -72,7 +82,7 @@
     {
       "flag": "--evidence-out",
       "value": "path",
-      "summary": "Output path for steward apply evidence JSON."
+      "summary": "Output path for steward apply or runtime activation evidence JSON."
     },
     {
       "flag": "--store",
@@ -105,6 +115,8 @@
     "node atm.mjs broker proposal validate proposal-123 --json",
     "node atm.mjs broker compose --proposal-file proposal-a.json --proposal-file proposal-b.json --json",
     "node atm.mjs broker compose --store .atm/runtime/broker-proposals.json --proposal-id proposal-a --proposal-id proposal-b --json",
+    "node atm.mjs broker runtime activate --task TASK-GOV-0100 --actor team-planner --scope-file src/target.ts --json",
+    "node atm.mjs broker runtime activate --task TASK-GOV-0100 --actor team-planner --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out runtime-evidence.json --json",
     "node atm.mjs broker steward plan --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --json",
     "node atm.mjs broker steward apply --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out steward-evidence.json --json"
   ]

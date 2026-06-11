@@ -50,7 +50,7 @@ export const teamSpecPermissionValidation = {
 
 export const teamSpecBrokerLane = {
   summary:
-    'Plan and start evaluate broker lanes; blocked CID conflicts fail closed before a run starts (team.plan-broker-lane).',
+    'Plan and start evaluate broker lanes; blocked CID conflicts fail closed before a run starts, and broker verdicts outrank Coordinator decisions inside broker-governed conflict domains (team.plan-broker-lane).',
   examples: ['node atm.mjs team plan --task TASK-TEAM-0002 --json', 'node atm.mjs team start --task TASK-AAO-0005 --actor codex-main --json']
 };
 
@@ -62,7 +62,7 @@ export const teamSpecCaptainDecision = {
 
 export const teamSpecLieutenantEscalation = {
   summary:
-    'Plan examples for lieutenant escalation dry-run output that includes escalationRequired, escalationReason, needLieutenant, and nextTeamShape (TASK-TEAM-0008 owns the escalation surface).',
+    'Plan examples for lieutenant escalation dry-run output that includes escalationRequired, escalationReason, needLieutenant, nextTeamShape, and the broker-over-coordinator authority chain (TASK-TEAM-0008 owns the escalation surface).',
   examples: ['node atm.mjs team plan --task TASK-TEAM-0008 --json']
 };
 

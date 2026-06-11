@@ -123,6 +123,11 @@ declare function buildTeamPlan(input: {
             agentId: string;
         };
         taskId: string;
+        authorityChain: {
+            broker: string;
+            coordinator: string;
+        };
+        conflictRules: string[];
         teamSize: string;
         requiredRoles: string[];
         optionalRoles: string[];
@@ -172,6 +177,7 @@ declare function buildTeamPlan(input: {
             mapUpdateNeed: boolean;
             escalationRequired: boolean;
             needLieutenant: boolean;
+            authorityChain: string;
         };
     };
     requiredRoles: TeamCrewRole[];

@@ -34,6 +34,33 @@ export interface TeamBrokerLaneResult {
   readonly evidence: TeamBrokerLaneEvidence;
 }
 
+export interface TeamBrokerRuntimeActivationHandshakeEvidence {
+  readonly schemaId: 'atm.teamBrokerRuntimeActivationHandshake.v1';
+  readonly specVersion: '0.1.0';
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly registryPath: string;
+  readonly brokerLane: TeamBrokerLaneEvidence;
+  readonly activationState: 'activated' | 'blocked';
+  readonly scopedWriteExecution: {
+    readonly approved: boolean;
+    readonly allowedFiles: readonly string[];
+    readonly evidencePath: string | null;
+    readonly acceptedInputs: readonly ['PatchProposal', 'MergePlan', 'StewardPlan'];
+  };
+  readonly runtimeBoundary: {
+    readonly gitWrite: false;
+    readonly taskLifecycle: false;
+    readonly selfClose: false;
+  };
+  readonly blockedReasons: readonly string[];
+}
+
+export interface TeamBrokerRuntimeActivationHandshakeResult {
+  readonly ok: boolean;
+  readonly evidence: TeamBrokerRuntimeActivationHandshakeEvidence;
+}
+
 export interface TeamBrokerFinding {
   readonly level: 'error' | 'warning';
   readonly code: string;
@@ -164,6 +191,48 @@ export function evaluateTeamBrokerLane(input: {
 
 export function buildTeamBrokerEvidence(result: TeamBrokerLaneResult): TeamBrokerLaneEvidence {
   return result.evidence;
+}
+
+export function buildTeamBrokerRuntimeActivationHandshake(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly task: unknown;
+  readonly writePaths: readonly string[];
+  readonly registryPath?: string;
+  readonly evidencePath?: string | null;
+}): TeamBrokerRuntimeActivationHandshakeResult {
+  const laneResult = evaluateTeamBrokerLane(input);
+  const approved = laneResult.ok && laneResult.evidence.safeToStart;
+  const allowedFiles = [...new Set(input.writePaths.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+
+  const evidence: TeamBrokerRuntimeActivationHandshakeEvidence = {
+    schemaId: 'atm.teamBrokerRuntimeActivationHandshake.v1',
+    specVersion: '0.1.0',
+    taskId: input.taskId,
+    actorId: input.actorId,
+    registryPath: laneResult.evidence.registryPath,
+    brokerLane: laneResult.evidence,
+    activationState: approved ? 'activated' : 'blocked',
+    scopedWriteExecution: {
+      approved,
+      allowedFiles,
+      evidencePath: input.evidencePath ?? null,
+      acceptedInputs: ['PatchProposal', 'MergePlan', 'StewardPlan']
+    },
+    runtimeBoundary: {
+      gitWrite: false,
+      taskLifecycle: false,
+      selfClose: false
+    },
+    blockedReasons: approved ? [] : [...laneResult.evidence.blockedReasons]
+  };
+
+  return {
+    ok: approved,
+    evidence
+  };
 }
 
 export function brokerLaneToFindings(result: TeamBrokerLaneResult): TeamBrokerFinding[] {

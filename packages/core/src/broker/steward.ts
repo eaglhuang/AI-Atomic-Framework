@@ -7,6 +7,7 @@ import type { StewardApplyEvidence } from './apply-evidence.ts';
 import { sortProposalsForCompose } from './merge-plan.ts';
 import { validateBrokerProposal } from './proposal.ts';
 import type { MergePlan, PatchProposal } from './types.ts';
+import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 
 export type StewardValidationCode =
   | 'scope-lock-mismatch'
@@ -47,6 +48,23 @@ export interface StewardPlanResult {
 export interface StewardApplyResult {
   readonly ok: boolean;
   readonly evidence: StewardApplyEvidence;
+}
+
+export interface BrokerScopedWriteExecutionEvidence {
+  readonly schemaId: 'atm.brokerScopedWriteExecution.v1';
+  readonly specVersion: '0.1.0';
+  readonly stewardId: string;
+  readonly mergePlanId: string;
+  readonly allowedFiles: readonly string[];
+  readonly handshake: TeamBrokerRuntimeActivationHandshakeEvidence;
+  readonly applyEvidence: StewardApplyEvidence | null;
+  readonly verdict: 'applied' | 'blocked';
+  readonly blockedReasons: readonly string[];
+}
+
+export interface BrokerScopedWriteExecutionResult {
+  readonly ok: boolean;
+  readonly evidence: BrokerScopedWriteExecutionEvidence;
 }
 
 export function planStewardApply(input: {
@@ -134,6 +152,81 @@ export function applyStewardPlan(input: {
   });
   if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
   return { ok: true, evidence };
+}
+
+export function executeBrokerScopedWrite(input: {
+  readonly cwd: string;
+  readonly stewardId: string;
+  readonly mergePlan: MergePlan;
+  readonly proposals: readonly PatchProposal[];
+  readonly scopeFiles: readonly string[];
+  readonly handshake: TeamBrokerRuntimeActivationHandshakeEvidence;
+  readonly evidenceOutPath?: string | null;
+}): BrokerScopedWriteExecutionResult {
+  const allowedFiles = [...new Set(input.handshake.scopedWriteExecution.allowedFiles.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+  const scopeFiles = [...new Set(input.scopeFiles.map((entry) => entry.replace(/\\/g, '/')).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+
+  if (!input.handshake.scopedWriteExecution.approved) {
+    return {
+      ok: false,
+      evidence: {
+        schemaId: 'atm.brokerScopedWriteExecution.v1',
+        specVersion: '0.1.0',
+        stewardId: input.stewardId,
+        mergePlanId: input.mergePlan.mergePlanId,
+        allowedFiles,
+        handshake: input.handshake,
+        applyEvidence: null,
+        verdict: 'blocked',
+        blockedReasons: input.handshake.blockedReasons.length > 0
+          ? input.handshake.blockedReasons
+          : ['Broker runtime activation handshake is not approved.']
+      }
+    };
+  }
+
+  if (allowedFiles.length !== scopeFiles.length || allowedFiles.some((entry, index) => entry !== scopeFiles[index])) {
+    return {
+      ok: false,
+      evidence: {
+        schemaId: 'atm.brokerScopedWriteExecution.v1',
+        specVersion: '0.1.0',
+        stewardId: input.stewardId,
+        mergePlanId: input.mergePlan.mergePlanId,
+        allowedFiles,
+        handshake: input.handshake,
+        applyEvidence: null,
+        verdict: 'blocked',
+        blockedReasons: ['Scoped write request does not match broker-approved allowed files.']
+      }
+    };
+  }
+
+  const applyResult = applyStewardPlan({
+    cwd: input.cwd,
+    stewardId: input.stewardId,
+    mergePlan: input.mergePlan,
+    proposals: input.proposals,
+    scopeFiles,
+    evidenceOutPath: input.evidenceOutPath
+  });
+
+  return {
+    ok: applyResult.ok,
+    evidence: {
+      schemaId: 'atm.brokerScopedWriteExecution.v1',
+      specVersion: '0.1.0',
+      stewardId: input.stewardId,
+      mergePlanId: input.mergePlan.mergePlanId,
+      allowedFiles,
+      handshake: input.handshake,
+      applyEvidence: applyResult.evidence,
+      verdict: applyResult.ok ? 'applied' : 'blocked',
+      blockedReasons: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? ['Broker scoped write apply was blocked.'])
+    }
+  };
 }
 
 function validateStewardInputs(input: {

@@ -53,19 +53,35 @@ async function runTimedSection(section: string, fn: () => Promise<void>) {
   console.log(`[task-direction-governance:${mode}] section done ${section} ${Date.now() - startedAt}ms`);
 }
 
+function fixtureStep(label: string) {
+  console.log(`[task-direction-governance:${mode}] fixture ${label}`);
+}
+
 async function main() {
+  const onlySection = process.argv.includes('--only')
+    ? process.argv[process.argv.indexOf('--only') + 1]
+    : null;
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-task-direction-governance-'));
   try {
-    await runTimedSection('validateAdopterGoverned', () => validateAdopterGoverned(tempRoot));
-    await runTimedSection('validateBatchCheckpointHold', () => validateBatchCheckpointHold(tempRoot));
-    await runTimedSection('validateAaoThroughputAgentJourney', () => validateAaoThroughputAgentJourney(tempRoot));
-    await runTimedSection('validateFrameworkDevelopment', () => validateFrameworkDevelopment(tempRoot));
-    await runTimedSection('validateTaskSelfAllowOnClaim', () => validateTaskSelfAllowOnClaim(tempRoot));
-    await runTimedSection('validateTasksClaimDirectionLockConsistency', () => validateTasksClaimDirectionLockConsistency(tempRoot));
-    await runTimedSection('validateNextClaimPromptScopeConsistency', () => validateNextClaimPromptScopeConsistency(tempRoot));
-    await runTimedSection('validateOutOfScopeSubtraction', () => validateOutOfScopeSubtraction(tempRoot));
-    await runTimedSection('validateSameFileParallelClaimAdmission', () => validateSameFileParallelClaimAdmission(tempRoot));
-    await runTimedSection('validateSameFilePreCommitOwnership', () => validateSameFilePreCommitOwnership(tempRoot));
+    const sections: Array<[string, (tempRoot: string) => Promise<void>]> = [
+      ['validateAdopterGoverned', validateAdopterGoverned],
+      ['validateBatchCheckpointHold', validateBatchCheckpointHold],
+      ['validateAaoThroughputAgentJourney', validateAaoThroughputAgentJourney],
+      ['validateFrameworkDevelopment', validateFrameworkDevelopment],
+      ['validateTaskSelfAllowOnClaim', validateTaskSelfAllowOnClaim],
+      ['validateTasksClaimDirectionLockConsistency', validateTasksClaimDirectionLockConsistency],
+      ['validateNextClaimPromptScopeConsistency', validateNextClaimPromptScopeConsistency],
+      ['validateOutOfScopeSubtraction', validateOutOfScopeSubtraction],
+      ['validateSameFileParallelClaimAdmission', validateSameFileParallelClaimAdmission],
+      ['validateSameFilePreCommitOwnership', validateSameFilePreCommitOwnership]
+    ];
+    for (const [name, fn] of sections) {
+      if (onlySection && onlySection !== name) continue;
+      await runTimedSection(name, () => fn(tempRoot));
+    }
+    if (onlySection && !sections.some(([name]) => name === onlySection)) {
+      fail(`unknown --only section ${onlySection}`);
+    }
     if (!process.exitCode) {
       console.log(`[task-direction-governance:${mode}] ok (adopter-governed and framework-development task direction gates verified)`);
       process.exit(0);
@@ -240,8 +256,10 @@ async function validateBatchCheckpointHold(tempRoot: string) {
 
 async function validateAdopterGoverned(tempRoot: string) {
   const repo = makeAdopterRepo(tempRoot, 'adopter-governed');
+  initializeGit(repo);
   const prompt = 'TASK-ADOPT-0001 TASK-ADOPT-0002 all task cards';
 
+  fixtureStep('adopter-governed route');
   const route = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert(route.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'adopter prompt must resolve to a scoped task queue');
   assert((route.evidence.taskQueue as any)?.schemaId === 'atm.taskQueuePreview.v1', 'adopter prompt route must stay read-only and only expose atm.taskQueuePreview.v1');
@@ -258,6 +276,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(beforeClaim.ok === false, 'adopter prompt-scoped edit must be blocked before claim');
   assert(beforeClaim.messages.some((entry) => entry.code === 'ATM_TASK_DIRECTION_LOCK_REQUIRED'), 'adopter pre-tool block must require a direction lock');
 
+  fixtureStep('adopter-governed claim');
   const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
   assert(claim.ok === true, 'adopter next --claim must claim queue head');
   assert((claim.evidence.taskDirectionLock as any)?.taskId === 'TASK-ADOPT-0001', 'adopter claim must create direction lock for queue head');
@@ -291,6 +310,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(outOfScope.ok === false, 'adopter queue must block edits to the next task before queue head closes');
   assert(outOfScope.messages.some((entry) => entry.code === 'ATM_TOOL_SCOPE_DRIFT_BLOCKED'), 'adopter out-of-scope edit must report scope drift');
 
+  fixtureStep('adopter-cross-repo setup');
   const crossRepo = makeAdopterRepo(tempRoot, 'adopter-cross-repo');
   writeLedgerTask(crossRepo, 'TASK-CROSS-PLAN-0001', 'Cross planning mirror task', 'src/one.ts', {
     scopePaths: [
@@ -300,6 +320,7 @@ async function validateAdopterGoverned(tempRoot: string) {
     sourcePlanPath: '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
   });
   writeEvidence(crossRepo, 'TASK-CROSS-PLAN-0001');
+  fixtureStep('adopter-cross-repo claim');
   const crossClaim = await runNext(['--cwd', crossRepo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-CROSS-PLAN-0001']);
   assert(crossClaim.ok === true, 'cross planning fixture must claim successfully');
   const mirrorBlock = runIntegrationHookInvocation([
@@ -342,6 +363,7 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(runtimeLockEditBlock.ok === false, 'adopter queue must block manual runtime lock edits');
   assert(runtimeLockEditBlock.messages.some((entry) => entry.code === 'ATM_RUNTIME_LOCK_MANUAL_EDIT_BLOCKED'), 'manual runtime lock edits must report the dedicated blocker');
 
+  fixtureStep('adopter-scope-expansion setup');
   const scopeExpansionRepo = makeAdopterRepo(tempRoot, 'adopter-scope-expansion');
   writeLedgerTask(scopeExpansionRepo, 'TASK-EXPAND-0005', 'Generated fixture exclusion boundaries', 'src/one.ts');
   writeEvidence(scopeExpansionRepo, 'TASK-EXPAND-0005');
@@ -370,6 +392,7 @@ async function validateAdopterGoverned(tempRoot: string) {
     );
   }
 
+  fixtureStep('adopter-governed checkpoint');
   writeFileSync(path.join(repo, 'src', 'one.ts'), 'export const one = 2;\n', 'utf8');
   await runBatch(['checkpoint', '--cwd', repo, '--actor', 'adopter-agent', '--json']);
   const checkpointWindowStatus = await runBatch(['current', '--cwd', repo, '--batch', adopterBatchId, '--compact', '--json']);
@@ -377,17 +400,29 @@ async function validateAdopterGoverned(tempRoot: string) {
   assert(String((checkpointWindowStatus.evidence.current as any)?.pendingCommitWindow?.commitCommand ?? '').includes('TASK-ADOPT-0001'), 'pending checkpoint commit window must include a task-specific commit command');
   const afterFirstClose = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert((afterFirstClose.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0002', 'adopter queue must advance to second task after closing first');
-  initializeGit(repo);
   runGit(repo, ['add',
     'src/one.ts',
     '.atm/history/tasks/TASK-ADOPT-0001.json',
     '.atm/history/evidence/TASK-ADOPT-0001.json',
     '.atm/history/task-events/TASK-ADOPT-0001'
   ]);
-  const checkpointCommit = runHook(['pre-commit', '--cwd', repo]);
-  assert(checkpointCommit.ok === true, 'batch checkpoint commit must pass even after the direction lock advances to the next queue head');
+  let checkpointCommit: ReturnType<typeof runHook>;
+  process.env.ATM_COMMIT_ACTOR_ID = 'adopter-agent';
+  process.env.ATM_COMMIT_TASK_ID = 'TASK-ADOPT-0001';
+  process.env.GIT_AUTHOR_NAME = 'ATM Test';
+  process.env.GIT_AUTHOR_EMAIL = 'atm-test@example.invalid';
+  try {
+    checkpointCommit = runHook(['pre-commit', '--cwd', repo]);
+  } finally {
+    delete process.env.ATM_COMMIT_ACTOR_ID;
+    delete process.env.ATM_COMMIT_TASK_ID;
+    delete process.env.GIT_AUTHOR_NAME;
+    delete process.env.GIT_AUTHOR_EMAIL;
+  }
+  assert(checkpointCommit.ok === true, `batch checkpoint commit must pass even after the direction lock advances to the next queue head. Got: ${JSON.stringify((checkpointCommit.evidence as any)?.blockingFindings ?? checkpointCommit.messages ?? [])}`);
   assert(((checkpointCommit.evidence as any).directionLockDriftFiles ?? []).length === 0, 'checkpointed task deliverables must not be reported as drift against the next task lock');
 
+  fixtureStep('adopter-infra-sync setup');
   const syncRepo = makeAdopterRepo(tempRoot, 'adopter-infra-sync-with-lock');
   initializeGit(syncRepo);
   const syncPrompt = 'TASK-ADOPT-0001';

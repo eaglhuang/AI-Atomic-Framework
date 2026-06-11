@@ -602,6 +602,15 @@ function buildCaptainDecision(task, writePaths, validation, brokerLane, crewBrie
             agentId: 'coordinator'
         },
         taskId: crewBriefingContract.taskId,
+        authorityChain: {
+            broker: 'Broker verdicts override Coordinator decisions inside broker-governed conflict domains.',
+            coordinator: 'Coordinator retains team-local lifecycle authority outside broker-governed conflict domains.'
+        },
+        conflictRules: [
+            'If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.',
+            'If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.',
+            'Coordinator must not silently override broker verdicts inside broker-governed conflict domains.'
+        ],
         teamSize: sizing.teamSize,
         requiredRoles: crewBriefingContract.requiredRoles.map((role) => role.role),
         optionalRoles: crewBriefingContract.optionalRoles.map((role) => role.role),
@@ -618,7 +627,8 @@ function buildCaptainDecision(task, writePaths, validation, brokerLane, crewBrie
             largeScriptRisk: atomizationChecklist.largeScriptRisk,
             mapUpdateNeed: atomizationChecklist.mapUpdateNeed,
             escalationRequired: lieutenantEscalation.escalationRequired,
-            needLieutenant: lieutenantEscalation.needLieutenant
+            needLieutenant: lieutenantEscalation.needLieutenant,
+            authorityChain: 'Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them.'
         }
     };
 }

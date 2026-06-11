@@ -54,7 +54,7 @@ function commitText(cwd: string, message: string) {
 }
 
 function hashFile(filePath: string): string {
-  return createHash('sha256').update(readFileSync(filePath)).digest('hex');
+  return `sha256:${createHash('sha256').update(readFileSync(filePath)).digest('hex')}`;
 }
 
 function makeProposal(baseCommit: string, fileBeforeHash: string, proposalId = 'proposal.steward.0020.valid'): PatchProposal {

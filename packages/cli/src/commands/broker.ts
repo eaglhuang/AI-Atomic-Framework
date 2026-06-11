@@ -10,7 +10,14 @@ import {
 } from '../../../core/src/broker/registry.ts';
 import { calculateBrokerDecision } from '../../../core/src/broker/decision.ts';
 import { composeBrokerProposals } from '../../../core/src/broker/compose.ts';
-import { applyStewardPlan, planStewardApply } from '../../../core/src/broker/steward.ts';
+import {
+  applyStewardPlan,
+  executeBrokerScopedWrite,
+  planStewardApply
+} from '../../../core/src/broker/steward.ts';
+import {
+  buildTeamBrokerRuntimeActivationHandshake,
+} from '../../../core/src/broker/team-lane.ts';
 import {
   defaultBrokerProposalStoreRelativePath,
   findBrokerProposal,
@@ -55,7 +62,7 @@ export async function runBroker(argv: string[]) {
         message(
           decision.verdict === 'blocked-cid-conflict' || decision.verdict === 'blocked-shared-surface' ? 'error' : 'info',
           'ATM_BROKER_REGISTERED',
-          `Write intent registered with verdict '${decision.verdict}' and lane '${decision.lane}'`,
+          `Write intent registered with verdict '${decision.verdict}' and lane '${decision.lane}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`,
           { decision }
         )
       ],
@@ -387,6 +394,124 @@ export async function runBroker(argv: string[]) {
     throw new CliError('ATM_CLI_USAGE', 'broker steward supports: plan, apply.', { exitCode: 2 });
   }
 
+  if (options.action === 'runtime') {
+    if (options.runtimeAction !== 'activate') {
+      throw new CliError('ATM_CLI_USAGE', 'broker runtime requires an action: activate.', { exitCode: 2 });
+    }
+    if (!options.task) {
+      throw new CliError('ATM_CLI_USAGE', 'broker runtime activate requires --task <task-id>.', { exitCode: 2 });
+    }
+    if (!options.actorId) {
+      throw new CliError('ATM_CLI_USAGE', 'broker runtime activate requires --actor <actor-id>.', { exitCode: 2 });
+    }
+    if (options.scopeFiles.length === 0) {
+      throw new CliError('ATM_CLI_USAGE', 'broker runtime activate requires at least one --scope-file <path>.', { exitCode: 2 });
+    }
+
+    const taskPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${options.task}.json`);
+    if (!existsSync(taskPath)) {
+      throw new CliError('ATM_TASK_NOT_FOUND', `Task not found: ${options.task}`, {
+        exitCode: 2,
+        details: { taskPath: path.relative(options.cwd, taskPath).replace(/\\/g, '/') }
+      });
+    }
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const handshake = buildTeamBrokerRuntimeActivationHandshake({
+      cwd: options.cwd,
+      taskId: options.task,
+      actorId: options.actorId,
+      task,
+      writePaths: options.scopeFiles,
+      registryPath
+    });
+
+    if (!handshake.ok) {
+      return makeResult({
+        ok: false,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message('error', 'ATM_BROKER_RUNTIME_ACTIVATION_BLOCKED', 'Broker runtime activation handshake blocked.', {
+            taskId: options.task,
+            reasonCount: handshake.evidence.blockedReasons.length
+          })
+        ],
+        evidence: {
+          action: 'runtime-activate',
+          handshake: handshake.evidence,
+          runtimeWritten: false,
+          scopedWriteExecuted: false
+        }
+      });
+    }
+
+    if (!options.mergePlanFile) {
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message('info', 'ATM_BROKER_RUNTIME_ACTIVATION_READY', 'Broker runtime activation handshake approved; no scoped write was requested.', {
+            taskId: options.task,
+            actorId: options.actorId
+          })
+        ],
+        evidence: {
+          action: 'runtime-activate',
+          handshake: handshake.evidence,
+          runtimeWritten: false,
+          scopedWriteExecuted: false
+        }
+      });
+    }
+
+    const mergePlanPath = path.resolve(options.cwd, options.mergePlanFile);
+    if (!existsSync(mergePlanPath)) {
+      throw new CliError('ATM_FILE_NOT_FOUND', `Merge plan file not found: ${options.mergePlanFile}`, { exitCode: 1 });
+    }
+    const mergePlan = JSON.parse(readFileSync(mergePlanPath, 'utf8')) as MergePlan;
+    const proposals = loadComposeProposals(options);
+    const stewardId = options.stewardId ?? 'neutral-write-steward';
+    const applyResult = executeBrokerScopedWrite({
+      cwd: options.cwd,
+      stewardId,
+      mergePlan,
+      proposals,
+      scopeFiles: options.scopeFiles,
+      handshake: handshake.evidence,
+      evidenceOutPath: options.evidenceOutPath ? path.resolve(options.cwd, options.evidenceOutPath) : null
+    });
+
+    return makeResult({
+      ok: applyResult.ok,
+      command: 'broker',
+      cwd: options.cwd,
+      messages: [
+        message(
+          applyResult.ok ? 'info' : 'error',
+          applyResult.ok ? 'ATM_BROKER_RUNTIME_SCOPED_WRITE_APPLIED' : 'ATM_BROKER_RUNTIME_SCOPED_WRITE_BLOCKED',
+          applyResult.ok
+            ? `Broker runtime scoped write applied for task ${options.task}.`
+            : 'Broker runtime scoped write blocked; no scoped file writes were performed.',
+          {
+            taskId: options.task,
+            mergePlanId: mergePlan.mergePlanId,
+            applied: applyResult.ok
+          }
+        )
+      ],
+      evidence: {
+        action: 'runtime-activate',
+        handshake: handshake.evidence,
+        scopedWriteExecution: applyResult.evidence,
+        runtimeWritten: true,
+        scopedWriteExecuted: applyResult.ok,
+        mergePlan,
+        proposalCount: proposals.length
+      }
+    });
+  }
+
   if (options.action === 'compose') {
     const proposals = loadComposeProposals(options);
     const composeResult = composeBrokerProposals(proposals);
@@ -402,7 +527,7 @@ export async function runBroker(argv: string[]) {
           blocked ? 'error' : composeResult.mergePlan.verdict === 'needs-steward' ? 'warn' : 'info',
           blocked ? 'ATM_BROKER_COMPOSE_BLOCKED' : 'ATM_BROKER_COMPOSE_PLANNED',
           blocked
-            ? `Broker compose blocked with verdict '${composeResult.mergePlan.verdict}'.`
+            ? `Broker compose blocked with verdict '${composeResult.mergePlan.verdict}'. In broker-governed conflict domains, broker verdicts override Coordinator decisions; Coordinator must yield and escalate.`
             : `Broker compose produced merge plan '${composeResult.mergePlan.mergePlanId}' with verdict '${composeResult.mergePlan.verdict}'.`,
           {
             mergePlanId: composeResult.mergePlan.mergePlanId,
@@ -420,15 +545,17 @@ export async function runBroker(argv: string[]) {
     });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime', { exitCode: 2 });
 }
 
 interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | 'steward' | null;
+  readonly action: 'register' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
+  readonly runtimeAction: 'activate' | null;
   readonly task: string | null;
+  readonly actorId: string | null;
   readonly intentFile: string | null;
   readonly ttlSeconds: number;
   readonly proposalFiles: readonly string[];
@@ -446,7 +573,9 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     action: null as ParsedBrokerOptions['action'],
     proposalAction: null as ParsedBrokerOptions['proposalAction'],
     stewardAction: null as ParsedBrokerOptions['stewardAction'],
+    runtimeAction: null as ParsedBrokerOptions['runtimeAction'],
     task: null as string | null,
+    actorId: null as string | null,
     intentFile: null as string | null,
     ttlSeconds: 1800,
     proposalFiles: [] as string[],
@@ -468,6 +597,11 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     }
     if (arg === '--task') {
       state.task = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      state.actorId = requireValue(argv, index, '--actor');
       index += 1;
       continue;
     }
@@ -528,6 +662,8 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       state.proposalIdPositional = arg;
     } else if (state.action === 'steward' && !state.stewardAction) {
       state.stewardAction = arg as ParsedBrokerOptions['stewardAction'];
+    } else if (state.action === 'runtime' && !state.runtimeAction) {
+      state.runtimeAction = arg as ParsedBrokerOptions['runtimeAction'];
     } else {
       throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
     }
@@ -544,7 +680,9 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     action: state.action,
     proposalAction: state.proposalAction,
     stewardAction: state.stewardAction,
+    runtimeAction: state.runtimeAction,
     task: state.task,
+    actorId: state.actorId,
     intentFile: state.intentFile,
     ttlSeconds: state.ttlSeconds,
     proposalFiles: state.proposalFiles,
