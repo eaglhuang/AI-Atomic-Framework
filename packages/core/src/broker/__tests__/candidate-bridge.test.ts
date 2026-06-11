@@ -137,6 +137,20 @@ function testDeterministicAtomCid() {
   console.log('ok: deterministic atomCid (canonical contract, ATM-AUTO fallback)');
 }
 
+function testLineBoundedAtomCid() {
+  const first = computeCandidateAtomCid(makeCandidate());
+  const diffStartLine = computeCandidateAtomCid(makeCandidate({ lineStart: 10 }));
+  const diffEndLine = computeCandidateAtomCid(makeCandidate({ lineEnd: 20 }));
+  const bothLines = computeCandidateAtomCid(makeCandidate({ lineStart: 3, lineEnd: 7 }));
+
+  assert.notEqual(first, diffStartLine);
+  assert.notEqual(first, diffEndLine);
+  assert.notEqual(diffStartLine, bothLines);
+  assert.notEqual(diffEndLine, bothLines);
+  assert.ok(first.length === 64);
+  console.log('ok: line-bounded candidates generate distinct deterministic CIDs');
+}
+
 function testParallelSafeScenario() {
   const intentA = candidatesToWriteIntent([makeCandidate()], baseContext);
   const intentB = candidatesToWriteIntent(
@@ -210,6 +224,7 @@ function testSdkCandidateAssignability() {
 
 testWellFormedWriteIntent();
 testDeterministicAtomCid();
+testLineBoundedAtomCid();
 testParallelSafeScenario();
 testCidConflictScenario();
 testFileOverlapScenario();

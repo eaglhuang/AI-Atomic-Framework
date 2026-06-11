@@ -120,7 +120,44 @@ try {
   const targetFile = path.join(targetDir, 'target.ts');
   mkdirSync(targetDir, { recursive: true });
   writeFileSync(targetFile, 'alpha\n', 'utf8');
+  const taskDir = path.join(tempRoot, '.atm', 'history', 'tasks');
+  mkdirSync(taskDir, { recursive: true });
+  writeJson(path.join(taskDir, 'TASK-CID-0020.json'), {
+    atomizationImpact: {
+      ownerAtomOrMap: 'ATM-CORE-0020'
+    }
+  });
   const baseCommit = commitText(tempRoot, 'base target for steward fixture');
+  const registryDir = path.join(tempRoot, '.atm', 'runtime');
+  mkdirSync(registryDir, { recursive: true });
+  writeJson(path.join(registryDir, 'write-broker.registry.json'), {
+    schemaId: 'atm.writeBrokerRegistry.v1',
+    specVersion: '0.1.0',
+    repoId: 'local-repo',
+    workspaceId: 'main',
+    activeIntents: [
+      {
+        intentId: 'intent-fixture-0001',
+        taskId: 'TASK-CID-0999',
+        teamRunId: null,
+        actorId: '009',
+        baseCommit,
+        resourceKeys: {
+          files: ['src/occupied.ts'],
+          atomIds: ['ATM-CORE-0999'],
+          atomCids: ['cid-0999'],
+          generators: [],
+          projections: [],
+          registries: [],
+          validators: [],
+          artifacts: []
+        },
+        leaseEpoch: Date.now(),
+        lane: 'neutral-steward',
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+      }
+    ]
+  });
 
   const proposal = makeProposal(baseCommit, hashFile(targetFile));
   const compose = composeBrokerProposals([proposal]);
@@ -206,6 +243,25 @@ try {
   writeJson(proposalFile, freshProposal);
   writeJson(mergePlanFile, freshCompose.mergePlan);
 
+  const cliRuntime = await runAtm([
+    'broker', 'runtime', 'activate',
+    '--task', 'TASK-CID-0020',
+    '--actor', '008',
+    '--merge-plan-file', 'merge-plan.json',
+    '--proposal-file', 'proposal.json',
+    '--scope-file', 'src/target.ts',
+    '--evidence-out', 'runtime-evidence.json'
+  ], tempRoot);
+  check(cliRuntime.exitCode === 0 && cliRuntime.parsed.ok === true, `broker runtime activate CLI must pass: ${JSON.stringify(cliRuntime.parsed)}`);
+  check(
+    cliRuntime.parsed.evidence?.handshake?.brokerLane?.virtualAtomInUseRegistry?.activeVirtualAtoms?.length === 1,
+    'runtime activation must expose one virtual atom in-use record'
+  );
+  check(
+    cliRuntime.parsed.evidence?.scopedWriteExecution?.virtualAtomInUseRegistry?.activeVirtualAtoms?.length === 1,
+    'runtime activation must carry the same virtual atom in-use registry through steward execution'
+  );
+
   const invalidMergePlanFile = path.join(tempRoot, 'invalid-merge-plan.json');
   writeJson(invalidMergePlanFile, { ...freshCompose.mergePlan, inputProposals: ['missing-proposal-id'] });
   const cliPlan = await runAtm([
@@ -227,12 +283,18 @@ try {
 
   const cliApply = await runAtm([
     'broker', 'steward', 'apply',
+    '--task', 'TASK-CID-0020',
+    '--actor', '008',
     '--merge-plan-file', 'merge-plan.json',
     '--proposal-file', 'proposal.json',
     '--scope-file', 'src/target.ts',
     '--evidence-out', 'steward-evidence.json'
   ], tempRoot);
   check(cliApply.exitCode === 0 && cliApply.parsed.ok === true, `steward apply CLI must pass: ${JSON.stringify(cliApply.parsed)}`);
+  check(
+    cliApply.parsed.evidence?.scopedWriteExecution?.virtualAtomInUseRegistry?.activeVirtualAtoms?.length === 1,
+    'steward apply CLI must carry the same virtual atom in-use registry'
+  );
 
   console.log(`[broker-steward:${mode}] ok`);
 } finally {

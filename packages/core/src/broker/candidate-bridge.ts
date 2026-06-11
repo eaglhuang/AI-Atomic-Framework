@@ -57,7 +57,8 @@ export function candidatesToWriteIntent(
     return {
       atomId: candidate.suggestedAtomId ?? `ATM-AUTO-${atomCid.slice(0, 8)}`,
       atomCid,
-      operation: 'create'
+      operation: 'create',
+      ...computeCandidateSourceRange(candidate)
     };
   });
 
@@ -92,10 +93,12 @@ export function computeCandidateAtomCid(candidate: BridgeAtomCandidate): string 
   const sourcePaths = [...new Set(
     [candidate.filePath, ...(candidate.suggestedSourcePaths ?? [])].map(normalizePath)
   )].sort();
+  const lineSignature = `${candidate.lineStart ?? ''}:${candidate.lineEnd ?? ''}`;
   const contract = [
     candidate.kind,
     candidate.symbol,
     sourcePaths.join(','),
+    lineSignature,
     candidate.detectionMethod
   ].join('||');
   return createHash('sha256').update(contract).digest('hex');
@@ -103,4 +106,27 @@ export function computeCandidateAtomCid(candidate: BridgeAtomCandidate): string 
 
 function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, '/');
+}
+
+function computeCandidateSourceRange(candidate: BridgeAtomCandidate):
+  | { sourceRange?: { filePath: string; lineStart: number; lineEnd: number } }
+  | undefined {
+  if (
+    candidate.lineStart == null ||
+    candidate.lineEnd == null ||
+    Number.isNaN(candidate.lineStart) ||
+    Number.isNaN(candidate.lineEnd)
+  ) {
+    return undefined;
+  }
+
+  const start = Math.max(1, candidate.lineStart);
+  const end = Math.max(start, candidate.lineEnd);
+  return {
+    sourceRange: {
+      filePath: normalizePath(candidate.filePath),
+      lineStart: start,
+      lineEnd: end
+    }
+  };
 }

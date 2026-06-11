@@ -6,6 +6,7 @@ import { buildStewardApplyEvidence } from './apply-evidence.ts';
 import type { StewardApplyEvidence } from './apply-evidence.ts';
 import { sortProposalsForCompose } from './merge-plan.ts';
 import { validateBrokerProposal } from './proposal.ts';
+import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { MergePlan, PatchProposal } from './types.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 
@@ -57,6 +58,7 @@ export interface BrokerScopedWriteExecutionEvidence {
   readonly mergePlanId: string;
   readonly allowedFiles: readonly string[];
   readonly handshake: TeamBrokerRuntimeActivationHandshakeEvidence;
+  readonly virtualAtomInUseRegistry: VirtualAtomInUseRegistryDocument;
   readonly applyEvidence: StewardApplyEvidence | null;
   readonly verdict: 'applied' | 'blocked';
   readonly blockedReasons: readonly string[];
@@ -178,6 +180,7 @@ export function executeBrokerScopedWrite(input: {
         mergePlanId: input.mergePlan.mergePlanId,
         allowedFiles,
         handshake: input.handshake,
+        virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
         applyEvidence: null,
         verdict: 'blocked',
         blockedReasons: input.handshake.blockedReasons.length > 0
@@ -197,6 +200,7 @@ export function executeBrokerScopedWrite(input: {
         mergePlanId: input.mergePlan.mergePlanId,
         allowedFiles,
         handshake: input.handshake,
+        virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
         applyEvidence: null,
         verdict: 'blocked',
         blockedReasons: ['Scoped write request does not match broker-approved allowed files.']
@@ -222,6 +226,7 @@ export function executeBrokerScopedWrite(input: {
       mergePlanId: input.mergePlan.mergePlanId,
       allowedFiles,
       handshake: input.handshake,
+      virtualAtomInUseRegistry: input.handshake.brokerLane.virtualAtomInUseRegistry,
       applyEvidence: applyResult.evidence,
       verdict: applyResult.ok ? 'applied' : 'blocked',
       blockedReasons: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? ['Broker scoped write apply was blocked.'])

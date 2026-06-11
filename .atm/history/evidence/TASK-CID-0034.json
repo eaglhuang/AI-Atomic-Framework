@@ -1,0 +1,157 @@
+{
+  "taskId": "TASK-CID-0034",
+  "updatedAt": "2026-06-11T15:00:57.198Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for TASK-CID-0034: codex-main -> codex-gpt-5.4-mini.",
+      "artifactPaths": [
+        ".atm/history/tasks/TASK-CID-0034.json"
+      ],
+      "producedBy": "codex-gpt-5.4-mini",
+      "createdAt": "2026-06-11T12:40:31.602Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-main",
+          "leaseId": "lease-76d13f6a9df0",
+          "claimedAt": "2026-06-11T10:02:54.579Z",
+          "heartbeatAt": "2026-06-11T10:02:54.579Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/TASK-CID-0034.json",
+            "packages/core/src/broker/registry.ts",
+            "packages/core/src/broker/steward.ts",
+            "packages/core/src/broker/team-lane.ts",
+            "scripts/validate-broker-steward.ts"
+          ],
+          "state": "active"
+        },
+        "newClaim": {
+          "actorId": "codex-gpt-5.4-mini",
+          "leaseId": "lease-d3e5b2c406c2",
+          "claimedAt": "2026-06-11T12:40:31.562Z",
+          "heartbeatAt": "2026-06-11T12:40:31.562Z",
+          "ttlSeconds": 1800,
+          "files": [
+            "packages/core/src/broker/registry.ts",
+            "packages/core/src/broker/steward.ts",
+            "packages/core/src/broker/team-lane.ts",
+            "scripts/validate-broker-steward.ts"
+          ],
+          "state": "active",
+          "reason": "002b governance closeout continuation after validator unblock"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "TASK-CID-0034 validator matrix passed after restoring isolated AGR runtime payload.",
+      "artifactPaths": [
+        "packages/core/src/broker/candidate-bridge.ts",
+        "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/team-lane.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260611142203-codex-gpt-5.4-mini-TASK-CID-0034-ad0759ec74",
+      "createdAt": "2026-06-11T14:24:00.524Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260611142203-codex-gpt-5.4-mini-TASK-CID-0034-ad0759ec74",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git-diff-check",
+          "typecheck",
+          "validate-broker-steward",
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-broker-steward.ts --mode validate && npm run typecheck && npm run validate:cli && git diff --check -- packages/core/src/broker/candidate-bridge.ts packages/core/src/broker/__tests__/candidate-bridge.test.ts packages/core/src/broker/registry.ts packages/core/src/broker/steward.ts packages/core/src/broker/team-lane.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20cedce6121644e2cf8c6c8322c4fd9389c599dfb60f0b9e6c6e417568585f17",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate-broker-steward",
+              "typecheck",
+              "validate:cli",
+              "git-diff-check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:70d8bc9ea2975bdafc3d69b88767e41b882896bbc66caf5cdfef54ddfe973239",
+            "cached": false,
+            "generatedAt": "2026-06-11T14:24:00.580Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:495a1b362921b1cea9df9e206db10dd017cb5591d104e76fdadc519e526e8597",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "TASK-CID-0034 validator matrix passed after restoring honest scope from blocked isolation stash and reclaiming write ownership.",
+      "artifactPaths": [
+        "packages/core/src/broker/candidate-bridge.ts",
+        "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/team-lane.ts",
+        "scripts/validate-broker-steward.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+      "createdAt": "2026-06-11T15:00:57.198Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260611145943-codex-gpt-5.4-mini-TASK-CID-0034-51e2d698b8",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git-diff-check",
+          "typecheck",
+          "validate-broker-steward",
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-broker-steward.ts --mode validate && npm run typecheck && npm run validate:cli && git diff --check -- packages/core/src/broker/__tests__/candidate-bridge.test.ts packages/core/src/broker/candidate-bridge.ts packages/core/src/broker/registry.ts packages/core/src/broker/steward.ts packages/core/src/broker/team-lane.ts scripts/validate-broker-steward.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7d86f534ee0b35c4f0f8cb66d61934cf619225537ad6d6a86f6ff7cb4eb525ca",
+            "stderrSha256": "sha256:f88560af22d776c5ab8b1815587b543f3fdd694fbaeb65caef16ea5af7ebecdb",
+            "validators": [
+              "validate-broker-steward",
+              "typecheck",
+              "validate:cli",
+              "git-diff-check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:91263e66118148d2900d7283f1ee3f01fc1095554faa7b376a42f69adae5aacf",
+            "cached": false,
+            "generatedAt": "2026-06-11T15:00:57.261Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f0bbfd96173853d8de6e2900e335931c4f7137f89ac66f2686594a1007e1966d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

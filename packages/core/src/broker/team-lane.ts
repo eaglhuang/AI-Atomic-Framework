@@ -1,8 +1,9 @@
 import path from 'node:path';
 import { calculateBrokerDecision } from './decision.ts';
-import { loadRegistry } from './registry.ts';
+import { buildVirtualAtomInUseRegistry, loadRegistry } from './registry.ts';
 import { readGitHeadCommit } from './steward.ts';
 import type { BrokerDecision, WriteIntent, WriteIntentAtomRef } from './types.ts';
+import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 
 export const DEFAULT_TEAM_STEWARD_ID = 'neutral-write-steward';
 export const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = '.atm/runtime/write-broker.registry.json';
@@ -22,6 +23,7 @@ export interface TeamBrokerLaneEvidence {
   readonly registryPath: string;
   readonly writeIntent: WriteIntent;
   readonly decision: BrokerDecision;
+  readonly virtualAtomInUseRegistry: VirtualAtomInUseRegistryDocument;
   readonly chosenLane: TeamBrokerChosenLane;
   readonly stewardId: string | null;
   readonly composerPath: string | null;
@@ -165,6 +167,7 @@ export function evaluateTeamBrokerLane(input: {
   const registryPath = input.registryPath ?? path.join(path.resolve(input.cwd), DEFAULT_BROKER_REGISTRY_RELATIVE_PATH);
   const writeIntent = buildTeamWriteIntent(input);
   const registry = loadRegistry(registryPath);
+  const virtualAtomInUseRegistry = buildVirtualAtomInUseRegistry(registry);
   const decision = calculateBrokerDecision(writeIntent, registry);
   const resolution = resolveTeamBrokerLane(decision);
 
@@ -176,6 +179,7 @@ export function evaluateTeamBrokerLane(input: {
     registryPath: DEFAULT_BROKER_REGISTRY_RELATIVE_PATH,
     writeIntent,
     decision,
+    virtualAtomInUseRegistry,
     chosenLane: resolution.chosenLane,
     stewardId: resolution.stewardId,
     composerPath: resolution.composerPath,
