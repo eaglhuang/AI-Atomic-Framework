@@ -5,6 +5,8 @@ interface InstallEditorHooksOptions {
     readonly force?: boolean;
 }
 export declare function runIntegrationHookInvocation(argv: string[]): import("./shared.ts").CommandResult;
+/** In-process validators inherit idle stdin pipes; opt out explicitly instead of reading. */
+export declare function runIntegrationHookInvocationInProcess(argv: string[]): import("./shared.ts").CommandResult;
 export declare function installEditorIntegrationHooks(cwd: string, adapterId: string, options?: InstallEditorHooksOptions): {
     schemaId: string;
     generatedAt: string;
@@ -97,4 +99,6 @@ export declare function inspectFrameworkHookReadiness(cwd: string): {
 };
 export declare function makeIntegrationHookInstallResult(cwd: string, adapterId: string, options?: InstallEditorHooksOptions): import("./shared.ts").CommandResult;
 export declare function makeIntegrationHookVerifyResult(cwd: string, adapterId: string): import("./shared.ts").CommandResult;
+/** Read optional JSON from piped stdin; exported for regression tests. */
+export declare function readOptionalStdinJson(skipStdin?: boolean): unknown;
 export {};

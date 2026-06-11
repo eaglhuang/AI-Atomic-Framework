@@ -9,7 +9,6 @@ import { detectFrameworkRepoIdentity, detectFrameworkStaleLocks } from './framew
 import { createGitHeadEvidenceCheck } from './git-head-evidence.js';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.js';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.js';
-import { inspectFrameworkHookReadiness } from './integration-hooks.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.js';
 const legacyBehaviorPackageNames = [
@@ -53,7 +52,7 @@ export async function runDoctor(argv) {
         .map((entry) => packageDirLabel(root, entry.packageDir));
     const charterIntegrity = checkCharterIntegrity(root);
     const integrationHealth = await checkIntegrationHealth(root);
-    const frameworkHookReadiness = inspectFrameworkHookReadiness(root);
+    const frameworkHookReadiness = (await import('./integration-hooks.js')).inspectFrameworkHookReadiness(root);
     const cleanCheckoutFrameworkHookContractOk = repoIdentity.isFrameworkRepo
         && frameworkHookReadiness.gitHooks.installedHookFiles.every((entry) => entry.present && entry.markerPresent)
         && frameworkHookReadiness.editorHooks.some((entry) => entry.supported

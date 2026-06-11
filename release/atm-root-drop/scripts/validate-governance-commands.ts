@@ -709,10 +709,28 @@ try {
   const closeoutIntentClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--claim-intent', 'no-more-mutation', '--json']);
   assert(closeoutIntentClaim.exitCode === 0, 'tasks claim --claim-intent no-more-mutation must exit 0');
   assert(closeoutIntentClaim.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim must normalize no-more-mutation to closeout-only in evidence');
+  const closeoutIntentAliasReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--title', 'Closeout-only claim intent alias test', '--json']);
+  assert(closeoutIntentAliasReserve.exitCode === 0, 'closeout-only alias tasks reserve must exit 0');
+  const closeoutIntentAliasPromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--json']);
+  assert(closeoutIntentAliasPromote.exitCode === 0, 'closeout-only alias tasks promote must exit 0');
+  const closeoutIntentShortAlias = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--closeout-only', '--json']);
+  assert(closeoutIntentShortAlias.exitCode === 0, 'tasks claim --closeout-only must exit 0');
+  assert(closeoutIntentShortAlias.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim --closeout-only must surface claimIntent=closeout-only');
+  const closeoutIntentAliasReserve2 = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--title', 'Closeout-only no-more-mutation alias test', '--json']);
+  assert(closeoutIntentAliasReserve2.exitCode === 0, 'closeout-only alias tasks reserve must exit 0');
+  const closeoutIntentPromote2 = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--json']);
+  assert(closeoutIntentPromote2.exitCode === 0, 'closeout-only alias tasks promote must exit 0');
+  const closeoutIntentNoMoreMutationAlias = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--no-more-mutation', '--json']);
+  assert(closeoutIntentNoMoreMutationAlias.exitCode === 0, 'tasks claim --no-more-mutation must exit 0');
+  assert(closeoutIntentNoMoreMutationAlias.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim --no-more-mutation must surface claimIntent=closeout-only');
   const closeoutIntentTask = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0112.json'), 'utf8'));
   assert(closeoutIntentTask.claim?.intent === 'closeout-only', 'tasks claim must persist claim.intent=closeout-only in the task ledger');
   const closeoutIntentRelease = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--reason', 'closeout-only claim intent surface test cleanup', '--json']);
   assert(closeoutIntentRelease.exitCode === 0, 'closeout-only claim intent tasks release must exit 0');
+  const closeoutIntentAliasRelease = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--reason', 'closeout-only claim intent alias test cleanup', '--json']);
+  assert(closeoutIntentAliasRelease.exitCode === 0, 'closeout-only alias tasks release must exit 0');
+  const closeoutIntentAliasRelease2 = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--reason', 'closeout-only alias test cleanup', '--json']);
+  assert(closeoutIntentAliasRelease2.exitCode === 0, 'closeout-only alias tasks release2 must exit 0');
 
   const artifactOnlyReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--title', 'Artifact-only closure guard', '--json']);
   assert(artifactOnlyReserve.exitCode === 0, 'artifact-only tasks reserve must exit 0');

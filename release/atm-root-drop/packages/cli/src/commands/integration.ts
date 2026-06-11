@@ -8,13 +8,11 @@ import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } f
 import type { InstallManifest, IntegrationAdapter } from '../../../integrations-core/src/index.ts';
 import { CliError, ensureAtmDirectory, makeResult, message, parseArgsForCommand, readJsonFile, relativePathFrom, resolveValue } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
-import {
-  installEditorIntegrationHooks,
-  makeIntegrationHookInstallResult,
-  makeIntegrationHookVerifyResult,
-  runIntegrationHookInvocation,
-  verifyEditorIntegrationHooks
-} from './integration-hooks.ts';
+type IntegrationHooksModule = typeof import('./integration-hooks.ts');
+
+async function loadIntegrationHooks(): Promise<IntegrationHooksModule> {
+  return import('./integration-hooks.ts');
+}
 
 const integrationAdapterFactories = Object.freeze({
   'claude-code': createClaudeCodeIntegrationAdapter,
@@ -178,7 +176,8 @@ export async function runIntegration(argv: string[]) {
     throw new CliError('ATM_CLI_HELP_NOT_FOUND', 'No help spec found for integration.', { exitCode: 2 });
   }
   if (argv[0] === 'hook') {
-    return runIntegrationHookInvocation(argv.slice(1));
+    const hooks = await loadIntegrationHooks();
+    return hooks.runIntegrationHookInvocation(argv.slice(1));
   }
   const parsed = parseArgsForCommand(spec, argv);
   const [action = 'list', adapterId, maybeHookAdapterId] = parsed.positional;
@@ -196,13 +195,15 @@ export async function runIntegration(argv: string[]) {
           force: parsed.options.force === true
         });
       }
-      return makeIntegrationHookInstallResult(cwd, requiredHookAdapterId, {
+      const hooks = await loadIntegrationHooks();
+      return hooks.makeIntegrationHookInstallResult(cwd, requiredHookAdapterId, {
         dryRun: parsed.options.dryRun === true,
         force: parsed.options.force === true
       });
     }
     if (hooksAction === 'verify') {
-      return makeIntegrationHookVerifyResult(cwd, requireAdapterId(hookAdapterId, 'hooks verify'));
+      const hooks = await loadIntegrationHooks();
+      return hooks.makeIntegrationHookVerifyResult(cwd, requireAdapterId(hookAdapterId, 'hooks verify'));
     }
     throw new CliError('ATM_CLI_USAGE', 'integration hooks supports only: install | verify', { exitCode: 2 });
   }
@@ -220,7 +221,7 @@ export async function runIntegration(argv: string[]) {
     });
     const hookInstallReport = parsed.options.dryRun === true || (adapterId !== 'copilot' && adapterId !== 'claude-code')
       ? null
-      : installEditorIntegrationHooks(cwd, adapterId, { force: true });
+      : (await loadIntegrationHooks()).installEditorIntegrationHooks(cwd, adapterId, { force: true });
     return makeResult({
       ok: true,
       command: 'integration',
@@ -244,7 +245,7 @@ export async function runIntegration(argv: string[]) {
     const manifest = readIntegrationManifest(cwd, adapter.id);
     const verifyReport = await resolveValue(adapter.verify(createIntegrationContext(cwd, adapter, {}), manifest));
     const hookVerifyReport = adapter.id === 'copilot' || adapter.id === 'claude-code'
-      ? verifyEditorIntegrationHooks(cwd, adapter.id)
+      ? (await loadIntegrationHooks()).verifyEditorIntegrationHooks(cwd, adapter.id)
       : null;
     const ok = verifyReport.ok && (hookVerifyReport?.ok ?? true);
     return makeResult({

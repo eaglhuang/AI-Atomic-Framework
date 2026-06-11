@@ -1,6 +1,20 @@
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import fs from 'node:fs';
 import path from 'node:path';
+const { existsSync, mkdirSync, readFileSync, readSync, writeFileSync } = fs;
+function setStdinBlocking(blocking) {
+    const setBlocking = fs.setBlocking;
+    if (typeof setBlocking === 'function') {
+        setBlocking(0, blocking);
+    }
+}
+function hasNonBlockingStdinSupport() {
+    return typeof fs.setBlocking === 'function';
+}
+function readStdinBytes(scratch) {
+    return readSync(0, scratch, 0, scratch.length, null);
+}
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus, detectFrameworkRepoIdentity, isAtmCriticalNonDocSurface } from './framework-development.js';
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.js';
 import { extractPathLikeStringsFromPrompt, isPathAllowedByScope, isQuickfixPrompt, readActiveQuickfixLock } from './work-channels.js';
@@ -15,12 +29,20 @@ const adapterHookEvents = {
     codex: [],
     antigravity: []
 };
+/** Poll window for piped hook stdin when data may arrive shortly after process start. */
+const HOOK_STDIN_POLL_MS = 50;
+const HOOK_STDIN_CHUNK_BYTES = 64 * 1024;
+const hookStdinSleepBuffer = new Int32Array(new SharedArrayBuffer(4));
 export function runIntegrationHookInvocation(argv) {
     const options = parseHookInvocationArgs(argv);
     if (options.event === 'pre-agent') {
         return runPreAgentHook(options);
     }
     return runPreToolHook(options);
+}
+/** In-process validators inherit idle stdin pipes; opt out explicitly instead of reading. */
+export function runIntegrationHookInvocationInProcess(argv) {
+    return runIntegrationHookInvocation(['--no-stdin', ...argv]);
 }
 export function installEditorIntegrationHooks(cwd, adapterId, options = {}) {
     const root = path.resolve(cwd);
@@ -647,6 +669,7 @@ function runPreToolHook(options) {
     });
 }
 function parseHookInvocationArgs(argv) {
+    const skipStdin = shouldSkipHookStdin(argv);
     const state = {
         cwd: process.cwd(),
         event: null,
@@ -694,7 +717,7 @@ function parseHookInvocationArgs(argv) {
             index += 1;
             continue;
         }
-        if (arg === '--json' || arg === '--pretty')
+        if (arg === '--json' || arg === '--pretty' || arg === '--no-stdin')
             continue;
         if (arg !== 'pre-agent' && arg !== 'pre-tool') {
             throw new CliError('ATM_CLI_USAGE', 'integration hook supports only: pre-agent | pre-tool', { exitCode: 2 });
@@ -704,7 +727,7 @@ function parseHookInvocationArgs(argv) {
     if (!state.event) {
         throw new CliError('ATM_CLI_USAGE', 'integration hook requires an event: pre-agent | pre-tool', { exitCode: 2 });
     }
-    const stdinPayload = readOptionalStdinJson();
+    const stdinPayload = readOptionalStdinJson(skipStdin);
     const payloadEditor = readStringPath(stdinPayload, ['editor', 'editorId', 'source']);
     const payloadTargetRepo = readStringPath(stdinPayload, ['targetRepo', 'target_repo', 'repository', 'repoPath', 'repo_path']);
     return {
@@ -900,14 +923,139 @@ function quoteHookCliValue(value) {
     const trimmed = value.length > 240 ? `${value.slice(0, 240)}...` : value;
     return `"${trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
-function readOptionalStdinJson() {
+function shouldSkipHookStdin(argv) {
+    if (argv.includes('--no-stdin'))
+        return true;
+    const envValue = process.env.ATM_HOOK_NO_STDIN;
+    return envValue === '1' || envValue === 'true';
+}
+/** Read optional JSON from piped stdin; exported for regression tests. */
+export function readOptionalStdinJson(skipStdin = false) {
+    if (skipStdin || shouldSkipHookStdin([]))
+        return null;
     if (process.stdin.isTTY)
         return null;
+    return readPipedStdinJsonSync();
+}
+function readPipedStdinJsonSync() {
+    // Non-TTY stdin from editor hooks is a pipe. Poll briefly, then read without blocking
+    // forever on inherited idle pipes (common for npm/in-process validators).
+    if (hasNonBlockingStdinSupport()) {
+        return readPipedStdinJsonSyncNonBlocking();
+    }
+    return readPipedStdinJsonSyncWithTimedFallback();
+}
+function readPipedStdinJsonSyncNonBlocking() {
+    const scratch = Buffer.alloc(HOOK_STDIN_CHUNK_BYTES);
+    const chunks = [];
+    const deadline = Date.now() + HOOK_STDIN_POLL_MS;
     try {
-        const text = readFileSync(0, 'utf8').trim();
-        if (!text)
+        setStdinBlocking(false);
+        while (Date.now() < deadline) {
+            let bytesRead = 0;
+            try {
+                bytesRead = readStdinBytes(scratch);
+            }
+            catch (error) {
+                const code = error.code;
+                if (code === 'EAGAIN' || code === 'EWOULDBLOCK') {
+                    Atomics.wait(hookStdinSleepBuffer, 0, 0, 1);
+                    continue;
+                }
+                return null;
+            }
+            if (bytesRead > 0) {
+                chunks.push(Buffer.from(scratch.subarray(0, bytesRead)));
+                drainAvailableStdin(scratch, chunks);
+                break;
+            }
+            Atomics.wait(hookStdinSleepBuffer, 0, 0, 1);
+        }
+        return parseStdinJsonFromText(chunks.length > 0 ? Buffer.concat(chunks).toString('utf8') : '');
+    }
+    catch {
+        return null;
+    }
+    finally {
+        try {
+            setStdinBlocking(true);
+        }
+        catch {
+            // Ignore restore failures on platforms without setBlocking support.
+        }
+    }
+}
+function readPipedStdinJsonSyncWithTimedFallback() {
+    const deadline = Date.now() + HOOK_STDIN_POLL_MS;
+    while (Date.now() < deadline) {
+        if ((process.stdin.readableLength ?? 0) > 0)
+            break;
+        if (process.stdin.readableEnded)
+            break;
+        Atomics.wait(hookStdinSleepBuffer, 0, 0, 1);
+    }
+    if ((process.stdin.readableLength ?? 0) > 0) {
+        return parseStdinJsonFromRead(() => readFileSync(0, 'utf8'));
+    }
+    const fromChild = readStdinViaTimedChild(HOOK_STDIN_POLL_MS);
+    if (fromChild !== null) {
+        return parseStdinJsonFromText(fromChild);
+    }
+    if (process.stdin.readableEnded) {
+        return parseStdinJsonFromRead(() => readFileSync(0, 'utf8'));
+    }
+    return null;
+}
+function readStdinViaTimedChild(timeoutMs) {
+    const result = spawnSync(process.execPath, ['--strip-types', '-e', 'import { readFileSync } from "node:fs"; process.stdout.write(readFileSync(0, "utf8"));'], {
+        stdio: ['inherit', 'pipe', 'pipe'],
+        timeout: timeoutMs,
+        encoding: 'utf8',
+        windowsHide: true,
+        maxBuffer: HOOK_STDIN_CHUNK_BYTES
+    });
+    if (result.error) {
+        const code = result.error.code;
+        if (code === 'ETIMEDOUT')
             return null;
-        return JSON.parse(text);
+    }
+    if (result.status !== 0)
+        return null;
+    const text = (result.stdout ?? '').trim();
+    return text.length > 0 ? text : null;
+}
+function drainAvailableStdin(scratch, chunks) {
+    while (true) {
+        try {
+            const bytesRead = readStdinBytes(scratch);
+            if (bytesRead > 0) {
+                chunks.push(Buffer.from(scratch.subarray(0, bytesRead)));
+                continue;
+            }
+            break;
+        }
+        catch (error) {
+            const code = error.code;
+            if (code === 'EAGAIN' || code === 'EWOULDBLOCK')
+                break;
+            return;
+        }
+    }
+}
+function parseStdinJsonFromRead(readText) {
+    try {
+        return parseStdinJsonFromText(readText());
+    }
+    catch {
+        return null;
+    }
+}
+function parseStdinJsonFromText(text) {
+    const trimmed = text.trim();
+    if (!trimmed)
+        return null;
+    try {
+        return JSON.parse(trimmed);
     }
     catch {
         return null;

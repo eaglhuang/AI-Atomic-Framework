@@ -715,6 +715,14 @@ export function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release'
       options.reservedOk = true;
       continue;
     }
+    if (arg === '--closeout-only' || arg === '--no-more-mutation') {
+      if (action !== 'claim') {
+        throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option ${arg}`, { exitCode: 2 });
+      }
+      options.claimIntent = 'closeout-only';
+      continue;
+    }
+
     if (arg === '--claim-intent') {
       if (action !== 'claim') {
         throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option --claim-intent`, { exitCode: 2 });
