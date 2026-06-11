@@ -228,6 +228,7 @@ async function validateAaoThroughputAgentJourney(tempRoot: string) {
 
 async function validateBatchCheckpointHold(tempRoot: string) {
   const repo = makeAdopterRepo(tempRoot, 'adopter-batch-hold');
+  initializeGit(repo);
   const prompt = 'TASK-ADOPT-0001 TASK-ADOPT-0002 all task cards';
   const claim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', prompt]);
   assert(claim.ok === true, 'batch hold fixture must claim queue head');
