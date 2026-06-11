@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0139",
+  "title": "Preserve task-id casing across import, close verification, and pre-commit transition checks",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0135"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/hook.ts",
+    "tests/cli/task-id-casing.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/hook.ts",
+    "tests/cli/task-id-casing.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types tests/cli/task-id-casing.test.ts"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "broker decision logic",
+    "taskflow opener numbering policy (separate from this casing fix)"
+  ],
+  "nonGoals": [
+    "Do not redesign the task-id format or introduce a new id allocation scheme (INV-ATM-001).",
+    "Do not relax the pre-commit transition-pairing requirement itself; only fix its path comparison.",
+    "Do not hand-edit .atm/history or .atm/runtime state as part of the fix.",
+    "Do not require ledger migration for existing uppercase-id tasks."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "contextMap": {
+    "primary": [],
+    "secondary": [],
+    "tests": [],
+    "patterns": []
+  },
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-tasks-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0139-task-id-casing-governance.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-aao.json",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks/task-import-validators.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/hook.ts",
+      "C:/Users/User/AI-Atomic-Framework/tests/cli/task-id-casing.test.ts",
+      "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "While closing `TASK-APO-0030-python-language-adapter-plugin` in batch `batch-d95420db3166` (AAF governance commit `eda4e412`), two defects surfaced:\n\n1. **`tasks import` force-uppercases task ids.** `normalizeTaskId()` in `packages/cli/src/commands/tasks/task-import-validators.ts` currently applies `.toUpperCase()` to the whole id, so a card with `task_id: TASK-APO-0030-python-language-adapter-plugin` lands in the ledger as `TASK-APO-0030-PYTHON-LANGUAGE-ADAPTER-PLUGIN`. Batch queues and prompt routing derive ids from file names with casing preserved, so the live ledger and the queue head disagree. On a case-insensitive filesystem (Windows) both ids resolve to the same ledger file, and `verifyPersistedTaskDocument()` in `tasks.ts` then fails its identity check, rolling back an otherwise valid close transaction (`ATM_TASK_CLOSE_TRANSACTION_FAILED`).\n\n2. **The pre-commit hook compares staged paths too literally.** The `task-file-missing-transition` check in `packages/cli/src/commands/hook.ts` builds `expectedEventPath` from the ledger `workItemId` and looks it up in a staged-path string set. When the on-disk event directory casing differs from the ledger `workItemId` casing, the staged transition event is not recognized and the governance commit is blocked (`ATM_HOOK_PRE_COMMIT_FAILED`), even though the matching event is staged.\n\nThe observed workaround was hand-aligning `workItemId` casing and renaming `.atm/history/task-events/<id>/` directories, which is exactly the kind of direct `.atm` surgery the framework forbids.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0139-task-id-casing-governance.task.md",
+    "sectionTitle": "TASK-AAO-0139",
+    "headingLine": 98,
+    "hash": "055028e4807125ed"
+  },
+  "importedAt": "2026-06-11T06:39:27.249Z",
+  "lastTransitionId": "2026-06-11T06-56-49-912Z-close-b2f1e47f33b8",
+  "lastTransitionAt": "2026-06-11T06:56:49.912Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-aao139",
+  "reservedAt": "2026-06-11T06:39:36.287Z",
+  "promotedAt": "2026-06-11T06:39:36.291Z",
+  "claim": {
+    "actorId": "cursor-aao139",
+    "leaseId": "lease-4710e8d9b995",
+    "claimedAt": "2026-06-11T06:39:36.293Z",
+    "heartbeatAt": "2026-06-11T06:56:49.909Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0139.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/task-id-casing.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-11T06:39:36.293Z",
+  "startedByActor": "cursor-aao139",
+  "startedBySessionId": "session-20260611063936-cursor-aao139-TASK-AAO-0139-a0f276279b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0139",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0139.*",
+      ".atm/history/task-events/TASK-AAO-0139/**",
+      ".atm/history/tasks/TASK-AAO-0139.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/task-id-casing.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "11e05da6b878c0a763986a404de5d4801f375f256cd5af89d856fc28ca9e0638",
+    "actorId": "cursor-aao139",
+    "createdAt": "2026-06-11T06:39:36.315Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-11T06:56:49.909Z",
+  "closedByActor": "cursor-aao139",
+  "closedBySessionId": "session-20260611063936-cursor-aao139-TASK-AAO-0139-a0f276279b",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0139.closure-packet.json"
+}

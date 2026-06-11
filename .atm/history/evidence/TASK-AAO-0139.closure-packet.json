@@ -1,0 +1,128 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0139",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1a8f4b2cce958275c85ff1d06308b2a19de33a75",
+  "governedTreeSha": "4f277d4264a18ca2619aa951a4b2910ce8aecbc0",
+  "targetCommitDelta": {
+    "currentCommitSha": "1a8f4b2cce958275c85ff1d06308b2a19de33a75",
+    "parentCommitShas": [
+      "1a8f4b2cce958275c85ff1d06308b2a19de33a75"
+    ],
+    "governedTreeSha": "4f277d4264a18ca2619aa951a4b2910ce8aecbc0",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0139.json",
+      ".atm/history/task-events/TASK-AAO-0139/2026-06-11T06-39-27-253Z-import-be370efed333.json",
+      ".atm/history/task-events/TASK-AAO-0139/2026-06-11T06-39-36-287Z-reserve-2ad4ff01068f.json",
+      ".atm/history/task-events/TASK-AAO-0139/2026-06-11T06-39-36-291Z-promote-39c9363321e2.json",
+      ".atm/history/task-events/TASK-AAO-0139/2026-06-11T06-39-36-315Z-claim-41978b169721.json",
+      ".atm/history/tasks/TASK-AAO-0139.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/task-id-casing.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-id-casing.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6de41a03e4eb341fd92e2c61f57041d9851e38368d6d2a6ebaeb576e70cb1fbb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed246a28261d81fb2767c1a324e59e50bce766941fcc4435b33cf563d3224778",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:487f5490368a670d3cfd796473f8c4e85f5ce9cf899a751231f33885da01c93d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/task-id-casing.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-11T06:56:49.908Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0139-task-id-casing-governance.task.md",
+      ".atm/history/evidence/TASK-AAO-0139.*",
+      ".atm/history/task-events/TASK-AAO-0139/**",
+      ".atm/history/tasks/TASK-AAO-0139.json",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/task-id-casing.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "tests/cli/task-id-casing.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0139.json",
+  "closedAt": "2026-06-11T06:56:49.909Z",
+  "closedByActor": "cursor-aao139",
+  "sessionId": "session-20260611063936-cursor-aao139-TASK-AAO-0139-a0f276279b",
+  "attestation": null
+}

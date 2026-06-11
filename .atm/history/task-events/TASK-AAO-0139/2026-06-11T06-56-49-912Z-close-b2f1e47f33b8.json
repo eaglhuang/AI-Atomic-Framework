@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-11T06-56-49-912Z-close-b2f1e47f33b8",
+  "taskId": "TASK-AAO-0139",
+  "action": "close",
+  "actorId": "cursor-aao139",
+  "sessionId": "session-20260611063936-cursor-aao139-TASK-AAO-0139-a0f276279b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0139.json",
+  "taskSha256": "sha256:1ed36d70dc056e3505b072ac9347a8a919a790f9602c0b142a7afc0c547c3f6e",
+  "createdAt": "2026-06-11T06:56:49.912Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0139 --actor cursor-aao139 --status done --historical-delivery c8ad9d5b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260611063936-cursor-aao139-TASK-AAO-0139-a0f276279b",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0139.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/task-id-casing.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-11T06:56:49.908Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0139-task-id-casing-governance.task.md",
+        ".atm/history/evidence/TASK-AAO-0139.*",
+        ".atm/history/task-events/TASK-AAO-0139/**",
+        ".atm/history/tasks/TASK-AAO-0139.json",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "tests/cli/task-id-casing.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "tests/cli/task-id-casing.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
