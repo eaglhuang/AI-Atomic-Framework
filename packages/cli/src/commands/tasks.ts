@@ -90,6 +90,7 @@ import {
   normalizeOptionalString,
   normalizeYamlScalar,
   normalizeTaskId,
+  taskIdsEqual,
   parseMarkdownTableCells,
   parseYamlList,
   validateDeliverablesList,
@@ -4513,7 +4514,7 @@ function verifyPersistedTaskDocument(input: {
   }
   const persistedTaskId = normalizeTaskDocumentId(persisted, path.basename(input.taskPath, '.json'));
   const persistedStatus = typeof persisted.status === 'string' ? persisted.status : null;
-  if (persistedTaskId !== input.taskId || persistedStatus !== input.expectedStatus) {
+  if (!taskIdsEqual(persistedTaskId, input.taskId) || persistedStatus !== input.expectedStatus) {
     throw new CliError('ATM_TASK_LEDGER_WRITE_MISMATCH', `Task ${input.taskId} persisted an unexpected state after ${input.action}.`, {
       details: {
         taskId: input.taskId,

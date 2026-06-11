@@ -32,6 +32,11 @@ import {
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
 import { runContextMapAdvisor } from './hook/context-map-advisor.ts';
 import { readBrokerLifecycleState } from '../../../core/src/broker/lifecycle.ts';
+import {
+  findCaseInsensitiveRelativePath,
+  taskIdsEqual,
+  taskIdsInclude
+} from './tasks/task-import-validators.ts';
 
 export const hookContractVersion = 'atm.integration-hooks/v1' as const;
 export const hookProvider = 'atm-framework-development-hooks/v1' as const;
@@ -2278,7 +2283,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]) {
+export function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly string[]) {
   const protectedFiles = stagedFiles.filter((entry) => isProtectedAtmManagedStatePath(entry) || isStaticEvidenceArtifactPath(entry));
   const findings: ProtectedStateFinding[] = [];
   const activeBatches = listActiveBatchRuns(cwd);
@@ -2356,7 +2361,10 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
       const taskId = typeof task?.workItemId === 'string' ? task.workItemId : path.basename(normalized, '.json');
       const lastTransitionId = typeof task?.lastTransitionId === 'string' ? task.lastTransitionId : '';
       const expectedEventPath = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
-      if (!lastTransitionId || !stagedSet.has(expectedEventPath)) {
+      const stagedEventPath = lastTransitionId
+        ? findCaseInsensitiveRelativePath(stagedSet, expectedEventPath)
+        : null;
+      if (!lastTransitionId || !stagedEventPath) {
         findings.push({
           file: normalized,
           reason: 'task-file-missing-transition',
@@ -2364,12 +2372,13 @@ function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readonly stri
         });
         continue;
       }
-      const event = readJsonFile(path.join(cwd, expectedEventPath));
+      const event = readJsonFile(path.join(cwd, stagedEventPath));
       const expectedSha = sha256(readFileSync(absolutePath));
-      const owningBatch = activeBatches.find((batchRun) => batchRun.taskIds.includes(taskId)) ?? null;
+      const owningBatch = activeBatches.find((batchRun) => taskIdsInclude(batchRun.taskIds, taskId)) ?? null;
       if (event?.schemaId !== 'atm.taskTransition.v1'
         || event?.transitionId !== lastTransitionId
-        || event?.taskId !== taskId
+        || typeof event?.taskId !== 'string'
+        || !taskIdsEqual(event.taskId, taskId)
         || event?.taskPath !== normalized
         || event?.taskSha256 !== expectedSha
         || typeof event?.command !== 'string'
