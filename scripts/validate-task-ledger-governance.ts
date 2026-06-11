@@ -24,6 +24,7 @@ import {
 import { loadProfile, buildDelegationContract, resolveOpenerMode } from '../packages/cli/src/commands/taskflow/profile-loader.ts';
 import { resolveNextDefaultOutputPath } from '../packages/cli/src/commands/shared.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
+import { runTaskflow } from '../packages/cli/src/commands/taskflow.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
 import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
@@ -1425,9 +1426,10 @@ try {
   await validateTaskImportRefreshClaimPreservation(tempRoot);
   await validateTaskImportDispatchMetadataPreservation(tempRoot);
   await validateTaskResidueClassification(tempRoot);
+  await validateTaskflowCloseOrchestration(tempRoot);
 
   if (!process.exitCode) {
-    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, TASK-AAO-0039 planning-only ledger audit boundary covered, and TASK-AAO-0137 write-path atomicity + operator diagnostics covered)`);
+    console.log(`[task-ledger-governance:${mode}] ok (dual ledger modes, visible mirrors, CLI transitions, disabled ledger, AI manual task rejection, legacy baseline migration, TASK-AAO-0038 import contract fidelity, TASK-AAO-0050 stale framework lock classification, TEST-TASK fixture id clarity, TASK-AAO-0053 batch framework delivery window, TASK-AAO-0055 historical done task reconcile closure sync, TASK-AAO-0056 deliver-and-close macro end-to-end, TASK-AAO-0057 close-gate scoped diff isolation, TASK-AAO-0061 task-ledger-readers atomization verified, TASK-AAO-0039 planning-only ledger audit boundary covered, TASK-AAO-0137 write-path atomicity + operator diagnostics covered, and TASK-AAO-0140 taskflow close closeback orchestration covered)`);
   }
 } finally {
   if (previousGitCeilingDirectories === undefined) {
@@ -1889,4 +1891,39 @@ async function validateTaskResidueClassification(tempRoot: string) {
   const ambiguousResidue = ambiguousStatus.evidence.residueClassification as any;
   assert(ambiguousResidue.bucket === 'ambiguous-manual-review', 'ambiguous-manual-review bucket must be reported');
   assert(String(ambiguousResidue.nextCommand).includes('tasks status'), 'ambiguous-manual-review next command must point to status');
+}
+
+async function validateTaskflowCloseOrchestration(tempRoot: string) {
+  const repo = makeHostRepo(tempRoot, 'taskflow-close-orchestration');
+  initGitRepo(repo);
+  const governedProfilePath = path.join(root, 'fixtures/taskflow-profile/governed-invocable.profile.json');
+
+  const taskId = 'TASK-CLOSE-ORCH-0001';
+  const planRelativePath = 'docs/tasks/TASK-CLOSE-ORCH-0001.task.md';
+  const planPath = path.join(repo, planRelativePath);
+  mkdirSync(path.dirname(planPath), { recursive: true });
+  writeFileSync(planPath, [
+    '---',
+    `task_id: ${taskId}`,
+    'title: "Taskflow close orchestration fixture"',
+    'status: running',
+    '---',
+    `# ${taskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: 'Taskflow close orchestration fixture',
+    status: 'running',
+    related_plan: planRelativePath,
+    source: { planPath: planRelativePath, sectionTitle: taskId, headingLine: 1, hash: 'taskflow-close' }
+  });
+
+  const dryRun = await runTaskflow(['close', '--cwd', repo, '--task', taskId, '--profile', governedProfilePath, '--json']) as any;
+  assert(dryRun.ok === true, 'taskflow close dry-run must succeed');
+  assert(dryRun.schemaId === 'atm.taskflowCloseResult.v1', 'taskflow close must return atm.taskflowCloseResult.v1');
+  assert(dryRun.evidence.closeMode === 'normal-close', 'taskflow close dry-run must report normal-close');
+  assert(dryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'taskflow close must route to tasks-close backend');
+  assert(dryRun.evidence.closebackPlan.writerBoundary.generationSurface === 'tasks-new', 'taskflow close must not add a second generator');
 }

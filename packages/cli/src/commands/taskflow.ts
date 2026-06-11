@@ -1,7 +1,19 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.ts';
-import { generateTaskCard, runTasks, runTasksRosterUpdate } from './tasks.ts';
+import {
+  buildResidueDiagnosisEvidence,
+  generateTaskCard,
+  loadTaskDocumentOrThrow,
+  runTasks,
+  runTasksRosterUpdate
+} from './tasks.ts';
+import {
+  buildCloseBackendArgv,
+  buildClosebackPlan,
+  buildTaskflowCloseDiagnostics,
+  resolveCloseWriteSupport
+} from './taskflow/close-orchestration.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 import {
   buildDelegationContract,
@@ -135,6 +147,190 @@ function buildOrchestrationPlan(input: {
   };
 }
 
+function collectHistoricalDeliveryRefs(parsed: ReturnType<typeof parseArgsForCommand>): string[] {
+  const refs: string[] = [];
+  const historicalDelivery = parsed.options.historicalDelivery;
+  if (Array.isArray(historicalDelivery)) {
+    refs.push(...historicalDelivery.map(String));
+  } else if (typeof historicalDelivery === 'string' && historicalDelivery.trim()) {
+    refs.push(historicalDelivery);
+  }
+  const deliveryCommit = parsed.options.deliveryCommit ? String(parsed.options.deliveryCommit) : null;
+  if (deliveryCommit) {
+    refs.push(deliveryCommit);
+  }
+  return [...new Set(refs)];
+}
+
+async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, cwd: string) {
+  const taskId = parsed.options.task ? String(parsed.options.task) : '';
+  const actorId = parsed.options.actor ? String(parsed.options.actor) : '';
+  const writeRequested = !!parsed.options.write;
+  const profilePath = parsed.options.profile ? String(parsed.options.profile) : null;
+  const historicalDeliveryRefs = collectHistoricalDeliveryRefs(parsed);
+
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'taskflow close requires --task <work-item-id>.', { exitCode: 2 });
+  }
+
+  let profileData: TaskflowProfileV1 | null = null;
+  if (profilePath) {
+    profileData = loadProfile(profilePath);
+  }
+  const delegationContract = buildDelegationContract(profileData);
+  const { taskDocument } = loadTaskDocumentOrThrow(cwd, taskId);
+  const diagnosis = buildResidueDiagnosisEvidence(cwd, taskId, taskDocument);
+  const closebackPlan = buildClosebackPlan({
+    taskId,
+    actorId: actorId || '<actor>',
+    historicalDeliveryRefs,
+    delegationContract,
+    diagnosis: {
+      bucket: diagnosis.bucket,
+      truth: diagnosis.truth,
+      residue: diagnosis.residue,
+      reason: diagnosis.reason,
+      nextCommand: diagnosis.nextCommand,
+      triangulation: diagnosis.triangulation
+    }
+  });
+  const diagnostics = buildTaskflowCloseDiagnostics({
+    closeMode: closebackPlan.closeMode,
+    writeRequested,
+    actorSupplied: actorId.length > 0,
+    taskIdSupplied: taskId.length > 0
+  });
+  const writeSupport = resolveCloseWriteSupport({
+    writeRequested,
+    closeMode: closebackPlan.closeMode,
+    actorSupplied: actorId.length > 0,
+    taskIdSupplied: taskId.length > 0,
+    historicalDeliveryGateRequired: closebackPlan.historicalDeliveryGate.required,
+    historicalDeliverySupplied: historicalDeliveryRefs.length > 0
+  });
+
+  if (writeRequested && !writeSupport.allowed) {
+    throw new CliError(
+      closebackPlan.closeMode === 'ambiguous-manual-review'
+        ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE'
+        : 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED',
+      writeSupport.reason,
+      {
+        exitCode: 1,
+        details: {
+          closeMode: closebackPlan.closeMode,
+          writeSupport,
+          diagnostics,
+          closebackPlan,
+          recommendedCommand: diagnosis.nextCommand
+        }
+      }
+    );
+  }
+
+  if (writeRequested && writeSupport.allowed) {
+    const backendArgv = buildCloseBackendArgv({
+      cwd,
+      taskId,
+      actorId,
+      backendSurface: closebackPlan.backendSurface,
+      historicalDeliveryRefs,
+      planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+      forceImport: diagnosis.bucket === 'stale-import'
+    });
+    const backendResult = await runTasks(backendArgv);
+    let rosterCloseback: Record<string, unknown> | null = null;
+    if (
+      closebackPlan.writerBoundary.rosterClosebackCommand
+      && closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
+      && closebackPlan.writerBoundary.rosterIndexPath
+      && closebackPlan.writerBoundary.planningMirrorPath
+    ) {
+      rosterCloseback = {
+        mode: 'inline',
+        command: closebackPlan.writerBoundary.rosterClosebackCommand,
+        result: await runTasksRosterUpdate([
+          '--cwd', cwd,
+          '--index', closebackPlan.writerBoundary.rosterIndexPath,
+          '--from', closebackPlan.writerBoundary.planningMirrorPath
+        ])
+      };
+    } else if (
+      closebackPlan.writerBoundary.rosterClosebackCommand
+      && closebackPlan.writerBoundary.rosterSyncPolicy === 'follow-up-command'
+    ) {
+      rosterCloseback = {
+        mode: 'follow-up-command',
+        command: closebackPlan.writerBoundary.rosterClosebackCommand
+      };
+    }
+
+    return {
+      ...makeResult({
+        ok: backendResult.ok,
+        command: 'taskflow close',
+        cwd,
+        mode: 'write',
+        messages: [
+          message(
+            backendResult.ok ? 'info' : 'error',
+            backendResult.ok ? 'ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED' : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED',
+            backendResult.ok
+              ? `taskflow close orchestrated ${closebackPlan.backendSurface} for ${taskId}.`
+              : `taskflow close write failed for ${taskId}.`,
+            { closeMode: closebackPlan.closeMode, backendSurface: closebackPlan.backendSurface }
+          )
+        ],
+        evidence: {
+          closeMode: closebackPlan.closeMode,
+          writeSupport,
+          delegationContract,
+          diagnostics,
+          closebackPlan,
+          backendResult,
+          rosterCloseback,
+          residueDiagnosis: diagnosis,
+          ...(profileData ? { profile: profileData } : {})
+        }
+      }),
+      schemaId: 'atm.taskflowCloseResult.v1',
+      writeEnabled: true
+    };
+  }
+
+  return {
+    ...makeResult({
+      ok: true,
+      command: 'taskflow close',
+      cwd,
+      mode: 'dry-run',
+      messages: [
+        message(
+          closebackPlan.closeMode === 'ambiguous-manual-review' ? 'warn' : 'info',
+          closebackPlan.closeMode === 'ambiguous-manual-review'
+            ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE'
+            : 'ATM_TASKFLOW_CLOSE_ORCHESTRATION_READY',
+          closebackPlan.closeMode === 'ambiguous-manual-review'
+            ? 'taskflow close dry-run blocked on ambiguous residue; operator review required.'
+            : `taskflow close dry-run plan is ready (${closebackPlan.closeMode}).`,
+          { taskId, closeMode: closebackPlan.closeMode }
+        )
+      ],
+      evidence: {
+        closeMode: closebackPlan.closeMode,
+        writeSupport,
+        delegationContract,
+        diagnostics,
+        closebackPlan,
+        residueDiagnosis: diagnosis,
+        ...(profileData ? { profile: profileData } : {})
+      }
+    }),
+    schemaId: 'atm.taskflowCloseResult.v1',
+    writeEnabled: false
+  };
+}
+
 export async function runTaskflow(argv: string[] = []) {
   const spec = getCommandSpec('taskflow');
   if (!spec) {
@@ -144,8 +340,11 @@ export async function runTaskflow(argv: string[] = []) {
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
 
   const action = parsed.positional[0];
+  if (action === 'close') {
+    return runTaskflowClose(parsed, cwd);
+  }
   if (action !== 'open') {
-    throw new CliError('ATM_CLI_USAGE', `Unknown taskflow action: ${action}. Only "open" is supported.`, { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', `Unknown taskflow action: ${action}. Supported actions: open, close.`, { exitCode: 2 });
   }
 
   const writeRequested = !!parsed.options.write;
