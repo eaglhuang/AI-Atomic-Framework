@@ -15,22 +15,49 @@
       "workspace:packages/*"
     ]
   },
-  "targetCommit": "1ae2b5b3a9b725cb4547bcda4e5a6521c4d13f24",
-  "governedTreeSha": "ca22a312e02986e5f2ff3ee78034d2b49b2b4603",
+  "targetCommit": "eda4e41268dbfcd9c05ed5f89b5038df3869d3b4",
+  "governedTreeSha": "aed8ed88ed2991217a5accd59e3b85998102b711",
   "targetCommitDelta": {
-    "currentCommitSha": "1ae2b5b3a9b725cb4547bcda4e5a6521c4d13f24",
+    "currentCommitSha": "189e59292884c7e819dc75d63e3a1a7061cf34bf",
     "parentCommitShas": [
-      "1ae2b5b3a9b725cb4547bcda4e5a6521c4d13f24"
+      "eda4e41268dbfcd9c05ed5f89b5038df3869d3b4"
     ],
-    "governedTreeSha": "ca22a312e02986e5f2ff3ee78034d2b49b2b4603",
+    "governedTreeSha": "aed8ed88ed2991217a5accd59e3b85998102b711",
     "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0007.closure-packet.json",
+      ".atm/history/evidence/TASK-TEAM-0007.json",
+      ".atm/history/evidence/TASK-TEAM-0008.closure-packet.json",
       ".atm/history/evidence/TASK-TEAM-0008.json",
+      ".atm/history/task-events/TASK-CID-0024/2026-06-10T15-20-32-033Z-import-3964882f81e6.json",
+      ".atm/history/task-events/TASK-CID-0024/2026-06-10T16-10-36-730Z-reserve-178f01fd80d6.json",
+      ".atm/history/task-events/TASK-CID-0024/2026-06-10T16-10-36-734Z-promote-10163d4ea97a.json",
+      ".atm/history/task-events/TASK-CID-0024/2026-06-10T16-10-36-772Z-claim-96834aeaec3f.json",
+      ".atm/history/task-events/TASK-TEAM-0007/2026-06-10T12-28-06-130Z-close-7886253c267a.json",
       ".atm/history/task-events/TASK-TEAM-0008/2026-06-10T12-20-08-802Z-import-b2afe6afeff6.json",
+      ".atm/history/task-events/TASK-TEAM-0008/2026-06-10T15-24-54-448Z-close-6f9809d957be.json",
+      ".atm/history/tasks/TASK-CID-0024.json",
+      ".atm/history/tasks/TASK-TEAM-0007.json",
       ".atm/history/tasks/TASK-TEAM-0008.json",
-      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
-      "packages/cli/src/commands/command-specs/team.spec.ts",
-      "packages/cli/src/commands/team.ts",
+      "docs/tasks/TASK-APO-0031-historical-ledger-restore-standard-flow.task.md",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/docs/ADAPTER_GUIDE.md",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers.ts",
       "release/atm-root-drop/packages/language-js/dist/language-js-adapter.d.ts",
       "release/atm-root-drop/packages/language-js/dist/language-js-adapter.js",
       "release/atm-root-drop/packages/language-js/src/language-js-adapter.ts",
@@ -44,7 +71,14 @@
       "release/atm-root-drop/packages/plugin-sdk/dist/index.js",
       "release/atm-root-drop/packages/plugin-sdk/src/index.ts",
       "release/atm-root-drop/release-manifest.json",
-      "scripts/validate-team-agents.ts"
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement.ts",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-task-direction-governance.ts",
+      "release/atm-root-drop/scripts/validate-task-ledger-governance.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-direction-governance.ts",
+      "scripts/validate-task-ledger-governance.ts"
     ]
   },
   "closedByCommand": "atm tasks close",
@@ -112,5 +146,13 @@
     "reconciledAt": "2026-06-10T15:24:52.973Z",
     "reconciledByActor": "002",
     "reason": "Historical reconcile sync against commit 3c7df06717ce8a268989758b54ad1c3b24eb7378"
+  },
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-06-12T03:43:42.666Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "189e59292884c7e819dc75d63e3a1a7061cf34bf",
+    "repairedTargetCommitSha": "eda4e41268dbfcd9c05ed5f89b5038df3869d3b4",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
   }
 }
