@@ -9,3 +9,5 @@ export * from './apply-evidence.ts';
 export * from './steward.ts';
 export * from './team-lane.ts';
 export * from './lifecycle.ts';
+export * from './orphan-cleanup.ts';
+export * from './recovery.ts';
