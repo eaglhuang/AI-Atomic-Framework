@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import type { WriteBrokerRegistryDocument, WriteIntent, ActiveWriteIntent } from './types.ts';
+import type { ActiveWriteIntent, WriteBrokerRegistryDocument, WriteIntent } from './types.ts';
 
 export interface VirtualAtomInUseRecord {
   readonly virtualAtomId: string;
@@ -62,10 +62,11 @@ export function registerIntent(
   lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked',
   ttlSeconds = 1800
 ): WriteBrokerRegistryDocument {
-  // 先把該 taskId 既有的 intents 移除，避免重複
-  const cleanedIntents = doc.activeIntents.filter(i => i.taskId !== intent.taskId);
-
-  const expiresAt = new Date(Date.now() + ttlSeconds * 1000).toISOString();
+  const leaseSeconds = resolveLeaseSeconds(intent, ttlSeconds);
+  const leaseMaxSeconds = resolveLeaseMaxSeconds(intent, ttlSeconds);
+  const cleanedIntents = doc.activeIntents.filter((entry) => entry.taskId !== intent.taskId);
+  const now = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + leaseSeconds * 1000).toISOString();
 
   const newActive: ActiveWriteIntent = {
     intentId: `intent-${Date.now()}`,
@@ -75,8 +76,8 @@ export function registerIntent(
     baseCommit: intent.baseCommit,
     resourceKeys: {
       files: intent.targetFiles,
-      atomIds: intent.atomRefs.map(r => r.atomId),
-      atomCids: intent.atomRefs.map(r => r.atomCid),
+      atomIds: intent.atomRefs.map((ref) => ref.atomId),
+      atomCids: intent.atomRefs.map((ref) => ref.atomCid),
       atomRanges: intent.atomRefs
         .map((ref) => ({
           filePath: ref.sourceRange?.filePath ?? '',
@@ -92,6 +93,9 @@ export function registerIntent(
       artifacts: intent.sharedSurfaces.artifacts
     },
     leaseEpoch: Date.now(),
+    leaseSeconds,
+    leaseMaxSeconds,
+    heartbeatAt: now,
     lane,
     expiresAt
   };
@@ -102,13 +106,43 @@ export function registerIntent(
   };
 }
 
+export function renewIntentLease(
+  doc: WriteBrokerRegistryDocument,
+  taskId: string,
+  actorId: string,
+  ttlSeconds = 1800
+): WriteBrokerRegistryDocument {
+  const target = doc.activeIntents.find((intent) => intent.taskId === taskId && intent.actorId === actorId);
+  if (!target) {
+    return doc;
+  }
+
+  const leaseSeconds = Math.min(Math.max(1, Math.floor(ttlSeconds)), target.leaseMaxSeconds);
+  const now = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + leaseSeconds * 1000).toISOString();
+
+  return {
+    ...doc,
+    activeIntents: doc.activeIntents.map((intent) => {
+      if (intent.intentId !== target.intentId) return intent;
+      return {
+        ...intent,
+        leaseEpoch: Date.now(),
+        leaseSeconds,
+        heartbeatAt: now,
+        expiresAt
+      };
+    })
+  };
+}
+
 export function releaseTask(
   doc: WriteBrokerRegistryDocument,
   taskId: string
 ): WriteBrokerRegistryDocument {
   return {
     ...doc,
-    activeIntents: doc.activeIntents.filter(i => i.taskId !== taskId)
+    activeIntents: doc.activeIntents.filter((entry) => entry.taskId !== taskId)
   };
 }
 
@@ -116,9 +150,9 @@ export function cleanupStale(
   doc: WriteBrokerRegistryDocument
 ): WriteBrokerRegistryDocument {
   const now = Date.now();
-  const validIntents = doc.activeIntents.filter(i => {
-    if (!i.expiresAt) return true;
-    const exp = Date.parse(i.expiresAt);
+  const validIntents = doc.activeIntents.filter((entry) => {
+    if (!entry.expiresAt) return true;
+    const exp = Date.parse(entry.expiresAt);
     return exp > now;
   });
 
@@ -171,4 +205,17 @@ export function buildVirtualAtomInUseRegistry(doc: WriteBrokerRegistryDocument):
     activeVirtualAtoms,
     activeIntents: doc.activeIntents
   };
+}
+
+function resolveLeaseSeconds(intent: WriteIntent, ttlSeconds: number): number {
+  const requested = Math.max(1, Math.floor(intent.leaseBounds?.requestedSeconds ?? ttlSeconds));
+  const maxSeconds = resolveLeaseMaxSeconds(intent, ttlSeconds);
+  if (requested > maxSeconds) {
+    throw new RangeError(`Requested leaseSeconds ${requested} exceeds leaseMaxSeconds ${maxSeconds}.`);
+  }
+  return requested;
+}
+
+function resolveLeaseMaxSeconds(intent: WriteIntent, ttlSeconds: number): number {
+  return Math.max(1, Math.floor(intent.leaseBounds?.maxSeconds ?? ttlSeconds));
 }

@@ -54,6 +54,12 @@ export interface WriteIntent {
   readonly readAtoms?: readonly WriteIntentAtomRef[];
   readonly sharedSurfaces: SharedSurfacesRecord;
   readonly requestedLane: 'auto' | 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
+  readonly leaseBounds?: LeaseBounds;
+}
+
+export interface LeaseBounds {
+  readonly requestedSeconds: number;
+  readonly maxSeconds: number;
 }
 
 export interface ProposalAtomRef {
@@ -98,6 +104,7 @@ export interface BrokerDecision {
   readonly verdict: 'parallel-safe' | 'needs-physical-split' | 'blocked-cid-conflict' | 'blocked-shared-surface' | 'serial' | 'blocked-active-lease';
   readonly lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
   readonly conflicts: readonly ConflictDetail[];
+  readonly conflictMatrix?: BrokerConflictMatrix;
   readonly decompositionRequest?: DecompositionRequest | null;
   readonly stewardId?: string | null;
   readonly applyMethod: 'patch-apply' | 'ast-rewrite' | 'git-three-way-fallback' | 'steward-authored-final-patch' | 'none';
@@ -168,6 +175,9 @@ export interface ActiveWriteIntent {
     }[];
   };
   readonly leaseEpoch: number;
+  readonly leaseSeconds: number;
+  readonly leaseMaxSeconds: number;
+  readonly heartbeatAt: string;
   readonly lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
   readonly expiresAt?: string;
 }
@@ -178,4 +188,21 @@ export interface WriteBrokerRegistryDocument {
   readonly repoId: string;
   readonly workspaceId: string;
   readonly activeIntents: readonly ActiveWriteIntent[];
+}
+
+export type BrokerArbitrationVerdict = 'allow' | 'watch' | 'freeze' | 'takeover';
+
+export interface BrokerConflictClassResult {
+  readonly kind: 'shared-surface' | 'cid' | 'read-set' | 'file-range' | 'intent-shape' | 'lease';
+  readonly detail: string;
+  readonly blockingTask: string;
+}
+
+export interface BrokerConflictMatrix {
+  readonly schemaId: 'atm.brokerConflictMatrix.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly taskId: string;
+  readonly arbitrationVerdict: BrokerArbitrationVerdict;
+  readonly conflicts: readonly BrokerConflictClassResult[];
 }

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { loadRegistry, releaseTask, cleanupStale, saveRegistry } from './registry.ts';
+import { loadRegistry, releaseTask, cleanupStale, saveRegistry, renewIntentLease } from './registry.ts';
 import { DEFAULT_BROKER_REGISTRY_RELATIVE_PATH } from './team-lane.ts';
 import type { WriteBrokerRegistryDocument, ActiveWriteIntent } from './types.ts';
 
@@ -65,6 +65,7 @@ export function recordBrokerClaimIntent(input: {
   readonly lane?: ActiveWriteIntent['lane'];
   readonly targetFiles?: readonly string[];
   readonly ttlSeconds?: number;
+  readonly leaseMaxSeconds?: number;
 }): BrokerLifecycleState {
   const registryPath = resolveBrokerRegistryPath(input.cwd);
   const registry = cleanupStale(loadRegistry(registryPath));
@@ -90,6 +91,9 @@ export function recordBrokerClaimIntent(input: {
           artifacts: []
         },
         leaseEpoch: Date.now(),
+        leaseSeconds: Math.max(1, Math.floor(input.ttlSeconds ?? 1800)),
+        leaseMaxSeconds: Math.max(1, Math.floor(input.leaseMaxSeconds ?? input.ttlSeconds ?? 1800)),
+        heartbeatAt: now,
         lane: input.lane ?? 'direct-brokered',
         expiresAt: new Date(Date.now() + (input.ttlSeconds ?? 1800) * 1000).toISOString()
       }
@@ -110,6 +114,23 @@ export function clearBrokerRuntimeStateForTask(input: {
   const registryPath = resolveBrokerRegistryPath(input.cwd);
   const registry = cleanupStale(loadRegistry(registryPath));
   const nextRegistry = releaseTask(registry, input.taskId);
+  saveRegistry(registryPath, nextRegistry);
+  return {
+    registryPath,
+    registry: nextRegistry,
+    activeIntents: nextRegistry.activeIntents
+  };
+}
+
+export function renewBrokerClaimIntent(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly ttlSeconds?: number;
+}): BrokerLifecycleState {
+  const registryPath = resolveBrokerRegistryPath(input.cwd);
+  const registry = cleanupStale(loadRegistry(registryPath));
+  const nextRegistry = renewIntentLease(registry, input.taskId, input.actorId, input.ttlSeconds ?? 1800);
   saveRegistry(registryPath, nextRegistry);
   return {
     registryPath,

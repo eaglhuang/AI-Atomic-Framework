@@ -38,6 +38,9 @@ function toActiveIntent(intent: WriteIntent, intentId: string): ActiveWriteInten
       artifacts: intent.sharedSurfaces.artifacts
     },
     leaseEpoch: 1,
+    leaseSeconds: 1800,
+    leaseMaxSeconds: 1800,
+    heartbeatAt: '2026-01-01T00:00:00.000Z',
     lane: 'direct-brokered'
   };
 }
