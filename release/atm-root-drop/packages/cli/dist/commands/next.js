@@ -18,7 +18,7 @@ import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue
 import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, writeBatchRun, writeQuickfixLock } from './work-channels.js';
 import { decideActiveBatchClaimTask } from './next-active-batch.js';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
-import { runTasks, findTaskClaimDependencyBlockers } from './tasks.js';
+import { runTasks, findTaskClaimDependencyBlockers } from './tasks/public-surface.js';
 import { taskPathFor } from './tasks/task-file-io-helpers.js';
 import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText, normalizeTaskIntent, normalizeOptionalTaskPath, readStringArray, splitListValue } from './next/intent-normalizers.js';
 import { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards } from './next/route-predicates.js';
@@ -433,17 +433,22 @@ async function claimNextImportedTask(input) {
     }
     if (selectedTaskDependencyBlockers.length > 0) {
         const firstBlocker = selectedTaskDependencyBlockers[0];
-        const requiredCmd = firstBlocker.status === 'incomplete-closeout'
-            ? `node atm.mjs tasks finalize diagnose --task ${firstBlocker.taskId} --json`
-            : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`;
+        const requiredCmd = firstBlocker.requiredCommand
+            ?? (firstBlocker.status === 'incomplete-closeout' || firstBlocker.status === 'source-done-governance-incomplete'
+                ? `node atm.mjs tasks status --task ${firstBlocker.taskId} --residue --json`
+                : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`);
+        const blockerText = firstBlocker.status === 'source-done-governance-incomplete'
+            ? `Claim blocked: prerequisite ${firstBlocker.taskId} is source-done but not governably closed.`
+            : `Claim blocked until prerequisite task(s) close for ${selectedTask?.workItemId ?? 'the selected task'}.`;
         return makeResult({
             ok: false,
             command: 'next',
             cwd: input.cwd,
-            messages: [message('error', 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', `Claim blocked until prerequisite task(s) close for ${selectedTask?.workItemId ?? 'the selected task'}.`, {
+            messages: [message('error', 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', blockerText, {
                     taskId: selectedTask?.workItemId ?? null,
                     blockingTaskIds: selectedTaskDependencyBlockers.map((b) => b.taskId),
-                    requiredCommand: requiredCmd
+                    requiredCommand: requiredCmd,
+                    dependencyStatuses: selectedTaskDependencyBlockers
                 })],
             evidence: {
                 taskIntent: input.taskIntent,

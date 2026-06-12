@@ -57,7 +57,7 @@ import {
 } from './work-channels.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
-import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './tasks.ts';
+import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './tasks/public-surface.ts';
 import { taskPathFor } from './tasks/task-file-io-helpers.ts';
 import {
   parseMarkdownFrontmatter,

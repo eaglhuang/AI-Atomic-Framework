@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
-import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from './tasks.js';
+import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from './tasks/public-surface.js';
 import { buildCloseBackendArgv, buildClosebackPlan, buildTaskflowCloseDiagnostics, resolveCloseWriteSupport } from './taskflow/close-orchestration.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';

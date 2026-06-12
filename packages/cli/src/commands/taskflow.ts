@@ -7,7 +7,7 @@ import {
   loadTaskDocumentOrThrow,
   runTasks,
   runTasksRosterUpdate
-} from './tasks.ts';
+} from './tasks/public-surface.ts';
 import {
   buildCloseBackendArgv,
   buildClosebackPlan,

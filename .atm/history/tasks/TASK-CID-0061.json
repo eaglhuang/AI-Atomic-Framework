@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0061",
+  "title": "Tasks command surface invariant hard gate",
+  "status": "running",
+  "milestone": "M12",
+  "dependencies": [
+    "TASK-CID-0060"
+  ],
+  "acceptance": [
+    "If `tasks.ts` loses a required export or helper, ATM should fail before a worker mistakes the repo as healthy.",
+    "If a caller wants to depend on `tasks.ts` behavior, it should depend on the declared public surface, not on ad hoc internal helpers.",
+    "If release-side command surface and source-side command surface diverge, the validator must report the drift explicitly.",
+    "The output must identify which surface contract broke and which downstream surface depended on it."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/public-surface.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-tasks-command-surface.ts",
+    "docs/reports/tasks-command-surface-contract.md",
+    "package.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/public-surface.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-tasks-command-surface.ts",
+    "docs/reports/tasks-command-surface-contract.md",
+    "package.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-tasks-command-surface.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Broad module extraction from tasks.ts",
+    "Mailbox transport redesign",
+    "Rewriting unrelated broker workflows"
+  ],
+  "nonGoals": [
+    "Do not rely on build failure alone as the only detection path.",
+    "Do not weaken existing closeout or historical-delivery gates to make the validator pass."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the new hard gate if it incorrectly rejects legitimate command-surface evolution, then tighten the invariant list and reland.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-command-surface-invariant-map",
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "docs/reports/tasks-command-surface-contract.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0061-tasks-command-surface-invariant-hard-gate.task.md",
+    "sectionTitle": "TASK-CID-0061",
+    "headingLine": 61,
+    "hash": "37ee71cecf0ed3c6"
+  },
+  "importedAt": "2026-06-12T14:25:51.702Z",
+  "claim": {
+    "actorId": "007",
+    "leaseId": "lease-45147bf7d9cb",
+    "claimedAt": "2026-06-12T14:25:46.583Z",
+    "heartbeatAt": "2026-06-12T14:25:46.583Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0061.json",
+      "docs/reports/tasks-command-surface-contract.md",
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-tasks-command-surface.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "owner": "007",
+  "startedAt": "2026-06-12T14:25:46.583Z",
+  "startedBySessionId": "session-20260612142546-007-TASK-CID-0061-63643ba950",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0061",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0061.*",
+      ".atm/history/task-events/TASK-CID-0061/**",
+      ".atm/history/tasks/TASK-CID-0061.json",
+      "docs/reports/tasks-command-surface-contract.md",
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-tasks-command-surface.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8f51f0b28119db650aa28065cd2927536d42b3105f39980dd8bcb20ead79b161",
+    "actorId": "007",
+    "createdAt": "2026-06-12T14:25:46.607Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-06-12T14-25-51-706Z-import-a06fadc353b7",
+  "lastTransitionAt": "2026-06-12T14:25:51.706Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

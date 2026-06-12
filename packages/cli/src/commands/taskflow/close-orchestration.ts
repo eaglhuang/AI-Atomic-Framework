@@ -1,5 +1,5 @@
 import type { TaskflowDelegationContract } from './profile-loader.ts';
-import type { TaskResidueBucket, TaskResidueClassification } from '../tasks.ts';
+import type { TaskResidueBucket, TaskResidueClassification } from '../tasks/public-surface.ts';
 import { CliError } from '../shared.ts';
 
 export type TaskflowCloseMode =
