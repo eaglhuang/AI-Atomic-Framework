@@ -596,13 +596,15 @@ function classifyTaskResidue(input: {
     };
   }
 
-  if (liveDone && !planningDone && input.planningFrontmatter.status !== null) {
+  if (liveDone && !planningDone && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
+    const isCrossRepo = normalizeOptionalString(input.taskDocument.planningRepo ?? input.taskDocument.planning_repo)
+      !== normalizeOptionalString(input.taskDocument.targetRepo ?? input.taskDocument.target_repo);
     return {
-      bucket: mirrorPath ? 'planning-mirror-only' : 'stale-import',
+      bucket: (mirrorPath && !isCrossRepo) ? 'planning-mirror-only' : 'stale-import',
       truth: 'live ledger is done, but the planning mirror has not converged',
-      residue: mirrorPath ? 'Only the planning mirror remains to be refreshed or retired.' : 'The imported ledger is ahead of the planning mirror.',
+      residue: (mirrorPath && !isCrossRepo) ? 'Only the planning mirror remains to be refreshed or retired.' : 'The imported ledger is ahead of the planning mirror.',
       nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --force --json',
-      reason: mirrorPath ? 'The task appears complete in the target ledger, but the planning mirror still needs a governed refresh.' : 'The ledger is ahead of the planning mirror and should be re-imported from the authoritative plan.'
+      reason: (mirrorPath && !isCrossRepo) ? 'The task appears complete in the target ledger, but the planning mirror still needs a governed refresh.' : 'The ledger is ahead of the planning mirror and should be re-imported from the authoritative plan.'
     };
   }
 
@@ -4263,7 +4265,7 @@ export function inspectHistoricalDelivery(input: {
       ...fileBuckets.allowedRunnerOutputFiles
     ])
     : changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
-  const hasTaskDeliverable = fileBuckets.taskMatchedFiles.length > 0;
+  const hasTaskDeliverable = fileBuckets.taskMatchedFiles.length > 0 || fileBuckets.allowedRunnerOutputFiles.length > 0;
   const hasOutOfScope = fileBuckets.outOfScopeSourceFiles.length > 0;
   const waiverReason = input.waiverReason?.trim() ?? '';
   let ok = hasTaskDeliverable;

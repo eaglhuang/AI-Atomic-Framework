@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, unlinkSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
@@ -864,6 +864,84 @@ try {
   assert(String(amendUnavailableDetails.requiredCommand ?? '').includes(`node atm.mjs git commit --actor <actor-id> --task ${repairTaskId}`), 'repair-closure --amend must redirect to the governed git commit wrapper');
 
   const resetRepo = makeHostRepo(tempRoot, 'reset-release');
+  // TASK-CID-0064: test missing closure packet recovery (reconstruction from event)
+  const reconTaskId = 'TASK-REPAIR-RECONSTRUCT-0002';
+  await runTasks(['create', '--cwd', repairRepo, '--task', reconTaskId, '--actor', 'validator', '--title', 'Reconstructible task']);
+  const reconTaskPath = path.join(repairRepo, '.atm', 'history', 'tasks', `${reconTaskId}.json`);
+  const reconTaskDoc = readJson(reconTaskPath);
+  reconTaskDoc.deliverables = ['src/reconstruct-deliverable.ts'];
+  reconTaskDoc.scopePaths = ['src/reconstruct-deliverable.ts'];
+  writeJson(reconTaskPath, reconTaskDoc);
+
+  await runNext(['--cwd', repairRepo, '--claim', '--actor', 'validator', '--prompt', reconTaskId]);
+
+  writeJson(path.join(repairRepo, '.atm', 'history', 'evidence', `${reconTaskId}.json`), {
+    taskId: reconTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'reconstruct fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['src/reconstruct-deliverable.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate reconstruct fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+        stderrSha256: 'sha256:2222222222222222222222222222222222222222222222222222222222222222'
+      }]
+    }]
+  });
+
+  mkdirSync(path.join(repairRepo, 'src'), { recursive: true });
+  writeFileSync(path.join(repairRepo, 'src', 'reconstruct-deliverable.ts'), 'export const test = 1;\n', 'utf8');
+  execFileSync('git', ['add', 'src/reconstruct-deliverable.ts'], { cwd: repairRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'add reconstruct deliverable'], { cwd: repairRepo, stdio: 'ignore' });
+
+  const reconstructCloseResult = await runTasks(['close', '--cwd', repairRepo, '--task', reconTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', 'HEAD']);
+  assert(reconstructCloseResult.ok === true, 'reconstruct task close must succeed');
+  execFileSync('git', ['commit', '--no-verify', '-m', 'close reconstruct task'], { cwd: repairRepo, stdio: 'ignore' });
+
+  const reconPacketPath = `.atm/history/evidence/${reconTaskId}.closure-packet.json`;
+  const reconPacketAbsolute = path.join(repairRepo, reconPacketPath);
+  assert(existsSync(reconPacketAbsolute), 'closure packet must exist after close');
+
+  // 1. Reconstruction check
+  unlinkSync(reconPacketAbsolute);
+  assert(!existsSync(reconPacketAbsolute), 'closure packet must be deleted');
+
+  const repairReconstructResult = await runTasks(['repair-closure', '--cwd', repairRepo, '--task', reconTaskId, '--json']);
+  assert(repairReconstructResult.ok === true, 'tasks repair-closure must reconstruct missing packet from event');
+  assert(existsSync(reconPacketAbsolute), 'closure packet must be reconstructed');
+  const reconstructedDoc = readJson(reconPacketAbsolute);
+  assert(reconstructedDoc.recoveredFromMissingPacket === true, 'reconstructed packet must carry recoveredFromMissingPacket marker');
+  assert(reconstructedDoc.taskId === reconTaskId, 'reconstructed packet taskId must match');
+
+  // 2. Fail-Closed check (invalid metadata)
+  unlinkSync(reconPacketAbsolute);
+  const eventDir = path.join(repairRepo, '.atm', 'history', 'task-events', reconTaskId);
+  const eventFiles = readdirSync(eventDir).filter((file: string) => file.includes('-close-'));
+  assert(eventFiles.length > 0, 'close event files must exist');
+  for (const file of eventFiles) {
+    const eventPath = path.join(eventDir, file);
+    const eventData = readJson(eventPath);
+    delete eventData.closure;
+    writeJson(eventPath, eventData);
+  }
+  execFileSync('git', ['add', '.'], { cwd: repairRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '--no-verify', '-m', 'remove closure metadata from events'], { cwd: repairRepo, stdio: 'ignore' });
+
+  const repairImpossibleDetails = await expectTaskErrorDetails(
+    ['repair-closure', '--cwd', repairRepo, '--task', reconTaskId, '--json'],
+    'ATM_CLOSURE_REPAIR_IMPOSSIBLE'
+  );
+  assert(Array.isArray(repairImpossibleDetails.missingSegments), 'impossible repair must report missingSegments');
+  assert(repairImpossibleDetails.missingSegments.includes('closure-packet'), 'missingSegments must include closure-packet');
+  assert(repairImpossibleDetails.missingSegments.includes('close-transition-metadata'), 'missingSegments must include close-transition-metadata');
+  assert(String(repairImpossibleDetails.requiredCommand ?? '').includes('tasks reconcile'), 'remediation command must recommend tasks reconcile');
+
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
   assert(resetCreate.ok === true, 'reset fixture task create must succeed');
   await runTasks(['reserve', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator']);
@@ -1859,12 +1937,17 @@ async function validateTaskResidueClassification(tempRoot: string) {
     planningRepo: '3KLife',
     targetRepo: 'AI-Atomic-Framework',
     closureAuthority: 'target_repo',
+    closurePacket: `.atm/history/evidence/${staleTaskId}.closure-packet.json`,
     source: {
       planPath: path.join(repo, 'docs', 'fixtures', 'missing-residue-stale.task.md'),
       sectionTitle: staleTaskId,
       headingLine: 1,
       hash: 'stale-import'
     }
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'evidence', `${staleTaskId}.closure-packet.json`), {
+    schemaId: 'atm.closurePacket.v1',
+    taskId: staleTaskId
   });
   const staleStatus = await runTasks(['status', '--cwd', repo, '--task', staleTaskId, '--json']);
   assert(staleStatus.ok === true, 'stale-import status must succeed');

@@ -68,6 +68,10 @@ function hasValidClosurePacketFile(cwd: string, taskId: string, document: Record
 }
 
 export function verifyCloseoutProvenance(cwd: string, taskId: string, document: Record<string, unknown>): boolean {
+  const closureAuthority = document.closureAuthority ?? document.closure_authority;
+  if (closureAuthority === 'planning_repo') {
+    return true;
+  }
   if (hasValidClosurePacketFile(cwd, taskId, document)) {
     return true;
   }
