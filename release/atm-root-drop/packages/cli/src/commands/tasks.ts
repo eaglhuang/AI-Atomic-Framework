@@ -23,6 +23,7 @@ import {
   requireTargetRepoClosureAuthority,
   runnerStaleWarningMessage,
   type ClosurePacket,
+  type HistoricalDeliveryProvenance,
   validateClosurePacket,
   writeClosurePacket
 } from './framework-development.ts';
@@ -212,6 +213,14 @@ export interface TaskDeliverableGateReport {
   readonly requiredCommand: string | null;
 }
 
+export interface HistoricalDeliveryFileBuckets {
+  readonly taskMatchedFiles: readonly string[];
+  readonly governanceFiles: readonly string[];
+  readonly allowedRunnerOutputFiles: readonly string[];
+  readonly outOfScopeSourceFiles: readonly string[];
+  readonly ignoredFiles: readonly string[];
+}
+
 export interface TaskHistoricalDeliveryReport {
   readonly requestedRef: string;
   readonly commitSha: string | null;
@@ -219,6 +228,8 @@ export interface TaskHistoricalDeliveryReport {
   readonly reason: string;
   readonly changedFiles: readonly string[];
   readonly deliverableFiles: readonly string[];
+  readonly fileBuckets: HistoricalDeliveryFileBuckets;
+  readonly waiverApplied: boolean;
 }
 
 export interface TaskImportDiagnostic {
@@ -913,7 +924,9 @@ async function runTasksReconcile(argv: string[]) {
     taskDocument,
     taskDeclaredFiles,
     claim: null,
-    historicalDeliveryRefs: [options.deliveryCommit]
+    historicalDeliveryRefs: [options.deliveryCommit],
+    waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
+    waiverReason: options.waiverReason
   });
   if (!deliverableGate.ok) {
     throw new CliError('ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', `Task ${options.taskId} cannot be reconciled because ATM found no real non-.atm deliverable diff.`, {
@@ -1011,7 +1024,11 @@ async function runTasksReconcile(argv: string[]) {
         reconciledAt: new Date().toISOString(),
         reconciledByActor: actorId,
         reason: reconcileReason
-      }
+      },
+      historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(
+        deliverableGate.historicalDeliveries[0] ?? null,
+        options.waiverReason
+      )
     });
     const validation = validateClosurePacket(pendingReconcilePacket);
     if (!validation.ok) {
@@ -2209,6 +2226,17 @@ async function runTasksClose(argv: string[]) {
         }
       });
     }
+    const normPrevStatus = normalizeWorkItemStatus(taskDocument.status);
+    if (normPrevStatus === 'planned') {
+      throw new CliError('ATM_TASK_CLOSE_INVALID_LIFECYCLE', `Task ${options.taskId} status is ${normPrevStatus}. Cannot close a task directly from ${normPrevStatus} to ${options.status}.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          previousStatus: normPrevStatus,
+          status: options.status
+        }
+      });
+    }
     if (!currentClaim || currentClaim.state !== 'active' || currentClaim.actorId !== actorId) {
       throw new CliError('ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active claim owned by ${actorId}.`, {
         exitCode: 1,
@@ -2216,6 +2244,15 @@ async function runTasksClose(argv: string[]) {
           taskId: options.taskId,
           actorId,
           requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${options.taskId}" --json`
+        }
+      });
+    }
+    if (!activeSession || !activeSession.sessionId) {
+      throw new CliError('ATM_TASK_CLOSE_SESSION_CONTEXT_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active work session.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          actorId
         }
       });
     }
@@ -2367,7 +2404,9 @@ async function runTasksClose(argv: string[]) {
       taskDocument,
       taskDeclaredFiles,
       claim: parseClaimRecord(taskDocument.claim),
-      historicalDeliveryRefs: options.historicalDeliveryRefs
+      historicalDeliveryRefs: options.historicalDeliveryRefs,
+      waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
+      waiverReason: options.reason
     })
     : null;
   if (deliverableGate && !deliverableGate.ok) {
@@ -2421,7 +2460,11 @@ async function runTasksClose(argv: string[]) {
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
       requiredGates: frameworkStatus.requiredGates,
       changedFiles: deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
-      frameworkStatus
+      frameworkStatus,
+      historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(
+        deliverableGate?.historicalDeliveries[0] ?? null,
+        options.reason
+      )
     });
     const validation = validateClosurePacket(pendingClosurePacket);
     if (!validation.ok) {
@@ -2440,6 +2483,23 @@ async function runTasksClose(argv: string[]) {
     }
     closurePacket = pendingClosurePacket;
     createdClosurePacketAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.closure-packet.json`);
+  }
+
+  if (options.status === 'done') {
+    const finalPacketPath = existingClosurePacketPath || (pendingClosurePacket ? `.atm/history/evidence/${options.taskId}.closure-packet.json` : null);
+    const finalPacket = closurePacket || pendingClosurePacket;
+    const evaluatedMetadata = createClosureTransitionMetadata(
+      finalPacketPath,
+      finalPacket,
+      owningBatch?.batchId ?? options.batchId,
+      activeSession?.sessionId ?? null
+    );
+    if (!evaluatedMetadata || evaluatedMetadata.schemaId !== 'atm.taskClosureTransition.v1') {
+      throw new CliError('ATM_TASK_CLOSE_CLOSURE_METADATA_REQUIRED', `Task ${options.taskId} cannot be closed as ${options.status} because closure metadata cannot be produced.`, {
+        exitCode: 1,
+        details: { taskId: options.taskId }
+      });
+    }
   }
 
   if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
@@ -3981,6 +4041,14 @@ function evaluateFrameworkCloseDirtyGuard(input: {
 
 
 
+const EMPTY_HISTORICAL_DELIVERY_BUCKETS: HistoricalDeliveryFileBuckets = {
+  taskMatchedFiles: [],
+  governanceFiles: [],
+  allowedRunnerOutputFiles: [],
+  outOfScopeSourceFiles: [],
+  ignoredFiles: []
+};
+
 function evaluateTaskDeliverableGate(input: {
   readonly cwd: string;
   readonly taskId: string;
@@ -3988,6 +4056,8 @@ function evaluateTaskDeliverableGate(input: {
   readonly taskDeclaredFiles: readonly string[];
   readonly claim: TaskClaimRecord | null;
   readonly historicalDeliveryRefs?: readonly string[];
+  readonly waiverOutOfScopeDelivery?: boolean;
+  readonly waiverReason?: string | null;
 }): TaskDeliverableGateReport {
   const required = isDeliverableDiffRequired(input.taskDocument);
   const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
@@ -4008,9 +4078,12 @@ function evaluateTaskDeliverableGate(input: {
     : deliverableFiles;
   const historicalDeliveries = (input.historicalDeliveryRefs ?? []).map((ref) => inspectHistoricalDelivery({
     cwd: input.cwd,
+    taskId: input.taskId,
     requestedRef: ref,
     declaredFiles,
-    enforceDeclaredScope
+    enforceDeclaredScope,
+    waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
+    waiverReason: input.waiverReason ?? null
   }));
   const historicalDeliveryErrors = historicalDeliveries.filter((entry) => !entry.ok);
   const historicalDeliverableFiles = uniqueStrings(historicalDeliveries.flatMap((entry) => entry.deliverableFiles));
@@ -4045,7 +4118,7 @@ function evaluateTaskDeliverableGate(input: {
     ],
     remediation: ok
       ? 'Deliverable diff found; continue with validators and closure evidence.'
-      : 'Implement the deliverables described by the task, stage or leave the real file changes visible, then rerun tasks close --status done. If the deliverable already landed in an earlier commit, pass --historical-delivery <commit> so ATM can verify the scoped non-.atm files. If the task is not delivered yet, close review instead of done.',
+      : 'Implement the deliverables described by the task, stage or leave the real file changes visible, then rerun tasks close --status done. If the deliverable already landed in an earlier commit, pass --historical-delivery <commit> so ATM can verify the scoped non-.atm files. If the historical commit also contains unrelated source files, pass --waiver-out-of-scope-delivery with --reason. If the task is not delivered yet, close review instead of done.',
     requiredCommand: ok ? null : `node atm.mjs tasks close --task ${input.taskId} --actor <actor> --status review --reason "awaiting real deliverable diff" --json`
   };
 }
@@ -4085,11 +4158,81 @@ function normalizeTaskScopePaths(cwd: string, values: readonly string[]): readon
   }));
 }
 
-function inspectHistoricalDelivery(input: {
+export function categorizeHistoricalCommitFiles(input: {
+  readonly taskId: string;
+  readonly changedFiles: readonly string[];
+  readonly declaredFiles: readonly string[];
+}): HistoricalDeliveryFileBuckets {
+  const taskMatchedFiles: string[] = [];
+  const governanceFiles: string[] = [];
+  const allowedRunnerOutputFiles: string[] = [];
+  const outOfScopeSourceFiles: string[] = [];
+  const ignoredFiles: string[] = [];
+
+  for (const filePath of input.changedFiles) {
+    const normalized = normalizeRelativePath(filePath);
+    if (!normalized) continue;
+
+    if (normalized.startsWith('.atm/')) {
+      if (isTaskCloseGovernanceCriticalPath(normalized, input.taskId)) {
+        governanceFiles.push(normalized);
+      } else {
+        ignoredFiles.push(normalized);
+      }
+      continue;
+    }
+
+    const inScope = input.declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
+    if (inScope && isRealDeliverablePath(normalized)) {
+      taskMatchedFiles.push(normalized);
+      continue;
+    }
+    if (isDeclaredRunnerOutputPath(normalized, input.declaredFiles)) {
+      allowedRunnerOutputFiles.push(normalized);
+      continue;
+    }
+    if (isRealDeliverablePath(normalized) || normalized.startsWith('release/')) {
+      outOfScopeSourceFiles.push(normalized);
+      continue;
+    }
+
+    ignoredFiles.push(normalized);
+  }
+
+  return {
+    taskMatchedFiles: uniqueStrings(taskMatchedFiles),
+    governanceFiles: uniqueStrings(governanceFiles),
+    allowedRunnerOutputFiles: uniqueStrings(allowedRunnerOutputFiles),
+    outOfScopeSourceFiles: uniqueStrings(outOfScopeSourceFiles),
+    ignoredFiles: uniqueStrings(ignoredFiles)
+  };
+}
+
+function buildHistoricalDeliveryProvenance(
+  report: TaskHistoricalDeliveryReport | null,
+  waiverReason: string | null | undefined
+): HistoricalDeliveryProvenance | null {
+  if (!report?.commitSha) return null;
+  return {
+    schemaId: 'atm.historicalDeliveryProvenance.v1',
+    deliveryCommitSha: report.commitSha,
+    taskMatchedFiles: [...report.fileBuckets.taskMatchedFiles],
+    governanceFiles: [...report.fileBuckets.governanceFiles],
+    allowedRunnerOutputFiles: [...report.fileBuckets.allowedRunnerOutputFiles],
+    outOfScopeSourceFiles: [...report.fileBuckets.outOfScopeSourceFiles],
+    waivedOutOfScopeFiles: report.waiverApplied ? [...report.fileBuckets.outOfScopeSourceFiles] : [],
+    waiverReason: report.waiverApplied ? (waiverReason?.trim() || null) : null
+  };
+}
+
+export function inspectHistoricalDelivery(input: {
   readonly cwd: string;
+  readonly taskId: string;
   readonly requestedRef: string;
   readonly declaredFiles: readonly string[];
   readonly enforceDeclaredScope: boolean;
+  readonly waiverOutOfScopeDelivery: boolean;
+  readonly waiverReason: string | null;
 }): TaskHistoricalDeliveryReport {
   const requestedRef = input.requestedRef.trim();
   if (!requestedRef) {
@@ -4099,7 +4242,9 @@ function inspectHistoricalDelivery(input: {
       ok: false,
       reason: 'empty-ref',
       changedFiles: [],
-      deliverableFiles: []
+      deliverableFiles: [],
+      fileBuckets: EMPTY_HISTORICAL_DELIVERY_BUCKETS,
+      waiverApplied: false
     };
   }
   const commitSha = readGitScalar(input.cwd, ['rev-parse', '--verify', `${requestedRef}^{commit}`]);
@@ -4110,21 +4255,57 @@ function inspectHistoricalDelivery(input: {
       ok: false,
       reason: 'commit-not-found',
       changedFiles: [],
-      deliverableFiles: []
+      deliverableFiles: [],
+      fileBuckets: EMPTY_HISTORICAL_DELIVERY_BUCKETS,
+      waiverApplied: false
     };
   }
   const changedFiles = readGitNameOnly(input.cwd, ['show', '--pretty=format:', '--name-only', commitSha, '--']);
-  const deliverableCandidates = changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
+  const fileBuckets = categorizeHistoricalCommitFiles({
+    taskId: input.taskId,
+    changedFiles,
+    declaredFiles: input.declaredFiles
+  });
   const deliverableFiles = input.enforceDeclaredScope
-    ? deliverableCandidates.filter((filePath) => input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
-    : deliverableCandidates;
+    ? uniqueStrings([
+      ...fileBuckets.taskMatchedFiles,
+      ...fileBuckets.allowedRunnerOutputFiles
+    ])
+    : changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
+  const hasTaskDeliverable = fileBuckets.taskMatchedFiles.length > 0;
+  const hasOutOfScope = fileBuckets.outOfScopeSourceFiles.length > 0;
+  const waiverReason = input.waiverReason?.trim() ?? '';
+  let ok = hasTaskDeliverable;
+  let reason = 'no-scoped-deliverable-files';
+  let waiverApplied = false;
+
+  if (!hasTaskDeliverable) {
+    ok = false;
+    reason = 'no-scoped-deliverable-files';
+  } else if (hasOutOfScope && !input.waiverOutOfScopeDelivery) {
+    ok = false;
+    reason = 'out-of-scope-source-files-present';
+  } else if (hasOutOfScope && input.waiverOutOfScopeDelivery && !waiverReason) {
+    ok = false;
+    reason = 'out-of-scope-waiver-reason-required';
+  } else if (hasOutOfScope && input.waiverOutOfScopeDelivery) {
+    ok = true;
+    reason = 'scoped-deliverable-with-waived-out-of-scope';
+    waiverApplied = true;
+  } else {
+    ok = true;
+    reason = 'scoped-deliverable-files-present';
+  }
+
   return {
     requestedRef,
     commitSha,
-    ok: deliverableFiles.length > 0,
-    reason: deliverableFiles.length > 0 ? 'scoped-deliverable-files-present' : 'no-scoped-deliverable-files',
+    ok,
+    reason,
     changedFiles,
-    deliverableFiles
+    deliverableFiles,
+    fileBuckets,
+    waiverApplied
   };
 }
 

@@ -71,6 +71,8 @@ export function parseReconcileOptions(argv: string[]) {
     taskId: '',
     actorId: null as string | null,
     deliveryCommit: '',
+    waiverOutOfScopeDelivery: false,
+    waiverReason: null as string | null,
     allowStaleRunner: parseAllowStaleRunnerFlag(argv)
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -95,6 +97,15 @@ export function parseReconcileOptions(argv: string[]) {
       index += 1;
       continue;
     }
+    if (arg === '--waiver-out-of-scope-delivery') {
+      options.waiverOutOfScopeDelivery = true;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.waiverReason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
       continue;
     }
@@ -110,7 +121,8 @@ export function parseReconcileOptions(argv: string[]) {
     ...options,
     cwd: path.resolve(options.cwd),
     taskId: options.taskId.trim(),
-    deliveryCommit: options.deliveryCommit.trim()
+    deliveryCommit: options.deliveryCommit.trim(),
+    waiverReason: options.waiverReason?.trim() || null
   };
 }
 
@@ -379,6 +391,7 @@ export function parseCloseOptions(argv: string[]) {
     fromBatchCheckpoint: false,
     batchId: null as string | null,
     historicalDeliveryRefs: [] as string[],
+    waiverOutOfScopeDelivery: false,
     allowStaleRunner: parseAllowStaleRunnerFlag(argv)
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -426,6 +439,10 @@ export function parseCloseOptions(argv: string[]) {
       index += 1;
       continue;
     }
+    if (arg === '--waiver-out-of-scope-delivery') {
+      options.waiverOutOfScopeDelivery = true;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
       continue;
     }
@@ -438,7 +455,8 @@ export function parseCloseOptions(argv: string[]) {
     ...options,
     cwd: path.resolve(options.cwd),
     taskId: options.taskId.trim(),
-    historicalDeliveryRefs: uniqueStrings(options.historicalDeliveryRefs)
+    historicalDeliveryRefs: uniqueStrings(options.historicalDeliveryRefs),
+    reason: options.reason?.trim() || null
   };
 }
 

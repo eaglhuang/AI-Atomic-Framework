@@ -14,7 +14,9 @@ export declare function parseReconcileOptions(argv: string[]): {
     cwd: string;
     taskId: string;
     deliveryCommit: string;
+    waiverReason: string | null;
     actorId: string | null;
+    waiverOutOfScopeDelivery: boolean;
     allowStaleRunner: boolean;
 };
 export declare function parseDeliverAndCloseOptions(argv: string[]): {
@@ -57,11 +59,12 @@ export declare function parseCloseOptions(argv: string[]): {
     cwd: string;
     taskId: string;
     historicalDeliveryRefs: readonly string[];
+    reason: string | null;
     actorId: string | null;
     status: "done" | "review" | "blocked" | "abandoned";
-    reason: string | null;
     fromBatchCheckpoint: boolean;
     batchId: string | null;
+    waiverOutOfScopeDelivery: boolean;
     allowStaleRunner: boolean;
 };
 export declare function parseResetOptions(argv: string[]): {

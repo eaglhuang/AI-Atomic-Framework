@@ -7,6 +7,7 @@ import { quoteForShell, detectAutoLinkedValidator } from '../packages/cli/src/co
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 import { cliCommandRunners, runCli } from '../packages/cli/src/atm.ts';
 import { commandSpecs, listCommandSpecs } from '../packages/cli/src/commands/command-specs.ts';
+import { categorizeHistoricalCommitFiles, inspectHistoricalDelivery } from '../packages/cli/src/commands/tasks.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -1317,8 +1318,231 @@ try {
     // 再次嘗試 tasks claim，此時 dependency blockers 應該不包含 A (因為 A 已經有 provenance 了，雖然 B 狀態為 ready 還不能 claim，但錯誤不應該是 dependency blocked)
     const claimResPass = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
     assert(claimResPass.parsed.messages.every((msg: any) => msg.code !== 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'dependency B must no longer be blocked by dependency A');
+
+    // Test 5.2: historical-delivery scope and commit provenance hard gate (TASK-CID-0049)
+    const declaredFiles = ['src/task-owned.ts', 'release/atm-onefile/atm.mjs'];
+    const bucketsNoOverlap = categorizeHistoricalCommitFiles({
+      taskId: 'TASK-HIST-0049',
+      changedFiles: ['src/unrelated-only.ts'],
+      declaredFiles
+    });
+    assert(bucketsNoOverlap.taskMatchedFiles.length === 0, 'unrelated-only commit must not match task deliverables');
+    assert(bucketsNoOverlap.outOfScopeSourceFiles.includes('src/unrelated-only.ts'), 'unrelated source must be out-of-scope');
+
+    const bucketsMixed = categorizeHistoricalCommitFiles({
+      taskId: 'TASK-HIST-0049',
+      changedFiles: ['src/task-owned.ts', 'packages/core/src/broker/freeze.ts'],
+      declaredFiles
+    });
+    assert(bucketsMixed.taskMatchedFiles.includes('src/task-owned.ts'), 'task-owned file must be task-matched');
+    assert(bucketsMixed.outOfScopeSourceFiles.includes('packages/core/src/broker/freeze.ts'), 'unrelated broker file must be out-of-scope');
+
+    const bucketsReleaseAllowed = categorizeHistoricalCommitFiles({
+      taskId: 'TASK-HIST-0049',
+      changedFiles: ['src/task-owned.ts', 'release/atm-onefile/atm.mjs'],
+      declaredFiles
+    });
+    assert(bucketsReleaseAllowed.allowedRunnerOutputFiles.includes('release/atm-onefile/atm.mjs'), 'declared runner output must be allowed');
+    assert(bucketsReleaseAllowed.outOfScopeSourceFiles.length === 0, 'declared runner output must not count as out-of-scope');
+
+    const histWorkspace = createCliTempWorkspace('validate-cli-historical-delivery');
+    try {
+      initializeGitRepository(histWorkspace);
+      const ownedPath = path.join(histWorkspace, 'src', 'task-owned.ts');
+      mkdirSync(path.dirname(ownedPath), { recursive: true });
+      writeFileSync(ownedPath, 'export const owned = true;\n', 'utf8');
+      spawnSync('git', ['-C', histWorkspace, 'add', '-A'], { encoding: 'utf8' });
+      spawnSync('git', ['-C', histWorkspace, '-c', 'user.name=ATM', '-c', 'user.email=atm@test', 'commit', '-m', 'base'], { encoding: 'utf8' });
+
+      const unrelatedPath = path.join(histWorkspace, 'src', 'unrelated-only.ts');
+      writeFileSync(unrelatedPath, 'export const unrelated = true;\n', 'utf8');
+      spawnSync('git', ['-C', histWorkspace, 'add', '-A'], { encoding: 'utf8' });
+      spawnSync('git', ['-C', histWorkspace, '-c', 'user.name=ATM', '-c', 'user.email=atm@test', 'commit', '-m', 'unrelated'], { encoding: 'utf8' });
+      const unrelatedCommit = spawnSync('git', ['-C', histWorkspace, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
+
+      const unrelatedInspect = inspectHistoricalDelivery({
+        cwd: histWorkspace,
+        taskId: 'TASK-HIST-0049',
+        requestedRef: unrelatedCommit,
+        declaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
+      });
+      assert(!unrelatedInspect.ok, 'historical delivery without task overlap must fail');
+      assert(unrelatedInspect.reason === 'no-scoped-deliverable-files', 'must report no scoped deliverable files');
+
+      const freezePath = path.join(histWorkspace, 'packages', 'core', 'src', 'broker', 'freeze.ts');
+      mkdirSync(path.dirname(freezePath), { recursive: true });
+      writeFileSync(path.join(histWorkspace, 'src', 'task-owned.ts'), 'export const owned = false;\n', 'utf8');
+      writeFileSync(freezePath, 'export {};\n', 'utf8');
+      spawnSync('git', ['-C', histWorkspace, 'add', '-A'], { encoding: 'utf8' });
+      spawnSync('git', ['-C', histWorkspace, '-c', 'user.name=ATM', '-c', 'user.email=atm@test', 'commit', '-m', 'mixed'], { encoding: 'utf8' });
+      const mixedCommit = spawnSync('git', ['-C', histWorkspace, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
+
+      const mixedInspect = inspectHistoricalDelivery({
+        cwd: histWorkspace,
+        taskId: 'TASK-HIST-0049',
+        requestedRef: mixedCommit,
+        declaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
+      });
+      assert(!mixedInspect.ok, 'mixed commit must fail without waiver');
+      assert(mixedInspect.reason === 'out-of-scope-source-files-present', 'must report out-of-scope source files');
+
+      const mixedWaiverInspect = inspectHistoricalDelivery({
+        cwd: histWorkspace,
+        taskId: 'TASK-HIST-0049',
+        requestedRef: mixedCommit,
+        declaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: true,
+        waiverReason: 'captain-approved mixed historical delivery for regression'
+      });
+      assert(mixedWaiverInspect.ok, 'mixed commit must pass with waiver and reason');
+      assert(mixedWaiverInspect.reason === 'scoped-deliverable-with-waived-out-of-scope', 'must report waived out-of-scope acceptance');
+    } finally {
+      rmSync(histWorkspace, { recursive: true, force: true });
+    }
   } finally {
     rmSync(autoLinkTempWorkspace, { recursive: true, force: true });
+  }
+
+  // Test 5.2: tasks close state machine and closure metadata hard gate regression check
+  const closeGateWorkspace = createCliTempWorkspace('close-gate');
+  initializeGitRepository(closeGateWorkspace);
+  try {
+    const taskAPath = path.join(closeGateWorkspace, '.atm', 'history', 'tasks', 'TASK-CLOSE-A.json');
+
+    // Test 5.2a: planned status cannot be closed to done
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-CLOSE-A',
+      status: 'planned',
+      deliverableMode: 'ledger-only'
+    });
+    const closeAPlannedRes = await runAtm(['tasks', 'close', '--task', 'TASK-CLOSE-A', '--status', 'done', '--actor', 'Antigravity'], closeGateWorkspace);
+    assert(closeAPlannedRes.exitCode !== 0, 'closing planned task directly to done must fail');
+    assert(closeAPlannedRes.parsed.messages.some((msg: any) => msg.code === 'ATM_TASK_CLOSE_INVALID_LIFECYCLE'), 'must report ATM_TASK_CLOSE_INVALID_LIFECYCLE');
+
+    // Test 5.2b: unclaimed task cannot be closed to done
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-CLOSE-A',
+      status: 'ready',
+      deliverableMode: 'ledger-only'
+    });
+    const closeAUnclaimedRes = await runAtm(['tasks', 'close', '--task', 'TASK-CLOSE-A', '--status', 'done', '--actor', 'Antigravity'], closeGateWorkspace);
+    assert(closeAUnclaimedRes.exitCode !== 0, 'closing unclaimed task to done must fail');
+    assert(closeAUnclaimedRes.parsed.messages.some((msg: any) => msg.code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED'), 'must report ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED');
+
+    // Test 5.2c: active claim but no session context cannot be closed to done
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-CLOSE-A',
+      status: 'running',
+      deliverableMode: 'ledger-only',
+      claim: {
+        state: 'active',
+        actorId: 'Antigravity',
+        leaseId: 'lease-123456',
+        claimedAt: new Date().toISOString(),
+        heartbeatAt: new Date().toISOString(),
+        files: ['scripts/validate-cli.ts']
+      }
+    });
+    const closeANoSessionRes = await runAtm(['tasks', 'close', '--task', 'TASK-CLOSE-A', '--status', 'done', '--actor', 'Antigravity'], closeGateWorkspace);
+    assert(closeANoSessionRes.exitCode !== 0, 'closing task without session must fail');
+    assert(closeANoSessionRes.parsed.messages.some((msg: any) => msg.code === 'ATM_TASK_CLOSE_SESSION_CONTEXT_REQUIRED'), 'must report ATM_TASK_CLOSE_SESSION_CONTEXT_REQUIRED');
+
+    // Test 5.2d: task with active session but no evidence must fail close as done, then pass after providing evidence
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-CLOSE-A',
+      status: 'ready',
+      deliverableMode: 'ledger-only'
+    });
+    const claimRes = await runAtm(['tasks', 'claim', '--task', 'TASK-CLOSE-A', '--actor', 'Antigravity'], closeGateWorkspace);
+    assert(claimRes.exitCode === 0, 'tasks claim close-gate task must succeed');
+
+    const closeNoEvidenceRes = await runAtm(['tasks', 'close', '--task', 'TASK-CLOSE-A', '--status', 'done', '--actor', 'Antigravity'], closeGateWorkspace);
+    assert(closeNoEvidenceRes.exitCode !== 0, 'closing task without evidence must fail');
+    assert(closeNoEvidenceRes.parsed.messages.some((msg: any) => msg.code === 'ATM_TASK_CLOSE_EVIDENCE_REQUIRED'), 'must report ATM_TASK_CLOSE_EVIDENCE_REQUIRED');
+
+    // Add dummy evidence records so it passes the evidence gate
+    const evidencePath = path.join(closeGateWorkspace, '.atm', 'history', 'evidence', 'TASK-CLOSE-A.json');
+    writeJson(evidencePath, {
+      schemaId: 'atm.taskEvidence.v1',
+      specVersion: '0.1.0',
+      taskId: 'TASK-CLOSE-A',
+      evidence: [
+        {
+          evidenceKind: 'validation',
+          evidenceType: 'test',
+          summary: 'Auto-run: npm run typecheck',
+          evidenceFreshness: 'fresh',
+          details: {
+            kind: 'test',
+            freshness: 'fresh',
+            validationPasses: ['typecheck'],
+            commandRuns: [
+              {
+                command: 'npm run typecheck',
+                exitCode: 0,
+                stdoutSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+                stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+              }
+            ]
+          }
+        },
+        {
+          evidenceKind: 'validation',
+          evidenceType: 'test',
+          summary: 'Auto-run: npm run validate:cli',
+          evidenceFreshness: 'fresh',
+          details: {
+            kind: 'test',
+            freshness: 'fresh',
+            validationPasses: ['validate:cli'],
+            commandRuns: [
+              {
+                command: 'npm run validate:cli',
+                exitCode: 0,
+                stdoutSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+                stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+              }
+            ]
+          }
+        },
+        {
+          evidenceKind: 'validation',
+          evidenceType: 'test',
+          summary: 'Auto-run: npm run validate:git-head-evidence',
+          evidenceFreshness: 'fresh',
+          details: {
+            kind: 'test',
+            freshness: 'fresh',
+            validationPasses: ['validate:git-head-evidence'],
+            commandRuns: [
+              {
+                command: 'npm run validate:git-head-evidence',
+                exitCode: 0,
+                stdoutSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+                stderrSha256: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+              }
+            ]
+          }
+        }
+      ]
+    });
+
+    const closeSuccessRes = await runAtm(['tasks', 'close', '--task', 'TASK-CLOSE-A', '--status', 'done', '--actor', 'Antigravity'], closeGateWorkspace);
+    assert(closeSuccessRes.exitCode === 0, 'closing task with valid evidence and session must succeed');
+    assert(closeSuccessRes.parsed.ok === true, 'must report ok = true');
+  } finally {
+    rmSync(closeGateWorkspace, { recursive: true, force: true });
   }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });

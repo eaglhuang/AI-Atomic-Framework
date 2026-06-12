@@ -63,6 +63,8 @@ export function parseReconcileOptions(argv) {
         taskId: '',
         actorId: null,
         deliveryCommit: '',
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null,
         allowStaleRunner: parseAllowStaleRunnerFlag(argv)
     };
     for (let index = 0; index < argv.length; index += 1) {
@@ -87,6 +89,15 @@ export function parseReconcileOptions(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--waiver-out-of-scope-delivery') {
+            options.waiverOutOfScopeDelivery = true;
+            continue;
+        }
+        if (arg === '--reason') {
+            options.waiverReason = requireValue(argv, index, '--reason');
+            index += 1;
+            continue;
+        }
         if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
             continue;
         }
@@ -102,7 +113,8 @@ export function parseReconcileOptions(argv) {
         ...options,
         cwd: path.resolve(options.cwd),
         taskId: options.taskId.trim(),
-        deliveryCommit: options.deliveryCommit.trim()
+        deliveryCommit: options.deliveryCommit.trim(),
+        waiverReason: options.waiverReason?.trim() || null
     };
 }
 export function parseDeliverAndCloseOptions(argv) {
@@ -365,6 +377,7 @@ export function parseCloseOptions(argv) {
         fromBatchCheckpoint: false,
         batchId: null,
         historicalDeliveryRefs: [],
+        waiverOutOfScopeDelivery: false,
         allowStaleRunner: parseAllowStaleRunnerFlag(argv)
     };
     for (let index = 0; index < argv.length; index += 1) {
@@ -412,6 +425,10 @@ export function parseCloseOptions(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--waiver-out-of-scope-delivery') {
+            options.waiverOutOfScopeDelivery = true;
+            continue;
+        }
         if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
             continue;
         }
@@ -424,7 +441,8 @@ export function parseCloseOptions(argv) {
         ...options,
         cwd: path.resolve(options.cwd),
         taskId: options.taskId.trim(),
-        historicalDeliveryRefs: uniqueStrings(options.historicalDeliveryRefs)
+        historicalDeliveryRefs: uniqueStrings(options.historicalDeliveryRefs),
+        reason: options.reason?.trim() || null
     };
 }
 export function parseResetOptions(argv) {

@@ -40,6 +40,7 @@ export default defineCommandSpec({
         { flag: '--status', value: 'state', summary: 'Target status for tasks close: done|review|blocked|abandoned. done requires real non-.atm deliverables plus evidence.' },
         { flag: '--reason', value: 'text', summary: 'Reason for release, handoff, takeover, or close.' },
         { flag: '--historical-delivery', value: 'commit', summary: 'Allow tasks close done or tasks reconcile to verify an earlier delivery commit.' },
+        { flag: '--waiver-out-of-scope-delivery', summary: 'Allow historical delivery when the commit also contains unrelated source files; requires --reason.' },
         { flag: '--scope', value: 'taskId', summary: 'For tasks repair-closure, limit dirty-tree blocking to files overlapping the scoped task claim/direction lock/deliverables; unrelated dirty files become warnings.' },
         { flag: '--amend', summary: 'For tasks repair-closure, explicitly request HEAD rewrite after staging the repaired packet. ATM fails safely when no amend-capable governed wrapper is available.' },
         { flag: '--no-amend', summary: 'Compatibility alias for the default stage-only tasks repair-closure flow.' },
