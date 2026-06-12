@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0042",
+  "title": "Freeze, patch envelope, checkpoint, and filesystem WIP snapshot",
+  "status": "running",
+  "milestone": "M5",
+  "dependencies": [
+    "TASK-CID-0040",
+    "TASK-CID-0041"
+  ],
+  "acceptance": [
+    "Freeze acknowledgement, timeout, and force-release are deterministic.",
+    "Patch envelopes can represent partial WIP safely.",
+    "Snapshot defaults are documented and can be validated by the implementation card."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/freeze.ts",
+    "packages/core/src/broker/patch-envelope.ts",
+    "schemas/patch-envelope.schema.json",
+    "packages/core/src/broker/__tests__/freeze-protocol.test.ts"
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0042-freeze-patch-envelope-checkpoint-and-filesystem-wip-snapshot.task.md",
+    "sectionTitle": "TASK-CID-0042",
+    "headingLine": 48,
+    "hash": "7ecac7faff4145f3"
+  },
+  "importedAt": "2026-06-12T07:45:34.638Z",
+  "scopePaths": [
+    "packages/core/src/broker/freeze.ts",
+    "packages/core/src/broker/patch-envelope.ts",
+    "schemas/patch-envelope.schema.json",
+    "packages/core/src/broker/__tests__/freeze-protocol.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:schemas",
+    "npm run validate:cli",
+    "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Deleting source worktree changes during freeze",
+    "Auto-rollback without steward/captain verdict"
+  ],
+  "nonGoals": [
+    "Do not let snapshot metadata replace a real envelope when one is available."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert freeze / patch-envelope / snapshot logic if agents cannot recover safely from blocked state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cid-agr-freeze-snapshot-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-12T08-25-29-633Z-claim-062c156caaea",
+  "lastTransitionAt": "2026-06-12T08:25:29.633Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-12T08:25:13.588Z",
+  "promotedAt": "2026-06-12T08:25:13.619Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-eda7f3924d54",
+    "claimedAt": "2026-06-12T08:25:29.609Z",
+    "heartbeatAt": "2026-06-12T08:25:29.609Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0042.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-12T08:25:29.609Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260612082529-codex-gpt-5.4-mini-TASK-CID-0042-dfc3613d60",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0042",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0042.*",
+      ".atm/history/task-events/TASK-CID-0042/**",
+      ".atm/history/tasks/TASK-CID-0042.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d088f2cce253712d97589e2deb6758a29d5874da7725bd08863516b805a265ed",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-12T08:25:29.633Z",
+    "status": "active"
+  }
+}
