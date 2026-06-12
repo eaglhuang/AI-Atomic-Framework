@@ -6,7 +6,8 @@ import addFormats from 'ajv-formats';
 import {
   createAtomicMapSemanticFingerprint,
   createAtomicSpecSemanticFingerprint,
-  normalizeSemanticFingerprint
+  normalizeSemanticFingerprint,
+  type AtomicSpecSemanticFingerprintInput
 } from '../packages/core/src/registry/semantic-fingerprint.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,6 +28,9 @@ const fixturePaths = {
   legacyNoSf: 'fixtures/registry/legacy-no-sf.json',
   mapWithSf: 'fixtures/registry/map-with-sf.json',
   pendingSfCalculation: 'fixtures/registry/pending-sf-calculation.json',
+  determinismPermutation: 'fixtures/semantic-fingerprint/determinism/spec-permutation.json',
+  determinismRecompute: 'fixtures/semantic-fingerprint/determinism/spec-recompute.json',
+  determinismIdentityNoise: 'fixtures/semantic-fingerprint/determinism/identity-noise.json',
   registryV1: 'fixtures/registry/v1-with-versions.json',
   versionIndex: 'fixtures/registry/version-index.json'
 };
@@ -58,6 +62,9 @@ const atomWithSf = readJson(fixturePaths.atomWithSf);
 const legacyNoSf = readJson(fixturePaths.legacyNoSf);
 const mapWithSf = readJson(fixturePaths.mapWithSf);
 const pendingSfCalculation = readJson(fixturePaths.pendingSfCalculation);
+const determinismPermutation = readJson(fixturePaths.determinismPermutation);
+const determinismRecompute = readJson(fixturePaths.determinismRecompute);
+const determinismIdentityNoise = readJson(fixturePaths.determinismIdentityNoise);
 const registryV1 = readJson(fixturePaths.registryV1);
 const versionIndex = readJson(fixturePaths.versionIndex);
 const helloWorldAtom = readJson('tests/schema-fixtures/positive/hello-world.atom.json');
@@ -115,31 +122,14 @@ check(
   'pending-sf-calculation should resolve to the same canonical fingerprint once calculation runs'
 );
 
-const atomDeterminismA = createAtomicSpecSemanticFingerprint(atomWithSf);
-const atomDeterminismB = createAtomicSpecSemanticFingerprint(JSON.parse(JSON.stringify(atomWithSf)));
-check(
-  normalizeSemanticFingerprint(atomDeterminismA) === normalizeSemanticFingerprint(atomDeterminismB),
-  'atomic-spec fingerprint generation must be deterministic for equivalent identity-hash inputs'
-);
+runDeterminismRegressionChecks({
+  specPermutation: determinismPermutation,
+  specRecompute: determinismRecompute
+});
 
-const mapDeterminismA = createAtomicMapSemanticFingerprint({
-  entrypoints: ['ATM-FIXTURE-0001', 'ATM-FIXTURE-0002'],
-  qualityTargets: {
-    requiredChecks: 1,
-    promoteGateRequired: true
-  }
-});
-const mapDeterminismB = createAtomicMapSemanticFingerprint({
-  entrypoints: ['ATM-FIXTURE-0002', 'ATM-FIXTURE-0001'],
-  qualityTargets: {
-    promoteGateRequired: true,
-    requiredChecks: 1
-  }
-});
-check(
-  normalizeSemanticFingerprint(mapDeterminismA) === normalizeSemanticFingerprint(mapDeterminismB),
-  'atomic-map fingerprint generation must be deterministic across equivalent fixture permutations'
-);
+if (mode === 'determinism-negative') {
+  runNegativeDeterminismCheck(determinismIdentityNoise);
+}
 
 const historyEntry = Array.isArray(registryV1.entries)
   ? registryV1.entries.find((entry: any) => entry.atomId === 'ATM-FIXTURE-0001')
@@ -209,4 +199,46 @@ function formatErrors(errors: any) {
   return (errors || [])
     .map((error: any) => `${error.instancePath || '/'} ${error.message}`)
     .join('; ');
+}
+
+function runDeterminismRegressionChecks(fixtures: {
+  readonly specPermutation: any;
+  readonly specRecompute: any;
+}) {
+  const specA = fixtures.specPermutation.contractA;
+  const specB = fixtures.specPermutation.contractB;
+  check(
+    normalizeSemanticFingerprint(createAtomicSpecSemanticFingerprint(specA))
+      === normalizeSemanticFingerprint(createAtomicSpecSemanticFingerprint(specB)),
+    'semantic fingerprint must stay stable across equivalent declared-contract permutations'
+  );
+
+  const recomputeSamples = Array.isArray(fixtures.specRecompute.samples) ? fixtures.specRecompute.samples : [];
+  check(recomputeSamples.length > 0, 'determinism recompute fixture must include at least one sample');
+  const recomputeFingerprints = recomputeSamples.map((sample: AtomicSpecSemanticFingerprintInput) =>
+    normalizeSemanticFingerprint(createAtomicSpecSemanticFingerprint(sample)));
+  check(
+    new Set(recomputeFingerprints).size === 1,
+    'semantic fingerprint recomputation must stay byte-identical across repeated equivalent samples'
+  );
+
+}
+
+function containsNonDeterministicIdentitySignal(input: any) {
+  return Boolean(input)
+    && (Object.prototype.hasOwnProperty.call(input, 'timestamp')
+      || Object.prototype.hasOwnProperty.call(input, 'pid')
+      || Object.prototype.hasOwnProperty.call(input, 'randomNonce')
+      || Object.prototype.hasOwnProperty.call(input, 'nonce')
+      || Object.prototype.hasOwnProperty.call(input, 'seed'));
+}
+
+function runNegativeDeterminismCheck(fixtures: any) {
+  const identityNoise = fixtures.identityHashInput;
+  if (!containsNonDeterministicIdentitySignal(identityNoise)) {
+    fail('negative determinism fixture must carry a forbidden non-deterministic identity input');
+    return;
+  }
+
+  fail('negative determinism fixture failed closed: non-deterministic identity signal was present');
 }

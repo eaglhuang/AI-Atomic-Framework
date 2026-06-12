@@ -1,0 +1,85 @@
+{
+  "samples": [
+    {
+      "inputs": [
+        {
+          "name": "goal",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "evidence",
+          "kind": "evidence",
+          "required": true
+        }
+      ],
+      "language": {
+        "primary": "javascript"
+      },
+      "validation": {
+        "evidenceRequired": false
+      },
+      "performanceBudget": {
+        "hotPath": true,
+        "inputMutation": "forbidden",
+        "maxDurationMs": 900
+      }
+    },
+    {
+      "outputs": [
+        {
+          "required": true,
+          "kind": "evidence",
+          "name": "evidence"
+        }
+      ],
+      "language": {
+        "primary": "javascript"
+      },
+      "inputs": [
+        {
+          "required": true,
+          "kind": "text",
+          "name": "goal"
+        }
+      ],
+      "performanceBudget": {
+        "maxDurationMs": 900,
+        "inputMutation": "forbidden",
+        "hotPath": true
+      },
+      "validation": {
+        "evidenceRequired": false
+      }
+    },
+    {
+      "language": {
+        "primary": "javascript"
+      },
+      "validation": {
+        "evidenceRequired": false
+      },
+      "performanceBudget": {
+        "inputMutation": "forbidden",
+        "hotPath": true,
+        "maxDurationMs": 900
+      },
+      "outputs": [
+        {
+          "kind": "evidence",
+          "name": "evidence",
+          "required": true
+        }
+      ],
+      "inputs": [
+        {
+          "kind": "text",
+          "name": "goal",
+          "required": true
+        }
+      ]
+    }
+  ]
+}
