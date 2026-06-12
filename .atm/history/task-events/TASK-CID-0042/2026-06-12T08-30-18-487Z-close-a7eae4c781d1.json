@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-12T08-30-18-487Z-close-a7eae4c781d1",
+  "taskId": "TASK-CID-0042",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260612082529-codex-gpt-5.4-mini-TASK-CID-0042-dfc3613d60",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0042.json",
+  "taskSha256": "sha256:44a5cb8b0e559cefc957a2570d51d19a6f5937ea6631a3cc0072e565e2775b8a",
+  "createdAt": "2026-06-12T08:30:18.487Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0042 --actor codex-gpt-5.4-mini --status done --historical-delivery 803ffc335a2f71a38a1de41bbf69728fb7939a42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260612082529-codex-gpt-5.4-mini-TASK-CID-0042-dfc3613d60",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0042.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-12T08:30:18.484Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0042-freeze-patch-envelope-checkpoint-and-filesystem-wip-snapshot.task.md",
+        ".atm/history/evidence/TASK-CID-0042.*",
+        ".atm/history/task-events/TASK-CID-0042/**",
+        ".atm/history/tasks/TASK-CID-0042.json",
+        "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+        "packages/core/src/broker/freeze.ts",
+        "packages/core/src/broker/patch-envelope.ts",
+        "schemas/patch-envelope.schema.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+        "packages/core/src/broker/freeze.ts",
+        "packages/core/src/broker/patch-envelope.ts",
+        "schemas/patch-envelope.schema.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
