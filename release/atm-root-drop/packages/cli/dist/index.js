@@ -278,6 +278,13 @@ export const plannedCliCommands = [
         outputFormat: 'pretty+json'
     },
     {
+        commandName: 'route',
+        summary: 'Steward takeover and validator-gated apply command',
+        implemented: true,
+        standaloneMode: true,
+        outputFormat: 'pretty+json'
+    },
+    {
         commandName: 'registry',
         summary: 'Backfill adopter-owned registry lineage from verified evidence',
         implemented: true,

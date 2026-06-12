@@ -410,6 +410,16 @@ target_repo: AI-Atomic-Framework
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DEP-0001.json'), 'TASK-DEP-0001', 'Unfinished dependency', 'docs/dep.md', {
       status: 'planned'
     });
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DEP-0041.json'), 'TASK-DEP-0041', 'Ready task with hard dependency', 'docs/dep-0041.md', {
+      status: 'ready',
+      dependencies: ['TASK-DEP-0001']
+    });
+    const dependencyBlockedNextClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-DEP-0041']);
+    assert(dependencyBlockedNextClaim.ok === false, 'next --claim must block when a task dependency is not yet closed');
+    assert(dependencyBlockedNextClaim.messages.some((entry) => entry.code === 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED'), 'next --claim must report dependency-blocked guidance');
+    const dependencyBlockedTasksClaim = await runTasks(['claim', '--cwd', tempRoot, '--task', 'TASK-DEP-0041', '--actor', 'prompt-scope-test', '--json']).catch((error: any) => ({ ok: false, error }));
+    const dependencyBlockedTasksClaimError = (dependencyBlockedTasksClaim as any).error;
+    assert(dependencyBlockedTasksClaimError && dependencyBlockedTasksClaimError.code === 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED', 'tasks claim must fail when a task dependency is not yet closed');
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DEP-0040.json'), 'TASK-DEP-0040', 'Explicit running task with advisory dependency', 'docs/dep-0040.md', {
       status: 'running',
       claimActorId: 'prompt-scope-test',

@@ -1579,6 +1579,31 @@ async function runTasksReservation(action, argv) {
         }
     });
 }
+function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument) {
+    const declaredDependencies = Array.from(new Set(parseYamlList(taskDocument.dependencies ?? taskDocument.depends_on ?? taskDocument.blocked_by)));
+    if (declaredDependencies.length === 0) {
+        return [];
+    }
+    const blockers = [];
+    for (const dependencyTaskId of declaredDependencies) {
+        const dependencyPath = taskPathFor(cwd, dependencyTaskId);
+        if (!existsSync(dependencyPath)) {
+            blockers.push({ taskId: dependencyTaskId, status: 'missing', taskPath: dependencyPath });
+            continue;
+        }
+        try {
+            const dependencyDocument = JSON.parse(readFileSync(dependencyPath, 'utf8'));
+            const dependencyStatus = normalizeWorkItemStatus(dependencyDocument.status);
+            if (dependencyStatus !== 'done' && dependencyStatus !== 'verified') {
+                blockers.push({ taskId: dependencyTaskId, status: dependencyStatus, taskPath: dependencyPath });
+            }
+        }
+        catch {
+            blockers.push({ taskId: dependencyTaskId, status: 'unreadable', taskPath: dependencyPath });
+        }
+    }
+    return blockers.filter((entry) => entry.taskId !== taskId);
+}
 async function runTasksReset(argv) {
     const options = parseResetOptions(argv);
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -2826,6 +2851,18 @@ async function runTasksClaimLifecycle(action, argv) {
                 details: {
                     taskId: options.taskId,
                     status: taskDocument.status ?? null
+                }
+            });
+        }
+        const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
+        if (dependencyBlockers.length > 0) {
+            throw new CliError('ATM_TASK_CLAIM_DEPENDENCY_BLOCKED', `Task ${options.taskId} cannot be claimed until prerequisite task(s) close.`, {
+                exitCode: 1,
+                details: {
+                    taskId: options.taskId,
+                    dependencyTaskIds: dependencyBlockers.map((entry) => entry.taskId),
+                    dependencyStatuses: dependencyBlockers,
+                    requiredCommand: `node atm.mjs tasks status --task ${dependencyBlockers[0].taskId} --json`
                 }
             });
         }

@@ -64,6 +64,7 @@ import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startu
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 import { runIdentity } from './commands/identity.ts';
 import { runBroker } from './commands/broker.ts';
+import { runRoute } from './commands/route.ts';
 
 export const cliCommandRunners: Record<string, (argv: any) => any> = {
   atomize: runAtomize,
@@ -125,7 +126,8 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   'health-report': runHealthReport,
   identity: runIdentity,
   taskflow: runTaskflow,
-  broker: runBroker
+  broker: runBroker,
+  route: runRoute
 };
 
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {

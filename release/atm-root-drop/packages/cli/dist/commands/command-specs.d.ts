@@ -377,6 +377,13 @@ export declare const commandSpecs: Readonly<{
         options: any[];
         examples: any[];
     }>;
+    route: Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+    }>;
 }>;
 export declare function getCommandSpec(commandName: string): any;
 export declare function listCommandSpecs(options?: {
