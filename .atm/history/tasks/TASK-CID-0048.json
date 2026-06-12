@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0048",
+  "title": "Task close state machine and closure metadata hard gate",
+  "status": "done",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-CID-0046",
+    "TASK-CID-0047"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-cli.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-cli.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Historical-delivery commit diff scope enforcement",
+    "Mailbox dependency bridge",
+    "Planning mirror status sync"
+  ],
+  "nonGoals": [
+    "Do not permit a plain status write or manual close event to become trusted closeout provenance."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert this gate if it blocks legitimate governed closeout flows that carry an active claim and valid closure metadata.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cid-close-checkpoint-gate-map",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0048-task-close-state-machine-and-closure-metadata-hard-gate.task.md",
+    "sectionTitle": "TASK-CID-0048",
+    "headingLine": 47,
+    "hash": "b4348c9830b5a27b"
+  },
+  "importedAt": "2026-06-12T11:14:33.708Z",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0048.closure-packet.json",
+  "lastTransitionId": "2026-06-12T11-37-01-124Z-repair-closure-7ec1a968acc9",
+  "lastTransitionAt": "2026-06-12T11:37:01.124Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
