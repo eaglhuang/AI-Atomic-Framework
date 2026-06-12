@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0040",
   "title": "Intent registration, lease, heartbeat, and lease bounds",
-  "status": "running",
+  "status": "done",
   "milestone": "M5",
   "dependencies": [
     "TASK-CID-0032",
@@ -11,7 +11,9 @@
   "acceptance": [
     "Register, renew, and release flows are deterministic and test-covered.",
     "Unknown-scope or malformed admission requests fail closed.",
-    "Lease bounds are explicit and cannot silently exceed the agreed maximum."
+    "Lease bounds are explicit and cannot silently exceed the agreed maximum.",
+    "Claim must fail closed when any declared dependency is still open, running, planned, or otherwise not done / verified.",
+    "After deliverables exist, agents must still run `tasks close`; validator green is not a substitute for closeout."
   ],
   "deliverables": [
     "packages/core/src/broker/intent-registry.ts",
@@ -73,42 +75,41 @@
   "source": {
     "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0040-intent-registration-lease-heartbeat-and-lease-bounds.task.md",
     "sectionTitle": "TASK-CID-0040",
-    "headingLine": 61,
-    "hash": "ad5d921fb4e796b6"
+    "headingLine": 63,
+    "hash": "9e5e627140f3adb0"
   },
-  "importedAt": "2026-06-12T07:56:49.734Z",
-  "lastTransitionId": "2026-06-12T07-56-53-884Z-claim-0f38366fa55c",
-  "lastTransitionAt": "2026-06-12T07:56:53.884Z",
+  "importedAt": "2026-06-12T09:38:58.714Z",
+  "reopenedAt": "2026-06-12T09:38:58.718Z",
+  "lastTransitionId": "2026-06-12T13-51-44-606Z-close-786551898dd8",
+  "lastTransitionAt": "2026-06-12T13:51:44.606Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-06-12T07:56:53.857Z",
-  "promotedAt": "2026-06-12T07:56:53.860Z",
+  "owner": "001",
+  "reservedAt": "2026-06-12T09:41:53.500Z",
+  "promotedAt": "2026-06-12T09:41:53.664Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-91f2c3939d91",
-    "claimedAt": "2026-06-12T07:56:53.863Z",
-    "heartbeatAt": "2026-06-12T07:56:53.863Z",
+    "leaseId": "lease-37ab5f7e348a",
+    "claimedAt": "2026-06-12T09:42:01.210Z",
+    "heartbeatAt": "2026-06-12T13:51:44.605Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-CID-0040.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-139Z-import-24c9003e7ccd.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-141Z-claim-displaced-by-import-da3cbcddcfba.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-39-441Z-release-4a43b92ad00c.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-501Z-reserve-45bb57af8d24.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-665Z-promote-2100ac0b059a.json",
       ".atm/history/tasks/TASK-CID-0040.json",
-      "packages/cli/src/commands/broker.ts",
-      "packages/core/src/broker/__tests__/agr-layer2.test.ts",
-      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
-      "packages/core/src/broker/__tests__/decision.test.ts",
-      "packages/core/src/broker/__tests__/intent-registry.test.ts",
       "packages/core/src/broker/index.ts",
       "packages/core/src/broker/intent-registry.ts",
-      "packages/core/src/broker/lifecycle.ts",
-      "packages/core/src/broker/registry.ts",
-      "packages/core/src/broker/types.ts",
-      "scripts/validate-broker-registry.ts"
+      "packages/core/src/broker/lifecycle.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "reconciled"
   },
-  "startedAt": "2026-06-12T07:56:53.863Z",
+  "startedAt": "2026-06-12T09:41:16.182Z",
   "startedByActor": "codex-gpt-5.4-mini",
-  "startedBySessionId": "session-20260612075653-codex-gpt-5.4-mini-TASK-CID-0040-ea675f9981",
+  "startedBySessionId": "session-20260612094201-codex-gpt-5.4-mini-TASK-CID-0040-bf1788b377",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -119,26 +120,29 @@
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/TASK-CID-0040.*",
+      ".atm/history/evidence/TASK-CID-0040.json",
       ".atm/history/task-events/TASK-CID-0040/**",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-139Z-import-24c9003e7ccd.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-141Z-claim-displaced-by-import-da3cbcddcfba.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-39-441Z-release-4a43b92ad00c.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-501Z-reserve-45bb57af8d24.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-665Z-promote-2100ac0b059a.json",
       ".atm/history/tasks/TASK-CID-0040.json",
-      "packages/cli/src/commands/broker.ts",
-      "packages/core/src/broker/__tests__/agr-layer2.test.ts",
-      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
-      "packages/core/src/broker/__tests__/decision.test.ts",
-      "packages/core/src/broker/__tests__/intent-registry.test.ts",
       "packages/core/src/broker/index.ts",
       "packages/core/src/broker/intent-registry.ts",
-      "packages/core/src/broker/lifecycle.ts",
-      "packages/core/src/broker/registry.ts",
-      "packages/core/src/broker/types.ts",
-      "scripts/validate-broker-registry.ts"
+      "packages/core/src/broker/lifecycle.ts"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "89d536e4e9668fe43723996578b5d5b05fa137796c54128dbd24ae69d1c73955",
     "actorId": "codex-gpt-5.4-mini",
-    "createdAt": "2026-06-12T07:56:53.883Z",
+    "createdAt": "2026-06-12T09:42:01.230Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-12T13:51:44.605Z",
+  "closedByActor": "001",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit daf47aa840c45cf00bb1564cfbecfaa4fd02774d",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0040.closure-packet.json"
 }

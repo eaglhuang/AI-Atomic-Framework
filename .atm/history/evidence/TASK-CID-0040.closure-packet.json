@@ -1,0 +1,233 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0040",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "55dc787adb385d276dd03089b6743f0a1e88e033",
+  "governedTreeSha": "3157bd0bcc6644880ceae031f70211af2ab9f286",
+  "targetCommitDelta": {
+    "currentCommitSha": "55dc787adb385d276dd03089b6743f0a1e88e033",
+    "parentCommitShas": [
+      "55dc787adb385d276dd03089b6743f0a1e88e033"
+    ],
+    "governedTreeSha": "3157bd0bcc6644880ceae031f70211af2ab9f286",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0040.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-139Z-import-24c9003e7ccd.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-141Z-claim-displaced-by-import-da3cbcddcfba.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-38-58-718Z-import-c16d47c508b1.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-39-19-245Z-reserve-c07d60a70119.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-39-19-344Z-promote-8061bb76720f.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-16-202Z-claim-b9f098a9641d.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-39-441Z-release-4a43b92ad00c.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-501Z-reserve-45bb57af8d24.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-665Z-promote-2100ac0b059a.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-42-01-231Z-claim-fb8a550f874b.json",
+      ".atm/history/tasks/TASK-AAO-0063.json",
+      ".atm/history/tasks/TASK-CID-0040.json",
+      ".atm/history/tasks/TASK-CID-0042.json",
+      ".atm/history/tasks/TASK-CID-0050.json",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/core/src/broker/__tests__/agr-layer2.test.ts",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/__tests__/intent-registry.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/intent-registry.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/proposal.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/types.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/atm.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-predicates.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/src/atm.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-predicates.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "scripts/validate-broker-registry.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da89f730cddd75dba1a2dbd74c95cf6e423e71a1506abc14aca00486bab9d3be",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:56445fcf1c928669a5c87b3b100b1a9b35d2d245d133f69acd2612de72f18c02",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:221ae6a74ce096fe673ccc15d13937ebc75403a2da6e06a3c3651cb4613663a6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9782b5b016e73e6140889e5921b53f7be85ae568f468b32636ffa1f290e134d4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-12T13:51:44.604Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0040-intent-registration-lease-heartbeat-and-lease-bounds.task.md",
+      ".atm/history/evidence/TASK-CID-0040.*",
+      ".atm/history/evidence/TASK-CID-0040.json",
+      ".atm/history/task-events/TASK-CID-0040/**",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-139Z-import-24c9003e7ccd.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-31-46-141Z-claim-displaced-by-import-da3cbcddcfba.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-39-441Z-release-4a43b92ad00c.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-501Z-reserve-45bb57af8d24.json",
+      ".atm/history/task-events/TASK-CID-0040/2026-06-12T09-41-53-665Z-promote-2100ac0b059a.json",
+      ".atm/history/tasks/TASK-CID-0040.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/agr-layer2.test.ts",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/__tests__/intent-registry.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/intent-registry.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/types.ts",
+      "scripts/validate-broker-registry.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/agr-layer2.test.ts",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/__tests__/intent-registry.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/intent-registry.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/types.ts",
+      "scripts/validate-broker-registry.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0040.json",
+  "closedAt": "2026-06-12T13:51:44.604Z",
+  "closedByActor": "001",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "daf47aa840c45cf00bb1564cfbecfaa4fd02774d",
+    "reconciledAt": "2026-06-12T13:51:43.803Z",
+    "reconciledByActor": "001",
+    "reason": "Historical reconcile sync against commit daf47aa840c45cf00bb1564cfbecfaa4fd02774d"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "daf47aa840c45cf00bb1564cfbecfaa4fd02774d",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/__tests__/agr-layer2.test.ts",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/__tests__/intent-registry.test.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/types.ts",
+      "scripts/validate-broker-registry.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  }
+}
