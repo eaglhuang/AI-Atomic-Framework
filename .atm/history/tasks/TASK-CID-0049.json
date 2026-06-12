@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0049",
+  "title": "Historical-delivery scope and commit provenance hard gate",
+  "status": "done",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-CID-0046",
+    "TASK-CID-0047"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-cli.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-cli.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "General task close lifecycle state-machine hardening",
+    "Mailbox dependency bridge",
+    "Planning mirror status sync"
+  ],
+  "nonGoals": [
+    "Do not allow broad commits, mixed-task commits, or generic git-head evidence to replace task-specific delivery proof."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if legitimate historical-delivery closeback can no longer prove task-specific deliverables.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cid-historical-delivery-provenance-map",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0049-historical-delivery-scope-and-commit-provenance-hard-gate.task.md",
+    "sectionTitle": "TASK-CID-0049",
+    "headingLine": 46,
+    "hash": "6a272f5ccb1711ab"
+  },
+  "importedAt": "2026-06-12T11:14:33.770Z",
+  "lastTransitionId": "2026-06-12T11-41-38-786Z-close-9830fd1bd60a",
+  "lastTransitionAt": "2026-06-12T11:41:38.786Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "008",
+  "closedAt": "2026-06-12T11:41:38.785Z",
+  "closedByActor": "008",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 1bc75f770d5fe142a92ae2d23b4d50e66e9eed78",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0049.closure-packet.json"
+}
