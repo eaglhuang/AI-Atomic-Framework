@@ -191,6 +191,12 @@ export declare function buildResidueDiagnosisEvidence(cwd: string, taskId: strin
         residueClassification: TaskResidueClassification;
     };
 };
+export declare function verifyCloseoutProvenance(cwd: string, taskId: string, document: Record<string, unknown>): boolean;
+export declare function findTaskClaimDependencyBlockers(cwd: string, taskId: string, taskDocument: Record<string, unknown>): {
+    taskId: string;
+    status: string;
+    taskPath: string;
+}[];
 export interface ParsedPlanResult {
     readonly tasks: readonly TaskImportRecord[];
     readonly diagnostics: TaskImportDiagnostic[];

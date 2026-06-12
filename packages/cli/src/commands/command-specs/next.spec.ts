@@ -1,3 +1,4 @@
+// Spec definitions for next command
 import { defineCommandSpec } from '../shared.ts';
 import {
   commonCwdOption,

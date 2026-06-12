@@ -57,7 +57,8 @@ import {
 } from './work-channels.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
-import { runTasks } from './tasks.ts';
+import { runTasks, findTaskClaimDependencyBlockers } from './tasks.ts';
+import { taskPathFor } from './tasks/task-file-io-helpers.ts';
 import {
   parseMarkdownFrontmatter,
   normalizeTaskRouteStatus,
@@ -549,22 +550,30 @@ async function claimNextImportedTask(input: {
   const claimDependencyStatusById = new Map(
     input.importedTaskQueue.tasks.map((task) => [task.workItemId, task.status] as const)
   );
-  const selectedTaskDependencyBlockers = input.importedTaskQueue.selectedTask
-    ? input.importedTaskQueue.selectedTask.dependencies.filter((dependency) => {
-      const status = claimDependencyStatusById.get(dependency);
-      return status !== 'done' && status !== 'verified';
-    })
-    : [];
-  if (!input.importedTaskQueue.claimableTask && selectedTaskDependencyBlockers.length > 0) {
-    const selectedTask = input.importedTaskQueue.selectedTask;
+  const selectedTask = input.importedTaskQueue.claimableTask || input.importedTaskQueue.selectedTask;
+  let selectedTaskDependencyBlockers: Array<{ taskId: string; status: string; taskPath: string }> = [];
+  if (selectedTask) {
+    const taskPath = taskPathFor(input.cwd, selectedTask.workItemId);
+    if (existsSync(taskPath)) {
+      try {
+        const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+        selectedTaskDependencyBlockers = findTaskClaimDependencyBlockers(input.cwd, selectedTask.workItemId, taskDocument);
+      } catch {}
+    }
+  }
+  if (selectedTaskDependencyBlockers.length > 0) {
+    const firstBlocker = selectedTaskDependencyBlockers[0];
+    const requiredCmd = firstBlocker.status === 'incomplete-closeout'
+      ? `node atm.mjs tasks finalize diagnose --task ${firstBlocker.taskId} --json`
+      : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`;
     return makeResult({
       ok: false,
       command: 'next',
       cwd: input.cwd,
       messages: [message('error', 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', `Claim blocked until prerequisite task(s) close for ${selectedTask?.workItemId ?? 'the selected task'}.`, {
         taskId: selectedTask?.workItemId ?? null,
-        blockingTaskIds: selectedTaskDependencyBlockers,
-        requiredCommand: `node atm.mjs tasks status --task ${selectedTaskDependencyBlockers[0]} --json`
+        blockingTaskIds: selectedTaskDependencyBlockers.map((b) => b.taskId),
+        requiredCommand: requiredCmd
       })],
       evidence: {
         taskIntent: input.taskIntent,
@@ -2012,11 +2021,11 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
   const explicitSingleTaskRoute = isExplicitSingleTaskRoute(promptScope, taskIntent);
   const selectedTask = explicitSingleTaskRoute
     ? selectedTaskPool[0] ?? null
-    : selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById)) ?? null;
+    : selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById, cwd)) ?? null;
   const claimableTask = selectedTask
     && selectedTask.format === 'json'
     && (canTaskBePreparedForClaim(selectedTask.status) || isTaskAlreadyActivelyClaimed(selectedTask))
-    && (areTaskDependenciesSatisfied(selectedTask, statusById) || isTaskAlreadyActivelyClaimed(selectedTask))
+    && (areTaskDependenciesSatisfied(selectedTask, statusById, cwd) || isTaskAlreadyActivelyClaimed(selectedTask))
     ? selectedTask
     : null;
 

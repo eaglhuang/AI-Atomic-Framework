@@ -43,7 +43,7 @@ interface ImportedTaskQueue {
 }
 declare function isFrameworkMaintenancePrompt(prompt: string): boolean;
 declare function isExplicitSingleTaskRoute(promptScope: PromptScopedTaskRoute | null, taskIntent: TaskIntent | null): boolean;
-declare function areTaskDependenciesSatisfied(task: ImportedTaskSummary, statusById: ReadonlyMap<string, string>): boolean;
+declare function areTaskDependenciesSatisfied(task: ImportedTaskSummary, statusById: ReadonlyMap<string, string>, cwd?: string): boolean;
 declare function canTaskBePreparedForClaim(status: string): boolean;
 declare function isTaskAlreadyActivelyClaimed(task: ImportedTaskSummary): boolean;
 declare function isClosedTaskStatus(status: string): boolean;

@@ -18,7 +18,8 @@ import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue
 import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, writeBatchRun, writeQuickfixLock } from './work-channels.js';
 import { decideActiveBatchClaimTask } from './next-active-batch.js';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
-import { runTasks } from './tasks.js';
+import { runTasks, findTaskClaimDependencyBlockers } from './tasks.js';
+import { taskPathFor } from './tasks/task-file-io-helpers.js';
 import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText, normalizeTaskIntent, normalizeOptionalTaskPath, readStringArray, splitListValue } from './next/intent-normalizers.js';
 import { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards } from './next/route-predicates.js';
 import { dedupeStrings, quoteCliValue, sha256, toTaskCandidateView, uniqueInOrder, uniqueSorted } from './next/view-projections.js';
@@ -418,22 +419,31 @@ async function claimNextImportedTask(input) {
         });
     }
     const claimDependencyStatusById = new Map(input.importedTaskQueue.tasks.map((task) => [task.workItemId, task.status]));
-    const selectedTaskDependencyBlockers = input.importedTaskQueue.selectedTask
-        ? input.importedTaskQueue.selectedTask.dependencies.filter((dependency) => {
-            const status = claimDependencyStatusById.get(dependency);
-            return status !== 'done' && status !== 'verified';
-        })
-        : [];
-    if (!input.importedTaskQueue.claimableTask && selectedTaskDependencyBlockers.length > 0) {
-        const selectedTask = input.importedTaskQueue.selectedTask;
+    const selectedTask = input.importedTaskQueue.claimableTask || input.importedTaskQueue.selectedTask;
+    let selectedTaskDependencyBlockers = [];
+    if (selectedTask) {
+        const taskPath = taskPathFor(input.cwd, selectedTask.workItemId);
+        if (existsSync(taskPath)) {
+            try {
+                const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+                selectedTaskDependencyBlockers = findTaskClaimDependencyBlockers(input.cwd, selectedTask.workItemId, taskDocument);
+            }
+            catch { }
+        }
+    }
+    if (selectedTaskDependencyBlockers.length > 0) {
+        const firstBlocker = selectedTaskDependencyBlockers[0];
+        const requiredCmd = firstBlocker.status === 'incomplete-closeout'
+            ? `node atm.mjs tasks finalize diagnose --task ${firstBlocker.taskId} --json`
+            : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`;
         return makeResult({
             ok: false,
             command: 'next',
             cwd: input.cwd,
             messages: [message('error', 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', `Claim blocked until prerequisite task(s) close for ${selectedTask?.workItemId ?? 'the selected task'}.`, {
                     taskId: selectedTask?.workItemId ?? null,
-                    blockingTaskIds: selectedTaskDependencyBlockers,
-                    requiredCommand: `node atm.mjs tasks status --task ${selectedTaskDependencyBlockers[0]} --json`
+                    blockingTaskIds: selectedTaskDependencyBlockers.map((b) => b.taskId),
+                    requiredCommand: requiredCmd
                 })],
             evidence: {
                 taskIntent: input.taskIntent,
@@ -1746,11 +1756,11 @@ function inspectImportedTaskQueue(cwd, taskIntent) {
     const explicitSingleTaskRoute = isExplicitSingleTaskRoute(promptScope, taskIntent);
     const selectedTask = explicitSingleTaskRoute
         ? selectedTaskPool[0] ?? null
-        : selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById)) ?? null;
+        : selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById, cwd)) ?? null;
     const claimableTask = selectedTask
         && selectedTask.format === 'json'
         && (canTaskBePreparedForClaim(selectedTask.status) || isTaskAlreadyActivelyClaimed(selectedTask))
-        && (areTaskDependenciesSatisfied(selectedTask, statusById) || isTaskAlreadyActivelyClaimed(selectedTask))
+        && (areTaskDependenciesSatisfied(selectedTask, statusById, cwd) || isTaskAlreadyActivelyClaimed(selectedTask))
         ? selectedTask
         : null;
     return {

@@ -31,10 +31,66 @@ function isExplicitSingleTaskRoute(promptScope, taskIntent) {
     return taskIntent.explicitTaskIds.includes(selectedTaskId)
         || taskIntent.mentionedTaskIds.includes(selectedTaskId);
 }
-function areTaskDependenciesSatisfied(task, statusById) {
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+function verifyCloseoutProvenance(cwd, taskId, document) {
+    const closurePacketVal = document.closurePacket ?? document.closure_packet;
+    if (typeof closurePacketVal === 'string' && closurePacketVal.trim().length > 0) {
+        const cpPath = path.resolve(cwd, closurePacketVal.trim());
+        if (existsSync(cpPath)) {
+            try {
+                const cpData = JSON.parse(readFileSync(cpPath, 'utf8'));
+                if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
+                    return true;
+                }
+            }
+            catch { }
+        }
+    }
+    const lastTransitionId = document.lastTransitionId ?? document.last_transition_id;
+    if (typeof lastTransitionId === 'string' && lastTransitionId.trim().length > 0) {
+        const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId.trim()}.json`);
+        if (existsSync(eventPath)) {
+            try {
+                const eventData = JSON.parse(readFileSync(eventPath, 'utf8'));
+                if (eventData && (eventData.action === 'close' || eventData.toStatus === 'done' || eventData.toStatus === 'verified')) {
+                    if (eventData.closure && typeof eventData.closure === 'object' && eventData.closure.schemaId === 'atm.taskClosureTransition.v1') {
+                        return true;
+                    }
+                }
+            }
+            catch { }
+        }
+    }
+    const fallbackCpPath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
+    if (existsSync(fallbackCpPath)) {
+        try {
+            const cpData = JSON.parse(readFileSync(fallbackCpPath, 'utf8'));
+            if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
+                return true;
+            }
+        }
+        catch { }
+    }
+    return false;
+}
+function areTaskDependenciesSatisfied(task, statusById, cwd = process.cwd()) {
     return task.dependencies.every((dependency) => {
         const status = statusById.get(dependency);
-        return status === 'done' || status === 'verified';
+        if (status !== 'done' && status !== 'verified') {
+            return false;
+        }
+        const dependencyPath = path.join(cwd, '.atm', 'history', 'tasks', `${dependency}.json`);
+        if (!existsSync(dependencyPath)) {
+            return false;
+        }
+        try {
+            const dependencyDoc = JSON.parse(readFileSync(dependencyPath, 'utf8'));
+            return verifyCloseoutProvenance(cwd, dependency, dependencyDoc);
+        }
+        catch {
+            return false;
+        }
     });
 }
 function canTaskBePreparedForClaim(status) {

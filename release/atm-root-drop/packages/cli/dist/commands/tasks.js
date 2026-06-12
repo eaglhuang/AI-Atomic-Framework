@@ -1579,7 +1579,48 @@ async function runTasksReservation(action, argv) {
         }
     });
 }
-function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument) {
+export function verifyCloseoutProvenance(cwd, taskId, document) {
+    const closurePacketVal = document.closurePacket ?? document.closure_packet;
+    if (typeof closurePacketVal === 'string' && closurePacketVal.trim().length > 0) {
+        const cpPath = path.resolve(cwd, closurePacketVal.trim());
+        if (existsSync(cpPath)) {
+            try {
+                const cpData = JSON.parse(readFileSync(cpPath, 'utf8'));
+                if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
+                    return true;
+                }
+            }
+            catch { }
+        }
+    }
+    const lastTransitionId = document.lastTransitionId ?? document.last_transition_id;
+    if (typeof lastTransitionId === 'string' && lastTransitionId.trim().length > 0) {
+        const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId.trim()}.json`);
+        if (existsSync(eventPath)) {
+            try {
+                const eventData = JSON.parse(readFileSync(eventPath, 'utf8'));
+                if (eventData && (eventData.action === 'close' || eventData.toStatus === 'done' || eventData.toStatus === 'verified')) {
+                    if (eventData.closure && typeof eventData.closure === 'object' && eventData.closure.schemaId === 'atm.taskClosureTransition.v1') {
+                        return true;
+                    }
+                }
+            }
+            catch { }
+        }
+    }
+    const fallbackCpPath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
+    if (existsSync(fallbackCpPath)) {
+        try {
+            const cpData = JSON.parse(readFileSync(fallbackCpPath, 'utf8'));
+            if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
+                return true;
+            }
+        }
+        catch { }
+    }
+    return false;
+}
+export function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument) {
     const declaredDependencies = Array.from(new Set(parseYamlList(taskDocument.dependencies ?? taskDocument.depends_on ?? taskDocument.blocked_by)));
     if (declaredDependencies.length === 0) {
         return [];
@@ -1596,6 +1637,11 @@ function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument) {
             const dependencyStatus = normalizeWorkItemStatus(dependencyDocument.status);
             if (dependencyStatus !== 'done' && dependencyStatus !== 'verified') {
                 blockers.push({ taskId: dependencyTaskId, status: dependencyStatus, taskPath: dependencyPath });
+            }
+            else {
+                if (!verifyCloseoutProvenance(cwd, dependencyTaskId, dependencyDocument)) {
+                    blockers.push({ taskId: dependencyTaskId, status: 'incomplete-closeout', taskPath: dependencyPath });
+                }
             }
         }
         catch {
@@ -2856,13 +2902,17 @@ async function runTasksClaimLifecycle(action, argv) {
         }
         const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
         if (dependencyBlockers.length > 0) {
+            const firstBlocker = dependencyBlockers[0];
+            const requiredCmd = firstBlocker.status === 'incomplete-closeout'
+                ? `node atm.mjs tasks finalize diagnose --task ${firstBlocker.taskId} --json`
+                : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`;
             throw new CliError('ATM_TASK_CLAIM_DEPENDENCY_BLOCKED', `Task ${options.taskId} cannot be claimed until prerequisite task(s) close.`, {
                 exitCode: 1,
                 details: {
                     taskId: options.taskId,
                     dependencyTaskIds: dependencyBlockers.map((entry) => entry.taskId),
                     dependencyStatuses: dependencyBlockers,
-                    requiredCommand: `node atm.mjs tasks status --task ${dependencyBlockers[0].taskId} --json`
+                    requiredCommand: requiredCmd
                 }
             });
         }

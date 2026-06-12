@@ -1210,6 +1210,113 @@ try {
     const showUnknownEvidence = tasksShowUnknownRes.parsed.evidence;
     assert('status' in showUnknownEvidence, 'tasks show evidence must contain status');
     assert(!('unknownField' in showUnknownEvidence), 'tasks show evidence must not contain unknownField');
+
+    // Test 5.1: Dependency closeout provenance regression check
+    const taskAPath = path.join(autoLinkTempWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-DEP-A.json');
+    const taskBPath = path.join(autoLinkTempWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-DEP-B.json');
+
+    // 建立 task A：狀態為 done，但沒有 closurePacket 與 transition event (即 manual-done)
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-REGRESS-DEP-A',
+      title: 'Dependency A',
+      status: 'done'
+    });
+
+    // 建立 task B：狀態為 ready，依賴 task A
+    writeJson(taskBPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-REGRESS-DEP-B',
+      title: 'Dependency B',
+      status: 'ready',
+      dependencies: ['TASK-REGRESS-DEP-A']
+    });
+
+    // 執行 claim：應該被 block，因為 task A 沒有 closeout provenance
+    const claimRes = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
+    assert(claimRes.exitCode !== 0, 'tasks claim B must fail because dependency A has no closeout provenance');
+    assert(claimRes.parsed.messages.some((msg: any) => msg.code === 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'must report dependency blocked');
+    assert(claimRes.parsed.messages[0].data.requiredCommand.includes('finalize diagnose'), 'requiredCommand must recommend tasks finalize diagnose');
+
+    // 跑 next --claim 同樣應該被 block
+    const nextClaimRes = await runAtm(['next', '--claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
+    assert(nextClaimRes.exitCode !== 0, 'next --claim B must fail because dependency A has no closeout provenance');
+    assert(nextClaimRes.parsed.messages.some((msg: any) => msg.code === 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED'), 'must report dependency blocked in next');
+
+    // 建立手寫且沒有有效 closure metadata 的 close transition event
+    const eventPath = path.join(autoLinkTempWorkspace, '.atm', 'history', 'task-events', 'TASK-REGRESS-DEP-A', '2026-06-12T08-30-18-487Z-close-a7eae4c781d1.json');
+    writeJson(eventPath, {
+      schemaId: 'atm.taskTransition.v1',
+      specVersion: '0.1.0',
+      transitionId: '2026-06-12T08-30-18-487Z-close-a7eae4c781d1',
+      taskId: 'TASK-REGRESS-DEP-A',
+      action: 'close',
+      toStatus: 'done'
+      // 沒有 closure 屬性
+    });
+
+    // 更新 task A 指向該 event
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-REGRESS-DEP-A',
+      title: 'Dependency A',
+      status: 'done',
+      lastTransitionId: '2026-06-12T08-30-18-487Z-close-a7eae4c781d1'
+    });
+
+    // 執行 claim：應該仍被 block，因為 close event 沒有 closure metadata
+    const claimResWithInvalidEvent = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
+    assert(claimResWithInvalidEvent.exitCode !== 0, 'must fail because event lacks closure metadata');
+    assert(claimResWithInvalidEvent.parsed.messages.some((msg: any) => msg.code === 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'must report dependency blocked with invalid event');
+
+    // 更新 event 使其帶有有效的 closure metadata
+    writeJson(eventPath, {
+      schemaId: 'atm.taskTransition.v1',
+      specVersion: '0.1.0',
+      transitionId: '2026-06-12T08-30-18-487Z-close-a7eae4c781d1',
+      taskId: 'TASK-REGRESS-DEP-A',
+      action: 'close',
+      toStatus: 'done',
+      closure: {
+        schemaId: 'atm.taskClosureTransition.v1',
+        sessionId: 'session-123456',
+        closurePacketPath: '.atm/history/evidence/TASK-REGRESS-DEP-A.closure-packet.json'
+      }
+    });
+
+    // 再次嘗試 claim：此時應該通過了（不再報 dependency blocked 錯誤）
+    const claimResWithValidEvent = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
+    assert(claimResWithValidEvent.parsed.messages.every((msg: any) => msg.code !== 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'dependency B must no longer be blocked with valid event closure metadata');
+
+    // 移除 transition event 關聯，回到純 closurePacket 驗證
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-REGRESS-DEP-A',
+      title: 'Dependency A',
+      status: 'done'
+    });
+
+    // 建立 task A 的 closurePacket，讓它擁有 valid provenance
+    const cpPath = path.join(autoLinkTempWorkspace, '.atm', 'history', 'evidence', 'TASK-REGRESS-DEP-A.closure-packet.json');
+    writeJson(cpPath, {
+      schemaId: 'atm.closurePacket.v1',
+      specVersion: '0.1.0',
+      taskId: 'TASK-REGRESS-DEP-A',
+      evidence: []
+    });
+
+    // 重新寫入 task A，關聯其 closurePacket
+    writeJson(taskAPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-REGRESS-DEP-A',
+      title: 'Dependency A',
+      status: 'done',
+      closurePacket: '.atm/history/evidence/TASK-REGRESS-DEP-A.closure-packet.json'
+    });
+
+    // 再次嘗試 tasks claim，此時 dependency blockers 應該不包含 A (因為 A 已經有 provenance 了，雖然 B 狀態為 ready 還不能 claim，但錯誤不應該是 dependency blocked)
+    const claimResPass = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
+    assert(claimResPass.parsed.messages.every((msg: any) => msg.code !== 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'dependency B must no longer be blocked by dependency A');
   } finally {
     rmSync(autoLinkTempWorkspace, { recursive: true, force: true });
   }

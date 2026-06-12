@@ -1,3 +1,4 @@
+// Spec definitions for tasks command
 import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
