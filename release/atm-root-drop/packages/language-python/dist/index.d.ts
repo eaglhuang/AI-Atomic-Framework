@@ -1,5 +1,5 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
-import type { LanguageAdapter as SdkLanguageAdapter } from '@ai-atomic-framework/plugin-sdk';
+import type { LanguageAdapter as SdkLanguageAdapter, LanguageAdapterManifest as SdkLanguageAdapterManifest } from '@ai-atomic-framework/plugin-sdk';
 export declare const pythonLanguageAdapterPackage: {
     readonly packageName: "@ai-atomic-framework/language-python";
     readonly packageRole: "python-language-adapter";
@@ -100,9 +100,11 @@ export interface PythonValidationCommand {
     readonly required: boolean;
 }
 export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
+export type PythonLanguageAdapterManifest = SdkLanguageAdapterManifest;
 export interface PythonLanguageAdapter extends LanguageAdapter<PythonProjectProfile, PythonLanguageAdapterValidationRequest, PythonLanguageAdapterValidationReport> {
     readonly adapterName: '@ai-atomic-framework/language-python';
     readonly languageIds: readonly ['python'];
+    readonly manifest: PythonLanguageAdapterManifest;
     readonly supportsAtomizeDryRun: true;
     readonly supportsInfectDryRun: true;
 }
@@ -116,4 +118,4 @@ export declare const pythonLanguageRuntime: {
     readonly supportsInfectDryRun: true;
     readonly resultFormat: "PythonLanguageAdapterValidationReport";
 };
-export { createPythonLanguageAdapter, createPythonAtomizationPlanningAdapter, detectPythonProjectProfile, discoverPythonAtomCandidates, planPythonAtomizeFromCandidate, scanPythonImports, scanPythonEntrypoints, planPythonAtomize, validatePythonComputeAtom, createPythonCommandRunnerContract } from './language-python-adapter.ts';
+export { defaultPythonLanguageAdapterManifest, createPythonLanguageAdapter, createPythonAtomizationPlanningAdapter, detectPythonProjectProfile, discoverPythonAtomCandidates, planPythonAtomizeFromCandidate, scanPythonImports, scanPythonEntrypoints, planPythonAtomize, validatePythonComputeAtom, createPythonCommandRunnerContract } from './language-python-adapter.ts';

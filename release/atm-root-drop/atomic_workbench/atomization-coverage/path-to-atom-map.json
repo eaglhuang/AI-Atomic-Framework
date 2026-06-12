@@ -314,8 +314,15 @@
     {
       "path_pattern": "packages/cli/src/commands/git-governance.ts",
       "atom_id": "atm.git-governance-map",
-      "capability": "git identity preparation, commit wrapper trailers, task/session attribution, mirror-sync-only commit handling, and narrow closed-task historical ledger restore packet commits",
+      "capability": "git identity preparation, commit wrapper trailers, task/session attribution, mirror-sync-only commit handling, narrow closed-task historical ledger restore packet commits, and task-scoped staging required-command diagnostics for empty-index commits",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "atom_id": "atm.git-governance-map",
+      "capability": "regression coverage for task-scoped git commit staging diagnostics and mixed-scope fail-closed behavior",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0141"
     },
     {
       "path_pattern": "packages/cli/src/commands/guard.ts",
@@ -645,6 +652,27 @@
       "atom_id": "atm.task-direction-map",
       "capability": "isPathAllowedByScope is the quickfix/batch scope path matcher; explicitly NOT the SSOT for task direction allowed files (TASK-AAO-0012).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/agr.ts",
+      "atom_id": "atm.cid-agr-layer2-map",
+      "capability": "AGR Layer2 primitives for conflict extraction and bounded overlap metadata",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0031"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/policy.ts",
+      "atom_id": "atm.cid-agr-layer2-map",
+      "capability": "Layer2 trigger policy thresholds and bounded decision contract",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0031"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/__tests__/agr-layer2.test.ts",
+      "atom_id": "atm.cid-agr-layer2-map",
+      "capability": "Layer2 trigger/coverage focused test for bounded overlap and decomposition request emission",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0031"
     },
     {
       "path_pattern": "packages/core/src/**",

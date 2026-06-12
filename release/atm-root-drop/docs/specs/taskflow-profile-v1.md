@@ -9,7 +9,9 @@ The `taskflow.profile.v1` schema specifies the capabilities and delegation confi
 ## Operator Entry Model
 
 - `taskflow open` orchestrates the official governed opener entry.
+- `taskflow close` orchestrates the official governed closeback entry.
 - `tasks new` generates markdown templates through the existing plugin/generator surface.
+- `tasks close`, `tasks reconcile`, `tasks import`, and `tasks repair-closure` remain the authoritative backend operations.
 - Host numbering, canonical output-path policy, and roster synchronization are supplied through `delegation.policy` (`TASK-AAO-0138B`).
 
 ## Taskflow Open Result Contract (`atm.taskflowOpenResult.v1`)
@@ -48,6 +50,32 @@ The `taskflow.profile.v1` schema specifies the capabilities and delegation confi
 | `fallbackBehavior` | Explains why ATM remains in template-only fallback when host policy is unavailable. |
 
 Roster synchronization uses `node atm.mjs tasks roster update` as the only official write path.
+
+## Taskflow Close Result Contract (`atm.taskflowCloseResult.v1`)
+
+`taskflow close` reports closeback orchestration through these primary fields:
+
+| Field | Purpose |
+|---|---|
+| `closeMode` | `normal-close`, `historical-delivery-close`, `planning-mirror-sync-repair`, `residue-repair`, or `ambiguous-manual-review` |
+| `writeSupport` | Whether `--write` may execute the governed closeback entry |
+| `closebackPlan` | Backend surface, command, follow-up steps, writer boundary, and evidence validators |
+| `residueDiagnosis` | Reuses `atm.taskResidueDiagnosis.v1` truth/residue classification |
+| `delegationContract` | Same adopter-aware writer/roster boundary as `taskflow open` |
+
+### Close mode rules
+
+- `normal-close`: live ledger is ready for `tasks close`.
+- `historical-delivery-close`: residue or delivery context requires `tasks close --historical-delivery` or `tasks reconcile`.
+- `planning-mirror-sync-repair`: planning mirror residue routes to `tasks import`.
+- `residue-repair`: interrupted close routes to `tasks repair-closure`.
+- `ambiguous-manual-review`: fail closed; operator must inspect `tasks status` / `tasks finalize diagnose`.
+
+### Write gate
+
+- `taskflow close --write` requires `--task` and `--actor`.
+- Ambiguous residue fails closed with `ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE`.
+- Planning-mirror closeback reuses `tasks import` and `tasks roster update`; ATM does not add a second closeback writer.
 
 ## Invariants
 

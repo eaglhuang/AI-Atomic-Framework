@@ -5,11 +5,23 @@ export const defaultJavaScriptImportPolicy = Object.freeze({
     forbiddenSpecifiers: ['fs', 'node:fs', 'child_process', 'node:child_process'],
     allowedSpecifiers: []
 });
+export const defaultJavaScriptLanguageAdapterManifest = {
+    symbolCanonicalization: {
+        policy: 'declaration-name',
+        reExportAliasBehavior: 'syntactic-only',
+        decoratorResolutionStance: 'not-supported'
+    },
+    notes: [
+        'The JS adapter canonicalizes by declared symbol name and inspects re-export syntax, but it does not resolve alias provenance semantically.',
+        'Decorator semantics are not resolved by this adapter.'
+    ]
+};
 export function createJavaScriptLanguageAdapter(policyOverrides = {}) {
     const defaultPolicy = mergePolicy(defaultJavaScriptImportPolicy, policyOverrides);
     return {
         adapterName: '@ai-atomic-framework/language-js',
         languageIds: ['javascript', 'typescript'],
+        manifest: defaultJavaScriptLanguageAdapterManifest,
         detectProjectProfile,
         scanImports,
         validateComputeAtom: (request, profile = createUnknownProfile()) => validateComputeAtom(request, profile, defaultPolicy),

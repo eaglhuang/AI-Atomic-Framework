@@ -1,5 +1,6 @@
 import type { AtomCandidate, AtomCandidateDiscoveryRequest, AtomizationPlan, AtomizationPlanRequest, AtomizationPlanningAdapter } from '@ai-atomic-framework/plugin-sdk';
-import type { PythonAtomizePlan, PythonAtomizePlanRequest, PythonCommandRunnerContract, PythonEntrypointRecord, PythonImportPolicy, PythonImportRecord, PythonLanguageAdapter, PythonLanguageAdapterValidationReport, PythonLanguageAdapterValidationRequest, PythonProjectProfile, PythonSourceFile } from './index.ts';
+import type { PythonAtomizePlan, PythonAtomizePlanRequest, PythonCommandRunnerContract, PythonEntrypointRecord, PythonImportPolicy, PythonImportRecord, PythonLanguageAdapter, PythonLanguageAdapterManifest, PythonLanguageAdapterValidationReport, PythonLanguageAdapterValidationRequest, PythonProjectProfile, PythonSourceFile } from './index.ts';
+export declare const defaultPythonLanguageAdapterManifest: PythonLanguageAdapterManifest;
 export declare function createPythonLanguageAdapter(policyOverrides?: Partial<PythonImportPolicy>): PythonLanguageAdapter;
 export declare function detectPythonProjectProfile(repositoryRoot: string): PythonProjectProfile;
 export declare function validatePythonComputeAtom(request: PythonLanguageAdapterValidationRequest, profile?: PythonProjectProfile, basePolicy?: PythonImportPolicy): PythonLanguageAdapterValidationReport;

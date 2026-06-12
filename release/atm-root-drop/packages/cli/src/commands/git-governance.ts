@@ -4,6 +4,8 @@ import path from 'node:path';
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, resolveActorId, writeRuntimeIdentityDefault } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { findCloseCommitWindowCoveringPaths } from './framework-development.ts';
+import { getCanonicalAllowedFilesForTask, sanitizeTaskDirectionAllowedFiles } from './task-direction.ts';
+import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
 type TaskClaimRecord = {
@@ -312,6 +314,41 @@ function runGitCommit(options: ParsedGitOptions) {
         requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${options.taskId}" --json`
       }
     });
+  }
+  if (options.taskId && taskDocument && !bypassesActiveSession) {
+    const stagingInspection = inspectTaskScopedUnstagedCommit(options.cwd, options.taskId, taskDocument);
+    if (stagingInspection?.kind === 'staging-required') {
+      throw new CliError(
+        'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED',
+        `git commit for ${options.taskId} requires staged task-scoped files before the wrapper can create a governed commit.`,
+        {
+          exitCode: 1,
+          details: {
+            actorId,
+            taskId: options.taskId,
+            sessionId: session?.sessionId ?? null,
+            inScopeDirtyFiles: stagingInspection.inScopeDirtyFiles,
+            requiredCommand: stagingInspection.requiredCommand
+          }
+        }
+      );
+    }
+    if (stagingInspection?.kind === 'mixed-scope') {
+      throw new CliError(
+        'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS',
+        `git commit for ${options.taskId} found task-scoped dirty files mixed with out-of-scope dirty files; stage only in-scope files manually before retrying.`,
+        {
+          exitCode: 1,
+          details: {
+            actorId,
+            taskId: options.taskId,
+            sessionId: session?.sessionId ?? null,
+            inScopeDirtyFiles: stagingInspection.inScopeDirtyFiles,
+            outOfScopeDirtyFiles: stagingInspection.outOfScopeDirtyFiles
+          }
+        }
+      );
+    }
   }
   const trailers = [
     `ATM-Actor: ${actorId}`,
@@ -719,6 +756,140 @@ function readStagedFiles(cwd: string): readonly string[] {
   } catch {
     return [];
   }
+}
+
+type TaskScopedStagingInspection =
+  | { readonly kind: 'staging-required'; readonly inScopeDirtyFiles: readonly string[]; readonly requiredCommand: string }
+  | { readonly kind: 'mixed-scope'; readonly inScopeDirtyFiles: readonly string[]; readonly outOfScopeDirtyFiles: readonly string[] };
+
+function inspectTaskScopedUnstagedCommit(
+  cwd: string,
+  taskId: string,
+  taskDocument: Record<string, unknown>
+): TaskScopedStagingInspection | null {
+  if (readStagedFiles(cwd).length > 0) {
+    return null;
+  }
+  const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
+  if (declaredScope.length === 0) {
+    return null;
+  }
+  const dirtyFiles = listTaskScopedWorktreeDirtyFiles(cwd);
+  if (dirtyFiles.length === 0) {
+    return null;
+  }
+  const deliverableDirtyFiles = dirtyFiles.filter((filePath) =>
+    declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
+  );
+  if (deliverableDirtyFiles.length === 0) {
+    return null;
+  }
+  const blockingOutOfScopeDirtyFiles = dirtyFiles.filter((filePath) =>
+    !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
+    && !isIgnorableCommitStagingSideEffect(filePath, taskId)
+  );
+  if (blockingOutOfScopeDirtyFiles.length > 0) {
+    return {
+      kind: 'mixed-scope',
+      inScopeDirtyFiles: uniqueSorted(deliverableDirtyFiles),
+      outOfScopeDirtyFiles: uniqueSorted(blockingOutOfScopeDirtyFiles)
+    };
+  }
+  return {
+    kind: 'staging-required',
+    inScopeDirtyFiles: uniqueSorted(deliverableDirtyFiles),
+    requiredCommand: buildTaskScopedStagingRequiredCommand(cwd, deliverableDirtyFiles)
+  };
+}
+
+function isIgnorableCommitStagingSideEffect(filePath: string, taskId: string): boolean {
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  const normalizedTaskId = taskId.toLowerCase();
+  if (normalized.startsWith('.atm/runtime/')) {
+    return true;
+  }
+  if (normalized === `.atm/history/tasks/${normalizedTaskId}.json`) {
+    return true;
+  }
+  if (normalized.startsWith(`.atm/history/task-events/${normalizedTaskId}/`)) {
+    return true;
+  }
+  return false;
+}
+
+function resolveTaskDeclaredScope(cwd: string, taskId: string, taskDocument: Record<string, unknown>): readonly string[] {
+  const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
+    ? taskDocument.taskDirectionLock as Record<string, unknown>
+    : {};
+  const claim = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
+    ? taskDocument.claim as Record<string, unknown>
+    : {};
+  const lockAllowedFiles = getCanonicalAllowedFilesForTask(cwd, taskId) ?? [];
+  return sanitizeTaskDirectionAllowedFiles(uniqueSorted([
+    ...lockAllowedFiles,
+    ...extractStringList(taskDirectionLock.allowedFiles),
+    ...extractStringList(claim.files),
+    ...extractStringList(taskDocument.targetAllowedFiles),
+    ...extractTaskDeclaredFiles(taskDocument)
+  ]));
+}
+
+function listTaskScopedWorktreeDirtyFiles(cwd: string): readonly string[] {
+  const files = new Set<string>();
+  for (const filePath of readGitNameOnly(cwd, ['diff', '--name-only'])) {
+    files.add(filePath);
+  }
+  for (const filePath of readGitNameOnly(cwd, ['ls-files', '-o', '--exclude-standard'])) {
+    files.add(filePath);
+  }
+  return uniqueSorted([...files]);
+}
+
+function buildTaskScopedStagingRequiredCommand(cwd: string, files: readonly string[]): string {
+  const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
+  const cwdFlag = path.resolve(cwd) === path.resolve(process.cwd())
+    ? ''
+    : ` -C ${quoteCliValue(cwd)}`;
+  return `git${cwdFlag} add -- ${normalizedFiles.map(quoteCliValue).join(' ')}`;
+}
+
+function pathMatchesTaskScope(filePath: string, scope: string): boolean {
+  const file = normalizeRelativePath(filePath).toLowerCase();
+  const candidate = normalizeRelativePath(scope).toLowerCase();
+  if (!candidate) return false;
+  if (candidate.includes('*')) {
+    const escaped = candidate
+      .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+      .replace(/\*\*/g, '__ATM_DOUBLE_STAR__')
+      .replace(/\*/g, '[^/]*')
+      .replace(/__ATM_DOUBLE_STAR__/g, '.*');
+    return new RegExp(`^${escaped}$`).test(file);
+  }
+  if (file === candidate) return true;
+  if (candidate.endsWith('/')) return file.startsWith(candidate);
+  return file.startsWith(`${candidate}/`);
+}
+
+function readGitNameOnly(cwd: string, args: readonly string[]): readonly string[] {
+  try {
+    return execFileSync('git', args, {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).split(/\r?\n/).map(normalizeRelativePath).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function extractStringList(value: unknown): readonly string[] {
+  return Array.isArray(value)
+    ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
+    : [];
+}
+
+function uniqueSorted(values: readonly string[]): readonly string[] {
+  return [...new Set(values.map((entry) => entry.trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right));
 }
 
 function taskImportReportReferencesTask(cwd: string, file: string, taskId: string): boolean {

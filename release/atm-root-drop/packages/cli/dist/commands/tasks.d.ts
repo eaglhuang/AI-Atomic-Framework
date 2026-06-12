@@ -144,6 +144,53 @@ export interface TaskResidueClassification {
     nextCommand: string;
     autoMutationAllowed: false;
 }
+export declare function loadTaskDocumentOrThrow(cwd: string, taskId: string): {
+    taskPath: string;
+    taskDocument: Record<string, unknown>;
+};
+export declare function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>): {
+    schemaId: "atm.taskResidueDiagnosis.v1";
+    taskId: string;
+    bucket: TaskResidueBucket;
+    truth: string;
+    residue: string;
+    reason: string;
+    nextCommand: string;
+    nextCommandTemplate: string;
+    autoMutationAllowed: false;
+    diagnostics: {
+        codes: string[];
+        messages: string[];
+    };
+    triangulation: {
+        ssot: "liveLedger";
+        liveLedger: {
+            status: string | null;
+            claimState: "active" | "released" | "handoff" | "taken_over" | null;
+            lastTransitionId: string | null;
+            lastTransitionAt: string | null;
+        };
+        lastTransitionEvent: {
+            action: string | null;
+            actorId: string | null;
+            createdAt: string | null;
+            fromStatus: string | null;
+            toStatus: string | null;
+        } | null;
+        planningFrontmatter: {
+            status: string | null;
+            source: string | null;
+        };
+        divergence: {
+            field: string;
+            liveLedger: string | null;
+            planningFrontmatter?: string | null;
+            lastTransitionEvent?: string | null;
+        }[];
+        recommendation: string | null;
+        residueClassification: TaskResidueClassification;
+    };
+};
 export interface ParsedPlanResult {
     readonly tasks: readonly TaskImportRecord[];
     readonly diagnostics: TaskImportDiagnostic[];

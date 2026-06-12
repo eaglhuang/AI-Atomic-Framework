@@ -1,5 +1,5 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
-import type { LanguageAdapter as SdkLanguageAdapter } from '@ai-atomic-framework/plugin-sdk';
+import type { LanguageAdapter as SdkLanguageAdapter, LanguageAdapterManifest as SdkLanguageAdapterManifest } from '@ai-atomic-framework/plugin-sdk';
 export declare const languageJsPackage: {
     readonly packageName: "@ai-atomic-framework/language-js";
     readonly packageRole: "javascript-typescript-language-adapter";
@@ -49,6 +49,7 @@ export interface JavaScriptValidationCommand {
     readonly required: boolean;
 }
 export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
+export type JavaScriptLanguageAdapterManifest = SdkLanguageAdapterManifest;
 export interface JavaScriptValidationReport {
     readonly ok: boolean;
     readonly profile: JavaScriptProjectProfile;
@@ -60,6 +61,9 @@ export interface JavaScriptValidationReport {
 export interface JavaScriptLanguageAdapter extends LanguageAdapter<JavaScriptProjectProfile, LanguageAdapterValidationRequest, JavaScriptValidationReport> {
     readonly adapterName: '@ai-atomic-framework/language-js';
     readonly languageIds: readonly ['javascript', 'typescript'];
+    readonly manifest: JavaScriptLanguageAdapterManifest;
+    scanImports(sourceFile: JavaScriptSourceFile): readonly JavaScriptImportRecord[];
+    createCommandRunnerContract(profile: JavaScriptProjectProfile): TestCommandRunnerContract;
 }
 export declare const defaultJavaScriptImportPolicy: JavaScriptImportPolicy;
 export declare const languageJsRuntime: {
@@ -69,3 +73,4 @@ export declare const languageJsRuntime: {
     readonly supportsDelegatedTestCommands: true;
     readonly resultFormat: "JavaScriptValidationReport";
 };
+export { defaultJavaScriptLanguageAdapterManifest, createJavaScriptLanguageAdapter, createJavaScriptAtomizationPlanningAdapter, discoverJavaScriptAtomCandidates, detectProjectProfile, validateComputeAtom, scanImports, createCommandRunnerContract } from './language-js-adapter.ts';

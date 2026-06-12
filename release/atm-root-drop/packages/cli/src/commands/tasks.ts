@@ -651,7 +651,7 @@ async function recordStaleRunnerOverride(input: {
   return true;
 }
 
-function loadTaskDocumentOrThrow(cwd: string, taskId: string): { taskPath: string; taskDocument: Record<string, unknown> } {
+export function loadTaskDocumentOrThrow(cwd: string, taskId: string): { taskPath: string; taskDocument: Record<string, unknown> } {
   const taskPath = taskPathFor(cwd, taskId);
   if (!existsSync(taskPath)) {
     throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${taskId}.`, {
@@ -665,7 +665,7 @@ function loadTaskDocumentOrThrow(cwd: string, taskId: string): { taskPath: strin
   };
 }
 
-function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>) {
+export function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>) {
   const triangulation = buildTaskStatusTriangulation(cwd, taskId, taskDocument);
   const residue = triangulation.residueClassification;
   return {

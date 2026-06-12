@@ -353,7 +353,7 @@ async function recordStaleRunnerOverride(input) {
     });
     return true;
 }
-function loadTaskDocumentOrThrow(cwd, taskId) {
+export function loadTaskDocumentOrThrow(cwd, taskId) {
     const taskPath = taskPathFor(cwd, taskId);
     if (!existsSync(taskPath)) {
         throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${taskId}.`, {
@@ -366,7 +366,7 @@ function loadTaskDocumentOrThrow(cwd, taskId) {
         taskDocument: JSON.parse(readFileSync(taskPath, 'utf8'))
     };
 }
-function buildResidueDiagnosisEvidence(cwd, taskId, taskDocument) {
+export function buildResidueDiagnosisEvidence(cwd, taskId, taskDocument) {
     const triangulation = buildTaskStatusTriangulation(cwd, taskId, taskDocument);
     const residue = triangulation.residueClassification;
     return {

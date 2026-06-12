@@ -2,7 +2,7 @@ import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
     name: 'git',
-    summary: 'Prepare repo-local git identity, create governed commits, and verify ATM git-governance trailers.',
+    summary: 'Prepare repo-local git identity, create governed commits, verify ATM git-governance trailers, and return task-scoped staging diagnostics when --task commits have in-scope dirty files but an empty index.',
     positional: [
         { name: 'action', summary: 'prepare | check | commit', required: true }
     ],
@@ -26,6 +26,7 @@ export default defineCommandSpec({
         'node atm.mjs git check --actor codex-main --json',
         'node atm.mjs git commit --actor codex-main --task TASK-AAO-0036 --message "atm: sync TASK-AAO-0036 ledger mirror" --json',
         'node atm.mjs git commit --actor codex-main --task TASK-AAO-0063 --message "atm: restore TASK-AAO-0063 historical ledger packet" --json',
-        'node atm.mjs git commit --actor codex-main --task ATM-GOV-0105 --message "complete ATM-GOV-0105" --json'
+        'node atm.mjs git commit --actor codex-main --task ATM-GOV-0105 --message "complete ATM-GOV-0105" --json',
+        'node atm.mjs git commit --actor codex-main --task TASK-AAO-0141 --message "feat: scoped deliverable" --json'
     ]
 });

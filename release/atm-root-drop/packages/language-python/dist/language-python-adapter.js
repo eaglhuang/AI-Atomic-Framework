@@ -2,11 +2,23 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 const PIPELINE_FOLDER_HINTS = ['pipelines', 'jobs', 'tasks', 'workflows', 'flows'];
+export const defaultPythonLanguageAdapterManifest = {
+    symbolCanonicalization: {
+        policy: 'declaration-name',
+        reExportAliasBehavior: 'not-supported',
+        decoratorResolutionStance: 'not-supported'
+    },
+    notes: [
+        'The Python adapter canonicalizes declared function/class/module symbols only; it does not resolve alias provenance semantically.',
+        'Decorator semantics are not resolved by this adapter.'
+    ]
+};
 export function createPythonLanguageAdapter(policyOverrides = {}) {
     const basePolicy = mergePolicy({ forbiddenSpecifiers: [] }, policyOverrides);
     return {
         adapterName: '@ai-atomic-framework/language-python',
         languageIds: ['python'],
+        manifest: defaultPythonLanguageAdapterManifest,
         supportsAtomizeDryRun: true,
         supportsInfectDryRun: true,
         async detectProjectProfile(repositoryRoot) {
