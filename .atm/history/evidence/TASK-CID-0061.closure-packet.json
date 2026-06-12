@@ -1,0 +1,174 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0061",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "841dacf9febbfa565ef69b9d4e6602e00e0b0326",
+  "governedTreeSha": "296860e705a3e97407788e63a6c97608b3f4400f",
+  "targetCommitDelta": {
+    "currentCommitSha": "841dacf9febbfa565ef69b9d4e6602e00e0b0326",
+    "parentCommitShas": [
+      "841dacf9febbfa565ef69b9d4e6602e00e0b0326"
+    ],
+    "governedTreeSha": "296860e705a3e97407788e63a6c97608b3f4400f",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0040.json",
+      ".atm/history/tasks/TASK-AAO-0063.json",
+      ".atm/history/tasks/TASK-CID-0040.json",
+      ".atm/history/tasks/TASK-CID-0042.json",
+      ".atm/history/tasks/TASK-CID-0050.json",
+      "docs/reports/tasks-command-surface-contract.md",
+      "package.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/proposal.ts",
+      "release/atm-root-drop/packages/cli/dist/atm.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-predicates.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/src/atm.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-predicates.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "scripts/validate-tasks-command-surface.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:221ae6a74ce096fe673ccc15d13937ebc75403a2da6e06a3c3651cb4613663a6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:41643c6ddeafd4987e4ec15e0252f46b9f1df844452a2ba698b42beadaf3a7c7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:tasks-surface",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dd8986336b943c93322601ee86fbc09f204fb62cb69acb3281a605cdd49bcabb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:tasks-command-surface"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-12T14:32:50.194Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0061-tasks-command-surface-invariant-hard-gate.task.md",
+      ".atm/history/evidence/TASK-CID-0061.*",
+      ".atm/history/task-events/TASK-CID-0061/**",
+      ".atm/history/tasks/TASK-CID-0061.json",
+      "docs/reports/tasks-command-surface-contract.md",
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-tasks-command-surface.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-tasks-command-surface.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0061.json",
+  "closedAt": "2026-06-12T14:32:50.194Z",
+  "closedByActor": "007",
+  "sessionId": "session-20260612142546-007-TASK-CID-0061-63643ba950",
+  "attestation": null,
+  "historicalDeliveryProvenance": null
+}
