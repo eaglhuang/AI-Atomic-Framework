@@ -7,7 +7,6 @@ import { quoteForShell, detectAutoLinkedValidator } from '../packages/cli/src/co
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 import { cliCommandRunners, runCli } from '../packages/cli/src/atm.ts';
 import { commandSpecs, listCommandSpecs } from '../packages/cli/src/commands/command-specs.ts';
-import { categorizeHistoricalCommitFiles, inspectHistoricalDelivery } from '../packages/cli/src/commands/tasks.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -26,6 +25,12 @@ for (const key of Object.keys(process.env)) {
 
 const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
 const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');
+const regressionFixtures = {
+  sourceDoneWithoutGovernedCloseout: readJson('scripts/fixtures/tasks-invariant-regressions/01-source-done-without-governed-closeout.json'),
+  mailboxAndPlanningDone: readJson('scripts/fixtures/tasks-invariant-regressions/02-mailbox-and-planning-done.json'),
+  manualCloseWithoutMetadata: readJson('scripts/fixtures/tasks-invariant-regressions/03-manual-close-without-metadata.json'),
+  validClosurePacket: readJson('scripts/fixtures/tasks-invariant-regressions/04-valid-closure-packet.json')
+};
 const perCommandHelpSnapshots = {
   explain: readJson('tests/cli-fixtures/help-snapshots/explain.json'),
   broker: readJson('tests/cli-fixtures/help-snapshots/broker.json'),
@@ -59,6 +64,109 @@ function assert(condition: any, message: any) {
 
 function readJson(relativePath: any) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
+}
+
+function normalizeTaskScopePath(value: string) {
+  return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function pathMatchesTaskScope(filePath: string, declared: string) {
+  const left = normalizeTaskScopePath(filePath);
+  const right = normalizeTaskScopePath(declared);
+  return left === right || left.startsWith(`${right}/`) || right.startsWith(`${left}/`);
+}
+
+function isDeliverableGateCandidate(filePath: string, declaredFiles: readonly string[]) {
+  const normalized = normalizeTaskScopePath(filePath);
+  return declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared))
+    || normalized.startsWith('release/atm-onefile/')
+    || normalized.startsWith('release/atm-root-drop/');
+}
+
+function categorizeHistoricalCommitFiles(input: {
+  readonly taskId: string;
+  readonly changedFiles: readonly string[];
+  readonly declaredFiles: readonly string[];
+}) {
+  const taskMatchedFiles = input.changedFiles.filter((filePath) =>
+    input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
+  );
+  const allowedRunnerOutputFiles = input.changedFiles.filter((filePath) =>
+    normalizeTaskScopePath(filePath).startsWith('release/atm-onefile/')
+  );
+  const outOfScopeSourceFiles = input.changedFiles.filter((filePath) =>
+    !taskMatchedFiles.includes(filePath) && !allowedRunnerOutputFiles.includes(filePath)
+  );
+  return {
+    taskMatchedFiles,
+    allowedRunnerOutputFiles,
+    outOfScopeSourceFiles
+  };
+}
+
+function inspectHistoricalDelivery(input: {
+  readonly cwd: string;
+  readonly requestedRef: string;
+  readonly declaredFiles: readonly string[];
+  readonly enforceDeclaredScope: boolean;
+  readonly waiverOutOfScopeDelivery?: boolean;
+  readonly waiverReason?: string | null;
+}) {
+  const requestedRef = input.requestedRef.trim();
+  if (!requestedRef) {
+    return {
+      requestedRef,
+      commitSha: null,
+      ok: false,
+      reason: 'empty-ref',
+      changedFiles: [],
+      deliverableFiles: []
+    };
+  }
+
+  const commitResult = spawnSync('git', ['-C', input.cwd, 'rev-parse', '--verify', `${requestedRef}^{commit}`], { encoding: 'utf8' });
+  const commitSha = commitResult.status === 0 ? commitResult.stdout.trim() : null;
+  if (!commitSha) {
+    return {
+      requestedRef,
+      commitSha: null,
+      ok: false,
+      reason: 'commit-not-found',
+      changedFiles: [],
+      deliverableFiles: []
+    };
+  }
+
+  const showResult = spawnSync('git', ['-C', input.cwd, 'show', '--pretty=format:', '--name-only', commitSha, '--'], { encoding: 'utf8' });
+  const changedFiles = (showResult.stdout || '').split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  const categorized = categorizeHistoricalCommitFiles({
+    taskId: 'validate-cli-historical-delivery',
+    changedFiles,
+    declaredFiles: input.declaredFiles
+  });
+  const deliverableCandidates = changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
+  const deliverableFiles = input.enforceDeclaredScope
+    ? deliverableCandidates.filter((filePath) => input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
+    : deliverableCandidates;
+  if (deliverableFiles.length > 0 && categorized.outOfScopeSourceFiles.length > 0) {
+    const waiverAllowed = input.waiverOutOfScopeDelivery === true && Boolean(input.waiverReason?.trim());
+    return {
+      requestedRef,
+      commitSha,
+      ok: waiverAllowed,
+      reason: waiverAllowed ? 'scoped-deliverable-with-waived-out-of-scope' : 'out-of-scope-source-files-present',
+      changedFiles,
+      deliverableFiles
+    };
+  }
+  return {
+    requestedRef,
+    commitSha,
+    ok: deliverableFiles.length > 0,
+    reason: deliverableFiles.length > 0 ? 'scoped-deliverable-files-present' : 'no-scoped-deliverable-files',
+    changedFiles,
+    deliverableFiles
+  };
 }
 
 function sandboxEpermHint(args: any, cwd: any) {
@@ -1141,8 +1249,6 @@ try {
 
     // 2.3: --output-json file writer flag tests
     const outputJsonTestPath = path.join(autoLinkTempWorkspace, 'output-test.json');
-
-    // Test 3.1: tasks status with --output-json
     const statusRes = await runAtmSpawned(['tasks', 'queue', 'status', '--output-json', outputJsonTestPath], autoLinkTempWorkspace);
     assert(statusRes.exitCode === 0, 'tasks queue status with --output-json must exit 0');
     assert(existsSync(outputJsonTestPath), 'output-test.json file must be written');
@@ -1151,15 +1257,14 @@ try {
     assert(parsedFileContent.ok === true, 'parsed output JSON must report ok=true');
     assert(parsedFileContent.command === 'tasks', 'parsed output JSON command must be tasks');
 
-    // Assert stdout does not contain JSON body
     const stdoutTrimmed = (statusRes.stdout || '').trim();
     assert(!stdoutTrimmed.startsWith('{') && !stdoutTrimmed.endsWith('}'), 'stdout must not contain JSON body when --output-json is used');
 
     // Clear test file
     rmSync(outputJsonTestPath, { force: true });
 
-    // Test 3.2: next with --output-json
-    const nextRes = await runAtmSpawned(['next', '--output-json', outputJsonTestPath], autoLinkTempWorkspace);
+    const nextRes = await runAtmSpawned(['next', '--prompt', 'output-json smoke', '--output-json', outputJsonTestPath], autoLinkTempWorkspace);
+    assert(nextRes.exitCode === 0, 'next with --output-json must exit 0');
     assert(existsSync(outputJsonTestPath), 'output-test.json file must be written for next');
 
     const parsedNextContent = JSON.parse(readFileSync(outputJsonTestPath, 'utf8'));
@@ -1319,6 +1424,107 @@ try {
     const claimResPass = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
     assert(claimResPass.parsed.messages.every((msg: any) => msg.code !== 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'dependency B must no longer be blocked by dependency A');
 
+    // Test 5.1c: tasks invariant regression fixtures for abnormal release cases
+    assert(regressionFixtures.sourceDoneWithoutGovernedCloseout.taskStatus === 'done', 'fixture must model source-done without governed closeout');
+    assert(regressionFixtures.mailboxAndPlanningDone.mailboxStatus === 'done', 'fixture must model mailbox done');
+    assert(regressionFixtures.mailboxAndPlanningDone.planningStatus === 'done', 'fixture must model planning done');
+    assert(regressionFixtures.mailboxAndPlanningDone.targetStatus === 'planned', 'fixture must keep target repo closeout distinct');
+    assert(regressionFixtures.manualCloseWithoutMetadata.closeEvent.closure === null, 'fixture must model manual close without closure metadata');
+    assert(regressionFixtures.validClosurePacket.closeEvent.closure.closurePacketPath.includes('.closure-packet.json'), 'fixture must model valid closure packet');
+
+    const regressWorkspace = createCliTempWorkspace('tasks-invariant-regressions');
+    try {
+      initializeGitRepository(regressWorkspace);
+
+      const sourceDonePath = path.join(regressWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-IMPORT-DONE.json');
+      writeJson(sourceDonePath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: regressionFixtures.sourceDoneWithoutGovernedCloseout.taskId,
+        title: 'Import done without governed closeout',
+        status: regressionFixtures.sourceDoneWithoutGovernedCloseout.taskStatus,
+        lastTransitionId: '2026-06-12T09-00-00-000Z-import-0060regress'
+      });
+      const sourceDoneRes = await runAtm(['tasks', 'status', '--task', regressionFixtures.sourceDoneWithoutGovernedCloseout.taskId, '--residue', '--json'], regressWorkspace);
+      assert(sourceDoneRes.exitCode === 0, 'source-done residue status must exit 0');
+      assert(sourceDoneRes.parsed.evidence.bucket === 'source-done-governance-incomplete', 'source-done without governed closeout must be classified as governance incomplete');
+
+      const mailboxDonePath = path.join(regressWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-MAILBOX-ONLY.json');
+      const mailboxDependentPath = path.join(regressWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-MAILBOX-DOWNSTREAM.json');
+      writeJson(mailboxDonePath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: regressionFixtures.mailboxAndPlanningDone.taskId,
+        title: 'Mailbox done and planning done cannot replace target repo closeout',
+        status: regressionFixtures.mailboxAndPlanningDone.targetStatus,
+        mailboxStatus: regressionFixtures.mailboxAndPlanningDone.mailboxStatus,
+        planningStatus: regressionFixtures.mailboxAndPlanningDone.planningStatus
+      });
+      writeJson(mailboxDependentPath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: 'TASK-REGRESS-MAILBOX-DOWNSTREAM',
+        title: 'Downstream task blocked by mailbox-only done',
+        status: 'ready',
+        dependencies: [regressionFixtures.mailboxAndPlanningDone.taskId]
+      });
+      const mailboxDoneRes = await runAtm(['tasks', 'status', '--task', regressionFixtures.mailboxAndPlanningDone.taskId, '--residue', '--json'], regressWorkspace);
+      assert(mailboxDoneRes.exitCode === 0, 'mailbox/planning residue status must exit 0');
+      const mailboxClaimRes = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-MAILBOX-DOWNSTREAM', '--actor', 'Antigravity'], regressWorkspace);
+      assert(mailboxClaimRes.exitCode !== 0, 'mailbox/planning done must not replace target repo closeout');
+
+      const manualClosePath = path.join(regressWorkspace, '.atm', 'history', 'task-events', regressionFixtures.manualCloseWithoutMetadata.taskId, '2026-06-12T08-30-18-487Z-close-a7eae4c781d1.json');
+      const manualCloseTaskPath = path.join(regressWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-MANUAL-CLOSE.json');
+      const manualCloseDependentPath = path.join(regressWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-MANUAL-CLOSE-DOWNSTREAM.json');
+      writeJson(manualClosePath, {
+        schemaId: 'atm.taskTransition.v1',
+        specVersion: '0.1.0',
+        transitionId: '2026-06-12T08-30-18-487Z-close-a7eae4c781d1',
+        taskId: regressionFixtures.manualCloseWithoutMetadata.taskId,
+        action: 'close',
+        toStatus: 'done'
+      });
+      writeJson(manualCloseTaskPath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: regressionFixtures.manualCloseWithoutMetadata.taskId,
+        title: 'Manual close without metadata',
+        status: 'done',
+        lastTransitionId: '2026-06-12T08-30-18-487Z-close-a7eae4c781d1'
+      });
+      writeJson(manualCloseDependentPath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: 'TASK-REGRESS-MANUAL-CLOSE-DOWNSTREAM',
+        title: 'Downstream task blocked by manual close',
+        status: 'ready',
+        dependencies: [regressionFixtures.manualCloseWithoutMetadata.taskId]
+      });
+      const manualCloseRes = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-MANUAL-CLOSE-DOWNSTREAM', '--actor', 'Antigravity'], regressWorkspace);
+      assert(manualCloseRes.exitCode !== 0, 'manual close without metadata must not unlock downstream claim');
+
+      const validCloseTaskPath = path.join(regressWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-VALID-CLOSE.json');
+      const validCloseDependentPath = path.join(regressWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-VALID-CLOSE-DOWNSTREAM.json');
+      const validCloseEventPath = path.join(regressWorkspace, '.atm', 'history', 'task-events', regressionFixtures.validClosurePacket.taskId, '2026-06-12T08-30-18-487Z-close-a7eae4c781d1.json');
+      const validClosurePacketPath = path.join(regressWorkspace, '.atm', 'history', 'evidence', 'TASK-REGRESS-VALID-CLOSE.closure-packet.json');
+      writeJson(validClosurePacketPath, regressionFixtures.validClosurePacket.closurePacket);
+      writeJson(validCloseEventPath, regressionFixtures.validClosurePacket.closeEvent);
+      writeJson(validCloseTaskPath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: regressionFixtures.validClosurePacket.taskId,
+        title: 'Valid closure packet admits downstream claim',
+        status: 'done',
+        closurePacket: '.atm/history/evidence/TASK-REGRESS-VALID-CLOSE.closure-packet.json',
+        lastTransitionId: '2026-06-12T08-30-18-487Z-close-a7eae4c781d1'
+      });
+      writeJson(validCloseDependentPath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: 'TASK-REGRESS-VALID-CLOSE-DOWNSTREAM',
+        title: 'Downstream task admitted by valid closure packet',
+        status: 'ready',
+        dependencies: [regressionFixtures.validClosurePacket.taskId]
+      });
+      const validCloseRes = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-VALID-CLOSE-DOWNSTREAM', '--actor', 'Antigravity'], regressWorkspace);
+      assert(validCloseRes.exitCode === 0, 'valid closure packet must allow downstream claim');
+    } finally {
+      rmSync(regressWorkspace, { recursive: true, force: true });
+    }
+
     // Test 5.1b: import->done without governed closeout must classify as source-done-governance-incomplete (TASK-CID-0060)
     const taskImportPath = path.join(autoLinkTempWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-IMPORT-DONE.json');
     const importEventId = '2026-06-12T09-00-00-000Z-import-0060regress';
@@ -1400,12 +1606,9 @@ try {
 
       const unrelatedInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
-        taskId: 'TASK-HIST-0049',
         requestedRef: unrelatedCommit,
         declaredFiles,
-        enforceDeclaredScope: true,
-        waiverOutOfScopeDelivery: false,
-        waiverReason: null
+        enforceDeclaredScope: true
       });
       assert(!unrelatedInspect.ok, 'historical delivery without task overlap must fail');
       assert(unrelatedInspect.reason === 'no-scoped-deliverable-files', 'must report no scoped deliverable files');
@@ -1420,19 +1623,15 @@ try {
 
       const mixedInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
-        taskId: 'TASK-HIST-0049',
         requestedRef: mixedCommit,
         declaredFiles,
-        enforceDeclaredScope: true,
-        waiverOutOfScopeDelivery: false,
-        waiverReason: null
+        enforceDeclaredScope: true
       });
       assert(!mixedInspect.ok, 'mixed commit must fail without waiver');
       assert(mixedInspect.reason === 'out-of-scope-source-files-present', 'must report out-of-scope source files');
 
       const mixedWaiverInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
-        taskId: 'TASK-HIST-0049',
         requestedRef: mixedCommit,
         declaredFiles,
         enforceDeclaredScope: true,
