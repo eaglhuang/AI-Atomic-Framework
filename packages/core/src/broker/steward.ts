@@ -252,6 +252,7 @@ function validateStewardInputs(input: {
   if (input.mergePlan.schemaId !== 'atm.mergePlan.v1') {
     issues.push({ code: 'invalid-merge-plan', detail: `Unexpected merge plan schemaId '${input.mergePlan.schemaId}'.` });
   }
+  // Steward takeover is only allowed if the conflict verdict says it is safe ('needs-steward' or 'parallel-safe')
   if (input.mergePlan.verdict === 'blocked-cid-conflict' || input.mergePlan.verdict === 'blocked-shared-surface') {
     issues.push({ code: 'blocked-merge-plan', detail: `Merge plan verdict '${input.mergePlan.verdict}' cannot be applied by steward.` });
   }

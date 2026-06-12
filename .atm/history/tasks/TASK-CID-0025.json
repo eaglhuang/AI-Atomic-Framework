@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0025",
+  "title": "Broker-owned write actor runtime boundary and activation contract",
+  "status": "blocked",
+  "milestone": "P1",
+  "dependencies": [
+    "TASK-CID-0021",
+    "TASK-CID-0023"
+  ],
+  "acceptance": [
+    "The contract explicitly states whether broker-owned write actor runtime is allowed.",
+    "The contract explicitly states whether this actor can be implemented **independently** from the coordinator command surface.",
+    "The answer must be: independent for scoped file-write execution, **not** independent for lifecycle authority.",
+    "The contract explicitly states that `Broker` is the higher authority inside broker-governed conflict domains, and `Coordinator` must follow broker verdicts there.",
+    "The contract explicitly states that `Coordinator` remains the team-local lifecycle owner outside broker-governed conflict domains.",
+    "The contract names the exact allowed capability set for broker-owned write actor.",
+    "The contract names the exact forbidden capability set for broker-owned write actor.",
+    "The contract prevents a second scheduler / second close authority from appearing.",
+    "The contract states whether this work can proceed without waiting for `TASK-CID-0024`.",
+    "The contract states how `team plan/start`, broker lane evaluation, and steward apply should hand off into this actor."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/core/src/broker/team-lane.ts",
+    "packages/core/src/broker/steward.ts",
+    "scripts/validate-team-brokered-write.ts",
+    "scripts/validate-broker-steward.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/core/src/broker/team-lane.ts",
+    "packages/core/src/broker/steward.ts",
+    "scripts/validate-team-brokered-write.ts",
+    "scripts/validate-broker-steward.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-brokered-write.ts --mode validate",
+    "node --strip-types scripts/validate-broker-steward.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Giving broker-owned write actor git.write",
+    "Giving broker-owned write actor task.lifecycle",
+    "Creating a second closure authority beside coordinator/captain",
+    "Remote broker service or cross-machine shared runtime"
+  ],
+  "nonGoals": [
+    "Do not rewrite existing broker conflict logic",
+    "Do not collapse coordinator and steward into one role",
+    "Do not require TASK-CID-0024 to finish before this contract can be planned"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert broker-owned write actor runtime boundary and activation wiring.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Update note (2026-06-10): clarified that broker-owned write actor may be independently materialized for scoped file-write execution, but authority remains layered rather than parallel.\n- Update note (2026-06-10): clarified authority chain so `Broker` overrides `Coordinator` only inside broker-governed conflict domains.\n- Dispatch note (2026-06-11): opened three inbox packets for this card under `docs/ai_atomic_framework/cid-hardening/inbox/`:\n  - `P1-TASK-CID-0025-001-broker-runtime-activation-handshake--captain-to-001--20260611TPE.dispatch.md`\n  - `P1-TASK-CID-0025-002-authority-chain-and-conflict-rules--captain-to-002--20260611TPE.dispatch.md`\n  - `P1-TASK-CID-0025-003-evidence-and-closeout-validation--captain-to-003--20260611TPE.dispatch.md`\n- This card is intentionally about **runtime ownership and activation**, not about changing CID verdict logic.\n- The design target is \"broker-controlled write execution, coordinator-controlled lifecycle closeout\".\n- If the implementation would require broker-owned actor to self-commit or self-close, that should be treated as a contract violation, not an acceptable shortcut.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0025-broker-owned-write-actor-runtime-boundary.task.md",
+    "sectionTitle": "TASK-CID-0025",
+    "headingLine": 56,
+    "hash": "59f48d25479be0bc"
+  },
+  "importedAt": "2026-06-12T07:39:45.472Z",
+  "lastTransitionId": "2026-06-12T08-13-15-475Z-block-9188839eb2cf",
+  "lastTransitionAt": "2026-06-12T08:13:15.475Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-12T07:40:19.399Z",
+  "promotedAt": "2026-06-12T07:40:19.404Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-346223b75b39",
+    "claimedAt": "2026-06-12T07:40:19.487Z",
+    "heartbeatAt": "2026-06-12T08:12:19.485Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0025.json"
+    ],
+    "state": "released",
+    "reason": "scope complete but blocked by npm run typecheck failure in scripts/validate-semantic-fingerprint.ts:217 (implicit any on sample), which is outside TASK-CID-0025 allowed scope"
+  },
+  "startedAt": "2026-06-12T07:40:19.487Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260612074019-codex-gpt-5.4-mini-TASK-CID-0025-4cc9f16f8c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0025",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0025.*",
+      ".atm/history/task-events/TASK-CID-0025/**",
+      ".atm/history/tasks/TASK-CID-0025.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "80145271f4083be36e3d08f76475965dade28003f2a82888eb2ed3b3d2e56e03",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-12T07:40:19.510Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-12T08:13:15.473Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260612074019-codex-gpt-5.4-mini-TASK-CID-0025-4cc9f16f8c",
+  "closeReason": "scope complete but blocked by npm run typecheck failure in scripts/validate-semantic-fingerprint.ts:217 (implicit any on sample), which is outside TASK-CID-0025 allowed scope"
+}

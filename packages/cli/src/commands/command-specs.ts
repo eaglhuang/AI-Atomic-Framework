@@ -66,6 +66,7 @@ import agentPackSpec from './command-specs/agent-pack.spec.ts';
 import reviewAdvisorySpec from './command-specs/review-advisory.spec.ts';
 import taskflowSpec from './command-specs/taskflow.spec.ts';
 import brokerSpec from './command-specs/broker.spec.ts';
+import routeSpec from './command-specs/route.spec.ts';
 
 function withVisibility(spec: any, visibility: 'public' | 'internal' = 'public') {
   return Object.freeze({
@@ -135,6 +136,7 @@ export const commandSpecs = Object.freeze({
   verify: verifySpec,
   taskflow: withVisibility(taskflowSpec, 'internal'),
   broker: brokerSpec,
+  route: routeSpec,
 });
 
 export function getCommandSpec(commandName: string) {

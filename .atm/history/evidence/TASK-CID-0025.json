@@ -1,0 +1,60 @@
+{
+  "taskId": "TASK-CID-0025",
+  "updatedAt": "2026-06-12T08:12:19.487Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "TASK-CID-0025 scope completed, but closeout is blocked by an out-of-scope typecheck failure.",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/team-lane.ts",
+        "packages/core/src/broker/steward.ts",
+        "scripts/validate-team-brokered-write.ts",
+        "scripts/validate-broker-steward.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5.4-mini",
+      "sessionId": "session-20260612074019-codex-gpt-5.4-mini-TASK-CID-0025-4cc9f16f8c",
+      "createdAt": "2026-06-12T08:12:19.487Z",
+      "details": {
+        "actorId": "codex-gpt-5.4-mini",
+        "sessionId": "session-20260612074019-codex-gpt-5.4-mini-TASK-CID-0025-4cc9f16f8c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli",
+          "validate-team-brokered-write",
+          "validate-broker-steward",
+          "git-diff-check"
+        ],
+        "blocker": {
+          "validator": "npm run typecheck",
+          "file": "scripts/validate-semantic-fingerprint.ts",
+          "line": 217,
+          "reason": "implicit any on sample",
+          "scopeStatus": "out-of-scope for TASK-CID-0025"
+        },
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli && node --strip-types scripts/validate-team-brokered-write.ts --mode validate && node --strip-types scripts/validate-broker-steward.ts --mode validate && git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli",
+              "validate-team-brokered-write",
+              "validate-broker-steward",
+              "git-diff-check"
+            ],
+            "cwd": ".",
+            "runnerKind": "manual",
+            "cached": false,
+            "generatedAt": "2026-06-12T08:12:19.487Z"
+          }
+        ]
+      }
+    }
+  ]
+}
