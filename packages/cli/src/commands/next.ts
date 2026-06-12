@@ -546,6 +546,32 @@ async function claimNextImportedTask(input: {
       }
     });
   }
+  const claimDependencyStatusById = new Map(
+    input.importedTaskQueue.tasks.map((task) => [task.workItemId, task.status] as const)
+  );
+  const selectedTaskDependencyBlockers = input.importedTaskQueue.selectedTask
+    ? input.importedTaskQueue.selectedTask.dependencies.filter((dependency) => {
+      const status = claimDependencyStatusById.get(dependency);
+      return status !== 'done' && status !== 'verified';
+    })
+    : [];
+  if (!input.importedTaskQueue.claimableTask && selectedTaskDependencyBlockers.length > 0) {
+    const selectedTask = input.importedTaskQueue.selectedTask;
+    return makeResult({
+      ok: false,
+      command: 'next',
+      cwd: input.cwd,
+      messages: [message('error', 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', `Claim blocked until prerequisite task(s) close for ${selectedTask?.workItemId ?? 'the selected task'}.`, {
+        taskId: selectedTask?.workItemId ?? null,
+        blockingTaskIds: selectedTaskDependencyBlockers,
+        requiredCommand: `node atm.mjs tasks status --task ${selectedTaskDependencyBlockers[0]} --json`
+      })],
+      evidence: {
+        taskIntent: input.taskIntent,
+        importedTaskQueue: input.importedTaskQueue
+      }
+    });
+  }
   if (!input.importedTaskQueue.claimableTask) {
     const claimCode = input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
       ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
@@ -1990,7 +2016,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
   const claimableTask = selectedTask
     && selectedTask.format === 'json'
     && (canTaskBePreparedForClaim(selectedTask.status) || isTaskAlreadyActivelyClaimed(selectedTask))
-    && (areTaskDependenciesSatisfied(selectedTask, statusById) || explicitSingleTaskRoute || isTaskAlreadyActivelyClaimed(selectedTask))
+    && (areTaskDependenciesSatisfied(selectedTask, statusById) || isTaskAlreadyActivelyClaimed(selectedTask))
     ? selectedTask
     : null;
 
@@ -3799,6 +3825,18 @@ function buildNextMessages(
       `Follow the ${nextAction.playbook.channel} playbook exactly before editing, closing, or committing.`,
       nextAction.playbook
     ));
+    if (nextAction.playbook.channel === 'normal') {
+      messages.push(message(
+        'info',
+        'ATM_TASK_CLOSE_REMINDER',
+        'Normal task cards are not finished at validators or evidence: after deliverables exist, always run tasks close before committing.',
+        {
+          schemaId: 'atm.taskCloseReminder.v1',
+          taskId: readTaskId(nextAction.selectedTask) ?? nextAction.queueHeadTaskId ?? null,
+          playbookChannel: 'normal'
+        }
+      ));
+    }
   }
   const deliveryPrinciple = nextAction.deliveryPrinciple
     ?? (nextAction.selectedTask || nextAction.selectedTasks ? buildTaskDeliveryPrinciple({ channel: nextAction.selectedTasks ? 'batch' : 'normal' }) : null);

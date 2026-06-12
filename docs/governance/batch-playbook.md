@@ -58,6 +58,7 @@ If ATM returns `state: 'repair-required'`, stop immediately and run the
 - You ask ATM to claim a batch of tasks (or a planning doc that contains them).
 - ATM gives you **one task at a time** as the "queue head".
 - For each queue head: **implement → evidence → checkpoint → commit**.
+- Normal one-task work does **not** stop at validators or evidence; it ends only after `tasks close` has been run and recorded.
 - `batch checkpoint` closes the current queue head and advances; ATM picks the
   next one from the same `batchId`.
 - You commit **once per task**, packaging deliverables + ATM ledger entries
@@ -108,6 +109,7 @@ git commit -m "<scope>: complete <queue-head-task-id>"
 - Add evidence **before** checkpoint so closure_packet is complete.
 - Keep one commit per task; never lump two tasks into one commit.
 - Read `batch status --batch <id>` to see where you are after interruptions.
+- For normal single-task work, never stop after evidence: finish the delivery with `tasks close` before you commit.
 
 ### Don't
 
