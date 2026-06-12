@@ -1,4 +1,15 @@
-import type { ActiveWriteIntent, BrokerDecision, ConflictDetail, DecompositionRequest, DecompositionTargetFunction, LineRange, WriteBrokerRegistryDocument, WriteIntent } from './types.ts';
+import type {
+  ActiveWriteIntent,
+  BrokerConflictMatrix,
+  BrokerDecision,
+  ConflictDetail,
+  DecompositionRequest,
+  DecompositionTargetFunction,
+  LineRange,
+  WriteBrokerRegistryDocument,
+  WriteIntent
+} from './types.ts';
+import { evaluateConflictMatrix } from './conflict-matrix.ts';
 import { DEFAULT_AGR_LAYER2_THRESHOLDS, shouldTriggerLayer2 } from './policy.ts';
 import { intersectRanges, normalizeLineRange, rangesOverlap, type Layer2Conflict, type VirtualAtomCandidate } from './agr.ts';
 
@@ -8,8 +19,27 @@ export function calculateBrokerDecision(
 ): BrokerDecision {
   const conflicts: ConflictDetail[] = [];
   const taskId = newIntent.taskId;
+  const conflictMatrix = evaluateConflictMatrix(newIntent, registry.activeIntents);
 
-  // 1. 檢查 Shared Surfaces 衝突
+  if (conflictMatrix.arbitrationVerdict === 'takeover') {
+    return {
+      schemaId: 'atm.brokerDecision.v1',
+      specVersion: '0.1.0',
+      migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
+      intentId: `decision-${Date.now()}`,
+      taskId,
+      verdict: 'blocked-active-lease',
+      lane: 'blocked',
+      conflicts: [
+        { kind: 'lease', detail: 'Malformed intent shape or active lease mismatch requires takeover. Abort write path and request explicit clearance.' }
+      ],
+      applyMethod: 'none',
+      reason: 'Takeover required before conflict arbitration',
+      conflictMatrix
+    };
+  }
+
+  // 1. Shared Surfaces conflict check
   const newGenerators = new Set(newIntent.sharedSurfaces.generators);
   const newProjections = new Set(newIntent.sharedSurfaces.projections);
   const newRegistries = new Set(newIntent.sharedSurfaces.registries);
@@ -21,29 +51,29 @@ export function calculateBrokerDecision(
       continue;
     }
 
-    for (const g of active.resourceKeys.generators) {
-      if (newGenerators.has(g)) {
-        conflicts.push({ kind: 'generator', detail: `Shared generator conflict: '${g}' is in use by task '${active.taskId}'` });
+    for (const generator of active.resourceKeys.generators) {
+      if (newGenerators.has(generator)) {
+        conflicts.push({ kind: 'generator', detail: `Shared generator conflict: '${generator}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const p of newProjections) {
-      if (active.resourceKeys.projections.includes(p)) {
-        conflicts.push({ kind: 'projection', detail: `Shared projection conflict: '${p}' is in use by task '${active.taskId}'` });
+    for (const projection of newProjections) {
+      if (active.resourceKeys.projections.includes(projection)) {
+        conflicts.push({ kind: 'projection', detail: `Shared projection conflict: '${projection}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const r of newRegistries) {
-      if (active.resourceKeys.registries.includes(r)) {
-        conflicts.push({ kind: 'registry', detail: `Shared registry conflict: '${r}' is in use by task '${active.taskId}'` });
+    for (const registryKey of newRegistries) {
+      if (active.resourceKeys.registries.includes(registryKey)) {
+        conflicts.push({ kind: 'registry', detail: `Shared registry conflict: '${registryKey}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const v of newValidators) {
-      if (active.resourceKeys.validators.includes(v)) {
-        conflicts.push({ kind: 'validator', detail: `Shared validator conflict: '${v}' is in use by task '${active.taskId}'` });
+    for (const validator of newValidators) {
+      if (active.resourceKeys.validators.includes(validator)) {
+        conflicts.push({ kind: 'validator', detail: `Shared validator conflict: '${validator}' is in use by task '${active.taskId}'` });
       }
     }
-    for (const a of newArtifacts) {
-      if (active.resourceKeys.artifacts.includes(a)) {
-        conflicts.push({ kind: 'artifact', detail: `Shared artifact conflict: '${a}' is in use by task '${active.taskId}'` });
+    for (const artifact of newArtifacts) {
+      if (active.resourceKeys.artifacts.includes(artifact)) {
+        conflicts.push({ kind: 'artifact', detail: `Shared artifact conflict: '${artifact}' is in use by task '${active.taskId}'` });
       }
     }
   }
@@ -59,11 +89,12 @@ export function calculateBrokerDecision(
       lane: 'blocked',
       conflicts,
       applyMethod: 'none',
-      reason: 'Blocked by shared surface conflict'
+      reason: 'Blocked by shared surface conflict',
+        conflictMatrix
     };
   }
 
-  // 2. 檢查 CID / read-set 衝突
+  // 2. CID / read-set semantic conflicts
   const newAtomIds = new Set(newIntent.atomRefs.map((ref) => ref.atomId));
   const newAtomCids = new Set(newIntent.atomRefs.map((ref) => ref.atomCid));
   const newReadAtomIds = new Set((newIntent.readAtoms ?? []).map((ref) => ref.atomId));
@@ -124,11 +155,12 @@ export function calculateBrokerDecision(
       lane: 'blocked',
       conflicts,
       applyMethod: 'none',
-      reason: 'Blocked by Atom ID, CID, or read-set semantic conflict'
+      reason: 'Blocked by Atom ID, CID, or read-set semantic conflict',
+      conflictMatrix
     };
   }
 
-  // 3. 檢查 physical file overlap (同檔但CID disjoint)
+  // 3. Physical file overlap checks
   const fileOverlapResult = evaluatePhysicalOverlap(newIntent, registry.activeIntents);
   if (fileOverlapResult != null) {
     const decision: BrokerDecision = {
@@ -141,7 +173,8 @@ export function calculateBrokerDecision(
       lane: 'deterministic-composer',
       conflicts: fileOverlapResult.conflicts,
       applyMethod: 'patch-apply',
-      reason: fileOverlapResult.reason
+      reason: fileOverlapResult.reason,
+      conflictMatrix
     };
 
     if (fileOverlapResult.decompositionRequest) {
@@ -154,7 +187,7 @@ export function calculateBrokerDecision(
     return decision;
   }
 
-  // 4. 無衝突
+  // 4. Allowed path
   return {
     schemaId: 'atm.brokerDecision.v1',
     specVersion: '0.1.0',
@@ -165,7 +198,8 @@ export function calculateBrokerDecision(
     lane: 'direct-brokered',
     conflicts: [],
     applyMethod: 'none',
-    reason: 'Parallel safe'
+    reason: 'Parallel safe',
+    conflictMatrix
   };
 }
 
@@ -175,7 +209,10 @@ interface PhysicalOverlapResult {
   readonly decompositionRequest?: DecompositionRequest;
 }
 
-function evaluatePhysicalOverlap(newIntent: WriteIntent, activeIntents: readonly ActiveWriteIntent[]): PhysicalOverlapResult | null {
+function evaluatePhysicalOverlap(
+  newIntent: WriteIntent,
+  activeIntents: readonly ActiveWriteIntent[]
+): PhysicalOverlapResult | null {
   const newIntentRanges = toVirtualAtoms(newIntent);
   const unresolvedOverlaps = new Set<string>();
   const conflicts: ConflictDetail[] = [];
@@ -203,6 +240,10 @@ function evaluatePhysicalOverlap(newIntent: WriteIntent, activeIntents: readonly
       for (const newAtom of newCandidates) {
         for (const activeAtom of activeCandidates) {
           if (!rangesOverlap(newAtom.sourceRange, activeAtom.sourceRange)) {
+            conflicts.push({
+              kind: 'file-range',
+              detail: `Syntactic disjoint overlap on '${newFile}' for atom '${newAtom.atomCid}' and '${activeAtom.atomCid}'.`
+            });
             continue;
           }
 

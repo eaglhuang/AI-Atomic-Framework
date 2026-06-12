@@ -5,6 +5,7 @@ import {
   loadRegistry,
   saveRegistry,
   registerIntent,
+  renewIntentLease,
   releaseTask,
   cleanupStale
 } from '../../../core/src/broker/registry.ts';
@@ -49,26 +50,56 @@ export async function runBroker(argv: string[]) {
     const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8')) as WriteIntent;
     let registry = loadRegistry(registryPath);
     const decision = calculateBrokerDecision(newIntent, registry);
+    const conflictMatrix = decision.conflictMatrix;
+    const isBrokerSafe = decision.verdict !== 'blocked-cid-conflict'
+      && decision.verdict !== 'blocked-shared-surface'
+      && decision.verdict !== 'blocked-active-lease';
 
     // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
     registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds);
     saveRegistry(registryPath, registry);
 
     return makeResult({
-      ok: decision.verdict === 'parallel-safe' || decision.verdict === 'needs-physical-split',
+      ok: isBrokerSafe,
       command: 'broker',
       cwd: options.cwd,
       messages: [
         message(
-          decision.verdict === 'blocked-cid-conflict' || decision.verdict === 'blocked-shared-surface' ? 'error' : 'info',
+          isBrokerSafe ? 'info' : 'error',
           'ATM_BROKER_REGISTERED',
-          `Write intent registered with verdict '${decision.verdict}' and lane '${decision.lane}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`,
+          `Write intent registered with verdict '${decision.verdict}' and lane '${decision.lane}'. Arbitration matrix verdict: '${conflictMatrix?.arbitrationVerdict ?? 'n/a'}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`,
           { decision }
         )
       ],
       evidence: {
         decision,
         registryPath: '.atm/runtime/write-broker.registry.json'
+      }
+    });
+  }
+
+  if (options.action === 'heartbeat') {
+    if (!options.task) {
+      throw new CliError('ATM_CLI_USAGE', 'broker heartbeat requires --task <task-id>.', { exitCode: 2 });
+    }
+    if (!options.actorId) {
+      throw new CliError('ATM_CLI_USAGE', 'broker heartbeat requires --actor <actor-id>.', { exitCode: 2 });
+    }
+    let registry = loadRegistry(registryPath);
+    registry = renewIntentLease(registry, options.task, options.actorId, options.ttlSeconds);
+    saveRegistry(registryPath, registry);
+
+    return makeResult({
+      ok: true,
+      command: 'broker',
+      cwd: options.cwd,
+      messages: [
+        message('info', 'ATM_BROKER_HEARTBEAT_RENEWED', `Renewed write-intent lease for task ${options.task}.`)
+      ],
+      evidence: {
+        registryPath: '.atm/runtime/write-broker.registry.json',
+        renewedTask: options.task,
+        actorId: options.actorId
       }
     });
   }
@@ -589,7 +620,7 @@ export async function runBroker(argv: string[]) {
 
 interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
