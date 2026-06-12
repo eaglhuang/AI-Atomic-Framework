@@ -98,6 +98,16 @@ export interface ClosurePacketRepairMetadata {
     readonly repairedTargetCommitSha: string | null;
     readonly evidencePath: string;
 }
+export interface HistoricalDeliveryProvenance {
+    readonly schemaId: 'atm.historicalDeliveryProvenance.v1';
+    readonly deliveryCommitSha: string;
+    readonly taskMatchedFiles: readonly string[];
+    readonly governanceFiles: readonly string[];
+    readonly allowedRunnerOutputFiles: readonly string[];
+    readonly outOfScopeSourceFiles: readonly string[];
+    readonly waivedOutOfScopeFiles: readonly string[];
+    readonly waiverReason: string | null;
+}
 export interface ClosurePacket {
     readonly schemaId: 'atm.closurePacket.v1';
     readonly specVersion: '0.1.0';
@@ -118,6 +128,8 @@ export interface ClosurePacket {
     readonly sessionId: string | null;
     readonly attestation?: ClosurePacketReconcileAttestation | null;
     readonly repair?: ClosurePacketRepairMetadata | null;
+    readonly historicalDeliveryProvenance?: HistoricalDeliveryProvenance | null;
+    readonly recoveredFromMissingPacket?: boolean;
 }
 export interface FrameworkCloseWorktreeReport {
     readonly ok: boolean;
@@ -231,6 +243,7 @@ export declare function createClosurePacket(input: {
     readonly changedFiles?: readonly string[];
     readonly frameworkStatus?: Pick<FrameworkModeStatusReport, 'mode' | 'repoRole' | 'changedFiles' | 'criticalChangedFiles' | 'requiredGates'> | null;
     readonly attestation?: ClosurePacketReconcileAttestation | null;
+    readonly historicalDeliveryProvenance?: HistoricalDeliveryProvenance | null;
 }): ClosurePacket;
 export declare function writeClosurePacket(cwd: string, taskId: string, packet: ClosurePacket): string;
 export type AtmTasksWriteAction = 'tasks-close' | 'tasks-reconcile' | 'tasks-import-write' | 'tasks-repair-closure-write';

@@ -60,6 +60,7 @@ Roster synchronization uses `node atm.mjs tasks roster update` as the only offic
 | `closeMode` | `normal-close`, `historical-delivery-close`, `planning-mirror-sync-repair`, `residue-repair`, or `ambiguous-manual-review` |
 | `writeSupport` | Whether `--write` may execute the governed closeback entry |
 | `closebackPlan` | Backend surface, command, follow-up steps, writer boundary, and evidence validators |
+| `governedCommitBundle` | Dual-repo exact-path stage/commit bundle (`atm.taskflowGovernedCommitBundle.v1`) |
 | `residueDiagnosis` | Reuses `atm.taskResidueDiagnosis.v1` truth/residue classification |
 | `delegationContract` | Same adopter-aware writer/roster boundary as `taskflow open` |
 
@@ -76,6 +77,28 @@ Roster synchronization uses `node atm.mjs tasks roster update` as the only offic
 - `taskflow close --write` requires `--task` and `--actor`.
 - Ambiguous residue fails closed with `ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE`.
 - Planning-mirror closeback reuses `tasks import` and `tasks roster update`; ATM does not add a second closeback writer.
+- `taskflow close --write` always exact-stages the target repository closeout artifacts and planning repository closeback artifacts.
+- `taskflow close --write` auto-commits both repositories by default, target first and planning second.
+- `taskflow close --write --no-commit` keeps mandatory dual-repo exact staging but returns deterministic commit commands without committing.
+- `taskflow close --dry-run` never stages or commits; it returns a bundle preview.
+- If either repository's stage-file set cannot be computed, ATM fails closed before writing with `ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE`.
+
+## Taskflow Governed Commit Bundle (`atm.taskflowGovernedCommitBundle.v1`)
+
+`taskflow close` reports the dual-repo closeback bundle through these fields:
+
+| Field | Purpose |
+|---|---|
+| `targetRepo.repoRoot` | Target repository root used for exact-path staging |
+| `targetRepo.stageFiles` | Deterministic target files to stage, including task JSON, evidence, closure packet, and task-events |
+| `targetRepo.commitMessage` | Commit message for the target closeout bundle |
+| `targetRepo.commitCommand` | Deterministic recovery command for the target commit |
+| `targetRepo.commitSha` | Commit SHA when auto-commit succeeds |
+| `targetRepo.status` | `preview`, `staged`, `committed`, `skipped`, `failed`, or `uncomputed` |
+| `planningRepo.*` | Same fields for the planning repository closeback bundle |
+| `commitMode` | `dry-run`, `stage-only`, or `auto-commit` |
+| `failClosed` | `true` when the bundle cannot be computed or a partial commit failure requires operator recovery |
+| `recoveryCommand` | Command to run when target commit succeeded and planning commit failed |
 
 ## Invariants
 
@@ -83,6 +106,7 @@ Roster synchronization uses `node atm.mjs tasks roster update` as the only offic
 2. **Schema ID Verification**: Every profile must contain a `"schemaId"` field exactly equal to `"taskflow.profile.v1"`.
 3. **Generation surface**: Markdown generation always flows through `tasks new` / `generateTaskCard`; `taskflow open` does not render templates directly.
 4. **Runtime continuity**: `taskflow open --write` is not complete until the generated task card has been imported into `.atm/history/tasks` through `tasks import --write`.
+5. **Close bundle isolation**: `taskflow close` may stage only the deterministic bundle files it reports; unrelated dirty files in either repository must not enter the bundle.
 
 ## JSON Schema
 

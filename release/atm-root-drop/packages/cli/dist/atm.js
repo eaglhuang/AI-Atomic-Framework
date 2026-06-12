@@ -59,7 +59,7 @@ import { runCache } from './commands/cache.js';
 import { runHealthReport } from './commands/health-report.js';
 import { runTaskflow } from './commands/taskflow.js';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.js';
-import { CliError, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
+import { applyOutputProjectionFlagsFromArgv, CliError, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.js';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.js';
 import { runIdentity } from './commands/identity.js';
@@ -129,6 +129,7 @@ export const cliCommandRunners = {
     route: runRoute
 };
 export async function runCli(argv = process.argv.slice(2), io = { stdout: process.stdout, stderr: process.stderr }) {
+    applyOutputProjectionFlagsFromArgv(argv);
     const [commandName, ...rawCommandArgs] = argv;
     const outputFormat = selectOutputFormat(argv, io);
     const commandArgs = stripFormatFlags(rawCommandArgs);

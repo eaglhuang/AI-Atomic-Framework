@@ -1,3 +1,5 @@
+export declare function resetOutputProjectionGlobals(): void;
+export declare function applyOutputProjectionFlagsFromArgv(argv: readonly string[]): void;
 export declare function setOutputJsonPath(resolvedPath: string | null): void;
 export declare function resolveNextDefaultOutputPath(cwd: string): string;
 export declare const configRelativePath: string;

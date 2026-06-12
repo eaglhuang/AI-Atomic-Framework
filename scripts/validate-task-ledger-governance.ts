@@ -2009,4 +2009,8 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(dryRun.evidence.closeMode === 'normal-close', 'taskflow close dry-run must report normal-close');
   assert(dryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'taskflow close must route to tasks-close backend');
   assert(dryRun.evidence.closebackPlan.writerBoundary.generationSurface === 'tasks-new', 'taskflow close must not add a second generator');
+  assert(dryRun.evidence.governedCommitBundle?.schemaId === 'atm.taskflowGovernedCommitBundle.v1', 'taskflow close must report governed commit bundle schema');
+  assert(dryRun.evidence.governedCommitBundle?.commitMode === 'dry-run', 'taskflow close dry-run bundle must report dry-run commit mode');
+  assert(dryRun.evidence.governedCommitBundle?.targetRepo?.stageFiles?.includes(`.atm/history/tasks/${taskId}.json`), 'taskflow close bundle must include target task json');
+  assert(dryRun.evidence.governedCommitBundle?.planningRepo?.stageFiles?.includes(planRelativePath), 'taskflow close bundle must include planning card path');
 }

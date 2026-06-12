@@ -21,7 +21,7 @@ export default defineCommandSpec({
         { flag: '--staged', summary: 'Run tasks audit in staged/pre-commit mode.' },
         { flag: '--queue', value: 'id', summary: 'Task queue id for tasks queue abandon.' },
         { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close/reconcile/repair-closure/status/finalize diagnose/scope add.' },
-        { flag: '--residue', summary: 'For tasks status, return residue-focused diagnosis evidence only.' },
+        { flag: '--residue', summary: 'For tasks status, return residue-focused diagnosis evidence only (including source-done-governance-incomplete vs ambiguous-manual-review).' },
         { flag: '--allow-stale-runner', summary: 'Allow write actions while the frozen runner is older than framework source (disaster recovery only).' },
         { flag: '--with', value: 'id', summary: 'Second task id for tasks parallel pair analysis.' },
         { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close/reconcile lifecycle actions (or set ATM_ACTOR_ID).' },

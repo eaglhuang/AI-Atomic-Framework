@@ -33,47 +33,7 @@ function isExplicitSingleTaskRoute(promptScope, taskIntent) {
 }
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-function verifyCloseoutProvenance(cwd, taskId, document) {
-    const closurePacketVal = document.closurePacket ?? document.closure_packet;
-    if (typeof closurePacketVal === 'string' && closurePacketVal.trim().length > 0) {
-        const cpPath = path.resolve(cwd, closurePacketVal.trim());
-        if (existsSync(cpPath)) {
-            try {
-                const cpData = JSON.parse(readFileSync(cpPath, 'utf8'));
-                if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
-                    return true;
-                }
-            }
-            catch { }
-        }
-    }
-    const lastTransitionId = document.lastTransitionId ?? document.last_transition_id;
-    if (typeof lastTransitionId === 'string' && lastTransitionId.trim().length > 0) {
-        const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId.trim()}.json`);
-        if (existsSync(eventPath)) {
-            try {
-                const eventData = JSON.parse(readFileSync(eventPath, 'utf8'));
-                if (eventData && (eventData.action === 'close' || eventData.toStatus === 'done' || eventData.toStatus === 'verified')) {
-                    if (eventData.closure && typeof eventData.closure === 'object' && eventData.closure.schemaId === 'atm.taskClosureTransition.v1') {
-                        return true;
-                    }
-                }
-            }
-            catch { }
-        }
-    }
-    const fallbackCpPath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
-    if (existsSync(fallbackCpPath)) {
-        try {
-            const cpData = JSON.parse(readFileSync(fallbackCpPath, 'utf8'));
-            if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
-                return true;
-            }
-        }
-        catch { }
-    }
-    return false;
-}
+import { verifyCloseoutProvenance } from '../tasks/closeout-signaling.js';
 function areTaskDependenciesSatisfied(task, statusById, cwd = process.cwd()) {
     return task.dependencies.every((dependency) => {
         const status = statusById.get(dependency);

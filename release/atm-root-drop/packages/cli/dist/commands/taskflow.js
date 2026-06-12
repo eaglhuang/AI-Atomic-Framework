@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from './tasks/public-surface.js';
@@ -6,6 +7,8 @@ import { buildCloseBackendArgv, buildClosebackPlan, buildTaskflowCloseDiagnostic
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
+import { runAtmGit } from './git-governance.js';
+import { quoteCliValue, relativePathFrom } from './shared.js';
 function buildTasksNewCommand(input) {
     const parts = ['node atm.mjs tasks new'];
     if (input.template) {
@@ -114,10 +117,270 @@ function collectHistoricalDeliveryRefs(parsed) {
     }
     return [...new Set(refs)];
 }
+function normalizeRepoRelativePath(repoRoot, filePath) {
+    const resolved = path.isAbsolute(filePath) ? filePath : path.resolve(repoRoot, filePath);
+    return relativePathFrom(repoRoot, resolved).replace(/\\/g, '/');
+}
+function uniqueSorted(values) {
+    return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+function listExistingFilesRecursively(root, relativeDirectory) {
+    const directory = path.join(root, relativeDirectory);
+    if (!existsSync(directory))
+        return [];
+    const files = [];
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        const relativePath = path.posix.join(relativeDirectory.replace(/\\/g, '/'), entry.name);
+        const absolutePath = path.join(root, relativePath);
+        if (entry.isDirectory()) {
+            files.push(...listExistingFilesRecursively(root, relativePath));
+        }
+        else if (entry.isFile()) {
+            files.push(normalizeRepoRelativePath(root, absolutePath));
+        }
+    }
+    return files;
+}
+function tryGitScalar(cwd, args) {
+    try {
+        return execFileSync('git', [...args], {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe']
+        }).trim() || null;
+    }
+    catch {
+        return null;
+    }
+}
+function readGitRoot(startPath) {
+    const probe = existsSync(startPath) && statSync(startPath).isDirectory() ? startPath : path.dirname(startPath);
+    const root = tryGitScalar(probe, ['rev-parse', '--show-toplevel']);
+    return root ? path.resolve(root) : null;
+}
+function runGitOrThrow(cwd, args) {
+    execFileSync('git', [...args], {
+        cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+}
+function commitCommandFor(input) {
+    if (!input.repoRoot)
+        return '';
+    if (input.repoKind === 'target') {
+        return `node atm.mjs git commit --cwd ${quoteCliValue(input.repoRoot)} --actor ${quoteCliValue(input.actorId ?? '<actor>')} --task ${input.taskId} --message ${quoteCliValue(input.commitMessage)} --json`;
+    }
+    const messageParts = [
+        input.commitMessage,
+        '',
+        `ATM-Actor: ${input.actorId ?? '<actor>'}`,
+        `ATM-Task: ${input.taskId}`,
+        'ATM-Surface: taskflow-close-planning-bundle'
+    ];
+    return `git -C ${quoteCliValue(input.repoRoot)} commit -m ${quoteCliValue(messageParts.join('\n'))}`;
+}
+function extractBackendStageFiles(backendResult) {
+    const evidence = backendResult?.evidence;
+    if (!evidence)
+        return [];
+    const files = [];
+    for (const key of ['taskPath', 'closurePacketPath', 'transitionPath']) {
+        const value = evidence[key];
+        if (typeof value === 'string' && value.trim()) {
+            files.push(value);
+        }
+    }
+    const allowedFiles = evidence.closeCommitWindowAllowedFiles;
+    if (Array.isArray(allowedFiles)) {
+        files.push(...allowedFiles.filter((value) => typeof value === 'string'));
+    }
+    return files;
+}
+function buildTargetStageFiles(cwd, taskId, backendResult) {
+    return uniqueSorted([
+        `.atm/history/tasks/${taskId}.json`,
+        `.atm/history/evidence/${taskId}.json`,
+        `.atm/history/evidence/${taskId}.closure-packet.json`,
+        ...listExistingFilesRecursively(cwd, `.atm/history/task-events/${taskId}`),
+        ...extractBackendStageFiles(backendResult)
+    ]);
+}
+function resolvePlanningPath(cwd, planningMirrorPath) {
+    if (!planningMirrorPath) {
+        return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
+    }
+    const absolutePath = path.isAbsolute(planningMirrorPath)
+        ? path.resolve(planningMirrorPath)
+        : path.resolve(cwd, planningMirrorPath);
+    const repoRoot = readGitRoot(absolutePath);
+    if (!repoRoot) {
+        return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
+    }
+    return {
+        repoRoot,
+        relativePath: normalizeRepoRelativePath(repoRoot, absolutePath),
+        reason: null
+    };
+}
+function buildTaskflowCommitBundle(input) {
+    const targetRepoRoot = path.resolve(input.cwd);
+    const targetStageFiles = buildTargetStageFiles(targetRepoRoot, input.taskId, input.backendResult ?? null);
+    const planning = resolvePlanningPath(targetRepoRoot, input.planningMirrorPath);
+    const planningStageFiles = planning.repoRoot && planning.relativePath
+        ? uniqueSorted([
+            planning.relativePath,
+            ...(input.rosterIndexPath
+                ? [normalizeRepoRelativePath(planning.repoRoot, path.isAbsolute(input.rosterIndexPath)
+                        ? input.rosterIndexPath
+                        : path.resolve(planning.repoRoot, input.rosterIndexPath))]
+                : [])
+        ])
+        : [];
+    const targetMessage = `chore(taskflow): close ${input.taskId} target governance bundle`;
+    const planningMessage = `docs(taskflow): close ${input.taskId} planning bundle`;
+    const failClosed = targetStageFiles.length === 0 || !planning.repoRoot || planningStageFiles.length === 0;
+    return {
+        schemaId: 'atm.taskflowGovernedCommitBundle.v1',
+        taskId: input.taskId,
+        actorId: input.actorId,
+        targetRepo: {
+            repoRoot: targetRepoRoot,
+            stageFiles: targetStageFiles,
+            commitMessage: targetMessage,
+            commitCommand: commitCommandFor({
+                repoRoot: targetRepoRoot,
+                taskId: input.taskId,
+                actorId: input.actorId,
+                commitMessage: targetMessage,
+                repoKind: 'target'
+            }),
+            commitSha: null,
+            status: input.commitMode === 'dry-run' ? 'preview' : 'uncomputed',
+            reason: targetStageFiles.length > 0 ? null : 'target close artifact paths could not be computed'
+        },
+        planningRepo: {
+            repoRoot: planning.repoRoot,
+            stageFiles: planningStageFiles,
+            commitMessage: planningMessage,
+            commitCommand: commitCommandFor({
+                repoRoot: planning.repoRoot,
+                taskId: input.taskId,
+                actorId: input.actorId,
+                commitMessage: planningMessage,
+                repoKind: 'planning'
+            }),
+            commitSha: null,
+            status: input.commitMode === 'dry-run' ? 'preview' : 'uncomputed',
+            reason: planning.reason
+        },
+        commitMode: input.commitMode,
+        failClosed,
+        recoveryCommand: null
+    };
+}
+function assertCommitBundleReady(bundle) {
+    if (bundle.failClosed || !bundle.targetRepo.repoRoot || !bundle.planningRepo.repoRoot) {
+        throw new CliError('ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE', 'taskflow close cannot compute the dual-repo governed commit bundle.', {
+            exitCode: 1,
+            details: { governedCommitBundle: bundle }
+        });
+    }
+}
+function stageRepoBundle(repo) {
+    if (!repo.repoRoot || repo.stageFiles.length === 0) {
+        return { ...repo, status: 'uncomputed' };
+    }
+    const existingFiles = repo.stageFiles.filter((file) => existsSync(path.resolve(repo.repoRoot ?? '', file)));
+    if (existingFiles.length === 0) {
+        return { ...repo, stageFiles: existingFiles, status: 'skipped', reason: 'no existing bundle files to stage' };
+    }
+    runGitOrThrow(repo.repoRoot, ['add', '--', ...existingFiles]);
+    return { ...repo, stageFiles: existingFiles, status: 'staged' };
+}
+async function commitTaskflowBundle(input) {
+    const targetResult = await runAtmGit([
+        'commit',
+        '--cwd', input.bundle.targetRepo.repoRoot ?? '',
+        '--actor', input.actorId,
+        '--task', input.taskId,
+        '--message', input.bundle.targetRepo.commitMessage,
+        '--json'
+    ]);
+    const targetCommitSha = String(targetResult.evidence?.commitSha ?? '') || null;
+    let targetRepo = {
+        ...input.bundle.targetRepo,
+        commitSha: targetCommitSha,
+        status: 'committed'
+    };
+    let planningRepo = input.bundle.planningRepo;
+    try {
+        if (!planningRepo.repoRoot) {
+            throw new Error('planning repo root missing');
+        }
+        const planningMessage = [
+            planningRepo.commitMessage,
+            '',
+            `ATM-Actor: ${input.actorId}`,
+            `ATM-Task: ${input.taskId}`,
+            'ATM-Surface: taskflow-close-planning-bundle'
+        ].join('\n');
+        runGitOrThrow(planningRepo.repoRoot, ['commit', '-m', planningMessage]);
+        planningRepo = {
+            ...planningRepo,
+            commitSha: tryGitScalar(planningRepo.repoRoot, ['rev-parse', '--verify', 'HEAD']),
+            status: 'committed'
+        };
+    }
+    catch (error) {
+        planningRepo = {
+            ...planningRepo,
+            status: 'failed',
+            reason: error instanceof Error ? error.message : String(error)
+        };
+        targetRepo = { ...targetRepo, status: 'committed' };
+        return {
+            ...input.bundle,
+            targetRepo,
+            planningRepo,
+            failClosed: true,
+            recoveryCommand: planningRepo.commitCommand || null
+        };
+    }
+    return {
+        ...input.bundle,
+        targetRepo,
+        planningRepo,
+        failClosed: false,
+        recoveryCommand: null
+    };
+}
+async function finalizeTaskflowCommitBundle(input) {
+    assertCommitBundleReady(input.bundle);
+    const stagedTarget = stageRepoBundle(input.bundle.targetRepo);
+    const stagedPlanning = stageRepoBundle(input.bundle.planningRepo);
+    const stagedBundle = {
+        ...input.bundle,
+        targetRepo: stagedTarget,
+        planningRepo: stagedPlanning
+    };
+    if (input.bundle.commitMode === 'stage-only') {
+        return stagedBundle;
+    }
+    return commitTaskflowBundle({
+        bundle: stagedBundle,
+        actorId: input.actorId,
+        taskId: input.taskId
+    });
+}
 async function runTaskflowClose(parsed, cwd) {
     const taskId = parsed.options.task ? String(parsed.options.task) : '';
     const actorId = parsed.options.actor ? String(parsed.options.actor) : '';
     const writeRequested = !!parsed.options.write;
+    const noCommitRequested = !!parsed.options.noCommit;
+    const commitMode = writeRequested
+        ? noCommitRequested ? 'stage-only' : 'auto-commit'
+        : 'dry-run';
     const profilePath = parsed.options.profile ? String(parsed.options.profile) : null;
     const historicalDeliveryRefs = collectHistoricalDeliveryRefs(parsed);
     if (!taskId) {
@@ -172,6 +435,19 @@ async function runTaskflowClose(parsed, cwd) {
             }
         });
     }
+    const previewCommitBundle = buildTaskflowCommitBundle({
+        cwd,
+        taskId,
+        actorId: actorId || null,
+        commitMode,
+        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+        rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
+            ? closebackPlan.writerBoundary.rosterIndexPath
+            : null
+    });
+    if (writeRequested) {
+        assertCommitBundleReady(previewCommitBundle);
+    }
     if (writeRequested && writeSupport.allowed) {
         const backendArgv = buildCloseBackendArgv({
             cwd,
@@ -205,6 +481,21 @@ async function runTaskflowClose(parsed, cwd) {
                 command: closebackPlan.writerBoundary.rosterClosebackCommand
             };
         }
+        const governedCommitBundle = await finalizeTaskflowCommitBundle({
+            bundle: buildTaskflowCommitBundle({
+                cwd,
+                taskId,
+                actorId,
+                commitMode,
+                planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+                rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
+                    ? closebackPlan.writerBoundary.rosterIndexPath
+                    : null,
+                backendResult: backendResult
+            }),
+            actorId,
+            taskId
+        });
         return {
             ...makeResult({
                 ok: backendResult.ok,
@@ -219,11 +510,13 @@ async function runTaskflowClose(parsed, cwd) {
                 evidence: {
                     closeMode: closebackPlan.closeMode,
                     writeSupport,
+                    commitMode,
                     delegationContract,
                     diagnostics,
                     closebackPlan,
                     backendResult,
                     rosterCloseback,
+                    governedCommitBundle,
                     residueDiagnosis: diagnosis,
                     ...(profileData ? { profile: profileData } : {})
                 }
@@ -247,10 +540,12 @@ async function runTaskflowClose(parsed, cwd) {
             ],
             evidence: {
                 closeMode: closebackPlan.closeMode,
+                commitMode,
                 writeSupport,
                 delegationContract,
                 diagnostics,
                 closebackPlan,
+                governedCommitBundle: previewCommitBundle,
                 residueDiagnosis: diagnosis,
                 ...(profileData ? { profile: profileData } : {})
             }

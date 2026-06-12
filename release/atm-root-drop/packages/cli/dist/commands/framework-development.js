@@ -939,7 +939,8 @@ export function createClosurePacket(input) {
         closedAt: new Date().toISOString(),
         closedByActor: input.actorId,
         sessionId: normalizeOptionalString(input.sessionId) ?? null,
-        attestation: input.attestation ?? null
+        attestation: input.attestation ?? null,
+        historicalDeliveryProvenance: input.historicalDeliveryProvenance ?? null
     };
 }
 export function writeClosurePacket(cwd, taskId, packet) {
@@ -1224,16 +1225,100 @@ export function repairClosurePacketForTask(input) {
     }
     const packetPath = resolveClosurePacketPath(cwd, taskId);
     const packetAbsolutePath = path.join(cwd, packetPath);
-    if (!existsSync(packetAbsolutePath)) {
-        throw new CliError('ATM_CLOSURE_REPAIR_PACKET_NOT_FOUND', `Closure packet not found for ${taskId}.`, {
-            exitCode: 1,
-            details: { taskId, expectedPath: packetPath }
-        });
+    let parsed = readJsonIfExists(packetAbsolutePath);
+    if (!parsed) {
+        // Attempt to reconstruct the closure packet from the transition event
+        const taskDocPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+        const taskDocument = readJsonIfExists(taskDocPath);
+        if (!taskDocument) {
+            throw new CliError('ATM_CLOSURE_REPAIR_PACKET_NOT_FOUND', `Closure packet not found and task ledger is missing for ${taskId}.`, {
+                exitCode: 1,
+                details: { taskId, expectedPath: packetPath }
+            });
+        }
+        const lastTransitionId = normalizeOptionalString(taskDocument.lastTransitionId ?? taskDocument.last_transition_id);
+        let reconstructedPacket = null;
+        const missingSegments = ['closure-packet'];
+        if (lastTransitionId) {
+            const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`);
+            const eventDoc = readJsonIfExists(eventPath);
+            if (eventDoc && eventDoc.closure && typeof eventDoc.closure === 'object' && eventDoc.closure.schemaId === 'atm.taskClosureTransition.v1') {
+                const closureInfo = eventDoc.closure;
+                const headDetails = readGitHeadDetails(cwd);
+                const targetCommit = readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'tasks', `${taskId}.json`))
+                    || readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`))
+                    || headDetails.commitSha;
+                if (targetCommit) {
+                    const commitDetails = readGitCommitDetails(cwd, targetCommit);
+                    const governedTreeSha = commitDetails.treeSha || headDetails.treeSha;
+                    const parentCommitShas = commitDetails.parentCommitShas;
+                    const changedFiles = readRepairCommitChangedFiles(cwd, targetCommit);
+                    const repoStatus = createFrameworkModeStatus({
+                        cwd,
+                        files: changedFiles.length > 0 ? changedFiles : undefined
+                    });
+                    reconstructedPacket = {
+                        schemaId: 'atm.closurePacket.v1',
+                        specVersion: '0.1.0',
+                        taskId,
+                        targetRepoIdentity: detectFrameworkRepoIdentity(cwd),
+                        targetCommit,
+                        governedTreeSha: governedTreeSha ?? '',
+                        targetCommitDelta: {
+                            currentCommitSha: targetCommit,
+                            parentCommitShas,
+                            governedTreeSha: governedTreeSha ?? '',
+                            changedFiles: [...changedFiles]
+                        },
+                        closedByCommand: 'atm tasks close',
+                        commandRuns: [],
+                        validationPasses: closureInfo.validationPasses ?? [],
+                        evidenceFreshness: closureInfo.evidenceFreshness ?? 'fresh',
+                        requiredGates: closureInfo.requiredGates ?? [],
+                        requiredGatesSnapshot: closureInfo.requiredGatesSnapshot ?? null,
+                        evidencePath: `.atm/history/evidence/${taskId}.json`,
+                        closedAt: eventDoc.createdAt ?? new Date().toISOString(),
+                        closedByActor: eventDoc.actorId ?? 'unknown',
+                        sessionId: eventDoc.sessionId || null,
+                        attestation: null,
+                        historicalDeliveryProvenance: null,
+                        recoveredFromMissingPacket: true
+                    };
+                }
+            }
+            else {
+                missingSegments.push('close-transition-metadata');
+            }
+        }
+        else {
+            missingSegments.push('close-transition-metadata');
+        }
+        if (reconstructedPacket) {
+            parsed = reconstructedPacket;
+            if (!input.dryRun) {
+                mkdirSync(path.dirname(packetAbsolutePath), { recursive: true });
+                writeFileSync(packetAbsolutePath, `${JSON.stringify(reconstructedPacket, null, 2)}\n`, 'utf8');
+            }
+        }
+        else {
+            const deliveryCommit = readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'tasks', `${taskId}.json`)) || '<commit-sha>';
+            const actorId = input.actorId || '<actor>';
+            const recoveryCommand = `node atm.mjs tasks reconcile --task ${taskId} --actor ${actorId} --delivery-commit ${deliveryCommit} --json`;
+            throw new CliError('ATM_CLOSURE_REPAIR_IMPOSSIBLE', `Closure packet not found for ${taskId} and cannot be reconstructed automatically because close transition metadata is missing.`, {
+                exitCode: 1,
+                details: {
+                    taskId,
+                    missingSegments,
+                    requiredCommand: recoveryCommand,
+                    remediation: 'Use the reconcile command to sync the historical commit and build closeout provenance.'
+                }
+            });
+        }
     }
     const upstreamEvidence = normalizeUpstreamEvidenceForTask(cwd, taskId);
     const scopeTaskId = normalizeOptionalString(input.scopeTaskId);
     const scopeFiles = scopeTaskId ? collectTaskScopeFiles(cwd, scopeTaskId) : null;
-    const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath);
+    const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath && !entry.startsWith('.atm/runtime/'));
     const scopeWarnings = [];
     const blockingDirtyFiles = scopeFiles
         ? trackedDirtyFiles.filter((entry) => {
@@ -1257,7 +1342,9 @@ export function repairClosurePacketForTask(input) {
             }
         });
     }
-    let parsed = readJsonIfExists(packetAbsolutePath);
+    if (!parsed) {
+        parsed = readJsonIfExists(packetAbsolutePath);
+    }
     if (parsed) {
         parsed = refreshPacketFromEvidenceContext(cwd, taskId, parsed);
         if (!input.dryRun) {

@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'taskflow',
-  summary: 'Official operator-facing task opener and closeback orchestration. taskflow open orchestrates open; taskflow close orchestrates closeback; tasks new generates; tasks close/reconcile remain authoritative backends.',
+  summary: 'Official operator-facing task opener and closeback orchestration. taskflow open orchestrates open; taskflow close is the default operator lane for closeback; tasks new generates; tasks close/reconcile remain authoritative backends.',
   positional: [
     { name: 'action', summary: 'open | close', required: true }
   ],
@@ -16,6 +16,7 @@ export default defineCommandSpec({
     commonCwdOption,
     { flag: '--dry-run', summary: 'Return the orchestration plan without writing. Default when --write is omitted.' },
     { flag: '--write', summary: 'Run the governed orchestration entry when prerequisites are satisfied; otherwise fail closed.' },
+    { flag: '--no-commit', summary: 'For taskflow close --write: exact-stage the target and planning repo bundle, but do not commit. Auto-commit is on by default.' },
     { flag: '--profile', value: 'path', summary: 'Path to the taskflow profile JSON file.' },
     { flag: '--task', value: 'id', summary: 'Task id for taskflow close orchestration.' },
     { flag: '--actor', value: 'id', summary: 'Actor id required for taskflow close --write.' },
@@ -35,6 +36,7 @@ export default defineCommandSpec({
     'node atm.mjs taskflow open --dry-run --profile planning/taskflow.profile.json --json',
     'node atm.mjs taskflow open --write --profile planning/taskflow.profile.json --task-id TASK-ADOPTER-0002 --output tasks/TASK-ADOPTER-0002.task.md --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --dry-run --json',
-    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-delivery abc123 --write --json'
+    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-delivery abc123 --write --json',
+    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --write --no-commit --json'
   ]
 });

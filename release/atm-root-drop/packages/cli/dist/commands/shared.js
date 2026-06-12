@@ -5,6 +5,26 @@ import { projectFields, projectSummary } from './output-projection.js';
 let outputJsonPath = null;
 let globalSummaryProjection = false;
 let globalFieldsProjection = null;
+export function resetOutputProjectionGlobals() {
+    outputJsonPath = null;
+    globalSummaryProjection = false;
+    globalFieldsProjection = null;
+}
+export function applyOutputProjectionFlagsFromArgv(argv) {
+    resetOutputProjectionGlobals();
+    const summaryIdx = argv.indexOf('--summary');
+    if (summaryIdx !== -1) {
+        globalSummaryProjection = true;
+    }
+    const fieldsIdx = argv.indexOf('--fields');
+    if (fieldsIdx !== -1 && fieldsIdx + 1 < argv.length && !argv[fieldsIdx + 1].startsWith('-')) {
+        globalFieldsProjection = argv[fieldsIdx + 1].split(',').map((entry) => entry.trim()).filter(Boolean);
+    }
+    const outputJsonIdx = argv.indexOf('--output-json');
+    if (outputJsonIdx !== -1 && outputJsonIdx + 1 < argv.length && !argv[outputJsonIdx + 1].startsWith('-')) {
+        outputJsonPath = argv[outputJsonIdx + 1];
+    }
+}
 export function setOutputJsonPath(resolvedPath) {
     outputJsonPath = resolvedPath;
 }

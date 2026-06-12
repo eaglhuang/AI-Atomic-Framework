@@ -57,7 +57,7 @@ import {
 } from './work-channels.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
-import { runTasks, findTaskClaimDependencyBlockers } from './tasks.ts';
+import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './tasks/public-surface.ts';
 import { taskPathFor } from './tasks/task-file-io-helpers.ts';
 import {
   parseMarkdownFrontmatter,
@@ -551,7 +551,7 @@ async function claimNextImportedTask(input: {
     input.importedTaskQueue.tasks.map((task) => [task.workItemId, task.status] as const)
   );
   const selectedTask = input.importedTaskQueue.claimableTask || input.importedTaskQueue.selectedTask;
-  let selectedTaskDependencyBlockers: Array<{ taskId: string; status: string; taskPath: string }> = [];
+  let selectedTaskDependencyBlockers: TaskClaimDependencyBlocker[] = [];
   if (selectedTask) {
     const taskPath = taskPathFor(input.cwd, selectedTask.workItemId);
     if (existsSync(taskPath)) {
@@ -563,17 +563,22 @@ async function claimNextImportedTask(input: {
   }
   if (selectedTaskDependencyBlockers.length > 0) {
     const firstBlocker = selectedTaskDependencyBlockers[0];
-    const requiredCmd = firstBlocker.status === 'incomplete-closeout'
-      ? `node atm.mjs tasks finalize diagnose --task ${firstBlocker.taskId} --json`
-      : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`;
+    const requiredCmd = firstBlocker.requiredCommand
+      ?? (firstBlocker.status === 'incomplete-closeout' || firstBlocker.status === 'source-done-governance-incomplete'
+        ? `node atm.mjs tasks status --task ${firstBlocker.taskId} --residue --json`
+        : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`);
+    const blockerText = firstBlocker.status === 'source-done-governance-incomplete'
+      ? `Claim blocked: prerequisite ${firstBlocker.taskId} is source-done but not governably closed.`
+      : `Claim blocked until prerequisite task(s) close for ${selectedTask?.workItemId ?? 'the selected task'}.`;
     return makeResult({
       ok: false,
       command: 'next',
       cwd: input.cwd,
-      messages: [message('error', 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', `Claim blocked until prerequisite task(s) close for ${selectedTask?.workItemId ?? 'the selected task'}.`, {
+      messages: [message('error', 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED', blockerText, {
         taskId: selectedTask?.workItemId ?? null,
         blockingTaskIds: selectedTaskDependencyBlockers.map((b) => b.taskId),
-        requiredCommand: requiredCmd
+        requiredCommand: requiredCmd,
+        dependencyStatuses: selectedTaskDependencyBlockers
       })],
       evidence: {
         taskIntent: input.taskIntent,
