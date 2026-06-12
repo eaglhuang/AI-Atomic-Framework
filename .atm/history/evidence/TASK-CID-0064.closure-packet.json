@@ -1,0 +1,170 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0064",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f51d59c2eedc8ae6bc051f2416b45addc5475cb5",
+  "governedTreeSha": "5f4cecdac6552e21ddd14ea5ec5acb1e36b1340b",
+  "targetCommitDelta": {
+    "currentCommitSha": "f51d59c2eedc8ae6bc051f2416b45addc5475cb5",
+    "parentCommitShas": [
+      "f51d59c2eedc8ae6bc051f2416b45addc5475cb5"
+    ],
+    "governedTreeSha": "5f4cecdac6552e21ddd14ea5ec5acb1e36b1340b",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0064.json",
+      ".atm/history/task-events/TASK-CID-0064/2026-06-12T15-28-54-714Z-import-e40034545a70.json",
+      ".atm/history/task-events/TASK-CID-0064/2026-06-12T15-29-00-817Z-import-5356582c0193.json",
+      ".atm/history/task-events/TASK-CID-0064/2026-06-12T15-29-03-295Z-claim-0daa24bf23f1.json",
+      ".atm/history/task-events/TASK-CID-0064/2026-06-12T15-29-05-791Z-scope-amendment-fde448bc12d5.json",
+      ".atm/history/tasks/TASK-AAO-0063.json",
+      ".atm/history/tasks/TASK-CID-0064.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/closeout-signaling.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/lifecycle.ts",
+      "packages/core/src/broker/proposal.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/packages/cli/dist/atm.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-predicates.js",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/shared.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/src/atm.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-predicates.ts",
+      "release/atm-root-drop/packages/cli/src/commands/shared.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "release/atm-root-drop/scripts/validate-task-ledger-governance.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:221ae6a74ce096fe673ccc15d13937ebc75403a2da6e06a3c3651cb4613663a6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7afb8059587bc8d61d96c853874b033d2d6481459171853235ac049079c98c6d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e86e6a3a612bae766f3b22398ef4990bff6f1dbb94267e5514740baf3cd39406",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:task-ledger-governance"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-12T15:44:43.631Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0064-repair-closure-missing-packet-recovery.task.md",
+      ".atm/history/evidence/TASK-CID-0064.*",
+      ".atm/history/task-events/TASK-CID-0064/**",
+      ".atm/history/tasks/TASK-CID-0064.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/closeout-signaling.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/closeout-signaling.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0064.json",
+  "closedAt": "2026-06-12T15:44:43.632Z",
+  "closedByActor": "007",
+  "sessionId": "session-20260612152903-007-TASK-CID-0064-c57cb0d129",
+  "attestation": null,
+  "historicalDeliveryProvenance": null
+}
