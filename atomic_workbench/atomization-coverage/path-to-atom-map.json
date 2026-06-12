@@ -696,6 +696,41 @@
       "source_task": "TASK-CID-0035"
     },
     {
+      "path_pattern": "packages/core/src/broker/recovery.ts",
+      "atom_id": "atm.cid-agr-recovery-map",
+      "capability": "Broker snapshot recovery, lease revalidation, and manual override audit trail.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0044"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/orphan-cleanup.ts",
+      "atom_id": "atm.cid-agr-recovery-map",
+      "capability": "Suspect-to-stale orphan lease cleanup without inventing authority.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0044"
+    },
+    {
+      "path_pattern": "scripts/validate-broker-recovery.ts",
+      "atom_id": "atm.cid-agr-recovery-map",
+      "capability": "Command-backed recovery and orphan cleanup validation gate.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0044"
+    },
+    {
+      "path_pattern": "scripts/lib/agr-conflict-benchmark-runner.ts",
+      "atom_id": "atm.cid-agr-conflict-benchmark-map",
+      "capability": "Conflict arbitration benchmark runner with capsule CID drift and catch-rate reporting.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0045"
+    },
+    {
+      "path_pattern": "scripts/validate-agr-conflict-benchmark.ts",
+      "atom_id": "atm.cid-agr-conflict-benchmark-map",
+      "capability": "Conflict benchmark validator gate and ship-safe reporting.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0045"
+    },
+    {
       "path_pattern": "packages/core/src/**",
       "atom_id": "atom-core-registry",
       "capability": "core package fallback ownership (anything not matched above)",
@@ -1076,6 +1111,27 @@
       "capability": "Deterministic validator for captain decision, team sizing, and lieutenant escalation dry-run outputs across small, medium, and large task shapes",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0008"
+    },
+    {
+      "path_pattern": "scripts/validate-semantic-fingerprint.ts",
+      "atom_id": "atom-validator-framework",
+      "capability": "Deterministic validator for semantic fingerprint regression fixtures and identity-hash determinism checks",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0003"
+    },
+    {
+      "path_pattern": "tests/registry/semantic-fingerprint-determinism.test.ts",
+      "atom_id": "atom-validator-framework",
+      "capability": "Regression coverage for semantic fingerprint determinism fixtures and negative failure mode",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0003"
+    },
+    {
+      "path_pattern": "fixtures/semantic-fingerprint/determinism/*",
+      "atom_id": "atm.cid-map",
+      "capability": "Deterministic regression fixtures for semantic fingerprint permutation, recompute stability, and non-deterministic input rejection",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0003"
     }
   ],
   "summary": {

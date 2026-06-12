@@ -103,6 +103,8 @@
         "validate-broker-steward",
         "validate-brokered-write",
         "validate-agr-benchmark",
+        "validate-agr-conflict-benchmark",
+        "validate-broker-recovery",
         "validate-team-brokered-write"
       ]
     },
@@ -223,6 +225,8 @@
     { "name": "validate-broker-steward", "entry": "scripts/validate-broker-steward.ts", "tags": ["broker", "steward", "logic"], "slow": false },
     { "name": "validate-brokered-write", "entry": "scripts/validate-brokered-write.ts", "tags": ["broker", "acceptance", "logic"], "slow": false },
     { "name": "validate-agr-benchmark", "entry": "scripts/validate-agr-benchmark.ts", "tags": ["broker", "agr", "benchmark"], "slow": false },
+    { "name": "validate-agr-conflict-benchmark", "entry": "scripts/validate-agr-conflict-benchmark.ts", "tags": ["broker", "agr", "conflict", "benchmark"], "slow": false },
+    { "name": "validate-broker-recovery", "entry": "scripts/validate-broker-recovery.ts", "tags": ["broker", "recovery", "logic"], "slow": false },
     { "name": "validate-team-brokered-write", "entry": "scripts/validate-team-brokered-write.ts", "tags": ["broker", "team", "logic"], "slow": false },
     { "name": "validate-task-parallel-advisor", "entry": "scripts/validate-task-parallel-advisor.ts", "tags": ["cli", "tasks", "governance"], "slow": false }
   ]

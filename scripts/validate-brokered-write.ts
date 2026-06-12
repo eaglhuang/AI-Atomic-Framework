@@ -75,7 +75,7 @@ function writeScenarioFiles(tempRoot: string, files: readonly BrokeredWriteScena
 }
 
 function hashText(value: string): string {
-  return createHash('sha256').update(value).digest('hex');
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
 function createHashForScenario(fileContents: string): string {
