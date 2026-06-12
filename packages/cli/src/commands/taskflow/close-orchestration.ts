@@ -143,7 +143,7 @@ export function resolveTaskflowCloseMode(input: {
   if (input.bucket === 'interrupted-close') {
     return 'residue-repair';
   }
-  if (input.bucket === 'complete-but-unfinalized') {
+  if (input.bucket === 'complete-but-unfinalized' || input.bucket === 'source-done-governance-incomplete') {
     return 'historical-delivery-close';
   }
   if (input.liveStatus === 'done') {

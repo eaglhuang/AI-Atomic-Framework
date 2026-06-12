@@ -1237,7 +1237,7 @@ try {
     const claimRes = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
     assert(claimRes.exitCode !== 0, 'tasks claim B must fail because dependency A has no closeout provenance');
     assert(claimRes.parsed.messages.some((msg: any) => msg.code === 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'must report dependency blocked');
-    assert(claimRes.parsed.messages[0].data.requiredCommand.includes('finalize diagnose'), 'requiredCommand must recommend tasks finalize diagnose');
+    assert(claimRes.parsed.messages[0].data.requiredCommand.includes('repair-closure'), 'requiredCommand must recommend tasks repair-closure for manual-done without closeout provenance');
 
     // 跑 next --claim 同樣應該被 block
     const nextClaimRes = await runAtm(['next', '--claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
@@ -1318,6 +1318,44 @@ try {
     // 再次嘗試 tasks claim，此時 dependency blockers 應該不包含 A (因為 A 已經有 provenance 了，雖然 B 狀態為 ready 還不能 claim，但錯誤不應該是 dependency blocked)
     const claimResPass = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-DEP-B', '--actor', 'Antigravity'], autoLinkTempWorkspace);
     assert(claimResPass.parsed.messages.every((msg: any) => msg.code !== 'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED'), 'dependency B must no longer be blocked by dependency A');
+
+    // Test 5.1b: import->done without governed closeout must classify as source-done-governance-incomplete (TASK-CID-0060)
+    const taskImportPath = path.join(autoLinkTempWorkspace, '.atm', 'history', 'tasks', 'TASK-REGRESS-IMPORT-DONE.json');
+    const importEventId = '2026-06-12T09-00-00-000Z-import-0060regress';
+    const importEventPath = path.join(autoLinkTempWorkspace, '.atm', 'history', 'task-events', 'TASK-REGRESS-IMPORT-DONE', `${importEventId}.json`);
+    writeJson(importEventPath, {
+      schemaId: 'atm.taskTransition.v1',
+      specVersion: '0.1.0',
+      transitionId: importEventId,
+      taskId: 'TASK-REGRESS-IMPORT-DONE',
+      action: 'import',
+      toStatus: 'done'
+    });
+    writeJson(taskImportPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-REGRESS-IMPORT-DONE',
+      title: 'Import done without governed closeout',
+      status: 'done',
+      lastTransitionId: importEventId
+    });
+    const residueRes = await runAtm(['tasks', 'status', '--task', 'TASK-REGRESS-IMPORT-DONE', '--residue', '--json'], autoLinkTempWorkspace);
+    assert(residueRes.exitCode === 0, 'tasks status --residue must succeed for import-done task');
+    assert(residueRes.parsed.evidence.bucket === 'source-done-governance-incomplete', 'import->done without provenance must bucket as source-done-governance-incomplete');
+    assert(
+      typeof residueRes.parsed.evidence.nextCommand === 'string'
+        ? residueRes.parsed.evidence.nextCommand.includes('tasks reconcile')
+        : true,
+      'import-done residue must recommend tasks reconcile'
+    );
+    assert(
+      typeof residueRes.parsed.evidence.residue === 'string'
+        ? residueRes.parsed.evidence.residue.includes('import')
+        : true,
+      'residue explanation must mention import path'
+    );
+
+    const finalizeDiagRes = await runAtm(['tasks', 'finalize', 'diagnose', '--task', 'TASK-REGRESS-IMPORT-DONE', '--json'], autoLinkTempWorkspace);
+    assert(finalizeDiagRes.parsed.evidence.bucket === 'source-done-governance-incomplete', 'finalize diagnose must agree with residue bucket for import-done');
 
     // Test 5.2: historical-delivery scope and commit provenance hard gate (TASK-CID-0049)
     const declaredFiles = ['src/task-owned.ts', 'release/atm-onefile/atm.mjs'];

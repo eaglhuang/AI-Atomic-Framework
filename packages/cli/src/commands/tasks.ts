@@ -48,6 +48,14 @@ import {
   writeTaskDirectionLock
 } from './task-direction.ts';
 import { findActiveBatchRunForTask, readActiveBatchRun, isPathAllowedByScope } from './work-channels.ts';
+import {
+  assessCloseoutProvenanceGap,
+  buildDependencyCloseoutBlocker,
+  buildDependencyCloseoutRecoveryCommand,
+  formatDependencyCloseoutBlockedMessage,
+  verifyCloseoutProvenance,
+  type TaskDependencyCloseoutBlocker
+} from './tasks/closeout-signaling.ts';
 import { runAtmGit } from './git-governance.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.ts';
@@ -507,6 +515,7 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
 
 export type TaskResidueBucket =
   | 'complete-but-unfinalized'
+  | 'source-done-governance-incomplete'
   | 'planning-mirror-only'
   | 'interrupted-close'
   | 'stale-import'
@@ -587,7 +596,7 @@ function classifyTaskResidue(input: {
     };
   }
 
-  if (liveDone && !planningDone) {
+  if (liveDone && !planningDone && input.planningFrontmatter.status !== null) {
     return {
       bucket: mirrorPath ? 'planning-mirror-only' : 'stale-import',
       truth: 'live ledger is done, but the planning mirror has not converged',
@@ -605,6 +614,19 @@ function classifyTaskResidue(input: {
       nextCommand: 'node atm.mjs tasks repair-closure --task <id> --json',
       reason: 'A done/done task still carries an active claim, so the finalization flow needs repair rather than a new close.'
     };
+  }
+
+  if (liveDone && !verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
+    const gap = assessCloseoutProvenanceGap(input.cwd, input.taskId, input.taskDocument);
+    if (gap.bucket === 'source-done-governance-incomplete') {
+      return {
+        bucket: 'source-done-governance-incomplete',
+        truth: gap.truth,
+        residue: `${gap.residue} Missing proof segments: ${gap.missingSegments.join(', ')}.`,
+        nextCommand: gap.recoveryCommand,
+        reason: gap.reason
+      };
+    }
   }
 
   if (planningMirrorOnly) {
@@ -1986,56 +2008,18 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
   });
 }
 
-export function verifyCloseoutProvenance(cwd: string, taskId: string, document: Record<string, unknown>): boolean {
-  const closurePacketVal = document.closurePacket ?? document.closure_packet;
-  if (typeof closurePacketVal === 'string' && closurePacketVal.trim().length > 0) {
-    const cpPath = path.resolve(cwd, closurePacketVal.trim());
-    if (existsSync(cpPath)) {
-      try {
-        const cpData = JSON.parse(readFileSync(cpPath, 'utf8'));
-        if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
-          return true;
-        }
-      } catch {}
-    }
-  }
+export { verifyCloseoutProvenance } from './tasks/closeout-signaling.ts';
 
-  const lastTransitionId = document.lastTransitionId ?? document.last_transition_id;
-  if (typeof lastTransitionId === 'string' && lastTransitionId.trim().length > 0) {
-    const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId.trim()}.json`);
-    if (existsSync(eventPath)) {
-      try {
-        const eventData = JSON.parse(readFileSync(eventPath, 'utf8'));
-        if (eventData && (eventData.action === 'close' || eventData.toStatus === 'done' || eventData.toStatus === 'verified')) {
-          if (eventData.closure && typeof eventData.closure === 'object' && eventData.closure.schemaId === 'atm.taskClosureTransition.v1') {
-            return true;
-          }
-        }
-      } catch {}
-    }
-  }
+export type TaskClaimDependencyBlocker = TaskDependencyCloseoutBlocker;
 
-  const fallbackCpPath = path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.closure-packet.json`);
-  if (existsSync(fallbackCpPath)) {
-    try {
-      const cpData = JSON.parse(readFileSync(fallbackCpPath, 'utf8'));
-      if (cpData && cpData.schemaId === 'atm.closurePacket.v1' && cpData.taskId === taskId) {
-        return true;
-      }
-    } catch {}
-  }
-
-  return false;
-}
-
-export function findTaskClaimDependencyBlockers(cwd: string, taskId: string, taskDocument: Record<string, unknown>) {
+export function findTaskClaimDependencyBlockers(cwd: string, taskId: string, taskDocument: Record<string, unknown>): TaskClaimDependencyBlocker[] {
   const declaredDependencies = Array.from(new Set(parseYamlList(
     taskDocument.dependencies ?? taskDocument.depends_on ?? taskDocument.blocked_by
   )));
   if (declaredDependencies.length === 0) {
     return [];
   }
-  const blockers: Array<{ taskId: string; status: string; taskPath: string }> = [];
+  const blockers: TaskClaimDependencyBlocker[] = [];
   for (const dependencyTaskId of declaredDependencies) {
     const dependencyPath = taskPathFor(cwd, dependencyTaskId);
     if (!existsSync(dependencyPath)) {
@@ -2047,10 +2031,9 @@ export function findTaskClaimDependencyBlockers(cwd: string, taskId: string, tas
       const dependencyStatus = normalizeWorkItemStatus(dependencyDocument.status);
       if (dependencyStatus !== 'done' && dependencyStatus !== 'verified') {
         blockers.push({ taskId: dependencyTaskId, status: dependencyStatus, taskPath: dependencyPath });
-      } else {
-        if (!verifyCloseoutProvenance(cwd, dependencyTaskId, dependencyDocument)) {
-          blockers.push({ taskId: dependencyTaskId, status: 'incomplete-closeout', taskPath: dependencyPath });
-        }
+      } else if (!verifyCloseoutProvenance(cwd, dependencyTaskId, dependencyDocument)) {
+        const blocker = buildDependencyCloseoutBlocker(cwd, dependencyTaskId, dependencyPath, dependencyDocument);
+        blockers.push(blocker);
       }
     } catch {
       blockers.push({ taskId: dependencyTaskId, status: 'unreadable', taskPath: dependencyPath });
@@ -3433,16 +3416,24 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
     if (dependencyBlockers.length > 0) {
       const firstBlocker = dependencyBlockers[0];
-      const requiredCmd = firstBlocker.status === 'incomplete-closeout'
-        ? `node atm.mjs tasks finalize diagnose --task ${firstBlocker.taskId} --json`
-        : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`;
-      throw new CliError('ATM_TASK_CLAIM_DEPENDENCY_BLOCKED', `Task ${options.taskId} cannot be claimed until prerequisite task(s) close.`, {
+      const closeoutBlocker = firstBlocker as TaskDependencyCloseoutBlocker;
+      const requiredCmd = closeoutBlocker.requiredCommand
+        ?? (closeoutBlocker.status === 'incomplete-closeout' || closeoutBlocker.status === 'source-done-governance-incomplete'
+          ? buildDependencyCloseoutRecoveryCommand(closeoutBlocker)
+          : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`);
+      const blockerMessage = closeoutBlocker.status === 'source-done-governance-incomplete'
+        ? formatDependencyCloseoutBlockedMessage(closeoutBlocker)
+        : `Task ${options.taskId} cannot be claimed until prerequisite task(s) close.`;
+      throw new CliError('ATM_TASK_CLAIM_DEPENDENCY_BLOCKED', blockerMessage, {
         exitCode: 1,
         details: {
           taskId: options.taskId,
           dependencyTaskIds: dependencyBlockers.map((entry) => entry.taskId),
           dependencyStatuses: dependencyBlockers,
-          requiredCommand: requiredCmd
+          requiredCommand: requiredCmd,
+          closeoutGap: firstBlocker.status === 'source-done-governance-incomplete'
+            ? assessCloseoutProvenanceGap(options.cwd, firstBlocker.taskId, JSON.parse(readFileSync(firstBlocker.taskPath, 'utf8')) as Record<string, unknown>)
+            : null
         }
       });
     }
