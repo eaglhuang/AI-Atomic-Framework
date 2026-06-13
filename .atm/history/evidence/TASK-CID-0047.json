@@ -1,5 +1,48 @@
 {
-  "schemaId": "atm.taskEvidence.v0.2",
   "taskId": "TASK-CID-0047",
-  "evidence": []
+  "updatedAt": "2026-06-13T06:23:53.095Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git -C C:\\Users\\User\\3KLife diff --check -- docs/ai_atomic_framework/cid-hardening/atm-abnormal-release-forensics-report.md",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613061659-captain-TASK-CID-0047-18b8d93c63",
+      "createdAt": "2026-06-13T06:23:53.095Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613061659-captain-TASK-CID-0047-18b8d93c63",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git -C C:\\Users\\User\\3KLife diff --check -- docs/ai_atomic_framework/cid-hardening/atm-abnormal-release-forensics-report.md",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7201fdf9df6dbbaee305b89de3e90b7bbf565b65cab96fe0852925f21cc02410",
+            "cached": false,
+            "generatedAt": "2026-06-13T06:23:53.132Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:840caff8d21239e5f2dd7bc333c4fc8ae36aa79414d751a5b9d3bf8b6b385e5b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
 }
