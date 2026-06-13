@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0059",
+  "title": "Tasks atomic map final validation and dogfood report",
+  "status": "done",
+  "milestone": "M10",
+  "dependencies": [
+    "TASK-CID-0058"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "docs/reports/tasks-command-atomic-map.md",
+    "docs/reports/tasks-atomic-map-dogfood-report.md",
+    "scripts/validate-tasks-atomic-map.ts"
+  ],
+  "scopePaths": [
+    "docs/reports/tasks-command-atomic-map.md",
+    "docs/reports/tasks-atomic-map-dogfood-report.md",
+    "scripts/validate-tasks-atomic-map.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-tasks-atomic-map.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Further production refactors",
+    "Closing unrelated historical tasks"
+  ],
+  "nonGoals": [
+    "Do not declare success without command-backed validation."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-command-atomic-map",
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "docs/reports/tasks-atomic-map-dogfood-report.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0059-tasks-atomic-map-final-validation-and-dogfood-report.task.md",
+    "sectionTitle": "TASK-CID-0059",
+    "headingLine": 44,
+    "hash": "4eca4886b42a507f"
+  },
+  "importedAt": "2026-06-13T15:50:37.472Z",
+  "lastTransitionId": "2026-06-13T16-00-30-779Z-close-d51e9ab1d7d6",
+  "lastTransitionAt": "2026-06-13T16:00:30.779Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T15:51:06.647Z",
+  "promotedAt": "2026-06-13T15:51:06.651Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-145c26d7b332",
+    "claimedAt": "2026-06-13T15:51:06.654Z",
+    "heartbeatAt": "2026-06-13T16:00:30.775Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0059.json",
+      "docs/reports/tasks-atomic-map-dogfood-report.md",
+      "docs/reports/tasks-command-atomic-map.md",
+      "scripts/validate-tasks-atomic-map.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T15:51:06.654Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613155106-captain-TASK-CID-0059-6b7025913f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0059",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0059.*",
+      ".atm/history/task-events/TASK-CID-0059/**",
+      ".atm/history/tasks/TASK-CID-0059.json",
+      "docs/reports/tasks-atomic-map-dogfood-report.md",
+      "docs/reports/tasks-command-atomic-map.md",
+      "scripts/validate-tasks-atomic-map.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0a9c4bf25f45799bb0e8f87b0a59c7166cffb21e7621727d3b415ee7d37deab9",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T15:51:06.675Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T16:00:30.775Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613155106-captain-TASK-CID-0059-6b7025913f",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0059.closure-packet.json"
+}
