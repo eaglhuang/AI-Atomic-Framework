@@ -1,4 +1,5 @@
 import { type CommandResult } from './shared.ts';
+import { type TaskHistoricalDeliveryReport } from './tasks/historical-delivery.ts';
 import { type TaskDispatchPattern } from './tasks/task-markdown-helpers.ts';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.ts';
 import { type ContextMap } from './tasks/task-import-validators.ts';
@@ -81,23 +82,6 @@ export interface TaskDeliverableGateReport {
     readonly remediation: string;
     readonly requiredCommand: string | null;
 }
-export interface HistoricalDeliveryFileBuckets {
-    readonly taskMatchedFiles: readonly string[];
-    readonly governanceFiles: readonly string[];
-    readonly allowedRunnerOutputFiles: readonly string[];
-    readonly outOfScopeSourceFiles: readonly string[];
-    readonly ignoredFiles: readonly string[];
-}
-export interface TaskHistoricalDeliveryReport {
-    readonly requestedRef: string;
-    readonly commitSha: string | null;
-    readonly ok: boolean;
-    readonly reason: string;
-    readonly changedFiles: readonly string[];
-    readonly deliverableFiles: readonly string[];
-    readonly fileBuckets: HistoricalDeliveryFileBuckets;
-    readonly waiverApplied: boolean;
-}
 export interface TaskImportDiagnostic {
     readonly level: 'info' | 'warning' | 'error';
     readonly code: string;
@@ -143,80 +127,15 @@ export interface TaskLegacyLedgerMigrationSkip {
     readonly reason: string;
 }
 export declare function runTasks(argv: string[]): Promise<CommandResult>;
-export type TaskResidueBucket = 'no-residue' | 'complete-but-unfinalized' | 'source-done-governance-incomplete' | 'planning-mirror-only' | 'interrupted-close' | 'stale-import' | 'ambiguous-manual-review';
-export interface TaskResidueClassification {
-    bucket: TaskResidueBucket;
-    truth: string;
-    residue: string;
-    reason: string;
-    nextCommandTemplate: string;
-    nextCommand: string;
-    autoMutationAllowed: false;
-}
+export type { TaskResidueBucket, TaskResidueClassification } from './tasks/residue-diagnostics.ts';
 export declare function loadTaskDocumentOrThrow(cwd: string, taskId: string): {
     taskPath: string;
     taskDocument: Record<string, unknown>;
 };
-export declare function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>): {
-    schemaId: "atm.taskResidueDiagnosis.v1";
-    taskId: string;
-    bucket: TaskResidueBucket;
-    truth: string;
-    residue: string;
-    reason: string;
-    nextCommand: string;
-    nextCommandTemplate: string;
-    autoMutationAllowed: false;
-    diagnostics: {
-        codes: string[];
-        messages: string[];
-    };
-    triangulation: {
-        ssot: "liveLedger";
-        liveLedger: {
-            status: string | null;
-            claimState: "active" | "released" | "handoff" | "taken_over" | null;
-            lastTransitionId: string | null;
-            lastTransitionAt: string | null;
-        };
-        lastTransitionEvent: {
-            action: string | null;
-            actorId: string | null;
-            createdAt: string | null;
-            fromStatus: string | null;
-            toStatus: string | null;
-        } | null;
-        planningFrontmatter: {
-            status: string | null;
-            source: string | null;
-        };
-        divergence: {
-            field: string;
-            liveLedger: string | null;
-            planningFrontmatter?: string | null;
-            lastTransitionEvent?: string | null;
-        }[];
-        recommendation: string | null;
-        residueClassification: TaskResidueClassification;
-    };
-};
+export declare function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>): import("./tasks/residue-diagnostics.ts").TaskResidueDiagnosisEvidence;
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';
-export { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.ts';
-export type { TaskClaimDependencyBlocker } from './tasks/dependency-gate.ts';
-export declare function categorizeHistoricalCommitFiles(input: {
-    readonly taskId: string;
-    readonly changedFiles: readonly string[];
-    readonly declaredFiles: readonly string[];
-}): HistoricalDeliveryFileBuckets;
-export declare function inspectHistoricalDelivery(input: {
-    readonly cwd: string;
-    readonly taskId: string;
-    readonly requestedRef: string;
-    readonly declaredFiles: readonly string[];
-    readonly enforceDeclaredScope: boolean;
-    readonly waiverOutOfScopeDelivery: boolean;
-    readonly waiverReason: string | null;
-}): TaskHistoricalDeliveryReport;
+export { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
+export type { TaskClaimDependencyBlocker } from './tasks/dependency-gates.ts';
 export interface ParsedPlanResult {
     readonly tasks: readonly TaskImportRecord[];
     readonly diagnostics: TaskImportDiagnostic[];

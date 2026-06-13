@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'taskflow',
-  summary: 'Official operator-facing task opener and closeback orchestration. taskflow open orchestrates open; taskflow close is the official operator lane for closeback and may delegate protected backend surfaces internally. tasks new generates; tasks close/reconcile/import/repair-closure remain authoritative emergency backends when used directly.',
+  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow close is the normal closeback lane with dual-repo governed commit bundle and may delegate protected backend surfaces internally. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
   positional: [
     { name: 'action', summary: 'open | close', required: true }
   ],

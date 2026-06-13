@@ -69,6 +69,11 @@ export declare const minimumAtmEntrySkillDefinitions: readonly [{
     readonly title: "ATM Internal Build Sync";
     readonly summary: "Build the ATM framework runner and sync it to explicit internal adopter repositories with skip/exclude controls.";
     readonly command: "node atm.mjs internal-release sync $ARGUMENTS --json";
+}, {
+    readonly id: "atm-atom-map-refactor";
+    readonly title: "ATM Atom Map Refactor";
+    readonly summary: "Plan ATM framework refactors by preserving atom/map semantics before splitting large governance modules.";
+    readonly command: "node atm.mjs next --prompt \"$ARGUMENTS\" --json";
 }];
 export declare function parseSkillTemplate(content: string, sourcePath?: string): AtmSkillTemplate;
 export declare function loadSkillTemplates(templateDirectory?: string): readonly AtmSkillTemplate[];

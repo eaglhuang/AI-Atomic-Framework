@@ -62,10 +62,24 @@ Lease checks validate task, actor, permission, expiry, max-use count, and explic
 |---|---|
 | `openerMode` | `delegated-governed` or `template-only-fallback` |
 | `writeSupport` | Whether `--write` may execute as the governed entry |
+| `writeReadinessHint` | Top-level operator-facing hint (`atm.taskflowOpenWriteReadinessHint.v1`) naming exactly what is missing when `--write` would fail closed |
 | `delegationContract` | Host opener availability and generation surface (`tasks-new`) |
 | `diagnostics` | Codes, messages, and missing prerequisites |
 | `orchestrationPlan` | Dry-run plan including the `tasks new` and `tasks import` commands that would run |
 | `runtimeImport` | Write-mode runtime import result returned from `tasks import --write` |
+
+### Write readiness hint (`atm.taskflowOpenWriteReadinessHint.v1`)
+
+`writeReadinessHint` is emitted at the top level of every `taskflow open` result and inside the fail-closed error details when `--write` is rejected. It removes the need to inspect nested `orchestrationPlan.hostPolicy.fallbackBehavior` fields to learn whether `--write` will succeed.
+
+| Field | Purpose |
+|---|---|
+| `status` | `ready` (delegated-governed), `fallback` (template-only-fallback), or `incomplete` (delegated profile loaded but explicit inputs missing) |
+| `summary` | One-line operator-facing sentence describing the current readiness state |
+| `missingPrerequisites` | Exact list of profile policy fields or explicit flags still required before `--write` can succeed |
+| `nextCommand` | Suggested `taskflow open --write` invocation when ready, otherwise `null` |
+| `operatorLane` | Always `taskflow open`; reinforces that this is the official operator surface |
+| `fallbackSurface` | `tasks new (low-level generator)` when the operator must escape governed lane, otherwise `null` |
 
 ### Opener mode rules
 
@@ -132,6 +146,9 @@ and delegates to the target backend with `--historical-delivery-repo <repo>`.
 - `taskflow close --write --no-commit` keeps mandatory dual-repo exact staging but returns deterministic commit commands without committing.
 - `taskflow close --dry-run` never stages or commits; it returns a bundle preview.
 - If either repository's stage-file set cannot be computed, ATM fails closed before writing with `ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE`.
+- When `source.planPath` is absent, `taskflow close --profile <profile>` may recover the planning card path from the profile repository root and `delegation.policy.resolveCanonicalOutputPath` using the runtime task id. Recovery succeeds only when the resolved path exists and the planning card frontmatter matches the runtime task id.
+- If profile-root recovery finds no file, mismatched task id, or conflicting `related_plan`, ATM fails closed with `ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING`, `ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH`, or `ATM_TASKFLOW_CLOSE_PLANNING_PATH_AMBIGUOUS`.
+- Dry-run and write results expose `closebackPathResolution.route` as `source-plan-path`, `profile-root-fallback`, `missing`, or `ambiguous`.
 
 ## Taskflow Governed Commit Bundle (`atm.taskflowGovernedCommitBundle.v1`)
 

@@ -72,6 +72,12 @@ export const minimumAtmEntrySkillDefinitions = [
         title: 'ATM Internal Build Sync',
         summary: 'Build the ATM framework runner and sync it to explicit internal adopter repositories with skip/exclude controls.',
         command: 'node atm.mjs internal-release sync $ARGUMENTS --json'
+    },
+    {
+        id: 'atm-atom-map-refactor',
+        title: 'ATM Atom Map Refactor',
+        summary: 'Plan ATM framework refactors by preserving atom/map semantics before splitting large governance modules.',
+        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
     }
 ];
 export function parseSkillTemplate(content, sourcePath = '<inline>') {

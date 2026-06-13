@@ -522,6 +522,75 @@ try {
   assert((closeoutOnlyGate.deliverableFiles ?? []).includes('pipelines/sanguo-rag/closeout_only_bootstrap.py'), 'closeout-only historical close must credit the scoped deliverable file');
   assert((closeoutOnlyGate.historicalDeliveries ?? []).some((entry: any) => entry.ok === true), 'closeout-only historical close must accept the shared delivery commit');
 
+  // TASK-CID-0076: a task already in review must not require reset/open/import
+  // hacks when the real delivery already landed. Only the closeout-only lane can
+  // reclaim it, and done still requires command-backed historical delivery proof.
+  const reviewCloseoutRepo = makeHostRepo(tempRoot, 'review-closeout-target');
+  initGitRepo(reviewCloseoutRepo);
+  const reviewPlanningRepo = makeHostRepo(tempRoot, 'review-closeout-planning');
+  initGitRepo(reviewPlanningRepo);
+  mkdirSync(path.join(reviewPlanningRepo, 'docs'), { recursive: true });
+  const reviewCloseoutDeliverable = 'docs/review-closeout-deliverable.md';
+  writeFileSync(path.join(reviewPlanningRepo, reviewCloseoutDeliverable), '# review closeout delivery\n', 'utf8');
+  execFileSync('git', ['add', reviewCloseoutDeliverable], { cwd: reviewPlanningRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'land review closeout planning deliverable'], { cwd: reviewPlanningRepo, stdio: 'ignore' });
+  const reviewPlanningDeliverySha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: reviewPlanningRepo, encoding: 'utf8' }).trim();
+  const reviewCloseoutTaskId = 'TEST-TASK-0076';
+  const reviewCloseoutTask = await runTasks(['create', '--cwd', reviewCloseoutRepo, '--task', reviewCloseoutTaskId, '--actor', 'validator', '--title', 'Review closeout-only reclaim fixture']);
+  assert(reviewCloseoutTask.ok === true, 'review closeout fixture task create must succeed');
+  const reviewCloseoutTaskPath = path.join(reviewCloseoutRepo, '.atm', 'history', 'tasks', `${reviewCloseoutTaskId}.json`);
+  const reviewCloseoutTaskDoc = readJson(reviewCloseoutTaskPath);
+  reviewCloseoutTaskDoc.status = 'review';
+  reviewCloseoutTaskDoc.scopePaths = [reviewCloseoutDeliverable];
+  reviewCloseoutTaskDoc.deliverables = [reviewCloseoutDeliverable];
+  reviewCloseoutTaskDoc.planningRepo = reviewPlanningRepo;
+  reviewCloseoutTaskDoc.closureAuthority = 'planning_repo';
+  reviewCloseoutTaskDoc.source = { planPath: path.join(reviewPlanningRepo, 'tasks', 'review-closeout.task.md') };
+  reviewCloseoutTaskDoc.claim = {
+    state: 'released',
+    actorId: 'previous-validator',
+    leaseId: 'released-review-claim',
+    releasedAt: new Date().toISOString(),
+    intent: 'write',
+    files: [reviewCloseoutDeliverable]
+  };
+  writeJson(reviewCloseoutTaskPath, reviewCloseoutTaskDoc);
+  const reviewWriteNext = await runNext(['--cwd', reviewCloseoutRepo, '--claim', '--actor', 'validator', '--prompt', reviewCloseoutTaskId]);
+  assert(reviewWriteNext.ok === false, 'next --claim write must reject review-state tasks with closeout-only guidance');
+  assert(reviewWriteNext.messages?.[0]?.code === 'ATM_NEXT_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED', 'next review write rejection must use a stable diagnostic code');
+  assert(String(reviewWriteNext.messages?.[0]?.data?.requiredCommand ?? '').includes('--claim-intent closeout-only'), 'next review write rejection must point to closeout-only reclaim');
+  const reviewWriteClaimError = await expectTaskErrorDetails(['claim', '--cwd', reviewCloseoutRepo, '--task', reviewCloseoutTaskId, '--actor', 'validator', '--files', reviewCloseoutDeliverable], 'ATM_TASK_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED');
+  assert(String(reviewWriteClaimError.requiredCommand ?? '').includes('--claim-intent closeout-only'), 'tasks claim review rejection must point to closeout-only reclaim');
+  const reviewCloseoutClaim = await runNext(['--cwd', reviewCloseoutRepo, '--claim', '--actor', 'validator', '--prompt', reviewCloseoutTaskId, '--claim-intent', 'closeout-only']);
+  assert(reviewCloseoutClaim.ok === true, 'next --claim closeout-only must reclaim a review-state task');
+  const reviewCloseoutClaimedLedger = readJson(reviewCloseoutTaskPath);
+  assert(reviewCloseoutClaimedLedger.status === 'running', 'review closeout-only reclaim must move the task into running for the active close gate');
+  assert(reviewCloseoutClaimedLedger.claim?.intent === 'closeout-only', 'review closeout-only reclaim must persist claim.intent');
+  writeJson(path.join(reviewCloseoutRepo, '.atm', 'history', 'evidence', `${reviewCloseoutTaskId}.json`), {
+    taskId: reviewCloseoutTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'review closeout fixture planning-side delivery already landed',
+      producedBy: 'validator',
+      artifactPaths: [reviewCloseoutDeliverable],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate review closeout fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  const reviewCloseoutMissingProof = await expectTaskErrorDetails(['close', '--cwd', reviewCloseoutRepo, '--task', reviewCloseoutTaskId, '--actor', 'validator', '--status', 'done'], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+  assert(reviewCloseoutMissingProof.reason === 'missing-real-deliverable-diff', 'review closeout without historical delivery proof must fail closed');
+  const reviewCloseoutClose = await runTasks(['close', '--cwd', reviewCloseoutRepo, '--task', reviewCloseoutTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', reviewPlanningDeliverySha, '--historical-delivery-repo', reviewPlanningRepo]);
+  assert(reviewCloseoutClose.ok === true, 'review closeout-only task must close done against planning-repo historical delivery proof');
+  const reviewCloseoutGate = (reviewCloseoutClose.evidence as any)?.deliverableGate ?? {};
+  assert(reviewCloseoutGate.reason === 'historical-delivery-diff-present', 'review closeout done must be backed by historical delivery proof');
+  assert((reviewCloseoutGate.deliverableFiles ?? []).includes(reviewCloseoutDeliverable), 'review closeout historical proof must credit the planning-side scoped deliverable');
+
   const runnerReleaseFixtureTaskId = 'TEST-TASK-0004';
   const runnerReleaseTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', runnerReleaseFixtureTaskId, '--actor', 'validator', '--title', 'Committed runner release fixture']);
   assert(runnerReleaseTask.ok === true, 'runner release fixture task create must succeed');
@@ -2081,6 +2150,62 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(plannedDryRun.ok === true, 'taskflow close dry-run must accept active target plus planned planning mirror');
   assert(plannedDryRun.evidence.closeMode === 'normal-close', 'active target plus planned planning mirror must not route to ambiguous manual review');
   assert(plannedDryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'active target plus planned planning mirror must use tasks-close backend');
+
+  const profileFallbackTaskId = 'TASK-CLOSE-ORCH-0003';
+  const profileFallbackPlanRelativePath = `docs/tasks/${profileFallbackTaskId}.task.md`;
+  const profileFallbackPlanPath = path.join(repo, profileFallbackPlanRelativePath);
+  const profileFallbackProfilePath = path.join(repo, 'taskflow.profile.json');
+  writeFileSync(profileFallbackPlanPath, [
+    '---',
+    `task_id: ${profileFallbackTaskId}`,
+    'title: "Taskflow close profile-root fallback fixture"',
+    'status: running',
+    '---',
+    `# ${profileFallbackTaskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  writeJson(profileFallbackProfilePath, {
+    schemaId: 'taskflow.profile.v1',
+    id: 'taskflow-close-profile-fallback-fixture',
+    name: 'Taskflow Close Profile Fallback Fixture',
+    repoLabel: 'Planning Repo',
+    ownerRepo: 'planning',
+    taskIdPrefix: 'TASK-CLOSE-ORCH',
+    taskId: { format: 'TASK-CLOSE-ORCH-NNNN' },
+    template: { defaultMarkdown: '# ${taskId} ${title}\n\n## Goal\n${description}' },
+    capabilities: { supportsDryRun: true, supportsWrite: false },
+    delegation: {
+      hint: 'Profile-root closeback fallback fixture.',
+      openerPath: 'tools/task-card-opener.js',
+      policy: {
+        allocateTaskId: { mode: 'host-opener', prefix: 'TASK-CLOSE-ORCH', format: 'TASK-CLOSE-ORCH-NNNN' },
+        resolveCanonicalOutputPath: {
+          mode: 'host-opener',
+          pattern: 'docs/tasks/${taskId}.task.md',
+          directory: 'docs/tasks'
+        },
+        rosterSyncPolicy: 'none',
+        fallbackBehavior: { mode: 'template-only-fallback', reason: 'fixture fallback' }
+      },
+      writerInvocation: { describeOnly: false, displayHint: 'fixture opener' }
+    }
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${profileFallbackTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: profileFallbackTaskId,
+    title: 'Taskflow close profile-root fallback fixture',
+    status: 'running'
+  });
+  const profileFallbackDryRun = await runTaskflow([
+    'close',
+    '--cwd', repo,
+    '--task', profileFallbackTaskId,
+    '--profile', profileFallbackProfilePath,
+    '--json'
+  ]) as any;
+  assert(profileFallbackDryRun.ok === true, 'taskflow close must recover planning path from profile when source.planPath is absent');
+  assert(profileFallbackDryRun.evidence.closebackPathResolution.route === 'profile-root-fallback', 'taskflow close must report profile-root fallback route');
+  assert(profileFallbackDryRun.evidence.governedCommitBundle?.planningRepo?.stageFiles?.includes(profileFallbackPlanRelativePath), 'profile-root fallback must include recovered planning card in bundle');
 }
 
 function validateEmergencyUsePreCommitAudit(tempRoot: string) {

@@ -86,6 +86,7 @@ export function createAntigravitySourceFiles(repositoryRoot = process.cwd()): re
     '- `.agents/skills/atm-evidence/SKILL.md`',
     '- `.agents/skills/atm-upgrade-scan/SKILL.md`',
     '- `.agents/skills/atm-handoff/SKILL.md`',
+    '- `.agents/skills/atm-atom-map-refactor/SKILL.md`',
     '',
     '## Charter Invariants',
     '',

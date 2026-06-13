@@ -396,7 +396,7 @@ function buildMissingValidatorFinding(
     return {
       code: 'ATM_EVIDENCE_VALIDATOR_ABSENT',
       validator: gate, category: 'absent',
-      summary: `No evidence record claims validator '${gate}' passed. Run the validator and capture command-backed evidence.`,
+      summary: `No evidence record claims validator '${gate}' passed. Use evidence run so ATM executes the validator and captures command-backed evidence.`,
       requiredCommand
     };
   }
@@ -404,7 +404,7 @@ function buildMissingValidatorFinding(
     return {
       code: 'ATM_EVIDENCE_VALIDATOR_FAILED_RUN',
       validator: gate, category: 'failed-run',
-      summary: `Validator '${gate}' has at least one command run with non-zero exit code. Fix the failure and rerun, then add fresh evidence.`,
+      summary: `Validator '${gate}' has at least one command run with non-zero exit code. Fix the failure and rerun it through evidence run to add fresh evidence.`,
       requiredCommand
     };
   }
@@ -412,7 +412,7 @@ function buildMissingValidatorFinding(
     return {
       code: 'ATM_EVIDENCE_VALIDATOR_STALE',
       validator: gate, category: 'stale',
-      summary: `Validator '${gate}' evidence is not fresh (historical-reference or draft). Rerun in this session to refresh.`,
+      summary: `Validator '${gate}' evidence is not fresh (historical-reference or draft). Rerun it through evidence run in this session to refresh.`,
       requiredCommand
     };
   }

@@ -7,6 +7,12 @@ import { quoteForShell, detectAutoLinkedValidator } from '../packages/cli/src/co
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 import { cliCommandRunners, runCli } from '../packages/cli/src/atm.ts';
 import { commandSpecs, listCommandSpecs } from '../packages/cli/src/commands/command-specs.ts';
+import {
+  categorizeHistoricalCommitFiles,
+  inspectHistoricalDelivery,
+  isDeliverableGateCandidate,
+  pathMatchesTaskScope
+} from '../packages/cli/src/commands/tasks/historical-delivery.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -68,105 +74,6 @@ function readJson(relativePath: any) {
 
 function normalizeTaskScopePath(value: string) {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
-}
-
-function pathMatchesTaskScope(filePath: string, declared: string) {
-  const left = normalizeTaskScopePath(filePath);
-  const right = normalizeTaskScopePath(declared);
-  return left === right || left.startsWith(`${right}/`) || right.startsWith(`${left}/`);
-}
-
-function isDeliverableGateCandidate(filePath: string, declaredFiles: readonly string[]) {
-  const normalized = normalizeTaskScopePath(filePath);
-  return declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared))
-    || normalized.startsWith('release/atm-onefile/')
-    || normalized.startsWith('release/atm-root-drop/');
-}
-
-function categorizeHistoricalCommitFiles(input: {
-  readonly taskId: string;
-  readonly changedFiles: readonly string[];
-  readonly declaredFiles: readonly string[];
-}) {
-  const taskMatchedFiles = input.changedFiles.filter((filePath) =>
-    input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
-  );
-  const allowedRunnerOutputFiles = input.changedFiles.filter((filePath) =>
-    normalizeTaskScopePath(filePath).startsWith('release/atm-onefile/')
-  );
-  const outOfScopeSourceFiles = input.changedFiles.filter((filePath) =>
-    !taskMatchedFiles.includes(filePath) && !allowedRunnerOutputFiles.includes(filePath)
-  );
-  return {
-    taskMatchedFiles,
-    allowedRunnerOutputFiles,
-    outOfScopeSourceFiles
-  };
-}
-
-function inspectHistoricalDelivery(input: {
-  readonly cwd: string;
-  readonly requestedRef: string;
-  readonly declaredFiles: readonly string[];
-  readonly enforceDeclaredScope: boolean;
-  readonly waiverOutOfScopeDelivery?: boolean;
-  readonly waiverReason?: string | null;
-}) {
-  const requestedRef = input.requestedRef.trim();
-  if (!requestedRef) {
-    return {
-      requestedRef,
-      commitSha: null,
-      ok: false,
-      reason: 'empty-ref',
-      changedFiles: [],
-      deliverableFiles: []
-    };
-  }
-
-  const commitResult = spawnSync('git', ['-C', input.cwd, 'rev-parse', '--verify', `${requestedRef}^{commit}`], { encoding: 'utf8' });
-  const commitSha = commitResult.status === 0 ? commitResult.stdout.trim() : null;
-  if (!commitSha) {
-    return {
-      requestedRef,
-      commitSha: null,
-      ok: false,
-      reason: 'commit-not-found',
-      changedFiles: [],
-      deliverableFiles: []
-    };
-  }
-
-  const showResult = spawnSync('git', ['-C', input.cwd, 'show', '--pretty=format:', '--name-only', commitSha, '--'], { encoding: 'utf8' });
-  const changedFiles = (showResult.stdout || '').split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
-  const categorized = categorizeHistoricalCommitFiles({
-    taskId: 'validate-cli-historical-delivery',
-    changedFiles,
-    declaredFiles: input.declaredFiles
-  });
-  const deliverableCandidates = changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
-  const deliverableFiles = input.enforceDeclaredScope
-    ? deliverableCandidates.filter((filePath) => input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
-    : deliverableCandidates;
-  if (deliverableFiles.length > 0 && categorized.outOfScopeSourceFiles.length > 0) {
-    const waiverAllowed = input.waiverOutOfScopeDelivery === true && Boolean(input.waiverReason?.trim());
-    return {
-      requestedRef,
-      commitSha,
-      ok: waiverAllowed,
-      reason: waiverAllowed ? 'scoped-deliverable-with-waived-out-of-scope' : 'out-of-scope-source-files-present',
-      changedFiles,
-      deliverableFiles
-    };
-  }
-  return {
-    requestedRef,
-    commitSha,
-    ok: deliverableFiles.length > 0,
-    reason: deliverableFiles.length > 0 ? 'scoped-deliverable-files-present' : 'no-scoped-deliverable-files',
-    changedFiles,
-    deliverableFiles
-  };
 }
 
 function sandboxEpermHint(args: any, cwd: any) {
@@ -302,6 +209,26 @@ for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-c
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
+const dependencyGatesSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks/dependency-gates.ts'), 'utf8');
+assert(
+  dependencyGatesSource.includes("from './dependency-gate.ts'"),
+  'dependency-gates facade must preserve dependency-gate.ts as the implementation owner'
+);
+const surfaceInvariantsSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks/surface-invariants.ts'), 'utf8');
+for (const symbol of [
+  'resolveTaskflowCloseMode',
+  'resolveTaskflowCloseBackend',
+  'taskflowCloseEvidenceValidators',
+  'taskflowCloseGovernanceEvidenceValidator'
+]) {
+  assert(surfaceInvariantsSource.includes(symbol), `surface-invariants missing required closeout strategy export: ${symbol}`);
+}
+const tasksCommandSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks.ts'), 'utf8');
+assert(
+  tasksCommandSource.includes("from './tasks/dependency-gates.ts'"),
+  'tasks.ts must consume dependency admission through the plural dependency-gates facade'
+);
+
 const cliIndex = readFileSync(path.join(root, 'packages/cli/src/index.ts'), 'utf8');
 for (const commandName of fixture.commands) {
   assert(cliIndex.includes(`commandName: '${commandName}'`), `index.ts missing command descriptor: ${commandName}`);
@@ -366,11 +293,53 @@ assert(tasksUsageText.includes('node atm.mjs tasks repair-closure'), 'tasks --he
 assert(tasksUsageText.includes('--amend'), 'tasks --help must document explicit repair-closure amend opt-in');
 assert(tasksUsageText.includes('--emergency-approval'), 'tasks --help must document emergency approval for protected backend surfaces');
 assert(tasksUsageText.includes('taskflow open/close'), 'tasks --help must identify taskflow as the official operator lane');
+assert(tasksUsageText.includes('low-level template generator'), 'tasks --help must label tasks new as a low-level template generator surface');
+assert(tasksUsageText.includes('runtime synchronization surface'), 'tasks --help must label tasks import as the runtime synchronization (backend) surface');
 
 const taskflowHelp = await runAtm(['taskflow', '--help'], root);
 const taskflowUsageText = JSON.stringify(taskflowHelp.parsed.evidence?.usage ?? {});
-assert(taskflowUsageText.includes('official operator lane'), 'taskflow --help must identify taskflow close as the operator lane');
-assert(taskflowUsageText.includes('protected backend surfaces'), 'taskflow --help must explain internal protected backend delegation');
+assert(taskflowUsageText.includes('Official operator lane'), 'taskflow --help must identify taskflow as the official operator lane');
+assert(taskflowUsageText.includes('writeReadinessHint'), 'taskflow --help must reference the writeReadinessHint surface for dry-run --write readiness');
+assert(taskflowUsageText.includes('low-level template generator surface'), 'taskflow --help must label tasks new as a low-level template generator surface');
+assert(taskflowUsageText.includes('runtime synchronization surface'), 'taskflow --help must label tasks import as a runtime synchronization (backend) surface');
+
+const lifecycleStateTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(lifecycleStateTest.status === 0, `lifecycle-state focused test must pass: ${lifecycleStateTest.stderr || lifecycleStateTest.stdout}`);
+
+const historicalDeliveryTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(historicalDeliveryTest.status === 0, `historical-delivery focused test must pass: ${historicalDeliveryTest.stderr || historicalDeliveryTest.stdout}`);
+
+const scopeLockDiagnosticsTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(scopeLockDiagnosticsTest.status === 0, `scope-lock-diagnostics focused test must pass: ${scopeLockDiagnosticsTest.stderr || scopeLockDiagnosticsTest.stdout}`);
+
+const residueDiagnosticsTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(residueDiagnosticsTest.status === 0, `residue-diagnostics focused test must pass: ${residueDiagnosticsTest.stderr || residueDiagnosticsTest.stdout}`);
+
+const nextHelp = await runAtm(['next', '--help'], root);
+const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
+assert(nextUsageText.includes('prefers the explicit --task'), 'next --help must explain that the recommended claim command prefers --task TASK-XXX form when the task is already known');
+
+const evidenceHelp = await runAtm(['evidence', '--help'], root);
+const evidenceUsageText = JSON.stringify(evidenceHelp.parsed.evidence?.usage ?? {});
+assert(evidenceUsageText.includes('evidence run --task ATM-GOV-0104'), 'evidence --help examples must put evidence run on the normal validator capture path');
+assert(evidenceUsageText.includes('Raw evidence add only'), 'evidence --help must label evidence add metadata flags as raw/manual surface');
+assert(evidenceUsageText.indexOf('evidence run --task ATM-GOV-0104') < evidenceUsageText.indexOf('evidence add --task ATM-GOV-0104'), 'evidence --help examples must show evidence run before evidence add');
 
 const emergencyHelp = await runAtm(['emergency', '--help'], root);
 assert(emergencyHelp.exitCode === 0, 'emergency --help must exit 0');
@@ -1326,6 +1295,18 @@ try {
     // Register active session to satisfy evidence add constraint
     await runAtm(['next', '--claim', '--actor', 'Antigravity', '--task', 'TASK-AAO-0063'], autoLinkTempWorkspace);
 
+    const missingBeforeEvidence = await runAtm([
+      'evidence', 'missing',
+      '--task', 'TASK-AAO-0063',
+      '--actor', 'Antigravity'
+    ], autoLinkTempWorkspace);
+    assert(missingBeforeEvidence.parsed.ok === false, 'evidence missing must report absent validator evidence before evidence capture');
+    const absentFinding = missingBeforeEvidence.parsed.evidence?.blockingFindings
+      ?.find((finding: any) => finding.code === 'ATM_EVIDENCE_VALIDATOR_ABSENT');
+    assert(absentFinding, 'evidence missing must include an absent validator finding');
+    assert(String(absentFinding?.requiredCommand ?? '').startsWith('node atm.mjs evidence run '), 'missing evidence remediation must prefer evidence run');
+    assert(String(absentFinding?.summary ?? '').includes('Use evidence run'), 'missing evidence summary must direct operators to evidence run');
+
     // 2.1: evidence add without --validators (auto-link check)
     const addRes1 = await runAtm([
       'evidence', 'add',
@@ -1723,9 +1704,12 @@ try {
 
       const unrelatedInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
+        taskId: 'validate-cli-historical-delivery',
         requestedRef: unrelatedCommit,
         declaredFiles,
-        enforceDeclaredScope: true
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
       });
       assert(!unrelatedInspect.ok, 'historical delivery without task overlap must fail');
       assert(unrelatedInspect.reason === 'no-scoped-deliverable-files', 'must report no scoped deliverable files');
@@ -1740,15 +1724,19 @@ try {
 
       const mixedInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
+        taskId: 'validate-cli-historical-delivery',
         requestedRef: mixedCommit,
         declaredFiles,
-        enforceDeclaredScope: true
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
       });
       assert(!mixedInspect.ok, 'mixed commit must fail without waiver');
       assert(mixedInspect.reason === 'out-of-scope-source-files-present', 'must report out-of-scope source files');
 
       const mixedWaiverInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
+        taskId: 'validate-cli-historical-delivery',
         requestedRef: mixedCommit,
         declaredFiles,
         enforceDeclaredScope: true,

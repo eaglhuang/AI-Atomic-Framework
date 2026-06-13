@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, wri
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from './tasks/public-surface.js';
-import { buildCloseBackendArgv, buildClosebackPlan, buildTaskflowCloseDiagnostics, resolveCloseWriteSupport } from './taskflow/close-orchestration.js';
+import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildTaskflowCloseDiagnostics, resolveClosebackPlanningPath, resolveCloseWriteSupport } from './taskflow/close-orchestration.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
@@ -104,6 +104,48 @@ function buildOrchestrationPlan(input) {
             fallbackBehavior: input.delegationContract.policy.fallbackBehavior
         },
         hostPolicyDecision: input.hostPolicyDecision ?? null
+    };
+}
+function buildWriteReadinessHint(input) {
+    if (input.openerMode === 'delegated-governed') {
+        return {
+            schemaId: 'atm.taskflowOpenWriteReadinessHint.v1',
+            status: 'ready',
+            summary: 'taskflow open --write is ready to orchestrate the governed opener lane.',
+            missingPrerequisites: [],
+            nextCommand: 'node atm.mjs taskflow open --write --json',
+            operatorLane: 'taskflow open',
+            fallbackSurface: null
+        };
+    }
+    const policy = input.delegationContract.policy;
+    const missing = [];
+    if (!input.profileLoaded) {
+        missing.push('Load a planning/adopter profile via --profile <adopter-repo>/taskflow.profile.json');
+    }
+    else if (!input.delegationContract.invocable) {
+        missing.push('Profile delegation must declare an invocable host opener (delegation.openerPath set and delegation.writerInvocation.describeOnly = false)');
+    }
+    const resolvedTaskId = input.hostPolicyDecision?.taskId ?? input.taskId;
+    if (policy.allocateTaskId.mode !== 'host-opener' && !resolvedTaskId) {
+        missing.push('Either set delegation.policy.allocateTaskId.mode = "host-opener" in the profile, or pass --task-id TASK-XXX-NNNN explicitly');
+    }
+    const resolvedOutputPath = input.hostPolicyDecision?.outputPath ?? input.outputPath;
+    if (policy.resolveCanonicalOutputPath.mode !== 'host-opener' && !resolvedOutputPath) {
+        missing.push('Either set delegation.policy.resolveCanonicalOutputPath.mode = "host-opener" in the profile, or pass --output <planning-relative-path> explicitly');
+    }
+    const status = input.openerMode === 'template-only-fallback' ? 'fallback' : 'incomplete';
+    const summary = status === 'fallback'
+        ? 'taskflow open --write will fail closed in template-only-fallback mode. Configure the listed prerequisites, or use tasks new as the explicit low-level generator surface.'
+        : 'taskflow open --write prerequisites are incomplete. Resolve the listed items before retrying --write.';
+    return {
+        schemaId: 'atm.taskflowOpenWriteReadinessHint.v1',
+        status,
+        summary,
+        missingPrerequisites: missing,
+        nextCommand: null,
+        operatorLane: 'taskflow open',
+        fallbackSurface: 'tasks new (low-level generator)'
     };
 }
 function collectHistoricalDeliveryRefs(parsed) {
@@ -287,11 +329,49 @@ function taskflowPathMatches(filePath, declaredPath) {
         return false;
     return file === declared || file.startsWith(`${declared}/`);
 }
+function isDirectoryStyleDeclaration(repoRoot, declaredPath) {
+    const normalized = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '');
+    if (!normalized)
+        return false;
+    if (normalized.endsWith('/'))
+        return true;
+    const absolutePath = path.resolve(repoRoot, normalized);
+    return existsSync(absolutePath) && statSync(absolutePath).isDirectory();
+}
+function buildScopeAmendmentProposal(input) {
+    const candidateFiles = uniqueSorted(input.candidateFiles);
+    if (candidateFiles.length === 0) {
+        return {
+            required: false,
+            candidateFiles,
+            reason: null,
+            remediationCommand: null,
+            humanReviewRequired: false,
+            notes: []
+        };
+    }
+    const planPath = sourcePlanPathOf(input.taskDocument);
+    const remediationCommand = planPath
+        ? `node atm.mjs tasks import --from ${quoteCliValue(planPath)} --write --force --json`
+        : `node atm.mjs tasks scope add --task ${input.taskId} --actor ${input.actorId ?? '<actor>'} --add ${candidateFiles.join(',')} --json`;
+    return {
+        required: true,
+        candidateFiles,
+        reason: input.reason ?? 'Dirty files overlap the task scope but are not justified by deliverables and targetAllowedFiles.',
+        remediationCommand,
+        humanReviewRequired: true,
+        notes: [
+            'Do not restore, checkout, clean, or delete another agent active work to satisfy closeout.',
+            'Repair the governed task metadata or direction lock, rerun taskflow close --dry-run, then close through taskflow close --write.',
+            'The CLI-computed bundle remains authoritative; LLM review may flag omissions but must not append files ad hoc.'
+        ]
+    };
+}
 function inspectPlanningAuthorityDelivery(input) {
     if (normalizeTaskflowAuthority(input.taskDocument) !== 'planning_repo') {
         return { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null };
     }
-    const planPath = sourcePlanPathOf(input.taskDocument);
+    const planPath = input.resolvedPlanningMirrorPath ?? sourcePlanPathOf(input.taskDocument);
     const planning = resolvePlanningPath(input.cwd, planPath);
     if (!planning.repoRoot) {
         return { required: true, ok: false, repoRoot: null, matchedFiles: [], reason: planning.reason ?? 'planning repo could not be resolved' };
@@ -419,9 +499,142 @@ function resolvePlanningRosterPaths(input) {
         reason: null
     };
 }
+function getDirtyFiles(cwd) {
+    const output = tryGitScalar(cwd, ['status', '--porcelain', '-uall']) ?? '';
+    const files = [];
+    for (const line of output.split(/\r?\n/)) {
+        if (!line.trim())
+            continue;
+        let filePart = line.slice(2).trim();
+        if (filePart.startsWith('"') && filePart.endsWith('"')) {
+            try {
+                filePart = JSON.parse(filePart);
+            }
+            catch {
+                filePart = filePart.slice(1, -1);
+            }
+        }
+        if (line.startsWith('R ')) {
+            const parts = filePart.split(' -> ');
+            if (parts[1]) {
+                filePart = parts[1].trim();
+            }
+        }
+        files.push(filePart.replace(/\\/g, '/'));
+    }
+    return [...new Set(files.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+function getHistoricalCommittedFiles(cwd, refs) {
+    const files = [];
+    for (const ref of refs) {
+        if (!ref)
+            continue;
+        const commitSha = tryGitScalar(cwd, ['rev-parse', '--verify', `${ref}^{commit}`]);
+        if (!commitSha)
+            continue;
+        const output = tryGitScalar(cwd, ['show', '--pretty=format:', '--name-only', commitSha, '--']) ?? '';
+        for (const line of output.split(/\r?\n/)) {
+            const trimmed = line.trim();
+            if (trimmed) {
+                files.push(trimmed.replace(/\\/g, '/'));
+            }
+        }
+    }
+    return [...new Set(files)];
+}
 function buildTaskflowCommitBundle(input) {
     const targetRepoRoot = path.resolve(input.cwd);
-    const targetStageFiles = buildTargetStageFiles(targetRepoRoot, input.taskId, input.backendResult ?? null);
+    let taskDocument = {};
+    try {
+        const loaded = loadTaskDocumentOrThrow(targetRepoRoot, input.taskId);
+        taskDocument = loaded.taskDocument;
+    }
+    catch (err) {
+        // If it cannot load, we'll mark as failClosed later
+    }
+    const deliverables = extractTaskStringList(taskDocument, 'deliverables');
+    const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
+    const targetAllowedFiles = extractTaskStringList(taskDocument, 'targetAllowedFiles');
+    const dirtyFiles = getDirtyFiles(targetRepoRoot);
+    let allowed = targetAllowedFiles;
+    if (allowed.length === 0) {
+        allowed = scopePaths;
+    }
+    const targetDeliveryFiles = [];
+    const targetGovernanceFiles = [
+        `.atm/history/tasks/${input.taskId}.json`,
+        `.atm/history/evidence/${input.taskId}.json`,
+        `.atm/history/evidence/${input.taskId}.closure-packet.json`,
+        ...listExistingFilesRecursively(targetRepoRoot, `.atm/history/task-events/${input.taskId}`),
+        ...extractBackendStageFiles(input.backendResult ?? null)
+    ];
+    const excludedDirtyFiles = [];
+    const excludedReasons = {};
+    const scopeAmendmentCandidateFiles = [];
+    let metadataFailClosed = false;
+    let failClosedReason = null;
+    // 1. Metadata sufficiency & consistency validation
+    if (deliverables.length === 0) {
+        metadataFailClosed = true;
+        failClosedReason = 'Task metadata error: "deliverables" list is empty or missing.';
+    }
+    for (const del of deliverables) {
+        const isAllowed = allowed.some((all) => taskflowPathMatches(del, all));
+        if (!isAllowed) {
+            metadataFailClosed = true;
+            failClosedReason = `Task metadata error: declared deliverable "${del}" falls outside active direction lock / targetAllowedFiles.`;
+        }
+    }
+    const hasPlanningFile = deliverables.some(del => del.startsWith('docs/tasks/') || del.endsWith('.task.md'));
+    const hasTargetFile = deliverables.some(del => !del.startsWith('docs/tasks/') && !del.endsWith('.task.md'));
+    if (hasPlanningFile && hasTargetFile) {
+        metadataFailClosed = true;
+        failClosedReason = 'Task metadata error: deliverables contain mixed planning-path and target-path declarations.';
+    }
+    const hasDirectoryDeclarations = deliverables.some((del) => isDirectoryStyleDeclaration(targetRepoRoot, del));
+    if (hasDirectoryDeclarations) {
+        metadataFailClosed = true;
+        failClosedReason = 'Task metadata error: deliverables contain directory-style declarations which are ambiguous.';
+    }
+    // 2. Classify dirty files
+    for (const file of dirtyFiles) {
+        if (file.startsWith('.atm/')) {
+            continue;
+        }
+        const inScope = scopePaths.some((sp) => taskflowPathMatches(file, sp));
+        const isDeclared = deliverables.some((del) => taskflowPathMatches(file, del));
+        const isAllowed = allowed.some((all) => taskflowPathMatches(file, all));
+        if (isDeclared && isAllowed) {
+            targetDeliveryFiles.push(file);
+        }
+        else {
+            excludedDirtyFiles.push(file);
+            if (inScope) {
+                scopeAmendmentCandidateFiles.push(file);
+                metadataFailClosed = true;
+                failClosedReason = `Scope amendment required: dirty file "${file}" is inside task scope but is not declared in deliverables and targetAllowedFiles.`;
+                excludedReasons[file] = 'inside scope but not declared/allowed (fail-closed trigger)';
+            }
+            else {
+                excludedReasons[file] = 'outside task scope; excluded from governed bundle and must be left untouched';
+            }
+        }
+    }
+    const scopeAmendment = buildScopeAmendmentProposal({
+        taskId: input.taskId,
+        actorId: input.actorId,
+        taskDocument,
+        candidateFiles: scopeAmendmentCandidateFiles,
+        reason: failClosedReason
+    });
+    // 3. Historical delivery subtraction
+    const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
+    const finalDeliveryFiles = targetDeliveryFiles.filter((file) => !historicalCommitted.some((h) => taskflowPathMatches(file, h)));
+    // 4. Build target stage files
+    const targetStageFiles = uniqueSorted([
+        ...finalDeliveryFiles,
+        ...targetGovernanceFiles
+    ]);
     const planning = resolvePlanningPath(targetRepoRoot, input.planningMirrorPath);
     const planningStageFiles = planning.repoRoot && planning.relativePath
         ? uniqueSorted([
@@ -435,7 +648,7 @@ function buildTaskflowCommitBundle(input) {
         : [];
     const targetMessage = `chore(taskflow): close ${input.taskId} target governance bundle`;
     const planningMessage = `docs(taskflow): close ${input.taskId} planning bundle`;
-    const failClosed = targetStageFiles.length === 0 || !planning.repoRoot || planningStageFiles.length === 0;
+    const failClosed = metadataFailClosed || targetStageFiles.length === 0 || !planning.repoRoot || planningStageFiles.length === 0;
     return {
         schemaId: 'atm.taskflowGovernedCommitBundle.v1',
         taskId: input.taskId,
@@ -453,7 +666,7 @@ function buildTaskflowCommitBundle(input) {
             }),
             commitSha: null,
             status: input.commitMode === 'dry-run' ? 'preview' : 'uncomputed',
-            reason: targetStageFiles.length > 0 ? null : 'target close artifact paths could not be computed'
+            reason: failClosedReason || (targetStageFiles.length > 0 ? null : 'target close artifact paths could not be computed')
         },
         planningRepo: {
             repoRoot: planning.repoRoot,
@@ -472,7 +685,13 @@ function buildTaskflowCommitBundle(input) {
         },
         commitMode: input.commitMode,
         failClosed,
-        recoveryCommand: null
+        recoveryCommand: null,
+        targetDeliveryFiles: finalDeliveryFiles,
+        targetGovernanceFiles,
+        planningFiles: planningStageFiles,
+        excludedDirtyFiles,
+        excludedReasons,
+        scopeAmendment
     };
 }
 function assertCommitBundleReady(bundle) {
@@ -557,6 +776,48 @@ async function commitTaskflowBundle(input) {
         recoveryCommand: null
     };
 }
+async function commitTaskflowDeliveryFiles(input) {
+    const repoRoot = input.bundle.targetRepo.repoRoot;
+    const stageFiles = uniqueSorted(input.bundle.targetDeliveryFiles);
+    if (!repoRoot || stageFiles.length === 0) {
+        return null;
+    }
+    const deliveryBundle = {
+        repoRoot,
+        stageFiles,
+        commitMessage: `chore(taskflow): deliver ${input.taskId} source bundle`,
+        commitCommand: commitCommandFor({
+            repoRoot,
+            actorId: input.actorId,
+            taskId: input.taskId,
+            commitMessage: `chore(taskflow): deliver ${input.taskId} source bundle`,
+            repoKind: 'target'
+        }),
+        commitSha: null,
+        status: 'uncomputed'
+    };
+    const preflight = verifyRepoIndexIsolation(deliveryBundle, 'pre-stage');
+    const staged = verifyRepoIndexIsolation(stageRepoBundle(preflight), 'post-stage');
+    if (staged.status !== 'staged') {
+        return null;
+    }
+    const targetResult = await runAtmGit([
+        'commit',
+        '--cwd', repoRoot,
+        '--actor', input.actorId,
+        '--task', input.taskId,
+        '--message', deliveryBundle.commitMessage,
+        '--json'
+    ]);
+    const commitSha = String(targetResult.evidence?.commitSha ?? '') || null;
+    return {
+        repoRoot,
+        stageFiles: staged.stageFiles,
+        commitMessage: deliveryBundle.commitMessage,
+        commitSha,
+        status: 'committed'
+    };
+}
 async function finalizeTaskflowCommitBundle(input) {
     assertCommitBundleReady(input.bundle);
     const preflightTarget = verifyRepoIndexIsolation(input.bundle.targetRepo, 'pre-stage');
@@ -596,11 +857,41 @@ async function runTaskflowClose(parsed, cwd) {
     }
     const delegationContract = buildDelegationContract(profileData);
     const { taskDocument } = loadTaskDocumentOrThrow(cwd, taskId);
+    const profileRepoRoot = profilePath && profileData
+        ? resolveProfileRepoRoot(profilePath, cwd)
+        : null;
+    const closebackPathResolution = resolveClosebackPlanningPath({
+        cwd,
+        taskId,
+        taskDocument,
+        profile: profileData,
+        profileRepoRoot,
+        delegationContract
+    });
+    if (profileData || writeRequested) {
+        assertClosebackPlanningPathReady(closebackPathResolution, {
+            profileSupplied: Boolean(profileData),
+            requirePlanningPath: true
+        });
+    }
     const diagnosis = buildResidueDiagnosisEvidence(cwd, taskId, taskDocument);
+    const enrichedDiagnosis = closebackPathResolution.planningMirrorPath
+        ? {
+            ...diagnosis,
+            triangulation: {
+                ...diagnosis.triangulation,
+                planningFrontmatter: {
+                    status: closebackPathResolution.planningStatus ?? diagnosis.triangulation.planningFrontmatter.status,
+                    source: closebackPathResolution.planningMirrorPath
+                }
+            }
+        }
+        : diagnosis;
     const planningAuthorityDeliveryGate = inspectPlanningAuthorityDelivery({
         cwd,
         taskDocument,
-        historicalDeliveryRefs
+        historicalDeliveryRefs,
+        resolvedPlanningMirrorPath: closebackPathResolution.planningMirrorPath
     });
     if (planningAuthorityDeliveryGate.required
         && historicalDeliveryRefs.length > 0
@@ -621,13 +912,14 @@ async function runTaskflowClose(parsed, cwd) {
         planningAuthorityDeliveryGate,
         delegationContract,
         diagnosis: {
-            bucket: diagnosis.bucket,
-            truth: diagnosis.truth,
-            residue: diagnosis.residue,
-            reason: diagnosis.reason,
-            nextCommand: diagnosis.nextCommand,
-            triangulation: diagnosis.triangulation
-        }
+            bucket: enrichedDiagnosis.bucket,
+            truth: enrichedDiagnosis.truth,
+            residue: enrichedDiagnosis.residue,
+            reason: enrichedDiagnosis.reason,
+            nextCommand: enrichedDiagnosis.nextCommand,
+            triangulation: enrichedDiagnosis.triangulation
+        },
+        closebackPathResolution
     });
     const diagnostics = buildTaskflowCloseDiagnostics({
         closeMode: closebackPlan.closeMode,
@@ -635,12 +927,24 @@ async function runTaskflowClose(parsed, cwd) {
         actorSupplied: actorId.length > 0,
         taskIdSupplied: taskId.length > 0
     });
+    const previewCommitBundle = buildTaskflowCommitBundle({
+        cwd,
+        taskId,
+        actorId: actorId || null,
+        commitMode,
+        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+        rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
+            ? closebackPlan.writerBoundary.rosterIndexPath
+            : null,
+        historicalDeliveryRefs
+    });
+    const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
     const writeSupport = resolveCloseWriteSupport({
         writeRequested,
         closeMode: closebackPlan.closeMode,
         actorSupplied: actorId.length > 0,
         taskIdSupplied: taskId.length > 0,
-        historicalDeliveryGateRequired: closebackPlan.historicalDeliveryGate.required,
+        historicalDeliveryGateRequired: closebackPlan.historicalDeliveryGate.required && !hasUncommittedDeliverables,
         historicalDeliverySupplied: historicalDeliveryRefs.length > 0
     });
     if (writeRequested && !writeSupport.allowed) {
@@ -657,26 +961,34 @@ async function runTaskflowClose(parsed, cwd) {
             }
         });
     }
-    const previewCommitBundle = buildTaskflowCommitBundle({
-        cwd,
-        taskId,
-        actorId: actorId || null,
-        commitMode,
-        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
-        rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
-            ? closebackPlan.writerBoundary.rosterIndexPath
-            : null
-    });
     if (writeRequested) {
         assertCommitBundleReady(previewCommitBundle);
     }
     if (writeRequested && writeSupport.allowed) {
+        if (previewCommitBundle.targetDeliveryFiles.length > 0 && commitMode !== 'auto-commit') {
+            throw new CliError('ATM_TASKFLOW_CLOSE_DELIVERY_COMMIT_REQUIRED', 'taskflow close --write --no-commit cannot close dirty source deliverables because backend close requires a delivery commit first. Rerun without --no-commit or commit through the governed taskflow close operator lane.', {
+                exitCode: 1,
+                details: {
+                    taskId,
+                    governedCommitBundle: previewCommitBundle,
+                    remediation: `node atm.mjs taskflow close --task ${taskId} --actor ${actorId || '<actor>'} --write --json`
+                }
+            });
+        }
+        const preCloseDeliveryCommit = await commitTaskflowDeliveryFiles({
+            bundle: previewCommitBundle,
+            actorId,
+            taskId
+        });
+        const effectiveHistoricalDeliveryRefs = preCloseDeliveryCommit?.commitSha
+            ? uniqueSorted([...historicalDeliveryRefs, preCloseDeliveryCommit.commitSha])
+            : historicalDeliveryRefs;
         const backendArgv = buildCloseBackendArgv({
             cwd,
             taskId,
             actorId,
             backendSurface: closebackPlan.backendSurface,
-            historicalDeliveryRefs,
+            historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
             historicalDeliveryRepo: closebackPlan.planningAuthorityDeliveryGate.ok
                 ? closebackPlan.planningAuthorityDeliveryGate.repoRoot
                 : null,
@@ -689,7 +1001,7 @@ async function runTaskflowClose(parsed, cwd) {
                 cwd,
                 planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
                 actorId,
-                historicalDeliveryRefs
+                historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
             })
             : null;
         let rosterCloseback = null;
@@ -735,7 +1047,8 @@ async function runTaskflowClose(parsed, cwd) {
                 rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
                     ? closebackPlan.writerBoundary.rosterIndexPath
                     : null,
-                backendResult: backendResult
+                backendResult: backendResult,
+                historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
             }),
             actorId,
             taskId
@@ -759,10 +1072,12 @@ async function runTaskflowClose(parsed, cwd) {
                     diagnostics,
                     closebackPlan,
                     backendResult,
+                    preCloseDeliveryCommit,
                     planningCardCloseback,
                     rosterCloseback,
                     governedCommitBundle,
-                    residueDiagnosis: diagnosis,
+                    residueDiagnosis: enrichedDiagnosis,
+                    closebackPathResolution,
                     ...(profileData ? { profile: profileData } : {})
                 }
             }),
@@ -791,7 +1106,8 @@ async function runTaskflowClose(parsed, cwd) {
                 diagnostics,
                 closebackPlan,
                 governedCommitBundle: previewCommitBundle,
-                residueDiagnosis: diagnosis,
+                residueDiagnosis: enrichedDiagnosis,
+                closebackPathResolution,
                 ...(profileData ? { profile: profileData } : {})
             }
         }),
@@ -877,14 +1193,23 @@ export async function runTaskflow(argv = []) {
         rosterIndexPath,
         hostPolicyDecision
     });
+    const writeReadinessHint = buildWriteReadinessHint({
+        openerMode,
+        delegationContract,
+        hostPolicyDecision,
+        taskId,
+        outputPath,
+        profileLoaded: profileData != null
+    });
     if (writeRequested && !writeSupport.allowed) {
         throw new CliError('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK', openerMode === 'template-only-fallback'
-            ? 'taskflow open --write is not available in template-only-fallback mode. Load an invocable host opener profile or use tasks new for explicit template generation.'
+            ? 'taskflow open --write is not available in template-only-fallback mode. Load an invocable host opener profile or use tasks new (low-level generator surface) for explicit template generation.'
             : 'taskflow open --write prerequisites are incomplete. Supply --task-id/--output or configure host-opener numbering and output-path policy.', {
             exitCode: 1,
             details: {
                 openerMode,
                 writeSupport,
+                writeReadinessHint,
                 delegationContract,
                 diagnostics,
                 orchestrationPlan,
@@ -974,6 +1299,7 @@ export async function runTaskflow(argv = []) {
                 evidence: {
                     openerMode,
                     writeSupport,
+                    writeReadinessHint,
                     delegationContract,
                     diagnostics,
                     orchestrationPlan,
@@ -992,7 +1318,8 @@ export async function runTaskflow(argv = []) {
                 }
             }),
             schemaId: 'atm.taskflowOpenResult.v1',
-            writeEnabled: true
+            writeEnabled: true,
+            writeReadinessHint
         };
     }
     const result = makeResult({
@@ -1005,11 +1332,12 @@ export async function runTaskflow(argv = []) {
                 ? 'ATM_TASKFLOW_OPEN_ORCHESTRATION_READY'
                 : 'ATM_TASKFLOW_OPEN_TEMPLATE_ONLY_FALLBACK', openerMode === 'delegated-governed'
                 ? 'taskflow open dry-run orchestration plan is ready for delegated governed entry.'
-                : 'taskflow open is in template-only-fallback mode. tasks new remains the explicit low-level generator.', { cwd, openerMode })
+                : 'taskflow open is in template-only-fallback mode. --write will fail closed; see writeReadinessHint for the exact missing prerequisites. tasks new (low-level generator surface) remains the explicit non-governed escape hatch.', { cwd, openerMode, writeReadinessHintStatus: writeReadinessHint.status })
         ],
         evidence: {
             openerMode,
             writeSupport,
+            writeReadinessHint,
             delegationContract,
             diagnostics,
             orchestrationPlan,
@@ -1021,6 +1349,7 @@ export async function runTaskflow(argv = []) {
     return {
         ...result,
         schemaId: 'atm.taskflowOpenResult.v1',
-        writeEnabled: false
+        writeEnabled: false,
+        writeReadinessHint
     };
 }

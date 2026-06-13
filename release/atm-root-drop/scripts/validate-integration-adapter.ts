@@ -39,6 +39,7 @@ const requiredFiles = [
   'templates/skills/atm-evidence.skill.md',
   'templates/skills/atm-upgrade-scan.skill.md',
   'templates/skills/atm-handoff.skill.md',
+  'templates/skills/atm-atom-map-refactor.skill.md',
   'schemas/integrations/install-manifest.schema.json',
   'tests/schema-fixtures/positive/integration-install-manifest.json',
   'integrations/codex-skills/atm-governance-router/SKILL.md'

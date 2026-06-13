@@ -3,7 +3,7 @@ import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
     name: 'next',
-    summary: 'Route the current prompt into the official ATM fast, normal, or batch work channel.',
+    summary: 'Route the current prompt into the official ATM fast, normal, or batch work channel. When the selected task id is already known (via --task or an unambiguous --prompt resolution), the recommended claim command prefers the explicit --task TASK-XXX form over re-passing the natural-language prompt.',
     options: [
         commonCwdOption,
         { flag: '--claim', summary: 'Start the selected fast/normal/batch route and create the required runtime state.' },

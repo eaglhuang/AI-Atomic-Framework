@@ -11,10 +11,15 @@ import { assertRunnerFreshForWriteAction, auditTasks, createClosurePacket, creat
 import { CliError, makeResult, message, parseJsonText, parseOptions, parseArgsForCommand, relativePathFrom, resolveValue } from './shared.js';
 import { appendTaskTransitionEvent, createTaskTransitionId, defaultMirrorTaskId, readTaskLedgerPolicy } from './task-ledger.js';
 import { readPluginRegistry } from '../plugin-registry.js';
-import { advanceTaskQueueAfterClose, abandonTaskQueue, assertTaskCloseAllowedByDirection, findActiveTaskQueue, isTaskDirectionPathCandidate, sanitizeTaskDirectionAllowedFiles, writeTaskDirectionLock } from './task-direction.js';
+import { advanceTaskQueueAfterClose, abandonTaskQueue, assertTaskCloseAllowedByDirection, findActiveTaskQueue, sanitizeTaskDirectionAllowedFiles, writeTaskDirectionLock } from './task-direction.js';
 import { findActiveBatchRunForTask, readActiveBatchRun, isPathAllowedByScope } from './work-channels.js';
-import { assessCloseoutProvenanceGap, buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, verifyCloseoutProvenance } from './tasks/closeout-provenance.js';
-import { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.js';
+import { assessCloseoutProvenanceGap, buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage } from './tasks/closeout-provenance.js';
+import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.js';
+import { evaluateTaskClaimAdmission, evaluateTaskDoneCloseAdmission, evaluateTaskPromotionAdmission, evaluateTaskResetAdmission } from './tasks/lifecycle-state.js';
+import { buildHistoricalDeliveryProvenance, inspectHistoricalDelivery, isDeliverableGateCandidate, pathMatchesTaskScope } from './tasks/historical-delivery.js';
+import { attachDirtyGuardToScopedDiffIsolation, buildCloseScopedDiffIsolation, evaluateFrameworkCloseDirtyGuard } from './tasks/scope-lock-diagnostics.js';
+import { buildResidueClassification, buildResidueDiagnosisEvidenceFromTriangulation } from './tasks/residue-diagnostics.js';
+import { dispatchTasksAction } from './tasks/command-dispatch.js';
 import { runAtmGit } from './git-governance.js';
 import { assertEmergencyApproval } from './emergency/gate.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.js';
@@ -37,92 +42,30 @@ const tagsHeaders = ['tags', 'labels', '標籤'];
 const taskIdPattern = /^(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 export async function runTasks(argv) {
-    const cleanArgv = [];
-    for (let i = 0; i < argv.length; i++) {
-        if (argv[i] === '--output-json') {
-            i++;
-            continue;
-        }
-        cleanArgv.push(argv[i]);
-    }
-    argv = cleanArgv;
-    const action = (argv[0] ?? '').toLowerCase();
-    if (action === 'close') {
-        return await runTasksClose(argv.slice(1));
-    }
-    if (action === 'reset') {
-        return await runTasksReset(argv.slice(1));
-    }
-    if (action === 'block') {
-        return await runTasksClose(['--status', 'blocked', ...argv.slice(1)]);
-    }
-    if (action === 'abandon') {
-        return await runTasksClose(['--status', 'abandoned', ...argv.slice(1)]);
-    }
-    if (action === 'create') {
-        return await runTasksCreate(argv.slice(1));
-    }
-    if (action === 'mirror') {
-        return await runTasksMirror(argv.slice(1));
-    }
-    if (action === 'audit') {
-        return runTasksAudit(argv.slice(1));
-    }
-    if (action === 'queue') {
-        return runTasksQueue(argv.slice(1));
-    }
-    if (action === 'parallel') {
-        return runTasksParallel(argv.slice(1));
-    }
-    if (action === 'lock') {
-        return await runTasksLock(argv.slice(1));
-    }
-    if (action === 'migrate-legacy-ledger') {
-        return runTasksMigrateLegacyLedger(argv.slice(1));
-    }
-    if (action === 'reserve' || action === 'promote') {
-        return await runTasksReservation(action, argv.slice(1));
-    }
-    if (action === 'claim' || action === 'renew' || action === 'release' || action === 'handoff' || action === 'takeover') {
-        return await runTasksClaimLifecycle(action, argv.slice(1));
-    }
-    if (action === 'reconcile') {
-        return await runTasksReconcile(argv.slice(1));
-    }
-    if (action === 'repair-closure') {
-        return await runTasksRepairClosure(argv.slice(1));
-    }
-    if (action === 'show') {
-        return await runTasksShow(argv.slice(1));
-    }
-    if (action === 'status') {
-        return await runTasksStatus(argv.slice(1));
-    }
-    if (action === 'finalize') {
-        return await runTasksFinalize(argv.slice(1));
-    }
-    if (action === 'deliver-and-close') {
-        return await runTasksDeliverAndClose(argv.slice(1));
-    }
-    if (action === 'roster') {
-        return await runTasksRoster(argv.slice(1));
-    }
-    if (action === 'new') {
-        return await runTasksNew(argv.slice(1));
-    }
-    if (action === 'import') {
-        return await runTasksImport(argv.slice(1));
-    }
-    if (action === 'verify') {
-        return await runTasksVerify(argv.slice(1));
-    }
-    if (action === 'scope') {
-        return await runTasksScope(argv.slice(1));
-    }
-    if (!action) {
-        throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).', { exitCode: 2 });
-    }
-    throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
+    return dispatchTasksAction(argv, {
+        close: runTasksClose,
+        reset: runTasksReset,
+        create: runTasksCreate,
+        mirror: runTasksMirror,
+        audit: runTasksAudit,
+        queue: runTasksQueue,
+        parallel: runTasksParallel,
+        lock: runTasksLock,
+        migrateLegacyLedger: runTasksMigrateLegacyLedger,
+        reservation: runTasksReservation,
+        claimLifecycle: runTasksClaimLifecycle,
+        reconcile: runTasksReconcile,
+        repairClosure: runTasksRepairClosure,
+        show: runTasksShow,
+        status: runTasksStatus,
+        finalize: runTasksFinalize,
+        deliverAndClose: runTasksDeliverAndClose,
+        roster: runTasksRoster,
+        newTask: runTasksNew,
+        importTask: runTasksImport,
+        verify: runTasksVerify,
+        scope: runTasksScope
+    });
 }
 async function runTasksShow(argv) {
     const { options } = parseOptions(argv, 'tasks');
@@ -249,120 +192,6 @@ function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
         residueClassification
     };
 }
-function materializeResidueNextCommand(template, taskId, planningCardPath) {
-    const planPath = planningCardPath ?? '<plan.md>';
-    return template
-        .replaceAll('<id>', taskId)
-        .replaceAll('<plan.md>', planPath);
-}
-function buildResidueClassification(input) {
-    const base = classifyTaskResidue(input);
-    return {
-        ...base,
-        nextCommandTemplate: base.nextCommand,
-        nextCommand: materializeResidueNextCommand(base.nextCommand, input.taskId, input.planningFrontmatter.source),
-        autoMutationAllowed: false
-    };
-}
-function classifyTaskResidue(input) {
-    const closurePacket = normalizeOptionalString(input.taskDocument.closurePacket ?? input.taskDocument.closure_packet);
-    const closedAt = normalizeOptionalString(input.taskDocument.closedAt ?? input.taskDocument.closed_at);
-    const hasHistoricalCloseArtifacts = Boolean(closurePacket || closedAt || input.lastTransitionEvent?.action === 'close');
-    const planningDone = input.planningFrontmatter.status === 'done';
-    const liveDone = input.liveLedger.status === 'done';
-    const activeClaim = input.liveLedger.claimState === 'active';
-    const mirrorPath = normalizeOptionalString(input.planningFrontmatter.source);
-    const planningMirrorOnly = Boolean(planningDone
-        && liveDone
-        && (normalizeOptionalString(input.taskDocument.planningRepo ?? input.taskDocument.planning_repo) === normalizeOptionalString(input.taskDocument.targetRepo ?? input.taskDocument.target_repo)));
-    if (planningDone && !liveDone) {
-        return {
-            bucket: hasHistoricalCloseArtifacts || activeClaim
-                ? 'complete-but-unfinalized'
-                : 'stale-import',
-            truth: 'planning-mirror says done, live ledger has not finished finalization',
-            residue: hasHistoricalCloseArtifacts || activeClaim
-                ? 'There is enough close-path residue to point the operator at reconcile or repair.'
-                : 'The imported planning mirror is ahead of the live ledger.',
-            nextCommand: hasHistoricalCloseArtifacts || activeClaim
-                ? 'node atm.mjs tasks reconcile --task <id> --actor <actor> --delivery-commit <sha> --json'
-                : 'node atm.mjs tasks import --from <plan.md> --write --json',
-            reason: hasHistoricalCloseArtifacts || activeClaim
-                ? 'Historical close artifacts or an active claim remain, so the task is substantively done but not finalized.'
-                : 'Planning mirror is done, but the live ledger still needs import reconciliation.'
-        };
-    }
-    if (liveDone && !planningDone && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
-        const isCrossRepo = normalizeOptionalString(input.taskDocument.planningRepo ?? input.taskDocument.planning_repo)
-            !== normalizeOptionalString(input.taskDocument.targetRepo ?? input.taskDocument.target_repo);
-        return {
-            bucket: (mirrorPath && !isCrossRepo) ? 'planning-mirror-only' : 'stale-import',
-            truth: 'live ledger is done, but the planning mirror has not converged',
-            residue: (mirrorPath && !isCrossRepo) ? 'Only the planning mirror remains to be refreshed or retired.' : 'The imported ledger is ahead of the planning mirror.',
-            nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --force --json',
-            reason: (mirrorPath && !isCrossRepo) ? 'The task appears complete in the target ledger, but the planning mirror still needs a governed refresh.' : 'The ledger is ahead of the planning mirror and should be re-imported from the authoritative plan.'
-        };
-    }
-    if (planningDone && liveDone && activeClaim) {
-        return {
-            bucket: 'interrupted-close',
-            truth: 'both mirrors say done, but the live claim state is still active',
-            residue: 'The close was interrupted before the claim fully released.',
-            nextCommand: 'node atm.mjs tasks repair-closure --task <id> --json',
-            reason: 'A done/done task still carries an active claim, so the finalization flow needs repair rather than a new close.'
-        };
-    }
-    if (planningDone
-        && liveDone
-        && input.divergence.length === 0
-        && !planningMirrorOnly
-        && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
-        return {
-            bucket: 'no-residue',
-            truth: 'planning mirror and live ledger agree on governed done',
-            residue: 'No closeback residue remains for this task.',
-            nextCommand: 'node atm.mjs tasks status --task <id> --json',
-            reason: 'The live ledger is done, the planning mirror is done, closeout provenance is complete, and no status divergence remains.'
-        };
-    }
-    if (liveDone && !verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
-        const gap = assessCloseoutProvenanceGap(input.cwd, input.taskId, input.taskDocument);
-        if (gap.bucket === 'source-done-governance-incomplete') {
-            return {
-                bucket: 'source-done-governance-incomplete',
-                truth: gap.truth,
-                residue: `${gap.residue} Missing proof segments: ${gap.missingSegments.join(', ')}.`,
-                nextCommand: gap.recoveryCommand,
-                reason: gap.reason
-            };
-        }
-    }
-    if (planningMirrorOnly) {
-        return {
-            bucket: 'planning-mirror-only',
-            truth: 'planning mirror and live ledger align as done, but the task is still within a planning-mirror authority shape',
-            residue: 'The residue lives in the planning mirror rather than the live ledger.',
-            nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --json',
-            reason: 'This task is planning-mirror-owned, so the operator should refresh the mirrored source of truth instead of forcing close.'
-        };
-    }
-    if (input.divergence.length > 0) {
-        return {
-            bucket: 'ambiguous-manual-review',
-            truth: 'the status surfaces disagree, but the operator path is not unique',
-            residue: 'There are multiple possible governed next steps and the system should fail closed.',
-            nextCommand: 'node atm.mjs tasks status --task <id> --json',
-            reason: 'The divergence pattern is not enough to choose a single governed operator action.'
-        };
-    }
-    return {
-        bucket: 'ambiguous-manual-review',
-        truth: 'no residue bucket is clearly dominant',
-        residue: 'The state is too quiet to classify as a governed residue bucket without more evidence.',
-        nextCommand: 'node atm.mjs tasks status --task <id> --json',
-        reason: 'The current status triangulation does not expose a decisive residue path.'
-    };
-}
 async function recordStaleRunnerOverride(input) {
     const taskPath = taskPathFor(input.cwd, input.taskId);
     if (!existsSync(taskPath))
@@ -398,23 +227,7 @@ export function loadTaskDocumentOrThrow(cwd, taskId) {
 }
 export function buildResidueDiagnosisEvidence(cwd, taskId, taskDocument) {
     const triangulation = buildTaskStatusTriangulation(cwd, taskId, taskDocument);
-    const residue = triangulation.residueClassification;
-    return {
-        schemaId: 'atm.taskResidueDiagnosis.v1',
-        taskId,
-        bucket: residue.bucket,
-        truth: residue.truth,
-        residue: residue.residue,
-        reason: residue.reason,
-        nextCommand: residue.nextCommand,
-        nextCommandTemplate: residue.nextCommandTemplate,
-        autoMutationAllowed: residue.autoMutationAllowed,
-        diagnostics: {
-            codes: [`ATM_TASK_RESIDUE_${residue.bucket.toUpperCase().replace(/-/g, '_')}`],
-            messages: [residue.reason, `Recommended next command: ${residue.nextCommand}`]
-        },
-        triangulation
-    };
+    return buildResidueDiagnosisEvidenceFromTriangulation({ taskId, triangulation });
 }
 async function runTasksStatus(argv) {
     const options = parseStatusOptions(argv);
@@ -1631,10 +1444,14 @@ async function runTasksReservation(action, argv) {
             details: { taskId: options.taskId, owner: currentOwner, actorId }
         });
     }
-    if (String(taskDocument.status ?? '') !== 'reserved') {
-        throw new CliError('ATM_TASKS_PROMOTE_INVALID_STATE', `Task ${options.taskId} must be in reserved state before promote.`, {
+    const promotionAdmission = evaluateTaskPromotionAdmission({
+        taskId: options.taskId,
+        status: taskDocument.status
+    });
+    if (!promotionAdmission.ok) {
+        throw new CliError(promotionAdmission.code, promotionAdmission.message, {
             exitCode: 1,
-            details: { taskId: options.taskId, status: taskDocument.status ?? null }
+            details: promotionAdmission.details
         });
     }
     taskDocument.status = 'ready';
@@ -1668,7 +1485,7 @@ async function runTasksReservation(action, argv) {
     });
 }
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.js';
-export { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.js';
+export { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.js';
 async function runTasksReset(argv) {
     const options = parseResetOptions(argv);
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -1696,19 +1513,15 @@ async function runTasksReset(argv) {
     }
     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
     const previousStatus = normalizeTaskStatus(taskDocument.status);
-    if (options.to !== 'open') {
-        throw new CliError('ATM_CLI_USAGE', 'tasks reset currently supports only --to open.', { exitCode: 2 });
-    }
-    if (previousStatus === 'done') {
-        throw new CliError('ATM_TASK_RESET_DONE_REQUIRES_REOPEN', `Task ${options.taskId} is done and cannot be reset to open without a reopen flow.`, {
-            exitCode: 1,
-            details: { taskId: options.taskId, status: previousStatus }
-        });
-    }
-    if (!['reserved', 'ready', 'running', 'open'].includes(previousStatus)) {
-        throw new CliError('ATM_TASK_RESET_INVALID_STATE', `Task ${options.taskId} cannot reset from ${previousStatus} to open.`, {
-            exitCode: 1,
-            details: { taskId: options.taskId, status: previousStatus, allowedFrom: ['reserved', 'ready', 'running', 'open'] }
+    const resetAdmission = evaluateTaskResetAdmission({
+        taskId: options.taskId,
+        fromStatus: previousStatus,
+        toStatus: options.to
+    });
+    if (!resetAdmission.ok) {
+        throw new CliError(resetAdmission.code, resetAdmission.message, {
+            exitCode: resetAdmission.code === 'ATM_CLI_USAGE' ? 2 : 1,
+            details: resetAdmission.details
         });
     }
     const currentClaim = parseClaimRecord(taskDocument.claim);
@@ -1866,34 +1679,18 @@ async function runTasksClose(argv) {
                 }
             });
         }
-        const normPrevStatus = normalizeWorkItemStatus(taskDocument.status);
-        if (normPrevStatus === 'planned') {
-            throw new CliError('ATM_TASK_CLOSE_INVALID_LIFECYCLE', `Task ${options.taskId} status is ${normPrevStatus}. Cannot close a task directly from ${normPrevStatus} to ${options.status}.`, {
+        const doneCloseAdmission = evaluateTaskDoneCloseAdmission({
+            taskId: options.taskId,
+            actorId,
+            status: taskDocument.status,
+            claimState: currentClaim?.state ?? null,
+            claimActorId: currentClaim?.actorId ?? null,
+            hasActiveSession: Boolean(activeSession?.sessionId)
+        });
+        if (!doneCloseAdmission.ok) {
+            throw new CliError(doneCloseAdmission.code, doneCloseAdmission.message, {
                 exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    previousStatus: normPrevStatus,
-                    status: options.status
-                }
-            });
-        }
-        if (!currentClaim || currentClaim.state !== 'active' || currentClaim.actorId !== actorId) {
-            throw new CliError('ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active claim owned by ${actorId}.`, {
-                exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    actorId,
-                    requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${options.taskId}" --json`
-                }
-            });
-        }
-        if (!activeSession || !activeSession.sessionId) {
-            throw new CliError('ATM_TASK_CLOSE_SESSION_CONTEXT_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active work session.`, {
-                exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    actorId
-                }
+                details: doneCloseAdmission.details
             });
         }
         assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId);
@@ -1941,14 +1738,7 @@ async function runTasksClose(argv) {
             trackedDirtyFiles: closeWorktree.trackedDirtyFiles
         });
         if (closeScopedDiffIsolation) {
-            closeScopedDiffIsolation = {
-                ...closeScopedDiffIsolation,
-                blockingTrackedDirtyFiles: closeDirtyGuard.blockingTrackedDirtyFiles,
-                scopeTrackedDirtyFiles: closeDirtyGuard.scopeTrackedDirtyFiles,
-                governanceTrackedDirtyFiles: closeDirtyGuard.governanceTrackedDirtyFiles,
-                advisoryTrackedDirtyFiles: closeDirtyGuard.advisoryTrackedDirtyFiles,
-                ignoredUntrackedFiles: closeWorktree.ignoredUntrackedFiles
-            };
+            closeScopedDiffIsolation = attachDirtyGuardToScopedDiffIsolation(closeScopedDiffIsolation, closeDirtyGuard, closeWorktree.ignoredUntrackedFiles);
         }
         if (closeDirtyGuard.blockingTrackedDirtyFiles.length > 0) {
             throw new CliError('ATM_TASK_CLOSE_DIRTY_WORKTREE', `Task ${options.taskId} cannot be closed as done while in-scope or closure-governance tracked changes are still dirty.`, {
@@ -2987,13 +2777,16 @@ async function runTasksClaimLifecycle(action, argv) {
                 details: { taskId: options.taskId, actorId: currentClaim.actorId, leaseId: currentClaim.leaseId }
             });
         }
-        if (String(taskDocument.status ?? '') !== 'ready') {
-            throw new CliError('ATM_TASK_CLAIM_NOT_READY', `Task ${options.taskId} must be ready before it can be claimed.`, {
+        const claimAdmission = evaluateTaskClaimAdmission({
+            taskId: options.taskId,
+            actorId,
+            status: String(taskDocument.status ?? ''),
+            claimIntent: options.claimIntent
+        });
+        if (!claimAdmission.ok) {
+            throw new CliError(claimAdmission.code, claimAdmission.message, {
                 exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    status: taskDocument.status ?? null
-                }
+                details: claimAdmission.details
             });
         }
         const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
@@ -3510,51 +3303,6 @@ function evaluateFrameworkDeliveryWindow(input) {
                 : `Normal framework critical tasks close in two phases: first create a governed delivery commit with ${normalDeliveryCommitCommand}; then close with ${normalHistoricalCloseCommand}. Batch checkpoint commands are only for --from-batch-checkpoint closures.`
     };
 }
-function buildCloseScopedDiffIsolation(input) {
-    const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
-    const allChangedFiles = uniqueStrings(input.frameworkChangedFiles.map(normalizeRelativePath).filter(Boolean));
-    const scopedCriticalChangedFiles = [...input.frameworkDeliveryWindow.scopedCriticalChangedFiles];
-    const isolatedUnrelatedChanges = [...input.frameworkDeliveryWindow.unscopedCriticalChangedFiles];
-    const declaredButUnchanged = declaredFiles.filter((declared) => !allChangedFiles.some((changed) => pathMatchesTaskScope(changed, declared)));
-    return {
-        schemaId: 'atm.taskCloseScopedDiffIsolation.v1',
-        taskId: input.taskId,
-        declaredFiles,
-        scopedCriticalChangedFiles,
-        isolatedUnrelatedChanges,
-        declaredButUnchanged,
-        summary: isolatedUnrelatedChanges.length === 0 && declaredButUnchanged.length === 0
-            ? 'no-isolation-required'
-            : isolatedUnrelatedChanges.length > 0 && scopedCriticalChangedFiles.length === 0
-                ? 'all-critical-changes-isolated-as-advisory'
-                : 'mixed-in-scope-and-isolated-changes',
-        advisoryNote: 'isolatedUnrelatedChanges are framework critical files outside this task scope; they are advisory and do not block close. Address them via their own governed task.'
-    };
-}
-function evaluateFrameworkCloseDirtyGuard(input) {
-    const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
-    const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
-    const scopeTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) => declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)));
-    const governanceTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) => !scopeTrackedDirtyFiles.includes(filePath) && isTaskCloseGovernanceCriticalPath(filePath, input.taskId));
-    const blockingTrackedDirtyFiles = uniqueStrings([
-        ...scopeTrackedDirtyFiles,
-        ...governanceTrackedDirtyFiles
-    ]);
-    const advisoryTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) => !blockingTrackedDirtyFiles.includes(filePath));
-    return {
-        blockingTrackedDirtyFiles,
-        scopeTrackedDirtyFiles,
-        governanceTrackedDirtyFiles,
-        advisoryTrackedDirtyFiles
-    };
-}
-const EMPTY_HISTORICAL_DELIVERY_BUCKETS = {
-    taskMatchedFiles: [],
-    governanceFiles: [],
-    allowedRunnerOutputFiles: [],
-    outOfScopeSourceFiles: [],
-    ignoredFiles: []
-};
 function evaluateTaskDeliverableGate(input) {
     const required = isDeliverableDiffRequired(input.taskDocument);
     const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
@@ -3665,139 +3413,6 @@ function normalizeTaskScopePaths(cwd, values) {
             : normalized;
     }));
 }
-export function categorizeHistoricalCommitFiles(input) {
-    const taskMatchedFiles = [];
-    const governanceFiles = [];
-    const allowedRunnerOutputFiles = [];
-    const outOfScopeSourceFiles = [];
-    const ignoredFiles = [];
-    for (const filePath of input.changedFiles) {
-        const normalized = normalizeRelativePath(filePath);
-        if (!normalized)
-            continue;
-        if (normalized.startsWith('.atm/')) {
-            if (isTaskCloseGovernanceCriticalPath(normalized, input.taskId)) {
-                governanceFiles.push(normalized);
-            }
-            else {
-                ignoredFiles.push(normalized);
-            }
-            continue;
-        }
-        const inScope = input.declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
-        if (inScope && isRealDeliverablePath(normalized)) {
-            taskMatchedFiles.push(normalized);
-            continue;
-        }
-        if (isDeclaredRunnerOutputPath(normalized, input.declaredFiles)) {
-            allowedRunnerOutputFiles.push(normalized);
-            continue;
-        }
-        if (isRealDeliverablePath(normalized) || normalized.startsWith('release/')) {
-            outOfScopeSourceFiles.push(normalized);
-            continue;
-        }
-        ignoredFiles.push(normalized);
-    }
-    return {
-        taskMatchedFiles: uniqueStrings(taskMatchedFiles),
-        governanceFiles: uniqueStrings(governanceFiles),
-        allowedRunnerOutputFiles: uniqueStrings(allowedRunnerOutputFiles),
-        outOfScopeSourceFiles: uniqueStrings(outOfScopeSourceFiles),
-        ignoredFiles: uniqueStrings(ignoredFiles)
-    };
-}
-function buildHistoricalDeliveryProvenance(report, waiverReason) {
-    if (!report?.commitSha)
-        return null;
-    return {
-        schemaId: 'atm.historicalDeliveryProvenance.v1',
-        deliveryCommitSha: report.commitSha,
-        taskMatchedFiles: [...report.fileBuckets.taskMatchedFiles],
-        governanceFiles: [...report.fileBuckets.governanceFiles],
-        allowedRunnerOutputFiles: [...report.fileBuckets.allowedRunnerOutputFiles],
-        outOfScopeSourceFiles: [...report.fileBuckets.outOfScopeSourceFiles],
-        waivedOutOfScopeFiles: report.waiverApplied ? [...report.fileBuckets.outOfScopeSourceFiles] : [],
-        waiverReason: report.waiverApplied ? (waiverReason?.trim() || null) : null
-    };
-}
-export function inspectHistoricalDelivery(input) {
-    const requestedRef = input.requestedRef.trim();
-    if (!requestedRef) {
-        return {
-            requestedRef,
-            commitSha: null,
-            ok: false,
-            reason: 'empty-ref',
-            changedFiles: [],
-            deliverableFiles: [],
-            fileBuckets: EMPTY_HISTORICAL_DELIVERY_BUCKETS,
-            waiverApplied: false
-        };
-    }
-    const commitSha = readGitScalar(input.cwd, ['rev-parse', '--verify', `${requestedRef}^{commit}`]);
-    if (!commitSha) {
-        return {
-            requestedRef,
-            commitSha: null,
-            ok: false,
-            reason: 'commit-not-found',
-            changedFiles: [],
-            deliverableFiles: [],
-            fileBuckets: EMPTY_HISTORICAL_DELIVERY_BUCKETS,
-            waiverApplied: false
-        };
-    }
-    const changedFiles = readGitNameOnly(input.cwd, ['show', '--pretty=format:', '--name-only', commitSha, '--']);
-    const fileBuckets = categorizeHistoricalCommitFiles({
-        taskId: input.taskId,
-        changedFiles,
-        declaredFiles: input.declaredFiles
-    });
-    const deliverableFiles = input.enforceDeclaredScope
-        ? uniqueStrings([
-            ...fileBuckets.taskMatchedFiles,
-            ...fileBuckets.allowedRunnerOutputFiles
-        ])
-        : changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
-    const hasTaskDeliverable = fileBuckets.taskMatchedFiles.length > 0 || fileBuckets.allowedRunnerOutputFiles.length > 0;
-    const hasOutOfScope = fileBuckets.outOfScopeSourceFiles.length > 0;
-    const waiverReason = input.waiverReason?.trim() ?? '';
-    let ok = hasTaskDeliverable;
-    let reason = 'no-scoped-deliverable-files';
-    let waiverApplied = false;
-    if (!hasTaskDeliverable) {
-        ok = false;
-        reason = 'no-scoped-deliverable-files';
-    }
-    else if (hasOutOfScope && !input.waiverOutOfScopeDelivery) {
-        ok = false;
-        reason = 'out-of-scope-source-files-present';
-    }
-    else if (hasOutOfScope && input.waiverOutOfScopeDelivery && !waiverReason) {
-        ok = false;
-        reason = 'out-of-scope-waiver-reason-required';
-    }
-    else if (hasOutOfScope && input.waiverOutOfScopeDelivery) {
-        ok = true;
-        reason = 'scoped-deliverable-with-waived-out-of-scope';
-        waiverApplied = true;
-    }
-    else {
-        ok = true;
-        reason = 'scoped-deliverable-files-present';
-    }
-    return {
-        requestedRef,
-        commitSha,
-        ok,
-        reason,
-        changedFiles,
-        deliverableFiles,
-        fileBuckets,
-        waiverApplied
-    };
-}
 function isDeliverableDiffRequired(taskDocument) {
     const mode = String(taskDocument.deliverableMode ?? taskDocument.deliverable_mode ?? '').toLowerCase();
     if (mode === 'ledger-only')
@@ -3888,50 +3503,6 @@ function readGitNameOnly(cwd, args) {
     catch {
         return [];
     }
-}
-function isRealDeliverablePath(filePath) {
-    const normalized = normalizeRelativePath(filePath);
-    if (!normalized)
-        return false;
-    if (normalized.startsWith('.atm/'))
-        return false;
-    if (normalized.startsWith('.git/'))
-        return false;
-    if (/^(node_modules|dist|build|coverage|release|scratch|temp|tmp|\.atm-temp)\//.test(normalized))
-        return false;
-    return isTaskDirectionPathCandidate(normalized);
-}
-function isDeliverableGateCandidate(filePath, declaredFiles) {
-    return isRealDeliverablePath(filePath) || isDeclaredRunnerOutputPath(filePath, declaredFiles);
-}
-function isDeclaredRunnerOutputPath(filePath, declaredFiles) {
-    const normalized = normalizeRelativePath(filePath);
-    if (!normalized)
-        return false;
-    if (normalized.startsWith('.atm/') || normalized.startsWith('.git/'))
-        return false;
-    if (!normalized.startsWith('release/atm-onefile/') && !normalized.startsWith('release/atm-root-drop/'))
-        return false;
-    return declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared));
-}
-function pathMatchesTaskScope(filePath, scope) {
-    const file = normalizeRelativePath(filePath).toLowerCase();
-    const candidate = normalizeRelativePath(scope).toLowerCase();
-    if (!candidate)
-        return false;
-    if (candidate.includes('*')) {
-        const escaped = candidate
-            .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-            .replace(/\*\*/g, '__ATM_DOUBLE_STAR__')
-            .replace(/\*/g, '[^/]*')
-            .replace(/__ATM_DOUBLE_STAR__/g, '.*');
-        return new RegExp(`^${escaped}$`).test(file);
-    }
-    if (file === candidate)
-        return true;
-    if (candidate.endsWith('/'))
-        return file.startsWith(candidate);
-    return file.startsWith(`${candidate}/`);
 }
 function writeLockCleanupReport(input) {
     const directory = path.join(input.cwd, '.atm', 'history', 'reports', 'lock-cleanup');
