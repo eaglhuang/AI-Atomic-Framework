@@ -3497,13 +3497,16 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         details: { taskId: options.taskId, actorId: currentClaim.actorId, leaseId: currentClaim.leaseId }
       });
     }
-    if (String(taskDocument.status ?? '') !== 'ready') {
-      throw new CliError('ATM_TASK_CLAIM_NOT_READY', `Task ${options.taskId} must be ready before it can be claimed.`, {
+    const claimAdmission = evaluateTaskClaimAdmission({
+      taskId: options.taskId,
+      actorId,
+      status: String(taskDocument.status ?? ''),
+      claimIntent: options.claimIntent
+    });
+    if (!claimAdmission.ok) {
+      throw new CliError(claimAdmission.code, claimAdmission.message, {
         exitCode: 1,
-        details: {
-          taskId: options.taskId,
-          status: taskDocument.status ?? null
-        }
+        details: claimAdmission.details
       });
     }
     const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
@@ -3617,7 +3620,54 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         taskDirectionLock: directionLock
       }
     });
+}
+
+function evaluateTaskClaimAdmission(input: {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly status: string;
+  readonly claimIntent: 'write' | 'closeout-only';
+}): {
+  readonly ok: true;
+  readonly reason: 'ready-claim' | 'review-closeout-only-reclaim';
+} | {
+  readonly ok: false;
+  readonly code: 'ATM_TASK_CLAIM_NOT_READY' | 'ATM_TASK_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED';
+  readonly message: string;
+  readonly details: Record<string, unknown>;
+} {
+  const status = normalizeTaskStatus(input.status);
+  if (status === 'ready') {
+    return { ok: true, reason: 'ready-claim' };
   }
+  if (status === 'review' && input.claimIntent === 'closeout-only') {
+    return { ok: true, reason: 'review-closeout-only-reclaim' };
+  }
+  if (status === 'review') {
+    return {
+      ok: false,
+      code: 'ATM_TASK_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED',
+      message: `Task ${input.taskId} is in review and can only be reclaimed through closeout-only claim intent.`,
+      details: {
+        taskId: input.taskId,
+        status,
+        claimIntent: input.claimIntent,
+        requiredCommand: `node atm.mjs next --claim --actor ${input.actorId} --prompt ${input.taskId} --claim-intent closeout-only --json`,
+        directCommand: `node atm.mjs tasks claim --task ${input.taskId} --actor ${input.actorId} --claim-intent closeout-only --files <scoped-files> --json`,
+        remediation: 'Use closeout-only only when the scoped deliverable already landed and the remaining work is governed closeback. If the deliverable is still missing, leave the task in review.'
+      }
+    };
+  }
+  return {
+    ok: false,
+    code: 'ATM_TASK_CLAIM_NOT_READY',
+    message: `Task ${input.taskId} must be ready before it can be claimed.`,
+    details: {
+      taskId: input.taskId,
+      status
+    }
+  };
+}
 
   if (!currentClaim && action === 'release' && options.reservedOk && normalizeTaskStatus(taskDocument.status) === 'reserved') {
     const previousStatus = String(taskDocument.status ?? '');

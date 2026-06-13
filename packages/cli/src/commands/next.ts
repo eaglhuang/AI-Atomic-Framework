@@ -130,7 +130,7 @@ export async function runNext(argv: any) {
     intentPath: options.intent,
     explicitTaskIds
   });
-  const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent);
+  const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent, claimIntent);
   const scopedTargetRepo = importedTaskQueue.promptScope?.targetRepo ?? null;
   const earlyFrameworkStatus = createFrameworkModeStatus({
     cwd: options.cwd,
@@ -587,6 +587,28 @@ async function claimNextImportedTask(input: {
     });
   }
   if (!input.importedTaskQueue.claimableTask) {
+    const selectedReviewTask = input.importedTaskQueue.selectedTask
+      && normalizeTaskRouteStatus(input.importedTaskQueue.selectedTask.status) === 'review'
+      ? input.importedTaskQueue.selectedTask
+      : null;
+    if (selectedReviewTask && claimIntent !== 'closeout-only') {
+      const requiredCommand = `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(selectedReviewTask.workItemId)} --claim-intent closeout-only --json`;
+      return makeResult({
+        ok: false,
+        command: 'next',
+        cwd: input.cwd,
+        messages: [message('error', 'ATM_NEXT_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED', `Task ${selectedReviewTask.workItemId} is in review; reclaim it only through the closeout-only lane when no more source mutation is needed.`, {
+          taskId: selectedReviewTask.workItemId,
+          status: normalizeTaskRouteStatus(selectedReviewTask.status),
+          requiredCommand,
+          remediation: 'Use closeout-only with command-backed historical delivery evidence, or leave the task in review until a real deliverable exists.'
+        })],
+        evidence: {
+          taskIntent: input.taskIntent,
+          importedTaskQueue: input.importedTaskQueue
+        }
+      });
+    }
     const claimCode = input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
       ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
       : 'ATM_NEXT_CLAIM_NO_TASK';
@@ -649,7 +671,7 @@ async function claimNextImportedTask(input: {
     }
   }
   if (activeBatchAtClaimStart?.status === 'active' && claimableTask) {
-    const batchPromptQueue = inspectImportedTaskQueue(input.cwd, createDeterministicTaskIntent(activeBatchAtClaimStart.sourcePrompt));
+    const batchPromptQueue = inspectImportedTaskQueue(input.cwd, createDeterministicTaskIntent(activeBatchAtClaimStart.sourcePrompt), claimIntent);
     const activeBatchClaimDecision = decideActiveBatchClaimTask({
       activeBatch: activeBatchAtClaimStart,
       activeQueue: activeQueueForIntent
@@ -1858,7 +1880,7 @@ export interface PromptScopedTaskContext {
   } | null;
 }
 
-function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): ImportedTaskQueue {
+function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, claimIntent: NextClaimIntent = 'write'): ImportedTaskQueue {
   const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
   const jsonTasks = existsSync(taskStorePath) ? readdirSync(taskStorePath)
     .filter((entry) => entry.endsWith('.json'))
@@ -2032,7 +2054,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     : selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById, cwd)) ?? null;
   const claimableTask = selectedTask
     && selectedTask.format === 'json'
-    && (canTaskBePreparedForClaim(selectedTask.status) || isTaskAlreadyActivelyClaimed(selectedTask))
+    && (isSelectedTaskClaimableForIntent(selectedTask, claimIntent) || isTaskAlreadyActivelyClaimed(selectedTask))
     && (areTaskDependenciesSatisfied(selectedTask, statusById, cwd) || isTaskAlreadyActivelyClaimed(selectedTask))
     ? selectedTask
     : null;
@@ -2045,6 +2067,12 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null): I
     tasks,
     promptScope
   };
+}
+
+function isSelectedTaskClaimableForIntent(task: ImportedTaskSummary, claimIntent: NextClaimIntent) {
+  const status = normalizeTaskRouteStatus(task.status);
+  if (canTaskBePreparedForClaim(status)) return true;
+  return status === 'review' && claimIntent === 'closeout-only';
 }
 
 function hasPromptScopedWorkItems(importedTaskQueue: ImportedTaskQueue) {
