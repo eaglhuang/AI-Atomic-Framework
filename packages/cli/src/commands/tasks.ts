@@ -78,6 +78,15 @@ import {
   evaluateFrameworkCloseDirtyGuard,
   type TaskCloseScopedDiffIsolationReport
 } from './tasks/scope-lock-diagnostics.ts';
+import {
+  buildResidueClassification,
+  buildResidueDiagnosisEvidenceFromTriangulation,
+  type TaskResidueDivergence,
+  type TaskResidueLedgerSnapshot,
+  type TaskResiduePlanningSnapshot,
+  type TaskResidueTransitionSnapshot,
+  type TaskStatusTriangulation
+} from './tasks/residue-diagnostics.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval } from './emergency/gate.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
@@ -446,16 +455,16 @@ function readLastTransitionEventRecord(cwd: string, taskId: string, transitionId
   return JSON.parse(readFileSync(eventPath, 'utf8')) as Record<string, unknown>;
 }
 
-function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument: Record<string, unknown>) {
+function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument: Record<string, unknown>): TaskStatusTriangulation {
   const claim = parseClaimRecord(taskDocument.claim);
-  const liveLedger = {
+  const liveLedger: TaskResidueLedgerSnapshot = {
     status: typeof taskDocument.status === 'string' ? taskDocument.status : null,
     claimState: claim?.state ?? null,
     lastTransitionId: typeof taskDocument.lastTransitionId === 'string' ? taskDocument.lastTransitionId : null,
     lastTransitionAt: typeof taskDocument.lastTransitionAt === 'string' ? taskDocument.lastTransitionAt : null
   };
   const lastTransitionEventRecord = readLastTransitionEventRecord(cwd, taskId, liveLedger.lastTransitionId);
-  const lastTransitionEvent = lastTransitionEventRecord ? {
+  const lastTransitionEvent: TaskResidueTransitionSnapshot | null = lastTransitionEventRecord ? {
     action: typeof lastTransitionEventRecord.action === 'string' ? lastTransitionEventRecord.action : null,
     actorId: typeof lastTransitionEventRecord.actorId === 'string' ? lastTransitionEventRecord.actorId : null,
     createdAt: typeof lastTransitionEventRecord.createdAt === 'string' ? lastTransitionEventRecord.createdAt : null,
@@ -463,7 +472,7 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
     toStatus: typeof lastTransitionEventRecord.toStatus === 'string' ? lastTransitionEventRecord.toStatus : null
   } : null;
   const planningCardPath = resolvePlanningCardPath(cwd, taskDocument);
-  let planningFrontmatter: { status: string | null; source: string | null } = { status: null, source: null };
+  let planningFrontmatter: TaskResiduePlanningSnapshot = { status: null, source: null };
   if (planningCardPath) {
     const frontMatter = extractFrontMatter(readFileSync(planningCardPath, 'utf8'));
     if (frontMatter) {
@@ -473,7 +482,7 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
       };
     }
   }
-  const divergence: Array<{ field: string; liveLedger: string | null; planningFrontmatter?: string | null; lastTransitionEvent?: string | null }> = [];
+  const divergence: TaskResidueDivergence[] = [];
   if (planningFrontmatter.status && planningFrontmatter.status !== liveLedger.status) {
     divergence.push({
       field: 'status',
@@ -517,169 +526,7 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
   };
 }
 
-export type TaskResidueBucket =
-  | 'no-residue'
-  | 'complete-but-unfinalized'
-  | 'source-done-governance-incomplete'
-  | 'planning-mirror-only'
-  | 'interrupted-close'
-  | 'stale-import'
-  | 'ambiguous-manual-review';
-
-export interface TaskResidueClassification {
-  bucket: TaskResidueBucket;
-  truth: string;
-  residue: string;
-  reason: string;
-  nextCommandTemplate: string;
-  nextCommand: string;
-  autoMutationAllowed: false;
-}
-
-function materializeResidueNextCommand(template: string, taskId: string, planningCardPath: string | null): string {
-  const planPath = planningCardPath ?? '<plan.md>';
-  return template
-    .replaceAll('<id>', taskId)
-    .replaceAll('<plan.md>', planPath);
-}
-
-function buildResidueClassification(input: {
-  cwd: string;
-  taskId: string;
-  taskDocument: Record<string, unknown>;
-  liveLedger: { status: string | null; claimState: string | null; lastTransitionId: string | null; lastTransitionAt: string | null };
-  planningFrontmatter: { status: string | null; source: string | null };
-  lastTransitionEvent: { action: string | null; actorId: string | null; createdAt: string | null; fromStatus: string | null; toStatus: string | null } | null;
-  divergence: Array<{ field: string; liveLedger: string | null; planningFrontmatter?: string | null; lastTransitionEvent?: string | null }>;
-}): TaskResidueClassification {
-  const base = classifyTaskResidue(input);
-  return {
-    ...base,
-    nextCommandTemplate: base.nextCommand,
-    nextCommand: materializeResidueNextCommand(base.nextCommand, input.taskId, input.planningFrontmatter.source),
-    autoMutationAllowed: false
-  };
-}
-
-function classifyTaskResidue(input: {
-  cwd: string;
-  taskId: string;
-  taskDocument: Record<string, unknown>;
-  liveLedger: { status: string | null; claimState: string | null; lastTransitionId: string | null; lastTransitionAt: string | null };
-  planningFrontmatter: { status: string | null; source: string | null };
-  lastTransitionEvent: { action: string | null; actorId: string | null; createdAt: string | null; fromStatus: string | null; toStatus: string | null } | null;
-  divergence: Array<{ field: string; liveLedger: string | null; planningFrontmatter?: string | null; lastTransitionEvent?: string | null }>;
-}): Omit<TaskResidueClassification, 'nextCommandTemplate' | 'autoMutationAllowed'> & { nextCommand: string } {
-  const closurePacket = normalizeOptionalString(input.taskDocument.closurePacket ?? input.taskDocument.closure_packet);
-  const closedAt = normalizeOptionalString(input.taskDocument.closedAt ?? input.taskDocument.closed_at);
-  const hasHistoricalCloseArtifacts = Boolean(closurePacket || closedAt || input.lastTransitionEvent?.action === 'close');
-  const planningDone = input.planningFrontmatter.status === 'done';
-  const liveDone = input.liveLedger.status === 'done';
-  const activeClaim = input.liveLedger.claimState === 'active';
-  const mirrorPath = normalizeOptionalString(input.planningFrontmatter.source);
-  const planningMirrorOnly = Boolean(
-    planningDone
-    && liveDone
-    && (normalizeOptionalString(input.taskDocument.planningRepo ?? input.taskDocument.planning_repo) === normalizeOptionalString(input.taskDocument.targetRepo ?? input.taskDocument.target_repo))
-  );
-
-  if (planningDone && !liveDone) {
-    return {
-      bucket: hasHistoricalCloseArtifacts || activeClaim
-        ? 'complete-but-unfinalized'
-        : 'stale-import',
-      truth: 'planning-mirror says done, live ledger has not finished finalization',
-      residue: hasHistoricalCloseArtifacts || activeClaim
-        ? 'There is enough close-path residue to point the operator at reconcile or repair.'
-        : 'The imported planning mirror is ahead of the live ledger.',
-      nextCommand: hasHistoricalCloseArtifacts || activeClaim
-        ? 'node atm.mjs tasks reconcile --task <id> --actor <actor> --delivery-commit <sha> --json'
-        : 'node atm.mjs tasks import --from <plan.md> --write --json',
-      reason: hasHistoricalCloseArtifacts || activeClaim
-        ? 'Historical close artifacts or an active claim remain, so the task is substantively done but not finalized.'
-        : 'Planning mirror is done, but the live ledger still needs import reconciliation.'
-    };
-  }
-
-  if (liveDone && !planningDone && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
-    const isCrossRepo = normalizeOptionalString(input.taskDocument.planningRepo ?? input.taskDocument.planning_repo)
-      !== normalizeOptionalString(input.taskDocument.targetRepo ?? input.taskDocument.target_repo);
-    return {
-      bucket: (mirrorPath && !isCrossRepo) ? 'planning-mirror-only' : 'stale-import',
-      truth: 'live ledger is done, but the planning mirror has not converged',
-      residue: (mirrorPath && !isCrossRepo) ? 'Only the planning mirror remains to be refreshed or retired.' : 'The imported ledger is ahead of the planning mirror.',
-      nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --force --json',
-      reason: (mirrorPath && !isCrossRepo) ? 'The task appears complete in the target ledger, but the planning mirror still needs a governed refresh.' : 'The ledger is ahead of the planning mirror and should be re-imported from the authoritative plan.'
-    };
-  }
-
-  if (planningDone && liveDone && activeClaim) {
-    return {
-      bucket: 'interrupted-close',
-      truth: 'both mirrors say done, but the live claim state is still active',
-      residue: 'The close was interrupted before the claim fully released.',
-      nextCommand: 'node atm.mjs tasks repair-closure --task <id> --json',
-      reason: 'A done/done task still carries an active claim, so the finalization flow needs repair rather than a new close.'
-    };
-  }
-
-  if (
-    planningDone
-    && liveDone
-    && input.divergence.length === 0
-    && !planningMirrorOnly
-    && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)
-  ) {
-    return {
-      bucket: 'no-residue',
-      truth: 'planning mirror and live ledger agree on governed done',
-      residue: 'No closeback residue remains for this task.',
-      nextCommand: 'node atm.mjs tasks status --task <id> --json',
-      reason: 'The live ledger is done, the planning mirror is done, closeout provenance is complete, and no status divergence remains.'
-    };
-  }
-
-  if (liveDone && !verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
-    const gap = assessCloseoutProvenanceGap(input.cwd, input.taskId, input.taskDocument);
-    if (gap.bucket === 'source-done-governance-incomplete') {
-      return {
-        bucket: 'source-done-governance-incomplete',
-        truth: gap.truth,
-        residue: `${gap.residue} Missing proof segments: ${gap.missingSegments.join(', ')}.`,
-        nextCommand: gap.recoveryCommand,
-        reason: gap.reason
-      };
-    }
-  }
-
-  if (planningMirrorOnly) {
-    return {
-      bucket: 'planning-mirror-only',
-      truth: 'planning mirror and live ledger align as done, but the task is still within a planning-mirror authority shape',
-      residue: 'The residue lives in the planning mirror rather than the live ledger.',
-      nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --json',
-      reason: 'This task is planning-mirror-owned, so the operator should refresh the mirrored source of truth instead of forcing close.'
-    };
-  }
-
-  if (input.divergence.length > 0) {
-    return {
-      bucket: 'ambiguous-manual-review',
-      truth: 'the status surfaces disagree, but the operator path is not unique',
-      residue: 'There are multiple possible governed next steps and the system should fail closed.',
-      nextCommand: 'node atm.mjs tasks status --task <id> --json',
-      reason: 'The divergence pattern is not enough to choose a single governed operator action.'
-    };
-  }
-
-  return {
-    bucket: 'ambiguous-manual-review',
-    truth: 'no residue bucket is clearly dominant',
-    residue: 'The state is too quiet to classify as a governed residue bucket without more evidence.',
-    nextCommand: 'node atm.mjs tasks status --task <id> --json',
-    reason: 'The current status triangulation does not expose a decisive residue path.'
-  };
-}
+export type { TaskResidueBucket, TaskResidueClassification } from './tasks/residue-diagnostics.ts';
 
 async function recordStaleRunnerOverride(input: {
   readonly cwd: string;
@@ -723,23 +570,7 @@ export function loadTaskDocumentOrThrow(cwd: string, taskId: string): { taskPath
 
 export function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>) {
   const triangulation = buildTaskStatusTriangulation(cwd, taskId, taskDocument);
-  const residue = triangulation.residueClassification;
-  return {
-    schemaId: 'atm.taskResidueDiagnosis.v1' as const,
-    taskId,
-    bucket: residue.bucket,
-    truth: residue.truth,
-    residue: residue.residue,
-    reason: residue.reason,
-    nextCommand: residue.nextCommand,
-    nextCommandTemplate: residue.nextCommandTemplate,
-    autoMutationAllowed: residue.autoMutationAllowed,
-    diagnostics: {
-      codes: [`ATM_TASK_RESIDUE_${residue.bucket.toUpperCase().replace(/-/g, '_')}`],
-      messages: [residue.reason, `Recommended next command: ${residue.nextCommand}`]
-    },
-    triangulation
-  };
+  return buildResidueDiagnosisEvidenceFromTriangulation({ taskId, triangulation });
 }
 
 async function runTasksStatus(argv: string[]): Promise<CommandResult> {

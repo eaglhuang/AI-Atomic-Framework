@@ -304,6 +304,13 @@ const scopeLockDiagnosticsTest = spawnSync(
 );
 assert(scopeLockDiagnosticsTest.status === 0, `scope-lock-diagnostics focused test must pass: ${scopeLockDiagnosticsTest.stderr || scopeLockDiagnosticsTest.stdout}`);
 
+const residueDiagnosticsTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(residueDiagnosticsTest.status === 0, `residue-diagnostics focused test must pass: ${residueDiagnosticsTest.stderr || residueDiagnosticsTest.stdout}`);
+
 const nextHelp = await runAtm(['next', '--help'], root);
 const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
 assert(nextUsageText.includes('prefers the explicit --task'), 'next --help must explain that the recommended claim command prefers --task TASK-XXX form when the task is already known');
