@@ -1,5 +1,4 @@
 import { type CommandResult } from './shared.ts';
-import { type TaskDependencyCloseoutBlocker } from './tasks/closeout-provenance.ts';
 import { type TaskDispatchPattern } from './tasks/task-markdown-helpers.ts';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.ts';
 import { type ContextMap } from './tasks/task-import-validators.ts';
@@ -202,8 +201,8 @@ export declare function buildResidueDiagnosisEvidence(cwd: string, taskId: strin
     };
 };
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';
-export type TaskClaimDependencyBlocker = TaskDependencyCloseoutBlocker;
-export declare function findTaskClaimDependencyBlockers(cwd: string, taskId: string, taskDocument: Record<string, unknown>): TaskClaimDependencyBlocker[];
+export { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.ts';
+export type { TaskClaimDependencyBlocker } from './tasks/dependency-gate.ts';
 export declare function categorizeHistoricalCommitFiles(input: {
     readonly taskId: string;
     readonly changedFiles: readonly string[];

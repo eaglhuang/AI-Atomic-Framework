@@ -31,28 +31,7 @@ function isExplicitSingleTaskRoute(promptScope, taskIntent) {
     return taskIntent.explicitTaskIds.includes(selectedTaskId)
         || taskIntent.mentionedTaskIds.includes(selectedTaskId);
 }
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
-import { verifyCloseoutProvenance } from '../tasks/closeout-provenance.js';
-function areTaskDependenciesSatisfied(task, statusById, cwd = process.cwd()) {
-    return task.dependencies.every((dependency) => {
-        const status = statusById.get(dependency);
-        if (status !== 'done' && status !== 'verified') {
-            return false;
-        }
-        const dependencyPath = path.join(cwd, '.atm', 'history', 'tasks', `${dependency}.json`);
-        if (!existsSync(dependencyPath)) {
-            return false;
-        }
-        try {
-            const dependencyDoc = JSON.parse(readFileSync(dependencyPath, 'utf8'));
-            return verifyCloseoutProvenance(cwd, dependency, dependencyDoc);
-        }
-        catch {
-            return false;
-        }
-    });
-}
+import { areTaskDependenciesSatisfied } from '../tasks/dependency-gate.js';
 function canTaskBePreparedForClaim(status) {
     const normalized = normalizeTaskRouteStatus(status);
     return normalized === 'planned'

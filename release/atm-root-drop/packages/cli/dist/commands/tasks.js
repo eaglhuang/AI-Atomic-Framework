@@ -13,7 +13,8 @@ import { appendTaskTransitionEvent, createTaskTransitionId, defaultMirrorTaskId,
 import { readPluginRegistry } from '../plugin-registry.js';
 import { advanceTaskQueueAfterClose, abandonTaskQueue, assertTaskCloseAllowedByDirection, findActiveTaskQueue, isTaskDirectionPathCandidate, sanitizeTaskDirectionAllowedFiles, writeTaskDirectionLock } from './task-direction.js';
 import { findActiveBatchRunForTask, readActiveBatchRun, isPathAllowedByScope } from './work-channels.js';
-import { assessCloseoutProvenanceGap, buildDependencyCloseoutBlocker, buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, verifyCloseoutProvenance } from './tasks/closeout-provenance.js';
+import { assessCloseoutProvenanceGap, buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, verifyCloseoutProvenance } from './tasks/closeout-provenance.js';
+import { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.js';
 import { runAtmGit } from './git-governance.js';
 import { assertEmergencyApproval } from './emergency/gate.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.js';
@@ -1667,35 +1668,7 @@ async function runTasksReservation(action, argv) {
     });
 }
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.js';
-export function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument) {
-    const declaredDependencies = Array.from(new Set(parseYamlList(taskDocument.dependencies ?? taskDocument.depends_on ?? taskDocument.blocked_by)));
-    if (declaredDependencies.length === 0) {
-        return [];
-    }
-    const blockers = [];
-    for (const dependencyTaskId of declaredDependencies) {
-        const dependencyPath = taskPathFor(cwd, dependencyTaskId);
-        if (!existsSync(dependencyPath)) {
-            blockers.push({ taskId: dependencyTaskId, status: 'missing', taskPath: dependencyPath });
-            continue;
-        }
-        try {
-            const dependencyDocument = JSON.parse(readFileSync(dependencyPath, 'utf8'));
-            const dependencyStatus = normalizeWorkItemStatus(dependencyDocument.status);
-            if (dependencyStatus !== 'done' && dependencyStatus !== 'verified') {
-                blockers.push({ taskId: dependencyTaskId, status: dependencyStatus, taskPath: dependencyPath });
-            }
-            else if (!verifyCloseoutProvenance(cwd, dependencyTaskId, dependencyDocument)) {
-                const blocker = buildDependencyCloseoutBlocker(cwd, dependencyTaskId, dependencyPath, dependencyDocument);
-                blockers.push(blocker);
-            }
-        }
-        catch {
-            blockers.push({ taskId: dependencyTaskId, status: 'unreadable', taskPath: dependencyPath });
-        }
-    }
-    return blockers.filter((entry) => entry.taskId !== taskId);
-}
+export { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.js';
 async function runTasksReset(argv) {
     const options = parseResetOptions(argv);
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
