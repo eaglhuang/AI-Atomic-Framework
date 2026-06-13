@@ -7,6 +7,12 @@ import { quoteForShell, detectAutoLinkedValidator } from '../packages/cli/src/co
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 import { cliCommandRunners, runCli } from '../packages/cli/src/atm.ts';
 import { commandSpecs, listCommandSpecs } from '../packages/cli/src/commands/command-specs.ts';
+import {
+  categorizeHistoricalCommitFiles,
+  inspectHistoricalDelivery,
+  isDeliverableGateCandidate,
+  pathMatchesTaskScope
+} from '../packages/cli/src/commands/tasks/historical-delivery.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -68,105 +74,6 @@ function readJson(relativePath: any) {
 
 function normalizeTaskScopePath(value: string) {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
-}
-
-function pathMatchesTaskScope(filePath: string, declared: string) {
-  const left = normalizeTaskScopePath(filePath);
-  const right = normalizeTaskScopePath(declared);
-  return left === right || left.startsWith(`${right}/`) || right.startsWith(`${left}/`);
-}
-
-function isDeliverableGateCandidate(filePath: string, declaredFiles: readonly string[]) {
-  const normalized = normalizeTaskScopePath(filePath);
-  return declaredFiles.some((declared) => pathMatchesTaskScope(normalized, declared))
-    || normalized.startsWith('release/atm-onefile/')
-    || normalized.startsWith('release/atm-root-drop/');
-}
-
-function categorizeHistoricalCommitFiles(input: {
-  readonly taskId: string;
-  readonly changedFiles: readonly string[];
-  readonly declaredFiles: readonly string[];
-}) {
-  const taskMatchedFiles = input.changedFiles.filter((filePath) =>
-    input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
-  );
-  const allowedRunnerOutputFiles = input.changedFiles.filter((filePath) =>
-    normalizeTaskScopePath(filePath).startsWith('release/atm-onefile/')
-  );
-  const outOfScopeSourceFiles = input.changedFiles.filter((filePath) =>
-    !taskMatchedFiles.includes(filePath) && !allowedRunnerOutputFiles.includes(filePath)
-  );
-  return {
-    taskMatchedFiles,
-    allowedRunnerOutputFiles,
-    outOfScopeSourceFiles
-  };
-}
-
-function inspectHistoricalDelivery(input: {
-  readonly cwd: string;
-  readonly requestedRef: string;
-  readonly declaredFiles: readonly string[];
-  readonly enforceDeclaredScope: boolean;
-  readonly waiverOutOfScopeDelivery?: boolean;
-  readonly waiverReason?: string | null;
-}) {
-  const requestedRef = input.requestedRef.trim();
-  if (!requestedRef) {
-    return {
-      requestedRef,
-      commitSha: null,
-      ok: false,
-      reason: 'empty-ref',
-      changedFiles: [],
-      deliverableFiles: []
-    };
-  }
-
-  const commitResult = spawnSync('git', ['-C', input.cwd, 'rev-parse', '--verify', `${requestedRef}^{commit}`], { encoding: 'utf8' });
-  const commitSha = commitResult.status === 0 ? commitResult.stdout.trim() : null;
-  if (!commitSha) {
-    return {
-      requestedRef,
-      commitSha: null,
-      ok: false,
-      reason: 'commit-not-found',
-      changedFiles: [],
-      deliverableFiles: []
-    };
-  }
-
-  const showResult = spawnSync('git', ['-C', input.cwd, 'show', '--pretty=format:', '--name-only', commitSha, '--'], { encoding: 'utf8' });
-  const changedFiles = (showResult.stdout || '').split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
-  const categorized = categorizeHistoricalCommitFiles({
-    taskId: 'validate-cli-historical-delivery',
-    changedFiles,
-    declaredFiles: input.declaredFiles
-  });
-  const deliverableCandidates = changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, input.declaredFiles));
-  const deliverableFiles = input.enforceDeclaredScope
-    ? deliverableCandidates.filter((filePath) => input.declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
-    : deliverableCandidates;
-  if (deliverableFiles.length > 0 && categorized.outOfScopeSourceFiles.length > 0) {
-    const waiverAllowed = input.waiverOutOfScopeDelivery === true && Boolean(input.waiverReason?.trim());
-    return {
-      requestedRef,
-      commitSha,
-      ok: waiverAllowed,
-      reason: waiverAllowed ? 'scoped-deliverable-with-waived-out-of-scope' : 'out-of-scope-source-files-present',
-      changedFiles,
-      deliverableFiles
-    };
-  }
-  return {
-    requestedRef,
-    commitSha,
-    ok: deliverableFiles.length > 0,
-    reason: deliverableFiles.length > 0 ? 'scoped-deliverable-files-present' : 'no-scoped-deliverable-files',
-    changedFiles,
-    deliverableFiles
-  };
 }
 
 function sandboxEpermHint(args: any, cwd: any) {
@@ -382,6 +289,13 @@ const lifecycleStateTest = spawnSync(
   { cwd: root, encoding: 'utf8' }
 );
 assert(lifecycleStateTest.status === 0, `lifecycle-state focused test must pass: ${lifecycleStateTest.stderr || lifecycleStateTest.stdout}`);
+
+const historicalDeliveryTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(historicalDeliveryTest.status === 0, `historical-delivery focused test must pass: ${historicalDeliveryTest.stderr || historicalDeliveryTest.stdout}`);
 
 const nextHelp = await runAtm(['next', '--help'], root);
 const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
@@ -1756,9 +1670,12 @@ try {
 
       const unrelatedInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
+        taskId: 'validate-cli-historical-delivery',
         requestedRef: unrelatedCommit,
         declaredFiles,
-        enforceDeclaredScope: true
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
       });
       assert(!unrelatedInspect.ok, 'historical delivery without task overlap must fail');
       assert(unrelatedInspect.reason === 'no-scoped-deliverable-files', 'must report no scoped deliverable files');
@@ -1773,15 +1690,19 @@ try {
 
       const mixedInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
+        taskId: 'validate-cli-historical-delivery',
         requestedRef: mixedCommit,
         declaredFiles,
-        enforceDeclaredScope: true
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
       });
       assert(!mixedInspect.ok, 'mixed commit must fail without waiver');
       assert(mixedInspect.reason === 'out-of-scope-source-files-present', 'must report out-of-scope source files');
 
       const mixedWaiverInspect = inspectHistoricalDelivery({
         cwd: histWorkspace,
+        taskId: 'validate-cli-historical-delivery',
         requestedRef: mixedCommit,
         declaredFiles,
         enforceDeclaredScope: true,
