@@ -1,0 +1,87 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T16-16-11-975Z-close-d94c31294353",
+  "taskId": "TASK-CID-0062",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613160222-captain-TASK-CID-0062-525a86f833",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0062.json",
+  "taskSha256": "sha256:9b3b20509a146c6ddf734accff038545401090dd65cad2407b9f9c25e4cb788b",
+  "createdAt": "2026-06-13T16:16:11.975Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0062 --actor captain --status done --historical-delivery 9f22c9fe",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613160222-captain-TASK-CID-0062-525a86f833",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0062.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "git-diff-check",
+      "typecheck",
+      "validate:cli",
+      "validate:dependency-gate",
+      "validate:git-head-evidence",
+      "validate:tasks-atomic-map",
+      "validate:tasks-command-surface"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T16:16:11.970Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0062-tasks-governance-invariant-module-extraction.task.md",
+        ".atm/history/evidence/TASK-CID-0062.*",
+        ".atm/history/task-events/TASK-CID-0062/**",
+        ".atm/history/tasks/TASK-CID-0062.json",
+        "docs/reports/tasks-command-atomic-map.md",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/closeout-signaling.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/tasks/historical-delivery.ts",
+        "packages/cli/src/commands/tasks/public-surface.ts",
+        "packages/cli/src/commands/tasks/surface-invariants.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/closeout-signaling.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/tasks/historical-delivery.ts",
+        "packages/cli/src/commands/tasks/public-surface.ts",
+        "packages/cli/src/commands/tasks/surface-invariants.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

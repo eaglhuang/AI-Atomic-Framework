@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0062",
+  "title": "Tasks governance invariant module extraction",
+  "status": "done",
+  "milestone": "M12",
+  "dependencies": [
+    "TASK-CID-0059",
+    "TASK-CID-0061"
+  ],
+  "acceptance": [
+    "`tasks.ts` becomes thinner in responsibility, not merely shorter in line count.",
+    "The caller-facing contract stays stable even while internal modules move.",
+    "Required governance invariants have one clear owner module each.",
+    "Shared admission paths stop depending on fragile implicit coupling to one giant file.",
+    "Regression coverage proves the extraction did not reopen the abnormal-release class of bug."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/public-surface.ts",
+    "packages/cli/src/commands/tasks/closeout-signaling.ts",
+    "packages/cli/src/commands/tasks/dependency-gates.ts",
+    "packages/cli/src/commands/tasks/historical-delivery.ts",
+    "packages/cli/src/commands/tasks/surface-invariants.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-cli.ts",
+    "docs/reports/tasks-command-atomic-map.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/public-surface.ts",
+    "packages/cli/src/commands/tasks/closeout-signaling.ts",
+    "packages/cli/src/commands/tasks/dependency-gates.ts",
+    "packages/cli/src/commands/tasks/historical-delivery.ts",
+    "packages/cli/src/commands/tasks/surface-invariants.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-cli.ts",
+    "docs/reports/tasks-command-atomic-map.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-tasks-command-surface.ts",
+    "node --strip-types scripts/validate-tasks-atomic-map.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing task storage model",
+    "Changing planning repo task lifecycle",
+    "Unrelated CLI surface cleanup"
+  ],
+  "nonGoals": [
+    "Do not perform a formatting-only breakup of tasks.ts.",
+    "Do not remove the hard gate introduced by TASK-CID-0061."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the extraction if any admission, closeout, or historical-delivery behavior regresses; preserve the hard gate from TASK-CID-0061.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-governance-invariant-modules-map",
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "docs/reports/tasks-command-surface-contract.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0062-tasks-governance-invariant-module-extraction.task.md",
+    "sectionTitle": "TASK-CID-0062",
+    "headingLine": 65,
+    "hash": "0377d692ba57258f"
+  },
+  "importedAt": "2026-06-13T16:02:16.687Z",
+  "lastTransitionId": "2026-06-13T16-16-11-975Z-close-d94c31294353",
+  "lastTransitionAt": "2026-06-13T16:16:11.975Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T16:02:22.642Z",
+  "promotedAt": "2026-06-13T16:02:22.647Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-c9162423e537",
+    "claimedAt": "2026-06-13T16:02:22.649Z",
+    "heartbeatAt": "2026-06-13T16:16:11.971Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0062.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/closeout-signaling.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "packages/cli/src/commands/tasks/surface-invariants.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T16:02:22.649Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613160222-captain-TASK-CID-0062-525a86f833",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0062",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0062.*",
+      ".atm/history/task-events/TASK-CID-0062/**",
+      ".atm/history/tasks/TASK-CID-0062.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/closeout-signaling.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "packages/cli/src/commands/tasks/surface-invariants.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1f99eeaecaaee4d7c653f17a32b8a96a21688a99b9385d8240783c72d1580576",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T16:02:22.671Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T16:16:11.971Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613160222-captain-TASK-CID-0062-525a86f833",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0062.closure-packet.json"
+}
