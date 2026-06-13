@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T01-41-55-690Z-close-860a82dbbd0f",
+  "taskId": "TASK-CID-0044",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613014019-captain-TASK-CID-0044-b743c83888",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0044.json",
+  "taskSha256": "sha256:784ba9dd6cc358dae81bbfb517e7835e00d8b64730cefd654d7e97421aae7645",
+  "createdAt": "2026-06-13T01:41:55.690Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0044 --actor captain --status done --historical-delivery d5c3dea8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613014019-captain-TASK-CID-0044-b743c83888",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0044.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/core/src/broker/__tests__/recovery.test.ts",
+      "typecheck",
+      "validate:broker-recovery",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T01:41:55.687Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0044-recovery-orphan-cleanup-manual-override-audit-and-snapshot-recovery.task.md",
+        ".atm/history/evidence/TASK-CID-0044.*",
+        ".atm/history/task-events/TASK-CID-0044/**",
+        ".atm/history/tasks/TASK-CID-0044.json",
+        "packages/core/src/broker/__tests__/recovery.test.ts",
+        "packages/core/src/broker/orphan-cleanup.ts",
+        "packages/core/src/broker/recovery.ts",
+        "scripts/validate-broker-recovery.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/recovery.test.ts",
+        "packages/core/src/broker/orphan-cleanup.ts",
+        "packages/core/src/broker/recovery.ts",
+        "scripts/validate-broker-recovery.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

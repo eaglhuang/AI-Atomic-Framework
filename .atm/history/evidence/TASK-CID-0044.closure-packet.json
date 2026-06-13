@@ -1,0 +1,171 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0044",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "adf31d56d9847a85d3710a98a094e0dddf3d9d0c",
+  "governedTreeSha": "7772661a8928d10dc882d79e388e20839a41b453",
+  "targetCommitDelta": {
+    "currentCommitSha": "adf31d56d9847a85d3710a98a094e0dddf3d9d0c",
+    "parentCommitShas": [
+      "adf31d56d9847a85d3710a98a094e0dddf3d9d0c"
+    ],
+    "governedTreeSha": "7772661a8928d10dc882d79e388e20839a41b453",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0043.closure-packet.json",
+      ".atm/history/evidence/TASK-CID-0043.json",
+      ".atm/history/evidence/TASK-CID-0044.json",
+      ".atm/history/task-events/TASK-CID-0043/2026-06-13T01-40-05-198Z-close-c70df85aefef.json",
+      ".atm/history/task-events/TASK-CID-0044/2026-06-12T07-45-34-666Z-import-b0cafc62a225.json",
+      ".atm/history/task-events/TASK-CID-0044/2026-06-13T01-40-19-769Z-reserve-00d7d3e97759.json",
+      ".atm/history/task-events/TASK-CID-0044/2026-06-13T01-40-19-771Z-promote-28c3f9e7beaa.json",
+      ".atm/history/task-events/TASK-CID-0044/2026-06-13T01-40-19-796Z-claim-efce92a44eb7.json",
+      ".atm/history/tasks/TASK-CID-0043.json",
+      ".atm/history/tasks/TASK-CID-0044.json",
+      "packages/core/src/broker/__tests__/recovery.test.ts",
+      "packages/core/src/broker/orphan-cleanup.ts",
+      "packages/core/src/broker/recovery.ts",
+      "scripts/validate-broker-recovery.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/recovery.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1fc52880b277722f9fea031474a7422d618e6817dc903438ef957136d7d1068e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-broker-recovery.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:39b67662d12e98b646e9cf22d1fa64a727e7f155a02a8567b89306cba90caeea",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:221ae6a74ce096fe673ccc15d13937ebc75403a2da6e06a3c3651cb4613663a6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:13246c7a8a79fd16483ff5ae4d2f9abdbf381f85561e4a90ea0f051e86384b76",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/recovery.test.ts",
+    "typecheck",
+    "validate:broker-recovery",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-13T01:41:55.687Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0044-recovery-orphan-cleanup-manual-override-audit-and-snapshot-recovery.task.md",
+      ".atm/history/evidence/TASK-CID-0044.*",
+      ".atm/history/task-events/TASK-CID-0044/**",
+      ".atm/history/tasks/TASK-CID-0044.json",
+      "packages/core/src/broker/__tests__/recovery.test.ts",
+      "packages/core/src/broker/orphan-cleanup.ts",
+      "packages/core/src/broker/recovery.ts",
+      "scripts/validate-broker-recovery.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/__tests__/recovery.test.ts",
+      "packages/core/src/broker/orphan-cleanup.ts",
+      "packages/core/src/broker/recovery.ts",
+      "scripts/validate-broker-recovery.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0044.json",
+  "closedAt": "2026-06-13T01:41:55.688Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260613014019-captain-TASK-CID-0044-b743c83888",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d5c3dea86a57c4107b1945d21e2da5181d7c92b7",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/__tests__/recovery.test.ts",
+      "packages/core/src/broker/orphan-cleanup.ts",
+      "packages/core/src/broker/recovery.ts",
+      "scripts/validate-broker-recovery.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/core/src/broker/index.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/core/src/broker/index.ts"
+    ],
+    "waiverReason": "historical delivery includes packages/core/src/broker/index.ts export surface required to expose TASK-CID-0044 recovery and orphan cleanup modules; declared deliverables are present and validated"
+  }
+}
