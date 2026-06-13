@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T16-27-48-825Z-close-0bb1d2ec63ae",
+  "taskId": "TASK-CID-0002",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": null,
+  "fromStatus": "done",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0002.json",
+  "taskSha256": "sha256:91d446b04ac3aaf5f0c2c13df148687f3c7cfe3ad648049d2a1fef493d3f86f0",
+  "createdAt": "2026-06-13T16:27:48.825Z",
+  "command": "node atm.mjs tasks reconcile --task TASK-CID-0002 --actor captain --delivery-commit 3c7df067 --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0002.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "git-diff-check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas",
+      "validate:semantic-fingerprint"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T16:27:48.820Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0002-cid-semantics-and-fingerprint-profile-schema.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/CID_SEMANTICS.md",
+        "packages/core/src/registry/semantic-fingerprint.ts",
+        "schemas/atomic-spec.schema.json",
+        "schemas/registry/fingerprint-profile.schema.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/registry/semantic-fingerprint.ts",
+        "schemas/atomic-spec.schema.json",
+        "schemas/registry/fingerprint-profile.schema.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
