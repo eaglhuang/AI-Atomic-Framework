@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0067",
   "title": "Planning repo authority taskflow close cross-repo deliverable verification",
-  "status": "running",
+  "status": "done",
   "milestone": "M14",
   "dependencies": [
     "TASK-CID-0063",
@@ -71,8 +71,8 @@
     "hash": "e25279080c4cef8f"
   },
   "importedAt": "2026-06-13T06:39:45.943Z",
-  "lastTransitionId": "2026-06-13T06-39-58-108Z-claim-2da8343ed248",
-  "lastTransitionAt": "2026-06-13T06:39:58.108Z",
+  "lastTransitionId": "2026-06-13T06-55-49-262Z-close-2a036968732d",
+  "lastTransitionAt": "2026-06-13T06:55:49.262Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-13T06:39:58.081Z",
@@ -81,7 +81,7 @@
     "actorId": "captain",
     "leaseId": "lease-80f027912946",
     "claimedAt": "2026-06-13T06:39:58.086Z",
-    "heartbeatAt": "2026-06-13T06:39:58.086Z",
+    "heartbeatAt": "2026-06-13T06:55:49.260Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0067.json",
@@ -91,8 +91,8 @@
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
       "scripts/validate-task-ledger-governance.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "reconciled"
   },
   "startedAt": "2026-06-13T06:39:58.086Z",
   "startedByActor": "captain",
@@ -122,5 +122,10 @@
     "actorId": "captain",
     "createdAt": "2026-06-13T06:39:58.107Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-13T06:55:49.260Z",
+  "closedByActor": "captain",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit ea1ffcb6c29607cbf8514c4b7ce8474a20992e40",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0067.closure-packet.json"
 }
