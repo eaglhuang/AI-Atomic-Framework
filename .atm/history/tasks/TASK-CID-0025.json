@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0025",
   "title": "Broker-owned write actor runtime boundary and activation contract",
-  "status": "running",
+  "status": "done",
   "milestone": "P1",
   "dependencies": [
     "TASK-CID-0021",
@@ -79,8 +79,8 @@
     "hash": "75636fbec90531ff"
   },
   "importedAt": "2026-06-13T16:36:06.077Z",
-  "lastTransitionId": "2026-06-13T16-36-13-891Z-claim-4285a8f9e250",
-  "lastTransitionAt": "2026-06-13T16:36:13.891Z",
+  "lastTransitionId": "2026-06-13T16-38-46-717Z-close-06076dd84e4a",
+  "lastTransitionAt": "2026-06-13T16:38:46.717Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-13T16:36:13.862Z",
@@ -89,7 +89,7 @@
     "actorId": "captain",
     "leaseId": "lease-5915584f62f0",
     "claimedAt": "2026-06-13T16:36:13.867Z",
-    "heartbeatAt": "2026-06-13T16:36:13.867Z",
+    "heartbeatAt": "2026-06-13T16:38:46.714Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0025.json",
@@ -100,8 +100,8 @@
       "scripts/validate-broker-steward.ts",
       "scripts/validate-team-brokered-write.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Historical delivery d32a097d contains the TASK-CID-0025 scoped broker-owned write actor boundary deliverables and validators now pass. The same commit also contains adjacent command-spec, fixture, and release output files, so the out-of-scope delivery waiver is used only to record governed closeout for the scoped 0025 deliverables after the earlier external typecheck blocker was resolved by TASK-CID-0003."
   },
   "startedAt": "2026-06-13T16:36:13.867Z",
   "startedByActor": "captain",
@@ -132,5 +132,10 @@
     "actorId": "captain",
     "createdAt": "2026-06-13T16:36:13.891Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-13T16:38:46.714Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613163613-captain-TASK-CID-0025-8e3bf613ac",
+  "closeReason": "Historical delivery d32a097d contains the TASK-CID-0025 scoped broker-owned write actor boundary deliverables and validators now pass. The same commit also contains adjacent command-spec, fixture, and release output files, so the out-of-scope delivery waiver is used only to record governed closeout for the scoped 0025 deliverables after the earlier external typecheck blocker was resolved by TASK-CID-0003.",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0025.closure-packet.json"
 }
