@@ -72,6 +72,12 @@ import {
   type HistoricalDeliveryFileBuckets,
   type TaskHistoricalDeliveryReport
 } from './tasks/historical-delivery.ts';
+import {
+  attachDirtyGuardToScopedDiffIsolation,
+  buildCloseScopedDiffIsolation,
+  evaluateFrameworkCloseDirtyGuard,
+  type TaskCloseScopedDiffIsolationReport
+} from './tasks/scope-lock-diagnostics.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval } from './emergency/gate.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
@@ -2344,14 +2350,11 @@ async function runTasksClose(argv: string[]) {
       trackedDirtyFiles: closeWorktree.trackedDirtyFiles
     });
     if (closeScopedDiffIsolation) {
-      closeScopedDiffIsolation = {
-        ...closeScopedDiffIsolation,
-        blockingTrackedDirtyFiles: closeDirtyGuard.blockingTrackedDirtyFiles,
-        scopeTrackedDirtyFiles: closeDirtyGuard.scopeTrackedDirtyFiles,
-        governanceTrackedDirtyFiles: closeDirtyGuard.governanceTrackedDirtyFiles,
-        advisoryTrackedDirtyFiles: closeDirtyGuard.advisoryTrackedDirtyFiles,
-        ignoredUntrackedFiles: closeWorktree.ignoredUntrackedFiles
-      };
+      closeScopedDiffIsolation = attachDirtyGuardToScopedDiffIsolation(
+        closeScopedDiffIsolation,
+        closeDirtyGuard,
+        closeWorktree.ignoredUntrackedFiles
+      );
     }
     if (closeDirtyGuard.blockingTrackedDirtyFiles.length > 0) {
       throw new CliError('ATM_TASK_CLOSE_DIRTY_WORKTREE', `Task ${options.taskId} cannot be closed as done while in-scope or closure-governance tracked changes are still dirty.`, {
@@ -4019,87 +4022,6 @@ function evaluateFrameworkDeliveryWindow(input: {
       : input.fromBatchCheckpoint
         ? `Remove unrelated framework critical diffs or add the real deliverable paths to the task scope before rerunning ${checkpointCommand}. If the scoped delivery already landed, use ${historicalCommand}.`
         : `Normal framework critical tasks close in two phases: first create a governed delivery commit with ${normalDeliveryCommitCommand}; then close with ${normalHistoricalCloseCommand}. Batch checkpoint commands are only for --from-batch-checkpoint closures.`
-  };
-}
-
-// TASK-AAO-0057: precise scoped-diff isolation diagnostic produced during close.
-// Splits framework working-tree changes into three categories so close/checkpoint
-// can isolate unrelated dirty/untracked changes (advisory) while still defending
-// the task's own deliverables and flagging scope-overflow critical changes.
-interface TaskCloseScopedDiffIsolationReport {
-  readonly schemaId: 'atm.taskCloseScopedDiffIsolation.v1';
-  readonly taskId: string;
-  readonly declaredFiles: readonly string[];
-  readonly scopedCriticalChangedFiles: readonly string[];
-  readonly isolatedUnrelatedChanges: readonly string[];
-  readonly declaredButUnchanged: readonly string[];
-  readonly summary: string;
-  readonly advisoryNote: string;
-  readonly blockingTrackedDirtyFiles?: readonly string[];
-  readonly scopeTrackedDirtyFiles?: readonly string[];
-  readonly governanceTrackedDirtyFiles?: readonly string[];
-  readonly advisoryTrackedDirtyFiles?: readonly string[];
-  readonly ignoredUntrackedFiles?: readonly string[];
-}
-
-function buildCloseScopedDiffIsolation(input: {
-  readonly cwd: string;
-  readonly taskId: string;
-  readonly taskDeclaredFiles: readonly string[];
-  readonly frameworkChangedFiles: readonly string[];
-  readonly frameworkDeliveryWindow: {
-    readonly scopedCriticalChangedFiles: readonly string[];
-    readonly unscopedCriticalChangedFiles: readonly string[];
-    readonly declaredFiles: readonly string[];
-  };
-}): TaskCloseScopedDiffIsolationReport {
-  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
-  const allChangedFiles = uniqueStrings(input.frameworkChangedFiles.map(normalizeRelativePath).filter(Boolean));
-  const scopedCriticalChangedFiles = [...input.frameworkDeliveryWindow.scopedCriticalChangedFiles];
-  const isolatedUnrelatedChanges = [...input.frameworkDeliveryWindow.unscopedCriticalChangedFiles];
-  const declaredButUnchanged = declaredFiles.filter((declared) =>
-    !allChangedFiles.some((changed) => pathMatchesTaskScope(changed, declared))
-  );
-  return {
-    schemaId: 'atm.taskCloseScopedDiffIsolation.v1' as const,
-    taskId: input.taskId,
-    declaredFiles,
-    scopedCriticalChangedFiles,
-    isolatedUnrelatedChanges,
-    declaredButUnchanged,
-    summary: isolatedUnrelatedChanges.length === 0 && declaredButUnchanged.length === 0
-      ? 'no-isolation-required'
-      : isolatedUnrelatedChanges.length > 0 && scopedCriticalChangedFiles.length === 0
-        ? 'all-critical-changes-isolated-as-advisory'
-        : 'mixed-in-scope-and-isolated-changes',
-    advisoryNote: 'isolatedUnrelatedChanges are framework critical files outside this task scope; they are advisory and do not block close. Address them via their own governed task.'
-  };
-}
-
-function evaluateFrameworkCloseDirtyGuard(input: {
-  readonly cwd: string;
-  readonly taskId: string;
-  readonly taskDeclaredFiles: readonly string[];
-  readonly trackedDirtyFiles: readonly string[];
-}) {
-  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
-  const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
-  const scopeTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) =>
-    declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
-  );
-  const governanceTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) =>
-    !scopeTrackedDirtyFiles.includes(filePath) && isTaskCloseGovernanceCriticalPath(filePath, input.taskId)
-  );
-  const blockingTrackedDirtyFiles = uniqueStrings([
-    ...scopeTrackedDirtyFiles,
-    ...governanceTrackedDirtyFiles
-  ]);
-  const advisoryTrackedDirtyFiles = trackedDirtyFiles.filter((filePath) => !blockingTrackedDirtyFiles.includes(filePath));
-  return {
-    blockingTrackedDirtyFiles,
-    scopeTrackedDirtyFiles,
-    governanceTrackedDirtyFiles,
-    advisoryTrackedDirtyFiles
   };
 }
 
