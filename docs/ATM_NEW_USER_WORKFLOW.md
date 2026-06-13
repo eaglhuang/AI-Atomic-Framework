@@ -59,18 +59,23 @@ Dry-run first. Nothing is written. This is your "show me what would happen" comm
 
 ```bash
 node atm.mjs taskflow open --dry-run \
-  --profile docs/taskflow.profile.json \
+  --profile <adopter-repo>/taskflow.profile.json \
   --title "Export CSV report" \
   --json
 ```
 
+> The `<adopter-repo>` placeholder points at your planning or adopter repo, the one that owns the task cards. The framework repo itself does not ship `taskflow.profile.json`; you write one when you adopt ATM. See `docs/specs/taskflow-profile-v1.md` for the schema.
+
 **What you see:**
 
-- The `tasks new` command ATM *would* run to generate the task card.
-- The `tasks import` command ATM *would* run to load it into target runtime.
-- Any missing prerequisites (e.g. profile not loaded, host opener not configured).
+- A top-level `writeReadinessHint` (`atm.taskflowOpenWriteReadinessHint.v1`) that tells you in plain language whether `--write` will succeed:
+  - `status: "ready"` — `--write` is good to go.
+  - `status: "fallback"` — profile is missing or in template-only mode; `--write` will fail closed. The `missingPrerequisites` array names exactly which profile policy fields or explicit flags to add.
+  - `status: "incomplete"` — profile is loaded but `--task-id` / `--output` were not derivable; same `missingPrerequisites` list applies.
+- The `tasks new` command ATM would run to generate the task card (low-level generator surface).
+- The `tasks import` command ATM would run to load the card into the target runtime (backend synchronization surface).
 
-**Why this matters:** if `--dry-run` already complains, fix the inputs before any write.
+**Why this matters:** the `writeReadinessHint` is the one field you read first. You no longer have to dig into `orchestrationPlan.hostPolicy.fallbackBehavior` to learn why `--write` would fail.
 
 ## Step 2: Open the task (write)
 
@@ -78,7 +83,7 @@ When the dry-run looks right, swap `--dry-run` for `--write`:
 
 ```bash
 node atm.mjs taskflow open --write \
-  --profile docs/taskflow.profile.json \
+  --profile <adopter-repo>/taskflow.profile.json \
   --title "Export CSV report" \
   --json
 ```
@@ -101,7 +106,20 @@ node atm.mjs next --prompt "Export CSV report" --json
 
 **Why:** ATM looks at the prompt, the open tasks, the queue, and any active claims, and routes you to exactly one next action. The AI agent should treat this as authoritative. If `next` says "claim this task", claim it. If `next` says "the repository needs bootstrap first", do that first.
 
+When `next` resolves the prompt to a specific task, the result includes a `taskScopedClaimCommand` field — the explicit `--task TASK-XXX` form. **Prefer that command over re-typing the natural-language prompt** in Step 4. It is shorter, more deterministic, and avoids prompt-resolution ambiguity if you retry.
+
 ## Step 4: Claim the task
+
+If `next` already resolved to a single task, claim with the explicit task id (recommended):
+
+```bash
+node atm.mjs next --claim \
+  --actor <actor> \
+  --task TASK-XXXX-0001 \
+  --json
+```
+
+The prompt form still works and is useful when the human did not specify a task id:
 
 ```bash
 node atm.mjs next --claim \
@@ -218,7 +236,8 @@ These rules exist because they have been violated, and each violation cost a rea
 
 - **Do not edit `.atm/history/**` by hand.** Ever. Even when "just fixing one field" looks tempting. Governance writes are CLI-only.
 - **Do not skip `next`.** The router exists so two agents do not claim the same scope. If you bypass it, you will eventually corrupt the queue.
-- **Do not call `tasks close`, `tasks reconcile`, `tasks import`, or `tasks repair-closure` as the normal path.** Those are backend surfaces. The official operator lanes are `taskflow open` and `taskflow close`. The backend commands exist for repair and edge cases — they are not your daily driver.
+- **Do not call `tasks close`, `tasks reconcile`, or `tasks repair-closure` as the normal path.** Those are protected backend / emergency surfaces. The official operator lanes are `taskflow open` and `taskflow close`. The backend commands exist for repair and edge cases — they are not your daily driver.
+- **`tasks new` and `tasks import` are not protected, but they are still not the normal operator path.** `tasks new` is the **low-level template generator** (no governed lifecycle, no runtime import). `tasks import` is the **runtime synchronization surface** (loads a planning markdown into the target ledger). `taskflow open --write` already calls both internally — invoke them directly only when you have a clear reason (e.g. generating a template offline).
 - **Do not use `--force`, `--no-verify`, broad cleanup commands, historical waivers, or `git reset --hard`** unless a human approved emergency maintenance for that specific scope.
 - **Do not claim "source done", "planning done", or "mailbox done" as governed done.** Governed done means the target repo ledger is closed *and* a closure packet exists *and* a close event was recorded. Anything less is not done.
 
@@ -243,11 +262,11 @@ This guide deliberately does not document the protected backend commands in deta
 ```bash
 # Preview open
 node atm.mjs taskflow open --dry-run \
-  --profile docs/taskflow.profile.json --title "..." --json
+  --profile <adopter-repo>/taskflow.profile.json --title "..." --json
 
 # Open (writes the task card and imports it)
 node atm.mjs taskflow open --write \
-  --profile docs/taskflow.profile.json --title "..." --json
+  --profile <adopter-repo>/taskflow.profile.json --title "..." --json
 
 # Ask ATM what to do next
 node atm.mjs next --prompt "..." --json

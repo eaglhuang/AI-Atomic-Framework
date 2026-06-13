@@ -20,6 +20,14 @@ assert.equal(res1.evidence.delegationContract.hostOpenerAvailable, false);
 assert.equal(res1.evidence.delegationContract.generationSurface, 'tasks-new');
 assert.equal(res1.evidence.orchestrationPlan.wouldInvokeTasksNew, true);
 assert.ok(res1.evidence.diagnostics.codes.includes('ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK'));
+// TASK-CID-0073: writeReadinessHint surfaces fallback-mode prerequisites at top level
+assert.equal(res1.writeReadinessHint.schemaId, 'atm.taskflowOpenWriteReadinessHint.v1', 'top-level writeReadinessHint must use atm.taskflowOpenWriteReadinessHint.v1 schemaId');
+assert.equal(res1.writeReadinessHint.status, 'fallback', 'no-profile dry-run must report writeReadinessHint.status = fallback');
+assert.equal(res1.writeReadinessHint.operatorLane, 'taskflow open');
+assert.equal(res1.writeReadinessHint.fallbackSurface, 'tasks new (low-level generator)', 'fallback hint must label tasks new as low-level generator surface');
+assert.ok(res1.writeReadinessHint.missingPrerequisites.length > 0, 'fallback hint must list at least one missing prerequisite');
+assert.ok(res1.writeReadinessHint.summary.includes('fail closed'), 'fallback hint summary must explain that --write will fail closed');
+assert.equal(res1.evidence.writeReadinessHint.status, 'fallback', 'writeReadinessHint must also appear inside evidence for backwards-compat consumers');
 
 const validProfilePath = path.join(rootDir, 'fixtures/taskflow-profile/valid.profile.json');
 const res2 = await runTaskflow(['open', '--dry-run', '--profile', validProfilePath]) as any;
@@ -41,6 +49,11 @@ const res3 = await runTaskflow(['open', '--dry-run', '--profile', governedProfil
 assert.equal(res3.evidence.openerMode, 'delegated-governed');
 assert.equal(res3.evidence.delegationContract.invocable, true);
 assert.equal(res3.evidence.writeSupport.allowed, false);
+// TASK-CID-0073: delegated-governed dry-run reports writeReadinessHint.status = ready
+assert.equal(res3.writeReadinessHint.status, 'ready', 'delegated-governed dry-run must report writeReadinessHint.status = ready');
+assert.equal(res3.writeReadinessHint.missingPrerequisites.length, 0, 'ready hint must not list any missing prerequisites');
+assert.equal(res3.writeReadinessHint.nextCommand, 'node atm.mjs taskflow open --write --json');
+assert.equal(res3.writeReadinessHint.fallbackSurface, null);
 assert.equal(res3.evidence.hostPolicyDecision.taskId, 'TASK-GOVERNED-0001');
 assert.equal(res3.evidence.hostPolicyDecision.outputPath, 'docs/tasks/TASK-GOVERNED-0001.task.md');
 assert.equal(res3.evidence.orchestrationPlan.policyDecision.allocateTaskId.mode, 'host-opener');
@@ -895,6 +908,132 @@ await assert.rejects(
     '--json'
   ]),
   (err: any) => err.code === 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_AMBIGUOUS'
+);
+
+async function makeUncommittedDeliverablesFixture(label: string, customTaskDoc?: (doc: any) => void) {
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-del-${label}-`));
+  const targetRepo = path.join(tempRoot, 'target');
+  const planningRepo = path.join(tempRoot, 'planning');
+  initGitRepo(targetRepo);
+  initGitRepo(planningRepo);
+  writeJson(path.join(targetRepo, 'package.json'), { name: `target-del-${label}`, type: 'module' });
+  writeJson(path.join(targetRepo, '.atm/config.json'), {
+    schemaVersion: 'atm.config.v0.1',
+    layoutVersion: 2,
+    paths: { tasks: '.atm/history/tasks', taskEvents: '.atm/history/task-events' },
+    taskLedger: { enabled: true, mode: 'auto', mirrorExternalTasks: true, requireCliTransitions: true, provider: 'atm-local' }
+  });
+  writeJson(path.join(targetRepo, '.atm/runtime/identity/default.json'), {
+    actorId: 'validator', gitName: 'ATM Validator', gitEmail: 'validator@example.invalid', updatedAt: new Date().toISOString()
+  });
+
+  const fixtureTaskId = `TASK-DEL-${label.toUpperCase()}`;
+  const planPath = path.join(planningRepo, 'docs', 'tasks', `${fixtureTaskId}.task.md`);
+  writeText(planPath, [
+    '---',
+    `task_id: ${fixtureTaskId}`,
+    'title: "Deliverables test fixture"',
+    'status: running',
+    '---',
+    `# ${fixtureTaskId}`
+  ].join('\n'));
+
+  writeJson(path.join(planningRepo, 'taskflow.profile.json'), {
+    schemaId: 'taskflow.profile.v1',
+    id: `del-profile-${label}`,
+    name: 'Deliverables Profile',
+    repoLabel: 'Planning Repo',
+    ownerRepo: 'planning',
+    taskIdPrefix: 'TASK-DEL',
+    taskId: { format: 'TASK-DEL-NNNN' },
+    template: { defaultMarkdown: '# ${taskId} ${title}' },
+    capabilities: { supportsDryRun: true, supportsWrite: false },
+    delegation: {
+      hint: 'hint', openerPath: 'tools/task-card-opener.js',
+      policy: {
+        allocateTaskId: { mode: 'host-opener', prefix: 'TASK-DEL', format: 'TASK-DEL-NNNN' },
+        resolveCanonicalOutputPath: { mode: 'host-opener', pattern: 'docs/tasks/${taskId}.task.md', directory: 'docs/tasks' },
+        rosterSyncPolicy: 'none', fallbackBehavior: { mode: 'template-only-fallback', reason: 'fallback' }
+      },
+      writerInvocation: { describeOnly: false, displayHint: 'node tools/task-card-opener.js --write --task ${taskId}' }
+    }
+  });
+
+  const taskDoc = {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: fixtureTaskId,
+    title: 'Deliverables test fixture',
+    status: 'ready',
+    scopePaths: ['src/deliver.txt', 'src/other.txt'],
+    deliverables: ['src/deliver.txt'],
+    targetAllowedFiles: ['src/deliver.txt'],
+    planningRepo: 'planning',
+    targetRepo: 'target',
+    closureAuthority: 'target_repo'
+  };
+  if (customTaskDoc) {
+    customTaskDoc(taskDoc);
+  }
+  writeJson(path.join(targetRepo, '.atm/history/tasks', `${fixtureTaskId}.json`), taskDoc);
+
+  execFileSync('git', ['add', '.'], { cwd: targetRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'base target'], { cwd: targetRepo, stdio: 'ignore' });
+  const baseCommitSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: targetRepo, encoding: 'utf8' }).trim();
+  execFileSync('git', ['add', '.'], { cwd: planningRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'base planning'], { cwd: planningRepo, stdio: 'ignore' });
+
+  const claim = await runNext(['--cwd', targetRepo, '--claim', '--actor', 'validator', '--task', fixtureTaskId]);
+  assert.equal(claim.ok, true);
+
+  return {
+    targetRepo,
+    planningRepo,
+    taskId: fixtureTaskId,
+    planPath,
+    profilePath: path.join(planningRepo, 'taskflow.profile.json'),
+    baseCommitSha
+  };
+}
+
+// 1. Success case: uncommitted declared deliverables included in stageFiles
+const successDelFixture = await makeUncommittedDeliverablesFixture('success');
+writeText(path.join(successDelFixture.targetRepo, 'src/deliver.txt'), 'content\n');
+writeText(path.join(successDelFixture.targetRepo, 'src/unrelated.txt'), 'unrelated content\n');
+
+const dryRunResult = await runTaskflow([
+  'close',
+  '--cwd', successDelFixture.targetRepo,
+  '--profile', successDelFixture.profilePath,
+  '--task', successDelFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+
+assert.equal(dryRunResult.ok, true);
+const stageFiles = dryRunResult.evidence.governedCommitBundle.targetRepo.stageFiles;
+assert.ok(stageFiles.includes('src/deliver.txt'), 'uncommitted deliverables should be staged');
+assert.ok(!stageFiles.includes('src/unrelated.txt'), 'unrelated files should be excluded');
+assert.deepEqual(dryRunResult.evidence.governedCommitBundle.targetDeliveryFiles, ['src/deliver.txt']);
+assert.deepEqual(dryRunResult.evidence.governedCommitBundle.excludedDirtyFiles, ['src/unrelated.txt']);
+
+// 2. Fail-closed case: dirty file in scopePaths but not in deliverables or targetAllowedFiles
+const failClosedFixture = await makeUncommittedDeliverablesFixture('failclosed', (doc) => {
+  doc.targetAllowedFiles = []; // fallback to scopePaths
+});
+writeText(path.join(failClosedFixture.targetRepo, 'src/other.txt'), 'modified\n');
+
+await assert.rejects(
+  () => runTaskflow([
+    'close',
+    '--cwd', failClosedFixture.targetRepo,
+    '--profile', failClosedFixture.profilePath,
+    '--task', failClosedFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', failClosedFixture.baseCommitSha,
+    '--write',
+    '--json'
+  ]),
+  (err: any) => err.code === 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE'
 );
 
 console.log('[taskflow-dryrun:test] ok');

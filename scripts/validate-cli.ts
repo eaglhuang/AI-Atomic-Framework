@@ -366,11 +366,19 @@ assert(tasksUsageText.includes('node atm.mjs tasks repair-closure'), 'tasks --he
 assert(tasksUsageText.includes('--amend'), 'tasks --help must document explicit repair-closure amend opt-in');
 assert(tasksUsageText.includes('--emergency-approval'), 'tasks --help must document emergency approval for protected backend surfaces');
 assert(tasksUsageText.includes('taskflow open/close'), 'tasks --help must identify taskflow as the official operator lane');
+assert(tasksUsageText.includes('low-level template generator'), 'tasks --help must label tasks new as a low-level template generator surface');
+assert(tasksUsageText.includes('runtime synchronization surface'), 'tasks --help must label tasks import as the runtime synchronization (backend) surface');
 
 const taskflowHelp = await runAtm(['taskflow', '--help'], root);
 const taskflowUsageText = JSON.stringify(taskflowHelp.parsed.evidence?.usage ?? {});
-assert(taskflowUsageText.includes('official operator lane'), 'taskflow --help must identify taskflow close as the operator lane');
-assert(taskflowUsageText.includes('protected backend surfaces'), 'taskflow --help must explain internal protected backend delegation');
+assert(taskflowUsageText.includes('Official operator lane'), 'taskflow --help must identify taskflow as the official operator lane');
+assert(taskflowUsageText.includes('writeReadinessHint'), 'taskflow --help must reference the writeReadinessHint surface for dry-run --write readiness');
+assert(taskflowUsageText.includes('low-level template generator surface'), 'taskflow --help must label tasks new as a low-level template generator surface');
+assert(taskflowUsageText.includes('runtime synchronization surface'), 'taskflow --help must label tasks import as a runtime synchronization (backend) surface');
+
+const nextHelp = await runAtm(['next', '--help'], root);
+const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
+assert(nextUsageText.includes('prefers the explicit --task'), 'next --help must explain that the recommended claim command prefers --task TASK-XXX form when the task is already known');
 
 const emergencyHelp = await runAtm(['emergency', '--help'], root);
 assert(emergencyHelp.exitCode === 0, 'emergency --help must exit 0');

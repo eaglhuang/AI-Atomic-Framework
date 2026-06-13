@@ -1589,12 +1589,15 @@ function buildPromptScopedNextResult(input: {
   const normalClaimCommand = explicitTaskSelector
     ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --json`
     : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`;
+  const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --json`;
   const nextAction = {
     status: 'task-route-ready',
     command: normalClaimCommand,
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
     recommendedChannel: 'normal',
     riskLevel: 'medium',
+    taskScopedClaimCommand,
+    claimCommandShape: explicitTaskSelector ? 'task-scoped' : 'prompt-scoped',
     playbook: buildChannelPlaybook({
       channel: 'normal',
       taskId: selectedTask.workItemId,

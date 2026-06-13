@@ -62,10 +62,24 @@ Lease checks validate task, actor, permission, expiry, max-use count, and explic
 |---|---|
 | `openerMode` | `delegated-governed` or `template-only-fallback` |
 | `writeSupport` | Whether `--write` may execute as the governed entry |
+| `writeReadinessHint` | Top-level operator-facing hint (`atm.taskflowOpenWriteReadinessHint.v1`) naming exactly what is missing when `--write` would fail closed |
 | `delegationContract` | Host opener availability and generation surface (`tasks-new`) |
 | `diagnostics` | Codes, messages, and missing prerequisites |
 | `orchestrationPlan` | Dry-run plan including the `tasks new` and `tasks import` commands that would run |
 | `runtimeImport` | Write-mode runtime import result returned from `tasks import --write` |
+
+### Write readiness hint (`atm.taskflowOpenWriteReadinessHint.v1`)
+
+`writeReadinessHint` is emitted at the top level of every `taskflow open` result and inside the fail-closed error details when `--write` is rejected. It removes the need to inspect nested `orchestrationPlan.hostPolicy.fallbackBehavior` fields to learn whether `--write` will succeed.
+
+| Field | Purpose |
+|---|---|
+| `status` | `ready` (delegated-governed), `fallback` (template-only-fallback), or `incomplete` (delegated profile loaded but explicit inputs missing) |
+| `summary` | One-line operator-facing sentence describing the current readiness state |
+| `missingPrerequisites` | Exact list of profile policy fields or explicit flags still required before `--write` can succeed |
+| `nextCommand` | Suggested `taskflow open --write` invocation when ready, otherwise `null` |
+| `operatorLane` | Always `taskflow open`; reinforces that this is the official operator surface |
+| `fallbackSurface` | `tasks new (low-level generator)` when the operator must escape governed lane, otherwise `null` |
 
 ### Opener mode rules
 
