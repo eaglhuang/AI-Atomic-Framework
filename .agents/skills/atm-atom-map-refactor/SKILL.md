@@ -85,8 +85,26 @@ validator results.
 
 ## Casebook
 
-Read `references/casebook.md` when the current task resembles prior CID work or
-when adding a new lesson after a successful extraction.
+Read `references/casebook.md` when the current task resembles prior CID or RFT
+work or when adding a new lesson after a successful extraction.
+
+The casebook covers two refactor series:
+
+- **CID series** (`TASK-CID-005x`..`TASK-CID-007x`) — closeout/governance-invariant
+  atomization, targeting `packages/cli/src/commands/tasks.ts`. See the plan at
+  `docs/ai_atomic_framework/cid-hardening/atm-tasks-command-atomic-map-refactor-plan.md`
+  in the planning repo.
+- **RFT series** (`TASK-RFT-0001`..`TASK-RFT-0008`) — size/complexity atomization,
+  targeting the other oversized governance-critical modules (`next.ts`,
+  `hook.ts`, `framework-development.ts`, `validate-task-ledger-governance.ts`,
+  `captain-dispatch-mailbox.ts`, `police/family.ts`, `evidence.ts`, `taskflow.ts`).
+  See the plan at
+  `docs/ai_atomic_framework/rft-hardening/atm-cli-oversized-module-refactor-plan.md`
+  in the planning repo.
+
+If your current task matches an RFT forward case, read the case before
+implementing — the suggested owner modules, focused tests, and line-count
+ceilings are already pre-decided so you do not have to re-derive them.
 
 Add a new case only after a task is governed done. Keep cases short: problem,
 chosen pattern, owner module, proof, lesson.
