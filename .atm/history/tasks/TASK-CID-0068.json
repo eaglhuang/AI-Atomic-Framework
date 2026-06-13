@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0068",
   "title": "Taskflow close auto-commit index isolation hardening",
-  "status": "running",
+  "status": "done",
   "milestone": "M14",
   "dependencies": [
     "TASK-CID-0063",
@@ -72,8 +72,8 @@
     "hash": "fd04b280ed143a71"
   },
   "importedAt": "2026-06-13T07:04:04.099Z",
-  "lastTransitionId": "2026-06-13T07-14-36-399Z-renew-fe44a0781b36",
-  "lastTransitionAt": "2026-06-13T07:14:36.399Z",
+  "lastTransitionId": "2026-06-13T07-14-55-171Z-close-3343e039159d",
+  "lastTransitionAt": "2026-06-13T07:14:55.171Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-13T07:04:10.947Z",
@@ -82,7 +82,7 @@
     "actorId": "captain",
     "leaseId": "lease-8f5cd60bacc0",
     "claimedAt": "2026-06-13T07:04:10.952Z",
-    "heartbeatAt": "2026-06-13T07:14:36.384Z",
+    "heartbeatAt": "2026-06-13T07:14:55.170Z",
     "ttlSeconds": 3600,
     "files": [
       ".atm/history/tasks/TASK-CID-0068.json",
@@ -91,7 +91,8 @@
       "packages/cli/src/commands/tasks.ts",
       "scripts/validate-task-ledger-governance.ts"
     ],
-    "state": "active"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-13T07:04:10.952Z",
   "startedByActor": "captain",
@@ -120,5 +121,9 @@
     "actorId": "captain",
     "createdAt": "2026-06-13T07:04:10.970Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-13T07:14:55.170Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613070410-captain-TASK-CID-0068-1115faf487",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0068.closure-packet.json"
 }
