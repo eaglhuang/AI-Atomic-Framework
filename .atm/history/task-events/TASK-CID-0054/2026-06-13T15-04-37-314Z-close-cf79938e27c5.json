@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T15-04-37-314Z-close-cf79938e27c5",
+  "taskId": "TASK-CID-0054",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613145738-captain-TASK-CID-0054-2df483eb2a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0054.json",
+  "taskSha256": "sha256:8d5e18f21e7564d0281c51c6d83e48dbb8a80fd5ef7501f276ac778e3527c36a",
+  "createdAt": "2026-06-13T15:04:37.314Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0054 --actor captain --status done --historical-delivery ec9d8be8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613145738-captain-TASK-CID-0054-2df483eb2a",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0054.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T15:04:37.310Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0054-task-lifecycle-state-machine-atom-extraction.task.md",
+        ".atm/history/evidence/TASK-CID-0054.*",
+        ".atm/history/task-events/TASK-CID-0054/**",
+        ".atm/history/tasks/TASK-CID-0054.json",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
