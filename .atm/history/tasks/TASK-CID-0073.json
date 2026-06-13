@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0073",
+  "title": "Taskflow operator guidance and backend wording normalization",
+  "status": "done",
+  "milestone": "M15",
+  "dependencies": [
+    "TASK-CID-0063",
+    "TASK-CID-0066",
+    "TASK-CID-0070"
+  ],
+  "acceptance": [
+    "A dry-run opener in fallback mode emits a user-facing readiness hint that clearly says `--write` will fail closed and what must be fixed.",
+    "Workflow docs no longer instruct framework-repo users to rely on a nonexistent local `docs/taskflow.profile.json`.",
+    "At least one `next` claim guidance path emits an explicit task-scoped claim command when the selected task is already known.",
+    "Help/spec/docs label `tasks new` as generation-only and `tasks import` as backend/runtime sync, not as normal operator defaults.",
+    "`npm run validate:cli` proves the new wording and recommended-action contract."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/command-specs/next.spec.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "scripts/validate-cli.ts",
+    "tests/cli-fixtures/help-snapshots/next.json",
+    "docs/specs/taskflow-profile-v1.md",
+    "docs/ATM_NEW_USER_WORKFLOW.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/command-specs/next.spec.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "scripts/validate-cli.ts",
+    "tests/cli-fixtures/help-snapshots/next.json",
+    "docs/specs/taskflow-profile-v1.md",
+    "docs/ATM_NEW_USER_WORKFLOW.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing taskflow close bundle semantics",
+    "Changing emergency lease validation rules",
+    "Adding a second task opener lifecycle"
+  ],
+  "nonGoals": [
+    "Do not leave fallback-mode write failure discoverable only by reading raw dry-run JSON.",
+    "Do not keep `tasks new` or `tasks import` worded as co-equal operator defaults when taskflow open exists."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if the guidance rewrite makes correct operator paths harder to discover or regresses existing taskflow/operator commands.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-operator-guidance-surface",
+    "mapUpdates": [
+      "docs/specs/taskflow-profile-v1.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0073-taskflow-operator-guidance-and-backend-wording-normalization.task.md",
+    "sectionTitle": "TASK-CID-0073",
+    "headingLine": 63,
+    "hash": "f136c1815b900399"
+  },
+  "importedAt": "2026-06-13T13:21:47.109Z",
+  "lastTransitionId": "2026-06-13T13-31-42-055Z-close-fad8b50cd900",
+  "lastTransitionAt": "2026-06-13T13:31:42.055Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "004",
+  "reservedAt": "2026-06-13T13:21:56.760Z",
+  "promotedAt": "2026-06-13T13:21:56.764Z",
+  "claim": {
+    "actorId": "004",
+    "leaseId": "lease-e1de87344811",
+    "claimedAt": "2026-06-13T13:21:56.768Z",
+    "heartbeatAt": "2026-06-13T13:31:42.053Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0073.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/specs/taskflow-profile-v1.md",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-cli.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T13:21:56.768Z",
+  "startedByActor": "004",
+  "startedBySessionId": "session-20260613132156-004-TASK-CID-0073-254779a2cd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0073",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0073.*",
+      ".atm/history/task-events/TASK-CID-0073/**",
+      ".atm/history/tasks/TASK-CID-0073.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/specs/taskflow-profile-v1.md",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-cli.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "869e333007127c4b12eaec3b2b40416c767927d464e9fafb171691fe70574377",
+    "actorId": "004",
+    "createdAt": "2026-06-13T13:21:56.794Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T13:31:42.053Z",
+  "closedByActor": "004",
+  "closedBySessionId": "session-20260613132156-004-TASK-CID-0073-254779a2cd",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0073.closure-packet.json"
+}
