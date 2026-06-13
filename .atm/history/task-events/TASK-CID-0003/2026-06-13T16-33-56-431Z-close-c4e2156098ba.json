@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T16-33-56-431Z-close-c4e2156098ba",
+  "taskId": "TASK-CID-0003",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613162831-captain-TASK-CID-0003-dba9afcf6c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0003.json",
+  "taskSha256": "sha256:14216abee5a1b9107334ace97132f97da7a8b84193490c34385da21428e9fa3a",
+  "createdAt": "2026-06-13T16:33:56.431Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0003 --actor captain --status done --historical-delivery d73372c8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613162831-captain-TASK-CID-0003-dba9afcf6c",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "npm test",
+      "npm-test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:semantic-fingerprint"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T16:33:56.426Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0003-validate-semantic-fingerprint-determinism.task.md",
+        ".atm/history/evidence/TASK-CID-0003.*",
+        ".atm/history/task-events/TASK-CID-0003/**",
+        ".atm/history/tasks/TASK-CID-0003.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "fixtures/semantic-fingerprint/determinism/*",
+        "scripts/validate-semantic-fingerprint.ts",
+        "tests/registry/semantic-fingerprint-determinism.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-semantic-fingerprint.ts",
+        "tests/registry/semantic-fingerprint-determinism.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

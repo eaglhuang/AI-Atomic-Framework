@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0003",
+  "title": "Extend existing validate:semantic-fingerprint with deterministic identity-hash regression fixtures",
+  "status": "done",
+  "milestone": "E0",
+  "dependencies": [
+    "TASK-CID-0002"
+  ],
+  "acceptance": [
+    "`npm run validate:semantic-fingerprint` runs the new determinism checks in addition to existing checks.",
+    "Positive fixtures pass: same contract → same fingerprint; N-recompute stable.",
+    "Negative fixture fails closed: non-deterministic signal in identity input → validator exits non-zero with a clear code.",
+    "No new top-level script file; no new npm script entry.",
+    "Existing fingerprint validator output remains unchanged for the pre-card fixture set."
+  ],
+  "deliverables": [
+    "scripts/validate-semantic-fingerprint.ts",
+    "tests/registry/semantic-fingerprint-determinism.test.ts",
+    "fixtures/semantic-fingerprint/determinism/*",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "scripts/validate-semantic-fingerprint.ts",
+    "tests/registry/semantic-fingerprint-determinism.test.ts",
+    "fixtures/semantic-fingerprint/determinism/*",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-semantic-fingerprint.ts --mode validate",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Creating a new validate-* script (must extend the existing validate-semantic-fingerprint.ts)",
+    "Adding a new npm script entry (reuse the existing one)",
+    "Testing CID.Effects / Sandbox / Behavior dimensions",
+    "Adding embedding or vector tests",
+    "Modifying semantic-fingerprint.ts compute logic"
+  ],
+  "nonGoals": [
+    "Do not turn the validator into a quality gate (it stays a determinism guard)",
+    "Do not assert anything about a fingerprint value beyond its determinism and stability"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the validator extension and fixtures. Because no new script file is introduced, rollback restores the pre-card validate:semantic-fingerprint surface.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cid-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "Closes the E0 minimal loop. Successor (after E0 closes): the **future queue** opens with `TASK-CID-0005` (E2 lease fencing, aligning with `TASK-TEAM-0018`) as Captain's priority.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0003-validate-semantic-fingerprint-determinism.task.md",
+    "sectionTitle": "TASK-CID-0003",
+    "headingLine": 51,
+    "hash": "c132dec122b9d511"
+  },
+  "importedAt": "2026-06-13T16:20:51.783Z",
+  "lastTransitionId": "2026-06-13T16-33-56-431Z-close-c4e2156098ba",
+  "lastTransitionAt": "2026-06-13T16:33:56.431Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T16:28:31.367Z",
+  "promotedAt": "2026-06-13T16:28:31.370Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-7aab90e3d1b5",
+    "claimedAt": "2026-06-13T16:28:31.373Z",
+    "heartbeatAt": "2026-06-13T16:33:56.427Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0003.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "fixtures/semantic-fingerprint/determinism/*",
+      "scripts/validate-semantic-fingerprint.ts",
+      "tests/registry/semantic-fingerprint-determinism.test.ts"
+    ],
+    "state": "released",
+    "reason": "Historical delivery d73372c8 already added semantic-fingerprint determinism fixtures, validator coverage, regression test, and atom-map mapping; this close records command-backed governed completion under the active TASK-CID-0003 claim."
+  },
+  "startedAt": "2026-06-13T16:28:31.373Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613162831-captain-TASK-CID-0003-dba9afcf6c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0003",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0003.*",
+      ".atm/history/task-events/TASK-CID-0003/**",
+      ".atm/history/tasks/TASK-CID-0003.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "fixtures/semantic-fingerprint/determinism/*",
+      "scripts/validate-semantic-fingerprint.ts",
+      "tests/registry/semantic-fingerprint-determinism.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d496c95f9ae60d0f5835ed10517c1b204b26a22fa8c6513aab031cd734976dc7",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T16:28:31.399Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T16:33:56.427Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613162831-captain-TASK-CID-0003-dba9afcf6c",
+  "closeReason": "Historical delivery d73372c8 already added semantic-fingerprint determinism fixtures, validator coverage, regression test, and atom-map mapping; this close records command-backed governed completion under the active TASK-CID-0003 claim.",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0003.closure-packet.json"
+}
