@@ -84,7 +84,7 @@ function isExplicitSingleTaskRoute(promptScope: PromptScopedTaskRoute | null, ta
 
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { verifyCloseoutProvenance } from '../tasks/closeout-signaling.ts';
+import { verifyCloseoutProvenance } from '../tasks/closeout-provenance.ts';
 
 function areTaskDependenciesSatisfied(task: ImportedTaskSummary, statusById: ReadonlyMap<string, string>, cwd = process.cwd()) {
   return task.dependencies.every((dependency) => {

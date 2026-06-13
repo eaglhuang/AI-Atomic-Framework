@@ -13,7 +13,7 @@ import { appendTaskTransitionEvent, createTaskTransitionId, defaultMirrorTaskId,
 import { readPluginRegistry } from '../plugin-registry.js';
 import { advanceTaskQueueAfterClose, abandonTaskQueue, assertTaskCloseAllowedByDirection, findActiveTaskQueue, isTaskDirectionPathCandidate, sanitizeTaskDirectionAllowedFiles, writeTaskDirectionLock } from './task-direction.js';
 import { findActiveBatchRunForTask, readActiveBatchRun, isPathAllowedByScope } from './work-channels.js';
-import { assessCloseoutProvenanceGap, buildDependencyCloseoutBlocker, buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, verifyCloseoutProvenance } from './tasks/closeout-signaling.js';
+import { assessCloseoutProvenanceGap, buildDependencyCloseoutBlocker, buildDependencyCloseoutRecoveryCommand, formatDependencyCloseoutBlockedMessage, verifyCloseoutProvenance } from './tasks/closeout-provenance.js';
 import { runAtmGit } from './git-governance.js';
 import { assertEmergencyApproval } from './emergency/gate.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.js';
@@ -1666,7 +1666,7 @@ async function runTasksReservation(action, argv) {
         }
     });
 }
-export { verifyCloseoutProvenance } from './tasks/closeout-signaling.js';
+export { verifyCloseoutProvenance } from './tasks/closeout-provenance.js';
 export function findTaskClaimDependencyBlockers(cwd, taskId, taskDocument) {
     const declaredDependencies = Array.from(new Set(parseYamlList(taskDocument.dependencies ?? taskDocument.depends_on ?? taskDocument.blocked_by)));
     if (declaredDependencies.length === 0) {

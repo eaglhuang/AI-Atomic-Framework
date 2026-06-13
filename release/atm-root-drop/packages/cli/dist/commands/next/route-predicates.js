@@ -33,7 +33,7 @@ function isExplicitSingleTaskRoute(promptScope, taskIntent) {
 }
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { verifyCloseoutProvenance } from '../tasks/closeout-signaling.js';
+import { verifyCloseoutProvenance } from '../tasks/closeout-provenance.js';
 function areTaskDependenciesSatisfied(task, statusById, cwd = process.cwd()) {
     return task.dependencies.every((dependency) => {
         const status = statusById.get(dependency);

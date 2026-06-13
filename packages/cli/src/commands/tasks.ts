@@ -55,7 +55,7 @@ import {
   formatDependencyCloseoutBlockedMessage,
   verifyCloseoutProvenance,
   type TaskDependencyCloseoutBlocker
-} from './tasks/closeout-signaling.ts';
+} from './tasks/closeout-provenance.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval } from './emergency/gate.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
@@ -2086,7 +2086,7 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
   });
 }
 
-export { verifyCloseoutProvenance } from './tasks/closeout-signaling.ts';
+export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';
 
 export type TaskClaimDependencyBlocker = TaskDependencyCloseoutBlocker;
 
