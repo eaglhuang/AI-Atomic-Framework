@@ -28,6 +28,10 @@ export interface EmergencyMaintenanceUse {
     readonly usedAt: string;
     readonly reason: string | null;
     readonly command: string | null;
+    readonly result: 'authorized' | 'succeeded' | 'failed';
+    readonly before: Record<string, unknown>;
+    readonly after: Record<string, unknown>;
+    readonly touchedFiles: readonly string[];
 }
 export declare function emergencyRoot(cwd: string): string;
 export declare function createEmergencyLease(input: {
@@ -66,6 +70,10 @@ export declare function consumeEmergencyLease(input: {
     readonly flags: readonly string[];
     readonly reason: string | null;
     readonly command: string | null;
+    readonly before?: Record<string, unknown>;
+    readonly after?: Record<string, unknown>;
+    readonly touchedFiles?: readonly string[];
+    readonly result?: 'authorized' | 'succeeded' | 'failed';
 }): {
     lease: EmergencyMaintenanceLease;
     use: EmergencyMaintenanceUse;

@@ -12,7 +12,11 @@
     "surface",
     "usedAt",
     "reason",
-    "command"
+    "command",
+    "result",
+    "before",
+    "after",
+    "touchedFiles"
   ],
   "properties": {
     "schemaId": { "const": "atm.emergencyMaintenanceUse.v1" },
@@ -23,7 +27,11 @@
     "surface": { "type": "string", "minLength": 1 },
     "usedAt": { "type": "string", "format": "date-time" },
     "reason": { "type": ["string", "null"] },
-    "command": { "type": ["string", "null"] }
+    "command": { "type": ["string", "null"] },
+    "result": { "enum": ["authorized", "succeeded", "failed"] },
+    "before": { "type": "object" },
+    "after": { "type": "object" },
+    "touchedFiles": { "type": "array", "items": { "type": "string" } }
   },
   "additionalProperties": false
 }

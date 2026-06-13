@@ -399,6 +399,14 @@ try {
   assertReadable(emergencyPermissions, 'emergency permissions');
   assert(Array.isArray(emergencyPermissions.parsed.evidence?.permissions), 'emergency permissions must return registry entries');
   assert(emergencyPermissions.parsed.evidence.permissions.some((entry: any) => entry.id === 'backend.tasks.reconcile'), 'emergency permissions must include backend.tasks.reconcile');
+  const reconcilePermission = emergencyPermissions.parsed.evidence.permissions.find((entry: any) => entry.id === 'backend.tasks.reconcile');
+  assert(reconcilePermission.normalLane === 'taskflow close', 'emergency permission registry must expose normalLane');
+  assert(reconcilePermission.riskTier === 'high', 'emergency permission registry must expose riskTier');
+  assert(reconcilePermission.requiresTaskId === true, 'emergency permission registry must expose requiresTaskId');
+  assert(reconcilePermission.requiresActor === true, 'emergency permission registry must expose requiresActor');
+  assert(reconcilePermission.requiresHumanApprovalText === true, 'emergency permission registry must expose requiresHumanApprovalText');
+  assert(reconcilePermission.auditRequired === true, 'emergency permission registry must expose auditRequired');
+  assert(Array.isArray(reconcilePermission.validatorTags) && reconcilePermission.validatorTags.includes('emergency-backend-reconcile'), 'emergency permission registry must expose validatorTags');
 
   const emergencyApproval = await runAtm([
     'emergency', 'approve',
@@ -444,6 +452,50 @@ try {
   ], tempRoot);
   assert(forceImportWithoutApproval.exitCode === 1, 'protected force import without emergency approval must fail closed before file mutation');
   assertMessageCode(forceImportWithoutApproval, 'ATM_EMERGENCY_LANE_APPROVAL_REQUIRED');
+
+  const importPlanPath = path.join(tempRoot, 'TASK-CID-TEST.task.md');
+  writeFileSync(importPlanPath, [
+    '---',
+    'task_id: TASK-CID-TEST',
+    'title: "Emergency import fixture"',
+    'status: planned',
+    'scopePaths:',
+    '  - "src/emergency-fixture.ts"',
+    'deliverables:',
+    '  - "src/emergency-fixture.ts"',
+    '---',
+    '# TASK-CID-TEST',
+    ''
+  ].join('\n'), 'utf8');
+  const importApproval = await runAtm([
+    'emergency', 'approve',
+    '--cwd', tempRoot,
+    '--task', 'TASK-CID-TEST',
+    '--actor', 'validator',
+    '--permission', 'backend.tasks.import.write',
+    '--allowed-flag', '--force',
+    '--approval-text', 'Human approved validator force import test',
+    '--reason', 'validator consumes emergency import lease',
+    '--json'
+  ], tempRoot);
+  assert(importApproval.exitCode === 0, 'emergency approve for import must exit 0');
+  const importLeaseId = importApproval.parsed.evidence?.lease?.leaseId;
+  const forceImportWithApproval = await runAtm([
+    'tasks', 'import',
+    '--cwd', tempRoot,
+    '--from', importPlanPath,
+    '--write',
+    '--force',
+    '--emergency-approval', importLeaseId,
+    '--json'
+  ], tempRoot);
+  assert(forceImportWithApproval.exitCode === 0, 'protected force import with matching emergency approval must pass');
+  const importEmergencyUse = forceImportWithApproval.parsed.evidence?.emergencyUse?.use;
+  assert(importEmergencyUse?.schemaId === 'atm.emergencyMaintenanceUse.v1', 'approved backend result must include emergency use evidence');
+  assert(importEmergencyUse.result === 'authorized', 'emergency use evidence must include result');
+  assert(importEmergencyUse.before && typeof importEmergencyUse.before === 'object', 'emergency use evidence must include before snapshot');
+  assert(importEmergencyUse.after && typeof importEmergencyUse.after === 'object', 'emergency use evidence must include after snapshot');
+  assert(Array.isArray(importEmergencyUse.touchedFiles), 'emergency use evidence must include touchedFiles');
 
   const onefileCacheRoot = path.join(tempRoot, 'onefile-cache');
   for (const [entryName, timestamp] of [

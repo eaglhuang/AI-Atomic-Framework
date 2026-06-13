@@ -820,8 +820,9 @@ interface ParsedRepairClosureOptions {
 async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
   const options = parseRepairClosureOptions(argv);
   const resolvedActor = options.actorId ? resolveActorId(options.actorId, options.cwd) : null;
+  let emergencyUse: EmergencyUseEvidence = null;
   if (!options.dryRun) {
-    assertEmergencyApproval({
+    emergencyUse = assertEmergencyApproval({
       cwd: options.cwd,
       surface: 'tasks repair-closure',
       permission: 'backend.tasks.repairClosure',
@@ -897,6 +898,7 @@ async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
     ],
     evidence: {
       result,
+      emergencyUse,
       transitionPath,
       nextAction: !options.dryRun && stagedOnly ? {
         kind: 'governed-commit-required',
@@ -942,7 +944,7 @@ async function runTasksReconcile(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks reconcile requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
-  assertEmergencyApproval({
+  const emergencyUse = assertEmergencyApproval({
     cwd: options.cwd,
     surface: 'tasks reconcile',
     permission: 'backend.tasks.reconcile',
@@ -1218,6 +1220,7 @@ async function runTasksReconcile(argv: string[]) {
       transitionPath,
       closeCommitWindowPath: closeCommitWindowPathReconcile,
       closeCommitWindowAllowedFiles,
+      emergencyUse,
       deliverableGate: deliverableGate as unknown as Record<string, unknown> | null
     }
   });
@@ -1463,8 +1466,9 @@ async function runTasksImport(argv: string[]) {
     || options.resetOpen
     || options.allowStaleRunner
   );
+  let emergencyUse: EmergencyUseEvidence = null;
   if (importEmergencyRequired) {
-    assertEmergencyApproval({
+    emergencyUse = assertEmergencyApproval({
       cwd: options.cwd,
       surface: 'tasks import --write recovery flags',
       permission: 'backend.tasks.import.write',
@@ -1688,7 +1692,8 @@ async function runTasksImport(argv: string[]) {
       manifest,
       planPath: manifest.planPath,
       writtenPaths,
-      evidencePath
+      evidencePath,
+      emergencyUse
     }
   });
 }
@@ -2217,8 +2222,9 @@ async function runTasksClose(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks close requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  let emergencyUse: EmergencyUseEvidence = null;
   if (options.historicalDeliveryRefs.length > 0 || options.waiverOutOfScopeDelivery || options.allowStaleRunner) {
-    assertEmergencyApproval({
+    emergencyUse = assertEmergencyApproval({
       cwd: options.cwd,
       surface: 'tasks close historical-delivery backend',
       permission: 'backend.tasks.close',
@@ -2711,6 +2717,7 @@ async function runTasksClose(argv: string[]) {
       // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
       // critical changes were in-scope vs isolated as advisory unrelated changes.
       closeScopedDiffIsolation,
+      emergencyUse,
       taskQueue
     }
   });
@@ -6688,3 +6695,4 @@ export {
   normalizeRelativePath,
   legacyTaskRequiresBaseline
 };
+type EmergencyUseEvidence = ReturnType<typeof assertEmergencyApproval>;

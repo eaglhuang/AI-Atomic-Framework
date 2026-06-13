@@ -153,6 +153,24 @@ interface SameFileClaimOwnershipReport {
   readonly findings: readonly SameFileClaimOwnershipFinding[];
 }
 
+interface EmergencyUseAuditFinding {
+  readonly code:
+    | 'ATM_EMERGENCY_USE_LEASE_MISSING'
+    | 'ATM_EMERGENCY_USE_LEASE_NOT_USED'
+    | 'ATM_EMERGENCY_USE_PERMISSION_MISMATCH'
+    | 'ATM_EMERGENCY_USE_TASK_MISMATCH'
+    | 'ATM_EMERGENCY_USE_ACTOR_MISMATCH';
+  readonly file: string;
+  readonly leasePath?: string;
+  readonly detail: string;
+}
+
+interface EmergencyUseAuditReport {
+  readonly ok: boolean;
+  readonly inspectedUseFiles: readonly string[];
+  readonly findings: readonly EmergencyUseAuditFinding[];
+}
+
 interface PreCommitBlockingFinding {
   readonly code: string;
   readonly source: string;
@@ -470,6 +488,7 @@ function runPreCommitHook(cwd: string) {
     ? quickfixChangedLineCount > activeQuickfixLock.maxChangedLines
     : false;
   const protectedStateReport = inspectProtectedAtmStateChanges(root, stagedFiles);
+  const emergencyUseAuditReport = inspectEmergencyUseAudit(root, stagedFiles);
   const taskCardStatusReport = inspectTaskCardStatusChanges(root, stagedFiles);
   const commitAttributionReport = inspectCommitAttribution(root, stagedFiles);
   // TASK-CID-0024: same-file parallel claims are first-class. Multiple active
@@ -518,6 +537,7 @@ function runPreCommitHook(cwd: string) {
     && !quickfixLineLimitExceeded
     && commitAttributionReport.ok
     && protectedStateReport.ok
+    && emergencyUseAuditReport.ok
     && taskCardStatusReport.ok
     && sameFileClaimReport.ok
     && blockingTaskAuditFindings.length === 0
@@ -541,6 +561,7 @@ function runPreCommitHook(cwd: string) {
     quickfixChangedLineCount,
     commitAttributionFindings: commitAttributionReport.findings,
     protectedStateFindings: protectedStateReport.findings,
+    emergencyUseAuditFindings: emergencyUseAuditReport.findings,
     taskCardStatusFindings: taskCardStatusReport.findings,
     sameFileClaimFindings: sameFileClaimReport.findings,
     taskAuditFindings: taskAudit.findings,
@@ -591,6 +612,7 @@ function runPreCommitHook(cwd: string) {
           quickfixLineLimitExceeded,
           quickfixChangedLineCount,
           protectedStateFindings: protectedStateReport.findings,
+          emergencyUseAuditFindings: emergencyUseAuditReport.findings,
           taskCardStatusFindings: taskCardStatusReport.findings,
           sameFileClaimFindings: sameFileClaimReport.findings,
           taskAuditFindings: taskAudit.findings.length,
@@ -632,6 +654,7 @@ function runPreCommitHook(cwd: string) {
       quickfixChangedLineCount,
       commitAttributionReport,
       protectedStateReport,
+      emergencyUseAuditReport,
       taskCardStatusReport,
       sameFileClaimReport,
       taskAudit,
@@ -657,6 +680,7 @@ function buildPreCommitBlockingFindings(input: {
   readonly quickfixChangedLineCount: number;
   readonly commitAttributionFindings: readonly PreCommitBlockingFinding[];
   readonly protectedStateFindings: readonly ProtectedStateFinding[];
+  readonly emergencyUseAuditFindings: readonly EmergencyUseAuditFinding[];
   readonly taskCardStatusFindings: readonly TaskCardStatusFinding[];
   readonly sameFileClaimFindings: readonly SameFileClaimOwnershipFinding[];
   readonly taskAuditFindings: ReturnType<typeof auditTasks>['findings'];
@@ -676,6 +700,17 @@ function buildPreCommitBlockingFindings(input: {
     });
   }
   findings.push(...input.commitAttributionFindings);
+  for (const finding of input.emergencyUseAuditFindings) {
+    findings.push({
+      code: finding.code,
+      source: 'emergency-use-audit',
+      file: finding.file,
+      detail: finding.detail,
+      requiredCommand: null,
+      classification: 'current-task',
+      data: finding
+    });
+  }
   for (const finding of input.encodingReport.findings) {
     findings.push({
       code: `ATM_ENCODING_${finding.issue.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
@@ -2702,6 +2737,70 @@ function readJsonFile(filePath: string): Record<string, unknown> | null {
   } catch {
     return null;
   }
+}
+
+function inspectEmergencyUseAudit(cwd: string, stagedFiles: readonly string[]): EmergencyUseAuditReport {
+  const useFiles = stagedFiles
+    .map(normalizeRelativePath)
+    .filter((entry) => /^\.atm\/runtime\/emergency\/uses\/[^/]+\.json$/i.test(entry));
+  const findings: EmergencyUseAuditFinding[] = [];
+  for (const useFile of useFiles) {
+    const use = readJsonFile(path.resolve(cwd, useFile));
+    const leaseId = typeof use?.leaseId === 'string' ? use.leaseId.trim() : '';
+    const leasePath = leaseId ? `.atm/runtime/emergency/leases/${leaseId}.json` : undefined;
+    const lease = leasePath ? readJsonFile(path.resolve(cwd, leasePath)) : null;
+    if (!leaseId || !lease) {
+      findings.push({
+        code: 'ATM_EMERGENCY_USE_LEASE_MISSING',
+        file: useFile,
+        leasePath,
+        detail: `Emergency use record ${useFile} must have a matching staged or tracked lease record.`
+      });
+      continue;
+    }
+    const usedCount = typeof lease.usedCount === 'number' ? lease.usedCount : Number(lease.usedCount ?? 0);
+    if (!Number.isFinite(usedCount) || usedCount < 1) {
+      findings.push({
+        code: 'ATM_EMERGENCY_USE_LEASE_NOT_USED',
+        file: useFile,
+        leasePath,
+        detail: `Emergency lease ${leaseId} must be marked used before committing use record ${useFile}.`
+      });
+    }
+    if (String(lease.permission ?? '') !== String(use?.permission ?? '')) {
+      findings.push({
+        code: 'ATM_EMERGENCY_USE_PERMISSION_MISMATCH',
+        file: useFile,
+        leasePath,
+        detail: `Emergency use permission ${String(use?.permission ?? '<missing>')} does not match lease ${String(lease.permission ?? '<missing>')}.`
+      });
+    }
+    const leaseTaskId = lease.taskId == null ? null : String(lease.taskId);
+    const useTaskId = use?.taskId == null ? null : String(use.taskId);
+    if (leaseTaskId && useTaskId && leaseTaskId !== useTaskId) {
+      findings.push({
+        code: 'ATM_EMERGENCY_USE_TASK_MISMATCH',
+        file: useFile,
+        leasePath,
+        detail: `Emergency use task ${useTaskId} does not match lease task ${leaseTaskId}.`
+      });
+    }
+    const leaseActorId = typeof lease.actorId === 'string' ? lease.actorId : null;
+    const useActorId = use?.actorId == null ? null : String(use.actorId);
+    if (leaseActorId && useActorId && leaseActorId !== useActorId) {
+      findings.push({
+        code: 'ATM_EMERGENCY_USE_ACTOR_MISMATCH',
+        file: useFile,
+        leasePath,
+        detail: `Emergency use actor ${useActorId} does not match lease actor ${leaseActorId}.`
+      });
+    }
+  }
+  return {
+    ok: findings.length === 0,
+    inspectedUseFiles: useFiles,
+    findings
+  };
 }
 
 function inferTaskIdsFromStagedFiles(stagedFiles: readonly string[]) {

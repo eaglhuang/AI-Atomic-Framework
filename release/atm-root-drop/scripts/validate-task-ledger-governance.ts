@@ -26,6 +26,7 @@ import { resolveNextDefaultOutputPath } from '../packages/cli/src/commands/share
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTaskflow } from '../packages/cli/src/commands/taskflow.ts';
 import { withTaskflowOperatorLane } from '../packages/cli/src/commands/emergency/context.ts';
+import { runHook } from '../packages/cli/src/commands/hook.ts';
 import { runTasks as runTasksBackend } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
 import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
@@ -1509,6 +1510,7 @@ try {
   await validateTaskImportRefreshClaimPreservation(tempRoot);
   await validateTaskImportDispatchMetadataPreservation(tempRoot);
   await validateTaskResidueClassification(tempRoot);
+  validateEmergencyUsePreCommitAudit(tempRoot);
   await validateTaskflowCloseOrchestration(tempRoot);
 
   if (!process.exitCode) {
@@ -2079,4 +2081,53 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(plannedDryRun.ok === true, 'taskflow close dry-run must accept active target plus planned planning mirror');
   assert(plannedDryRun.evidence.closeMode === 'normal-close', 'active target plus planned planning mirror must not route to ambiguous manual review');
   assert(plannedDryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'active target plus planned planning mirror must use tasks-close backend');
+}
+
+function validateEmergencyUsePreCommitAudit(tempRoot: string) {
+  const repo = makeHostRepo(tempRoot, 'emergency-use-precommit-audit');
+  initGitRepo(repo);
+  const leaseId = 'EMG-TASK-EMERGENCY-0001-validator';
+  const usePath = path.join(repo, '.atm', 'runtime', 'emergency', 'uses', '2026-06-13T00-00-00-000Z-EMG-TASK-EMERGENCY-0001-validator.json');
+  const leasePath = path.join(repo, '.atm', 'runtime', 'emergency', 'leases', `${leaseId}.json`);
+  writeJson(usePath, {
+    schemaId: 'atm.emergencyMaintenanceUse.v1',
+    leaseId,
+    taskId: 'TASK-EMERGENCY-0001',
+    actorId: 'validator',
+    permission: 'backend.tasks.reconcile',
+    surface: 'tasks reconcile',
+    usedAt: '2026-06-13T00:00:00.000Z',
+    reason: 'validator fixture',
+    command: 'node atm.mjs tasks reconcile --task TASK-EMERGENCY-0001 --actor validator --json',
+    result: 'authorized',
+    before: { leaseStatus: 'active', usedCount: 0 },
+    after: { leaseStatus: 'used', usedCount: 1 },
+    touchedFiles: ['.atm/history/tasks/TASK-EMERGENCY-0001.json']
+  });
+  execFileSync('git', ['add', '.atm/runtime/emergency/uses'], { cwd: repo, stdio: 'ignore' });
+  const missingLeaseHook = runHook(['pre-commit', '--cwd', repo]) as any;
+  assert(missingLeaseHook.ok === false, 'pre-commit must reject a staged emergency use record without its matching lease');
+  assert((missingLeaseHook.evidence?.emergencyUseAuditReport?.findings ?? []).some((finding: any) => finding.code === 'ATM_EMERGENCY_USE_LEASE_MISSING'), 'pre-commit must report ATM_EMERGENCY_USE_LEASE_MISSING');
+  execFileSync('git', ['reset', '--quiet'], { cwd: repo, stdio: 'ignore' });
+
+  writeJson(leasePath, {
+    schemaId: 'atm.emergencyMaintenanceLease.v1',
+    leaseId,
+    permission: 'backend.tasks.reconcile',
+    taskId: 'TASK-EMERGENCY-0001',
+    actorId: 'validator',
+    approvedAt: '2026-06-13T00:00:00.000Z',
+    expiresAt: '2026-06-13T00:30:00.000Z',
+    approvedBy: 'human',
+    approvalText: 'Human approved validator emergency use fixture',
+    allowedFlags: [],
+    reason: 'validator fixture',
+    status: 'used',
+    maxUses: 1,
+    usedCount: 1
+  });
+  execFileSync('git', ['add', '.atm/runtime/emergency'], { cwd: repo, stdio: 'ignore' });
+  const matchedLeaseHook = runHook(['pre-commit', '--cwd', repo]) as any;
+  assert(matchedLeaseHook.evidence?.emergencyUseAuditReport?.ok === true, 'pre-commit emergency audit must pass when use and used lease match');
+  assert(!(matchedLeaseHook.evidence?.blockingFindings ?? []).some((finding: any) => finding.source === 'emergency-use-audit'), 'matching emergency use and lease must not create emergency-use-audit blocking findings');
 }

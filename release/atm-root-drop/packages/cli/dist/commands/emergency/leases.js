@@ -131,7 +131,17 @@ export function consumeEmergencyLease(input) {
         surface: input.surface,
         usedAt,
         reason: input.reason,
-        command: input.command
+        command: input.command,
+        result: input.result ?? 'authorized',
+        before: input.before ?? {
+            leaseStatus: lease.status,
+            usedCount: lease.usedCount
+        },
+        after: input.after ?? {
+            leaseStatus: updated.status,
+            usedCount: updated.usedCount
+        },
+        touchedFiles: [...new Set((input.touchedFiles ?? []).map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean))].sort()
     };
     const usePath = path.join(usesDir(input.cwd), `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
     return {

@@ -3,8 +3,15 @@ export interface EmergencyPermissionDefinition {
     readonly id: EmergencyPermissionId;
     readonly summary: string;
     readonly protectedSurfaces: readonly string[];
+    readonly normalLane: string;
+    readonly riskTier: 'medium' | 'high' | 'critical';
     readonly defaultTtlMinutes: number;
     readonly defaultMaxUses: number;
+    readonly requiresTaskId: boolean;
+    readonly requiresActor: boolean;
+    readonly requiresHumanApprovalText: boolean;
+    readonly auditRequired: boolean;
+    readonly validatorTags: readonly string[];
 }
 export declare const emergencyPermissionRegistry: readonly EmergencyPermissionDefinition[];
 export declare function getEmergencyPermission(id: string): EmergencyPermissionDefinition | null;

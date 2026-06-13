@@ -34,6 +34,10 @@ export interface EmergencyMaintenanceUse {
   readonly usedAt: string;
   readonly reason: string | null;
   readonly command: string | null;
+  readonly result: 'authorized' | 'succeeded' | 'failed';
+  readonly before: Record<string, unknown>;
+  readonly after: Record<string, unknown>;
+  readonly touchedFiles: readonly string[];
 }
 
 export function emergencyRoot(cwd: string): string {
@@ -159,6 +163,10 @@ export function consumeEmergencyLease(input: {
   readonly flags: readonly string[];
   readonly reason: string | null;
   readonly command: string | null;
+  readonly before?: Record<string, unknown>;
+  readonly after?: Record<string, unknown>;
+  readonly touchedFiles?: readonly string[];
+  readonly result?: 'authorized' | 'succeeded' | 'failed';
 }): { lease: EmergencyMaintenanceLease; use: EmergencyMaintenanceUse; leasePath: string; usePath: string } {
   const lease = readEmergencyLease(input.cwd, input.leaseId);
   if (lease.status !== 'active') {
@@ -199,7 +207,17 @@ export function consumeEmergencyLease(input: {
     surface: input.surface,
     usedAt,
     reason: input.reason,
-    command: input.command
+    command: input.command,
+    result: input.result ?? 'authorized',
+    before: input.before ?? {
+      leaseStatus: lease.status,
+      usedCount: lease.usedCount
+    },
+    after: input.after ?? {
+      leaseStatus: updated.status,
+      usedCount: updated.usedCount
+    },
+    touchedFiles: [...new Set((input.touchedFiles ?? []).map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean))].sort()
   };
   const usePath = path.join(usesDir(input.cwd), `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
   return {
