@@ -8,24 +8,24 @@ import {
 
 export default defineCommandSpec({
   name: 'evidence',
-  summary: 'Add or verify task evidence for close/commit/PR governance gates.',
+  summary: 'Run validators as governed evidence, or add raw/manual evidence for close/commit/PR gates.',
   positional: [
     { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing', required: true }
   ],
   options: [
     commonCwdOption,
     { flag: '--task', value: 'id', summary: 'Task id to append or verify evidence.' },
-    { flag: '--actor', value: 'id', summary: 'Actor id for evidence add (or set ATM_ACTOR_ID).' },
-    { flag: '--kind', value: 'type', summary: 'Evidence kind for add: test|artifact|attestation|review|commit|waiver.' },
-    { flag: '--summary', value: 'text', summary: 'Optional short evidence summary for add.' },
-    { flag: '--artifacts', value: 'csv', summary: 'Optional artifact path list for add.' },
-    { flag: '--freshness', value: 'type', summary: 'Evidence freshness for add: fresh|historical-reference|draft (default: fresh).' },
-    { flag: '--validators', value: 'csv', summary: 'Optional validator pass list recorded with the evidence.' },
-    { flag: '--command', value: 'text', summary: 'Optional command string for runnable evidence proof (requires exit code and sha256 outputs).' },
-    { flag: '--command-runs', value: 'json-file', summary: 'Append multiple commandRuns from a JSON array or {commandRuns:[]} cache file.' },
-    { flag: '--exit-code', value: 'number', summary: 'Exit code paired with --command evidence.' },
-    { flag: '--stdout-sha256', value: 'sha256', summary: 'stdout digest paired with --command evidence.' },
-    { flag: '--stderr-sha256', value: 'sha256', summary: 'stderr digest paired with --command evidence.' },
+    { flag: '--actor', value: 'id', summary: 'Actor id for evidence run/add (or set ATM_ACTOR_ID).' },
+    { flag: '--kind', value: 'type', summary: 'Evidence kind for raw evidence add or evidence run: test|artifact|attestation|review|commit|waiver.' },
+    { flag: '--summary', value: 'text', summary: 'Optional short evidence summary.' },
+    { flag: '--artifacts', value: 'csv', summary: 'Optional artifact path list recorded with the evidence.' },
+    { flag: '--freshness', value: 'type', summary: 'Raw evidence add freshness: fresh|historical-reference|draft (default: fresh).' },
+    { flag: '--validators', value: 'csv', summary: 'Validator pass list; normal validator capture should use evidence run with this flag.' },
+    { flag: '--command', value: 'text', summary: 'Command to run/capture. With evidence add this is raw metadata and also requires exit code plus sha256 outputs.' },
+    { flag: '--command-runs', value: 'json-file', summary: 'Raw evidence add only: append commandRuns from a JSON array or {commandRuns:[]} cache file.' },
+    { flag: '--exit-code', value: 'number', summary: 'Raw evidence add only: exit code paired with --command evidence.' },
+    { flag: '--stdout-sha256', value: 'sha256', summary: 'Raw evidence add only: stdout digest paired with --command evidence.' },
+    { flag: '--stderr-sha256', value: 'sha256', summary: 'Raw evidence add only: stderr digest paired with --command evidence.' },
     { flag: '--runner-kind', value: 'kind', summary: 'Runner kind for command proof: dev-source|frozen-runner|external.' },
     { flag: '--source-commit', value: 'sha', summary: 'Source commit paired with dev-source command proof.' },
     { flag: '--reason', value: 'text', summary: 'Optional rationale for git-head-backfill.' },
@@ -37,13 +37,13 @@ export default defineCommandSpec({
     commonHelpOption
   ],
   examples: [
-    'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --summary "governance validator passed" --artifacts reports/governance.json --json',
-    'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --freshness fresh --command "npm run typecheck" --exit-code 0 --stdout-sha256 sha256:1111111111111111111111111111111111111111111111111111111111111111 --stderr-sha256 sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --validators typecheck,validate:cli --json',
-    'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --command-runs .atm/runtime/command-runs/batch-validators.json --validators typecheck,validate:cli --json',
+    'node atm.mjs evidence run --task ATM-GOV-0104 --actor codex-main --command "npm run typecheck" --validators typecheck --json',
+    'node atm.mjs evidence run --task ATM-GOV-0104 --actor codex-main --command "npm run validate:cli" --validators validate:cli --recent-run --json',
+    'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --summary "raw artifact evidence" --artifacts reports/governance.json --json',
+    'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --freshness fresh --command "npm run typecheck" --exit-code 0 --stdout-sha256 sha256:1111111111111111111111111111111111111111111111111111111111111111 --stderr-sha256 sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --validators typecheck --json',
     'node atm.mjs evidence git-head-backfill --actor codex-main --reason "Backfill evidence for a pre-ATM HEAD commit" --json',
     'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json',
     'node atm.mjs evidence validators --list --task ATM-GOV-0104 --json',
-    'node atm.mjs evidence run --task ATM-GOV-0104 --actor Augment --command "npm run typecheck" --validators typecheck --recent-run --json',
     'node atm.mjs evidence missing --task ATM-GOV-0104 --actor Augment --json'
   ]
 });

@@ -141,18 +141,17 @@ node atm.mjs next --claim \
 Now the AI does the actual work. The rules are simple:
 
 - **Only edit files inside `allowedFiles`** from the claim response.
-- **Run the validators declared on the task card** (typecheck, lint, the focused test, whatever the card listed).
-- **Record evidence as command runs**, not as chat summaries. ATM wants the command, exit code, and output hashes — not "I think it works".
+- **Run the validators declared on the task card through `evidence run`** when you are ready to record them (typecheck, lint, the focused test, whatever the card listed).
+- **Record evidence as command runs**, not as chat summaries or plain terminal history. ATM wants the command, exit code, and output hashes, not "I think it works".
 
-Typical commands you might run yourself:
+Normal validator capture uses `evidence run`:
 
 ```bash
-npm run typecheck
-npm run validate:cli
-# any focused test the task card pointed at
+node atm.mjs evidence run --task TASK-XXXX-0001 --actor <actor> --command "npm run typecheck" --validators typecheck --json
+node atm.mjs evidence run --task TASK-XXXX-0001 --actor <actor> --command "npm run validate:cli" --validators validate:cli --json
 ```
 
-ATM will accept these as evidence because they are reproducible. A paragraph that says "tests passed" is not evidence.
+Running `npm run typecheck` in a plain terminal can help you debug, but it is not task evidence until ATM captures it with `evidence run`. `evidence add` is the raw/manual surface for operators who already have the exact command, exit code, and sha256 output digests.
 
 ## Step 6: Preview the close
 

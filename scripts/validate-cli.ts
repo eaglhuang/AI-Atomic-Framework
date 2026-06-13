@@ -380,6 +380,12 @@ const nextHelp = await runAtm(['next', '--help'], root);
 const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
 assert(nextUsageText.includes('prefers the explicit --task'), 'next --help must explain that the recommended claim command prefers --task TASK-XXX form when the task is already known');
 
+const evidenceHelp = await runAtm(['evidence', '--help'], root);
+const evidenceUsageText = JSON.stringify(evidenceHelp.parsed.evidence?.usage ?? {});
+assert(evidenceUsageText.includes('evidence run --task ATM-GOV-0104'), 'evidence --help examples must put evidence run on the normal validator capture path');
+assert(evidenceUsageText.includes('Raw evidence add only'), 'evidence --help must label evidence add metadata flags as raw/manual surface');
+assert(evidenceUsageText.indexOf('evidence run --task ATM-GOV-0104') < evidenceUsageText.indexOf('evidence add --task ATM-GOV-0104'), 'evidence --help examples must show evidence run before evidence add');
+
 const emergencyHelp = await runAtm(['emergency', '--help'], root);
 assert(emergencyHelp.exitCode === 0, 'emergency --help must exit 0');
 assertReadable(emergencyHelp, 'emergency --help');
@@ -1333,6 +1339,18 @@ try {
 
     // Register active session to satisfy evidence add constraint
     await runAtm(['next', '--claim', '--actor', 'Antigravity', '--task', 'TASK-AAO-0063'], autoLinkTempWorkspace);
+
+    const missingBeforeEvidence = await runAtm([
+      'evidence', 'missing',
+      '--task', 'TASK-AAO-0063',
+      '--actor', 'Antigravity'
+    ], autoLinkTempWorkspace);
+    assert(missingBeforeEvidence.parsed.ok === false, 'evidence missing must report absent validator evidence before evidence capture');
+    const absentFinding = missingBeforeEvidence.parsed.evidence?.blockingFindings
+      ?.find((finding: any) => finding.code === 'ATM_EVIDENCE_VALIDATOR_ABSENT');
+    assert(absentFinding, 'evidence missing must include an absent validator finding');
+    assert(String(absentFinding?.requiredCommand ?? '').startsWith('node atm.mjs evidence run '), 'missing evidence remediation must prefer evidence run');
+    assert(String(absentFinding?.summary ?? '').includes('Use evidence run'), 'missing evidence summary must direct operators to evidence run');
 
     // 2.1: evidence add without --validators (auto-link check)
     const addRes1 = await runAtm([

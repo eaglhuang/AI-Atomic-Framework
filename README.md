@@ -51,7 +51,7 @@ ATM is not just an atom runner. It is the route, scope, evidence, close, and han
 | --- | --- |
 | Deterministic routing | `atm next` recommends the official next action for a real user request. |
 | Scope control | Locks file, package, or capability scope before mutation. |
-| Evidence-first validation | Guards, tests, reports, and logs become durable evidence instead of terminal noise. |
+| Evidence-first validation | `evidence run` turns guards, tests, reports, and logs into durable command-backed evidence instead of terminal noise. |
 | First-touch onboarding | `atm welcome`, ATMChart, and agent integrations make the local route discoverable. |
 | Portable contracts | Core contracts stay neutral across languages, repositories, and agent environments. |
 | Replaceable governance bundle | Tasks, rules, artifacts, evidence, and adapters can be swapped without forking core semantics. |
