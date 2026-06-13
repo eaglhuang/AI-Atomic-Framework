@@ -57,7 +57,7 @@ import {
 import {
   findTaskClaimDependencyBlockers,
   type TaskClaimDependencyBlocker
-} from './tasks/dependency-gate.ts';
+} from './tasks/dependency-gates.ts';
 import {
   evaluateTaskClaimAdmission,
   evaluateTaskDoneCloseAdmission,
@@ -1863,8 +1863,8 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
 }
 
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';
-export { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.ts';
-export type { TaskClaimDependencyBlocker } from './tasks/dependency-gate.ts';
+export { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
+export type { TaskClaimDependencyBlocker } from './tasks/dependency-gates.ts';
 
 async function runTasksReset(argv: string[]) {
   const options = parseResetOptions(argv);

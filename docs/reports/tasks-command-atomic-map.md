@@ -18,6 +18,7 @@ This report does not change production command behavior. It exists to define the
 | `tasks.status.triangulation` | Status / claim / planning mirror truth triangulation | `packages/cli/src/commands/tasks.ts` | Compares live ledger, planning frontmatter, and last transition event. |
 | `tasks.residue.diagnostics` | Residue bucket classification and next-command recommendation | `packages/cli/src/commands/tasks.ts` | Produces `complete-but-unfinalized`, `interrupted-close`, `planning-mirror-only`, etc. |
 | `tasks.scope.locking` | Scope-lock and path gating for tasks | `packages/cli/src/commands/tasks.ts` | Governs current task lock state and write surface restriction. |
+| `tasks.surface.invariants` | Shared closeout routing, backend selection, and validator strategy | `packages/cli/src/commands/tasks/surface-invariants.ts`, `packages/cli/src/commands/taskflow/close-orchestration.ts` | `surface-invariants.ts` owns close mode / backend policy and close evidence validator constants; `close-orchestration.ts` consumes the strategy without owning the table. |
 | `tasks.ledger.import.verify` | Import / verify / legacy-ledger migration surfaces | `packages/cli/src/commands/tasks.ts` | Maintains task-store and task-event synchronization. |
 | `next.imported-task.routing` | Imported-task queue selection and claim routing | `packages/cli/src/commands/next.ts` | Finds the queue head and prepares claimable tasks. |
 | `next.route.predicates` | Predicate library for routing decisions | `packages/cli/src/commands/next/route-predicates.ts` | Shared logic for dependency gating, claim state, explicit route matching, and closed-task checks. |
@@ -27,6 +28,7 @@ This report does not change production command behavior. It exists to define the
 - Closeout provenance must be command-backed, not just frontmatter-backed.
 - A task is only claimable when dependency satisfaction and lifecycle state both permit it.
 - Historical delivery is part of close validation when the card declares it.
+- Taskflow close mode, backend selection, and close evidence validator policy must be owned by `tasks.surface.invariants`, not duplicated inside orchestration code.
 - Scope locks and residue diagnostics are separate concerns and must not be conflated with delivery success.
 - Closed task truth must stay consistent across live ledger, planning mirror, and last transition evidence.
 
@@ -40,7 +42,8 @@ This report does not change production command behavior. It exists to define the
 2. Dependency gating is split between `tasks.ts` close / claim flows and `next/route-predicates.ts`.
 3. Lifecycle state checks appear in both queue selection and claim admission.
 4. Historical delivery appears in close, reconcile, and residue diagnostics.
-5. Scope-lock and residue diagnostics share task-truth context but should remain separate atoms.
+5. Taskflow close strategy previously lived directly inside `taskflow/close-orchestration.ts`; `tasks.surface.invariants` now owns the strategy table.
+6. Scope-lock and residue diagnostics share task-truth context but should remain separate atoms.
 
 ## Caller Surfaces
 
@@ -53,6 +56,14 @@ This report does not change production command behavior. It exists to define the
 - Keep `tasks.command.dispatch` as the entrypoint atom.
 - Split governance into separate atoms for closeout, claim lifecycle, reconcile, status triangulation, and residue diagnostics.
 - Keep route predicates as a reusable routing library rather than duplicating state checks inside `next.ts`.
+- Keep closeout strategy as `tasks.surface.invariants`, with taskflow orchestration consuming the strategy rather than owning it.
+
+## TASK-CID-0062 Update
+
+- `packages/cli/src/commands/tasks/dependency-gates.ts` is the plural dependency admission facade. It preserves `dependency-gate.ts` as the implementation owner while giving `tasks.ts` a stable Strategy Map entry point.
+- `packages/cli/src/commands/tasks/surface-invariants.ts` owns taskflow close mode selection, close backend selection, and close evidence validator policy.
+- `packages/cli/src/commands/taskflow/close-orchestration.ts` now consumes `resolveTaskflowCloseMode`, `resolveTaskflowCloseBackend`, and close evidence validator constants from `tasks.surface.invariants`.
+- `scripts/validate-cli.ts` now verifies the dependency admission facade and the invariant surface exports required by `TASK-CID-0062`.
 
 ## TASK-CID-0058 Update
 
@@ -67,6 +78,7 @@ This report does not change production command behavior. It exists to define the
 - Required sections: `Scope`, `Atom List`, `Governance Invariants`, `Duplicate Logic Hotspots`, `Caller Surfaces`, `Extraction Targets`, `Validator Notes`.
 - The validator should fail closed if any required section is missing or if the atom list does not mention the three caller surfaces.
 - TASK-CID-0058 requires the report to mention `packages/cli/src/commands/tasks/command-dispatch.ts` so future map checks keep the dispatch atom visible.
+- TASK-CID-0062 requires the report to mention `packages/cli/src/commands/tasks/dependency-gates.ts` and `packages/cli/src/commands/tasks/surface-invariants.ts` so future map checks keep the governance invariant owner modules visible.
 
 ## Report Summary
 

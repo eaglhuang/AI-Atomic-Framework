@@ -209,6 +209,26 @@ for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-c
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
+const dependencyGatesSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks/dependency-gates.ts'), 'utf8');
+assert(
+  dependencyGatesSource.includes("from './dependency-gate.ts'"),
+  'dependency-gates facade must preserve dependency-gate.ts as the implementation owner'
+);
+const surfaceInvariantsSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks/surface-invariants.ts'), 'utf8');
+for (const symbol of [
+  'resolveTaskflowCloseMode',
+  'resolveTaskflowCloseBackend',
+  'taskflowCloseEvidenceValidators',
+  'taskflowCloseGovernanceEvidenceValidator'
+]) {
+  assert(surfaceInvariantsSource.includes(symbol), `surface-invariants missing required closeout strategy export: ${symbol}`);
+}
+const tasksCommandSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks.ts'), 'utf8');
+assert(
+  tasksCommandSource.includes("from './tasks/dependency-gates.ts'"),
+  'tasks.ts must consume dependency admission through the plural dependency-gates facade'
+);
+
 const cliIndex = readFileSync(path.join(root, 'packages/cli/src/index.ts'), 'utf8');
 for (const commandName of fixture.commands) {
   assert(cliIndex.includes(`commandName: '${commandName}'`), `index.ts missing command descriptor: ${commandName}`);
