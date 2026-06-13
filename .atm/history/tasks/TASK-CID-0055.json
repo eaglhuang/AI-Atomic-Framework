@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0055",
+  "title": "Historical delivery atom extraction and provenance policy",
+  "status": "done",
+  "milestone": "M8",
+  "dependencies": [
+    "TASK-CID-0051",
+    "TASK-CID-0052"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/historical-delivery.ts",
+    "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/historical-delivery.ts",
+    "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing git history",
+    "Broad retroactive cleanup of old task ledgers"
+  ],
+  "nonGoals": [
+    "Do not let a broad mixed commit silently become trusted task delivery."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.historical-delivery-atom",
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0055-historical-delivery-atom-extraction-and-provenance-policy.task.md",
+    "sectionTitle": "TASK-CID-0055",
+    "headingLine": 46,
+    "hash": "b6d595e7fdc37113"
+  },
+  "importedAt": "2026-06-13T15:05:11.259Z",
+  "lastTransitionId": "2026-06-13T15-13-28-040Z-close-ab6678b715b3",
+  "lastTransitionAt": "2026-06-13T15:13:28.040Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T15:05:17.131Z",
+  "promotedAt": "2026-06-13T15:05:17.133Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-64602264029a",
+    "claimedAt": "2026-06-13T15:05:17.137Z",
+    "heartbeatAt": "2026-06-13T15:13:28.038Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0055.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T15:05:17.137Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613150517-captain-TASK-CID-0055-56478092bd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0055",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0055.*",
+      ".atm/history/task-events/TASK-CID-0055/**",
+      ".atm/history/tasks/TASK-CID-0055.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts",
+      "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3414df2bfbd989030a17bffff034c4f38f6592e609c1f6fda2de3576c6e6b775",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T15:05:17.160Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T15:13:28.038Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613150517-captain-TASK-CID-0055-56478092bd",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0055.closure-packet.json"
+}
