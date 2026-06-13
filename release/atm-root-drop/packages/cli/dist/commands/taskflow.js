@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from './tasks/public-surface.js';
@@ -347,6 +347,57 @@ function resolvePlanningPath(cwd, planningMirrorPath) {
         reason: null
     };
 }
+function quoteYamlString(value) {
+    return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+function upsertFrontmatterField(frontmatter, key, value) {
+    const pattern = new RegExp(`^${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:.*$`, 'm');
+    if (pattern.test(frontmatter)) {
+        return frontmatter.replace(pattern, `${key}: ${value}`);
+    }
+    const trimmed = frontmatter.replace(/\s+$/, '');
+    return `${trimmed}\n${key}: ${value}`;
+}
+function applyPlanningCardCloseback(input) {
+    const planning = resolvePlanningPath(input.cwd, input.planningMirrorPath);
+    if (!planning.repoRoot || !planning.relativePath) {
+        return null;
+    }
+    const absolutePath = path.resolve(planning.repoRoot, planning.relativePath);
+    if (!existsSync(absolutePath)) {
+        throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_CARD_MISSING', 'taskflow close could not find the planning card for closeback.', {
+            exitCode: 1,
+            details: { planningMirrorPath: input.planningMirrorPath, planning }
+        });
+    }
+    const content = readFileSync(absolutePath, 'utf8');
+    const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
+    if (!match) {
+        throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_FRONTMATTER_MISSING', 'taskflow close requires planning card frontmatter for governed closeback.', {
+            exitCode: 1,
+            details: { planningMirrorPath: input.planningMirrorPath, planning }
+        });
+    }
+    const lineEnding = content.includes('\r\n') ? '\r\n' : '\n';
+    const updatedFields = ['status', 'completed_at', 'completed_by_agent'];
+    let frontmatter = match[1].replace(/\r\n/g, '\n');
+    frontmatter = upsertFrontmatterField(frontmatter, 'status', 'done');
+    frontmatter = upsertFrontmatterField(frontmatter, 'completed_at', quoteYamlString(new Date().toISOString()));
+    frontmatter = upsertFrontmatterField(frontmatter, 'completed_by_agent', quoteYamlString(input.actorId));
+    if (input.historicalDeliveryRefs[0]) {
+        frontmatter = upsertFrontmatterField(frontmatter, 'delivery_commit', quoteYamlString(input.historicalDeliveryRefs[0]));
+        updatedFields.push('delivery_commit');
+    }
+    const rest = content.slice(match[0].length);
+    const normalizedFrontmatter = frontmatter.split('\n').join(lineEnding);
+    writeFileSync(absolutePath, `---${lineEnding}${normalizedFrontmatter}${lineEnding}---${lineEnding}${rest}`, 'utf8');
+    return {
+        mode: 'frontmatter-closeback',
+        repoRoot: planning.repoRoot,
+        relativePath: planning.relativePath,
+        updatedFields
+    };
+}
 function resolvePlanningRosterPaths(input) {
     const planning = resolvePlanningPath(input.cwd, input.planningMirrorPath);
     if (!planning.repoRoot || !planning.relativePath) {
@@ -633,6 +684,14 @@ async function runTaskflowClose(parsed, cwd) {
             forceImport: diagnosis.bucket === 'stale-import'
         });
         const backendResult = await withTaskflowOperatorLane(() => runTasks(backendArgv));
+        const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok
+            ? applyPlanningCardCloseback({
+                cwd,
+                planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+                actorId,
+                historicalDeliveryRefs
+            })
+            : null;
         let rosterCloseback = null;
         if (closebackPlan.writerBoundary.rosterClosebackCommand
             && closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
@@ -700,6 +759,7 @@ async function runTaskflowClose(parsed, cwd) {
                     diagnostics,
                     closebackPlan,
                     backendResult,
+                    planningCardCloseback,
                     rosterCloseback,
                     governedCommitBundle,
                     residueDiagnosis: diagnosis,

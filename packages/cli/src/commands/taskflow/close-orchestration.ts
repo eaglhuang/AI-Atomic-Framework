@@ -135,20 +135,28 @@ function resolveBackendSurface(bucket: TaskResidueBucket, closeMode: TaskflowClo
 export function resolveTaskflowCloseMode(input: {
   bucket: TaskResidueBucket;
   liveStatus: string | null;
+  planningStatus?: string | null;
   historicalDeliveryRefs: string[];
   planningAuthorityDeliveryOk?: boolean;
   divergenceCount: number;
 }): TaskflowCloseMode {
+  const liveStatus = normalizeLifecycleStatus(input.liveStatus);
+  const planningStatus = normalizeLifecycleStatus(input.planningStatus ?? null);
+  const activeLiveLedger = isActiveLedgerStatus(liveStatus);
+  const openPlanningMirror = isOpenPlanningStatus(planningStatus);
   if (input.bucket === 'ambiguous-manual-review') {
     if (input.planningAuthorityDeliveryOk && input.historicalDeliveryRefs.length > 0) {
       return 'historical-delivery-close';
     }
+    if (activeLiveLedger && openPlanningMirror) {
+      return 'normal-close';
+    }
     if (
       input.divergenceCount === 0
-      && input.liveStatus
-      && !['done', 'blocked', 'abandoned'].includes(input.liveStatus)
+      && liveStatus
+      && !['done', 'blocked', 'abandoned'].includes(liveStatus)
     ) {
-      return input.historicalDeliveryRefs.length > 0 ? 'historical-delivery-close' : 'normal-close';
+      return 'normal-close';
     }
     return 'ambiguous-manual-review';
   }
@@ -161,8 +169,11 @@ export function resolveTaskflowCloseMode(input: {
   if (input.bucket === 'complete-but-unfinalized' || input.bucket === 'source-done-governance-incomplete') {
     return 'historical-delivery-close';
   }
-  if (input.liveStatus === 'done') {
+  if (liveStatus === 'done') {
     return 'ambiguous-manual-review';
+  }
+  if (activeLiveLedger && openPlanningMirror) {
+    return 'normal-close';
   }
   if (input.historicalDeliveryRefs.length > 0) {
     return 'historical-delivery-close';
@@ -171,6 +182,20 @@ export function resolveTaskflowCloseMode(input: {
     return 'normal-close';
   }
   return 'ambiguous-manual-review';
+}
+
+function normalizeLifecycleStatus(status: string | null): string | null {
+  const normalized = String(status ?? '').trim().toLowerCase().replace(/-/g, '_');
+  return normalized || null;
+}
+
+function isActiveLedgerStatus(status: string | null): boolean {
+  return !!status && !['done', 'blocked', 'abandoned'].includes(status);
+}
+
+function isOpenPlanningStatus(status: string | null): boolean {
+  if (!status) return true;
+  return ['planned', 'open', 'ready', 'running', 'in_progress', 'review'].includes(status);
 }
 
 export function buildClosebackPlan(input: {
@@ -201,6 +226,7 @@ export function buildClosebackPlan(input: {
   const closeMode = resolveTaskflowCloseMode({
     bucket: input.diagnosis.bucket,
     liveStatus: input.diagnosis.triangulation.liveLedger.status,
+    planningStatus: input.diagnosis.triangulation.planningFrontmatter.status,
     historicalDeliveryRefs: input.historicalDeliveryRefs,
     planningAuthorityDeliveryOk: input.planningAuthorityDeliveryGate?.ok === true,
     divergenceCount: input.diagnosis.triangulation.divergence.length

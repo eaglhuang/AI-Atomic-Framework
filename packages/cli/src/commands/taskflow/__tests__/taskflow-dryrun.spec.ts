@@ -171,7 +171,7 @@ function initGitRepo(repo: string) {
   execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
 }
 
-async function makeDualRepoCloseFixture(label: string) {
+async function makeDualRepoCloseFixture(label: string, options: { closePlanningStatus?: string } = {}) {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-close-${label}-`));
   const targetRepo = path.join(tempRoot, 'target');
   const planningRepo = path.join(tempRoot, 'planning');
@@ -315,7 +315,7 @@ async function makeDualRepoCloseFixture(label: string) {
     '---',
     `task_id: ${fixtureTaskId}`,
     'title: "Dual repo close fixture"',
-    'status: done',
+    `status: ${options.closePlanningStatus ?? 'done'}`,
     '---',
     `# ${fixtureTaskId}`,
     ''
@@ -342,6 +342,42 @@ assert.ok(dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includ
 assert.ok(dryRunClose.evidence.governedCommitBundle.planningRepo.stageFiles.includes(`docs/tasks/${dryRunFixture.taskId}.task.md`));
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.targetRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage target repo');
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.planningRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage planning repo');
+
+const normalLaneFixture = await makeDualRepoCloseFixture('normal-lane-planned', { closePlanningStatus: 'planned' });
+const normalLaneDryRun = await runTaskflow([
+  'close',
+  '--cwd', normalLaneFixture.targetRepo,
+  '--profile', normalLaneFixture.profilePath,
+  '--task', normalLaneFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', normalLaneFixture.deliveryCommit,
+  '--json'
+]) as any;
+assert.equal(normalLaneDryRun.ok, true);
+assert.equal(normalLaneDryRun.evidence.closeMode, 'normal-close', 'active target ledger plus open planning card must stay on the normal close lane');
+assert.equal(normalLaneDryRun.evidence.closebackPlan.backendSurface, 'tasks-close', 'normal close lane must route to tasks-close backend');
+const normalLaneStage = await runTaskflow([
+  'close',
+  '--cwd', normalLaneFixture.targetRepo,
+  '--profile', normalLaneFixture.profilePath,
+  '--task', normalLaneFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', normalLaneFixture.deliveryCommit,
+  '--write',
+  '--no-commit',
+  '--json'
+]) as any;
+assert.equal(normalLaneStage.evidence.closeMode, 'normal-close');
+assert.equal(normalLaneStage.evidence.planningCardCloseback?.mode, 'frontmatter-closeback', 'taskflow close must update the planning card in the same closeback story');
+const normalLanePlanningCard = readFileSync(normalLaneFixture.planPath, 'utf8');
+assert.ok(normalLanePlanningCard.includes('status: done'), 'taskflow close must mark the planning card done');
+assert.ok(normalLanePlanningCard.includes('completed_by_agent: "validator"'), 'taskflow close must record the planning closeback actor');
+assert.ok(normalLanePlanningCard.includes(`delivery_commit: "${normalLaneFixture.deliveryCommit}"`), 'taskflow close must record the delivery commit on the planning card');
+assert.deepEqual(
+  execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: normalLaneFixture.planningRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean),
+  ['docs/tasks/README.md', `docs/tasks/${normalLaneFixture.taskId}.task.md`],
+  'normal close lane must exact-stage only the planning closeback bundle'
+);
 
 const stageOnlyFixture = await makeDualRepoCloseFixture('stageonly');
 const stageOnlyTargetHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: stageOnlyFixture.targetRepo, encoding: 'utf8' }).trim();

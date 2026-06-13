@@ -2047,4 +2047,36 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(dryRun.evidence.governedCommitBundle?.commitMode === 'dry-run', 'taskflow close dry-run bundle must report dry-run commit mode');
   assert(dryRun.evidence.governedCommitBundle?.targetRepo?.stageFiles?.includes(`.atm/history/tasks/${taskId}.json`), 'taskflow close bundle must include target task json');
   assert(dryRun.evidence.governedCommitBundle?.planningRepo?.stageFiles?.includes(planRelativePath), 'taskflow close bundle must include planning card path');
+
+  const plannedTaskId = 'TASK-CLOSE-ORCH-0002';
+  const plannedPlanRelativePath = 'docs/tasks/TASK-CLOSE-ORCH-0002.task.md';
+  const plannedPlanPath = path.join(repo, plannedPlanRelativePath);
+  writeFileSync(plannedPlanPath, [
+    '---',
+    `task_id: ${plannedTaskId}`,
+    'title: "Taskflow close planned mirror fixture"',
+    'status: planned',
+    '---',
+    `# ${plannedTaskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${plannedTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: plannedTaskId,
+    title: 'Taskflow close planned mirror fixture',
+    status: 'running',
+    related_plan: plannedPlanRelativePath,
+    source: { planPath: plannedPlanRelativePath, sectionTitle: plannedTaskId, headingLine: 1, hash: 'taskflow-close-planned' }
+  });
+  const plannedDryRun = await runTaskflow([
+    'close',
+    '--cwd', repo,
+    '--task', plannedTaskId,
+    '--profile', governedProfilePath,
+    '--historical-delivery', '0123456789abcdef',
+    '--json'
+  ]) as any;
+  assert(plannedDryRun.ok === true, 'taskflow close dry-run must accept active target plus planned planning mirror');
+  assert(plannedDryRun.evidence.closeMode === 'normal-close', 'active target plus planned planning mirror must not route to ambiguous manual review');
+  assert(plannedDryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'active target plus planned planning mirror must use tasks-close backend');
 }

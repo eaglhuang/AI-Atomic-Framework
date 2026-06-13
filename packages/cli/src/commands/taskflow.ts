@@ -63,6 +63,13 @@ interface TaskflowGovernedCommitBundle {
   recoveryCommand: string | null;
 }
 
+interface PlanningCardCloseback {
+  mode: 'frontmatter-closeback';
+  repoRoot: string;
+  relativePath: string;
+  updatedFields: string[];
+}
+
 function buildTasksNewCommand(input: {
   taskId?: string | null;
   outputPath?: string | null;
@@ -458,6 +465,65 @@ function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { 
   };
 }
 
+function quoteYamlString(value: string): string {
+  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+function upsertFrontmatterField(frontmatter: string, key: string, value: string): string {
+  const pattern = new RegExp(`^${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:.*$`, 'm');
+  if (pattern.test(frontmatter)) {
+    return frontmatter.replace(pattern, `${key}: ${value}`);
+  }
+  const trimmed = frontmatter.replace(/\s+$/, '');
+  return `${trimmed}\n${key}: ${value}`;
+}
+
+function applyPlanningCardCloseback(input: {
+  cwd: string;
+  planningMirrorPath: string | null;
+  actorId: string;
+  historicalDeliveryRefs: string[];
+}): PlanningCardCloseback | null {
+  const planning = resolvePlanningPath(input.cwd, input.planningMirrorPath);
+  if (!planning.repoRoot || !planning.relativePath) {
+    return null;
+  }
+  const absolutePath = path.resolve(planning.repoRoot, planning.relativePath);
+  if (!existsSync(absolutePath)) {
+    throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_CARD_MISSING', 'taskflow close could not find the planning card for closeback.', {
+      exitCode: 1,
+      details: { planningMirrorPath: input.planningMirrorPath, planning }
+    });
+  }
+  const content = readFileSync(absolutePath, 'utf8');
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
+  if (!match) {
+    throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_FRONTMATTER_MISSING', 'taskflow close requires planning card frontmatter for governed closeback.', {
+      exitCode: 1,
+      details: { planningMirrorPath: input.planningMirrorPath, planning }
+    });
+  }
+  const lineEnding = content.includes('\r\n') ? '\r\n' : '\n';
+  const updatedFields = ['status', 'completed_at', 'completed_by_agent'];
+  let frontmatter = match[1].replace(/\r\n/g, '\n');
+  frontmatter = upsertFrontmatterField(frontmatter, 'status', 'done');
+  frontmatter = upsertFrontmatterField(frontmatter, 'completed_at', quoteYamlString(new Date().toISOString()));
+  frontmatter = upsertFrontmatterField(frontmatter, 'completed_by_agent', quoteYamlString(input.actorId));
+  if (input.historicalDeliveryRefs[0]) {
+    frontmatter = upsertFrontmatterField(frontmatter, 'delivery_commit', quoteYamlString(input.historicalDeliveryRefs[0]));
+    updatedFields.push('delivery_commit');
+  }
+  const rest = content.slice(match[0].length);
+  const normalizedFrontmatter = frontmatter.split('\n').join(lineEnding);
+  writeFileSync(absolutePath, `---${lineEnding}${normalizedFrontmatter}${lineEnding}---${lineEnding}${rest}`, 'utf8');
+  return {
+    mode: 'frontmatter-closeback',
+    repoRoot: planning.repoRoot,
+    relativePath: planning.relativePath,
+    updatedFields
+  };
+}
+
 function resolvePlanningRosterPaths(input: {
   cwd: string;
   planningMirrorPath: string | null;
@@ -782,6 +848,14 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       forceImport: diagnosis.bucket === 'stale-import'
     });
     const backendResult = await withTaskflowOperatorLane(() => runTasks(backendArgv));
+    const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok
+      ? applyPlanningCardCloseback({
+        cwd,
+        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+        actorId,
+        historicalDeliveryRefs
+      })
+      : null;
     let rosterCloseback: Record<string, unknown> | null = null;
     if (
       closebackPlan.writerBoundary.rosterClosebackCommand
@@ -858,6 +932,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           diagnostics,
           closebackPlan,
           backendResult,
+          planningCardCloseback,
           rosterCloseback,
           governedCommitBundle,
           residueDiagnosis: diagnosis,
