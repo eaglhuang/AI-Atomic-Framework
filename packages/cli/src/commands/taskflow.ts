@@ -54,6 +54,15 @@ interface TaskflowCommitRepoBundle {
   indexIsolation?: TaskflowIndexIsolation;
 }
 
+interface TaskflowScopeAmendmentProposal {
+  required: boolean;
+  candidateFiles: string[];
+  reason: string | null;
+  remediationCommand: string | null;
+  humanReviewRequired: boolean;
+  notes: string[];
+}
+
 interface TaskflowGovernedCommitBundle {
   schemaId: 'atm.taskflowGovernedCommitBundle.v1';
   taskId: string;
@@ -68,6 +77,15 @@ interface TaskflowGovernedCommitBundle {
   planningFiles: string[];
   excludedDirtyFiles: string[];
   excludedReasons: Record<string, string>;
+  scopeAmendment: TaskflowScopeAmendmentProposal;
+}
+
+interface TaskflowDeliveryCommit {
+  repoRoot: string;
+  stageFiles: string[];
+  commitMessage: string;
+  commitSha: string | null;
+  status: 'committed';
 }
 
 interface PlanningCardCloseback {
@@ -468,6 +486,50 @@ function taskflowPathMatches(filePath: string, declaredPath: string): boolean {
   return file === declared || file.startsWith(`${declared}/`);
 }
 
+function isDirectoryStyleDeclaration(repoRoot: string, declaredPath: string): boolean {
+  const normalized = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '');
+  if (!normalized) return false;
+  if (normalized.endsWith('/')) return true;
+  const absolutePath = path.resolve(repoRoot, normalized);
+  return existsSync(absolutePath) && statSync(absolutePath).isDirectory();
+}
+
+function buildScopeAmendmentProposal(input: {
+  taskId: string;
+  actorId: string | null;
+  taskDocument: Record<string, unknown>;
+  candidateFiles: string[];
+  reason: string | null;
+}): TaskflowScopeAmendmentProposal {
+  const candidateFiles = uniqueSorted(input.candidateFiles);
+  if (candidateFiles.length === 0) {
+    return {
+      required: false,
+      candidateFiles,
+      reason: null,
+      remediationCommand: null,
+      humanReviewRequired: false,
+      notes: []
+    };
+  }
+  const planPath = sourcePlanPathOf(input.taskDocument);
+  const remediationCommand = planPath
+    ? `node atm.mjs tasks import --from ${quoteCliValue(planPath)} --write --force --json`
+    : `node atm.mjs tasks scope add --task ${input.taskId} --actor ${input.actorId ?? '<actor>'} --add ${candidateFiles.join(',')} --json`;
+  return {
+    required: true,
+    candidateFiles,
+    reason: input.reason ?? 'Dirty files overlap the task scope but are not justified by deliverables and targetAllowedFiles.',
+    remediationCommand,
+    humanReviewRequired: true,
+    notes: [
+      'Do not restore, checkout, clean, or delete another agent active work to satisfy closeout.',
+      'Repair the governed task metadata or direction lock, rerun taskflow close --dry-run, then close through taskflow close --write.',
+      'The CLI-computed bundle remains authoritative; LLM review may flag omissions but must not append files ad hoc.'
+    ]
+  };
+}
+
 function inspectPlanningAuthorityDelivery(input: {
   cwd: string;
   taskDocument: Record<string, unknown>;
@@ -709,6 +771,7 @@ function buildTaskflowCommitBundle(input: {
 
   const excludedDirtyFiles: string[] = [];
   const excludedReasons: Record<string, string> = {};
+  const scopeAmendmentCandidateFiles: string[] = [];
   let metadataFailClosed = false;
   let failClosedReason: string | null = null;
 
@@ -733,7 +796,7 @@ function buildTaskflowCommitBundle(input: {
     failClosedReason = 'Task metadata error: deliverables contain mixed planning-path and target-path declarations.';
   }
 
-  const hasDirectoryDeclarations = deliverables.some(del => del.endsWith('/') || !path.extname(del));
+  const hasDirectoryDeclarations = deliverables.some((del) => isDirectoryStyleDeclaration(targetRepoRoot, del));
   if (hasDirectoryDeclarations) {
     metadataFailClosed = true;
     failClosedReason = 'Task metadata error: deliverables contain directory-style declarations which are ambiguous.';
@@ -753,14 +816,23 @@ function buildTaskflowCommitBundle(input: {
     } else {
       excludedDirtyFiles.push(file);
       if (inScope) {
+        scopeAmendmentCandidateFiles.push(file);
         metadataFailClosed = true;
-        failClosedReason = `Dirty file "${file}" is inside task scope (scopePaths) but is not declared in deliverables or allowed by direction-lock/targetAllowedFiles.`;
+        failClosedReason = `Scope amendment required: dirty file "${file}" is inside task scope but is not declared in deliverables and targetAllowedFiles.`;
         excludedReasons[file] = 'inside scope but not declared/allowed (fail-closed trigger)';
       } else {
-        excludedReasons[file] = 'outside task scope';
+        excludedReasons[file] = 'outside task scope; excluded from governed bundle and must be left untouched';
       }
     }
   }
+
+  const scopeAmendment = buildScopeAmendmentProposal({
+    taskId: input.taskId,
+    actorId: input.actorId,
+    taskDocument,
+    candidateFiles: scopeAmendmentCandidateFiles,
+    reason: failClosedReason
+  });
 
   // 3. Historical delivery subtraction
   const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
@@ -831,7 +903,8 @@ function buildTaskflowCommitBundle(input: {
     targetGovernanceFiles,
     planningFiles: planningStageFiles,
     excludedDirtyFiles,
-    excludedReasons
+    excludedReasons,
+    scopeAmendment
   };
 }
 
@@ -920,6 +993,53 @@ async function commitTaskflowBundle(input: {
     planningRepo,
     failClosed: false,
     recoveryCommand: null
+  };
+}
+
+async function commitTaskflowDeliveryFiles(input: {
+  bundle: TaskflowGovernedCommitBundle;
+  actorId: string;
+  taskId: string;
+}): Promise<TaskflowDeliveryCommit | null> {
+  const repoRoot = input.bundle.targetRepo.repoRoot;
+  const stageFiles = uniqueSorted(input.bundle.targetDeliveryFiles);
+  if (!repoRoot || stageFiles.length === 0) {
+    return null;
+  }
+  const deliveryBundle: TaskflowCommitRepoBundle = {
+    repoRoot,
+    stageFiles,
+    commitMessage: `chore(taskflow): deliver ${input.taskId} source bundle`,
+    commitCommand: commitCommandFor({
+      repoRoot,
+      actorId: input.actorId,
+      taskId: input.taskId,
+      commitMessage: `chore(taskflow): deliver ${input.taskId} source bundle`,
+      repoKind: 'target'
+    }),
+    commitSha: null,
+    status: 'uncomputed'
+  };
+  const preflight = verifyRepoIndexIsolation(deliveryBundle, 'pre-stage');
+  const staged = verifyRepoIndexIsolation(stageRepoBundle(preflight), 'post-stage');
+  if (staged.status !== 'staged') {
+    return null;
+  }
+  const targetResult = await runAtmGit([
+    'commit',
+    '--cwd', repoRoot,
+    '--actor', input.actorId,
+    '--task', input.taskId,
+    '--message', deliveryBundle.commitMessage,
+    '--json'
+  ]);
+  const commitSha = String((targetResult.evidence as Record<string, unknown>)?.commitSha ?? '') || null;
+  return {
+    repoRoot,
+    stageFiles: staged.stageFiles,
+    commitMessage: deliveryBundle.commitMessage,
+    commitSha,
+    status: 'committed'
   };
 }
 
@@ -1088,12 +1208,30 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   }
 
   if (writeRequested && writeSupport.allowed) {
+    if (previewCommitBundle.targetDeliveryFiles.length > 0 && commitMode !== 'auto-commit') {
+      throw new CliError('ATM_TASKFLOW_CLOSE_DELIVERY_COMMIT_REQUIRED', 'taskflow close --write --no-commit cannot close dirty source deliverables because backend close requires a delivery commit first. Rerun without --no-commit or commit through the governed taskflow close operator lane.', {
+        exitCode: 1,
+        details: {
+          taskId,
+          governedCommitBundle: previewCommitBundle,
+          remediation: `node atm.mjs taskflow close --task ${taskId} --actor ${actorId || '<actor>'} --write --json`
+        }
+      });
+    }
+    const preCloseDeliveryCommit = await commitTaskflowDeliveryFiles({
+      bundle: previewCommitBundle,
+      actorId,
+      taskId
+    });
+    const effectiveHistoricalDeliveryRefs = preCloseDeliveryCommit?.commitSha
+      ? uniqueSorted([...historicalDeliveryRefs, preCloseDeliveryCommit.commitSha])
+      : historicalDeliveryRefs;
     const backendArgv = buildCloseBackendArgv({
       cwd,
       taskId,
       actorId,
       backendSurface: closebackPlan.backendSurface,
-      historicalDeliveryRefs,
+      historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
       historicalDeliveryRepo: closebackPlan.planningAuthorityDeliveryGate.ok
         ? closebackPlan.planningAuthorityDeliveryGate.repoRoot
         : null,
@@ -1106,7 +1244,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         cwd,
         planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
         actorId,
-        historicalDeliveryRefs
+        historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
       })
       : null;
     let rosterCloseback: Record<string, unknown> | null = null;
@@ -1156,7 +1294,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           ? closebackPlan.writerBoundary.rosterIndexPath
           : null,
         backendResult: backendResult as unknown as Record<string, unknown>,
-        historicalDeliveryRefs
+        historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
       }),
       actorId,
       taskId
@@ -1186,6 +1324,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           diagnostics,
           closebackPlan,
           backendResult,
+          preCloseDeliveryCommit,
           planningCardCloseback,
           rosterCloseback,
           governedCommitBundle,

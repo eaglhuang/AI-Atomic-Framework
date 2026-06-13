@@ -1016,6 +1016,45 @@ assert.ok(!stageFiles.includes('src/unrelated.txt'), 'unrelated files should be 
 assert.deepEqual(dryRunResult.evidence.governedCommitBundle.targetDeliveryFiles, ['src/deliver.txt']);
 assert.deepEqual(dryRunResult.evidence.governedCommitBundle.excludedDirtyFiles, ['src/unrelated.txt']);
 
+const writeDelFixture = await makeUncommittedDeliverablesFixture('write');
+writeText(path.join(writeDelFixture.targetRepo, 'src/deliver.txt'), 'content\n');
+writeText(path.join(writeDelFixture.targetRepo, 'src/unrelated.txt'), 'unrelated content\n');
+writeJson(path.join(writeDelFixture.targetRepo, '.atm/history/evidence', `${writeDelFixture.taskId}.json`), {
+  taskId: writeDelFixture.taskId,
+  evidence: [{
+    evidenceKind: 'validation',
+    evidenceType: 'test',
+    summary: 'uncommitted delivery close fixture evidence',
+    producedBy: 'validator',
+    freshness: 'fresh',
+    validationPasses: ['validate:cli'],
+    artifactPaths: ['src/deliver.txt'],
+    createdAt: new Date().toISOString(),
+    commandRuns: [{
+      command: 'validate uncommitted delivery close fixture',
+      exitCode: 0,
+      stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+      stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+    }]
+  }]
+});
+const writeDelClose = await runTaskflow([
+  'close',
+  '--cwd', writeDelFixture.targetRepo,
+  '--profile', writeDelFixture.profilePath,
+  '--task', writeDelFixture.taskId,
+  '--actor', 'validator',
+  '--write',
+  '--json'
+]) as any;
+assert.equal(writeDelClose.ok, true);
+assert.ok(writeDelClose.evidence.preCloseDeliveryCommit?.commitSha, 'taskflow close must create a governed delivery commit for uncommitted deliverables');
+assert.equal(execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: writeDelFixture.targetRepo, encoding: 'utf8' }).trim(), `chore(taskflow): close ${writeDelFixture.taskId} target governance bundle`);
+assert.equal(execFileSync('git', ['log', '-2', '--pretty=%s'], { cwd: writeDelFixture.targetRepo, encoding: 'utf8' }).trim().split(/\r?\n/)[1], `chore(taskflow): deliver ${writeDelFixture.taskId} source bundle`);
+const writeDelDeliveryFiles = execFileSync('git', ['show', '--name-only', '--pretty=', 'HEAD~1'], { cwd: writeDelFixture.targetRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
+assert.deepEqual(writeDelDeliveryFiles, ['src/deliver.txt'], 'delivery commit must include only declared deliverables');
+assert.ok(execFileSync('git', ['status', '--short'], { cwd: writeDelFixture.targetRepo, encoding: 'utf8' }).includes('src/unrelated.txt'), 'unrelated dirty file must remain untouched');
+
 // 2. Fail-closed case: dirty file in scopePaths but not in deliverables or targetAllowedFiles
 const failClosedFixture = await makeUncommittedDeliverablesFixture('failclosed', (doc) => {
   doc.targetAllowedFiles = []; // fallback to scopePaths
@@ -1033,7 +1072,36 @@ await assert.rejects(
     '--write',
     '--json'
   ]),
-  (err: any) => err.code === 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE'
+  (err: any) => {
+    assert.equal(err.code, 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE');
+    const bundle = err.details.governedCommitBundle;
+    assert.equal(bundle.scopeAmendment.required, true, 'in-scope undeclared dirty files must require a governed scope amendment');
+    assert.deepEqual(bundle.scopeAmendment.candidateFiles, ['src/other.txt']);
+    assert.ok(bundle.scopeAmendment.remediationCommand.includes('tasks scope add') || bundle.scopeAmendment.remediationCommand.includes('tasks import'));
+    assert.ok(bundle.scopeAmendment.notes.some((note: string) => note.includes('Do not restore')));
+    return true;
+  }
 );
+
+// 3. Legal extensionless file deliverables must not be misclassified as directory declarations
+const extensionlessFixture = await makeUncommittedDeliverablesFixture('extensionless', (doc) => {
+  doc.scopePaths = ['Dockerfile'];
+  doc.deliverables = ['Dockerfile'];
+  doc.targetAllowedFiles = ['Dockerfile'];
+});
+writeText(path.join(extensionlessFixture.targetRepo, 'Dockerfile'), 'FROM scratch\n');
+
+const extensionlessDryRun = await runTaskflow([
+  'close',
+  '--cwd', extensionlessFixture.targetRepo,
+  '--profile', extensionlessFixture.profilePath,
+  '--task', extensionlessFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+
+assert.equal(extensionlessDryRun.ok, true);
+assert.deepEqual(extensionlessDryRun.evidence.governedCommitBundle.targetDeliveryFiles, ['Dockerfile']);
+assert.equal(extensionlessDryRun.evidence.governedCommitBundle.scopeAmendment.required, false);
 
 console.log('[taskflow-dryrun:test] ok');
