@@ -7,8 +7,16 @@ description: Recommend the next official ATM guidance action from current state.
 # ATM Next
 
 If the current user prompt mentions a task id, task card, plan document, or a
-scoped batch of tasks, invoke the `atm-task-intent-resolver` skill first. That
-skill must write `.atm/runtime/task-intent.json` and route with:
+scoped batch of tasks, choose the narrowest route before editing. For one exact
+task id, do not write the shared runtime intent file; route directly with:
+
+```bash
+node atm.mjs next --task TASK-ABC-0001 --json
+```
+
+Invoke the `atm-task-intent-resolver` skill when the prompt needs semantic
+resolution for fuzzy task, plan, or batch scope. That skill writes
+`.atm/runtime/task-intent.json` and routes with:
 
 ```bash
 node atm.mjs next --intent .atm/runtime/task-intent.json --json
@@ -28,9 +36,33 @@ editing, closing, or committing. The playbook is the authoritative short
 instruction sheet for the selected channel:
 
 - `fast`: small quickfix, no task close.
-- `normal`: one task, claim -> deliver -> evidence -> tasks close -> commit.
+- `normal`: one task, claim -> implement -> validators -> evidence add -> tasks
+  close -> commit.
 - `batch`: many tasks, claim original prompt -> deliver queue head -> evidence
   -> batch checkpoint -> commit -> continue next queue head.
+
+For normal task-card work, keep this order fixed:
+
+```text
+claim -> implement -> validators -> evidence add -> tasks close -> commit
+```
+
+Do not commit a normal task before the matching evidence has been added and
+`tasks close` has succeeded.
+
+Framework critical files have one narrow exception to the close timing, not to
+the evidence requirement. If `tasks close` is blocked by
+`ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, keep the active claim and command-backed
+evidence, make a governed delivery commit for the scoped non-`.atm`
+deliverables, then close with:
+
+```bash
+node atm.mjs tasks close --task <task-id> --actor "$ATM_ACTOR_ID" --status done --historical-delivery <commit> --json
+```
+
+After that close succeeds, make a separate closure commit for the ATM ledger
+updates. Do not treat the critical-diff gate as permission to skip ATM or close
+without evidence.
 
 ## Route Command
 
@@ -44,6 +76,12 @@ For collaboration workflows, claim the selected imported task before edits:
 
 ```bash
 node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --prompt "$ARGUMENTS" --json
+```
+
+For one exact task id, prefer:
+
+```bash
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --task TASK-ABC-0001 --json
 ```
 
 If the route returns `recommendedChannel: "batch"`, do not manually run

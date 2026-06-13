@@ -1,10 +1,3 @@
----
-name: atm-atom-map-refactor
-description: Plan ATM framework refactors by preserving atom/map semantics before splitting large governance modules.
-argument-hint: "<ATM context>"
-charter-invariants-injected: true
----
-
 
 # ATM Atom Map Refactor
 
@@ -105,3 +98,9 @@ chosen pattern, owner module, proof, lesson.
   Rule: The framework repository must not host downstream adopter planning queues or project-specific work tracking artifacts. ATM framework-development tasks may live in the framework repository only as ATM-managed .atm/history/tasks ledger records with CLI transition evidence.
 - `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
   Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.
+
+## Rules
+
+- Use ATM as the only governance route for this action.
+- Do not create a second registry, task state, or approval workflow.
+- Preserve user-edited integration files; manifest hashes decide uninstall safety.

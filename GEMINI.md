@@ -24,6 +24,7 @@ Do not manually loop over `tasks reserve`, `tasks promote`, `tasks claim`, or `t
 - `.agents/skills/atm-evidence/SKILL.md`
 - `.agents/skills/atm-upgrade-scan/SKILL.md`
 - `.agents/skills/atm-handoff/SKILL.md`
+- `.agents/skills/atm-atom-map-refactor/SKILL.md`
 
 ## Charter Invariants
 

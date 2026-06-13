@@ -19,7 +19,8 @@ const requiredTemplateIds = [
   'atm-evidence',
   'atm-upgrade-scan',
   'atm-handoff',
-  'atm-internal-build-sync'
+  'atm-internal-build-sync',
+  'atm-atom-map-refactor'
 ];
 
 function fail(message: string) {
@@ -104,11 +105,11 @@ const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', te
 const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates, { repositoryRoot: root });
 const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates, { repositoryRoot: root });
 
-assert(claudeFiles.length === 10, 'Claude compiler output must contain ten files');
-assert(codexFiles.length === 10, 'Codex compiler output must contain ten files');
-assert(copilotFiles.length === 20, 'Copilot compiler output must contain twenty scoped instruction and prompt files');
-assert(cursorFiles.length === 10, 'Cursor compiler output must contain ten files');
-assert(geminiFiles.length === 10, 'Gemini compiler output must contain ten files');
+assert(claudeFiles.length === 11, 'Claude compiler output must contain eleven files');
+assert(codexFiles.length === 11, 'Codex compiler output must contain eleven files');
+assert(copilotFiles.length === 22, 'Copilot compiler output must contain twenty-two scoped instruction and prompt files');
+assert(cursorFiles.length === 11, 'Cursor compiler output must contain eleven files');
+assert(geminiFiles.length === 11, 'Gemini compiler output must contain eleven files');
 
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
   assert(
@@ -128,5 +129,5 @@ assert(codexFiles.every((compiledFile: any) => compiledFile.content.includes('ch
 assert(geminiFiles.every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field');
 
 if (!process.exitCode) {
-  console.log(`[skill-templates:${mode}] ok (10 source templates, schema, and 5 adapter compilers)`);
+  console.log(`[skill-templates:${mode}] ok (11 source templates, schema, and 5 adapter compilers)`);
 }

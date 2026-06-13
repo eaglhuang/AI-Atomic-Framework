@@ -12,6 +12,18 @@ refactor, split, atomize, infect, migrate, or modernize existing source code.
 The goal is to keep the user request natural while still routing the work
 through ATM evidence before choosing a local implementation path.
 
+## Captain/Dispatch Entry Gate
+
+If the user asks for Captain, Coordinator, dispatch, task cards, sidecars,
+subagents, delegation, condition review, or closeout work, first route the
+request through `ai-role-router` when available, then through `atm-dispatch`
+before drafting instructions, delegating work, or reviewing another agent.
+
+State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal
+sidecar is the default for review, preflight, grep, checklist, planning-only
+checks, and post-report verification. External dispatch is opt-in, and external
+write is forbidden unless the user explicitly grants write authority and scope.
+
 ## Delivery Principle
 
 The objective is to deliver the task content, not to close task cards. A task
@@ -54,6 +66,25 @@ task status to `done`, do not bulk-close task cards, and do not treat static
 `atomic_workbench/evidence/*.json` files as completion evidence. Claim/lock the
 task, run `guard framework-development`, `tasks audit`, `doctor`, and the
 required validators before closing with `tasks close`.
+
+For ordinary task-card delivery, the lifecycle remains:
+
+```text
+claim -> implement -> validators -> evidence add -> tasks close -> commit
+```
+
+Framework critical files only change the close/commit timing when the close gate
+blocks a live critical diff. If `tasks close` reports
+`ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE`, do not bypass the gate. Make a governed
+delivery commit for the scoped non-`.atm` deliverables, then run:
+
+```bash
+node atm.mjs tasks close --task <task-id> --actor "$ATM_ACTOR_ID" --status done --historical-delivery <commit> --json
+```
+
+After close succeeds, make a separate closure commit for the generated ATM
+ledger updates. This historical-delivery path still requires validators and
+command-backed evidence; it is not a relaxed closure rule.
 
 ## Route Command
 

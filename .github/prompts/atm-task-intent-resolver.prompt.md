@@ -9,6 +9,17 @@ description: Resolve the current user prompt into an atm.taskIntent.v1 proposal 
 Use this skill when the user prompt mentions a task id, task card, plan document,
 or a scoped batch of tasks.
 
+If the user gives one exact task id and no extra plan or batch ambiguity, prefer
+the session-local CLI selector instead of writing the shared runtime intent file:
+
+```bash
+node atm.mjs next --task TASK-ABC-0001 --json
+node atm.mjs next --claim --actor "$ATM_ACTOR_ID" --task TASK-ABC-0001 --json
+```
+
+Use this semantic resolver for fuzzy task titles, shorthand ranges, plan
+documents, target-repo hints, or multiple tasks.
+
 ## Semantic Extraction First
 
 Read the current user prompt semantically before routing. Do not rely on keyword
@@ -23,7 +34,8 @@ matching alone. Infer, with explicit uncertainty when needed:
 - Whether the user asks for one task, an ordinal range such as "first three", or
   the whole scoped queue.
 
-Write exactly one `atm.taskIntent.v1` JSON file before calling ATM:
+When semantic resolution is needed, write exactly one `atm.taskIntent.v1` JSON
+file before calling ATM:
 
 ```json
 {
@@ -40,8 +52,9 @@ Write exactly one `atm.taskIntent.v1` JSON file before calling ATM:
 ```
 
 Use `.atm/runtime/task-intent.json` unless the editor integration provides a
-different runtime path. The skill may propose intent; ATM CLI remains the only
-authority that can accept, reject, narrow, claim, or route it.
+different runtime path. This is a shared runtime fallback; do not use it for a
+single exact `--task` route. The skill may propose intent; ATM CLI remains the
+only authority that can accept, reject, narrow, claim, or route it.
 
 ## First Command After Intent File Exists
 
