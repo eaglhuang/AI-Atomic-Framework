@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0066",
+  "title": "ATM new user workflow guide closeout",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-CID-0063"
+  ],
+  "acceptance": [
+    "`docs/ATM_NEW_USER_WORKFLOW.md` exists and presents a human-readable and AI-readable step-by-step normal workflow.",
+    "`README.md` links to the new guide from the `60-Second Start` section.",
+    "The guide clearly distinguishes official operator lanes (`taskflow open`, `next`, `taskflow close`) from backend/repair surfaces.",
+    "The guide documents the three adoption levels: profile-only, light adaptor, and full adaptor/SDK.",
+    "The guide avoids presenting emergency/backend commands as normal daily workflow.",
+    "The commit for this task does not include unrelated `.atm/history` residue, TASK-CID-0065 source work, or release artifacts."
+  ],
+  "deliverables": [
+    "README.md",
+    "docs/ATM_NEW_USER_WORKFLOW.md"
+  ],
+  "scopePaths": [
+    "README.md",
+    "docs/ATM_NEW_USER_WORKFLOW.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run validate:neutrality"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [
+    "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0066-atm-new-user-workflow-guide-closeout.task.md"
+  ],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    ".atm/history/task-events/TASK-CID-0025/**",
+    ".atm/history/task-events/TASK-CID-0048/**",
+    ".atm/history/task-events/TASK-CID-0064/**",
+    ".atm/runtime/**",
+    "packages/**",
+    "release/**",
+    "TASK-CID-0065 emergency permission lease implementation"
+  ],
+  "nonGoals": [
+    "Do not implement or change taskflow open/close behavior.",
+    "Do not close TASK-CID-0065.",
+    "Do not clean legacy .atm residue as part of this documentation task."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "contextMap": {
+    "primary": [],
+    "secondary": [],
+    "tests": [],
+    "patterns": []
+  },
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0066-atm-new-user-workflow-guide-closeout.task.md",
+    "sectionTitle": "TASK-CID-0066",
+    "headingLine": 50,
+    "hash": "227c265d212a171f"
+  },
+  "importedAt": "2026-06-13T03:04:28.825Z",
+  "lastTransitionId": "2026-06-13T03-07-58-611Z-close-97b50c091876",
+  "lastTransitionAt": "2026-06-13T03:07:58.611Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T03:04:59.374Z",
+  "promotedAt": "2026-06-13T03:04:59.378Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-c1d60a2401be",
+    "claimedAt": "2026-06-13T03:04:59.380Z",
+    "heartbeatAt": "2026-06-13T03:07:58.609Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0066.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "README.md"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T03:04:59.380Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613030459-captain-TASK-CID-0066-cdb01be91e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0066",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0066.*",
+      ".atm/history/task-events/TASK-CID-0066/**",
+      ".atm/history/tasks/TASK-CID-0066.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "README.md"
+    ],
+    "planningReadOnlyPaths": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0066-atm-new-user-workflow-guide-closeout.task.md"
+    ],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f551ab447aa1f9b5df70f14c4062fef5a09e58e52a020a4da633145e7f3708ec",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T03:04:59.398Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T03:07:58.609Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613030459-captain-TASK-CID-0066-cdb01be91e",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0066.closure-packet.json"
+}

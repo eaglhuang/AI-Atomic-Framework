@@ -1,0 +1,131 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0066",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8950ec67d2737b3ed6fe85cdf8c72fd59126d729",
+  "governedTreeSha": "2ab265f28c54ec470776808bddd094ab2d843bf4",
+  "targetCommitDelta": {
+    "currentCommitSha": "8950ec67d2737b3ed6fe85cdf8c72fd59126d729",
+    "parentCommitShas": [
+      "8950ec67d2737b3ed6fe85cdf8c72fd59126d729"
+    ],
+    "governedTreeSha": "2ab265f28c54ec470776808bddd094ab2d843bf4",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0066.json",
+      ".atm/history/task-events/TASK-CID-0066/2026-06-13T03-03-25-792Z-import-64189f64893d.json",
+      ".atm/history/task-events/TASK-CID-0066/2026-06-13T03-04-28-830Z-import-b722e868a2d4.json",
+      ".atm/history/task-events/TASK-CID-0066/2026-06-13T03-04-59-375Z-reserve-b2e8bb2699cc.json",
+      ".atm/history/task-events/TASK-CID-0066/2026-06-13T03-04-59-378Z-promote-98c6a550ffba.json",
+      ".atm/history/task-events/TASK-CID-0066/2026-06-13T03-04-59-399Z-claim-cefce392c22a.json",
+      ".atm/history/tasks/TASK-CID-0066.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "README.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:neutrality",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b8b1cf82e8926928003ab1f46c4660413ac676ceaefacea7391f1f28501c008c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:978cea89a60b7126fe153c343f40343f674b3296b9a301bd30bbcdc8b0d1b0d7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:221ae6a74ce096fe673ccc15d13937ebc75403a2da6e06a3c3651cb4613663a6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "npm run validate:neutrality",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:neutrality"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-13T03:07:58.608Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0066-atm-new-user-workflow-guide-closeout.task.md",
+      ".atm/history/evidence/TASK-CID-0066.*",
+      ".atm/history/task-events/TASK-CID-0066/**",
+      ".atm/history/tasks/TASK-CID-0066.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "README.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0066.json",
+  "closedAt": "2026-06-13T03:07:58.608Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260613030459-captain-TASK-CID-0066-cdb01be91e",
+  "attestation": null,
+  "historicalDeliveryProvenance": null
+}
