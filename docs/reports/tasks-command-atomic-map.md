@@ -10,7 +10,7 @@ This report does not change production command behavior. It exists to define the
 
 | Atom | Responsibility | Primary File(s) | Notes |
 | --- | --- | --- | --- |
-| `tasks.command.dispatch` | Top-level `tasks` action router | `packages/cli/src/commands/tasks.ts` | Fan-out over `close`, `reset`, `claim`, `reconcile`, `repair-closure`, `status`, `finalize`, etc. |
+| `tasks.command.dispatch` | Top-level `tasks` action router | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/command-dispatch.ts` | `tasks.ts` now supplies the handler table; `command-dispatch.ts` owns argv normalization, action aliases, usage errors, and fan-out over `close`, `reset`, `claim`, `reconcile`, `repair-closure`, `status`, `finalize`, etc. |
 | `tasks.close.governance` | Close path governance and closure packet enforcement | `packages/cli/src/commands/tasks.ts` | Owns close command admission, closure authority, historical delivery, and commit-window registration. |
 | `tasks.claim.lifecycle` | Claim / renew / release / handoff / takeover lifecycle | `packages/cli/src/commands/tasks.ts`, `packages/core/src/broker/lifecycle.ts` | Shared claim-state logic with broker claim intent recording. |
 | `tasks.reconcile.delivery` | Historical delivery reconciliation and provenance | `packages/cli/src/commands/tasks.ts` | Handles delivery commit refs, provenance checks, and close/truth repair. |
@@ -54,10 +54,19 @@ This report does not change production command behavior. It exists to define the
 - Split governance into separate atoms for closeout, claim lifecycle, reconcile, status triangulation, and residue diagnostics.
 - Keep route predicates as a reusable routing library rather than duplicating state checks inside `next.ts`.
 
+## TASK-CID-0058 Update
+
+- Before this task, `packages/cli/src/commands/tasks.ts` was 5890 lines and contained the top-level action fan-out directly inside `runTasks`.
+- `tasks.command.dispatch` moved into `packages/cli/src/commands/tasks/command-dispatch.ts`, with focused coverage in `packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts`.
+- After the extraction, `packages/cli/src/commands/tasks.ts` is 5829 lines. It keeps the public `runTasks` facade and a handler table, while the new 102-line `command-dispatch.ts` owns `--output-json` cleanup, action aliasing for `block` / `abandon`, lifecycle action grouping, and CLI usage errors.
+- The new focused dispatch test is 65 lines and covers argv normalization, alias routing, lifecycle action identity, missing action errors, and unknown action errors.
+- Closeout, dependency, lifecycle, historical-delivery, scope-lock, and residue trust decisions remain in their existing owner atoms; this task only moved dispatch responsibility.
+
 ## Validator Notes
 
 - Required sections: `Scope`, `Atom List`, `Governance Invariants`, `Duplicate Logic Hotspots`, `Caller Surfaces`, `Extraction Targets`, `Validator Notes`.
 - The validator should fail closed if any required section is missing or if the atom list does not mention the three caller surfaces.
+- TASK-CID-0058 requires the report to mention `packages/cli/src/commands/tasks/command-dispatch.ts` so future map checks keep the dispatch atom visible.
 
 ## Report Summary
 

@@ -87,6 +87,7 @@ import {
   type TaskResidueTransitionSnapshot,
   type TaskStatusTriangulation
 } from './tasks/residue-diagnostics.ts';
+import { dispatchTasksAction } from './tasks/command-dispatch.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval } from './emergency/gate.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
@@ -312,93 +313,30 @@ const taskIdPattern = /^(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 
 export async function runTasks(argv: string[]): Promise<CommandResult> {
-  const cleanArgv = [];
-  for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--output-json') {
-      i++;
-      continue;
-    }
-    cleanArgv.push(argv[i]);
-  }
-  argv = cleanArgv;
-
-  const action = (argv[0] ?? '').toLowerCase();
-  if (action === 'close') {
-    return await runTasksClose(argv.slice(1));
-  }
-  if (action === 'reset') {
-    return await runTasksReset(argv.slice(1));
-  }
-  if (action === 'block') {
-    return await runTasksClose(['--status', 'blocked', ...argv.slice(1)]);
-  }
-  if (action === 'abandon') {
-    return await runTasksClose(['--status', 'abandoned', ...argv.slice(1)]);
-  }
-  if (action === 'create') {
-    return await runTasksCreate(argv.slice(1));
-  }
-  if (action === 'mirror') {
-    return await runTasksMirror(argv.slice(1));
-  }
-  if (action === 'audit') {
-    return runTasksAudit(argv.slice(1));
-  }
-  if (action === 'queue') {
-    return runTasksQueue(argv.slice(1));
-  }
-  if (action === 'parallel') {
-    return runTasksParallel(argv.slice(1));
-  }
-  if (action === 'lock') {
-    return await runTasksLock(argv.slice(1));
-  }
-  if (action === 'migrate-legacy-ledger') {
-    return runTasksMigrateLegacyLedger(argv.slice(1));
-  }
-  if (action === 'reserve' || action === 'promote') {
-    return await runTasksReservation(action, argv.slice(1));
-  }
-  if (action === 'claim' || action === 'renew' || action === 'release' || action === 'handoff' || action === 'takeover') {
-    return await runTasksClaimLifecycle(action, argv.slice(1));
-  }
-  if (action === 'reconcile') {
-    return await runTasksReconcile(argv.slice(1));
-  }
-  if (action === 'repair-closure') {
-    return await runTasksRepairClosure(argv.slice(1));
-  }
-  if (action === 'show') {
-    return await runTasksShow(argv.slice(1));
-  }
-  if (action === 'status') {
-    return await runTasksStatus(argv.slice(1));
-  }
-  if (action === 'finalize') {
-    return await runTasksFinalize(argv.slice(1));
-  }
-  if (action === 'deliver-and-close') {
-    return await runTasksDeliverAndClose(argv.slice(1));
-  }
-  if (action === 'roster') {
-    return await runTasksRoster(argv.slice(1));
-  }
-  if (action === 'new') {
-    return await runTasksNew(argv.slice(1));
-  }
-  if (action === 'import') {
-    return await runTasksImport(argv.slice(1));
-  }
-  if (action === 'verify') {
-    return await runTasksVerify(argv.slice(1));
-  }
-  if (action === 'scope') {
-    return await runTasksScope(argv.slice(1));
-  }
-  if (!action) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).', { exitCode: 2 });
-  }
-  throw new CliError('ATM_CLI_USAGE', `tasks does not support action ${action}.`, { exitCode: 2 });
+  return dispatchTasksAction(argv, {
+    close: runTasksClose,
+    reset: runTasksReset,
+    create: runTasksCreate,
+    mirror: runTasksMirror,
+    audit: runTasksAudit,
+    queue: runTasksQueue,
+    parallel: runTasksParallel,
+    lock: runTasksLock,
+    migrateLegacyLedger: runTasksMigrateLegacyLedger,
+    reservation: runTasksReservation,
+    claimLifecycle: runTasksClaimLifecycle,
+    reconcile: runTasksReconcile,
+    repairClosure: runTasksRepairClosure,
+    show: runTasksShow,
+    status: runTasksStatus,
+    finalize: runTasksFinalize,
+    deliverAndClose: runTasksDeliverAndClose,
+    roster: runTasksRoster,
+    newTask: runTasksNew,
+    importTask: runTasksImport,
+    verify: runTasksVerify,
+    scope: runTasksScope
+  });
 }
 
 async function runTasksShow(argv: string[]): Promise<CommandResult> {
