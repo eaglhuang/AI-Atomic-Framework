@@ -333,6 +333,9 @@ assert.equal(stageOnly.evidence.governedCommitBundle.commitMode, 'stage-only');
 assert.equal(stageOnly.evidence.governedCommitBundle.targetRepo.status, 'staged');
 assert.equal(stageOnly.evidence.governedCommitBundle.planningRepo.status, 'staged');
 assert.equal(stageOnly.evidence.governedCommitBundle.failClosed, false);
+assert.equal(stageOnly.evidence.governedCommitBundle.targetRepo.indexIsolation.verified, true, 'stage-only target index isolation must be verified');
+assert.equal(stageOnly.evidence.governedCommitBundle.planningRepo.indexIsolation.verified, true, 'stage-only planning index isolation must be verified');
+assert.ok(stageOnly.evidence.governedCommitBundle.targetRepo.indexIsolation.expectedStageFiles.includes(`.atm/history/evidence/${stageOnlyFixture.taskId}.json`), 'target index diagnostics must include expected bundle files');
 assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: stageOnlyFixture.targetRepo, encoding: 'utf8' }).trim(), stageOnlyTargetHead, '--no-commit must not commit target repo');
 assert.equal(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: stageOnlyFixture.planningRepo, encoding: 'utf8' }).trim(), stageOnlyPlanningHead, '--no-commit must not commit planning repo');
 const stageOnlyTargetStaged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: stageOnlyFixture.targetRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
@@ -342,6 +345,51 @@ assert.ok(stageOnlyTargetStaged.some((entry) => entry.startsWith(`.atm/history/t
 assert.ok(!stageOnlyTargetStaged.includes('scratch.txt'), 'stage-only target bundle must not stage unrelated dirty files');
 assert.deepEqual(stageOnlyPlanningStaged, ['docs/tasks/README.md', `docs/tasks/${stageOnlyFixture.taskId}.task.md`], 'stage-only planning bundle must exact-stage the planning card and roster');
 assert.ok(readFileSync(path.join(stageOnlyFixture.planningRepo, 'docs/tasks/README.md'), 'utf8').includes('| done |'), 'profile-only taskflow close must update the planning roster from the planning repo');
+const targetIndexContaminationFixture = await makeDualRepoCloseFixture('target-index-contamination');
+writeText(path.join(targetIndexContaminationFixture.targetRepo, 'pre-staged-target.txt'), 'must not commit\n');
+execFileSync('git', ['add', 'pre-staged-target.txt'], { cwd: targetIndexContaminationFixture.targetRepo, stdio: 'ignore' });
+await assert.rejects(() => runTaskflow([
+    'close',
+    '--cwd', targetIndexContaminationFixture.targetRepo,
+    '--profile', targetIndexContaminationFixture.profilePath,
+    '--task', targetIndexContaminationFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', targetIndexContaminationFixture.deliveryCommit,
+    '--write',
+    '--json'
+]), (err) => err.code === 'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED' && err.details?.indexIsolation?.unexpectedStagedFiles?.includes('pre-staged-target.txt'), 'target repo unrelated pre-staged files must fail closed before auto-commit');
+const planningIndexContaminationFixture = await makeDualRepoCloseFixture('planning-index-contamination');
+writeText(path.join(planningIndexContaminationFixture.planningRepo, 'docs/tasks/pre-staged-planning.md'), 'must not commit\n');
+execFileSync('git', ['add', 'docs/tasks/pre-staged-planning.md'], { cwd: planningIndexContaminationFixture.planningRepo, stdio: 'ignore' });
+await assert.rejects(() => runTaskflow([
+    'close',
+    '--cwd', planningIndexContaminationFixture.targetRepo,
+    '--profile', planningIndexContaminationFixture.profilePath,
+    '--task', planningIndexContaminationFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', planningIndexContaminationFixture.deliveryCommit,
+    '--write',
+    '--json'
+]), (err) => err.code === 'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED' && err.details?.indexIsolation?.unexpectedStagedFiles?.includes('docs/tasks/pre-staged-planning.md'), 'planning repo unrelated pre-staged files must fail closed before auto-commit');
+const expectedPreStagedFixture = await makeDualRepoCloseFixture('expected-pre-staged');
+execFileSync('git', ['add', `.atm/history/evidence/${expectedPreStagedFixture.taskId}.json`], { cwd: expectedPreStagedFixture.targetRepo, stdio: 'ignore' });
+execFileSync('git', ['add', `docs/tasks/${expectedPreStagedFixture.taskId}.task.md`], { cwd: expectedPreStagedFixture.planningRepo, stdio: 'ignore' });
+const expectedPreStaged = await runTaskflow([
+    'close',
+    '--cwd', expectedPreStagedFixture.targetRepo,
+    '--profile', expectedPreStagedFixture.profilePath,
+    '--task', expectedPreStagedFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', expectedPreStagedFixture.deliveryCommit,
+    '--write',
+    '--no-commit',
+    '--json'
+]);
+assert.equal(expectedPreStaged.evidence.governedCommitBundle.failClosed, false, 'expected pre-staged bundle files must not fail isolation');
+assert.equal(expectedPreStaged.evidence.governedCommitBundle.targetRepo.indexIsolation.verified, true);
+assert.equal(expectedPreStaged.evidence.governedCommitBundle.planningRepo.indexIsolation.verified, true);
+assert.ok(expectedPreStaged.evidence.governedCommitBundle.targetRepo.indexIsolation.preStagedFiles.includes(`.atm/history/evidence/${expectedPreStagedFixture.taskId}.json`), 'target diagnostics must preserve expected pre-staged bundle file');
+assert.ok(expectedPreStaged.evidence.governedCommitBundle.planningRepo.indexIsolation.preStagedFiles.includes(`docs/tasks/${expectedPreStagedFixture.taskId}.task.md`), 'planning diagnostics must preserve expected pre-staged bundle file');
 const autoCommitFixture = await makeDualRepoCloseFixture('autocommit');
 const autoCommit = await runTaskflow([
     'close',

@@ -311,6 +311,19 @@ function classifyTaskResidue(input) {
             reason: 'A done/done task still carries an active claim, so the finalization flow needs repair rather than a new close.'
         };
     }
+    if (planningDone
+        && liveDone
+        && input.divergence.length === 0
+        && !planningMirrorOnly
+        && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
+        return {
+            bucket: 'no-residue',
+            truth: 'planning mirror and live ledger agree on governed done',
+            residue: 'No closeback residue remains for this task.',
+            nextCommand: 'node atm.mjs tasks status --task <id> --json',
+            reason: 'The live ledger is done, the planning mirror is done, closeout provenance is complete, and no status divergence remains.'
+        };
+    }
     if (liveDone && !verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)) {
         const gap = assessCloseoutProvenanceGap(input.cwd, input.taskId, input.taskDocument);
         if (gap.bucket === 'source-done-governance-incomplete') {

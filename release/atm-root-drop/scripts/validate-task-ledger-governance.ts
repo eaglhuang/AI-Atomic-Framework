@@ -1960,7 +1960,36 @@ async function validateTaskResidueClassification(tempRoot: string) {
   assert(staleResidue.bucket === 'stale-import', 'stale-import bucket must be reported');
   assert(String(staleResidue.nextCommand).includes('--force'), 'stale-import next command must point to force import');
 
-  const ambiguousTaskId = 'TASK-RESIDUE-0005';
+  const noResidueTaskId = 'TASK-RESIDUE-0005';
+  const noResiduePlanPath = writePlanningCard('docs/fixtures/residue-none.task.md', noResidueTaskId, 'done');
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${noResidueTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: noResidueTaskId,
+    title: 'No residue fixture',
+    status: 'done',
+    planningRepo: '3KLife',
+    targetRepo: 'AI-Atomic-Framework',
+    closureAuthority: 'target_repo',
+    closurePacket: `.atm/history/evidence/${noResidueTaskId}.closure-packet.json`,
+    closedAt: '2026-06-10T00:00:00.000Z',
+    source: {
+      planPath: noResiduePlanPath,
+      sectionTitle: noResidueTaskId,
+      headingLine: 1,
+      hash: 'no-residue'
+    }
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'evidence', `${noResidueTaskId}.closure-packet.json`), {
+    schemaId: 'atm.closurePacket.v1',
+    taskId: noResidueTaskId
+  });
+  const noResidueStatus = await runTasks(['status', '--cwd', repo, '--task', noResidueTaskId, '--residue', '--json']);
+  assert(noResidueStatus.ok === true, 'no-residue status must succeed');
+  const noResidue = (noResidueStatus.evidence.residueClassification ?? noResidueStatus.evidence) as any;
+  assert(noResidue.bucket === 'no-residue', 'complete done/done task must report no-residue');
+  assert(String(noResidue.nextCommand).includes('tasks status'), 'no-residue next command must point to status');
+
+  const ambiguousTaskId = 'TASK-RESIDUE-0006';
   writePlanningCard('docs/fixtures/residue-ambiguous.task.md', ambiguousTaskId, 'open');
   writeJson(path.join(repo, '.atm', 'history', 'tasks', `${ambiguousTaskId}.json`), {
     schemaVersion: 'atm.workItem.v0.2',

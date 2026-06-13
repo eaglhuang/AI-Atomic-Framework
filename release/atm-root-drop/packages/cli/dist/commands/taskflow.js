@@ -183,6 +183,45 @@ function runGitOrThrow(cwd, args) {
         stdio: ['ignore', 'pipe', 'pipe']
     });
 }
+function readStagedFiles(repoRoot) {
+    const output = tryGitScalar(repoRoot, ['diff', '--cached', '--name-only']) ?? '';
+    return uniqueSorted(output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean));
+}
+function existingBundleFiles(repo) {
+    if (!repo.repoRoot)
+        return [];
+    return uniqueSorted(repo.stageFiles.filter((file) => existsSync(path.resolve(repo.repoRoot ?? '', file))));
+}
+function buildIndexIsolation(repo, stagedFiles) {
+    const expectedStageFiles = existingBundleFiles(repo);
+    const expected = new Set(expectedStageFiles);
+    const preStagedFiles = uniqueSorted(stagedFiles);
+    const unexpectedStagedFiles = preStagedFiles.filter((file) => !expected.has(file));
+    return {
+        verified: unexpectedStagedFiles.length === 0,
+        expectedStageFiles,
+        preStagedFiles,
+        unexpectedStagedFiles
+    };
+}
+function verifyRepoIndexIsolation(repo, phase) {
+    if (!repo.repoRoot)
+        return repo;
+    const isolation = buildIndexIsolation(repo, readStagedFiles(repo.repoRoot));
+    const nextRepo = { ...repo, indexIsolation: isolation };
+    if (!isolation.verified) {
+        throw new CliError('ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED', `taskflow close ${phase} index isolation failed; unexpected staged files would be included in the governed commit.`, {
+            exitCode: 1,
+            details: {
+                repoRoot: repo.repoRoot,
+                phase,
+                indexIsolation: isolation,
+                remediation: 'Unstage unrelated files or commit them separately, then rerun taskflow close.'
+            }
+        });
+    }
+    return nextRepo;
+}
 function commitCommandFor(input) {
     if (!input.repoRoot)
         return '';
@@ -397,9 +436,15 @@ function stageRepoBundle(repo) {
     if (!repo.repoRoot || repo.stageFiles.length === 0) {
         return { ...repo, status: 'uncomputed' };
     }
-    const existingFiles = repo.stageFiles.filter((file) => existsSync(path.resolve(repo.repoRoot ?? '', file)));
+    const existingFiles = existingBundleFiles(repo);
     if (existingFiles.length === 0) {
-        return { ...repo, stageFiles: existingFiles, status: 'skipped', reason: 'no existing bundle files to stage' };
+        return {
+            ...repo,
+            stageFiles: existingFiles,
+            status: 'skipped',
+            reason: 'no existing bundle files to stage',
+            indexIsolation: buildIndexIsolation(repo, readStagedFiles(repo.repoRoot))
+        };
     }
     runGitOrThrow(repo.repoRoot, ['add', '--', ...existingFiles]);
     return { ...repo, stageFiles: existingFiles, status: 'staged' };
@@ -463,8 +508,10 @@ async function commitTaskflowBundle(input) {
 }
 async function finalizeTaskflowCommitBundle(input) {
     assertCommitBundleReady(input.bundle);
-    const stagedTarget = stageRepoBundle(input.bundle.targetRepo);
-    const stagedPlanning = stageRepoBundle(input.bundle.planningRepo);
+    const preflightTarget = verifyRepoIndexIsolation(input.bundle.targetRepo, 'pre-stage');
+    const preflightPlanning = verifyRepoIndexIsolation(input.bundle.planningRepo, 'pre-stage');
+    const stagedTarget = verifyRepoIndexIsolation(stageRepoBundle(preflightTarget), 'post-stage');
+    const stagedPlanning = verifyRepoIndexIsolation(stageRepoBundle(preflightPlanning), 'post-stage');
     const stagedBundle = {
         ...input.bundle,
         targetRepo: stagedTarget,

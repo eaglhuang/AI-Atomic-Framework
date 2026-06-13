@@ -144,7 +144,7 @@ export interface TaskLegacyLedgerMigrationSkip {
     readonly reason: string;
 }
 export declare function runTasks(argv: string[]): Promise<CommandResult>;
-export type TaskResidueBucket = 'complete-but-unfinalized' | 'source-done-governance-incomplete' | 'planning-mirror-only' | 'interrupted-close' | 'stale-import' | 'ambiguous-manual-review';
+export type TaskResidueBucket = 'no-residue' | 'complete-but-unfinalized' | 'source-done-governance-incomplete' | 'planning-mirror-only' | 'interrupted-close' | 'stale-import' | 'ambiguous-manual-review';
 export interface TaskResidueClassification {
     bucket: TaskResidueBucket;
     truth: string;

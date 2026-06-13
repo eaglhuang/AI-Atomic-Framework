@@ -515,6 +515,7 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
 }
 
 export type TaskResidueBucket =
+  | 'no-residue'
   | 'complete-but-unfinalized'
   | 'source-done-governance-incomplete'
   | 'planning-mirror-only'
@@ -616,6 +617,22 @@ function classifyTaskResidue(input: {
       residue: 'The close was interrupted before the claim fully released.',
       nextCommand: 'node atm.mjs tasks repair-closure --task <id> --json',
       reason: 'A done/done task still carries an active claim, so the finalization flow needs repair rather than a new close.'
+    };
+  }
+
+  if (
+    planningDone
+    && liveDone
+    && input.divergence.length === 0
+    && !planningMirrorOnly
+    && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)
+  ) {
+    return {
+      bucket: 'no-residue',
+      truth: 'planning mirror and live ledger agree on governed done',
+      residue: 'No closeback residue remains for this task.',
+      nextCommand: 'node atm.mjs tasks status --task <id> --json',
+      reason: 'The live ledger is done, the planning mirror is done, closeout provenance is complete, and no status divergence remains.'
     };
   }
 
