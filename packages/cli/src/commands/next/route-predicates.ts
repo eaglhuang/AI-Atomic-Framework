@@ -82,28 +82,7 @@ function isExplicitSingleTaskRoute(promptScope: PromptScopedTaskRoute | null, ta
     || taskIntent.mentionedTaskIds.includes(selectedTaskId);
 }
 
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
-import { verifyCloseoutProvenance } from '../tasks/closeout-provenance.ts';
-
-function areTaskDependenciesSatisfied(task: ImportedTaskSummary, statusById: ReadonlyMap<string, string>, cwd = process.cwd()) {
-  return task.dependencies.every((dependency) => {
-    const status = statusById.get(dependency);
-    if (status !== 'done' && status !== 'verified') {
-      return false;
-    }
-    const dependencyPath = path.join(cwd, '.atm', 'history', 'tasks', `${dependency}.json`);
-    if (!existsSync(dependencyPath)) {
-      return false;
-    }
-    try {
-      const dependencyDoc = JSON.parse(readFileSync(dependencyPath, 'utf8')) as Record<string, unknown>;
-      return verifyCloseoutProvenance(cwd, dependency, dependencyDoc);
-    } catch {
-      return false;
-    }
-  });
-}
+import { areTaskDependenciesSatisfied } from '../tasks/dependency-gate.ts';
 
 function canTaskBePreparedForClaim(status: string) {
   const normalized = normalizeTaskRouteStatus(status);

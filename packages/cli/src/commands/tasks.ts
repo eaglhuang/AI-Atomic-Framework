@@ -50,12 +50,14 @@ import {
 import { findActiveBatchRunForTask, readActiveBatchRun, isPathAllowedByScope } from './work-channels.ts';
 import {
   assessCloseoutProvenanceGap,
-  buildDependencyCloseoutBlocker,
   buildDependencyCloseoutRecoveryCommand,
   formatDependencyCloseoutBlockedMessage,
-  verifyCloseoutProvenance,
-  type TaskDependencyCloseoutBlocker
+  verifyCloseoutProvenance
 } from './tasks/closeout-provenance.ts';
+import {
+  findTaskClaimDependencyBlockers,
+  type TaskClaimDependencyBlocker
+} from './tasks/dependency-gate.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval } from './emergency/gate.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
@@ -2087,38 +2089,8 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
 }
 
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';
-
-export type TaskClaimDependencyBlocker = TaskDependencyCloseoutBlocker;
-
-export function findTaskClaimDependencyBlockers(cwd: string, taskId: string, taskDocument: Record<string, unknown>): TaskClaimDependencyBlocker[] {
-  const declaredDependencies = Array.from(new Set(parseYamlList(
-    taskDocument.dependencies ?? taskDocument.depends_on ?? taskDocument.blocked_by
-  )));
-  if (declaredDependencies.length === 0) {
-    return [];
-  }
-  const blockers: TaskClaimDependencyBlocker[] = [];
-  for (const dependencyTaskId of declaredDependencies) {
-    const dependencyPath = taskPathFor(cwd, dependencyTaskId);
-    if (!existsSync(dependencyPath)) {
-      blockers.push({ taskId: dependencyTaskId, status: 'missing', taskPath: dependencyPath });
-      continue;
-    }
-    try {
-      const dependencyDocument = JSON.parse(readFileSync(dependencyPath, 'utf8')) as Record<string, unknown>;
-      const dependencyStatus = normalizeWorkItemStatus(dependencyDocument.status);
-      if (dependencyStatus !== 'done' && dependencyStatus !== 'verified') {
-        blockers.push({ taskId: dependencyTaskId, status: dependencyStatus, taskPath: dependencyPath });
-      } else if (!verifyCloseoutProvenance(cwd, dependencyTaskId, dependencyDocument)) {
-        const blocker = buildDependencyCloseoutBlocker(cwd, dependencyTaskId, dependencyPath, dependencyDocument);
-        blockers.push(blocker);
-      }
-    } catch {
-      blockers.push({ taskId: dependencyTaskId, status: 'unreadable', taskPath: dependencyPath });
-    }
-  }
-  return blockers.filter((entry) => entry.taskId !== taskId);
-}
+export { findTaskClaimDependencyBlockers } from './tasks/dependency-gate.ts';
+export type { TaskClaimDependencyBlocker } from './tasks/dependency-gate.ts';
 
 async function runTasksReset(argv: string[]) {
   const options = parseResetOptions(argv);
@@ -3537,7 +3509,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
     if (dependencyBlockers.length > 0) {
       const firstBlocker = dependencyBlockers[0];
-      const closeoutBlocker = firstBlocker as TaskDependencyCloseoutBlocker;
+      const closeoutBlocker = firstBlocker as TaskClaimDependencyBlocker;
       const requiredCmd = closeoutBlocker.requiredCommand
         ?? (closeoutBlocker.status === 'incomplete-closeout' || closeoutBlocker.status === 'source-done-governance-incomplete'
           ? buildDependencyCloseoutRecoveryCommand(closeoutBlocker)
