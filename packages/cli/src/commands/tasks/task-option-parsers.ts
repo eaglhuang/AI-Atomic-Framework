@@ -403,6 +403,7 @@ export function parseCloseOptions(argv: string[]) {
     fromBatchCheckpoint: false,
     batchId: null as string | null,
     historicalDeliveryRefs: [] as string[],
+    historicalDeliveryRepo: null as string | null,
     waiverOutOfScopeDelivery: false,
     emergencyApproval: null as string | null,
     allowStaleRunner: parseAllowStaleRunnerFlag(argv)
@@ -452,6 +453,11 @@ export function parseCloseOptions(argv: string[]) {
       index += 1;
       continue;
     }
+    if (arg === '--historical-delivery-repo' || arg === '--delivery-repo' || arg === '--planning-delivery-repo') {
+      options.historicalDeliveryRepo = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
     if (arg === '--waiver-out-of-scope-delivery') {
       options.waiverOutOfScopeDelivery = true;
       continue;
@@ -474,6 +480,7 @@ export function parseCloseOptions(argv: string[]) {
     cwd: path.resolve(options.cwd),
     taskId: options.taskId.trim(),
     historicalDeliveryRefs: uniqueStrings(options.historicalDeliveryRefs),
+    historicalDeliveryRepo: options.historicalDeliveryRepo ? path.resolve(options.historicalDeliveryRepo) : null,
     reason: options.reason?.trim() || null
   };
 }

@@ -136,7 +136,7 @@ function parseEmergencyOptions(argv) {
             continue;
         }
         if (arg === '--allowed-flag') {
-            state.allowedFlags.push(requireValue(argv, index, '--allowed-flag'));
+            state.allowedFlags.push(requireAllowedFlagValue(argv, index));
             index += 1;
             continue;
         }
@@ -183,6 +183,13 @@ function requireValue(argv, index, flag) {
     const value = argv[index + 1];
     if (!value || value.startsWith('--')) {
         throw new CliError('ATM_CLI_USAGE', `emergency requires a value for ${flag}`, { exitCode: 2 });
+    }
+    return value;
+}
+function requireAllowedFlagValue(argv, index) {
+    const value = argv[index + 1];
+    if (!value) {
+        throw new CliError('ATM_CLI_USAGE', 'emergency requires a value for --allowed-flag', { exitCode: 2 });
     }
     return value;
 }

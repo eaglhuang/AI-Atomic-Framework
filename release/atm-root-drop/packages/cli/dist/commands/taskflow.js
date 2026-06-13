@@ -215,6 +215,73 @@ function extractBackendStageFiles(backendResult) {
     }
     return files;
 }
+function extractTaskStringList(taskDocument, key) {
+    const value = taskDocument[key];
+    return Array.isArray(value)
+        ? value.map((entry) => typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '').filter(Boolean)
+        : [];
+}
+function extractTaskflowDeclaredFiles(taskDocument) {
+    return uniqueSorted([
+        ...extractTaskStringList(taskDocument, 'scopePaths'),
+        ...extractTaskStringList(taskDocument, 'deliverables'),
+        ...extractTaskStringList(taskDocument, 'targetAllowedFiles')
+    ].filter((file) => !file.startsWith('.atm/')));
+}
+function normalizeTaskflowAuthority(taskDocument) {
+    return String(taskDocument.closureAuthority ?? taskDocument.closure_authority ?? '')
+        .trim()
+        .toLowerCase()
+        .replace(/-/g, '_');
+}
+function sourcePlanPathOf(taskDocument) {
+    const source = taskDocument.source;
+    if (!source || typeof source !== 'object' || Array.isArray(source))
+        return null;
+    const planPath = source.planPath;
+    return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null;
+}
+function taskflowPathMatches(filePath, declaredPath) {
+    const file = filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+    const declared = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
+    if (!file || !declared)
+        return false;
+    return file === declared || file.startsWith(`${declared}/`);
+}
+function inspectPlanningAuthorityDelivery(input) {
+    if (normalizeTaskflowAuthority(input.taskDocument) !== 'planning_repo') {
+        return { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null };
+    }
+    const planPath = sourcePlanPathOf(input.taskDocument);
+    const planning = resolvePlanningPath(input.cwd, planPath);
+    if (!planning.repoRoot) {
+        return { required: true, ok: false, repoRoot: null, matchedFiles: [], reason: planning.reason ?? 'planning repo could not be resolved' };
+    }
+    if (input.historicalDeliveryRefs.length === 0) {
+        return { required: true, ok: false, repoRoot: planning.repoRoot, matchedFiles: [], reason: 'planning authority close requires --historical-delivery <planning-repo-commit>' };
+    }
+    const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
+    const matchedFiles = [];
+    for (const ref of input.historicalDeliveryRefs) {
+        const commitSha = tryGitScalar(planning.repoRoot, ['rev-parse', '--verify', `${ref}^{commit}`]);
+        if (!commitSha)
+            continue;
+        const changedFiles = tryGitScalar(planning.repoRoot, ['show', '--pretty=format:', '--name-only', commitSha, '--']);
+        for (const file of (changedFiles ?? '').split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean)) {
+            if (declaredFiles.some((declared) => taskflowPathMatches(file, declared))) {
+                matchedFiles.push(file.replace(/\\/g, '/'));
+            }
+        }
+    }
+    const uniqueMatched = uniqueSorted(matchedFiles);
+    return {
+        required: true,
+        ok: uniqueMatched.length > 0,
+        repoRoot: planning.repoRoot,
+        matchedFiles: uniqueMatched,
+        reason: uniqueMatched.length > 0 ? null : 'planning delivery commit does not contain declared deliverable files'
+    };
+}
 function buildTargetStageFiles(cwd, taskId, backendResult) {
     return uniqueSorted([
         `.atm/history/tasks/${taskId}.json`,
@@ -432,10 +499,28 @@ async function runTaskflowClose(parsed, cwd) {
     const delegationContract = buildDelegationContract(profileData);
     const { taskDocument } = loadTaskDocumentOrThrow(cwd, taskId);
     const diagnosis = buildResidueDiagnosisEvidence(cwd, taskId, taskDocument);
+    const planningAuthorityDeliveryGate = inspectPlanningAuthorityDelivery({
+        cwd,
+        taskDocument,
+        historicalDeliveryRefs
+    });
+    if (planningAuthorityDeliveryGate.required
+        && historicalDeliveryRefs.length > 0
+        && !planningAuthorityDeliveryGate.ok) {
+        throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_DELIVERY_INVALID', 'taskflow close could not verify the supplied planning-repo delivery commit against the task deliverables.', {
+            exitCode: 1,
+            details: {
+                taskId,
+                planningAuthorityDeliveryGate,
+                historicalDeliveryRefs
+            }
+        });
+    }
     const closebackPlan = buildClosebackPlan({
         taskId,
         actorId: actorId || '<actor>',
         historicalDeliveryRefs,
+        planningAuthorityDeliveryGate,
         delegationContract,
         diagnosis: {
             bucket: diagnosis.bucket,
@@ -494,6 +579,9 @@ async function runTaskflowClose(parsed, cwd) {
             actorId,
             backendSurface: closebackPlan.backendSurface,
             historicalDeliveryRefs,
+            historicalDeliveryRepo: closebackPlan.planningAuthorityDeliveryGate.ok
+                ? closebackPlan.planningAuthorityDeliveryGate.repoRoot
+                : null,
             planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
             forceImport: diagnosis.bucket === 'stale-import'
         });

@@ -61,6 +61,7 @@ export declare function parseCloseOptions(argv: string[]): {
     cwd: string;
     taskId: string;
     historicalDeliveryRefs: readonly string[];
+    historicalDeliveryRepo: string | null;
     reason: string | null;
     actorId: string | null;
     status: "done" | "review" | "blocked" | "abandoned";

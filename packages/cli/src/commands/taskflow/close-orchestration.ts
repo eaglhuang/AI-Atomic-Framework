@@ -36,6 +36,13 @@ export interface TaskflowClosebackPlan {
     refs: string[];
     validatorSurfaces: string[];
   };
+  planningAuthorityDeliveryGate: {
+    required: boolean;
+    ok: boolean;
+    repoRoot: string | null;
+    matchedFiles: string[];
+    reason: string | null;
+  };
   evidenceValidators: string[];
   residue: Pick<TaskResidueClassification, 'bucket' | 'truth' | 'residue' | 'reason' | 'nextCommand'>;
 }
@@ -44,6 +51,7 @@ function buildTasksCloseCommand(input: {
   taskId: string;
   actorId: string;
   historicalDeliveryRefs?: string[];
+  historicalDeliveryRepo?: string | null;
 }): string {
   const parts = [
     'node atm.mjs tasks close',
@@ -54,6 +62,9 @@ function buildTasksCloseCommand(input: {
   ];
   for (const ref of input.historicalDeliveryRefs ?? []) {
     parts.push(`--historical-delivery ${ref}`);
+  }
+  if (input.historicalDeliveryRepo) {
+    parts.push(`--historical-delivery-repo ${input.historicalDeliveryRepo}`);
   }
   return parts.join(' ');
 }
@@ -125,9 +136,13 @@ export function resolveTaskflowCloseMode(input: {
   bucket: TaskResidueBucket;
   liveStatus: string | null;
   historicalDeliveryRefs: string[];
+  planningAuthorityDeliveryOk?: boolean;
   divergenceCount: number;
 }): TaskflowCloseMode {
   if (input.bucket === 'ambiguous-manual-review') {
+    if (input.planningAuthorityDeliveryOk && input.historicalDeliveryRefs.length > 0) {
+      return 'historical-delivery-close';
+    }
     if (
       input.divergenceCount === 0
       && input.liveStatus
@@ -162,6 +177,13 @@ export function buildClosebackPlan(input: {
   taskId: string;
   actorId: string;
   historicalDeliveryRefs: string[];
+  planningAuthorityDeliveryGate?: {
+    required: boolean;
+    ok: boolean;
+    repoRoot: string | null;
+    matchedFiles: string[];
+    reason: string | null;
+  };
   delegationContract: TaskflowDelegationContract;
   diagnosis: {
     bucket: TaskResidueBucket;
@@ -180,9 +202,12 @@ export function buildClosebackPlan(input: {
     bucket: input.diagnosis.bucket,
     liveStatus: input.diagnosis.triangulation.liveLedger.status,
     historicalDeliveryRefs: input.historicalDeliveryRefs,
+    planningAuthorityDeliveryOk: input.planningAuthorityDeliveryGate?.ok === true,
     divergenceCount: input.diagnosis.triangulation.divergence.length
   });
-  const backendSurface = resolveBackendSurface(input.diagnosis.bucket, closeMode);
+  const backendSurface = input.planningAuthorityDeliveryGate?.ok === true
+    ? 'tasks-close'
+    : resolveBackendSurface(input.diagnosis.bucket, closeMode);
   const planningMirrorPath = input.diagnosis.triangulation.planningFrontmatter.source;
   const rosterIndexPath = input.delegationContract.policy.rosterSync.indexPath;
   const rosterClosebackCommand = rosterIndexPath && planningMirrorPath
@@ -195,7 +220,8 @@ export function buildClosebackPlan(input: {
     backendCommand = buildTasksCloseCommand({
       taskId: input.taskId,
       actorId: input.actorId,
-      historicalDeliveryRefs: input.historicalDeliveryRefs
+      historicalDeliveryRefs: input.historicalDeliveryRefs,
+      historicalDeliveryRepo: input.planningAuthorityDeliveryGate?.repoRoot ?? null
     });
     followUpSteps.push('close-live-ledger');
     if (planningMirrorPath) {
@@ -261,6 +287,13 @@ export function buildClosebackPlan(input: {
         'tasks close scoped-diff isolation'
       ]
     },
+    planningAuthorityDeliveryGate: input.planningAuthorityDeliveryGate ?? {
+      required: false,
+      ok: false,
+      repoRoot: null,
+      matchedFiles: [],
+      reason: null
+    },
     evidenceValidators,
     residue: {
       bucket: input.diagnosis.bucket,
@@ -305,6 +338,7 @@ export function buildCloseBackendArgv(input: {
   actorId: string;
   backendSurface: TaskflowCloseBackend;
   historicalDeliveryRefs: string[];
+  historicalDeliveryRepo?: string | null;
   planningMirrorPath: string | null;
   forceImport: boolean;
 }): string[] {
@@ -334,6 +368,9 @@ export function buildCloseBackendArgv(input: {
   const argv = ['close', '--cwd', input.cwd, '--task', input.taskId, '--actor', input.actorId, '--status', 'done'];
   for (const ref of input.historicalDeliveryRefs) {
     argv.push('--historical-delivery', ref);
+  }
+  if (input.historicalDeliveryRepo) {
+    argv.push('--historical-delivery-repo', input.historicalDeliveryRepo);
   }
   return argv;
 }

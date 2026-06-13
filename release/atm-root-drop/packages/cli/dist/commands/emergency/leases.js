@@ -51,7 +51,7 @@ export function createEmergencyLease(input) {
         approvalText: input.approvalText.trim(),
         reason: input.reason.trim(),
         surface: input.surface?.trim() || null,
-        allowedFlags: input.allowedFlags,
+        allowedFlags: normalizeEmergencyFlags(input.allowedFlags),
         createdAt: createdAt.toISOString(),
         expiresAt: expiresAt.toISOString(),
         maxUses: input.maxUses ?? permission.defaultMaxUses,
@@ -111,9 +111,11 @@ export function consumeEmergencyLease(input) {
     if (lease.usedCount >= lease.maxUses) {
         throw new CliError('ATM_EMERGENCY_APPROVAL_EXHAUSTED', `Emergency approval lease has no remaining uses: ${lease.leaseId}`, { exitCode: 1, details: { leaseId: lease.leaseId, maxUses: lease.maxUses } });
     }
-    const disallowedFlag = input.flags.find((flag) => !lease.allowedFlags.includes(flag));
+    const approvedFlags = normalizeEmergencyFlags(lease.allowedFlags);
+    const requestedFlags = normalizeEmergencyFlags(input.flags);
+    const disallowedFlag = requestedFlags.find((flag) => !approvedFlags.includes(flag));
     if (disallowedFlag) {
-        throw new CliError('ATM_EMERGENCY_FLAG_NOT_APPROVED', `Emergency approval ${lease.leaseId} does not allow ${disallowedFlag}.`, { exitCode: 1, details: { leaseId: lease.leaseId, disallowedFlag, allowedFlags: lease.allowedFlags } });
+        throw new CliError('ATM_EMERGENCY_FLAG_NOT_APPROVED', `Emergency approval ${lease.leaseId} does not allow ${disallowedFlag}.`, { exitCode: 1, details: { leaseId: lease.leaseId, disallowedFlag, allowedFlags: approvedFlags } });
     }
     const updated = {
         ...lease,
@@ -138,4 +140,12 @@ export function consumeEmergencyLease(input) {
         leasePath: writeJson(leasePath(input.cwd, lease.leaseId), updated),
         usePath: writeJson(usePath, use)
     };
+}
+function normalizeEmergencyFlags(flags) {
+    return [...new Set(flags.map((flag) => {
+            const trimmed = String(flag ?? '').trim();
+            if (!trimmed)
+                return '';
+            return trimmed.startsWith('--') ? trimmed : `--${trimmed}`;
+        }).filter(Boolean))].sort();
 }

@@ -105,10 +105,17 @@ Roster synchronization uses `node atm.mjs tasks roster update` as the only offic
 | `residueDiagnosis` | Reuses `atm.taskResidueDiagnosis.v1` truth/residue classification |
 | `delegationContract` | Same adopter-aware writer/roster boundary as `taskflow open` |
 
+`closebackPlan.planningAuthorityDeliveryGate` is populated for tasks whose
+runtime ledger declares `closureAuthority: planning_repo`. In that case,
+`taskflow close --historical-delivery <commit>` treats the commit as a planning
+repository commit, verifies it against the task's declared deliverable paths,
+and delegates to the target backend with `--historical-delivery-repo <repo>`.
+
 ### Close mode rules
 
 - `normal-close`: live ledger is ready for `tasks close`.
 - `historical-delivery-close`: residue or delivery context requires `tasks close --historical-delivery` or `tasks reconcile`.
+- `historical-delivery-close`: for `planning_repo` authority tasks, a verified planning repo delivery commit may select this mode even when target/planning status fields diverge.
 - `planning-mirror-sync-repair`: planning mirror residue routes to `tasks import`.
 - `residue-repair`: interrupted close routes to `tasks repair-closure`.
 - `ambiguous-manual-review`: fail closed; operator must inspect `tasks status` / `tasks finalize diagnose`.
@@ -118,6 +125,7 @@ Roster synchronization uses `node atm.mjs tasks roster update` as the only offic
 - `taskflow close --write` requires `--task` and `--actor`.
 - Ambiguous residue fails closed with `ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE`.
 - Planning-mirror closeback reuses `tasks import` and `tasks roster update`; ATM does not add a second closeback writer.
+- Planning-repo authority closeback must verify the supplied planning repo commit against declared deliverables before backend close. If the commit is missing or does not touch a declared deliverable, ATM fails closed with `ATM_TASKFLOW_CLOSE_PLANNING_DELIVERY_INVALID`.
 - When a profile is supplied, relative roster/index paths are resolved against the planning/adopter repository that owns the task source path, not against the target runtime repo.
 - `taskflow close --write` always exact-stages the target repository closeout artifacts and planning repository closeback artifacts.
 - `taskflow close --write` auto-commits both repositories by default, target first and planning second.

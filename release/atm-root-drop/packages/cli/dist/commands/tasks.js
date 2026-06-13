@@ -1790,6 +1790,7 @@ async function runTasksClose(argv) {
             emergencyApproval: options.emergencyApproval,
             flags: [
                 ...(options.historicalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
+                ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
                 ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
                 ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
             ],
@@ -2049,6 +2050,7 @@ async function runTasksClose(argv) {
             taskDeclaredFiles,
             claim: parseClaimRecord(taskDocument.claim),
             historicalDeliveryRefs: options.historicalDeliveryRefs,
+            historicalDeliveryRepo: options.historicalDeliveryRepo,
             waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
             waiverReason: options.reason
         })
@@ -3576,7 +3578,7 @@ function evaluateTaskDeliverableGate(input) {
         ? deliverableFiles.filter((filePath) => declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
         : deliverableFiles;
     const historicalDeliveries = (input.historicalDeliveryRefs ?? []).map((ref) => inspectHistoricalDelivery({
-        cwd: input.cwd,
+        cwd: input.historicalDeliveryRepo ?? input.cwd,
         taskId: input.taskId,
         requestedRef: ref,
         declaredFiles,
