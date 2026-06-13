@@ -971,7 +971,7 @@ async function runTasksReconcile(argv: string[]) {
     });
   }
 
-  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
+  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId);
   const deliverableGate = evaluateTaskDeliverableGate({
     cwd: options.cwd,
     taskId: options.taskId,
@@ -4216,19 +4216,35 @@ function taskDeliveryPrincipleText() {
   return 'The goal is to deliver the requested task content, not to close task cards. done is only the record after real deliverables and validators exist.';
 }
 
-function extractTaskCloseDeclaredFiles(taskDocument: Record<string, unknown>): readonly string[] {
+function extractTaskCloseDeclaredFiles(taskDocument: Record<string, unknown>, cwd?: string, taskId?: string): readonly string[] {
   const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
     ? taskDocument.taskDirectionLock as Record<string, unknown>
     : {};
   const claim = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
     ? taskDocument.claim as Record<string, unknown>
     : {};
+  const runtimeLock = cwd && taskId ? readRuntimeTaskDirectionLock(cwd, taskId) : {};
   return uniqueStrings([
     ...extractStringList(taskDirectionLock.allowedFiles),
+    ...extractStringList(runtimeLock.allowedFiles),
     ...extractStringList(claim.files),
     ...extractStringList(taskDocument.targetAllowedFiles),
     ...extractTaskDeclaredFiles(taskDocument)
   ]);
+}
+
+function readRuntimeTaskDirectionLock(cwd: string, taskId: string): Record<string, unknown> {
+  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+  if (!existsSync(lockPath)) return {};
+  try {
+    const outerLock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+    const embeddedLock = outerLock.taskDirectionLock;
+    return embeddedLock && typeof embeddedLock === 'object' && !Array.isArray(embeddedLock)
+      ? embeddedLock as Record<string, unknown>
+      : {};
+  } catch {
+    return {};
+  }
 }
 
 function extractStringList(value: unknown): readonly string[] {

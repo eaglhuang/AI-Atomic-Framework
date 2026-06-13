@@ -614,7 +614,7 @@ async function runTasksReconcile(argv) {
             details: { taskId: options.taskId, requestedRef: options.deliveryCommit }
         });
     }
-    const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
+    const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId);
     const deliverableGate = evaluateTaskDeliverableGate({
         cwd: options.cwd,
         taskId: options.taskId,
@@ -3626,19 +3626,36 @@ function evaluateTaskDeliverableGate(input) {
 function taskDeliveryPrincipleText() {
     return 'The goal is to deliver the requested task content, not to close task cards. done is only the record after real deliverables and validators exist.';
 }
-function extractTaskCloseDeclaredFiles(taskDocument) {
+function extractTaskCloseDeclaredFiles(taskDocument, cwd, taskId) {
     const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
         ? taskDocument.taskDirectionLock
         : {};
     const claim = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
         ? taskDocument.claim
         : {};
+    const runtimeLock = cwd && taskId ? readRuntimeTaskDirectionLock(cwd, taskId) : {};
     return uniqueStrings([
         ...extractStringList(taskDirectionLock.allowedFiles),
+        ...extractStringList(runtimeLock.allowedFiles),
         ...extractStringList(claim.files),
         ...extractStringList(taskDocument.targetAllowedFiles),
         ...extractTaskDeclaredFiles(taskDocument)
     ]);
+}
+function readRuntimeTaskDirectionLock(cwd, taskId) {
+    const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+    if (!existsSync(lockPath))
+        return {};
+    try {
+        const outerLock = JSON.parse(readFileSync(lockPath, 'utf8'));
+        const embeddedLock = outerLock.taskDirectionLock;
+        return embeddedLock && typeof embeddedLock === 'object' && !Array.isArray(embeddedLock)
+            ? embeddedLock
+            : {};
+    }
+    catch {
+        return {};
+    }
 }
 function extractStringList(value) {
     return Array.isArray(value)
