@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T15-22-00-808Z-close-b4f3f13b9308",
+  "taskId": "TASK-CID-0056",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613151420-captain-TASK-CID-0056-094530e043",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0056.json",
+  "taskSha256": "sha256:52e99788be7d77571a55419491516aa27ddeed77939325391d4d095e2a94a769",
+  "createdAt": "2026-06-13T15:22:00.808Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0056 --actor captain --status done --historical-delivery e66a033541e2fae110eeb706704e6736d48aafa0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613151420-captain-TASK-CID-0056-094530e043",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0056.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T15:22:00.802Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0056-scope-lock-and-dirty-file-diagnostic-atom-extraction.task.md",
+        ".atm/history/evidence/TASK-CID-0056.*",
+        ".atm/history/task-events/TASK-CID-0056/**",
+        ".atm/history/tasks/TASK-CID-0056.json",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
