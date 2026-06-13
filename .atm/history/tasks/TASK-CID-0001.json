@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0001",
+  "title": "CID hardening control plane bootstrap + verified facts baseline",
+  "status": "done",
+  "milestone": "E0",
+  "dependencies": [],
+  "acceptance": [
+    "The lane exists at `docs/ai_atomic_framework/cid-hardening/` with README + plan book + verified facts + tasks/.",
+    "`tasks/README.md` shows exactly three pilot cards (`0001 / 0002 / 0003`) and a clearly-labelled future queue for `0004 ~ 0007` (no `.task.md` files created for them).",
+    "Every card carries `task_id`, `target_repo`, `closure_authority`, `scopePaths`, `deliverables`, `validators`, `evidence`, `rollback`, `atomizationImpact`, `outOfScope`.",
+    "No AAF source files are modified. No `.atm/runtime/**` or `.atm/history/**` writes.",
+    "`tasks import --dry-run` resolves all three pilot cards with their declared `task_id`."
+  ],
+  "deliverables": [
+    "docs/ai_atomic_framework/cid-hardening/README.md",
+    "docs/ai_atomic_framework/cid-hardening/CID硬化計畫書.md",
+    "docs/ai_atomic_framework/cid-hardening/00-verified-facts.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/README.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0001-*.task.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0002-*.task.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0003-*.task.md"
+  ],
+  "scopePaths": [
+    "docs/ai_atomic_framework/cid-hardening/README.md",
+    "docs/ai_atomic_framework/cid-hardening/CID硬化計畫書.md",
+    "docs/ai_atomic_framework/cid-hardening/00-verified-facts.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/README.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0001-*.task.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0002-*.task.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0003-*.task.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "node atm.mjs tasks import --from \\\"C:/Users/User/3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0001-cid-hardening-control-plane-bootstrap.task.md\\\" --dry-run --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "3KLife",
+  "closureAuthority": "planning_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Modifying AI-Atomic-Framework source",
+    "Hand-editing .atm/runtime/** or .atm/history/**",
+    "Executing tasks import --write",
+    "Opening TASK-CID-0004 ~ 0007 as formal cards (future queue only)",
+    "Implementing any schema, scanner, sandbox, or runtime"
+  ],
+  "nonGoals": [
+    "Do not import CID into TASK-TEAM-* namespace",
+    "Do not claim AAF implementation work in this card"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the planning bootstrap commit. Planning-only; no AAF source touched, no .atm/runtime or .atm/history writes.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.planning-bridge-map",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "Direct successor to the v3.1 roadmap approval. Follow-up: after this card closes, the next claim should be `TASK-CID-0002` (CID semantics + fingerprintProfile schema, AAF).",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0001-cid-hardening-control-plane-bootstrap.task.md",
+    "sectionTitle": "TASK-CID-0001",
+    "headingLine": 57,
+    "hash": "79295adbd3e07017"
+  },
+  "importedAt": "2026-06-13T16:23:01.383Z",
+  "lastTransitionId": "2026-06-13T16-23-01-387Z-import-c7ec70a37526",
+  "lastTransitionAt": "2026-06-13T16:23:01.387Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
