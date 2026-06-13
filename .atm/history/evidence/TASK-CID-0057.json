@@ -1,0 +1,326 @@
+{
+  "taskId": "TASK-CID-0057",
+  "updatedAt": "2026-06-13T15:34:55.098Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed for residue diagnostics extraction",
+      "artifactPaths": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+      "createdAt": "2026-06-13T15:33:00.123Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-13T15:33:00.195Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:90b1cbdfcfe80cc4bdee52867d0278ff736ea2ddc7bb52936f0e8003709579e3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "focused residue diagnostics test passed",
+      "artifactPaths": [
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+      "createdAt": "2026-06-13T15:33:05.097Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "residue-diagnostics"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:37c302df3f37c49d4c8d10f4dd40a3443e6ea7ac8a47460d1ab7fd90df2a952a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "residue-diagnostics"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4a4c12d26dc3adbf98af2fbe0c5d2c9bec4f4700265704245c929a862bbbf592",
+            "cached": false,
+            "generatedAt": "2026-06-13T15:33:05.160Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:94364dba57eab04170c2349cf953ba423bf6cfaf014f1beee600f9e76cbd910d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate:cli passed with residue diagnostics focused coverage",
+      "artifactPaths": [
+        "scripts/validate-cli.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+      "createdAt": "2026-06-13T15:33:38.445Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-06-13T15:33:38.533Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:48e495795e268d50f5b1ee9baba04c3bf5d559375d7d61bc2703b8d3af828c45",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git diff whitespace check passed",
+      "artifactPaths": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+      "createdAt": "2026-06-13T15:33:46.786Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git-diff-check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git-diff-check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-13T15:33:46.847Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4f53c4030edc3f3cf27855ae6a4cb6ecc01c93275eaf6e7788ff587cdf2cc0e9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git diff --check passed",
+      "artifactPaths": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+      "createdAt": "2026-06-13T15:34:28.666Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-13T15:34:28.727Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4f53c4030edc3f3cf27855ae6a4cb6ecc01c93275eaf6e7788ff587cdf2cc0e9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "focused residue diagnostics test passed",
+      "artifactPaths": [
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+      "createdAt": "2026-06-13T15:34:34.004Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:37c302df3f37c49d4c8d10f4dd40a3443e6ea7ac8a47460d1ab7fd90df2a952a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:4a4c12d26dc3adbf98af2fbe0c5d2c9bec4f4700265704245c929a862bbbf592",
+            "cached": false,
+            "generatedAt": "2026-06-13T15:34:34.069Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:94364dba57eab04170c2349cf953ba423bf6cfaf014f1beee600f9e76cbd910d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git-head evidence validator passed",
+      "artifactPaths": [
+        ".atm/history/evidence/TASK-CID-0057.json"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+      "createdAt": "2026-06-13T15:34:55.098Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:057b8caeff6655abdfc78138336c6ead8bd5b50ff000d6c896586243429ccac5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:d36ea072de0b3cf26e338458aaf899ea465ce559aefb21de1f530e563e5ad142",
+            "cached": false,
+            "generatedAt": "2026-06-13T15:34:55.166Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:cb220c3f0b4aa67877fa3df91b30a72cb9c0389ed8f2809890653ee7ff0971e2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

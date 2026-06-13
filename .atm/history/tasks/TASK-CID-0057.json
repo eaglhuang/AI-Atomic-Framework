@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0057",
+  "title": "Residue and ambiguous state diagnostic atom extraction",
+  "status": "done",
+  "milestone": "M9",
+  "dependencies": [
+    "TASK-CID-0053",
+    "TASK-CID-0054"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+    "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+    "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing closeout trust semantics",
+    "Planning mirror writer behavior"
+  ],
+  "nonGoals": [
+    "Do not convert ambiguous-manual-review into a pass state."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.residue-diagnostic-atom",
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0057-residue-and-ambiguous-state-diagnostic-atom-extraction.task.md",
+    "sectionTitle": "TASK-CID-0057",
+    "headingLine": 46,
+    "hash": "6df5d997bcc0ec7f"
+  },
+  "importedAt": "2026-06-13T15:23:40.726Z",
+  "lastTransitionId": "2026-06-13T15-36-17-438Z-close-4eafa8806389",
+  "lastTransitionAt": "2026-06-13T15:36:17.438Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T15:23:55.602Z",
+  "promotedAt": "2026-06-13T15:23:55.605Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-b5a6ac21bd1b",
+    "claimedAt": "2026-06-13T15:23:55.609Z",
+    "heartbeatAt": "2026-06-13T15:36:17.435Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0057.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+      "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T15:23:55.609Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0057",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0057.*",
+      ".atm/history/task-events/TASK-CID-0057/**",
+      ".atm/history/tasks/TASK-CID-0057.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+      "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e9a52f80dcd4901f78a311a2b066edd8127b7775dd817c30f68ee3965cb62c0d",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T15:23:55.636Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T15:36:17.436Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613152355-captain-TASK-CID-0057-53a5ce720d",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0057.closure-packet.json"
+}
