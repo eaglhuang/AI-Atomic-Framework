@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T10-14-18-143Z-close-2e7b325e2c5d",
+  "taskId": "TASK-CID-0071",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613100945-captain-TASK-CID-0071-156e4945d8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0071.json",
+  "taskSha256": "sha256:31e3cfd1aadb0ae1ccea06bd48f644a4687c335eb902c8e90f3961deb2ff72cd",
+  "createdAt": "2026-06-13T10:14:18.143Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0071 --actor captain --status done --historical-delivery c7060c8aabdd6da55bd5bd8a035b92751f7c75d3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613100945-captain-TASK-CID-0071-156e4945d8",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0071.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "python C:/Users/User/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/atm-atom-map-refactor",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T10:14:18.139Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0071-atom-map-refactor-skill-v1.task.md",
+        ".agents/skills/atm-atom-map-refactor/agents/openai.yaml",
+        ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+        ".agents/skills/atm-atom-map-refactor/references/patterns.md",
+        ".agents/skills/atm-atom-map-refactor/SKILL.md",
+        ".atm/history/evidence/TASK-CID-0071.*",
+        ".atm/history/task-events/TASK-CID-0071/**",
+        ".atm/history/tasks/TASK-CID-0071.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
