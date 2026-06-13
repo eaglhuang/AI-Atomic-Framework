@@ -376,6 +376,13 @@ assert(taskflowUsageText.includes('writeReadinessHint'), 'taskflow --help must r
 assert(taskflowUsageText.includes('low-level template generator surface'), 'taskflow --help must label tasks new as a low-level template generator surface');
 assert(taskflowUsageText.includes('runtime synchronization surface'), 'taskflow --help must label tasks import as a runtime synchronization (backend) surface');
 
+const lifecycleStateTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(lifecycleStateTest.status === 0, `lifecycle-state focused test must pass: ${lifecycleStateTest.stderr || lifecycleStateTest.stdout}`);
+
 const nextHelp = await runAtm(['next', '--help'], root);
 const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
 assert(nextUsageText.includes('prefers the explicit --task'), 'next --help must explain that the recommended claim command prefers --task TASK-XXX form when the task is already known');

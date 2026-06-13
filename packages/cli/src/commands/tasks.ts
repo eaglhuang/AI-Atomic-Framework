@@ -58,6 +58,12 @@ import {
   findTaskClaimDependencyBlockers,
   type TaskClaimDependencyBlocker
 } from './tasks/dependency-gate.ts';
+import {
+  evaluateTaskClaimAdmission,
+  evaluateTaskDoneCloseAdmission,
+  evaluateTaskPromotionAdmission,
+  evaluateTaskResetAdmission
+} from './tasks/lifecycle-state.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval } from './emergency/gate.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
@@ -2051,10 +2057,14 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
       details: { taskId: options.taskId, owner: currentOwner, actorId }
     });
   }
-  if (String(taskDocument.status ?? '') !== 'reserved') {
-    throw new CliError('ATM_TASKS_PROMOTE_INVALID_STATE', `Task ${options.taskId} must be in reserved state before promote.`, {
+  const promotionAdmission = evaluateTaskPromotionAdmission({
+    taskId: options.taskId,
+    status: taskDocument.status
+  });
+  if (!promotionAdmission.ok) {
+    throw new CliError(promotionAdmission.code, promotionAdmission.message, {
       exitCode: 1,
-      details: { taskId: options.taskId, status: taskDocument.status ?? null }
+      details: promotionAdmission.details
     });
   }
   taskDocument.status = 'ready';
@@ -2119,19 +2129,15 @@ async function runTasksReset(argv: string[]) {
   }
   const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
   const previousStatus = normalizeTaskStatus(taskDocument.status);
-  if (options.to !== 'open') {
-    throw new CliError('ATM_CLI_USAGE', 'tasks reset currently supports only --to open.', { exitCode: 2 });
-  }
-  if (previousStatus === 'done') {
-    throw new CliError('ATM_TASK_RESET_DONE_REQUIRES_REOPEN', `Task ${options.taskId} is done and cannot be reset to open without a reopen flow.`, {
-      exitCode: 1,
-      details: { taskId: options.taskId, status: previousStatus }
-    });
-  }
-  if (!['reserved', 'ready', 'running', 'open'].includes(previousStatus)) {
-    throw new CliError('ATM_TASK_RESET_INVALID_STATE', `Task ${options.taskId} cannot reset from ${previousStatus} to open.`, {
-      exitCode: 1,
-      details: { taskId: options.taskId, status: previousStatus, allowedFrom: ['reserved', 'ready', 'running', 'open'] }
+  const resetAdmission = evaluateTaskResetAdmission({
+    taskId: options.taskId,
+    fromStatus: previousStatus,
+    toStatus: options.to
+  });
+  if (!resetAdmission.ok) {
+    throw new CliError(resetAdmission.code, resetAdmission.message, {
+      exitCode: resetAdmission.code === 'ATM_CLI_USAGE' ? 2 : 1,
+      details: resetAdmission.details
     });
   }
   const currentClaim = parseClaimRecord(taskDocument.claim);
@@ -2289,34 +2295,18 @@ async function runTasksClose(argv: string[]) {
         }
       });
     }
-    const normPrevStatus = normalizeWorkItemStatus(taskDocument.status);
-    if (normPrevStatus === 'planned') {
-      throw new CliError('ATM_TASK_CLOSE_INVALID_LIFECYCLE', `Task ${options.taskId} status is ${normPrevStatus}. Cannot close a task directly from ${normPrevStatus} to ${options.status}.`, {
+    const doneCloseAdmission = evaluateTaskDoneCloseAdmission({
+      taskId: options.taskId,
+      actorId,
+      status: taskDocument.status,
+      claimState: currentClaim?.state ?? null,
+      claimActorId: currentClaim?.actorId ?? null,
+      hasActiveSession: Boolean(activeSession?.sessionId)
+    });
+    if (!doneCloseAdmission.ok) {
+      throw new CliError(doneCloseAdmission.code, doneCloseAdmission.message, {
         exitCode: 1,
-        details: {
-          taskId: options.taskId,
-          previousStatus: normPrevStatus,
-          status: options.status
-        }
-      });
-    }
-    if (!currentClaim || currentClaim.state !== 'active' || currentClaim.actorId !== actorId) {
-      throw new CliError('ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active claim owned by ${actorId}.`, {
-        exitCode: 1,
-        details: {
-          taskId: options.taskId,
-          actorId,
-          requiredCommand: `node atm.mjs next --claim --actor ${actorId} --prompt "${options.taskId}" --json`
-        }
-      });
-    }
-    if (!activeSession || !activeSession.sessionId) {
-      throw new CliError('ATM_TASK_CLOSE_SESSION_CONTEXT_REQUIRED', `Task ${options.taskId} cannot be closed as done without an active work session.`, {
-        exitCode: 1,
-        details: {
-          taskId: options.taskId,
-          actorId
-        }
+        details: doneCloseAdmission.details
       });
     }
     assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId);
@@ -3620,53 +3610,6 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         taskDirectionLock: directionLock
       }
     });
-}
-
-function evaluateTaskClaimAdmission(input: {
-  readonly taskId: string;
-  readonly actorId: string;
-  readonly status: string;
-  readonly claimIntent: 'write' | 'closeout-only';
-}): {
-  readonly ok: true;
-  readonly reason: 'ready-claim' | 'review-closeout-only-reclaim';
-} | {
-  readonly ok: false;
-  readonly code: 'ATM_TASK_CLAIM_NOT_READY' | 'ATM_TASK_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED';
-  readonly message: string;
-  readonly details: Record<string, unknown>;
-} {
-  const status = normalizeTaskStatus(input.status);
-  if (status === 'ready') {
-    return { ok: true, reason: 'ready-claim' };
-  }
-  if (status === 'review' && input.claimIntent === 'closeout-only') {
-    return { ok: true, reason: 'review-closeout-only-reclaim' };
-  }
-  if (status === 'review') {
-    return {
-      ok: false,
-      code: 'ATM_TASK_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED',
-      message: `Task ${input.taskId} is in review and can only be reclaimed through closeout-only claim intent.`,
-      details: {
-        taskId: input.taskId,
-        status,
-        claimIntent: input.claimIntent,
-        requiredCommand: `node atm.mjs next --claim --actor ${input.actorId} --prompt ${input.taskId} --claim-intent closeout-only --json`,
-        directCommand: `node atm.mjs tasks claim --task ${input.taskId} --actor ${input.actorId} --claim-intent closeout-only --files <scoped-files> --json`,
-        remediation: 'Use closeout-only only when the scoped deliverable already landed and the remaining work is governed closeback. If the deliverable is still missing, leave the task in review.'
-      }
-    };
-  }
-  return {
-    ok: false,
-    code: 'ATM_TASK_CLAIM_NOT_READY',
-    message: `Task ${input.taskId} must be ready before it can be claimed.`,
-    details: {
-      taskId: input.taskId,
-      status
-    }
-  };
 }
 
   if (!currentClaim && action === 'release' && options.reservedOk && normalizeTaskStatus(taskDocument.status) === 'reserved') {
