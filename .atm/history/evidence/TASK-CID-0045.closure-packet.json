@@ -1,0 +1,180 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0045",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8be7a4470bdbf76086cfc1c7f69222be2ccf2187",
+  "governedTreeSha": "0791213c3ebd84c7e289f286c20fc005ef72d3f5",
+  "targetCommitDelta": {
+    "currentCommitSha": "8be7a4470bdbf76086cfc1c7f69222be2ccf2187",
+    "parentCommitShas": [
+      "8be7a4470bdbf76086cfc1c7f69222be2ccf2187"
+    ],
+    "governedTreeSha": "0791213c3ebd84c7e289f286c20fc005ef72d3f5",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0045.json",
+      ".atm/history/task-events/TASK-CID-0045/2026-06-12T07-45-34-667Z-import-4856052a0c25.json",
+      ".atm/history/task-events/TASK-CID-0045/2026-06-13T01-42-06-403Z-reserve-b3a8524420ad.json",
+      ".atm/history/task-events/TASK-CID-0045/2026-06-13T01-42-06-406Z-promote-d25a30d6069b.json",
+      ".atm/history/task-events/TASK-CID-0045/2026-06-13T01-42-06-426Z-claim-9572887e40e9.json",
+      ".atm/history/task-events/TASK-CID-0045/2026-06-13T01-43-33-990Z-scope-amendment-366843a9f3f1.json",
+      ".atm/history/tasks/TASK-CID-0045.json",
+      "docs/reports/agr-conflict-arbitration-benchmark.md",
+      "scripts/fixtures/agr-conflict-benchmark/01-parallel-safe-disjoint.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/02-read-write-dependency-freeze.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/03-capsule-cid-drift-freeze.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/04-shared-surface-blocked.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/05-cid-conflict-blocked.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/06-physical-overlap-steward.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/07-orphan-lock-cleanup.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/08-manual-override-collision.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/manifest.json",
+      "scripts/lib/agr-conflict-benchmark-runner.ts",
+      "scripts/validate-agr-conflict-benchmark.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:agr-conflict-benchmark",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10500976be127a8462a64c1da2f2ff79acd565200acc5c6ee8c19fdcd132713a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:221ae6a74ce096fe673ccc15d13937ebc75403a2da6e06a3c3651cb4613663a6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:11cbd1e6a52175c82140df8e54838991ac1dc3d4cb7a3ad17b41f7d59269fbcb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:agr-conflict-benchmark",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-13T01:46:08.397Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0045-conflict-benchmark-validator-catch-rate-and-latency-reporting.task.md",
+      ".atm/history/evidence/TASK-CID-0045.*",
+      ".atm/history/task-events/TASK-CID-0045/**",
+      ".atm/history/tasks/TASK-CID-0045.json",
+      "docs/reports/agr-conflict-arbitration-benchmark.md",
+      "scripts/fixtures/agr-conflict-benchmark/",
+      "scripts/lib/agr-conflict-benchmark-runner.ts",
+      "scripts/validate-agr-conflict-benchmark.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/fixtures/agr-conflict-benchmark/",
+      "scripts/lib/agr-conflict-benchmark-runner.ts",
+      "scripts/validate-agr-conflict-benchmark.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0045.json",
+  "closedAt": "2026-06-13T01:46:08.398Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260613014206-captain-TASK-CID-0045-1f6dc2b92f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0285e399dfd08882704f0f7bbf81acb4b435f8af",
+    "taskMatchedFiles": [
+      "docs/reports/agr-conflict-arbitration-benchmark.md",
+      "scripts/fixtures/agr-conflict-benchmark/01-parallel-safe-disjoint.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/02-read-write-dependency-freeze.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/03-capsule-cid-drift-freeze.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/04-shared-surface-blocked.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/05-cid-conflict-blocked.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/06-physical-overlap-steward.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/07-orphan-lock-cleanup.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/08-manual-override-collision.scenario.json",
+      "scripts/fixtures/agr-conflict-benchmark/manifest.json",
+      "scripts/lib/agr-conflict-benchmark-runner.ts",
+      "scripts/validate-agr-conflict-benchmark.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "scripts/validate-brokered-write.ts",
+      "scripts/validators.config.json"
+    ],
+    "waivedOutOfScopeFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "scripts/validate-brokered-write.ts",
+      "scripts/validators.config.json"
+    ],
+    "waiverReason": "historical delivery includes package.json validator wiring, atomization map, brokered-write validator alignment, and validators.config registration required to expose TASK-CID-0045 benchmark; scoped benchmark deliverables are present and validated, with current validator wiring restored in commit 8be7a447"
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0045",
+  "title": "Conflict benchmark, validator catch-rate, and latency reporting",
+  "status": "done",
+  "milestone": "M5",
+  "dependencies": [
+    "TASK-CID-0041",
+    "TASK-CID-0042",
+    "TASK-CID-0043",
+    "TASK-CID-0044"
+  ],
+  "acceptance": [
+    "The fixture matrix includes capsule CID drift as a dedicated scenario.",
+    "Validator catch-rate and latency reporting are both deterministic.",
+    "The benchmark fails hard on false-safe regressions."
+  ],
+  "deliverables": [
+    "scripts/validate-agr-conflict-benchmark.ts",
+    "scripts/fixtures/agr-conflict-benchmark/",
+    "scripts/lib/agr-conflict-benchmark-runner.ts",
+    "docs/reports/agr-conflict-arbitration-benchmark.md"
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0045-conflict-benchmark-validator-catch-rate-and-latency-reporting.task.md",
+    "sectionTitle": "TASK-CID-0045",
+    "headingLine": 48,
+    "hash": "23be8658b382f20a"
+  },
+  "importedAt": "2026-06-12T07:45:34.638Z",
+  "scopePaths": [
+    "scripts/validate-agr-conflict-benchmark.ts",
+    "scripts/fixtures/agr-conflict-benchmark/",
+    "scripts/lib/agr-conflict-benchmark-runner.ts",
+    "docs/reports/agr-conflict-arbitration-benchmark.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-agr-conflict-benchmark.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Distributed load testing",
+    "External services or network dependencies"
+  ],
+  "nonGoals": [
+    "Do not accept a benchmark that fails to flag the new capsule CID drift case."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the benchmark pack if it fails to detect capsule CID drift or false-safe regressions.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cid-agr-conflict-benchmark-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-13T01-46-08-401Z-close-340b4285c9a2",
+  "lastTransitionAt": "2026-06-13T01:46:08.401Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T01:42:06.403Z",
+  "promotedAt": "2026-06-13T01:42:06.406Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-931f1813f71c",
+    "claimedAt": "2026-06-13T01:42:06.409Z",
+    "heartbeatAt": "2026-06-13T01:46:08.398Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0045.json",
+      "docs/reports/agr-conflict-arbitration-benchmark.md",
+      "scripts/fixtures/agr-conflict-benchmark/",
+      "scripts/lib/agr-conflict-benchmark-runner.ts",
+      "scripts/validate-agr-conflict-benchmark.ts"
+    ],
+    "state": "released",
+    "reason": "historical delivery includes package.json validator wiring, atomization map, brokered-write validator alignment, and validators.config registration required to expose TASK-CID-0045 benchmark; scoped benchmark deliverables are present and validated, with current validator wiring restored in commit 8be7a447"
+  },
+  "startedAt": "2026-06-13T01:42:06.409Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613014206-captain-TASK-CID-0045-1f6dc2b92f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0045",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0045.*",
+      ".atm/history/task-events/TASK-CID-0045/**",
+      ".atm/history/tasks/TASK-CID-0045.json",
+      "docs/reports/agr-conflict-arbitration-benchmark.md",
+      "scripts/fixtures/agr-conflict-benchmark/",
+      "scripts/lib/agr-conflict-benchmark-runner.ts",
+      "scripts/validate-agr-conflict-benchmark.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f73222b5fb3b1566cc4f8e51363d03cbc4d59335060d46f4d0a9922f76ea1f10",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T01:42:06.426Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T01:46:08.398Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613014206-captain-TASK-CID-0045-1f6dc2b92f",
+  "closeReason": "historical delivery includes package.json validator wiring, atomization map, brokered-write validator alignment, and validators.config registration required to expose TASK-CID-0045 benchmark; scoped benchmark deliverables are present and validated, with current validator wiring restored in commit 8be7a447",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0045.closure-packet.json"
+}
