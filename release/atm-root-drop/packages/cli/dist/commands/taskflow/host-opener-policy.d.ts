@@ -14,6 +14,7 @@ export interface HostOpenerPolicyInput {
     delegationContract: TaskflowDelegationContract;
     taskId?: string | null;
     outputPath?: string | null;
+    title?: string | null;
 }
 export declare function resolveHostOpenerPolicyDecision(input: HostOpenerPolicyInput): HostOpenerPolicyDecision;
 export declare function canResolveHostOpenerPolicy(input: HostOpenerPolicyInput): boolean;

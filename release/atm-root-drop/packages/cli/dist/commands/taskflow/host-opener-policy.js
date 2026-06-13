@@ -79,7 +79,7 @@ function allocateTaskIdFromPolicy(cwd, profile, policy) {
         ]
     };
 }
-function resolveOutputPathFromPolicy(taskId, policy) {
+function resolveOutputPathFromPolicy(taskId, title, policy) {
     if (policy.resolveCanonicalOutputPath.mode !== 'host-opener') {
         throw new CliError('ATM_TASKFLOW_HOST_POLICY_PATH_UNSUPPORTED', 'Host opener canonical output-path policy is not configured; supply --output explicitly.', { exitCode: 1 });
     }
@@ -87,11 +87,24 @@ function resolveOutputPathFromPolicy(taskId, policy) {
     if (!pattern || !pattern.includes('${taskId}')) {
         throw new CliError('ATM_TASKFLOW_HOST_POLICY_PATH_AMBIGUOUS', 'Host opener output-path pattern must include ${taskId}.', { exitCode: 1 });
     }
-    const outputPath = pattern.split('${taskId}').join(taskId).replace(/\\/g, '/');
+    const slug = slugifyTitle(title ?? taskId);
+    const outputPath = pattern
+        .split('${taskId}').join(taskId)
+        .split('${slug}').join(slug)
+        .replace(/\\/g, '/');
     return {
         outputPath,
         diagnostics: [`Resolved canonical output path ${outputPath} from host-neutral policy pattern.`]
     };
+}
+function slugifyTitle(title) {
+    const slug = title
+        .trim()
+        .toLowerCase()
+        .replace(/['"]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    return slug || 'task';
 }
 export function resolveHostOpenerPolicyDecision(input) {
     const diagnostics = [];
@@ -108,14 +121,14 @@ export function resolveHostOpenerPolicyDecision(input) {
         diagnostics.push(...allocated.diagnostics);
     }
     if (!outputPath) {
-        const resolved = resolveOutputPathFromPolicy(taskId, input.delegationContract.policy);
+        const resolved = resolveOutputPathFromPolicy(taskId, input.title ?? null, input.delegationContract.policy);
         outputPath = resolved.outputPath;
         sources.outputPath = 'host-policy';
         diagnostics.push(...resolved.diagnostics);
     }
     const absoluteOutput = path.resolve(input.cwd, outputPath);
     if (existsSync(absoluteOutput)) {
-        throw new CliError('ATM_TASKFLOW_HOST_POLICY_PATH_COLLISION', `Canonical output path already exists: ${outputPath}`, { exitCode: 1, details: { taskId, outputPath } });
+        diagnostics.push(`Canonical output path already exists and may be reused by taskflow open: ${outputPath}.`);
     }
     return {
         taskId: normalizeTaskId(taskId),

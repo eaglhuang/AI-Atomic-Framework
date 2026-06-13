@@ -43,6 +43,94 @@ assert.equal(res3.evidence.orchestrationPlan.policyDecision.allocateTaskId.mode,
 assert.equal(res3.evidence.orchestrationPlan.policyDecision.resolveCanonicalOutputPath.mode, 'host-opener');
 assert.equal(res3.evidence.orchestrationPlan.policyDecision.rosterSyncPolicy, 'follow-up-command');
 assert.equal(res3.evidence.fallbackBehavior.mode, 'template-only-fallback');
+async function makeDualRepoOpenFixture() {
+    const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-taskflow-open-'));
+    const targetRepo = path.join(tempRoot, 'target');
+    const planningRepo = path.join(tempRoot, 'planning');
+    initGitRepo(targetRepo);
+    initGitRepo(planningRepo);
+    writeJson(path.join(targetRepo, 'package.json'), { name: 'target-open-fixture', type: 'module' });
+    writeJson(path.join(targetRepo, '.atm/config.json'), {
+        schemaVersion: 'atm.config.v0.1',
+        layoutVersion: 2,
+        paths: {
+            tasks: '.atm/history/tasks',
+            taskEvents: '.atm/history/task-events'
+        },
+        taskLedger: {
+            enabled: true,
+            mode: 'auto',
+            mirrorExternalTasks: true,
+            requireCliTransitions: true,
+            provider: 'atm-local'
+        }
+    });
+    writeJson(path.join(planningRepo, 'taskflow.profile.json'), {
+        schemaId: 'taskflow.profile.v1',
+        id: 'dual-repo-open-profile',
+        name: 'Dual Repo Open Profile',
+        repoLabel: 'Planning Repo',
+        ownerRepo: 'planning',
+        taskIdPrefix: 'TASK-OPEN',
+        taskId: {
+            format: 'TASK-OPEN-NNNN'
+        },
+        template: {
+            defaultMarkdown: '# ${taskId} ${title}\n\n## Goal\n${description}'
+        },
+        capabilities: {
+            supportsDryRun: true,
+            supportsWrite: false
+        },
+        delegation: {
+            hint: 'Planning repo owns task cards; target repo owns runtime import.',
+            openerPath: 'tools/task-card-opener.js',
+            policy: {
+                allocateTaskId: {
+                    mode: 'host-opener',
+                    prefix: 'TASK-OPEN',
+                    format: 'TASK-OPEN-NNNN'
+                },
+                resolveCanonicalOutputPath: {
+                    mode: 'host-opener',
+                    pattern: 'docs/tasks/${taskId}.task.md',
+                    directory: 'docs/tasks'
+                },
+                rosterSyncPolicy: 'none',
+                fallbackBehavior: {
+                    mode: 'template-only-fallback',
+                    reason: 'fallback'
+                }
+            },
+            writerInvocation: {
+                describeOnly: false,
+                displayHint: 'node tools/task-card-opener.js --write --task ${taskId}'
+            }
+        }
+    });
+    execFileSync('git', ['add', '.'], { cwd: targetRepo, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'base target open fixture'], { cwd: targetRepo, stdio: 'ignore' });
+    execFileSync('git', ['add', '.'], { cwd: planningRepo, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'base planning open fixture'], { cwd: planningRepo, stdio: 'ignore' });
+    return { targetRepo, planningRepo, profilePath: path.join(planningRepo, 'taskflow.profile.json') };
+}
+const openFixture = await makeDualRepoOpenFixture();
+const openWrite = await runTaskflow([
+    'open',
+    '--cwd', openFixture.targetRepo,
+    '--profile', openFixture.profilePath,
+    '--write',
+    '--title', 'Dual repo open write fixture',
+    '--json'
+]);
+assert.equal(openWrite.ok, true);
+assert.equal(openWrite.writeEnabled, true);
+assert.equal(openWrite.evidence.openerMode, 'delegated-governed');
+assert.equal(openWrite.evidence.hostPolicyDecision.taskId, 'TASK-OPEN-0001');
+assert.equal(openWrite.evidence.hostPolicyDecision.outputPath, 'docs/tasks/TASK-OPEN-0001.task.md');
+assert.ok(openWrite.evidence.runtimeImport, 'taskflow open write must import into target runtime');
+assert.ok(readFileSync(path.join(openFixture.planningRepo, 'docs/tasks/TASK-OPEN-0001.task.md'), 'utf8').includes('TASK-OPEN-0001'), 'taskflow open write must create the planning repo task card');
+assert.ok(readFileSync(path.join(openFixture.targetRepo, '.atm/history/tasks/TASK-OPEN-0001.json'), 'utf8').includes('TASK-OPEN-0001'), 'taskflow open write must import the task into the target runtime ledger');
 await assert.rejects(() => runTaskflow(['open', '--write']), (err) => err.code === 'ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK');
 const invalidProfilePath = path.join(rootDir, 'fixtures/taskflow-profile/invalid-missing-schema-id.profile.json');
 await assert.rejects(() => runTaskflow(['open', '--dry-run', '--profile', invalidProfilePath]), (err) => err.code === 'ATM_TASKFLOW_PROFILE_INVALID_SCHEMA_ID');
@@ -89,6 +177,7 @@ async function makeDualRepoCloseFixture(label) {
     });
     const fixtureTaskId = `TASK-DUAL-${label.toUpperCase()}`;
     const planPath = path.join(planningRepo, 'docs', 'tasks', `${fixtureTaskId}.task.md`);
+    const rosterPath = path.join(planningRepo, 'docs', 'tasks', 'README.md');
     writeText(planPath, [
         '---',
         `task_id: ${fixtureTaskId}`,
@@ -98,6 +187,58 @@ async function makeDualRepoCloseFixture(label) {
         `# ${fixtureTaskId}`,
         ''
     ].join('\n'));
+    writeText(rosterPath, [
+        '| Task ID | Title | Status |',
+        '| --- | --- | --- |',
+        `| [${fixtureTaskId}](./${fixtureTaskId}.task.md) | Dual repo close fixture | running |`,
+        ''
+    ].join('\n'));
+    writeJson(path.join(planningRepo, 'taskflow.profile.json'), {
+        schemaId: 'taskflow.profile.v1',
+        id: `dual-repo-close-${label}-profile`,
+        name: 'Dual Repo Close Profile',
+        repoLabel: 'Planning Repo',
+        ownerRepo: 'planning',
+        taskIdPrefix: 'TASK-DUAL',
+        taskId: {
+            format: 'TASK-DUAL-NNNN'
+        },
+        template: {
+            defaultMarkdown: '# ${taskId} ${title}\n\n## Goal\n${description}'
+        },
+        capabilities: {
+            supportsDryRun: true,
+            supportsWrite: false
+        },
+        delegation: {
+            hint: 'Planning repo owns task cards and roster closeback.',
+            openerPath: 'tools/task-card-opener.js',
+            policy: {
+                allocateTaskId: {
+                    mode: 'host-opener',
+                    prefix: 'TASK-DUAL',
+                    format: 'TASK-DUAL-NNNN'
+                },
+                resolveCanonicalOutputPath: {
+                    mode: 'host-opener',
+                    pattern: 'docs/tasks/${taskId}.task.md',
+                    directory: 'docs/tasks'
+                },
+                rosterSyncPolicy: 'inline',
+                rosterSync: {
+                    indexPath: 'docs/tasks/README.md'
+                },
+                fallbackBehavior: {
+                    mode: 'template-only-fallback',
+                    reason: 'fallback'
+                }
+            },
+            writerInvocation: {
+                describeOnly: false,
+                displayHint: 'node tools/task-card-opener.js --write --task ${taskId}'
+            }
+        }
+    });
     writeJson(path.join(targetRepo, '.atm/history/tasks', `${fixtureTaskId}.json`), {
         schemaVersion: 'atm.workItem.v0.2',
         workItemId: fixtureTaskId,
@@ -154,7 +295,7 @@ async function makeDualRepoCloseFixture(label) {
         ''
     ].join('\n'));
     writeText(path.join(targetRepo, 'scratch.txt'), 'unrelated noise\n');
-    return { targetRepo, planningRepo, taskId: fixtureTaskId, planPath, deliveryCommit };
+    return { targetRepo, planningRepo, taskId: fixtureTaskId, planPath, deliveryCommit, profilePath: path.join(planningRepo, 'taskflow.profile.json') };
 }
 const dryRunFixture = await makeDualRepoCloseFixture('dryrun');
 const dryRunClose = await runTaskflow([
@@ -180,6 +321,7 @@ const stageOnlyPlanningHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: 
 const stageOnly = await runTaskflow([
     'close',
     '--cwd', stageOnlyFixture.targetRepo,
+    '--profile', stageOnlyFixture.profilePath,
     '--task', stageOnlyFixture.taskId,
     '--actor', 'validator',
     '--historical-delivery', stageOnlyFixture.deliveryCommit,
@@ -198,7 +340,8 @@ const stageOnlyPlanningStaged = execFileSync('git', ['diff', '--cached', '--name
 assert.ok(stageOnlyTargetStaged.includes(`.atm/history/tasks/${stageOnlyFixture.taskId}.json`), 'stage-only target bundle must stage task json');
 assert.ok(stageOnlyTargetStaged.some((entry) => entry.startsWith(`.atm/history/task-events/${stageOnlyFixture.taskId}/`) && entry.includes('-close-')), 'stage-only target bundle must stage close event');
 assert.ok(!stageOnlyTargetStaged.includes('scratch.txt'), 'stage-only target bundle must not stage unrelated dirty files');
-assert.deepEqual(stageOnlyPlanningStaged, [`docs/tasks/${stageOnlyFixture.taskId}.task.md`], 'stage-only planning bundle must exact-stage only the planning card');
+assert.deepEqual(stageOnlyPlanningStaged, ['docs/tasks/README.md', `docs/tasks/${stageOnlyFixture.taskId}.task.md`], 'stage-only planning bundle must exact-stage the planning card and roster');
+assert.ok(readFileSync(path.join(stageOnlyFixture.planningRepo, 'docs/tasks/README.md'), 'utf8').includes('| done |'), 'profile-only taskflow close must update the planning roster from the planning repo');
 const autoCommitFixture = await makeDualRepoCloseFixture('autocommit');
 const autoCommit = await runTaskflow([
     'close',

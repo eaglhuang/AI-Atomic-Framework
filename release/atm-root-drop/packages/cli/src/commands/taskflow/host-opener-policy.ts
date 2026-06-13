@@ -20,6 +20,7 @@ export interface HostOpenerPolicyInput {
   delegationContract: TaskflowDelegationContract;
   taskId?: string | null;
   outputPath?: string | null;
+  title?: string | null;
 }
 
 function escapeRegex(value: string): string {
@@ -132,6 +133,7 @@ function allocateTaskIdFromPolicy(
 
 function resolveOutputPathFromPolicy(
   taskId: string,
+  title: string | null,
   policy: TaskflowDelegationContract['policy']
 ): { outputPath: string; diagnostics: string[] } {
   if (policy.resolveCanonicalOutputPath.mode !== 'host-opener') {
@@ -151,11 +153,25 @@ function resolveOutputPathFromPolicy(
     );
   }
 
-  const outputPath = pattern.split('${taskId}').join(taskId).replace(/\\/g, '/');
+  const slug = slugifyTitle(title ?? taskId);
+  const outputPath = pattern
+    .split('${taskId}').join(taskId)
+    .split('${slug}').join(slug)
+    .replace(/\\/g, '/');
   return {
     outputPath,
     diagnostics: [`Resolved canonical output path ${outputPath} from host-neutral policy pattern.`]
   };
+}
+
+function slugifyTitle(title: string): string {
+  const slug = title
+    .trim()
+    .toLowerCase()
+    .replace(/['"]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug || 'task';
 }
 
 export function resolveHostOpenerPolicyDecision(input: HostOpenerPolicyInput): HostOpenerPolicyDecision {
@@ -175,7 +191,7 @@ export function resolveHostOpenerPolicyDecision(input: HostOpenerPolicyInput): H
   }
 
   if (!outputPath) {
-    const resolved = resolveOutputPathFromPolicy(taskId, input.delegationContract.policy);
+    const resolved = resolveOutputPathFromPolicy(taskId, input.title ?? null, input.delegationContract.policy);
     outputPath = resolved.outputPath;
     sources.outputPath = 'host-policy';
     diagnostics.push(...resolved.diagnostics);
@@ -183,11 +199,7 @@ export function resolveHostOpenerPolicyDecision(input: HostOpenerPolicyInput): H
 
   const absoluteOutput = path.resolve(input.cwd, outputPath);
   if (existsSync(absoluteOutput)) {
-    throw new CliError(
-      'ATM_TASKFLOW_HOST_POLICY_PATH_COLLISION',
-      `Canonical output path already exists: ${outputPath}`,
-      { exitCode: 1, details: { taskId, outputPath } }
-    );
+    diagnostics.push(`Canonical output path already exists and may be reused by taskflow open: ${outputPath}.`);
   }
 
   return {

@@ -92,13 +92,14 @@ function buildRosterSyncCommand(input: {
 function buildTasksImportCommand(input: {
   fromPath: string;
 }): string {
-  return `node atm.mjs tasks import --from ${input.fromPath} --write --json`;
+  return `node atm.mjs tasks import --from ${quoteCliValue(input.fromPath)} --write --json`;
 }
 
 function buildOrchestrationPlan(input: {
   profile: TaskflowProfileV1 | null;
   openerMode: ReturnType<typeof resolveOpenerMode>;
   delegationContract: ReturnType<typeof buildDelegationContract>;
+  outputRoot?: string | null;
   taskId?: string | null;
   outputPath?: string | null;
   template?: string | null;
@@ -149,7 +150,9 @@ function buildOrchestrationPlan(input: {
       title: input.title
     }),
     tasksImportCommand: resolvedOutputPath
-      ? buildTasksImportCommand({ fromPath: resolvedOutputPath })
+      ? buildTasksImportCommand({
+        fromPath: input.outputRoot ? resolveOutputAbsolute(input.outputRoot, resolvedOutputPath) : resolvedOutputPath
+      })
       : null,
     hostOpenerInvocation: input.delegationContract.displayHint,
     rosterSyncPolicy,
@@ -161,6 +164,7 @@ function buildOrchestrationPlan(input: {
       || (rosterSyncPolicy === 'follow-up-command' && Boolean(rosterFollowUpCommand)),
     followUpSteps,
     targetRepo: input.profile?.ownerRepo ?? 'adopter-repo',
+    outputRepoRoot: input.outputRoot ?? null,
     profileRepoLabel: input.profile?.repoLabel ?? 'adopter-repo',
     policyDecision: {
       allocateTaskId: input.delegationContract.policy.allocateTaskId,
@@ -229,6 +233,25 @@ function readGitRoot(startPath: string): string | null {
   const probe = existsSync(startPath) && statSync(startPath).isDirectory() ? startPath : path.dirname(startPath);
   const root = tryGitScalar(probe, ['rev-parse', '--show-toplevel']);
   return root ? path.resolve(root) : null;
+}
+
+function resolveProfileRepoRoot(profilePath: string | null, fallbackCwd: string): string {
+  if (!profilePath) return fallbackCwd;
+  const resolvedProfilePath = path.resolve(profilePath);
+  return readGitRoot(resolvedProfilePath) ?? path.dirname(resolvedProfilePath);
+}
+
+function resolveTaskflowOpenOutputRoot(input: {
+  profilePath: string | null;
+  profile: TaskflowProfileV1 | null;
+  cwd: string;
+}): string {
+  if (!input.profile) return input.cwd;
+  return resolveProfileRepoRoot(input.profilePath, input.cwd);
+}
+
+function resolveOutputAbsolute(root: string, outputPath: string): string {
+  return path.isAbsolute(outputPath) ? path.resolve(outputPath) : path.resolve(root, outputPath);
 }
 
 function runGitOrThrow(cwd: string, args: readonly string[]) {
@@ -301,6 +324,32 @@ function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { 
   return {
     repoRoot,
     relativePath: normalizeRepoRelativePath(repoRoot, absolutePath),
+    reason: null
+  };
+}
+
+function resolvePlanningRosterPaths(input: {
+  cwd: string;
+  planningMirrorPath: string | null;
+  rosterIndexPath: string | null;
+}): { repoRoot: string | null; fromPath: string | null; indexPath: string | null; reason: string | null } {
+  const planning = resolvePlanningPath(input.cwd, input.planningMirrorPath);
+  if (!planning.repoRoot || !planning.relativePath) {
+    return {
+      repoRoot: null,
+      fromPath: null,
+      indexPath: null,
+      reason: planning.reason
+    };
+  }
+  return {
+    repoRoot: planning.repoRoot,
+    fromPath: planning.relativePath,
+    indexPath: input.rosterIndexPath
+      ? normalizeRepoRelativePath(planning.repoRoot, path.isAbsolute(input.rosterIndexPath)
+        ? input.rosterIndexPath
+        : path.resolve(planning.repoRoot, input.rosterIndexPath))
+      : null,
     reason: null
   };
 }
@@ -579,13 +628,24 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       && closebackPlan.writerBoundary.rosterIndexPath
       && closebackPlan.writerBoundary.planningMirrorPath
     ) {
+      const planningRosterPaths = resolvePlanningRosterPaths({
+        cwd,
+        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+        rosterIndexPath: closebackPlan.writerBoundary.rosterIndexPath
+      });
+      if (!planningRosterPaths.repoRoot || !planningRosterPaths.indexPath || !planningRosterPaths.fromPath) {
+        throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_ROSTER_UNRESOLVED', planningRosterPaths.reason ?? 'taskflow close could not resolve planning roster paths.', {
+          exitCode: 1,
+          details: { closebackPlan }
+        });
+      }
       rosterCloseback = {
         mode: 'inline',
         command: closebackPlan.writerBoundary.rosterClosebackCommand,
         result: await runTasksRosterUpdate([
-          '--cwd', cwd,
-          '--index', closebackPlan.writerBoundary.rosterIndexPath,
-          '--from', closebackPlan.writerBoundary.planningMirrorPath
+          '--cwd', planningRosterPaths.repoRoot,
+          '--index', planningRosterPaths.indexPath,
+          '--from', planningRosterPaths.fromPath
         ])
       };
     } else if (
@@ -711,6 +771,11 @@ export async function runTaskflow(argv: string[] = []) {
   if (profilePath) {
     profileData = loadProfile(profilePath);
   }
+  const openOutputRoot = resolveTaskflowOpenOutputRoot({
+    profilePath,
+    profile: profileData,
+    cwd
+  });
 
   const prerequisiteInput = {
     profile: profileData,
@@ -726,19 +791,21 @@ export async function runTaskflow(argv: string[] = []) {
 
   let hostPolicyDecision: ReturnType<typeof resolveHostOpenerPolicyDecision> | null = null;
   if (profileData && canResolveHostOpenerPolicy({
-    cwd,
+    cwd: openOutputRoot,
     profile: profileData,
     delegationContract,
     taskId,
-    outputPath
+    outputPath,
+    title
   })) {
     try {
       hostPolicyDecision = resolveHostOpenerPolicyDecision({
-        cwd,
+        cwd: openOutputRoot,
         profile: profileData,
         delegationContract,
         taskId,
-        outputPath
+        outputPath,
+        title
       });
       diagnostics.messages.push(...hostPolicyDecision.diagnostics);
     } catch (error) {
@@ -752,6 +819,7 @@ export async function runTaskflow(argv: string[] = []) {
     profile: profileData,
     openerMode,
     delegationContract,
+    outputRoot: openOutputRoot,
     taskId: hostPolicyDecision?.taskId ?? taskId,
     outputPath: hostPolicyDecision?.outputPath ?? outputPath,
     template,
@@ -791,43 +859,43 @@ export async function runTaskflow(argv: string[] = []) {
     }
 
     const resolved = hostPolicyDecision ?? resolveHostOpenerPolicyDecision({
-      cwd,
+      cwd: openOutputRoot,
       profile: profileData,
       delegationContract,
       taskId,
-      outputPath
+      outputPath,
+      title
     });
 
-    const generated = await generateTaskCard({
-      cwd,
-      templateKey: template,
-      taskId: resolved.taskId,
-      title,
-      outputPath: resolved.outputPath
-    });
-
-    const targetAbsolute = path.resolve(cwd, resolved.outputPath);
+    const targetAbsolute = resolveOutputAbsolute(openOutputRoot, resolved.outputPath);
     const hadExistingTarget = existsSync(targetAbsolute);
-    const previousTargetContent = hadExistingTarget ? readFileSync(targetAbsolute, 'utf8') : null;
-    mkdirSync(path.dirname(targetAbsolute), { recursive: true });
-    writeFileSync(targetAbsolute, generated.content, 'utf8');
+    let generated: Awaited<ReturnType<typeof generateTaskCard>> | null = null;
+    if (!hadExistingTarget) {
+      generated = await generateTaskCard({
+        cwd: openOutputRoot,
+        templateKey: template,
+        taskId: resolved.taskId,
+        title,
+        outputPath: resolved.outputPath
+      });
+      mkdirSync(path.dirname(targetAbsolute), { recursive: true });
+      writeFileSync(targetAbsolute, generated.content, 'utf8');
+    }
 
     let runtimeImport: Record<string, unknown> | null = null;
     try {
       const runtimeImportResult = await runTasks([
         'import',
         '--cwd', cwd,
-        '--from', resolved.outputPath,
+        '--from', targetAbsolute,
         '--write'
       ]);
       runtimeImport = {
-        command: buildTasksImportCommand({ fromPath: resolved.outputPath }),
+        command: buildTasksImportCommand({ fromPath: targetAbsolute }),
         result: runtimeImportResult
       };
     } catch (error) {
-      if (hadExistingTarget && previousTargetContent !== null) {
-        writeFileSync(targetAbsolute, previousTargetContent, 'utf8');
-      } else if (existsSync(targetAbsolute)) {
+      if (!hadExistingTarget && existsSync(targetAbsolute)) {
         rmSync(targetAbsolute, { force: true });
       }
       throw error;
@@ -876,9 +944,11 @@ export async function runTaskflow(argv: string[] = []) {
           hostPolicyDecision: resolved,
           generation: {
             surface: 'tasks-new',
-            taskId: generated.taskId,
-            sourcePath: generated.sourcePath,
-            templateUsed: generated.templateUsed
+            taskId: generated?.taskId ?? resolved.taskId,
+            sourcePath: generated?.sourcePath ?? resolved.outputPath,
+            templateUsed: generated?.templateUsed ?? template,
+            reusedExistingCard: hadExistingTarget,
+            outputRepoRoot: openOutputRoot
           },
           runtimeImport,
           rosterSync,
