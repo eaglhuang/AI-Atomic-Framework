@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T09-47-41-810Z-close-0ff0ec8f0f13",
+  "taskId": "TASK-CID-0053",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613093521-captain-TASK-CID-0053-f872c9f549",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0053.json",
+  "taskSha256": "sha256:e81e85d1acf6f88d71d57ddd1d905d134a59ba164982ba656e8dff4c6c186710",
+  "createdAt": "2026-06-13T09:47:41.810Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0053 --actor captain --status done --historical-delivery 7f72057e3791b6e6e0ad5c8d0e1eae78aaa36083",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613093521-captain-TASK-CID-0053-f872c9f549",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0053.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+      "npm run build",
+      "npm run typecheck",
+      "npm run validate:cli",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T09:47:41.807Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0053-dependency-gate-atom-extraction-for-next-and-claim.task.md",
+        ".atm/history/evidence/TASK-CID-0053.*",
+        ".atm/history/task-events/TASK-CID-0053/**",
+        ".atm/history/tasks/TASK-CID-0053.json",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts",
+        "packages/cli/src/commands/tasks/dependency-gate.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
