@@ -14,6 +14,7 @@ import createMapSpec from './command-specs/create-map.spec.js';
 import daemonSpec from './command-specs/daemon.spec.js';
 import doctorSpec from './command-specs/doctor.spec.js';
 import doSpec from './command-specs/do.spec.js';
+import emergencySpec from './command-specs/emergency.spec.js';
 import experienceSpec from './command-specs/experience.spec.js';
 import healthReportSpec from './command-specs/health-report.spec.js';
 import identitySpec from './command-specs/identity.spec.js';
@@ -83,6 +84,7 @@ export const commandSpecs = Object.freeze({
     daemon: withVisibility(daemonSpec, 'internal'),
     doctor: doctorSpec,
     do: withVisibility(doSpec, 'internal'),
+    emergency: emergencySpec,
     experience: experienceSpec,
     explain: explainSpec,
     evidence: evidenceSpec,

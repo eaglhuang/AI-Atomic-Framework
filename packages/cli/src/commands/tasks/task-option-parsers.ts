@@ -73,6 +73,7 @@ export function parseReconcileOptions(argv: string[]) {
     deliveryCommit: '',
     waiverOutOfScopeDelivery: false,
     waiverReason: null as string | null,
+    emergencyApproval: null as string | null,
     allowStaleRunner: parseAllowStaleRunnerFlag(argv)
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -103,6 +104,11 @@ export function parseReconcileOptions(argv: string[]) {
     }
     if (arg === '--reason') {
       options.waiverReason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--emergency-approval') {
+      options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
       continue;
     }
@@ -203,6 +209,7 @@ export function parseScopeAddOptions(argv: string[]) {
     cwd: process.cwd(),
     taskId: '',
     actorId: null as string | null,
+    emergencyApproval: null as string | null,
     addPaths: [] as string[]
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -219,6 +226,11 @@ export function parseScopeAddOptions(argv: string[]) {
     }
     if (arg === '--actor') {
       options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--emergency-approval') {
+      options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
       continue;
     }
@@ -392,6 +404,7 @@ export function parseCloseOptions(argv: string[]) {
     batchId: null as string | null,
     historicalDeliveryRefs: [] as string[],
     waiverOutOfScopeDelivery: false,
+    emergencyApproval: null as string | null,
     allowStaleRunner: parseAllowStaleRunnerFlag(argv)
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -443,6 +456,11 @@ export function parseCloseOptions(argv: string[]) {
       options.waiverOutOfScopeDelivery = true;
       continue;
     }
+    if (arg === '--emergency-approval') {
+      options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
+      index += 1;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
       continue;
     }
@@ -465,6 +483,7 @@ export function parseResetOptions(argv: string[]) {
     cwd: process.cwd(),
     taskId: '',
     actorId: null as string | null,
+    emergencyApproval: null as string | null,
     to: 'open',
     reason: null as string | null
   };
@@ -482,6 +501,11 @@ export function parseResetOptions(argv: string[]) {
     }
     if (arg === '--actor') {
       options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--emergency-approval') {
+      options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
       continue;
     }
@@ -582,6 +606,7 @@ export function parseLockCleanupOptions(argv: string[]) {
     taskId: '',
     actorId: null as string | null,
     reason: null as string | null,
+    emergencyApproval: null as string | null,
     allStale: false
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -598,6 +623,11 @@ export function parseLockCleanupOptions(argv: string[]) {
     }
     if (arg === '--actor') {
       options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--emergency-approval') {
+      options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
       continue;
     }

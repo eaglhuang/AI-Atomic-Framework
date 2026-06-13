@@ -28,6 +28,7 @@ import {
   canResolveHostOpenerPolicy,
   resolveHostOpenerPolicyDecision
 } from './taskflow/host-opener-policy.ts';
+import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { runAtmGit } from './git-governance.ts';
 import { quoteCliValue, relativePathFrom } from './shared.ts';
 
@@ -620,7 +621,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
       forceImport: diagnosis.bucket === 'stale-import'
     });
-    const backendResult = await runTasks(backendArgv);
+    const backendResult = await withTaskflowOperatorLane(() => runTasks(backendArgv));
     let rosterCloseback: Record<string, unknown> | null = null;
     if (
       closebackPlan.writerBoundary.rosterClosebackCommand
@@ -884,12 +885,12 @@ export async function runTaskflow(argv: string[] = []) {
 
     let runtimeImport: Record<string, unknown> | null = null;
     try {
-      const runtimeImportResult = await runTasks([
+      const runtimeImportResult = await withTaskflowOperatorLane(() => runTasks([
         'import',
         '--cwd', cwd,
         '--from', targetAbsolute,
         '--write'
-      ]);
+      ]));
       runtimeImport = {
         command: buildTasksImportCommand({ fromPath: targetAbsolute }),
         result: runtimeImportResult

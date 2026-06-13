@@ -7,6 +7,7 @@ import { buildCloseBackendArgv, buildClosebackPlan, buildTaskflowCloseDiagnostic
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
+import { withTaskflowOperatorLane } from './emergency/context.js';
 import { runAtmGit } from './git-governance.js';
 import { quoteCliValue, relativePathFrom } from './shared.js';
 function buildTasksNewCommand(input) {
@@ -496,7 +497,7 @@ async function runTaskflowClose(parsed, cwd) {
             planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
             forceImport: diagnosis.bucket === 'stale-import'
         });
-        const backendResult = await runTasks(backendArgv);
+        const backendResult = await withTaskflowOperatorLane(() => runTasks(backendArgv));
         let rosterCloseback = null;
         if (closebackPlan.writerBoundary.rosterClosebackCommand
             && closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
@@ -729,12 +730,12 @@ export async function runTaskflow(argv = []) {
         }
         let runtimeImport = null;
         try {
-            const runtimeImportResult = await runTasks([
+            const runtimeImportResult = await withTaskflowOperatorLane(() => runTasks([
                 'import',
                 '--cwd', cwd,
                 '--from', targetAbsolute,
                 '--write'
-            ]);
+            ]));
             runtimeImport = {
                 command: buildTasksImportCommand({ fromPath: targetAbsolute }),
                 result: runtimeImportResult

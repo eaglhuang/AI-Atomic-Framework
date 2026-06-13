@@ -9,7 +9,7 @@ import {
 
 export default defineCommandSpec({
   name: 'tasks',
-  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, run read-only tasks parallel advisor checks, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. tasks new is the low-level template generator only; taskflow open is the official governed opener orchestration entry. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, compact dispatchPattern / conditionReview / mailboxAssignee dispatch metadata, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
+  summary: 'Create/import/mirror/verify/audit task plans, manage prompt-scoped queues and claim lifecycle, run read-only tasks parallel advisor checks, migrate legacy ledger records, close tasks with deliverable/evidence gates, and amend active task scope via tasks scope add. taskflow open/close is the official operator lane; tasks close/reconcile/import --write/repair-closure/reset/lock cleanup are backend surfaces and protected emergency mutations when used directly. tasks new is the low-level template generator only; taskflow open is the official governed opener orchestration entry. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, compact dispatchPattern / conditionReview / mailboxAssignee dispatch metadata, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
   positional: [
     { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | finalize | roster | new', required: true }
   ],
@@ -29,6 +29,7 @@ export default defineCommandSpec({
     { flag: '--task', value: 'id', summary: 'Task id for reserve/promote/claim/renew/release/handoff/takeover/close/reconcile/repair-closure/status/finalize diagnose/scope add.' },
     { flag: '--residue', summary: 'For tasks status, return residue-focused diagnosis evidence only (including source-done-governance-incomplete vs ambiguous-manual-review).' },
     { flag: '--allow-stale-runner', summary: 'Allow write actions while the frozen runner is older than framework source (disaster recovery only).' },
+    { flag: '--emergency-approval', value: 'leaseId', summary: 'Required for protected direct backend emergency surfaces; obtain via emergency approve after human approval.' },
     { flag: '--with', value: 'id', summary: 'Second task id for tasks parallel pair analysis.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for reservation/claim/close/reconcile lifecycle actions (or set ATM_ACTOR_ID).' },
     { flag: '--claim-intent', value: 'mode', summary: 'Claim mode for tasks claim: write (default) or closeout-only/no-more-mutation.' },
@@ -93,10 +94,10 @@ export default defineCommandSpec({
     'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reason "handoff complete" --json',
     'node atm.mjs tasks release --task ATM-GOV-0101 --actor codex-main --reserved-ok --reason "rollback cleanup" --json',
     'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --json',
-    'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --historical-delivery abc123 --json',
+    'node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --historical-delivery abc123 --emergency-approval EMG-... --json',
     'node atm.mjs tasks repair-closure --task TASK-AAO-0102 --json',
     'node atm.mjs tasks block --task ATM-GOV-0104 --actor codex-main --reason "waiting on target evidence" --json',
-    'node atm.mjs tasks reconcile --task TASK-AAO-0055 --actor codex-main --delivery-commit abc1234 --json',
+    'node atm.mjs tasks reconcile --task TASK-AAO-0055 --actor codex-main --delivery-commit abc1234 --emergency-approval EMG-... --json',
     'node atm.mjs tasks status --task TASK-AAO-0137 --json',
     'node atm.mjs tasks status --task TASK-AAO-0137 --residue --json',
     'node atm.mjs tasks finalize diagnose --task TASK-AAO-0137 --json',

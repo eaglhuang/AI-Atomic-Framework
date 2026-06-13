@@ -298,7 +298,7 @@ function assertMessageCode(result: any, code: any) {
   assert(result.parsed.messages.some((entry: any) => entry.code === code), `expected message code ${code}`);
 }
 
-for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/cache.ts', 'packages/cli/src/commands/candidates.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/framework-development.ts', 'packages/cli/src/commands/internal-release.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/police.ts', 'packages/cli/src/commands/registry.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json', 'fixtures/verify/guard-evidence-pass.json', 'fixtures/verify/guard-evidence-missing-justification.json']) {
+for (const relativePath of [fixture.entrypoint, 'packages/cli/src/commands/atm-chart.ts', 'packages/cli/src/commands/bootstrap-entry.ts', 'packages/cli/src/commands/cache.ts', 'packages/cli/src/commands/candidates.ts', 'packages/cli/src/commands/create.ts', 'packages/cli/src/commands/doctor.ts', 'packages/cli/src/commands/emergency.ts', 'packages/cli/src/commands/framework-development.ts', 'packages/cli/src/commands/internal-release.ts', 'packages/cli/src/commands/next.ts', 'packages/cli/src/commands/init.ts', 'packages/cli/src/commands/integration.ts', 'packages/cli/src/commands/police.ts', 'packages/cli/src/commands/registry.ts', 'packages/cli/src/commands/rollback.ts', 'packages/cli/src/commands/review.ts', 'packages/cli/src/commands/self-host-alpha.ts', 'packages/cli/src/commands/spec.ts', 'packages/cli/src/commands/status.ts', 'packages/cli/src/commands/upgrade.ts', 'packages/cli/src/commands/test.ts', 'packages/cli/src/commands/validate.ts', 'packages/cli/src/commands/verify.ts', 'packages/cli/src/commands/welcome.ts', 'templates/enforcement/pre-commit.sh', 'templates/enforcement/ci-atm-onboarding.yml', 'fixtures/upgrade/hash-diff-report.json', 'fixtures/upgrade/quality-comparison-pass.json', 'fixtures/upgrade/quality-comparison-blocked.json', 'fixtures/upgrade/proposal-pass.json', 'fixtures/upgrade/proposal-blocked.json', 'fixtures/evolution/evidence-patterns/no-signal.json', 'fixtures/evolution/evidence-patterns/recurring-failure-candidate.json', 'fixtures/registry/v1-with-versions.json', 'tests/police-fixtures/positive/non-regression-report.json', 'tests/police-fixtures/positive/registry-candidate-report.json', 'tests/schema-fixtures/positive/minimal-execution-evidence.json', fixture.validAtomicSpec, 'atomic-registry.json', 'fixtures/verify/guard-evidence-pass.json', 'fixtures/verify/guard-evidence-missing-justification.json']) {
   assert(existsSync(path.join(root, relativePath)), `missing CLI fixture dependency: ${relativePath}`);
 }
 
@@ -364,6 +364,20 @@ const tasksUsageText = JSON.stringify(tasksHelp.parsed.evidence?.usage ?? {});
 assert(tasksUsageText.includes('repair-closure'), 'tasks --help CLI surface must list repair-closure');
 assert(tasksUsageText.includes('node atm.mjs tasks repair-closure'), 'tasks --help examples must show tasks repair-closure usage');
 assert(tasksUsageText.includes('--amend'), 'tasks --help must document explicit repair-closure amend opt-in');
+assert(tasksUsageText.includes('--emergency-approval'), 'tasks --help must document emergency approval for protected backend surfaces');
+assert(tasksUsageText.includes('taskflow open/close'), 'tasks --help must identify taskflow as the official operator lane');
+
+const taskflowHelp = await runAtm(['taskflow', '--help'], root);
+const taskflowUsageText = JSON.stringify(taskflowHelp.parsed.evidence?.usage ?? {});
+assert(taskflowUsageText.includes('official operator lane'), 'taskflow --help must identify taskflow close as the operator lane');
+assert(taskflowUsageText.includes('protected backend surfaces'), 'taskflow --help must explain internal protected backend delegation');
+
+const emergencyHelp = await runAtm(['emergency', '--help'], root);
+assert(emergencyHelp.exitCode === 0, 'emergency --help must exit 0');
+assertReadable(emergencyHelp, 'emergency --help');
+const emergencyUsageText = JSON.stringify(emergencyHelp.parsed.evidence?.usage ?? {});
+assert(emergencyUsageText.includes('approve'), 'emergency --help must document approve');
+assert(emergencyUsageText.includes('--approval-text'), 'emergency --help must require human approval text');
 
 const rescueHelp = await runAtm(['rescue', '--help'], root);
 const rescueUsageText = JSON.stringify(rescueHelp.parsed.evidence?.usage ?? {});
@@ -380,6 +394,57 @@ if (surfaceOnly) {
 
 const tempRoot = createCliTempWorkspace('atm-cli-');
 try {
+  const emergencyPermissions = await runAtm(['emergency', 'permissions', '--json'], tempRoot);
+  assert(emergencyPermissions.exitCode === 0, 'emergency permissions must exit 0');
+  assertReadable(emergencyPermissions, 'emergency permissions');
+  assert(Array.isArray(emergencyPermissions.parsed.evidence?.permissions), 'emergency permissions must return registry entries');
+  assert(emergencyPermissions.parsed.evidence.permissions.some((entry: any) => entry.id === 'backend.tasks.reconcile'), 'emergency permissions must include backend.tasks.reconcile');
+
+  const emergencyApproval = await runAtm([
+    'emergency', 'approve',
+    '--cwd', tempRoot,
+    '--task', 'TASK-CID-TEST',
+    '--actor', 'validator',
+    '--permission', 'backend.tasks.reconcile',
+    '--approval-text', 'Human approved validator emergency reconcile test',
+    '--reason', 'validator exercises emergency lease lifecycle',
+    '--json'
+  ], tempRoot);
+  assert(emergencyApproval.exitCode === 0, 'emergency approve must exit 0');
+  assertReadable(emergencyApproval, 'emergency approve');
+  const emergencyLeaseId = emergencyApproval.parsed.evidence?.lease?.leaseId;
+  assert(typeof emergencyLeaseId === 'string' && emergencyLeaseId.startsWith('EMG-'), 'emergency approve must return a lease id');
+
+  const emergencyShow = await runAtm(['emergency', 'show', '--cwd', tempRoot, '--lease', emergencyLeaseId, '--json'], tempRoot);
+  assert(emergencyShow.exitCode === 0, 'emergency show must exit 0');
+  assert(emergencyShow.parsed.evidence?.leases?.[0]?.leaseId === emergencyLeaseId, 'emergency show must load the requested lease');
+
+  const emergencyRevoke = await runAtm(['emergency', 'revoke', '--cwd', tempRoot, '--lease', emergencyLeaseId, '--actor', 'captain', '--json'], tempRoot);
+  assert(emergencyRevoke.exitCode === 0, 'emergency revoke must exit 0');
+  assert(emergencyRevoke.parsed.evidence?.lease?.status === 'revoked', 'emergency revoke must mark the lease revoked');
+
+  const backendWithoutApproval = await runAtm([
+    'tasks', 'reconcile',
+    '--cwd', tempRoot,
+    '--task', 'TASK-CID-TEST',
+    '--actor', 'validator',
+    '--delivery-commit', 'deadbeef',
+    '--json'
+  ], tempRoot);
+  assert(backendWithoutApproval.exitCode === 1, 'protected direct tasks reconcile without emergency approval must fail closed');
+  assertMessageCode(backendWithoutApproval, 'ATM_EMERGENCY_LANE_APPROVAL_REQUIRED');
+
+  const forceImportWithoutApproval = await runAtm([
+    'tasks', 'import',
+    '--cwd', tempRoot,
+    '--from', path.join(tempRoot, 'TASK-CID-TEST.task.md'),
+    '--write',
+    '--force',
+    '--json'
+  ], tempRoot);
+  assert(forceImportWithoutApproval.exitCode === 1, 'protected force import without emergency approval must fail closed before file mutation');
+  assertMessageCode(forceImportWithoutApproval, 'ATM_EMERGENCY_LANE_APPROVAL_REQUIRED');
+
   const onefileCacheRoot = path.join(tempRoot, 'onefile-cache');
   for (const [entryName, timestamp] of [
     ['old-a', '2026-05-01T00:00:00.000Z'],
@@ -1202,7 +1267,7 @@ try {
     const importRes = await runAtm([
       'tasks', 'import',
       '--from', path.resolve(root, '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md'),
-      '--write', '--force'
+      '--write'
     ], autoLinkTempWorkspace);
     assert(importRes.parsed.ok === true, 'import task must succeed');
 

@@ -11,6 +11,7 @@ import { runCandidates } from './commands/candidates.js';
 import { runCreate } from './commands/create.js';
 import { runCreateMap } from './commands/create-map.js';
 import { runDoctor } from './commands/doctor.js';
+import { runEmergency } from './commands/emergency.js';
 import { runExplain } from './commands/explain.js';
 import { runExperience } from './commands/experience.js';
 import { runEvidence } from './commands/evidence.js';
@@ -76,6 +77,7 @@ export const cliCommandRunners = {
     create: runCreate,
     'create-map': runCreateMap,
     doctor: runDoctor,
+    emergency: runEmergency,
     explain: runExplain,
     experience: runExperience,
     evidence: runEvidence,

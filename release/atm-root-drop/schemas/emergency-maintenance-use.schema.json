@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/emergency-maintenance-use.schema.json",
+  "title": "ATM Emergency Maintenance Use",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "leaseId",
+    "taskId",
+    "actorId",
+    "permission",
+    "surface",
+    "usedAt",
+    "reason",
+    "command"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.emergencyMaintenanceUse.v1" },
+    "leaseId": { "type": "string", "minLength": 1 },
+    "taskId": { "type": ["string", "null"] },
+    "actorId": { "type": ["string", "null"] },
+    "permission": { "type": "string", "minLength": 1 },
+    "surface": { "type": "string", "minLength": 1 },
+    "usedAt": { "type": "string", "format": "date-time" },
+    "reason": { "type": ["string", "null"] },
+    "command": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

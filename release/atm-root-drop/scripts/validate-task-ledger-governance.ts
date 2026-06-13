@@ -25,7 +25,8 @@ import { loadProfile, buildDelegationContract, resolveOpenerMode } from '../pack
 import { resolveNextDefaultOutputPath } from '../packages/cli/src/commands/shared.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTaskflow } from '../packages/cli/src/commands/taskflow.ts';
-import { runTasks } from '../packages/cli/src/commands/tasks.ts';
+import { withTaskflowOperatorLane } from '../packages/cli/src/commands/emergency/context.ts';
+import { runTasks as runTasksBackend } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
 import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
 
@@ -42,6 +43,10 @@ function fail(message: string): never {
 
 function assert(condition: unknown, message: string) {
   if (!condition) fail(message);
+}
+
+function runTasks(argv: string[]) {
+  return withTaskflowOperatorLane(() => runTasksBackend(argv));
 }
 
 function writeJson(filePath: string, value: unknown) {

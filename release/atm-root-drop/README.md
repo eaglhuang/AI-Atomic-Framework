@@ -59,6 +59,8 @@ ATM is not just an atom runner. It is the route, scope, evidence, close, and han
 
 ## 60-Second Start
 
+> New to ATM? Start with [docs/ATM_NEW_USER_WORKFLOW.md](docs/ATM_NEW_USER_WORKFLOW.md) for the 7-step normal workflow before diving into the bootstrap routes below.
+
 ### Start a new governed project
 
 ```bash

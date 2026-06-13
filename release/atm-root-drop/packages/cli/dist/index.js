@@ -82,6 +82,13 @@ export const plannedCliCommands = [
         outputFormat: 'pretty+json'
     },
     {
+        commandName: 'emergency',
+        summary: 'Manage human-approved emergency maintenance leases for protected backend surfaces',
+        implemented: true,
+        standaloneMode: true,
+        outputFormat: 'pretty+json'
+    },
+    {
         commandName: 'experience',
         summary: 'Extract reviewable learning artifacts from ATM evidence',
         implemented: true,

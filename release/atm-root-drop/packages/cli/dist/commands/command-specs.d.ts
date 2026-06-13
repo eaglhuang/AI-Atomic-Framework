@@ -100,6 +100,13 @@ export declare const commandSpecs: Readonly<{
         examples: any[];
     }>;
     do: any;
+    emergency: Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+    }>;
     experience: Readonly<{
         name: string;
         summary: string;

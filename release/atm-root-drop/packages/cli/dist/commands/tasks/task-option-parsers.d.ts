@@ -17,6 +17,7 @@ export declare function parseReconcileOptions(argv: string[]): {
     waiverReason: string | null;
     actorId: string | null;
     waiverOutOfScopeDelivery: boolean;
+    emergencyApproval: string | null;
     allowStaleRunner: boolean;
 };
 export declare function parseDeliverAndCloseOptions(argv: string[]): {
@@ -34,6 +35,7 @@ export declare function parseScopeAddOptions(argv: string[]): {
     cwd: string;
     taskId: string;
     actorId: string | null;
+    emergencyApproval: string | null;
     addPaths: string[];
 };
 export declare function parseCreateOptions(argv: string[]): {
@@ -65,12 +67,14 @@ export declare function parseCloseOptions(argv: string[]): {
     fromBatchCheckpoint: boolean;
     batchId: string | null;
     waiverOutOfScopeDelivery: boolean;
+    emergencyApproval: string | null;
     allowStaleRunner: boolean;
 };
 export declare function parseResetOptions(argv: string[]): {
     cwd: string;
     taskId: string;
     actorId: string | null;
+    emergencyApproval: string | null;
     to: string;
     reason: string | null;
 };
@@ -89,6 +93,7 @@ export declare function parseLockCleanupOptions(argv: string[]): {
     taskId: string;
     actorId: string | null;
     reason: string | null;
+    emergencyApproval: string | null;
     allStale: boolean;
 };
 export declare function parseLegacyLedgerMigrationOptions(argv: string[]): {

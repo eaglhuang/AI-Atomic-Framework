@@ -57,6 +57,7 @@ import {
   type TaskDependencyCloseoutBlocker
 } from './tasks/closeout-signaling.ts';
 import { runAtmGit } from './git-governance.ts';
+import { assertEmergencyApproval } from './emergency/gate.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.ts';
 import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/normalize-string-value-helper.ts';
@@ -795,6 +796,7 @@ interface ParsedRepairClosureOptions {
   readonly dryRun: boolean;
   readonly amend: boolean;
   readonly scopeTaskId: string | null;
+  readonly emergencyApproval: string | null;
   readonly allowStaleRunner: boolean;
 }
 
@@ -802,6 +804,20 @@ async function runTasksRepairClosure(argv: string[]): Promise<CommandResult> {
   const options = parseRepairClosureOptions(argv);
   const resolvedActor = options.actorId ? resolveActorId(options.actorId, options.cwd) : null;
   if (!options.dryRun) {
+    assertEmergencyApproval({
+      cwd: options.cwd,
+      surface: 'tasks repair-closure',
+      permission: 'backend.tasks.repairClosure',
+      taskId: options.taskId,
+      actorId: resolvedActor?.actorId ?? null,
+      emergencyApproval: options.emergencyApproval,
+      flags: [
+        ...(options.amend ? ['--amend'] : []),
+        ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
+      ],
+      reason: 'Direct closure packet repair backend mutation.',
+      command: `node atm.mjs tasks repair-closure --task ${options.taskId} --json`
+    });
     const staleGate = assertRunnerFreshForWriteAction({
       cwd: options.cwd,
       action: 'tasks-repair-closure-write',
@@ -909,6 +925,20 @@ async function runTasksReconcile(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks reconcile requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  assertEmergencyApproval({
+    cwd: options.cwd,
+    surface: 'tasks reconcile',
+    permission: 'backend.tasks.reconcile',
+    taskId: options.taskId,
+    actorId,
+    emergencyApproval: options.emergencyApproval,
+    flags: [
+      ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
+      ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
+    ],
+    reason: options.waiverReason ?? 'Direct reconcile backend closeback.',
+    command: `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`
+  });
   const taskPath = taskPathFor(options.cwd, options.taskId);
   if (!existsSync(taskPath)) {
     throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
@@ -1409,6 +1439,30 @@ async function runTasksImport(argv: string[]) {
   }
   if (options.dryRun === options.write) {
     throw new CliError('ATM_CLI_USAGE', 'tasks import requires exactly one of --dry-run or --write.', { exitCode: 2 });
+  }
+  const importEmergencyRequired = options.write && (
+    options.force
+    || options.forceOverwriteClaims
+    || options.resetOpen
+    || options.allowStaleRunner
+  );
+  if (importEmergencyRequired) {
+    assertEmergencyApproval({
+      cwd: options.cwd,
+      surface: 'tasks import --write recovery flags',
+      permission: 'backend.tasks.import.write',
+      taskId: options.from.match(/TASK-[A-Z]+-\d+/i)?.[0] ?? null,
+      actorId: null,
+      emergencyApproval: options.emergencyApproval,
+      flags: [
+        ...(options.force ? ['--force'] : []),
+        ...(options.forceOverwriteClaims ? ['--force-overwrite-claims'] : []),
+        ...(options.resetOpen ? ['--reset-open'] : []),
+        ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
+      ],
+      reason: 'Direct task runtime import backend write.',
+      command: `node atm.mjs tasks import --from ${options.from} --write --json`
+    });
   }
   if (options.write) {
     const staleGate = assertRunnerFreshForWriteAction({
@@ -2051,6 +2105,17 @@ async function runTasksReset(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks reset requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  assertEmergencyApproval({
+    cwd: options.cwd,
+    surface: 'tasks reset',
+    permission: 'backend.tasks.reset',
+    taskId: options.taskId,
+    actorId,
+    emergencyApproval: options.emergencyApproval,
+    flags: [],
+    reason: options.reason ?? 'Direct lifecycle reset backend mutation.',
+    command: `node atm.mjs tasks reset --task ${options.taskId} --actor ${actorId} --to ${options.to} --json`
+  });
   const taskPath = taskPathFor(options.cwd, options.taskId);
   if (!existsSync(taskPath)) {
     throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
@@ -2135,6 +2200,23 @@ async function runTasksClose(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks close requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  if (options.historicalDeliveryRefs.length > 0 || options.waiverOutOfScopeDelivery || options.allowStaleRunner) {
+    assertEmergencyApproval({
+      cwd: options.cwd,
+      surface: 'tasks close historical-delivery backend',
+      permission: 'backend.tasks.close',
+      taskId: options.taskId,
+      actorId,
+      emergencyApproval: options.emergencyApproval,
+      flags: [
+        ...(options.historicalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
+        ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
+        ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
+      ],
+      reason: options.reason ?? 'Direct close backend historical-delivery path.',
+      command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --status ${options.status} --json`
+    });
+  }
   const taskPath = taskPathFor(options.cwd, options.taskId);
   if (!existsSync(taskPath)) {
     throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
@@ -2775,6 +2857,17 @@ async function runTasksLockCleanup(argv: string[]) {
   }
   const actorId = resolvedActor.actorId;
   if (options.allStale) {
+    assertEmergencyApproval({
+      cwd: options.cwd,
+      surface: 'tasks lock cleanup --all-stale',
+      permission: 'backend.tasks.lockCleanupGlobal',
+      taskId: null,
+      actorId,
+      emergencyApproval: options.emergencyApproval,
+      flags: ['--all-stale'],
+      reason: options.reason ?? 'Global stale lock cleanup.',
+      command: `node atm.mjs tasks lock cleanup --all-stale --actor ${actorId} --json`
+    });
     const taskIds = listRuntimeLockTaskIds(options.cwd);
     const cleaned: unknown[] = [];
     const skipped: unknown[] = [];
@@ -4904,6 +4997,7 @@ function parseImportOptions(argv: string[]) {
     reopen: false,
     // TASK-AAO-0064: --strict-paths flag
     strictPaths: false,
+    emergencyApproval: null as string | null,
     allowStaleRunner: parseAllowStaleRunnerFlag(argv)
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -4946,6 +5040,11 @@ function parseImportOptions(argv: string[]) {
       options.strictPaths = true;
       continue;
     }
+    if (arg === '--emergency-approval') {
+      options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
+      index += 1;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty' || arg === '--allow-stale-runner') {
       continue;
     }
@@ -4979,6 +5078,7 @@ function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {
     scopeTaskId: null as string | null,
     dryRun: false,
     amend: false,
+    emergencyApproval: null as string | null,
     allowStaleRunner: parseAllowStaleRunnerFlag(argv)
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -4995,6 +5095,11 @@ function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {
     }
     if (arg === '--actor') {
       state.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--emergency-approval') {
+      state.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
       continue;
     }
@@ -5030,6 +5135,7 @@ function parseRepairClosureOptions(argv: string[]): ParsedRepairClosureOptions {
     scopeTaskId: state.scopeTaskId,
     dryRun: state.dryRun,
     allowStaleRunner: state.allowStaleRunner,
+    emergencyApproval: state.emergencyApproval,
     amend: state.amend
   };
 }

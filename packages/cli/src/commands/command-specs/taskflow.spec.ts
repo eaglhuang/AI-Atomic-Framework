@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'taskflow',
-  summary: 'Official operator-facing task opener and closeback orchestration. taskflow open orchestrates open; taskflow close is the default operator lane for closeback; tasks new generates; tasks close/reconcile remain authoritative backends.',
+  summary: 'Official operator-facing task opener and closeback orchestration. taskflow open orchestrates open; taskflow close is the official operator lane for closeback and may delegate protected backend surfaces internally. tasks new generates; tasks close/reconcile/import/repair-closure remain authoritative emergency backends when used directly.',
   positional: [
     { name: 'action', summary: 'open | close', required: true }
   ],

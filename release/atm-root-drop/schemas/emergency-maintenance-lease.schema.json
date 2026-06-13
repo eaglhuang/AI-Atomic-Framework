@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/emergency-maintenance-lease.schema.json",
+  "title": "ATM Emergency Maintenance Lease",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "leaseId",
+    "taskId",
+    "actorId",
+    "permission",
+    "approvedBy",
+    "approvalText",
+    "reason",
+    "surface",
+    "allowedFlags",
+    "createdAt",
+    "expiresAt",
+    "maxUses",
+    "usedCount",
+    "status"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.emergencyMaintenanceLease.v1" },
+    "leaseId": { "type": "string", "minLength": 1 },
+    "taskId": { "type": ["string", "null"] },
+    "actorId": { "type": "string", "minLength": 1 },
+    "permission": { "type": "string", "minLength": 1 },
+    "approvedBy": { "type": "string", "minLength": 1 },
+    "approvalText": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "surface": { "type": ["string", "null"] },
+    "allowedFlags": { "type": "array", "items": { "type": "string" } },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "maxUses": { "type": "integer", "minimum": 1 },
+    "usedCount": { "type": "integer", "minimum": 0 },
+    "status": { "enum": ["active", "revoked"] },
+    "revokedAt": { "type": ["string", "null"], "format": "date-time" },
+    "revokedBy": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

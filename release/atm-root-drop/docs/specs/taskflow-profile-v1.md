@@ -33,6 +33,27 @@ For closeback, the same layering applies:
 - light adaptors may update host-local status fields before or during the taskflow close path, but they do not replace target runtime close/reconcile;
 - full SDK integrations may expose a local "close task" button or command, but that facade must call `taskflow close` and preserve the `atm.taskflowGovernedCommitBundle.v1` result.
 
+## Emergency Backend Lane
+
+`taskflow open` and `taskflow close` are the normal operator lane. Backend commands remain available because ATM needs repair tools, but direct high-risk backend mutation is an emergency maintenance lane, not the default workflow.
+
+Emergency access is controlled by `node atm.mjs emergency approve/show/revoke` and the `atm.emergencyMaintenanceLease.v1` lease contract. A protected direct backend invocation must pass `--emergency-approval <leaseId>` unless it is being called from the taskflow operator lane.
+
+Protected direct surfaces include:
+
+| Permission | Protected surface |
+|---|---|
+| `backend.tasks.close` | `tasks close` historical-delivery / waiver / stale-runner recovery paths |
+| `backend.tasks.reconcile` | `tasks reconcile` |
+| `backend.tasks.import.write` | `tasks import --write` recovery flags such as `--force`, `--force-overwrite-claims`, `--reset-open`, or `--allow-stale-runner` |
+| `backend.tasks.repairClosure` | `tasks repair-closure` write mode |
+| `backend.tasks.reset` | `tasks reset` |
+| `backend.tasks.lockCleanupGlobal` | `tasks lock cleanup --all-stale` |
+| `backend.waiver.historicalDeliveryOutOfScope` | Historical-delivery out-of-scope waiver policy |
+| `backend.runnerRecovery` | Stale-runner recovery override policy |
+
+Lease checks validate task, actor, permission, expiry, max-use count, and explicitly allowed flags before mutation. Normal profile-only adoption must not require emergency approval: taskflow may delegate to backend surfaces internally because taskflow is the governed operator boundary and returns the close/open result contract.
+
 ## Taskflow Open Result Contract (`atm.taskflowOpenResult.v1`)
 
 `taskflow open` reports orchestration through these primary fields:
