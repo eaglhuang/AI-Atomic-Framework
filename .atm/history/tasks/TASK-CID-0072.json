@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0072",
+  "title": "Taskflow close auto-stage declared deliverables",
+  "status": "done",
+  "milestone": "M8",
+  "dependencies": [
+    "TASK-CID-0063",
+    "TASK-CID-0071"
+  ],
+  "acceptance": [
+    "A fixture task with untracked declared deliverables shows those files in `taskflow close --dry-run` `governedCommitBundle.targetRepo.stageFiles`.",
+    "`taskflow close --write --no-commit` stages untracked declared deliverables plus `.atm` closeout artifacts, and leaves unrelated dirty files unstaged.",
+    "`taskflow close --write` auto-commits a target bundle containing both declared deliverables and closeout artifacts when the deliverables were not pre-committed.",
+    "A task closed with `--historical-delivery <sha>` does not re-stage already committed deliverable files, but still commits closeout artifacts.",
+    "Missing or ambiguous deliverable stage computation fails closed with a stable diagnostic code.",
+    "Regression coverage prevents the TASK-CID-0071 failure mode: a new skill/file deliverable cannot be omitted from the close bundle preview.",
+    "Dry-run output is specific enough that an LLM or human reviewer can compare the predicted bundle against the task contract, but changing the bundle still requires changing governed inputs or the deterministic algorithm.",
+    "A fixture with multiple declared deliverables but only a subset changed stages exactly the changed in-scope deliverables, without forcing untouched declared files into the commit bundle.",
+    "A fixture with incomplete or contradictory metadata fails closed with a stable diagnostic and a remediation path that points back to governed metadata repair."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "docs/specs/taskflow-profile-v1.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "docs/specs/taskflow-profile-v1.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing emergency lane authorization semantics",
+    "Changing taskflow open behavior",
+    "Redesigning tasks close/reconcile backend semantics",
+    "Committing or cleaning legacy unrelated dirty files"
+  ],
+  "nonGoals": [
+    "Do not rely on agent judgment to manually stage deliverables.",
+    "Do not stage every dirty file in the repository.",
+    "Do not require a pre-existing source delivery commit when uncommitted declared deliverables are present and in scope."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert taskflow close bundle changes if target delivery staging starts including unrelated dirty files.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-governed-commit-bundle",
+    "mapUpdates": [
+      "packages/cli/src/commands/taskflow/close-orchestration.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Treat this as a set-calculation problem, not an intent-interpretation problem.\n- The preferred mental model is:\n  - start from dirty/untracked target files;\n  - intersect with the hard boundary from direction lock / `targetAllowedFiles`;\n  - classify files into `targetDeliveryFiles`, `targetGovernanceFiles`, or excluded buckets;\n  - subtract files already covered by `--historical-delivery` when applicable;\n  - fail closed if the remaining stage set cannot be justified from governed metadata.\n- Do not use plain `scopePaths` as an unconditional stage list. They describe allowed work, not automatic inclusion.\n- Do not use `deliverables` as an unconditional stage list either. They define the intended delivery universe, but only changed files from that universe should enter the bundle for the current close.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0072-taskflow-close-auto-stage-declared-deliverables.task.md",
+    "sectionTitle": "TASK-CID-0072",
+    "headingLine": 61,
+    "hash": "cf4b0e22215a9ca5"
+  },
+  "importedAt": "2026-06-13T13:59:54.440Z",
+  "lastTransitionId": "2026-06-13T14-24-37-201Z-close-5a4dae2774b1",
+  "lastTransitionAt": "2026-06-13T14:24:37.201Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T14:00:08.996Z",
+  "promotedAt": "2026-06-13T14:00:08.998Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-d5a1bf70a08f",
+    "claimedAt": "2026-06-13T14:02:10.472Z",
+    "heartbeatAt": "2026-06-13T14:24:37.199Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0072.json",
+      "docs/specs/taskflow-profile-v1.md",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T14:02:10.472Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613140210-captain-TASK-CID-0072-087bb3d9e2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0072",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0072.*",
+      ".atm/history/task-events/TASK-CID-0072/**",
+      ".atm/history/tasks/TASK-CID-0072.json",
+      "docs/specs/taskflow-profile-v1.md",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3767b0540c94d3c48a51d0efa89cc80912848003f0c2ae3c237a662fa2495bc3",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T14:02:10.492Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T14:24:37.199Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613140210-captain-TASK-CID-0072-087bb3d9e2",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0072.closure-packet.json"
+}

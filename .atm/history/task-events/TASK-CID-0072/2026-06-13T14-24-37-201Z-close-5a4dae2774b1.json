@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T14-24-37-201Z-close-5a4dae2774b1",
+  "taskId": "TASK-CID-0072",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613140210-captain-TASK-CID-0072-087bb3d9e2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0072.json",
+  "taskSha256": "sha256:8420a89a4a9bca384e9893b240646c69ede13bfcde349c765fa597aa08030db9",
+  "createdAt": "2026-06-13T14:24:37.201Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0072 --actor captain --status done --historical-delivery 7f78ea0e0a52bf50b43af024cb21d595e80752e1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613140210-captain-TASK-CID-0072-087bb3d9e2",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0072.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "git diff --check",
+      "task-ledger-governance",
+      "taskflow-dryrun",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T14:24:37.198Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0072-taskflow-close-auto-stage-declared-deliverables.task.md",
+        ".atm/history/evidence/TASK-CID-0072.*",
+        ".atm/history/task-events/TASK-CID-0072/**",
+        ".atm/history/tasks/TASK-CID-0072.json",
+        "docs/specs/taskflow-profile-v1.md",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
