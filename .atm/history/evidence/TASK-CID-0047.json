@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-CID-0047",
-  "updatedAt": "2026-06-13T06:23:53.095Z",
+  "updatedAt": "2026-06-13T14:53:58.705Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -38,6 +38,48 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:840caff8d21239e5f2dd7bc333c4fc8ae36aa79414d751a5b9d3bf8b6b385e5b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260613145243-captain-TASK-CID-0047-b5067d762a",
+      "createdAt": "2026-06-13T14:53:58.705Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260613145243-captain-TASK-CID-0047-b5067d762a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-13T14:53:58.757Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f01e4dd9b0589b5ac0244227956f2bb3a5be0d403cb5aadee26595437ff022b7",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
