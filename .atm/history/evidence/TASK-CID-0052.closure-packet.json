@@ -1,0 +1,156 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0052",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d779a820d15b15e0d57135b82c7fa483956fb04f",
+  "governedTreeSha": "37feace210340fc12abbf0511364e3c0a5bd776e",
+  "targetCommitDelta": {
+    "currentCommitSha": "d779a820d15b15e0d57135b82c7fa483956fb04f",
+    "parentCommitShas": [
+      "d779a820d15b15e0d57135b82c7fa483956fb04f"
+    ],
+    "governedTreeSha": "37feace210340fc12abbf0511364e3c0a5bd776e",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0052.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-18-44-744Z-import-f183f18ab24d.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-18-45-562Z-reserve-3db6bd6937c2.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-18-45-565Z-promote-66febd3d4e02.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-18-45-589Z-claim-6e407572ef0a.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-19-18-935Z-scope-amendment-25378b05955f.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-27-218Z-scope-amendment-9b0edc805233.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-27-589Z-scope-amendment-47dabab00eb0.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-27-959Z-scope-amendment-d27bff747ddf.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-28-310Z-scope-amendment-9a33a3df588d.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-28-643Z-scope-amendment-0c033e5d8543.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-28-990Z-scope-amendment-89dbd6b137b8.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-29-368Z-scope-amendment-ff1dee3c1936.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-29-705Z-scope-amendment-938650672998.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-30-076Z-scope-amendment-0cea85834ef5.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-30-457Z-scope-amendment-8c85dd9fd624.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-30-797Z-scope-amendment-20173384c83c.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-31-129Z-scope-amendment-7cd79e1a6986.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-31-470Z-scope-amendment-d223006a253b.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-31-815Z-scope-amendment-74c4ec948933.json",
+      ".atm/history/task-events/TASK-CID-0052/2026-06-13T09-21-32-160Z-scope-amendment-a3ec5bd2d5bc.json",
+      ".atm/history/tasks/TASK-CID-0052.json",
+      "packages/cli/src/commands/next/route-predicates.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/closeout-provenance.test.ts",
+      "packages/cli/src/commands/tasks/closeout-provenance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/closeout-provenance.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:478bd0a658c607adda7447ea88fe15c8d71ea43c9fe1f8787d46fe1793a06359",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bddb04d19cc104f2eb434eb77348e2b1c11a0be47ee3682e4055fc27d880055f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "closeout-provenance.test",
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-13T09:23:32.206Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0052-closeout-provenance-atom-extraction.task.md",
+      ".atm/history/evidence/TASK-CID-0052.*",
+      ".atm/history/task-events/TASK-CID-0052/**",
+      ".atm/history/tasks/TASK-CID-0052.json",
+      "packages/cli/src/commands/next/route-predicates.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/closeout-provenance.test.ts",
+      "packages/cli/src/commands/tasks/closeout-provenance.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next/route-predicates.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/closeout-provenance.test.ts",
+      "packages/cli/src/commands/tasks/closeout-provenance.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0052.json",
+  "closedAt": "2026-06-13T09:23:32.206Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260613091845-captain-TASK-CID-0052-dea72a1884",
+  "attestation": null,
+  "historicalDeliveryProvenance": null
+}
