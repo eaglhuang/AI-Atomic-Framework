@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0070",
+  "title": "Emergency backend lease audit and use-record hardening",
+  "status": "done",
+  "milestone": "M14",
+  "dependencies": [
+    "TASK-CID-0065",
+    "TASK-CID-0069"
+  ],
+  "acceptance": [
+    "`node atm.mjs emergency permissions --json` returns entries with `normalLane`, `riskTier`, `requiresTaskId`, `requiresActor`, `requiresHumanApprovalText`, `auditRequired`, and `validatorTags`.",
+    "A consumed emergency lease writes `atm.emergencyMaintenanceUse.v1` with `result`, `before`, `after`, and `touchedFiles` fields.",
+    "Direct protected tasks backend results include emergency use evidence when a lease is consumed.",
+    "A staged emergency use record without a matching used lease fails `node atm.mjs hook pre-commit --json`.",
+    "A staged emergency use record with a matching used lease passes the emergency audit portion of pre-commit.",
+    "`taskflow close --write` remains exempt through `withTaskflowOperatorLane`.",
+    "Existing TASK-CID-0065 denial behavior still emits `ATM_EMERGENCY_LANE_APPROVAL_REQUIRED`."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/emergency/registry.ts",
+    "packages/cli/src/commands/emergency/leases.ts",
+    "packages/cli/src/commands/hook.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/emergency/registry.ts",
+    "packages/cli/src/commands/emergency/leases.ts",
+    "packages/cli/src/commands/emergency/gate.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/hook.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "schemas/emergency-maintenance-lease.schema.json",
+    "schemas/emergency-maintenance-use.schema.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not reopen TASK-CID-0065.",
+    "Do not weaken taskflow open/close as the normal operator lane.",
+    "Do not add a permanent superuser mode.",
+    "Do not make read-only diagnostics require emergency approval.",
+    "Do not clean unrelated historical untracked .atm residue."
+  ],
+  "nonGoals": [
+    "No free-form approval text as the only gate.",
+    "No long-lived global permission file.",
+    "No second task lifecycle model."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if emergency backend use records or audit guards block valid taskflow operator-lane work.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.emergency-maintenance-permission-lane",
+    "mapUpdates": [
+      "packages/cli/src/commands/emergency/",
+      "packages/cli/src/commands/hook.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0070-emergency-backend-lease-audit-and-use-record-hardening.task.md",
+    "sectionTitle": "TASK-CID-0070",
+    "headingLine": 59,
+    "hash": "4f24d67abfe1c2df"
+  },
+  "importedAt": "2026-06-13T08:02:04.016Z",
+  "lastTransitionId": "2026-06-13T08-15-54-916Z-close-31c4d7fc1ded",
+  "lastTransitionAt": "2026-06-13T08:15:54.916Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-13T08:02:10.514Z",
+  "promotedAt": "2026-06-13T08:02:10.517Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-2b81b80280ff",
+    "claimedAt": "2026-06-13T08:02:10.521Z",
+    "heartbeatAt": "2026-06-13T08:15:54.914Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0070.json",
+      "packages/cli/src/commands/emergency/gate.ts",
+      "packages/cli/src/commands/emergency/leases.ts",
+      "packages/cli/src/commands/emergency/registry.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "schemas/emergency-maintenance-lease.schema.json",
+      "schemas/emergency-maintenance-use.schema.json",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-13T08:02:10.521Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260613080210-captain-TASK-CID-0070-5c266cd767",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0070",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0070.*",
+      ".atm/history/task-events/TASK-CID-0070/**",
+      ".atm/history/tasks/TASK-CID-0070.json",
+      "packages/cli/src/commands/emergency/gate.ts",
+      "packages/cli/src/commands/emergency/leases.ts",
+      "packages/cli/src/commands/emergency/registry.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "schemas/emergency-maintenance-lease.schema.json",
+      "schemas/emergency-maintenance-use.schema.json",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "fa744937c9b969769b43f1d38bd155e2c5da368bfead712e659141ce0972d913",
+    "actorId": "captain",
+    "createdAt": "2026-06-13T08:02:10.539Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-13T08:15:54.914Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260613080210-captain-TASK-CID-0070-5c266cd767",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0070.closure-packet.json"
+}

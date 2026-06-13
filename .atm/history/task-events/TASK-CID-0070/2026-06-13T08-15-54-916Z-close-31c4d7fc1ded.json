@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-13T08-15-54-916Z-close-31c4d7fc1ded",
+  "taskId": "TASK-CID-0070",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260613080210-captain-TASK-CID-0070-5c266cd767",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0070.json",
+  "taskSha256": "sha256:960dfd893c820994daf6832e1e16c750de9501940f257f0d5b85848dc32e3885",
+  "createdAt": "2026-06-13T08:15:54.916Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0070 --actor captain --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260613080210-captain-TASK-CID-0070-5c266cd767",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0070.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "git-diff-check",
+      "typecheck",
+      "validate-task-ledger-governance",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-13T08:15:54.913Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0070-emergency-backend-lease-audit-and-use-record-hardening.task.md",
+        ".atm/history/evidence/TASK-CID-0070.*",
+        ".atm/history/task-events/TASK-CID-0070/**",
+        ".atm/history/tasks/TASK-CID-0070.json",
+        "packages/cli/src/commands/emergency/gate.ts",
+        "packages/cli/src/commands/emergency/leases.ts",
+        "packages/cli/src/commands/emergency/registry.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "schemas/emergency-maintenance-lease.schema.json",
+        "schemas/emergency-maintenance-use.schema.json",
+        "scripts/validate-cli.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/emergency/gate.ts",
+        "packages/cli/src/commands/emergency/leases.ts",
+        "packages/cli/src/commands/emergency/registry.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "schemas/emergency-maintenance-lease.schema.json",
+        "schemas/emergency-maintenance-use.schema.json",
+        "scripts/validate-cli.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
