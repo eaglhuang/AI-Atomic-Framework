@@ -10,9 +10,11 @@ import {
   runTasksRosterUpdate
 } from './tasks/public-surface.ts';
 import {
+  assertClosebackPlanningPathReady,
   buildCloseBackendArgv,
   buildClosebackPlan,
   buildTaskflowCloseDiagnostics,
+  resolveClosebackPlanningPath,
   resolveCloseWriteSupport
 } from './taskflow/close-orchestration.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
@@ -397,6 +399,7 @@ function inspectPlanningAuthorityDelivery(input: {
   cwd: string;
   taskDocument: Record<string, unknown>;
   historicalDeliveryRefs: string[];
+  resolvedPlanningMirrorPath?: string | null;
 }): {
   required: boolean;
   ok: boolean;
@@ -407,7 +410,7 @@ function inspectPlanningAuthorityDelivery(input: {
   if (normalizeTaskflowAuthority(input.taskDocument) !== 'planning_repo') {
     return { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null };
   }
-  const planPath = sourcePlanPathOf(input.taskDocument);
+  const planPath = input.resolvedPlanningMirrorPath ?? sourcePlanPathOf(input.taskDocument);
   const planning = resolvePlanningPath(input.cwd, planPath);
   if (!planning.repoRoot) {
     return { required: true, ok: false, repoRoot: null, matchedFiles: [], reason: planning.reason ?? 'planning repo could not be resolved' };
@@ -750,11 +753,41 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   }
   const delegationContract = buildDelegationContract(profileData);
   const { taskDocument } = loadTaskDocumentOrThrow(cwd, taskId);
+  const profileRepoRoot = profilePath && profileData
+    ? resolveProfileRepoRoot(profilePath, cwd)
+    : null;
+  const closebackPathResolution = resolveClosebackPlanningPath({
+    cwd,
+    taskId,
+    taskDocument,
+    profile: profileData,
+    profileRepoRoot,
+    delegationContract
+  });
+  if (profileData || writeRequested) {
+    assertClosebackPlanningPathReady(closebackPathResolution, {
+      profileSupplied: Boolean(profileData),
+      requirePlanningPath: true
+    });
+  }
   const diagnosis = buildResidueDiagnosisEvidence(cwd, taskId, taskDocument);
+  const enrichedDiagnosis = closebackPathResolution.planningMirrorPath
+    ? {
+      ...diagnosis,
+      triangulation: {
+        ...diagnosis.triangulation,
+        planningFrontmatter: {
+          status: closebackPathResolution.planningStatus ?? diagnosis.triangulation.planningFrontmatter.status,
+          source: closebackPathResolution.planningMirrorPath
+        }
+      }
+    }
+    : diagnosis;
   const planningAuthorityDeliveryGate = inspectPlanningAuthorityDelivery({
     cwd,
     taskDocument,
-    historicalDeliveryRefs
+    historicalDeliveryRefs,
+    resolvedPlanningMirrorPath: closebackPathResolution.planningMirrorPath
   });
   if (
     planningAuthorityDeliveryGate.required
@@ -777,13 +810,14 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     planningAuthorityDeliveryGate,
     delegationContract,
     diagnosis: {
-      bucket: diagnosis.bucket,
-      truth: diagnosis.truth,
-      residue: diagnosis.residue,
-      reason: diagnosis.reason,
-      nextCommand: diagnosis.nextCommand,
-      triangulation: diagnosis.triangulation
-    }
+      bucket: enrichedDiagnosis.bucket,
+      truth: enrichedDiagnosis.truth,
+      residue: enrichedDiagnosis.residue,
+      reason: enrichedDiagnosis.reason,
+      nextCommand: enrichedDiagnosis.nextCommand,
+      triangulation: enrichedDiagnosis.triangulation
+    },
+    closebackPathResolution
   });
   const diagnostics = buildTaskflowCloseDiagnostics({
     closeMode: closebackPlan.closeMode,
@@ -935,7 +969,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           planningCardCloseback,
           rosterCloseback,
           governedCommitBundle,
-          residueDiagnosis: diagnosis,
+          residueDiagnosis: enrichedDiagnosis,
+          closebackPathResolution,
           ...(profileData ? { profile: profileData } : {})
         }
       }),
@@ -970,7 +1005,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         diagnostics,
         closebackPlan,
         governedCommitBundle: previewCommitBundle,
-        residueDiagnosis: diagnosis,
+        residueDiagnosis: enrichedDiagnosis,
+        closebackPathResolution,
         ...(profileData ? { profile: profileData } : {})
       }
     }),

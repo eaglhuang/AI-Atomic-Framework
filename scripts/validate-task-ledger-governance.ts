@@ -2081,6 +2081,62 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(plannedDryRun.ok === true, 'taskflow close dry-run must accept active target plus planned planning mirror');
   assert(plannedDryRun.evidence.closeMode === 'normal-close', 'active target plus planned planning mirror must not route to ambiguous manual review');
   assert(plannedDryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'active target plus planned planning mirror must use tasks-close backend');
+
+  const profileFallbackTaskId = 'TASK-CLOSE-ORCH-0003';
+  const profileFallbackPlanRelativePath = `docs/tasks/${profileFallbackTaskId}.task.md`;
+  const profileFallbackPlanPath = path.join(repo, profileFallbackPlanRelativePath);
+  const profileFallbackProfilePath = path.join(repo, 'taskflow.profile.json');
+  writeFileSync(profileFallbackPlanPath, [
+    '---',
+    `task_id: ${profileFallbackTaskId}`,
+    'title: "Taskflow close profile-root fallback fixture"',
+    'status: running',
+    '---',
+    `# ${profileFallbackTaskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  writeJson(profileFallbackProfilePath, {
+    schemaId: 'taskflow.profile.v1',
+    id: 'taskflow-close-profile-fallback-fixture',
+    name: 'Taskflow Close Profile Fallback Fixture',
+    repoLabel: 'Planning Repo',
+    ownerRepo: 'planning',
+    taskIdPrefix: 'TASK-CLOSE-ORCH',
+    taskId: { format: 'TASK-CLOSE-ORCH-NNNN' },
+    template: { defaultMarkdown: '# ${taskId} ${title}\n\n## Goal\n${description}' },
+    capabilities: { supportsDryRun: true, supportsWrite: false },
+    delegation: {
+      hint: 'Profile-root closeback fallback fixture.',
+      openerPath: 'tools/task-card-opener.js',
+      policy: {
+        allocateTaskId: { mode: 'host-opener', prefix: 'TASK-CLOSE-ORCH', format: 'TASK-CLOSE-ORCH-NNNN' },
+        resolveCanonicalOutputPath: {
+          mode: 'host-opener',
+          pattern: 'docs/tasks/${taskId}.task.md',
+          directory: 'docs/tasks'
+        },
+        rosterSyncPolicy: 'none',
+        fallbackBehavior: { mode: 'template-only-fallback', reason: 'fixture fallback' }
+      },
+      writerInvocation: { describeOnly: false, displayHint: 'fixture opener' }
+    }
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${profileFallbackTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: profileFallbackTaskId,
+    title: 'Taskflow close profile-root fallback fixture',
+    status: 'running'
+  });
+  const profileFallbackDryRun = await runTaskflow([
+    'close',
+    '--cwd', repo,
+    '--task', profileFallbackTaskId,
+    '--profile', profileFallbackProfilePath,
+    '--json'
+  ]) as any;
+  assert(profileFallbackDryRun.ok === true, 'taskflow close must recover planning path from profile when source.planPath is absent');
+  assert(profileFallbackDryRun.evidence.closebackPathResolution.route === 'profile-root-fallback', 'taskflow close must report profile-root fallback route');
+  assert(profileFallbackDryRun.evidence.governedCommitBundle?.planningRepo?.stageFiles?.includes(profileFallbackPlanRelativePath), 'profile-root fallback must include recovered planning card in bundle');
 }
 
 function validateEmergencyUsePreCommitAudit(tempRoot: string) {

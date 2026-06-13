@@ -132,6 +132,9 @@ and delegates to the target backend with `--historical-delivery-repo <repo>`.
 - `taskflow close --write --no-commit` keeps mandatory dual-repo exact staging but returns deterministic commit commands without committing.
 - `taskflow close --dry-run` never stages or commits; it returns a bundle preview.
 - If either repository's stage-file set cannot be computed, ATM fails closed before writing with `ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE`.
+- When `source.planPath` is absent, `taskflow close --profile <profile>` may recover the planning card path from the profile repository root and `delegation.policy.resolveCanonicalOutputPath` using the runtime task id. Recovery succeeds only when the resolved path exists and the planning card frontmatter matches the runtime task id.
+- If profile-root recovery finds no file, mismatched task id, or conflicting `related_plan`, ATM fails closed with `ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING`, `ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH`, or `ATM_TASKFLOW_CLOSE_PLANNING_PATH_AMBIGUOUS`.
+- Dry-run and write results expose `closebackPathResolution.route` as `source-plan-path`, `profile-root-fallback`, `missing`, or `ambiguous`.
 
 ## Taskflow Governed Commit Bundle (`atm.taskflowGovernedCommitBundle.v1`)
 

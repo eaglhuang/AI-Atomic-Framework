@@ -1,6 +1,26 @@
-import type { TaskflowDelegationContract } from './profile-loader.ts';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import type { TaskflowDelegationContract, TaskflowProfileV1 } from './profile-loader.ts';
 import type { TaskResidueBucket, TaskResidueClassification } from '../tasks/public-surface.ts';
+import { extractFrontMatter, normalizeTaskId } from '../tasks/task-import-validators.ts';
 import { CliError } from '../shared.ts';
+
+export type ClosebackPlanningPathRoute =
+  | 'source-plan-path'
+  | 'profile-root-fallback'
+  | 'missing'
+  | 'ambiguous';
+
+export interface ClosebackPlanningPathResolution {
+  route: ClosebackPlanningPathRoute;
+  planningMirrorPath: string | null;
+  profileRepoRoot: string | null;
+  planningStatus: string | null;
+  diagnostics: {
+    codes: string[];
+    messages: string[];
+  };
+}
 
 export type TaskflowCloseMode =
   | 'normal-close'
@@ -45,6 +65,7 @@ export interface TaskflowClosebackPlan {
   };
   evidenceValidators: string[];
   residue: Pick<TaskResidueClassification, 'bucket' | 'truth' | 'residue' | 'reason' | 'nextCommand'>;
+  closebackPathResolution?: ClosebackPlanningPathResolution;
 }
 
 function buildTasksCloseCommand(input: {
@@ -222,6 +243,7 @@ export function buildClosebackPlan(input: {
       divergence: Array<{ field: string }>;
     };
   };
+  closebackPathResolution?: ClosebackPlanningPathResolution;
 }): TaskflowClosebackPlan {
   const closeMode = resolveTaskflowCloseMode({
     bucket: input.diagnosis.bucket,
@@ -327,7 +349,8 @@ export function buildClosebackPlan(input: {
       residue: input.diagnosis.residue,
       reason: input.diagnosis.reason,
       nextCommand: input.diagnosis.nextCommand
-    }
+    },
+    closebackPathResolution: input.closebackPathResolution
   };
 }
 
@@ -399,6 +422,232 @@ export function buildCloseBackendArgv(input: {
     argv.push('--historical-delivery-repo', input.historicalDeliveryRepo);
   }
   return argv;
+}
+
+function readTaskDocumentSourcePlanPath(taskDocument: Record<string, unknown>): string | null {
+  const source = taskDocument.source;
+  if (!source || typeof source !== 'object' || Array.isArray(source)) return null;
+  const planPath = (source as Record<string, unknown>).planPath;
+  return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null;
+}
+
+function readTaskDocumentRelatedPlanPath(taskDocument: Record<string, unknown>): string | null {
+  const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan;
+  return typeof relatedPlan === 'string' && relatedPlan.trim() ? relatedPlan.trim() : null;
+}
+
+function slugifyPlanningTitle(title: string): string {
+  const slug = title
+    .trim()
+    .toLowerCase()
+    .replace(/['"]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug || 'task';
+}
+
+function resolveCanonicalPlanningRelativePath(
+  taskId: string,
+  title: string | null,
+  policy: TaskflowDelegationContract['policy']
+): string | null {
+  const pattern = policy.resolveCanonicalOutputPath.pattern;
+  if (!pattern || !pattern.includes('${taskId}')) {
+    return null;
+  }
+  const slug = slugifyPlanningTitle(title ?? taskId);
+  return pattern
+    .split('${taskId}').join(taskId)
+    .split('${slug}').join(slug)
+    .replace(/\\/g, '/');
+}
+
+function readPlanningCardMetadata(absolutePath: string): { taskId: string | null; status: string | null } {
+  if (!existsSync(absolutePath)) {
+    return { taskId: null, status: null };
+  }
+  const frontMatter = extractFrontMatter(readFileSync(absolutePath, 'utf8'));
+  if (!frontMatter) {
+    return { taskId: null, status: null };
+  }
+  const rawTaskId = typeof frontMatter.data.task_id === 'string'
+    ? frontMatter.data.task_id
+    : typeof frontMatter.data.id === 'string'
+      ? frontMatter.data.id
+      : null;
+  return {
+    taskId: rawTaskId ? normalizeTaskId(rawTaskId) : null,
+    status: typeof frontMatter.data.status === 'string' ? frontMatter.data.status : null
+  };
+}
+
+function normalizeComparablePath(filePath: string): string {
+  return path.resolve(filePath).replace(/\\/g, '/');
+}
+
+export function resolveClosebackPlanningPath(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+  profile: TaskflowProfileV1 | null;
+  profileRepoRoot: string | null;
+  delegationContract: TaskflowDelegationContract;
+}): ClosebackPlanningPathResolution {
+  const normalizedTaskId = normalizeTaskId(input.taskId);
+  const title = typeof input.taskDocument.title === 'string' ? input.taskDocument.title : null;
+
+  const directPlanPath = readTaskDocumentSourcePlanPath(input.taskDocument);
+  if (directPlanPath) {
+    const absolutePath = path.isAbsolute(directPlanPath)
+      ? path.resolve(directPlanPath)
+      : path.resolve(input.cwd, directPlanPath);
+    if (!existsSync(absolutePath)) {
+      return {
+        route: 'missing',
+        planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
+        profileRepoRoot: null,
+        planningStatus: null,
+        diagnostics: {
+          codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'],
+          messages: [`Planning card path from source.planPath does not exist: ${directPlanPath}.`]
+        }
+      };
+    }
+    const metadata = readPlanningCardMetadata(absolutePath);
+    if (metadata.taskId && metadata.taskId !== normalizedTaskId) {
+      return {
+        route: 'missing',
+        planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
+        profileRepoRoot: null,
+        planningStatus: metadata.status,
+        diagnostics: {
+          codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'],
+          messages: [`Planning card task id ${metadata.taskId} does not match runtime task ${normalizedTaskId}.`]
+        }
+      };
+    }
+    return {
+      route: 'source-plan-path',
+      planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
+      profileRepoRoot: null,
+      planningStatus: metadata.status,
+      diagnostics: {
+        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT'],
+        messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`]
+      }
+    };
+  }
+
+  if (!input.profile || !input.profileRepoRoot) {
+    return {
+      route: 'missing',
+      planningMirrorPath: null,
+      profileRepoRoot: null,
+      planningStatus: null,
+      diagnostics: {
+        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_UNAVAILABLE'],
+        messages: ['source.planPath is absent and no taskflow profile was supplied for governed fallback recovery.']
+      }
+    };
+  }
+
+  const relativeOutput = resolveCanonicalPlanningRelativePath(
+    normalizedTaskId,
+    title,
+    input.delegationContract.policy
+  );
+  if (!relativeOutput) {
+    return {
+      route: 'missing',
+      planningMirrorPath: null,
+      profileRepoRoot: input.profileRepoRoot,
+      planningStatus: null,
+      diagnostics: {
+        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_POLICY_MISSING'],
+        messages: ['Profile canonical output-path policy cannot deterministically resolve a planning card path for closeback.']
+      }
+    };
+  }
+
+  const profileAbsolutePath = path.resolve(input.profileRepoRoot, relativeOutput);
+  const relatedPlanPath = readTaskDocumentRelatedPlanPath(input.taskDocument);
+  if (relatedPlanPath) {
+    const relatedAbsolutePath = path.isAbsolute(relatedPlanPath)
+      ? path.resolve(relatedPlanPath)
+      : path.resolve(input.cwd, relatedPlanPath);
+    if (
+      existsSync(relatedAbsolutePath)
+      && normalizeComparablePath(relatedAbsolutePath) !== normalizeComparablePath(profileAbsolutePath)
+    ) {
+      return {
+        route: 'ambiguous',
+        planningMirrorPath: null,
+        profileRepoRoot: input.profileRepoRoot,
+        planningStatus: null,
+        diagnostics: {
+          codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_AMBIGUOUS'],
+          messages: [
+            `Profile canonical path ${relativeOutput} conflicts with related_plan ${relatedPlanPath}; closeback requires one deterministic planning path.`
+          ]
+        }
+      };
+    }
+  }
+
+  if (!existsSync(profileAbsolutePath)) {
+    return {
+      route: 'missing',
+      planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
+      profileRepoRoot: input.profileRepoRoot,
+      planningStatus: null,
+      diagnostics: {
+        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'],
+        messages: [`Recovered profile-root planning path does not exist: ${relativeOutput}.`]
+      }
+    };
+  }
+
+  const metadata = readPlanningCardMetadata(profileAbsolutePath);
+  if (!metadata.taskId || metadata.taskId !== normalizedTaskId) {
+    return {
+      route: 'missing',
+      planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
+      profileRepoRoot: input.profileRepoRoot,
+      planningStatus: metadata.status,
+      diagnostics: {
+        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'],
+        messages: [`Recovered planning card task id ${metadata.taskId ?? '<missing>'} does not match runtime task ${normalizedTaskId}.`]
+      }
+    };
+  }
+
+  return {
+    route: 'profile-root-fallback',
+    planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
+    profileRepoRoot: input.profileRepoRoot,
+    planningStatus: metadata.status,
+    diagnostics: {
+      codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_PROFILE_FALLBACK'],
+      messages: [`Recovered planning path ${relativeOutput} from profile canonical output policy.`]
+    }
+  };
+}
+
+export function assertClosebackPlanningPathReady(
+  resolution: ClosebackPlanningPathResolution,
+  input: { profileSupplied: boolean; requirePlanningPath: boolean }
+): void {
+  if (!input.requirePlanningPath) {
+    return;
+  }
+  if (resolution.route === 'source-plan-path' || resolution.route === 'profile-root-fallback') {
+    return;
+  }
+  const code = resolution.diagnostics.codes[0] ?? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING';
+  throw new CliError(code, resolution.diagnostics.messages.join(' '), {
+    exitCode: 1,
+    details: { closebackPathResolution: resolution, profileSupplied: input.profileSupplied }
+  });
 }
 
 export function resolveCloseWriteSupport(input: {
