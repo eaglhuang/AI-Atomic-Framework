@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0080",
+  "title": "Taskflow close dry-run parity and hidden-blocker disclosure",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-CID-0074",
+    "TASK-CID-0076"
+  ],
+  "acceptance": [
+    "Dry-run now names blockers that previously only appeared at write time.",
+    "The close write path stays fail-closed and authoritative.",
+    "Validation proves disclosure parity for at least one active-claim case and one"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing emergency lease policy itself",
+    "Turning dry-run into a mutating close path"
+  ],
+  "nonGoals": [
+    "Do not keep dry-run optimistic when write mode will later fail for predictable reasons.",
+    "Do not hide historical-delivery repo or waiver constraints behind backend-only errors."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if dry-run starts implying mutation success it still cannot execute or if closeback truthfulness regresses.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-close-dry-run-parity",
+    "mapUpdates": [
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0080-taskflow-close-dry-run-parity-and-hidden-blocker-disclosure.task.md",
+    "sectionTitle": "TASK-CID-0080",
+    "headingLine": 51,
+    "hash": "ebb55e0c72dd3737"
+  },
+  "importedAt": "2026-06-14T04:03:39.383Z",
+  "lastTransitionId": "2026-06-14T04-14-48-221Z-close-58e1388d0ca6",
+  "lastTransitionAt": "2026-06-14T04:14:48.221Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-14T04:03:47.800Z",
+  "promotedAt": "2026-06-14T04:03:47.802Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-9a62f0024929",
+    "claimedAt": "2026-06-14T04:03:47.805Z",
+    "heartbeatAt": "2026-06-14T04:14:48.218Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0080.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-14T04:03:47.805Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260614040347-captain-TASK-CID-0080-c7c30cabd4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0080",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0080.*",
+      ".atm/history/task-events/TASK-CID-0080/**",
+      ".atm/history/tasks/TASK-CID-0080.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1c4a6619bdfb27a4f7420f73f600281730b087044950580e4272c5c4211e7a42",
+    "actorId": "captain",
+    "createdAt": "2026-06-14T04:03:47.825Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-14T04:14:48.218Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260614040347-captain-TASK-CID-0080-c7c30cabd4",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0080.closure-packet.json"
+}

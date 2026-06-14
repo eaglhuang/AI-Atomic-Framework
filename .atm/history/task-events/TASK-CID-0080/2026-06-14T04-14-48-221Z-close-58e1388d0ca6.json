@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T04-14-48-221Z-close-58e1388d0ca6",
+  "taskId": "TASK-CID-0080",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260614040347-captain-TASK-CID-0080-c7c30cabd4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0080.json",
+  "taskSha256": "sha256:4c13c855f4e6fcb3c1edf661151d636a85d32577cf081057ef997b0213cb3b8e",
+  "createdAt": "2026-06-14T04:14:48.221Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0080 --actor captain --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614040347-captain-TASK-CID-0080-c7c30cabd4",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0080.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T04:14:48.217Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0080-taskflow-close-dry-run-parity-and-hidden-blocker-disclosure.task.md",
+        ".atm/history/evidence/TASK-CID-0080.*",
+        ".atm/history/task-events/TASK-CID-0080/**",
+        ".atm/history/tasks/TASK-CID-0080.json",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
