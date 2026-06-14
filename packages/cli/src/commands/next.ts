@@ -101,6 +101,10 @@ import {
   uniqueInOrder,
   uniqueSorted
 } from './next/view-projections.ts';
+import {
+  resolveCandidatePlanningRoots,
+  type PlanningRootWarning
+} from './next/planning-root-preference.ts';
 
 export async function runNext(argv: any) {
   // TASK-CID-0024: --claim-intent is a next-only claim flag; extract it before
@@ -298,6 +302,17 @@ function withRunnerMode<T extends { evidence?: any; messages?: any[] }>(result: 
     result.evidence.runnerMode = runnerMode;
     if (result.evidence.nextAction && typeof result.evidence.nextAction === 'object' && !Array.isArray(result.evidence.nextAction)) {
       result.evidence.nextAction.runnerMode = runnerMode;
+    }
+  }
+  const planningRootWarnings = result.evidence?.importedTaskQueue?.planningRootWarnings as readonly PlanningRootWarning[] | undefined;
+  if (Array.isArray(planningRootWarnings) && Array.isArray(result.messages)) {
+    for (const warning of planningRootWarnings) {
+      if (result.messages.some((entry) => entry?.code === warning.code && entry?.data?.siblingRepoDirs?.join(',') === warning.siblingRepoDirs.join(','))) {
+        continue;
+      }
+      result.messages.unshift(message('warning', warning.code, warning.detail, {
+        siblingRepoDirs: warning.siblingRepoDirs
+      }));
     }
   }
   if (Array.isArray(result.messages) && !result.messages.some((entry) => entry?.code === 'ATM_RUNNER_MODE')) {
@@ -1921,6 +1936,9 @@ export interface PromptScopedTaskContext {
 }
 
 function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, claimIntent: NextClaimIntent = 'write'): ImportedTaskQueue {
+  const planningRootResolution = resolveCandidatePlanningRoots(cwd, {
+    configuredRoots: readConfiguredPlanningRoots(cwd)
+  });
   const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
   const jsonTasks = existsSync(taskStorePath) ? readdirSync(taskStorePath)
     .filter((entry) => entry.endsWith('.json'))
@@ -2003,7 +2021,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
   const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent)
     ? uniqueSorted([
       ...listTaskCardFiles(cwd),
-      ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent)
+      ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots)
     ])
     : [];
   const markdownTasks = markdownTaskFiles
@@ -2105,7 +2123,8 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
     selectedTask,
     claimableTask,
     tasks,
-    promptScope
+    promptScope,
+    planningRootWarnings: planningRootResolution.warnings
   };
 }
 
@@ -2549,6 +2568,10 @@ function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: Task
   if (/(?:\u4efb\u52d9\u5361|task\s*card)/i.test(intent.userPrompt ?? '') && /\.task\.md$/i.test(task.taskPath)) {
     score += 10;
     reasons.push('task-card-surface');
+  }
+  if (task.taskPath && isTaskPathUnderPreferredPlanningRoots(cwd, task.taskPath)) {
+    score += 15;
+    reasons.push('canonical-planning-root');
   }
   return {
     ...task,
@@ -3014,10 +3037,16 @@ function listTaskCardDiscoveryRoots(cwd: string): readonly string[] {
     .filter((entry) => existsSync(entry)));
 }
 
-function listPromptScopedExternalTaskCardFiles(cwd: string, intent: TaskIntent | null): readonly string[] {
+function listPromptScopedExternalTaskCardFiles(
+  cwd: string,
+  intent: TaskIntent | null,
+  planningRoots: readonly string[] = resolveCandidatePlanningRoots(cwd, {
+    configuredRoots: readConfiguredPlanningRoots(cwd)
+  }).roots
+): readonly string[] {
   if (!intent?.userPrompt || !intent.taskScopeMentioned) return [];
   const output = new Set<string>();
-  for (const root of listCandidatePlanningRoots(cwd)) {
+  for (const root of planningRoots) {
     const markdownFiles = listFilesRecursive(root, (filePath) => filePath.endsWith('.md') && !filePath.endsWith('.task.md'));
     for (const planPath of markdownFiles) {
       if (!planFileMatchesPrompt(cwd, planPath, intent)) continue;
@@ -3037,23 +3066,12 @@ function listPromptScopedExternalTaskCardFiles(cwd: string, intent: TaskIntent |
   return uniqueSorted(Array.from(output));
 }
 
-function listCandidatePlanningRoots(cwd: string): readonly string[] {
-  const roots = new Set<string>();
-  for (const configuredRoot of readConfiguredPlanningRoots(cwd)) {
-    roots.add(path.isAbsolute(configuredRoot) ? configuredRoot : path.resolve(cwd, configuredRoot));
-  }
-  roots.add(path.join(cwd, 'docs', 'ai_atomic_framework'));
-
-  const parent = path.dirname(path.resolve(cwd));
-  for (const entry of safeReadDir(parent)) {
-    if (!entry.isDirectory()) continue;
-    roots.add(path.join(parent, entry.name, 'docs', 'ai_atomic_framework'));
-  }
-
-  return Array.from(roots)
-    .map((entry) => path.resolve(entry))
-    .filter((entry) => existsSync(entry))
-    .sort((left, right) => left.localeCompare(right));
+function isTaskPathUnderPreferredPlanningRoots(cwd: string, taskPath: string): boolean {
+  const absoluteTaskPath = path.resolve(cwd, taskPath);
+  const resolution = resolveCandidatePlanningRoots(cwd, {
+    configuredRoots: readConfiguredPlanningRoots(cwd)
+  });
+  return resolution.roots.some((root) => absoluteTaskPath.startsWith(`${root}${path.sep}`));
 }
 
 function readConfiguredPlanningRoots(cwd: string): readonly string[] {

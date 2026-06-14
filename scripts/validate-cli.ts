@@ -324,6 +324,20 @@ const scopeLockDiagnosticsTest = spawnSync(
 );
 assert(scopeLockDiagnosticsTest.status === 0, `scope-lock-diagnostics focused test must pass: ${scopeLockDiagnosticsTest.stderr || scopeLockDiagnosticsTest.stdout}`);
 
+const planningRootPreferenceTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(planningRootPreferenceTest.status === 0, `planning-root-preference focused test must pass: ${planningRootPreferenceTest.stderr || planningRootPreferenceTest.stdout}`);
+
+const planningRootCanonicalPreferenceValidator = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'scripts/validate-planning-root-canonical-preference.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(planningRootCanonicalPreferenceValidator.status === 0, `planning-root canonical preference validator must pass: ${planningRootCanonicalPreferenceValidator.stderr || planningRootCanonicalPreferenceValidator.stdout}`);
+
 const residueDiagnosticsTest = spawnSync(
   process.execPath,
   ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts')],
