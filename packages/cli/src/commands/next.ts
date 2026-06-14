@@ -3196,8 +3196,8 @@ function detectRequestedTaskAction(prompt: string): RequestedTaskAction | null {
   if (/\u95dc\u9589|\u5b8c\u6210|close|done/i.test(prompt)) return 'close';
   if (/audit|\u7a3d\u6838|\u6aa2\u8a0e/i.test(prompt)) return 'audit';
   if (/cleanup|\u6e05\u7406/i.test(prompt)) return 'cleanup';
-  if (/implement|\u5be6\u4f5c|\u958b\u767c/i.test(prompt)) return 'implement';
   if (/\u5206\u6790|analy[sz]e/i.test(prompt)) return 'analyze';
+  if (/implement|\u5be6\u4f5c|\u958b\u767c/i.test(prompt)) return 'implement';
   return null;
 }
 

@@ -161,6 +161,11 @@ async function main() {
     assert(!collaborationIsolation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'natural language commit/push isolation prompt must not be misread as a task scope because of task/evidence or commit/push text');
     assert((collaborationIsolation.evidence.taskIntent as any)?.taskScopeMentioned === false, 'commit/push isolation prompt must not set taskScopeMentioned without a real task id, task card, plan, or path');
 
+    const analyzePlanPrompt = '請分析目前最適合優先執行的開發計畫是哪一塊? 目前 ATM 還沒有很優化 跟 bug 的部分是哪一個呢 ?';
+    const analyzePlanRoute = await runNext(['--cwd', tempRoot, '--prompt', analyzePlanPrompt]);
+    assert((analyzePlanRoute.evidence.taskIntent as any)?.requestedAction === 'analyze', 'analysis prompts that mention 開發計畫 must keep requestedAction=analyze instead of implement');
+    assert(!analyzePlanRoute.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'analysis-only planning prompts must not be routed as an implementation task');
+
     const externalPlanQueue = await runNext(['--cwd', tempRoot, '--prompt', '閱讀 ATM Agent-First 可操作性優化計畫書，請按照 ATM 的流程完成所有任務卡']);
     assert(externalPlanQueue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'external planning document prompt must route to its adjacent task cards');
     assert((externalPlanQueue.evidence.nextAction as any).recommendedChannel === 'batch', 'external planning document queue must recommend batch channel');
