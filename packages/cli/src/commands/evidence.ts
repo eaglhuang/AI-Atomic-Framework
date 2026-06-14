@@ -49,6 +49,10 @@ interface CommandRunEvidenceInput {
   readonly generatedAt?: string;
 }
 
+const evidenceWriteSleepBuffer = new Int32Array(new SharedArrayBuffer(4));
+const evidenceWriteLockRetryMs = 50;
+const evidenceWriteLockTimeoutMs = 5_000;
+
 export interface EvidenceGateResult {
   readonly ok: boolean;
   readonly gate: EvidenceGate;
@@ -932,7 +936,6 @@ function runEvidenceAdd(argv: string[]) {
   }
   const actorId = resolvedActor.actorId;
   const evidencePath = evidencePathForTask(options.cwd, options.taskId);
-  const bundle = readEvidenceBundle(options.cwd, options.taskId);
   const nowIso = new Date().toISOString();
   const kind = normalizeEvidenceKind(options.kind);
   const session = resolveActorWorkSession(options.cwd, {
@@ -1023,13 +1026,18 @@ function runEvidenceAdd(argv: string[]) {
       ...(commandRunCache ? { commandRunCache } : {})
     }
   };
-  const nextEvidence = [...bundle.evidence, evidenceRecord];
-  const envelope: EvidenceEnvelope = {
-    taskId: options.taskId,
-    updatedAt: nowIso,
-    evidence: nextEvidence
-  };
-  writeEvidenceEnvelope(evidencePath, envelope);
+  const nextEvidence = withTaskEvidenceWriteLock(options.cwd, options.taskId, actorId, () => {
+    const bundle = readEvidenceBundle(options.cwd, options.taskId);
+    maybeHoldEvidenceWriteLockForTests();
+    const mergedEvidence = [...bundle.evidence, evidenceRecord];
+    const envelope: EvidenceEnvelope = {
+      taskId: options.taskId,
+      updatedAt: nowIso,
+      evidence: mergedEvidence
+    };
+    writeEvidenceEnvelope(evidencePath, envelope);
+    return mergedEvidence;
+  });
   return makeResult({
     ok: true,
     command: 'evidence',
@@ -1592,6 +1600,46 @@ function mkdirTempDir() {
   return path.resolve(mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-backfill-')));
 }
 
+function withTaskEvidenceWriteLock<T>(cwd: string, taskId: string, actorId: string, operation: () => T): T {
+  const lockPath = evidenceWriteLockPath(cwd, taskId);
+  mkdirSync(path.dirname(lockPath), { recursive: true });
+  const startedAt = Date.now();
+  while (true) {
+    try {
+      mkdirSync(lockPath, { recursive: false });
+      break;
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? String((error as { code?: unknown }).code ?? '') : '';
+      if (code !== 'EEXIST' && code !== 'EACCES') {
+        throw error;
+      }
+      if ((Date.now() - startedAt) >= evidenceWriteLockTimeoutMs) {
+        throw new CliError(
+          'ATM_EVIDENCE_WRITE_LOCK_CONFLICT',
+          `Evidence write for ${taskId} is already in progress. Retry after the active writer finishes.`,
+          {
+            exitCode: 2,
+            details: {
+              taskId,
+              actorId,
+              lockPath: relativePathFrom(cwd, lockPath),
+              retryable: true,
+              remediation: `Retry the same evidence command for ${taskId} after the current write completes.`
+            }
+          }
+        );
+      }
+      sleepMs(evidenceWriteLockRetryMs);
+    }
+  }
+
+  try {
+    return operation();
+  } finally {
+    rmSync(lockPath, { recursive: true, force: true });
+  }
+}
+
 function readEvidenceBundle(cwd: string, taskId: string): { evidence: readonly Record<string, unknown>[] } {
   const evidencePath = evidencePathForTask(cwd, taskId);
   if (!existsSync(evidencePath)) {
@@ -1663,6 +1711,10 @@ function normalizeEvidenceFreshness(value: string): EvidenceFreshness {
 
 function evidencePathForTask(cwd: string, taskId: string) {
   return path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+}
+
+function evidenceWriteLockPath(cwd: string, taskId: string) {
+  return path.join(cwd, '.atm', 'runtime', 'evidence-write-locks', `${taskId}.lock`);
 }
 
 function taskPathForEvidence(cwd: string, taskId: string) {
@@ -1798,6 +1850,18 @@ function parseIntegerFlag(argv: string[], flag: string) {
   if (raw === null) return null;
   const value = Number.parseInt(raw, 10);
   return Number.isFinite(value) ? value : null;
+}
+
+function maybeHoldEvidenceWriteLockForTests() {
+  const holdMs = Number.parseInt(process.env.ATM_EVIDENCE_TEST_HOLD_LOCK_MS ?? '', 10);
+  if (Number.isFinite(holdMs) && holdMs > 0) {
+    sleepMs(holdMs);
+  }
+}
+
+function sleepMs(ms: number) {
+  if (!Number.isFinite(ms) || ms <= 0) return;
+  Atomics.wait(evidenceWriteSleepBuffer, 0, 0, ms);
 }
 
 export function quoteForShell(arg: string): string {

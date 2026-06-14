@@ -1,10 +1,40 @@
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawn } from 'node:child_process';
 import { runEvidence } from '../packages/cli/src/commands/evidence.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+function runCliEvidence(repo: string, args: string[], env: Record<string, string> = {}) {
+  return new Promise<{ exitCode: number; stdout: string; stderr: string }>((resolve, reject) => {
+    const child = spawn(process.execPath, ['--strip-types', path.join(process.cwd(), 'packages/cli/src/atm.ts'), ...args], {
+      cwd: repo,
+      env: {
+        ...process.env,
+        ...env
+      },
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => {
+      stdout += String(chunk);
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += String(chunk);
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      resolve({
+        exitCode: code ?? 1,
+        stdout,
+        stderr
+      });
+    });
+  });
 }
 
 async function main() {
@@ -192,6 +222,63 @@ async function main() {
   const doctorEntry = catalog.find((e) => e.name === 'doctor');
   assert(doctorEntry?.closureRequired === false,
     'doctor must be closureRequired:false (advisory batch-tier gate)');
+
+  const concurrentTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'TASK-EVIDENCE-LOCK-0001.json');
+  writeFileSync(concurrentTaskPath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-EVIDENCE-LOCK-0001',
+    title: 'Concurrent evidence write validation task',
+    status: 'running',
+    kind: 'code',
+    scope: ['packages/cli/src/commands/evidence.ts']
+  }, null, 2)}\n`, 'utf8');
+
+  const firstWrite = runCliEvidence(repo, [
+    'evidence',
+    'add',
+    '--cwd',
+    repo,
+    '--task',
+    'TASK-EVIDENCE-LOCK-0001',
+    '--actor',
+    'validator-a',
+    '--kind',
+    'test',
+    '--summary',
+    'concurrent write A',
+    '--json'
+  ], {
+    ATM_EVIDENCE_TEST_HOLD_LOCK_MS: '250'
+  });
+  const secondWrite = runCliEvidence(repo, [
+    'evidence',
+    'add',
+    '--cwd',
+    repo,
+    '--task',
+    'TASK-EVIDENCE-LOCK-0001',
+    '--actor',
+    'validator-b',
+    '--kind',
+    'test',
+    '--summary',
+    'concurrent write B',
+    '--json'
+  ]);
+  const [firstResult, secondResult] = await Promise.all([firstWrite, secondWrite]);
+  assert(firstResult.exitCode === 0, `first concurrent evidence add must succeed, stderr=${firstResult.stderr}`);
+  assert(secondResult.exitCode === 0, `second concurrent evidence add must succeed after serialization, stderr=${secondResult.stderr}`);
+
+  const concurrentEvidencePath = path.join(repo, '.atm', 'history', 'evidence', 'TASK-EVIDENCE-LOCK-0001.json');
+  const concurrentEnvelope = JSON.parse(readFileSync(concurrentEvidencePath, 'utf8'));
+  assert(Array.isArray(concurrentEnvelope.evidence), 'concurrent evidence envelope must persist evidence[]');
+  assert(concurrentEnvelope.evidence.length === 2,
+    `serialized same-task writes must preserve both evidence records, got ${concurrentEnvelope.evidence.length}`);
+  const concurrentSummaries = concurrentEnvelope.evidence.map((entry: any) => entry.summary);
+  assert(concurrentSummaries.includes('concurrent write A'),
+    `serialized same-task writes must retain first summary, got ${JSON.stringify(concurrentSummaries)}`);
+  assert(concurrentSummaries.includes('concurrent write B'),
+    `serialized same-task writes must retain second summary, got ${JSON.stringify(concurrentSummaries)}`);
 }
 
 main().catch((error) => {
