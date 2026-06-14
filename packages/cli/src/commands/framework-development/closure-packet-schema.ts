@@ -145,6 +145,21 @@ export interface HistoricalDeliveryProvenance {
   readonly waiverReason: string | null;
 }
 
+export interface ClosurePacketTeamSummary {
+  readonly schemaId: 'atm.closurePacketTeamSummary.v1';
+  readonly capturedAt: string;
+  readonly source: {
+    readonly kind: 'team-run';
+    readonly teamRunPath: string;
+  };
+  readonly teamRunId: string;
+  readonly captainDecision: unknown;
+  readonly agentReports: readonly unknown[];
+  readonly patrolFindings: readonly unknown[];
+  readonly evidenceCuratorSummary: unknown;
+  readonly teamSummary: unknown;
+}
+
 export interface ClosurePacket {
   readonly schemaId: 'atm.closurePacket.v1';
   readonly specVersion: '0.1.0';
@@ -166,6 +181,7 @@ export interface ClosurePacket {
   readonly attestation?: ClosurePacketReconcileAttestation | null;
   readonly repair?: ClosurePacketRepairMetadata | null;
   readonly historicalDeliveryProvenance?: HistoricalDeliveryProvenance | null;
+  readonly teamSummary?: ClosurePacketTeamSummary | null;
   readonly recoveredFromMissingPacket?: boolean;
 }
 
@@ -1096,6 +1112,36 @@ export function validateClosurePacket(value: unknown): {
       if (typeof att.reason !== 'string') missing.push('attestation/reason');
     }
   }
+  if (packet.teamSummary !== undefined && packet.teamSummary !== null) {
+    const summary = packet.teamSummary as Partial<ClosurePacketTeamSummary> & Record<string, unknown>;
+    if (typeof summary !== 'object' || Array.isArray(summary)) {
+      missing.push('teamSummary');
+    } else {
+      if (summary.schemaId !== 'atm.closurePacketTeamSummary.v1') missing.push('teamSummary/schemaId');
+      if (!normalizeOptionalString(summary.capturedAt)) missing.push('teamSummary/capturedAt');
+      if (!normalizeOptionalString(summary.teamRunId)) missing.push('teamSummary/teamRunId');
+      if (!summary.source || typeof summary.source !== 'object' || Array.isArray(summary.source)) {
+        missing.push('teamSummary/source');
+      } else {
+        const source = summary.source as Record<string, unknown>;
+        if (source.kind !== 'team-run') missing.push('teamSummary/source/kind');
+        if (!normalizeOptionalString(source.teamRunPath)) missing.push('teamSummary/source/teamRunPath');
+      }
+      if (!Object.prototype.hasOwnProperty.call(summary, 'captainDecision')) missing.push('teamSummary/captainDecision');
+      if (!Array.isArray(summary.agentReports)) missing.push('teamSummary/agentReports');
+      if (!Array.isArray(summary.patrolFindings)) missing.push('teamSummary/patrolFindings');
+      if (!Object.prototype.hasOwnProperty.call(summary, 'evidenceCuratorSummary')) missing.push('teamSummary/evidenceCuratorSummary');
+      if (!Object.prototype.hasOwnProperty.call(summary, 'teamSummary')) missing.push('teamSummary/teamSummary');
+      if (Object.prototype.hasOwnProperty.call(summary, 'validationPasses')) {
+        invalidFormat.push({
+          path: 'teamSummary/validationPasses',
+          kind: 'invalidFormat',
+          formatExpected: 'teamSummary must not declare validationPasses; only command-backed closure packet evidence can pass validators.',
+          actualValue: 'present'
+        });
+      }
+    }
+  }
   if (packet.evidenceFreshness !== 'fresh') {
     missing.push('evidenceFreshness');
   }
@@ -1185,6 +1231,7 @@ export function createClosurePacket(input: {
   readonly frameworkStatus?: Pick<FrameworkModeStatusReport, 'mode' | 'repoRole' | 'changedFiles' | 'criticalChangedFiles' | 'requiredGates'> | null;
   readonly attestation?: ClosurePacketReconcileAttestation | null;
   readonly historicalDeliveryProvenance?: HistoricalDeliveryProvenance | null;
+  readonly teamSummary?: ClosurePacketTeamSummary | null;
 }): ClosurePacket {
   const cwd = path.resolve(input.cwd);
   const targetCommitDelta = readFutureTargetCommitDelta(cwd, input.changedFiles, input.taskId);
@@ -1215,8 +1262,67 @@ export function createClosurePacket(input: {
     closedByActor: input.actorId,
     sessionId: normalizeOptionalString(input.sessionId) ?? null,
     attestation: input.attestation ?? null,
-    historicalDeliveryProvenance: input.historicalDeliveryProvenance ?? null
+    historicalDeliveryProvenance: input.historicalDeliveryProvenance ?? null,
+    teamSummary: input.teamSummary === undefined
+      ? readLatestClosurePacketTeamSummary(cwd, input.taskId)
+      : input.teamSummary
   };
+}
+
+function readLatestClosurePacketTeamSummary(cwd: string, taskId: string): ClosurePacketTeamSummary | null {
+  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  if (!existsSync(directory)) return null;
+  const candidates = readdirSync(directory)
+    .filter((entry) => entry.endsWith('.json'))
+    .map((entry) => {
+      const absolutePath = path.join(directory, entry);
+      const run = readJsonIfExists(absolutePath);
+      return run && String(run.taskId ?? '').trim() === taskId
+        ? { run, absolutePath }
+        : null;
+    })
+    .filter((entry): entry is { run: Record<string, any>; absolutePath: string } => Boolean(entry))
+    .sort((left, right) => readTeamRunTimestamp(right.run).localeCompare(readTeamRunTimestamp(left.run)));
+
+  const latest = candidates[0];
+  if (!latest) return null;
+  const run = latest.run;
+  const teamSummary = isRecordValue(run.teamSummary) ? run.teamSummary : null;
+  return {
+    schemaId: 'atm.closurePacketTeamSummary.v1',
+    capturedAt: new Date().toISOString(),
+    source: {
+      kind: 'team-run',
+      teamRunPath: normalizeRelativePath(relativePathFrom(cwd, latest.absolutePath))
+    },
+    teamRunId: String(run.teamRunId ?? path.basename(latest.absolutePath, '.json')),
+    captainDecision: run.captainDecision ?? readNestedRecordValue(run, ['teamPlan', 'captainDecision']) ?? readNestedRecordValue(teamSummary, ['captainDecision']) ?? null,
+    agentReports: normalizeUnknownArray(run.agentReports ?? run.agent_reports ?? readNestedRecordValue(teamSummary, ['agentReports'])),
+    patrolFindings: normalizeUnknownArray(run.patrolFindings ?? run.patrol_findings ?? readNestedRecordValue(teamSummary, ['patrolFindings'])),
+    evidenceCuratorSummary: run.evidenceCuratorSummary ?? run.evidence_curator_summary ?? readNestedRecordValue(teamSummary, ['evidenceCuratorSummary']) ?? null,
+    teamSummary
+  };
+}
+
+function readTeamRunTimestamp(run: Record<string, any>): string {
+  return normalizeOptionalString(run.updatedAt) ?? normalizeOptionalString(run.createdAt) ?? '';
+}
+
+function isRecordValue(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function readNestedRecordValue(value: unknown, pathParts: readonly string[]): unknown {
+  let cursor: unknown = value;
+  for (const part of pathParts) {
+    if (!isRecordValue(cursor)) return null;
+    cursor = cursor[part];
+  }
+  return cursor ?? null;
+}
+
+function normalizeUnknownArray(value: unknown): readonly unknown[] {
+  return Array.isArray(value) ? value : [];
 }
 
 export function writeClosurePacket(cwd: string, taskId: string, packet: ClosurePacket) {
@@ -2773,4 +2879,3 @@ function requireValue(argv: string[], index: number, flag: string): string {
   }
   return value;
 }
-

@@ -1434,6 +1434,43 @@ try {
   const legacyValidation = validateClosurePacket(legacyPacket);
   assert(legacyValidation.ok === true, 'validateClosurePacket must accept a legacy closure packet without attestation');
 
+  const packetWithTeamSummary = {
+    ...legacyPacket,
+    teamSummary: {
+      schemaId: 'atm.closurePacketTeamSummary.v1',
+      capturedAt: '2026-06-14T00:00:00.000Z',
+      source: {
+        kind: 'team-run',
+        teamRunPath: '.atm/runtime/team-runs/team-fixture.json'
+      },
+      teamRunId: 'team-fixture',
+      captainDecision: { decision: 'close', reason: 'fixture' },
+      agentReports: [{ role: 'validator', status: 'done' }],
+      patrolFindings: ['no scope drift'],
+      evidenceCuratorSummary: { summary: 'command evidence remains authoritative' },
+      teamSummary: {
+        decision: 'close',
+        implementationSummary: 'fixture',
+        validators: ['typecheck'],
+        evidence: ['fixture evidence'],
+        risk: 'low',
+        closeReady: true
+      }
+    }
+  };
+  assert(validateClosurePacket(packetWithTeamSummary).ok === true, 'validateClosurePacket must accept optional team summary metadata');
+  assert(validateClosurePacket({ ...legacyPacket, teamSummary: null }).ok === true, 'validateClosurePacket must accept closure packets without team summary data');
+  const invalidTeamSummaryPacket = {
+    ...packetWithTeamSummary,
+    teamSummary: {
+      ...(packetWithTeamSummary.teamSummary as Record<string, unknown>),
+      validationPasses: ['typecheck']
+    }
+  };
+  const invalidTeamSummaryValidation = validateClosurePacket(invalidTeamSummaryPacket);
+  assert(invalidTeamSummaryValidation.ok === false, 'team summary must not be able to declare validator passes');
+  assert(invalidTeamSummaryValidation.invalidFormat.some((entry) => entry.path === 'teamSummary/validationPasses'), 'team summary validator pass claims must be reported');
+
   // TASK-AAO-0135: validateClosurePacket invalidFormat vs missing + repair-closure upstream evidence fix
   const upperStdout = 'sha256:ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789';
   const lowerStdout = normalizeSha256DigestValue(upperStdout);

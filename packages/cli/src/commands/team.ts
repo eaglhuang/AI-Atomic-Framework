@@ -1712,6 +1712,18 @@ export function writeTeamRun(input: {
     permissionLeases: input.teamPlan.suggestedPermissionLeases,
     validation: input.validation,
     brokerLane: input.teamPlan.brokerLane,
+    captainDecision: input.teamPlan.captainDecision,
+    agentReports: [],
+    patrolFindings: [],
+    evidenceCuratorSummary: null,
+    teamSummary: {
+      decision: input.teamPlan.captainDecision.reason,
+      implementationSummary: 'Team runtime started; closure remains governed by command-backed evidence.',
+      validators: normalizeStringArray(input.task.validators),
+      evidence: [],
+      risk: input.teamPlan.captainDecision.escalationRequired ? 'medium' : 'low',
+      closeReady: false
+    },
     createdAt: now,
     updatedAt: now
   };
