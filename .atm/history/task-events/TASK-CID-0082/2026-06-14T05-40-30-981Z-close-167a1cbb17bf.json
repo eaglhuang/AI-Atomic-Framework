@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T05-40-30-981Z-close-167a1cbb17bf",
+  "taskId": "TASK-CID-0082",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260614053810-captain-TASK-CID-0082-d357eb88d5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0082.json",
+  "taskSha256": "sha256:cdf5f0adc964ea6d4ddf81ab9e7720f386bea5dac53ef9ea0b728d6fa7476399",
+  "createdAt": "2026-06-14T05:40:30.981Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0082 --actor captain --status done --historical-delivery c1a67ecdbc1f460a13e17fd1f9be85d6a8f438c3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614053810-captain-TASK-CID-0082-d357eb88d5",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0082.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "build",
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T05:40:30.975Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0082-release-root-drop-generated-artifact-staging-contract.task.md",
+        ".atm/history/evidence/TASK-CID-0082.*",
+        ".atm/history/task-events/TASK-CID-0082/**",
+        ".atm/history/tasks/TASK-CID-0082.json",
+        ".gitignore",
+        "release/atm-root-drop/release-manifest.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
