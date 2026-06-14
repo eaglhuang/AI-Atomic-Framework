@@ -1,0 +1,314 @@
+{
+  "taskId": "TASK-TEAM-0011",
+  "updatedAt": "2026-06-14T14:49:32.710Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed for TASK-TEAM-0011",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+      "createdAt": "2026-06-14T14:47:09.563Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-14T14:47:09.616Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b8efafbd95ff5f6b3455d8069798363b813bf938f1496ce6175936d79b09afda",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "start-status validator passed for TASK-TEAM-0011",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+      "createdAt": "2026-06-14T14:47:21.291Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:team-agents"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-team-agents.ts --case start-status",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f8da9081d51c6d80eaa3c83132e97d4ee8d4a82bfb44296462390d34263d2db0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:team-agents"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ce01ab594d1677fefe9bbee23ede0507f9879680449a30ac7d68ad429dcf7723",
+            "cached": false,
+            "generatedAt": "2026-06-14T14:47:21.349Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:76a82c52eae743119ceb986a02ff0289a2e7dbcf1d6d6c4dd6ed909c5eeaecaa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git diff whitespace check passed for TASK-TEAM-0011",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+      "createdAt": "2026-06-14T14:47:21.306Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-14T14:47:21.360Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:491ba3627c66d147ea041aef9d7a9da2d15d4e573ce4c5a514d88cae44b3f479",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "CLI validator passed for TASK-TEAM-0011",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+      "createdAt": "2026-06-14T14:47:38.809Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-06-14T14:47:38.861Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:81ae14b877462e39cafe008f7640dbab7b1279f2719c3d7b5130dc786954b736",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "frozen team start writes runtime state for TASK-TEAM-0011",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+      "createdAt": "2026-06-14T14:47:47.575Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:46b7a12f746601a708d7ac078b2ef978be0ce1a17e1fab9fe3cff9efb87e8e44",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:c9f60cf22f03117d20bc574fa82309d844030f1628e02a35eb73e0943ebae766",
+            "cached": false,
+            "generatedAt": "2026-06-14T14:47:47.642Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:948aefca70770d071098bbfedc7fa563ecb46eec29acf13063f9e4bca4434eeb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "frozen team status compact reports active team runs for TASK-TEAM-0011",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+      "createdAt": "2026-06-14T14:47:55.897Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs team status --compact --json"
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs team status --compact --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:bfe98f004aa99a6d382613cd0d09c253487908d3fc3dee15e6b3fe892024dd63",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs team status --compact --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7dc9622a27fa41940c544c56d5c33287a7eca9b3bef2e2b3c7f81138b8f3a6fa",
+            "cached": false,
+            "generatedAt": "2026-06-14T14:47:55.952Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:330118bdd66806077020995b562c21f053deccff9f8b9598f2052c9931e9fb7d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git head evidence validator passed for TASK-TEAM-0011",
+      "artifactPaths": [
+        "packages/cli/src/commands/team.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+      "createdAt": "2026-06-14T14:49:32.710Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-06-14T14:49:32.755Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f78e86ce35b95761cc08d645e7d45f616d4a9679f8fa901469856a9920d5362f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

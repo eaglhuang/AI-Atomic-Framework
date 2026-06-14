@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0011",
+  "title": "Team start/status runtime",
+  "status": "done",
+  "milestone": "M5",
+  "dependencies": [
+    "TASK-TEAM-0009"
+  ],
+  "acceptance": [
+    "`team start` writes a single team run file under `.atm/runtime/team-runs/**`.",
+    "`team status --compact --json` returns active team run summaries.",
+    "Runtime state includes teamRunId, taskId, actorId, recipeId, roles, leases, status, and timestamps.",
+    "Runtime writes do not touch `.atm/history/**`.",
+    "CLI help documents start/status usage."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case start-status",
+    "node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json",
+    "node atm.mjs team status --compact --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Subagent spawning",
+    "Pre-tool or pre-commit enforcement",
+    "Changing task close behavior"
+  ],
+  "nonGoals": [
+    "Do not write outside .atm/runtime/team-runs/**",
+    "Do not grant write permissions to non-coordinator roles"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert team runtime writes and validation coverage.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card introduces runtime state but still avoids real subagent spawning.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0011-team-start-status-runtime.task.md",
+    "sectionTitle": "TASK-TEAM-0011",
+    "headingLine": 49,
+    "hash": "9d2b7d96b7df170d"
+  },
+  "importedAt": "2026-06-14T14:42:16.303Z",
+  "lastTransitionId": "2026-06-14T14-49-39-271Z-close-186a4d18b128",
+  "lastTransitionAt": "2026-06-14T14:49:39.271Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain-teamagents",
+  "reservedAt": "2026-06-14T14:42:21.140Z",
+  "promotedAt": "2026-06-14T14:42:21.144Z",
+  "claim": {
+    "actorId": "captain-teamagents",
+    "leaseId": "lease-aa26157af5d0",
+    "claimedAt": "2026-06-14T14:42:21.146Z",
+    "heartbeatAt": "2026-06-14T14:49:39.269Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0011.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-14T14:42:21.146Z",
+  "startedByActor": "captain-teamagents",
+  "startedBySessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0011",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0011.*",
+      ".atm/history/task-events/TASK-TEAM-0011/**",
+      ".atm/history/tasks/TASK-TEAM-0011.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2735d5b4829ec0cca43260d7cb2f3ca7a9fd4966813bc410698a4fddf8676b5d",
+    "actorId": "captain-teamagents",
+    "createdAt": "2026-06-14T14:42:21.169Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-14T14:49:39.269Z",
+  "closedByActor": "captain-teamagents",
+  "closedBySessionId": "session-20260614144221-captain-teamagents-TASK-TEAM-0011-49162ecb6e",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0011.closure-packet.json"
+}
