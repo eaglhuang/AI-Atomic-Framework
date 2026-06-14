@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T12-47-52-227Z-close-60f67cd5a5dd",
+  "taskId": "TASK-TEAM-0005",
+  "action": "close",
+  "actorId": "external-005",
+  "sessionId": "session-20260614124029-external-005-TASK-TEAM-0005-ffa15b5586",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0005.json",
+  "taskSha256": "sha256:6aa6114bdea0d2c66c9c1f27cfe2d9d1107ea5f260a32ad52ef31576b41f6477",
+  "createdAt": "2026-06-14T12:47:52.227Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0005 --actor external-005 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614124029-external-005-TASK-TEAM-0005-ffa15b5586",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0005.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "diff-check",
+      "git diff --check",
+      "typecheck",
+      "validate-team-agents-templates",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents-templates"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T12:47:52.224Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0005-team-memory-captain-decision-templates.task.md",
+        ".atm/history/evidence/TASK-TEAM-0005.*",
+        ".atm/history/task-events/TASK-TEAM-0005/**",
+        ".atm/history/tasks/TASK-TEAM-0005.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/templates/captain-decision-template.md",
+        "docs/governance/team-agents/templates/team-memory-shard-template.md",
+        "scripts/validate-team-agents-templates.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-team-agents-templates.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
