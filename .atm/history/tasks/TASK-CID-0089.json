@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0089",
+  "title": "Integration drift remediation UX",
+  "status": "done",
+  "milestone": "M18",
+  "dependencies": [
+    "TASK-CID-0088"
+  ],
+  "acceptance": [
+    "Drift diagnostics identify adapter id, manifest path, and drifted file paths.",
+    "Operator guidance names the exact `integration verify` and `integration add`",
+    "Existing integration validators remain green."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/doctor.ts",
+    "packages/cli/src/commands/integration.ts",
+    "scripts/validate-agent-pack-onboarding.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/doctor.ts",
+    "packages/cli/src/commands/integration.ts",
+    "scripts/validate-agent-pack-onboarding.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:agent-pack-onboarding",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Automatically overwriting user-modified integration files without an explicit command",
+    "Changing adapter installation layout"
+  ],
+  "nonGoals": [
+    "Do not demote real hash mismatches to success."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if integration drift diagnostics become less actionable or hide hash mismatches.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.integration-drift-remediation",
+    "mapUpdates": [
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/integration.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0089-integration-drift-remediation-ux.task.md",
+    "sectionTitle": "TASK-CID-0089",
+    "headingLine": 47,
+    "hash": "e3f5f07ba33e3b16"
+  },
+  "importedAt": "2026-06-14T10:33:04.775Z",
+  "lastTransitionId": "2026-06-14T10-37-06-257Z-close-af71bd980ab6",
+  "lastTransitionAt": "2026-06-14T10:37:06.257Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-14T10:33:06.029Z",
+  "promotedAt": "2026-06-14T10:33:06.033Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-1fddd06bba4a",
+    "claimedAt": "2026-06-14T10:33:06.036Z",
+    "heartbeatAt": "2026-06-14T10:37:06.255Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0089.json",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/integration.ts",
+      "scripts/validate-agent-pack-onboarding.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-14T10:33:06.036Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260614103306-captain-TASK-CID-0089-5e9edb10e1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0089",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0089.*",
+      ".atm/history/task-events/TASK-CID-0089/**",
+      ".atm/history/tasks/TASK-CID-0089.json",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/integration.ts",
+      "scripts/validate-agent-pack-onboarding.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ed0af397285e68ae36fedfd8e52c32e0e8f646a07387c1d4d4c462f49cd46395",
+    "actorId": "captain",
+    "createdAt": "2026-06-14T10:33:06.060Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-14T10:37:06.255Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260614103306-captain-TASK-CID-0089-5e9edb10e1",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0089.closure-packet.json"
+}
