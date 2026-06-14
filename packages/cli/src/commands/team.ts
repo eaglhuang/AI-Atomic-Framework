@@ -45,10 +45,13 @@ type TeamRecipe = {
 type PermissionFinding = {
   level: 'error' | 'warning';
   code: string;
+  summary: string;
   detail: string;
+  role?: string;
   permission?: string;
   agentIds?: string[];
   paths?: string[];
+  suggestedFix: string;
 };
 
 type PermissionLease = {
@@ -104,6 +107,30 @@ const teamPermissionCatalog: TeamPermissionDefinition[] = [
   { id: 'ci.write', mode: 'exclusive', scopeRequired: true },
   { id: 'evidence.write', mode: 'exclusive' }
 ];
+
+const coordinatorExclusivePermissions = ['task.lifecycle', 'git.write', 'evidence.write'] as const;
+
+const readOnlyTeamRoles = new Set([
+  'atomizationPlanner',
+  'scopeGuardian',
+  'reader',
+  'evidenceCollector',
+  'validator'
+]);
+
+const writeTeamPermissions = new Set([
+  'task.lifecycle',
+  'git.write',
+  'file.write',
+  'evidence.write',
+  'web.query',
+  'web.download',
+  'exec.mutating',
+  'sandbox.write',
+  'pipeline.write',
+  'database.write',
+  'ci.write'
+]);
 
 const atomizationRiskHotFiles = new Set([
   'tasks.ts',
@@ -164,6 +191,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team.ts#buildTeamStatusResult',
     capability: 'Read-only team run status surface.',
     downstreamTasks: ['TASK-TEAM-0011']
+  },
+  'team.permission-lease-validator': {
+    anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
+    capability: 'Deterministic permission lease validation before team runtime start.',
+    downstreamTasks: ['TASK-TEAM-0012']
   }
 } as const;
 
@@ -239,21 +271,25 @@ export async function runTeam(argv: string[]) {
     requestedRecipeId: String(parsed.options.recipe ?? '').trim(),
     actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim()
   });
-  const { task, recipes, recipe, validation, teamPlan } = context;
+  const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
   const ok = validation.findings.every((finding) => finding.level !== 'error');
 
   if (action === 'validate') {
+    const permissionOk = permissionValidation.ok;
+    const nonPermissionFindings = validation.findings.filter(
+      (finding) => !permissionValidation.findings.includes(finding)
+    );
     return makeResult({
-      ok,
+      ok: permissionOk,
       command: 'team',
       cwd,
       messages: [
-        message(ok ? 'info' : 'error', ok ? 'ATM_TEAM_PERMISSION_VALID' : 'ATM_TEAM_PERMISSION_INVALID', ok
+        message(permissionOk ? 'info' : 'error', permissionOk ? 'ATM_TEAM_PERMISSION_VALID' : 'ATM_TEAM_PERMISSION_INVALID', permissionOk
           ? 'Team recipe and permission leases are valid.'
           : 'Team recipe or permission leases contain blocking findings.', {
           taskId,
           recipeId: recipe.recipeId,
-          findingCount: validation.findings.length
+          findingCount: permissionValidation.findings.length
         })
       ],
       evidence: {
@@ -265,7 +301,8 @@ export async function runTeam(argv: string[]) {
         recipe,
         recipeSources: recipes.sources,
         permissionCatalog: teamPermissionCatalog,
-        validation,
+        validation: permissionValidation,
+        relatedFindings: nonPermissionFindings,
         suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
         brokerLane: teamPlan.brokerLane
       }
@@ -393,12 +430,12 @@ async function buildTeamPlanningContext(input: {
         const finding = candidate.finding;
         if (finding && Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0) {
           // Consumer-side compensation: override verdict to 'blocked-cid-conflict'
-          parallelFindings.push({
+          parallelFindings.push(buildPermissionFinding({
             level: 'error',
             code: 'blocked-cid-conflict',
             detail: `Parallel advisor identified a CID logic conflict with task ${candidate.taskId} on atom(s): ${finding.overlappingAtomIds.join(', ')}`,
             paths: finding.overlappingFiles
-          });
+          }));
         }
       }
     }
@@ -432,6 +469,7 @@ async function buildTeamPlanningContext(input: {
     task,
     recipes,
     recipe,
+    permissionValidation,
     validation,
     teamPlan: {
       ...finalTeamPlan,
@@ -540,9 +578,10 @@ function inferTaskLanguage(task: any) {
 }
 
 export function validateTeamPermissionModel(recipe: TeamRecipe, writePaths: string[]) {
+  const agentRoles = new Map(recipe.agents.map((agent) => [agent.agentId, agent.role]));
   return mergeValidation(
-    validateTeamRecipe(recipe),
-    validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths))
+    validateTeamRecipe(recipe, agentRoles),
+    validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths), agentRoles)
   );
 }
 
@@ -557,7 +596,7 @@ export function planTeamBrokerLane(input: {
   return {
     result: brokerLaneResult,
     evidence: buildTeamBrokerEvidence(brokerLaneResult),
-    findings: brokerLaneToFindings(brokerLaneResult).map((finding) => ({
+    findings: brokerLaneToFindings(brokerLaneResult).map((finding) => buildPermissionFinding({
       level: finding.level,
       code: finding.code,
       detail: finding.detail,
@@ -566,7 +605,109 @@ export function planTeamBrokerLane(input: {
   };
 }
 
-function validateTeamRecipe(recipe: TeamRecipe) {
+function buildPermissionFinding(input: {
+  level: 'error' | 'warning';
+  code: string;
+  detail: string;
+  permission?: string;
+  agentIds?: string[];
+  paths?: string[];
+  role?: string;
+}): PermissionFinding {
+  return {
+    level: input.level,
+    code: input.code,
+    summary: permissionFindingSummary(input),
+    detail: input.detail,
+    role: input.role,
+    permission: input.permission,
+    agentIds: input.agentIds,
+    paths: input.paths,
+    suggestedFix: permissionFindingSuggestedFix(input)
+  };
+}
+
+function permissionFindingSummary(input: {
+  code: string;
+  detail: string;
+  permission?: string;
+  role?: string;
+}): string {
+  switch (input.code) {
+    case 'ATM_TEAM_PERMISSION_UNKNOWN':
+      return input.permission
+        ? `Unknown permission ${input.permission}.`
+        : 'Unknown team permission.';
+    case 'ATM_TEAM_PERMISSION_CONFLICT':
+      return input.permission
+        ? `Exclusive permission ${input.permission} has multiple recipe owners.`
+        : 'Exclusive permission has multiple recipe owners.';
+    case 'ATM_TEAM_UNIQUE_OWNER_REQUIRED':
+      return input.permission
+        ? `${input.permission} must stay with the coordinator.`
+        : 'Coordinator-only permission has an invalid owner.';
+    case 'ATM_TEAM_READONLY_ROLE_WRITE_FORBIDDEN':
+      return input.role
+        ? `Read-only role ${input.role} must not receive write permissions.`
+        : 'Read-only role received a write permission.';
+    case 'ATM_TEAM_PERMISSION_SCOPE_REQUIRED':
+      return input.permission
+        ? `${input.permission} requires explicit scoped paths.`
+        : 'Scoped permission is missing lease paths.';
+    case 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN':
+      return 'Write lease targets forbidden runtime paths.';
+    case 'ATM_TEAM_PERMISSION_LEASE_CONFLICT':
+      return input.permission
+        ? `Exclusive permission lease ${input.permission} has multiple owners.`
+        : 'Exclusive permission lease has multiple owners.';
+    default:
+      return input.detail;
+  }
+}
+
+function permissionFindingSuggestedFix(input: {
+  code: string;
+  permission?: string;
+  role?: string;
+  agentIds?: string[];
+}): string {
+  switch (input.code) {
+    case 'ATM_TEAM_PERMISSION_UNKNOWN':
+      return 'Remove the unknown permission or add it to the team permission catalog before team start.';
+    case 'ATM_TEAM_PERMISSION_CONFLICT':
+      return input.permission
+        ? `Keep ${input.permission} on one role only and remove it from the other agent recipe entries.`
+        : 'Assign each exclusive permission to exactly one agent in the recipe.';
+    case 'ATM_TEAM_UNIQUE_OWNER_REQUIRED':
+      return input.permission
+        ? `Grant ${input.permission} only to the coordinator agent and remove it from other roles.`
+        : 'Move coordinator-only permissions back to the coordinator agent.';
+    case 'ATM_TEAM_READONLY_ROLE_WRITE_FORBIDDEN':
+      return input.role
+        ? `Remove write permissions from ${input.role}; keep read-only roles on file.read or exec.validator only.`
+        : 'Remove write permissions from read-only roles in the recipe.';
+    case 'ATM_TEAM_PERMISSION_SCOPE_REQUIRED':
+      return input.permission
+        ? `Add explicit scoped paths to the ${input.permission} lease before team start.`
+        : 'Provide scoped paths for permissions that require a lease boundary.';
+    case 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN':
+      return 'Remove .atm/runtime/** paths from write leases; runtime state is managed by team start, not leased writes.';
+    case 'ATM_TEAM_PERMISSION_LEASE_CONFLICT':
+      return input.permission
+        ? `Rebuild suggested leases so only one agent owns ${input.permission}.`
+        : 'Ensure each exclusive lease has a single owner before team start.';
+    default:
+      return 'Review the recipe permissions and suggested leases, then rerun team validate.';
+  }
+}
+
+function resolveFindingRole(agentRoles: Map<string, string>, agentIds?: string[]): string | undefined {
+  const primaryAgentId = agentIds?.[0];
+  if (!primaryAgentId) return undefined;
+  return agentRoles.get(primaryAgentId);
+}
+
+function validateTeamRecipe(recipe: TeamRecipe, agentRoles: Map<string, string>) {
   const permissionDefinitions = new Map(teamPermissionCatalog.map((entry) => [entry.id, entry]));
   const ownersByPermission = new Map<string, string[]>();
   const findings: PermissionFinding[] = [];
@@ -574,13 +715,24 @@ function validateTeamRecipe(recipe: TeamRecipe) {
   for (const agent of recipe.agents) {
     for (const permission of agent.permissions) {
       if (!permissionDefinitions.has(permission)) {
-        findings.push({
+        findings.push(buildPermissionFinding({
           level: 'error',
           code: 'ATM_TEAM_PERMISSION_UNKNOWN',
           detail: `Unknown team permission: ${permission}`,
           permission,
-          agentIds: [agent.agentId]
-        });
+          agentIds: [agent.agentId],
+          role: agent.role
+        }));
+      }
+      if (readOnlyTeamRoles.has(agent.role) && writeTeamPermissions.has(permission)) {
+        findings.push(buildPermissionFinding({
+          level: 'error',
+          code: 'ATM_TEAM_READONLY_ROLE_WRITE_FORBIDDEN',
+          detail: `Read-only role ${agent.role} must not receive write permission ${permission}.`,
+          permission,
+          agentIds: [agent.agentId],
+          role: agent.role
+        }));
       }
       ownersByPermission.set(permission, [...(ownersByPermission.get(permission) ?? []), agent.agentId]);
     }
@@ -589,27 +741,29 @@ function validateTeamRecipe(recipe: TeamRecipe) {
   for (const permission of teamPermissionCatalog.filter((entry) => entry.mode === 'exclusive')) {
     const owners = ownersByPermission.get(permission.id) ?? [];
     if (owners.length > 1) {
-      findings.push({
+      findings.push(buildPermissionFinding({
         level: 'error',
         code: 'ATM_TEAM_PERMISSION_CONFLICT',
         detail: `Exclusive permission ${permission.id} has multiple owners.`,
         permission: permission.id,
-        agentIds: owners
-      });
+        agentIds: owners,
+        role: resolveFindingRole(agentRoles, owners)
+      }));
     }
   }
 
   const coordinator = recipe.agents.find((agent) => agent.role === 'coordinator');
-  for (const permission of ['task.lifecycle', 'git.write']) {
+  for (const permission of coordinatorExclusivePermissions) {
     const owners = ownersByPermission.get(permission) ?? [];
     if (owners.length !== 1 || owners[0] !== coordinator?.agentId) {
-      findings.push({
+      findings.push(buildPermissionFinding({
         level: 'error',
         code: 'ATM_TEAM_UNIQUE_OWNER_REQUIRED',
         detail: `${permission} must have exactly one owner and it must be the coordinator.`,
         permission,
-        agentIds: owners
-      });
+        agentIds: owners,
+        role: resolveFindingRole(agentRoles, owners)
+      }));
     }
   }
 
@@ -619,21 +773,23 @@ function validateTeamRecipe(recipe: TeamRecipe) {
   };
 }
 
-function validatePermissionLeases(leases: PermissionLease[]) {
+function validatePermissionLeases(leases: PermissionLease[], agentRoles: Map<string, string>) {
   const permissionDefinitions = new Map(teamPermissionCatalog.map((entry) => [entry.id, entry]));
   const findings: PermissionFinding[] = [];
   const ownersByExclusivePermission = new Map<string, string[]>();
 
   for (const lease of leases) {
     const definition = permissionDefinitions.get(lease.permission);
+    const role = agentRoles.get(lease.agentId);
     if (!definition) {
-      findings.push({
+      findings.push(buildPermissionFinding({
         level: 'error',
         code: 'ATM_TEAM_PERMISSION_UNKNOWN',
         detail: `Unknown team permission lease: ${lease.permission}`,
         permission: lease.permission,
-        agentIds: [lease.agentId]
-      });
+        agentIds: [lease.agentId],
+        role
+      }));
       continue;
     }
     if (definition.mode === 'exclusive') {
@@ -643,36 +799,39 @@ function validatePermissionLeases(leases: PermissionLease[]) {
       ]);
     }
     if (definition.scopeRequired && (!Array.isArray(lease.paths) || lease.paths.length === 0)) {
-      findings.push({
+      findings.push(buildPermissionFinding({
         level: 'error',
         code: 'ATM_TEAM_PERMISSION_SCOPE_REQUIRED',
         detail: `${lease.permission} requires explicit scoped paths.`,
         permission: lease.permission,
-        agentIds: [lease.agentId]
-      });
+        agentIds: [lease.agentId],
+        role
+      }));
     }
     const forbiddenRuntimePaths = (lease.paths ?? []).filter((entry) => entry.replace(/\\/g, '/').startsWith('.atm/runtime/'));
     if (forbiddenRuntimePaths.length > 0) {
-      findings.push({
+      findings.push(buildPermissionFinding({
         level: 'error',
         code: 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN',
         detail: `${lease.permission} cannot lease .atm/runtime/** paths.`,
         permission: lease.permission,
         agentIds: [lease.agentId],
+        role,
         paths: forbiddenRuntimePaths
-      });
+      }));
     }
   }
 
   for (const [permission, owners] of ownersByExclusivePermission.entries()) {
     if (new Set(owners).size > 1) {
-      findings.push({
+      findings.push(buildPermissionFinding({
         level: 'error',
         code: 'ATM_TEAM_PERMISSION_LEASE_CONFLICT',
         detail: `Exclusive permission lease ${permission} has multiple owners.`,
         permission,
-        agentIds: owners
-      });
+        agentIds: owners,
+        role: resolveFindingRole(agentRoles, owners)
+      }));
     }
   }
 
