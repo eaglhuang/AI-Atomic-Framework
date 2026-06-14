@@ -43,6 +43,12 @@ export const teamSpecTask0009Preflight = {
   examples: ['node atm.mjs team plan --task TASK-TEAM-0009 --json']
 };
 
+export const teamSpecPlanResolver = {
+  summary:
+    'Plan examples for the TASK-TEAM-0009 dry-run resolver output (atm.teamPlan.v1 plan schema and evidence surface).',
+  examples: ['node atm.mjs team plan --task TASK-TEAM-0009 --json']
+};
+
 export const teamSpecPermissionValidation = {
   summary: 'Validate recipe permissions and scoped leases before team start.',
   examples: ['node atm.mjs team validate --task TASK-AAO-0005 --recipe atm.default.normal.typescript --json']
@@ -76,7 +82,7 @@ export default defineCommandSpec({
   examples: [
     ...teamSpecCrewBriefing.examples,
     ...teamSpecAtomizationPlanner.examples,
-    ...teamSpecTask0009Preflight.examples,
+    ...teamSpecPlanResolver.examples,
     ...teamSpecCaptainDecision.examples,
     ...teamSpecLieutenantEscalation.examples,
     ...teamSpecPermissionValidation.examples,
