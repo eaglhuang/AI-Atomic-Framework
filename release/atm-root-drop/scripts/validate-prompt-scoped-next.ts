@@ -178,6 +178,14 @@ async function main() {
     const familyTrail = assertDecisionTrail(familyQueue.evidence.nextAction as any, 'task family queue');
     assert(familyTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-AAO-0001')), 'task family decisionTrail must record the matching queue head');
 
+    writeTaskCard(path.join(taskDir, 'TASK-EMPTY-0001.task.md'), 'TASK-EMPTY-0001', 'Empty scope fixture', { status: 'done' });
+    const emptyScope = await runNext(['--cwd', tempRoot, '--prompt', 'Please continue remaining TASK-EMPTY task cards one by one']);
+    assert(emptyScope.ok === true, 'family prompt with only closed task cards must return a clean no-work result');
+    assert(emptyScope.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_NO_WORK'), 'family prompt with only closed task cards must report no-work instead of scope-not-found');
+    assert((emptyScope.evidence.nextAction as any).status === 'task-no-work', 'no-work route must expose task-no-work status');
+    const emptyScopeTrail = assertDecisionTrail(emptyScope.evidence.nextAction as any, 'task-no-work');
+    assert(emptyScopeTrail.some((entry) => entry.check === 'prompt-scope-resolution' && entry.result === 'pass'), 'no-work route must record a passing prompt-scope-resolution decision');
+
     const shorthandExact = await runNext(['--cwd', tempRoot, '--prompt', '請補強 AAO-0011 unrelated untracked claim 行為']);
     assert(shorthandExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'AAO shorthand task id must route to canonical TASK-AAO card');
     assert((shorthandExact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-AAO-0011', 'AAO shorthand exact route selected wrong canonical task');

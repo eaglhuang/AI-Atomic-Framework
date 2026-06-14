@@ -50,6 +50,55 @@ export interface ValidatorFailureEnvelopeInput {
   readonly spawnError?: string | null;
 }
 
+function normalizeCommandToken(raw: string): string {
+  return raw.trim().replace(/\s+/g, ' ');
+}
+
+function canonicalizeValidatorOrCommand(raw: string): string {
+  const normalized = normalizeCommandToken(raw);
+  if (!normalized) return normalized;
+  const lowered = normalized.toLowerCase();
+  if (lowered === 'typecheck') return 'typecheck';
+  if (lowered === 'git diff --check' || lowered === 'git-diff-check') return 'git diff --check';
+  if (lowered === 'doctor') return 'doctor';
+  if (lowered === 'framework-development') return 'framework-development';
+  if (lowered === 'tasks-audit') return 'tasks-audit';
+  if (lowered === 'git-head-evidence' || lowered === 'git-head-backfill') return 'git-head-evidence';
+  const npmMatch = normalized.match(/^npm run (.+)$/i);
+  if (npmMatch) return canonicalizeValidatorOrCommand(npmMatch[1].trim());
+  const nodeScriptMatch = normalized.match(/(?:^|\s)scripts[\\/]+validate-([a-z0-9-]+)\.ts\b/i);
+  if (nodeScriptMatch) return `validate:${nodeScriptMatch[1].toLowerCase()}`;
+  if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+doctor\b/i.test(normalized)) return 'doctor';
+  if (
+    /^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+next\b/i.test(normalized)
+    && /\s--json(?:\s|$)/i.test(` ${normalized} `)
+    && !/\s--prompt(?:\s|$)|\s--claim(?:\s|$)|\s--task(?:\s|$)/i.test(` ${normalized} `)
+  ) {
+    return 'framework-development';
+  }
+  if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+tasks\s+audit\b/i.test(normalized)) return 'tasks-audit';
+  if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+evidence\s+git-head-backfill\b/i.test(normalized)) return 'git-head-evidence';
+  return normalized;
+}
+
+function extractFlagValue(command: string, flag: string): string | null {
+  const escapedFlag = flag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = command.match(new RegExp(`${escapedFlag}\\s+(?:\"([^\"]+)\"|'([^']+)'|([^\\s]+))`, 'i'));
+  return match ? (match[1] ?? match[2] ?? match[3] ?? null) : null;
+}
+
+function canonicalizeRequiredCommandForFingerprint(command: string | null | undefined): string | null {
+  if (typeof command !== 'string' || !command.trim()) return null;
+  const normalized = normalizeCommandToken(command);
+  if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+evidence\s+run\b/i.test(normalized)) {
+    const validatorValue = extractFlagValue(normalized, '--validators');
+    if (validatorValue) return `validator:${canonicalizeValidatorOrCommand(validatorValue)}`;
+    const commandValue = extractFlagValue(normalized, '--command');
+    if (commandValue) return `command:${canonicalizeValidatorOrCommand(commandValue)}`;
+  }
+  return canonicalizeValidatorOrCommand(normalized);
+}
+
 export function findingFingerprint(finding: ValidatorBlockingFinding): string {
   return JSON.stringify({
     code: finding.code,
@@ -57,7 +106,7 @@ export function findingFingerprint(finding: ValidatorBlockingFinding): string {
     detail: finding.detail,
     file: finding.file ?? null,
     files: [...(finding.files ?? [])].sort(),
-    requiredCommand: finding.requiredCommand ?? null
+    requiredCommand: canonicalizeRequiredCommandForFingerprint(finding.requiredCommand)
   });
 }
 

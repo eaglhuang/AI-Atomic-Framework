@@ -3,10 +3,13 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, wri
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from './tasks/public-surface.js';
+import { evaluateTaskDoneCloseAdmission } from './tasks/lifecycle-state.js';
+import { inspectHistoricalDelivery } from './tasks/historical-delivery.js';
 import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildTaskflowCloseDiagnostics, resolveClosebackPlanningPath, resolveCloseWriteSupport } from './taskflow/close-orchestration.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
+import { resolveActorWorkSession } from './actor-session.js';
 import { withTaskflowOperatorLane } from './emergency/context.js';
 import { runAtmGit } from './git-governance.js';
 import { quoteCliValue, relativePathFrom } from './shared.js';
@@ -146,6 +149,108 @@ function buildWriteReadinessHint(input) {
         nextCommand: null,
         operatorLane: 'taskflow open',
         fallbackSurface: 'tasks new (low-level generator)'
+    };
+}
+function normalizeTaskflowLifecycleStatus(value) {
+    return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+}
+function readTaskflowClaimContext(taskDocument) {
+    const claim = taskDocument.claim;
+    if (!claim || typeof claim !== 'object' || Array.isArray(claim)) {
+        return { state: null, actorId: null, leaseId: null };
+    }
+    const record = claim;
+    return {
+        state: typeof record.state === 'string' ? record.state : null,
+        actorId: typeof record.actorId === 'string' ? record.actorId : null,
+        leaseId: typeof record.leaseId === 'string' ? record.leaseId : null
+    };
+}
+function buildTaskflowCloseWriteReadinessHint(input) {
+    const blockers = [];
+    const taskStatus = normalizeTaskflowLifecycleStatus(input.taskDocument.status);
+    const claim = readTaskflowClaimContext(input.taskDocument);
+    const activeSession = input.actorId
+        ? resolveActorWorkSession(input.cwd, {
+            actorId: input.actorId,
+            taskId: input.taskId,
+            claimLeaseId: claim.leaseId,
+            includeNonActive: true
+        })
+        : null;
+    if (!input.actorId) {
+        blockers.push({
+            code: 'ATM_TASKFLOW_CLOSE_ACTOR_REQUIRED',
+            summary: 'taskflow close --write requires --actor before ATM can verify claim ownership and active session context.',
+            requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor <actor> --write --json`
+        });
+    }
+    else {
+        const admission = evaluateTaskDoneCloseAdmission({
+            taskId: input.taskId,
+            actorId: input.actorId,
+            status: taskStatus,
+            claimState: claim.state,
+            claimActorId: claim.actorId,
+            hasActiveSession: Boolean(activeSession?.sessionId)
+        });
+        if (!admission.ok) {
+            blockers.push({
+                code: admission.code,
+                summary: admission.message,
+                requiredCommand: typeof admission.details.requiredCommand === 'string'
+                    ? admission.details.requiredCommand
+                    : null
+            });
+        }
+    }
+    const hasUncommittedDeliverables = input.previewCommitBundle.targetDeliveryFiles.length > 0;
+    if (input.closebackPlan.historicalDeliveryGate.required
+        && !hasUncommittedDeliverables
+        && input.historicalDeliveryRefs.length === 0) {
+        blockers.push({
+            code: 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED',
+            summary: 'Framework delivery already landed; taskflow close --write will require --historical-delivery before backend close can proceed.',
+            requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery <commit> --write --json`
+        });
+    }
+    if (input.planningAuthorityDeliveryGate.required && !input.planningAuthorityDeliveryGate.ok) {
+        blockers.push({
+            code: 'ATM_TASKFLOW_CLOSE_PLANNING_DELIVERY_REQUIRED',
+            summary: input.planningAuthorityDeliveryGate.reason ?? 'Planning-authority close requires a verifiable planning-repo historical delivery commit.',
+            requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery <planning-repo-commit> --write --json`
+        });
+    }
+    const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
+    const historicalRef = input.historicalDeliveryRefs[0] ?? null;
+    if (historicalRef && declaredFiles.length > 0) {
+        const historicalReport = inspectHistoricalDelivery({
+            cwd: input.cwd,
+            taskId: input.taskId,
+            requestedRef: historicalRef,
+            declaredFiles,
+            enforceDeclaredScope: true,
+            waiverOutOfScopeDelivery: false,
+            waiverReason: null
+        });
+        if (historicalReport.reason === 'out-of-scope-source-files-present') {
+            blockers.push({
+                code: 'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUIRED',
+                summary: `Historical delivery ${historicalRef} includes out-of-scope source files. taskflow close will fail closed unless the delivery is isolated or the backend waiver path is used explicitly.`,
+                requiredCommand: `node atm.mjs tasks close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --status done --historical-delivery ${historicalRef} --waiver-out-of-scope-delivery --reason \"<reason>\" --json`
+            });
+        }
+    }
+    const status = blockers.length === 0 ? 'ready' : 'blocked';
+    return {
+        schemaId: 'atm.taskflowCloseWriteReadinessHint.v1',
+        status,
+        summary: status === 'ready'
+            ? 'taskflow close --write has no known preflight blockers beyond the dry-run bundle.'
+            : `taskflow close --write has ${blockers.length} known blocker(s) that dry-run can already disclose.`,
+        blockers,
+        nextCommand: blockers[0]?.requiredCommand ?? null,
+        operatorLane: 'taskflow close'
     };
 }
 function collectHistoricalDeliveryRefs(parsed) {
@@ -939,6 +1044,16 @@ async function runTaskflowClose(parsed, cwd) {
         historicalDeliveryRefs
     });
     const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
+    const writeReadinessHint = buildTaskflowCloseWriteReadinessHint({
+        cwd,
+        taskId,
+        actorId,
+        taskDocument,
+        closebackPlan,
+        previewCommitBundle,
+        historicalDeliveryRefs,
+        planningAuthorityDeliveryGate
+    });
     const writeSupport = resolveCloseWriteSupport({
         writeRequested,
         closeMode: closebackPlan.closeMode,
@@ -1092,16 +1207,21 @@ async function runTaskflowClose(parsed, cwd) {
             cwd,
             mode: 'dry-run',
             messages: [
-                message(closebackPlan.closeMode === 'ambiguous-manual-review' ? 'warn' : 'info', closebackPlan.closeMode === 'ambiguous-manual-review'
+                message(closebackPlan.closeMode === 'ambiguous-manual-review' || writeReadinessHint.status === 'blocked' ? 'warn' : 'info', closebackPlan.closeMode === 'ambiguous-manual-review'
                     ? 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE'
-                    : 'ATM_TASKFLOW_CLOSE_ORCHESTRATION_READY', closebackPlan.closeMode === 'ambiguous-manual-review'
+                    : writeReadinessHint.status === 'blocked'
+                        ? 'ATM_TASKFLOW_CLOSE_WRITE_NOT_READY'
+                        : 'ATM_TASKFLOW_CLOSE_ORCHESTRATION_READY', closebackPlan.closeMode === 'ambiguous-manual-review'
                     ? 'taskflow close dry-run blocked on ambiguous residue; operator review required.'
-                    : `taskflow close dry-run plan is ready (${closebackPlan.closeMode}).`, { taskId, closeMode: closebackPlan.closeMode })
+                    : writeReadinessHint.status === 'blocked'
+                        ? `taskflow close dry-run found known write blockers (${closebackPlan.closeMode}); inspect writeReadinessHint before --write.`
+                        : `taskflow close dry-run plan is ready (${closebackPlan.closeMode}).`, { taskId, closeMode: closebackPlan.closeMode })
             ],
             evidence: {
                 closeMode: closebackPlan.closeMode,
                 commitMode,
                 writeSupport,
+                writeReadinessHint,
                 delegationContract,
                 diagnostics,
                 closebackPlan,

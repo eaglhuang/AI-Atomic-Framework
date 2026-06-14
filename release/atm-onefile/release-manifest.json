@@ -1,8 +1,26 @@
 {
-  "schemaVersion": "atm.onefileRelease.v0.1",
-  "generatedAt": "2026-06-13T16:48:04.477Z",
+  "schemaVersion": "atm.onefileRelease.v0.2",
+  "generatedAt": "2026-06-14T05:31:41.142Z",
   "entrypoint": "atm.mjs",
-  "payloadSha256": "857dc0eef8501f0170e036d783fe5eab453c37f674ece6154be4fac1ad19944f",
+  "payloadSha256": "2b7b42b39a78c6b8a96b8d2fb3edb62c722c8728b26d639a4510c4c2ad4ea0be",
   "sourceRoot": "release/atm-root-drop",
-  "fileCount": 2130
+  "fileCount": 2130,
+  "generatedFiles": [
+    "release/atm-onefile/README.onefile.md",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json"
+  ],
+  "stagingContract": {
+    "schemaId": "atm.generatedArtifactStaging.v1",
+    "generatedFiles": [
+      "release/atm-onefile/README.onefile.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json"
+    ],
+    "ignoredByDefault": true,
+    "requiresExplicitStaging": true,
+    "contractSurface": "release-manifest.json",
+    "dependsOnRootDropManifest": "release/atm-root-drop/release-manifest.json",
+    "rationale": "release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list."
+  }
 }

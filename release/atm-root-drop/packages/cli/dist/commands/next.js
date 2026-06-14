@@ -431,7 +431,12 @@ async function claimNextImportedTask(input) {
             catch { }
         }
     }
-    if (selectedTaskDependencyBlockers.length > 0) {
+    const reusesOwnActiveClaim = Boolean(selectedTask
+        && isTaskAlreadyActivelyClaimed(selectedTask)
+        && typeof input.actor === 'string'
+        && input.actor.trim().length > 0
+        && selectedTask.activeClaimActorId === input.actor.trim());
+    if (selectedTaskDependencyBlockers.length > 0 && !reusesOwnActiveClaim) {
         const firstBlocker = selectedTaskDependencyBlockers[0];
         const requiredCmd = firstBlocker.requiredCommand
             ?? (firstBlocker.status === 'incomplete-closeout' || firstBlocker.status === 'source-done-governance-incomplete'
@@ -973,6 +978,33 @@ function buildPromptScopedNextResult(input) {
     if (!promptScope)
         return null;
     const selectedTasks = promptScope.selectedTasks;
+    if (promptScope.status === 'empty') {
+        const nextAction = {
+            status: 'task-no-work',
+            command: 'node atm.mjs next --cwd . --json',
+            reason: 'the prompt points at a task scope, but no open imported work remains for that scope',
+            taskIntent: input.taskIntent,
+            candidates: [],
+            allowedCommands: allowedGuidanceBootstrapCommands(),
+            blockedCommands: blockedMutationCommands()
+        };
+        return makeResult({
+            ok: true,
+            command: 'next',
+            cwd: input.cwd,
+            messages: buildNextMessages(nextAction, null, input.integrationBootstrap, input.runtimeAdapterReadiness, message('info', 'ATM_NEXT_TASK_NO_WORK', 'The prompt points at a known task scope, but no open imported work remains for it.', {
+                taskIntent: input.taskIntent,
+                diagnostics: promptScope.diagnostics
+            })),
+            evidence: {
+                nextAction,
+                taskIntent: input.taskIntent,
+                importedTaskQueue: input.importedTaskQueue,
+                integrationBootstrap: input.integrationBootstrap,
+                runtimeAdapterReadiness: input.runtimeAdapterReadiness
+            }
+        });
+    }
     if (promptScope.status === 'not-found') {
         const nextAction = {
             status: 'task-scope-not-found',
@@ -2048,6 +2080,18 @@ function resolvePromptScopedTaskRoute(cwd, tasks, taskIntent) {
         ? scored.filter((task) => hasRequiredPromptScopeMatch(task, taskIntent))
         : scored;
     if (viableMatches.length === 0) {
+        if (taskIntent.taskRootHints.some((hint) => hint.startsWith('TASK-'))
+            && (taskIntent.mentionedTaskIds.length === 0
+                && taskIntent.mentionedPlanPaths.length === 0
+                && taskIntent.taskRootHints.length > 0
+                && (taskIntent.queueRequested || taskIntent.ordinalScope !== null || taskIntent.requestedAction === 'close'))) {
+            return {
+                status: 'empty',
+                selectedTasks: [],
+                targetRepo: null,
+                diagnostics: ['prompt-task-scope-had-no-open-imported-work']
+            };
+        }
         return {
             status: 'not-found',
             selectedTasks: [],
@@ -3291,6 +3335,13 @@ function buildDecisionTrail(nextAction) {
             check: 'prompt-scope-resolution',
             result: 'blocked',
             reason: 'No matching task scope was found; ATM did not fall back to unrelated task cards.'
+        });
+    }
+    if (nextAction.status === 'task-no-work') {
+        entries.push({
+            check: 'prompt-scope-resolution',
+            result: 'pass',
+            reason: 'The scoped prompt resolved cleanly, but no open imported work remains for that scope.'
         });
     }
     if (nextAction.status === 'task-selection-required') {

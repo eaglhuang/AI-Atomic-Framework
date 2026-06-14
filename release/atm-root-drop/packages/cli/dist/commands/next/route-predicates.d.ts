@@ -1,5 +1,5 @@
 import { type TaskIntent } from './intent-normalizers.ts';
-type PromptScopedRouteStatus = 'ready' | 'queue' | 'ambiguous' | 'not-found';
+type PromptScopedRouteStatus = 'ready' | 'queue' | 'ambiguous' | 'not-found' | 'empty';
 interface PromptScopedTaskRoute {
     readonly status: PromptScopedRouteStatus;
     readonly selectedTasks: readonly ImportedTaskSummary[];

@@ -9,6 +9,9 @@ import { createFrameworkModeStatus } from './framework-development.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
 import { gitHeadEvidencePath } from './git-head-evidence.js';
 import { generateDiffEvidence, mergeDiffEvidenceWithExisting, validateDiffEvidence } from '../../../core/dist/evidence/diff-evidence.js';
+const evidenceWriteSleepBuffer = new Int32Array(new SharedArrayBuffer(4));
+const evidenceWriteLockRetryMs = 50;
+const evidenceWriteLockTimeoutMs = 5_000;
 export async function runEvidence(argv) {
     const action = (argv[0] ?? '').toLowerCase();
     if (action === 'add') {
@@ -34,6 +37,19 @@ export async function runEvidence(argv) {
     }
     throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing', { exitCode: 2 });
 }
+const VALIDATOR_GATE_ALIAS_MAP = new Map([
+    ['typecheck', 'typecheck'],
+    ['git diff --check', 'git diff --check'],
+    ['git-diff-check', 'git diff --check'],
+    ['doctor', 'doctor'],
+    ['framework-development', 'framework-development'],
+    ['tasks-audit', 'tasks-audit'],
+    ['git-head-evidence', 'git-head-evidence'],
+    ['git-head-backfill', 'git-head-evidence']
+]);
+function normalizeValidatorToken(raw) {
+    return raw.trim().replace(/\s+/g, ' ');
+}
 /**
  * 將 task card 裡的 validator 字串正規化成 gate 名稱。
  * 例如 "npm run typecheck" → "typecheck"
@@ -52,6 +68,34 @@ function normalizeValidatorGateName(raw) {
     return raw;
 }
 /** 依 gate 名稱歸類 tier */
+function canonicalizeValidatorIdentity(raw) {
+    const normalized = normalizeValidatorToken(raw);
+    if (!normalized)
+        return normalized;
+    const lowered = normalized.toLowerCase();
+    const aliased = VALIDATOR_GATE_ALIAS_MAP.get(lowered);
+    if (aliased)
+        return aliased;
+    const gate = normalizeValidatorGateName(normalized);
+    const gatedLower = gate.toLowerCase();
+    const gatedAlias = VALIDATOR_GATE_ALIAS_MAP.get(gatedLower);
+    if (gatedAlias)
+        return gatedAlias;
+    if (/^git diff --check$/i.test(normalized))
+        return 'git diff --check';
+    if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+doctor\b/i.test(normalized))
+        return 'doctor';
+    if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+next\b/i.test(normalized)
+        && /\s--json(?:\s|$)/i.test(` ${normalized} `)
+        && !/\s--prompt(?:\s|$)|\s--claim(?:\s|$)|\s--task(?:\s|$)/i.test(` ${normalized} `)) {
+        return 'framework-development';
+    }
+    if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+tasks\s+audit\b/i.test(normalized))
+        return 'tasks-audit';
+    if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+evidence\s+git-head-backfill\b/i.test(normalized))
+        return 'git-head-evidence';
+    return gate;
+}
 function classifyValidatorTier(gate) {
     // Release gates — 只有 release 類 task 才需要重跑
     if (gate === 'validate:integration-adapter' ||
@@ -146,7 +190,7 @@ function runEvidenceValidators(argv) {
     const taskDeclaredValidators = Array.isArray(taskDocument?.validators)
         ? taskDocument.validators
             .filter((v) => typeof v === 'string' && v.trim().length > 0)
-            .map((v) => normalizeValidatorGateName(v.trim()))
+            .map((v) => canonicalizeValidatorIdentity(v.trim()))
             .filter(Boolean)
         : [];
     // 3. 讀取 evidence 中已記錄的 validationPasses
@@ -157,7 +201,7 @@ function runEvidenceValidators(argv) {
         if (Array.isArray(record.validationPasses)) {
             for (const v of record.validationPasses) {
                 if (typeof v === 'string' && v.trim())
-                    recordedPasses.add(v.trim());
+                    recordedPasses.add(canonicalizeValidatorIdentity(v.trim()));
             }
         }
         // details.validationPasses（主要格式，由 evidence add 寫入）
@@ -166,7 +210,7 @@ function runEvidenceValidators(argv) {
             if (Array.isArray(d.validationPasses)) {
                 for (const v of d.validationPasses) {
                     if (typeof v === 'string' && v.trim())
-                        recordedPasses.add(v.trim());
+                        recordedPasses.add(canonicalizeValidatorIdentity(v.trim()));
                 }
             }
         }
@@ -225,14 +269,14 @@ function readRecordValidationPasses(record) {
     if (Array.isArray(top)) {
         for (const v of top)
             if (typeof v === 'string' && v.trim())
-                passes.add(v.trim());
+                passes.add(canonicalizeValidatorIdentity(v.trim()));
     }
     if (isRecord(record.details)) {
         const inner = record.details.validationPasses;
         if (Array.isArray(inner)) {
             for (const v of inner)
                 if (typeof v === 'string' && v.trim())
-                    passes.add(v.trim());
+                    passes.add(canonicalizeValidatorIdentity(v.trim()));
         }
     }
     return [...passes];
@@ -268,10 +312,10 @@ function classifyValidatorEvidenceState(bundle, gate) {
             const runValidators = Array.isArray(run.validators)
                 ? (run.validators)
                     .filter((v) => typeof v === 'string')
-                    .map((v) => v.trim())
+                    .map((v) => canonicalizeValidatorIdentity(v))
                 : [];
             const cmd = typeof run.command === 'string' ? run.command : '';
-            const matches = runValidators.includes(gate) || normalizeValidatorGateName(cmd) === gate;
+            const matches = runValidators.includes(gate) || canonicalizeValidatorIdentity(cmd) === gate;
             const exitCode = run.exitCode;
             if (matches && typeof exitCode === 'number' && exitCode !== 0)
                 sawFailedRun = true;
@@ -334,7 +378,7 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
     const taskDeclaredValidators = Array.isArray(taskDocument?.validators)
         ? taskDocument.validators
             .filter((v) => typeof v === 'string' && v.trim().length > 0)
-            .map((v) => normalizeValidatorGateName(v.trim()))
+            .map((v) => canonicalizeValidatorIdentity(v.trim()))
             .filter(Boolean)
         : [];
     // 3. 合併並去重
@@ -769,7 +813,6 @@ function runEvidenceAdd(argv) {
     }
     const actorId = resolvedActor.actorId;
     const evidencePath = evidencePathForTask(options.cwd, options.taskId);
-    const bundle = readEvidenceBundle(options.cwd, options.taskId);
     const nowIso = new Date().toISOString();
     const kind = normalizeEvidenceKind(options.kind);
     const session = resolveActorWorkSession(options.cwd, {
@@ -795,8 +838,8 @@ function runEvidenceAdd(argv) {
         sourceCommit: options.sourceCommit
     });
     const validationPasses = uniqueStrings([
-        ...options.validators,
-        ...commandRuns.flatMap((run) => Array.isArray(run.validators) ? run.validators : [])
+        ...options.validators.map((entry) => canonicalizeValidatorIdentity(entry)),
+        ...commandRuns.flatMap((run) => Array.isArray(run.validators) ? run.validators.map((entry) => canonicalizeValidatorIdentity(entry)) : [])
     ]);
     const failedValidationRuns = commandRuns.filter((run) => run.exitCode !== 0 && (validationPasses.length > 0 || (Array.isArray(run.validators) && run.validators.length > 0)));
     if (failedValidationRuns.length > 0) {
@@ -852,13 +895,18 @@ function runEvidenceAdd(argv) {
             ...(commandRunCache ? { commandRunCache } : {})
         }
     };
-    const nextEvidence = [...bundle.evidence, evidenceRecord];
-    const envelope = {
-        taskId: options.taskId,
-        updatedAt: nowIso,
-        evidence: nextEvidence
-    };
-    writeEvidenceEnvelope(evidencePath, envelope);
+    const nextEvidence = withTaskEvidenceWriteLock(options.cwd, options.taskId, actorId, () => {
+        const bundle = readEvidenceBundle(options.cwd, options.taskId);
+        maybeHoldEvidenceWriteLockForTests();
+        const mergedEvidence = [...bundle.evidence, evidenceRecord];
+        const envelope = {
+            taskId: options.taskId,
+            updatedAt: nowIso,
+            evidence: mergedEvidence
+        };
+        writeEvidenceEnvelope(evidencePath, envelope);
+        return mergedEvidence;
+    });
     return makeResult({
         ok: true,
         command: 'evidence',
@@ -1060,7 +1108,7 @@ function parseEvidenceAddOptions(argv) {
             continue;
         }
         if (arg === '--validators') {
-            options.validators = requireValue(argv, index, '--validators').split(',').map((entry) => entry.trim()).filter(Boolean);
+            options.validators = requireValue(argv, index, '--validators').split(',').map((entry) => canonicalizeValidatorIdentity(entry)).filter(Boolean);
             index += 1;
             continue;
         }
@@ -1246,7 +1294,7 @@ function normalizeCommandRunInput(value, label) {
         exitCode,
         stdoutSha256,
         stderrSha256,
-        validators: Array.isArray(value.validators) ? value.validators.filter((entry) => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim()) : undefined,
+        validators: Array.isArray(value.validators) ? value.validators.filter((entry) => typeof entry === 'string' && entry.trim().length > 0).map((entry) => canonicalizeValidatorIdentity(entry)) : undefined,
         cached: value.cached === true,
         cacheKey: typeof value.cacheKey === 'string' && value.cacheKey.trim() ? value.cacheKey.trim() : undefined,
         runnerKind: typeof value.runnerKind === 'string' && value.runnerKind.trim() ? normalizeRunnerKind(value.runnerKind) : undefined,
@@ -1396,6 +1444,42 @@ function readGovernedCommitTreeWithoutEvidence(cwd, commitSha) {
 function mkdirTempDir() {
     return path.resolve(mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-backfill-')));
 }
+function withTaskEvidenceWriteLock(cwd, taskId, actorId, operation) {
+    const lockPath = evidenceWriteLockPath(cwd, taskId);
+    mkdirSync(path.dirname(lockPath), { recursive: true });
+    const startedAt = Date.now();
+    while (true) {
+        try {
+            mkdirSync(lockPath, { recursive: false });
+            break;
+        }
+        catch (error) {
+            const code = error && typeof error === 'object' && 'code' in error ? String(error.code ?? '') : '';
+            if (code !== 'EEXIST' && code !== 'EACCES') {
+                throw error;
+            }
+            if ((Date.now() - startedAt) >= evidenceWriteLockTimeoutMs) {
+                throw new CliError('ATM_EVIDENCE_WRITE_LOCK_CONFLICT', `Evidence write for ${taskId} is already in progress. Retry after the active writer finishes.`, {
+                    exitCode: 2,
+                    details: {
+                        taskId,
+                        actorId,
+                        lockPath: relativePathFrom(cwd, lockPath),
+                        retryable: true,
+                        remediation: `Retry the same evidence command for ${taskId} after the current write completes.`
+                    }
+                });
+            }
+            sleepMs(evidenceWriteLockRetryMs);
+        }
+    }
+    try {
+        return operation();
+    }
+    finally {
+        rmSync(lockPath, { recursive: true, force: true });
+    }
+}
 function readEvidenceBundle(cwd, taskId) {
     const evidencePath = evidencePathForTask(cwd, taskId);
     if (!existsSync(evidencePath)) {
@@ -1469,6 +1553,9 @@ function normalizeEvidenceFreshness(value) {
 }
 function evidencePathForTask(cwd, taskId) {
     return path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+}
+function evidenceWriteLockPath(cwd, taskId) {
+    return path.join(cwd, '.atm', 'runtime', 'evidence-write-locks', `${taskId}.lock`);
 }
 function taskPathForEvidence(cwd, taskId) {
     return path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
@@ -1600,6 +1687,17 @@ function parseIntegerFlag(argv, flag) {
     const value = Number.parseInt(raw, 10);
     return Number.isFinite(value) ? value : null;
 }
+function maybeHoldEvidenceWriteLockForTests() {
+    const holdMs = Number.parseInt(process.env.ATM_EVIDENCE_TEST_HOLD_LOCK_MS ?? '', 10);
+    if (Number.isFinite(holdMs) && holdMs > 0) {
+        sleepMs(holdMs);
+    }
+}
+function sleepMs(ms) {
+    if (!Number.isFinite(ms) || ms <= 0)
+        return;
+    Atomics.wait(evidenceWriteSleepBuffer, 0, 0, ms);
+}
 export function quoteForShell(arg) {
     if (/^[a-zA-Z0-9.\-_:/]+$/.test(arg)) {
         return arg;
@@ -1607,17 +1705,15 @@ export function quoteForShell(arg) {
     return `"${arg.replace(/"/g, '\\"')}"`;
 }
 export function detectAutoLinkedValidator(command) {
-    const trimmed = command.trim();
-    const npmMatch = trimmed.match(/^npm run ([a-z0-9-:]+)$/);
-    if (npmMatch) {
-        const gate = npmMatch[1];
-        if (gate === 'typecheck' || gate.startsWith('validate:')) {
-            return gate;
-        }
-    }
-    const nodeMatch = trimmed.match(/^node --strip-types scripts\/validate-([a-z0-9-]+)\.ts --mode validate$/);
-    if (nodeMatch) {
-        return `validate:${nodeMatch[1]}`;
+    const gate = canonicalizeValidatorIdentity(command);
+    if (gate === 'typecheck'
+        || gate === 'git diff --check'
+        || gate === 'doctor'
+        || gate === 'framework-development'
+        || gate === 'tasks-audit'
+        || gate === 'git-head-evidence'
+        || gate.startsWith('validate:')) {
+        return gate;
     }
     return null;
 }

@@ -22,6 +22,7 @@ import { buildResidueClassification, buildResidueDiagnosisEvidenceFromTriangulat
 import { dispatchTasksAction } from './tasks/command-dispatch.js';
 import { runAtmGit } from './git-governance.js';
 import { assertEmergencyApproval } from './emergency/gate.js';
+import { emergencyRoot, readEmergencyLease } from './emergency/leases.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.js';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.js';
 import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/normalize-string-value-helper.js';
@@ -122,6 +123,57 @@ function readLastTransitionEventRecord(cwd, taskId, transitionId) {
         return null;
     return JSON.parse(readFileSync(eventPath, 'utf8'));
 }
+function normalizeParityLifecycleValue(value) {
+    const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+    return normalized || null;
+}
+function isOpenPlanningParityStatus(status) {
+    if (!status)
+        return false;
+    return ['planned', 'open', 'ready', 'running', 'in_progress', 'review'].includes(status);
+}
+function hasOnlyStatusDivergence(divergence) {
+    return divergence.length > 0 && divergence.every((entry) => entry.field === 'status');
+}
+function buildPlanningMirrorParityOverride(input) {
+    if (!hasOnlyStatusDivergence(input.divergence))
+        return null;
+    const liveStatus = normalizeParityLifecycleValue(input.liveLedger.status);
+    const planningStatus = normalizeParityLifecycleValue(input.planningFrontmatter.status);
+    if (!isOpenPlanningParityStatus(liveStatus) || !isOpenPlanningParityStatus(planningStatus)) {
+        return null;
+    }
+    const claimState = normalizeParityLifecycleValue(input.liveLedger.claimState);
+    const lastAction = normalizeParityLifecycleValue(input.lastTransitionEvent?.action ?? null);
+    const activeClaimLane = claimState === 'active' || lastAction === 'claim';
+    const releasedPredecessorLane = claimState === 'released' || lastAction === 'release';
+    if (!activeClaimLane && !releasedPredecessorLane) {
+        return null;
+    }
+    const uniqueLaneStatus = activeClaimLane
+        ? {
+            truth: 'planning mirror is stale, but the active live claim already defines a unique governed lane',
+            residue: 'Planning-mirror parity drift is advisory while the active claim remains authoritative.',
+            reason: 'The live ledger claim state already identifies the governed operator lane, so the stale planning status should not force import repair or ambiguous-manual-review.'
+        }
+        : {
+            truth: 'planning mirror is stale, but the live ledger already records an intentional release or supersede lane',
+            residue: 'The predecessor task was intentionally released or superseded, so parity drift is advisory rather than repairable by import by default.',
+            reason: 'The live ledger already records a unique non-claim operator story, so the stale planning status should not push the operator back through tasks import.'
+        };
+    return {
+        residueClassification: {
+            bucket: 'no-residue',
+            truth: uniqueLaneStatus.truth,
+            residue: uniqueLaneStatus.residue,
+            reason: uniqueLaneStatus.reason,
+            nextCommandTemplate: 'node atm.mjs tasks status --task <id> --json',
+            nextCommand: `node atm.mjs tasks status --task ${input.taskId} --json`,
+            autoMutationAllowed: false
+        },
+        recommendation: null
+    };
+}
 function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
     const claim = parseClaimRecord(taskDocument.claim);
     const liveLedger = {
@@ -177,11 +229,20 @@ function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
         lastTransitionEvent,
         divergence
     });
-    const recommendation = divergence.length > 0
-        ? (planningFrontmatter.status === 'done' && liveLedger.status !== 'done'
-            ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
-            : `node atm.mjs tasks import --from <plan.md> --write --json`)
-        : null;
+    const parityOverride = buildPlanningMirrorParityOverride({
+        taskId,
+        liveLedger,
+        planningFrontmatter,
+        lastTransitionEvent,
+        divergence
+    });
+    const recommendation = parityOverride
+        ? parityOverride.recommendation
+        : divergence.length > 0
+            ? (planningFrontmatter.status === 'done' && liveLedger.status !== 'done'
+                ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
+                : `node atm.mjs tasks import --from <plan.md> --write --json`)
+            : null;
     return {
         ssot: 'liveLedger',
         liveLedger,
@@ -189,7 +250,7 @@ function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
         planningFrontmatter,
         divergence,
         recommendation,
-        residueClassification
+        residueClassification: parityOverride?.residueClassification ?? residueClassification
     };
 }
 async function recordStaleRunnerOverride(input) {
@@ -211,6 +272,58 @@ async function recordStaleRunnerOverride(input) {
         command: input.command
     });
     return true;
+}
+function isCliErrorWithCode(error, codePrefix) {
+    return error instanceof CliError && typeof error.code === 'string' && error.code.startsWith(codePrefix);
+}
+function recordFailedEmergencyUseAttempt(input) {
+    if (!input.leaseId)
+        return null;
+    try {
+        const lease = readEmergencyLease(input.cwd, input.leaseId);
+        if (lease.status !== 'active')
+            return null;
+        if (lease.permission !== input.permission)
+            return null;
+        if (lease.taskId && lease.taskId !== input.taskId)
+            return null;
+        if (input.actorId && lease.actorId !== input.actorId)
+            return null;
+        const usedCount = typeof lease.usedCount === 'number' ? lease.usedCount : Number(lease.usedCount ?? 0);
+        if (!Number.isFinite(usedCount) || usedCount >= lease.maxUses)
+            return null;
+        if (Date.parse(lease.expiresAt) <= Date.now())
+            return null;
+        const usedAt = new Date().toISOString();
+        const usePath = path.join(emergencyRoot(input.cwd), 'uses', `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
+        mkdirSync(path.dirname(usePath), { recursive: true });
+        writeFileSync(usePath, `${JSON.stringify({
+            schemaId: 'atm.emergencyMaintenanceUse.v1',
+            leaseId: lease.leaseId,
+            taskId: input.taskId,
+            actorId: input.actorId,
+            permission: input.permission,
+            surface: input.surface,
+            usedAt,
+            reason: input.reason,
+            command: input.command,
+            result: 'failed',
+            before: {
+                leaseStatus: lease.status,
+                usedCount
+            },
+            after: {
+                leaseStatus: lease.status,
+                usedCount,
+                failureCode: input.failureCode
+            },
+            touchedFiles: []
+        }, null, 2)}\n`, 'utf8');
+        return relativePathFrom(input.cwd, usePath);
+    }
+    catch {
+        return null;
+    }
 }
 export function loadTaskDocumentOrThrow(cwd, taskId) {
     const taskPath = taskPathFor(cwd, taskId);
@@ -1584,468 +1697,513 @@ async function runTasksClose(argv) {
         throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks close requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
     const actorId = resolvedActor.actorId;
+    const protectedCloseSurface = 'tasks close historical-delivery backend';
+    const protectedCloseFlags = [
+        ...(options.historicalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
+        ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
+        ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
+        ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
+    ];
+    const protectedCloseCommand = `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --status ${options.status} --json`;
+    const requiresProtectedCloseApproval = protectedCloseFlags.length > 0;
+    const shouldDeferProtectedCloseApproval = requiresProtectedCloseApproval && !options.allowStaleRunner;
     let emergencyUse = null;
-    if (options.historicalDeliveryRefs.length > 0 || options.waiverOutOfScopeDelivery || options.allowStaleRunner) {
-        emergencyUse = assertEmergencyApproval({
-            cwd: options.cwd,
-            surface: 'tasks close historical-delivery backend',
-            permission: 'backend.tasks.close',
-            taskId: options.taskId,
-            actorId,
-            emergencyApproval: options.emergencyApproval,
-            flags: [
-                ...(options.historicalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
-                ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
-                ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
-                ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
-            ],
-            reason: options.reason ?? 'Direct close backend historical-delivery path.',
-            command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --status ${options.status} --json`
-        });
-    }
-    const taskPath = taskPathFor(options.cwd, options.taskId);
-    if (!existsSync(taskPath)) {
-        throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
-            exitCode: 2,
-            details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
-        });
-    }
-    const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
-    const previousTaskContent = readFileSync(taskPath, 'utf8');
-    const staleGate = assertRunnerFreshForWriteAction({
-        cwd: options.cwd,
-        action: 'tasks-close',
-        allowStaleRunner: options.allowStaleRunner
-    });
-    if (options.allowStaleRunner && staleGate.warning) {
-        await recordStaleRunnerOverride({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            actorId,
-            action: 'tasks-close',
-            command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --allow-stale-runner --json`
-        });
-    }
-    const currentClaim = parseClaimRecord(taskDocument.claim);
-    const activeSession = resolveActorWorkSession(options.cwd, {
-        actorId,
-        taskId: options.taskId,
-        claimLeaseId: currentClaim?.leaseId ?? null,
-        includeNonActive: true
-    });
-    const currentOwner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
-    if (currentOwner && currentOwner !== actorId) {
-        throw new CliError('ATM_TASK_CLOSE_OWNER_MISMATCH', `Task ${options.taskId} owner is ${currentOwner}, not ${actorId}.`, {
-            exitCode: 1,
-            details: { taskId: options.taskId, owner: currentOwner, actorId }
-        });
-    }
-    requireTargetRepoClosureAuthority({
-        cwd: options.cwd,
-        taskDocument,
-        taskId: options.taskId,
-        status: options.status
-    });
-    const owningBatch = options.status === 'done'
-        ? (options.batchId ? readActiveBatchRun(options.cwd, { batchId: options.batchId }) : findActiveBatchRunForTask(options.cwd, options.taskId))
-        : null;
-    if (options.status === 'done') {
-        if (owningBatch?.status === 'active' && owningBatch.taskIds.includes(options.taskId) && !options.fromBatchCheckpoint) {
-            const currentTaskId = owningBatch.currentTaskId ?? owningBatch.taskIds[owningBatch.currentIndex] ?? null;
-            throw new CliError('ATM_BATCH_CHECKPOINT_REQUIRED', currentTaskId === options.taskId
-                ? `Task ${options.taskId} is the active batch queue head. Close it through batch checkpoint, not direct tasks close.`
-                : `Task ${options.taskId} belongs to active batch ${owningBatch.batchId}. Do not close batch tasks directly; deliver the current queue head and use batch checkpoint to advance.`, {
-                exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    batchId: owningBatch.batchId,
-                    currentIndex: owningBatch.currentIndex,
-                    currentTaskId,
-                    requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json`,
-                    blockedPattern: 'manual tasks close during active batch',
-                    remediation: currentTaskId && currentTaskId !== options.taskId
-                        ? `Deliver queue head ${currentTaskId}, then run node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json instead of directly closing ${options.taskId}.`
-                        : `Run node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json after delivering ${options.taskId}.`
-                }
+    let failedEmergencyAuditPath = null;
+    try {
+        const taskPath = taskPathFor(options.cwd, options.taskId);
+        if (!existsSync(taskPath)) {
+            throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
+                exitCode: 2,
+                details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
             });
         }
-        if (options.fromBatchCheckpoint && owningBatch?.batchId && options.batchId && owningBatch.batchId !== options.batchId) {
-            throw new CliError('ATM_BATCH_OWNERSHIP_MISMATCH', `Task ${options.taskId} belongs to batch ${owningBatch.batchId}, not ${options.batchId}.`, {
-                exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    expectedBatchId: owningBatch.batchId,
-                    actualBatchId: options.batchId
-                }
-            });
-        }
-        const doneCloseAdmission = evaluateTaskDoneCloseAdmission({
-            taskId: options.taskId,
-            actorId,
-            status: taskDocument.status,
-            claimState: currentClaim?.state ?? null,
-            claimActorId: currentClaim?.actorId ?? null,
-            hasActiveSession: Boolean(activeSession?.sessionId)
-        });
-        if (!doneCloseAdmission.ok) {
-            throw new CliError(doneCloseAdmission.code, doneCloseAdmission.message, {
-                exitCode: 1,
-                details: doneCloseAdmission.details
-            });
-        }
-        assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId);
-    }
-    const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
-    const activeFrameworkStatus = options.status === 'done'
-        ? createFrameworkModeStatus({ cwd: options.cwd })
-        : null;
-    const frameworkStatus = options.status === 'done'
-        ? createFrameworkModeStatus({
-            cwd: options.cwd,
-            files: taskDeclaredFiles.length > 0 ? taskDeclaredFiles : undefined
-        })
-        : null;
-    const frameworkDeliveryWindow = options.status === 'done'
-        ? evaluateFrameworkDeliveryWindow({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            actorId,
-            batchId: options.batchId ?? owningBatch?.batchId ?? null,
-            fromBatchCheckpoint: options.fromBatchCheckpoint,
-            taskDeclaredFiles,
-            criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
-            historicalDeliveryRefs: options.historicalDeliveryRefs
-        })
-        : null;
-    // TASK-AAO-0057: scoped diff isolation — partition framework critical changes
-    // into in-scope (must be governed) vs unrelated (advisory, isolated) so that
-    // dirty/untracked files outside the task scope never hard-block close.
-    let closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
-        ? buildCloseScopedDiffIsolation({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            taskDeclaredFiles,
-            frameworkChangedFiles: activeFrameworkStatus?.changedFiles ?? [],
-            frameworkDeliveryWindow
-        })
-        : null;
-    if (frameworkStatus?.repoRole === 'framework') {
-        const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
-        const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            taskDeclaredFiles,
-            trackedDirtyFiles: closeWorktree.trackedDirtyFiles
-        });
-        if (closeScopedDiffIsolation) {
-            closeScopedDiffIsolation = attachDirtyGuardToScopedDiffIsolation(closeScopedDiffIsolation, closeDirtyGuard, closeWorktree.ignoredUntrackedFiles);
-        }
-        if (closeDirtyGuard.blockingTrackedDirtyFiles.length > 0) {
-            throw new CliError('ATM_TASK_CLOSE_DIRTY_WORKTREE', `Task ${options.taskId} cannot be closed as done while in-scope or closure-governance tracked changes are still dirty.`, {
-                exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    trackedDirtyFiles: closeDirtyGuard.blockingTrackedDirtyFiles,
-                    scopeTrackedDirtyFiles: closeDirtyGuard.scopeTrackedDirtyFiles,
-                    governanceTrackedDirtyFiles: closeDirtyGuard.governanceTrackedDirtyFiles,
-                    advisoryTrackedDirtyFiles: closeDirtyGuard.advisoryTrackedDirtyFiles,
-                    unstagedFiles: closeWorktree.unstagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
-                    stagedFiles: closeWorktree.stagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
-                    ignoredUntrackedFiles: closeWorktree.ignoredUntrackedFiles,
-                    remediation: 'Commit this task\'s scoped delivery changes first before closing done. Unrelated tracked dirty files are isolated as advisory and do not block this task. The closure packet describes the delivery parent commit instead of the mutable worktree.'
-                }
-            });
-        }
-        const scopedCriticalChangedFiles = frameworkDeliveryWindow?.scopedCriticalChangedFiles ?? [];
-        const isolatedUnrelatedChanges = frameworkDeliveryWindow?.unscopedCriticalChangedFiles ?? [];
-        if (scopedCriticalChangedFiles.length > 0 && frameworkDeliveryWindow?.ok !== true) {
-            throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE', `Task ${options.taskId} cannot be closed while in-scope ATM framework critical files are still modified outside the governed delivery window.`, {
-                details: {
-                    taskId: options.taskId,
-                    criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
-                    scopedCriticalChangedFiles,
-                    isolatedUnrelatedChanges,
-                    closeScopedDiffIsolation,
-                    frameworkDeliveryWindow,
-                    requiredCommand: frameworkDeliveryWindow?.requiredCommand ?? null,
-                    remediation: frameworkDeliveryWindow?.remediation ?? 'Stage only the task-scoped deliverables/evidence, then close through the governed task or batch lifecycle.'
-                }
-            });
-        }
-        const effectiveFrameworkBlockers = frameworkDeliveryWindow?.ok === true
-            ? frameworkStatus.blockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
-            : frameworkStatus.blockers;
-        if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && effectiveFrameworkBlockers.length > 0) {
-            // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
-            const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
-            throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED', `Task ${options.taskId} cannot be closed until framework-development blockers are resolved.`, {
-                details: {
-                    taskId: options.taskId,
-                    blockers: effectiveFrameworkBlockers,
-                    suppressedBlockers: frameworkDeliveryWindow?.ok === true
-                        ? frameworkStatus.blockers.filter((entry) => frameworkDeliveryWindow.allowedBlockers.includes(entry))
-                        : [],
-                    frameworkDeliveryWindow,
-                    closeScopedDiffIsolation,
-                    criticalChangedFiles: frameworkStatus.criticalChangedFiles,
-                    requiredGates: frameworkStatus.requiredGates,
-                    tldr: missingReport.tldr,
-                    missingValidationPasses: missingReport.missingValidationPasses,
-                    blockingFindings: missingReport.blockingFindings
-                }
-            });
-        }
-    }
-    const evidenceGate = options.status === 'done'
-        ? verifyTaskEvidence({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            gate: 'close',
-            taskDocument,
-            taskDeclaredFiles,
-            frameworkTask: frameworkStatus?.repoRole === 'framework'
-        })
-        : null;
-    if (evidenceGate && !evidenceGate.ok) {
-        // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
-        const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
-        throw new CliError('ATM_TASK_CLOSE_EVIDENCE_REQUIRED', `Task ${options.taskId} cannot be closed as done without required delivery evidence. The goal is to deliver the task, not to mark it done.`, {
-            exitCode: 1,
-            details: {
-                taskId: options.taskId,
-                deliveryPrinciple: taskDeliveryPrincipleText(),
-                gate: evidenceGate.gate,
-                missing: evidenceGate.missing,
-                evidenceCount: evidenceGate.total,
-                remediation: 'Implement the requested non-.atm deliverables, run the required validators, then add command-backed evidence before closing done.',
-                tldr: missingReport.tldr,
-                missingValidationPasses: missingReport.missingValidationPasses,
-                blockingFindings: missingReport.blockingFindings
-            }
-        });
-    }
-    const deliverableGate = options.status === 'done'
-        ? evaluateTaskDeliverableGate({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            taskDocument,
-            taskDeclaredFiles,
-            claim: parseClaimRecord(taskDocument.claim),
-            historicalDeliveryRefs: options.historicalDeliveryRefs,
-            historicalDeliveryRepo: options.historicalDeliveryRepo,
-            waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
-            waiverReason: options.reason
-        })
-        : null;
-    if (deliverableGate && !deliverableGate.ok) {
-        throw new CliError('ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', `Task ${options.taskId} cannot be closed as done because ATM found no real non-.atm deliverable diff. Task delivery comes before task closure.`, {
-            exitCode: 1,
-            details: deliverableGate
-        });
-    }
-    let closurePacketPath = null;
-    let closurePacket = null;
-    let pendingClosurePacket = null;
-    let createdClosurePacketAbsolute = null;
-    const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
-        ? taskDocument.closurePacket
-        : typeof taskDocument.closure_packet === 'string'
-            ? taskDocument.closure_packet
-            : null;
-    if (options.status === 'done' && existingClosurePacketPath) {
-        const packetPath = path.resolve(options.cwd, existingClosurePacketPath);
-        if (!existsSync(packetPath)) {
-            throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_MISSING', `Task ${options.taskId} references a missing closure packet.`, {
-                details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath }
-            });
-        }
-        const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
-        const validation = validateClosurePacket(packet);
-        if (!validation.ok) {
-            // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
-            const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
-            throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet is invalid.`, {
-                details: {
-                    taskId: options.taskId,
-                    closurePacketPath: existingClosurePacketPath,
-                    missing: validation.missing,
-                    invalidFormat: validation.invalidFormat,
-                    tldr: missingReport.tldr,
-                    missingValidationPasses: missingReport.missingValidationPasses,
-                    blockingFindings: missingReport.blockingFindings
-                }
-            });
-        }
-        closurePacket = packet;
-        closurePacketPath = existingClosurePacketPath;
-    }
-    else if (options.status === 'done' && frameworkStatus?.repoRole === 'framework') {
-        pendingClosurePacket = createClosurePacket({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            actorId,
-            sessionId: activeSession?.sessionId ?? null,
-            evidencePath: `.atm/history/evidence/${options.taskId}.json`,
-            requiredGates: frameworkStatus.requiredGates,
-            changedFiles: deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
-            frameworkStatus,
-            historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate?.historicalDeliveries[0] ?? null, options.reason)
-        });
-        const validation = validateClosurePacket(pendingClosurePacket);
-        if (!validation.ok) {
-            // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
-            const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
-            throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet contract is incomplete.`, {
-                details: {
-                    taskId: options.taskId,
-                    missing: validation.missing,
-                    invalidFormat: validation.invalidFormat,
-                    tldr: missingReport.tldr,
-                    missingValidationPasses: missingReport.missingValidationPasses,
-                    blockingFindings: missingReport.blockingFindings
-                }
-            });
-        }
-        closurePacket = pendingClosurePacket;
-        createdClosurePacketAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.closure-packet.json`);
-    }
-    if (options.status === 'done') {
-        const finalPacketPath = existingClosurePacketPath || (pendingClosurePacket ? `.atm/history/evidence/${options.taskId}.closure-packet.json` : null);
-        const finalPacket = closurePacket || pendingClosurePacket;
-        const evaluatedMetadata = createClosureTransitionMetadata(finalPacketPath, finalPacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null);
-        if (!evaluatedMetadata || evaluatedMetadata.schemaId !== 'atm.taskClosureTransition.v1') {
-            throw new CliError('ATM_TASK_CLOSE_CLOSURE_METADATA_REQUIRED', `Task ${options.taskId} cannot be closed as ${options.status} because closure metadata cannot be produced.`, {
-                exitCode: 1,
-                details: { taskId: options.taskId }
-            });
-        }
-    }
-    if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
-        taskDocument.claim = {
-            ...currentClaim,
-            heartbeatAt: new Date().toISOString(),
-            state: 'released',
-            reason: options.reason ?? 'closed'
-        };
-    }
-    const previousStatus = String(taskDocument.status ?? '');
-    taskDocument.status = options.status;
-    taskDocument.owner = actorId;
-    taskDocument.closedAt = new Date().toISOString();
-    taskDocument.closedByActor = actorId;
-    taskDocument.closedBySessionId = activeSession?.sessionId ?? null;
-    if (options.reason) {
-        taskDocument.closeReason = options.reason;
-    }
-    const closeTransitionCommand = buildTaskTransitionCommand({
-        action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
-        taskId: options.taskId,
-        actorId,
-        status: options.status,
-        fromBatchCheckpoint: options.fromBatchCheckpoint,
-        batchId: owningBatch?.batchId ?? options.batchId,
-        historicalDeliveryRefs: options.historicalDeliveryRefs
-    });
-    const closeWriteResult = await executeTaskCloseTransaction({
-        cwd: options.cwd,
-        taskId: options.taskId,
-        taskPath,
-        phase: 'close',
-        previousTaskContent,
-        createdClosurePacketAbsolute,
-        runWrites: () => {
-            if (pendingClosurePacket) {
-                closurePacketPath = writeClosurePacket(options.cwd, options.taskId, pendingClosurePacket);
-                closurePacket = pendingClosurePacket;
-                taskDocument.closurePacket = closurePacketPath;
-            }
-            const transitionPath = writeTaskDocumentWithTransition({
+        if (requiresProtectedCloseApproval && !shouldDeferProtectedCloseApproval) {
+            emergencyUse = assertEmergencyApproval({
                 cwd: options.cwd,
-                taskPath,
+                surface: protectedCloseSurface,
+                permission: 'backend.tasks.close',
+                taskId: options.taskId,
+                actorId,
+                emergencyApproval: options.emergencyApproval,
+                flags: protectedCloseFlags,
+                reason: options.reason ?? 'Direct close backend historical-delivery path.',
+                command: protectedCloseCommand
+            });
+        }
+        const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const previousTaskContent = readFileSync(taskPath, 'utf8');
+        const staleGate = assertRunnerFreshForWriteAction({
+            cwd: options.cwd,
+            action: 'tasks-close',
+            allowStaleRunner: options.allowStaleRunner
+        });
+        if (options.allowStaleRunner && staleGate.warning) {
+            await recordStaleRunnerOverride({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                actorId,
+                action: 'tasks-close',
+                command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --allow-stale-runner --json`
+            });
+        }
+        const currentClaim = parseClaimRecord(taskDocument.claim);
+        const activeSession = resolveActorWorkSession(options.cwd, {
+            actorId,
+            taskId: options.taskId,
+            claimLeaseId: currentClaim?.leaseId ?? null,
+            includeNonActive: true
+        });
+        const currentOwner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
+        if (currentOwner && currentOwner !== actorId) {
+            throw new CliError('ATM_TASK_CLOSE_OWNER_MISMATCH', `Task ${options.taskId} owner is ${currentOwner}, not ${actorId}.`, {
+                exitCode: 1,
+                details: { taskId: options.taskId, owner: currentOwner, actorId }
+            });
+        }
+        requireTargetRepoClosureAuthority({
+            cwd: options.cwd,
+            taskDocument,
+            taskId: options.taskId,
+            status: options.status
+        });
+        const owningBatch = options.status === 'done'
+            ? (options.batchId ? readActiveBatchRun(options.cwd, { batchId: options.batchId }) : findActiveBatchRunForTask(options.cwd, options.taskId))
+            : null;
+        if (options.status === 'done') {
+            if (owningBatch?.status === 'active' && owningBatch.taskIds.includes(options.taskId) && !options.fromBatchCheckpoint) {
+                const currentTaskId = owningBatch.currentTaskId ?? owningBatch.taskIds[owningBatch.currentIndex] ?? null;
+                throw new CliError('ATM_BATCH_CHECKPOINT_REQUIRED', currentTaskId === options.taskId
+                    ? `Task ${options.taskId} is the active batch queue head. Close it through batch checkpoint, not direct tasks close.`
+                    : `Task ${options.taskId} belongs to active batch ${owningBatch.batchId}. Do not close batch tasks directly; deliver the current queue head and use batch checkpoint to advance.`, {
+                    exitCode: 1,
+                    details: {
+                        taskId: options.taskId,
+                        batchId: owningBatch.batchId,
+                        currentIndex: owningBatch.currentIndex,
+                        currentTaskId,
+                        requiredCommand: `node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json`,
+                        blockedPattern: 'manual tasks close during active batch',
+                        remediation: currentTaskId && currentTaskId !== options.taskId
+                            ? `Deliver queue head ${currentTaskId}, then run node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json instead of directly closing ${options.taskId}.`
+                            : `Run node atm.mjs batch checkpoint --actor ${actorId} --batch ${owningBatch.batchId} --json after delivering ${options.taskId}.`
+                    }
+                });
+            }
+            if (options.fromBatchCheckpoint && owningBatch?.batchId && options.batchId && owningBatch.batchId !== options.batchId) {
+                throw new CliError('ATM_BATCH_OWNERSHIP_MISMATCH', `Task ${options.taskId} belongs to batch ${owningBatch.batchId}, not ${options.batchId}.`, {
+                    exitCode: 1,
+                    details: {
+                        taskId: options.taskId,
+                        expectedBatchId: owningBatch.batchId,
+                        actualBatchId: options.batchId
+                    }
+                });
+            }
+            const doneCloseAdmission = evaluateTaskDoneCloseAdmission({
+                taskId: options.taskId,
+                actorId,
+                status: taskDocument.status,
+                claimState: currentClaim?.state ?? null,
+                claimActorId: currentClaim?.actorId ?? null,
+                hasActiveSession: Boolean(activeSession?.sessionId)
+            });
+            if (!doneCloseAdmission.ok) {
+                throw new CliError(doneCloseAdmission.code, doneCloseAdmission.message, {
+                    exitCode: 1,
+                    details: doneCloseAdmission.details
+                });
+            }
+            assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId);
+        }
+        const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
+        const activeFrameworkStatus = options.status === 'done'
+            ? createFrameworkModeStatus({ cwd: options.cwd })
+            : null;
+        const frameworkStatus = options.status === 'done'
+            ? createFrameworkModeStatus({
+                cwd: options.cwd,
+                files: taskDeclaredFiles.length > 0 ? taskDeclaredFiles : undefined
+            })
+            : null;
+        const frameworkDeliveryWindow = options.status === 'done'
+            ? evaluateFrameworkDeliveryWindow({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                actorId,
+                batchId: options.batchId ?? owningBatch?.batchId ?? null,
+                fromBatchCheckpoint: options.fromBatchCheckpoint,
+                taskDeclaredFiles,
+                criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
+                historicalDeliveryRefs: options.historicalDeliveryRefs
+            })
+            : null;
+        // TASK-AAO-0057: scoped diff isolation — partition framework critical changes
+        // into in-scope (must be governed) vs unrelated (advisory, isolated) so that
+        // dirty/untracked files outside the task scope never hard-block close.
+        let closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
+            ? buildCloseScopedDiffIsolation({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                taskDeclaredFiles,
+                frameworkChangedFiles: activeFrameworkStatus?.changedFiles ?? [],
+                frameworkDeliveryWindow
+            })
+            : null;
+        if (frameworkStatus?.repoRole === 'framework') {
+            const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
+            const allowedAdvisoryGovernanceFiles = options.status === 'done' && options.historicalDeliveryRefs.length > 0
+                ? [`.atm/history/evidence/${options.taskId}.json`]
+                : [];
+            const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                taskDeclaredFiles,
+                trackedDirtyFiles: closeWorktree.trackedDirtyFiles,
+                allowedAdvisoryGovernanceFiles
+            });
+            if (closeScopedDiffIsolation) {
+                closeScopedDiffIsolation = attachDirtyGuardToScopedDiffIsolation(closeScopedDiffIsolation, closeDirtyGuard, closeWorktree.ignoredUntrackedFiles);
+            }
+            if (closeDirtyGuard.blockingTrackedDirtyFiles.length > 0) {
+                throw new CliError('ATM_TASK_CLOSE_DIRTY_WORKTREE', `Task ${options.taskId} cannot be closed as done while in-scope or closure-governance tracked changes are still dirty.`, {
+                    exitCode: 1,
+                    details: {
+                        taskId: options.taskId,
+                        trackedDirtyFiles: closeDirtyGuard.blockingTrackedDirtyFiles,
+                        scopeTrackedDirtyFiles: closeDirtyGuard.scopeTrackedDirtyFiles,
+                        governanceTrackedDirtyFiles: closeDirtyGuard.governanceTrackedDirtyFiles,
+                        advisoryTrackedDirtyFiles: closeDirtyGuard.advisoryTrackedDirtyFiles,
+                        unstagedFiles: closeWorktree.unstagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
+                        stagedFiles: closeWorktree.stagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
+                        ignoredUntrackedFiles: closeWorktree.ignoredUntrackedFiles,
+                        remediation: 'Commit this task\'s scoped delivery changes first before closing done. Unrelated tracked dirty files are isolated as advisory and do not block this task. The closure packet describes the delivery parent commit instead of the mutable worktree.'
+                    }
+                });
+            }
+            const scopedCriticalChangedFiles = frameworkDeliveryWindow?.scopedCriticalChangedFiles ?? [];
+            const isolatedUnrelatedChanges = frameworkDeliveryWindow?.unscopedCriticalChangedFiles ?? [];
+            if (scopedCriticalChangedFiles.length > 0 && frameworkDeliveryWindow?.ok !== true) {
+                throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE', `Task ${options.taskId} cannot be closed while in-scope ATM framework critical files are still modified outside the governed delivery window.`, {
+                    details: {
+                        taskId: options.taskId,
+                        criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
+                        scopedCriticalChangedFiles,
+                        isolatedUnrelatedChanges,
+                        closeScopedDiffIsolation,
+                        frameworkDeliveryWindow,
+                        requiredCommand: frameworkDeliveryWindow?.requiredCommand ?? null,
+                        remediation: frameworkDeliveryWindow?.remediation ?? 'Stage only the task-scoped deliverables/evidence, then close through the governed task or batch lifecycle.'
+                    }
+                });
+            }
+            const effectiveFrameworkBlockers = frameworkDeliveryWindow?.ok === true
+                ? frameworkStatus.blockers.filter((entry) => !frameworkDeliveryWindow.allowedBlockers.includes(entry))
+                : frameworkStatus.blockers;
+            if ((frameworkStatus.mode === 'required' || frameworkStatus.mode === 'cross-repo-target-required') && effectiveFrameworkBlockers.length > 0) {
+                // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+                const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
+                throw new CliError('ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED', `Task ${options.taskId} cannot be closed until framework-development blockers are resolved.`, {
+                    details: {
+                        taskId: options.taskId,
+                        blockers: effectiveFrameworkBlockers,
+                        suppressedBlockers: frameworkDeliveryWindow?.ok === true
+                            ? frameworkStatus.blockers.filter((entry) => frameworkDeliveryWindow.allowedBlockers.includes(entry))
+                            : [],
+                        frameworkDeliveryWindow,
+                        closeScopedDiffIsolation,
+                        criticalChangedFiles: frameworkStatus.criticalChangedFiles,
+                        requiredGates: frameworkStatus.requiredGates,
+                        tldr: missingReport.tldr,
+                        missingValidationPasses: missingReport.missingValidationPasses,
+                        blockingFindings: missingReport.blockingFindings
+                    }
+                });
+            }
+        }
+        const evidenceGate = options.status === 'done'
+            ? verifyTaskEvidence({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                gate: 'close',
+                taskDocument,
+                taskDeclaredFiles,
+                frameworkTask: frameworkStatus?.repoRole === 'framework'
+            })
+            : null;
+        if (evidenceGate && !evidenceGate.ok) {
+            // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+            const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
+            throw new CliError('ATM_TASK_CLOSE_EVIDENCE_REQUIRED', `Task ${options.taskId} cannot be closed as done without required delivery evidence. The goal is to deliver the task, not to mark it done.`, {
+                exitCode: 1,
+                details: {
+                    taskId: options.taskId,
+                    deliveryPrinciple: taskDeliveryPrincipleText(),
+                    gate: evidenceGate.gate,
+                    missing: evidenceGate.missing,
+                    evidenceCount: evidenceGate.total,
+                    remediation: 'Implement the requested non-.atm deliverables, run the required validators, then add command-backed evidence before closing done.',
+                    tldr: missingReport.tldr,
+                    missingValidationPasses: missingReport.missingValidationPasses,
+                    blockingFindings: missingReport.blockingFindings
+                }
+            });
+        }
+        const deliverableGate = options.status === 'done'
+            ? evaluateTaskDeliverableGate({
+                cwd: options.cwd,
                 taskId: options.taskId,
                 taskDocument,
-                action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
-                actorId,
-                sessionId: activeSession?.sessionId ?? null,
-                previousStatus,
-                closureMetadata: options.status === 'done'
-                    ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null)
-                    : null,
-                command: closeTransitionCommand
+                taskDeclaredFiles,
+                claim: parseClaimRecord(taskDocument.claim),
+                historicalDeliveryRefs: options.historicalDeliveryRefs,
+                historicalDeliveryRepo: options.historicalDeliveryRepo,
+                waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
+                waiverReason: options.reason
+            })
+            : null;
+        if (deliverableGate && !deliverableGate.ok) {
+            throw new CliError('ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', `Task ${options.taskId} cannot be closed as done because ATM found no real non-.atm deliverable diff. Task delivery comes before task closure.`, {
+                exitCode: 1,
+                details: deliverableGate
             });
-            return { transitionPath, closurePacketPath };
         }
-    });
-    const transitionPath = closeWriteResult.transitionPath;
-    closurePacketPath = closeWriteResult.closurePacketPath ?? closurePacketPath;
-    const closeEvidencePath = `.atm/history/evidence/${options.taskId}.json`;
-    stageTaskCloseArtifacts(options.cwd, [
-        relativePathFrom(options.cwd, taskPath),
-        closeEvidencePath,
-        transitionPath,
-        closurePacketPath
-    ]);
-    if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
-        const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
-        await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
-    }
-    if (activeSession?.sessionId) {
-        updateActorWorkSessionState({
-            cwd: options.cwd,
-            sessionId: activeSession.sessionId,
-            status: options.status === 'done' ? 'closed' : currentClaim?.state === 'handoff' ? 'handoff' : 'released',
-            reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
-        });
-    }
-    // TASK-AAO-0136: register close-commit-window for done closes so the captain's
-    // follow-up `git commit --task <id>` can land closure-packet + transition + ledger
-    // even though the direction lock has now released.
-    const closeCommitWindowPathFromClose = options.status === 'done'
-        ? registerCloseCommitWindow({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            actorId,
-            allowedFiles: [
-                relativePathFrom(options.cwd, taskPath),
-                closeEvidencePath,
-                transitionPath,
-                ...(closurePacketPath ? [closurePacketPath] : [])
-            ],
-            transitionId: transitionPath.split(/[\\/]/).pop()?.replace(/\.json$/, '') ?? null,
-            action: 'close'
-        })
-        : null;
-    const taskQueue = options.status === 'done'
-        ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
-        : null;
-    return makeResult({
-        ok: true,
-        command: 'tasks',
-        cwd: options.cwd,
-        messages: [message('info', 'ATM_TASKS_CLOSED', `Task ${options.taskId} moved to ${options.status}.`, {
+        let closurePacketPath = null;
+        let closurePacket = null;
+        let pendingClosurePacket = null;
+        let createdClosurePacketAbsolute = null;
+        const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
+            ? taskDocument.closurePacket
+            : typeof taskDocument.closure_packet === 'string'
+                ? taskDocument.closure_packet
+                : null;
+        if (options.status === 'done' && existingClosurePacketPath) {
+            const packetPath = path.resolve(options.cwd, existingClosurePacketPath);
+            if (!existsSync(packetPath)) {
+                throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_MISSING', `Task ${options.taskId} references a missing closure packet.`, {
+                    details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath }
+                });
+            }
+            const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
+            const validation = validateClosurePacket(packet);
+            if (!validation.ok) {
+                // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+                const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
+                throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet is invalid.`, {
+                    details: {
+                        taskId: options.taskId,
+                        closurePacketPath: existingClosurePacketPath,
+                        missing: validation.missing,
+                        invalidFormat: validation.invalidFormat,
+                        tldr: missingReport.tldr,
+                        missingValidationPasses: missingReport.missingValidationPasses,
+                        blockingFindings: missingReport.blockingFindings
+                    }
+                });
+            }
+            closurePacket = packet;
+            closurePacketPath = existingClosurePacketPath;
+        }
+        else if (options.status === 'done' && frameworkStatus?.repoRole === 'framework') {
+            pendingClosurePacket = createClosurePacket({
+                cwd: options.cwd,
                 taskId: options.taskId,
                 actorId,
-                status: options.status,
-                closeCommitWindowPath: closeCommitWindowPathFromClose
-            })],
-        evidence: {
-            action: 'close',
+                sessionId: activeSession?.sessionId ?? null,
+                evidencePath: `.atm/history/evidence/${options.taskId}.json`,
+                requiredGates: frameworkStatus.requiredGates,
+                changedFiles: deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
+                frameworkStatus,
+                historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate?.historicalDeliveries[0] ?? null, options.reason)
+            });
+            const validation = validateClosurePacket(pendingClosurePacket);
+            if (!validation.ok) {
+                // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
+                const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
+                throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet contract is incomplete.`, {
+                    details: {
+                        taskId: options.taskId,
+                        missing: validation.missing,
+                        invalidFormat: validation.invalidFormat,
+                        tldr: missingReport.tldr,
+                        missingValidationPasses: missingReport.missingValidationPasses,
+                        blockingFindings: missingReport.blockingFindings
+                    }
+                });
+            }
+            closurePacket = pendingClosurePacket;
+            createdClosurePacketAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.closure-packet.json`);
+        }
+        if (options.status === 'done') {
+            const finalPacketPath = existingClosurePacketPath || (pendingClosurePacket ? `.atm/history/evidence/${options.taskId}.closure-packet.json` : null);
+            const finalPacket = closurePacket || pendingClosurePacket;
+            const evaluatedMetadata = createClosureTransitionMetadata(finalPacketPath, finalPacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null);
+            if (!evaluatedMetadata || evaluatedMetadata.schemaId !== 'atm.taskClosureTransition.v1') {
+                throw new CliError('ATM_TASK_CLOSE_CLOSURE_METADATA_REQUIRED', `Task ${options.taskId} cannot be closed as ${options.status} because closure metadata cannot be produced.`, {
+                    exitCode: 1,
+                    details: { taskId: options.taskId }
+                });
+            }
+        }
+        if (requiresProtectedCloseApproval && shouldDeferProtectedCloseApproval) {
+            emergencyUse = assertEmergencyApproval({
+                cwd: options.cwd,
+                surface: protectedCloseSurface,
+                permission: 'backend.tasks.close',
+                taskId: options.taskId,
+                actorId,
+                emergencyApproval: options.emergencyApproval,
+                flags: protectedCloseFlags,
+                reason: options.reason ?? 'Direct close backend historical-delivery path.',
+                command: protectedCloseCommand
+            });
+        }
+        if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
+            taskDocument.claim = {
+                ...currentClaim,
+                heartbeatAt: new Date().toISOString(),
+                state: 'released',
+                reason: options.reason ?? 'closed'
+            };
+        }
+        const previousStatus = String(taskDocument.status ?? '');
+        taskDocument.status = options.status;
+        taskDocument.owner = actorId;
+        taskDocument.closedAt = new Date().toISOString();
+        taskDocument.closedByActor = actorId;
+        taskDocument.closedBySessionId = activeSession?.sessionId ?? null;
+        if (options.reason) {
+            taskDocument.closeReason = options.reason;
+        }
+        const closeTransitionCommand = buildTaskTransitionCommand({
+            action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
             taskId: options.taskId,
             actorId,
             status: options.status,
-            taskPath: relativePathFrom(options.cwd, taskPath),
-            evidenceGate,
-            closurePacketPath,
+            fromBatchCheckpoint: options.fromBatchCheckpoint,
+            batchId: owningBatch?.batchId ?? options.batchId,
+            historicalDeliveryRefs: options.historicalDeliveryRefs
+        });
+        const closeWriteResult = await executeTaskCloseTransaction({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            taskPath,
+            phase: 'close',
+            previousTaskContent,
+            createdClosurePacketAbsolute,
+            runWrites: () => {
+                if (pendingClosurePacket) {
+                    closurePacketPath = writeClosurePacket(options.cwd, options.taskId, pendingClosurePacket);
+                    closurePacket = pendingClosurePacket;
+                    taskDocument.closurePacket = closurePacketPath;
+                }
+                const transitionPath = writeTaskDocumentWithTransition({
+                    cwd: options.cwd,
+                    taskPath,
+                    taskId: options.taskId,
+                    taskDocument,
+                    action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
+                    actorId,
+                    sessionId: activeSession?.sessionId ?? null,
+                    previousStatus,
+                    closureMetadata: options.status === 'done'
+                        ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null)
+                        : null,
+                    command: closeTransitionCommand
+                });
+                return { transitionPath, closurePacketPath };
+            }
+        });
+        const transitionPath = closeWriteResult.transitionPath;
+        closurePacketPath = closeWriteResult.closurePacketPath ?? closurePacketPath;
+        const closeEvidencePath = `.atm/history/evidence/${options.taskId}.json`;
+        stageTaskCloseArtifacts(options.cwd, [
+            relativePathFrom(options.cwd, taskPath),
+            closeEvidencePath,
             transitionPath,
-            closeCommitWindowPath: closeCommitWindowPathFromClose,
-            deliverableGate: deliverableGate,
-            // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
-            // critical changes were in-scope vs isolated as advisory unrelated changes.
-            closeScopedDiffIsolation,
-            emergencyUse,
-            taskQueue
+            closurePacketPath
+        ]);
+        if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
+            const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
+            await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
         }
-    });
+        if (activeSession?.sessionId) {
+            updateActorWorkSessionState({
+                cwd: options.cwd,
+                sessionId: activeSession.sessionId,
+                status: options.status === 'done' ? 'closed' : currentClaim?.state === 'handoff' ? 'handoff' : 'released',
+                reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
+            });
+        }
+        // TASK-AAO-0136: register close-commit-window for done closes so the captain's
+        // follow-up `git commit --task <id>` can land closure-packet + transition + ledger
+        // even though the direction lock has now released.
+        const closeCommitWindowPathFromClose = options.status === 'done'
+            ? registerCloseCommitWindow({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                actorId,
+                allowedFiles: [
+                    relativePathFrom(options.cwd, taskPath),
+                    closeEvidencePath,
+                    transitionPath,
+                    ...(closurePacketPath ? [closurePacketPath] : [])
+                ],
+                transitionId: transitionPath.split(/[\\/]/).pop()?.replace(/\.json$/, '') ?? null,
+                action: 'close'
+            })
+            : null;
+        const taskQueue = options.status === 'done'
+            ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
+            : null;
+        return makeResult({
+            ok: true,
+            command: 'tasks',
+            cwd: options.cwd,
+            messages: [message('info', 'ATM_TASKS_CLOSED', `Task ${options.taskId} moved to ${options.status}.`, {
+                    taskId: options.taskId,
+                    actorId,
+                    status: options.status,
+                    closeCommitWindowPath: closeCommitWindowPathFromClose
+                })],
+            evidence: {
+                action: 'close',
+                taskId: options.taskId,
+                actorId,
+                status: options.status,
+                taskPath: relativePathFrom(options.cwd, taskPath),
+                evidenceGate,
+                closurePacketPath,
+                transitionPath,
+                closeCommitWindowPath: closeCommitWindowPathFromClose,
+                deliverableGate: deliverableGate,
+                // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
+                // critical changes were in-scope vs isolated as advisory unrelated changes.
+                closeScopedDiffIsolation,
+                emergencyUse,
+                failedEmergencyAuditPath,
+                taskQueue
+            }
+        });
+    }
+    catch (error) {
+        if (shouldDeferProtectedCloseApproval
+            && options.emergencyApproval
+            && !emergencyUse
+            && !isCliErrorWithCode(error, 'ATM_EMERGENCY_')) {
+            failedEmergencyAuditPath = recordFailedEmergencyUseAttempt({
+                cwd: options.cwd,
+                leaseId: options.emergencyApproval,
+                permission: 'backend.tasks.close',
+                surface: protectedCloseSurface,
+                taskId: options.taskId,
+                actorId,
+                reason: options.reason ?? 'Direct close backend historical-delivery path.',
+                command: protectedCloseCommand,
+                failureCode: error instanceof CliError && typeof error.code === 'string' ? error.code : null
+            });
+        }
+        throw error;
+    }
 }
 function runTasksAudit(argv) {
     const options = parseAuditOptions(argv);

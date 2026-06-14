@@ -40,16 +40,6 @@ export function buildOnefileRelease(options: any = {}) {
   mkdirSync(outputRoot, { recursive: true });
   writeFileSync(outputFilePath, runtimeSource, 'utf8');
 
-  const manifestPath = path.join(outputRoot, 'release-manifest.json');
-  writeFileSync(manifestPath, `${JSON.stringify({
-    schemaVersion: 'atm.onefileRelease.v0.1',
-    generatedAt: payload.generatedAt,
-    entrypoint: 'atm.mjs',
-    payloadSha256,
-    sourceRoot: 'release/atm-root-drop',
-    fileCount: payloadFiles.length
-  }, null, 2)}\n`, 'utf8');
-
   const readmePath = path.join(outputRoot, 'README.onefile.md');
   writeFileSync(readmePath, `${[
     '# ATM One-File Release',
@@ -64,6 +54,28 @@ export function buildOnefileRelease(options: any = {}) {
     '',
     'Read README.md if present, then run "node atm.mjs next --prompt \\"<current user prompt>\\" --json" from the repository root before task work. Use "node atm.mjs next --json" only as read-only orientation when no user prompt is available. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.'
   ].join('\n')}\n`, 'utf8');
+  const manifestPath = path.join(outputRoot, 'release-manifest.json');
+  const generatedFiles = collectGeneratedArtifactPaths(outputRoot, 'release/atm-onefile', [
+    'release-manifest.json'
+  ]);
+  writeFileSync(manifestPath, `${JSON.stringify({
+    schemaVersion: 'atm.onefileRelease.v0.2',
+    generatedAt: payload.generatedAt,
+    entrypoint: 'atm.mjs',
+    payloadSha256,
+    sourceRoot: 'release/atm-root-drop',
+    fileCount: payloadFiles.length,
+    generatedFiles,
+    stagingContract: {
+      schemaId: 'atm.generatedArtifactStaging.v1',
+      generatedFiles,
+      ignoredByDefault: true,
+      requiresExplicitStaging: true,
+      contractSurface: 'release-manifest.json',
+      dependsOnRootDropManifest: 'release/atm-root-drop/release-manifest.json',
+      rationale: 'release/atm-onefile is generated under the repo ignore boundary; stage these generated files explicitly and treat the root-drop manifest as the upstream artifact list.'
+    }
+  }, null, 2)}\n`, 'utf8');
 
   return {
     outputRoot,
@@ -86,6 +98,22 @@ function collectPayloadFiles(root: any) {
     });
   }
   return files;
+}
+
+function collectGeneratedArtifactPaths(root: string, repoRelativeRoot: string, appendFiles: readonly string[] = []) {
+  const generated = new Set<string>();
+  for (const absolutePath of walkFiles(root)) {
+    const relativePath = path.relative(root, absolutePath).replace(/\\/g, '/');
+    if (!relativePath) continue;
+    generated.add(`${repoRelativeRoot}/${relativePath}`);
+  }
+  for (const relativePath of appendFiles) {
+    const normalized = String(relativePath || '').replace(/\\/g, '/').replace(/^\/+/, '');
+    if (normalized) {
+      generated.add(`${repoRelativeRoot}/${normalized}`);
+    }
+  }
+  return [...generated].sort();
 }
 
 function walkFiles(directory: any): string[] {
