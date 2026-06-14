@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T10-43-36-578Z-close-8af7ab4789be",
+  "taskId": "TASK-MAO-0011",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260614103746-captain-TASK-MAO-0011-af6e454a45",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0011.json",
+  "taskSha256": "sha256:e63897b4f348e140320ae706ac1c418f43856d1d155cc00ad9bcc9dec02e077d",
+  "createdAt": "2026-06-14T10:43:36.578Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0011 --actor captain --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614103746-captain-TASK-MAO-0011-af6e454a45",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0011.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release",
+      "validate:runner-reproducibility"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T10:43:36.574Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0011-reproducible-runner-build-audit.task.md",
+        ".atm/history/evidence/TASK-MAO-0011.*",
+        ".atm/history/task-events/TASK-MAO-0011/**",
+        ".atm/history/tasks/TASK-MAO-0011.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/reports/runner-reproducibility-audit.md",
+        "package.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-runner-reproducibility.ts",
+        "tests/fixtures/runner-reproducibility/"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-runner-reproducibility.ts",
+        "tests/fixtures/runner-reproducibility/"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}

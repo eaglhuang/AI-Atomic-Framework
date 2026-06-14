@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0011",
+  "title": "reproducible runner build audit",
+  "status": "done",
+  "milestone": "M5",
+  "dependencies": [],
+  "acceptance": [
+    "The reproducibility validator fails before remediation on known nondeterministic fixtures and passes after remediation.",
+    "Critical artifact comparison covers `release/atm-onefile/atm.mjs`, `release/atm-onefile/release-manifest.json`, `release/atm-root-drop/release-manifest.json`, and any manifest that feeds the onefile payload hash.",
+    "The report explicitly states whether wall-clock timestamps remain inside byte-compared artifacts.",
+    "Existing release validators still pass."
+  ],
+  "deliverables": [
+    "scripts/validate-runner-reproducibility.ts",
+    "tests/fixtures/runner-reproducibility/",
+    "docs/reports/runner-reproducibility-audit.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "package.json",
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/validate-runner-reproducibility.ts",
+    "tests/fixtures/runner-reproducibility/",
+    "docs/reports/runner-reproducibility-audit.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-runner-reproducibility.ts --mode validate",
+    "npm run validate:root-drop-release",
+    "npm run validate:onefile-release",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Publishing runner refs",
+    "Broker submit-patch pipeline",
+    "Closure packet runner binding"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert reproducibility validator, fixture, report, build-script normalization, and atomization map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-build-reproducibility-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0011-reproducible-runner-build-audit.task.md",
+    "sectionTitle": "TASK-MAO-0011",
+    "headingLine": 47,
+    "hash": "a7d054c1215a9cef"
+  },
+  "importedAt": "2026-06-14T10:37:45.690Z",
+  "lastTransitionId": "2026-06-14T10-43-36-578Z-close-8af7ab4789be",
+  "lastTransitionAt": "2026-06-14T10:43:36.578Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-14T10:37:46.795Z",
+  "promotedAt": "2026-06-14T10:37:46.798Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-d9076c9d379b",
+    "claimedAt": "2026-06-14T10:37:46.801Z",
+    "heartbeatAt": "2026-06-14T10:43:36.575Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0011.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/runner-reproducibility-audit.md",
+      "package.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/validate-runner-reproducibility.ts",
+      "tests/fixtures/runner-reproducibility/"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-14T10:37:46.801Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260614103746-captain-TASK-MAO-0011-af6e454a45",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0011",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0011.*",
+      ".atm/history/task-events/TASK-MAO-0011/**",
+      ".atm/history/tasks/TASK-MAO-0011.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/runner-reproducibility-audit.md",
+      "package.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/validate-runner-reproducibility.ts",
+      "tests/fixtures/runner-reproducibility/"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "32d0407573dbfc9e249cd85c3b70c26762ea40ccbe0854ede00327995acefaea",
+    "actorId": "captain",
+    "createdAt": "2026-06-14T10:37:46.822Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-14T10:43:36.575Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260614103746-captain-TASK-MAO-0011-af6e454a45",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0011.closure-packet.json"
+}
