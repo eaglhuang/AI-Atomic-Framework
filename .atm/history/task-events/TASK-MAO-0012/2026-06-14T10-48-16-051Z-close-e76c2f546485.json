@@ -1,0 +1,86 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T10-48-16-051Z-close-e76c2f546485",
+  "taskId": "TASK-MAO-0012",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260614104414-captain-TASK-MAO-0012-8bcf127e1d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0012.json",
+  "taskSha256": "sha256:88a6cac2c587b4baf38400dc5cd39b25988c28e848b96ed5ed2bbada17509f27",
+  "createdAt": "2026-06-14T10:48:16.051Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0012 --actor captain --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614104414-captain-TASK-MAO-0012-8bcf127e1d",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0012.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release",
+      "validate:runner-build-scope",
+      "validate:script-parity"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T10:48:16.047Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0012-runner-build-scope-manifest.task.md",
+        ".atm/history/evidence/TASK-MAO-0012.*",
+        ".atm/history/task-events/TASK-MAO-0012/**",
+        ".atm/history/tasks/TASK-MAO-0012.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "package.json",
+        "scripts/AtmCore/",
+        "scripts/AtmCore/README.md",
+        "scripts/AtmCore/runner-build-scope.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-runner-build-scope.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/AtmCore/",
+        "scripts/AtmCore/runner-build-scope.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-package-dist.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-runner-build-scope.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
