@@ -32,6 +32,7 @@ import {
   canResolveHostOpenerPolicy,
   resolveHostOpenerPolicyDecision
 } from './taskflow/host-opener-policy.ts';
+import { buildTaskflowCommitMessage } from './taskflow/commit-messages.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { runAtmGit } from './git-governance.ts';
@@ -1002,8 +1003,8 @@ function buildTaskflowCommitBundle(input: {
     ])
     : [];
 
-  const targetMessage = `chore(taskflow): close ${input.taskId} target governance bundle`;
-  const planningMessage = `docs(taskflow): close ${input.taskId} planning bundle`;
+  const targetMessage = buildTaskflowCommitMessage('target', { taskId: input.taskId });
+  const planningMessage = buildTaskflowCommitMessage('planning', { taskId: input.taskId });
   const failClosed = metadataFailClosed || targetStageFiles.length === 0 || !planning.repoRoot || planningStageFiles.length === 0;
 
   return {

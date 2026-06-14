@@ -9,6 +9,7 @@ import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildCloseback
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
+import { buildTaskflowCommitMessage } from './taskflow/commit-messages.js';
 import { resolveActorWorkSession } from './actor-session.js';
 import { withTaskflowOperatorLane } from './emergency/context.js';
 import { runAtmGit } from './git-governance.js';
@@ -751,8 +752,8 @@ function buildTaskflowCommitBundle(input) {
                 : [])
         ])
         : [];
-    const targetMessage = `chore(taskflow): close ${input.taskId} target governance bundle`;
-    const planningMessage = `docs(taskflow): close ${input.taskId} planning bundle`;
+    const targetMessage = buildTaskflowCommitMessage('target', { taskId: input.taskId });
+    const planningMessage = buildTaskflowCommitMessage('planning', { taskId: input.taskId });
     const failClosed = metadataFailClosed || targetStageFiles.length === 0 || !planning.repoRoot || planningStageFiles.length === 0;
     return {
         schemaId: 'atm.taskflowGovernedCommitBundle.v1',
