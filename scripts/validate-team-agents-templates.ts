@@ -10,7 +10,15 @@ if (task !== 'TASK-TEAM-0004' && task !== 'TASK-TEAM-0005' && task !== 'TASK-TEA
   fail(`unsupported or missing --task value: ${task ?? '<none>'}`);
 }
 
-const templates = [
+type TemplateContract = {
+  label: string;
+  file: string;
+  required: string[];
+  requiredText?: string[];
+  expectedTask: string;
+};
+
+const templates: TemplateContract[] = [
   {
     label: 'team-brief',
     file: 'docs/governance/team-agents/templates/team-brief-template.md',
@@ -23,20 +31,56 @@ const templates = [
       '## Assignment',
       '## Validation Plan',
       '## Evidence Plan',
+      '## Expected Report',
       '## Stop Conditions'
+    ],
+    requiredText: [
+      'Allowed files',
+      'Do-not-touch paths',
+      'Forbidden repositories',
+      'Assigned Work',
+      'Expected Report',
+      'Stop Conditions',
+      'atm.team-agents-template-map'
     ],
     expectedTask: 'TASK-TEAM-0004'
   },
   {
     label: 'agent-report',
     file: 'docs/governance/team-agents/templates/agent-report-template.md',
-    required: ['## Role', '## Status', '## Files Read', '## Files Changed', '## Commands Run', '## Findings', '## Blockers', '## Recommendation'],
+    required: [
+      '## Role',
+      '## Status',
+      '## Files Read',
+      '## Files Changed',
+      '## Commands Run',
+      '## Findings',
+      '## Blockers',
+      '## Recommendation',
+      '## Handoff'
+    ],
+    requiredText: [
+      'Parent task',
+      'Assigned work',
+      'Scope drift',
+      'Read-only roles should report `none`',
+      '<close | continue | escalate>'
+    ],
     expectedTask: 'TASK-TEAM-0004'
   },
   {
     label: 'team-summary',
     file: 'docs/governance/team-agents/templates/team-summary-template.md',
     required: ['## Decision', '## Implementation Summary', '## Validators', '## Evidence', '## Risk', '## Close-Ready'],
+    requiredText: [
+      'Decision time',
+      'Scope drift',
+      'Close command',
+      'Close result',
+      'Commit SHA',
+      'validators pass',
+      'close command succeeds'
+    ],
     expectedTask: 'TASK-TEAM-0004'
   }
 ];
@@ -99,6 +143,11 @@ for (const template of templates) {
   for (const heading of template.required) {
     if (!content.includes(heading)) {
       fail(`${template.label} missing required section: ${heading}`);
+    }
+  }
+  for (const snippet of template.requiredText ?? []) {
+    if (!content.includes(snippet)) {
+      fail(`${template.label} missing required text: ${snippet}`);
     }
   }
   if (!content.includes(template.expectedTask)) {
