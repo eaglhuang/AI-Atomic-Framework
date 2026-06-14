@@ -25,6 +25,7 @@ import { loadProfile, buildDelegationContract, resolveOpenerMode } from '../pack
 import { resolveNextDefaultOutputPath } from '../packages/cli/src/commands/shared.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTaskflow } from '../packages/cli/src/commands/taskflow.ts';
+import { assertEmergencyApproval } from '../packages/cli/src/commands/emergency/gate.ts';
 import { withTaskflowOperatorLane } from '../packages/cli/src/commands/emergency/context.ts';
 import { runHook } from '../packages/cli/src/commands/hook.ts';
 import { computeMissingValidatorReport } from '../packages/cli/src/commands/evidence.ts';
@@ -338,6 +339,16 @@ async function expectTaskflowErrorDetails(argv: string[], code: string): Promise
     fail(`taskflow ${argv.join(' ')} expected ${code} but succeeded.`);
   } catch (error) {
     assert((error as { code?: string }).code === code, `taskflow ${argv.join(' ')} expected ${code}, got ${(error as { code?: string }).code ?? 'unknown'}.`);
+    return ((error as { details?: Record<string, any> }).details ?? {}) as Record<string, any>;
+  }
+}
+
+async function expectBackendTaskErrorDetails(argv: string[], code: string): Promise<Record<string, any>> {
+  try {
+    await runTasksBackend(argv);
+    fail(`tasks backend ${argv.join(' ')} expected ${code} but succeeded.`);
+  } catch (error) {
+    assert((error as { code?: string }).code === code, `tasks backend ${argv.join(' ')} expected ${code}, got ${(error as { code?: string }).code ?? 'unknown'}.`);
     return ((error as { details?: Record<string, any> }).details ?? {}) as Record<string, any>;
   }
 }
@@ -1654,6 +1665,7 @@ try {
   await validateTaskImportDispatchMetadataPreservation(tempRoot);
   await validateTaskResidueClassification(tempRoot);
   validateEmergencyUsePreCommitAudit(tempRoot);
+  await validateEmergencyLeaseUseCountSemantics(tempRoot);
   await validateTaskflowCloseOrchestration(tempRoot);
 
   if (!process.exitCode) {
@@ -2452,4 +2464,137 @@ function validateEmergencyUsePreCommitAudit(tempRoot: string) {
   const matchedLeaseHook = runHook(['pre-commit', '--cwd', repo]) as any;
   assert(matchedLeaseHook.evidence?.emergencyUseAuditReport?.ok === true, 'pre-commit emergency audit must pass when use and used lease match');
   assert(!(matchedLeaseHook.evidence?.blockingFindings ?? []).some((finding: any) => finding.source === 'emergency-use-audit'), 'matching emergency use and lease must not create emergency-use-audit blocking findings');
+}
+
+async function validateEmergencyLeaseUseCountSemantics(tempRoot: string) {
+  const repo = makeHostRepo(tempRoot, 'emergency-lease-use-count-semantics');
+  initGitRepo(repo);
+
+  const taskId = 'TASK-EMERGENCY-LEASE-0001';
+  const planRelativePath = `docs/tasks/${taskId}.task.md`;
+  mkdirSync(path.join(repo, 'docs', 'tasks'), { recursive: true });
+  writeFileSync(path.join(repo, planRelativePath), [
+    '---',
+    `task_id: ${taskId}`,
+    'title: "Emergency lease use-count semantics fixture"',
+    'status: running',
+    '---',
+    `# ${taskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  mkdirSync(path.join(repo, 'src'), { recursive: true });
+  writeFileSync(path.join(repo, 'src', 'lease-owned.ts'), 'export const leaseOwned = true;\n', 'utf8');
+  writeFileSync(path.join(repo, 'src', 'lease-unrelated.ts'), 'export const leaseUnrelated = true;\n', 'utf8');
+  execFileSync('git', ['add', '.'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'emergency lease fixture delivery'], { cwd: repo, stdio: 'ignore' });
+
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: 'Emergency lease use-count semantics fixture',
+    status: 'ready',
+    deliverables: ['src/lease-owned.ts'],
+    scopePaths: ['src/lease-owned.ts'],
+    source: { planPath: planRelativePath, sectionTitle: taskId, headingLine: 1, hash: 'emergency-lease-semantics' }
+  });
+  const claimResult = await runNext(['--cwd', repo, '--claim', '--actor', 'validator', '--task', taskId, '--json']);
+  assert(claimResult.ok === true, 'emergency lease semantics fixture must create an active claim');
+
+  writeJson(path.join(repo, '.atm', 'history', 'evidence', `${taskId}.json`), {
+    taskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'emergency lease semantics fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      artifactPaths: ['src/lease-owned.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate emergency lease semantics fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+        stderrSha256: 'sha256:2222222222222222222222222222222222222222222222222222222222222222'
+      }]
+    }]
+  });
+
+  const leaseId = 'EMG-TASK-EMERGENCY-LEASE-0001-validator';
+  writeJson(path.join(repo, '.atm', 'runtime', 'emergency', 'leases', `${leaseId}.json`), {
+    schemaId: 'atm.emergencyMaintenanceLease.v1',
+    leaseId,
+    permission: 'backend.tasks.close',
+    taskId,
+    actorId: 'validator',
+    approvedBy: 'human',
+    approvalText: 'Human approved emergency close fixture',
+    reason: 'validator fixture',
+    surface: 'tasks close historical-delivery backend',
+    allowedFlags: ['--historical-delivery', '--waiver-out-of-scope-delivery'],
+    createdAt: '2026-06-14T00:00:00.000Z',
+    expiresAt: '2099-06-14T00:30:00.000Z',
+    maxUses: 1,
+    usedCount: 0,
+    status: 'active',
+    revokedAt: null,
+    revokedBy: null
+  });
+
+  await expectBackendTaskErrorDetails([
+    'close',
+    '--cwd', repo,
+    '--task', taskId,
+    '--actor', 'validator',
+    '--status', 'done',
+    '--historical-delivery', 'HEAD',
+    '--emergency-approval', leaseId,
+    '--json'
+  ], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+
+  const firstLease = readJson(path.join(repo, '.atm', 'runtime', 'emergency', 'leases', `${leaseId}.json`));
+  assert(firstLease.usedCount === 0, 'failed pre-mutation backend close must not consume the emergency lease');
+  const usesDir = path.join(repo, '.atm', 'runtime', 'emergency', 'uses');
+  const failedUseFiles = readdirSync(usesDir).filter((entry) => entry.includes(leaseId));
+  assert(failedUseFiles.length === 1, 'failed pre-mutation backend close must write exactly one failed emergency audit record');
+  const failedUse = readJson(path.join(usesDir, failedUseFiles[0]));
+  assert(failedUse.result === 'failed', 'failed pre-mutation backend close must record result=failed');
+  assert(Number(failedUse.before?.usedCount ?? -1) === 0, 'failed pre-mutation backend close must preserve before.usedCount=0');
+  assert(Number(failedUse.after?.usedCount ?? -1) === 0, 'failed pre-mutation backend close must preserve after.usedCount=0');
+  assert(failedUse.after?.failureCode === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', 'failed pre-mutation backend close must capture the failure code');
+
+  const success = await runTasksBackend([
+    'close',
+    '--cwd', repo,
+    '--task', taskId,
+    '--actor', 'validator',
+    '--status', 'done',
+    '--historical-delivery', 'HEAD',
+    '--waiver-out-of-scope-delivery',
+    '--reason', 'validator waiver for out-of-scope fixture file',
+    '--emergency-approval', leaseId,
+    '--json'
+  ]) as any;
+  assert(success.ok === true, 'waived backend close must succeed after the failed audited attempt');
+  assert(success.evidence?.emergencyUse?.use?.result === 'authorized', 'successful backend close must still emit authorized emergency use evidence');
+  const usedLease = readJson(path.join(repo, '.atm', 'runtime', 'emergency', 'leases', `${leaseId}.json`));
+  assert(usedLease.usedCount === 1, 'successful backend close must consume the emergency lease exactly once');
+  const allUseFiles = readdirSync(usesDir).filter((entry) => entry.includes(leaseId));
+  assert(allUseFiles.length === 2, 'successful backend close must append exactly one additional emergency use record');
+
+  try {
+    assertEmergencyApproval({
+      cwd: repo,
+      surface: 'tasks close historical-delivery backend',
+      permission: 'backend.tasks.close',
+      taskId,
+      actorId: 'validator',
+      emergencyApproval: leaseId,
+      flags: ['--historical-delivery', '--waiver-out-of-scope-delivery'],
+      reason: 'validator replay rejection fixture',
+      command: `node atm.mjs tasks close --task ${taskId} --actor validator --status done --historical-delivery HEAD --waiver-out-of-scope-delivery --json`
+    });
+    fail('replayed emergency approval expected ATM_EMERGENCY_APPROVAL_EXHAUSTED but succeeded.');
+  } catch (error) {
+    assert((error as { code?: string }).code === 'ATM_EMERGENCY_APPROVAL_EXHAUSTED', `replayed emergency approval expected ATM_EMERGENCY_APPROVAL_EXHAUSTED, got ${(error as { code?: string }).code ?? 'unknown'}.`);
+  }
 }

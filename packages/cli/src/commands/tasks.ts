@@ -90,6 +90,7 @@ import {
 import { dispatchTasksAction } from './tasks/command-dispatch.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval } from './emergency/gate.ts';
+import { emergencyRoot, readEmergencyLease } from './emergency/leases.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.ts';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.ts';
 import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/normalize-string-value-helper.ts';
@@ -490,6 +491,62 @@ async function recordStaleRunnerOverride(input: {
     command: input.command
   });
   return true;
+}
+
+function isCliErrorWithCode(error: unknown, codePrefix: string): boolean {
+  return error instanceof CliError && typeof error.code === 'string' && error.code.startsWith(codePrefix);
+}
+
+function recordFailedEmergencyUseAttempt(input: {
+  readonly cwd: string;
+  readonly leaseId: string | null | undefined;
+  readonly permission: 'backend.tasks.close';
+  readonly surface: string;
+  readonly taskId: string;
+  readonly actorId: string | null;
+  readonly reason: string | null;
+  readonly command: string | null;
+  readonly failureCode: string | null;
+}) {
+  if (!input.leaseId) return null;
+  try {
+    const lease = readEmergencyLease(input.cwd, input.leaseId);
+    if (lease.status !== 'active') return null;
+    if (lease.permission !== input.permission) return null;
+    if (lease.taskId && lease.taskId !== input.taskId) return null;
+    if (input.actorId && lease.actorId !== input.actorId) return null;
+    const usedCount = typeof lease.usedCount === 'number' ? lease.usedCount : Number(lease.usedCount ?? 0);
+    if (!Number.isFinite(usedCount) || usedCount >= lease.maxUses) return null;
+    if (Date.parse(lease.expiresAt) <= Date.now()) return null;
+    const usedAt = new Date().toISOString();
+    const usePath = path.join(emergencyRoot(input.cwd), 'uses', `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
+    mkdirSync(path.dirname(usePath), { recursive: true });
+    writeFileSync(usePath, `${JSON.stringify({
+      schemaId: 'atm.emergencyMaintenanceUse.v1',
+      leaseId: lease.leaseId,
+      taskId: input.taskId,
+      actorId: input.actorId,
+      permission: input.permission,
+      surface: input.surface,
+      usedAt,
+      reason: input.reason,
+      command: input.command,
+      result: 'failed',
+      before: {
+        leaseStatus: lease.status,
+        usedCount
+      },
+      after: {
+        leaseStatus: lease.status,
+        usedCount,
+        failureCode: input.failureCode
+      },
+      touchedFiles: []
+    }, null, 2)}\n`, 'utf8');
+    return relativePathFrom(input.cwd, usePath);
+  } catch {
+    return null;
+  }
 }
 
 export function loadTaskDocumentOrThrow(cwd: string, taskId: string): { taskPath: string; taskDocument: Record<string, unknown> } {
@@ -1964,48 +2021,55 @@ async function runTasksClose(argv: string[]) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks close requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  const protectedCloseSurface = 'tasks close historical-delivery backend';
+  const protectedCloseFlags = [
+    ...(options.historicalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
+    ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
+    ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
+    ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
+  ];
+  const protectedCloseCommand = `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --status ${options.status} --json`;
+  const requiresProtectedCloseApproval = protectedCloseFlags.length > 0;
+  const shouldDeferProtectedCloseApproval = requiresProtectedCloseApproval && !options.allowStaleRunner;
   let emergencyUse: EmergencyUseEvidence = null;
-  if (options.historicalDeliveryRefs.length > 0 || options.waiverOutOfScopeDelivery || options.allowStaleRunner) {
-    emergencyUse = assertEmergencyApproval({
+  let failedEmergencyAuditPath: string | null = null;
+  try {
+    const taskPath = taskPathFor(options.cwd, options.taskId);
+    if (!existsSync(taskPath)) {
+      throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
+        exitCode: 2,
+        details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
+      });
+    }
+    if (requiresProtectedCloseApproval && !shouldDeferProtectedCloseApproval) {
+      emergencyUse = assertEmergencyApproval({
+        cwd: options.cwd,
+        surface: protectedCloseSurface,
+        permission: 'backend.tasks.close',
+        taskId: options.taskId,
+        actorId,
+        emergencyApproval: options.emergencyApproval,
+        flags: protectedCloseFlags,
+        reason: options.reason ?? 'Direct close backend historical-delivery path.',
+        command: protectedCloseCommand
+      });
+    }
+    const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const previousTaskContent = readFileSync(taskPath, 'utf8');
+    const staleGate = assertRunnerFreshForWriteAction({
       cwd: options.cwd,
-      surface: 'tasks close historical-delivery backend',
-      permission: 'backend.tasks.close',
-      taskId: options.taskId,
-      actorId,
-      emergencyApproval: options.emergencyApproval,
-      flags: [
-        ...(options.historicalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
-        ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
-        ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
-        ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
-      ],
-      reason: options.reason ?? 'Direct close backend historical-delivery path.',
-      command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --status ${options.status} --json`
-    });
-  }
-  const taskPath = taskPathFor(options.cwd, options.taskId);
-  if (!existsSync(taskPath)) {
-    throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
-      exitCode: 2,
-      details: { taskPath: relativePathFrom(options.cwd, taskPath), taskId: options.taskId }
-    });
-  }
-  const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
-  const previousTaskContent = readFileSync(taskPath, 'utf8');
-  const staleGate = assertRunnerFreshForWriteAction({
-    cwd: options.cwd,
-    action: 'tasks-close',
-    allowStaleRunner: options.allowStaleRunner
-  });
-  if (options.allowStaleRunner && staleGate.warning) {
-    await recordStaleRunnerOverride({
-      cwd: options.cwd,
-      taskId: options.taskId,
-      actorId,
       action: 'tasks-close',
-      command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --allow-stale-runner --json`
+      allowStaleRunner: options.allowStaleRunner
     });
-  }
+    if (options.allowStaleRunner && staleGate.warning) {
+      await recordStaleRunnerOverride({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        actorId,
+        action: 'tasks-close',
+        command: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --allow-stale-runner --json`
+      });
+    }
   const currentClaim = parseClaimRecord(taskDocument.claim);
   const activeSession = resolveActorWorkSession(options.cwd, {
     actorId,
@@ -2317,6 +2381,20 @@ async function runTasksClose(argv: string[]) {
     }
   }
 
+    if (requiresProtectedCloseApproval && shouldDeferProtectedCloseApproval) {
+      emergencyUse = assertEmergencyApproval({
+        cwd: options.cwd,
+        surface: protectedCloseSurface,
+        permission: 'backend.tasks.close',
+        taskId: options.taskId,
+        actorId,
+        emergencyApproval: options.emergencyApproval,
+        flags: protectedCloseFlags,
+        reason: options.reason ?? 'Direct close backend historical-delivery path.',
+        command: protectedCloseCommand
+      });
+    }
+
   if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
     taskDocument.claim = {
       ...currentClaim,
@@ -2441,9 +2519,31 @@ async function runTasksClose(argv: string[]) {
       // critical changes were in-scope vs isolated as advisory unrelated changes.
       closeScopedDiffIsolation,
       emergencyUse,
+      failedEmergencyAuditPath,
       taskQueue
     }
   });
+  } catch (error) {
+    if (
+      shouldDeferProtectedCloseApproval
+      && options.emergencyApproval
+      && !emergencyUse
+      && !isCliErrorWithCode(error, 'ATM_EMERGENCY_')
+    ) {
+      failedEmergencyAuditPath = recordFailedEmergencyUseAttempt({
+        cwd: options.cwd,
+        leaseId: options.emergencyApproval,
+        permission: 'backend.tasks.close',
+        surface: protectedCloseSurface,
+        taskId: options.taskId,
+        actorId,
+        reason: options.reason ?? 'Direct close backend historical-delivery path.',
+        command: protectedCloseCommand,
+        failureCode: error instanceof CliError && typeof error.code === 'string' ? error.code : null
+      });
+    }
+    throw error;
+  }
 }
 
 function runTasksAudit(argv: string[]) {
