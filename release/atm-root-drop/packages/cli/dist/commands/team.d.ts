@@ -100,12 +100,12 @@ export declare const TEAM_ATOM_BOUNDARIES: {
     readonly 'team.start-runtime-state': {
         readonly anchor: "packages/cli/src/commands/team.ts#writeTeamRun";
         readonly capability: "Team run runtime record writer under .atm/runtime/team-runs.";
-        readonly downstreamTasks: readonly ["TASK-TEAM-0001"];
+        readonly downstreamTasks: readonly ["TASK-TEAM-0011"];
     };
     readonly 'team.status-runtime-read': {
         readonly anchor: "packages/cli/src/commands/team.ts#buildTeamStatusResult";
         readonly capability: "Read-only team run status surface.";
-        readonly downstreamTasks: readonly ["TASK-TEAM-0001"];
+        readonly downstreamTasks: readonly ["TASK-TEAM-0011"];
     };
 };
 export declare function runTeam(argv: string[]): Promise<import("./shared.ts").CommandResult>;
@@ -411,7 +411,15 @@ export declare function writeTeamRun(input: {
         targetRepo: any;
         sourcePlanPath: any;
     };
+    roles: {
+        agentId: string;
+        role: string;
+        profile: string | null;
+        language: string | null;
+        permissions: string[];
+    }[];
     agents: TeamRecipeAgent[];
+    leases: PermissionLease[];
     permissionLeases: PermissionLease[];
     validation: {
         ok: boolean;

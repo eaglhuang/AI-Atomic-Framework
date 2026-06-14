@@ -71,12 +71,12 @@ export const TEAM_ATOM_BOUNDARIES = {
     'team.start-runtime-state': {
         anchor: 'packages/cli/src/commands/team.ts#writeTeamRun',
         capability: 'Team run runtime record writer under .atm/runtime/team-runs.',
-        downstreamTasks: ['TASK-TEAM-0001']
+        downstreamTasks: ['TASK-TEAM-0011']
     },
     'team.status-runtime-read': {
         anchor: 'packages/cli/src/commands/team.ts#buildTeamStatusResult',
         capability: 'Read-only team run status surface.',
-        downstreamTasks: ['TASK-TEAM-0001']
+        downstreamTasks: ['TASK-TEAM-0011']
     }
 };
 const builtInRecipes = [
@@ -1124,7 +1124,15 @@ export function writeTeamRun(input) {
         agentsSpawned: false,
         runtimeWritten: true,
         task: summarizeTask(input.taskId, input.task),
+        roles: input.recipe.agents.map((agent) => ({
+            agentId: agent.agentId,
+            role: agent.role,
+            profile: agent.profile ?? null,
+            language: agent.language ?? null,
+            permissions: agent.permissions
+        })),
         agents: input.recipe.agents,
+        leases: input.teamPlan.suggestedPermissionLeases,
         permissionLeases: input.teamPlan.suggestedPermissionLeases,
         validation: input.validation,
         brokerLane: input.teamPlan.brokerLane,
@@ -1139,7 +1147,7 @@ export function writeTeamRun(input) {
 export function buildTeamStatusResult(input) {
     const runs = input.requestedTeamRunId
         ? [readTeamRun(input.cwd, input.requestedTeamRunId)]
-        : listTeamRuns(input.cwd);
+        : listTeamRuns(input.cwd).filter((run) => run.status === 'active');
     return makeResult({
         ok: true,
         command: 'team',
@@ -1163,6 +1171,7 @@ function listTeamRuns(cwd) {
         return [];
     return readdirSync(directory)
         .filter((entry) => entry.endsWith('.json'))
+        .sort((left, right) => left.localeCompare(right))
         .map((entry) => readJsonFile(path.join(directory, entry), 'ATM_TEAM_RUN_INVALID'));
 }
 function readTeamRun(cwd, teamRunId) {
@@ -1180,10 +1189,12 @@ function compactTeamRun(run) {
         teamRunId: run.teamRunId,
         taskId: run.taskId,
         recipeId: run.recipeId,
+        actorId: run.actorId,
         status: run.status,
-        agentCount: Array.isArray(run.agents) ? run.agents.length : 0,
-        permissionLeaseCount: Array.isArray(run.permissionLeases) ? run.permissionLeases.length : 0,
+        roleCount: Array.isArray(run.roles) ? run.roles.length : Array.isArray(run.agents) ? run.agents.length : 0,
+        leaseCount: Array.isArray(run.leases) ? run.leases.length : Array.isArray(run.permissionLeases) ? run.permissionLeases.length : 0,
         agentsSpawned: run.agentsSpawned === true,
+        createdAt: run.createdAt ?? null,
         updatedAt: run.updatedAt ?? null
     };
 }
