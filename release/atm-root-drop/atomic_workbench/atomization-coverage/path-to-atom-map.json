@@ -233,9 +233,9 @@
     {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecPermissionValidation",
       "atom_id": "team.spec.permission-validation",
-      "capability": "Command-spec examples for recipe permission and lease validation.",
+      "capability": "Command-spec examples for recipe permission, scoped lease, and file.write scope validation.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0012"
+      "source_task": "TASK-TEAM-0013"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecRuntimeStatus",
@@ -554,6 +554,13 @@
       "capability": "Deterministic permission lease validation before team runtime start.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0012"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
+      "atom_id": "team.file-write-scope-validator",
+      "capability": "Deterministic file.write lease scope validation against task allowed files before team runtime start.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0013"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#writeTeamRun",

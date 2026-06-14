@@ -29,6 +29,9 @@ type PermissionLease = {
     agentId: string;
     paths?: string[];
 };
+type TeamPermissionValidationOptions = {
+    allowedWritePaths?: string[];
+};
 type TeamCrewRole = {
     role: string;
     agentId: string;
@@ -115,9 +118,14 @@ export declare const TEAM_ATOM_BOUNDARIES: {
         readonly capability: "Deterministic permission lease validation before team runtime start.";
         readonly downstreamTasks: readonly ["TASK-TEAM-0012"];
     };
+    readonly 'team.file-write-scope-validator': {
+        readonly anchor: "packages/cli/src/commands/team.ts#validateTeamPermissionModel";
+        readonly capability: "Deterministic file.write lease scope validation against task allowed files before team runtime start.";
+        readonly downstreamTasks: readonly ["TASK-TEAM-0013"];
+    };
 };
 export declare function runTeam(argv: string[]): Promise<import("./shared.ts").CommandResult>;
-export declare function validateTeamPermissionModel(recipe: TeamRecipe, writePaths: string[]): {
+export declare function validateTeamPermissionModel(recipe: TeamRecipe, writePaths: string[], options?: TeamPermissionValidationOptions): {
     ok: boolean;
     findings: PermissionFinding[];
 };

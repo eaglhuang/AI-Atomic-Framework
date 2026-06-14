@@ -103,6 +103,11 @@ export const TEAM_ATOM_BOUNDARIES = {
         anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
         capability: 'Deterministic permission lease validation before team runtime start.',
         downstreamTasks: ['TASK-TEAM-0012']
+    },
+    'team.file-write-scope-validator': {
+        anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
+        capability: 'Deterministic file.write lease scope validation against task allowed files before team runtime start.',
+        downstreamTasks: ['TASK-TEAM-0013']
     }
 };
 const builtInRecipes = [
@@ -302,7 +307,9 @@ async function buildTeamPlanningContext(input) {
         task
     });
     const writePaths = deriveWritePaths(task);
-    const permissionValidation = validateTeamPermissionModel(recipe, writePaths);
+    const permissionValidation = validateTeamPermissionModel(recipe, writePaths, {
+        allowedWritePaths: deriveAllowedWriteScope(task)
+    });
     const parallelFindings = [];
     try {
         const parallelResult = await runTasks([
@@ -452,9 +459,9 @@ function inferTaskLanguage(task) {
         return 'csharp';
     return 'typescript';
 }
-export function validateTeamPermissionModel(recipe, writePaths) {
+export function validateTeamPermissionModel(recipe, writePaths, options = {}) {
     const agentRoles = new Map(recipe.agents.map((agent) => [agent.agentId, agent.role]));
-    return mergeValidation(validateTeamRecipe(recipe, agentRoles), validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths), agentRoles));
+    return mergeValidation(validateTeamRecipe(recipe, agentRoles), validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths), agentRoles, options));
 }
 export function planTeamBrokerLane(input) {
     const brokerLaneResult = evaluateTeamBrokerLane(input);
@@ -506,6 +513,10 @@ function permissionFindingSummary(input) {
                 : 'Scoped permission is missing lease paths.';
         case 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN':
             return 'Write lease targets forbidden runtime paths.';
+        case 'ATM_TEAM_WRITE_SCOPE_OUT_OF_BOUNDS':
+            return 'Write lease includes paths outside the task write scope.';
+        case 'ATM_TEAM_WRITE_SCOPE_TRAVERSAL':
+            return 'Write lease includes unsafe path traversal.';
         case 'ATM_TEAM_PERMISSION_LEASE_CONFLICT':
             return input.permission
                 ? `Exclusive permission lease ${input.permission} has multiple owners.`
@@ -536,6 +547,10 @@ function permissionFindingSuggestedFix(input) {
                 : 'Provide scoped paths for permissions that require a lease boundary.';
         case 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN':
             return 'Remove .atm/runtime/** paths from write leases; runtime state is managed by team start, not leased writes.';
+        case 'ATM_TEAM_WRITE_SCOPE_OUT_OF_BOUNDS':
+            return 'Request a governed scope amendment or remove the path before team start.';
+        case 'ATM_TEAM_WRITE_SCOPE_TRAVERSAL':
+            return 'Use repository-relative paths without .. segments or absolute drive roots.';
         case 'ATM_TEAM_PERMISSION_LEASE_CONFLICT':
             return input.permission
                 ? `Rebuild suggested leases so only one agent owns ${input.permission}.`
@@ -611,10 +626,11 @@ function validateTeamRecipe(recipe, agentRoles) {
         findings
     };
 }
-function validatePermissionLeases(leases, agentRoles) {
+function validatePermissionLeases(leases, agentRoles, options = {}) {
     const permissionDefinitions = new Map(teamPermissionCatalog.map((entry) => [entry.id, entry]));
     const findings = [];
     const ownersByExclusivePermission = new Map();
+    const allowedWritePathSet = new Set((options.allowedWritePaths ?? []).map(normalizeTeamLeasePath).filter(Boolean));
     for (const lease of leases) {
         const definition = permissionDefinitions.get(lease.permission);
         const role = agentRoles.get(lease.agentId);
@@ -645,19 +661,62 @@ function validatePermissionLeases(leases, agentRoles) {
                 role
             }));
         }
-        const forbiddenRuntimePaths = (lease.paths ?? []).filter((entry) => entry.replace(/\\/g, '/').startsWith('.atm/runtime/'));
-        if (forbiddenRuntimePaths.length > 0) {
+        const normalizedLeasePaths = (lease.paths ?? []).map((entry) => ({
+            raw: entry,
+            normalized: normalizeTeamLeasePath(entry)
+        }));
+        const unsafeTraversalPaths = normalizedLeasePaths
+            .filter((entry) => isUnsafeTeamLeasePath(entry.raw, entry.normalized))
+            .map((entry) => entry.raw);
+        if (unsafeTraversalPaths.length > 0) {
             findings.push(buildPermissionFinding({
                 level: 'error',
-                code: 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN',
-                detail: `${lease.permission} cannot lease .atm/runtime/** paths.`,
+                code: 'ATM_TEAM_WRITE_SCOPE_TRAVERSAL',
+                detail: `${lease.permission} cannot lease path traversal or absolute paths: ${unsafeTraversalPaths.join(', ')}`,
                 permission: lease.permission,
                 agentIds: [lease.agentId],
                 role,
-                paths: forbiddenRuntimePaths
+                paths: unsafeTraversalPaths
             }));
         }
+        const forbiddenRuntimePaths = normalizedLeasePaths
+            .filter((entry) => entry.normalized.startsWith('.atm/runtime/') || entry.normalized === '.atm/runtime')
+            .map((entry) => entry.raw);
+        const forbiddenHistoryPaths = normalizedLeasePaths
+            .filter((entry) => entry.normalized.startsWith('.atm/history/') || entry.normalized === '.atm/history')
+            .map((entry) => entry.raw);
+        const forbiddenWritePaths = uniqueStrings([...forbiddenRuntimePaths, ...forbiddenHistoryPaths]);
+        if (forbiddenWritePaths.length > 0) {
+            findings.push(buildPermissionFinding({
+                level: 'error',
+                code: 'ATM_TEAM_WRITE_SCOPE_FORBIDDEN',
+                detail: `${lease.permission} cannot lease ATM managed runtime/history paths: ${forbiddenWritePaths.join(', ')}`,
+                permission: lease.permission,
+                agentIds: [lease.agentId],
+                role,
+                paths: forbiddenWritePaths
+            }));
+        }
+        if (lease.permission === 'file.write' && allowedWritePathSet.size > 0) {
+            const outOfBoundsPaths = normalizedLeasePaths
+                .filter((entry) => entry.normalized && !allowedWritePathSet.has(entry.normalized))
+                .map((entry) => entry.raw);
+            if (outOfBoundsPaths.length > 0) {
+                findings.push(buildPermissionFinding({
+                    level: 'error',
+                    code: 'ATM_TEAM_WRITE_SCOPE_OUT_OF_BOUNDS',
+                    detail: `file.write lease paths are outside task allowedFiles/deliverables: ${outOfBoundsPaths.join(', ')}`,
+                    permission: lease.permission,
+                    agentIds: [lease.agentId],
+                    role,
+                    paths: outOfBoundsPaths
+                }));
+            }
+        }
     }
+    return finalizeLeaseValidation(findings, ownersByExclusivePermission, agentRoles);
+}
+function finalizeLeaseValidation(findings, ownersByExclusivePermission, agentRoles) {
     for (const [permission, owners] of ownersByExclusivePermission.entries()) {
         if (new Set(owners).size > 1) {
             findings.push(buildPermissionFinding({
@@ -674,6 +733,33 @@ function validatePermissionLeases(leases, agentRoles) {
         ok: findings.every((finding) => finding.level !== 'error'),
         findings
     };
+}
+function normalizeTeamLeasePath(value) {
+    const normalized = path.posix.normalize(String(value).trim().replace(/\\/g, '/'));
+    return normalized === '.' ? '' : normalized.replace(/^\.\//, '');
+}
+function isUnsafeTeamLeasePath(rawPath, normalizedPath) {
+    const raw = String(rawPath).trim().replace(/\\/g, '/');
+    return raw.startsWith('/')
+        || /^[A-Za-z]:\//.test(raw)
+        || raw === '..'
+        || raw.startsWith('../')
+        || raw.includes('/../')
+        || normalizedPath === '..'
+        || normalizedPath.startsWith('../');
+}
+function deriveAllowedWriteScope(task) {
+    const explicitAllowed = normalizeStringArray(task.targetAllowedFiles);
+    if (explicitAllowed.length > 0) {
+        return normalizeTaskWriteScope(explicitAllowed);
+    }
+    return normalizeTaskWriteScope([
+        ...normalizeStringArray(task.deliverables),
+        ...normalizeStringArray(task.scopePaths)
+    ]);
+}
+function normalizeTaskWriteScope(paths) {
+    return uniqueStrings(paths.map(normalizeTeamLeasePath).filter(Boolean));
 }
 function mergeValidation(...reports) {
     const findings = reports.flatMap((report) => report.findings);
@@ -1354,8 +1440,8 @@ function deriveWritePaths(task) {
         ...normalizeStringArray(task.scopePaths)
     ];
     return uniqueStrings(candidates.filter((entry) => {
-        const normalized = entry.replace(/\\/g, '/');
-        return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/task-events/');
+        const normalized = normalizeTeamLeasePath(entry);
+        return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
     }));
 }
 function normalizeStringArray(value) {
