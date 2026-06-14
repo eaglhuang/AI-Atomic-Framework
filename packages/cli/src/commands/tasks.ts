@@ -80,6 +80,7 @@ import {
 } from './tasks/scope-lock-diagnostics.ts';
 import {
   buildResidueClassification,
+  type TaskResidueClassification,
   buildResidueDiagnosisEvidenceFromTriangulation,
   type TaskResidueDivergence,
   type TaskResidueLedgerSnapshot,
@@ -394,6 +395,68 @@ function readLastTransitionEventRecord(cwd: string, taskId: string, transitionId
   return JSON.parse(readFileSync(eventPath, 'utf8')) as Record<string, unknown>;
 }
 
+function normalizeParityLifecycleValue(value: string | null): string | null {
+  const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+  return normalized || null;
+}
+
+function isOpenPlanningParityStatus(status: string | null): boolean {
+  if (!status) return false;
+  return ['planned', 'open', 'ready', 'running', 'in_progress', 'review'].includes(status);
+}
+
+function hasOnlyStatusDivergence(divergence: readonly TaskResidueDivergence[]): boolean {
+  return divergence.length > 0 && divergence.every((entry) => entry.field === 'status');
+}
+
+function buildPlanningMirrorParityOverride(input: {
+  taskId: string;
+  liveLedger: TaskResidueLedgerSnapshot;
+  planningFrontmatter: TaskResiduePlanningSnapshot;
+  lastTransitionEvent: TaskResidueTransitionSnapshot | null;
+  divergence: readonly TaskResidueDivergence[];
+}): {
+    residueClassification: TaskResidueClassification;
+    recommendation: string | null;
+  } | null {
+  if (!hasOnlyStatusDivergence(input.divergence)) return null;
+  const liveStatus = normalizeParityLifecycleValue(input.liveLedger.status);
+  const planningStatus = normalizeParityLifecycleValue(input.planningFrontmatter.status);
+  if (!isOpenPlanningParityStatus(liveStatus) || !isOpenPlanningParityStatus(planningStatus)) {
+    return null;
+  }
+  const claimState = normalizeParityLifecycleValue(input.liveLedger.claimState);
+  const lastAction = normalizeParityLifecycleValue(input.lastTransitionEvent?.action ?? null);
+  const activeClaimLane = claimState === 'active' || lastAction === 'claim';
+  const releasedPredecessorLane = claimState === 'released' || lastAction === 'release';
+  if (!activeClaimLane && !releasedPredecessorLane) {
+    return null;
+  }
+  const uniqueLaneStatus = activeClaimLane
+    ? {
+      truth: 'planning mirror is stale, but the active live claim already defines a unique governed lane',
+      residue: 'Planning-mirror parity drift is advisory while the active claim remains authoritative.',
+      reason: 'The live ledger claim state already identifies the governed operator lane, so the stale planning status should not force import repair or ambiguous-manual-review.'
+    }
+    : {
+      truth: 'planning mirror is stale, but the live ledger already records an intentional release or supersede lane',
+      residue: 'The predecessor task was intentionally released or superseded, so parity drift is advisory rather than repairable by import by default.',
+      reason: 'The live ledger already records a unique non-claim operator story, so the stale planning status should not push the operator back through tasks import.'
+    };
+  return {
+    residueClassification: {
+      bucket: 'no-residue',
+      truth: uniqueLaneStatus.truth,
+      residue: uniqueLaneStatus.residue,
+      reason: uniqueLaneStatus.reason,
+      nextCommandTemplate: 'node atm.mjs tasks status --task <id> --json',
+      nextCommand: `node atm.mjs tasks status --task ${input.taskId} --json`,
+      autoMutationAllowed: false
+    },
+    recommendation: null
+  };
+}
+
 function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument: Record<string, unknown>): TaskStatusTriangulation {
   const claim = parseClaimRecord(taskDocument.claim);
   const liveLedger: TaskResidueLedgerSnapshot = {
@@ -449,7 +512,16 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
     lastTransitionEvent,
     divergence
   });
-  const recommendation = divergence.length > 0
+  const parityOverride = buildPlanningMirrorParityOverride({
+    taskId,
+    liveLedger,
+    planningFrontmatter,
+    lastTransitionEvent,
+    divergence
+  });
+  const recommendation = parityOverride
+    ? parityOverride.recommendation
+    : divergence.length > 0
     ? (planningFrontmatter.status === 'done' && liveLedger.status !== 'done'
       ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
       : `node atm.mjs tasks import --from <plan.md> --write --json`)
@@ -461,7 +533,7 @@ function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument:
     planningFrontmatter,
     divergence,
     recommendation,
-    residueClassification
+    residueClassification: parityOverride?.residueClassification ?? residueClassification
   };
 }
 

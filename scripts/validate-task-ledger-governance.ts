@@ -2238,6 +2238,82 @@ async function validateTaskResidueClassification(tempRoot: string) {
   const ambiguousResidue = ambiguousStatus.evidence.residueClassification as any;
   assert(ambiguousResidue.bucket === 'ambiguous-manual-review', 'ambiguous-manual-review bucket must be reported');
   assert(String(ambiguousResidue.nextCommand).includes('tasks status'), 'ambiguous-manual-review next command must point to status');
+
+  const activeClaimTaskId = 'TASK-RESIDUE-0007';
+  const activeClaimPlanPath = writePlanningCard('docs/fixtures/residue-active-claim.task.md', activeClaimTaskId, 'planned');
+  const activeClaimTransitionId = '2026-06-14T00-00-00-000Z-claim-fixture';
+  mkdirSync(path.join(repo, '.atm', 'history', 'task-events', activeClaimTaskId), { recursive: true });
+  writeJson(path.join(repo, '.atm', 'history', 'task-events', activeClaimTaskId, `${activeClaimTransitionId}.json`), {
+    action: 'claim',
+    actorId: 'fixture-agent',
+    createdAt: '2026-06-14T00:00:00.000Z',
+    fromStatus: 'open',
+    toStatus: 'running'
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${activeClaimTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: activeClaimTaskId,
+    title: 'Active claim parity fixture',
+    status: 'running',
+    lastTransitionId: activeClaimTransitionId,
+    claim: {
+      actorId: 'fixture-agent',
+      leaseId: 'lease-0007',
+      claimedAt: '2026-06-14T00:00:00.000Z',
+      heartbeatAt: '2026-06-14T00:00:00.000Z',
+      state: 'active',
+      files: ['.atm/history/tasks/TASK-RESIDUE-0007.json']
+    },
+    source: {
+      planPath: activeClaimPlanPath,
+      sectionTitle: activeClaimTaskId,
+      headingLine: 1,
+      hash: 'active-claim-parity'
+    }
+  });
+  const activeClaimStatus = await runTasks(['status', '--cwd', repo, '--task', activeClaimTaskId, '--json']);
+  assert(activeClaimStatus.ok === true, 'active-claim parity status must succeed');
+  const activeClaimResidue = activeClaimStatus.evidence.residueClassification as any;
+  assert(activeClaimResidue.bucket === 'no-residue', 'active-claim parity must downgrade stale planning drift to no-residue');
+  assert(activeClaimStatus.evidence.recommendation === null, 'active-claim parity must not recommend redundant import repair');
+
+  const releasedTaskId = 'TASK-RESIDUE-0008';
+  const releasedPlanPath = writePlanningCard('docs/fixtures/residue-released.task.md', releasedTaskId, 'planned');
+  const releasedTransitionId = '2026-06-14T00-00-00-000Z-release-fixture';
+  mkdirSync(path.join(repo, '.atm', 'history', 'task-events', releasedTaskId), { recursive: true });
+  writeJson(path.join(repo, '.atm', 'history', 'task-events', releasedTaskId, `${releasedTransitionId}.json`), {
+    action: 'release',
+    actorId: 'fixture-agent',
+    createdAt: '2026-06-14T00:00:00.000Z',
+    fromStatus: 'running',
+    toStatus: 'open'
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${releasedTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: releasedTaskId,
+    title: 'Released predecessor parity fixture',
+    status: 'open',
+    lastTransitionId: releasedTransitionId,
+    claim: {
+      actorId: 'fixture-agent',
+      leaseId: 'lease-0008',
+      claimedAt: '2026-06-14T00:00:00.000Z',
+      heartbeatAt: '2026-06-14T00:00:00.000Z',
+      state: 'released',
+      files: ['.atm/history/tasks/TASK-RESIDUE-0008.json']
+    },
+    source: {
+      planPath: releasedPlanPath,
+      sectionTitle: releasedTaskId,
+      headingLine: 1,
+      hash: 'released-parity'
+    }
+  });
+  const releasedStatus = await runTasks(['status', '--cwd', repo, '--task', releasedTaskId, '--json']);
+  assert(releasedStatus.ok === true, 'released predecessor parity status must succeed');
+  const releasedResidue = releasedStatus.evidence.residueClassification as any;
+  assert(releasedResidue.bucket === 'no-residue', 'released predecessor parity must not report ambiguous-manual-review');
+  assert(releasedStatus.evidence.recommendation === null, 'released predecessor parity must not recommend import repair by default');
 }
 
 async function validateTaskflowCloseOrchestration(tempRoot: string) {
@@ -2309,6 +2385,57 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(plannedDryRun.ok === true, 'taskflow close dry-run must accept active target plus planned planning mirror');
   assert(plannedDryRun.evidence.closeMode === 'normal-close', 'active target plus planned planning mirror must not route to ambiguous manual review');
   assert(plannedDryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'active target plus planned planning mirror must use tasks-close backend');
+
+  const claimedParityTaskId = 'TASK-CLOSE-ORCH-0003';
+  const claimedParityPlanRelativePath = 'docs/tasks/TASK-CLOSE-ORCH-0003.task.md';
+  writeFileSync(path.join(repo, claimedParityPlanRelativePath), [
+    '---',
+    `task_id: ${claimedParityTaskId}`,
+    'title: "Taskflow close claimed parity fixture"',
+    'status: planned',
+    '---',
+    `# ${claimedParityTaskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  const claimedParityTransitionId = '2026-06-14T00-00-00-000Z-claim-fixture';
+  mkdirSync(path.join(repo, '.atm', 'history', 'task-events', claimedParityTaskId), { recursive: true });
+  writeJson(path.join(repo, '.atm', 'history', 'task-events', claimedParityTaskId, `${claimedParityTransitionId}.json`), {
+    action: 'claim',
+    actorId: 'validator',
+    createdAt: '2026-06-14T00:00:00.000Z',
+    fromStatus: 'open',
+    toStatus: 'running'
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${claimedParityTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: claimedParityTaskId,
+    title: 'Taskflow close claimed parity fixture',
+    status: 'running',
+    related_plan: claimedParityPlanRelativePath,
+    lastTransitionId: claimedParityTransitionId,
+    claim: {
+      actorId: 'validator',
+      leaseId: 'lease-close-0003',
+      claimedAt: '2026-06-14T00:00:00.000Z',
+      heartbeatAt: '2026-06-14T00:00:00.000Z',
+      state: 'active',
+      files: ['.atm/history/tasks/TASK-CLOSE-ORCH-0003.json']
+    },
+    source: { planPath: claimedParityPlanRelativePath, sectionTitle: claimedParityTaskId, headingLine: 1, hash: 'taskflow-close-claimed-parity' }
+  });
+  const claimedParityDryRun = await runTaskflow([
+    'close',
+    '--cwd', repo,
+    '--task', claimedParityTaskId,
+    '--actor', 'validator',
+    '--profile', governedProfilePath,
+    '--historical-delivery', '0123456789abcdef',
+    '--json'
+  ]) as any;
+  assert(claimedParityDryRun.ok === true, 'claimed parity dry-run must succeed');
+  assert(claimedParityDryRun.evidence.closeMode === 'normal-close', 'claimed parity dry-run must keep the normal close lane');
+  assert(claimedParityDryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'claimed parity dry-run must keep tasks-close backend');
+  assert(claimedParityDryRun.evidence.residueDiagnosis.bucket === 'no-residue', 'claimed parity dry-run must not surface ambiguous-manual-review solely due to planned mirror drift');
 
   const claimBlockedTaskId = 'TASK-CLOSE-ORCH-0004';
   const claimBlockedPlanRelativePath = 'docs/tasks/TASK-CLOSE-ORCH-0004.task.md';
