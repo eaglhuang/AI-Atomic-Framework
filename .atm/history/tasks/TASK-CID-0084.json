@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0084",
+  "title": "Planning mirror claim/import parity and false ambiguous residue hardening",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-CID-0086"
+  ],
+  "acceptance": [
+    "A claimed imported CID task does not trigger false planning-mirror ambiguity",
+    "Status guidance no longer recommends redundant `tasks import --write` for this",
+    "Regression coverage proves the planning-mirror divergence is either repaired",
+    "Regression coverage also proves that a superseded or intentionally released"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run build",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing planning close authority rules",
+    "Broad task-card authoring refactors unrelated to parity diagnostics"
+  ],
+  "nonGoals": [
+    "Do not mask real close blockers by suppressing residue blindly.",
+    "Do not require operators to re-import already claimed tasks just to clear false ambiguity."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if planning-mirror parity logic starts mutating adopter task cards outside governed taskflow/task import lanes.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.planning-mirror-claim-parity",
+    "mapUpdates": [
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0084-planning-mirror-claim-import-parity-and-false-ambiguous-residue-hardening.task.md",
+    "sectionTitle": "TASK-CID-0084",
+    "headingLine": 48,
+    "hash": "41d2c9f40335d634"
+  },
+  "importedAt": "2026-06-14T05:30:37.127Z",
+  "lastTransitionId": "2026-06-14T05-34-41-705Z-close-59378c4cf083",
+  "lastTransitionAt": "2026-06-14T05:34:41.705Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-14T05:30:43.478Z",
+  "promotedAt": "2026-06-14T05:30:43.481Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-1732b299b354",
+    "claimedAt": "2026-06-14T05:30:43.484Z",
+    "heartbeatAt": "2026-06-14T05:34:41.702Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0084.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-14T05:30:43.484Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260614053043-captain-TASK-CID-0084-6cd04da019",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0084",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0084.*",
+      ".atm/history/task-events/TASK-CID-0084/**",
+      ".atm/history/tasks/TASK-CID-0084.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8f25f84510ea49d67891cfcd408be720a7a02d738cce19a7909fb121f4d8cce6",
+    "actorId": "captain",
+    "createdAt": "2026-06-14T05:30:43.506Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-14T05:34:41.702Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260614053043-captain-TASK-CID-0084-6cd04da019",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0084.closure-packet.json"
+}
