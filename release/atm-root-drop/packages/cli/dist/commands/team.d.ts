@@ -33,6 +33,29 @@ type TeamCrewRole = {
     permissions: string[];
     description: string;
 };
+type TeamImplementerSelector = {
+    schemaId: 'atm.teamImplementerSelector.v1';
+    selectedImplementer: {
+        agentId: string;
+        role: string;
+        profile?: string;
+        language?: string;
+        recipeId: string;
+    };
+    languageMatch: 'typescript' | 'python' | 'unknown';
+    roleMatch: 'typescript-implementer' | 'python-implementer' | 'ui-implementer' | 'generic-implementer';
+    fallbackReason: string;
+    confidence: 'low' | 'medium' | 'high';
+    deterministicHints: {
+        scopePaths: string[];
+        deliverables: string[];
+        fileExtensions: string[];
+        pathHints: string[];
+        pythonHeavy: boolean;
+        typescriptHeavy: boolean;
+        uiPaths: boolean;
+    };
+};
 export declare const TEAM_ATOM_BOUNDARIES: {
     readonly 'team.cli-entry': {
         readonly anchor: "packages/cli/src/commands/team.ts#runTeam";
@@ -68,6 +91,11 @@ export declare const TEAM_ATOM_BOUNDARIES: {
         readonly anchor: "packages/cli/src/commands/team.ts#buildCaptainDecision";
         readonly capability: "Captain decision dry-run output for team sizing, required roles, confidence, and stop conditions.";
         readonly downstreamTasks: readonly ["TASK-TEAM-0007"];
+    };
+    readonly 'team.implementer-selector': {
+        readonly anchor: "packages/cli/src/commands/team.ts#selectTeamImplementer";
+        readonly capability: "Deterministic implementer selector for Team Agents based on task paths, deliverables, language hints, and safe generic fallback.";
+        readonly downstreamTasks: readonly ["TASK-TEAM-0010"];
     };
     readonly 'team.start-runtime-state': {
         readonly anchor: "packages/cli/src/commands/team.ts#writeTeamRun";
@@ -133,6 +161,7 @@ declare function buildTeamPlan(input: {
         optionalRoles: string[];
         reason: string;
         confidence: string;
+        implementerSelector: TeamImplementerSelector;
         stopConditions: string[];
         escalationRequired: boolean;
         escalationReason: string;
@@ -180,6 +209,7 @@ declare function buildTeamPlan(input: {
             authorityChain: string;
         };
     };
+    implementerSelector: TeamImplementerSelector;
     requiredRoles: TeamCrewRole[];
     optionalRoles: TeamCrewRole[];
     briefingContract: {
@@ -252,6 +282,7 @@ declare function buildTeamPlan(input: {
         findings: PermissionFinding[];
     };
 };
+export declare function selectTeamImplementer(task: any, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector;
 export declare function assessLieutenantEscalation(task: any, writePaths: string[], validation: {
     ok: boolean;
     findings: PermissionFinding[];

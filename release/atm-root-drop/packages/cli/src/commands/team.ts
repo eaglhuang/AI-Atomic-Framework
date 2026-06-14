@@ -65,6 +65,30 @@ type TeamCrewRole = {
   description: string;
 };
 
+type TeamImplementerSelector = {
+  schemaId: 'atm.teamImplementerSelector.v1';
+  selectedImplementer: {
+    agentId: string;
+    role: string;
+    profile?: string;
+    language?: string;
+    recipeId: string;
+  };
+  languageMatch: 'typescript' | 'python' | 'unknown';
+  roleMatch: 'typescript-implementer' | 'python-implementer' | 'ui-implementer' | 'generic-implementer';
+  fallbackReason: string;
+  confidence: 'low' | 'medium' | 'high';
+  deterministicHints: {
+    scopePaths: string[];
+    deliverables: string[];
+    fileExtensions: string[];
+    pathHints: string[];
+    pythonHeavy: boolean;
+    typescriptHeavy: boolean;
+    uiPaths: boolean;
+  };
+};
+
 const teamPermissionCatalog: TeamPermissionDefinition[] = [
   { id: 'task.lifecycle', mode: 'exclusive' },
   { id: 'git.write', mode: 'exclusive' },
@@ -125,6 +149,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team.ts#buildCaptainDecision',
     capability: 'Captain decision dry-run output for team sizing, required roles, confidence, and stop conditions.',
     downstreamTasks: ['TASK-TEAM-0007']
+  },
+  'team.implementer-selector': {
+    anchor: 'packages/cli/src/commands/team.ts#selectTeamImplementer',
+    capability: 'Deterministic implementer selector for Team Agents based on task paths, deliverables, language hints, and safe generic fallback.',
+    downstreamTasks: ['TASK-TEAM-0010']
   },
   'team.start-runtime-state': {
     anchor: 'packages/cli/src/commands/team.ts#writeTeamRun',
@@ -687,7 +716,8 @@ function buildTeamPlan(input: {
 }) {
   const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
   const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
-  const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist);
+  const implementerSelector = selectTeamImplementer(input.task, input.recipe, input.writePaths);
+  const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector);
   return {
     schemaId: 'atm.teamPlan.v1',
     recipeId: input.recipe.recipeId,
@@ -695,6 +725,7 @@ function buildTeamPlan(input: {
     brokerLane: input.brokerLane,
     agents: input.recipe.agents,
     captainDecision,
+    implementerSelector,
     requiredRoles: crewBriefingContract.requiredRoles,
     optionalRoles: crewBriefingContract.optionalRoles,
     briefingContract: crewBriefingContract,
@@ -720,7 +751,8 @@ function buildCaptainDecision(
   validation: { ok: boolean; findings: PermissionFinding[] },
   brokerLane: TeamBrokerLaneEvidence,
   crewBriefingContract: ReturnType<typeof buildMinimalTaskCrewBriefingContract>,
-  atomizationChecklist: ReturnType<typeof buildAtomizationChecklist>
+  atomizationChecklist: ReturnType<typeof buildAtomizationChecklist>,
+  implementerSelector: TeamImplementerSelector
 ) {
   const sizing = decideTeamSizing(task, writePaths, validation, brokerLane);
   const lieutenantEscalation = assessLieutenantEscalation(task, writePaths, validation, brokerLane, atomizationChecklist);
@@ -745,6 +777,7 @@ function buildCaptainDecision(
     optionalRoles: crewBriefingContract.optionalRoles.map((role) => role.role),
     reason: sizing.reason,
     confidence: sizing.confidence,
+    implementerSelector,
     stopConditions: crewBriefingContract.stopConditions,
     escalationRequired: lieutenantEscalation.escalationRequired,
     escalationReason: lieutenantEscalation.escalationReason,
@@ -760,6 +793,180 @@ function buildCaptainDecision(
       authorityChain: 'Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them.'
     }
   };
+}
+
+export function selectTeamImplementer(task: any, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector {
+  const deterministicHints = collectImplementerHints(task, writePaths);
+  const implementers = recipe.agents
+    .filter((agent) => isImplementerAgent(agent))
+    .sort((left, right) => left.agentId.localeCompare(right.agentId));
+  const pythonImplementers = implementers.filter((agent) => matchesImplementerLanguage(agent, 'python'));
+  const typescriptImplementers = implementers.filter((agent) => matchesImplementerLanguage(agent, 'typescript'));
+  const uiImplementers = implementers.filter((agent) => matchesUiImplementer(agent));
+
+  const selected = pickImplementerCandidate({
+    implementers,
+    pythonImplementers,
+    typescriptImplementers,
+    uiImplementers,
+    deterministicHints,
+    recipeId: recipe.recipeId
+  });
+
+  return {
+    schemaId: 'atm.teamImplementerSelector.v1',
+    ...selected,
+    deterministicHints
+  };
+}
+
+function pickImplementerCandidate(input: {
+  implementers: TeamRecipeAgent[];
+  pythonImplementers: TeamRecipeAgent[];
+  typescriptImplementers: TeamRecipeAgent[];
+  uiImplementers: TeamRecipeAgent[];
+  deterministicHints: TeamImplementerSelector['deterministicHints'] & {
+    pythonHeavy: boolean;
+    typescriptHeavy: boolean;
+    uiPaths: boolean;
+  };
+  recipeId: string;
+}) {
+  const { deterministicHints, recipeId } = input;
+  const genericImplementer = input.implementers.find((agent) => agent.language === 'generic') ?? {
+    agentId: 'implementer-generic',
+    role: 'implementer',
+    profile: 'atm.implementer.generic.v1',
+    language: 'generic',
+    permissions: ['file.write']
+  };
+
+  if (deterministicHints.pythonHeavy && input.pythonImplementers.length > 0) {
+    return buildSelectorResult(input.pythonImplementers[0], recipeId, 'python', 'python-implementer', 'No fallback needed; Python-heavy paths matched a Python implementer.', 'high');
+  }
+
+  if (deterministicHints.uiPaths && input.uiImplementers.length > 0) {
+    return buildSelectorResult(input.uiImplementers[0], recipeId, inferSelectorLanguage(input.uiImplementers[0]), 'ui-implementer', 'No fallback needed; adopter UI path hints matched a UI-oriented implementer.', input.uiImplementers[0].language ? 'high' : 'medium');
+  }
+
+  if (deterministicHints.typescriptHeavy && input.typescriptImplementers.length > 0) {
+    return buildSelectorResult(input.typescriptImplementers[0], recipeId, 'typescript', 'typescript-implementer', 'No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.', 'high');
+  }
+
+  const fallbackRoleMatch = deterministicHints.uiPaths
+    ? 'ui-implementer'
+    : deterministicHints.pythonHeavy
+      ? 'python-implementer'
+      : deterministicHints.typescriptHeavy
+        ? 'typescript-implementer'
+        : 'generic-implementer';
+
+  const fallbackReason = deterministicHints.pythonHeavy
+    ? `Python-heavy paths were detected, but the selected recipe only exposed ${genericImplementer.agentId} as the available implementer.`
+    : deterministicHints.uiPaths
+      ? `Adopter UI path hints were detected, but the selected recipe only exposed ${genericImplementer.agentId} as the available implementer.`
+      : deterministicHints.typescriptHeavy
+        ? `TypeScript-heavy paths were detected, but the selected recipe only exposed ${genericImplementer.agentId} as the available implementer.`
+        : `No specific language or UI hint dominated, so ${genericImplementer.agentId} was selected as the generic implementer.`;
+
+  return buildSelectorResult(
+    genericImplementer,
+    recipeId,
+    inferSelectorLanguage(genericImplementer),
+    fallbackRoleMatch,
+    fallbackReason,
+    deterministicHints.pythonHeavy || deterministicHints.typescriptHeavy || deterministicHints.uiPaths ? 'medium' : 'low'
+  );
+}
+
+function buildSelectorResult(
+  agent: TeamRecipeAgent,
+  recipeId: string,
+  languageMatch: TeamImplementerSelector['languageMatch'],
+  roleMatch: TeamImplementerSelector['roleMatch'],
+  fallbackReason: string,
+  confidence: TeamImplementerSelector['confidence']
+) {
+  return {
+    selectedImplementer: {
+      agentId: agent.agentId,
+      role: agent.role,
+      profile: agent.profile,
+      language: agent.language,
+      recipeId
+    },
+    languageMatch,
+    roleMatch,
+    fallbackReason,
+    confidence
+  };
+}
+
+function collectImplementerHints(task: any, writePaths: string[]) {
+  const scopePaths = uniqueStrings([
+    ...normalizeStringArray(task?.scopePaths),
+    ...normalizeStringArray(task?.targetAllowedFiles),
+    ...writePaths
+  ]);
+  const deliverables = uniqueStrings(normalizeStringArray(task?.deliverables));
+  const allPaths = uniqueStrings([...scopePaths, ...deliverables]);
+  const fileExtensions = uniqueStrings(
+    allPaths
+      .map((entry) => path.posix.extname(entry.replace(/\\/g, '/')).toLowerCase())
+      .filter(Boolean)
+  );
+  const pathHints = uniqueStrings([
+    ...(allPaths.some((entry) => /\.pyi?$/i.test(entry)) ? ['python-heavy'] : []),
+    ...(allPaths.some((entry) => /\.(ts|tsx|mts|cts)$/i.test(entry)) ? ['typescript-heavy'] : []),
+    ...(allPaths.some((entry) => /(^|\/)(ui|editor|panel|view|scene|adopter|components?)(\/|$)/i.test(entry)) ? ['adopter-ui'] : []),
+    ...pathHintsFromPaths(allPaths)
+  ]);
+  return {
+    scopePaths,
+    deliverables,
+    fileExtensions,
+    pathHints,
+    pythonHeavy: allPaths.some((entry) => /\.pyi?$/i.test(entry)),
+    typescriptHeavy: allPaths.some((entry) => /\.(ts|tsx|mts|cts)$/i.test(entry)),
+    uiPaths: allPaths.some((entry) => /(^|\/)(ui|editor|panel|view|scene|adopter|components?)(\/|$)/i.test(entry))
+  };
+}
+
+function pathHintsFromPaths(paths: string[]) {
+  const hints: string[] = [];
+  for (const entry of paths) {
+    const normalized = entry.replace(/\\/g, '/').toLowerCase();
+    if (normalized.includes('/packages/cli/src/commands/')) hints.push('cli-command-surface');
+    if (normalized.includes('/scripts/')) hints.push('script-surface');
+    if (normalized.includes('/assets/')) hints.push('asset-surface');
+    if (normalized.includes('/ui/') || normalized.includes('/editor/')) hints.push('adopter-ui');
+    if (normalized.endsWith('.py') || normalized.endsWith('.pyi')) hints.push('python-file');
+    if (normalized.endsWith('.ts') || normalized.endsWith('.tsx') || normalized.endsWith('.mts') || normalized.endsWith('.cts')) hints.push('typescript-file');
+  }
+  return hints;
+}
+
+function isImplementerAgent(agent: TeamRecipeAgent) {
+  return /implementer/i.test(agent.role)
+    || /implementer/i.test(agent.agentId)
+    || /implementer/i.test(agent.profile ?? '')
+    || agent.permissions.includes('file.write');
+}
+
+function matchesImplementerLanguage(agent: TeamRecipeAgent, language: 'typescript' | 'python') {
+  const value = [agent.language, agent.profile, agent.agentId, agent.role].filter(Boolean).join(' ').toLowerCase();
+  return value.includes(language);
+}
+
+function matchesUiImplementer(agent: TeamRecipeAgent) {
+  const value = [agent.role, agent.profile, agent.agentId].filter(Boolean).join(' ').toLowerCase();
+  return value.includes('ui') || value.includes('editor');
+}
+
+function inferSelectorLanguage(agent: TeamRecipeAgent) {
+  if (matchesImplementerLanguage(agent, 'python')) return 'python' as const;
+  if (matchesImplementerLanguage(agent, 'typescript')) return 'typescript' as const;
+  return 'unknown' as const;
 }
 
 export function assessLieutenantEscalation(

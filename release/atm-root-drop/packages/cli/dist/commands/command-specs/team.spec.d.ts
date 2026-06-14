@@ -26,6 +26,10 @@ export declare const teamSpecPlanResolver: {
     summary: string;
     examples: string[];
 };
+export declare const teamSpecRoleSelector: {
+    summary: string;
+    examples: string[];
+};
 export declare const teamSpecPermissionValidation: {
     summary: string;
     examples: string[];
