@@ -56,8 +56,9 @@ export const teamSpecRoleSelector = {
 };
 
 export const teamSpecPermissionValidation = {
-  summary: 'Validate recipe permissions and scoped leases before team start (TASK-TEAM-0012 owns structured permission lease findings).',
+  summary: 'Validate recipe permissions and scoped file.write leases before team start (TASK-TEAM-0012 owns structured permission lease findings; TASK-TEAM-0013 owns file.write scope checks).',
   examples: [
+    'node atm.mjs team validate --task TASK-TEAM-0013 --json',
     'node atm.mjs team validate --task TASK-TEAM-0012 --json',
     'node atm.mjs team validate --task TASK-AAO-0005 --recipe atm.default.normal.typescript --json'
   ]
