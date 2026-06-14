@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0085",
   "title": "Historical-delivery close evidence-context deadlock hardening successor lane",
-  "status": "running",
+  "status": "abandoned",
   "milestone": "M17",
   "dependencies": [],
   "acceptance": [
@@ -64,8 +64,8 @@
     "hash": "b65c024d6ed09637"
   },
   "importedAt": "2026-06-14T04:56:32.125Z",
-  "lastTransitionId": "2026-06-14T04-56-32-922Z-claim-ac2217909f3d",
-  "lastTransitionAt": "2026-06-14T04:56:32.922Z",
+  "lastTransitionId": "2026-06-14T05-25-51-167Z-abandon-63142d6dbd60",
+  "lastTransitionAt": "2026-06-14T05:25:51.167Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-14T04:56:32.886Z",
@@ -74,7 +74,7 @@
     "actorId": "captain",
     "leaseId": "lease-c05906faf082",
     "claimedAt": "2026-06-14T04:56:32.894Z",
-    "heartbeatAt": "2026-06-14T04:56:32.894Z",
+    "heartbeatAt": "2026-06-14T05:07:46.093Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0085.json",
@@ -85,8 +85,8 @@
       "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
       "scripts/validate-task-ledger-governance.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "superseded by TASK-CID-0086 because focused regression file must be first-class deliverable"
   },
   "startedAt": "2026-06-14T04:56:32.894Z",
   "startedByActor": "captain",
@@ -117,5 +117,9 @@
     "actorId": "captain",
     "createdAt": "2026-06-14T04:56:32.920Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-14T05:25:51.165Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260614045632-captain-TASK-CID-0085-18b060f55a",
+  "closeReason": "superseded by TASK-CID-0086 after focused regression deliverable became first-class scope"
 }

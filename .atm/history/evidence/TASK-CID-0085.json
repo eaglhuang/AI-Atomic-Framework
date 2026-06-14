@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-CID-0085",
-  "updatedAt": "2026-06-14T05:04:31.528Z",
+  "updatedAt": "2026-06-14T05:07:09.377Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -206,6 +206,48 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:daece3b18d3b93c0360129d7fda67e820b2d200c56b7f59e871a04687b3e50aa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260614045632-captain-TASK-CID-0085-18b060f55a",
+      "createdAt": "2026-06-14T05:07:09.377Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260614045632-captain-TASK-CID-0085-18b060f55a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5faac3e6b079f6277eba66ef04636bd46563a3d91ccb79a076789e6cb97afc81",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:e720c348604612e1c6f33d9d081f810ab137ca1cbcefff9072cebdf959d8fa5e",
+            "cached": false,
+            "generatedAt": "2026-06-14T05:07:09.426Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:87f1d8b7469cab5efdee8822b1287f1613ea26fbcce52eb8b7c601e0adf1b8b9",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
