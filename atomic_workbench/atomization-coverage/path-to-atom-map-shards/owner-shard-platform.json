@@ -27,6 +27,97 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "docs/governance/team-agents/templates/agent-report-template.md",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "Canonical agent report template for role, status, files read/changed, commands, findings, blockers, and recommendation",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0004"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/templates/team-brief-template.md",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "Canonical team brief template for task, captain, scope, atomization plan, validation, evidence, and stop conditions",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0004"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/templates/team-summary-template.md",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "Canonical team summary template for decision, implementation summary, validators, evidence, risk, and close-ready status",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0004"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/templates/patrol-report-template.md",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "Canonical patrol report template for read-only patrol scope, validation plan, evidence plan, and closeout-ready status",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0006"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/templates/captain-decision-template.md",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "Canonical captain decision template for explicit target, scope family, allowed files, forbidden scope, acceptance, and handoff",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0005"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/templates/team-memory-shard-template.md",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "Canonical team memory shard template for retained operational memory, validation, and retention rules",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0005"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents-templates.ts",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "Deterministic validator for Team Agents templates and schema contracts, covering TASK-TEAM-0004/0005/0006 template sections and TASK-TEAM-0017 JSON Schema / fixture validation",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0017"
+    },
+    {
+      "path_pattern": "schemas/team-agents/team-brief.schema.json",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "JSON Schema contract for Team brief records, including scope boundaries and Atomization Plan nine-field coverage",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0017"
+    },
+    {
+      "path_pattern": "schemas/team-agents/agent-report.schema.json",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "JSON Schema contract for bounded agent reports, status, files read/changed, commands, findings, blockers, recommendation, and handoff",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0017"
+    },
+    {
+      "path_pattern": "schemas/team-agents/team-summary.schema.json",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "JSON Schema contract for Team summary close-readiness records, validators, evidence, implementation summary, and risk",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0017"
+    },
+    {
+      "path_pattern": "schemas/team-agents/captain-decision.schema.json",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "JSON Schema contract for advisory Captain decisions, options, chosen option, reason, risk, lieutenant need, and next team shape",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0017"
+    },
+    {
+      "path_pattern": "schemas/team-agents/team-memory-shard.schema.json",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "JSON Schema contract for advisory-only Team memory shards with retrieval metadata that must not become task truth or evidence authority",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0017"
+    },
+    {
+      "path_pattern": "schemas/team-agents/patrol-report.schema.json",
+      "atom_id": "atm.team-agents-template-map",
+      "capability": "JSON Schema contract for read-only patrol reports, including explicit source-write prohibition without a separate task card",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0017"
+    },
+    {
       "path_pattern": "integrations/claude/**",
       "atom_id": "atom-claude-adapter",
       "capability": "Claude editor integration",

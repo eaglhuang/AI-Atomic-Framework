@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/patrol-report.schema.json",
+  "title": "PatrolReport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task", "captain", "patrolScope", "patrolPlan", "validationPlan", "evidencePlan", "stopConditions", "workerReport", "readOnly"],
+  "properties": {
+    "task": { "type": "string", "minLength": 1 },
+    "captain": { "type": "string", "minLength": 1 },
+    "patrolScope": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "patrolPlan": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "validationPlan": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "evidencePlan": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "stopConditions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "workerReport": { "type": "string", "minLength": 1 },
+    "readOnly": { "const": true },
+    "writePermissionRequired": { "const": true },
+    "mustNotWriteSourceWithoutTaskCard": { "const": true }
+  }
+}

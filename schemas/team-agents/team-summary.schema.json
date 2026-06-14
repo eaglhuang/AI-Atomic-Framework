@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/team-summary.schema.json",
+  "title": "TeamSummary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision", "implementationSummary", "validators", "evidence", "risk", "closeReady"],
+  "properties": {
+    "decision": { "type": "string", "minLength": 1 },
+    "implementationSummary": { "type": "string", "minLength": 1 },
+    "validators": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "evidence": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "risk": { "enum": ["low", "medium", "high"] },
+    "closeReady": { "type": "boolean" }
+  }
+}

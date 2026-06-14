@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/team-memory-shard.schema.json",
+  "title": "TeamMemoryShard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "knowledgeScope",
+    "repoId",
+    "pathHints",
+    "relatedAtoms",
+    "relatedValidators",
+    "symptom",
+    "lesson",
+    "reuse",
+    "avoid",
+    "freshness",
+    "retentionClass",
+    "advisoryOnly"
+  ],
+  "properties": {
+    "knowledgeScope": { "type": "string", "minLength": 1 },
+    "repoId": { "type": "string", "minLength": 1 },
+    "pathHints": { "type": "array", "items": { "type": "string" } },
+    "relatedAtoms": { "type": "array", "items": { "type": "string" } },
+    "relatedValidators": { "type": "array", "items": { "type": "string" } },
+    "symptom": { "type": "string", "minLength": 1 },
+    "lesson": { "type": "string", "minLength": 1 },
+    "reuse": { "type": "string", "minLength": 1 },
+    "avoid": { "type": "string", "minLength": 1 },
+    "freshness": { "enum": ["fresh", "stale", "unknown"] },
+    "retentionClass": { "enum": ["short", "medium", "long"] },
+    "advisoryOnly": { "const": true },
+    "notTaskTruth": { "const": true },
+    "notEvidenceAuthority": { "const": true }
+  }
+}

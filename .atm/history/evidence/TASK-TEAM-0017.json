@@ -1,0 +1,384 @@
+{
+  "taskId": "TASK-TEAM-0017",
+  "updatedAt": "2026-06-14T13:42:44.783Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:37:51.742Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:37:51.797Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:75714795bdec021f1f7538186e125b5e5e32d8d1ec2978a67810b0b21737a4d1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate cli passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:38:11.155Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:38:11.209Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:44b02913a592846949b9a498baf0380ae4ceac9d2e0773419809c152ec92e5e1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "team agents schema and fixture validator passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:38:12.122Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:team-agents-templates"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-team-agents-templates.ts --fixtures",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c506920dc618bdcc54ae467c8922f93302df983038effac3c2b427fc86fdaced",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:team-agents-templates"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:2a16ef6881350df54134590533581e77bfc3e2199a79275953bdd865b73ffebf",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:38:12.182Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:97e3f6aaec07cb3fc0924cd0249d73a69fbb3fb39c501413cb4af62fd2500c5f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git diff check passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:38:12.950Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:38:13.032Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:132c480bd9260b4f90f15ef5544eb5dfcc3bb4c071e10b78a6bd9eed7ac6f5bd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "typecheck passed after schema contract and atom map shard updates",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:42:09.477Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:42:09.530Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:75714795bdec021f1f7538186e125b5e5e32d8d1ec2978a67810b0b21737a4d1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "validate cli passed after Team Agents schema validator contract",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:42:32.099Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:42:32.155Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:44b02913a592846949b9a498baf0380ae4ceac9d2e0773419809c152ec92e5e1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "team agents template schema and fixture validator passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:42:36.574Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:team-agents-templates"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-team-agents-templates.ts --fixtures",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c506920dc618bdcc54ae467c8922f93302df983038effac3c2b427fc86fdaced",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:team-agents-templates"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:2a16ef6881350df54134590533581e77bfc3e2199a79275953bdd865b73ffebf",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:42:36.622Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:97e3f6aaec07cb3fc0924cd0249d73a69fbb3fb39c501413cb4af62fd2500c5f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "atomization coverage passed for path-to-atom-map shard and projection updates",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:42:41.079Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:atomization-coverage"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:atomization-coverage",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:f247b915291edf2ede64c5f2cb135cfeb42f87e693fbe7d77d97def72acca185",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:atomization-coverage"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:dc866141b1163be9daeff0d462cd5940e4bc359f9bbcf735ce0483bdbe466052",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:42:41.128Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0da0b1842042872dd3a6f256e87a5b61dea7cdf34b1307da9263d5d18a68265d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git diff whitespace check passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain-teamagents",
+      "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+      "createdAt": "2026-06-14T13:42:44.783Z",
+      "details": {
+        "actorId": "captain-teamagents",
+        "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-14T13:42:44.835Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:132c480bd9260b4f90f15ef5544eb5dfcc3bb4c071e10b78a6bd9eed7ac6f5bd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
