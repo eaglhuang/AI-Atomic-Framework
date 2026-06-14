@@ -8,12 +8,25 @@ import {
 
 export default defineCommandSpec({
   name: 'route',
-  summary: 'Steward takeover and validator-gated apply command.',
+  summary: 'Manage MAO route lifecycle records and legacy steward takeover.',
   positional: [
-    { name: 'action', summary: 'takeover', required: true }
+    { name: 'action', summary: 'open | status | list | pause | resume | abandon | takeover', required: true }
   ],
   options: [
     commonCwdOption,
+    { flag: '--route', value: 'id', summary: 'Route context id for status, pause, resume, or abandon.' },
+    { flag: '--route-id', value: 'id', summary: 'Explicit route context id when opening a route.' },
+    { flag: '--task', value: 'id', summary: 'Task id for route open.' },
+    { flag: '--actor', value: 'id', summary: 'Actor id for route open or lifecycle transition.' },
+    { flag: '--claim-intent', value: 'intent', summary: 'Route claim intent: read, write, review, steward, or release-sync.' },
+    { flag: '--read-set', value: 'csv', summary: 'Comma-separated declared read files.' },
+    { flag: '--write-set', value: 'csv', summary: 'Comma-separated declared write files.' },
+    { flag: '--atom-cids', value: 'csv', summary: 'Comma-separated target atom CIDs.' },
+    { flag: '--virtual-atom-cids', value: 'csv', summary: 'Comma-separated target virtual atom CIDs.' },
+    { flag: '--patch-envelope-ref', value: 'ref', summary: 'Optional patch envelope reference.' },
+    { flag: '--reason', value: 'text', summary: 'Reason for pause, resume, or abandon.' },
+    { flag: '--ttl-seconds', value: 'seconds', summary: 'Route lease TTL in seconds.' },
+    { flag: '--max-seconds', value: 'seconds', summary: 'Route lease maximum lifetime in seconds.' },
     { flag: '--merge-plan-file', value: 'path', summary: 'Path to merge plan file.' },
     { flag: '--proposal-file', value: 'path', summary: 'Path to patch proposal file.' },
     { flag: '--steward-id', value: 'name', summary: 'Steward identity name.' },
@@ -24,6 +37,11 @@ export default defineCommandSpec({
     commonHelpOption
   ],
   examples: [
+    'node atm.mjs route open --task TASK-MAO-0003 --actor captain --write-set packages/cli/src/commands/route.ts',
+    'node atm.mjs route status --route route-TASK-MAO-0003-captain',
+    'node atm.mjs route pause --route route-TASK-MAO-0003-captain --actor captain --reason review',
+    'node atm.mjs route resume --route route-TASK-MAO-0003-captain --actor captain',
+    'node atm.mjs route abandon --route route-TASK-MAO-0003-captain --actor captain --reason superseded',
     'node atm.mjs route takeover --merge-plan-file plan.json --proposal-file prop.json'
   ]
 });
