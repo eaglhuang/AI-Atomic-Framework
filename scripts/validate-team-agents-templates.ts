@@ -91,15 +91,20 @@ if (task === 'TASK-TEAM-0005') {
       label: 'captain-decision',
       file: 'docs/governance/team-agents/templates/captain-decision-template.md',
       required: [
-        '## Task',
-        '## Context',
         '## Decision',
-        '## Preconditions',
-        '## Allowed Files',
-        '## Forbidden Scope',
-        '## Acceptance',
-        '## Exit Criteria',
-        '## Handoff'
+        '## Options Considered',
+        '## Chosen Option',
+        '## Reason',
+        '## Risk',
+        '## Lieutenant Need',
+        '## Next Team Shape'
+      ],
+      requiredText: [
+        'Advisory-only',
+        'no ATM gate authority',
+        'no evidence authority',
+        'no task status authority',
+        'TASK-TEAM-0005'
       ],
       expectedTask: 'TASK-TEAM-0005'
     },
@@ -107,13 +112,26 @@ if (task === 'TASK-TEAM-0005') {
       label: 'team-memory-shard',
       file: 'docs/governance/team-agents/templates/team-memory-shard-template.md',
       required: [
-        '## Task',
-        '## Identity',
-        '## Memory Payload',
-        '## Allowed Files',
-        '## Forbidden Scope',
-        '## Validation',
-        '## Retention'
+        '## Knowledge Scope',
+        '## Retrieval / Path Hints',
+        '## Related Atoms',
+        '## Related Validators',
+        '## Task Type',
+        '## Symptom',
+        '## Lesson',
+        '## Reuse Conditions',
+        '## Avoid Conditions',
+        '## Freshness / Retention Hints',
+        '## Related Commands',
+        '## Related Files'
+      ],
+      requiredText: [
+        'Advisory-only',
+        'does not replace closure evidence',
+        'task ledgers',
+        'ATM task status records',
+        'TASK-TEAM-0005',
+        'AI-Atomic-Framework'
       ],
       expectedTask: 'TASK-TEAM-0005'
     }
