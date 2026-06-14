@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { existsSync, rmSync } from 'node:fs';
+import path from 'node:path';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { assessLieutenantEscalation, buildAtomizationChecklist, runTeam, selectTeamImplementer } from '../packages/cli/src/commands/team.ts';
 
@@ -225,6 +227,55 @@ async function main() {
     assert.equal(genericSelection.confidence, 'low');
 
     console.log('[validate-team-agents] ok (role-selector)');
+    return;
+  }
+
+  if (taskCase === 'start-status') {
+    const start = await runTeam(['start', '--task', 'TASK-TEAM-0011', '--actor', 'codex-main', '--cwd', process.cwd(), '--json']);
+    const startEvidence = start.evidence as any;
+    assert.equal(start.ok, true);
+    assert.equal(startEvidence?.action, 'start');
+    assert.equal(startEvidence?.runtimeWritten, true);
+    assert.equal(startEvidence?.agentsSpawned, false);
+    assert.match(startEvidence?.teamRunPath, /^\.atm\/runtime\/team-runs\/team-[a-f0-9]{12}\.json$/);
+
+    const teamRun = startEvidence?.teamRun;
+    assert.equal(teamRun?.schemaId, 'atm.teamRun.v1');
+    assert.match(teamRun?.teamRunId, /^team-[a-f0-9]{12}$/);
+    assert.equal(teamRun?.taskId, 'TASK-TEAM-0011');
+    assert.equal(teamRun?.actorId, 'codex-main');
+    assert.equal(teamRun?.recipeId, 'atm.default.normal.typescript');
+    assert.equal(teamRun?.status, 'active');
+    assert.equal(teamRun?.executionMode, 'manual-team');
+    assert.equal(teamRun?.agentsSpawned, false);
+    assert.equal(teamRun?.runtimeWritten, true);
+    assert.ok(Array.isArray(teamRun?.roles) && teamRun.roles.length > 0);
+    assert.ok(Array.isArray(teamRun?.leases) && teamRun.leases.length > 0);
+    assert.deepEqual(teamRun?.leases, teamRun?.permissionLeases);
+    assert.ok(teamRun.roles.some((role: any) => role.agentId === 'coordinator' && role.role === 'coordinator'));
+    assert.ok(teamRun.leases.some((lease: any) => lease.permission === 'file.write' && Array.isArray(lease.paths)));
+    assert.match(teamRun?.createdAt, /^\d{4}-\d{2}-\d{2}T/);
+    assert.match(teamRun?.updatedAt, /^\d{4}-\d{2}-\d{2}T/);
+
+    const status = await runTeam(['status', '--compact', '--cwd', process.cwd(), '--json']);
+    const statusEvidence = status.evidence as any;
+    assert.equal(status.ok, true);
+    assert.equal(statusEvidence?.action, 'status');
+    assert.ok(statusEvidence?.teamRunCount >= 1);
+    const summary = statusEvidence?.teamRuns?.find((entry: any) => entry.teamRunId === teamRun.teamRunId);
+    assert.equal(summary?.taskId, 'TASK-TEAM-0011');
+    assert.equal(summary?.actorId, 'codex-main');
+    assert.equal(summary?.recipeId, 'atm.default.normal.typescript');
+    assert.equal(summary?.status, 'active');
+    assert.equal(summary?.roleCount, teamRun.roles.length);
+    assert.equal(summary?.leaseCount, teamRun.leases.length);
+    assert.equal(summary?.agentsSpawned, false);
+
+    const runtimePath = path.join(process.cwd(), '.atm', 'runtime', 'team-runs', `${teamRun.teamRunId}.json`);
+    assert.equal(existsSync(runtimePath), true);
+    rmSync(runtimePath, { force: true });
+
+    console.log('[validate-team-agents] ok (start-status)');
     return;
   }
 

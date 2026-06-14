@@ -242,7 +242,7 @@
       "atom_id": "team.spec.runtime-status",
       "capability": "Command-spec examples for read-only team run status.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
+      "source_task": "TASK-TEAM-0011"
     },
     {
       "path_pattern": "packages/cli/src/commands/doctor.ts",
@@ -525,7 +525,7 @@
       "atom_id": "team.status-runtime-read",
       "capability": "Read-only team run status surface.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
+      "source_task": "TASK-TEAM-0011"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
@@ -553,7 +553,7 @@
       "atom_id": "team.start-runtime-state",
       "capability": "Team run runtime record writer under .atm/runtime/team-runs.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
+      "source_task": "TASK-TEAM-0011"
     },
     {
       "path_pattern": "packages/cli/src/commands/work-channels.ts",
@@ -840,16 +840,16 @@
     {
       "path_pattern": "packages/cli/src/commands/team.ts",
       "atom_id": "atm.team-agents-map",
-      "capability": "Team Agents CLI planning surface, including deterministic role and implementer selector output for TASK-TEAM-0010.",
+      "capability": "Team Agents CLI planning and runtime surface, including deterministic role selector output and team start/status runtime records.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0010"
+      "source_task": "TASK-TEAM-0011"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts",
       "atom_id": "atm.team-agents-map",
-      "capability": "Team Agents CLI help/spec examples for crew briefing, plan resolver, role selector, captain decision, lieutenant escalation, and runtime status.",
+      "capability": "Team Agents CLI help/spec examples for crew briefing, plan resolver, role selector, captain decision, lieutenant escalation, start, and runtime status.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0010"
+      "source_task": "TASK-TEAM-0011"
     },
     {
       "path_pattern": "scripts/audit-*.ts",
@@ -969,9 +969,9 @@
     {
       "path_pattern": "scripts/validate-team-agents.ts",
       "atom_id": "atm.team-agents-validator-map",
-      "capability": "Deterministic validator for Team Agents plan and role contracts, including TASK-TEAM-0008 lieutenant escalation and TASK-TEAM-0009 plan-resolver coverage.",
+      "capability": "Deterministic validator for Team Agents plan, role, and start/status runtime contracts.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0009"
+      "source_task": "TASK-TEAM-0011"
     },
     {
       "path_pattern": "scripts/validate-validator-envelope.ts",

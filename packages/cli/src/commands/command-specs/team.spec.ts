@@ -79,8 +79,12 @@ export const teamSpecLieutenantEscalation = {
 };
 
 export const teamSpecRuntimeStatus = {
-  summary: 'Read-only team run status surface (team.status-runtime-read).',
-  examples: ['node atm.mjs team status --compact --json']
+  summary:
+    'Start and inspect a manual team runtime record without spawning subagents (TASK-TEAM-0011 owns team.start-runtime-state and team.status-runtime-read).',
+  examples: [
+    'node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json',
+    'node atm.mjs team status --compact --json'
+  ]
 };
 
 export default defineCommandSpec({
@@ -93,7 +97,6 @@ export default defineCommandSpec({
     ...teamSpecCaptainDecision.examples,
     ...teamSpecLieutenantEscalation.examples,
     ...teamSpecPermissionValidation.examples,
-    'node atm.mjs team start --task TASK-AAO-0005 --actor codex-main --json',
     ...teamSpecRuntimeStatus.examples
   ]
 });
