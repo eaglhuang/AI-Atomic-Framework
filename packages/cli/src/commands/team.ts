@@ -6,6 +6,7 @@ import {
   makeResult,
   message,
   parseArgsForCommand,
+  quoteCliValue,
   readJsonFile,
   writeJsonFile
 } from './shared.ts';
@@ -205,8 +206,88 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
     capability: 'Deterministic file.write lease scope validation against task allowed files before team runtime start.',
     downstreamTasks: ['TASK-TEAM-0013']
+  },
+  'team.next-recommendation': {
+    anchor: 'packages/cli/src/commands/team.ts#buildTeamRecommendation',
+    capability: 'Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.',
+    downstreamTasks: ['TASK-TEAM-0015']
   }
 } as const;
+
+export type TeamRecommendationChannel = 'fast' | 'normal' | 'batch';
+
+export type TeamRecommendation = {
+  readonly schemaId: 'atm.teamRecommendation.v1';
+  readonly enabled: boolean;
+  readonly required: false;
+  readonly channel: TeamRecommendationChannel;
+  readonly taskId: string;
+  readonly recipeId: string;
+  readonly reason: string;
+  readonly plan: string;
+  readonly start: string;
+  readonly status: string;
+  readonly validate: string;
+  readonly constraints: readonly string[];
+  readonly parallelAdvisory?: unknown;
+};
+
+export function resolveTeamRecipeIdForChannel(channel: TeamRecommendationChannel): string {
+  if (channel === 'batch') {
+    return 'atm.default.batch';
+  }
+  if (channel === 'fast') {
+    return 'atm.default.fast';
+  }
+  return 'atm.default.normal.typescript';
+}
+
+export function defaultTeamRecommendationReason(channel: TeamRecommendationChannel): string {
+  if (channel === 'batch') {
+    return 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.';
+  }
+  if (channel === 'fast') {
+    return 'Fast quickfix work usually stays single-actor; a team run is optional and advisory only.';
+  }
+  return 'This task can use an optional team run for role and permission coordination.';
+}
+
+export function buildTeamRecommendation(input: {
+  readonly taskId: string | null | undefined;
+  readonly actorId?: string;
+  readonly channel: TeamRecommendationChannel;
+  readonly reason?: string;
+  readonly enabled?: boolean;
+  readonly parallelAdvisory?: unknown;
+}): TeamRecommendation | null {
+  const taskId = typeof input.taskId === 'string' ? input.taskId.trim() : '';
+  if (!taskId || input.enabled === false) {
+    return null;
+  }
+  const actorId = input.actorId?.trim() || '<id>';
+  const recipeId = resolveTeamRecipeIdForChannel(input.channel);
+  const quotedTask = quoteCliValue(taskId);
+  const reason = input.reason?.trim() || defaultTeamRecommendationReason(input.channel);
+  return {
+    schemaId: 'atm.teamRecommendation.v1',
+    enabled: true,
+    required: false,
+    channel: input.channel,
+    taskId,
+    recipeId,
+    reason,
+    plan: `node atm.mjs team plan --task ${quotedTask} --recipe ${recipeId} --json`,
+    validate: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
+    start: `node atm.mjs team start --task ${quotedTask} --actor ${actorId} --recipe ${recipeId} --json`,
+    status: 'node atm.mjs team status --compact --json',
+    ...(input.parallelAdvisory ? { parallelAdvisory: input.parallelAdvisory } : {}),
+    constraints: [
+      'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
+      'Team agents are not spawned by this recommendation.',
+      'Coordinator remains the only task.lifecycle and git.write owner.'
+    ]
+  };
+}
 
 const builtInRecipes: TeamRecipe[] = [
   {

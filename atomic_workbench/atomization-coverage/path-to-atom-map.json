@@ -295,7 +295,7 @@
     {
       "path_pattern": "packages/cli/src/commands/next.ts",
       "atom_id": "atm.next-router-map",
-      "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
+      "capability": "next-action routing, task scope resolution, public decisionTrail contract, and advisory teamRecommendation embedding in next/playbook output (TASK-TEAM-0015).",
       "coverage_status": "active"
     },
     {
@@ -526,6 +526,20 @@
       "capability": "Read-only team run status surface.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0011"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamRecommendation",
+      "atom_id": "team.next-recommendation",
+      "capability": "Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0015"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecNextRecommendation",
+      "atom_id": "team.spec.next-recommendation",
+      "capability": "Command spec examples for next/playbook teamRecommendation advisory surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0015"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",

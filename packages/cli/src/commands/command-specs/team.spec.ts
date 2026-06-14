@@ -91,6 +91,15 @@ export const teamSpecRuntimeStatus = {
   ]
 };
 
+export const teamSpecNextRecommendation = {
+  summary:
+    'Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands (TASK-TEAM-0015).',
+  examples: [
+    'node atm.mjs next --task TASK-TEAM-0015 --json',
+    'node atm.mjs team plan --task TASK-TEAM-0015 --json'
+  ]
+};
+
 export default defineCommandSpec({
   ...teamSpecCommandSurface,
   examples: [
@@ -101,6 +110,7 @@ export default defineCommandSpec({
     ...teamSpecCaptainDecision.examples,
     ...teamSpecLieutenantEscalation.examples,
     ...teamSpecPermissionValidation.examples,
-    ...teamSpecRuntimeStatus.examples
+    ...teamSpecRuntimeStatus.examples,
+    ...teamSpecNextRecommendation.examples
   ]
 });

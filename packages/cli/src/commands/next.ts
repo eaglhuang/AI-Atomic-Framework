@@ -55,6 +55,7 @@ import {
   writeBatchRun,
   writeQuickfixLock
 } from './work-channels.ts';
+import { buildTeamRecommendation, type TeamRecommendation } from './team.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
 import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './tasks/public-surface.ts';
@@ -991,16 +992,7 @@ async function claimNextImportedTask(input: {
     targetFiles: directionLock.allowedFiles,
     ttlSeconds: 1800
   });
-  const teamRecommendation = buildTeamRecommendation({
-    taskId: claimableTask.workItemId,
-    actorId: resolvedActor.actorId,
-    channel: recommendedChannel,
-    reason: recommendedChannel === 'batch'
-      ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
-      : 'This task can use an optional team run for role/permission coordination.',
-    parallelAdvisory
-  });
-  const nextAction = {
+  const nextActionBase = {
     status: 'ready',
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
     reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
@@ -1018,7 +1010,6 @@ async function claimNextImportedTask(input: {
       channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
       taskId: claimableTask.workItemId
     }),
-    teamRecommendation,
     selectedTask: claimableTask,
     batchId: batchRun?.batchId ?? null,
     scopeKey: batchRun?.scopeKey ?? null,
@@ -1056,6 +1047,15 @@ async function claimNextImportedTask(input: {
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   };
+  const nextAction = embedTeamRecommendation(nextActionBase, {
+    taskId: claimableTask.workItemId,
+    actorId: resolvedActor.actorId,
+    channel: recommendedChannel,
+    reason: recommendedChannel === 'batch'
+      ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
+      : 'This task can use an optional team run for role/permission coordination.',
+    parallelAdvisory
+  });
   const userNotice = buildFirstUseUserNotice(nextAction as any);
   return makeResult({
     ok: true,
@@ -1091,7 +1091,7 @@ async function claimNextImportedTask(input: {
       taskDirectionLock: directionLock,
       taskQueue: activeQueue,
       batchRun,
-    teamRecommendation,
+      teamRecommendation: nextAction.teamRecommendation ?? null,
       sessionId: actorSession.sessionId,
       actorSession,
       recommendedChannel: nextAction.recommendedChannel,
@@ -1312,7 +1312,7 @@ function buildPromptScopedNextResult(input: {
       currentIndex: activeBatchQueue?.currentIndex ?? 0,
       queueHeadTaskId
     };
-    const nextAction = {
+    const nextAction = embedTeamRecommendation({
       status: 'task-queue-ready',
       command: queueHeadTask
         ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --json`
@@ -1345,7 +1345,10 @@ function buildPromptScopedNextResult(input: {
       queueSize: selectedTasks.length,
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
-    };
+    }, {
+      taskId: queueHeadTaskId,
+      channel: 'batch'
+    });
     return makeResult({
       ok: true,
       command: 'next',
@@ -1595,7 +1598,7 @@ function buildPromptScopedNextResult(input: {
       currentIndex: activeBatch.currentIndex,
       queueHeadTaskId
     };
-    const nextAction = {
+    const nextAction = embedTeamRecommendation({
       status: 'task-batch-context-active',
       command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --json`,
       reason: `task ${selectedTask.workItemId} belongs to active batch ${activeBatch.batchId}; continue through the current batch queue head`,
@@ -1626,7 +1629,10 @@ function buildPromptScopedNextResult(input: {
       activeBatchRunId: activeBatch.batchId,
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
-    };
+    }, {
+      taskId: queueHeadTaskId ?? selectedTask.workItemId,
+      channel: 'batch'
+    });
     return makeResult({
       ok: true,
       command: 'next',
@@ -1667,7 +1673,7 @@ function buildPromptScopedNextResult(input: {
     ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --json`
     : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`;
   const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --json`;
-  const nextAction = {
+  const nextAction = embedTeamRecommendation({
     status: 'task-route-ready',
     command: normalClaimCommand,
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
@@ -1689,7 +1695,10 @@ function buildPromptScopedNextResult(input: {
     requiredCommand: normalClaimCommand,
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
-  };
+  }, {
+    taskId: selectedTask.workItemId,
+    channel: 'normal'
+  });
   return makeResult({
     ok: true,
     command: 'next',
@@ -3715,39 +3724,23 @@ function buildChannelPlaybook(input: {
   };
 }
 
-function buildTeamRecommendation(input: {
-  readonly taskId: string;
-  readonly actorId: string;
-  readonly channel: 'normal' | 'batch';
-  readonly reason: string;
-  readonly parallelAdvisory?: any;
-}) {
-  const recipeId = input.channel === 'batch'
-    ? 'atm.default.batch'
-    : 'atm.default.normal.typescript';
-  const quotedTask = quoteCliValue(input.taskId);
+function embedTeamRecommendation<T extends { readonly playbook?: unknown }>(
+  nextAction: T,
+  input: Parameters<typeof buildTeamRecommendation>[0]
+): T & { teamRecommendation?: TeamRecommendation | null } {
+  const teamRecommendation = buildTeamRecommendation(input);
+  if (!teamRecommendation) {
+    return nextAction;
+  }
+  const playbook = nextAction.playbook && typeof nextAction.playbook === 'object' && !Array.isArray(nextAction.playbook)
+    ? { ...(nextAction.playbook as Record<string, unknown>), teamRecommendation }
+    : nextAction.playbook;
   return {
-    schemaId: 'atm.teamRecommendation.v1',
-    enabled: true,
-    required: false,
-    channel: input.channel,
-    taskId: input.taskId,
-    recipeId,
-    reason: input.reason,
-    planCommand: `node atm.mjs team plan --task ${quotedTask} --recipe ${recipeId} --json`,
-    validateCommand: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
-    startCommand: `node atm.mjs team start --task ${quotedTask} --actor ${input.actorId} --recipe ${recipeId} --json`,
-    statusCommand: 'node atm.mjs team status --compact --json',
-    ...(input.parallelAdvisory ? { parallelAdvisory: input.parallelAdvisory } : {}),
-    constraints: [
-      'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
-      'Team agents are not spawned by this recommendation.',
-      'Coordinator remains the only task.lifecycle and git.write owner.'
-    ]
+    ...nextAction,
+    teamRecommendation,
+    playbook
   };
 }
-
-
 
 type NextActionLike = {
   status: string;
@@ -3763,6 +3756,7 @@ type NextActionLike = {
   taskDirectionLock?: { readonly taskId?: string; readonly schemaId?: string };
   deliveryPrinciple?: ReturnType<typeof buildTaskDeliveryPrinciple>;
   playbook?: ReturnType<typeof buildChannelPlaybook>;
+  teamRecommendation?: TeamRecommendation | null;
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
   missingEvidence?: readonly string[];
@@ -3973,6 +3967,21 @@ function buildNextMessages(
       'ATM_TASK_DELIVERY_PRINCIPLE',
       'Task cards are not targets to close; they are delivery contracts. Implement the requested non-.atm deliverables before closing.',
       deliveryPrinciple
+    ));
+  }
+  if (nextAction.teamRecommendation?.enabled) {
+    messages.push(message(
+      'info',
+      'ATM_TEAM_RECOMMENDATION',
+      nextAction.teamRecommendation.reason,
+      {
+        schemaId: nextAction.teamRecommendation.schemaId,
+        plan: nextAction.teamRecommendation.plan,
+        start: nextAction.teamRecommendation.start,
+        status: nextAction.teamRecommendation.status,
+        recipeId: nextAction.teamRecommendation.recipeId,
+        taskId: nextAction.teamRecommendation.taskId
+      }
     ));
   }
   messages.push(routeMessage);
