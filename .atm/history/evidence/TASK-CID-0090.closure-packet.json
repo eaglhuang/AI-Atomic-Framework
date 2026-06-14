@@ -1,0 +1,220 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0090",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5f67a10a5a6f086c1a47a9d2027ad7172878a689",
+  "governedTreeSha": "06ab96b1dee4105889b8735c6d5bc1041b183d09",
+  "targetCommitDelta": {
+    "currentCommitSha": "5f67a10a5a6f086c1a47a9d2027ad7172878a689",
+    "parentCommitShas": [
+      "5f67a10a5a6f086c1a47a9d2027ad7172878a689"
+    ],
+    "governedTreeSha": "06ab96b1dee4105889b8735c6d5bc1041b183d09",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0090.json",
+      ".atm/history/task-events/TASK-CID-0090/2026-06-14T10-37-28-244Z-import-3a7a791deaf6.json",
+      ".atm/history/task-events/TASK-CID-0090/2026-06-14T10-57-18-622Z-import-10ee7c339d30.json",
+      ".atm/history/task-events/TASK-CID-0090/2026-06-14T10-57-19-087Z-reserve-8ea2f897817f.json",
+      ".atm/history/task-events/TASK-CID-0090/2026-06-14T10-57-19-516Z-promote-23960da4f312.json",
+      ".atm/history/task-events/TASK-CID-0090/2026-06-14T10-57-20-009Z-claim-464d1360bd55.json",
+      ".atm/history/task-events/TASK-CID-0090/2026-06-14T10-57-24-866Z-scope-amendment-99604b5a4808.json",
+      ".atm/history/tasks/TASK-CID-0090.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/doctor.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/src/commands/doctor.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/build-onefile-release.ts",
+      "release/atm-root-drop/scripts/build-root-drop-release.ts",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "release/atm-root-drop/scripts/validate-git-head-evidence.ts",
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement.ts",
+      "release/atm-root-drop/scripts/validate-prompt-scoped-next.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-runner-reproducibility.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0ab8aba5585b7a61eed2876061c79fcfeb24e45c019d26d8b4fe09c110e86d95",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-runner-build-scope.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:28a7b4ab10eca57a8c9c166a123f15a7cd0e96295818d8d45d1cf1991a4bec18",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:runner-entrypoints",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0edc8b6d39a7b2e180f8a51ce2a2f663dfcb25effe5453df9afe24f2fbb46b40",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run build",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a8b2d606843a221724c4404cc42858bfa6dda33e524108942c49d75b634e5fb5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:73ceb615e87e7edb71af8fcf638f99e5366a8a9106bd27bfa2d5129919e48a8e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:01cbceef86029c9bbc1907fd6d28377066d0d7be65540b2e86f25378cf58364d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "build",
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release",
+    "validate:runner-build-scope",
+    "validate:runner-entrypoints",
+    "validate:runner-reproducibility"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-14T10:59:59.084Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0090-runner-sync-steward-v1-cid-bridge.task.md",
+      ".atm/history/evidence/TASK-CID-0090.*",
+      ".atm/history/task-events/TASK-CID-0090/**",
+      ".atm/history/tasks/TASK-CID-0090.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/runner-reproducibility-audit.md",
+      "package.json",
+      "release/atm-onefile/",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/",
+      "release/atm-root-drop/release-manifest.json",
+      "scripts/AtmCore/",
+      "scripts/AtmCore/README.md",
+      "scripts/AtmCore/runner-build-scope.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/validate-runner-build-scope.ts",
+      "scripts/validate-runner-entrypoints.ts",
+      "scripts/validate-runner-reproducibility.ts"
+    ],
+    "criticalChangedFiles": [
+      "atm.mjs",
+      "package.json",
+      "scripts/AtmCore/",
+      "scripts/AtmCore/runner-build-scope.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/validate-runner-build-scope.ts",
+      "scripts/validate-runner-entrypoints.ts",
+      "scripts/validate-runner-reproducibility.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0090.json",
+  "closedAt": "2026-06-14T10:59:59.085Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260614105719-captain-TASK-CID-0090-ac0888d3b3",
+  "attestation": null,
+  "historicalDeliveryProvenance": null
+}
