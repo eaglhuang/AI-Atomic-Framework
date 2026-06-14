@@ -72,6 +72,34 @@
       "source_task": "TASK-MAO-0001"
     },
     {
+      "path_pattern": "schemas/route-context.schema.json",
+      "atom_id": "atm.mao-route-context-map",
+      "capability": "Published JSON Schema contract for MAO route context records, states, leases, declared read/write sets, patch envelope references, and blockers",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0002"
+    },
+    {
+      "path_pattern": "packages/core/src/routing/route-context.ts",
+      "atom_id": "atm.mao-route-context-map",
+      "capability": "Core TypeScript route context contract, state vocabulary, admission vocabulary, and AJV-backed validation helper",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0002"
+    },
+    {
+      "path_pattern": "packages/core/src/routing/index.ts",
+      "atom_id": "atm.mao-route-context-map",
+      "capability": "Core routing contract export surface for MAO route context consumers",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0002"
+    },
+    {
+      "path_pattern": "tests/core/route-context.test.ts",
+      "atom_id": "atm.mao-route-context-map",
+      "capability": "Regression coverage for minimal, blocked, frozen, and invalid MAO route context records",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0002"
+    },
+    {
       "path_pattern": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
       "atom_id": "atom-cli-router",
       "capability": "owner-shard source-of-truth for the CLI owner family; first writable target for round1 steward writes; post-proof stewardship handoff anchor; successor continuity baseline",
