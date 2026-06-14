@@ -1,0 +1,89 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T14-08-21-413Z-close-b54a856a3f55",
+  "taskId": "TASK-RFT-0003",
+  "action": "close",
+  "actorId": "captain-teamagents",
+  "sessionId": "session-20260614135743-captain-teamagents-TASK-RFT-0003-32ea85eb95",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0003.json",
+  "taskSha256": "sha256:17c8efeb524b2e9bd15fd01262b9df38bf4f3eae710d5293cb03b8d11b610659",
+  "createdAt": "2026-06-14T14:08:21.413Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0003 --actor captain-teamagents --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614135743-captain-teamagents-TASK-RFT-0003-32ea85eb95",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "framework-development-focused-specs",
+      "git diff --check",
+      "typecheck",
+      "validate-framework-development-atomic-map",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T14:08:21.410Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0003-framework-development-temp-claim-lifecycle.task.md",
+        ".atm/history/evidence/TASK-RFT-0003.*",
+        ".atm/history/task-events/TASK-RFT-0003/**",
+        ".atm/history/tasks/TASK-RFT-0003.json",
+        "docs/reports/framework-development-atomic-map.md",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/critical-path-gate.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/historical-delivery-provenance.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/sha256-normalization.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+        "packages/cli/src/commands/framework-development/historical-delivery-provenance.ts",
+        "packages/cli/src/commands/framework-development/sha256-normalization.ts",
+        "packages/cli/src/commands/framework-development/temp-claim.ts",
+        "scripts/validate-framework-development-atomic-map.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/critical-path-gate.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/historical-delivery-provenance.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/sha256-normalization.spec.ts",
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/critical-path-gate.ts",
+        "packages/cli/src/commands/framework-development/historical-delivery-provenance.ts",
+        "packages/cli/src/commands/framework-development/sha256-normalization.ts",
+        "packages/cli/src/commands/framework-development/temp-claim.ts",
+        "scripts/validate-framework-development-atomic-map.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
