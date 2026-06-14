@@ -4,6 +4,7 @@ import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readd
 import os from 'node:os';
 import path from 'node:path';
 import type { WorkItemRef } from '@ai-atomic-framework/core';
+import { runnerAffectingPatterns, type RunnerBuildScopeManifest } from '../../../core/src/broker/atm-core-scope.ts';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom, resolveValue } from './shared.ts';
 import { createGitHeadEvidenceCheck, gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.ts';
@@ -1245,13 +1246,30 @@ const FROZEN_RUNNER_ENTRYPOINTS = new Set([
 
 function newestFrameworkSourceMtime(rootDir: string): number {
   let newest = 0;
-  for (const entryPath of [
-    path.join(rootDir, 'packages', 'cli', 'src'),
-    path.join(rootDir, 'scripts')
-  ]) {
-    newest = Math.max(newest, newestMtimeInTree(entryPath));
+  for (const entryPath of runnerAffectingMtimeRoots(rootDir)) {
+    newest = Math.max(newest, newestMtimeInTree(path.join(rootDir, entryPath)));
   }
   return newest;
+}
+
+function runnerAffectingMtimeRoots(rootDir: string): string[] {
+  const manifest = readRunnerBuildScopeManifest(rootDir);
+  if (!manifest) return ['packages/cli/src', 'scripts'];
+  const roots = runnerAffectingPatterns(manifest)
+    .filter((pattern) => !pattern.startsWith('release/'))
+    .map((pattern) => pattern.includes('*') ? pattern.slice(0, pattern.indexOf('*')) : pattern)
+    .map((pattern) => pattern.replace(/\/$/, ''))
+    .filter((pattern) => pattern.length > 0);
+  return [...new Set(roots)];
+}
+
+function readRunnerBuildScopeManifest(rootDir: string): RunnerBuildScopeManifest | null {
+  const manifestPath = path.join(rootDir, 'scripts', 'AtmCore', 'runner-build-scope.json');
+  try {
+    return JSON.parse(readFileSync(manifestPath, 'utf8')) as RunnerBuildScopeManifest;
+  } catch {
+    return null;
+  }
 }
 
 function newestMtimeInTree(entryPath: string): number {

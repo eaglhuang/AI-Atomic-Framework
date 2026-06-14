@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 const stableRunner: string = readFileSync('atm.mjs', 'utf8');
 const devRunner: string = readFileSync('atm.dev.mjs', 'utf8');
+const frameworkDevelopment: string = readFileSync('packages/cli/src/commands/framework-development.ts', 'utf8');
 const cliFixture: { entrypoint?: string } = JSON.parse(readFileSync('tests/cli-fixtures/cli-mvp.fixture.json', 'utf8')) as { entrypoint?: string };
 
 assert.match(stableRunner, /release['"], ['"]atm-onefile['"], ['"]atm\.mjs/, 'atm.mjs should prefer the frozen onefile release runner.');
@@ -15,5 +16,13 @@ assert.doesNotMatch(stableRunner, /cliArgs\.includes\(['"]--json['"]\)/, 'atm.mj
 assert.match(devRunner, /packages['"], ['"]cli['"], ['"]src['"], ['"]atm\.ts/, 'atm.dev.mjs should load source-first for framework development.');
 assert.match(devRunner, /packages['"], ['"]cli['"], ['"]dist['"], ['"]atm\.js/, 'atm.dev.mjs should fall back to the built dist runner.');
 assert.equal(cliFixture.entrypoint, 'atm.dev.mjs', 'source CLI validation should use the source-first development runner.');
+
+assert.match(frameworkDevelopment, /runner-build-scope\.json/, 'stale-runner detection should consume the runner build scope manifest.');
+assert.match(frameworkDevelopment, /runnerAffectingPatterns/, 'stale-runner detection should use the ATM core scope classifier patterns.');
+assert.doesNotMatch(
+  frameworkDevelopment,
+  /path\.join\(rootDir, 'packages', 'cli', 'src'\)[\s\S]*path\.join\(rootDir, 'scripts'\)/,
+  'stale-runner detection must not be limited to packages/cli/src and scripts.'
+);
 
 console.log('[runner-entrypoints] ok');
