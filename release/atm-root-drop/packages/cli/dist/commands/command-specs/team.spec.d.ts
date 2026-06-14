@@ -22,6 +22,10 @@ export declare const teamSpecTask0009Preflight: {
     summary: string;
     examples: string[];
 };
+export declare const teamSpecPlanResolver: {
+    summary: string;
+    examples: string[];
+};
 export declare const teamSpecPermissionValidation: {
     summary: string;
     examples: string[];
