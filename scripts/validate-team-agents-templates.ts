@@ -152,6 +152,20 @@ if (task === 'TASK-TEAM-0006') {
       '## Stop Conditions',
       '## Worker Report'
     ],
+    requiredText: [
+      'Run ID',
+      'Team',
+      'Severity',
+      'Findings',
+      'Safe-to-proceed',
+      'Suggested command',
+      'Follow-up',
+      'patrols are read-only unless a separate task card grants write permission',
+      'daily',
+      'claim-preflight',
+      'close-preflight',
+      'big-script patrol report'
+    ],
     expectedTask: 'TASK-TEAM-0006'
   });
 }
