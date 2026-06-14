@@ -935,6 +935,79 @@ try {
   assert((dirtyCloseError.trackedDirtyFiles ?? []).includes('package.json'), 'dirty close error must report tracked dirty files');
   assert(String(dirtyCloseError.remediation ?? '').includes('delivery parent commit'), 'dirty close remediation must explain parent-commit closure semantics');
 
+  const historicalEvidenceRepo = makeFrameworkRepo(tempRoot);
+  initGitRepo(historicalEvidenceRepo);
+  execFileSync('git', ['add', '.'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial historical evidence fixture'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  const historicalEvidenceTaskId = 'TASK-HIST-EVIDENCE-0001';
+  const historicalEvidenceCreate = await runTasks(['create', '--cwd', historicalEvidenceRepo, '--task', historicalEvidenceTaskId, '--actor', 'validator', '--title', 'Historical evidence close fixture']);
+  assert(historicalEvidenceCreate.ok === true, 'historical evidence fixture task create must succeed');
+  const historicalEvidenceTaskPath = path.join(historicalEvidenceRepo, '.atm', 'history', 'tasks', `${historicalEvidenceTaskId}.json`);
+  const historicalEvidenceTaskDoc = readJson(historicalEvidenceTaskPath);
+  historicalEvidenceTaskDoc.status = 'ready';
+  historicalEvidenceTaskDoc.scopePaths = ['package.json'];
+  historicalEvidenceTaskDoc.deliverables = ['package.json'];
+  writeJson(historicalEvidenceTaskPath, historicalEvidenceTaskDoc);
+  const historicalEvidenceClaim = await runNext(['--cwd', historicalEvidenceRepo, '--claim', '--actor', 'validator', '--task', historicalEvidenceTaskId]);
+  assert(historicalEvidenceClaim.ok === true, 'historical evidence fixture task must be claimable');
+  writeJson(path.join(historicalEvidenceRepo, 'package.json'), { name: 'ai-atomic-framework', version: '0.0.0', delivery: true });
+  execFileSync('git', ['add', 'package.json'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'package delivery for historical evidence fixture'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  const historicalEvidenceDeliveryCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: historicalEvidenceRepo, encoding: 'utf8' }).trim();
+  writeJson(path.join(historicalEvidenceRepo, '.atm', 'history', 'evidence', `${historicalEvidenceTaskId}.json`), {
+    taskId: historicalEvidenceTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'historical evidence fixture baseline evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli'],
+      artifactPaths: ['package.json'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate historical evidence baseline fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+        stderrSha256: 'sha256:2222222222222222222222222222222222222222222222222222222222222222'
+      }]
+    }]
+  });
+  execFileSync('git', ['add', `.atm/history/evidence/${historicalEvidenceTaskId}.json`], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'baseline evidence for historical evidence fixture'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  execFileSync('node', [path.join(root, 'atm.mjs'), 'evidence', 'git-head-backfill', '--actor', 'validator', '--json'], {
+    cwd: historicalEvidenceRepo,
+    stdio: 'ignore'
+  });
+  execFileSync('git', ['add', '.atm/history/evidence/git-head.jsonl'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'git-head evidence for historical evidence fixture'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
+  writeJson(path.join(historicalEvidenceRepo, '.atm', 'history', 'evidence', `${historicalEvidenceTaskId}.json`), {
+    taskId: historicalEvidenceTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'historical evidence fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['package.json'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate historical evidence fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:3333333333333333333333333333333333333333333333333333333333333333',
+        stderrSha256: 'sha256:4444444444444444444444444444444444444444444444444444444444444444'
+      }]
+    }]
+  });
+  const historicalEvidenceWorktree = inspectFrameworkCloseWorktree(historicalEvidenceRepo, historicalEvidenceTaskId);
+  assert(historicalEvidenceWorktree.trackedDirtyFiles.includes(`.atm/history/evidence/${historicalEvidenceTaskId}.json`), 'historical evidence fixture must leave same-task evidence dirty before close');
+  const historicalEvidenceClose = await runTasks(['close', '--cwd', historicalEvidenceRepo, '--task', historicalEvidenceTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', historicalEvidenceDeliveryCommit]);
+  assert(historicalEvidenceClose.ok === true, 'historical-delivery close must accept same-task fresh evidence dirtiness when delivery already landed');
+  const historicalEvidenceClosedTask = readJson(historicalEvidenceTaskPath);
+  assert(historicalEvidenceClosedTask.status === 'done', 'historical evidence fixture task must transition to done');
+  assert(typeof historicalEvidenceClosedTask.lastTransitionId === 'string' && historicalEvidenceClosedTask.lastTransitionId.includes('-close-'), 'historical evidence fixture must write a close transition');
+
   const repairRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(repairRepo);
   execFileSync('git', ['add', '.'], { cwd: repairRepo, stdio: 'ignore' });

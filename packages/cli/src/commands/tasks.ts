@@ -2176,11 +2176,15 @@ async function runTasksClose(argv: string[]) {
     : null;
   if (frameworkStatus?.repoRole === 'framework') {
     const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
+    const allowedAdvisoryGovernanceFiles = options.status === 'done' && options.historicalDeliveryRefs.length > 0
+      ? [`.atm/history/evidence/${options.taskId}.json`]
+      : [];
     const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
       cwd: options.cwd,
       taskId: options.taskId,
       taskDeclaredFiles,
-      trackedDirtyFiles: closeWorktree.trackedDirtyFiles
+      trackedDirtyFiles: closeWorktree.trackedDirtyFiles,
+      allowedAdvisoryGovernanceFiles
     });
     if (closeScopedDiffIsolation) {
       closeScopedDiffIsolation = attachDirtyGuardToScopedDiffIsolation(

@@ -54,6 +54,21 @@ assert(cleanGuard.ok, 'generated and unrelated tracked files must be advisory on
 assert(cleanGuard.blockingTrackedDirtyFiles.length === 0, 'advisory-only state must not have blockers');
 assert(cleanGuard.remediation.requiredCommand === null, 'advisory-only state must not require a command');
 
+const historicalEvidenceGuard = evaluateFrameworkCloseDirtyGuard({
+  cwd: process.cwd(),
+  taskId: 'TASK-CID-0056',
+  taskDeclaredFiles: declaredFiles,
+  trackedDirtyFiles: [
+    '.atm/history/evidence/TASK-CID-0056.json'
+  ],
+  allowedAdvisoryGovernanceFiles: [
+    '.atm/history/evidence/TASK-CID-0056.json'
+  ]
+});
+assert(historicalEvidenceGuard.ok, 'allowlisted same-task evidence must not block historical-delivery close');
+assert(historicalEvidenceGuard.governanceTrackedDirtyFiles.length === 0, 'allowlisted same-task evidence must leave governance blockers empty');
+assert(historicalEvidenceGuard.advisoryTrackedDirtyFiles.includes('.atm/history/evidence/TASK-CID-0056.json'), 'allowlisted same-task evidence must become advisory');
+
 const isolation = buildCloseScopedDiffIsolation({
   cwd: process.cwd(),
   taskId: 'TASK-CID-0056',

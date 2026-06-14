@@ -122,9 +122,13 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   readonly taskId: string;
   readonly taskDeclaredFiles: readonly string[];
   readonly trackedDirtyFiles: readonly string[];
+  readonly allowedAdvisoryGovernanceFiles?: readonly string[];
 }): FrameworkCloseDirtyGuardReport {
   const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
   const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
+  const allowedAdvisoryGovernanceFiles = new Set(
+    uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean))
+  );
   const buckets: Record<DirtyBucketId, string[]> = {
     scopeTrackedDirtyFiles: [],
     governanceTrackedDirtyFiles: [],
@@ -141,13 +145,19 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   }
 
   const scopeTrackedDirtyFiles = uniqueStrings(buckets.scopeTrackedDirtyFiles);
-  const governanceTrackedDirtyFiles = uniqueStrings(buckets.governanceTrackedDirtyFiles);
+  const governanceTrackedDirtyFiles = uniqueStrings(
+    buckets.governanceTrackedDirtyFiles.filter((filePath) => !allowedAdvisoryGovernanceFiles.has(filePath))
+  );
+  const allowlistedGovernanceTrackedFiles = uniqueStrings(
+    buckets.governanceTrackedDirtyFiles.filter((filePath) => allowedAdvisoryGovernanceFiles.has(filePath))
+  );
   const blockingTrackedDirtyFiles = uniqueStrings([
     ...scopeTrackedDirtyFiles,
     ...governanceTrackedDirtyFiles
   ]);
   const generatedArtifactFiles = uniqueStrings(buckets.generatedArtifactFiles);
   const advisoryTrackedDirtyFiles = uniqueStrings([
+    ...allowlistedGovernanceTrackedFiles,
     ...generatedArtifactFiles,
     ...buckets.advisoryTrackedDirtyFiles
   ]);
