@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0079",
+  "title": "Same-task evidence write serialization",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-CID-0075"
+  ],
+  "acceptance": [
+    "Parallel evidence writes for the same task no longer lose previously recorded",
+    "Unrelated task evidence capture remains unaffected.",
+    "Validation proves the race is fixed or fail-closed."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/evidence.ts",
+    "scripts/validate-evidence-command-runs.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence.ts",
+    "scripts/validate-evidence-command-runs.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-evidence-command-runs.ts",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing what counts as valid evidence",
+    "Broad repo-wide write-lock redesign outside evidence capture"
+  ],
+  "nonGoals": [
+    "Do not allow parallel evidence writes to win by last write.",
+    "Do not serialize unrelated tasks together when the race only concerns the same task bundle."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if serialization corrupts ordinary evidence capture or silently drops command-run metadata.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-same-task-write-serialization",
+    "mapUpdates": [
+      "packages/cli/src/commands/evidence.ts",
+      "scripts/validate-evidence-command-runs.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0079-same-task-evidence-write-serialization.task.md",
+    "sectionTitle": "TASK-CID-0079",
+    "headingLine": 47,
+    "hash": "7d17a5f925cb331b"
+  },
+  "importedAt": "2026-06-14T03:53:28.204Z",
+  "lastTransitionId": "2026-06-14T04-02-26-429Z-close-14fa1fb50f75",
+  "lastTransitionAt": "2026-06-14T04:02:26.429Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-14T03:53:44.801Z",
+  "promotedAt": "2026-06-14T03:53:44.805Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-7b49a9f052f1",
+    "claimedAt": "2026-06-14T03:53:44.808Z",
+    "heartbeatAt": "2026-06-14T04:02:26.428Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0079.json",
+      "packages/cli/src/commands/evidence.ts",
+      "scripts/validate-evidence-command-runs.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-14T03:53:44.808Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260614035344-captain-TASK-CID-0079-209f2c2ac6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0079",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0079.*",
+      ".atm/history/task-events/TASK-CID-0079/**",
+      ".atm/history/tasks/TASK-CID-0079.json",
+      "packages/cli/src/commands/evidence.ts",
+      "scripts/validate-evidence-command-runs.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "66151cab80c55c016108a31cdc4111f6300a75d4d58d0631724fe20e013acac7",
+    "actorId": "captain",
+    "createdAt": "2026-06-14T03:53:44.828Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-14T04:02:26.428Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260614035344-captain-TASK-CID-0079-209f2c2ac6",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0079.closure-packet.json"
+}
