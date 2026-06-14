@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T11-28-41-471Z-close-9e1558a1bb32",
+  "taskId": "TASK-MAO-0002",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260614112326-captain-TASK-MAO-0002-14ef92d4a6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0002.json",
+  "taskSha256": "sha256:de69f9a709ef5722c3747921fb45df419c1bf136f06931900793bdca78411d69",
+  "createdAt": "2026-06-14T11:28:41.471Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0002 --actor captain --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614112326-captain-TASK-MAO-0002-14ef92d4a6",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0002.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "route-context-test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T11:28:41.468Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0002-route-context-state-schema.task.md",
+        ".atm/history/evidence/TASK-MAO-0002.*",
+        ".atm/history/task-events/TASK-MAO-0002/**",
+        ".atm/history/tasks/TASK-MAO-0002.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/core/src/routing/index.ts",
+        "packages/core/src/routing/route-context.ts",
+        "schemas/route-context.schema.json",
+        "tests/core/route-context.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/routing/index.ts",
+        "packages/core/src/routing/route-context.ts",
+        "schemas/route-context.schema.json",
+        "tests/core/route-context.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

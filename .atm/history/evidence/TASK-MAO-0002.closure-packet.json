@@ -1,0 +1,149 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0002",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e58cb1a1d3a3257b65b90241be1c3b75efb4ae8c",
+  "governedTreeSha": "76d7be9f6b0d3e0c320be2b7f81db89f3fce0592",
+  "targetCommitDelta": {
+    "currentCommitSha": "e58cb1a1d3a3257b65b90241be1c3b75efb4ae8c",
+    "parentCommitShas": [
+      "e58cb1a1d3a3257b65b90241be1c3b75efb4ae8c"
+    ],
+    "governedTreeSha": "76d7be9f6b0d3e0c320be2b7f81db89f3fce0592",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-MAO-0002.json",
+      ".atm/history/task-events/TASK-MAO-0002/2026-06-14T11-23-20-701Z-import-8c0521a43f19.json",
+      ".atm/history/task-events/TASK-MAO-0002/2026-06-14T11-23-26-242Z-reserve-ea2df664cfb3.json",
+      ".atm/history/task-events/TASK-MAO-0002/2026-06-14T11-23-26-245Z-promote-2c3096e9eaea.json",
+      ".atm/history/task-events/TASK-MAO-0002/2026-06-14T11-23-26-270Z-claim-bb8328b8f66d.json",
+      ".atm/history/tasks/TASK-MAO-0002.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/routing/index.ts",
+      "packages/core/src/routing/route-context.ts",
+      "schemas/route-context.schema.json",
+      "tests/core/route-context.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/core/route-context.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5dbe8f3fe4185a19b36353f3a4295a3221435cac12805cf51d1b21ae168e386c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d392841c1e47fbcd688c570429c3c2c8012e7ad04bd291d971604495c15f4e62",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "route-context-test",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-14T11:28:41.468Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0002-route-context-state-schema.task.md",
+      ".atm/history/evidence/TASK-MAO-0002.*",
+      ".atm/history/task-events/TASK-MAO-0002/**",
+      ".atm/history/tasks/TASK-MAO-0002.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/routing/index.ts",
+      "packages/core/src/routing/route-context.ts",
+      "schemas/route-context.schema.json",
+      "tests/core/route-context.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/routing/index.ts",
+      "packages/core/src/routing/route-context.ts",
+      "schemas/route-context.schema.json",
+      "tests/core/route-context.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0002.json",
+  "closedAt": "2026-06-14T11:28:41.469Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260614112326-captain-TASK-MAO-0002-14ef92d4a6",
+  "attestation": null,
+  "historicalDeliveryProvenance": null
+}

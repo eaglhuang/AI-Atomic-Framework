@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0002",
+  "title": "route context state schema",
+  "status": "done",
+  "milestone": "M0",
+  "dependencies": [
+    "TASK-MAO-0001"
+  ],
+  "acceptance": [
+    "Invalid route context records fail schema validation.",
+    "TypeScript types match the schema fields.",
+    "Tests cover minimal valid state, blocked state, and frozen state.",
+    "No task lifecycle behavior changes in this card."
+  ],
+  "deliverables": [
+    "schemas/route-context.schema.json",
+    "packages/core/src/routing/route-context.ts",
+    "packages/core/src/routing/index.ts",
+    "tests/core/route-context.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "schemas/route-context.schema.json",
+    "packages/core/src/routing/route-context.ts",
+    "packages/core/src/routing/index.ts",
+    "tests/core/route-context.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:schemas",
+    "npm run validate:cli",
+    "node --strip-types tests/core/route-context.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "CLI route command implementation",
+    "Persisting route state in runtime files",
+    "Broker admission logic"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove the route context schema, core type surface, tests, and atomization map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.mao-route-context-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0002-route-context-state-schema.task.md",
+    "sectionTitle": "TASK-MAO-0002",
+    "headingLine": 47,
+    "hash": "892bfb257347dc85"
+  },
+  "importedAt": "2026-06-14T11:23:20.697Z",
+  "lastTransitionId": "2026-06-14T11-28-41-471Z-close-9e1558a1bb32",
+  "lastTransitionAt": "2026-06-14T11:28:41.471Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-14T11:23:26.242Z",
+  "promotedAt": "2026-06-14T11:23:26.245Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-8543e685e865",
+    "claimedAt": "2026-06-14T11:23:26.247Z",
+    "heartbeatAt": "2026-06-14T11:28:41.469Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0002.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/routing/index.ts",
+      "packages/core/src/routing/route-context.ts",
+      "schemas/route-context.schema.json",
+      "tests/core/route-context.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-14T11:23:26.247Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260614112326-captain-TASK-MAO-0002-14ef92d4a6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0002",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0002.*",
+      ".atm/history/task-events/TASK-MAO-0002/**",
+      ".atm/history/tasks/TASK-MAO-0002.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/routing/index.ts",
+      "packages/core/src/routing/route-context.ts",
+      "schemas/route-context.schema.json",
+      "tests/core/route-context.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cfb128533372c7a743c7342b771bd3bea0728283b178f4e4b566392070ecaa40",
+    "actorId": "captain",
+    "createdAt": "2026-06-14T11:23:26.269Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-14T11:28:41.469Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260614112326-captain-TASK-MAO-0002-14ef92d4a6",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0002.closure-packet.json"
+}
