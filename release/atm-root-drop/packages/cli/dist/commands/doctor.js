@@ -113,6 +113,7 @@ export async function runDoctor(argv) {
     ];
     const ok = checks.every((check) => check.ok);
     const failedChecks = checks.filter((check) => !check.ok).map((check) => check.name);
+    const integrationDriftRemediation = createIntegrationDriftRemediation(integrationHealth);
     const recommendedAction = ok
         ? 'node atm.mjs next --json'
         : failedChecks.includes('charter-integrity')
@@ -128,7 +129,7 @@ export async function runDoctor(argv) {
                             : failedChecks.includes('git-head-evidence')
                                 ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
                                 : failedChecks.includes('integration-adapters')
-                                    ? 'Run node atm.mjs integration verify <id> --json for each failed adapter, then reinstall or remove the drifted integration manifest.'
+                                    ? integrationDriftRemediation.recommendedAction
                                     : failedChecks.includes('framework-integration-hooks')
                                         ? 'Run node atm.mjs integration hooks install <editor-id> --json, then node atm.mjs git-hooks verify --framework-required --json.'
                                         : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
@@ -187,7 +188,10 @@ export async function runDoctor(argv) {
                                 : failedChecks.includes('git-head-evidence')
                                     ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
                                     : failedChecks.includes('integration-adapters')
-                                        ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', { failedChecks })]
+                                        ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', {
+                                                failedChecks,
+                                                remediation: integrationDriftRemediation
+                                            })]
                                         : failedChecks.includes('framework-integration-hooks')
                                             ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]
                                             : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
@@ -226,6 +230,7 @@ export async function runDoctor(argv) {
             migrationNeeded: runtime.migrationNeeded,
             versionSummary,
             integrationBootstrap,
+            integrationDriftRemediation: integrationDriftRemediation.failedAdapters.length > 0 ? integrationDriftRemediation : undefined,
             frameworkHookReadiness,
             runtimeAdapterReadiness,
             trustIntegrity: trustMode ? trustIntegrity : undefined,
@@ -414,6 +419,28 @@ function readATMChartFrontmatter(filePath) {
     }
 }
 function createCheck(name, ok, details) { return { name, ok: ok === true, details }; }
+function createIntegrationDriftRemediation(integrationHealth) {
+    const failedAdapters = (integrationHealth?.failed ?? []).map((entry) => {
+        const adapterId = typeof entry.adapterId === 'string' && entry.adapterId.length > 0 ? entry.adapterId : null;
+        return {
+            adapterId,
+            manifestPath: entry.manifestPath ?? null,
+            status: entry.status ?? null,
+            driftedFiles: Array.isArray(entry.driftedFiles) ? entry.driftedFiles : [],
+            verifyCommand: adapterId ? `node atm.mjs integration verify ${adapterId} --json` : null,
+            reinstallCommand: adapterId ? `node atm.mjs integration add ${adapterId} --force --json` : null,
+            removeCommand: adapterId ? `node atm.mjs integration remove ${adapterId} --json` : null
+        };
+    });
+    const first = failedAdapters.find((entry) => entry.adapterId) ?? null;
+    return {
+        schemaId: 'atm.integrationDriftRemediation.v1',
+        failedAdapters,
+        recommendedAction: first
+            ? `Run ${first.verifyCommand}; if drift is expected, run ${first.reinstallCommand}. If the adapter is obsolete, run ${first.removeCommand}.`
+            : 'Run node atm.mjs integration verify <id> --json for each failed adapter, then reinstall or remove the drifted integration manifest.'
+    };
+}
 function readJsonIfExists(filePath) { return existsSync(filePath) ? JSON.parse(readFileSync(filePath, 'utf8')) : null; }
 function hasRequiredScripts(scripts = {}) {
     const required = ['build', 'typecheck', 'lint', 'test', 'validate:quick', 'validate:standard', 'validate:full'];

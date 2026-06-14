@@ -777,6 +777,14 @@ try {
   const integrationDriftCheck = initIntegrationDoctorDrift.parsed.evidence.checks.find((check: any) => check.name === 'integration-adapters');
   assert(integrationDriftCheck.ok === false, 'doctor integration-adapters check must fail after drift');
   assert(integrationDriftCheck.details.failed[0].driftedFiles.includes('.cursor/rules/skills/atm-next/SKILL.md'), 'doctor integration-adapters check must report drifted file');
+  const integrationDriftRemediation = initIntegrationDoctorDrift.parsed.evidence.integrationDriftRemediation;
+  assert(integrationDriftRemediation?.schemaId === 'atm.integrationDriftRemediation.v1', 'doctor integration drift must expose machine-readable remediation');
+  assert(integrationDriftRemediation.failedAdapters[0].adapterId === 'cursor', 'doctor integration drift remediation must report adapter id');
+  assert(integrationDriftRemediation.failedAdapters[0].manifestPath === '.atm/integrations/cursor.manifest.json', 'doctor integration drift remediation must report manifest path');
+  assert(integrationDriftRemediation.failedAdapters[0].driftedFiles.includes('.cursor/rules/skills/atm-next/SKILL.md'), 'doctor integration drift remediation must report drifted file paths');
+  assert(integrationDriftRemediation.failedAdapters[0].verifyCommand === 'node atm.mjs integration verify cursor --json', 'doctor integration drift remediation must report exact verify command');
+  assert(integrationDriftRemediation.failedAdapters[0].reinstallCommand === 'node atm.mjs integration add cursor --force --json', 'doctor integration drift remediation must report exact reinstall command');
+  assert(integrationDriftRemediation.failedAdapters[0].removeCommand === 'node atm.mjs integration remove cursor --json', 'doctor integration drift remediation must report exact remove command');
 
   const validSpecPath = path.join(root, fixture.validAtomicSpec);
   const validateSpec = await runAtm(['validate', '--spec', validSpecPath], blankRepo);

@@ -8,6 +8,7 @@ import { buildRootDropRelease } from './build-root-drop-release.ts';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rootDropReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
 const onefileReleaseRoot = path.join(repoRoot, 'release', 'atm-onefile');
+const deterministicGeneratedAt = '1970-01-01T00:00:00.000Z';
 
 export function buildOnefileRelease(options: any = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? repoRoot);
@@ -22,7 +23,7 @@ export function buildOnefileRelease(options: any = {}) {
   const payloadFiles = collectPayloadFiles(rootDropRoot);
   const payload = {
     schemaVersion: 'atm.onefilePayload.v0.1',
-    generatedAt: new Date().toISOString(),
+    generatedAt: resolveReleaseGeneratedAt(),
     sourceRoot: 'release/atm-root-drop',
     entrypoint: 'atm.mjs',
     files: payloadFiles
@@ -84,6 +85,18 @@ export function buildOnefileRelease(options: any = {}) {
     payloadSha256,
     fileCount: payloadFiles.length
   };
+}
+
+function resolveReleaseGeneratedAt() {
+  const explicit = process.env.ATM_RELEASE_GENERATED_AT ?? null;
+  if (explicit) {
+    return explicit;
+  }
+  const sourceDateEpoch = process.env.SOURCE_DATE_EPOCH ?? null;
+  if (sourceDateEpoch && /^\d+$/.test(sourceDateEpoch)) {
+    return new Date(Number(sourceDateEpoch) * 1000).toISOString();
+  }
+  return deterministicGeneratedAt;
 }
 
 function collectPayloadFiles(root: any) {

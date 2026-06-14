@@ -2850,10 +2850,10 @@ function detectRequestedTaskAction(prompt) {
         return 'audit';
     if (/cleanup|\u6e05\u7406/i.test(prompt))
         return 'cleanup';
-    if (/implement|\u5be6\u4f5c|\u958b\u767c/i.test(prompt))
-        return 'implement';
     if (/\u5206\u6790|analy[sz]e/i.test(prompt))
         return 'analyze';
+    if (/implement|\u5be6\u4f5c|\u958b\u767c/i.test(prompt))
+        return 'implement';
     return null;
 }
 function extractPromptPathHints(prompt) {

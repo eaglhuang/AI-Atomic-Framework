@@ -371,7 +371,21 @@ try {
   assert(reconcileDeliveryCommit.ok === true, 'reconcile hook fixture delivery commit must report ok=true');
   const reconcileDeliverySha = String(reconcileDeliveryCommit.evidence?.commitSha ?? '');
   assert(reconcileDeliverySha.length > 0, 'reconcile hook fixture delivery commit must return commit sha');
-  const reconcileClose = parsePayload(runCli(closureRepo, ['tasks', 'reconcile', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--json']));
+  const reconcileApproval = parsePayload(runCli(closureRepo, [
+    'emergency',
+    'approve',
+    '--cwd', closureRepo,
+    '--task', reconcileHookTaskId,
+    '--actor', 'fixture-agent',
+    '--permission', 'backend.tasks.reconcile',
+    '--approval-text', 'Human approved reconcile hook fixture backend repair',
+    '--reason', 'Validator fixture exercises the protected reconcile close-window contract.',
+    '--json'
+  ]));
+  assert(reconcileApproval.ok === true, 'reconcile hook fixture emergency approval must report ok=true');
+  const reconcileApprovalLease = String(reconcileApproval.evidence?.lease?.leaseId ?? reconcileApproval.evidence?.approval?.leaseId ?? reconcileApproval.evidence?.leaseId ?? '');
+  assert(reconcileApprovalLease.length > 0, 'reconcile hook fixture emergency approval must return a lease id');
+  const reconcileClose = parsePayload(runCli(closureRepo, ['tasks', 'reconcile', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--emergency-approval', reconcileApprovalLease, '--json']));
   assert(reconcileClose.ok === true, 'reconcile hook close step must report ok=true');
   const reconcilePreCommit = runCli(closureRepo, ['hook', 'pre-commit', '--cwd', closureRepo, '--json'], {
     env: {
@@ -557,7 +571,21 @@ try {
     ?? closureMismatchFinding?.data?.suggestedCommand;
   assert(typeof closureMismatchSuggestedFix === 'string' && closureMismatchSuggestedFix.includes('closure-packet'), 'closure packet tree mismatch finding must include an actionable suggested fix');
 
-  const repairPayload = parsePayload(runCli(closureRepo, ['tasks', 'repair-closure', '--task', 'TASK-X-9001', '--json']));
+  const repairApproval = parsePayload(runCli(closureRepo, [
+    'emergency',
+    'approve',
+    '--cwd', closureRepo,
+    '--task', 'TASK-X-9001',
+    '--actor', 'fixture-agent',
+    '--permission', 'backend.tasks.repairClosure',
+    '--approval-text', 'Human approved repair-closure hook fixture backend repair',
+    '--reason', 'Validator fixture exercises the protected closure-packet repair contract.',
+    '--json'
+  ]));
+  assert(repairApproval.ok === true, 'repair-closure hook fixture emergency approval must report ok=true');
+  const repairApprovalLease = String(repairApproval.evidence?.lease?.leaseId ?? repairApproval.evidence?.approval?.leaseId ?? repairApproval.evidence?.leaseId ?? '');
+  assert(repairApprovalLease.length > 0, 'repair-closure hook fixture emergency approval must return a lease id');
+  const repairPayload = parsePayload(runCli(closureRepo, ['tasks', 'repair-closure', '--task', 'TASK-X-9001', '--actor', 'fixture-agent', '--emergency-approval', repairApprovalLease, '--json']));
   assert(repairPayload.ok === true, 'tasks repair-closure must stage a repaired closure packet');
   const repairedPacketPath = path.join(closureRepo, '.atm', 'history', 'evidence', 'TASK-X-9001.closure-packet.json');
   const repairedPacket = JSON.parse(readFileSync(repairedPacketPath, 'utf8'));

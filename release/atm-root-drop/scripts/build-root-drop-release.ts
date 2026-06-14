@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const defaultReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
+const deterministicGeneratedAt = '1970-01-01T00:00:00.000Z';
 const releaseEntries = [
   'atm.mjs',
   'CHANGELOG.md',
@@ -66,7 +67,7 @@ export function buildRootDropRelease(options: any = {}) {
   ]);
   const manifest = {
     schemaVersion: 'atm.rootDropRelease.v0.3',
-    generatedAt: new Date().toISOString(),
+    generatedAt: resolveReleaseGeneratedAt(),
     releaseRoot: 'release/atm-root-drop',
     entrypoint: 'atm.mjs',
     entries: [...releaseEntries],
@@ -88,6 +89,18 @@ export function buildRootDropRelease(options: any = {}) {
     entrypointPath: path.join(releaseRoot, 'atm.mjs'),
     entryCount: releaseEntries.length
   };
+}
+
+function resolveReleaseGeneratedAt() {
+  const explicit = process.env.ATM_RELEASE_GENERATED_AT ?? null;
+  if (explicit) {
+    return explicit;
+  }
+  const sourceDateEpoch = process.env.SOURCE_DATE_EPOCH ?? null;
+  if (sourceDateEpoch && /^\d+$/.test(sourceDateEpoch)) {
+    return new Date(Number(sourceDateEpoch) * 1000).toISOString();
+  }
+  return deterministicGeneratedAt;
 }
 
 if (path.resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {

@@ -16,6 +16,55 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "docs/reports/runner-reproducibility-audit.md",
+      "atom_id": "atm.runner-build-reproducibility-map",
+      "capability": "Runner reproducibility audit proving byte-compared release artifacts exclude wall-clock generatedAt drift",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0011"
+    },
+    {
+      "path_pattern": "scripts/validate-runner-reproducibility.ts",
+      "atom_id": "atm.runner-build-reproducibility-map",
+      "capability": "Double-build validator comparing root-drop and onefile runner artifacts for byte-identical reproducibility",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0011"
+    },
+    {
+      "path_pattern": "scripts/AtmCore/runner-build-scope.json",
+      "atom_id": "atm.runner-build-scope-map",
+      "capability": "Machine-readable Runner Sync Steward v1 scope manifest separating runner-affecting source from generated release artifacts",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0012"
+    },
+    {
+      "path_pattern": "scripts/AtmCore/README.md",
+      "atom_id": "atm.runner-build-scope-map",
+      "capability": "Runner Sync Steward v1 contributor contract documenting manifest declaration and single-writer release output policy",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0012"
+    },
+    {
+      "path_pattern": "scripts/validate-runner-build-scope.ts",
+      "atom_id": "atm.runner-build-scope-map",
+      "capability": "Validator ensuring runner build scope manifest covers build chain scripts, core source roots, schemas, launchers, and steward-only generated artifacts",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0012"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/atm-core-scope.ts",
+      "atom_id": "atm.runner-core-scope-classifier-map",
+      "capability": "Pure classifier for Runner Sync Steward v1 paths, identifying atm-core writes, steward-only release artifacts, non-core planning utilities, and undeclared scope drift",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0013"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "atom_id": "atm.runner-core-scope-classifier-map",
+      "capability": "Regression coverage for ATM core scope classification across core, CLI, governance plugin, schemas, scripts, release artifacts, and planning-only paths",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0013"
+    },
+    {
       "path_pattern": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
       "atom_id": "atom-cli-router",
       "capability": "owner-shard source-of-truth for the CLI owner family; first writable target for round1 steward writes; post-proof stewardship handoff anchor; successor continuity baseline",

@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { runnerAffectingPatterns } from '../../../core/dist/broker/atm-core-scope.js';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/dist/index.js';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom, resolveValue } from './shared.js';
 import { createGitHeadEvidenceCheck, gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.js';
@@ -958,13 +959,30 @@ const FROZEN_RUNNER_ENTRYPOINTS = new Set([
 ]);
 function newestFrameworkSourceMtime(rootDir) {
     let newest = 0;
-    for (const entryPath of [
-        path.join(rootDir, 'packages', 'cli', 'src'),
-        path.join(rootDir, 'scripts')
-    ]) {
-        newest = Math.max(newest, newestMtimeInTree(entryPath));
+    for (const entryPath of runnerAffectingMtimeRoots(rootDir)) {
+        newest = Math.max(newest, newestMtimeInTree(path.join(rootDir, entryPath)));
     }
     return newest;
+}
+function runnerAffectingMtimeRoots(rootDir) {
+    const manifest = readRunnerBuildScopeManifest(rootDir);
+    if (!manifest)
+        return ['packages/cli/src', 'scripts'];
+    const roots = runnerAffectingPatterns(manifest)
+        .filter((pattern) => !pattern.startsWith('release/'))
+        .map((pattern) => pattern.includes('*') ? pattern.slice(0, pattern.indexOf('*')) : pattern)
+        .map((pattern) => pattern.replace(/\/$/, ''))
+        .filter((pattern) => pattern.length > 0);
+    return [...new Set(roots)];
+}
+function readRunnerBuildScopeManifest(rootDir) {
+    const manifestPath = path.join(rootDir, 'scripts', 'AtmCore', 'runner-build-scope.json');
+    try {
+        return JSON.parse(readFileSync(manifestPath, 'utf8'));
+    }
+    catch {
+        return null;
+    }
 }
 function newestMtimeInTree(entryPath) {
     let stat = null;
