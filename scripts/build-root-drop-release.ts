@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -45,16 +45,6 @@ export function buildRootDropRelease(options: any = {}) {
     cpSync(sourcePath, path.join(releaseRoot, relativePath), { recursive: true });
   }
 
-  const manifestPath = path.join(releaseRoot, 'release-manifest.json');
-  const manifest = {
-    schemaVersion: 'atm.rootDropRelease.v0.2',
-    generatedAt: new Date().toISOString(),
-    releaseRoot: 'release/atm-root-drop',
-    entrypoint: 'atm.mjs',
-    entries: [...releaseEntries]
-  };
-  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
-
   const bundleReadmePath = path.join(releaseRoot, 'README.root-drop.md');
   const bundleReadme = [
     '# ATM Root-Drop Release Bundle',
@@ -70,6 +60,27 @@ export function buildRootDropRelease(options: any = {}) {
     '`node atm.mjs next --prompt "<current user prompt>" --json`'
   ].join('\n');
   writeFileSync(bundleReadmePath, `${bundleReadme}\n`, 'utf8');
+  const manifestPath = path.join(releaseRoot, 'release-manifest.json');
+  const generatedFiles = collectGeneratedArtifactPaths(releaseRoot, 'release/atm-root-drop', [
+    'release-manifest.json'
+  ]);
+  const manifest = {
+    schemaVersion: 'atm.rootDropRelease.v0.3',
+    generatedAt: new Date().toISOString(),
+    releaseRoot: 'release/atm-root-drop',
+    entrypoint: 'atm.mjs',
+    entries: [...releaseEntries],
+    generatedFiles,
+    stagingContract: {
+      schemaId: 'atm.generatedArtifactStaging.v1',
+      generatedFiles,
+      ignoredByDefault: true,
+      requiresExplicitStaging: true,
+      contractSurface: 'release-manifest.json',
+      rationale: 'release/atm-root-drop is generated under the repo ignore boundary; use this list instead of operator memory when staging governed release artifacts.'
+    }
+  };
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 
   return {
     releaseRoot,
@@ -83,4 +94,30 @@ if (path.resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
   const result = buildRootDropRelease();
   const manifest = JSON.parse(readFileSync(result.manifestPath, 'utf8'));
   console.log(`[build-root-drop-release] built ${manifest.entries.length} entries at ${path.relative(repoRoot, result.releaseRoot)}`);
+}
+
+function collectGeneratedArtifactPaths(root: string, repoRelativeRoot: string, appendFiles: readonly string[] = []) {
+  const generated = new Set<string>();
+  for (const absolutePath of walkFiles(root)) {
+    const relativePath = path.relative(root, absolutePath).replace(/\\/g, '/');
+    if (!relativePath) continue;
+    generated.add(`${repoRelativeRoot}/${relativePath}`);
+  }
+  for (const relativePath of appendFiles) {
+    const normalized = String(relativePath || '').replace(/\\/g, '/').replace(/^\/+/, '');
+    if (normalized) {
+      generated.add(`${repoRelativeRoot}/${normalized}`);
+    }
+  }
+  return [...generated].sort();
+}
+
+function walkFiles(directory: string): string[] {
+  return readdirSync(directory).flatMap((entry) => {
+    const absolutePath = path.join(directory, entry);
+    if (statSync(absolutePath).isDirectory()) {
+      return walkFiles(absolutePath);
+    }
+    return [absolutePath];
+  });
 }
