@@ -16,10 +16,13 @@ type TeamRecipe = {
 type PermissionFinding = {
     level: 'error' | 'warning';
     code: string;
+    summary: string;
     detail: string;
+    role?: string;
     permission?: string;
     agentIds?: string[];
     paths?: string[];
+    suggestedFix: string;
 };
 type PermissionLease = {
     permission: string;
@@ -107,6 +110,11 @@ export declare const TEAM_ATOM_BOUNDARIES: {
         readonly capability: "Read-only team run status surface.";
         readonly downstreamTasks: readonly ["TASK-TEAM-0011"];
     };
+    readonly 'team.permission-lease-validator': {
+        readonly anchor: "packages/cli/src/commands/team.ts#validateTeamPermissionModel";
+        readonly capability: "Deterministic permission lease validation before team runtime start.";
+        readonly downstreamTasks: readonly ["TASK-TEAM-0012"];
+    };
 };
 export declare function runTeam(argv: string[]): Promise<import("./shared.ts").CommandResult>;
 export declare function validateTeamPermissionModel(recipe: TeamRecipe, writePaths: string[]): {
@@ -122,12 +130,7 @@ export declare function planTeamBrokerLane(input: {
 }): {
     result: import("@ai-atomic-framework/core").TeamBrokerLaneResult;
     evidence: TeamBrokerLaneEvidence;
-    findings: {
-        level: "warning" | "error";
-        code: string;
-        detail: string;
-        paths: string[] | undefined;
-    }[];
+    findings: PermissionFinding[];
 };
 declare function buildTeamPlan(input: {
     task: any;
