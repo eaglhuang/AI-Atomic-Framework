@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runNext } from '../../next.ts';
 import { runTaskflow } from '../../taskflow.ts';
+import { buildTaskflowCommitMessage } from '../commit-messages.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../../../../../../');
@@ -351,6 +352,16 @@ assert.equal(dryRunClose.evidence.governedCommitBundle.schemaId, 'atm.taskflowGo
 assert.equal(dryRunClose.evidence.governedCommitBundle.commitMode, 'dry-run');
 assert.equal(dryRunClose.evidence.governedCommitBundle.targetRepo.status, 'preview');
 assert.equal(dryRunClose.evidence.governedCommitBundle.planningRepo.status, 'preview');
+assert.equal(
+  dryRunClose.evidence.governedCommitBundle.targetRepo.commitMessage,
+  buildTaskflowCommitMessage('target', { taskId: dryRunFixture.taskId }),
+  'target close commit message must come from the taskflow commit-message strategy'
+);
+assert.equal(
+  dryRunClose.evidence.governedCommitBundle.planningRepo.commitMessage,
+  buildTaskflowCommitMessage('planning', { taskId: dryRunFixture.taskId }),
+  'planning close commit message must come from the taskflow commit-message strategy'
+);
 assert.ok(dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/tasks/${dryRunFixture.taskId}.json`));
 assert.ok(dryRunClose.evidence.governedCommitBundle.planningRepo.stageFiles.includes(`docs/tasks/${dryRunFixture.taskId}.task.md`));
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.targetRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage target repo');

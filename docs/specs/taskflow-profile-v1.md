@@ -103,8 +103,12 @@ Lease checks validate task, actor, permission, expiry, max-use count, and explic
 | `rosterSyncPolicy` | `inline`, `follow-up-command`, or `none`. |
 | `rosterSync.indexPath` | README roster table path used by `tasks roster update`. |
 | `fallbackBehavior` | Explains why ATM remains in template-only fallback when host policy is unavailable. |
+| `commitMessage.targetTemplate` | Optional future closeback target-repo commit message label. It is declared here as the Strategy Map seam, but profile loading does not consume it yet. |
+| `commitMessage.planningTemplate` | Optional future closeback planning-repo commit message label. It is declared here as the Strategy Map seam, but profile loading does not consume it yet. |
 
 Roster synchronization uses `node atm.mjs tasks roster update` as the only official write path.
+
+Commit-message template values are raw labels, not interpolation strings. The default Strategy Map receives the task id as a typed function input; profile strings must not support `${taskId}` substitution unless a future task explicitly adds a safe formatting contract.
 
 ## Taskflow Close Result Contract (`atm.taskflowCloseResult.v1`)
 
