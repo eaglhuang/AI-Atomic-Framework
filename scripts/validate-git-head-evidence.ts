@@ -190,7 +190,6 @@ try {
   runGit(treeRepo, ['add', '.atm/history/evidence/git-head.jsonl']);
   runGit(treeRepo, ['commit', '-m', 'change with tree evidence']);
   const treeMatched = runAtmDoctor(treeRepo);
-  console.log('DEBUG: treeMatched =', JSON.stringify(treeMatched, null, 2));
   assert(treeMatched.exitCode === 0, 'tree evidence doctor must exit 0');
   assert(treeMatched.parsed.ok === true, 'tree evidence doctor must report ok=true');
   assert(gitCheck(treeMatched)?.details?.matchedBy === 'treeSha+parentCommitShas', 'tree evidence must match by treeSha+parentCommitShas');
