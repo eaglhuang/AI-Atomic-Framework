@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TEAM-0017",
   "title": "Team template schema and validator contract",
-  "status": "running",
+  "status": "done",
   "milestone": "M2",
   "dependencies": [
     "TASK-TEAM-0004",
@@ -87,8 +87,8 @@
     "hash": "6a0f042581455dd4"
   },
   "importedAt": "2026-06-14T13:33:55.416Z",
-  "lastTransitionId": "2026-06-14T13-33-56-950Z-claim-53e8ebac8e78",
-  "lastTransitionAt": "2026-06-14T13:33:56.950Z",
+  "lastTransitionId": "2026-06-14T13-54-10-548Z-close-8cf0fbfb56ce",
+  "lastTransitionAt": "2026-06-14T13:54:10.548Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain-teamagents",
   "reservedAt": "2026-06-14T13:33:56.919Z",
@@ -97,7 +97,7 @@
     "actorId": "captain-teamagents",
     "leaseId": "lease-72a9a6694cd3",
     "claimedAt": "2026-06-14T13:33:56.924Z",
-    "heartbeatAt": "2026-06-14T13:33:56.924Z",
+    "heartbeatAt": "2026-06-14T13:54:10.546Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TEAM-0017.json",
@@ -110,8 +110,8 @@
       "schemas/team-agents/team-summary.schema.json",
       "scripts/validate-team-agents-templates.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Scope amendment added owner-shard-platform.json because path-to-atom-map.json is a generated projection and Team Agents schema ownership must be recorded in the shard source of truth."
   },
   "startedAt": "2026-06-14T13:33:56.924Z",
   "startedByActor": "captain-teamagents",
@@ -144,5 +144,10 @@
     "actorId": "captain-teamagents",
     "createdAt": "2026-06-14T13:33:56.949Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-14T13:54:10.546Z",
+  "closedByActor": "captain-teamagents",
+  "closedBySessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+  "closeReason": "Scope amendment added owner-shard-platform.json because path-to-atom-map.json is a generated projection and Team Agents schema ownership must be recorded in the shard source of truth.",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0017.closure-packet.json"
 }

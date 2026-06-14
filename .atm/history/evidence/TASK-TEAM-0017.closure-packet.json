@@ -1,0 +1,189 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0017",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4497fb169b9d5d5de66bdf48e50afa7ec1d11c44",
+  "governedTreeSha": "a172545a1b54068f63559b1327b36e5ee47268b3",
+  "targetCommitDelta": {
+    "currentCommitSha": "4497fb169b9d5d5de66bdf48e50afa7ec1d11c44",
+    "parentCommitShas": [
+      "4497fb169b9d5d5de66bdf48e50afa7ec1d11c44"
+    ],
+    "governedTreeSha": "a172545a1b54068f63559b1327b36e5ee47268b3",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0017.json",
+      ".atm/history/task-events/TASK-TEAM-0017/2026-06-14T13-45-51-130Z-scope-amendment-c4a5188a62df.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/team-agents/agent-report.schema.json",
+      "schemas/team-agents/captain-decision.schema.json",
+      "schemas/team-agents/patrol-report.schema.json",
+      "schemas/team-agents/team-brief.schema.json",
+      "schemas/team-agents/team-memory-shard.schema.json",
+      "schemas/team-agents/team-summary.schema.json",
+      "scripts/validate-team-agents-templates.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents-templates.ts --fixtures",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c506920dc618bdcc54ae467c8922f93302df983038effac3c2b427fc86fdaced",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:atomization-coverage",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f247b915291edf2ede64c5f2cb135cfeb42f87e693fbe7d77d97def72acca185",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:atomization-coverage",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents-templates"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-14T13:54:10.543Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0017-team-template-schema-validator-contract.task.md",
+      ".atm/history/evidence/TASK-TEAM-0017.*",
+      ".atm/history/task-events/TASK-TEAM-0017/**",
+      ".atm/history/tasks/TASK-TEAM-0017.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "schemas/team-agents/agent-report.schema.json",
+      "schemas/team-agents/captain-decision.schema.json",
+      "schemas/team-agents/patrol-report.schema.json",
+      "schemas/team-agents/team-brief.schema.json",
+      "schemas/team-agents/team-memory-shard.schema.json",
+      "schemas/team-agents/team-summary.schema.json",
+      "scripts/validate-team-agents-templates.ts"
+    ],
+    "criticalChangedFiles": [
+      "schemas/team-agents/agent-report.schema.json",
+      "schemas/team-agents/captain-decision.schema.json",
+      "schemas/team-agents/patrol-report.schema.json",
+      "schemas/team-agents/team-brief.schema.json",
+      "schemas/team-agents/team-memory-shard.schema.json",
+      "schemas/team-agents/team-summary.schema.json",
+      "scripts/validate-team-agents-templates.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0017.json",
+  "closedAt": "2026-06-14T13:54:10.544Z",
+  "closedByActor": "captain-teamagents",
+  "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "4497fb169b9d5d5de66bdf48e50afa7ec1d11c44",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "schemas/team-agents/agent-report.schema.json",
+      "schemas/team-agents/captain-decision.schema.json",
+      "schemas/team-agents/patrol-report.schema.json",
+      "schemas/team-agents/team-brief.schema.json",
+      "schemas/team-agents/team-memory-shard.schema.json",
+      "schemas/team-agents/team-summary.schema.json",
+      "scripts/validate-team-agents-templates.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TEAM-0017.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-TEAM-0017/2026-06-14T13-33-55-422Z-import-e018cb068acf.json",
+      ".atm/history/task-events/TASK-TEAM-0017/2026-06-14T13-33-56-919Z-reserve-8177d2dcb752.json",
+      ".atm/history/task-events/TASK-TEAM-0017/2026-06-14T13-33-56-922Z-promote-2cfdf40453fb.json",
+      ".atm/history/task-events/TASK-TEAM-0017/2026-06-14T13-33-56-950Z-claim-53e8ebac8e78.json",
+      ".atm/history/task-events/TASK-TEAM-0017/2026-06-14T13-40-30-425Z-scope-amendment-1c3cb638fe02.json",
+      ".atm/history/tasks/TASK-TEAM-0017.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-platform.json"
+    ],
+    "waivedOutOfScopeFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-platform.json"
+    ],
+    "waiverReason": "Scope amendment added owner-shard-platform.json because path-to-atom-map.json is a generated projection and Team Agents schema ownership must be recorded in the shard source of truth."
+  }
+}

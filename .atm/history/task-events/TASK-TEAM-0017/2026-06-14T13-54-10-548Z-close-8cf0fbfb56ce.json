@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-14T13-54-10-548Z-close-8cf0fbfb56ce",
+  "taskId": "TASK-TEAM-0017",
+  "action": "close",
+  "actorId": "captain-teamagents",
+  "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0017.json",
+  "taskSha256": "sha256:72922e256a2189baf5189982436d9235a95477a8ff221b6ef16f8ad399bf6451",
+  "createdAt": "2026-06-14T13:54:10.548Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0017 --actor captain-teamagents --status done --historical-delivery 4497fb169b9d5d5de66bdf48e50afa7ec1d11c44",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260614133356-captain-teamagents-TASK-TEAM-0017-cb8d2f736c",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0017.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:atomization-coverage",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents-templates"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-14T13:54:10.543Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0017-team-template-schema-validator-contract.task.md",
+        ".atm/history/evidence/TASK-TEAM-0017.*",
+        ".atm/history/task-events/TASK-TEAM-0017/**",
+        ".atm/history/tasks/TASK-TEAM-0017.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "schemas/team-agents/agent-report.schema.json",
+        "schemas/team-agents/captain-decision.schema.json",
+        "schemas/team-agents/patrol-report.schema.json",
+        "schemas/team-agents/team-brief.schema.json",
+        "schemas/team-agents/team-memory-shard.schema.json",
+        "schemas/team-agents/team-summary.schema.json",
+        "scripts/validate-team-agents-templates.ts"
+      ],
+      "criticalChangedFiles": [
+        "schemas/team-agents/agent-report.schema.json",
+        "schemas/team-agents/captain-decision.schema.json",
+        "schemas/team-agents/patrol-report.schema.json",
+        "schemas/team-agents/team-brief.schema.json",
+        "schemas/team-agents/team-memory-shard.schema.json",
+        "schemas/team-agents/team-summary.schema.json",
+        "scripts/validate-team-agents-templates.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
