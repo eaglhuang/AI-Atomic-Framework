@@ -146,6 +146,44 @@ validator.assert(
   'baseline-only validator failures should not force a current-task requiredCommand'
 );
 
+const commandCanonicalBaseline = createValidatorFailureEnvelope({
+  validatorName: 'synthetic-command-identity',
+  command: 'node atm.mjs evidence run --task TASK-BASELINE --actor alice --command "npm run validate:cli" --validators "npm run validate:cli" --json',
+  entry: 'packages/cli/src/commands/evidence.ts',
+  mode: 'validate',
+  ok: false,
+  exitCode: 1,
+  stdout: '',
+  stderr: ''
+});
+const commandCanonicalCurrent = createValidatorFailureEnvelope({
+  validatorName: 'synthetic-command-identity',
+  command: 'node atm.mjs evidence run --task TASK-CURRENT --actor bob --command "node --strip-types scripts/validate-cli.ts --mode validate" --validators validate:cli --json',
+  entry: 'packages/cli/src/commands/evidence.ts',
+  mode: 'validate',
+  ok: false,
+  exitCode: 1,
+  stdout: '',
+  stderr: ''
+});
+const commandCanonicalFingerprints = collectBaselineFindingFingerprints({
+  schemaId: 'atm.validatorRunSummary.v1',
+  validators: [
+    {
+      envelope: commandCanonicalBaseline
+    }
+  ]
+});
+const commandCanonicalReclassified = applyBaselineFailureSnapshot(commandCanonicalCurrent, commandCanonicalFingerprints);
+validator.assert(
+  commandCanonicalReclassified.baselineFailures.length === 1,
+  'equivalent evidence-run requiredCommand spellings must share the same baseline fingerprint'
+);
+validator.assert(
+  commandCanonicalReclassified.requiredCommand === null,
+  'baseline-only equivalent evidence-run findings must not keep a current-task requiredCommand'
+);
+
 const passingEnvelope = createValidatorFailureEnvelope({
   validatorName: 'synthetic-pass',
   command: 'node --strip-types scripts/validate-product-charter.ts --mode validate',

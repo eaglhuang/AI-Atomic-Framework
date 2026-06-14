@@ -1,0 +1,258 @@
+{
+  "taskId": "TASK-CID-0078",
+  "updatedAt": "2026-06-14T03:50:18.582Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+      "createdAt": "2026-06-14T03:48:21.624Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:73ceb615e87e7edb71af8fcf638f99e5366a8a9106bd27bfa2d5129919e48a8e",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:08482beeb82001dc872b514dd0144841ebef0f8f40c5885df4d6b5d972d07de1",
+            "cached": false,
+            "generatedAt": "2026-06-14T03:48:21.685Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d54d037521d8a083ef825e8bcc218aa0e4d68a532b15e53ae86672d238fb7d9e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+      "createdAt": "2026-06-14T03:48:30.932Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-14T03:48:30.984Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:53ab1bbaf3fdd8918e5e0f969054c6269a01a3603556461475023dc24ed79cae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+      "createdAt": "2026-06-14T03:48:54.541Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-06-14T03:48:54.598Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:18e6fd7ff8e36ab09076bdb729e9e31bc73bbd09e6ab5a8f238d1456eea170e9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-validator-envelope.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+      "createdAt": "2026-06-14T03:49:00.453Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:validator-envelope"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-validator-envelope.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:39db9340ac0bc67558c482038ddfaf87e1a1d63b9575d50089a5287632c7ae7d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:validator-envelope"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:90dc1a738611f5a0caba0d9bb0e007c933c4a1e1ff234e6be75bab10400da591",
+            "cached": false,
+            "generatedAt": "2026-06-14T03:49:00.505Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3bb80eb51e051d6874bcaaab90ebbdb031e8911926338fd496c85fe28ffc5d00",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+      "createdAt": "2026-06-14T03:49:36.681Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:task-ledger-governance"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e86e6a3a612bae766f3b22398ef4990bff6f1dbb94267e5514740baf3cd39406",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:task-ledger-governance"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ce151bddf937ac38dd4f686eba7e4658c1385b69ddbd723230db8d09e015f7ee",
+            "cached": false,
+            "generatedAt": "2026-06-14T03:49:36.738Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:66fe22a72fd801f3983cbf8f95291a3add3450a297d6a492803db89c44bba99d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+      "createdAt": "2026-06-14T03:50:18.582Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260614033902-captain-TASK-CID-0078-a58b370e40",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2ff7eb4e28cf74de0f4248b15aae7cdd81e50a7a4a9736594bac68eec795bda9",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:f51ab947bee8b5a656a946578652e1cb0975d48cfd9f2ddc91d0795d86962950",
+            "cached": false,
+            "generatedAt": "2026-06-14T03:50:18.632Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5b98dd500f56c8dcd137ab10812db98a6151664874ca177a63d06ef286b8b117",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

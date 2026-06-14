@@ -27,6 +27,7 @@ import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTaskflow } from '../packages/cli/src/commands/taskflow.ts';
 import { withTaskflowOperatorLane } from '../packages/cli/src/commands/emergency/context.ts';
 import { runHook } from '../packages/cli/src/commands/hook.ts';
+import { computeMissingValidatorReport } from '../packages/cli/src/commands/evidence.ts';
 import { runTasks as runTasksBackend } from '../packages/cli/src/commands/tasks.ts';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from '../packages/cli/src/commands/tasks/task-ledger-readers.ts';
 import { createValidatorFailureEnvelope } from './lib/validator-envelope.ts';
@@ -103,6 +104,68 @@ function assertSandboxDiagnosticsAreActionable() {
   const indexFinding = indexPermissionEnvelope.blockingFindings.find((finding) => finding.code === 'ATM_GIT_INDEX_PERMISSION_DENIED');
   assert(indexFinding?.classification === 'environment', '.git/index.lock permission denied must be an environment finding');
   assert((indexFinding?.data as any)?.notTaskEvidenceFailure === true, '.git/index.lock permission denied must not be treated as task evidence failure');
+}
+
+function assertValidatorCommandCanonicalization(tempRoot: string) {
+  const repo = makeHostRepo(tempRoot, 'validator-command-canonicalization');
+  const taskId = 'TASK-VALIDATOR-CANON-0001';
+  const taskPath = path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`);
+  const evidencePath = path.join(repo, '.atm', 'history', 'evidence', `${taskId}.json`);
+  writeJson(taskPath, {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: 'Validator command canonicalization fixture',
+    status: 'running',
+    validators: [
+      'npm run typecheck',
+      'node atm.mjs doctor --json',
+      'node atm.mjs evidence git-head-backfill --actor <actor> --json'
+    ]
+  });
+  writeJson(evidencePath, {
+    taskId,
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        evidenceType: 'test',
+        summary: 'canonicalization fixture',
+        producedBy: 'validator',
+        evidenceFreshness: 'fresh',
+        details: {
+          validationPasses: [
+            'npm run typecheck',
+            'node atm.mjs doctor --json',
+            'node atm.mjs evidence git-head-backfill --actor validator --json'
+          ],
+          commandRuns: [
+            {
+              command: 'npm run typecheck',
+              exitCode: 0,
+              stdoutSha256: `sha256:${'1'.repeat(64)}`,
+              stderrSha256: `sha256:${'2'.repeat(64)}`
+            },
+            {
+              command: 'node atm.mjs doctor --json',
+              exitCode: 0,
+              stdoutSha256: `sha256:${'3'.repeat(64)}`,
+              stderrSha256: `sha256:${'4'.repeat(64)}`
+            },
+            {
+              command: 'node atm.mjs evidence git-head-backfill --actor validator --json',
+              exitCode: 0,
+              stdoutSha256: `sha256:${'5'.repeat(64)}`,
+              stderrSha256: `sha256:${'6'.repeat(64)}`
+            }
+          ]
+        }
+      }
+    ]
+  });
+  const report = computeMissingValidatorReport(repo, taskId, 'validator');
+  const validatorStates = new Map(report.validators.map((entry) => [entry.name, entry.evidenceState]));
+  assert(validatorStates.get('typecheck') === 'pass', 'canonicalized validator report must accept npm run typecheck as typecheck evidence');
+  assert(validatorStates.get('doctor') === 'pass', 'canonicalized validator report must accept doctor command spelling as doctor evidence');
+  assert(validatorStates.get('git-head-evidence') === 'pass', 'canonicalized validator report must accept git-head-backfill command spelling as git-head-evidence');
 }
 
 async function assertTasksRosterUpdateContract() {
@@ -286,6 +349,7 @@ process.env.GIT_CEILING_DIRECTORIES = [process.cwd(), previousGitCeilingDirector
 
 try {
   assertSandboxDiagnosticsAreActionable();
+  assertValidatorCommandCanonicalization(tempRoot);
   assertTaskflowHostOpenerFallbackContract();
   await assertTasksNewRejectsRootOutput();
   await assertTasksRosterUpdateContract();

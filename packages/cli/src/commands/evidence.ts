@@ -94,6 +94,21 @@ export async function runEvidence(argv: string[]) {
  */
 type ValidatorTier = 'focused' | 'batch' | 'milestone' | 'release';
 
+const VALIDATOR_GATE_ALIAS_MAP = new Map<string, string>([
+  ['typecheck', 'typecheck'],
+  ['git diff --check', 'git diff --check'],
+  ['git-diff-check', 'git diff --check'],
+  ['doctor', 'doctor'],
+  ['framework-development', 'framework-development'],
+  ['tasks-audit', 'tasks-audit'],
+  ['git-head-evidence', 'git-head-evidence'],
+  ['git-head-backfill', 'git-head-evidence']
+]);
+
+function normalizeValidatorToken(raw: string): string {
+  return raw.trim().replace(/\s+/g, ' ');
+}
+
 /**
  * 將 task card 裡的 validator 字串正規化成 gate 名稱。
  * 例如 "npm run typecheck" → "typecheck"
@@ -111,6 +126,33 @@ function normalizeValidatorGateName(raw: string): string {
 }
 
 /** 依 gate 名稱歸類 tier */
+function canonicalizeValidatorIdentity(raw: string): string {
+  const normalized = normalizeValidatorToken(raw);
+  if (!normalized) return normalized;
+  const lowered = normalized.toLowerCase();
+  const aliased = VALIDATOR_GATE_ALIAS_MAP.get(lowered);
+  if (aliased) return aliased;
+
+  const gate = normalizeValidatorGateName(normalized);
+  const gatedLower = gate.toLowerCase();
+  const gatedAlias = VALIDATOR_GATE_ALIAS_MAP.get(gatedLower);
+  if (gatedAlias) return gatedAlias;
+
+  if (/^git diff --check$/i.test(normalized)) return 'git diff --check';
+  if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+doctor\b/i.test(normalized)) return 'doctor';
+  if (
+    /^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+next\b/i.test(normalized)
+    && /\s--json(?:\s|$)/i.test(` ${normalized} `)
+    && !/\s--prompt(?:\s|$)|\s--claim(?:\s|$)|\s--task(?:\s|$)/i.test(` ${normalized} `)
+  ) {
+    return 'framework-development';
+  }
+  if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+tasks\s+audit\b/i.test(normalized)) return 'tasks-audit';
+  if (/^node\s+(?:--strip-types\s+)?atm(?:\.dev)?\.mjs\s+evidence\s+git-head-backfill\b/i.test(normalized)) return 'git-head-evidence';
+
+  return gate;
+}
+
 function classifyValidatorTier(gate: string): ValidatorTier {
   // Release gates — 只有 release 類 task 才需要重跑
   if (
@@ -207,7 +249,7 @@ function runEvidenceValidators(argv: string[]) {
   const taskDeclaredValidators: string[] = Array.isArray(taskDocument?.validators)
     ? (taskDocument.validators as unknown[])
         .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
-        .map((v) => normalizeValidatorGateName(v.trim()))
+        .map((v) => canonicalizeValidatorIdentity(v.trim()))
         .filter(Boolean)
     : [];
 
@@ -218,7 +260,7 @@ function runEvidenceValidators(argv: string[]) {
     // top-level validationPasses（部分 legacy 格式）
     if (Array.isArray(record.validationPasses)) {
       for (const v of record.validationPasses as unknown[]) {
-        if (typeof v === 'string' && v.trim()) recordedPasses.add(v.trim());
+        if (typeof v === 'string' && v.trim()) recordedPasses.add(canonicalizeValidatorIdentity(v.trim()));
       }
     }
     // details.validationPasses（主要格式，由 evidence add 寫入）
@@ -226,7 +268,7 @@ function runEvidenceValidators(argv: string[]) {
       const d = record.details as Record<string, unknown>;
       if (Array.isArray(d.validationPasses)) {
         for (const v of d.validationPasses as unknown[]) {
-          if (typeof v === 'string' && v.trim()) recordedPasses.add(v.trim());
+          if (typeof v === 'string' && v.trim()) recordedPasses.add(canonicalizeValidatorIdentity(v.trim()));
         }
       }
     }
@@ -329,12 +371,12 @@ function readRecordValidationPasses(record: Record<string, unknown>): readonly s
   const passes = new Set<string>();
   const top = (record as { validationPasses?: unknown }).validationPasses;
   if (Array.isArray(top)) {
-    for (const v of top) if (typeof v === 'string' && v.trim()) passes.add(v.trim());
+    for (const v of top) if (typeof v === 'string' && v.trim()) passes.add(canonicalizeValidatorIdentity(v.trim()));
   }
   if (isRecord(record.details)) {
     const inner = (record.details as { validationPasses?: unknown }).validationPasses;
     if (Array.isArray(inner)) {
-      for (const v of inner) if (typeof v === 'string' && v.trim()) passes.add(v.trim());
+      for (const v of inner) if (typeof v === 'string' && v.trim()) passes.add(canonicalizeValidatorIdentity(v.trim()));
     }
   }
   return [...passes];
@@ -369,10 +411,10 @@ function classifyValidatorEvidenceState(bundle: readonly Record<string, unknown>
       const runValidators = Array.isArray((run as { validators?: unknown }).validators)
         ? ((run as { validators: unknown[] }).validators)
             .filter((v): v is string => typeof v === 'string')
-            .map((v) => v.trim())
+            .map((v) => canonicalizeValidatorIdentity(v))
         : [];
       const cmd = typeof (run as { command?: unknown }).command === 'string' ? (run as { command: string }).command : '';
-      const matches = runValidators.includes(gate) || normalizeValidatorGateName(cmd) === gate;
+      const matches = runValidators.includes(gate) || canonicalizeValidatorIdentity(cmd) === gate;
       const exitCode = (run as { exitCode?: unknown }).exitCode;
       if (matches && typeof exitCode === 'number' && exitCode !== 0) sawFailedRun = true;
     }
@@ -446,7 +488,7 @@ export function computeMissingValidatorReport(
   const taskDeclaredValidators: string[] = Array.isArray(taskDocument?.validators)
     ? (taskDocument.validators as unknown[])
         .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
-        .map((v) => normalizeValidatorGateName(v.trim()))
+        .map((v) => canonicalizeValidatorIdentity(v.trim()))
         .filter(Boolean)
     : [];
 
@@ -918,8 +960,8 @@ function runEvidenceAdd(argv: string[]) {
     sourceCommit: options.sourceCommit
   });
   const validationPasses = uniqueStrings([
-    ...options.validators,
-    ...commandRuns.flatMap((run) => Array.isArray(run.validators) ? run.validators : [])
+    ...options.validators.map((entry) => canonicalizeValidatorIdentity(entry)),
+    ...commandRuns.flatMap((run) => Array.isArray(run.validators) ? run.validators.map((entry) => canonicalizeValidatorIdentity(entry)) : [])
   ]);
   const failedValidationRuns = commandRuns.filter((run) => run.exitCode !== 0 && (
     validationPasses.length > 0 || (Array.isArray(run.validators) && run.validators.length > 0)
@@ -1192,7 +1234,7 @@ function parseEvidenceAddOptions(argv: string[]) {
       continue;
     }
     if (arg === '--validators') {
-      options.validators = requireValue(argv, index, '--validators').split(',').map((entry) => entry.trim()).filter(Boolean);
+      options.validators = requireValue(argv, index, '--validators').split(',').map((entry) => canonicalizeValidatorIdentity(entry)).filter(Boolean);
       index += 1;
       continue;
     }
@@ -1387,7 +1429,7 @@ function normalizeCommandRunInput(value: unknown, label: string): CommandRunEvid
     exitCode,
     stdoutSha256,
     stderrSha256,
-    validators: Array.isArray(value.validators) ? value.validators.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim()) : undefined,
+    validators: Array.isArray(value.validators) ? value.validators.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => canonicalizeValidatorIdentity(entry)) : undefined,
     cached: value.cached === true,
     cacheKey: typeof value.cacheKey === 'string' && value.cacheKey.trim() ? value.cacheKey.trim() : undefined,
     runnerKind: typeof value.runnerKind === 'string' && value.runnerKind.trim() ? normalizeRunnerKind(value.runnerKind) : undefined,
@@ -1766,17 +1808,17 @@ export function quoteForShell(arg: string): string {
 }
 
 export function detectAutoLinkedValidator(command: string): string | null {
-  const trimmed = command.trim();
-  const npmMatch = trimmed.match(/^npm run ([a-z0-9-:]+)$/);
-  if (npmMatch) {
-    const gate = npmMatch[1];
-    if (gate === 'typecheck' || gate.startsWith('validate:')) {
-      return gate;
-    }
-  }
-  const nodeMatch = trimmed.match(/^node --strip-types scripts\/validate-([a-z0-9-]+)\.ts --mode validate$/);
-  if (nodeMatch) {
-    return `validate:${nodeMatch[1]}`;
+  const gate = canonicalizeValidatorIdentity(command);
+  if (
+    gate === 'typecheck'
+    || gate === 'git diff --check'
+    || gate === 'doctor'
+    || gate === 'framework-development'
+    || gate === 'tasks-audit'
+    || gate === 'git-head-evidence'
+    || gate.startsWith('validate:')
+  ) {
+    return gate;
   }
   return null;
 }
