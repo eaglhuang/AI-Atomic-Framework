@@ -1,0 +1,193 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0013",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "2b5f30aee6bd327e56858afbc35532bf53388441",
+  "governedTreeSha": "f38e9b5d48c2cd6a449ff56e7d878e3ad133a609",
+  "targetCommitDelta": {
+    "currentCommitSha": "2b5f30aee6bd327e56858afbc35532bf53388441",
+    "parentCommitShas": [
+      "2b5f30aee6bd327e56858afbc35532bf53388441"
+    ],
+    "governedTreeSha": "f38e9b5d48c2cd6a449ff56e7d878e3ad133a609",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-MAO-0013.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-48-37-919Z-import-0c33498010c9.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-48-38-330Z-reserve-7471b23282ba.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-48-38-758Z-promote-d7594c2a8ba4.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-50-16-431Z-import-681e7c32f8ee.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-50-22-400Z-reserve-cde867a24c76.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-50-22-868Z-promote-e508d0b17d1f.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-50-23-370Z-claim-9b9d6215683e.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-50-23-809Z-scope-amendment-15a7765ce331.json",
+      ".atm/history/task-events/TASK-MAO-0013/2026-06-14T10-51-50-349Z-scope-amendment-c393f348e639.json",
+      ".atm/history/tasks/TASK-MAO-0013.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "packages/core/src/broker/atm-core-scope.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/doctor.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/src/commands/doctor.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/build-onefile-release.ts",
+      "release/atm-root-drop/scripts/build-root-drop-release.ts",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "release/atm-root-drop/scripts/validate-git-head-evidence.ts",
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement.ts",
+      "release/atm-root-drop/scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-runner-entrypoints.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5abc41daa94458c9967f6ff89be8dba2b5b2946ab53481a9a923689d3652b340",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:runner-entrypoints",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0edc8b6d39a7b2e180f8a51ce2a2f663dfcb25effe5453df9afe24f2fbb46b40",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:01cbceef86029c9bbc1907fd6d28377066d0d7be65540b2e86f25378cf58364d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "atm-core-scope-test",
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release",
+    "validate:runner-entrypoints"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-14T10:56:17.880Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0013-atm-core-scope-classifier.task.md",
+      ".atm/history/evidence/TASK-MAO-0013.*",
+      ".atm/history/task-events/TASK-MAO-0013/**",
+      ".atm/history/tasks/TASK-MAO-0013.json",
+      "atm.mjs",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "packages/core/src/broker/atm-core-scope.ts",
+      "scripts/validate-runner-entrypoints.ts"
+    ],
+    "criticalChangedFiles": [
+      "atm.mjs",
+      "packages/core/src/broker/__tests__/atm-core-scope.test.ts",
+      "packages/core/src/broker/atm-core-scope.ts",
+      "scripts/validate-runner-entrypoints.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0013.json",
+  "closedAt": "2026-06-14T10:56:17.881Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260614105023-captain-TASK-MAO-0013-a70c12b53b",
+  "attestation": null,
+  "historicalDeliveryProvenance": null
+}
