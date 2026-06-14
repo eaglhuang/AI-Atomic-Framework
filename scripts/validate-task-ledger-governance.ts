@@ -332,6 +332,16 @@ async function expectTaskErrorDetails(argv: string[], code: string): Promise<Rec
   }
 }
 
+async function expectTaskflowErrorDetails(argv: string[], code: string): Promise<Record<string, any>> {
+  try {
+    await runTaskflow(argv);
+    fail(`taskflow ${argv.join(' ')} expected ${code} but succeeded.`);
+  } catch (error) {
+    assert((error as { code?: string }).code === code, `taskflow ${argv.join(' ')} expected ${code}, got ${(error as { code?: string }).code ?? 'unknown'}.`);
+    return ((error as { details?: Record<string, any> }).details ?? {}) as Record<string, any>;
+  }
+}
+
 const sandboxFriendlyTempRoot = existsSync(path.join(root, '.atm-temp'))
   ? path.join(root, '.atm-temp')
   : os.tmpdir();
@@ -2214,6 +2224,129 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(plannedDryRun.ok === true, 'taskflow close dry-run must accept active target plus planned planning mirror');
   assert(plannedDryRun.evidence.closeMode === 'normal-close', 'active target plus planned planning mirror must not route to ambiguous manual review');
   assert(plannedDryRun.evidence.closebackPlan.backendSurface === 'tasks-close', 'active target plus planned planning mirror must use tasks-close backend');
+
+  const claimBlockedTaskId = 'TASK-CLOSE-ORCH-0004';
+  const claimBlockedPlanRelativePath = 'docs/tasks/TASK-CLOSE-ORCH-0004.task.md';
+  writeFileSync(path.join(repo, claimBlockedPlanRelativePath), [
+    '---',
+    `task_id: ${claimBlockedTaskId}`,
+    'title: "Taskflow close active-claim blocker fixture"',
+    'status: running',
+    '---',
+    `# ${claimBlockedTaskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  mkdirSync(path.join(repo, 'src'), { recursive: true });
+  writeFileSync(path.join(repo, 'src', 'claim-blocked.ts'), 'export const claimBlocked = true;\n', 'utf8');
+  execFileSync('git', ['add', '.'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'claim-blocked delivery'], { cwd: repo, stdio: 'ignore' });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${claimBlockedTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: claimBlockedTaskId,
+    title: 'Taskflow close active-claim blocker fixture',
+    status: 'running',
+    deliverables: ['src/claim-blocked.ts'],
+    scopePaths: ['src/claim-blocked.ts'],
+    source: { planPath: claimBlockedPlanRelativePath, sectionTitle: claimBlockedTaskId, headingLine: 1, hash: 'claim-blocked' }
+  });
+  const claimBlockedDryRun = await runTaskflow([
+    'close',
+    '--cwd', repo,
+    '--task', claimBlockedTaskId,
+    '--actor', 'validator',
+    '--profile', governedProfilePath,
+    '--historical-delivery', 'HEAD',
+    '--json'
+  ]) as any;
+  assert(claimBlockedDryRun.ok === true, 'active-claim parity dry-run must still return a non-mutating preview');
+  assert(claimBlockedDryRun.evidence.writeReadinessHint?.status === 'blocked', 'active-claim parity dry-run must disclose blocked write readiness');
+  assert((claimBlockedDryRun.evidence.writeReadinessHint?.blockers ?? []).some((entry: any) => entry.code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED'),
+    'active-claim parity dry-run must surface ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED');
+  const claimBlockedWrite = await expectTaskflowErrorDetails([
+    'close',
+    '--cwd', repo,
+    '--task', claimBlockedTaskId,
+    '--actor', 'validator',
+    '--profile', governedProfilePath,
+    '--historical-delivery', 'HEAD',
+    '--write',
+    '--json'
+  ], 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED');
+  assert(String(claimBlockedWrite.requiredCommand ?? '').includes('next --claim'),
+    'active-claim write failure must keep the governed reclaim command');
+
+  const waiverTaskId = 'TASK-CLOSE-ORCH-0005';
+  const waiverPlanRelativePath = 'docs/tasks/TASK-CLOSE-ORCH-0005.task.md';
+  writeFileSync(path.join(repo, waiverPlanRelativePath), [
+    '---',
+    `task_id: ${waiverTaskId}`,
+    'title: "Taskflow close waiver blocker fixture"',
+    'status: running',
+    '---',
+    `# ${waiverTaskId}`,
+    ''
+  ].join('\n'), 'utf8');
+  writeFileSync(path.join(repo, 'src', 'waiver-owned.ts'), 'export const waiverOwned = true;\n', 'utf8');
+  writeFileSync(path.join(repo, 'src', 'waiver-unrelated.ts'), 'export const waiverUnrelated = true;\n', 'utf8');
+  execFileSync('git', ['add', '.'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'waiver delivery'], { cwd: repo, stdio: 'ignore' });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', `${waiverTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: waiverTaskId,
+    title: 'Taskflow close waiver blocker fixture',
+    status: 'ready',
+    deliverables: ['src/waiver-owned.ts'],
+    scopePaths: ['src/waiver-owned.ts'],
+    source: { planPath: waiverPlanRelativePath, sectionTitle: waiverTaskId, headingLine: 1, hash: 'waiver-blocked' },
+    validators: ['npm run typecheck', 'npm run validate:cli', 'npm run validate:git-head-evidence']
+  });
+  const waiverClaim = await runNext(['--cwd', repo, '--claim', '--actor', 'validator', '--task', waiverTaskId]);
+  assert(waiverClaim.ok === true, 'waiver parity fixture must create an active claim');
+  writeJson(path.join(repo, '.atm', 'history', 'evidence', `${waiverTaskId}.json`), {
+    taskId: waiverTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'waiver parity fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['src/waiver-owned.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate waiver parity fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
+  });
+  const waiverDryRun = await runTaskflow([
+    'close',
+    '--cwd', repo,
+    '--task', waiverTaskId,
+    '--actor', 'validator',
+    '--profile', governedProfilePath,
+    '--historical-delivery', 'HEAD',
+    '--json'
+  ]) as any;
+  assert(waiverDryRun.ok === true, 'waiver parity dry-run must still succeed as preview');
+  assert(waiverDryRun.evidence.writeReadinessHint?.status === 'blocked', 'waiver parity dry-run must disclose blocked write readiness');
+  assert((waiverDryRun.evidence.writeReadinessHint?.blockers ?? []).some((entry: any) => entry.code === 'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUIRED'),
+    'waiver parity dry-run must disclose out-of-scope waiver blocker');
+  const waiverWrite = await expectTaskflowErrorDetails([
+    'close',
+    '--cwd', repo,
+    '--task', waiverTaskId,
+    '--actor', 'validator',
+    '--profile', governedProfilePath,
+    '--historical-delivery', 'HEAD',
+    '--write',
+    '--json'
+  ], 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED');
+  const waiverHistory = waiverWrite.historicalDeliveries?.[0];
+  assert(waiverHistory?.reason === 'out-of-scope-source-files-present',
+    `waiver parity write failure must preserve out-of-scope historical delivery reason, got ${String(waiverHistory?.reason ?? '<missing>')}`);
 
   const profileFallbackTaskId = 'TASK-CLOSE-ORCH-0003';
   const profileFallbackPlanRelativePath = `docs/tasks/${profileFallbackTaskId}.task.md`;
