@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
@@ -6,6 +6,7 @@ import {
   categorizeHistoricalCommitFiles,
   inspectHistoricalDelivery
 } from '../historical-delivery.ts';
+import { runEvidence } from '../../evidence.ts';
 
 function fail(message: string): never {
   console.error(`[historical-delivery.test] ${message}`);
@@ -97,6 +98,36 @@ try {
   });
   assert(report.ok, 'mixed commit must pass with explicit waiver reason');
   assert(report.waiverApplied, 'waived mixed commit must record waiverApplied');
+
+  mkdirSync(path.join(repo, '.atm', 'history', 'tasks'), { recursive: true });
+  writeFileSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-HIST.json'), JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-HIST',
+    status: 'ready',
+    scopePaths: ['src/task-owned.ts'],
+    deliverables: ['src/task-owned.ts']
+  }, null, 2), 'utf8');
+
+  const batchResult = await runEvidence([
+    'historical-batch',
+    '--cwd', repo,
+    '--delivery-repo', repo,
+    '--actor', 'tester',
+    '--tasks', 'TASK-HIST',
+    '--commits', mixedCommit,
+    '--validators', 'git diff --check',
+    '--validator-command', 'git diff --check',
+    '--write'
+  ]);
+  assert(batchResult.ok, 'historical-batch write must succeed');
+  const batchPath = path.join(repo, String(batchResult.evidence.batchPath));
+  assert(batchPath.includes(path.join('.atm', 'history', 'evidence', 'historical-batches')), 'historical batch path must be under historical-batches');
+  const taskEvidencePath = path.join(repo, '.atm', 'history', 'evidence', 'TASK-HIST.json');
+  const taskEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8')) as any;
+  const record = taskEvidence.evidence?.[0];
+  assert(record?.evidenceFreshness === 'historical-reference', 'task slice must be historical-reference');
+  assert(record?.details?.historicalBatch?.batchId, 'task slice must reference historical batch id');
+  assert(record?.details?.historicalBatch?.matchedFiles?.includes('src/task-owned.ts'), 'task slice must keep matched files');
 } finally {
   rmSync(repo, { recursive: true, force: true });
 }

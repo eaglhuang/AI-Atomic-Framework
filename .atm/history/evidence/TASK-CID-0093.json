@@ -1,0 +1,121 @@
+{
+  "taskId": "TASK-CID-0093",
+  "updatedAt": "2026-06-15T17:28:20.007Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-06-15T17-28-20-007Z for TASK-CID-0093.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-06-15T17-28-20-007Z.json",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "captain",
+      "sessionId": null,
+      "createdAt": "2026-06-15T17:28:20.007Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-06-15T17-28-20-007Z",
+          "commits": [
+            "31fd89ff0",
+            "ca59a88a9"
+          ],
+          "matchedCommits": [
+            "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+            "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+          ],
+          "matchedFiles": [
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/types.ts"
+          ],
+          "outOfScopeFiles": [
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/index.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "schemas/broker/mutation-request.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "taskSliceOk": true
+        },
+        "validationPasses": [
+          "git diff --check",
+          "test",
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check",
+              "test",
+              "typecheck"
+            ],
+            "generatedAt": "2026-06-15T17:28:20.419Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check",
+              "test",
+              "typecheck"
+            ],
+            "generatedAt": "2026-06-15T17:28:25.623Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm test",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3245aebe2787622da25dd169ae45e5099755eb84affd929db8e1cb616b8084d5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check",
+              "test",
+              "typecheck"
+            ],
+            "generatedAt": "2026-06-15T17:29:16.716Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    }
+  ]
+}

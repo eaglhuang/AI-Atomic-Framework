@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0094",
+  "title": "path-to-atom-map domain adapter",
+  "status": "planned",
+  "milestone": "M19",
+  "dependencies": [
+    "TASK-CID-0093"
+  ],
+  "acceptance": [
+    "Same file / different row updates can be planned as mergeable by broker.",
+    "Same row update conflict is detected before write.",
+    "Metadata, checksum, schema, or shard ownership changes are treated as wider conflict keys."
+  ],
+  "deliverables": [
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/registry.ts",
+    "packages/core/src/broker/adapters/atom-map.ts",
+    "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+    "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json"
+  ],
+  "scopePaths": [
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/registry.ts",
+    "packages/core/src/broker/adapters/atom-map.ts",
+    "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+    "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Replacing owner shard source-of-truth rules",
+    "Bulk atom map refactor unrelated to adapter mechanics"
+  ],
+  "nonGoals": [
+    "Do not make path-to-atom-map.json the only supported domain adapter."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert path-to-atom-map domain adapter and regression fixtures.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.path-to-atom-map-domain-adapter",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0094-path-to-atom-map-domain-adapter.task.md",
+    "sectionTitle": "TASK-CID-0094",
+    "headingLine": 51,
+    "hash": "bcae262f6fe0a063"
+  },
+  "importedAt": "2026-06-15T16:53:16.660Z",
+  "lastTransitionId": "2026-06-15T16-53-16-665Z-import-fc325cd510fb",
+  "lastTransitionAt": "2026-06-15T16:53:16.665Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0095",
+  "title": "Text range adapter with conservative merge rules",
+  "status": "planned",
+  "milestone": "M19",
+  "dependencies": [
+    "TASK-CID-0092"
+  ],
+  "acceptance": [
+    "Independent appends to different stable anchors can be batched when deterministic order is declared.",
+    "Overlapping range edits are not marked parallel-safe.",
+    "Missing anchor causes failed evidence instead of best-effort mutation."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/text-range.ts",
+    "packages/core/src/broker/__tests__/text-range-adapter.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/text-range.ts",
+    "packages/core/src/broker/__tests__/text-range-adapter.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Semantic Markdown parser",
+    "Rich document formats such as DOCX"
+  ],
+  "nonGoals": [
+    "Do not auto-merge overlapping text ranges."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert text adapter and tests.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.text-range-adapter",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0095-text-range-adapter-conservative-merge-rules.task.md",
+    "sectionTitle": "TASK-CID-0095",
+    "headingLine": 41,
+    "hash": "6f6791dfc72de5df"
+  },
+  "importedAt": "2026-06-15T16:53:16.492Z",
+  "lastTransitionId": "2026-06-15T16-53-16-497Z-import-131ff6ec64dc",
+  "lastTransitionAt": "2026-06-15T16:53:16.497Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

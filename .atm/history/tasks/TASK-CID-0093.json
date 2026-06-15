@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0093",
+  "title": "Generic JSON record adapter and conflict keys",
+  "status": "ready",
+  "milestone": "M19",
+  "dependencies": [
+    "TASK-CID-0092"
+  ],
+  "acceptance": [
+    "Two upserts to different object keys in the same JSON file can be planned as one broker batch.",
+    "Two writes to the same JSON pointer are not marked parallel-safe unless the adapter explicitly says the operation is commutative.",
+    "Invalid JSON or validation failure blocks write and records failed evidence."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/json-record.ts",
+    "packages/core/src/broker/__tests__/json-record-adapter.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/json-record.ts",
+    "packages/core/src/broker/__tests__/json-record-adapter.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "path-to-atom-map domain rules",
+    "Array semantic merge beyond conservative replace"
+  ],
+  "nonGoals": [
+    "Do not allow concurrent direct writes to JSON files."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert generic JSON adapter and tests.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.generic-json-record-adapter",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0093-generic-json-record-adapter-and-conflict-keys.task.md",
+    "sectionTitle": "TASK-CID-0093",
+    "headingLine": 43,
+    "hash": "a650ff1fcc1d5a71"
+  },
+  "importedAt": "2026-06-15T16:53:16.559Z",
+  "lastTransitionId": "2026-06-15T16-53-28-647Z-promote-6eaa82a75650",
+  "lastTransitionAt": "2026-06-15T16:53:28.647Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-15T16:53:28.641Z",
+  "promotedAt": "2026-06-15T16:53:28.646Z"
+}

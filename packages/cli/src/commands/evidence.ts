@@ -13,6 +13,7 @@ import {
   mergeDiffEvidenceWithExisting,
   validateDiffEvidence
 } from '../../../core/src/evidence/diff-evidence.ts';
+import { inspectHistoricalDelivery, type TaskHistoricalDeliveryReport } from './tasks/historical-delivery.ts';
 
 export type EvidenceGate = 'close' | 'commit' | 'pr';
 type CanonicalEvidenceKind = 'test' | 'artifact' | 'attestation' | 'review' | 'commit' | 'waiver' | 'other';
@@ -88,7 +89,10 @@ export async function runEvidence(argv: string[]) {
   if (action === 'missing') {
     return runEvidenceMissing(argv.slice(1));
   }
-  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing', { exitCode: 2 });
+  if (action === 'historical-batch') {
+    return runEvidenceHistoricalBatch(argv.slice(1));
+  }
+  throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing, historical-batch', { exitCode: 2 });
 }
 
 /** validator tier 說明
@@ -1060,6 +1064,370 @@ function runEvidenceAdd(argv: string[]) {
       commandRunCount: commandRuns.length,
       commandRunCache
     }
+  });
+}
+
+interface HistoricalBatchValidatorRun {
+  readonly command: string;
+  readonly cwd: string;
+  readonly exitCode: number;
+  readonly stdoutSha256: string;
+  readonly stderrSha256: string;
+  readonly validators: readonly string[];
+  readonly generatedAt: string;
+  readonly runnerKind: string;
+}
+
+interface HistoricalBatchTaskSlice {
+  readonly taskId: string;
+  readonly ok: boolean;
+  readonly matchedCommits: readonly string[];
+  readonly matchedFiles: readonly string[];
+  readonly outOfScopeFiles: readonly string[];
+  readonly reports: readonly TaskHistoricalDeliveryReport[];
+  readonly evidencePath: string | null;
+}
+
+function runEvidenceHistoricalBatch(argv: string[]) {
+  const options = parseEvidenceHistoricalBatchOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence historical-batch requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const nowIso = new Date().toISOString();
+  const batchId = `hist-batch-${nowIso.replace(/[:.]/g, '-')}`;
+  const validatorRuns = options.validatorCommands.map((command) => runHistoricalBatchValidator({
+    cwd: options.cwd,
+    command,
+    validators: options.validators
+  }));
+  const failedValidators = validatorRuns.filter((run) => run.exitCode !== 0);
+  if (failedValidators.length > 0) {
+    throw new CliError('ATM_HISTORICAL_BATCH_VALIDATOR_FAILED', 'historical batch evidence refused to write because one or more validator commands failed.', {
+      exitCode: 1,
+      details: {
+        failedValidators: failedValidators.map((run) => ({
+          command: run.command,
+          exitCode: run.exitCode,
+          stdoutSha256: run.stdoutSha256,
+          stderrSha256: run.stderrSha256
+        }))
+      }
+    });
+  }
+
+  const slices = options.taskIds.map((taskId) => buildHistoricalBatchTaskSlice({
+    cwd: options.cwd,
+    deliveryRepo: options.deliveryRepo,
+    taskId,
+    commits: options.commits
+  }));
+  const unmatchedTasks = slices.filter((slice) => !slice.ok);
+  if (unmatchedTasks.length > 0 && !options.allowUnmatched) {
+    throw new CliError('ATM_HISTORICAL_BATCH_TASK_UNMATCHED', 'historical batch evidence refused to write because at least one task had no scoped delivery files in the supplied commits.', {
+      exitCode: 1,
+      details: {
+        unmatchedTasks: unmatchedTasks.map((slice) => ({
+          taskId: slice.taskId,
+          reports: slice.reports.map((report) => ({
+            requestedRef: report.requestedRef,
+            commitSha: report.commitSha,
+            reason: report.reason
+          }))
+        })),
+        remediation: 'Supply the correct commit range or pass --allow-unmatched for a diagnostic-only batch.'
+      }
+    });
+  }
+
+  const batchEnvelope = {
+    schemaId: 'atm.historicalBatchEvidence.v1',
+    batchId,
+    createdAt: nowIso,
+    producedBy: actorId,
+    cwd: options.cwd,
+    deliveryRepo: options.deliveryRepo,
+    commits: options.commits,
+    validators: options.validators,
+    validatorRuns,
+    tasks: slices.map((slice) => ({
+      taskId: slice.taskId,
+      ok: slice.ok,
+      matchedCommits: slice.matchedCommits,
+      matchedFiles: slice.matchedFiles,
+      outOfScopeFiles: slice.outOfScopeFiles,
+      reports: slice.reports.map((report) => ({
+        requestedRef: report.requestedRef,
+        commitSha: report.commitSha,
+        ok: report.ok,
+        reason: report.reason,
+        changedFiles: report.changedFiles,
+        deliverableFiles: report.deliverableFiles,
+        fileBuckets: report.fileBuckets,
+        waiverApplied: report.waiverApplied
+      }))
+    }))
+  };
+
+  const batchPath = path.join(options.cwd, '.atm', 'history', 'evidence', 'historical-batches', `${batchId}.json`);
+  if (options.write) {
+    mkdirSync(path.dirname(batchPath), { recursive: true });
+    writeFileSync(batchPath, `${JSON.stringify(batchEnvelope, null, 2)}\n`, 'utf8');
+    for (const slice of slices) {
+      appendHistoricalBatchTaskEvidence({
+        cwd: options.cwd,
+        actorId,
+        nowIso,
+        batchId,
+        batchPath,
+        slice,
+        commits: options.commits,
+        validators: options.validators,
+        validatorRuns
+      });
+    }
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: options.cwd,
+    mode: options.write ? 'write' : 'dry-run',
+    messages: [
+      message('info', options.write ? 'ATM_HISTORICAL_BATCH_EVIDENCE_WRITTEN' : 'ATM_HISTORICAL_BATCH_EVIDENCE_READY',
+        options.write
+          ? `Historical batch evidence ${batchId} written for ${slices.length} task(s).`
+          : `Historical batch evidence ${batchId} planned for ${slices.length} task(s).`,
+        {
+          batchId,
+          tasks: slices.length,
+          commits: options.commits,
+          validatorCommands: options.validatorCommands,
+          unmatchedTasks: unmatchedTasks.map((slice) => slice.taskId)
+        })
+    ],
+    evidence: {
+      action: 'historical-batch',
+      batchId,
+      batchPath: relativePathFrom(options.cwd, batchPath),
+      write: options.write,
+      commits: options.commits,
+      validators: options.validators,
+      validatorRuns,
+      taskSlices: slices.map((slice) => ({
+        taskId: slice.taskId,
+        ok: slice.ok,
+        matchedCommits: slice.matchedCommits,
+        matchedFiles: slice.matchedFiles,
+        outOfScopeFiles: slice.outOfScopeFiles,
+        evidencePath: slice.evidencePath
+      }))
+    }
+  });
+}
+
+function parseEvidenceHistoricalBatchOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    deliveryRepo: null as string | null,
+    actorId: null as string | null,
+    taskIds: [] as string[],
+    commits: [] as string[],
+    validators: [] as string[],
+    validatorCommands: [] as string[],
+    write: false,
+    allowUnmatched: false
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--delivery-repo') {
+      options.deliveryRepo = requireValue(argv, index, '--delivery-repo');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--tasks') {
+      options.taskIds.push(...splitCsv(requireValue(argv, index, '--tasks')));
+      index += 1;
+      continue;
+    }
+    if (arg === '--commits') {
+      options.commits.push(...splitCsv(requireValue(argv, index, '--commits')));
+      index += 1;
+      continue;
+    }
+    if (arg === '--validators') {
+      options.validators.push(...splitCsv(requireValue(argv, index, '--validators')).map((entry) => canonicalizeValidatorIdentity(entry)));
+      index += 1;
+      continue;
+    }
+    if (arg === '--validator-command') {
+      options.validatorCommands.push(requireValue(argv, index, '--validator-command').trim());
+      index += 1;
+      continue;
+    }
+    if (arg === '--write') {
+      options.write = true;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      options.write = false;
+      continue;
+    }
+    if (arg === '--allow-unmatched') {
+      options.allowUnmatched = true;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence historical-batch does not support option ${arg}`, { exitCode: 2 });
+  }
+  const cwd = path.resolve(options.cwd);
+  const deliveryRepo = path.resolve(options.deliveryRepo ?? cwd);
+  const taskIds = uniqueStrings(options.taskIds);
+  const commits = uniqueStrings(options.commits);
+  const validators = uniqueStrings(options.validators);
+  const validatorCommands = uniqueStrings(options.validatorCommands);
+  if (taskIds.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires --tasks <csv>.', { exitCode: 2 });
+  if (commits.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires --commits <csv>.', { exitCode: 2 });
+  if (validatorCommands.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires at least one --validator-command.', { exitCode: 2 });
+  return {
+    ...options,
+    cwd,
+    deliveryRepo,
+    taskIds,
+    commits,
+    validators,
+    validatorCommands
+  };
+}
+
+function splitCsv(value: string): string[] {
+  return value.split(',').map((entry) => entry.trim()).filter(Boolean);
+}
+
+function runHistoricalBatchValidator(input: {
+  readonly cwd: string;
+  readonly command: string;
+  readonly validators: readonly string[];
+}): HistoricalBatchValidatorRun {
+  const shell = process.platform === 'win32' ? 'powershell.exe' : '/bin/sh';
+  const shellArgs = process.platform === 'win32' ? ['-NoProfile', '-Command', input.command] : ['-c', input.command];
+  const result = spawnSync(shell, shellArgs, {
+    cwd: input.cwd,
+    encoding: 'utf8',
+    env: { ...process.env }
+  });
+  return {
+    command: input.command,
+    cwd: '.',
+    exitCode: result.status ?? (result.error ? 1 : 0),
+    stdoutSha256: hashString(result.stdout ?? ''),
+    stderrSha256: hashString([result.stderr ?? '', result.error?.message ?? ''].filter(Boolean).join('\n')),
+    validators: input.validators,
+    generatedAt: new Date().toISOString(),
+    runnerKind: inferRunnerKindFromCommand(input.command)
+  };
+}
+
+function buildHistoricalBatchTaskSlice(input: {
+  readonly cwd: string;
+  readonly deliveryRepo: string;
+  readonly taskId: string;
+  readonly commits: readonly string[];
+}): HistoricalBatchTaskSlice {
+  const taskDocument = readTaskDocument(input.cwd, input.taskId);
+  const declaredFiles = extractHistoricalBatchDeclaredFiles(taskDocument);
+  const reports = input.commits.map((commit) => inspectHistoricalDelivery({
+    cwd: input.deliveryRepo,
+    taskId: input.taskId,
+    requestedRef: commit,
+    declaredFiles,
+    enforceDeclaredScope: true,
+    waiverOutOfScopeDelivery: true,
+    waiverReason: 'historical batch evidence envelope isolates scoped task slices from a mixed delivery package'
+  }));
+  const matchedReports = reports.filter((report) => report.commitSha && report.fileBuckets.taskMatchedFiles.length > 0);
+  const matchedFiles = uniqueStrings(matchedReports.flatMap((report) => report.fileBuckets.taskMatchedFiles));
+  const outOfScopeFiles = uniqueStrings(matchedReports.flatMap((report) => report.fileBuckets.outOfScopeSourceFiles));
+  return {
+    taskId: input.taskId,
+    ok: matchedFiles.length > 0,
+    matchedCommits: uniqueStrings(matchedReports.map((report) => report.commitSha ?? '').filter(Boolean)),
+    matchedFiles,
+    outOfScopeFiles,
+    reports,
+    evidencePath: relativePathFrom(input.cwd, evidencePathForTask(input.cwd, input.taskId))
+  };
+}
+
+function extractHistoricalBatchDeclaredFiles(taskDocument: Record<string, unknown> | null): string[] {
+  if (!taskDocument) return [];
+  const files = new Set<string>();
+  for (const key of ['scopePaths', 'deliverables', 'targetAllowedFiles', 'files', 'changedFiles', 'targetFiles']) {
+    collectTaskFileValues(taskDocument[key], files);
+  }
+  return [...files].map(normalizeRelativePath).filter(Boolean);
+}
+
+function appendHistoricalBatchTaskEvidence(input: {
+  readonly cwd: string;
+  readonly actorId: string;
+  readonly nowIso: string;
+  readonly batchId: string;
+  readonly batchPath: string;
+  readonly slice: HistoricalBatchTaskSlice;
+  readonly commits: readonly string[];
+  readonly validators: readonly string[];
+  readonly validatorRuns: readonly HistoricalBatchValidatorRun[];
+}) {
+  const evidencePath = evidencePathForTask(input.cwd, input.slice.taskId);
+  const evidenceRecord: Record<string, unknown> = {
+    evidenceKind: 'validation',
+    evidenceType: 'test',
+    summary: `Historical batch evidence ${input.batchId} for ${input.slice.taskId}.`,
+    artifactPaths: [normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath)), ...input.slice.matchedFiles],
+    evidenceFreshness: 'historical-reference',
+    producedBy: input.actorId,
+    sessionId: null,
+    createdAt: input.nowIso,
+    details: {
+      actorId: input.actorId,
+      sessionId: null,
+      kind: 'test',
+      freshness: 'historical-reference',
+      historicalBatch: {
+        schemaId: 'atm.historicalBatchTaskSlice.v1',
+        batchId: input.batchId,
+        commits: input.commits,
+        matchedCommits: input.slice.matchedCommits,
+        matchedFiles: input.slice.matchedFiles,
+        outOfScopeFiles: input.slice.outOfScopeFiles,
+        taskSliceOk: input.slice.ok
+      },
+      validationPasses: input.validators,
+      commandRuns: input.validatorRuns
+    }
+  };
+  withTaskEvidenceWriteLock(input.cwd, input.slice.taskId, input.actorId, () => {
+    const bundle = readEvidenceBundle(input.cwd, input.slice.taskId);
+    const envelope: EvidenceEnvelope = {
+      taskId: input.slice.taskId,
+      updatedAt: input.nowIso,
+      evidence: [...bundle.evidence, evidenceRecord]
+    };
+    writeEvidenceEnvelope(evidencePath, envelope);
   });
 }
 

@@ -1,0 +1,1150 @@
+{
+  "schemaId": "atm.historicalBatchEvidence.v1",
+  "batchId": "hist-batch-2026-06-15T17-28-20-007Z",
+  "createdAt": "2026-06-15T17:28:20.007Z",
+  "producedBy": "captain",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework",
+  "deliveryRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "commits": [
+    "31fd89ff0",
+    "ca59a88a9"
+  ],
+  "validators": [
+    "git diff --check",
+    "test",
+    "typecheck"
+  ],
+  "validatorRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check",
+        "test",
+        "typecheck"
+      ],
+      "generatedAt": "2026-06-15T17:28:20.419Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check",
+        "test",
+        "typecheck"
+      ],
+      "generatedAt": "2026-06-15T17:28:25.623Z",
+      "runnerKind": "unknown"
+    },
+    {
+      "command": "npm test",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3245aebe2787622da25dd169ae45e5099755eb84affd929db8e1cb616b8084d5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check",
+        "test",
+        "typecheck"
+      ],
+      "generatedAt": "2026-06-15T17:29:16.716Z",
+      "runnerKind": "unknown"
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "TASK-CID-0092",
+      "ok": true,
+      "matchedCommits": [
+        "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+        "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+      ],
+      "matchedFiles": [
+        "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+        "packages/core/src/broker/adapters/fallback-file-lock.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/broker/conflict-key.schema.json",
+        "schemas/broker/merge-decision.schema.json",
+        "schemas/broker/mutation-request.schema.json"
+      ],
+      "outOfScopeFiles": [
+        "docs/reports/broker-format-adapter-dogfood-report.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/batch-planner.test.ts",
+        "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/batch-planner.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/apply-evidence.ts",
+        "schemas/broker/mutation-batch-plan.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "reports": [
+        {
+          "requestedRef": "31fd89ff0",
+          "commitSha": "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+              "packages/core/src/broker/adapters/fallback-file-lock.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/index.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/conflict-key.schema.json",
+              "schemas/broker/merge-decision.schema.json",
+              "schemas/broker/mutation-request.schema.json"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+              "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+              "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+              "packages/core/src/broker/adapters/json-record.ts",
+              "packages/core/src/broker/adapters/numeric-scalar.ts",
+              "packages/core/src/broker/adapters/text-range.ts"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "ca59a88a9",
+          "commitSha": "ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/types.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/types.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "docs/reports/broker-format-adapter-dogfood-report.md",
+              "packages/cli/src/commands/broker.ts",
+              "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+              "packages/core/src/broker/__tests__/batch-planner.test.ts",
+              "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+              "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+              "packages/core/src/broker/adapters/atom-map.ts",
+              "packages/core/src/broker/adapters/batch-planner.ts",
+              "packages/core/src/broker/adapters/cas.ts",
+              "packages/core/src/broker/apply-evidence.ts",
+              "schemas/broker/mutation-batch-plan.schema.json",
+              "scripts/validate-schemas.ts"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-CID-0093",
+      "ok": true,
+      "matchedCommits": [
+        "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+        "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+      ],
+      "matchedFiles": [
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "outOfScopeFiles": [
+        "docs/reports/broker-format-adapter-dogfood-report.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/batch-planner.test.ts",
+        "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/batch-planner.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/fallback-file-lock.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/apply-evidence.ts",
+        "packages/core/src/broker/index.ts",
+        "schemas/broker/conflict-key.schema.json",
+        "schemas/broker/merge-decision.schema.json",
+        "schemas/broker/mutation-batch-plan.schema.json",
+        "schemas/broker/mutation-request.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "reports": [
+        {
+          "requestedRef": "31fd89ff0",
+          "commitSha": "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/types.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/json-record.ts",
+              "packages/core/src/broker/types.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+              "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+              "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+              "packages/core/src/broker/adapters/fallback-file-lock.ts",
+              "packages/core/src/broker/adapters/numeric-scalar.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/adapters/text-range.ts",
+              "packages/core/src/broker/index.ts",
+              "schemas/broker/conflict-key.schema.json",
+              "schemas/broker/merge-decision.schema.json",
+              "schemas/broker/mutation-request.schema.json"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "ca59a88a9",
+          "commitSha": "ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/types.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/types.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "docs/reports/broker-format-adapter-dogfood-report.md",
+              "packages/cli/src/commands/broker.ts",
+              "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+              "packages/core/src/broker/__tests__/batch-planner.test.ts",
+              "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+              "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+              "packages/core/src/broker/adapters/atom-map.ts",
+              "packages/core/src/broker/adapters/batch-planner.ts",
+              "packages/core/src/broker/adapters/cas.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/apply-evidence.ts",
+              "schemas/broker/mutation-batch-plan.schema.json",
+              "scripts/validate-schemas.ts"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-CID-0094",
+      "ok": true,
+      "matchedCommits": [
+        "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+        "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+      ],
+      "matchedFiles": [
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "outOfScopeFiles": [
+        "docs/reports/broker-format-adapter-dogfood-report.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+        "packages/core/src/broker/__tests__/batch-planner.test.ts",
+        "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/batch-planner.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/fallback-file-lock.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/apply-evidence.ts",
+        "packages/core/src/broker/index.ts",
+        "schemas/broker/conflict-key.schema.json",
+        "schemas/broker/merge-decision.schema.json",
+        "schemas/broker/mutation-batch-plan.schema.json",
+        "schemas/broker/mutation-request.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "reports": [
+        {
+          "requestedRef": "31fd89ff0",
+          "commitSha": "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/types.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/types.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+              "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+              "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+              "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+              "packages/core/src/broker/adapters/fallback-file-lock.ts",
+              "packages/core/src/broker/adapters/json-record.ts",
+              "packages/core/src/broker/adapters/numeric-scalar.ts",
+              "packages/core/src/broker/adapters/text-range.ts",
+              "packages/core/src/broker/index.ts",
+              "schemas/broker/conflict-key.schema.json",
+              "schemas/broker/merge-decision.schema.json",
+              "schemas/broker/mutation-request.schema.json"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "ca59a88a9",
+          "commitSha": "ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/types.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+              "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+              "packages/core/src/broker/adapters/atom-map.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/types.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "docs/reports/broker-format-adapter-dogfood-report.md",
+              "packages/cli/src/commands/broker.ts",
+              "packages/core/src/broker/__tests__/batch-planner.test.ts",
+              "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+              "packages/core/src/broker/adapters/batch-planner.ts",
+              "packages/core/src/broker/adapters/cas.ts",
+              "packages/core/src/broker/apply-evidence.ts",
+              "schemas/broker/mutation-batch-plan.schema.json",
+              "scripts/validate-schemas.ts"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-CID-0095",
+      "ok": true,
+      "matchedCommits": [
+        "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+        "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+      ],
+      "matchedFiles": [
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/text-range.ts"
+      ],
+      "outOfScopeFiles": [
+        "docs/reports/broker-format-adapter-dogfood-report.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/batch-planner.test.ts",
+        "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/batch-planner.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/fallback-file-lock.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/apply-evidence.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/broker/conflict-key.schema.json",
+        "schemas/broker/merge-decision.schema.json",
+        "schemas/broker/mutation-batch-plan.schema.json",
+        "schemas/broker/mutation-request.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "reports": [
+        {
+          "requestedRef": "31fd89ff0",
+          "commitSha": "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/text-range.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/text-range.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+              "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+              "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+              "packages/core/src/broker/adapters/fallback-file-lock.ts",
+              "packages/core/src/broker/adapters/json-record.ts",
+              "packages/core/src/broker/adapters/numeric-scalar.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/index.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/conflict-key.schema.json",
+              "schemas/broker/merge-decision.schema.json",
+              "schemas/broker/mutation-request.schema.json"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "ca59a88a9",
+          "commitSha": "ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/adapters/index.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/adapters/index.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "docs/reports/broker-format-adapter-dogfood-report.md",
+              "packages/cli/src/commands/broker.ts",
+              "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+              "packages/core/src/broker/__tests__/batch-planner.test.ts",
+              "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+              "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+              "packages/core/src/broker/adapters/atom-map.ts",
+              "packages/core/src/broker/adapters/batch-planner.ts",
+              "packages/core/src/broker/adapters/cas.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/apply-evidence.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/mutation-batch-plan.schema.json",
+              "scripts/validate-schemas.ts"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-CID-0096",
+      "ok": true,
+      "matchedCommits": [
+        "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+        "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+      ],
+      "matchedFiles": [
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts"
+      ],
+      "outOfScopeFiles": [
+        "docs/reports/broker-format-adapter-dogfood-report.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/batch-planner.test.ts",
+        "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/batch-planner.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/fallback-file-lock.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/apply-evidence.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/broker/conflict-key.schema.json",
+        "schemas/broker/merge-decision.schema.json",
+        "schemas/broker/mutation-batch-plan.schema.json",
+        "schemas/broker/mutation-request.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "reports": [
+        {
+          "requestedRef": "31fd89ff0",
+          "commitSha": "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/numeric-scalar.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+              "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+              "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+              "packages/core/src/broker/adapters/fallback-file-lock.ts",
+              "packages/core/src/broker/adapters/json-record.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/adapters/text-range.ts",
+              "packages/core/src/broker/index.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/conflict-key.schema.json",
+              "schemas/broker/merge-decision.schema.json",
+              "schemas/broker/mutation-request.schema.json"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "ca59a88a9",
+          "commitSha": "ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/adapters/index.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/adapters/index.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "docs/reports/broker-format-adapter-dogfood-report.md",
+              "packages/cli/src/commands/broker.ts",
+              "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+              "packages/core/src/broker/__tests__/batch-planner.test.ts",
+              "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+              "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+              "packages/core/src/broker/adapters/atom-map.ts",
+              "packages/core/src/broker/adapters/batch-planner.ts",
+              "packages/core/src/broker/adapters/cas.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/apply-evidence.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/mutation-batch-plan.schema.json",
+              "scripts/validate-schemas.ts"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-CID-0097",
+      "ok": true,
+      "matchedCommits": [
+        "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+        "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+      ],
+      "matchedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/batch-planner.test.ts",
+        "packages/core/src/broker/adapters/batch-planner.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/apply-evidence.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/broker/mutation-batch-plan.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "outOfScopeFiles": [
+        "docs/reports/broker-format-adapter-dogfood-report.md",
+        "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/fallback-file-lock.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/index.ts",
+        "schemas/broker/conflict-key.schema.json",
+        "schemas/broker/merge-decision.schema.json",
+        "schemas/broker/mutation-request.schema.json"
+      ],
+      "reports": [
+        {
+          "requestedRef": "31fd89ff0",
+          "commitSha": "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/types.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/types.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+              "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+              "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+              "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+              "packages/core/src/broker/adapters/fallback-file-lock.ts",
+              "packages/core/src/broker/adapters/json-record.ts",
+              "packages/core/src/broker/adapters/numeric-scalar.ts",
+              "packages/core/src/broker/adapters/text-range.ts",
+              "packages/core/src/broker/index.ts",
+              "schemas/broker/conflict-key.schema.json",
+              "schemas/broker/merge-decision.schema.json",
+              "schemas/broker/mutation-request.schema.json"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "ca59a88a9",
+          "commitSha": "ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "deliverableFiles": [
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/cli/src/commands/broker.ts",
+              "packages/core/src/broker/__tests__/batch-planner.test.ts",
+              "packages/core/src/broker/adapters/batch-planner.ts",
+              "packages/core/src/broker/adapters/cas.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/apply-evidence.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/mutation-batch-plan.schema.json",
+              "scripts/validate-schemas.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "docs/reports/broker-format-adapter-dogfood-report.md",
+              "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+              "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+              "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+              "packages/core/src/broker/adapters/atom-map.ts"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-CID-0098",
+      "ok": true,
+      "matchedCommits": [
+        "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+        "ca59a88a9adf19a5295541a738919ecf5cc6ffec"
+      ],
+      "matchedFiles": [
+        "docs/reports/broker-format-adapter-dogfood-report.md",
+        "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/batch-planner.test.ts",
+        "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "scripts/validate-schemas.ts"
+      ],
+      "outOfScopeFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/batch-planner.ts",
+        "packages/core/src/broker/adapters/cas.ts",
+        "packages/core/src/broker/adapters/fallback-file-lock.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/adapters/text-range.ts",
+        "packages/core/src/broker/apply-evidence.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/broker/conflict-key.schema.json",
+        "schemas/broker/merge-decision.schema.json",
+        "schemas/broker/mutation-batch-plan.schema.json",
+        "schemas/broker/mutation-request.schema.json"
+      ],
+      "reports": [
+        {
+          "requestedRef": "31fd89ff0",
+          "commitSha": "31fd89ff0b359edf8641e0a6c11d4449c11a9ca8",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+            "packages/core/src/broker/adapters/fallback-file-lock.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/json-record.ts",
+            "packages/core/src/broker/adapters/numeric-scalar.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/adapters/text-range.ts",
+            "packages/core/src/broker/index.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/conflict-key.schema.json",
+            "schemas/broker/merge-decision.schema.json",
+            "schemas/broker/mutation-request.schema.json"
+          ],
+          "deliverableFiles": [
+            "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+            "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+            "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+            "packages/core/src/broker/__tests__/text-range-adapter.test.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+              "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+              "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+              "packages/core/src/broker/__tests__/text-range-adapter.test.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/core/src/broker/adapters/fallback-file-lock.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/json-record.ts",
+              "packages/core/src/broker/adapters/numeric-scalar.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/adapters/text-range.ts",
+              "packages/core/src/broker/index.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/conflict-key.schema.json",
+              "schemas/broker/merge-decision.schema.json",
+              "schemas/broker/mutation-request.schema.json"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        },
+        {
+          "requestedRef": "ca59a88a9",
+          "commitSha": "ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+          "ok": true,
+          "reason": "scoped-deliverable-with-waived-out-of-scope",
+          "changedFiles": [
+            ".atm/history/evidence/git-head.jsonl",
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/cli/src/commands/broker.ts",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "packages/core/src/broker/adapters/atom-map.ts",
+            "packages/core/src/broker/adapters/batch-planner.ts",
+            "packages/core/src/broker/adapters/cas.ts",
+            "packages/core/src/broker/adapters/index.ts",
+            "packages/core/src/broker/adapters/registry.ts",
+            "packages/core/src/broker/apply-evidence.ts",
+            "packages/core/src/broker/types.ts",
+            "schemas/broker/mutation-batch-plan.schema.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "deliverableFiles": [
+            "docs/reports/broker-format-adapter-dogfood-report.md",
+            "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+            "packages/core/src/broker/__tests__/batch-planner.test.ts",
+            "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+            "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+            "scripts/validate-schemas.ts"
+          ],
+          "fileBuckets": {
+            "taskMatchedFiles": [
+              "docs/reports/broker-format-adapter-dogfood-report.md",
+              "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+              "packages/core/src/broker/__tests__/batch-planner.test.ts",
+              "packages/core/src/broker/__tests__/dogfood-adapter-benchmark.test.ts",
+              "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+              "scripts/validate-schemas.ts"
+            ],
+            "governanceFiles": [
+              ".atm/history/evidence/git-head.jsonl"
+            ],
+            "allowedRunnerOutputFiles": [],
+            "outOfScopeSourceFiles": [
+              "packages/cli/src/commands/broker.ts",
+              "packages/core/src/broker/adapters/atom-map.ts",
+              "packages/core/src/broker/adapters/batch-planner.ts",
+              "packages/core/src/broker/adapters/cas.ts",
+              "packages/core/src/broker/adapters/index.ts",
+              "packages/core/src/broker/adapters/registry.ts",
+              "packages/core/src/broker/apply-evidence.ts",
+              "packages/core/src/broker/types.ts",
+              "schemas/broker/mutation-batch-plan.schema.json"
+            ],
+            "ignoredFiles": []
+          },
+          "waiverApplied": true
+        }
+      ]
+    }
+  ]
+}

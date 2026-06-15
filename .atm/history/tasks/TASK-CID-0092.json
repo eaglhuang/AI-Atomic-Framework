@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0092",
+  "title": "Mutation broker adapter registry contract",
+  "status": "ready",
+  "milestone": "M19",
+  "dependencies": [
+    "TASK-CID-0091"
+  ],
+  "acceptance": [
+    "Broker core can register and resolve adapters deterministically.",
+    "Contract tests cover supported adapter, unsupported adapter, and fallback file lock.",
+    "No JSON / text / numeric specific merge logic is introduced into broker core."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/registry.ts",
+    "packages/core/src/broker/adapters/fallback-file-lock.ts",
+    "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+    "schemas/broker/mutation-request.schema.json",
+    "schemas/broker/conflict-key.schema.json",
+    "schemas/broker/merge-decision.schema.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/registry.ts",
+    "packages/core/src/broker/adapters/fallback-file-lock.ts",
+    "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+    "schemas/broker/mutation-request.schema.json",
+    "schemas/broker/conflict-key.schema.json",
+    "schemas/broker/merge-decision.schema.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "JSON domain adapter implementation",
+    "Text or numeric adapters"
+  ],
+  "nonGoals": [
+    "Do not hard-code format-specific merge logic in broker core."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert adapter registry contract and schemas.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.mutation-broker-adapter-registry",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0092-mutation-broker-adapter-registry-contract.task.md",
+    "sectionTitle": "TASK-CID-0092",
+    "headingLine": 53,
+    "hash": "017cc039b5be6acd"
+  },
+  "importedAt": "2026-06-15T16:54:21.070Z",
+  "lastTransitionId": "2026-06-15T16-55-03-569Z-promote-beb257351b44",
+  "lastTransitionAt": "2026-06-15T16:55:03.569Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-15T16:54:42.190Z",
+  "promotedAt": "2026-06-15T16:55:03.568Z"
+}
