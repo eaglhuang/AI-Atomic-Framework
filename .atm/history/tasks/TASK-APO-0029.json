@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-APO-0029",
+  "title": "ATM Task Plan Import and Work Item Opening Flow",
+  "status": "abandoned",
+  "milestone": "M5",
+  "dependencies": [
+    "TASK-APO-0028"
+  ],
+  "acceptance": [
+    "`tasks import --dry-run` parses a fixture Markdown roadmap into a deterministic manifest without writing task files.",
+    "`tasks import --write` writes task JSON records with stable IDs, titles, status, milestone, dependencies, acceptance, deliverables, and source trace.",
+    "Importing a plan with duplicate task IDs fails with a typed CLI error and does not partially write.",
+    "`tasks verify --json` validates the imported task directory and reports duplicate IDs, missing dependencies, invalid statuses, and malformed source traces.",
+    "`guide --goal \"open task cards from this plan\" --json` returns `matchedIntent: task-plan-import` and a `tasks import --dry-run` next command.",
+    "`next --json` can see imported open tasks without requiring agents to edit `.atm/runtime` by hand.",
+    "No runtime lock files are created by import-only commands.",
+    "A regression fixture covers the 3KLife/npc-brain low-manual-automation plan shape."
+  ],
+  "deliverables": [],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/command-specs.ts",
+    "packages/cli/src/atm.ts",
+    "packages/cli/src/index.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "packages/plugin-sdk/src/governance/stores.ts",
+    "packages/core/src/guidance/intent-classifier.ts",
+    "packages/core/src/guidance/route-engine.ts",
+    "templates/skills/atm-governance-router.skill.md",
+    "integrations/*/atm-governance-router/**",
+    "scripts/validate-task-import.ts",
+    "scripts/validate-guide.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "validators": [],
+  "planningRepo": null,
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": null,
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "assets/**",
+    "library/**"
+  ],
+  "nonGoals": [
+    "Do not redefine `atm create` as task-card creation.",
+    "Do not require agents to hand-write `.atm/history/tasks/*.json`.",
+    "Do not acquire runtime locks while only importing a plan.",
+    "Do not make host-local docs/tasks shards the canonical ATM work item store."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/command-specs.ts",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/index.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "packages/plugin-sdk/src/governance/stores.ts",
+      "packages/core/src/guidance/intent-classifier.ts",
+      "packages/core/src/guidance/route-engine.ts",
+      "templates/skills/atm-governance-router.skill.md",
+      "integrations/*/atm-governance-router/**",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-guide.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "blocked_by": [
+      "TASK-APO-0028"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "tags": [],
+  "notes": "A Claude Code black-box test asked an agent to open task cards from a host planning document using the ATM process. The agent correctly read the plan, but could not discover an official ATM task-card opening command. It tried to infer whether `atm create`, `atm start`, or direct writes to `.atm/history/tasks` were the intended path.\n\nThis is a product gap in ATM, not an agent failure. ATM already has a governance work item store, but the CLI does not expose a deterministic bulk task import flow for roadmaps and planning documents.",
+  "source": {
+    "planPath": "../3KLife-captain-dispatch-push/docs/ai_atomic_framework/agent-pack-onboarding/tasks/TASK-APO-0029-atm-task-plan-import-flow.task.md",
+    "sectionTitle": "TASK-APO-0029",
+    "headingLine": 42,
+    "hash": "aa5f23c92ab37b03"
+  },
+  "importedAt": "2026-06-15T03:11:14.070Z",
+  "lastTransitionId": "2026-06-15T03-19-21-605Z-abandon-efca33667301",
+  "lastTransitionAt": "2026-06-15T03:19:21.605Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-teamagents-dogfood",
+  "closedAt": "2026-06-15T03:19:21.603Z",
+  "closedByActor": "codex-teamagents-dogfood",
+  "closedBySessionId": null,
+  "closeReason": "Dogfood import used only to test Team Agents gating; not a real delivery task, and it blocks TASK-TEAM-0029 CID validation."
+}
