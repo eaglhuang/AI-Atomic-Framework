@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-TEAM-0030",
-  "updatedAt": "2026-06-15T06:32:10.898Z",
+  "updatedAt": "2026-06-15T06:33:46.729Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -134,6 +134,49 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:26e95775e9ed8fcc260dd427ed33f54906b6b464c3f5a2673e57b4acd27008cb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "git head evidence validation passed",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain-continuation",
+      "sessionId": "session-20260615062614-codex-captain-continuation-TASK-TEAM-0030-f49b8e6874",
+      "createdAt": "2026-06-15T06:33:46.729Z",
+      "details": {
+        "actorId": "codex-captain-continuation",
+        "sessionId": "session-20260615062614-codex-captain-continuation-TASK-TEAM-0030-f49b8e6874",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "898d97515e68d6487f4ec66f560bacec3aae38db",
+            "cacheKey": "sha256:8427f131ad7a9ad2465f6600ca05094fe742fbf9e9e1d1cd1591c9d757ec668d",
+            "cached": false,
+            "generatedAt": "2026-06-15T06:33:46.777Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:57d0742f85ae176b00ed312653d91ba3b27d7472022d18f2996d7fa180f52b22",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
