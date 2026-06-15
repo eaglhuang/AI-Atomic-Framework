@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0030",
+  "title": "Team Agents planning-repo path lease normalization",
+  "status": "running",
+  "milestone": "M5P",
+  "dependencies": [],
+  "acceptance": [
+    "A Team Agents regression covers a planning-repo task with absolute 3KLife paths and target-repo allowed files.",
+    "`team validate` does not request a write lease for planning-only files when the task targets `AI-Atomic-Framework`.",
+    "`team start` still fails closed for true unsafe target-repo writes.",
+    "The Captain report can distinguish planning-read-only context from target write scope.",
+    "The fix is recorded against `ATM-BUG-2026-06-15-008`."
+  ],
+  "deliverables": [],
+  "scopePaths": [
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/team.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/team.spec.ts",
+    "C:/Users/User/AI-Atomic-Framework/scripts/validate-team-agents.ts",
+    "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/3KLife/**",
+    "C:/Users/User/AI-Atomic-Framework/.atm/runtime/**",
+    "C:/Users/User/AI-Atomic-Framework/release/**",
+    "any direct runtime lock edits"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/team.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/team.spec.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-team-agents.ts",
+      "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    },
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "tags": [],
+  "notes": "`TASK-AAO-0124` already fixed ATM scope comparison between absolute and relative target paths. During dogfood, Team Agents exposed a different issue: `team plan` / `team validate` / `team start` can build permission leases from planning-repo absolute paths and ask for a write lease against `C:/Users/User/3KLife/**`, even when the implementation should only write target-repo files.\n\nThat is a Team Agents planning-path classification bug, not a reason to reopen `TASK-AAO-0124`.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0030-team-agents-planning-repo-path-lease-normalization.task.md",
+    "sectionTitle": "TASK-TEAM-0030",
+    "headingLine": 41,
+    "hash": "ef0d2672052f8bad"
+  },
+  "importedAt": "2026-06-15T06:26:07.018Z",
+  "lastTransitionId": "2026-06-15T06-26-15-004Z-claim-959034243cbc",
+  "lastTransitionAt": "2026-06-15T06:26:15.004Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-continuation",
+  "reservedAt": "2026-06-15T06:26:14.965Z",
+  "promotedAt": "2026-06-15T06:26:14.969Z",
+  "claim": {
+    "actorId": "codex-captain-continuation",
+    "leaseId": "lease-173243b1a559",
+    "claimedAt": "2026-06-15T06:26:14.972Z",
+    "heartbeatAt": "2026-06-15T06:26:14.972Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0030.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-15T06:26:14.972Z",
+  "startedByActor": "codex-captain-continuation",
+  "startedBySessionId": "session-20260615062614-codex-captain-continuation-TASK-TEAM-0030-f49b8e6874",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0030",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0030.*",
+      ".atm/history/task-events/TASK-TEAM-0030/**",
+      ".atm/history/tasks/TASK-TEAM-0030.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a2855be38d58cd15ccbefd7f01e017f04aaabb8138ca39ebe58a928ea8f0a363",
+    "actorId": "codex-captain-continuation",
+    "createdAt": "2026-06-15T06:26:15.003Z",
+    "status": "active"
+  }
+}
