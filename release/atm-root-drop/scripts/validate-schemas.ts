@@ -65,7 +65,11 @@ const schemaEntries: Record<string, string> = {
   'patch-proposal': 'schemas/governance/patch-proposal.schema.json',
   'broker-decision': 'schemas/governance/broker-decision.schema.json',
   'merge-plan': 'schemas/governance/merge-plan.schema.json',
-  'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json'
+  'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json',
+  'broker-mutation-request': 'schemas/broker/mutation-request.schema.json',
+  'broker-conflict-key': 'schemas/broker/conflict-key.schema.json',
+  'broker-merge-decision': 'schemas/broker/merge-decision.schema.json',
+  'broker-mutation-batch-plan': 'schemas/broker/mutation-batch-plan.schema.json'
 };
 
 const supportSchemaEntries: Record<string, string> = {

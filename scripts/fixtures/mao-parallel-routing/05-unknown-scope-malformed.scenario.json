@@ -1,0 +1,30 @@
+{
+  "id": "unknown-scope-malformed",
+  "description": "Malformed intent with empty atom refs must fail closed through steward-required.",
+  "kind": "conflict-matrix",
+  "capabilityIntroducedBy": "TASK-MAO-0006",
+  "coverageTier": "generic-mao",
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "mao-parallel-routing-benchmark" },
+      "taskId": "TASK-MAO-UNKNOWN",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["packages/core/src/broker/unknown.ts"],
+      "atomRefs": [],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": [], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "bench-repo",
+      "workspaceId": "main",
+      "activeIntents": []
+    }
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": { "routingVerdict": "steward-required", "validatorOutcome": "pass" }
+}

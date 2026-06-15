@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0029",
+  "title": "Per-task evidence slicing from wave diff",
+  "status": "planned",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-MAO-0028"
+  ],
+  "acceptance": [
+    "A wave with four independent tasks yields four evidence slices.",
+    "Ambiguous shared files require steward/reviewer confirmation.",
+    "A task with no matching deliverable changes remains partial or not-started."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/team-wave-evidence.ts",
+    "packages/core/src/broker/__tests__/team-wave-evidence.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/team-wave-evidence.ts",
+    "packages/core/src/broker/__tests__/team-wave-evidence.test.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types packages/core/src/broker/__tests__/team-wave-evidence.test.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Closing tasks",
+    "Automatic semantic ownership inference"
+  ],
+  "nonGoals": [
+    "Do not mark a task done if its deliverables cannot be isolated."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert wave evidence slicing helpers, tests, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-wave-evidence-slicing-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0029-per-task-evidence-slicing-from-wave-diff.task.md",
+    "sectionTitle": "TASK-MAO-0029",
+    "headingLine": 45,
+    "hash": "5ff1f2da3b29b7ff"
+  },
+  "importedAt": "2026-06-15T16:41:36.029Z",
+  "lastTransitionId": "2026-06-15T16-41-36-033Z-import-d6dad7727ab7",
+  "lastTransitionAt": "2026-06-15T16:41:36.033Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

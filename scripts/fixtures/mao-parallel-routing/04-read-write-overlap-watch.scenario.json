@@ -1,0 +1,55 @@
+{
+  "id": "read-write-overlap-watch",
+  "description": "Read-set crossing an active write lease must not false-safe to parallel admission.",
+  "kind": "conflict-matrix",
+  "capabilityIntroducedBy": "TASK-MAO-0006",
+  "coverageTier": "generic-mao",
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "mao-parallel-routing-benchmark" },
+      "taskId": "TASK-MAO-READ",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["packages/core/src/broker/shared.ts"],
+      "atomRefs": [{ "atomId": "atom-read", "atomCid": "cid-read", "operation": "modify" }],
+      "readAtoms": [{ "atomId": "atom-active", "atomCid": "cid-active", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": [], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "bench-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-active",
+          "taskId": "TASK-MAO-ACTIVE",
+          "teamRunId": null,
+          "actorId": "001",
+          "baseCommit": "commit-base",
+          "resourceKeys": {
+            "files": ["packages/core/src/broker/shared.ts"],
+            "atomIds": ["atom-active"],
+            "atomCids": ["cid-active"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": [],
+            "artifacts": []
+          },
+          "leaseEpoch": 1,
+          "leaseSeconds": 300,
+          "leaseMaxSeconds": 1800,
+          "heartbeatAt": "2026-06-15T08:00:00.000Z",
+          "lane": "direct-brokered",
+          "expiresAt": "2030-06-15T08:10:00.000Z"
+        }
+      ]
+    }
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": { "routingVerdict": "allow-with-watch", "validatorOutcome": "fail" }
+}

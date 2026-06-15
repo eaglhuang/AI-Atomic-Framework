@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0118",
   "title": "opener-first active-claim commit guard MVP",
-  "status": "open",
+  "status": "running",
   "milestone": "M16",
   "dependencies": [],
   "acceptance": [
@@ -15,22 +15,34 @@
   ],
   "deliverables": [],
   "scopePaths": [
-    "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0118-opener-first-active-claim-commit-guard-mvp.task.md",
-    "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
-    "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
-    "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json"
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/git-governance.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/git.spec.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/hook.ts"
   ],
   "validators": [],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
   "closureAuthority": "target_repo",
-  "planningReadOnlyPaths": [],
+  "planningReadOnlyPaths": [
+    "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0118-opener-first-active-claim-commit-guard-mvp.task.md",
+    "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+    "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+    "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json"
+  ],
   "planningMirrorPaths": [],
   "outOfScope": [
-    "C:/Users/User/AI-Atomic-Framework/**",
     "C:/Users/User/3KLife/.atm/**",
     "C:/Users/User/3KLife/.tmp/**",
-    "C:/Users/User/3KLife/examples/**"
+    "C:/Users/User/3KLife/examples/**",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/framework-development.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/git-head-evidence.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/evidence.ts",
+    "C:/Users/User/AI-Atomic-Framework/scripts/validate-cli.ts",
+    "C:/Users/User/AI-Atomic-Framework/package.json",
+    "C:/Users/User/AI-Atomic-Framework/release/**",
+    "C:/Users/User/AI-Atomic-Framework/scratch/**",
+    "C:/Users/User/AI-Atomic-Framework/.atm/history/**"
   ],
   "nonGoals": [
     "Do not mutate AAF source files.",
@@ -45,24 +57,10 @@
     "mapUpdates": []
   },
   "legacyImportAliases": {
-    "allowed_files": [
-      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0118-opener-first-active-claim-commit-guard-mvp.task.md",
-      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
-      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
-      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json"
-    ],
     "blocked_by": [],
     "upstream_repo": "AI-Atomic-Framework"
   },
   "importDiagnostics": [
-    {
-      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
-      "severity": "warning",
-      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
-      "field": "scopePaths",
-      "alias": "allowed_files",
-      "canonical": "scopePaths"
-    },
     {
       "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
       "severity": "warning",
@@ -77,31 +75,25 @@
   "source": {
     "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0118-opener-first-active-claim-commit-guard-mvp.task.md",
     "sectionTitle": "TASK-AAO-0118",
-    "headingLine": 40,
-    "hash": "62c0db4ce94f4c7a"
+    "headingLine": 52,
+    "hash": "0a24482ba714e796"
   },
-  "importedAt": "2026-06-15T04:45:04.416Z",
-  "lastTransitionId": "2026-06-15T04-54-49-037Z-release-4126379a52e5",
-  "lastTransitionAt": "2026-06-15T04:54:49.037Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-captain-continuation",
-  "reservedAt": "2026-06-15T04:48:19.586Z",
-  "promotedAt": "2026-06-15T04:48:19.589Z",
+  "importedAt": "2026-06-15T14:25:06.569Z",
   "claim": {
-    "actorId": "codex-captain-continuation",
-    "leaseId": "lease-a35f94fb8785",
-    "claimedAt": "2026-06-15T04:48:19.592Z",
-    "heartbeatAt": "2026-06-15T04:54:49.014Z",
+    "actorId": "captain",
+    "leaseId": "lease-ef6063e2df46",
+    "claimedAt": "2026-06-15T13:39:29.787Z",
+    "heartbeatAt": "2026-06-15T13:39:29.787Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0118.json"
     ],
-    "state": "released",
-    "reason": "switching to TASK-AAO-0124 closeback/follow-up governance"
+    "state": "active",
+    "intent": "write"
   },
+  "owner": "captain",
   "startedAt": "2026-06-15T04:48:19.592Z",
-  "startedByActor": "codex-captain-continuation",
-  "startedBySessionId": "session-20260615044819-codex-captain-continuation-TASK-AAO-0118-56c19b83ee",
+  "startedBySessionId": "session-20260615133929-captain-TASK-AAO-0118-93dfb8fda9",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -119,8 +111,11 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "d2d1f0e84ddd93c8efc89a5dd3d0c98ecdd13158e8410af7678141f80804446d",
-    "actorId": "codex-captain-continuation",
-    "createdAt": "2026-06-15T04:48:19.615Z",
+    "actorId": "captain",
+    "createdAt": "2026-06-15T13:39:29.812Z",
     "status": "active"
-  }
+  },
+  "lastTransitionId": "2026-06-15T14-25-06-573Z-import-71912b078abc",
+  "lastTransitionAt": "2026-06-15T14:25:06.573Z",
+  "ledgerContractVersion": "task-ledger/v1"
 }

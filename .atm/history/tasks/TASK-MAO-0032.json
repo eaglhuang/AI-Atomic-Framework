@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0032",
+  "title": "Validator and reviewer Team Agents roles for waves",
+  "status": "planned",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-MAO-0027",
+    "TASK-MAO-0028"
+  ],
+  "acceptance": [
+    "Team wave recipes expose validator and reviewer roles.",
+    "Reports include role-specific sections.",
+    "High-risk waves fail validation if validator/reviewer role coverage is absent."
+  ],
+  "deliverables": [
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts",
+    ".atm/config/team-recipes/",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "External agent spawning",
+    "Humanless merge approval"
+  ],
+  "nonGoals": [
+    "Do not make validator and reviewer roles optional for high-risk waves."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert validator/reviewer role definitions, recipe updates, tests, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-wave-validator-reviewer-roles-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0032-validator-and-reviewer-team-agents-roles-for-waves.task.md",
+    "sectionTitle": "TASK-MAO-0032",
+    "headingLine": 44,
+    "hash": "4dda4c90ff7d8d57"
+  },
+  "importedAt": "2026-06-15T16:41:37.255Z",
+  "lastTransitionId": "2026-06-15T16-41-37-259Z-import-2c51b4a6e5e5",
+  "lastTransitionAt": "2026-06-15T16:41:37.259Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

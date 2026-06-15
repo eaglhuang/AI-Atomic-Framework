@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0024",
+  "title": "Wave candidate planner and DAG grouping",
+  "status": "planned",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-MAO-0023"
+  ],
+  "acceptance": [
+    "The planner never includes a task whose dependencies are not satisfied unless it is explicitly ordered behind another same-wave task.",
+    "Different target repos or closure authorities split into separate waves.",
+    "The output is stable for the same task set."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team-wave.ts",
+    "packages/core/src/broker/__tests__/team-wave-planner.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team-wave.ts",
+    "packages/core/src/broker/",
+    "packages/core/src/broker/__tests__/team-wave-planner.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types packages/core/src/broker/__tests__/team-wave-planner.test.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Starting or spawning Team Agents",
+    "Checkpointing wave tasks"
+  ],
+  "nonGoals": [
+    "Do not reorder dependencies to make a wave look safe."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert wave planner command surface, tests, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-wave-candidate-planner-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0024-wave-candidate-planner-and-dag-grouping.task.md",
+    "sectionTitle": "TASK-MAO-0024",
+    "headingLine": 46,
+    "hash": "640b453964a1fbc1"
+  },
+  "importedAt": "2026-06-15T16:41:33.714Z",
+  "lastTransitionId": "2026-06-15T16-41-33-719Z-import-12c6314899ae",
+  "lastTransitionAt": "2026-06-15T16:41:33.719Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

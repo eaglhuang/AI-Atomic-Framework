@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0010",
+  "title": "multi-agent simulator benchmark",
+  "status": "planned",
+  "milestone": "M4",
+  "dependencies": [
+    "TASK-MAO-0003",
+    "TASK-MAO-0006",
+    "TASK-MAO-0009"
+  ],
+  "acceptance": [
+    "At least ten scenarios are covered.",
+    "The simulator fails hard when a known unsafe case is allowed.",
+    "The report identifies which MAO task introduced each capability.",
+    "The report names which scenarios are generic MAO coverage and which are expected to be extended by M5 runner Broker cards.",
+    "The benchmark can run without network access or external services."
+  ],
+  "deliverables": [
+    "scripts/validate-mao-parallel-routing.ts",
+    "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+    "scripts/fixtures/mao-parallel-routing/",
+    "docs/reports/mao-parallel-routing-benchmark.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "scripts/validate-mao-parallel-routing.ts",
+    "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+    "scripts/fixtures/mao-parallel-routing/",
+    "docs/reports/mao-parallel-routing-benchmark.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-mao-parallel-routing.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Real multi-process load testing",
+    "Distributed broker consensus"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove simulator, fixtures, report, and atomization map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.mao-parallel-routing-benchmark-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0010-multi-agent-simulator-benchmark.task.md",
+    "sectionTitle": "TASK-MAO-0010",
+    "headingLine": 47,
+    "hash": "364925729aad0856"
+  },
+  "importedAt": "2026-06-15T07:55:13.922Z",
+  "lastTransitionId": "2026-06-15T07-55-13-926Z-import-3efba0f2e565",
+  "lastTransitionAt": "2026-06-15T07:55:13.926Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

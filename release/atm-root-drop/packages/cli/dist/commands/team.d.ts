@@ -31,6 +31,7 @@ type PermissionLease = {
 };
 type TeamPermissionValidationOptions = {
     allowedWritePaths?: string[];
+    repoRoot?: string;
 };
 type TeamCrewRole = {
     role: string;

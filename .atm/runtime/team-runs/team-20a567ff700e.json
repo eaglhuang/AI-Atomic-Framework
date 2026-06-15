@@ -1,0 +1,292 @@
+{
+  "schemaId": "atm.teamRun.v1",
+  "teamRunId": "team-20a567ff700e",
+  "channel": "normal",
+  "taskId": "TASK-TEAM-0029",
+  "batchId": null,
+  "actorId": "codex-teamagents-dogfood",
+  "recipeId": "atm.default.normal.typescript",
+  "status": "active",
+  "executionMode": "manual-team",
+  "agentsSpawned": false,
+  "runtimeWritten": true,
+  "task": {
+    "taskId": "TASK-TEAM-0029",
+    "title": "Team start dependency gate parity",
+    "status": "planned",
+    "targetRepo": "AI-Atomic-Framework",
+    "sourcePlanPath": "docs/tasks/TASK-TEAM-0029-team-start-dependency-gate-parity.task.md"
+  },
+  "roles": [
+    {
+      "agentId": "coordinator",
+      "role": "coordinator",
+      "profile": "atm.coordinator.v1",
+      "language": null,
+      "permissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ]
+    },
+    {
+      "agentId": "atomization-planner",
+      "role": "atomizationPlanner",
+      "profile": "atm.atomizationPlanner.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "reader",
+      "role": "reader",
+      "profile": "atm.reader.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "scope-guardian",
+      "role": "scopeGuardian",
+      "profile": "atm.scopeGuardian.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "implementer-typescript",
+      "role": "implementer",
+      "profile": "atm.implementer.typescript.v1",
+      "language": "typescript",
+      "permissions": [
+        "file.write"
+      ]
+    },
+    {
+      "agentId": "validator",
+      "role": "validator",
+      "profile": "atm.validator.v1",
+      "language": null,
+      "permissions": [
+        "exec.validator"
+      ]
+    },
+    {
+      "agentId": "evidence-collector",
+      "role": "evidenceCollector",
+      "profile": "atm.evidenceCollector.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    }
+  ],
+  "agents": [
+    {
+      "agentId": "coordinator",
+      "role": "coordinator",
+      "profile": "atm.coordinator.v1",
+      "permissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ]
+    },
+    {
+      "agentId": "atomization-planner",
+      "role": "atomizationPlanner",
+      "profile": "atm.atomizationPlanner.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "reader",
+      "role": "reader",
+      "profile": "atm.reader.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "scope-guardian",
+      "role": "scopeGuardian",
+      "profile": "atm.scopeGuardian.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "implementer-typescript",
+      "role": "implementer",
+      "profile": "atm.implementer.typescript.v1",
+      "language": "typescript",
+      "permissions": [
+        "file.write"
+      ]
+    },
+    {
+      "agentId": "validator",
+      "role": "validator",
+      "profile": "atm.validator.v1",
+      "permissions": [
+        "exec.validator"
+      ]
+    },
+    {
+      "agentId": "evidence-collector",
+      "role": "evidenceCollector",
+      "profile": "atm.evidenceCollector.v1",
+      "permissions": [
+        "file.read"
+      ]
+    }
+  ],
+  "leases": [
+    {
+      "permission": "task.lifecycle",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "git.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "evidence.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "file.write",
+      "agentId": "implementer-typescript",
+      "paths": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/minimal-task-crew.md",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-team-agents.ts"
+      ]
+    }
+  ],
+  "permissionLeases": [
+    {
+      "permission": "task.lifecycle",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "git.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "evidence.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "file.write",
+      "agentId": "implementer-typescript",
+      "paths": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/minimal-task-crew.md",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-team-agents.ts"
+      ]
+    }
+  ],
+  "validation": {
+    "ok": true,
+    "findings": []
+  },
+  "brokerLane": {
+    "schemaId": "atm.teamBrokerLaneEvidence.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0029",
+    "actorId": "codex-teamagents-dogfood",
+    "registryPath": ".atm/runtime/write-broker.registry.json",
+    "writeIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "team plan/start broker lane"
+      },
+      "taskId": "TASK-TEAM-0029",
+      "actorId": "codex-teamagents-dogfood",
+      "baseCommit": "ffd3d0bd36299669fbad50c4a8496dd4383dba55",
+      "targetFiles": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/minimal-task-crew.md",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "atomRefs": [
+        {
+          "atomId": "atm.team-agents-map",
+          "atomCid": "task-team-0029",
+          "operation": "modify"
+        }
+      ],
+      "sharedSurfaces": {
+        "generators": [],
+        "projections": [],
+        "registries": [],
+        "validators": [],
+        "artifacts": []
+      },
+      "requestedLane": "auto"
+    },
+    "decision": {
+      "schemaId": "atm.brokerDecision.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "generated"
+      },
+      "intentId": "decision-1781493682332",
+      "taskId": "TASK-TEAM-0029",
+      "verdict": "parallel-safe",
+      "lane": "direct-brokered",
+      "conflicts": [],
+      "applyMethod": "none",
+      "reason": "Parallel safe",
+      "conflictMatrix": {
+        "schemaId": "atm.brokerConflictMatrix.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "generated"
+        },
+        "taskId": "TASK-TEAM-0029",
+        "arbitrationVerdict": "allow",
+        "conflicts": []
+      }
+    },
+    "virtualAtomInUseRegistry": {
+      "schemaId": "atm.virtualAtomInUseRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "local-repo",
+      "workspaceId": "main",
+      "activeVirtualAtoms": [],
+      "activeIntents": []
+    },
+    "chosenLane": "direct-brokered",
+    "stewardId": null,
+    "composerPath": null,
+    "safeToStart": true,
+    "blockedReasons": []
+  },
+  "createdAt": "2026-06-15T03:21:22.334Z",
+  "updatedAt": "2026-06-15T03:21:22.334Z"
+}

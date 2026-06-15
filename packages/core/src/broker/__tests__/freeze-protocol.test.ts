@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createFreezeSignal, acknowledgeFreeze, resolveFreezeDecision, resolveFreezeSnapshotDefaults } from '../freeze.ts';
+import { createFreezeSignal, acknowledgeFreeze, resolveFreezeDecision, resolveFreezeSnapshotDefaults, resumeFreeze, markBlockedFallback } from '../freeze.ts';
 import { createPatchEnvelope, isMetadataOnlyEnvelope, validatePatchEnvelope } from '../patch-envelope.ts';
 
 function testFreezeAckBeforeTimeout() {
@@ -68,10 +68,73 @@ function testSnapshotDefaultsAreStable() {
   assert.equal(defaults.snapshotDir, '.atm/runtime/wip-snapshot');
 }
 
+function testResumeRequiresAdmissionRecheck() {
+  const signal = createFreezeSignal({
+    taskId: 'TASK-RESUME',
+    actorId: 'agent-a',
+    now: Date.parse('2026-06-12T08:00:00.000Z')
+  });
+
+  const resumed = resumeFreeze(signal, { now: Date.parse('2026-06-12T08:00:05.000Z') });
+  assert.equal(resumed.decision.state, 'resumed');
+  assert.equal(resumed.forceRelease, false);
+  assert.equal(resumed.requireAdmissionRecheck, true);
+  assert.ok(resumed.decision.reason.includes('admission must be re-checked'));
+
+  const reentered = resumeFreeze(signal, { now: Date.parse('2026-06-12T08:00:06.000Z'), admissionRechecked: true });
+  assert.equal(reentered.decision.state, 'resumed');
+  assert.equal(reentered.requireAdmissionRecheck, false);
+  assert.ok(reentered.decision.reason.includes('admission recheck'));
+}
+
+function testBlockedFallbackOnRepeatedConflict() {
+  const signal = createFreezeSignal({
+    taskId: 'TASK-BLOCKED',
+    actorId: 'agent-a',
+    now: Date.parse('2026-06-12T08:00:00.000Z')
+  });
+
+  const blocked = markBlockedFallback(signal, {
+    now: Date.parse('2026-06-12T08:00:30.000Z'),
+    repeatedConflict: { blockingTask: 'TASK-B', blockingRoute: 'route-main', conflictingResource: 'src/one.ts' }
+  });
+
+  assert.equal(blocked.decision.state, 'blocked-fallback');
+  assert.equal(blocked.forceRelease, false);
+  assert.ok(blocked.decision.reason.includes('TASK-B'));
+  assert.ok(blocked.decision.reason.includes('route-main'));
+  assert.ok(blocked.decision.reason.includes('src/one.ts'));
+  assert.ok(blocked.decision.reason.includes('does not delete worktree changes'));
+}
+
+function testFreezeDiagnosticsNameConflict() {
+  const signal = createFreezeSignal({
+    taskId: 'TASK-DIAG',
+    actorId: 'agent-a',
+    now: Date.parse('2026-06-12T08:00:00.000Z'),
+    blockingTask: 'TASK-OWNER',
+    blockingRoute: 'route-alpha',
+    conflictingResource: 'packages/core/src/broker/freeze.ts'
+  });
+
+  assert.equal(signal.blockingTask, 'TASK-OWNER');
+  assert.equal(signal.blockingRoute, 'route-alpha');
+  assert.equal(signal.conflictingResource, 'packages/core/src/broker/freeze.ts');
+
+  const decision = resolveFreezeDecision({ signal, acknowledgedAt: null, now: Date.parse('2026-06-12T08:00:05.000Z') });
+  const reason = decision.decision.reason;
+  assert.ok(reason.includes('blockingTask=TASK-OWNER'));
+  assert.ok(reason.includes('blockingRoute=route-alpha'));
+  assert.ok(reason.includes('conflictingResource=packages/core/src/broker/freeze.ts'));
+}
+
 testFreezeAckBeforeTimeout();
 testFreezeTimeoutForcesRelease();
 testMetadataOnlyPatchEnvelopeIsAllowedForPartialWip();
 testTextualDiffEnvelopeCarriesPatchText();
 testSnapshotDefaultsAreStable();
+testResumeRequiresAdmissionRecheck();
+testBlockedFallbackOnRepeatedConflict();
+testFreezeDiagnosticsNameConflict();
 
 console.log('freeze protocol tests: ok');

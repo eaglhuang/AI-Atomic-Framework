@@ -1,7 +1,13 @@
 export const DEFAULT_FREEZE_ACK_TIMEOUT_MS = 30_000;
 export const DEFAULT_WIP_SNAPSHOT_RELATIVE_DIR = '.atm/runtime/wip-snapshot';
 
-export type FreezeState = 'pending' | 'acknowledged' | 'timed-out' | 'force-released';
+export type FreezeState =
+  | 'pending'
+  | 'acknowledged'
+  | 'timed-out'
+  | 'force-released'
+  | 'resumed'
+  | 'blocked-fallback';
 
 export interface FreezeSignal {
   readonly taskId: string;
@@ -9,6 +15,9 @@ export interface FreezeSignal {
   readonly issuedAt: string;
   readonly ackTimeoutMs: number;
   readonly freezeId: string;
+  readonly blockingTask?: string;
+  readonly blockingRoute?: string;
+  readonly conflictingResource?: string;
 }
 
 export interface FreezeAck {
@@ -30,6 +39,7 @@ export interface FreezeDecision {
 export interface FreezeResolution {
   readonly decision: FreezeDecision;
   readonly forceRelease: boolean;
+  readonly requireAdmissionRecheck?: boolean;
 }
 
 export interface FreezeSnapshotDefaults {
@@ -42,6 +52,9 @@ export function createFreezeSignal(input: {
   readonly actorId: string;
   readonly now?: number;
   readonly ackTimeoutMs?: number;
+  readonly blockingTask?: string;
+  readonly blockingRoute?: string;
+  readonly conflictingResource?: string;
 }): FreezeSignal {
   const now = input.now ?? Date.now();
   const ackTimeoutMs = resolveFreezeAckTimeoutMs(input.ackTimeoutMs);
@@ -50,7 +63,10 @@ export function createFreezeSignal(input: {
     taskId: input.taskId,
     actorId: input.actorId,
     issuedAt: new Date(now).toISOString(),
-    ackTimeoutMs
+    ackTimeoutMs,
+    ...(input.blockingTask ? { blockingTask: input.blockingTask } : {}),
+    ...(input.blockingRoute ? { blockingRoute: input.blockingRoute } : {}),
+    ...(input.conflictingResource ? { conflictingResource: input.conflictingResource } : {})
   };
 }
 
@@ -83,7 +99,7 @@ export function resolveFreezeDecision(input: {
         actorId: input.signal.actorId,
         state: 'acknowledged',
         deadlineAt: new Date(deadlineAtMs).toISOString(),
-        reason: 'freeze acknowledged in time'
+        reason: appendDiagnostic('freeze acknowledged in time', input.signal)
       }
     };
   }
@@ -97,7 +113,7 @@ export function resolveFreezeDecision(input: {
         actorId: input.signal.actorId,
         state: 'timed-out',
         deadlineAt: new Date(deadlineAtMs).toISOString(),
-        reason: 'freeze ack timeout reached'
+        reason: appendDiagnostic('freeze ack timeout reached', input.signal)
       }
     };
   }
@@ -110,9 +126,78 @@ export function resolveFreezeDecision(input: {
       actorId: input.signal.actorId,
       state: 'pending',
       deadlineAt: new Date(deadlineAtMs).toISOString(),
-      reason: 'waiting for freeze acknowledgement'
+      reason: appendDiagnostic('waiting for freeze acknowledgement', input.signal)
     }
   };
+}
+
+export function resumeFreeze(
+  signal: FreezeSignal,
+  input: { readonly now?: number; readonly admissionRechecked?: boolean } = {}
+): FreezeResolution {
+  const now = input.now ?? Date.now();
+  const issuedAtMs = Date.parse(signal.issuedAt);
+  const deadlineAtMs = issuedAtMs + signal.ackTimeoutMs;
+  return {
+    forceRelease: false,
+    requireAdmissionRecheck: input.admissionRechecked ? false : true,
+    decision: {
+      freezeId: signal.freezeId,
+      taskId: signal.taskId,
+      actorId: signal.actorId,
+      state: 'resumed',
+      deadlineAt: new Date(deadlineAtMs).toISOString(),
+      reason: appendDiagnostic(
+        input.admissionRechecked
+          ? `freeze resumed after broker admission recheck at ${new Date(now).toISOString()}`
+          : `freeze resume requested at ${new Date(now).toISOString()}; broker admission must be re-checked before write`,
+        signal
+      )
+    }
+  };
+}
+
+export function markBlockedFallback(
+  signal: FreezeSignal,
+  input: {
+    readonly now?: number;
+    readonly repeatedConflict?: {
+      readonly blockingTask?: string;
+      readonly blockingRoute?: string;
+      readonly conflictingResource?: string;
+    };
+  } = {}
+): FreezeResolution {
+  const now = input.now ?? Date.now();
+  const issuedAtMs = Date.parse(signal.issuedAt);
+  const deadlineAtMs = issuedAtMs + signal.ackTimeoutMs;
+  const repeat = input.repeatedConflict ?? {};
+  const conflictDescriptor =
+    [repeat.blockingTask, repeat.blockingRoute, repeat.conflictingResource]
+      .filter((part): part is string => Boolean(part))
+      .join('/') || 'prior conflict';
+  return {
+    forceRelease: false,
+    decision: {
+      freezeId: signal.freezeId,
+      taskId: signal.taskId,
+      actorId: signal.actorId,
+      state: 'blocked-fallback',
+      deadlineAt: new Date(deadlineAtMs).toISOString(),
+      reason: appendDiagnostic(
+        `blocked fallback at ${new Date(now).toISOString()}: repeated conflict (${conflictDescriptor}); protocol does not delete worktree changes`,
+        signal
+      )
+    }
+  };
+}
+
+function appendDiagnostic(base: string, signal: FreezeSignal): string {
+  const parts: string[] = [];
+  if (signal.blockingTask) parts.push(`blockingTask=${signal.blockingTask}`);
+  if (signal.blockingRoute) parts.push(`blockingRoute=${signal.blockingRoute}`);
+  if (signal.conflictingResource) parts.push(`conflictingResource=${signal.conflictingResource}`);
+  return parts.length === 0 ? base : `${base} [${parts.join(' ')}]`;
 }
 
 export function resolveFreezeSnapshotDefaults(): FreezeSnapshotDefaults {

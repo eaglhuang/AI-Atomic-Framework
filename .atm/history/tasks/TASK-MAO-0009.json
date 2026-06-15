@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0009",
+  "title": "steward arbitration flow",
+  "status": "planned",
+  "milestone": "M3",
+  "dependencies": [
+    "TASK-MAO-0006",
+    "TASK-MAO-0008"
+  ],
+  "acceptance": [
+    "Tests prove steward applies non-conflicting envelopes and blocks same-atom unsafe envelopes.",
+    "CLI output identifies which route/task owns the steward decision.",
+    "No broad `git add .` or hidden worktree sweep is introduced.",
+    "Derived-artifact single-writer behavior can be layered on top of steward decisions by M5.",
+    "Human-required verdict is available for unresolved ambiguity."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/steward.ts",
+    "packages/cli/src/commands/route.ts",
+    "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/steward.ts",
+    "packages/core/src/broker/types.ts",
+    "packages/cli/src/commands/route.ts",
+    "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "General-purpose semantic merge",
+    "Humanless resolution of ambiguous conflicts"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert steward arbitration flow, route CLI integration, tests, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.mao-steward-arbitration-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0009-steward-arbitration-flow.task.md",
+    "sectionTitle": "TASK-MAO-0009",
+    "headingLine": 45,
+    "hash": "6b4aa9835f15a858"
+  },
+  "importedAt": "2026-06-15T16:42:07.451Z",
+  "lastTransitionId": "2026-06-15T16-42-07-455Z-import-cdd4b8df8bc9",
+  "lastTransitionAt": "2026-06-15T16:42:07.455Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

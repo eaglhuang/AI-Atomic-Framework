@@ -4,7 +4,7 @@ export default defineCommandSpec({
     name: 'evidence',
     summary: 'Run validators as governed evidence, or add raw/manual evidence for close/commit/PR gates.',
     positional: [
-        { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing', required: true }
+        { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | historical-batch', required: true }
     ],
     options: [
         commonCwdOption,
@@ -26,6 +26,13 @@ export default defineCommandSpec({
         { flag: '--gate', value: 'type', summary: 'Evidence gate for verify: close|commit|pr.' },
         { flag: '--list', summary: 'List all required validators with tier and current evidence state (used with validators action).' },
         { flag: '--recent-run', summary: 'Use the most recent cached command run if available in the task evidence (used with run action).' },
+        { flag: '--tasks', value: 'csv', summary: 'Task ids for historical-batch evidence slicing.' },
+        { flag: '--commits', value: 'csv', summary: 'Delivery commit refs for historical-batch evidence slicing.' },
+        { flag: '--delivery-repo', value: 'path', summary: 'Repository that contains the historical delivery commits.' },
+        { flag: '--validator-command', value: 'text', summary: 'Validator command to run once for a historical batch; repeatable.' },
+        { flag: '--write', summary: 'Write historical-batch envelope and per-task slices.' },
+        { flag: '--dry-run', summary: 'Preview historical-batch evidence without writing.' },
+        { flag: '--allow-unmatched', summary: 'Allow diagnostic historical batches even when some tasks have no scoped commit match.' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption
@@ -38,6 +45,7 @@ export default defineCommandSpec({
         'node atm.mjs evidence git-head-backfill --actor codex-main --reason "Backfill evidence for a pre-ATM HEAD commit" --json',
         'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json',
         'node atm.mjs evidence validators --list --task ATM-GOV-0104 --json',
-        'node atm.mjs evidence missing --task ATM-GOV-0104 --actor Augment --json'
+        'node atm.mjs evidence missing --task ATM-GOV-0104 --actor Augment --json',
+        'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validators typecheck --validator-command "npm run typecheck" --write --json'
     ]
 });

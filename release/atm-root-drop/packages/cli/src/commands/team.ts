@@ -64,6 +64,7 @@ type PermissionLease = {
 
 type TeamPermissionValidationOptions = {
   allowedWritePaths?: string[];
+  repoRoot?: string;
 };
 
 type TeamCrewRole = {
@@ -509,9 +510,10 @@ async function buildTeamPlanningContext(input: {
     requestedRecipeId: input.requestedRecipeId,
     task
   });
-  const writePaths = deriveWritePaths(task);
+  const writePaths = deriveWritePaths(task, input.cwd);
   const permissionValidation = validateTeamPermissionModel(recipe, writePaths, {
-    allowedWritePaths: deriveAllowedWriteScope(task)
+    allowedWritePaths: deriveAllowedWriteScope(task, input.cwd),
+    repoRoot: input.cwd
   });
 
   const parallelFindings: PermissionFinding[] = [];
@@ -908,7 +910,7 @@ function validatePermissionLeases(
   const permissionDefinitions = new Map(teamPermissionCatalog.map((entry) => [entry.id, entry]));
   const findings: PermissionFinding[] = [];
   const ownersByExclusivePermission = new Map<string, string[]>();
-  const allowedWritePathSet = new Set((options.allowedWritePaths ?? []).map(normalizeTeamLeasePath).filter(Boolean));
+  const allowedWritePathSet = new Set((options.allowedWritePaths ?? []).map((entry) => normalizeTeamLeasePath(entry, options.repoRoot)).filter(Boolean));
 
   for (const lease of leases) {
     const definition = permissionDefinitions.get(lease.permission);
@@ -942,10 +944,10 @@ function validatePermissionLeases(
     }
     const normalizedLeasePaths = (lease.paths ?? []).map((entry) => ({
       raw: entry,
-      normalized: normalizeTeamLeasePath(entry)
+      normalized: normalizeTeamLeasePath(entry, options.repoRoot)
     }));
     const unsafeTraversalPaths = normalizedLeasePaths
-      .filter((entry) => isUnsafeTeamLeasePath(entry.raw, entry.normalized))
+      .filter((entry) => isUnsafeTeamLeasePath(entry.raw, entry.normalized, options.repoRoot))
       .map((entry) => entry.raw);
     if (unsafeTraversalPaths.length > 0) {
       findings.push(buildPermissionFinding({
@@ -1021,15 +1023,32 @@ function finalizeLeaseValidation(
   };
 }
 
-function normalizeTeamLeasePath(value: string) {
-  const normalized = path.posix.normalize(String(value).trim().replace(/\\/g, '/'));
+function normalizeTeamLeasePath(value: string, repoRoot?: string) {
+  const raw = String(value).trim();
+  const repoRelative = normalizeRepoAbsoluteLeasePath(raw, repoRoot);
+  const normalized = path.posix.normalize((repoRelative ?? raw).replace(/\\/g, '/'));
   return normalized === '.' ? '' : normalized.replace(/^\.\//, '');
 }
 
-function isUnsafeTeamLeasePath(rawPath: string, normalizedPath: string) {
+function normalizeRepoAbsoluteLeasePath(rawPath: string, repoRoot?: string) {
+  if (!repoRoot) return null;
+  const raw = String(rawPath).trim();
+  const normalizedRaw = raw.replace(/\\/g, '/');
+  if (!/^[A-Za-z]:\//.test(normalizedRaw) && !normalizedRaw.startsWith('/')) return null;
+
+  const root = path.resolve(repoRoot);
+  const candidate = path.resolve(raw);
+  const relative = path.relative(root, candidate);
+  if (!relative || relative === '') return '';
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) return null;
+  return relative.replace(/\\/g, '/');
+}
+
+function isUnsafeTeamLeasePath(rawPath: string, normalizedPath: string, repoRoot?: string) {
   const raw = String(rawPath).trim().replace(/\\/g, '/');
-  return raw.startsWith('/')
-    || /^[A-Za-z]:\//.test(raw)
+  const repoRelative = normalizeRepoAbsoluteLeasePath(rawPath, repoRoot);
+  const unsafeAbsolute = (raw.startsWith('/') || /^[A-Za-z]:\//.test(raw)) && repoRelative === null;
+  return unsafeAbsolute
     || raw === '..'
     || raw.startsWith('../')
     || raw.includes('/../')
@@ -1037,19 +1056,19 @@ function isUnsafeTeamLeasePath(rawPath: string, normalizedPath: string) {
     || normalizedPath.startsWith('../');
 }
 
-function deriveAllowedWriteScope(task: any) {
+function deriveAllowedWriteScope(task: any, repoRoot?: string) {
   const explicitAllowed = normalizeStringArray(task.targetAllowedFiles);
   if (explicitAllowed.length > 0) {
-    return normalizeTaskWriteScope(explicitAllowed);
+    return normalizeTaskWriteScope(explicitAllowed, repoRoot);
   }
   return normalizeTaskWriteScope([
     ...normalizeStringArray(task.deliverables),
     ...normalizeStringArray(task.scopePaths)
-  ]);
+  ], repoRoot);
 }
 
-function normalizeTaskWriteScope(paths: string[]) {
-  return uniqueStrings(paths.map(normalizeTeamLeasePath).filter(Boolean));
+function normalizeTaskWriteScope(paths: string[], repoRoot?: string) {
+  return uniqueStrings(paths.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter(Boolean));
 }
 
 function mergeValidation(...reports: { ok: boolean; findings: PermissionFinding[] }[]) {
@@ -1839,14 +1858,13 @@ function summarizeTask(taskId: string, task: any) {
   };
 }
 
-function deriveWritePaths(task: any) {
+function deriveWritePaths(task: any, repoRoot?: string) {
   const candidates = [
     ...normalizeStringArray(task.targetAllowedFiles),
     ...normalizeStringArray(task.deliverables),
     ...normalizeStringArray(task.scopePaths)
   ];
-  return uniqueStrings(candidates.filter((entry) => {
-    const normalized = normalizeTeamLeasePath(entry);
+  return uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
     return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
   }));
 }

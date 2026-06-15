@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0026",
+  "title": "Team wave broker admission integration",
+  "status": "planned",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-MAO-0024",
+    "TASK-MAO-0005",
+    "TASK-MAO-0006"
+  ],
+  "acceptance": [
+    "Same-file unknown-range writes block the wave or require more detail.",
+    "Same atom write/write conflicts block same-wave execution.",
+    "Different atom / different file cases are allowed when existing conflict rules allow them."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/team-wave-admission.ts",
+    "packages/core/src/broker/__tests__/team-wave-admission.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/core/src/broker/registry.ts",
+    "packages/core/src/broker/team-wave-admission.ts",
+    "packages/core/src/broker/__tests__/team-wave-admission.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types packages/core/src/broker/__tests__/team-wave-admission.test.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Implementing new conflict semantics unrelated to waves",
+    "Direct worktree patch application"
+  ],
+  "nonGoals": [
+    "Do not allow same-wave execution when Broker verdict is freeze/block."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert wave admission integration, tests, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-wave-broker-admission-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0026-team-wave-broker-admission-integration.task.md",
+    "sectionTitle": "TASK-MAO-0026",
+    "headingLine": 48,
+    "hash": "5fbebb48377bc61b"
+  },
+  "importedAt": "2026-06-15T16:41:34.584Z",
+  "lastTransitionId": "2026-06-15T16-41-34-589Z-import-843edeeef38c",
+  "lastTransitionAt": "2026-06-15T16:41:34.589Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

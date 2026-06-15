@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0091",
+  "title": "Broker format adapter architecture RFC",
+  "status": "running",
+  "milestone": "M19",
+  "dependencies": [
+    "TASK-CID-0090"
+  ],
+  "acceptance": [
+    "`CID硬化計畫書2.md` contains the architecture, adapter contract sketch, conflict key model, and task order.",
+    "The RFC explicitly separates format adapters from domain adapters.",
+    "The RFC does not describe proposed features as already implemented."
+  ],
+  "deliverables": [
+    "docs/ai_atomic_framework/cid-hardening/CID硬化計畫書2.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0091-broker-format-adapter-architecture-rfc.task.md"
+  ],
+  "scopePaths": [
+    "docs/ai_atomic_framework/cid-hardening/CID硬化計畫書2.md",
+    "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0091-broker-format-adapter-architecture-rfc.task.md"
+  ],
+  "validators": [
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "planning_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Implementing broker runtime code",
+    "Changing path-to-atom-map.json"
+  ],
+  "nonGoals": [
+    "Do not claim format adapters already exist."
+  ],
+  "evidenceRequired": "planning-attestation",
+  "rollbackStrategy": "revert-planning-doc",
+  "rollbackNotes": "Revert the RFC section and this planning task card.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-format-adapter-rfc",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0091-broker-format-adapter-architecture-rfc.task.md",
+    "sectionTitle": "TASK-CID-0091",
+    "headingLine": 37,
+    "hash": "58aca1075e062601"
+  },
+  "importedAt": "2026-06-15T17:11:43.824Z",
+  "lastTransitionId": "2026-06-15T17-11-49-856Z-claim-984e07772389",
+  "lastTransitionAt": "2026-06-15T17:11:49.856Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-15T17:11:49.826Z",
+  "promotedAt": "2026-06-15T17:11:49.829Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-91b6675f22b1",
+    "claimedAt": "2026-06-15T17:11:49.832Z",
+    "heartbeatAt": "2026-06-15T17:11:49.832Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0091.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-15T17:11:49.832Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260615171149-captain-TASK-CID-0091-33f8135afb",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0091",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0091.*",
+      ".atm/history/task-events/TASK-CID-0091/**",
+      ".atm/history/tasks/TASK-CID-0091.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "dc4f9f1631502a6111148f3c2a007bdad73bd324843b05e9f534a5e508ee5fc5",
+    "actorId": "captain",
+    "createdAt": "2026-06-15T17:11:49.855Z",
+    "status": "active"
+  }
+}

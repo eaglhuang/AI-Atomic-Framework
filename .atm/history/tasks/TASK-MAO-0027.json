@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0027",
+  "title": "Team wave runtime record and dispatch surface",
+  "status": "planned",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-MAO-0025",
+    "TASK-MAO-0026"
+  ],
+  "acceptance": [
+    "`team wave start` refuses unadmitted waves.",
+    "Runtime state records wave id, tasks, roles, envelope hash, admission verdict, and coordinator.",
+    "Existing single-task Team Agents behavior remains unchanged."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team-wave.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team-wave.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Actually spawning external agents",
+    "Granting worker lifecycle authority"
+  ],
+  "nonGoals": [
+    "Do not make Team Agents mandatory for ordinary single-task work."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert team wave runtime/start/status surface, validator updates, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-wave-runtime-record-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0027-team-wave-runtime-record-and-dispatch-surface.task.md",
+    "sectionTitle": "TASK-MAO-0027",
+    "headingLine": 46,
+    "hash": "f1d749415c4fa9df"
+  },
+  "importedAt": "2026-06-15T16:41:35.046Z",
+  "lastTransitionId": "2026-06-15T16-41-35-052Z-import-aeaa3b5d7c58",
+  "lastTransitionAt": "2026-06-15T16:41:35.052Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

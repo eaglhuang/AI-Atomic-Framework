@@ -319,6 +319,8 @@ ATM can coexist with agent frameworks, specification-driven development tools, C
 | First-touch onboarding and ATMChart | [docs/AGENT_PACK_ONBOARDING.md](docs/AGENT_PACK_ONBOARDING.md) |
 | Host-side enforcement | [docs/HOST_GOVERNANCE_INTEGRATION.md](docs/HOST_GOVERNANCE_INTEGRATION.md) |
 | Self-hosting alpha proof | [docs/SELF_HOSTING_ALPHA.md](docs/SELF_HOSTING_ALPHA.md) |
+| Bug backlog router | [.agents/skills/atm-bug-backlog/SKILL.md](.agents/skills/atm-bug-backlog/SKILL.md) |
+| ATM bug and optimization backlog | [docs/governance/atm-bug-and-optimization-backlog.md](docs/governance/atm-bug-and-optimization-backlog.md) |
 | Atom creation and generator provenance | [docs/ATOM_GENERATOR.md](docs/ATOM_GENERATOR.md) |
 | Atom workspace layout | [docs/ATOM_SPACE_LAYOUT.md](docs/ATOM_SPACE_LAYOUT.md) |
 | Atomic map replacement | [docs/MAP_REPLACEMENT_PROTOCOL.md](docs/MAP_REPLACEMENT_PROTOCOL.md) |

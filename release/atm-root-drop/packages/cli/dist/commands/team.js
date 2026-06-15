@@ -366,9 +366,10 @@ async function buildTeamPlanningContext(input) {
         requestedRecipeId: input.requestedRecipeId,
         task
     });
-    const writePaths = deriveWritePaths(task);
+    const writePaths = deriveWritePaths(task, input.cwd);
     const permissionValidation = validateTeamPermissionModel(recipe, writePaths, {
-        allowedWritePaths: deriveAllowedWriteScope(task)
+        allowedWritePaths: deriveAllowedWriteScope(task, input.cwd),
+        repoRoot: input.cwd
     });
     const parallelFindings = [];
     try {
@@ -703,7 +704,7 @@ function validatePermissionLeases(leases, agentRoles, options = {}) {
     const permissionDefinitions = new Map(teamPermissionCatalog.map((entry) => [entry.id, entry]));
     const findings = [];
     const ownersByExclusivePermission = new Map();
-    const allowedWritePathSet = new Set((options.allowedWritePaths ?? []).map(normalizeTeamLeasePath).filter(Boolean));
+    const allowedWritePathSet = new Set((options.allowedWritePaths ?? []).map((entry) => normalizeTeamLeasePath(entry, options.repoRoot)).filter(Boolean));
     for (const lease of leases) {
         const definition = permissionDefinitions.get(lease.permission);
         const role = agentRoles.get(lease.agentId);
@@ -736,10 +737,10 @@ function validatePermissionLeases(leases, agentRoles, options = {}) {
         }
         const normalizedLeasePaths = (lease.paths ?? []).map((entry) => ({
             raw: entry,
-            normalized: normalizeTeamLeasePath(entry)
+            normalized: normalizeTeamLeasePath(entry, options.repoRoot)
         }));
         const unsafeTraversalPaths = normalizedLeasePaths
-            .filter((entry) => isUnsafeTeamLeasePath(entry.raw, entry.normalized))
+            .filter((entry) => isUnsafeTeamLeasePath(entry.raw, entry.normalized, options.repoRoot))
             .map((entry) => entry.raw);
         if (unsafeTraversalPaths.length > 0) {
             findings.push(buildPermissionFinding({
@@ -807,32 +808,51 @@ function finalizeLeaseValidation(findings, ownersByExclusivePermission, agentRol
         findings
     };
 }
-function normalizeTeamLeasePath(value) {
-    const normalized = path.posix.normalize(String(value).trim().replace(/\\/g, '/'));
+function normalizeTeamLeasePath(value, repoRoot) {
+    const raw = String(value).trim();
+    const repoRelative = normalizeRepoAbsoluteLeasePath(raw, repoRoot);
+    const normalized = path.posix.normalize((repoRelative ?? raw).replace(/\\/g, '/'));
     return normalized === '.' ? '' : normalized.replace(/^\.\//, '');
 }
-function isUnsafeTeamLeasePath(rawPath, normalizedPath) {
+function normalizeRepoAbsoluteLeasePath(rawPath, repoRoot) {
+    if (!repoRoot)
+        return null;
+    const raw = String(rawPath).trim();
+    const normalizedRaw = raw.replace(/\\/g, '/');
+    if (!/^[A-Za-z]:\//.test(normalizedRaw) && !normalizedRaw.startsWith('/'))
+        return null;
+    const root = path.resolve(repoRoot);
+    const candidate = path.resolve(raw);
+    const relative = path.relative(root, candidate);
+    if (!relative || relative === '')
+        return '';
+    if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative))
+        return null;
+    return relative.replace(/\\/g, '/');
+}
+function isUnsafeTeamLeasePath(rawPath, normalizedPath, repoRoot) {
     const raw = String(rawPath).trim().replace(/\\/g, '/');
-    return raw.startsWith('/')
-        || /^[A-Za-z]:\//.test(raw)
+    const repoRelative = normalizeRepoAbsoluteLeasePath(rawPath, repoRoot);
+    const unsafeAbsolute = (raw.startsWith('/') || /^[A-Za-z]:\//.test(raw)) && repoRelative === null;
+    return unsafeAbsolute
         || raw === '..'
         || raw.startsWith('../')
         || raw.includes('/../')
         || normalizedPath === '..'
         || normalizedPath.startsWith('../');
 }
-function deriveAllowedWriteScope(task) {
+function deriveAllowedWriteScope(task, repoRoot) {
     const explicitAllowed = normalizeStringArray(task.targetAllowedFiles);
     if (explicitAllowed.length > 0) {
-        return normalizeTaskWriteScope(explicitAllowed);
+        return normalizeTaskWriteScope(explicitAllowed, repoRoot);
     }
     return normalizeTaskWriteScope([
         ...normalizeStringArray(task.deliverables),
         ...normalizeStringArray(task.scopePaths)
-    ]);
+    ], repoRoot);
 }
-function normalizeTaskWriteScope(paths) {
-    return uniqueStrings(paths.map(normalizeTeamLeasePath).filter(Boolean));
+function normalizeTaskWriteScope(paths, repoRoot) {
+    return uniqueStrings(paths.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter(Boolean));
 }
 function mergeValidation(...reports) {
     const findings = reports.flatMap((report) => report.findings);
@@ -1518,14 +1538,13 @@ function summarizeTask(taskId, task) {
         sourcePlanPath: task.source?.planPath ?? task.sourcePlanPath ?? null
     };
 }
-function deriveWritePaths(task) {
+function deriveWritePaths(task, repoRoot) {
     const candidates = [
         ...normalizeStringArray(task.targetAllowedFiles),
         ...normalizeStringArray(task.deliverables),
         ...normalizeStringArray(task.scopePaths)
     ];
-    return uniqueStrings(candidates.filter((entry) => {
-        const normalized = normalizeTeamLeasePath(entry);
+    return uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
         return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
     }));
 }
