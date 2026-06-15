@@ -1,0 +1,290 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0030",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e49365ef54aa95a09ea59a10898a35a176c3cc94",
+  "governedTreeSha": "e3c0b93322a20c1bc0938e5f26fdb45f373363af",
+  "targetCommitDelta": {
+    "currentCommitSha": "e49365ef54aa95a09ea59a10898a35a176c3cc94",
+    "parentCommitShas": [
+      "e49365ef54aa95a09ea59a10898a35a176c3cc94"
+    ],
+    "governedTreeSha": "e3c0b93322a20c1bc0938e5f26fdb45f373363af",
+    "changedFiles": [
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case planning-path-lease-normalization",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b25df6f58bbdd494572b022cb7797c650c91d5875c9db4132348a0f137818d06",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate-team-agents:planning-path-lease-normalization",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-15T06:34:32.641Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0030-team-agents-planning-repo-path-lease-normalization.task.md",
+      ".atm/history/evidence/TASK-TEAM-0030.*",
+      ".atm/history/task-events/TASK-TEAM-0030/**",
+      ".atm/history/tasks/TASK-TEAM-0030.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/team.spec.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/team.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-team-agents.ts",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0030.json",
+  "closedAt": "2026-06-15T06:34:32.641Z",
+  "closedByActor": "codex-captain-continuation",
+  "sessionId": "session-20260615062614-codex-captain-continuation-TASK-TEAM-0030-f49b8e6874",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": {
+    "schemaId": "atm.closurePacketTeamSummary.v1",
+    "capturedAt": "2026-06-15T06:34:32.642Z",
+    "source": {
+      "kind": "team-run",
+      "teamRunPath": ".atm/runtime/team-runs/team-48495f14cfa8.json"
+    },
+    "teamRunId": "team-48495f14cfa8",
+    "captainDecision": {
+      "schemaId": "atm.teamCaptainDecision.v1",
+      "captain": {
+        "role": "Task Captain",
+        "agentId": "coordinator"
+      },
+      "taskId": "TASK-TEAM-0030",
+      "authorityChain": {
+        "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+        "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+      },
+      "conflictRules": [
+        "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+        "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+        "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+      ],
+      "teamSize": "medium",
+      "requiredRoles": [
+        "Task Captain",
+        "Atomization Planner",
+        "Code Builder",
+        "Check Runner"
+      ],
+      "optionalRoles": [
+        "Reader",
+        "Evidence Collector",
+        "Scope Guardian"
+      ],
+      "reason": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "confidence": "medium",
+      "implementerSelector": {
+        "schemaId": "atm.teamImplementerSelector.v1",
+        "selectedImplementer": {
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "profile": "atm.implementer.typescript.v1",
+          "language": "typescript",
+          "recipeId": "atm.default.normal.typescript"
+        },
+        "languageMatch": "typescript",
+        "roleMatch": "typescript-implementer",
+        "fallbackReason": "No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.",
+        "confidence": "high",
+        "deterministicHints": {
+          "scopePaths": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/team.spec.ts",
+            "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/team.ts",
+            "C:/Users/User/AI-Atomic-Framework/scripts/validate-team-agents.ts",
+            "packages/cli/src/commands/command-specs/team.spec.ts",
+            "packages/cli/src/commands/team.ts",
+            "scripts/validate-team-agents.ts"
+          ],
+          "deliverables": [],
+          "fileExtensions": [
+            ".json",
+            ".ts"
+          ],
+          "pathHints": [
+            "cli-command-surface",
+            "script-surface",
+            "typescript-file",
+            "typescript-heavy"
+          ],
+          "pythonHeavy": false,
+          "typescriptHeavy": true,
+          "uiPaths": false
+        }
+      },
+      "stopConditions": [
+        "scope must stay within declared allowed files",
+        "required roles must each be uniquely represented",
+        "validators must not report blocking permission conflicts",
+        "a broader or stronger lane must stop the plan"
+      ],
+      "escalationRequired": true,
+      "escalationReason": "Scope spans 4 declared paths, so coordination should be escalated. Scope crosses repo boundaries and should retain a lieutenant coordination boundary. Large script risk indicates the captain should not keep all coordination signals inline. Validator fan-out is 5, which merits lieutenant tracking.",
+      "needLieutenant": true,
+      "nextTeamShape": {
+        "schemaId": "atm.teamLieutenantEscalationShape.v1",
+        "captain": {
+          "role": "Task Captain",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ]
+        },
+        "lieutenant": {
+          "role": "Task Lieutenant",
+          "recommended": true,
+          "permissions": [
+            "file.read",
+            "exec.validator"
+          ],
+          "forbiddenPermissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "coordinationFocus": [
+            "phase coordination",
+            "blocker tracking",
+            "handoff summarization"
+          ]
+        },
+        "teamSizeHint": "medium",
+        "coordinationBoundary": "captain+lieutenant",
+        "signals": {
+          "scopeCount": 4,
+          "crossRepoScope": true,
+          "validatorCount": 5,
+          "largeScriptRisk": true,
+          "closureSignals": false,
+          "validationOk": true,
+          "brokerVerdict": "parallel-safe"
+        },
+        "suggestedPermissions": {
+          "captain": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "lieutenant": [
+            "file.read",
+            "exec.validator"
+          ]
+        }
+      },
+      "decisionSurface": {
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe",
+        "largeScriptRisk": {
+          "level": "high",
+          "threshold": 3,
+          "reasons": [
+            "touched files 4 exceed planning threshold 3"
+          ]
+        },
+        "mapUpdateNeed": true,
+        "escalationRequired": true,
+        "needLieutenant": true,
+        "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+      }
+    },
+    "agentReports": [],
+    "patrolFindings": [],
+    "evidenceCuratorSummary": null,
+    "teamSummary": {
+      "decision": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "implementationSummary": "Team runtime started; closure remains governed by command-backed evidence.",
+      "validators": [],
+      "evidence": [],
+      "risk": "medium",
+      "closeReady": false
+    }
+  }
+}
