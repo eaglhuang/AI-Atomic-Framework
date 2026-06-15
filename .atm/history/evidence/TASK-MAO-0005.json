@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-MAO-0005",
-  "updatedAt": "2026-06-15T12:37:29.034Z",
+  "updatedAt": "2026-06-15T12:39:25.190Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -178,6 +178,97 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:804eab338d5704043a25495e99090db5b7fd878bb394f40235f4039c30144529",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Full intent registry validator command passed for TASK-MAO-0005",
+      "artifactPaths": [
+        "packages/core/src/broker/__tests__/intent-registry.test.ts",
+        "packages/core/src/broker/registry.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain-continuation",
+      "sessionId": "session-20260615123605-codex-captain-continuation-TASK-MAO-0005-c231e471f1",
+      "createdAt": "2026-06-15T12:39:08.195Z",
+      "details": {
+        "actorId": "codex-captain-continuation",
+        "sessionId": "session-20260615123605-codex-captain-continuation-TASK-MAO-0005-c231e471f1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:da89f730cddd75dba1a2dbd74c95cf6e423e71a1506abc14aca00486bab9d3be",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:73559f54541a98ff80dd5e4a3a79ab59fbc4bb753089384ef0ac5d38e75d0ed0",
+            "cached": false,
+            "generatedAt": "2026-06-15T12:39:08.250Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2946dca5128101abccd40968c65928ee30f96ad8f5886bfd8d27e73aa99a5faa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Git-head evidence validator passed for TASK-MAO-0005 closeback",
+      "artifactPaths": [
+        ".atm/history/evidence/TASK-MAO-0005.json",
+        ".atm/history/evidence/git-head.jsonl"
+      ],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain-continuation",
+      "sessionId": "session-20260615123605-codex-captain-continuation-TASK-MAO-0005-c231e471f1",
+      "createdAt": "2026-06-15T12:39:25.190Z",
+      "details": {
+        "actorId": "codex-captain-continuation",
+        "sessionId": "session-20260615123605-codex-captain-continuation-TASK-MAO-0005-c231e471f1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-06-15T12:39:25.239Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:37db8c944c12a53f909e05e9deaace56ecf00ef0e6e18809e71c9ab0aab24b28",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
