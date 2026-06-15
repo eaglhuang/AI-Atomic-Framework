@@ -1,4 +1,4 @@
-import type { MergePlan, MigrationRecord } from './types.ts';
+import type { BrokerMutationEvidenceEntry, MergePlan, MigrationRecord } from './types.ts';
 
 export interface StewardPermissionBoundary {
   readonly fileWrite: readonly string[];
@@ -21,6 +21,7 @@ export interface StewardApplyEvidence {
   readonly applyMethod: MergePlan['applyMethod'];
   readonly verdict: 'applied' | 'blocked';
   readonly blockedReasons?: readonly string[];
+  readonly mutationEvidence?: readonly BrokerMutationEvidenceEntry[];
 }
 
 export const defaultStewardApplyMigration: MigrationRecord = {
@@ -39,6 +40,7 @@ export function buildStewardApplyEvidence(input: {
   readonly fileAfterHashes: Readonly<Record<string, string>>;
   readonly verdict: StewardApplyEvidence['verdict'];
   readonly blockedReasons?: readonly string[];
+  readonly mutationEvidence?: readonly BrokerMutationEvidenceEntry[];
 }): StewardApplyEvidence {
   return {
     schemaId: 'atm.stewardApplyEvidence.v1',
@@ -58,6 +60,9 @@ export function buildStewardApplyEvidence(input: {
     },
     applyMethod: input.mergePlan.applyMethod,
     verdict: input.verdict,
-    blockedReasons: input.blockedReasons ? [...input.blockedReasons] : undefined
+    blockedReasons: input.blockedReasons ? [...input.blockedReasons] : undefined,
+    // Omit the field entirely when not supplied so existing deepEqual-based
+    // evidence tests (which do not expect the key) keep passing.
+    ...(input.mutationEvidence ? { mutationEvidence: [...input.mutationEvidence] } : {})
   };
 }

@@ -1,6 +1,7 @@
 import { type FileDescriptor, type FileMutationAdapter } from '../types.ts';
 import { FALLBACK_ADAPTER_ID, fallbackFileLockAdapter } from './fallback-file-lock.ts';
 import { jsonRecordAdapter } from './json-record.ts';
+import { pathToAtomMapAdapter } from './atom-map.ts';
 import { textRangeAdapter } from './text-range.ts';
 import { numericScalarAdapter } from './numeric-scalar.ts';
 
@@ -78,20 +79,20 @@ function dedupeById(adapters: readonly FileMutationAdapter[], fallbackId: string
 /**
  * The default adapter registry used by the broker write path.
  *
- * Order (most specific first): numeric-scalar -> text-range -> json-record,
- * with the fallback file-lock adapter always consulted last. numeric-scalar is
- * listed before json-record because its `*.scalars.json` / `*.counter.json`
- * files also end in `.json` and must not be shadowed by the generic adapter.
- *
- * Phase C note: the path-to-atom-map domain adapter (TASK-CID-0094) will be
- * inserted BEFORE json-record here once it lands, since it is more specific
- * than the generic JSON adapter for owner-shard files.
+ * Order (most specific first): numeric-scalar -> text-range -> atom-map ->
+ * json-record, with the fallback file-lock adapter always consulted last.
+ * numeric-scalar is listed before json-record because its `*.scalars.json` /
+ * `*.counter.json` files also end in `.json` and must not be shadowed by the
+ * generic adapter. The path-to-atom-map domain adapter (TASK-CID-0094) sits
+ * before json-record since owner-shard files are also `.json` and need its
+ * row-identity conflict-key scheme rather than the generic JSON-pointer one.
  */
 export function defaultAdapterRegistry(): AdapterRegistry {
   return createAdapterRegistry(
     [
       numericScalarAdapter,
       textRangeAdapter,
+      pathToAtomMapAdapter,
       jsonRecordAdapter
     ],
     fallbackFileLockAdapter

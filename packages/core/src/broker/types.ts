@@ -316,6 +316,58 @@ export interface FileMutationAdapter {
   validate?(file: FileDescriptor): ValidationResult;
 }
 
+// ---------------------------------------------------------------------------
+// Batch planning + evidence (TASK-CID-0097, Phase C). Additive-only.
+// ---------------------------------------------------------------------------
+
+/**
+ * A group of normalized mutations against a single file that the planner has
+ * determined can be applied together. `verdict` mirrors the adapter merge
+ * verdict that justified grouping them (mergeable or commutative-merge).
+ */
+export interface MutationBatch {
+  readonly filePath: string;
+  readonly adapterId: string;
+  readonly verdict: Extract<MergeVerdict, 'mergeable' | 'commutative-merge'>;
+  readonly requestIds: readonly string[];
+  readonly conflictKeys: readonly ConflictKey[];
+}
+
+/**
+ * The deterministic plan produced by `planMutationBatch`. Batches hold
+ * co-applicable mutations; `queued` holds requests deferred because they
+ * conflict with an earlier batch on the same file; `blocked` holds requests an
+ * adapter rejected outright. `planId` is a content hash of the sorted request
+ * ids, mirroring the merge-plan deterministic-id idiom.
+ */
+export interface MutationBatchPlan {
+  readonly schemaId: 'atm.mutationBatchPlan.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly planId: string;
+  readonly batches: readonly MutationBatch[];
+  readonly queued: readonly string[];
+  readonly blocked: readonly string[];
+}
+
+/**
+ * One mutation-level evidence entry attached (optionally) to steward apply
+ * evidence so a brokered write records, per request, which adapter handled it,
+ * the base/result content hashes, the conflict keys it claimed, the adapter's
+ * merge decision verdict, and the final apply verdict.
+ */
+export interface BrokerMutationEvidenceEntry {
+  readonly requestId: string;
+  readonly actorId: string;
+  readonly adapterId: string;
+  readonly filePath: string;
+  readonly baseHash: string;
+  readonly resultHash: string;
+  readonly conflictKeys: readonly ConflictKey[];
+  readonly mergeDecision: MergeVerdict;
+  readonly verdict: 'applied' | 'queued' | 'blocked';
+}
+
 const FROZEN_MIGRATION: MigrationRecord = Object.freeze({
   strategy: 'none',
   fromVersion: null,

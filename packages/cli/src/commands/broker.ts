@@ -29,7 +29,11 @@ import {
   upsertBrokerProposalStore,
   validateBrokerProposal
 } from '../../../core/src/broker/proposal.ts';
-import type { MergePlan, PatchProposal, WriteIntent } from '../../../core/src/broker/types.ts';
+import { defaultAdapterRegistry, resolveAdapter } from '../../../core/src/broker/adapters/registry.ts';
+import { planMutationBatch } from '../../../core/src/broker/adapters/batch-planner.ts';
+import { computeCasResult, hashContent } from '../../../core/src/broker/adapters/cas.ts';
+import type { BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent } from '../../../core/src/broker/types.ts';
+import { readdirSync, writeFileSync } from 'node:fs';
 
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
@@ -615,12 +619,145 @@ export async function runBroker(argv: string[]) {
     });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime', { exitCode: 2 });
+  if (options.action === 'plan-batch') {
+    const requestPaths: string[] = [...options.requestFiles.map((file) => path.resolve(options.cwd, file))];
+    if (options.requestsDir) {
+      const dir = path.resolve(options.cwd, options.requestsDir);
+      if (!existsSync(dir)) {
+        throw new CliError('ATM_FILE_NOT_FOUND', `Requests dir not found: ${options.requestsDir}`, { exitCode: 1 });
+      }
+      for (const entry of readdirSync(dir).sort((left, right) => left.localeCompare(right))) {
+        if (entry.endsWith('.json')) {
+          requestPaths.push(path.join(dir, entry));
+        }
+      }
+    }
+    if (requestPaths.length === 0) {
+      throw new CliError('ATM_CLI_USAGE', 'broker plan-batch requires --request-file <path> and/or --requests-dir <dir>.', { exitCode: 2 });
+    }
+
+    const requests: MutationRequest[] = [];
+    for (const requestPath of requestPaths) {
+      if (!existsSync(requestPath)) {
+        throw new CliError('ATM_FILE_NOT_FOUND', `Mutation request file not found: ${requestPath}`, { exitCode: 1 });
+      }
+      requests.push(JSON.parse(readFileSync(requestPath, 'utf8')) as MutationRequest);
+    }
+
+    const registry = defaultAdapterRegistry();
+
+    // Load the current on-disk contents of each target file (when present) so the
+    // planner parses the real document and CAS can compare base hashes.
+    const fileContents: Record<string, string> = {};
+    for (const request of requests) {
+      if (fileContents[request.filePath] === undefined) {
+        const absolute = path.resolve(options.cwd, request.filePath);
+        fileContents[request.filePath] = existsSync(absolute) ? readFileSync(absolute, 'utf8') : '{}';
+      }
+    }
+
+    const plan = planMutationBatch({ registry, requests, fileContents });
+
+    const requestById = new Map(requests.map((request) => [request.requestId, request]));
+    const batchedIds = new Set(plan.batches.flatMap((batch) => batch.requestIds));
+    const mutationEvidence: BrokerMutationEvidenceEntry[] = [];
+    const casMismatches: string[] = [];
+    let applied = false;
+
+    if (options.apply) {
+      for (const batch of plan.batches) {
+        const absolute = path.resolve(options.cwd, batch.filePath);
+        const baseContents = fileContents[batch.filePath] ?? '{}';
+        const file = { filePath: batch.filePath, content: baseContents };
+        const adapter = resolveAdapter(registry, file);
+        const baseHash = hashContent(baseContents);
+
+        // CAS: re-read the file at apply time and verify it matches the base the
+        // plan was built against. One-shot, no retry loop.
+        const currentContents = existsSync(absolute) ? readFileSync(absolute, 'utf8') : '{}';
+        const cas = computeCasResult({ filePath: batch.filePath, expectedBaseHash: baseHash, currentFileContents: currentContents });
+        const batchRequests = batch.requestIds.map((id) => requestById.get(id)!).filter(Boolean);
+
+        if (!cas.ok || adapter.id === 'fallback-file-lock') {
+          if (!cas.ok) {
+            casMismatches.push(batch.filePath);
+          }
+          for (const request of batchRequests) {
+            mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, baseHash, batch.verdict, 'blocked'));
+          }
+          continue;
+        }
+
+        const parsed = adapter.parse(file);
+        const merged = adapter.merge(batchRequests.map((request) => adapter.normalize(request)), parsed);
+        const resultContents = adapter.serialize(merged);
+        writeFileSync(absolute, resultContents, 'utf8');
+        applied = true;
+        const resultHash = hashContent(resultContents);
+        for (const request of batchRequests) {
+          mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, resultHash, batch.verdict, 'applied'));
+        }
+      }
+
+      for (const id of [...plan.queued, ...plan.blocked]) {
+        const request = requestById.get(id);
+        if (!request) continue;
+        const baseHash = hashContent(fileContents[request.filePath] ?? '{}');
+        mutationEvidence.push(buildMutationEvidence('n/a', request, baseHash, baseHash, 'conflict', plan.blocked.includes(id) ? 'blocked' : 'queued'));
+      }
+    }
+
+    const ok = plan.blocked.length === 0 && casMismatches.length === 0 && (!options.apply || applied || (plan.batches.length === 0));
+    return makeResult({
+      ok,
+      command: 'broker',
+      cwd: options.cwd,
+      messages: [
+        message(
+          ok ? 'info' : 'warn',
+          'ATM_BROKER_PLAN_BATCH',
+          `Planned ${plan.batches.length} batch(es) over ${requests.length} request(s); queued=${plan.queued.length}, blocked=${plan.blocked.length}${options.apply ? `, applied=${applied}` : ''}.`,
+          { planId: plan.planId, batchCount: plan.batches.length, casMismatchCount: casMismatches.length }
+        )
+      ],
+      evidence: {
+        action: 'plan-batch',
+        plan,
+        applied: options.apply ? applied : false,
+        casMismatches,
+        mutationEvidence: options.apply ? mutationEvidence : [],
+        unbatchedRequestIds: requests.map((request) => request.requestId).filter((id) => !batchedIds.has(id))
+      }
+    });
+  }
+
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+
+function buildMutationEvidence(
+  adapterId: string,
+  request: MutationRequest,
+  baseHash: string,
+  resultHash: string,
+  mergeDecision: BrokerMutationEvidenceEntry['mergeDecision'],
+  verdict: BrokerMutationEvidenceEntry['verdict']
+): BrokerMutationEvidenceEntry {
+  return {
+    requestId: request.requestId,
+    actorId: request.actorId,
+    adapterId,
+    filePath: request.filePath,
+    baseHash,
+    resultHash,
+    conflictKeys: [],
+    mergeDecision,
+    verdict
+  };
 }
 
 interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'plan-batch' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
@@ -635,6 +772,9 @@ interface ParsedBrokerOptions {
   readonly scopeFiles: readonly string[];
   readonly stewardId: string | null;
   readonly evidenceOutPath: string | null;
+  readonly requestFiles: readonly string[];
+  readonly requestsDir: string | null;
+  readonly apply: boolean;
 }
 
 function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
@@ -655,7 +795,10 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     mergePlanFile: null as string | null,
     scopeFiles: [] as string[],
     stewardId: null as string | null,
-    evidenceOutPath: null as string | null
+    evidenceOutPath: null as string | null,
+    requestFiles: [] as string[],
+    requestsDir: null as string | null,
+    apply: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -721,6 +864,20 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--request-file') {
+      state.requestFiles.push(requireValue(argv, index, '--request-file'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--requests-dir') {
+      state.requestsDir = requireValue(argv, index, '--requests-dir');
+      index += 1;
+      continue;
+    }
+    if (arg === '--apply') {
+      state.apply = true;
+      continue;
+    }
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `broker does not support option ${arg}`, { exitCode: 2 });
     }
@@ -761,7 +918,10 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     mergePlanFile: state.mergePlanFile,
     scopeFiles: state.scopeFiles,
     stewardId: state.stewardId,
-    evidenceOutPath: state.evidenceOutPath
+    evidenceOutPath: state.evidenceOutPath,
+    requestFiles: state.requestFiles,
+    requestsDir: state.requestsDir,
+    apply: state.apply
   };
 }
 
