@@ -206,3 +206,123 @@ export interface BrokerConflictMatrix {
   readonly arbitrationVerdict: BrokerArbitrationVerdict;
   readonly conflicts: readonly BrokerConflictClassResult[];
 }
+
+// ---------------------------------------------------------------------------
+// Broker Format Adapter subsystem (TASK-CID-0092..0096, Phase B).
+// Additive-only types. Do NOT modify the interfaces above.
+// ConflictKey here is intentionally distinct from ConflictDetail / the broker
+// arbitration conflict classes: those describe write-intent arbitration, this
+// describes the fine-grained sub-file mutation surface a format adapter owns.
+// ---------------------------------------------------------------------------
+
+/**
+ * Describes the file a mutation targets. `content` is the current on-disk text
+ * (opaque to the registry; each adapter parses it in its own format).
+ */
+export interface FileDescriptor {
+  readonly filePath: string;
+  readonly content: string;
+}
+
+/**
+ * A single requested mutation against a file, expressed in adapter-neutral
+ * terms. `op` is the format-specific operation name (e.g. 'upsert',
+ * 'increment', 'append'); `target` identifies the sub-file location
+ * (JSON pointer, heading text, scalar key, ...); `value` is the payload.
+ */
+export interface MutationRequest {
+  readonly schemaId: 'atm.mutationRequest.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly requestId: string;
+  readonly actorId: string;
+  readonly filePath: string;
+  readonly op: string;
+  readonly target: string;
+  readonly value?: unknown;
+}
+
+/**
+ * An adapter-normalized mutation: the registry-neutral request after the
+ * adapter has resolved/validated the operation against the parsed document.
+ */
+export interface NormalizedMutation {
+  readonly requestId: string;
+  readonly actorId: string;
+  readonly filePath: string;
+  readonly op: string;
+  readonly target: string;
+  readonly value?: unknown;
+}
+
+export type ConflictKeyScope = 'file' | 'record' | 'range' | 'line' | 'scalar' | 'semantic';
+
+/**
+ * A fine-grained, comparable key identifying the sub-file surface a mutation
+ * touches. Two mutations whose conflict keys collide on `key` (within the same
+ * scope) are candidates for conflict; disjoint keys are independent.
+ */
+export interface ConflictKey {
+  readonly schemaId: 'atm.conflictKey.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly scope: ConflictKeyScope;
+  readonly key: string;
+}
+
+export type MergeVerdict = 'mergeable' | 'commutative-merge' | 'conflict';
+
+/**
+ * The decision an adapter reaches when asked whether two (or more) mutations
+ * to the same file can be combined.
+ */
+export interface MergeDecision {
+  readonly schemaId: 'atm.mergeDecision.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly verdict: MergeVerdict;
+  readonly reason: string;
+  readonly conflictKeys: readonly ConflictKey[];
+}
+
+/**
+ * The result of an adapter parsing a file's content into its own in-memory
+ * representation. `value` is adapter-private (parsed JSON, line array, ...).
+ */
+export interface ParsedDocument {
+  readonly filePath: string;
+  readonly value: unknown;
+}
+
+export interface ValidationResult {
+  readonly ok: boolean;
+  readonly errors: readonly string[];
+}
+
+/**
+ * The pluggable per-format adapter contract. The broker registry resolves a
+ * file to exactly one adapter via `supports()`. The broker core stays
+ * format-agnostic; all format knowledge lives behind this interface.
+ */
+export interface FileMutationAdapter {
+  readonly id: string;
+  supports(file: FileDescriptor): boolean;
+  parse(file: FileDescriptor): ParsedDocument;
+  normalize(request: MutationRequest): NormalizedMutation;
+  getConflictKeys(mutation: NormalizedMutation, parsed: ParsedDocument): readonly ConflictKey[];
+  canMerge(mutations: readonly NormalizedMutation[], parsed: ParsedDocument): MergeDecision;
+  merge(mutations: readonly NormalizedMutation[], parsed: ParsedDocument): ParsedDocument;
+  serialize(parsed: ParsedDocument): string;
+  validate?(file: FileDescriptor): ValidationResult;
+}
+
+const FROZEN_MIGRATION: MigrationRecord = Object.freeze({
+  strategy: 'none',
+  fromVersion: null,
+  notes: 'broker format adapter subsystem baseline'
+});
+
+/** Shared default migration record for adapter-emitted envelopes. */
+export function brokerAdapterMigration(): MigrationRecord {
+  return FROZEN_MIGRATION;
+}
