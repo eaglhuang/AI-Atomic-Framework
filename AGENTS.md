@@ -75,6 +75,8 @@ This is the **AI-Atomic-Framework** repository for **ATM** — a governance fram
 | `.atm/memory/atm-chart.md` | ATMChart — rendered rule summary for the current repository state |
 | `docs/AGENT_PACK_ONBOARDING.md` | First-touch onboarding: welcome flow, ATMChart, integration agent packs |
 | `docs/SELF_HOSTING_ALPHA.md` | Self-hosting reference for adopter repositories |
+| `.agents/skills/atm-bug-backlog/SKILL.md` | Bug backlog router: classifies ATM bugs vs project bugs before writing repo-specific backlog files |
+| `docs/governance/atm-bug-and-optimization-backlog.md` | ATM-owned Bug and Optimization Backlog for ATM framework, CLI, governance, and Team Agents issues |
 | AtomicCharter | Framework-level invariants and waiver authority (resolved by `atm next`) |
 
 ## Key Rules
@@ -83,6 +85,7 @@ This is the **AI-Atomic-Framework** repository for **ATM** — a governance fram
 - **Do not mark work done without evidence.** ATM requires guard output, artifacts, or attestation before closing a work item.
 - **Do not modify `.atm/` runtime state directly.** Use CLI commands; the runtime directory is managed by ATM.
 - **Do not add host-specific policy to framework docs.** Adopter rules belong in adapter or plugin configuration, not in `packages/core` or protected public docs.
+- **Bug backlog routing.** If the user mentions bug backlog, bug record, optimization backlog, bug 紀錄表, 優化事項, or ATM Bug and Optimization Backlog, use `.agents/skills/atm-bug-backlog/SKILL.md` first. Record ATM framework/CLI/governance/Team Agents issues in `docs/governance/atm-bug-and-optimization-backlog.md`; record adopter/app/project issues in that repo's `docs/governance/project-bug-and-optimization-backlog.md`. Do not use release incident response docs for ordinary dogfood bugs.
 
 ## Diagnosing Repository State
 
