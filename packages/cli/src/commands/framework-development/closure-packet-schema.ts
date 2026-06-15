@@ -1540,7 +1540,7 @@ export interface CloseCommitWindowRecord {
   readonly ttlSeconds: number;
   readonly allowedFiles: readonly string[];
   readonly transitionId: string | null;
-  readonly transitionAction: 'close' | 'reconcile';
+  readonly transitionAction: 'close' | 'reconcile' | 'abandon';
 }
 
 function closeCommitWindowPath(cwd: string, taskId: string): string {
@@ -1553,7 +1553,7 @@ export function registerCloseCommitWindow(input: {
   readonly actorId: string;
   readonly allowedFiles: readonly string[];
   readonly transitionId: string | null;
-  readonly action: 'close' | 'reconcile';
+  readonly action: 'close' | 'reconcile' | 'abandon';
 }): string {
   const now = new Date();
   const record: CloseCommitWindowRecord = {

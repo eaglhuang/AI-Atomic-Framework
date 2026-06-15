@@ -295,7 +295,7 @@
     {
       "path_pattern": "packages/cli/src/commands/next.ts",
       "atom_id": "atm.next-router-map",
-      "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
+      "capability": "next-action routing, task scope resolution, public decisionTrail contract, and advisory teamRecommendation embedding in next/playbook output (TASK-TEAM-0015).",
       "coverage_status": "active"
     },
     {
@@ -373,7 +373,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-closure-map",
-      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport — missingValidationPasses/blockingFindings now contain only closure-required validators so advisory framework health gates (doctor, framework-development, tasks-audit, git-head-evidence) do not falsely block close (TASK-AAO-0017, TASK-AAO-0017 follow-up).",
+      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport; missingValidationPasses/blockingFindings now contain only closure-required validators so advisory framework health gates (doctor, framework-development, tasks-audit, git-head-evidence) do not falsely block close. Closure packets may also carry optional teamSummary metadata while command-backed evidence remains authoritative (TASK-AAO-0017, TASK-AAO-0017 follow-up, TASK-TEAM-0016).",
       "coverage_status": "active"
     },
     {
@@ -528,11 +528,32 @@
       "source_task": "TASK-TEAM-0011"
     },
     {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamRecommendation",
+      "atom_id": "team.next-recommendation",
+      "capability": "Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0015"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecNextRecommendation",
+      "atom_id": "team.spec.next-recommendation",
+      "capability": "Command spec examples for next/playbook teamRecommendation advisory surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0015"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
       "atom_id": "team.plan-broker-lane",
       "capability": "Broker lane evaluation and steward/composer routing for team plan/start.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamClaimAdmissionFindings",
+      "atom_id": "team.start-claim-gate-parity",
+      "capability": "Team plan/start claim admission parity against normal task dependency gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0029"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#runTeam",
@@ -852,9 +873,16 @@
       "source_task": "TASK-TEAM-0017"
     },
     {
+      "path_pattern": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "Closure packet contract, validation, creation, repair helpers, and optional teamSummary integration that preserves captain decisions, agent reports, patrol findings, and evidence curator summaries without replacing command-backed validators (TASK-TEAM-0016).",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0016"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts",
       "atom_id": "atm.team-agents-map",
-      "capability": "Team Agents CLI planning and runtime surface, including deterministic role selector output and team start/status runtime records.",
+      "capability": "Team Agents CLI planning and runtime surface, including deterministic role selector output, team start/status runtime records, and closure-summary seed fields for TASK-TEAM-0016 closure packets.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0011"
     },

@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { CliError, makeResult, message, parseArgsForCommand, readJsonFile, writeJsonFile } from './shared.js';
+import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, readJsonFile, writeJsonFile } from './shared.js';
 import { getCommandSpec } from './command-specs.js';
 import { runTasks } from './tasks.js';
+import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.js';
 import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../core/dist/broker/team-lane.js';
 const teamPermissionCatalog = [
     { id: 'task.lifecycle', mode: 'exclusive' },
@@ -79,6 +80,11 @@ export const TEAM_ATOM_BOUNDARIES = {
         capability: 'Broker lane evaluation and steward/composer routing for team plan/start.',
         downstreamTasks: ['TASK-TEAM-0001', 'TASK-CID-0021']
     },
+    'team.start-claim-gate-parity': {
+        anchor: 'packages/cli/src/commands/team.ts#buildTeamClaimAdmissionFindings',
+        capability: 'Team plan/start claim admission parity against normal task dependency gates.',
+        downstreamTasks: ['TASK-TEAM-0029']
+    },
     'team.captain-decision': {
         anchor: 'packages/cli/src/commands/team.ts#buildCaptainDecision',
         capability: 'Captain decision dry-run output for team sizing, required roles, confidence, and stop conditions.',
@@ -108,8 +114,60 @@ export const TEAM_ATOM_BOUNDARIES = {
         anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
         capability: 'Deterministic file.write lease scope validation against task allowed files before team runtime start.',
         downstreamTasks: ['TASK-TEAM-0013']
+    },
+    'team.next-recommendation': {
+        anchor: 'packages/cli/src/commands/team.ts#buildTeamRecommendation',
+        capability: 'Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.',
+        downstreamTasks: ['TASK-TEAM-0015']
     }
 };
+export function resolveTeamRecipeIdForChannel(channel) {
+    if (channel === 'batch') {
+        return 'atm.default.batch';
+    }
+    if (channel === 'fast') {
+        return 'atm.default.fast';
+    }
+    return 'atm.default.normal.typescript';
+}
+export function defaultTeamRecommendationReason(channel) {
+    if (channel === 'batch') {
+        return 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.';
+    }
+    if (channel === 'fast') {
+        return 'Fast quickfix work usually stays single-actor; a team run is optional and advisory only.';
+    }
+    return 'This task can use an optional team run for role and permission coordination.';
+}
+export function buildTeamRecommendation(input) {
+    const taskId = typeof input.taskId === 'string' ? input.taskId.trim() : '';
+    if (!taskId || input.enabled === false) {
+        return null;
+    }
+    const actorId = input.actorId?.trim() || '<id>';
+    const recipeId = resolveTeamRecipeIdForChannel(input.channel);
+    const quotedTask = quoteCliValue(taskId);
+    const reason = input.reason?.trim() || defaultTeamRecommendationReason(input.channel);
+    return {
+        schemaId: 'atm.teamRecommendation.v1',
+        enabled: true,
+        required: false,
+        channel: input.channel,
+        taskId,
+        recipeId,
+        reason,
+        plan: `node atm.mjs team plan --task ${quotedTask} --recipe ${recipeId} --json`,
+        validate: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
+        start: `node atm.mjs team start --task ${quotedTask} --actor ${actorId} --recipe ${recipeId} --json`,
+        status: 'node atm.mjs team status --compact --json',
+        ...(input.parallelAdvisory ? { parallelAdvisory: input.parallelAdvisory } : {}),
+        constraints: [
+            'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
+            'Team agents are not spawned by this recommendation.',
+            'Coordinator remains the only task.lifecycle and git.write owner.'
+        ]
+    };
+}
 const builtInRecipes = [
     {
         schemaId: 'atm.teamRecipe.v1',
@@ -182,6 +240,7 @@ export async function runTeam(argv) {
     if (action === 'validate') {
         const permissionOk = permissionValidation.ok;
         const nonPermissionFindings = validation.findings.filter((finding) => !permissionValidation.findings.includes(finding));
+        const safeToStart = validation.findings.every((finding) => finding.level !== 'error');
         return makeResult({
             ok: permissionOk,
             command: 'team',
@@ -205,6 +264,7 @@ export async function runTeam(argv) {
                 recipeSources: recipes.sources,
                 permissionCatalog: teamPermissionCatalog,
                 validation: permissionValidation,
+                safeToStart,
                 relatedFindings: nonPermissionFindings,
                 suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
                 brokerLane: teamPlan.brokerLane
@@ -347,7 +407,8 @@ async function buildTeamPlanningContext(input) {
         writePaths
     });
     const brokerLane = brokerLanePlan.evidence;
-    const validation = mergeValidation(permissionValidation, { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings }, { ok: brokerLanePlan.findings.every((f) => f.level !== 'error'), findings: brokerLanePlan.findings });
+    const claimAdmissionFindings = buildTeamClaimAdmissionFindings(input.cwd, input.taskId, task);
+    const validation = mergeValidation(permissionValidation, { ok: claimAdmissionFindings.every((f) => f.level !== 'error'), findings: claimAdmissionFindings }, { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings }, { ok: brokerLanePlan.findings.every((f) => f.level !== 'error'), findings: brokerLanePlan.findings });
     const finalTeamPlan = buildTeamPlan({
         task,
         recipe,
@@ -367,6 +428,14 @@ async function buildTeamPlanningContext(input) {
             brokerLane
         }
     };
+}
+function buildTeamClaimAdmissionFindings(cwd, taskId, task) {
+    return findTaskClaimDependencyBlockers(cwd, taskId, task).map((blocker) => buildPermissionFinding({
+        level: 'error',
+        code: 'ATM_TEAM_START_CLAIM_DEPENDENCY_BLOCKED',
+        detail: `Team start is unsafe because normal task claim would be blocked by dependency ${blocker.taskId} (${blocker.status}).`,
+        paths: [path.relative(cwd, blocker.taskPath).replace(/\\/g, '/')]
+    }));
 }
 function readTask(cwd, taskId) {
     const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
@@ -521,6 +590,8 @@ function permissionFindingSummary(input) {
             return input.permission
                 ? `Exclusive permission lease ${input.permission} has multiple owners.`
                 : 'Exclusive permission lease has multiple owners.';
+        case 'ATM_TEAM_START_CLAIM_DEPENDENCY_BLOCKED':
+            return 'Team start is blocked by task claim dependency gates.';
         default:
             return input.detail;
     }
@@ -555,6 +626,8 @@ function permissionFindingSuggestedFix(input) {
             return input.permission
                 ? `Rebuild suggested leases so only one agent owns ${input.permission}.`
                 : 'Ensure each exclusive lease has a single owner before team start.';
+        case 'ATM_TEAM_START_CLAIM_DEPENDENCY_BLOCKED':
+            return 'Close, verify, or reopen the dependency through the normal task lifecycle, then rerun team plan/start.';
         default:
             return 'Review the recipe permissions and suggested leases, then rerun team validate.';
     }
@@ -1352,6 +1425,18 @@ export function writeTeamRun(input) {
         permissionLeases: input.teamPlan.suggestedPermissionLeases,
         validation: input.validation,
         brokerLane: input.teamPlan.brokerLane,
+        captainDecision: input.teamPlan.captainDecision,
+        agentReports: [],
+        patrolFindings: [],
+        evidenceCuratorSummary: null,
+        teamSummary: {
+            decision: input.teamPlan.captainDecision.reason,
+            implementationSummary: 'Team runtime started; closure remains governed by command-backed evidence.',
+            validators: normalizeStringArray(input.task.validators),
+            evidence: [],
+            risk: input.teamPlan.captainDecision.escalationRequired ? 'medium' : 'low',
+            closeReady: false
+        },
         createdAt: now,
         updatedAt: now
     };

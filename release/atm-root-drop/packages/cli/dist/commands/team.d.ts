@@ -93,6 +93,11 @@ export declare const TEAM_ATOM_BOUNDARIES: {
         readonly capability: "Broker lane evaluation and steward/composer routing for team plan/start.";
         readonly downstreamTasks: readonly ["TASK-TEAM-0001", "TASK-CID-0021"];
     };
+    readonly 'team.start-claim-gate-parity': {
+        readonly anchor: "packages/cli/src/commands/team.ts#buildTeamClaimAdmissionFindings";
+        readonly capability: "Team plan/start claim admission parity against normal task dependency gates.";
+        readonly downstreamTasks: readonly ["TASK-TEAM-0029"];
+    };
     readonly 'team.captain-decision': {
         readonly anchor: "packages/cli/src/commands/team.ts#buildCaptainDecision";
         readonly capability: "Captain decision dry-run output for team sizing, required roles, confidence, and stop conditions.";
@@ -123,7 +128,38 @@ export declare const TEAM_ATOM_BOUNDARIES: {
         readonly capability: "Deterministic file.write lease scope validation against task allowed files before team runtime start.";
         readonly downstreamTasks: readonly ["TASK-TEAM-0013"];
     };
+    readonly 'team.next-recommendation': {
+        readonly anchor: "packages/cli/src/commands/team.ts#buildTeamRecommendation";
+        readonly capability: "Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.";
+        readonly downstreamTasks: readonly ["TASK-TEAM-0015"];
+    };
 };
+export type TeamRecommendationChannel = 'fast' | 'normal' | 'batch';
+export type TeamRecommendation = {
+    readonly schemaId: 'atm.teamRecommendation.v1';
+    readonly enabled: boolean;
+    readonly required: false;
+    readonly channel: TeamRecommendationChannel;
+    readonly taskId: string;
+    readonly recipeId: string;
+    readonly reason: string;
+    readonly plan: string;
+    readonly start: string;
+    readonly status: string;
+    readonly validate: string;
+    readonly constraints: readonly string[];
+    readonly parallelAdvisory?: unknown;
+};
+export declare function resolveTeamRecipeIdForChannel(channel: TeamRecommendationChannel): string;
+export declare function defaultTeamRecommendationReason(channel: TeamRecommendationChannel): string;
+export declare function buildTeamRecommendation(input: {
+    readonly taskId: string | null | undefined;
+    readonly actorId?: string;
+    readonly channel: TeamRecommendationChannel;
+    readonly reason?: string;
+    readonly enabled?: boolean;
+    readonly parallelAdvisory?: unknown;
+}): TeamRecommendation | null;
 export declare function runTeam(argv: string[]): Promise<import("./shared.ts").CommandResult>;
 export declare function validateTeamPermissionModel(recipe: TeamRecipe, writePaths: string[], options?: TeamPermissionValidationOptions): {
     ok: boolean;
@@ -437,6 +473,82 @@ export declare function writeTeamRun(input: {
         findings: PermissionFinding[];
     };
     brokerLane: TeamBrokerLaneEvidence;
+    captainDecision: {
+        schemaId: string;
+        captain: {
+            role: string;
+            agentId: string;
+        };
+        taskId: string;
+        authorityChain: {
+            broker: string;
+            coordinator: string;
+        };
+        conflictRules: string[];
+        teamSize: string;
+        requiredRoles: string[];
+        optionalRoles: string[];
+        reason: string;
+        confidence: string;
+        implementerSelector: TeamImplementerSelector;
+        stopConditions: string[];
+        escalationRequired: boolean;
+        escalationReason: string;
+        needLieutenant: boolean;
+        nextTeamShape: {
+            schemaId: string;
+            captain: {
+                role: string;
+                permissions: string[];
+            };
+            lieutenant: {
+                role: string;
+                recommended: boolean;
+                permissions: string[];
+                forbiddenPermissions: string[];
+                coordinationFocus: string[];
+            };
+            teamSizeHint: string;
+            coordinationBoundary: string;
+            signals: {
+                scopeCount: number;
+                crossRepoScope: boolean;
+                validatorCount: number;
+                largeScriptRisk: boolean;
+                closureSignals: boolean;
+                validationOk: boolean;
+                brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+            };
+            suggestedPermissions: {
+                captain: string[];
+                lieutenant: string[];
+            };
+        };
+        decisionSurface: {
+            validationOk: boolean;
+            brokerVerdict: "serial" | "parallel-safe" | "needs-physical-split" | "blocked-cid-conflict" | "blocked-shared-surface" | "blocked-active-lease";
+            largeScriptRisk: {
+                level: string;
+                threshold: number;
+                reasons: string[];
+            };
+            mapUpdateNeed: boolean;
+            escalationRequired: boolean;
+            needLieutenant: boolean;
+            authorityChain: string;
+        };
+    };
+    agentReports: never[];
+    patrolFindings: never[];
+    evidenceCuratorSummary: null;
+    teamSummary: {
+        decision: string;
+        implementationSummary: string;
+        validators: string[];
+        evidence: never[];
+        risk: string;
+        closeReady: boolean;
+    };
     createdAt: string;
     updatedAt: string;
 };

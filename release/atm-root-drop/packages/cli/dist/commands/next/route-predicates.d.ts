@@ -40,6 +40,11 @@ interface ImportedTaskQueue {
     readonly claimableTask: ImportedTaskSummary | null;
     readonly tasks: readonly ImportedTaskSummary[];
     readonly promptScope: PromptScopedTaskRoute | null;
+    readonly planningRootWarnings?: readonly {
+        readonly code: 'ATM_PLANNING_ROOT_AMBIGUOUS';
+        readonly detail: string;
+        readonly siblingRepoDirs: readonly string[];
+    }[];
 }
 declare function isFrameworkMaintenancePrompt(prompt: string): boolean;
 declare function isExplicitSingleTaskRoute(promptScope: PromptScopedTaskRoute | null, taskIntent: TaskIntent | null): boolean;

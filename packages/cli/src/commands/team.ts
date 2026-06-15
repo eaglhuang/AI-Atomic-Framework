@@ -12,6 +12,7 @@ import {
 } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
 import { runTasks } from './tasks.ts';
+import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
 import {
   buildTeamBrokerEvidence,
   brokerLaneToFindings,
@@ -176,6 +177,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team.ts#planTeamBrokerLane',
     capability: 'Broker lane evaluation and steward/composer routing for team plan/start.',
     downstreamTasks: ['TASK-TEAM-0001', 'TASK-CID-0021']
+  },
+  'team.start-claim-gate-parity': {
+    anchor: 'packages/cli/src/commands/team.ts#buildTeamClaimAdmissionFindings',
+    capability: 'Team plan/start claim admission parity against normal task dependency gates.',
+    downstreamTasks: ['TASK-TEAM-0029']
   },
   'team.captain-decision': {
     anchor: 'packages/cli/src/commands/team.ts#buildCaptainDecision',
@@ -369,6 +375,7 @@ export async function runTeam(argv: string[]) {
     const nonPermissionFindings = validation.findings.filter(
       (finding) => !permissionValidation.findings.includes(finding)
     );
+    const safeToStart = validation.findings.every((finding) => finding.level !== 'error');
     return makeResult({
       ok: permissionOk,
       command: 'team',
@@ -392,6 +399,7 @@ export async function runTeam(argv: string[]) {
         recipeSources: recipes.sources,
         permissionCatalog: teamPermissionCatalog,
         validation: permissionValidation,
+        safeToStart,
         relatedFindings: nonPermissionFindings,
         suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
         brokerLane: teamPlan.brokerLane
@@ -543,8 +551,10 @@ async function buildTeamPlanningContext(input: {
     writePaths
   });
   const brokerLane = brokerLanePlan.evidence;
+  const claimAdmissionFindings = buildTeamClaimAdmissionFindings(input.cwd, input.taskId, task);
   const validation = mergeValidation(
     permissionValidation,
+    { ok: claimAdmissionFindings.every((f) => f.level !== 'error'), findings: claimAdmissionFindings },
     { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings },
     { ok: brokerLanePlan.findings.every((f) => f.level !== 'error'), findings: brokerLanePlan.findings }
   );
@@ -569,6 +579,15 @@ async function buildTeamPlanningContext(input: {
       brokerLane
     }
   };
+}
+
+function buildTeamClaimAdmissionFindings(cwd: string, taskId: string, task: Record<string, unknown>): PermissionFinding[] {
+  return findTaskClaimDependencyBlockers(cwd, taskId, task).map((blocker) => buildPermissionFinding({
+    level: 'error',
+    code: 'ATM_TEAM_START_CLAIM_DEPENDENCY_BLOCKED',
+    detail: `Team start is unsafe because normal task claim would be blocked by dependency ${blocker.taskId} (${blocker.status}).`,
+    paths: [path.relative(cwd, blocker.taskPath).replace(/\\/g, '/')]
+  }));
 }
 
 function readTask(cwd: string, taskId: string) {
@@ -760,6 +779,8 @@ function permissionFindingSummary(input: {
       return input.permission
         ? `Exclusive permission lease ${input.permission} has multiple owners.`
         : 'Exclusive permission lease has multiple owners.';
+    case 'ATM_TEAM_START_CLAIM_DEPENDENCY_BLOCKED':
+      return 'Team start is blocked by task claim dependency gates.';
     default:
       return input.detail;
   }
@@ -800,6 +821,8 @@ function permissionFindingSuggestedFix(input: {
       return input.permission
         ? `Rebuild suggested leases so only one agent owns ${input.permission}.`
         : 'Ensure each exclusive lease has a single owner before team start.';
+    case 'ATM_TEAM_START_CLAIM_DEPENDENCY_BLOCKED':
+      return 'Close, verify, or reopen the dependency through the normal task lifecycle, then rerun team plan/start.';
     default:
       return 'Review the recipe permissions and suggested leases, then rerun team validate.';
   }

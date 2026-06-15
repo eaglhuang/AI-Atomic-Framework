@@ -16,6 +16,7 @@ import { classifyTaskDelivery } from './task-intent.js';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/dist/broker/lifecycle.js';
 import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, readActiveTaskDirectionLocks, writeTaskDirectionLock } from './task-direction.js';
 import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, writeBatchRun, writeQuickfixLock } from './work-channels.js';
+import { buildTeamRecommendation } from './team.js';
 import { decideActiveBatchClaimTask } from './next-active-batch.js';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
 import { runTasks, findTaskClaimDependencyBlockers } from './tasks/public-surface.js';
@@ -23,6 +24,7 @@ import { taskPathFor } from './tasks/task-file-io-helpers.js';
 import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText, normalizeTaskIntent, normalizeOptionalTaskPath, readStringArray, splitListValue } from './next/intent-normalizers.js';
 import { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards } from './next/route-predicates.js';
 import { dedupeStrings, quoteCliValue, sha256, toTaskCandidateView, uniqueInOrder, uniqueSorted } from './next/view-projections.js';
+import { resolveCandidatePlanningRoots } from './next/planning-root-preference.js';
 export async function runNext(argv) {
     // TASK-CID-0024: --claim-intent is a next-only claim flag; extract it before
     // the shared option parser so the rest of the surface stays unchanged.
@@ -198,6 +200,17 @@ function withRunnerMode(result, cwd) {
         result.evidence.runnerMode = runnerMode;
         if (result.evidence.nextAction && typeof result.evidence.nextAction === 'object' && !Array.isArray(result.evidence.nextAction)) {
             result.evidence.nextAction.runnerMode = runnerMode;
+        }
+    }
+    const planningRootWarnings = result.evidence?.importedTaskQueue?.planningRootWarnings;
+    if (Array.isArray(planningRootWarnings) && Array.isArray(result.messages)) {
+        for (const warning of planningRootWarnings) {
+            if (result.messages.some((entry) => entry?.code === warning.code && entry?.data?.siblingRepoDirs?.join(',') === warning.siblingRepoDirs.join(','))) {
+                continue;
+            }
+            result.messages.unshift(message('warning', warning.code, warning.detail, {
+                siblingRepoDirs: warning.siblingRepoDirs
+            }));
         }
     }
     if (Array.isArray(result.messages) && !result.messages.some((entry) => entry?.code === 'ATM_RUNNER_MODE')) {
@@ -845,16 +858,7 @@ async function claimNextImportedTask(input) {
         targetFiles: directionLock.allowedFiles,
         ttlSeconds: 1800
     });
-    const teamRecommendation = buildTeamRecommendation({
-        taskId: claimableTask.workItemId,
-        actorId: resolvedActor.actorId,
-        channel: recommendedChannel,
-        reason: recommendedChannel === 'batch'
-            ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
-            : 'This task can use an optional team run for role/permission coordination.',
-        parallelAdvisory
-    });
-    const nextAction = {
+    const nextActionBase = {
         status: 'ready',
         command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
         reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
@@ -872,7 +876,6 @@ async function claimNextImportedTask(input) {
             channel: recommendedChannel === 'batch' ? 'batch' : 'normal',
             taskId: claimableTask.workItemId
         }),
-        teamRecommendation,
         selectedTask: claimableTask,
         batchId: batchRun?.batchId ?? null,
         scopeKey: batchRun?.scopeKey ?? null,
@@ -910,6 +913,15 @@ async function claimNextImportedTask(input) {
         allowedCommands: allowedGuidanceBootstrapCommands(),
         blockedCommands: blockedMutationCommands()
     };
+    const nextAction = embedTeamRecommendation(nextActionBase, {
+        taskId: claimableTask.workItemId,
+        actorId: resolvedActor.actorId,
+        channel: recommendedChannel,
+        reason: recommendedChannel === 'batch'
+            ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
+            : 'This task can use an optional team run for role/permission coordination.',
+        parallelAdvisory
+    });
     const userNotice = buildFirstUseUserNotice(nextAction);
     return makeResult({
         ok: true,
@@ -939,7 +951,7 @@ async function claimNextImportedTask(input) {
             taskDirectionLock: directionLock,
             taskQueue: activeQueue,
             batchRun,
-            teamRecommendation,
+            teamRecommendation: nextAction.teamRecommendation ?? null,
             sessionId: actorSession.sessionId,
             actorSession,
             recommendedChannel: nextAction.recommendedChannel,
@@ -1126,7 +1138,7 @@ function buildPromptScopedNextResult(input) {
             currentIndex: activeBatchQueue?.currentIndex ?? 0,
             queueHeadTaskId
         };
-        const nextAction = {
+        const nextAction = embedTeamRecommendation({
             status: 'task-queue-ready',
             command: queueHeadTask
                 ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --json`
@@ -1159,7 +1171,10 @@ function buildPromptScopedNextResult(input) {
             queueSize: selectedTasks.length,
             allowedCommands: allowedGuidanceBootstrapCommands(),
             blockedCommands: blockedMutationCommands()
-        };
+        }, {
+            taskId: queueHeadTaskId,
+            channel: 'batch'
+        });
         return makeResult({
             ok: true,
             command: 'next',
@@ -1377,7 +1392,7 @@ function buildPromptScopedNextResult(input) {
             currentIndex: activeBatch.currentIndex,
             queueHeadTaskId
         };
-        const nextAction = {
+        const nextAction = embedTeamRecommendation({
             status: 'task-batch-context-active',
             command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --json`,
             reason: `task ${selectedTask.workItemId} belongs to active batch ${activeBatch.batchId}; continue through the current batch queue head`,
@@ -1408,7 +1423,10 @@ function buildPromptScopedNextResult(input) {
             activeBatchRunId: activeBatch.batchId,
             allowedCommands: allowedGuidanceBootstrapCommands(),
             blockedCommands: blockedMutationCommands()
-        };
+        }, {
+            taskId: queueHeadTaskId ?? selectedTask.workItemId,
+            channel: 'batch'
+        });
         return makeResult({
             ok: true,
             command: 'next',
@@ -1443,7 +1461,7 @@ function buildPromptScopedNextResult(input) {
         ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --json`
         : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`;
     const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --json`;
-    const nextAction = {
+    const nextAction = embedTeamRecommendation({
         status: 'task-route-ready',
         command: normalClaimCommand,
         reason: `the prompt resolves to task ${selectedTask.workItemId}`,
@@ -1465,7 +1483,10 @@ function buildPromptScopedNextResult(input) {
         requiredCommand: normalClaimCommand,
         allowedCommands: allowedGuidanceBootstrapCommands(),
         blockedCommands: blockedMutationCommands()
-    };
+    }, {
+        taskId: selectedTask.workItemId,
+        channel: 'normal'
+    });
     return makeResult({
         ok: true,
         command: 'next',
@@ -1646,6 +1667,9 @@ function blockedMutationCommands() {
     ];
 }
 function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
+    const planningRootResolution = resolveCandidatePlanningRoots(cwd, {
+        configuredRoots: readConfiguredPlanningRoots(cwd)
+    });
     const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
     const jsonTasks = existsSync(taskStorePath) ? readdirSync(taskStorePath)
         .filter((entry) => entry.endsWith('.json'))
@@ -1730,7 +1754,7 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
     const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent)
         ? uniqueSorted([
             ...listTaskCardFiles(cwd),
-            ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent)
+            ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots)
         ])
         : [];
     const markdownTasks = markdownTaskFiles
@@ -1831,7 +1855,8 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
         selectedTask,
         claimableTask,
         tasks,
-        promptScope
+        promptScope,
+        planningRootWarnings: planningRootResolution.warnings
     };
 }
 function isSelectedTaskClaimableForIntent(task, claimIntent) {
@@ -2250,6 +2275,10 @@ function scoreTaskForIntent(cwd, task, intent) {
     if (/(?:\u4efb\u52d9\u5361|task\s*card)/i.test(intent.userPrompt ?? '') && /\.task\.md$/i.test(task.taskPath)) {
         score += 10;
         reasons.push('task-card-surface');
+    }
+    if (task.taskPath && isTaskPathUnderPreferredPlanningRoots(cwd, task.taskPath)) {
+        score += 15;
+        reasons.push('canonical-planning-root');
     }
     return {
         ...task,
@@ -2670,11 +2699,13 @@ function listTaskCardDiscoveryRoots(cwd) {
         .map((entry) => path.join(cwd, entry))
         .filter((entry) => existsSync(entry)));
 }
-function listPromptScopedExternalTaskCardFiles(cwd, intent) {
+function listPromptScopedExternalTaskCardFiles(cwd, intent, planningRoots = resolveCandidatePlanningRoots(cwd, {
+    configuredRoots: readConfiguredPlanningRoots(cwd)
+}).roots) {
     if (!intent?.userPrompt || !intent.taskScopeMentioned)
         return [];
     const output = new Set();
-    for (const root of listCandidatePlanningRoots(cwd)) {
+    for (const root of planningRoots) {
         const markdownFiles = listFilesRecursive(root, (filePath) => filePath.endsWith('.md') && !filePath.endsWith('.task.md'));
         for (const planPath of markdownFiles) {
             if (!planFileMatchesPrompt(cwd, planPath, intent))
@@ -2694,22 +2725,12 @@ function listPromptScopedExternalTaskCardFiles(cwd, intent) {
     }
     return uniqueSorted(Array.from(output));
 }
-function listCandidatePlanningRoots(cwd) {
-    const roots = new Set();
-    for (const configuredRoot of readConfiguredPlanningRoots(cwd)) {
-        roots.add(path.isAbsolute(configuredRoot) ? configuredRoot : path.resolve(cwd, configuredRoot));
-    }
-    roots.add(path.join(cwd, 'docs', 'ai_atomic_framework'));
-    const parent = path.dirname(path.resolve(cwd));
-    for (const entry of safeReadDir(parent)) {
-        if (!entry.isDirectory())
-            continue;
-        roots.add(path.join(parent, entry.name, 'docs', 'ai_atomic_framework'));
-    }
-    return Array.from(roots)
-        .map((entry) => path.resolve(entry))
-        .filter((entry) => existsSync(entry))
-        .sort((left, right) => left.localeCompare(right));
+function isTaskPathUnderPreferredPlanningRoots(cwd, taskPath) {
+    const absoluteTaskPath = path.resolve(cwd, taskPath);
+    const resolution = resolveCandidatePlanningRoots(cwd, {
+        configuredRoots: readConfiguredPlanningRoots(cwd)
+    });
+    return resolution.roots.some((root) => absoluteTaskPath.startsWith(`${root}${path.sep}`));
 }
 function readConfiguredPlanningRoots(cwd) {
     const configPath = path.join(cwd, '.atm', 'config.json');
@@ -3276,29 +3297,18 @@ function buildChannelPlaybook(input) {
         commitTiming: 'Commit only after tasks close succeeds.'
     };
 }
-function buildTeamRecommendation(input) {
-    const recipeId = input.channel === 'batch'
-        ? 'atm.default.batch'
-        : 'atm.default.normal.typescript';
-    const quotedTask = quoteCliValue(input.taskId);
+function embedTeamRecommendation(nextAction, input) {
+    const teamRecommendation = buildTeamRecommendation(input);
+    if (!teamRecommendation) {
+        return nextAction;
+    }
+    const playbook = nextAction.playbook && typeof nextAction.playbook === 'object' && !Array.isArray(nextAction.playbook)
+        ? { ...nextAction.playbook, teamRecommendation }
+        : nextAction.playbook;
     return {
-        schemaId: 'atm.teamRecommendation.v1',
-        enabled: true,
-        required: false,
-        channel: input.channel,
-        taskId: input.taskId,
-        recipeId,
-        reason: input.reason,
-        planCommand: `node atm.mjs team plan --task ${quotedTask} --recipe ${recipeId} --json`,
-        validateCommand: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
-        startCommand: `node atm.mjs team start --task ${quotedTask} --actor ${input.actorId} --recipe ${recipeId} --json`,
-        statusCommand: 'node atm.mjs team status --compact --json',
-        ...(input.parallelAdvisory ? { parallelAdvisory: input.parallelAdvisory } : {}),
-        constraints: [
-            'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
-            'Team agents are not spawned by this recommendation.',
-            'Coordinator remains the only task.lifecycle and git.write owner.'
-        ]
+        ...nextAction,
+        teamRecommendation,
+        playbook
     };
 }
 function ensureDecisionTrail(nextAction) {
@@ -3459,6 +3469,16 @@ function buildNextMessages(nextAction, userNotice, integrationBootstrap, runtime
         ?? (nextAction.selectedTask || nextAction.selectedTasks ? buildTaskDeliveryPrinciple({ channel: nextAction.selectedTasks ? 'batch' : 'normal' }) : null);
     if (deliveryPrinciple) {
         messages.push(message('warning', 'ATM_TASK_DELIVERY_PRINCIPLE', 'Task cards are not targets to close; they are delivery contracts. Implement the requested non-.atm deliverables before closing.', deliveryPrinciple));
+    }
+    if (nextAction.teamRecommendation?.enabled) {
+        messages.push(message('info', 'ATM_TEAM_RECOMMENDATION', nextAction.teamRecommendation.reason, {
+            schemaId: nextAction.teamRecommendation.schemaId,
+            plan: nextAction.teamRecommendation.plan,
+            start: nextAction.teamRecommendation.start,
+            status: nextAction.teamRecommendation.status,
+            recipeId: nextAction.teamRecommendation.recipeId,
+            taskId: nextAction.teamRecommendation.taskId
+        }));
     }
     messages.push(routeMessage);
     return messages;

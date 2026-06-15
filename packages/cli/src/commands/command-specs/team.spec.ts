@@ -4,12 +4,12 @@ import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption
 export const teamSpecCommandSurface = {
   name: 'team' as const,
   summary:
-    'Plan, start, or validate scoped ATM team agents for a task. Validates permissions, leases, parallel CID advisor preflight, and broker lane routing for steward/composer paths.',
+    'Plan, start, or validate scoped ATM team agents for a task. Validates permissions, leases, task claim dependency gates, parallel CID advisor preflight, and broker lane routing for steward/composer paths.',
   positional: [
     {
       name: 'action',
       summary:
-        'Team action. Supports: plan, start, status, validate. Plan and start evaluate broker lanes and fail closed on blocked CID conflicts before a run starts.'
+        'Team action. Supports: plan, start, status, validate. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
     }
   ],
   options: [
@@ -70,6 +70,15 @@ export const teamSpecBrokerLane = {
   examples: ['node atm.mjs team plan --task TASK-TEAM-0002 --json', 'node atm.mjs team start --task TASK-AAO-0005 --actor codex-main --json']
 };
 
+export const teamSpecClaimGateParity = {
+  summary:
+    'Plan/start claim-gate parity: team start fails closed when the normal task claim dependency gate would reject the task (TASK-TEAM-0029).',
+  examples: [
+    'node atm.mjs team plan --task TASK-TEAM-0029 --json',
+    'node atm.mjs team start --task TASK-TEAM-0029 --actor codex-main --json'
+  ]
+};
+
 export const teamSpecCaptainDecision = {
   summary:
     'Plan examples for captain decision dry-run output that includes team sizing, confidence, and stop conditions (TASK-TEAM-0007 owns the decision surface).',
@@ -110,6 +119,7 @@ export default defineCommandSpec({
     ...teamSpecCaptainDecision.examples,
     ...teamSpecLieutenantEscalation.examples,
     ...teamSpecPermissionValidation.examples,
+    ...teamSpecClaimGateParity.examples,
     ...teamSpecRuntimeStatus.examples,
     ...teamSpecNextRecommendation.examples
   ]

@@ -1732,6 +1732,16 @@ async function runTasksClose(argv) {
         }
         const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
         const previousTaskContent = readFileSync(taskPath, 'utf8');
+        if (options.status === 'abandoned' && !options.reason?.trim()) {
+            throw new CliError('ATM_TASK_ABANDON_REASON_REQUIRED', `Task ${options.taskId} cannot be abandoned without a reason.`, {
+                exitCode: 2,
+                details: {
+                    taskId: options.taskId,
+                    status: options.status,
+                    requiredCommand: `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --status abandoned --reason "<reason>" --json`
+                }
+            });
+        }
         const staleGate = assertRunnerFreshForWriteAction({
             cwd: options.cwd,
             action: 'tasks-close',
@@ -2116,12 +2126,13 @@ async function runTasksClose(argv) {
         const transitionPath = closeWriteResult.transitionPath;
         closurePacketPath = closeWriteResult.closurePacketPath ?? closurePacketPath;
         const closeEvidencePath = `.atm/history/evidence/${options.taskId}.json`;
-        stageTaskCloseArtifacts(options.cwd, [
+        const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
             relativePathFrom(options.cwd, taskPath),
             closeEvidencePath,
             transitionPath,
             closurePacketPath
         ]);
+        stageTaskCloseArtifacts(options.cwd, closeArtifactFiles);
         if (currentClaim && currentClaim.state === 'active' && currentClaim.actorId === actorId) {
             const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
             await resolveValue(adapter.stores.lockStore.releaseLock(options.taskId, actorId));
@@ -2137,19 +2148,14 @@ async function runTasksClose(argv) {
         // TASK-AAO-0136: register close-commit-window for done closes so the captain's
         // follow-up `git commit --task <id>` can land closure-packet + transition + ledger
         // even though the direction lock has now released.
-        const closeCommitWindowPathFromClose = options.status === 'done'
+        const closeCommitWindowPathFromClose = (options.status === 'done' || options.status === 'abandoned')
             ? registerCloseCommitWindow({
                 cwd: options.cwd,
                 taskId: options.taskId,
                 actorId,
-                allowedFiles: [
-                    relativePathFrom(options.cwd, taskPath),
-                    closeEvidencePath,
-                    transitionPath,
-                    ...(closurePacketPath ? [closurePacketPath] : [])
-                ],
+                allowedFiles: closeArtifactFiles,
                 transitionId: transitionPath.split(/[\\/]/).pop()?.replace(/\.json$/, '') ?? null,
-                action: 'close'
+                action: options.status === 'abandoned' ? 'abandon' : 'close'
             })
             : null;
         const taskQueue = options.status === 'done'
@@ -3936,6 +3942,11 @@ function stageTaskCloseArtifacts(cwd, files) {
         cwd,
         stdio: ['ignore', 'ignore', 'pipe']
     });
+}
+function existingTaskCloseArtifacts(cwd, files) {
+    return uniqueStrings(files
+        .map((entry) => typeof entry === 'string' ? entry.trim() : '')
+        .filter((entry) => entry && existsSync(path.resolve(cwd, entry))));
 }
 function verifyPersistedTaskDocument(input) {
     let persisted;

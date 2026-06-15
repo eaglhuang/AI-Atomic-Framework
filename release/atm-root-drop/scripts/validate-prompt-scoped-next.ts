@@ -39,6 +39,21 @@ function assertRunnerMode(result: any) {
   assert(String(runnerMode.sourceFirstOnlyWhen).includes('explicit source-first framework validation'), 'runner mode must restrict source-first guidance to explicit validation');
 }
 
+function assertTeamRecommendation(action: any, expectedChannel: string, expectedTaskId?: string) {
+  const recommendation = action?.teamRecommendation;
+  assert(recommendation?.schemaId === 'atm.teamRecommendation.v1', 'nextAction must expose atm.teamRecommendation.v1');
+  assert(recommendation?.required === false, 'teamRecommendation must stay advisory');
+  assert(typeof recommendation?.reason === 'string' && recommendation.reason.length > 0, 'teamRecommendation must include reason');
+  assert(String(recommendation?.plan).includes('team plan'), 'teamRecommendation.plan must suggest team plan');
+  assert(String(recommendation?.start).includes('team start'), 'teamRecommendation.start must suggest team start');
+  assert(String(recommendation?.status).includes('team status'), 'teamRecommendation.status must suggest team status');
+  assert(recommendation?.channel === expectedChannel, `teamRecommendation channel must be ${expectedChannel}`);
+  if (expectedTaskId) {
+    assert(recommendation?.taskId === expectedTaskId, `teamRecommendation taskId must be ${expectedTaskId}`);
+  }
+  assert(action?.playbook?.teamRecommendation?.schemaId === 'atm.teamRecommendation.v1', 'playbook must embed teamRecommendation');
+}
+
 async function main() {
   const tempRoot = mkdtempSync(path.join(process.cwd(), '.atm-temp', 'prompt-scoped-next-'));
   const previousGitCeilingDirectories = process.env.GIT_CEILING_DIRECTORIES;
@@ -90,6 +105,8 @@ async function main() {
     assert((exact.evidence.nextAction as any).recommendedChannel === 'normal', 'exact task id prompt must recommend normal channel');
     const exactTrail = assertDecisionTrail(exact.evidence.nextAction as any, 'task-route-ready');
     assert(exactTrail.some((entry) => entry.check === 'task-selection' && entry.result === 'pass'), 'exact task route decisionTrail must record task selection');
+    assertTeamRecommendation(exact.evidence.nextAction as any, 'normal', 'TASK-ALPHA-0001');
+    assert(exact.messages.some((entry) => entry.code === 'ATM_TEAM_RECOMMENDATION'), 'task route must emit team recommendation advisory');
 
     const explicitTask = await runNext(['--cwd', tempRoot, '--task', 'TASK-ALPHA-0001']);
     assert(explicitTask.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'next --task must route to one task');
@@ -148,6 +165,7 @@ async function main() {
     assert((queue.evidence.taskQueue as any)?.schemaId === 'atm.taskQueuePreview.v1', 'plan-scoped queue prompt must stay read-only and only expose a queue preview');
     assert((queue.evidence.nextAction as any).queueHeadTaskId === 'TASK-ALPHA-0001', 'plan-scoped queue must expose the queue head');
     const queueTrail = assertDecisionTrail(queue.evidence.nextAction as any, 'task-queue-ready');
+    assertTeamRecommendation(queue.evidence.nextAction as any, 'batch', 'TASK-ALPHA-0001');
     assert(queueTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-ALPHA-0001')), 'queue decisionTrail must record the queue head');
 
     const scopedNotFound = await runNext(['--cwd', tempRoot, '--prompt', 'ATM framework 100% self atomization plan implement all task cards']);

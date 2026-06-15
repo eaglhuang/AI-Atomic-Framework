@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0029",
+  "title": "Team start dependency gate parity",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-TEAM-0011",
+    "TASK-TEAM-0015"
+  ],
+  "acceptance": [
+    "`team start --task <id> --actor <actor> --json` fails closed when the same task",
+    "The blocked response names the dependency task ids, their statuses, and the",
+    "`team plan` and `team validate` may remain dry-run advisory surfaces, but their",
+    "A regression fixture covers a task whose dependency is missing or not done, and",
+    "A regression fixture covers a claimable task and proves `team start` still",
+    "CLI help and Team Agents docs explain that `team start` is subordinate to"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "scripts/validate-cli.ts",
+    "docs/governance/team-agents/minimal-task-crew.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "packages/cli/src/commands/tasks/dependency-gates.ts",
+    "scripts/validate-team-agents.ts",
+    "scripts/validate-cli.ts",
+    "docs/governance/team-agents/minimal-task-crew.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case claim-gate-parity",
+    "git diff --check"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Spawning real external subagents",
+    "Changing `next --claim` dependency semantics",
+    "Allowing `team start` to reserve, promote, or claim tasks by itself",
+    "Broad task lifecycle rewrites outside Team Agents start/plan/validate parity"
+  ],
+  "nonGoals": [
+    "Do not make Team Agents mandatory for normal single-agent tasks",
+    "Do not create a second task truth source",
+    "Do not weaken dependency gates to make team start easier"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the team start claim-gate integration, fixtures, docs, and atom-map updates if it blocks legitimate claimable team starts or diverges from the normal ATM task lifecycle.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [
+    "team-agents",
+    "task-lifecycle",
+    "dependency-gate",
+    "dogfood"
+  ],
+  "notes": "- Reuse the existing dependency gate logic used by `next --claim` rather than\n  introducing a Team Agents-only dependency checker.\n- Keep `team start` from mutating `.atm/runtime/team-runs/**` when the dependency\n  gate fails.\n- Preserve the existing manual-team behavior for claimable tasks:\n  `agentsSpawned: false`, a single runtime team run file, and no `.atm/history/**`\n  writes.\n- Prefer a focused validator case in `scripts/validate-team-agents.ts` so this\n  dogfood failure cannot regress quietly.",
+  "source": {
+    "planPath": "docs/tasks/TASK-TEAM-0029-team-start-dependency-gate-parity.task.md",
+    "sectionTitle": "TASK-TEAM-0029",
+    "headingLine": 59,
+    "hash": "deb2036aff77290b"
+  },
+  "importedAt": "2026-06-15T03:15:12.257Z",
+  "lastTransitionId": "2026-06-15T03-23-18-165Z-claim-db571ed98ada",
+  "lastTransitionAt": "2026-06-15T03:23:18.165Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-teamagents-dogfood",
+  "reservedAt": "2026-06-15T03:23:18.137Z",
+  "promotedAt": "2026-06-15T03:23:18.141Z",
+  "claim": {
+    "actorId": "codex-teamagents-dogfood",
+    "leaseId": "lease-d06df8e48d6b",
+    "claimedAt": "2026-06-15T03:23:18.143Z",
+    "heartbeatAt": "2026-06-15T03:23:18.143Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0029.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/minimal-task-crew.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-15T03:23:18.143Z",
+  "startedByActor": "codex-teamagents-dogfood",
+  "startedBySessionId": "session-20260615032318-codex-teamagents-dogfood-TASK-TEAM-0029-8511121a4e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0029",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0029.*",
+      ".atm/history/task-events/TASK-TEAM-0029/**",
+      ".atm/history/tasks/TASK-TEAM-0029.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/minimal-task-crew.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/tasks/dependency-gates.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5e1b2911a97041d795e08c9fa3ee8c2d72d1caa48d10c1a2452b22ca63c87262",
+    "actorId": "codex-teamagents-dogfood",
+    "createdAt": "2026-06-15T03:23:18.164Z",
+    "status": "active"
+  }
+}

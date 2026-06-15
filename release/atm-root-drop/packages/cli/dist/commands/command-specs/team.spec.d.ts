@@ -38,6 +38,10 @@ export declare const teamSpecBrokerLane: {
     summary: string;
     examples: string[];
 };
+export declare const teamSpecClaimGateParity: {
+    summary: string;
+    examples: string[];
+};
 export declare const teamSpecCaptainDecision: {
     summary: string;
     examples: string[];
@@ -47,6 +51,10 @@ export declare const teamSpecLieutenantEscalation: {
     examples: string[];
 };
 export declare const teamSpecRuntimeStatus: {
+    summary: string;
+    examples: string[];
+};
+export declare const teamSpecNextRecommendation: {
     summary: string;
     examples: string[];
 };
