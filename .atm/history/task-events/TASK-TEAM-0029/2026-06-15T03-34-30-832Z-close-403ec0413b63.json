@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-15T03-34-30-832Z-close-403ec0413b63",
+  "taskId": "TASK-TEAM-0029",
+  "action": "close",
+  "actorId": "codex-teamagents-dogfood",
+  "sessionId": "session-20260615032318-codex-teamagents-dogfood-TASK-TEAM-0029-8511121a4e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0029.json",
+  "taskSha256": "sha256:63d38d23a83adb70c0b9cdb0422c5261cbdaf8a9d25dfe847f329859350bc8bd",
+  "createdAt": "2026-06-15T03:34:30.832Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0029 --actor codex-teamagents-dogfood --status done --historical-delivery 48d5b55a7d23ba19439b201e48e3222cbf79be73",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260615032318-codex-teamagents-dogfood-TASK-TEAM-0029-8511121a4e",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0029.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate-cli",
+      "validate-team-agents:claim-gate-parity",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-15T03:34:30.827Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0029.*",
+        ".atm/history/task-events/TASK-TEAM-0029/**",
+        ".atm/history/tasks/TASK-TEAM-0029.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/minimal-task-crew.md",
+        "docs/tasks/TASK-TEAM-0029-team-start-dependency-gate-parity.task.md",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/tasks/dependency-gates.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
