@@ -1026,13 +1026,20 @@
       "atom_id": "atom-integration-playbook",
       "capability": "Reusable playbook fragments included by every editor adapter skill manifest",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/registry.ts",
+      "atom_id": "atm.mao-intent-registry-map",
+      "capability": "Broker-level intent registry holding actor/task/route/claim-intent/read-set/write-set/atom-CID/virtual-CID/outputs/lease/confidence records with pure register/renew/release/query helpers (unknown read/write sets preserved, not flattened to empty) — TASK-MAO-0005 ledger-closeback of historical delivery from CID-0015 / CID-0032 / CID-0034 lineage (502922a9d base, daf47aa84 tests, 165330238 + 768e72ef0 read-set, 9d214ad9f AGR runtime); deliverable path collapsed onto on-disk filename registry.ts per MAO/README reconciliation recommendation (b).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0005"
     }
   ],
   "summary": {
-    "total_production_paths": 156,
-    "mapped_paths": 156,
+    "total_production_paths": 157,
+    "mapped_paths": 157,
     "coverage_percentage": 100,
-    "atoms_defined": 107,
+    "atoms_defined": 108,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true
