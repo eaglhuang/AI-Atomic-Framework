@@ -206,6 +206,130 @@ function testTakeoverForStaleLease() {
   console.log('ok: stale lease maps to takeover');
 }
 
+function testFreezeForSameAtomCidWriteWrite() {
+  const active = asActive(
+    makeIntent({
+      taskId: 'TASK-B',
+      actorId: 'actor-b',
+      targetFiles: ['src/two.ts'],
+      sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] },
+      atomRefs: [{ atomId: 'atom-shared', atomCid: 'cid-shared', operation: 'modify', sourceRange: { filePath: 'src/two.ts', lineStart: 100, lineEnd: 110 } }]
+    }),
+    'TASK-B'
+  );
+  const newIntent = makeIntent({
+    taskId: 'TASK-C',
+    actorId: 'actor-c',
+    targetFiles: ['src/three.ts'],
+    sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] },
+    atomRefs: [{ atomId: 'atom-shared', atomCid: 'cid-shared', operation: 'modify', sourceRange: { filePath: 'src/three.ts', lineStart: 1, lineEnd: 10 } }]
+  });
+  const matrix = evaluateConflictMatrix(newIntent, [active]);
+  assert.equal(matrix.arbitrationVerdict, 'freeze');
+  assert.ok(matrix.conflicts.some((conflict) => conflict.kind === 'cid'));
+  assert.ok(matrix.conflicts.some((conflict) => conflict.detail.includes('cid-shared') || conflict.detail.includes('atom-shared')));
+  console.log('ok: same-atom write/write maps to freeze with cid conflict');
+}
+
+function testFreezeForSharedArtifactDrift() {
+  const active = asActive(
+    makeIntent({
+      taskId: 'TASK-B',
+      actorId: 'actor-b',
+      targetFiles: ['src/two.ts'],
+      sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: ['release/dist/atm-bundle.js'] },
+      atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify', sourceRange: { filePath: 'src/two.ts', lineStart: 1, lineEnd: 5 } }]
+    }),
+    'TASK-B'
+  );
+  const newIntent = makeIntent({
+    taskId: 'TASK-C',
+    actorId: 'actor-c',
+    targetFiles: ['src/three.ts'],
+    sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: ['release/dist/atm-bundle.js'] },
+    atomRefs: [{ atomId: 'atom-c', atomCid: 'cid-c', operation: 'modify', sourceRange: { filePath: 'src/three.ts', lineStart: 1, lineEnd: 5 } }]
+  });
+  const matrix = evaluateConflictMatrix(newIntent, [active]);
+  assert.equal(matrix.arbitrationVerdict, 'freeze');
+  const artifactConflict = matrix.conflicts.find((conflict) => conflict.kind === 'shared-surface' && conflict.detail.includes('artifact'));
+  assert.ok(artifactConflict, 'expected shared-surface artifact conflict');
+  assert.ok(artifactConflict!.detail.includes('release/dist/atm-bundle.js'), 'generated artifact owner must be named in detail');
+  assert.equal(artifactConflict!.blockingTask, 'TASK-B');
+  console.log('ok: generated artifact drift maps to freeze and names artifact owner');
+}
+
+function testFreezeForSharedRegistry() {
+  const active = asActive(
+    makeIntent({
+      taskId: 'TASK-B',
+      actorId: 'actor-b',
+      targetFiles: ['src/two.ts'],
+      sharedSurfaces: { generators: [], projections: [], registries: ['atom-registry-main'], validators: [], artifacts: [] },
+      atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify', sourceRange: { filePath: 'src/two.ts', lineStart: 1, lineEnd: 5 } }]
+    }),
+    'TASK-B'
+  );
+  const newIntent = makeIntent({
+    taskId: 'TASK-C',
+    actorId: 'actor-c',
+    targetFiles: ['src/three.ts'],
+    sharedSurfaces: { generators: [], projections: [], registries: ['atom-registry-main'], validators: [], artifacts: [] },
+    atomRefs: [{ atomId: 'atom-c', atomCid: 'cid-c', operation: 'modify', sourceRange: { filePath: 'src/three.ts', lineStart: 1, lineEnd: 5 } }]
+  });
+  const matrix = evaluateConflictMatrix(newIntent, [active]);
+  assert.equal(matrix.arbitrationVerdict, 'freeze');
+  assert.ok(matrix.conflicts.some((conflict) => conflict.kind === 'shared-surface' && conflict.detail.includes('registry')));
+  console.log('ok: shared registry surface maps to freeze');
+}
+
+function testFreezeForSharedValidator() {
+  const active = asActive(
+    makeIntent({
+      taskId: 'TASK-B',
+      actorId: 'actor-b',
+      targetFiles: ['src/two.ts'],
+      sharedSurfaces: { generators: [], projections: [], registries: [], validators: ['npm:typecheck'], artifacts: [] },
+      atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify', sourceRange: { filePath: 'src/two.ts', lineStart: 1, lineEnd: 5 } }]
+    }),
+    'TASK-B'
+  );
+  const newIntent = makeIntent({
+    taskId: 'TASK-C',
+    actorId: 'actor-c',
+    targetFiles: ['src/three.ts'],
+    sharedSurfaces: { generators: [], projections: [], registries: [], validators: ['npm:typecheck'], artifacts: [] },
+    atomRefs: [{ atomId: 'atom-c', atomCid: 'cid-c', operation: 'modify', sourceRange: { filePath: 'src/three.ts', lineStart: 1, lineEnd: 5 } }]
+  });
+  const matrix = evaluateConflictMatrix(newIntent, [active]);
+  assert.equal(matrix.arbitrationVerdict, 'freeze');
+  assert.ok(matrix.conflicts.some((conflict) => conflict.kind === 'shared-surface' && conflict.detail.includes('validator')));
+  console.log('ok: shared validator surface maps to freeze');
+}
+
+function testFreezeForSharedProjection() {
+  const active = asActive(
+    makeIntent({
+      taskId: 'TASK-B',
+      actorId: 'actor-b',
+      targetFiles: ['src/two.ts'],
+      sharedSurfaces: { generators: [], projections: ['atom-map-projection'], registries: [], validators: [], artifacts: [] },
+      atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify', sourceRange: { filePath: 'src/two.ts', lineStart: 1, lineEnd: 5 } }]
+    }),
+    'TASK-B'
+  );
+  const newIntent = makeIntent({
+    taskId: 'TASK-C',
+    actorId: 'actor-c',
+    targetFiles: ['src/three.ts'],
+    sharedSurfaces: { generators: [], projections: ['atom-map-projection'], registries: [], validators: [], artifacts: [] },
+    atomRefs: [{ atomId: 'atom-c', atomCid: 'cid-c', operation: 'modify', sourceRange: { filePath: 'src/three.ts', lineStart: 1, lineEnd: 5 } }]
+  });
+  const matrix = evaluateConflictMatrix(newIntent, [active]);
+  assert.equal(matrix.arbitrationVerdict, 'freeze');
+  assert.ok(matrix.conflicts.some((conflict) => conflict.kind === 'shared-surface' && conflict.detail.includes('projection')));
+  console.log('ok: shared projection surface maps to freeze');
+}
+
 testAllow();
 testWatchForSharedSurface();
 testWatchForFileRangeOverlap();
@@ -213,5 +337,10 @@ testWatchForDisjointFileRange();
 testReadSetConflict();
 testTakeoverForMalformedIntent();
 testTakeoverForStaleLease();
+testFreezeForSameAtomCidWriteWrite();
+testFreezeForSharedArtifactDrift();
+testFreezeForSharedRegistry();
+testFreezeForSharedValidator();
+testFreezeForSharedProjection();
 
 console.log('all conflict-matrix tests passed');
