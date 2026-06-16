@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-MAO-0010",
-  "updatedAt": "2026-06-16T12:58:49.211Z",
+  "updatedAt": "2026-06-16T15:56:03.837Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -285,6 +285,90 @@
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for TASK-MAO-0010: captain -> cursor-composer-2.5.",
+      "artifactPaths": [
+        ".atm/history/tasks/TASK-MAO-0010.json"
+      ],
+      "producedBy": "cursor-composer-2.5",
+      "createdAt": "2026-06-16T15:52:43.821Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "captain",
+          "leaseId": "lease-c82c6067456a",
+          "claimedAt": "2026-06-16T12:54:28.528Z",
+          "heartbeatAt": "2026-06-16T12:54:28.528Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/TASK-MAO-0010.json",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "docs/reports/mao-parallel-routing-benchmark.md",
+            "scripts/fixtures/mao-parallel-routing/",
+            "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+            "scripts/validate-mao-parallel-routing.ts"
+          ],
+          "state": "active"
+        },
+        "newClaim": {
+          "actorId": "cursor-composer-2.5",
+          "leaseId": "lease-e34ec252c675",
+          "claimedAt": "2026-06-16T15:52:43.789Z",
+          "heartbeatAt": "2026-06-16T15:52:43.789Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/TASK-MAO-0010.json",
+            "scripts/validate-mao-parallel-routing.ts",
+            "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+            "docs/reports/mao-parallel-routing-benchmark.md",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "state": "active",
+          "reason": "closeout handoff from captain to cursor-composer-2.5"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for TASK-MAO-0010: captain -> cursor-composer-2.5.",
+      "artifactPaths": [
+        ".atm/history/tasks/TASK-MAO-0010.json"
+      ],
+      "producedBy": "cursor-composer-2.5",
+      "createdAt": "2026-06-16T15:56:03.837Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "captain",
+          "leaseId": "lease-c82c6067456a",
+          "claimedAt": "2026-06-16T12:54:28.528Z",
+          "heartbeatAt": "2026-06-16T12:54:28.528Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/TASK-MAO-0010.json",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "docs/reports/mao-parallel-routing-benchmark.md",
+            "scripts/fixtures/mao-parallel-routing/",
+            "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+            "scripts/validate-mao-parallel-routing.ts"
+          ],
+          "state": "active"
+        },
+        "newClaim": {
+          "actorId": "cursor-composer-2.5",
+          "leaseId": "lease-20fb7fbe3638",
+          "claimedAt": "2026-06-16T15:56:03.810Z",
+          "heartbeatAt": "2026-06-16T15:56:03.810Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/TASK-MAO-0010.json"
+          ],
+          "state": "active",
+          "reason": "closeout metadata fix and formal close"
         }
       }
     }
