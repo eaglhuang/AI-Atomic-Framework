@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-16T02-34-37-274Z-close-da32c8ac398f",
+  "taskId": "TASK-CID-0099",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": null,
+  "fromStatus": "in_progress",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0099.json",
+  "taskSha256": "sha256:c332f252efd9c7d5650e6132b267ca53b0c6014304516dfb65197a8bcf9f0528",
+  "createdAt": "2026-06-16T02:34:37.274Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0099 --actor codex-main --status done --historical-delivery d8d27781e12e1f7a83398686dd8a6f4ca9c952b7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0099.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-16T02:34:37.267Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0099-historical-batch-evidence-envelope-mvp.task.md",
+        ".atm/history/evidence/historical-batches/",
+        ".atm/history/evidence/TASK-CID-0092.json",
+        ".atm/history/evidence/TASK-CID-0093.json",
+        ".atm/history/evidence/TASK-CID-0094.json",
+        ".atm/history/evidence/TASK-CID-0095.json",
+        ".atm/history/evidence/TASK-CID-0096.json",
+        ".atm/history/evidence/TASK-CID-0097.json",
+        ".atm/history/evidence/TASK-CID-0098.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
