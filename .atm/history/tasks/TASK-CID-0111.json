@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0111",
+  "title": "Broker operation run record lightweight receipt (partial blocker bypass)",
+  "status": "done",
+  "milestone": "M20",
+  "dependencies": [
+    "TASK-CID-0099"
+  ],
+  "acceptance": [
+    "`packages/core/src/broker/types.ts` 至少定義/延伸 run record 欄位，包含 `request_identity`、`adapter_choice`、`lane_decision`、`merge_verdict`、`applied_files`、`evidence_path`。",
+    "`packages/core/src/broker/team-lane.ts` 至少有一筆「兩個 task id 共寫」的成功合併 run evidence。",
+    "`packages/cli/src/commands/broker.ts` 穩定輸出可機器比對的 run record 路徑，並能對應到任務與 commit。",
+    "`taskflow open`（dry-run）能成功解析此卡，不再出現 placeholder/錯配欄位警示。"
+  ],
+  "deliverables": [
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/team-lane.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/core/src/broker/adapters/batch-planner.ts",
+    "packages/core/src/broker/__tests__/batch-planner.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker.ts",
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/team-lane.ts",
+    "packages/core/src/broker/adapters/batch-planner.ts",
+    "packages/core/src/broker/__tests__/batch-planner.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not upgrade schemaVersion (keep v0.2)",
+    "不改 taskflow 核心流程",
+    "不改變 broker 對外命令介面參數"
+  ],
+  "nonGoals": [
+    "Do not upgrade schemaVersion (keep v0.2)"
+  ],
+  "evidenceRequired": "planning-attestation",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "contextMap": {
+    "primary": [],
+    "secondary": [],
+    "tests": [],
+    "patterns": []
+  },
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-run-record",
+    "mapUpdates": [
+      "path_pattern: \"packages/core/src/broker/types.ts",
+      "path_pattern: \"packages/core/src/broker/team-lane.ts",
+      "path_pattern: \"packages/cli/src/commands/broker.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0111-broker-operation-run-record-lightweight-receipt.task.md",
+    "sectionTitle": "TASK-CID-0111",
+    "headingLine": 73,
+    "hash": "1db50d256820cbe3"
+  },
+  "importedAt": "2026-06-16T14:09:31.257Z",
+  "lastTransitionId": "2026-06-16T14-23-56-048Z-close-b9c422f69fc6",
+  "lastTransitionAt": "2026-06-16T14:23:56.048Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex",
+  "reservedAt": "2026-06-16T14:20:30.413Z",
+  "promotedAt": "2026-06-16T14:20:30.415Z",
+  "claim": {
+    "actorId": "codex",
+    "leaseId": "lease-1119f816c3fc",
+    "claimedAt": "2026-06-16T14:20:30.419Z",
+    "heartbeatAt": "2026-06-16T14:23:56.044Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0111.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-16T14:09:38.043Z",
+  "startedByActor": "codex",
+  "startedBySessionId": "session-20260616142030-codex-TASK-CID-0111-b5349af14d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0111",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0111.*",
+      ".atm/history/task-events/TASK-CID-0111/**",
+      ".atm/history/tasks/TASK-CID-0111.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "719c488130101111305dd27de3c223b0ab3d3a1c81ed4c3b918bb38ec159122f",
+    "actorId": "codex",
+    "createdAt": "2026-06-16T14:20:30.443Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-16T14:23:56.044Z",
+  "closedByActor": "codex",
+  "closedBySessionId": "session-20260616142030-codex-TASK-CID-0111-b5349af14d",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0111.closure-packet.json"
+}

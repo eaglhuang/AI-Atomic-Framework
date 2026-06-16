@@ -1,0 +1,194 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0111",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5d2bbff36edee02887f6c287c186c9ad41141009",
+  "governedTreeSha": "18d4dba47d2ce9ebf3b863ef0a4207e270c7bd50",
+  "targetCommitDelta": {
+    "currentCommitSha": "5d2bbff36edee02887f6c287c186c9ad41141009",
+    "parentCommitShas": [
+      "5d2bbff36edee02887f6c287c186c9ad41141009"
+    ],
+    "governedTreeSha": "18d4dba47d2ce9ebf3b863ef0a4207e270c7bd50",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0118.json",
+      ".atm/history/evidence/TASK-CID-0111.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-02-46-593Z-import-68a4bf5dd9e3.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-09-31-261Z-import-1ac79fa03d95.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-09-38-037Z-reserve-db7be14b0994.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-09-38-040Z-promote-4f74f799c5ed.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-09-38-085Z-claim-fca15d4ce3b5.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-20-22-940Z-release-5168bd0c9d81.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-20-30-413Z-reserve-9fa6335cbe55.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-20-30-416Z-promote-df129dccca7b.json",
+      ".atm/history/task-events/TASK-CID-0111/2026-06-16T14-20-30-444Z-claim-f8049b16d52c.json",
+      ".atm/history/tasks/TASK-AAO-0118.json",
+      ".atm/history/tasks/TASK-CID-0111.json",
+      ".atm/history/tasks/TASK-MAO-0009.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/types.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/reports/mao-parallel-routing-benchmark.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/route.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/route.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/steward-arbitration.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/adapters/batch-planner.js",
+      "release/atm-root-drop/packages/core/dist/broker/patch-envelope.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/patch-envelope.js",
+      "release/atm-root-drop/packages/core/dist/broker/steward.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/steward.js",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.js",
+      "release/atm-root-drop/packages/core/dist/broker/types.d.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/adapters/batch-planner.ts",
+      "release/atm-root-drop/packages/core/src/broker/patch-envelope.ts",
+      "release/atm-root-drop/packages/core/src/broker/steward.ts",
+      "release/atm-root-drop/packages/core/src/broker/team-lane.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/lib/agr-benchmark-runner.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run test",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df512eaad835843eabc7ac897d85c47fa0e20a2088c044809c1ca125d236a6c9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "test",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-16T14:23:56.041Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0111-broker-operation-run-record-lightweight-receipt.task.md",
+      ".atm/history/evidence/TASK-CID-0111.*",
+      ".atm/history/task-events/TASK-CID-0111/**",
+      ".atm/history/tasks/TASK-CID-0111.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0111.json",
+  "closedAt": "2026-06-16T14:23:56.042Z",
+  "closedByActor": "codex",
+  "sessionId": "session-20260616142030-codex-TASK-CID-0111-b5349af14d",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "5d2bbff36edee02887f6c287c186c9ad41141009",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
