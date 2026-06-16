@@ -423,6 +423,8 @@ assert.equal(batchLaneClose.evidence.governedCommitBundle.targetRepo.status, 'st
 assert.equal(batchLaneClose.evidence.governedCommitBundle.planningRepo.status, 'staged');
 assert.equal(batchLaneClose.evidence.governedCommitBundle.failClosed, false);
 assert.ok(batchLaneClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/evidence/${batchLaneFixture.taskId}.json`), 'historical-batch close must still stage task evidence in the target bundle');
+assert.ok(batchLaneClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/evidence/historical-batches/${batchId}.json`), 'historical-batch close must stage the referenced batch envelope in the target bundle');
+assert.ok(batchLaneClose.evidence.governedCommitBundle.targetGovernanceFiles.includes(`.atm/history/evidence/historical-batches/${batchId}.json`), 'historical-batch close must report the batch envelope as target governance evidence');
 assert.ok(batchLaneClose.evidence.governedCommitBundle.planningRepo.stageFiles.includes(`docs/tasks/${batchLaneFixture.taskId}.task.md`), 'historical-batch close must still stage the planning card closeback bundle');
 const batchLanePlanningCard = readFileSync(batchLaneFixture.planPath, 'utf8');
 assert.ok(batchLanePlanningCard.includes(`delivery_commit: "${batchLaneFixture.deliveryCommit}"`), 'historical-batch close must still write the matched delivery commit onto the planning card');
@@ -1098,6 +1100,7 @@ async function makeUncommittedDeliverablesFixture(label, customTaskDoc) {
         customTaskDoc(taskDoc);
     }
     writeJson(path.join(targetRepo, '.atm/history/tasks', `${fixtureTaskId}.json`), taskDoc);
+    writeText(path.join(targetRepo, 'src/other.txt'), 'baseline\n');
     execFileSync('git', ['add', '.'], { cwd: targetRepo, stdio: 'ignore' });
     execFileSync('git', ['commit', '-m', 'base target'], { cwd: targetRepo, stdio: 'ignore' });
     const baseCommitSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: targetRepo, encoding: 'utf8' }).trim();
@@ -1174,6 +1177,7 @@ assert.ok(execFileSync('git', ['status', '--short'], { cwd: writeDelFixture.targ
 const failClosedFixture = await makeUncommittedDeliverablesFixture('failclosed', (doc) => {
     doc.targetAllowedFiles = []; // fallback to scopePaths
 });
+writeText(path.join(failClosedFixture.targetRepo, 'src/deliver.txt'), 'content\n');
 writeText(path.join(failClosedFixture.targetRepo, 'src/other.txt'), 'modified\n');
 await assert.rejects(() => runTaskflow([
     'close',
@@ -1181,7 +1185,6 @@ await assert.rejects(() => runTaskflow([
     '--profile', failClosedFixture.profilePath,
     '--task', failClosedFixture.taskId,
     '--actor', 'validator',
-    '--historical-delivery', failClosedFixture.baseCommitSha,
     '--write',
     '--json'
 ]), (err) => {

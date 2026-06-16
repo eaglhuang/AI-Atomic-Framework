@@ -517,6 +517,13 @@ function loadHistoricalBatchMatchedCommits(cwd: string, taskId: string, batchRef
     : [];
 }
 
+function resolveExistingHistoricalBatchStageFile(cwd: string, batchRef?: string | null): string | null {
+  if (!batchRef) return null;
+  const batchPath = resolveHistoricalBatchPath(cwd, batchRef);
+  if (!batchPath || !existsSync(batchPath)) return null;
+  return normalizeRepoRelativePath(cwd, batchPath);
+}
+
 function normalizeRepoRelativePath(repoRoot: string, filePath: string): string {
   const resolved = path.isAbsolute(filePath) ? filePath : path.resolve(repoRoot, filePath);
   return relativePathFrom(repoRoot, resolved).replace(/\\/g, '/');
@@ -969,6 +976,7 @@ function buildTaskflowCommitBundle(input: {
   rosterIndexPath: string | null;
   backendResult?: Record<string, unknown> | null;
   historicalDeliveryRefs?: string[];
+  historicalBatchRef?: string | null;
 }): TaskflowGovernedCommitBundle {
   const targetRepoRoot = path.resolve(input.cwd);
 
@@ -994,10 +1002,12 @@ function buildTaskflowCommitBundle(input: {
   }
 
   const targetDeliveryFiles: string[] = [];
+  const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
   const targetGovernanceFiles: string[] = [
     `.atm/history/tasks/${input.taskId}.json`,
     `.atm/history/evidence/${input.taskId}.json`,
     `.atm/history/evidence/${input.taskId}.closure-packet.json`,
+    ...(historicalBatchStageFile ? [historicalBatchStageFile] : []),
     ...listExistingFilesRecursively(targetRepoRoot, `.atm/history/task-events/${input.taskId}`),
     ...extractBackendStageFiles(input.backendResult ?? null)
   ];
@@ -1418,7 +1428,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
       ? closebackPlan.writerBoundary.rosterIndexPath
       : null,
-    historicalDeliveryRefs
+    historicalDeliveryRefs,
+    historicalBatchRef
   });
 
   const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
@@ -1557,7 +1568,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           ? closebackPlan.writerBoundary.rosterIndexPath
           : null,
         backendResult: backendResult as unknown as Record<string, unknown>,
-        historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
+        historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
+        historicalBatchRef
       }),
       actorId,
       taskId
