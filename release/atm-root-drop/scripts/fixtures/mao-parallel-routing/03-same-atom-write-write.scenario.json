@@ -1,0 +1,54 @@
+{
+  "id": "same-atom-write-write",
+  "description": "Same atom write/write overlap must freeze instead of parallelizing.",
+  "kind": "conflict-matrix",
+  "capabilityIntroducedBy": "TASK-MAO-0006",
+  "coverageTier": "generic-mao",
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "mao-parallel-routing-benchmark" },
+      "taskId": "TASK-MAO-WRITE-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["packages/core/src/broker/atom-x.ts"],
+      "atomRefs": [{ "atomId": "atom-shared", "atomCid": "cid-shared", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": [], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "bench-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-write-a",
+          "taskId": "TASK-MAO-WRITE-A",
+          "teamRunId": null,
+          "actorId": "001",
+          "baseCommit": "commit-base",
+          "resourceKeys": {
+            "files": ["packages/core/src/broker/atom-x.ts"],
+            "atomIds": ["atom-shared"],
+            "atomCids": ["cid-shared"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": [],
+            "artifacts": []
+          },
+          "leaseEpoch": 1,
+          "leaseSeconds": 300,
+          "leaseMaxSeconds": 1800,
+          "heartbeatAt": "2026-06-15T08:00:00.000Z",
+          "lane": "direct-brokered",
+          "expiresAt": "2030-06-15T08:10:00.000Z"
+        }
+      ]
+    }
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": { "routingVerdict": "freeze", "validatorOutcome": "pass" }
+}

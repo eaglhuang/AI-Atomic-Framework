@@ -2,7 +2,7 @@
   "schemaId": "atm.pathToAtomMap.v1",
   "schemaSource": "docs/ATOMIZATION_COVERAGE_TAXONOMY.md#42-json-schema-草案-atmpathtoatommapv1",
   "version": "1.0",
-  "timestamp": "2026-06-14T13:41:25.826Z",
+  "timestamp": "2026-06-16T01:35:38.947Z",
   "sharding": {
     "strategy": "owner-shards",
     "manifestPath": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
@@ -149,6 +149,13 @@
       "coverage_status": "partial"
     },
     {
+      "path_pattern": "packages/cli/src/commands/atomize.ts",
+      "atom_id": "atm.atomization-registration-receipts-map",
+      "capability": "official atomize operator lane for registration-receipt, task snapshots, and count-and-digest verification over the atomization receipt helper.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0104"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/batch.ts",
       "atom_id": "atm.batch-checkpoint-map",
       "capability": "batch lifecycle, checkpoint delivery windows, and status: checkpoint can formally close scoped framework critical deliveries before the required single commit. TASK-AAO-0013: checkpoint failure returns structured category+requiredCommand (ATM_BATCH_CHECKPOINT_CLOSE_FAILED); partial completion uses ATM_BATCH_CHECKPOINT_PARTIAL_OK to prevent AI misreading partial-ok as batch-complete.",
@@ -185,9 +192,16 @@
       "coverage_status": "partial"
     },
     {
+      "path_pattern": "packages/cli/src/commands/command-specs/atomize.spec.ts",
+      "atom_id": "atm.atomization-registration-receipts-map",
+      "capability": "atomize command surface specification for the official registration-receipt, task snapshot, and count-and-digest verification lane.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0104"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs/evidence.spec.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence command surface specification including validators subcommand with --list --task flags, run with --recent-run, and missing subcommand with example (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017).",
+      "capability": "evidence command surface specification including validators subcommand with --list --task flags, run with --recent-run, missing subcommand, and historical-batch operator flags/examples for write, dry-run, and diagnostic-only approval flow (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017, TASK-CID-0099, TASK-CID-0100 to TASK-CID-0103).",
       "coverage_status": "active"
     },
     {
@@ -197,9 +211,21 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "taskflow close operator surface specification including --historical-batch as a first-class operator input that reuses matched delivery commits from evidence historical-batch.",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs/tasks.spec.ts",
       "atom_id": "atm.task-direction-map",
       "capability": "tasks command surface specification including scope add sub-command with --add csv option (TASK-AAO-0010).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "tasks close backend surface specification including --historical-delivery and --historical-batch examples so operator documentation reflects the protected close lane inputs for historical delivery reconstruction and historical-batch slices.",
       "coverage_status": "active"
     },
     {
@@ -233,16 +259,16 @@
     {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecPermissionValidation",
       "atom_id": "team.spec.permission-validation",
-      "capability": "Command-spec examples for recipe permission, scoped lease, and file.write scope validation.",
+      "capability": "Command-spec examples for recipe permission and lease validation.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0013"
+      "source_task": "TASK-TEAM-0027"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecRuntimeStatus",
       "atom_id": "team.spec.runtime-status",
       "capability": "Command-spec examples for read-only team run status.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0011"
+      "source_task": "TASK-TEAM-0027"
     },
     {
       "path_pattern": "packages/cli/src/commands/doctor.ts",
@@ -253,7 +279,7 @@
     {
       "path_pattern": "packages/cli/src/commands/evidence.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; --recent-run reuses cached results; validators --list returns per-task validator catalog with tier (focused/batch/milestone/release), expectedCommand, and evidenceState (pass/missing) sourced from framework requiredGates and task-declared validators (TASK-AAO-0015, TASK-AAO-0016); missing subcommand emits computeMissingValidatorReport — classifies each gate as pass/absent/failed-run/stale/diagnostic-only, scopes missingValidationPasses/blockingFindings to closure-required (focused + release + task-declared) validators, and surfaces batch-tier framework health gates as advisoryFindings that never block close; catalog entries carry closureRequired flag (TASK-AAO-0017, TASK-AAO-0017 follow-up); supports quoteForShell for cross-shell safe requiredCommand quoting and detectAutoLinkedValidator for auto-linking known validators during evidence add when no explicit validators are specified (TASK-AAO-0063).",
+      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing, and historical-batch; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; generic evidence records emit atomHealthClaims from task atomizationImpact; close verify requires atom-or-map-health-evidence for governed atom/map tasks; historical-batch slices record per-task deliverable coverage, validatorClaims (taskSpecific/batchWide/advisory), atomHealthClaims, okToRecordEvidence, okToCloseTask, and diagnostic-only approval metadata; supports quoteForShell for cross-shell safe requiredCommand quoting and detectAutoLinkedValidator for auto-linking known validators during evidence add when no explicit validators are specified (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017, TASK-AAO-0063, TASK-CID-0099, TASK-CID-0100 to TASK-CID-0103).",
       "coverage_status": "active"
     },
     {
@@ -295,7 +321,7 @@
     {
       "path_pattern": "packages/cli/src/commands/next.ts",
       "atom_id": "atm.next-router-map",
-      "capability": "next-action routing, task scope resolution, public decisionTrail contract, and advisory teamRecommendation embedding in next/playbook output (TASK-TEAM-0015).",
+      "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
       "coverage_status": "active"
     },
     {
@@ -359,6 +385,18 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/taskflow.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "taskflow close operator orchestration: historical-batch references are resolved into matched historical delivery commits before close mode, planning-authority verification, and governed commit bundle planning, so batch-backed close flows fall back to the normal close lane once the historical delivery gate is satisfied.",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "taskflow close backend argv/command builder for protected close surfaces, including pass-through of --historical-batch to tasks close and operator-facing backend command text.",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-ledger-governance-map",
       "capability": "tasks import/reconcile; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
@@ -373,7 +411,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-closure-map",
-      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport; missingValidationPasses/blockingFindings now contain only closure-required validators so advisory framework health gates (doctor, framework-development, tasks-audit, git-head-evidence) do not falsely block close. Closure packets may also carry optional teamSummary metadata while command-backed evidence remains authoritative (TASK-AAO-0017, TASK-AAO-0017 follow-up, TASK-TEAM-0016).",
+      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport missingValidationPasses/blockingFindings now contain only closure-required validators so advisory framework health gates (doctor, framework-development, tasks-audit, git-head-evidence) do not falsely block close (TASK-AAO-0017, TASK-AAO-0017 follow-up).",
       "coverage_status": "active"
     },
     {
@@ -385,7 +423,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-closure-map",
-      "capability": "tasks deliver-and-close macro: bundles delivery commit (auto-stage scope-matching modified files + atm git commit) → historical close (tasks close --historical-delivery) → governance commit (stage task JSON, evidence, closure packet, transition event + atm git commit) into one command. Supports --delivery-commit to skip auto-staging and use a pre-existing commit. Batch guard: ATM_BATCH_CHECKPOINT_REQUIRED when task belongs to an active batch without --from-batch-checkpoint. Dry-run mode emits wouldAutoStage without modifying repo state (TASK-AAO-0056).",
+      "capability": "tasks deliver-and-close macro: bundles delivery commit (auto-stage scope-matching modified files + atm git commit)  -> historical close (tasks close --historical-delivery)  -> governance commit (stage task JSON, evidence, closure packet, transition event + atm git commit) into one command. Supports --delivery-commit to skip auto-staging and use a pre-existing commit. Batch guard: ATM_BATCH_CHECKPOINT_REQUIRED when task belongs to an active batch without --from-batch-checkpoint. Dry-run mode emits wouldAutoStage without modifying repo state (TASK-AAO-0056).",
       "coverage_status": "active"
     },
     {
@@ -525,21 +563,7 @@
       "atom_id": "team.status-runtime-read",
       "capability": "Read-only team run status surface.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0011"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamRecommendation",
-      "atom_id": "team.next-recommendation",
-      "capability": "Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0015"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecNextRecommendation",
-      "atom_id": "team.spec.next-recommendation",
-      "capability": "Command spec examples for next/playbook teamRecommendation advisory surface.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0015"
+      "source_task": "TASK-TEAM-0027"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
@@ -547,13 +571,6 @@
       "capability": "Broker lane evaluation and steward/composer routing for team plan/start.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamClaimAdmissionFindings",
-      "atom_id": "team.start-claim-gate-parity",
-      "capability": "Team plan/start claim admission parity against normal task dependency gates.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0029"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#runTeam",
@@ -567,28 +584,14 @@
       "atom_id": "team.recipe-permission-model",
       "capability": "Recipe catalog validation and scoped permission lease planning.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0012"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
-      "atom_id": "team.permission-lease-validator",
-      "capability": "Deterministic permission lease validation before team runtime start.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0012"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
-      "atom_id": "team.file-write-scope-validator",
-      "capability": "Deterministic file.write lease scope validation against task allowed files before team runtime start.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0013"
+      "source_task": "TASK-TEAM-0027"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#writeTeamRun",
       "atom_id": "team.start-runtime-state",
       "capability": "Team run runtime record writer under .atm/runtime/team-runs.",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0011"
+      "source_task": "TASK-TEAM-0027"
     },
     {
       "path_pattern": "packages/cli/src/commands/work-channels.ts",
@@ -873,27 +876,6 @@
       "source_task": "TASK-TEAM-0017"
     },
     {
-      "path_pattern": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
-      "atom_id": "atm.task-closure-map",
-      "capability": "Closure packet contract, validation, creation, repair helpers, and optional teamSummary integration that preserves captain decisions, agent reports, patrol findings, and evidence curator summaries without replacing command-backed validators (TASK-TEAM-0016).",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0016"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts",
-      "atom_id": "atm.team-agents-map",
-      "capability": "Team Agents CLI planning and runtime surface, including deterministic role selector output, team start/status runtime records, and closure-summary seed fields for TASK-TEAM-0016 closure packets.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0011"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts",
-      "atom_id": "atm.team-agents-map",
-      "capability": "Team Agents CLI help/spec examples for crew briefing, plan resolver, role selector, captain decision, lieutenant escalation, start, and runtime status.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0011"
-    },
-    {
       "path_pattern": "scripts/audit-*.ts",
       "atom_id": "atom-validator-framework",
       "capability": "audit-style validators (e.g. hash placeholders)",
@@ -928,6 +910,13 @@
       "atom_id": "atm.validator-envelope-map",
       "capability": "validator runner with quick/standard/full presets and standardized failure envelope aggregation",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "scripts/src/atomization-register-receipt.js",
+      "atom_id": "atm.atomization-registration-receipts-map",
+      "capability": "formal owner-shard registration helper, receipt emitter, and task-level atomization snapshot guard for count-and-digest verification",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0104"
     },
     {
       "path_pattern": "scripts/src/atomize-score.js",
@@ -1009,13 +998,6 @@
       "source_task": "TASK-TEAM-0017"
     },
     {
-      "path_pattern": "scripts/validate-team-agents.ts",
-      "atom_id": "atm.team-agents-validator-map",
-      "capability": "Deterministic validator for Team Agents plan, role, and start/status runtime contracts.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0011"
-    },
-    {
       "path_pattern": "scripts/validate-validator-envelope.ts",
       "atom_id": "atm.validator-envelope-map",
       "capability": "validator failure envelope regression coverage for sandbox, index-lock, ATM gate, and runner JSON cases",
@@ -1026,55 +1008,13 @@
       "atom_id": "atom-integration-playbook",
       "capability": "Reusable playbook fragments included by every editor adapter skill manifest",
       "coverage_status": "active"
-    },
-    {
-      "path_pattern": "packages/core/src/broker/registry.ts",
-      "atom_id": "atm.mao-intent-registry-map",
-      "capability": "Broker-level intent registry holding actor/task/route/claim-intent/read-set/write-set/atom-CID/virtual-CID/outputs/lease/confidence records with pure register/renew/release/query helpers (unknown read/write sets preserved, not flattened to empty) — TASK-MAO-0005 ledger-closeback of historical delivery from CID-0015 / CID-0032 / CID-0034 lineage (502922a9d base, daf47aa84 tests, 165330238 + 768e72ef0 read-set, 9d214ad9f AGR runtime); deliverable path collapsed onto on-disk filename registry.ts per MAO/README reconciliation recommendation (b).",
-      "coverage_status": "active",
-      "source_task": "TASK-MAO-0005"
-    },
-    {
-      "path_pattern": "packages/core/src/broker/conflict-matrix.ts",
-      "atom_id": "atm.mao-conflict-matrix-map",
-      "capability": "Logical conflict matrix returning deterministic admission verdicts (parallel-safe, same-atom freeze/steward, write/read overlap, unknown-scope conservative block, generated-artifact drift) for MAO route intents prior to write — TASK-MAO-0006 ledger-closeback of historical delivery in commit 70594a031 (TASK-CID-0041).",
-      "coverage_status": "active",
-      "source_task": "TASK-MAO-0006"
-    },
-    {
-      "path_pattern": "scripts/validate-mao-parallel-routing.ts",
-      "atom_id": "atm.mao-parallel-routing-benchmark-map",
-      "capability": "Deterministic offline simulator benchmark for MAO v1 multi-agent routing: 12 named scenarios spanning conflict-matrix (parallel-safe, same-file disjoint, same-atom write/write, read/write overlap, unknown-scope, shared-surface), capsule-drift (generated-artifact), route-lifecycle (freeze/resume), steward-plan (apply/blocked); emits catch-rate + per-scenario latency + capability coverage + ship-safe verdict; fails hard on false-safe regressions. Runner library: scripts/lib/mao-parallel-routing-benchmark-runner.ts; fixtures: scripts/fixtures/mao-parallel-routing/01..12-*.scenario.json; report: docs/reports/mao-parallel-routing-benchmark.md. Generic-mao tier: 10 scenarios; m5-runner-extension tier: 2 scenarios (deferred to MAO-0011+). Out of scope: real multi-process load and distributed broker consensus.",
-      "coverage_status": "active",
-      "source_task": "TASK-MAO-0010"
-    },
-    {
-      "path_pattern": "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
-      "atom_id": "atm.mao-parallel-routing-benchmark-map",
-      "capability": "Runner library backing scripts/validate-mao-parallel-routing.ts: loads scenario fixtures, computes verdicts via conflict-matrix / capsule-drift / route-lifecycle / steward-plan kinds, aggregates catch-rate + tier coverage + capability coverage + per-scenario latency, and renders the human-readable benchmark report.",
-      "coverage_status": "active",
-      "source_task": "TASK-MAO-0010"
-    },
-    {
-      "path_pattern": "scripts/fixtures/mao-parallel-routing/",
-      "atom_id": "atm.mao-parallel-routing-benchmark-map",
-      "capability": "Deterministic offline scenario fixtures (manifest.json + 12 *.scenario.json) covering the conflict regimes the MAO v1 benchmark asserts: parallel-safe-disjoint, same-file-different-atom-disjoint, same-atom-write-write, read-write-overlap-watch, unknown-scope-malformed, generated-artifact-drift, route-freeze-on-pause, route-resume-after-freeze, steward-apply-safe, steward-blocked-out-of-scope, shared-surface-blocked, runner-derived-artifact-collision.",
-      "coverage_status": "active",
-      "source_task": "TASK-MAO-0010"
-    },
-    {
-      "path_pattern": "docs/reports/mao-parallel-routing-benchmark.md",
-      "atom_id": "atm.mao-parallel-routing-benchmark-map",
-      "capability": "Human-readable benchmark report regenerated by scripts/validate-mao-parallel-routing.ts; carries summary, capability coverage, tier coverage, CID/AGR incident lessons retained, false-safe regression list, expectation failures, scenario matrix, per-scenario latency, and remaining risks. Out of scope: STORM / CodeCRDT / SCF comparative baselines (PAPER-B / December 2026 follow-up).",
-      "coverage_status": "active",
-      "source_task": "TASK-MAO-0010"
     }
   ],
   "summary": {
-    "total_production_paths": 162,
-    "mapped_paths": 162,
+    "total_production_paths": 160,
+    "mapped_paths": 160,
     "coverage_percentage": 100,
-    "atoms_defined": 110,
+    "atoms_defined": 106,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true

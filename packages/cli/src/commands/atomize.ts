@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { CliError, makeResult, message } from './shared.ts';
 
@@ -8,6 +9,7 @@ type AtomizeOptions = {
   repo: string;
   apply: boolean;
   dryRun: boolean;
+  passthroughArgs: string[];
 };
 
 export async function runAtomize(argv: any) {
@@ -21,7 +23,7 @@ export async function runAtomize(argv: any) {
       messages: [
         message('error', 'ATM_ATOMIZE_MISSING_SUBCOMMAND', 'Missing required subcommand.', {
           usage: 'node atm.mjs atomize <subcommand> [options]',
-          subcommands: ['inventory']
+          subcommands: ['inventory', 'score', 'backfill', 'register-receipt', 'snapshot', 'verify-task']
         })
       ]
     });
@@ -39,16 +41,64 @@ export async function runAtomize(argv: any) {
     return runAtomizeBackfill(options);
   }
 
+  if (options.subcommand === 'register-receipt' || options.subcommand === 'snapshot' || options.subcommand === 'verify-task') {
+    return runAtomizationRegistrationTool(options);
+  }
+
   return makeResult({
     ok: false,
     command: 'atomize',
     cwd: options.cwd,
     messages: [
       message('error', 'ATM_ATOMIZE_UNKNOWN_SUBCOMMAND', `Unknown subcommand: ${options.subcommand}`, {
-        supportedSubcommands: ['inventory', 'score', 'backfill']
+        supportedSubcommands: ['inventory', 'score', 'backfill', 'register-receipt', 'snapshot', 'verify-task']
       })
     ]
   });
+}
+
+async function runAtomizationRegistrationTool(options: AtomizeOptions) {
+  const subcommand = options.subcommand as 'register-receipt' | 'snapshot' | 'verify-task';
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const repoRoot = path.resolve(__dirname, '../../../../');
+    const scriptPath = path.join(repoRoot, 'scripts', 'src', 'atomization-register-receipt.js');
+    const command = subcommand === 'register-receipt' ? 'register-path' : subcommand;
+    const output = execFileSync(process.execPath, [scriptPath, command, '--repo', options.repo, ...options.passthroughArgs], {
+      cwd: options.cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    const parsed = JSON.parse(output);
+    return makeResult({
+      ok: parsed.ok !== false,
+      command: `atomize ${options.subcommand}`,
+      cwd: options.cwd,
+      messages: [
+        message('info', 'ATM_ATOMIZE_REGISTRATION_TOOL_SUCCESS', `Atomize ${options.subcommand} completed.`, {
+          receiptPath: parsed.receiptPath ?? null,
+          snapshotPath: parsed.snapshotPath ?? null
+        })
+      ],
+      evidence: parsed
+    });
+  } catch (err: any) {
+    const stderr = typeof err?.stderr === 'string' ? err.stderr.trim() : '';
+    const payload = stderr.startsWith('{') ? stderr : '';
+    const details = payload ? JSON.parse(payload) : null;
+    return makeResult({
+      ok: false,
+      command: `atomize ${subcommand}`,
+      cwd: options.cwd,
+      messages: [
+        message('error', 'ATM_ATOMIZE_REGISTRATION_TOOL_FAILED', `Atomize ${subcommand} failed: ${details?.error ?? err.message}`, {
+          usage: details?.usage ?? null
+        })
+      ],
+      evidence: details ?? { stderr }
+    });
+  }
 }
 
 async function runAtomizeInventory(options: AtomizeOptions) {
@@ -263,7 +313,8 @@ function parseAtomizeArgs(argv: any) {
     subcommand: null,
     repo: '.',
     apply: false,
-    dryRun: false
+    dryRun: false,
+    passthroughArgs: []
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -294,6 +345,16 @@ function parseAtomizeArgs(argv: any) {
     if (!arg.startsWith('-')) {
       if (!state.subcommand) {
         state.subcommand = arg;
+        continue;
+      }
+    }
+
+    if (state.subcommand === 'register-receipt' || state.subcommand === 'snapshot' || state.subcommand === 'verify-task') {
+      state.passthroughArgs.push(arg);
+      const next = argv[index + 1];
+      if (arg.startsWith('--') && next && !next.startsWith('-')) {
+        state.passthroughArgs.push(next);
+        index += 1;
       }
     }
   }

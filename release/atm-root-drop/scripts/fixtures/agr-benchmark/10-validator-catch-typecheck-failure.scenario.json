@@ -1,0 +1,52 @@
+{
+  "id": "validator-catch-typecheck-failure",
+  "description": "Broker admits parallel-safe writes, but validator catches the semantic incompatibility.",
+  "kind": "compose",
+  "relevantModes": ["agrOff", "layer2Adr"],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.10.a",
+      "taskId": "TASK-CID-0037-A",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/types.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-10-A", "atomCid": "cid-agr-10-a" }],
+      "anchors": [{ "kind": "line", "hint": "typeA" }],
+      "intent": "Change exported type shape.",
+      "patch": "--- a/src/types.ts\n+++ b/src/types.ts\n@@ -1,1 +1,1 @@\n-export type Value = number;\n+export type Value = string;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert type A."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.10.b",
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/consumer.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-10-B", "atomCid": "cid-agr-10-b" }],
+      "anchors": [{ "kind": "line", "hint": "consumer" }],
+      "intent": "Consumer still assumes numeric Value.",
+      "patch": "--- a/src/consumer.ts\n+++ b/src/consumer.ts\n@@ -1,1 +1,1 @@\n-export const total: Value = 1;\n+export const total: Value = 1;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert consumer."
+    }
+  ],
+  "validatorFixture": {
+    "command": "npm run typecheck",
+    "shouldFail": true
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": {
+    "agrOff": { "composeVerdict": "parallel-safe", "validatorOutcome": "fail" },
+    "layer1": { "composeVerdict": "parallel-safe", "validatorOutcome": "fail" },
+    "layer2Adr": { "composeVerdict": "parallel-safe", "validatorOutcome": "fail" }
+  }
+}

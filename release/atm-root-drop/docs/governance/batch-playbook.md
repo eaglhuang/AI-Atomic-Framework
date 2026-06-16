@@ -220,6 +220,13 @@ node atm.mjs tasks close --task <task-id> --actor <id> --status done --historica
 After that close succeeds, make a separate closure commit for the generated
 ATM task, evidence, and task-event ledger updates.
 
+### Historical batch reconstruction
+
+When a real delivery already landed as one coherent commit package, use
+`evidence historical-batch` to reconstruct per-task evidence slices without
+pretending the work was validated one card at a time. See
+`docs/governance/historical-batch-evidence.md` for the full operator flow.
+
 ### Don't
 
 - ❌ Do not manually `tasks reserve / promote / claim` before `next --claim`.

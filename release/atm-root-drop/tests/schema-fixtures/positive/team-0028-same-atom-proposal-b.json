@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.patchProposal.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "TEAM-0028 synthetic collision fixture B"
+  },
+  "proposalId": "team-0028-proposal-b",
+  "taskId": "TASK-TEAM-0028",
+  "actorId": "002",
+  "baseCommit": "81262a2171a371c4178517ebc3eb4ee3146c5de6",
+  "fileBeforeHash": "sha256:edc0ea0548e8fcb6db2354c7ede8cb63a466aad239b304e5933fe4d5f8491243",
+  "targetFile": "packages/cli/src/commands/team.ts",
+  "atomRefs": [
+    {
+      "atomId": "team.plan-crew-briefing-contract",
+      "atomCid": "atom:cid:team-0028-crew-briefing-negative-control"
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "line-range",
+      "hint": "797-813"
+    }
+  ],
+  "intent": "Add one additional stopCondition to strengthen TEAM-0028 synthetic collision fixture B.",
+  "patch": "diff --git a/packages/cli/src/commands/team.ts b/packages/cli/src/commands/team.ts\\n--- a/packages/cli/src/commands/team.ts\\n+++ b/packages/cli/src/commands/team.ts\\n@@ -809,6 +809,7 @@\\n       'scope must stay within declared allowed files',\\n       'required roles must each be uniquely represented',\\n       'validators must not report blocking permission conflicts',\\n+      'pilot fixtures should never target path-to-atom-map directly',\\n       'a broader or stronger lane must stop the plan'\\n     ],",
+  "validators": ["npm run typecheck"],
+  "rollback": "revert commit"
+}

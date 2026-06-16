@@ -1,0 +1,30 @@
+{
+  "id": "capsule-cid-drift-freeze",
+  "description": "Registry capsule CID drift from source must freeze admission.",
+  "conflictType": "capsule-cid-drift",
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "conflict-benchmark" },
+      "taskId": "TASK-DRIFT",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["src/capsule.ts"],
+      "atomRefs": [{ "atomId": "ATM-CAPSULE-01", "atomCid": "cid-source-current", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": [], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "bench-repo",
+      "workspaceId": "main",
+      "activeIntents": []
+    }
+  },
+  "sourceCapsuleCid": "cid-source-current",
+  "registryCapsuleCid": "cid-registry-stale",
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": { "conflictVerdict": "freeze", "validatorOutcome": "pass" }
+}

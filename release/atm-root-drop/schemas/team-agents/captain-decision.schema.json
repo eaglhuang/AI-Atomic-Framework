@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/captain-decision.schema.json",
+  "title": "CaptainDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision", "optionsConsidered", "chosenOption", "reason", "risk", "lieutenantNeed", "nextTeamShape"],
+  "properties": {
+    "decision": { "type": "string", "minLength": 1 },
+    "optionsConsidered": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "chosenOption": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "risk": { "enum": ["low", "medium", "high"] },
+    "lieutenantNeed": { "type": "boolean" },
+    "nextTeamShape": { "type": "string", "minLength": 1 },
+    "advisoryOnly": { "const": true }
+  }
+}

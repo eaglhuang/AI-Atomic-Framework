@@ -1,0 +1,34 @@
+{
+  "schemaId": "atm.patchProposal.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "CID-NEXT-R10 lane D synthetic negative-control proposal"
+  },
+  "proposalId": "team-cidnext-r10-proposal-d",
+  "taskId": "TASK-CID-0023",
+  "actorId": "002",
+  "baseCommit": "81262a2171a371c4178517ebc3eb4ee3146c5de6",
+  "fileBeforeHash": "sha256:edc0ea0548e8fcb6db2354c7ede8cb63a466aad239b304e5933fe4d5f8491243",
+  "targetFile": "packages/cli/src/commands/team.ts",
+  "atomRefs": [
+    {
+      "atomId": "team.plan-atomization-planner",
+      "atomCid": "atom:cid:team-cidnext-r10-atomization-planner"
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "line-range",
+      "hint": "822-835"
+    }
+  ],
+  "intent": "Add a synthetic related-atoms helper note in buildAtomizationChecklist for lane D.",
+  "patch": "diff --git a/packages/cli/src/commands/team.ts b/packages/cli/src/commands/team.ts\\n--- a/packages/cli/src/commands/team.ts\\n+++ b/packages/cli/src/commands/team.ts\\n@@ -822,6 +822,8 @@ export function buildAtomizationChecklist(task: any, writePaths: string[]) {\\n   const taskId = String(task?.workItemId ?? task?.taskId ?? 'unknown-task');\\n+  const laneDSyntheticMarker = 'CID-NEXT-R10 lane D synthetic atomization proof';\\n+  void laneDSyntheticMarker;\\n   const primaryAtom: string = String(task?.atomizationImpact?.ownerAtomOrMap ?? task?.atomizationImpact?.owner_atom_or_map ?? 'atm.team-agents-map');\\n   const taskAtomSet = getTaskScopedAtoms(taskId);\\n   const relatedAtoms = uniqueStrings([",
+  "validators": [
+    "node atm.mjs team plan --task TASK-CID-0023 --json",
+    "npm run typecheck"
+  ],
+  "rollback": "remove synthetic marker and keep only purpose-specific evidence fields"
+}

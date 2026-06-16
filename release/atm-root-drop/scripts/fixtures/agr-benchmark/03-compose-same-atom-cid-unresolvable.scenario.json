@@ -1,0 +1,52 @@
+{
+  "id": "compose-same-atom-cid-unresolvable",
+  "description": "Two proposals collide on the same enclosing unit; refinement cannot split them safely.",
+  "kind": "compose",
+  "relevantModes": ["agrOff", "layer1", "layer2Adr"],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.03.a",
+      "taskId": "TASK-CID-0037-A",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/core.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-03", "atomCid": "cid-fn-core" }],
+      "anchors": [{ "kind": "line", "hint": "body" }],
+      "intent": "Change return in core function.",
+      "patch": "--- a/src/core.ts\n+++ b/src/core.ts\n@@ -2,1 +2,1 @@\n-  return 1;\n+  return 2;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert core return."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "proposalId": "proposal.agr.03.b",
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "fileBeforeHash": "hash-target",
+      "targetFile": "src/core.ts",
+      "atomRefs": [{ "atomId": "ATM-AGR-03", "atomCid": "cid-fn-core" }],
+      "anchors": [{ "kind": "line", "hint": "body" }],
+      "intent": "Change guard in same core function.",
+      "patch": "--- a/src/core.ts\n+++ b/src/core.ts\n@@ -1,1 +1,1 @@\n-if (!ready) return 0;\n+if (!ready || stale) return 0;\n",
+      "validators": ["npm run typecheck"],
+      "rollback": "Revert core guard."
+    }
+  ],
+  "layer1Refinement": {
+    "proposal.agr.03.a": [{ "atomId": "ATM-AGR-03", "atomCid": "cid-fn-core" }],
+    "proposal.agr.03.b": [{ "atomId": "ATM-AGR-03", "atomCid": "cid-fn-core" }]
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" },
+    "layer1": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" },
+    "layer2Adr": { "composeVerdict": "blocked-cid-conflict", "validatorOutcome": "pass" }
+  }
+}

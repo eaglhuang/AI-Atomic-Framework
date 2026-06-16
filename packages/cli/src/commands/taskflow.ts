@@ -446,6 +446,58 @@ function collectHistoricalDeliveryRefs(parsed: ReturnType<typeof parseArgsForCom
   return [...new Set(refs)];
 }
 
+function collectHistoricalBatchRef(parsed: ReturnType<typeof parseArgsForCommand>): string | null {
+  const value = parsed.options.historicalBatch;
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function resolveHistoricalBatchPath(cwd: string, batchRef: string) {
+  const trimmed = batchRef.trim();
+  if (!trimmed) return null;
+  if (path.isAbsolute(trimmed)) return trimmed;
+  if (trimmed.includes('/') || trimmed.includes('\\')) return path.resolve(cwd, trimmed);
+  return path.join(cwd, '.atm', 'history', 'evidence', 'historical-batches', trimmed.endsWith('.json') ? trimmed : `${trimmed}.json`);
+}
+
+function loadHistoricalBatchMatchedCommits(cwd: string, taskId: string, batchRef: string) {
+  const batchPath = resolveHistoricalBatchPath(cwd, batchRef);
+  if (!batchPath || !existsSync(batchPath)) {
+    throw new CliError('ATM_TASKFLOW_CLOSE_HISTORICAL_BATCH_NOT_FOUND', `Historical batch evidence not found for ${batchRef}.`, {
+      exitCode: 1,
+      details: { taskId, batchRef, batchPath: batchPath ? relativePathFrom(cwd, batchPath) : null }
+    });
+  }
+  const envelope = JSON.parse(readFileSync(batchPath, 'utf8')) as Record<string, unknown>;
+  const tasks = Array.isArray(envelope.tasks) ? envelope.tasks : [];
+  const rawSlice = tasks.find((entry) =>
+    entry && typeof entry === 'object' && !Array.isArray(entry) && String((entry as Record<string, unknown>).taskId ?? '') === taskId
+  ) as Record<string, unknown> | undefined;
+  if (!rawSlice) {
+    throw new CliError('ATM_TASKFLOW_CLOSE_HISTORICAL_BATCH_TASK_NOT_FOUND', `Historical batch ${batchRef} does not contain task ${taskId}.`, {
+      exitCode: 1,
+      details: { taskId, batchRef, batchPath: relativePathFrom(cwd, batchPath) }
+    });
+  }
+  if (rawSlice.okToCloseTask !== true) {
+    throw new CliError('ATM_TASKFLOW_CLOSE_HISTORICAL_BATCH_NOT_CLOSE_READY', `Historical batch ${batchRef} task slice for ${taskId} is not close-ready.`, {
+      exitCode: 1,
+      details: {
+        taskId,
+        batchRef,
+        batchPath: relativePathFrom(cwd, batchPath),
+        coverageStatus: rawSlice.coverageStatus ?? null,
+        okToRecordEvidence: rawSlice.okToRecordEvidence === true,
+        okToCloseTask: rawSlice.okToCloseTask === true,
+        diagnosticOnly: rawSlice.diagnosticOnly === true,
+        missingCoverage: Array.isArray(rawSlice.missingCoverage) ? rawSlice.missingCoverage : []
+      }
+    });
+  }
+  return Array.isArray(rawSlice.matchedCommits)
+    ? rawSlice.matchedCommits.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    : [];
+}
+
 function normalizeRepoRelativePath(repoRoot: string, filePath: string): string {
   const resolved = path.isAbsolute(filePath) ? filePath : path.resolve(repoRoot, filePath);
   return relativePathFrom(repoRoot, resolved).replace(/\\/g, '/');
@@ -1222,7 +1274,15 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     ? noCommitRequested ? 'stage-only' : 'auto-commit'
     : 'dry-run';
   const profilePath = parsed.options.profile ? String(parsed.options.profile) : null;
-  const historicalDeliveryRefs = collectHistoricalDeliveryRefs(parsed);
+  const historicalBatchRef = collectHistoricalBatchRef(parsed);
+  const explicitHistoricalDeliveryRefs = collectHistoricalDeliveryRefs(parsed);
+  const historicalBatchMatchedCommits = historicalBatchRef
+    ? loadHistoricalBatchMatchedCommits(cwd, taskId, historicalBatchRef)
+    : [];
+  const historicalDeliveryRefs = uniqueSorted([
+    ...explicitHistoricalDeliveryRefs,
+    ...historicalBatchMatchedCommits
+  ]);
 
   if (!taskId) {
     throw new CliError('ATM_CLI_USAGE', 'taskflow close requires --task <work-item-id>.', { exitCode: 2 });
@@ -1336,7 +1396,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     actorSupplied: actorId.length > 0,
     taskIdSupplied: taskId.length > 0,
     historicalDeliveryGateRequired: closebackPlan.historicalDeliveryGate.required && !hasUncommittedDeliverables,
-    historicalDeliverySupplied: historicalDeliveryRefs.length > 0
+    historicalDeliverySupplied: historicalDeliveryRefs.length > 0 || historicalBatchRef !== null
   });
 
   if (writeRequested && !writeSupport.allowed) {
@@ -1387,6 +1447,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       actorId,
       backendSurface: closebackPlan.backendSurface,
       historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
+      historicalBatchRef,
       historicalDeliveryRepo: closebackPlan.planningAuthorityDeliveryGate.ok
         ? closebackPlan.planningAuthorityDeliveryGate.repoRoot
         : null,

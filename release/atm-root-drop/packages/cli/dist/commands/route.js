@@ -1,0 +1,558 @@
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { applyStewardPlan } from '../../../core/dist/broker/steward.js';
+import { CliError, makeResult, message } from './shared.js';
+const lifecycleActions = new Set(['open', 'status', 'list', 'pause', 'resume', 'abandon']);
+const routeFileNamePattern = /^route-[A-Za-z0-9._:-]+\.json$/;
+export async function runRoute(argv) {
+    const options = parseRouteArgs(argv);
+    if (options.action === 'takeover') {
+        return runTakeover(options);
+    }
+    return runLifecycleRoute(options);
+}
+function runLifecycleRoute(options) {
+    if (options.action === 'open') {
+        const route = buildOpenedRoute(options);
+        const validation = validateRouteContext(route);
+        if (!validation.ok) {
+            throw new CliError('ATM_ROUTE_CONTEXT_INVALID', 'Route context failed validation.', {
+                exitCode: 1,
+                details: { errors: validation.errors }
+            });
+        }
+        const routePath = routeContextPath(options.cwd, route.routeId);
+        if (existsSync(routePath)) {
+            throw new CliError('ATM_ROUTE_ALREADY_EXISTS', `Route already exists: ${route.routeId}`, { exitCode: 1 });
+        }
+        mkdirSync(path.dirname(routePath), { recursive: true });
+        writeJson(routePath, route);
+        return makeLifecycleResult(options.cwd, 'open', 'ATM_ROUTE_OPENED', `Opened route ${route.routeId}.`, { route, routePath: relativePath(options.cwd, routePath) });
+    }
+    if (options.action === 'list') {
+        const routes = listRouteContexts(options.cwd);
+        return makeLifecycleResult(options.cwd, 'list', 'ATM_ROUTE_LIST', `Found ${routes.length} route context record(s).`, { routes });
+    }
+    const route = readRequiredRoute(options);
+    if (options.action === 'status') {
+        return makeLifecycleResult(options.cwd, 'status', 'ATM_ROUTE_STATUS', `Route ${route.routeId} is ${route.state}.`, { route });
+    }
+    if (options.action === 'pause') {
+        const updated = transitionRoute(route, 'frozen', options);
+        writeJson(routeContextPath(options.cwd, route.routeId), updated);
+        return makeLifecycleResult(options.cwd, 'pause', 'ATM_ROUTE_PAUSED', `Paused route ${route.routeId}.`, { route: updated });
+    }
+    if (options.action === 'resume') {
+        const updated = transitionRoute(route, 'open', options);
+        writeJson(routeContextPath(options.cwd, route.routeId), updated);
+        return makeLifecycleResult(options.cwd, 'resume', 'ATM_ROUTE_RESUMED', `Resumed route ${route.routeId}.`, { route: updated });
+    }
+    if (options.action === 'abandon') {
+        const updated = transitionRoute(route, 'abandoned', options);
+        writeJson(routeContextPath(options.cwd, route.routeId), updated);
+        return makeLifecycleResult(options.cwd, 'abandon', 'ATM_ROUTE_ABANDONED', `Abandoned route ${route.routeId}.`, { route: updated });
+    }
+    throw new CliError('ATM_CLI_USAGE', 'route supports open, status, list, pause, resume, abandon, and takeover.', { exitCode: 2 });
+}
+function runTakeover(options) {
+    if (!options.mergePlanFile) {
+        throw new CliError('ATM_CLI_USAGE', 'route takeover requires --merge-plan-file <path>.', { exitCode: 2 });
+    }
+    if (!options.proposalFile) {
+        throw new CliError('ATM_CLI_USAGE', 'route takeover requires --proposal-file <path>.', { exitCode: 2 });
+    }
+    const mergePlanPath = path.resolve(options.cwd, options.mergePlanFile);
+    if (!existsSync(mergePlanPath)) {
+        throw new CliError('ATM_FILE_NOT_FOUND', `Merge plan file not found: ${options.mergePlanFile}`, { exitCode: 1 });
+    }
+    const proposalPath = path.resolve(options.cwd, options.proposalFile);
+    if (!existsSync(proposalPath)) {
+        throw new CliError('ATM_FILE_NOT_FOUND', `Proposal file not found: ${options.proposalFile}`, { exitCode: 1 });
+    }
+    const mergePlan = JSON.parse(readFileSync(mergePlanPath, 'utf8'));
+    if (mergePlan.verdict === 'blocked-cid-conflict' || mergePlan.verdict === 'blocked-shared-surface') {
+        throw new CliError('ATM_ROUTE_UNSAFE_TAKEOVER', `Steward takeover is blocked because the conflict verdict is unsafe: '${mergePlan.verdict}'.`, {
+            exitCode: 1,
+            details: { verdict: mergePlan.verdict }
+        });
+    }
+    const proposal = JSON.parse(readFileSync(proposalPath, 'utf8'));
+    const proposals = [proposal];
+    const stewardId = options.stewardId ?? 'neutral-write-steward';
+    const scopeFiles = options.scopeFiles.length > 0 ? options.scopeFiles : proposals.map((entry) => entry.targetFile);
+    const backups = {};
+    for (const file of scopeFiles) {
+        const fullPath = path.resolve(options.cwd, file);
+        backups[file] = existsSync(fullPath) ? readFileSync(fullPath, 'utf8') : null;
+    }
+    const evidenceOutPath = options.evidenceOutPath ? path.resolve(options.cwd, options.evidenceOutPath) : null;
+    const applyResult = applyStewardPlan({
+        cwd: options.cwd,
+        stewardId,
+        mergePlan,
+        proposals,
+        scopeFiles,
+        evidenceOutPath
+    });
+    if (!applyResult.ok) {
+        restoreBackups(options.cwd, backups);
+        return makeResult({
+            ok: false,
+            command: 'route',
+            cwd: options.cwd,
+            messages: [
+                message('error', 'ATM_ROUTE_TAKEOVER_FAILED', 'Steward takeover merge failed.', {
+                    blockedReasons: applyResult.evidence.blockedReasons
+                })
+            ],
+            evidence: {
+                action: 'takeover',
+                applyResult
+            }
+        });
+    }
+    const validators = proposal.validators && proposal.validators.length > 0 ? proposal.validators : ['npm run typecheck'];
+    const validatorResults = [];
+    let allPassed = true;
+    for (const validator of validators) {
+        const parts = validator.split(' ');
+        const command = parts[0];
+        const args = parts.slice(1);
+        const result = spawnSync(command, args, { cwd: options.cwd, shell: true, encoding: 'utf8' });
+        const passed = result.status === 0;
+        validatorResults.push({
+            validator,
+            passed,
+            stdout: result.stdout,
+            stderr: result.stderr
+        });
+        if (!passed) {
+            allPassed = false;
+            break;
+        }
+    }
+    if (!allPassed) {
+        restoreBackups(options.cwd, backups);
+        return makeResult({
+            ok: false,
+            command: 'route',
+            cwd: options.cwd,
+            messages: [
+                message('error', 'ATM_ROUTE_VALIDATOR_FAILED', 'Validator-gated apply failed. Changes rolled back.', {
+                    validatorResults
+                })
+            ],
+            evidence: {
+                action: 'takeover',
+                applyResult,
+                validatorResults,
+                rolledBack: true
+            }
+        });
+    }
+    return makeResult({
+        ok: true,
+        command: 'route',
+        cwd: options.cwd,
+        messages: [
+            message('info', 'ATM_ROUTE_TAKEOVER_SUCCESS', 'Steward takeover successfully applied and verified via validator gates.')
+        ],
+        evidence: {
+            action: 'takeover',
+            applyResult,
+            validatorResults,
+            rolledBack: false
+        }
+    });
+}
+function buildOpenedRoute(options) {
+    if (!options.taskId) {
+        throw new CliError('ATM_CLI_USAGE', 'route open requires --task <id>.', { exitCode: 2 });
+    }
+    if (!options.actorId) {
+        throw new CliError('ATM_CLI_USAGE', 'route open requires --actor <id>.', { exitCode: 2 });
+    }
+    const now = new Date().toISOString();
+    const routeId = options.routeId ?? `route-${options.taskId}-${sanitizeRouteToken(options.actorId)}`;
+    return {
+        schemaId: 'atm.routeContext.v1',
+        specVersion: '0.1.0',
+        migration: {
+            strategy: 'none',
+            fromVersion: null,
+            notes: 'Initial route context lifecycle record.'
+        },
+        routeId,
+        taskId: options.taskId,
+        actorId: options.actorId,
+        claimIntent: options.claimIntent,
+        state: 'open',
+        openedAt: now,
+        updatedAt: now,
+        lease: {
+            leaseId: options.leaseId ?? `lease-${routeId}`,
+            issuedAt: now,
+            heartbeatAt: now,
+            ttlSeconds: options.ttlSeconds,
+            maxSeconds: options.maxSeconds
+        },
+        declaredReadSet: parseResourceSet(options.readSet),
+        declaredWriteSet: parseResourceSet(options.writeSet),
+        targetAtomCids: options.targetAtomCids,
+        targetVirtualAtomCids: options.targetVirtualAtomCids,
+        patchEnvelopeRef: options.patchEnvelopeRef,
+        blockedBy: [],
+        admission: {
+            verdict: 'watch',
+            reason: 'Lifecycle route is open; broker admission is handled by later MAO tasks.'
+        }
+    };
+}
+function transitionRoute(route, state, options) {
+    const now = new Date().toISOString();
+    const next = {
+        ...route,
+        state,
+        updatedAt: now,
+        closedAt: state === 'abandoned' ? now : route.closedAt,
+        blockedBy: state === 'frozen'
+            ? [{ kind: 'steward', id: options.actorId ?? 'route-operator', reason: options.reason ?? 'route paused' }]
+            : route.blockedBy,
+        admission: state === 'frozen'
+            ? { verdict: 'freeze', reason: options.reason ?? 'route paused' }
+            : state === 'abandoned'
+                ? { verdict: 'blocked', reason: options.reason ?? 'route abandoned' }
+                : { verdict: 'watch', reason: options.reason ?? 'route resumed' }
+    };
+    const validation = validateRouteContext(next);
+    if (!validation.ok) {
+        throw new CliError('ATM_ROUTE_CONTEXT_INVALID', 'Route context transition failed validation.', {
+            exitCode: 1,
+            details: { errors: validation.errors }
+        });
+    }
+    return next;
+}
+function readRequiredRoute(options) {
+    if (!options.routeId) {
+        throw new CliError('ATM_CLI_USAGE', `route ${options.action} requires --route <id>.`, { exitCode: 2 });
+    }
+    const routePath = routeContextPath(options.cwd, options.routeId);
+    if (!existsSync(routePath)) {
+        throw new CliError('ATM_ROUTE_NOT_FOUND', `Route not found: ${options.routeId}`, { exitCode: 1 });
+    }
+    const route = JSON.parse(readFileSync(routePath, 'utf8'));
+    const validation = validateRouteContext(route);
+    if (!validation.ok) {
+        throw new CliError('ATM_ROUTE_CONTEXT_INVALID', 'Stored route context failed validation.', {
+            exitCode: 1,
+            details: { errors: validation.errors }
+        });
+    }
+    return validation.value;
+}
+function listRouteContexts(cwd) {
+    const dir = routeContextDir(cwd);
+    if (!existsSync(dir)) {
+        return [];
+    }
+    return readdirSync(dir)
+        .filter((entry) => routeFileNamePattern.test(entry))
+        .map((entry) => JSON.parse(readFileSync(path.join(dir, entry), 'utf8')))
+        .filter((entry) => validateRouteContext(entry).ok);
+}
+function parseResourceSet(input) {
+    return {
+        files: unique(input),
+        atomCids: [],
+        virtualAtomCids: [],
+        validators: [],
+        artifacts: []
+    };
+}
+function validateRouteContext(value) {
+    const errors = [];
+    if (!value || typeof value !== 'object') {
+        return { ok: false, errors: ['/ must be object'] };
+    }
+    const record = value;
+    if (record.schemaId !== 'atm.routeContext.v1') {
+        errors.push('/schemaId must be atm.routeContext.v1');
+    }
+    if (record.specVersion !== '0.1.0') {
+        errors.push('/specVersion must be 0.1.0');
+    }
+    for (const [field, fieldValue] of Object.entries({
+        routeId: record.routeId,
+        taskId: record.taskId,
+        actorId: record.actorId,
+        openedAt: record.openedAt
+    })) {
+        if (typeof fieldValue !== 'string' || fieldValue.length === 0) {
+            errors.push(`/${field} must be a non-empty string`);
+        }
+    }
+    if (typeof record.routeId === 'string' && !/^route-[A-Za-z0-9._:-]+$/.test(record.routeId)) {
+        errors.push('/routeId must start with route- and contain only route id characters');
+    }
+    if (!['read', 'write', 'review', 'steward', 'release-sync'].includes(String(record.claimIntent))) {
+        errors.push('/claimIntent must be a supported route claim intent');
+    }
+    if (!['open', 'admitted', 'frozen', 'waiting', 'blocked', 'ready-to-apply', 'closed', 'abandoned'].includes(String(record.state))) {
+        errors.push('/state must be a supported route context state');
+    }
+    if (!record.lease || typeof record.lease !== 'object') {
+        errors.push('/lease must be an object');
+    }
+    if (!isResourceSet(record.declaredReadSet)) {
+        errors.push('/declaredReadSet must be a route resource set');
+    }
+    if (!isResourceSet(record.declaredWriteSet)) {
+        errors.push('/declaredWriteSet must be a route resource set');
+    }
+    if (!Array.isArray(record.targetAtomCids)) {
+        errors.push('/targetAtomCids must be an array');
+    }
+    if (!Array.isArray(record.targetVirtualAtomCids)) {
+        errors.push('/targetVirtualAtomCids must be an array');
+    }
+    if (!Array.isArray(record.blockedBy)) {
+        errors.push('/blockedBy must be an array');
+    }
+    if (record.patchEnvelopeRef !== null && typeof record.patchEnvelopeRef !== 'string') {
+        errors.push('/patchEnvelopeRef must be string or null');
+    }
+    return errors.length === 0
+        ? { ok: true, value: record }
+        : { ok: false, errors };
+}
+function isResourceSet(value) {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+    const record = value;
+    return Array.isArray(record.files)
+        && Array.isArray(record.atomCids)
+        && Array.isArray(record.virtualAtomCids)
+        && Array.isArray(record.validators)
+        && Array.isArray(record.artifacts);
+}
+function makeLifecycleResult(cwd, action, code, text, evidence) {
+    return makeResult({
+        ok: true,
+        command: 'route',
+        cwd,
+        messages: [message('info', code, text)],
+        evidence: {
+            schemaId: 'atm.routeLifecycle.v1',
+            action,
+            ...evidence
+        }
+    });
+}
+function routeContextDir(cwd) {
+    return path.join(cwd, '.atm', 'runtime', 'routes');
+}
+function routeContextPath(cwd, routeId) {
+    return path.join(routeContextDir(cwd), `${sanitizeRouteFileName(routeId)}.json`);
+}
+function writeJson(filePath, value) {
+    mkdirSync(path.dirname(filePath), { recursive: true });
+    writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+function relativePath(cwd, filePath) {
+    return path.relative(cwd, filePath).replace(/\\/g, '/');
+}
+function sanitizeRouteToken(value) {
+    return value.replace(/[^A-Za-z0-9._:-]+/g, '-');
+}
+function sanitizeRouteFileName(routeId) {
+    if (!routeId.startsWith('route-')) {
+        throw new CliError('ATM_CLI_USAGE', 'route id must start with route-.', { exitCode: 2 });
+    }
+    return sanitizeRouteToken(routeId);
+}
+function unique(values) {
+    return [...new Set(values.filter(Boolean))];
+}
+function restoreBackups(cwd, backups) {
+    for (const [file, content] of Object.entries(backups)) {
+        const fullPath = path.resolve(cwd, file);
+        if (content === null) {
+            rmSync(fullPath, { force: true });
+        }
+        else {
+            writeFileSync(fullPath, content, 'utf8');
+        }
+    }
+}
+function parseRouteArgs(argv) {
+    const state = {
+        cwd: process.cwd(),
+        action: null,
+        routeId: null,
+        taskId: null,
+        actorId: null,
+        claimIntent: 'write',
+        leaseId: null,
+        ttlSeconds: 1800,
+        maxSeconds: 7200,
+        readSet: [],
+        writeSet: [],
+        targetAtomCids: [],
+        targetVirtualAtomCids: [],
+        patchEnvelopeRef: null,
+        reason: null,
+        mergePlanFile: null,
+        proposalFile: null,
+        stewardId: null,
+        evidenceOutPath: null,
+        scopeFiles: []
+    };
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg === '--cwd') {
+            state.cwd = requireValue(argv, index, '--cwd');
+            index += 1;
+            continue;
+        }
+        if (arg === '--route' || arg === '--route-id') {
+            state.routeId = requireValue(argv, index, arg);
+            index += 1;
+            continue;
+        }
+        if (arg === '--task') {
+            state.taskId = requireValue(argv, index, '--task');
+            index += 1;
+            continue;
+        }
+        if (arg === '--actor') {
+            state.actorId = requireValue(argv, index, '--actor');
+            index += 1;
+            continue;
+        }
+        if (arg === '--claim-intent') {
+            state.claimIntent = parseClaimIntent(requireValue(argv, index, '--claim-intent'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--lease-id') {
+            state.leaseId = requireValue(argv, index, '--lease-id');
+            index += 1;
+            continue;
+        }
+        if (arg === '--ttl-seconds') {
+            state.ttlSeconds = parsePositiveInteger(requireValue(argv, index, '--ttl-seconds'), '--ttl-seconds');
+            index += 1;
+            continue;
+        }
+        if (arg === '--max-seconds') {
+            state.maxSeconds = parsePositiveInteger(requireValue(argv, index, '--max-seconds'), '--max-seconds');
+            index += 1;
+            continue;
+        }
+        if (arg === '--read-set') {
+            state.readSet = parseCsv(requireValue(argv, index, '--read-set'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--write-set') {
+            state.writeSet = parseCsv(requireValue(argv, index, '--write-set'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--atom-cids') {
+            state.targetAtomCids = parseCsv(requireValue(argv, index, '--atom-cids'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--virtual-atom-cids') {
+            state.targetVirtualAtomCids = parseCsv(requireValue(argv, index, '--virtual-atom-cids'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--patch-envelope-ref') {
+            state.patchEnvelopeRef = requireValue(argv, index, '--patch-envelope-ref');
+            index += 1;
+            continue;
+        }
+        if (arg === '--reason') {
+            state.reason = requireValue(argv, index, '--reason');
+            index += 1;
+            continue;
+        }
+        if (arg === '--merge-plan-file') {
+            state.mergePlanFile = requireValue(argv, index, '--merge-plan-file');
+            index += 1;
+            continue;
+        }
+        if (arg === '--proposal-file') {
+            state.proposalFile = requireValue(argv, index, '--proposal-file');
+            index += 1;
+            continue;
+        }
+        if (arg === '--steward-id') {
+            state.stewardId = requireValue(argv, index, '--steward-id');
+            index += 1;
+            continue;
+        }
+        if (arg === '--evidence-out-path') {
+            state.evidenceOutPath = requireValue(argv, index, '--evidence-out-path');
+            index += 1;
+            continue;
+        }
+        if (arg === '--scope-files') {
+            state.scopeFiles = parseCsv(requireValue(argv, index, '--scope-files'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--json' || arg === '--pretty') {
+            continue;
+        }
+        if (arg.startsWith('--')) {
+            throw new CliError('ATM_CLI_USAGE', `route does not support option ${arg}`, { exitCode: 2 });
+        }
+        if (state.action) {
+            throw new CliError('ATM_CLI_USAGE', 'route accepts only one action', { exitCode: 2 });
+        }
+        state.action = parseAction(arg);
+    }
+    if (!state.action) {
+        throw new CliError('ATM_CLI_USAGE', 'route requires an action: open, status, list, pause, resume, abandon, or takeover.', { exitCode: 2 });
+    }
+    return {
+        ...state,
+        cwd: path.resolve(state.cwd),
+        action: state.action
+    };
+}
+function parseAction(value) {
+    if (value === 'takeover' || lifecycleActions.has(value)) {
+        return value;
+    }
+    throw new CliError('ATM_CLI_USAGE', 'route supports open, status, list, pause, resume, abandon, and takeover.', { exitCode: 2 });
+}
+function parseClaimIntent(value) {
+    if (value === 'read' || value === 'write' || value === 'review' || value === 'steward' || value === 'release-sync') {
+        return value;
+    }
+    throw new CliError('ATM_CLI_USAGE', `unsupported route claim intent: ${value}`, { exitCode: 2 });
+}
+function parsePositiveInteger(value, optionName) {
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isInteger(parsed) || parsed < 1) {
+        throw new CliError('ATM_CLI_USAGE', `${optionName} must be a positive integer.`, { exitCode: 2 });
+    }
+    return parsed;
+}
+function parseCsv(value) {
+    return value.split(',').map((entry) => entry.trim()).filter(Boolean);
+}
+function requireValue(argv, optionIndex, optionName) {
+    const value = argv[optionIndex + 1];
+    if (!value || value.startsWith('--')) {
+        throw new CliError('ATM_CLI_USAGE', `route requires a value for ${optionName}`, { exitCode: 2 });
+    }
+    return value;
+}

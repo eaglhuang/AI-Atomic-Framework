@@ -403,6 +403,7 @@ export function parseCloseOptions(argv: string[]) {
     fromBatchCheckpoint: false,
     batchId: null as string | null,
     historicalDeliveryRefs: [] as string[],
+    historicalBatchRef: null as string | null,
     historicalDeliveryRepo: null as string | null,
     waiverOutOfScopeDelivery: false,
     emergencyApproval: null as string | null,
@@ -450,6 +451,11 @@ export function parseCloseOptions(argv: string[]) {
     }
     if (arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit') {
       options.historicalDeliveryRefs.push(...parseHistoricalDeliveryRefs(requireValue(argv, index, arg)));
+      index += 1;
+      continue;
+    }
+    if (arg === '--historical-batch') {
+      options.historicalBatchRef = requireValue(argv, index, '--historical-batch');
       index += 1;
       continue;
     }

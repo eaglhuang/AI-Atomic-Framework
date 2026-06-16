@@ -1,0 +1,52 @@
+{
+  "id": "shared-surface-blocked",
+  "description": "Shared validator surface collision must freeze admission.",
+  "conflictType": "generated-artifact-collision",
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "conflict-benchmark" },
+      "taskId": "TASK-SHARED",
+      "actorId": "004",
+      "baseCommit": "commit-base",
+      "targetFiles": ["scripts/validate-cli.ts"],
+      "atomRefs": [{ "atomId": "atom-shared", "atomCid": "cid-shared", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": ["validate-cli"], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "bench-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-shared",
+          "taskId": "TASK-ACTIVE",
+          "teamRunId": null,
+          "actorId": "001",
+          "baseCommit": "commit-base",
+          "resourceKeys": {
+            "files": ["scripts/validate-cli.ts"],
+            "atomIds": ["atom-active"],
+            "atomCids": ["cid-active"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": ["validate-cli"],
+            "artifacts": []
+          },
+          "leaseEpoch": 1,
+          "leaseSeconds": 300,
+          "leaseMaxSeconds": 1800,
+          "heartbeatAt": "2026-06-12T08:00:00.000Z",
+          "lane": "direct-brokered",
+          "expiresAt": "2030-06-12T08:10:00.000Z"
+        }
+      ]
+    }
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": { "conflictVerdict": "freeze", "validatorOutcome": "pass" }
+}

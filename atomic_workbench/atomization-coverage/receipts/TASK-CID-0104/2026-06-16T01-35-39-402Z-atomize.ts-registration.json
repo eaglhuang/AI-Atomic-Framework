@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.atomizationRegistrationReceipt.v1",
+  "generatedAt": "2026-06-16T01:35:39.402Z",
+  "repoRoot": "C:\\Users\\User\\AI-Atomic-Framework",
+  "taskId": "TASK-CID-0104",
+  "command": "register-path",
+  "mutation": "updated",
+  "shard": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+  "registeredEntry": {
+    "path_pattern": "packages/cli/src/commands/atomize.ts",
+    "atom_id": "atm.atomization-registration-receipts-map",
+    "capability": "official atomize operator lane for registration-receipt, task snapshots, and count-and-digest verification over the atomization receipt helper.",
+    "coverage_status": "active",
+    "source_task": "TASK-CID-0104"
+  },
+  "referencedMapIds": [
+    "atm.evidence-command-map"
+  ],
+  "projectionWrite": {
+    "path": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "mappingCount": 160
+  },
+  "validatorRuns": [
+    {
+      "command": "npm run validate:atomization-coverage",
+      "ok": true
+    }
+  ],
+  "validatorHealthy": true,
+  "before": {
+    "generatedAt": "2026-06-16T01:35:38.942Z",
+    "counts": {
+      "mappedPathCount": 160,
+      "atomRegistryCount": 104,
+      "mapRegistryCount": 10
+    },
+    "digests": {
+      "mappedPaths": "sha256:99b757d93ef0f0506ea3291f4103f980d9e46094713210e1f4cb083d8c32ad22",
+      "atomRegistry": "sha256:385dd73f37fe288ba970fb45ceaa30b582a2897320e94190a3c1d63fb278c7a4",
+      "mapRegistry": "sha256:2aaa449c5bbce0ac140874ea5e1902a4f6499e51dd734d4bab2decd01b3ecf42"
+    },
+    "projectionSummary": {
+      "total_production_paths": 160,
+      "mapped_paths": 160,
+      "coverage_percentage": 100,
+      "atoms_defined": 106,
+      "atoms_with_evidence": 0,
+      "debt_items": 0,
+      "core_wave1_completed": true
+    }
+  },
+  "after": {
+    "generatedAt": "2026-06-16T01:35:39.402Z",
+    "counts": {
+      "mappedPathCount": 160,
+      "atomRegistryCount": 104,
+      "mapRegistryCount": 10
+    },
+    "digests": {
+      "mappedPaths": "sha256:99b757d93ef0f0506ea3291f4103f980d9e46094713210e1f4cb083d8c32ad22",
+      "atomRegistry": "sha256:385dd73f37fe288ba970fb45ceaa30b582a2897320e94190a3c1d63fb278c7a4",
+      "mapRegistry": "sha256:2aaa449c5bbce0ac140874ea5e1902a4f6499e51dd734d4bab2decd01b3ecf42"
+    },
+    "projectionSummary": {
+      "total_production_paths": 160,
+      "mapped_paths": 160,
+      "coverage_percentage": 100,
+      "atoms_defined": 106,
+      "atoms_with_evidence": 0,
+      "debt_items": 0,
+      "core_wave1_completed": true
+    }
+  }
+}

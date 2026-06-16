@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'evidence',
-  summary: 'Run validators as governed evidence, or add raw/manual evidence for close/commit/PR gates.',
+  summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, or author historical-batch envelopes that later feed the taskflow close / tasks close operator lane.',
   positional: [
     { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | historical-batch', required: true }
   ],
@@ -32,13 +32,15 @@ export default defineCommandSpec({
     { flag: '--gate', value: 'type', summary: 'Evidence gate for verify: close|commit|pr.' },
     { flag: '--list', summary: 'List all required validators with tier and current evidence state (used with validators action).' },
     { flag: '--recent-run', summary: 'Use the most recent cached command run if available in the task evidence (used with run action).' },
-    { flag: '--tasks', value: 'csv', summary: 'Task ids for historical-batch evidence slicing.' },
-    { flag: '--commits', value: 'csv', summary: 'Delivery commit refs for historical-batch evidence slicing.' },
-    { flag: '--delivery-repo', value: 'path', summary: 'Repository that contains the historical delivery commits.' },
-    { flag: '--validator-command', value: 'text', summary: 'Validator command to run once for a historical batch; repeatable.' },
-    { flag: '--write', summary: 'Write historical-batch envelope and per-task slices.' },
-    { flag: '--dry-run', summary: 'Preview historical-batch evidence without writing.' },
+    { flag: '--tasks', value: 'csv', summary: 'Task ids to slice into per-task historical-batch close-readiness evidence.' },
+    { flag: '--commits', value: 'csv', summary: 'Delivery commit refs that historical-batch will inspect and match back to the listed tasks.' },
+    { flag: '--delivery-repo', value: 'path', summary: 'Repository that contains the historical delivery commits matched into the historical-batch envelope.' },
+    { flag: '--validator-command', value: 'text', summary: 'Validator command to run once for a historical batch; repeatable. The resulting passes are shared into task slices for later close-readiness checks.' },
+    { flag: '--write', summary: 'Write the historical-batch envelope plus per-task slices that tasks close / taskflow close can consume later.' },
+    { flag: '--dry-run', summary: 'Preview historical-batch matching and close-readiness evidence without writing.' },
     { flag: '--allow-unmatched', summary: 'Allow diagnostic historical batches even when some tasks have no scoped commit match.' },
+    { flag: '--approved-by', value: 'actor', summary: 'Required with --allow-unmatched: approver for diagnostic-only historical batch evidence.' },
+    { flag: '--approval-reason', value: 'text', summary: 'Required with --allow-unmatched: justification for recording unmatched historical batch diagnostics.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -52,6 +54,8 @@ export default defineCommandSpec({
     'node atm.mjs evidence verify --task ATM-GOV-0104 --gate close --json',
     'node atm.mjs evidence validators --list --task ATM-GOV-0104 --json',
     'node atm.mjs evidence missing --task ATM-GOV-0104 --actor Augment --json',
-    'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validators typecheck --validator-command "npm run typecheck" --write --json'
+    'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validator-command "npm run validate:cli" --dry-run --json',
+    'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validators typecheck --validator-command "npm run typecheck" --write --json',
+    'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123 --actor codex-main --validator-command "npm test" --allow-unmatched --approved-by captain --approval-reason "diagnostic backfill" --write --json'
   ]
 });

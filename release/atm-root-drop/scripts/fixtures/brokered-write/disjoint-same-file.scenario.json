@@ -1,0 +1,87 @@
+{
+  "id": "disjoint-same-file",
+  "description": "Two proposals target the same file but non-overlapping hunk ranges, so compose should remain parallel-safe and steward apply should succeed.",
+  "baseCommitMessage": "base brokered write acceptance target",
+  "files": [
+    {
+      "path": "src/target.ts",
+      "contents": "export const alpha = 'alpha';\nexport const beta = 'beta';\nexport const gamma = 'gamma';\n"
+    }
+  ],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "brokered-write-fixture"
+      },
+      "proposalId": "proposal.brokered-write.disjoint.a",
+      "taskId": "TASK-CID-0023",
+      "actorId": "008",
+      "baseCommit": "__BASE_COMMIT__",
+      "fileBeforeHash": "__FILE_HASH__",
+      "targetFile": "src/target.ts",
+      "atomRefs": [
+        {
+          "atomId": "ATM-0023-A",
+          "atomCid": "cid-0023-a"
+        }
+      ],
+      "anchors": [
+        {
+          "kind": "line",
+          "hint": "alpha"
+        }
+      ],
+      "intent": "Update the first line of the target file.",
+      "patch": "--- a/src/target.ts\n+++ b/src/target.ts\n@@ -1,1 +1,1 @@\n-export const alpha = 'alpha';\n+export const alpha = 'alpha-updated';\n",
+      "validators": [
+        "npm run typecheck"
+      ],
+      "rollback": "Revert the alpha line."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "brokered-write-fixture"
+      },
+      "proposalId": "proposal.brokered-write.disjoint.b",
+      "taskId": "TASK-CID-0023",
+      "actorId": "008",
+      "baseCommit": "__BASE_COMMIT__",
+      "fileBeforeHash": "__FILE_HASH__",
+      "targetFile": "src/target.ts",
+      "atomRefs": [
+        {
+          "atomId": "ATM-0023-B",
+          "atomCid": "cid-0023-b"
+        }
+      ],
+      "anchors": [
+        {
+          "kind": "line",
+          "hint": "gamma"
+        }
+      ],
+      "intent": "Update the last line of the target file.",
+      "patch": "--- a/src/target.ts\n+++ b/src/target.ts\n@@ -3,1 +3,1 @@\n-export const gamma = 'gamma';\n+export const gamma = 'gamma-updated';\n",
+      "validators": [
+        "npm run validate:cli"
+      ],
+      "rollback": "Revert the gamma line."
+    }
+  ],
+  "expected": {
+    "composeVerdict": "parallel-safe",
+    "stewardOk": true,
+    "fileAfter": {
+      "src/target.ts": "export const alpha = 'alpha-updated';\nexport const beta = 'beta';\nexport const gamma = 'gamma-updated';\n"
+    },
+    "validationOk": true
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/broker/mutation-request.schema.json",
+  "title": "ATM Broker Mutation Request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "requestId",
+    "actorId",
+    "filePath",
+    "op",
+    "target"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.mutationRequest.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "filePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "op": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target": {
+      "type": "string"
+    },
+    "value": {}
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

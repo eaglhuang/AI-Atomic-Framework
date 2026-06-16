@@ -1698,8 +1698,31 @@ async function runTasksClose(argv) {
     }
     const actorId = resolvedActor.actorId;
     const protectedCloseSurface = 'tasks close historical-delivery backend';
+    let historicalBatchSlice = null;
+    let effectiveHistoricalDeliveryRefs = [...options.historicalDeliveryRefs];
+    if (options.historicalBatchRef) {
+        historicalBatchSlice = loadHistoricalBatchCloseSlice(options.cwd, options.taskId, options.historicalBatchRef);
+        if (!historicalBatchSlice.okToCloseTask) {
+            throw new CliError('ATM_TASK_CLOSE_HISTORICAL_BATCH_NOT_CLOSE_READY', `Task ${options.taskId} cannot close from historical batch ${historicalBatchSlice.batchId} because the slice is not close-ready.`, {
+                exitCode: 1,
+                details: {
+                    taskId: options.taskId,
+                    batchId: historicalBatchSlice.batchId,
+                    batchPath: historicalBatchSlice.batchPath,
+                    coverageStatus: historicalBatchSlice.coverageStatus,
+                    okToRecordEvidence: historicalBatchSlice.okToRecordEvidence,
+                    okToCloseTask: historicalBatchSlice.okToCloseTask,
+                    diagnosticOnly: historicalBatchSlice.diagnosticOnly,
+                    missingCoverage: historicalBatchSlice.missingCoverage,
+                    taskSpecificValidationPasses: historicalBatchSlice.taskSpecificValidationPasses
+                }
+            });
+        }
+        effectiveHistoricalDeliveryRefs = uniqueStrings([...effectiveHistoricalDeliveryRefs, ...historicalBatchSlice.matchedCommits]);
+    }
     const protectedCloseFlags = [
-        ...(options.historicalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
+        ...(effectiveHistoricalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
+        ...(options.historicalBatchRef ? ['--historical-batch'] : []),
         ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
         ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
         ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
@@ -1844,7 +1867,7 @@ async function runTasksClose(argv) {
                 fromBatchCheckpoint: options.fromBatchCheckpoint,
                 taskDeclaredFiles,
                 criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
-                historicalDeliveryRefs: options.historicalDeliveryRefs
+                historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
             })
             : null;
         // TASK-AAO-0057: scoped diff isolation — partition framework critical changes
@@ -1861,7 +1884,7 @@ async function runTasksClose(argv) {
             : null;
         if (frameworkStatus?.repoRole === 'framework') {
             const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
-            const allowedAdvisoryGovernanceFiles = options.status === 'done' && options.historicalDeliveryRefs.length > 0
+            const allowedAdvisoryGovernanceFiles = options.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0
                 ? [`.atm/history/evidence/${options.taskId}.json`]
                 : [];
             const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
@@ -1965,7 +1988,7 @@ async function runTasksClose(argv) {
                 taskDocument,
                 taskDeclaredFiles,
                 claim: parseClaimRecord(taskDocument.claim),
-                historicalDeliveryRefs: options.historicalDeliveryRefs,
+                historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
                 historicalDeliveryRepo: options.historicalDeliveryRepo,
                 waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
                 waiverReason: options.reason
@@ -2091,7 +2114,7 @@ async function runTasksClose(argv) {
             status: options.status,
             fromBatchCheckpoint: options.fromBatchCheckpoint,
             batchId: owningBatch?.batchId ?? options.batchId,
-            historicalDeliveryRefs: options.historicalDeliveryRefs
+            historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
         });
         const closeWriteResult = await executeTaskCloseTransaction({
             cwd: options.cwd,
@@ -2187,7 +2210,8 @@ async function runTasksClose(argv) {
                 closeScopedDiffIsolation,
                 emergencyUse,
                 failedEmergencyAuditPath,
-                taskQueue
+                taskQueue,
+                historicalBatchSlice
             }
         });
     }
@@ -3530,6 +3554,49 @@ function evaluateTaskDeliverableGate(input) {
 }
 function taskDeliveryPrincipleText() {
     return 'The goal is to deliver the requested task content, not to close task cards. done is only the record after real deliverables and validators exist.';
+}
+function resolveHistoricalBatchPath(cwd, batchRef) {
+    const trimmed = batchRef.trim();
+    if (!trimmed)
+        return null;
+    if (path.isAbsolute(trimmed))
+        return trimmed;
+    if (trimmed.includes('/') || trimmed.includes('\\'))
+        return path.resolve(cwd, trimmed);
+    return path.join(cwd, '.atm', 'history', 'evidence', 'historical-batches', trimmed.endsWith('.json') ? trimmed : `${trimmed}.json`);
+}
+function loadHistoricalBatchCloseSlice(cwd, taskId, batchRef) {
+    const batchPath = resolveHistoricalBatchPath(cwd, batchRef);
+    if (!batchPath || !existsSync(batchPath)) {
+        throw new CliError('ATM_TASK_CLOSE_HISTORICAL_BATCH_NOT_FOUND', `Historical batch evidence not found for ${batchRef}.`, {
+            exitCode: 1,
+            details: { taskId, batchRef, batchPath: batchPath ? relativePathFrom(cwd, batchPath) : null }
+        });
+    }
+    const envelope = JSON.parse(readFileSync(batchPath, 'utf8'));
+    const tasks = Array.isArray(envelope.tasks) ? envelope.tasks : [];
+    const rawSlice = tasks.find((entry) => entry && typeof entry === 'object' && !Array.isArray(entry) && String(entry.taskId ?? '') === taskId);
+    if (!rawSlice) {
+        throw new CliError('ATM_TASK_CLOSE_HISTORICAL_BATCH_TASK_NOT_FOUND', `Historical batch ${batchRef} does not contain task ${taskId}.`, {
+            exitCode: 1,
+            details: { taskId, batchRef, batchPath: relativePathFrom(cwd, batchPath) }
+        });
+    }
+    return {
+        batchId: typeof envelope.batchId === 'string' ? envelope.batchId : path.basename(batchPath, '.json'),
+        batchPath: relativePathFrom(cwd, batchPath),
+        ok: rawSlice.ok === true,
+        matchedCommits: Array.isArray(rawSlice.matchedCommits) ? rawSlice.matchedCommits.filter((entry) => typeof entry === 'string' && entry.trim().length > 0) : [],
+        matchedFiles: Array.isArray(rawSlice.matchedFiles) ? rawSlice.matchedFiles.filter((entry) => typeof entry === 'string' && entry.trim().length > 0) : [],
+        coverageStatus: rawSlice.coverageStatus === 'complete' || rawSlice.coverageStatus === 'partial' || rawSlice.coverageStatus === 'blocked'
+            ? rawSlice.coverageStatus
+            : 'blocked',
+        okToRecordEvidence: rawSlice.okToRecordEvidence === true,
+        okToCloseTask: rawSlice.okToCloseTask === true,
+        diagnosticOnly: rawSlice.diagnosticOnly === true,
+        missingCoverage: Array.isArray(rawSlice.missingCoverage) ? rawSlice.missingCoverage.filter((entry) => typeof entry === 'string' && entry.trim().length > 0) : [],
+        taskSpecificValidationPasses: Array.isArray(rawSlice.taskSpecificValidationPasses) ? rawSlice.taskSpecificValidationPasses.filter((entry) => typeof entry === 'string' && entry.trim().length > 0) : []
+    };
 }
 function extractTaskCloseDeclaredFiles(taskDocument, cwd, taskId) {
     const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)

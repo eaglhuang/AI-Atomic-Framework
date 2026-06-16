@@ -67,6 +67,7 @@ export declare function parseCloseOptions(argv: string[]): {
     status: "done" | "review" | "blocked" | "abandoned";
     fromBatchCheckpoint: boolean;
     batchId: string | null;
+    historicalBatchRef: string | null;
     waiverOutOfScopeDelivery: boolean;
     emergencyApproval: string | null;
     allowStaleRunner: boolean;

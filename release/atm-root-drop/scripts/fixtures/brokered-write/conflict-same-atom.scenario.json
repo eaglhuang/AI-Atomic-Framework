@@ -1,0 +1,84 @@
+{
+  "id": "conflict-same-atom",
+  "description": "Two proposals claim the same atom id, so compose must fail closed with blocked-cid-conflict.",
+  "baseCommitMessage": "base brokered write conflict target",
+  "files": [
+    {
+      "path": "src/target.ts",
+      "contents": "export const alpha = 'alpha';\n"
+    }
+  ],
+  "proposals": [
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "brokered-write-fixture"
+      },
+      "proposalId": "proposal.brokered-write.conflict.a",
+      "taskId": "TASK-CID-0023",
+      "actorId": "008",
+      "baseCommit": "__BASE_COMMIT__",
+      "fileBeforeHash": "__FILE_HASH__",
+      "targetFile": "src/target.ts",
+      "atomRefs": [
+        {
+          "atomId": "ATM-0023-CONFLICT",
+          "atomCid": "cid-0023-conflict-a"
+        }
+      ],
+      "anchors": [
+        {
+          "kind": "line",
+          "hint": "alpha"
+        }
+      ],
+      "intent": "First conflicting proposal.",
+      "patch": "--- a/src/target.ts\n+++ b/src/target.ts\n@@ -1,1 +1,1 @@\n-export const alpha = 'alpha';\n+export const alpha = 'alpha-a';\n",
+      "validators": [
+        "npm run typecheck"
+      ],
+      "rollback": "Revert conflicting alpha line."
+    },
+    {
+      "schemaId": "atm.patchProposal.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "brokered-write-fixture"
+      },
+      "proposalId": "proposal.brokered-write.conflict.b",
+      "taskId": "TASK-CID-0023",
+      "actorId": "008",
+      "baseCommit": "__BASE_COMMIT__",
+      "fileBeforeHash": "__FILE_HASH__",
+      "targetFile": "src/target.ts",
+      "atomRefs": [
+        {
+          "atomId": "ATM-0023-CONFLICT",
+          "atomCid": "cid-0023-conflict-b"
+        }
+      ],
+      "anchors": [
+        {
+          "kind": "line",
+          "hint": "beta"
+        }
+      ],
+      "intent": "Second conflicting proposal.",
+      "patch": "--- a/src/target.ts\n+++ b/src/target.ts\n@@ -1,1 +1,1 @@\n-export const alpha = 'alpha';\n+export const alpha = 'alpha-b';\n",
+      "validators": [
+        "npm run validate:cli"
+      ],
+      "rollback": "Revert conflicting alpha line."
+    }
+  ],
+  "expected": {
+    "composeVerdict": "blocked-cid-conflict",
+    "stewardOk": false,
+    "validationOk": true
+  }
+}

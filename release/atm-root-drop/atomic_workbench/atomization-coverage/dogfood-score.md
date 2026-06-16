@@ -9,7 +9,7 @@
 
 | Component | Score | Pass threshold | Fail threshold | Status |
 |---|---|---|---|---|
-| source_ownership_coverage | 82 | 95 | 80 | ⚠️ at-risk |
+| source_ownership_coverage | 84 | 95 | 80 | ⚠️ at-risk |
 | public_command_coverage | 100 | 95 | 80 | ✅ pass |
 | atom_with_test_evidence | 100 | 80 | 60 | ✅ pass |
 | atom_with_rollback_evidence | 100 | 70 | 50 | ✅ pass |
@@ -18,14 +18,14 @@
 
 ## Inventory snapshot
 
-- production source paths: 476
-- owned by registry: 390
-- unowned: 86
-- coverage: 82%
+- production source paths: 609
+- owned by registry: 514
+- unowned: 95
+- coverage: 84%
 
 ## Priority gaps
 
-- source_ownership_coverage: 82% → 95% (driven by TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009)
+- source_ownership_coverage: 84% → 95% (driven by TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009)
 
 ## Next high-ROI area
 

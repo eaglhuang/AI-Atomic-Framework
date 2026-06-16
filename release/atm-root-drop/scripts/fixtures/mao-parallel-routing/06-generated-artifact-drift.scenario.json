@@ -1,0 +1,62 @@
+{
+  "id": "generated-artifact-drift",
+  "description": "Generated artifact ownership collision on release runner output must freeze.",
+  "kind": "capsule-drift",
+  "capabilityIntroducedBy": "TASK-MAO-0015",
+  "coverageTier": "m5-runner-extension",
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "mao-parallel-routing-benchmark" },
+      "taskId": "TASK-MAO-RUNNER-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["release/atm-onefile/atm.mjs"],
+      "atomRefs": [{ "atomId": "atm-core-runner", "atomCid": "cid-runner-current", "operation": "modify" }],
+      "sharedSurfaces": {
+        "generators": [],
+        "projections": [],
+        "registries": [],
+        "validators": [],
+        "artifacts": ["release/atm-onefile/atm.mjs"]
+      },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "bench-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-steward-runner",
+          "taskId": "TASK-MAO-STEWARD-RUNNER",
+          "teamRunId": null,
+          "actorId": "steward-runner",
+          "baseCommit": "commit-base",
+          "resourceKeys": {
+            "files": ["release/atm-onefile/atm.mjs"],
+            "atomIds": ["atm-core-runner"],
+            "atomCids": ["cid-runner-steward"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": [],
+            "artifacts": ["release/atm-onefile/atm.mjs"]
+          },
+          "leaseEpoch": 1,
+          "leaseSeconds": 300,
+          "leaseMaxSeconds": 1800,
+          "heartbeatAt": "2026-06-15T08:00:00.000Z",
+          "lane": "neutral-steward",
+          "expiresAt": "2030-06-15T08:10:00.000Z"
+        }
+      ]
+    }
+  },
+  "sourceCapsuleCid": "cid-runner-current",
+  "registryCapsuleCid": "cid-runner-steward",
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": { "routingVerdict": "freeze", "validatorOutcome": "pass" }
+}

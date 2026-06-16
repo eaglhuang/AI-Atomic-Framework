@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/team-brief.schema.json",
+  "title": "TeamBrief",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task",
+    "captain",
+    "team",
+    "scope",
+    "atomizationPlan",
+    "assignment",
+    "validationPlan",
+    "evidencePlan",
+    "expectedReport",
+    "stopConditions"
+  ],
+  "properties": {
+    "task": { "type": "string", "minLength": 1 },
+    "captain": { "type": "string", "minLength": 1 },
+    "team": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowedFiles", "doNotTouchPaths", "forbiddenRepositories"],
+      "properties": {
+        "allowedFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "doNotTouchPaths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "forbiddenRepositories": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "atomizationPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primaryAtom",
+        "relatedAtoms",
+        "capabilityTouched",
+        "commandSurface",
+        "largeScriptRisk",
+        "mapUpdateNeeded",
+        "recommendedImplementationSlice",
+        "doNotCrossBoundary",
+        "splitRecommendation"
+      ],
+      "properties": {
+        "primaryAtom": { "type": "string", "minLength": 1 },
+        "relatedAtoms": { "type": "array", "items": { "type": "string" } },
+        "capabilityTouched": { "type": "string", "minLength": 1 },
+        "commandSurface": { "type": "string", "minLength": 1 },
+        "largeScriptRisk": { "enum": ["LOW", "MEDIUM", "HIGH"] },
+        "mapUpdateNeeded": { "type": "boolean" },
+        "recommendedImplementationSlice": { "type": "string", "minLength": 1 },
+        "doNotCrossBoundary": { "type": "string", "minLength": 1 },
+        "splitRecommendation": { "type": "string", "minLength": 1 }
+      }
+    },
+    "assignment": { "type": "string", "minLength": 1 },
+    "validationPlan": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "evidencePlan": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "expectedReport": { "type": "string", "minLength": 1 },
+    "stopConditions": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  }
+}

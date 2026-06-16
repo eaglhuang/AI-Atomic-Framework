@@ -5,7 +5,7 @@
   "grade": "A",
   "stage": "dogfood-excellent",
   "scores": {
-    "source_ownership_coverage": 82,
+    "source_ownership_coverage": 84,
     "public_command_coverage": 100,
     "atom_with_test_evidence": 100,
     "atom_with_rollback_evidence": 100,
@@ -13,7 +13,7 @@
     "runAtm_with_readable_ref": 100
   },
   "weighted_components": {
-    "source_ownership_coverage": 82,
+    "source_ownership_coverage": 84,
     "public_command_coverage": 100,
     "runtime_behavior_coverage": 100,
     "evidence_coverage": 100,
@@ -34,22 +34,22 @@
   "priority_gaps": [
     {
       "area": "source_ownership_coverage",
-      "current": "82%",
+      "current": "84%",
       "target": "95%",
       "task": "TASK-ASA-0006,TASK-ASA-0008,TASK-ASA-0009"
     }
   ],
   "inventory": {
-    "production_source_count": 476,
-    "owned_by_registry": 390,
-    "unowned_count": 86,
-    "coverage_percentage": 82,
+    "production_source_count": 609,
+    "owned_by_registry": 514,
+    "unowned_count": 95,
+    "coverage_percentage": 84,
     "category_breakdown": {
-      "production": 476,
-      "generated": 0,
-      "test": 59,
-      "fixture": 230,
-      "doc": 77
+      "production": 609,
+      "generated": 1855,
+      "test": 69,
+      "fixture": 257,
+      "doc": 101
     }
   },
   "detail": {
@@ -62,8 +62,8 @@
       "coverage": 100
     },
     "command": {
-      "total": 52,
-      "withSpec": 52,
+      "total": 55,
+      "withSpec": 55,
       "coverage": 100,
       "source": "packages/cli/src/commands/command-specs.ts",
       "missing": [],
@@ -76,12 +76,14 @@
         "baseline",
         "batch",
         "bootstrap",
+        "broker",
         "budget",
         "cache",
         "candidates",
         "create",
         "create-map",
         "doctor",
+        "emergency",
         "evidence",
         "experience",
         "explain",
@@ -108,6 +110,7 @@
         "review",
         "review-advisory",
         "rollback",
+        "route",
         "self-host-alpha",
         "spec",
         "start",
@@ -127,7 +130,8 @@
         "do",
         "health-report",
         "map-capsule",
-        "rescue"
+        "rescue",
+        "taskflow"
       ]
     },
     "runtime": {

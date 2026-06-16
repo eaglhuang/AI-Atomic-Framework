@@ -1,0 +1,34 @@
+{
+  "schemaId": "atm.patchProposal.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "TEAM-0028 synthetic collision fixture A"
+  },
+  "proposalId": "team-0028-proposal-a",
+  "taskId": "TASK-TEAM-0028",
+  "actorId": "001",
+  "baseCommit": "81262a2171a371c4178517ebc3eb4ee3146c5de6",
+  "fileBeforeHash": "sha256:edc0ea0548e8fcb6db2354c7ede8cb63a466aad239b304e5933fe4d5f8491243",
+  "targetFile": "packages/cli/src/commands/team.ts",
+  "atomRefs": [
+    {
+      "atomId": "team.plan-crew-briefing-contract",
+      "atomCid": "atom:cid:team-0028-crew-briefing-negative-control"
+    }
+  ],
+  "anchors": [
+    {
+      "kind": "line-range",
+      "hint": "742-764"
+    }
+  ],
+  "intent": "Add one synthetic optional role note inside the crew briefing contract so fixture A collides on the same Team atom without sharing B's patch window.",
+  "patch": "diff --git a/packages/cli/src/commands/team.ts b/packages/cli/src/commands/team.ts\n--- a/packages/cli/src/commands/team.ts\n+++ b/packages/cli/src/commands/team.ts\n@@ -742,23 +742,24 @@ export function buildMinimalTaskCrewBriefingContract(\n   const optionalRoles: TeamCrewRole[] = [\n     {\n       role: 'Reader',\n       agentId: 'reader',\n       required: false,\n       permissions: ['file.read'],\n       description: 'Gathers source context when the task needs discovery.'\n     },\n     {\n       role: 'Evidence Collector',\n       agentId: 'evidence-collector',\n       required: false,\n       permissions: ['file.read'],\n       description: 'Packages command-backed evidence for the report.'\n     },\n+    {\n+      role: 'Collision Sentinel',\n+      agentId: 'scope-guardian',\n+      required: false,\n+      permissions: ['file.read'],\n+      description: 'Observes the crew briefing atom for same-atom negative-control collisions.'\n+    },\n     {\n       role: 'Scope Guardian',\n       agentId: 'scope-guardian',\n       required: false,\n       permissions: ['file.read'],\n       description: 'Watches for out-of-scope file drift.'\n     }\n   ];",
+  "validators": [
+    "node atm.mjs team plan --task TASK-TEAM-0028 --json",
+    "git diff --check"
+  ],
+  "rollback": "Remove the synthetic optional-role addition from the proposal fixture and regenerate the JSON if the control lane changes."
+}

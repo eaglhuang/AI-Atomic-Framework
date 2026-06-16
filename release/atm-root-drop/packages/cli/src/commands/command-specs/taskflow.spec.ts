@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'taskflow',
-  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow close is the normal closeback lane with dual-repo governed commit bundle and may delegate protected backend surfaces internally. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
+  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow close is the normal closeback lane with dual-repo governed commit bundle, may delegate protected backend surfaces internally, and can consume evidence historical-batch slices as operator-approved historical delivery proof. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
   positional: [
     { name: 'action', summary: 'open | close', required: true }
   ],
@@ -27,6 +27,7 @@ export default defineCommandSpec({
     { flag: '--roster-index', value: 'path', summary: 'Optional roster README path override for roster sync policy.' },
     { flag: '--historical-delivery', value: 'commit', summary: 'For taskflow close: verify an earlier delivery commit through tasks close or reconcile.', repeatable: true },
     { flag: '--delivery-commit', value: 'commit', summary: 'Alias for --historical-delivery on taskflow close.' },
+    { flag: '--historical-batch', value: 'batchId-or-path', summary: 'For taskflow close: consume a task slice produced by evidence historical-batch, reuse its matched delivery commits, and treat the slice as the operator close-readiness source.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -37,6 +38,8 @@ export default defineCommandSpec({
     'node atm.mjs taskflow open --write --profile planning/taskflow.profile.json --task-id TASK-ADOPTER-0002 --output tasks/TASK-ADOPTER-0002.task.md --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --dry-run --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-delivery abc123 --write --json',
+    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --dry-run --json',
+    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --write --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --write --no-commit --json'
   ]
 });

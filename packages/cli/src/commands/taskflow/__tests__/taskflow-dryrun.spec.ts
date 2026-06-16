@@ -403,6 +403,71 @@ assert.deepEqual(
   'normal close lane must exact-stage only the planning closeback bundle'
 );
 
+const batchLaneFixture = await makeDualRepoCloseFixture('historical-batch', { closePlanningStatus: 'planned' });
+const batchId = 'hist-batch-fixture';
+writeJson(path.join(batchLaneFixture.targetRepo, '.atm/history/evidence/historical-batches', `${batchId}.json`), {
+  schemaId: 'atm.historicalBatchEvidence.v1',
+  batchId,
+  taskIds: [batchLaneFixture.taskId],
+  commits: [batchLaneFixture.deliveryCommit],
+  tasks: [{
+    taskId: batchLaneFixture.taskId,
+    ok: true,
+    matchedCommits: [batchLaneFixture.deliveryCommit],
+    matchedFiles: ['src/deliver.txt'],
+    outOfScopeFiles: [],
+    declaredDeliverables: ['src/deliver.txt'],
+    declaredScopeFiles: ['src/deliver.txt'],
+    matchedDeliverables: ['src/deliver.txt'],
+    missingCoverage: [],
+    coverageStatus: 'complete',
+    validatorClaims: [{ gate: 'validate:cli', kind: 'taskSpecific', satisfied: true, requiredForClose: true }],
+    taskSpecificValidationPasses: ['validate:cli'],
+    batchWideValidationPasses: [],
+    advisoryValidationPasses: [],
+    atomHealthClaims: [{ atomOrMapId: 'atm.historical-batch-evidence', kind: 'owner', generatedByTask: true, validatorHealthy: true }],
+    okToRecordEvidence: true,
+    okToCloseTask: true,
+    diagnosticOnly: false
+  }]
+});
+const batchLaneDryRun = await runTaskflow([
+  'close',
+  '--cwd', batchLaneFixture.targetRepo,
+  '--profile', batchLaneFixture.profilePath,
+  '--task', batchLaneFixture.taskId,
+  '--actor', 'validator',
+  '--historical-batch', batchId,
+  '--json'
+]) as any;
+assert.equal(batchLaneDryRun.ok, true, 'taskflow close dry-run must accept historical-batch as a close-ready operator source');
+assert.equal(batchLaneDryRun.evidence.closeMode, 'normal-close', 'historical-batch close should behave like a normal close once the matched delivery commits satisfy the historical delivery gate');
+assert.equal(batchLaneDryRun.evidence.closebackPlan.backendSurface, 'tasks-close', 'historical-batch close should route through tasks-close when the live ledger is still active');
+assert.equal(batchLaneDryRun.evidence.writeReadinessHint.status, 'ready', 'historical-batch dry-run should satisfy the historical delivery gate');
+assert.equal(batchLaneDryRun.evidence.closebackPlan.historicalDeliveryGate.required, false, 'historical-batch dry-run should clear the historical-delivery gate before write');
+assert.deepEqual(batchLaneDryRun.evidence.governedCommitBundle.targetDeliveryFiles, [], 'historical-batch close should reuse matched commits rather than stage fresh deliverables');
+const batchLaneClose = await runTaskflow([
+  'close',
+  '--cwd', batchLaneFixture.targetRepo,
+  '--profile', batchLaneFixture.profilePath,
+  '--task', batchLaneFixture.taskId,
+  '--actor', 'validator',
+  '--historical-batch', batchId,
+  '--write',
+  '--no-commit',
+  '--json'
+]) as any;
+assert.equal(batchLaneClose.ok, true, 'taskflow close must accept historical-batch as a governed close source');
+assert.equal(batchLaneClose.evidence.backendResult?.evidence?.historicalBatchSlice?.batchId, batchId, 'backend close evidence must preserve the historical batch slice');
+assert.equal(batchLaneClose.evidence.governedCommitBundle.commitMode, 'stage-only', 'historical-batch write with --no-commit must keep the governed bundle in stage-only mode');
+assert.equal(batchLaneClose.evidence.governedCommitBundle.targetRepo.status, 'staged');
+assert.equal(batchLaneClose.evidence.governedCommitBundle.planningRepo.status, 'staged');
+assert.equal(batchLaneClose.evidence.governedCommitBundle.failClosed, false);
+assert.ok(batchLaneClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/evidence/${batchLaneFixture.taskId}.json`), 'historical-batch close must still stage task evidence in the target bundle');
+assert.ok(batchLaneClose.evidence.governedCommitBundle.planningRepo.stageFiles.includes(`docs/tasks/${batchLaneFixture.taskId}.task.md`), 'historical-batch close must still stage the planning card closeback bundle');
+const batchLanePlanningCard = readFileSync(batchLaneFixture.planPath, 'utf8');
+assert.ok(batchLanePlanningCard.includes(`delivery_commit: "${batchLaneFixture.deliveryCommit}"`), 'historical-batch close must still write the matched delivery commit onto the planning card');
+
 const stageOnlyFixture = await makeDualRepoCloseFixture('stageonly');
 const stageOnlyTargetHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: stageOnlyFixture.targetRepo, encoding: 'utf8' }).trim();
 const stageOnlyPlanningHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: stageOnlyFixture.planningRepo, encoding: 'utf8' }).trim();

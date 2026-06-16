@@ -3,6 +3,13 @@
   "owner": "cli",
   "mappings": [
     {
+      "path_pattern": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atom_id": "atom-cli-router",
+      "capability": "owner-shard source-of-truth for the CLI owner family; first writable target for round1 steward writes; post-proof stewardship handoff anchor; successor continuity baseline",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0023"
+    },
+    {
       "path_pattern": "packages/cli/src/**",
       "atom_id": "atom-cli-router",
       "capability": "CLI package fallback ownership (anything not matched above)",
@@ -25,6 +32,13 @@
       "atom_id": "atom-cli-atm-chart",
       "capability": "atm-chart command (semver and chart utilities)",
       "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/atomize.ts",
+      "atom_id": "atm.atomization-registration-receipts-map",
+      "capability": "official atomize operator lane for registration-receipt, task snapshots, and count-and-digest verification over the atomization receipt helper.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0104"
     },
     {
       "path_pattern": "packages/cli/src/commands/batch.ts",
@@ -63,9 +77,16 @@
       "coverage_status": "partial"
     },
     {
+      "path_pattern": "packages/cli/src/commands/command-specs/atomize.spec.ts",
+      "atom_id": "atm.atomization-registration-receipts-map",
+      "capability": "atomize command surface specification for the official registration-receipt, task snapshot, and count-and-digest verification lane.",
+      "coverage_status": "active",
+      "source_task": "TASK-CID-0104"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs/evidence.spec.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence command surface specification including validators subcommand with --list --task flags, run with --recent-run, and missing subcommand with example (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017).",
+      "capability": "evidence command surface specification including validators subcommand with --list --task flags, run with --recent-run, missing subcommand, and historical-batch operator flags/examples for write, dry-run, and diagnostic-only approval flow (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017, TASK-CID-0099, TASK-CID-0100 to TASK-CID-0103).",
       "coverage_status": "active"
     },
     {
@@ -75,10 +96,64 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "taskflow close operator surface specification including --historical-batch as a first-class operator input that reuses matched delivery commits from evidence historical-batch.",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs/tasks.spec.ts",
       "atom_id": "atm.task-direction-map",
       "capability": "tasks command surface specification including scope add sub-command with --add csv option (TASK-AAO-0010).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "tasks close backend surface specification including --historical-delivery and --historical-batch examples so operator documentation reflects the protected close lane inputs for historical delivery reconstruction and historical-batch slices.",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecAtomizationPlanner",
+      "atom_id": "team.spec.atomization-planner",
+      "capability": "Command-spec examples and notes for atomization planner advisory output.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecBrokerLane",
+      "atom_id": "team.spec.broker-lane",
+      "capability": "Command-spec notes for broker lane and blocked CID conflict preflight.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecCommandSurface",
+      "atom_id": "team.spec.command-surface",
+      "capability": "Team command spec surface: summary, positional args, and shared options.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecCrewBriefing",
+      "atom_id": "team.spec.crew-briefing",
+      "capability": "Command-spec examples and notes for crew briefing plan output.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecPermissionValidation",
+      "atom_id": "team.spec.permission-validation",
+      "capability": "Command-spec examples for recipe permission and lease validation.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecRuntimeStatus",
+      "atom_id": "team.spec.runtime-status",
+      "capability": "Command-spec examples for read-only team run status.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
     },
     {
       "path_pattern": "packages/cli/src/commands/doctor.ts",
@@ -89,7 +164,7 @@
     {
       "path_pattern": "packages/cli/src/commands/evidence.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; --recent-run reuses cached results; validators --list returns per-task validator catalog with tier (focused/batch/milestone/release), expectedCommand, and evidenceState (pass/missing) sourced from framework requiredGates and task-declared validators (TASK-AAO-0015, TASK-AAO-0016); missing subcommand emits computeMissingValidatorReport — classifies each gate as pass/absent/failed-run/stale/diagnostic-only, scopes missingValidationPasses/blockingFindings to closure-required (focused + release + task-declared) validators, and surfaces batch-tier framework health gates as advisoryFindings that never block close; catalog entries carry closureRequired flag (TASK-AAO-0017, TASK-AAO-0017 follow-up); supports quoteForShell for cross-shell safe requiredCommand quoting and detectAutoLinkedValidator for auto-linking known validators during evidence add when no explicit validators are specified (TASK-AAO-0063).",
+      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing, and historical-batch; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; generic evidence records emit atomHealthClaims from task atomizationImpact; close verify requires atom-or-map-health-evidence for governed atom/map tasks; historical-batch slices record per-task deliverable coverage, validatorClaims (taskSpecific/batchWide/advisory), atomHealthClaims, okToRecordEvidence, okToCloseTask, and diagnostic-only approval metadata; supports quoteForShell for cross-shell safe requiredCommand quoting and detectAutoLinkedValidator for auto-linking known validators during evidence add when no explicit validators are specified (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017, TASK-AAO-0063, TASK-CID-0099, TASK-CID-0100 to TASK-CID-0103).",
       "coverage_status": "active"
     },
     {
@@ -195,6 +270,18 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/taskflow.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "taskflow close operator orchestration: historical-batch references are resolved into matched historical delivery commits before close mode, planning-authority verification, and governed commit bundle planning, so batch-backed close flows fall back to the normal close lane once the historical delivery gate is satisfied.",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "taskflow close backend argv/command builder for protected close surfaces, including pass-through of --historical-batch to tasks close and operator-facing backend command text.",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-ledger-governance-map",
       "capability": "tasks import/reconcile; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
@@ -209,7 +296,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-closure-map",
-      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport — missingValidationPasses/blockingFindings now contain only closure-required validators so advisory framework health gates (doctor, framework-development, tasks-audit, git-head-evidence) do not falsely block close (TASK-AAO-0017, TASK-AAO-0017 follow-up).",
+      "capability": "tasks close error envelopes enriched with TL;DR and structured missing-validator report: ATM_TASK_CLOSE_EVIDENCE_REQUIRED, ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED, ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID all carry tldr, missingValidationPasses[{code,validator,category,summary,requiredCommand}], and blockingFindings[] via computeMissingValidatorReport missingValidationPasses/blockingFindings now contain only closure-required validators so advisory framework health gates (doctor, framework-development, tasks-audit, git-head-evidence) do not falsely block close (TASK-AAO-0017, TASK-AAO-0017 follow-up).",
       "coverage_status": "active"
     },
     {
@@ -221,7 +308,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-closure-map",
-      "capability": "tasks deliver-and-close macro: bundles delivery commit (auto-stage scope-matching modified files + atm git commit) → historical close (tasks close --historical-delivery) → governance commit (stage task JSON, evidence, closure packet, transition event + atm git commit) into one command. Supports --delivery-commit to skip auto-staging and use a pre-existing commit. Batch guard: ATM_BATCH_CHECKPOINT_REQUIRED when task belongs to an active batch without --from-batch-checkpoint. Dry-run mode emits wouldAutoStage without modifying repo state (TASK-AAO-0056).",
+      "capability": "tasks deliver-and-close macro: bundles delivery commit (auto-stage scope-matching modified files + atm git commit)  -> historical close (tasks close --historical-delivery)  -> governance commit (stage task JSON, evidence, closure packet, transition event + atm git commit) into one command. Supports --delivery-commit to skip auto-staging and use a pre-existing commit. Batch guard: ATM_BATCH_CHECKPOINT_REQUIRED when task belongs to an active batch without --from-batch-checkpoint. Dry-run mode emits wouldAutoStage without modifying repo state (TASK-AAO-0056).",
       "coverage_status": "active"
     },
     {
@@ -343,6 +430,34 @@
       "source_task": "TASK-AAO-0100"
     },
     {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildAtomizationChecklist",
+      "atom_id": "team.plan-atomization-planner",
+      "capability": "Atomization planner advisory checklist for scope shape and split recommendations.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildMinimalTaskCrewBriefingContract",
+      "atom_id": "team.plan-crew-briefing-contract",
+      "capability": "Minimal crew briefing contract with required roles, stop conditions, and parallel advisory.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamStatusResult",
+      "atom_id": "team.status-runtime-read",
+      "capability": "Read-only team run status surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
+      "atom_id": "team.plan-broker-lane",
+      "capability": "Broker lane evaluation and steward/composer routing for team plan/start.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts#runTeam",
       "atom_id": "team.cli-entry",
       "capability": "Team CLI entry router for plan, start, status, and validate actions.",
@@ -357,79 +472,9 @@
       "source_task": "TASK-TEAM-0027"
     },
     {
-      "path_pattern": "packages/cli/src/commands/team.ts#buildMinimalTaskCrewBriefingContract",
-      "atom_id": "team.plan-crew-briefing-contract",
-      "capability": "Minimal crew briefing contract with required roles, stop conditions, and parallel advisory.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts#buildAtomizationChecklist",
-      "atom_id": "team.plan-atomization-planner",
-      "capability": "Atomization planner advisory checklist for scope shape and split recommendations.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
-      "atom_id": "team.plan-broker-lane",
-      "capability": "Broker lane evaluation and steward/composer routing for team plan/start.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
       "path_pattern": "packages/cli/src/commands/team.ts#writeTeamRun",
       "atom_id": "team.start-runtime-state",
       "capability": "Team run runtime record writer under .atm/runtime/team-runs.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamStatusResult",
-      "atom_id": "team.status-runtime-read",
-      "capability": "Read-only team run status surface.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecCommandSurface",
-      "atom_id": "team.spec.command-surface",
-      "capability": "Team command spec surface: summary, positional args, and shared options.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecCrewBriefing",
-      "atom_id": "team.spec.crew-briefing",
-      "capability": "Command-spec examples and notes for crew briefing plan output.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecAtomizationPlanner",
-      "atom_id": "team.spec.atomization-planner",
-      "capability": "Command-spec examples and notes for atomization planner advisory output.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecPermissionValidation",
-      "atom_id": "team.spec.permission-validation",
-      "capability": "Command-spec examples for recipe permission and lease validation.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecBrokerLane",
-      "atom_id": "team.spec.broker-lane",
-      "capability": "Command-spec notes for broker lane and blocked CID conflict preflight.",
-      "coverage_status": "active",
-      "source_task": "TASK-TEAM-0027"
-    },
-    {
-      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecRuntimeStatus",
-      "atom_id": "team.spec.runtime-status",
-      "capability": "Command-spec examples for read-only team run status.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0027"
     },
@@ -438,13 +483,6 @@
       "atom_id": "atm.task-direction-map",
       "capability": "isPathAllowedByScope is the quickfix/batch scope path matcher; explicitly NOT the SSOT for task direction allowed files (TASK-AAO-0012).",
       "coverage_status": "active"
-    },
-    {
-      "path_pattern": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
-      "atom_id": "atom-cli-router",
-      "capability": "owner-shard source-of-truth for the CLI owner family; first writable target for round1 steward writes; post-proof stewardship handoff anchor; successor continuity baseline",
-      "coverage_status": "active",
-      "source_task": "TASK-CID-0023"
     }
   ]
 }

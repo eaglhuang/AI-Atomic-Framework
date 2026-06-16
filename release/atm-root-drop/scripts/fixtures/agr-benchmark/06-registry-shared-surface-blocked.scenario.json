@@ -1,0 +1,53 @@
+{
+  "id": "registry-shared-surface-blocked",
+  "description": "Shared validator surface conflict must remain blocked across all AGR modes.",
+  "kind": "registry",
+  "relevantModes": ["agrOff", "layer1", "layer2Adr"],
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "agr-benchmark" },
+      "taskId": "TASK-CID-0037-B",
+      "actorId": "008",
+      "baseCommit": "commit-base",
+      "targetFiles": ["scripts/validate-cli.ts"],
+      "atomRefs": [{ "atomId": "ATM-AGR-06-B", "atomCid": "cid-agr-06-b", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": ["validate-cli"], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "local-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-agr-06-a",
+          "taskId": "TASK-CID-0037-A",
+          "teamRunId": null,
+          "actorId": "001",
+          "baseCommit": "commit-base",
+          "resourceKeys": {
+            "files": ["packages/cli/src/commands/cli.ts"],
+            "atomIds": ["ATM-AGR-06-A"],
+            "atomCids": ["cid-agr-06-a"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": ["validate-cli"],
+            "artifacts": []
+          },
+          "leaseEpoch": 1,
+          "lane": "direct-brokered"
+        }
+      ]
+    }
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": false },
+  "expected": {
+    "agrOff": { "brokerVerdict": "blocked-shared-surface", "validatorOutcome": "pass" },
+    "layer1": { "brokerVerdict": "blocked-shared-surface", "validatorOutcome": "pass" },
+    "layer2Adr": { "brokerVerdict": "blocked-shared-surface", "validatorOutcome": "pass" }
+  }
+}

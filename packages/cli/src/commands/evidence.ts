@@ -13,7 +13,7 @@ import {
   mergeDiffEvidenceWithExisting,
   validateDiffEvidence
 } from '../../../core/src/evidence/diff-evidence.ts';
-import { inspectHistoricalDelivery, type TaskHistoricalDeliveryReport } from './tasks/historical-delivery.ts';
+import { inspectHistoricalDelivery, pathMatchesTaskScope, type TaskHistoricalDeliveryReport } from './tasks/historical-delivery.ts';
 
 export type EvidenceGate = 'close' | 'commit' | 'pr';
 type CanonicalEvidenceKind = 'test' | 'artifact' | 'attestation' | 'review' | 'commit' | 'waiver' | 'other';
@@ -104,6 +104,9 @@ type ValidatorTier = 'focused' | 'batch' | 'milestone' | 'release';
 
 const VALIDATOR_GATE_ALIAS_MAP = new Map<string, string>([
   ['typecheck', 'typecheck'],
+  ['test', 'test'],
+  ['npm test', 'test'],
+  ['npm run test', 'test'],
   ['git diff --check', 'git diff --check'],
   ['git-diff-check', 'git diff --check'],
   ['doctor', 'doctor'],
@@ -123,6 +126,7 @@ function normalizeValidatorToken(raw: string): string {
  *       "npm run validate:cli" → "validate:cli"
  */
 function normalizeValidatorGateName(raw: string): string {
+  if (/^npm(?:\s+run)?\s+test$/i.test(raw.trim())) return 'test';
   // "npm run <gate>" → "<gate>"
   const npmMatch = raw.match(/^npm run (.+)$/);
   if (npmMatch) return npmMatch[1].trim();
@@ -889,6 +893,7 @@ export function verifyTaskEvidence(input: {
   const verificationCount = counts.test + counts.artifact + counts.attestation + counts.commit;
   const reopenedRedteamTask = detectReopenedOrRedteamTask(input.taskDocument);
   const codeOrFrameworkTask = Boolean(input.frameworkTask) || detectCodeOrFrameworkTask(input.taskDocument, input.taskDeclaredFiles ?? []);
+  const healthyAtomEvidence = hasHealthyAtomEvidence(input.taskDocument ?? null, bundle.evidence);
   const missing: string[] = [];
   if (input.gate === 'close') {
     if (nonWaiver <= 0) {
@@ -902,6 +907,9 @@ export function verifyTaskEvidence(input: {
     }
     if (codeOrFrameworkTask && (counts.test + counts.commit + counts.attestation + commandRunEvidenceCount) <= 0) {
       missing.push('code-or-framework-runnable-evidence');
+    }
+    if (!healthyAtomEvidence) {
+      missing.push('atom-or-map-health-evidence');
     }
   } else if (input.gate === 'commit') {
     if (nonWaiver <= 0) {
@@ -1011,6 +1019,8 @@ function runEvidenceAdd(argv: string[]) {
       sourcePath: options.commandRunsPath ? normalizeRelativePath(relativePathFrom(options.cwd, options.commandRunsPath)) : null
     }
     : null;
+  const taskDocument = readTaskDocument(options.cwd, options.taskId);
+  const atomHealthClaims = buildGenericAtomHealthClaims(taskDocument, validationPasses);
   const evidenceRecord: Record<string, unknown> = {
     evidenceKind: kind === 'waiver' ? 'waiver' : 'validation',
     evidenceType: kind,
@@ -1026,6 +1036,7 @@ function runEvidenceAdd(argv: string[]) {
       kind,
       freshness: options.freshness,
       ...(validationPasses.length > 0 ? { validationPasses } : {}),
+      ...(atomHealthClaims.length > 0 ? { atomHealthClaims } : {}),
       ...(commandRuns.length > 0 ? { commandRuns } : {}),
       ...(commandRunCache ? { commandRunCache } : {})
     }
@@ -1078,12 +1089,42 @@ interface HistoricalBatchValidatorRun {
   readonly runnerKind: string;
 }
 
+type HistoricalBatchCoverageStatus = 'complete' | 'partial' | 'blocked';
+type HistoricalBatchValidatorKind = 'taskSpecific' | 'batchWide' | 'advisory';
+
+interface HistoricalBatchValidatorClaim {
+  readonly gate: string;
+  readonly kind: HistoricalBatchValidatorKind;
+  readonly satisfied: boolean;
+  readonly requiredForClose: boolean;
+}
+
+interface HistoricalBatchAtomHealthClaim {
+  readonly atomOrMapId: string;
+  readonly kind: 'owner' | 'map-update';
+  readonly generatedByTask: boolean;
+  readonly validatorHealthy: boolean;
+}
+
 interface HistoricalBatchTaskSlice {
   readonly taskId: string;
   readonly ok: boolean;
   readonly matchedCommits: readonly string[];
   readonly matchedFiles: readonly string[];
   readonly outOfScopeFiles: readonly string[];
+  readonly declaredDeliverables: readonly string[];
+  readonly declaredScopeFiles: readonly string[];
+  readonly matchedDeliverables: readonly string[];
+  readonly missingCoverage: readonly string[];
+  readonly coverageStatus: HistoricalBatchCoverageStatus;
+  readonly validatorClaims: readonly HistoricalBatchValidatorClaim[];
+  readonly taskSpecificValidationPasses: readonly string[];
+  readonly batchWideValidationPasses: readonly string[];
+  readonly advisoryValidationPasses: readonly string[];
+  readonly atomHealthClaims: readonly HistoricalBatchAtomHealthClaim[];
+  readonly okToRecordEvidence: boolean;
+  readonly okToCloseTask: boolean;
+  readonly diagnosticOnly: boolean;
   readonly reports: readonly TaskHistoricalDeliveryReport[];
   readonly evidencePath: string | null;
 }
@@ -1121,7 +1162,11 @@ function runEvidenceHistoricalBatch(argv: string[]) {
     cwd: options.cwd,
     deliveryRepo: options.deliveryRepo,
     taskId,
-    commits: options.commits
+    commits: options.commits,
+    validatorRuns,
+    allowUnmatched: options.allowUnmatched,
+    approvedBy: options.approvedBy,
+    approvalReason: options.approvalReason
   }));
   const unmatchedTasks = slices.filter((slice) => !slice.ok);
   if (unmatchedTasks.length > 0 && !options.allowUnmatched) {
@@ -1130,6 +1175,7 @@ function runEvidenceHistoricalBatch(argv: string[]) {
       details: {
         unmatchedTasks: unmatchedTasks.map((slice) => ({
           taskId: slice.taskId,
+          coverageStatus: slice.coverageStatus,
           reports: slice.reports.map((report) => ({
             requestedRef: report.requestedRef,
             commitSha: report.commitSha,
@@ -1154,6 +1200,15 @@ function runEvidenceHistoricalBatch(argv: string[]) {
     tasks: slices.map((slice) => ({
       taskId: slice.taskId,
       ok: slice.ok,
+      coverageStatus: slice.coverageStatus,
+      okToRecordEvidence: slice.okToRecordEvidence,
+      okToCloseTask: slice.okToCloseTask,
+      diagnosticOnly: slice.diagnosticOnly,
+      declaredDeliverables: slice.declaredDeliverables,
+      matchedDeliverables: slice.matchedDeliverables,
+      missingCoverage: slice.missingCoverage,
+      validatorClaims: slice.validatorClaims,
+      atomHealthClaims: slice.atomHealthClaims,
       matchedCommits: slice.matchedCommits,
       matchedFiles: slice.matchedFiles,
       outOfScopeFiles: slice.outOfScopeFiles,
@@ -1183,7 +1238,6 @@ function runEvidenceHistoricalBatch(argv: string[]) {
         batchPath,
         slice,
         commits: options.commits,
-        validators: options.validators,
         validatorRuns
       });
     }
@@ -1204,7 +1258,11 @@ function runEvidenceHistoricalBatch(argv: string[]) {
           tasks: slices.length,
           commits: options.commits,
           validatorCommands: options.validatorCommands,
-          unmatchedTasks: unmatchedTasks.map((slice) => slice.taskId)
+          unmatchedTasks: unmatchedTasks.map((slice) => slice.taskId),
+          approval: options.allowUnmatched ? {
+            approvedBy: options.approvedBy,
+            approvalReason: options.approvalReason
+          } : null
         })
     ],
     evidence: {
@@ -1218,6 +1276,14 @@ function runEvidenceHistoricalBatch(argv: string[]) {
       taskSlices: slices.map((slice) => ({
         taskId: slice.taskId,
         ok: slice.ok,
+        coverageStatus: slice.coverageStatus,
+        okToRecordEvidence: slice.okToRecordEvidence,
+        okToCloseTask: slice.okToCloseTask,
+        diagnosticOnly: slice.diagnosticOnly,
+        taskSpecificValidationPasses: slice.taskSpecificValidationPasses,
+        batchWideValidationPasses: slice.batchWideValidationPasses,
+        advisoryValidationPasses: slice.advisoryValidationPasses,
+        atomHealthClaims: slice.atomHealthClaims,
         matchedCommits: slice.matchedCommits,
         matchedFiles: slice.matchedFiles,
         outOfScopeFiles: slice.outOfScopeFiles,
@@ -1237,7 +1303,9 @@ function parseEvidenceHistoricalBatchOptions(argv: string[]) {
     validators: [] as string[],
     validatorCommands: [] as string[],
     write: false,
-    allowUnmatched: false
+    allowUnmatched: false,
+    approvedBy: null as string | null,
+    approvalReason: null as string | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -1288,6 +1356,16 @@ function parseEvidenceHistoricalBatchOptions(argv: string[]) {
       options.allowUnmatched = true;
       continue;
     }
+    if (arg === '--approved-by') {
+      options.approvedBy = requireValue(argv, index, '--approved-by');
+      index += 1;
+      continue;
+    }
+    if (arg === '--approval-reason') {
+      options.approvalReason = requireValue(argv, index, '--approval-reason');
+      index += 1;
+      continue;
+    }
     if (arg === '--json' || arg === '--pretty') {
       continue;
     }
@@ -1302,6 +1380,9 @@ function parseEvidenceHistoricalBatchOptions(argv: string[]) {
   if (taskIds.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires --tasks <csv>.', { exitCode: 2 });
   if (commits.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires --commits <csv>.', { exitCode: 2 });
   if (validatorCommands.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires at least one --validator-command.', { exitCode: 2 });
+  if (options.allowUnmatched && (!options.approvedBy?.trim() || !options.approvalReason?.trim())) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch --allow-unmatched requires both --approved-by and --approval-reason.', { exitCode: 2 });
+  }
   return {
     ...options,
     cwd,
@@ -1315,6 +1396,15 @@ function parseEvidenceHistoricalBatchOptions(argv: string[]) {
 
 function splitCsv(value: string): string[] {
   return value.split(',').map((entry) => entry.trim()).filter(Boolean);
+}
+
+function resolveHistoricalBatchRunValidators(command: string, requestedValidators: readonly string[]) {
+  const autoLinked = detectAutoLinkedValidator(command);
+  if (autoLinked) return [autoLinked];
+  const normalized = canonicalizeValidatorIdentity(command);
+  if (requestedValidators.includes(normalized)) return [normalized];
+  if (/^npm(?:\s+run)?\s+test$/i.test(command.trim()) && requestedValidators.includes('test')) return ['test'];
+  return [];
 }
 
 function runHistoricalBatchValidator(input: {
@@ -1335,7 +1425,7 @@ function runHistoricalBatchValidator(input: {
     exitCode: result.status ?? (result.error ? 1 : 0),
     stdoutSha256: hashString(result.stdout ?? ''),
     stderrSha256: hashString([result.stderr ?? '', result.error?.message ?? ''].filter(Boolean).join('\n')),
-    validators: input.validators,
+    validators: resolveHistoricalBatchRunValidators(input.command, input.validators),
     generatedAt: new Date().toISOString(),
     runnerKind: inferRunnerKindFromCommand(input.command)
   };
@@ -1346,9 +1436,15 @@ function buildHistoricalBatchTaskSlice(input: {
   readonly deliveryRepo: string;
   readonly taskId: string;
   readonly commits: readonly string[];
+  readonly validatorRuns: readonly HistoricalBatchValidatorRun[];
+  readonly allowUnmatched: boolean;
+  readonly approvedBy: string | null;
+  readonly approvalReason: string | null;
 }): HistoricalBatchTaskSlice {
   const taskDocument = readTaskDocument(input.cwd, input.taskId);
   const declaredFiles = extractHistoricalBatchDeclaredFiles(taskDocument);
+  const declaredDeliverables = extractHistoricalBatchDeclaredDeliverables(taskDocument, declaredFiles);
+  const declaredValidators = extractHistoricalBatchDeclaredValidators(taskDocument);
   const reports = input.commits.map((commit) => inspectHistoricalDelivery({
     cwd: input.deliveryRepo,
     taskId: input.taskId,
@@ -1361,12 +1457,58 @@ function buildHistoricalBatchTaskSlice(input: {
   const matchedReports = reports.filter((report) => report.commitSha && report.fileBuckets.taskMatchedFiles.length > 0);
   const matchedFiles = uniqueStrings(matchedReports.flatMap((report) => report.fileBuckets.taskMatchedFiles));
   const outOfScopeFiles = uniqueStrings(matchedReports.flatMap((report) => report.fileBuckets.outOfScopeSourceFiles));
+  const matchedDeliverables = declaredDeliverables.filter((entry) =>
+    matchedFiles.some((filePath) => pathMatchesTaskScope(filePath, entry))
+  );
+  const missingCoverage = declaredDeliverables.filter((entry) => !matchedDeliverables.includes(entry));
+  const coverageStatus: HistoricalBatchCoverageStatus = declaredDeliverables.length === 0
+    ? (matchedFiles.length > 0 ? 'complete' : 'blocked')
+    : (missingCoverage.length === 0
+      ? 'complete'
+      : matchedDeliverables.length > 0 ? 'partial' : 'blocked');
+  const validatorClaims = buildHistoricalBatchValidatorClaims({
+    requestedValidators: input.validatorRuns.flatMap((run) => run.validators),
+    declaredValidators,
+    validatorRuns: input.validatorRuns
+  });
+  const taskSpecificValidationPasses = validatorClaims
+    .filter((claim) => claim.kind === 'taskSpecific' && claim.satisfied)
+    .map((claim) => claim.gate);
+  const batchWideValidationPasses = validatorClaims
+    .filter((claim) => claim.kind === 'batchWide' && claim.satisfied)
+    .map((claim) => claim.gate);
+  const advisoryValidationPasses = validatorClaims
+    .filter((claim) => claim.kind === 'advisory' && claim.satisfied)
+    .map((claim) => claim.gate);
+  const atomHealthClaims = extractHistoricalBatchAtomHealthClaims({
+    taskDocument,
+    coverageStatus,
+    validatorClaims
+  });
+  const okToRecordEvidence = matchedFiles.length > 0 || (input.allowUnmatched && Boolean(input.approvedBy?.trim()) && Boolean(input.approvalReason?.trim()));
+  const okToCloseTask = matchedFiles.length > 0
+    && coverageStatus === 'complete'
+    && validatorClaims.filter((claim) => claim.requiredForClose).every((claim) => claim.satisfied)
+    && atomHealthClaims.every((claim) => claim.generatedByTask && claim.validatorHealthy);
   return {
     taskId: input.taskId,
     ok: matchedFiles.length > 0,
     matchedCommits: uniqueStrings(matchedReports.map((report) => report.commitSha ?? '').filter(Boolean)),
     matchedFiles,
     outOfScopeFiles,
+    declaredDeliverables,
+    declaredScopeFiles: declaredFiles,
+    matchedDeliverables,
+    missingCoverage,
+    coverageStatus,
+    validatorClaims,
+    taskSpecificValidationPasses,
+    batchWideValidationPasses,
+    advisoryValidationPasses,
+    atomHealthClaims,
+    okToRecordEvidence,
+    okToCloseTask,
+    diagnosticOnly: !okToCloseTask,
     reports,
     evidencePath: relativePathFrom(input.cwd, evidencePathForTask(input.cwd, input.taskId))
   };
@@ -1381,6 +1523,70 @@ function extractHistoricalBatchDeclaredFiles(taskDocument: Record<string, unknow
   return [...files].map(normalizeRelativePath).filter(Boolean);
 }
 
+function extractHistoricalBatchDeclaredDeliverables(taskDocument: Record<string, unknown> | null, declaredFiles: readonly string[]) {
+  if (!taskDocument) return [...declaredFiles];
+  const deliverables = new Set<string>();
+  collectTaskFileValues(taskDocument.deliverables, deliverables);
+  const normalized = [...deliverables].map(normalizeRelativePath).filter(Boolean);
+  return normalized.length > 0 ? normalized : [...declaredFiles];
+}
+
+function extractHistoricalBatchDeclaredValidators(taskDocument: Record<string, unknown> | null) {
+  if (!taskDocument || !Array.isArray(taskDocument.validators)) return [];
+  return uniqueStrings(
+    taskDocument.validators
+      .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      .map((entry) => canonicalizeValidatorIdentity(entry))
+  );
+}
+
+function extractHistoricalBatchAtomHealthClaims(input: {
+  readonly taskDocument: Record<string, unknown> | null;
+  readonly coverageStatus: HistoricalBatchCoverageStatus;
+  readonly validatorClaims: readonly HistoricalBatchValidatorClaim[];
+}) {
+  if (!input.taskDocument || !isRecord(input.taskDocument.atomizationImpact)) return [] as HistoricalBatchAtomHealthClaim[];
+  const atomizationImpact = input.taskDocument.atomizationImpact as Record<string, unknown>;
+  const ownerAtomOrMap = typeof atomizationImpact.ownerAtomOrMap === 'string' ? atomizationImpact.ownerAtomOrMap.trim() : '';
+  const mapUpdates = Array.isArray(atomizationImpact.mapUpdates)
+    ? atomizationImpact.mapUpdates.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim())
+    : [];
+  const validatorHealthy = input.validatorClaims.filter((claim) => claim.requiredForClose).every((claim) => claim.satisfied);
+  const generatedByTask = input.coverageStatus !== 'blocked';
+  const claims: HistoricalBatchAtomHealthClaim[] = [];
+  if (ownerAtomOrMap) {
+    claims.push({ atomOrMapId: ownerAtomOrMap, kind: 'owner', generatedByTask, validatorHealthy });
+  }
+  for (const mapUpdate of mapUpdates) {
+    claims.push({ atomOrMapId: mapUpdate, kind: 'map-update', generatedByTask, validatorHealthy });
+  }
+  return claims;
+}
+
+function buildHistoricalBatchValidatorClaims(input: {
+  readonly requestedValidators: readonly string[];
+  readonly declaredValidators: readonly string[];
+  readonly validatorRuns: readonly HistoricalBatchValidatorRun[];
+}) {
+  const allValidators = uniqueStrings([...input.requestedValidators, ...input.declaredValidators]);
+  return allValidators.map((gate): HistoricalBatchValidatorClaim => {
+    const requiredForClose = input.declaredValidators.includes(gate);
+    const tier = classifyValidatorTier(gate);
+    const kind: HistoricalBatchValidatorKind = requiredForClose
+      ? 'taskSpecific'
+      : (gate === 'doctor' || gate === 'framework-development' || gate === 'tasks-audit' || gate === 'git-head-evidence' || tier === 'batch')
+        ? 'advisory'
+        : 'batchWide';
+    const satisfied = input.validatorRuns.some((run) => run.exitCode === 0 && run.validators.includes(gate));
+    return {
+      gate,
+      kind,
+      satisfied,
+      requiredForClose
+    };
+  });
+}
+
 function appendHistoricalBatchTaskEvidence(input: {
   readonly cwd: string;
   readonly actorId: string;
@@ -1389,7 +1595,6 @@ function appendHistoricalBatchTaskEvidence(input: {
   readonly batchPath: string;
   readonly slice: HistoricalBatchTaskSlice;
   readonly commits: readonly string[];
-  readonly validators: readonly string[];
   readonly validatorRuns: readonly HistoricalBatchValidatorRun[];
 }) {
   const evidencePath = evidencePathForTask(input.cwd, input.slice.taskId);
@@ -1414,9 +1619,21 @@ function appendHistoricalBatchTaskEvidence(input: {
         matchedCommits: input.slice.matchedCommits,
         matchedFiles: input.slice.matchedFiles,
         outOfScopeFiles: input.slice.outOfScopeFiles,
-        taskSliceOk: input.slice.ok
+        taskSliceOk: input.slice.ok,
+        declaredDeliverables: input.slice.declaredDeliverables,
+        declaredScopeFiles: input.slice.declaredScopeFiles,
+        matchedDeliverables: input.slice.matchedDeliverables,
+        missingCoverage: input.slice.missingCoverage,
+        coverageStatus: input.slice.coverageStatus,
+        validatorClaims: input.slice.validatorClaims,
+        atomHealthClaims: input.slice.atomHealthClaims,
+        okToRecordEvidence: input.slice.okToRecordEvidence,
+        okToCloseTask: input.slice.okToCloseTask,
+        diagnosticOnly: input.slice.diagnosticOnly
       },
-      validationPasses: input.validators,
+      validationPasses: input.slice.taskSpecificValidationPasses,
+      batchWideValidationPasses: input.slice.batchWideValidationPasses,
+      advisoryValidationPasses: input.slice.advisoryValidationPasses,
       commandRuns: input.validatorRuns
     }
   };
@@ -2109,6 +2326,59 @@ function readTaskDocument(cwd: string, taskId: string) {
   const taskPath = taskPathForEvidence(cwd, taskId);
   if (!existsSync(taskPath)) return null;
   return JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+}
+
+function extractAtomizationTargets(taskDocument: Record<string, unknown> | null) {
+  if (!taskDocument || !isRecord(taskDocument.atomizationImpact)) return [] as Array<{ atomOrMapId: string; kind: 'owner' | 'map-update' }>;
+  const atomizationImpact = taskDocument.atomizationImpact as Record<string, unknown>;
+  const output: Array<{ atomOrMapId: string; kind: 'owner' | 'map-update' }> = [];
+  const ownerAtomOrMap = typeof atomizationImpact.ownerAtomOrMap === 'string' ? atomizationImpact.ownerAtomOrMap.trim() : '';
+  if (ownerAtomOrMap) {
+    output.push({ atomOrMapId: ownerAtomOrMap, kind: 'owner' });
+  }
+  if (Array.isArray(atomizationImpact.mapUpdates)) {
+    for (const entry of atomizationImpact.mapUpdates) {
+      if (typeof entry === 'string' && entry.trim()) {
+        output.push({ atomOrMapId: entry.trim(), kind: 'map-update' });
+      }
+    }
+  }
+  return output;
+}
+
+function buildGenericAtomHealthClaims(taskDocument: Record<string, unknown> | null, validationPasses: readonly string[]) {
+  const targets = extractAtomizationTargets(taskDocument);
+  const validatorHealthy = validationPasses.length > 0;
+  return targets.map((target) => ({
+    atomOrMapId: target.atomOrMapId,
+    kind: target.kind,
+    generatedByTask: true,
+    validatorHealthy
+  }));
+}
+
+function hasHealthyAtomEvidence(taskDocument: Record<string, unknown> | null, bundle: readonly Record<string, unknown>[]) {
+  const targets = extractAtomizationTargets(taskDocument);
+  if (targets.length === 0) return true;
+  const requiredIds = new Set(targets.map((target) => target.atomOrMapId));
+  const healthyIds = new Set<string>();
+  for (const record of bundle) {
+    const details = isRecord(record.details) ? record.details : null;
+    const candidates = details && Array.isArray(details.atomHealthClaims)
+      ? details.atomHealthClaims
+      : details && isRecord(details.historicalBatch) && Array.isArray(details.historicalBatch.atomHealthClaims)
+        ? details.historicalBatch.atomHealthClaims
+        : [];
+    for (const entry of candidates) {
+      if (!isRecord(entry)) continue;
+      const atomOrMapId = typeof entry.atomOrMapId === 'string' ? entry.atomOrMapId.trim() : '';
+      if (!atomOrMapId || !requiredIds.has(atomOrMapId)) continue;
+      if (entry.generatedByTask === true && entry.validatorHealthy === true) {
+        healthyIds.add(atomOrMapId);
+      }
+    }
+  }
+  return targets.every((target) => healthyIds.has(target.atomOrMapId));
 }
 
 function extractTaskDeclaredFiles(taskDocument: Record<string, unknown> | null) {
