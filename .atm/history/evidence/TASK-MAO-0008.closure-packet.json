@@ -1,0 +1,199 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0008",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "19576f9ab2f1c3392a2a7f1a7d9d708fc50b4a84",
+  "governedTreeSha": "67971efd09d04271eae21660ec966aa654021f44",
+  "targetCommitDelta": {
+    "currentCommitSha": "19576f9ab2f1c3392a2a7f1a7d9d708fc50b4a84",
+    "parentCommitShas": [
+      "19576f9ab2f1c3392a2a7f1a7d9d708fc50b4a84"
+    ],
+    "governedTreeSha": "67971efd09d04271eae21660ec966aa654021f44",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-MAO-0008.json",
+      ".atm/history/task-events/TASK-MAO-0008/2026-06-16T07-12-04-151Z-import-27c056f80d8f.json",
+      ".atm/history/task-events/TASK-MAO-0008/2026-06-16T07-42-52-087Z-reserve-c782f6b94628.json",
+      ".atm/history/task-events/TASK-MAO-0008/2026-06-16T07-42-52-090Z-promote-42aa67e61c32.json",
+      ".atm/history/task-events/TASK-MAO-0008/2026-06-16T07-42-52-131Z-claim-997b11b6396f.json",
+      ".atm/history/tasks/TASK-AAO-0118.json",
+      ".atm/history/tasks/TASK-CID-0091.json",
+      ".atm/history/tasks/TASK-CID-0097.json",
+      ".atm/history/tasks/TASK-MAO-0008.json",
+      ".atm/history/tasks/TASK-MAO-0023.json",
+      ".atm/history/tasks/TASK-MAO-0024.json",
+      ".atm/history/tasks/TASK-MAO-0025.json",
+      ".atm/history/tasks/TASK-MAO-0026.json",
+      ".atm/history/tasks/TASK-MAO-0027.json",
+      ".atm/history/tasks/TASK-MAO-0028.json",
+      ".atm/history/tasks/TASK-MAO-0029.json",
+      ".atm/history/tasks/TASK-MAO-0030.json",
+      ".atm/history/tasks/TASK-MAO-0031.json",
+      ".atm/history/tasks/TASK-MAO-0032.json",
+      ".atm/history/tasks/TASK-MAO-0033.json",
+      ".atm/history/tasks/TASK-MAO-0034.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "packages/core/src/broker/patch-envelope.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/patch-envelope.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/patch-envelope.js",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.js",
+      "release/atm-root-drop/packages/core/dist/broker/types.d.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/patch-envelope.ts",
+      "release/atm-root-drop/packages/core/src/broker/team-lane.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "schemas/patch-envelope.schema.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d95e7cae57396b9a65fbce7c71fa88c24a3f2135f970e1a6e8be866447b6018d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b2f798953d113f6fb697ccc86ad97a3647f177f5ec80f7e2be2c69584dfaf8e5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-16T12:00:47.004Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0008-patch-envelope-contract.task.md",
+      ".atm/history/evidence/TASK-MAO-0008.*",
+      ".atm/history/task-events/TASK-MAO-0008/**",
+      ".atm/history/tasks/TASK-MAO-0008.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "packages/core/src/broker/patch-envelope.ts",
+      "schemas/patch-envelope.schema.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "packages/core/src/broker/patch-envelope.ts",
+      "schemas/patch-envelope.schema.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0008.json",
+  "closedAt": "2026-06-16T12:00:47.004Z",
+  "closedByActor": "codex-captain-continuation",
+  "sessionId": "session-20260616074252-codex-captain-continuation-TASK-MAO-0008-0d068d693e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "803ffc335a2f71a38a1de41bbf69728fb7939a42",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/patch-envelope.ts",
+      "schemas/patch-envelope.schema.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts"
+    ],
+    "waiverReason": "803ffc335 bundled freeze (MAO-0007 already cited) + patch-envelope; MAO-0008 cites envelope half only"
+  },
+  "teamSummary": null
+}
