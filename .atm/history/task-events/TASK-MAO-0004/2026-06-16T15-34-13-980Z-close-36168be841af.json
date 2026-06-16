@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-16T15-34-13-980Z-close-36168be841af",
+  "taskId": "TASK-MAO-0004",
+  "action": "close",
+  "actorId": "augment-code",
+  "sessionId": "session-20260616151307-augment-code-TASK-MAO-0004-ff6d4d67a0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0004.json",
+  "taskSha256": "sha256:bf52f1022990429b807f24073068375f0ba86fd47fc1f2a8ea45863cff7fbc6f",
+  "createdAt": "2026-06-16T15:34:13.980Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0004 --actor augment-code --status done --historical-delivery 7e866ec41",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260616151307-augment-code-TASK-MAO-0004-ff6d4d67a0",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/next-route-selector.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-16T15:34:13.976Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0004-next-route-task-selector.task.md",
+        ".atm/history/evidence/TASK-MAO-0004.*",
+        ".atm/history/task-events/TASK-MAO-0004/**",
+        ".atm/history/tasks/TASK-MAO-0004.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/task-intent.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "tests/cli/next-route-selector.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/task-intent.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "tests/cli/next-route-selector.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
