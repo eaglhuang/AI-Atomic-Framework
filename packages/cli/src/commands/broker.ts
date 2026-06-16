@@ -37,6 +37,15 @@ import { planMutationBatch } from '../../../core/src/broker/adapters/batch-plann
 import { computeCasResult, hashContent } from '../../../core/src/broker/adapters/cas.ts';
 import type { BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent, ConflictKey, BrokerOperationRunRecord } from '../../../core/src/broker/types.ts';
 
+const defaultFallbackBrokerRunEvidenceDir = path.resolve(
+  process.env.USERPROFILE ?? process.env.HOME ?? 'C:\\Users\\User',
+  '3KLife',
+  'docs',
+  'ai_atomic_framework',
+  'broker-collision-evidence',
+  'runs'
+);
+
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
   const registryPath = path.join(options.cwd, '.atm', 'runtime', 'write-broker.registry.json');
@@ -677,9 +686,10 @@ export async function runBroker(argv: string[]) {
 
     if (options.apply) {
       const runId = randomUUID();
-      const runRecordPath = path.join(options.cwd, '.atm', 'history', 'evidence', 'broker-runs', `${runId}.json`);
+      const runEvidenceDir = resolveBrokerRunEvidenceDir(options);
+      const runRecordPath = path.join(runEvidenceDir, `${runId}.json`);
       runEvidencePath = runRecordPath;
-      runEvidencePathRelative = path.relative(options.cwd, runRecordPath).replace(/\\/g, '/');
+      runEvidencePathRelative = normalizeEvidencePath(options.cwd, runRecordPath);
 
       for (const batch of plan.batches) {
         const absolute = path.resolve(options.cwd, batch.filePath);
@@ -741,8 +751,7 @@ export async function runBroker(argv: string[]) {
       }
 
       if (runEvidenceRecords.length > 0) {
-        const evidenceDir = path.join(options.cwd, '.atm', 'history', 'evidence', 'broker-runs');
-        mkdirSync(evidenceDir, { recursive: true });
+        mkdirSync(runEvidenceDir, { recursive: true });
         const runEnvelope = buildTeamBrokerRunRecordEnvelope({
           runId,
           planId: plan.planId,
@@ -822,6 +831,7 @@ interface ParsedBrokerOptions {
   readonly evidenceOutPath: string | null;
   readonly requestFiles: readonly string[];
   readonly requestsDir: string | null;
+  readonly runEvidenceDir: string | null;
   readonly apply: boolean;
 }
 
@@ -846,6 +856,7 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     evidenceOutPath: null as string | null,
     requestFiles: [] as string[],
     requestsDir: null as string | null,
+    runEvidenceDir: null as string | null,
     apply: false
   };
 
@@ -912,6 +923,11 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--run-evidence-dir') {
+      state.runEvidenceDir = requireValue(argv, index, '--run-evidence-dir');
+      index += 1;
+      continue;
+    }
     if (arg === '--request-file') {
       state.requestFiles.push(requireValue(argv, index, '--request-file'));
       index += 1;
@@ -969,8 +985,25 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     evidenceOutPath: state.evidenceOutPath,
     requestFiles: state.requestFiles,
     requestsDir: state.requestsDir,
+    runEvidenceDir: state.runEvidenceDir,
     apply: state.apply
   };
+}
+
+function resolveBrokerRunEvidenceDir(options: ParsedBrokerOptions): string {
+  const configuredDir = options.runEvidenceDir ?? process.env.ATM_BROKER_RUN_EVIDENCE_DIR ?? null;
+  if (configuredDir) {
+    return path.resolve(options.cwd, configuredDir);
+  }
+  return defaultFallbackBrokerRunEvidenceDir;
+}
+
+function normalizeEvidencePath(cwd: string, filePath: string): string {
+  const absolute = path.resolve(filePath);
+  const relative = path.relative(cwd, absolute);
+  return relative.startsWith('..') || path.isAbsolute(relative)
+    ? absolute.replace(/\\/g, '/')
+    : relative.replace(/\\/g, '/');
 }
 
 function loadComposeProposals(options: ParsedBrokerOptions): PatchProposal[] {
