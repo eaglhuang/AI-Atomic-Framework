@@ -1,0 +1,144 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0007",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "4015cf7f090a2ddc9ba85c5bf3bf75cdf9c16fff",
+  "governedTreeSha": "948d5d02e93ef9055f18ccae0d4aeb2b8373c591",
+  "targetCommitDelta": {
+    "currentCommitSha": "4015cf7f090a2ddc9ba85c5bf3bf75cdf9c16fff",
+    "parentCommitShas": [
+      "4015cf7f090a2ddc9ba85c5bf3bf75cdf9c16fff"
+    ],
+    "governedTreeSha": "948d5d02e93ef9055f18ccae0d4aeb2b8373c591",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-MAO-0007.json",
+      ".atm/history/task-events/TASK-MAO-0007/2026-06-16T06-27-54-521Z-import-1dc55b2da8d8.json",
+      ".atm/history/task-events/TASK-MAO-0007/2026-06-16T06-28-02-724Z-reserve-3571ab586c7a.json",
+      ".atm/history/task-events/TASK-MAO-0007/2026-06-16T06-28-02-726Z-promote-59797db345f4.json",
+      ".atm/history/task-events/TASK-MAO-0007/2026-06-16T06-28-02-762Z-claim-e13db9669aa2.json",
+      ".atm/history/tasks/TASK-MAO-0007.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "@'\\nconst { spawnSync } = require('child_process');\\nconst { createHash } = require('crypto');\\nconst steps = [\\n  { label: 'typecheck', cmd: 'cmd', args: ['/d', '/s', '/c', 'npm run typecheck'] },\\n  { label: 'validate:cli', cmd: 'cmd', args: ['/d', '/s', '/c', 'npm run validate:cli'] },\\n  { label: 'freeze-protocol', cmd: 'node', args: ['--strip-types', 'packages/core/src/broker/__tests__/freeze-protocol.test.ts'] },\\n  { label: 'git-diff-check', cmd: 'git', args: ['diff', '--check'] }\\n];\\nlet stdout = '';\\nlet stderr = '';\\nfor (const step of steps) {\\n  const result = spawnSync(step.cmd, step.args, { encoding: 'utf8', shell: false, cwd: process.cwd() });\\n  stdout += \\\\n$ \\\\n;\\n  stderr += \\\\n$ \\\\n;\\n  console.log(STEP  exit=);\\n  if (result.status !== 0) {\\n    console.log('STDOUT_START');\\n    console.log(result.stdout || '');\\n    console.log('STDERR_START');\\n    console.log(result.stderr || '');\\n    process.exit(result.status || 1);\\n  }\\n}\\nconsole.log('COMBINED_STDOUT_SHA256=' + createHash('sha256').update(stdout).digest('hex'));\\nconsole.log('COMBINED_STDERR_SHA256=' + createHash('sha256').update(stderr).digest('hex'));\\n'@ | node -",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4fe2d139dbb5e396da99ed618da3fd7bf1ad225b93ee22ed04b751df07e196f6",
+      "stderrSha256": "sha256:ea94838bc4ee9b33244c5aa5117fb576c538349d46d2d981ec3b4cfd5823edd4",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d3fe5bcfe8446c9c71f07c8f3106bee85b44e6072e8bc1e9eaad974cb862bc7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "freeze-protocol",
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-16T06:42:26.679Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0007-freeze-resume-protocol.task.md",
+      ".atm/history/evidence/TASK-MAO-0007.*",
+      ".atm/history/task-events/TASK-MAO-0007/**",
+      ".atm/history/tasks/TASK-MAO-0007.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/route.ts",
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0007.json",
+  "closedAt": "2026-06-16T06:42:26.679Z",
+  "closedByActor": "captain",
+  "sessionId": "session-20260616062802-captain-TASK-MAO-0007-2bfc9c9ea9",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "803ffc335a2f71a38a1de41bbf69728fb7939a42",
+    "taskMatchedFiles": [
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/core/src/broker/patch-envelope.ts",
+      "schemas/patch-envelope.schema.json"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/core/src/broker/patch-envelope.ts",
+      "schemas/patch-envelope.schema.json"
+    ],
+    "waiverReason": "Historical delivery for TASK-MAO-0007 freeze/resume protocol plus atom map entries; source files were delivered in commit 803ffc335 and map entries in commit 8fe0d140f."
+  },
+  "teamSummary": null
+}

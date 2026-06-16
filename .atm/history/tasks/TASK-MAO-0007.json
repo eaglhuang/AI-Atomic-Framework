@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0007",
+  "title": "freeze resume protocol",
+  "status": "done",
+  "milestone": "M3",
+  "dependencies": [
+    "TASK-MAO-0005",
+    "TASK-MAO-0006"
+  ],
+  "acceptance": [
+    "Tests prove freeze, freeze acknowledgement, timeout, resume, and blocked fallback.",
+    "Freeze diagnostics identify the exact conflicting task/route/resource.",
+    "Resume requires broker admission to be checked again.",
+    "The protocol does not delete worktree changes."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/freeze.ts",
+    "packages/cli/src/commands/route.ts",
+    "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/freeze.ts",
+    "packages/core/src/broker/types.ts",
+    "packages/cli/src/commands/route.ts",
+    "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Patch envelope schema implementation",
+    "Automatic agent interruption during LLM inference"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert freeze/resume protocol, CLI hooks, tests, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.mao-freeze-protocol-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0007-freeze-resume-protocol.task.md",
+    "sectionTitle": "TASK-MAO-0007",
+    "headingLine": 45,
+    "hash": "05500becce543efc"
+  },
+  "importedAt": "2026-06-16T06:27:54.518Z",
+  "lastTransitionId": "2026-06-16T06-42-26-684Z-close-43652a62f7da",
+  "lastTransitionAt": "2026-06-16T06:42:26.684Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-16T06:28:02.724Z",
+  "promotedAt": "2026-06-16T06:28:02.726Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-abf7c18d96f8",
+    "claimedAt": "2026-06-16T06:28:02.729Z",
+    "heartbeatAt": "2026-06-16T06:42:26.681Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0007.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "state": "released",
+    "reason": "Historical delivery for TASK-MAO-0007 freeze/resume protocol plus atom map entries; source files were delivered in commit 803ffc335 and map entries in commit 8fe0d140f."
+  },
+  "startedAt": "2026-06-16T06:28:02.729Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260616062802-captain-TASK-MAO-0007-2bfc9c9ea9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0007",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0007.*",
+      ".atm/history/task-events/TASK-MAO-0007/**",
+      ".atm/history/tasks/TASK-MAO-0007.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "packages/core/src/broker/freeze.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9b6f9282c6d9c2cbac36a445043190c8508ac74ed1cf0a5371d71f4a340dd6ef",
+    "actorId": "captain",
+    "createdAt": "2026-06-16T06:28:02.762Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-16T06:42:26.681Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260616062802-captain-TASK-MAO-0007-2bfc9c9ea9",
+  "closeReason": "Historical delivery for TASK-MAO-0007 freeze/resume protocol plus atom map entries; source files were delivered in commit 803ffc335 and map entries in commit 8fe0d140f.",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0007.closure-packet.json"
+}
