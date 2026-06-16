@@ -7,7 +7,7 @@
 
 - Scenario count: 12
 - Catch rate: 100% (8/8 unsafe scenarios caught)
-- Average latency: 80926892 ns per scenario (deterministic local simulator)
+- Average latency: 51584608 ns per scenario (deterministic local simulator)
 - Ship-safe: yes
 
 ## Capability coverage (which MAO task introduced each behavior)
@@ -57,18 +57,18 @@
 
 ## Per-scenario latency (ns)
 
-- generated-artifact-drift: 52700
-- parallel-safe-disjoint: 493600
-- read-write-overlap-watch: 101500
-- route-freeze-on-pause: 2230600
-- route-resume-after-freeze: 139700
-- runner-derived-artifact-collision: 33300
-- same-atom-write-write: 6682100
-- same-file-different-atom-disjoint: 53700
-- shared-surface-blocked: 51500
-- steward-apply-safe: 349949900
-- steward-blocked-out-of-scope: 611309500
-- unknown-scope-malformed: 24600
+- generated-artifact-drift: 56300
+- parallel-safe-disjoint: 506800
+- read-write-overlap-watch: 165500
+- route-freeze-on-pause: 2440200
+- route-resume-after-freeze: 179900
+- runner-derived-artifact-collision: 25900
+- same-atom-write-write: 7716800
+- same-file-different-atom-disjoint: 67500
+- shared-surface-blocked: 63200
+- steward-apply-safe: 367285000
+- steward-blocked-out-of-scope: 240482300
+- unknown-scope-malformed: 25900
 
 ## Remaining risks
 
