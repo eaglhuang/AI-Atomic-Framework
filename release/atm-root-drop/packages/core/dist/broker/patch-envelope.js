@@ -23,6 +23,44 @@ export function createPatchEnvelope(input) {
 export function isMetadataOnlyEnvelope(envelope) {
     return envelope.mode === 'metadata-only' && envelope.patchText === null;
 }
+export function summarizePatchEnvelope(envelope) {
+    return {
+        envelopeId: envelope.envelopeId,
+        taskId: envelope.taskId,
+        actorId: envelope.actorId,
+        freezeId: envelope.metadata.freezeId,
+        mode: envelope.mode,
+        wipState: envelope.wipState,
+        confidence: envelope.metadata.confidence,
+        fileCount: envelope.targetFiles.length,
+        hasPatchText: envelope.patchText !== null && envelope.patchText.length > 0,
+        capturedAt: envelope.metadata.capturedAt
+    };
+}
+export function comparePatchEnvelopes(left, right) {
+    const divergences = [];
+    const scalarFields = [
+        'taskId', 'actorId', 'mode', 'wipState', 'snapshotDir', 'patchText'
+    ];
+    for (const field of scalarFields) {
+        if (left[field] !== right[field]) {
+            divergences.push({ field: String(field), left: left[field], right: right[field] });
+        }
+    }
+    if (left.targetFiles.length !== right.targetFiles.length ||
+        left.targetFiles.some((file, idx) => file !== right.targetFiles[idx])) {
+        divergences.push({ field: 'targetFiles', left: left.targetFiles, right: right.targetFiles });
+    }
+    const metadataFields = [
+        'freezeId', 'confidence', 'partialReason'
+    ];
+    for (const field of metadataFields) {
+        if (left.metadata[field] !== right.metadata[field]) {
+            divergences.push({ field: `metadata.${String(field)}`, left: left.metadata[field], right: right.metadata[field] });
+        }
+    }
+    return { equal: divergences.length === 0, divergences };
+}
 export function validatePatchEnvelope(envelope) {
     if (!envelope.taskId.trim()) {
         return { ok: false, reason: 'taskId is required' };

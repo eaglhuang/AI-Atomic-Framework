@@ -1,5 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { CliError, makeResult, message } from './shared.ts';
 import {
   loadRegistry,
@@ -18,6 +19,8 @@ import {
 } from '../../../core/src/broker/steward.ts';
 import {
   buildTeamBrokerRuntimeActivationHandshake,
+  buildTeamBrokerRunRecord,
+  buildTeamBrokerRunRecordEnvelope
 } from '../../../core/src/broker/team-lane.ts';
 import {
   defaultBrokerProposalStoreRelativePath,
@@ -32,8 +35,14 @@ import {
 import { defaultAdapterRegistry, resolveAdapter } from '../../../core/src/broker/adapters/registry.ts';
 import { planMutationBatch } from '../../../core/src/broker/adapters/batch-planner.ts';
 import { computeCasResult, hashContent } from '../../../core/src/broker/adapters/cas.ts';
-import type { BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent } from '../../../core/src/broker/types.ts';
-import { readdirSync, writeFileSync } from 'node:fs';
+import type { BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent, ConflictKey, BrokerOperationRunRecord } from '../../../core/src/broker/types.ts';
+
+const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
+  '.atm',
+  'runtime',
+  'broker-collision-evidence',
+  'runs'
+);
 
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
@@ -637,11 +646,13 @@ export async function runBroker(argv: string[]) {
     }
 
     const requests: MutationRequest[] = [];
+    const requestConflictKeys = new Map<string, readonly ConflictKey[]>();
     for (const requestPath of requestPaths) {
       if (!existsSync(requestPath)) {
         throw new CliError('ATM_FILE_NOT_FOUND', `Mutation request file not found: ${requestPath}`, { exitCode: 1 });
       }
-      requests.push(JSON.parse(readFileSync(requestPath, 'utf8')) as MutationRequest);
+      const request = JSON.parse(readFileSync(requestPath, 'utf8')) as MutationRequest;
+      requests.push(request);
     }
 
     const registry = defaultAdapterRegistry();
@@ -658,13 +669,26 @@ export async function runBroker(argv: string[]) {
 
     const plan = planMutationBatch({ registry, requests, fileContents });
 
+    for (const entry of plan.requestConflictKeys ?? []) {
+      requestConflictKeys.set(entry.requestId, entry.conflictKeys);
+    }
+
     const requestById = new Map(requests.map((request) => [request.requestId, request]));
     const batchedIds = new Set(plan.batches.flatMap((batch) => batch.requestIds));
     const mutationEvidence: BrokerMutationEvidenceEntry[] = [];
+    const runEvidenceRecords: BrokerOperationRunRecord[] = [];
+    let runEvidencePath: string | null = null;
+    let runEvidencePathRelative: string | null = null;
     const casMismatches: string[] = [];
     let applied = false;
 
     if (options.apply) {
+      const runId = randomUUID();
+      const runEvidenceDir = resolveBrokerRunEvidenceDir(options);
+      const runRecordPath = path.join(runEvidenceDir, `${runId}.json`);
+      runEvidencePath = runRecordPath;
+      runEvidencePathRelative = normalizeEvidencePath(options.cwd, runRecordPath);
+
       for (const batch of plan.batches) {
         const absolute = path.resolve(options.cwd, batch.filePath);
         const baseContents = fileContents[batch.filePath] ?? '{}';
@@ -683,7 +707,8 @@ export async function runBroker(argv: string[]) {
             casMismatches.push(batch.filePath);
           }
           for (const request of batchRequests) {
-            mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, baseHash, batch.verdict, 'blocked'));
+            const conflictKeys = requestConflictKeys.get(request.requestId) ?? [];
+            mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, baseHash, batch.verdict, 'blocked', conflictKeys));
           }
           continue;
         }
@@ -695,7 +720,8 @@ export async function runBroker(argv: string[]) {
         applied = true;
         const resultHash = hashContent(resultContents);
         for (const request of batchRequests) {
-          mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, resultHash, batch.verdict, 'applied'));
+          const conflictKeys = requestConflictKeys.get(request.requestId) ?? [];
+          mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, resultHash, batch.verdict, 'applied', conflictKeys));
         }
       }
 
@@ -703,7 +729,33 @@ export async function runBroker(argv: string[]) {
         const request = requestById.get(id);
         if (!request) continue;
         const baseHash = hashContent(fileContents[request.filePath] ?? '{}');
-        mutationEvidence.push(buildMutationEvidence('n/a', request, baseHash, baseHash, 'conflict', plan.blocked.includes(id) ? 'blocked' : 'queued'));
+        const conflictKeys = requestConflictKeys.get(id) ?? [];
+        mutationEvidence.push(buildMutationEvidence('n/a', request, baseHash, baseHash, 'conflict', plan.blocked.includes(id) ? 'blocked' : 'queued', conflictKeys));
+      }
+
+      for (const entry of mutationEvidence) {
+        const request = requestById.get(entry.requestId);
+        if (!request) continue;
+        runEvidenceRecords.push(buildTeamBrokerRunRecord({
+          runId,
+          planId: plan.planId,
+          request,
+          adapterChoice: entry.adapterId,
+          laneDecision: entry.verdict,
+          mergeVerdict: entry.mergeDecision,
+          evidencePath: runEvidencePathRelative ?? 'unknown',
+          appliedFiles: [entry.filePath]
+        }));
+      }
+
+      if (runEvidenceRecords.length > 0) {
+        mkdirSync(runEvidenceDir, { recursive: true });
+        const runEnvelope = buildTeamBrokerRunRecordEnvelope({
+          runId,
+          planId: plan.planId,
+          records: runEvidenceRecords
+        });
+        writeFileSync(runEvidencePath, JSON.stringify(runEnvelope), 'utf8');
       }
     }
 
@@ -726,6 +778,8 @@ export async function runBroker(argv: string[]) {
         applied: options.apply ? applied : false,
         casMismatches,
         mutationEvidence: options.apply ? mutationEvidence : [],
+        runEvidencePath: runEvidencePathRelative,
+        runRecords: options.apply ? runEvidenceRecords : [],
         unbatchedRequestIds: requests.map((request) => request.requestId).filter((id) => !batchedIds.has(id))
       }
     });
@@ -740,7 +794,8 @@ function buildMutationEvidence(
   baseHash: string,
   resultHash: string,
   mergeDecision: BrokerMutationEvidenceEntry['mergeDecision'],
-  verdict: BrokerMutationEvidenceEntry['verdict']
+  verdict: BrokerMutationEvidenceEntry['verdict'],
+  conflictKeys: readonly ConflictKey[]
 ): BrokerMutationEvidenceEntry {
   return {
     requestId: request.requestId,
@@ -749,7 +804,7 @@ function buildMutationEvidence(
     filePath: request.filePath,
     baseHash,
     resultHash,
-    conflictKeys: [],
+    conflictKeys,
     mergeDecision,
     verdict
   };
@@ -774,6 +829,7 @@ interface ParsedBrokerOptions {
   readonly evidenceOutPath: string | null;
   readonly requestFiles: readonly string[];
   readonly requestsDir: string | null;
+  readonly runEvidenceDir: string | null;
   readonly apply: boolean;
 }
 
@@ -798,6 +854,7 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     evidenceOutPath: null as string | null,
     requestFiles: [] as string[],
     requestsDir: null as string | null,
+    runEvidenceDir: null as string | null,
     apply: false
   };
 
@@ -864,6 +921,11 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       index += 1;
       continue;
     }
+    if (arg === '--run-evidence-dir') {
+      state.runEvidenceDir = requireValue(argv, index, '--run-evidence-dir');
+      index += 1;
+      continue;
+    }
     if (arg === '--request-file') {
       state.requestFiles.push(requireValue(argv, index, '--request-file'));
       index += 1;
@@ -921,8 +983,43 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     evidenceOutPath: state.evidenceOutPath,
     requestFiles: state.requestFiles,
     requestsDir: state.requestsDir,
+    runEvidenceDir: state.runEvidenceDir,
     apply: state.apply
   };
+}
+
+function readConfiguredBrokerRunEvidenceDir(cwd: string): string | null {
+  try {
+    const configPath = path.join(cwd, '.atm', 'config.json');
+    if (!existsSync(configPath)) {
+      return null;
+    }
+    const config = JSON.parse(readFileSync(configPath, 'utf8'));
+    const broker = config && typeof config === 'object' ? (config as any).broker : null;
+    const dir = broker && typeof broker === 'object' ? broker.runEvidenceDir : null;
+    return typeof dir === 'string' && dir.trim() ? dir.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+function resolveBrokerRunEvidenceDir(options: ParsedBrokerOptions): string {
+  const configuredDir = options.runEvidenceDir
+    ?? process.env.ATM_BROKER_RUN_EVIDENCE_DIR
+    ?? readConfiguredBrokerRunEvidenceDir(options.cwd)
+    ?? null;
+  if (configuredDir) {
+    return path.resolve(options.cwd, configuredDir);
+  }
+  return path.resolve(options.cwd, defaultFallbackBrokerRunEvidenceRelativeDir);
+}
+
+function normalizeEvidencePath(cwd: string, filePath: string): string {
+  const absolute = path.resolve(filePath);
+  const relative = path.relative(cwd, absolute);
+  return relative.startsWith('..') || path.isAbsolute(relative)
+    ? absolute.replace(/\\/g, '/')
+    : relative.replace(/\\/g, '/');
 }
 
 function loadComposeProposals(options: ParsedBrokerOptions): PatchProposal[] {

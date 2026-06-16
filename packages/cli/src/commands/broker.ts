@@ -37,11 +37,9 @@ import { planMutationBatch } from '../../../core/src/broker/adapters/batch-plann
 import { computeCasResult, hashContent } from '../../../core/src/broker/adapters/cas.ts';
 import type { BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent, ConflictKey, BrokerOperationRunRecord } from '../../../core/src/broker/types.ts';
 
-const defaultFallbackBrokerRunEvidenceDir = path.resolve(
-  process.env.USERPROFILE ?? process.env.HOME ?? 'C:\\Users\\User',
-  '3KLife',
-  'docs',
-  'ai_atomic_framework',
+const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
+  '.atm',
+  'runtime',
   'broker-collision-evidence',
   'runs'
 );
@@ -990,12 +988,30 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
   };
 }
 
+function readConfiguredBrokerRunEvidenceDir(cwd: string): string | null {
+  try {
+    const configPath = path.join(cwd, '.atm', 'config.json');
+    if (!existsSync(configPath)) {
+      return null;
+    }
+    const config = JSON.parse(readFileSync(configPath, 'utf8'));
+    const broker = config && typeof config === 'object' ? (config as any).broker : null;
+    const dir = broker && typeof broker === 'object' ? broker.runEvidenceDir : null;
+    return typeof dir === 'string' && dir.trim() ? dir.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
 function resolveBrokerRunEvidenceDir(options: ParsedBrokerOptions): string {
-  const configuredDir = options.runEvidenceDir ?? process.env.ATM_BROKER_RUN_EVIDENCE_DIR ?? null;
+  const configuredDir = options.runEvidenceDir
+    ?? process.env.ATM_BROKER_RUN_EVIDENCE_DIR
+    ?? readConfiguredBrokerRunEvidenceDir(options.cwd)
+    ?? null;
   if (configuredDir) {
     return path.resolve(options.cwd, configuredDir);
   }
-  return defaultFallbackBrokerRunEvidenceDir;
+  return path.resolve(options.cwd, defaultFallbackBrokerRunEvidenceRelativeDir);
 }
 
 function normalizeEvidencePath(cwd: string, filePath: string): string {

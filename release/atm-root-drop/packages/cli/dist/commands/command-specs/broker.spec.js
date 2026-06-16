@@ -4,7 +4,7 @@ export default defineCommandSpec({
     name: 'broker',
     summary: 'Manage write intents, proposal capsules, compose merge plans, runtime activation, steward apply, and inspect the local write-broker registry.',
     positional: [
-        { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime', required: true },
+        { name: 'action', summary: 'register | decision | status | release | cleanup | proposal | compose | steward | runtime | plan-batch', required: true },
         { name: 'proposal-action', summary: 'create | list | show | validate', required: false },
         { name: 'steward-action', summary: 'plan | apply', required: false },
         { name: 'runtime-action', summary: 'activate', required: false },
@@ -22,6 +22,7 @@ export default defineCommandSpec({
         { flag: '--scope-file', value: 'path', summary: 'Scoped file-write target allowed for steward apply or runtime activate. Repeatable.' },
         { flag: '--steward-id', value: 'id', summary: 'Neutral write steward identifier.' },
         { flag: '--evidence-out', value: 'path', summary: 'Output path for steward apply or runtime activation evidence JSON.' },
+        { flag: '--run-evidence-dir', value: 'path', summary: 'Directory to write broker batch run records (default: .atm/runtime/broker-collision-evidence/runs, resolved against --cwd).' },
         { flag: '--store', value: 'path', summary: 'Path to broker proposal store JSON.' },
         commonJsonOption,
         commonPrettyOption,
@@ -42,6 +43,7 @@ export default defineCommandSpec({
         'node atm.mjs broker runtime activate --task TASK-GOV-0100 --actor team-planner --scope-file src/target.ts --json',
         'node atm.mjs broker runtime activate --task TASK-GOV-0100 --actor team-planner --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out runtime-evidence.json --json',
         'node atm.mjs broker steward plan --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --json',
-        'node atm.mjs broker steward apply --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out steward-evidence.json --json'
+        'node atm.mjs broker steward apply --merge-plan-file merge-plan.json --proposal-file proposal.json --scope-file src/target.ts --evidence-out steward-evidence.json --json',
+        'node atm.mjs broker plan-batch --request-file tmp/request-a.json --request-file tmp/request-b.json --apply --run-evidence-dir .atm/runtime/broker-collision-evidence/runs --json'
     ]
 });

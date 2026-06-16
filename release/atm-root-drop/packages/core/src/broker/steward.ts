@@ -10,6 +10,16 @@ import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 import type { DecompositionRequest, MergePlan, PatchProposal } from './types.ts';
 
+// ---------------------------------------------------------------------------
+// Steward arbitration verdict — the four possible outcomes per implementation
+// contract (TASK-MAO-0009).
+// ---------------------------------------------------------------------------
+export type StewardArbitrationVerdict =
+  | 'apply'
+  | 'merge-required'
+  | 'blocked'
+  | 'human-required';
+
 export type StewardValidationCode =
   | 'scope-lock-mismatch'
   | 'stale-base-commit'
@@ -17,7 +27,9 @@ export type StewardValidationCode =
   | 'invalid-merge-plan'
   | 'out-of-scope-target'
   | 'blocked-merge-plan'
-  | 'missing-proposal';
+  | 'missing-proposal'
+  | 'invalid-steward-identity'
+  | 'human-review-required';
 
 export interface StewardValidationIssue {
   readonly code: StewardValidationCode;
@@ -49,6 +61,62 @@ export interface StewardPlanResult {
 export interface StewardApplyResult {
   readonly ok: boolean;
   readonly evidence: StewardApplyEvidence;
+}
+
+// ---------------------------------------------------------------------------
+// Steward identity & permission check.
+// ---------------------------------------------------------------------------
+export interface StewardIdentity {
+  /** The steward's identifier (e.g. 'neutral-write-steward', 'runner-broker'). */
+  readonly stewardId: string;
+  /** The type of steward. 'neutral' is the default; 'derived-artifact-writer'
+   *  is a specialized path for ATM core Runner Broker scoped writes. */
+  readonly kind: 'neutral' | 'derived-artifact-writer';
+  /** The route or task that authorised this steward session. */
+  readonly authorisedByRouteId?: string;
+  readonly authorisedByTaskId?: string;
+}
+
+export interface StewardPermissionCheckResult {
+  readonly ok: boolean;
+  readonly stewardId: string;
+  readonly kind: StewardIdentity['kind'];
+  readonly issues: readonly StewardValidationIssue[];
+}
+
+/**
+ * Validates that a steward identity is well-formed and authorised.
+ * Derived-artifact writers must declare a route or task authorisation.
+ */
+export function checkStewardPermission(identity: StewardIdentity): StewardPermissionCheckResult {
+  const issues: StewardValidationIssue[] = [];
+  if (!identity.stewardId || identity.stewardId.trim().length === 0) {
+    issues.push({ code: 'invalid-steward-identity', detail: 'stewardId must be a non-empty string.' });
+  }
+  if (identity.kind === 'derived-artifact-writer') {
+    if (!identity.authorisedByRouteId && !identity.authorisedByTaskId) {
+      issues.push({
+        code: 'invalid-steward-identity',
+        detail: 'Derived-artifact writer steward must declare authorisedByRouteId or authorisedByTaskId.'
+      });
+    }
+  }
+  return { ok: issues.length === 0, stewardId: identity.stewardId, kind: identity.kind, issues };
+}
+
+// ---------------------------------------------------------------------------
+// Steward arbitration result — the top-level output of arbitrateStewardRequest.
+// ---------------------------------------------------------------------------
+export interface StewardArbitrationResult {
+  readonly schemaId: 'atm.stewardArbitrationResult.v1';
+  readonly specVersion: '0.1.0';
+  readonly stewardId: string;
+  readonly verdict: StewardArbitrationVerdict;
+  readonly owningRouteId: string | null;
+  readonly owningTaskId: string | null;
+  readonly plan: StewardPlan | null;
+  readonly applyEvidence: StewardApplyEvidence | null;
+  readonly issues: readonly StewardValidationIssue[];
 }
 
 export interface BrokerScopedWriteExecutionEvidence {
@@ -239,6 +307,106 @@ export function executeBrokerScopedWrite(input: {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Top-level steward arbitration entry point (TASK-MAO-0009).
+// Wraps planning, identity checks, and verdict production. Records
+// route/task/evidence links as required by the acceptance criteria.
+// ---------------------------------------------------------------------------
+export function arbitrateStewardRequest(input: {
+  readonly cwd: string;
+  readonly identity: StewardIdentity;
+  readonly mergePlan: MergePlan;
+  readonly proposals: readonly PatchProposal[];
+  readonly scopeFiles: readonly string[];
+  readonly owningRouteId?: string | null;
+  readonly owningTaskId?: string | null;
+  readonly evidenceOutPath?: string | null;
+}): StewardArbitrationResult {
+  const owningRouteId = input.owningRouteId ?? input.identity.authorisedByRouteId ?? null;
+  const owningTaskId = input.owningTaskId ?? input.identity.authorisedByTaskId ?? null;
+
+  // 1. Identity / permission gate
+  const permResult = checkStewardPermission(input.identity);
+  if (!permResult.ok) {
+    return {
+      schemaId: 'atm.stewardArbitrationResult.v1',
+      specVersion: '0.1.0',
+      stewardId: input.identity.stewardId,
+      verdict: 'blocked',
+      owningRouteId,
+      owningTaskId,
+      plan: null,
+      applyEvidence: null,
+      issues: permResult.issues
+    };
+  }
+
+  // 2. Human-required verdict: fail closed, steward cannot auto-resolve
+  if (input.mergePlan.verdict === 'human-required') {
+    return {
+      schemaId: 'atm.stewardArbitrationResult.v1',
+      specVersion: '0.1.0',
+      stewardId: input.identity.stewardId,
+      verdict: 'human-required',
+      owningRouteId,
+      owningTaskId,
+      plan: null,
+      applyEvidence: null,
+      issues: [{ code: 'human-review-required', detail: 'Merge plan verdict is human-required; steward cannot auto-resolve.' }]
+    };
+  }
+
+  // 3. Plan the apply
+  const planResult = planStewardApply({
+    cwd: input.cwd,
+    stewardId: input.identity.stewardId,
+    mergePlan: input.mergePlan,
+    proposals: input.proposals,
+    scopeFiles: input.scopeFiles
+  });
+
+  if (!planResult.ok) {
+    // Determine if this is a merge-required or hard-blocked situation
+    const hasBlockingConflict = planResult.plan.issues.some(
+      (issue) => issue.code === 'blocked-merge-plan' || issue.code === 'out-of-scope-target'
+    );
+    const verdict: StewardArbitrationVerdict = hasBlockingConflict ? 'blocked' : 'merge-required';
+    return {
+      schemaId: 'atm.stewardArbitrationResult.v1',
+      specVersion: '0.1.0',
+      stewardId: input.identity.stewardId,
+      verdict,
+      owningRouteId,
+      owningTaskId,
+      plan: planResult.plan,
+      applyEvidence: null,
+      issues: planResult.plan.issues
+    };
+  }
+
+  // 4. Apply the plan
+  const applyResult = applyStewardPlan({
+    cwd: input.cwd,
+    stewardId: input.identity.stewardId,
+    mergePlan: input.mergePlan,
+    proposals: input.proposals,
+    scopeFiles: input.scopeFiles,
+    evidenceOutPath: input.evidenceOutPath
+  });
+
+  return {
+    schemaId: 'atm.stewardArbitrationResult.v1',
+    specVersion: '0.1.0',
+    stewardId: input.identity.stewardId,
+    verdict: applyResult.ok ? 'apply' : 'blocked',
+    owningRouteId,
+    owningTaskId,
+    plan: planResult.plan,
+    applyEvidence: applyResult.evidence,
+    issues: applyResult.ok ? [] : (applyResult.evidence.blockedReasons ?? []).map((reason) => ({ code: 'blocked-merge-plan' as StewardValidationCode, detail: reason }))
+  };
+}
+
 function validateStewardInputs(input: {
   readonly cwd: string;
   readonly mergePlan: MergePlan;
@@ -255,6 +423,11 @@ function validateStewardInputs(input: {
   // Steward takeover is only allowed if the conflict verdict says it is safe ('needs-steward' or 'parallel-safe')
   if (input.mergePlan.verdict === 'blocked-cid-conflict' || input.mergePlan.verdict === 'blocked-shared-surface') {
     issues.push({ code: 'blocked-merge-plan', detail: `Merge plan verdict '${input.mergePlan.verdict}' cannot be applied by steward.` });
+  }
+  // Human-required verdicts are fail-closed at the arbitration layer,
+  // but if someone calls planStewardApply directly with one, block it too.
+  if (input.mergePlan.verdict === 'human-required') {
+    issues.push({ code: 'human-review-required', detail: 'Merge plan verdict is human-required; steward cannot auto-resolve.' });
   }
 
   const proposalIds = new Set(input.proposals.map((proposal) => proposal.proposalId));

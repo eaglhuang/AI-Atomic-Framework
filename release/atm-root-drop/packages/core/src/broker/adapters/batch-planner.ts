@@ -90,6 +90,7 @@ export function planMutationBatch(input: {
 
   const batches: MutationBatch[] = [];
   const queued: string[] = [];
+  const requestConflictKeys: Array<{ requestId: string; conflictKeys: readonly ConflictKey[] }> = [];
 
   const sortedFiles = [...byFile.keys()].sort((left, right) => left.localeCompare(right));
   for (const filePath of sortedFiles) {
@@ -120,6 +121,10 @@ export function planMutationBatch(input: {
     if (current.length > 0) {
       const decision = adapter.canMerge(current.map((entry) => entry.mutation), parsed);
       const verdict = decision.verdict === 'commutative-merge' ? 'commutative-merge' : 'mergeable';
+      requestConflictKeys.push(...current.map((entry) => ({
+        requestId: entry.request.requestId,
+        conflictKeys: entry.conflictKeys
+      })));
       batches.push({
         filePath,
         adapterId: adapter.id,
@@ -138,6 +143,7 @@ export function planMutationBatch(input: {
     planId: buildDeterministicPlanId(allRequestIds),
     batches,
     queued: [...queued].sort((left, right) => left.localeCompare(right)),
-    blocked: [...blocked].sort((left, right) => left.localeCompare(right))
+    blocked: [...blocked].sort((left, right) => left.localeCompare(right)),
+    requestConflictKeys: requestConflictKeys.sort((left, right) => left.requestId.localeCompare(right.requestId))
   };
 }

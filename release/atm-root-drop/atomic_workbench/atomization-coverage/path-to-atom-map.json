@@ -2,7 +2,7 @@
   "schemaId": "atm.pathToAtomMap.v1",
   "schemaSource": "docs/ATOMIZATION_COVERAGE_TAXONOMY.md#42-json-schema-草案-atmpathtoatommapv1",
   "version": "1.0",
-  "timestamp": "2026-06-16T01:35:38.947Z",
+  "timestamp": "2026-06-16T15:15:00.000Z",
   "sharding": {
     "strategy": "owner-shards",
     "manifestPath": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
@@ -330,6 +330,20 @@
       "atom_id": "atm.next-router-map",
       "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/next.spec.ts",
+      "atom_id": "atm.next-router-map",
+      "capability": "next command CLI surface specification: summary, options (--claim, --actor, --prompt, --task, --tasks, --intent, --output), and canonical usage examples covering prompt-scoped, explicit-task, quickfix, batch, and claim flows (TASK-MAO-0004).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0004"
+    },
+    {
+      "path_pattern": "tests/cli/next-route-selector.test.ts",
+      "atom_id": "atm.next-router-map",
+      "capability": "Standard-suite regression wrapper for the prompt-scoped next route selector: delegates to validate-prompt-scoped-next.ts and surfaces the four acceptance scenarios (no route, unique route, ambiguous route, blocked route) as a named test in the npm run validate:cli sweep (TASK-MAO-0004).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0004"
     },
     {
       "path_pattern": "packages/cli/src/commands/next.ts",
@@ -1036,13 +1050,62 @@
       "capability": "Regression coverage for patch envelope: 8 named tests covering valid textual-diff envelope, partial-WIP metadata-only envelope, missing taskId/actorId/freezeId rejection, textual-diff-without-patchText rejection, summarize digest stability, compare divergence detection (scalar fields + targetFiles array + metadata sub-fields).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0008"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/steward.ts",
+      "atom_id": "atm.mao-steward-arbitration-map",
+      "capability": "Steward arbitration flow: StewardArbitrationVerdict (apply | merge-required | blocked | human-required), StewardIdentity & checkStewardPermission (neutral + derived-artifact-writer identity gates), arbitrateStewardRequest top-level entry point wrapping planning + identity + apply with route/task evidence links, planStewardApply/applyStewardPlan lower-level building blocks, executeBrokerScopedWrite for scoped derived-artifact writes, applyUnifiedPatch for patch application, human-required fail-closed enforcement.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0009"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+      "atom_id": "atm.mao-steward-arbitration-map",
+      "capability": "Regression coverage for steward arbitration: 13 named tests covering safe apply, unsafe block (blocked-cid-conflict), scope lock mismatch, human-required fail-closed, neutral steward identity validation, empty stewardId rejection, derived-artifact-writer auth requirement, derived-artifact-writer with taskId, arbitrateStewardRequest apply with route/task links, arbitrateStewardRequest human-required, arbitrateStewardRequest blocked by identity, arbitrateStewardRequest merge-required, blocked-shared-surface verdict.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0009"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/route.ts",
+      "atom_id": "atm.mao-steward-arbitration-map",
+      "capability": "CLI route takeover integration: steward identity, route/task ownership evidence in takeover success/failure/human-required output, human-required verdict gate returning structured ATM_ROUTE_HUMAN_REQUIRED message with owningRouteId/owningTaskId.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0009"
+    },
+    {
+      "path_pattern": "docs/reports/mao-parallel-routing-benchmark.md",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由基準的人類可讀報告，彙整 catch rate、能力覆蓋、tier 覆蓋、情境矩陣與剩餘風險，並明確反映 TASK-MAO-0009 的 steward 能力。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-parallel-routing/**",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由基準 fixture 套件，涵蓋 conflict matrix、route freeze/resume、steward apply/blocked 與 M5 runner-extension placeholder 情境。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
+    },
+    {
+      "path_pattern": "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由基準 runner：離線載入 fixture、執行 conflict / route / steward 模擬、計算延遲與安全性統計，並供 validator 與報告渲染重用。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
+    },
+    {
+      "path_pattern": "scripts/validate-mao-parallel-routing.ts",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由 validator：驗證 fixture pack、阻擋 false-safe regression、執行完整 benchmark，並輸出 docs/reports/mao-parallel-routing-benchmark.md。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
     }
   ],
   "summary": {
-    "total_production_paths": 163,
-    "mapped_paths": 163,
+    "total_production_paths": 170,
+    "mapped_paths": 170,
     "coverage_percentage": 100,
-    "atoms_defined": 107,
+    "atoms_defined": 109,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true

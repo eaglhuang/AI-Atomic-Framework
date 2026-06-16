@@ -31,6 +31,28 @@ export declare function createPatchEnvelope(input: {
     readonly capturedAt?: string;
 }): PatchEnvelope;
 export declare function isMetadataOnlyEnvelope(envelope: PatchEnvelope): boolean;
+export interface PatchEnvelopeSummary {
+    readonly envelopeId: string;
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly freezeId: string;
+    readonly mode: PatchEnvelopeMode;
+    readonly wipState: PatchEnvelopeWipState;
+    readonly confidence: 'low' | 'medium' | 'high';
+    readonly fileCount: number;
+    readonly hasPatchText: boolean;
+    readonly capturedAt: string;
+}
+export interface PatchEnvelopeDivergence {
+    readonly field: string;
+    readonly left: unknown;
+    readonly right: unknown;
+}
+export declare function summarizePatchEnvelope(envelope: PatchEnvelope): PatchEnvelopeSummary;
+export declare function comparePatchEnvelopes(left: PatchEnvelope, right: PatchEnvelope): {
+    readonly equal: boolean;
+    readonly divergences: readonly PatchEnvelopeDivergence[];
+};
 export declare function validatePatchEnvelope(envelope: PatchEnvelope): {
     readonly ok: boolean;
     readonly reason: string;

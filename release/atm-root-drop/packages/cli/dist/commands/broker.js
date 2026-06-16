@@ -1,16 +1,17 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { CliError, makeResult, message } from './shared.js';
 import { loadRegistry, saveRegistry, registerIntent, renewIntentLease, releaseTask, cleanupStale } from '../../../core/dist/broker/registry.js';
 import { calculateBrokerDecision } from '../../../core/dist/broker/decision.js';
 import { composeBrokerProposals } from '../../../core/dist/broker/compose.js';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../core/dist/broker/steward.js';
-import { buildTeamBrokerRuntimeActivationHandshake, } from '../../../core/dist/broker/team-lane.js';
+import { buildTeamBrokerRuntimeActivationHandshake, buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope } from '../../../core/dist/broker/team-lane.js';
 import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../../core/dist/broker/proposal.js';
 import { defaultAdapterRegistry, resolveAdapter } from '../../../core/dist/broker/adapters/registry.js';
 import { planMutationBatch } from '../../../core/dist/broker/adapters/batch-planner.js';
 import { computeCasResult, hashContent } from '../../../core/dist/broker/adapters/cas.js';
-import { readdirSync, writeFileSync } from 'node:fs';
+const defaultFallbackBrokerRunEvidenceRelativeDir = path.join('.atm', 'runtime', 'broker-collision-evidence', 'runs');
 export async function runBroker(argv) {
     const options = parseBrokerArgs(argv);
     const registryPath = path.join(options.cwd, '.atm', 'runtime', 'write-broker.registry.json');
@@ -541,11 +542,13 @@ export async function runBroker(argv) {
             throw new CliError('ATM_CLI_USAGE', 'broker plan-batch requires --request-file <path> and/or --requests-dir <dir>.', { exitCode: 2 });
         }
         const requests = [];
+        const requestConflictKeys = new Map();
         for (const requestPath of requestPaths) {
             if (!existsSync(requestPath)) {
                 throw new CliError('ATM_FILE_NOT_FOUND', `Mutation request file not found: ${requestPath}`, { exitCode: 1 });
             }
-            requests.push(JSON.parse(readFileSync(requestPath, 'utf8')));
+            const request = JSON.parse(readFileSync(requestPath, 'utf8'));
+            requests.push(request);
         }
         const registry = defaultAdapterRegistry();
         // Load the current on-disk contents of each target file (when present) so the
@@ -558,12 +561,23 @@ export async function runBroker(argv) {
             }
         }
         const plan = planMutationBatch({ registry, requests, fileContents });
+        for (const entry of plan.requestConflictKeys ?? []) {
+            requestConflictKeys.set(entry.requestId, entry.conflictKeys);
+        }
         const requestById = new Map(requests.map((request) => [request.requestId, request]));
         const batchedIds = new Set(plan.batches.flatMap((batch) => batch.requestIds));
         const mutationEvidence = [];
+        const runEvidenceRecords = [];
+        let runEvidencePath = null;
+        let runEvidencePathRelative = null;
         const casMismatches = [];
         let applied = false;
         if (options.apply) {
+            const runId = randomUUID();
+            const runEvidenceDir = resolveBrokerRunEvidenceDir(options);
+            const runRecordPath = path.join(runEvidenceDir, `${runId}.json`);
+            runEvidencePath = runRecordPath;
+            runEvidencePathRelative = normalizeEvidencePath(options.cwd, runRecordPath);
             for (const batch of plan.batches) {
                 const absolute = path.resolve(options.cwd, batch.filePath);
                 const baseContents = fileContents[batch.filePath] ?? '{}';
@@ -580,7 +594,8 @@ export async function runBroker(argv) {
                         casMismatches.push(batch.filePath);
                     }
                     for (const request of batchRequests) {
-                        mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, baseHash, batch.verdict, 'blocked'));
+                        const conflictKeys = requestConflictKeys.get(request.requestId) ?? [];
+                        mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, baseHash, batch.verdict, 'blocked', conflictKeys));
                     }
                     continue;
                 }
@@ -591,7 +606,8 @@ export async function runBroker(argv) {
                 applied = true;
                 const resultHash = hashContent(resultContents);
                 for (const request of batchRequests) {
-                    mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, resultHash, batch.verdict, 'applied'));
+                    const conflictKeys = requestConflictKeys.get(request.requestId) ?? [];
+                    mutationEvidence.push(buildMutationEvidence(adapter.id, request, baseHash, resultHash, batch.verdict, 'applied', conflictKeys));
                 }
             }
             for (const id of [...plan.queued, ...plan.blocked]) {
@@ -599,7 +615,32 @@ export async function runBroker(argv) {
                 if (!request)
                     continue;
                 const baseHash = hashContent(fileContents[request.filePath] ?? '{}');
-                mutationEvidence.push(buildMutationEvidence('n/a', request, baseHash, baseHash, 'conflict', plan.blocked.includes(id) ? 'blocked' : 'queued'));
+                const conflictKeys = requestConflictKeys.get(id) ?? [];
+                mutationEvidence.push(buildMutationEvidence('n/a', request, baseHash, baseHash, 'conflict', plan.blocked.includes(id) ? 'blocked' : 'queued', conflictKeys));
+            }
+            for (const entry of mutationEvidence) {
+                const request = requestById.get(entry.requestId);
+                if (!request)
+                    continue;
+                runEvidenceRecords.push(buildTeamBrokerRunRecord({
+                    runId,
+                    planId: plan.planId,
+                    request,
+                    adapterChoice: entry.adapterId,
+                    laneDecision: entry.verdict,
+                    mergeVerdict: entry.mergeDecision,
+                    evidencePath: runEvidencePathRelative ?? 'unknown',
+                    appliedFiles: [entry.filePath]
+                }));
+            }
+            if (runEvidenceRecords.length > 0) {
+                mkdirSync(runEvidenceDir, { recursive: true });
+                const runEnvelope = buildTeamBrokerRunRecordEnvelope({
+                    runId,
+                    planId: plan.planId,
+                    records: runEvidenceRecords
+                });
+                writeFileSync(runEvidencePath, JSON.stringify(runEnvelope), 'utf8');
             }
         }
         const ok = plan.blocked.length === 0 && casMismatches.length === 0 && (!options.apply || applied || (plan.batches.length === 0));
@@ -616,13 +657,15 @@ export async function runBroker(argv) {
                 applied: options.apply ? applied : false,
                 casMismatches,
                 mutationEvidence: options.apply ? mutationEvidence : [],
+                runEvidencePath: runEvidencePathRelative,
+                runRecords: options.apply ? runEvidenceRecords : [],
                 unbatchedRequestIds: requests.map((request) => request.requestId).filter((id) => !batchedIds.has(id))
             }
         });
     }
     throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
 }
-function buildMutationEvidence(adapterId, request, baseHash, resultHash, mergeDecision, verdict) {
+function buildMutationEvidence(adapterId, request, baseHash, resultHash, mergeDecision, verdict, conflictKeys) {
     return {
         requestId: request.requestId,
         actorId: request.actorId,
@@ -630,7 +673,7 @@ function buildMutationEvidence(adapterId, request, baseHash, resultHash, mergeDe
         filePath: request.filePath,
         baseHash,
         resultHash,
-        conflictKeys: [],
+        conflictKeys,
         mergeDecision,
         verdict
     };
@@ -656,6 +699,7 @@ function parseBrokerArgs(argv) {
         evidenceOutPath: null,
         requestFiles: [],
         requestsDir: null,
+        runEvidenceDir: null,
         apply: false
     };
     for (let index = 0; index < argv.length; index += 1) {
@@ -721,6 +765,11 @@ function parseBrokerArgs(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--run-evidence-dir') {
+            state.runEvidenceDir = requireValue(argv, index, '--run-evidence-dir');
+            index += 1;
+            continue;
+        }
         if (arg === '--request-file') {
             state.requestFiles.push(requireValue(argv, index, '--request-file'));
             index += 1;
@@ -781,8 +830,41 @@ function parseBrokerArgs(argv) {
         evidenceOutPath: state.evidenceOutPath,
         requestFiles: state.requestFiles,
         requestsDir: state.requestsDir,
+        runEvidenceDir: state.runEvidenceDir,
         apply: state.apply
     };
+}
+function readConfiguredBrokerRunEvidenceDir(cwd) {
+    try {
+        const configPath = path.join(cwd, '.atm', 'config.json');
+        if (!existsSync(configPath)) {
+            return null;
+        }
+        const config = JSON.parse(readFileSync(configPath, 'utf8'));
+        const broker = config && typeof config === 'object' ? config.broker : null;
+        const dir = broker && typeof broker === 'object' ? broker.runEvidenceDir : null;
+        return typeof dir === 'string' && dir.trim() ? dir.trim() : null;
+    }
+    catch {
+        return null;
+    }
+}
+function resolveBrokerRunEvidenceDir(options) {
+    const configuredDir = options.runEvidenceDir
+        ?? process.env.ATM_BROKER_RUN_EVIDENCE_DIR
+        ?? readConfiguredBrokerRunEvidenceDir(options.cwd)
+        ?? null;
+    if (configuredDir) {
+        return path.resolve(options.cwd, configuredDir);
+    }
+    return path.resolve(options.cwd, defaultFallbackBrokerRunEvidenceRelativeDir);
+}
+function normalizeEvidencePath(cwd, filePath) {
+    const absolute = path.resolve(filePath);
+    const relative = path.relative(cwd, absolute);
+    return relative.startsWith('..') || path.isAbsolute(relative)
+        ? absolute.replace(/\\/g, '/')
+        : relative.replace(/\\/g, '/');
 }
 function loadComposeProposals(options) {
     const proposals = [];

@@ -58,6 +58,68 @@ export function isMetadataOnlyEnvelope(envelope: PatchEnvelope): boolean {
   return envelope.mode === 'metadata-only' && envelope.patchText === null;
 }
 
+export interface PatchEnvelopeSummary {
+  readonly envelopeId: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly freezeId: string;
+  readonly mode: PatchEnvelopeMode;
+  readonly wipState: PatchEnvelopeWipState;
+  readonly confidence: 'low' | 'medium' | 'high';
+  readonly fileCount: number;
+  readonly hasPatchText: boolean;
+  readonly capturedAt: string;
+}
+
+export interface PatchEnvelopeDivergence {
+  readonly field: string;
+  readonly left: unknown;
+  readonly right: unknown;
+}
+
+export function summarizePatchEnvelope(envelope: PatchEnvelope): PatchEnvelopeSummary {
+  return {
+    envelopeId: envelope.envelopeId,
+    taskId: envelope.taskId,
+    actorId: envelope.actorId,
+    freezeId: envelope.metadata.freezeId,
+    mode: envelope.mode,
+    wipState: envelope.wipState,
+    confidence: envelope.metadata.confidence,
+    fileCount: envelope.targetFiles.length,
+    hasPatchText: envelope.patchText !== null && envelope.patchText.length > 0,
+    capturedAt: envelope.metadata.capturedAt
+  };
+}
+
+export function comparePatchEnvelopes(
+  left: PatchEnvelope,
+  right: PatchEnvelope
+): { readonly equal: boolean; readonly divergences: readonly PatchEnvelopeDivergence[] } {
+  const divergences: PatchEnvelopeDivergence[] = [];
+  const scalarFields: readonly (keyof PatchEnvelope)[] = [
+    'taskId', 'actorId', 'mode', 'wipState', 'snapshotDir', 'patchText'
+  ];
+  for (const field of scalarFields) {
+    if (left[field] !== right[field]) {
+      divergences.push({ field: String(field), left: left[field], right: right[field] });
+    }
+  }
+  if (left.targetFiles.length !== right.targetFiles.length ||
+      left.targetFiles.some((file, idx) => file !== right.targetFiles[idx])) {
+    divergences.push({ field: 'targetFiles', left: left.targetFiles, right: right.targetFiles });
+  }
+  const metadataFields: readonly (keyof PatchEnvelope['metadata'])[] = [
+    'freezeId', 'confidence', 'partialReason'
+  ];
+  for (const field of metadataFields) {
+    if (left.metadata[field] !== right.metadata[field]) {
+      divergences.push({ field: `metadata.${String(field)}`, left: left.metadata[field], right: right.metadata[field] });
+    }
+  }
+  return { equal: divergences.length === 0, divergences };
+}
+
 export function validatePatchEnvelope(envelope: PatchEnvelope): { readonly ok: boolean; readonly reason: string } {
   if (!envelope.taskId.trim()) {
     return { ok: false, reason: 'taskId is required' };

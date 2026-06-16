@@ -1,4 +1,5 @@
-import type { BrokerDecision, WriteIntent } from './types.ts';
+import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
+import type { WriteIntent } from './types.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 export declare const DEFAULT_TEAM_STEWARD_ID = "neutral-write-steward";
 export declare const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = ".atm/runtime/write-broker.registry.json";
@@ -53,6 +54,22 @@ export interface TeamBrokerFinding {
     readonly detail: string;
     readonly paths?: string[];
 }
+export interface BrokerRunRecordInput {
+    readonly runId: string;
+    readonly planId: string;
+    readonly request: MutationRequest;
+    readonly adapterChoice: string;
+    readonly laneDecision: string;
+    readonly mergeVerdict: MergeVerdict;
+    readonly evidencePath: string;
+    readonly appliedFiles?: readonly string[];
+}
+export declare function buildTeamBrokerRunRecord(input: BrokerRunRecordInput): BrokerOperationRunRecord;
+export declare function buildTeamBrokerRunRecordEnvelope(input: {
+    readonly runId: string;
+    readonly planId: string;
+    readonly records: readonly BrokerOperationRunRecord[];
+}): BrokerOperationRunRecordEnvelope;
 export declare function buildTeamWriteIntent(input: {
     readonly cwd: string;
     readonly taskId: string;

@@ -4,6 +4,43 @@ import { buildVirtualAtomInUseRegistry, loadRegistry } from './registry.js';
 import { readGitHeadCommit } from './steward.js';
 export const DEFAULT_TEAM_STEWARD_ID = 'neutral-write-steward';
 export const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = '.atm/runtime/write-broker.registry.json';
+export function buildTeamBrokerRunRecord(input) {
+    const taskId = input.request.taskId?.trim();
+    return {
+        schemaId: 'atm.brokerOperationRunRecord.v1',
+        specVersion: '0.1.0',
+        migration: {
+            strategy: 'none',
+            fromVersion: null,
+            notes: 'team lane run record'
+        },
+        runId: input.runId,
+        planId: input.planId,
+        request_identity: [input.request.requestId],
+        actor_ids: [input.request.actorId],
+        request_files: [input.request.filePath],
+        adapter_choice: input.adapterChoice,
+        applied_files: input.appliedFiles ?? [input.request.filePath],
+        lane_decision: input.laneDecision,
+        merge_verdict: input.mergeVerdict,
+        evidence_path: input.evidencePath,
+        ...(taskId ? { task_ids: [taskId] } : {})
+    };
+}
+export function buildTeamBrokerRunRecordEnvelope(input) {
+    return {
+        schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+        specVersion: '0.1.0',
+        migration: {
+            strategy: 'none',
+            fromVersion: null,
+            notes: 'team lane run record'
+        },
+        runId: input.runId,
+        planId: input.planId,
+        records: [...input.records]
+    };
+}
 export function buildTeamWriteIntent(input) {
     const task = input.task;
     const baseCommit = readGitHeadCommit(path.resolve(input.cwd)) ?? 'unknown-base-commit';
