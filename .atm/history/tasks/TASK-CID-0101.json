@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0101",
+  "title": "Task-specific validator mapping for historical batch evidence",
+  "status": "done",
+  "milestone": "M19",
+  "dependencies": [
+    "TASK-CID-0100"
+  ],
+  "acceptance": [
+    "Validator runs in historical batch output are classified as `batchWide`, `taskSpecific`, or `advisory`.",
+    "Each task slice records only validators it can actually claim.",
+    "Focused regression proves batch-wide validation does not automatically satisfy task-specific coverage."
+  ],
+  "deliverables": [],
+  "scopePaths": [
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/command-specs/evidence.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed-historical-batch",
+  "rollbackStrategy": "revert-historical-batch-validator-mapping",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts"
+    ]
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0101-task-specific-validator-mapping.task.md",
+    "sectionTitle": "TASK-CID-0101",
+    "headingLine": 28,
+    "hash": "7bd0772fb1b733a1"
+  },
+  "importedAt": "2026-06-16T01:39:03.753Z",
+  "lastTransitionId": "2026-06-16T02-47-05-869Z-close-6bb4753da12f",
+  "lastTransitionAt": "2026-06-16T02:47:05.869Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "closedAt": "2026-06-16T02:47:05.864Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": null,
+  "closeReason": "Historical batch dogfood delivery commit 917e54c3 is a multi-task bundle; TASK-CID-0101 slice is complete, close-ready, and sibling files are covered by their own task slices.",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0101.closure-packet.json"
+}

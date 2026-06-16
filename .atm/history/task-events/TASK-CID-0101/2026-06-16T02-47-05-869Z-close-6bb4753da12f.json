@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-16T02-47-05-869Z-close-6bb4753da12f",
+  "taskId": "TASK-CID-0101",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": null,
+  "fromStatus": "planned",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0101.json",
+  "taskSha256": "sha256:755465b083c510846a6c8f940f7d835812aa7e54103441906b8ec2fb2ab695d4",
+  "createdAt": "2026-06-16T02:47:05.869Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0101 --actor codex-main --status done --historical-delivery 917e54c3e23f9929652c636435642f59d974a8bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0101.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-16T02:47:05.861Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0101-task-specific-validator-mapping.task.md",
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
