@@ -974,8 +974,10 @@ export function createClosurePacket(input) {
         targetCommitDelta,
         closedByCommand: 'atm tasks close',
         commandRuns: evidenceContext.commandRuns,
-        validationPasses: evidenceContext.validationPasses,
-        evidenceFreshness: evidenceContext.evidenceFreshness,
+        validationPasses: input.validationPasses
+            ? uniqueSorted(input.validationPasses.map((entry) => String(entry).trim()).filter(Boolean))
+            : evidenceContext.validationPasses,
+        evidenceFreshness: input.evidenceFreshness ?? evidenceContext.evidenceFreshness,
         requiredGates,
         requiredGatesSnapshot,
         evidencePath: input.evidencePath,

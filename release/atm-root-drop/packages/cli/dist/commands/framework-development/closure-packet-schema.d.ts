@@ -260,6 +260,8 @@ export declare function createClosurePacket(input: {
     readonly attestation?: ClosurePacketReconcileAttestation | null;
     readonly historicalDeliveryProvenance?: HistoricalDeliveryProvenance | null;
     readonly teamSummary?: ClosurePacketTeamSummary | null;
+    readonly validationPasses?: readonly string[];
+    readonly evidenceFreshness?: 'fresh' | 'historical-reference' | 'draft';
 }): ClosurePacket;
 export declare function writeClosurePacket(cwd: string, taskId: string, packet: ClosurePacket): string;
 export type AtmTasksWriteAction = 'tasks-close' | 'tasks-reconcile' | 'tasks-import-write' | 'tasks-repair-closure-write';

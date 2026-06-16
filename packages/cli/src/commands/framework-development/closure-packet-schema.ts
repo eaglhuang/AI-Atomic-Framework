@@ -1232,6 +1232,8 @@ export function createClosurePacket(input: {
   readonly attestation?: ClosurePacketReconcileAttestation | null;
   readonly historicalDeliveryProvenance?: HistoricalDeliveryProvenance | null;
   readonly teamSummary?: ClosurePacketTeamSummary | null;
+  readonly validationPasses?: readonly string[];
+  readonly evidenceFreshness?: 'fresh' | 'historical-reference' | 'draft';
 }): ClosurePacket {
   const cwd = path.resolve(input.cwd);
   const targetCommitDelta = readFutureTargetCommitDelta(cwd, input.changedFiles, input.taskId);
@@ -1253,8 +1255,10 @@ export function createClosurePacket(input: {
     targetCommitDelta,
     closedByCommand: 'atm tasks close',
     commandRuns: evidenceContext.commandRuns,
-    validationPasses: evidenceContext.validationPasses,
-    evidenceFreshness: evidenceContext.evidenceFreshness,
+    validationPasses: input.validationPasses
+      ? uniqueSorted(input.validationPasses.map((entry) => String(entry).trim()).filter(Boolean))
+      : evidenceContext.validationPasses,
+    evidenceFreshness: input.evidenceFreshness ?? evidenceContext.evidenceFreshness,
     requiredGates,
     requiredGatesSnapshot,
     evidencePath: input.evidencePath,

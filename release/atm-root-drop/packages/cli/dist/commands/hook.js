@@ -2093,6 +2093,29 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
         }
         if (lower.startsWith('.atm/history/evidence/')) {
             const evidence = readJsonFile(absolutePath);
+            if (lower.startsWith('.atm/history/evidence/historical-batches/')) {
+                const envelopeTasks = Array.isArray(evidence?.tasks) ? evidence.tasks : [];
+                const taskIds = envelopeTasks
+                    .map((entry) => entry && typeof entry === 'object' && !Array.isArray(entry) ? entry.taskId : null)
+                    .filter((entry) => typeof entry === 'string' && entry.trim().length > 0);
+                const hasBatchTaskContext = taskIds.some((taskId) => {
+                    const normalizedTaskId = taskId.toLowerCase();
+                    const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${taskId}.json`);
+                    const hasSiblingEvent = protectedFiles.some((entry) => {
+                        const candidate = normalizeRelativePath(entry).toLowerCase();
+                        return candidate.startsWith(`.atm/history/task-events/${normalizedTaskId}/`);
+                    });
+                    return hasSiblingTask || hasSiblingEvent;
+                });
+                if (taskIds.length === 0 || !hasBatchTaskContext) {
+                    findings.push({
+                        file: normalized,
+                        reason: 'evidence-file-missing-task-context',
+                        detail: 'Historical batch evidence updates must travel with at least one staged task ledger change or transition event referenced by the batch envelope.'
+                    });
+                }
+                continue;
+            }
             const taskId = typeof evidence?.taskId === 'string' ? evidence.taskId : path.basename(normalized, '.json');
             const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${taskId}.json`);
             const hasSiblingEvent = protectedFiles.some((entry) => {

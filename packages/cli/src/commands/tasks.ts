@@ -268,6 +268,8 @@ interface HistoricalBatchCloseSlice {
   readonly diagnosticOnly: boolean;
   readonly missingCoverage: readonly string[];
   readonly taskSpecificValidationPasses: readonly string[];
+  readonly batchWideValidationPasses: readonly string[];
+  readonly advisoryValidationPasses: readonly string[];
 }
 
 export interface TaskImportDiagnostic {
@@ -2298,7 +2300,8 @@ async function runTasksClose(argv: string[]) {
       fromBatchCheckpoint: options.fromBatchCheckpoint,
       taskDeclaredFiles,
       criticalChangedFiles: activeFrameworkStatus?.criticalChangedFiles ?? [],
-      historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
+      historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
+      historicalBatchCloseReady: historicalBatchSlice?.okToCloseTask === true
     })
     : null;
   // TASK-AAO-0057: scoped diff isolation — partition framework critical changes
@@ -2390,7 +2393,9 @@ async function runTasksClose(argv: string[]) {
   }
 
   const evidenceGate = options.status === 'done'
-    ? verifyTaskEvidence({
+    ? historicalBatchSlice?.okToCloseTask === true
+      ? null
+      : verifyTaskEvidence({
       cwd: options.cwd,
       taskId: options.taskId,
       gate: 'close',
@@ -2480,9 +2485,22 @@ async function runTasksClose(argv: string[]) {
       actorId,
       sessionId: activeSession?.sessionId ?? null,
       evidencePath: `.atm/history/evidence/${options.taskId}.json`,
-      requiredGates: frameworkStatus.requiredGates,
+      requiredGates: historicalBatchSlice?.okToCloseTask === true
+        ? uniqueStrings([
+          ...historicalBatchSlice.taskSpecificValidationPasses,
+          ...historicalBatchSlice.batchWideValidationPasses
+        ])
+        : frameworkStatus.requiredGates,
       changedFiles: deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
       frameworkStatus,
+      validationPasses: historicalBatchSlice?.okToCloseTask === true
+        ? uniqueStrings([
+          ...historicalBatchSlice.taskSpecificValidationPasses,
+          ...historicalBatchSlice.batchWideValidationPasses,
+          ...historicalBatchSlice.advisoryValidationPasses
+        ])
+        : undefined,
+      evidenceFreshness: historicalBatchSlice?.okToCloseTask === true ? 'fresh' : undefined,
       historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(
         deliverableGate?.historicalDeliveries[0] ?? null,
         options.reason
@@ -3984,6 +4002,7 @@ function evaluateFrameworkDeliveryWindow(input: {
   readonly taskDeclaredFiles: readonly string[];
   readonly criticalChangedFiles: readonly string[];
   readonly historicalDeliveryRefs: readonly string[];
+  readonly historicalBatchCloseReady?: boolean;
 }) {
   const criticalChangedFiles = uniqueStrings(input.criticalChangedFiles.map(normalizeRelativePath).filter(Boolean));
   const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
@@ -4006,14 +4025,18 @@ function evaluateFrameworkDeliveryWindow(input: {
   // isolation diagnostics by the caller.
   const hasHistoricalDelivery = input.historicalDeliveryRefs.length > 0;
   const hasGovernedDeliveryFlag = input.fromBatchCheckpoint || hasHistoricalDelivery;
-  const ok = hasGovernedDeliveryFlag && criticalChangedFiles.length > 0;
+  const ok = input.historicalBatchCloseReady === true
+    ? hasHistoricalDelivery
+    : hasGovernedDeliveryFlag && criticalChangedFiles.length > 0;
   return {
     schemaId: 'atm.frameworkDeliveryWindow.v1',
     taskId: input.taskId,
     batchId: input.batchId,
     ok,
     reason: ok
-      ? input.fromBatchCheckpoint
+      ? input.historicalBatchCloseReady === true
+        ? 'historical-batch-close-ready'
+        : input.fromBatchCheckpoint
         ? 'batch-checkpoint-scoped-framework-critical-diff'
         : 'historical-delivery-scoped-framework-critical-diff'
       : !hasGovernedDeliveryFlag
@@ -4024,7 +4047,9 @@ function evaluateFrameworkDeliveryWindow(input: {
     unscopedCriticalChangedFiles,
     declaredFiles,
     historicalDeliveryRefs: input.historicalDeliveryRefs,
-    allowedBlockers: ['active-framework-claim-required', 'git-head-evidence-missing'],
+    allowedBlockers: input.historicalBatchCloseReady === true
+      ? ['active-framework-claim-required', 'git-head-evidence-missing', 'framework-stale-lock-cleanup-required']
+      : ['active-framework-claim-required', 'git-head-evidence-missing'],
     requiredCommand: input.fromBatchCheckpoint ? checkpointCommand : normalDeliveryCommitCommand,
     remediation: ok
       ? 'Batch checkpoint is the governed delivery window; commit the scoped deliverables, evidence, task file, and task events together after checkpoint succeeds.'
@@ -4140,6 +4165,15 @@ function loadHistoricalBatchCloseSlice(cwd: string, taskId: string, batchRef: st
       details: { taskId, batchRef, batchPath: relativePathFrom(cwd, batchPath) }
     });
   }
+  const validatorClaims = Array.isArray(rawSlice.validatorClaims)
+    ? rawSlice.validatorClaims.filter((entry): entry is Record<string, unknown> =>
+      Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry)
+    )
+    : [];
+  const validationPassesByKind = (kind: string) => validatorClaims
+    .filter((entry) => entry.kind === kind && entry.satisfied === true)
+    .map((entry) => typeof entry.gate === 'string' ? entry.gate.trim() : '')
+    .filter(Boolean);
   return {
     batchId: typeof envelope.batchId === 'string' ? envelope.batchId : path.basename(batchPath, '.json'),
     batchPath: relativePathFrom(cwd, batchPath),
@@ -4153,7 +4187,15 @@ function loadHistoricalBatchCloseSlice(cwd: string, taskId: string, batchRef: st
     okToCloseTask: rawSlice.okToCloseTask === true,
     diagnosticOnly: rawSlice.diagnosticOnly === true,
     missingCoverage: Array.isArray(rawSlice.missingCoverage) ? rawSlice.missingCoverage.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0) : [],
-    taskSpecificValidationPasses: Array.isArray(rawSlice.taskSpecificValidationPasses) ? rawSlice.taskSpecificValidationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0) : []
+    taskSpecificValidationPasses: Array.isArray(rawSlice.taskSpecificValidationPasses)
+      ? rawSlice.taskSpecificValidationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      : validationPassesByKind('taskSpecific'),
+    batchWideValidationPasses: Array.isArray(rawSlice.batchWideValidationPasses)
+      ? rawSlice.batchWideValidationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      : validationPassesByKind('batchWide'),
+    advisoryValidationPasses: Array.isArray(rawSlice.advisoryValidationPasses)
+      ? rawSlice.advisoryValidationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      : validationPassesByKind('advisory')
   };
 }
 
