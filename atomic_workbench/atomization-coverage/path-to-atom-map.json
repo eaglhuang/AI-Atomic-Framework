@@ -2,7 +2,7 @@
   "schemaId": "atm.pathToAtomMap.v1",
   "schemaSource": "docs/ATOMIZATION_COVERAGE_TAXONOMY.md#42-json-schema-草案-atmpathtoatommapv1",
   "version": "1.0",
-  "timestamp": "2026-06-16T01:35:38.947Z",
+  "timestamp": "2026-06-16T15:15:00.000Z",
   "sharding": {
     "strategy": "owner-shards",
     "manifestPath": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
@@ -330,6 +330,20 @@
       "atom_id": "atm.next-router-map",
       "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/next.spec.ts",
+      "atom_id": "atm.next-router-map",
+      "capability": "next command CLI surface specification: summary, options (--claim, --actor, --prompt, --task, --tasks, --intent, --output), and canonical usage examples covering prompt-scoped, explicit-task, quickfix, batch, and claim flows (TASK-MAO-0004).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0004"
+    },
+    {
+      "path_pattern": "tests/cli/next-route-selector.test.ts",
+      "atom_id": "atm.next-router-map",
+      "capability": "Standard-suite regression wrapper for the prompt-scoped next route selector: delegates to validate-prompt-scoped-next.ts and surfaces the four acceptance scenarios (no route, unique route, ambiguous route, blocked route) as a named test in the npm run validate:cli sweep (TASK-MAO-0004).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0004"
     },
     {
       "path_pattern": "packages/cli/src/commands/next.ts",

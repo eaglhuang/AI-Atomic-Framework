@@ -66,33 +66,27 @@
     "hash": "3cdc01c74ad0dbbb"
   },
   "importedAt": "2026-06-15T16:42:07.008Z",
-  "lastTransitionId": "2026-06-15T16-43-37-608Z-claim-b7f1c9335ed3",
-  "lastTransitionAt": "2026-06-15T16:43:37.608Z",
+  "lastTransitionId": "2026-06-16T15-13-07-467Z-claim-f449807f7b3f",
+  "lastTransitionAt": "2026-06-16T15:13:07.467Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-main",
-  "reservedAt": "2026-06-15T16:43:37.575Z",
-  "promotedAt": "2026-06-15T16:43:37.579Z",
+  "owner": "augment-code",
+  "reservedAt": "2026-06-16T15:12:45.259Z",
+  "promotedAt": "2026-06-16T15:13:02.159Z",
   "claim": {
-    "actorId": "codex-main",
-    "leaseId": "lease-ac9ed6a45356",
-    "claimedAt": "2026-06-15T16:43:37.581Z",
-    "heartbeatAt": "2026-06-15T16:43:37.581Z",
+    "actorId": "augment-code",
+    "leaseId": "lease-019bdb7852cb",
+    "claimedAt": "2026-06-16T15:13:07.433Z",
+    "heartbeatAt": "2026-06-16T15:13:07.433Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/TASK-MAO-0004.json",
-      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
-      "packages/cli/src/commands/command-specs/next.spec.ts",
-      "packages/cli/src/commands/next.ts",
-      "packages/cli/src/commands/task-intent.ts",
-      "scripts/validate-prompt-scoped-next.ts",
-      "tests/cli/next-route-selector.test.ts"
+      ".atm/history/tasks/TASK-MAO-0004.json"
     ],
     "state": "active",
-    "intent": "closeout-only"
+    "intent": "write"
   },
   "startedAt": "2026-06-15T16:43:37.581Z",
   "startedByActor": "codex-main",
-  "startedBySessionId": "session-20260615164337-codex-main-TASK-MAO-0004-0818c4b256",
+  "startedBySessionId": "session-20260616151307-augment-code-TASK-MAO-0004-ff6d4d67a0",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -104,20 +98,18 @@
     "allowedFiles": [
       ".atm/history/evidence/TASK-MAO-0004.*",
       ".atm/history/task-events/TASK-MAO-0004/**",
-      ".atm/history/tasks/TASK-MAO-0004.json",
-      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
-      "packages/cli/src/commands/command-specs/next.spec.ts",
-      "packages/cli/src/commands/next.ts",
-      "packages/cli/src/commands/task-intent.ts",
-      "scripts/validate-prompt-scoped-next.ts",
-      "tests/cli/next-route-selector.test.ts"
+      ".atm/history/tasks/TASK-MAO-0004.json"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "a8acf6fbcd16159bb7f6a43caf39679a7092eded2cc38b2ad0d35d6a2a83ae29",
-    "actorId": "codex-main",
-    "createdAt": "2026-06-15T16:43:37.607Z",
+    "actorId": "augment-code",
+    "createdAt": "2026-06-16T15:13:07.466Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-16T15:06:53.480Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "closedBySessionId": "session-20260616150617-claude-code-opus-4-7-TASK-MAO-0004-ecff993000",
+  "closeReason": "Phase 0 close-to-review; framework structural rejection of done-from-historical-delivery; deliverables already in commit 83a6e161c"
 }

@@ -1,0 +1,651 @@
+{
+  "taskId": "TASK-MAO-0004",
+  "updatedAt": "2026-06-16T15:13:55.241Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-06-16T13-33-10-280Z for TASK-MAO-0004.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-06-16T13-33-10-280Z.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "tests/cli/next-route-selector.test.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": null,
+      "createdAt": "2026-06-16T13:33:10.280Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-06-16T13-33-10-280Z",
+          "commits": [
+            "240b6b436",
+            "83a6e161c"
+          ],
+          "matchedCommits": [
+            "240b6b436752876acd58a2fff99940b9aef47c6c",
+            "83a6e161c696aa16612a45d81675de8c42749342"
+          ],
+          "matchedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "tests/cli/next-route-selector.test.ts"
+          ],
+          "outOfScopeFiles": [
+            "packages/cli/src/commands/route.ts",
+            "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+            "packages/core/src/broker/steward.ts",
+            "packages/core/src/broker/types.ts",
+            "scripts/lib/agr-benchmark-runner.ts"
+          ],
+          "taskSliceOk": true,
+          "declaredDeliverables": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "declaredScopeFiles": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "scripts/validate-prompt-scoped-next.ts",
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "matchedDeliverables": [
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "missingCoverage": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts"
+          ],
+          "coverageStatus": "partial",
+          "validatorClaims": [
+            {
+              "gate": "git diff --check",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "node --strip-types tests/cli/next-route-selector.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": false,
+              "requiredForClose": true
+            },
+            {
+              "gate": "typecheck",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:cli",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:prompt-scoped-next",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            }
+          ],
+          "atomHealthClaims": [
+            {
+              "atomOrMapId": "atm.mao-next-route-map",
+              "kind": "owner",
+              "generatedByTask": true,
+              "validatorHealthy": false
+            },
+            {
+              "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+              "kind": "map-update",
+              "generatedByTask": true,
+              "validatorHealthy": false
+            }
+          ],
+          "okToRecordEvidence": true,
+          "okToCloseTask": false,
+          "diagnosticOnly": true
+        },
+        "validationPasses": [
+          "git diff --check",
+          "typecheck",
+          "validate:cli",
+          "validate:prompt-scoped-next"
+        ],
+        "batchWideValidationPasses": [],
+        "advisoryValidationPasses": [],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "generatedAt": "2026-06-16T13:33:10.579Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types scripts/validate-prompt-scoped-next.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:prompt-scoped-next"
+            ],
+            "generatedAt": "2026-06-16T13:33:17.490Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-06-16T13:33:22.000Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-06-16T13:33:37.642Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-06-16T13-39-05-214Z for TASK-MAO-0004.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-06-16T13-39-05-214Z.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "tests/cli/next-route-selector.test.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": null,
+      "createdAt": "2026-06-16T13:39:05.214Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-06-16T13-39-05-214Z",
+          "commits": [
+            "240b6b436",
+            "83a6e161c"
+          ],
+          "matchedCommits": [
+            "240b6b436752876acd58a2fff99940b9aef47c6c",
+            "83a6e161c696aa16612a45d81675de8c42749342"
+          ],
+          "matchedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "tests/cli/next-route-selector.test.ts"
+          ],
+          "outOfScopeFiles": [
+            "packages/cli/src/commands/route.ts",
+            "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+            "packages/core/src/broker/steward.ts",
+            "packages/core/src/broker/types.ts",
+            "scripts/lib/agr-benchmark-runner.ts"
+          ],
+          "taskSliceOk": true,
+          "declaredDeliverables": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "declaredScopeFiles": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "scripts/validate-prompt-scoped-next.ts",
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "matchedDeliverables": [
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "missingCoverage": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts"
+          ],
+          "coverageStatus": "partial",
+          "validatorClaims": [
+            {
+              "gate": "git diff --check",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "node --strip-types tests/cli/next-route-selector.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "typecheck",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:cli",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:prompt-scoped-next",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            }
+          ],
+          "atomHealthClaims": [
+            {
+              "atomOrMapId": "atm.mao-next-route-map",
+              "kind": "owner",
+              "generatedByTask": true,
+              "validatorHealthy": true
+            },
+            {
+              "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+              "kind": "map-update",
+              "generatedByTask": true,
+              "validatorHealthy": true
+            }
+          ],
+          "okToRecordEvidence": true,
+          "okToCloseTask": false,
+          "diagnosticOnly": true
+        },
+        "validationPasses": [
+          "git diff --check",
+          "node --strip-types tests/cli/next-route-selector.test.ts",
+          "typecheck",
+          "validate:cli",
+          "validate:prompt-scoped-next"
+        ],
+        "batchWideValidationPasses": [],
+        "advisoryValidationPasses": [],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "generatedAt": "2026-06-16T13:39:05.493Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types scripts/validate-prompt-scoped-next.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:prompt-scoped-next"
+            ],
+            "generatedAt": "2026-06-16T13:39:13.047Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types tests/cli/next-route-selector.test.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6c37bd59fef3ec5ce8727e734920367b7afdac301bf97f0cab08c32aa5e2f7d2",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/next-route-selector.test.ts"
+            ],
+            "generatedAt": "2026-06-16T13:39:21.280Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-06-16T13:39:27.278Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-06-16T13:39:46.674Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Historical batch evidence hist-batch-2026-06-16T13-40-44-574Z for TASK-MAO-0004.",
+      "artifactPaths": [
+        ".atm/history/evidence/historical-batches/hist-batch-2026-06-16T13-40-44-574Z.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "tests/cli/next-route-selector.test.ts"
+      ],
+      "evidenceFreshness": "historical-reference",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": null,
+      "createdAt": "2026-06-16T13:40:44.574Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "historical-reference",
+        "historicalBatch": {
+          "schemaId": "atm.historicalBatchTaskSlice.v1",
+          "batchId": "hist-batch-2026-06-16T13-40-44-574Z",
+          "commits": [
+            "240b6b436",
+            "83a6e161c"
+          ],
+          "matchedCommits": [
+            "240b6b436752876acd58a2fff99940b9aef47c6c",
+            "83a6e161c696aa16612a45d81675de8c42749342"
+          ],
+          "matchedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "tests/cli/next-route-selector.test.ts"
+          ],
+          "outOfScopeFiles": [
+            "packages/cli/src/commands/route.ts",
+            "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+            "packages/core/src/broker/steward.ts",
+            "packages/core/src/broker/types.ts",
+            "scripts/lib/agr-benchmark-runner.ts"
+          ],
+          "taskSliceOk": true,
+          "declaredDeliverables": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "declaredScopeFiles": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "scripts/validate-prompt-scoped-next.ts",
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "matchedDeliverables": [
+            "tests/cli/next-route-selector.test.ts",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+          ],
+          "missingCoverage": [
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts"
+          ],
+          "coverageStatus": "partial",
+          "validatorClaims": [
+            {
+              "gate": "git diff --check",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+              "kind": "advisory",
+              "satisfied": true,
+              "requiredForClose": false
+            },
+            {
+              "gate": "node --strip-types tests/cli/next-route-selector.test.ts",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "typecheck",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:cli",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            },
+            {
+              "gate": "validate:prompt-scoped-next",
+              "kind": "taskSpecific",
+              "satisfied": true,
+              "requiredForClose": true
+            }
+          ],
+          "atomHealthClaims": [
+            {
+              "atomOrMapId": "atm.mao-next-route-map",
+              "kind": "owner",
+              "generatedByTask": true,
+              "validatorHealthy": true
+            },
+            {
+              "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+              "kind": "map-update",
+              "generatedByTask": true,
+              "validatorHealthy": true
+            }
+          ],
+          "okToRecordEvidence": true,
+          "okToCloseTask": false,
+          "diagnosticOnly": true
+        },
+        "validationPasses": [
+          "git diff --check",
+          "node --strip-types tests/cli/next-route-selector.test.ts",
+          "typecheck",
+          "validate:cli",
+          "validate:prompt-scoped-next"
+        ],
+        "batchWideValidationPasses": [],
+        "advisoryValidationPasses": [
+          "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "generatedAt": "2026-06-16T13:40:44.839Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c6d9b40900dd785eee0c45face9039a41d62cda4b3f2f00ee7c7eea9469d56b8",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts"
+            ],
+            "generatedAt": "2026-06-16T13:40:45.661Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types scripts/validate-prompt-scoped-next.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:prompt-scoped-next"
+            ],
+            "generatedAt": "2026-06-16T13:40:52.494Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "node --strip-types tests/cli/next-route-selector.test.ts",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6c37bd59fef3ec5ce8727e734920367b7afdac301bf97f0cab08c32aa5e2f7d2",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/next-route-selector.test.ts"
+            ],
+            "generatedAt": "2026-06-16T13:41:02.124Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run typecheck",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "generatedAt": "2026-06-16T13:41:06.761Z",
+            "runnerKind": "unknown"
+          },
+          {
+            "command": "npm run validate:cli",
+            "cwd": ".",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "generatedAt": "2026-06-16T13:41:22.149Z",
+            "runnerKind": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for TASK-MAO-0004: codex-main -> claude-code-opus-4-7.",
+      "artifactPaths": [
+        ".atm/history/tasks/TASK-MAO-0004.json"
+      ],
+      "producedBy": "claude-code-opus-4-7",
+      "createdAt": "2026-06-16T15:06:17.934Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-main",
+          "leaseId": "lease-ac9ed6a45356",
+          "claimedAt": "2026-06-15T16:43:37.581Z",
+          "heartbeatAt": "2026-06-15T16:43:37.581Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/TASK-MAO-0004.json",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/task-intent.ts",
+            "scripts/validate-prompt-scoped-next.ts",
+            "tests/cli/next-route-selector.test.ts"
+          ],
+          "state": "active"
+        },
+        "newClaim": {
+          "actorId": "claude-code-opus-4-7",
+          "leaseId": "lease-068729de11a8",
+          "claimedAt": "2026-06-16T15:06:17.891Z",
+          "heartbeatAt": "2026-06-16T15:06:17.891Z",
+          "ttlSeconds": 1800,
+          "files": [
+            "tests/cli/next-route-selector.test.ts"
+          ],
+          "state": "active",
+          "reason": "session 2 reclaim of stale codex-main lease for Phase 0 close-to-review"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "augment-code fresh validation: validate-prompt-scoped-next exit 0, next-route-selector exit 0; all TASK-MAO-0004 deliverables present and atom-map updated with 2 new entries (next.spec.ts, next-route-selector.test.ts)",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "augment-code",
+      "sessionId": "session-20260616151307-augment-code-TASK-MAO-0004-ff6d4d67a0",
+      "createdAt": "2026-06-16T15:13:55.241Z",
+      "details": {
+        "actorId": "augment-code",
+        "sessionId": "session-20260616151307-augment-code-TASK-MAO-0004-ff6d4d67a0",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.mao-next-route-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ]
+      }
+    }
+  ]
+}
