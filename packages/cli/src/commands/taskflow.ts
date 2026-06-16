@@ -330,6 +330,8 @@ function buildTaskflowCloseWriteReadinessHint(input: {
   closebackPlan: ReturnType<typeof buildClosebackPlan>;
   previewCommitBundle: TaskflowGovernedCommitBundle;
   historicalDeliveryRefs: readonly string[];
+  waiverOutOfScopeDelivery: boolean;
+  waiverReason: string | null;
   planningAuthorityDeliveryGate: {
     required: boolean;
     ok: boolean;
@@ -407,14 +409,14 @@ function buildTaskflowCloseWriteReadinessHint(input: {
       requestedRef: historicalRef,
       declaredFiles,
       enforceDeclaredScope: true,
-      waiverOutOfScopeDelivery: false,
-      waiverReason: null
+      waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
+      waiverReason: input.waiverReason
     });
     if (historicalReport.reason === 'out-of-scope-source-files-present') {
       blockers.push({
         code: 'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUIRED',
-        summary: `Historical delivery ${historicalRef} includes out-of-scope source files. taskflow close will fail closed unless the delivery is isolated or the backend waiver path is used explicitly.`,
-        requiredCommand: `node atm.mjs tasks close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --status done --historical-delivery ${historicalRef} --waiver-out-of-scope-delivery --reason \"<reason>\" --json`
+        summary: `Historical delivery ${historicalRef} includes out-of-scope source files. taskflow close requires an explicit waiver reason to continue through the operator lane.`,
+        requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery ${historicalRef} --waiver-out-of-scope-delivery --reason \"<reason>\" --write --json`
       });
     }
   }
@@ -450,6 +452,22 @@ function collectHistoricalDeliveryRefs(parsed: ReturnType<typeof parseArgsForCom
 function collectHistoricalBatchRef(parsed: ReturnType<typeof parseArgsForCommand>): string | null {
   const value = parsed.options.historicalBatch;
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function collectWaiverOutOfScopeDelivery(parsed: ReturnType<typeof parseArgsForCommand>) {
+  const waiverOutOfScopeDelivery = parsed.options.waiverOutOfScopeDelivery === true;
+  const reason = typeof parsed.options.reason === 'string' && parsed.options.reason.trim()
+    ? parsed.options.reason.trim()
+    : null;
+  if (waiverOutOfScopeDelivery && !reason) {
+    throw new CliError('ATM_TASKFLOW_CLOSE_WAIVER_REASON_REQUIRED', 'taskflow close --waiver-out-of-scope-delivery requires --reason <text>.', {
+      exitCode: 2
+    });
+  }
+  return {
+    waiverOutOfScopeDelivery,
+    waiverReason: reason
+  };
 }
 
 function resolveHistoricalBatchPath(cwd: string, batchRef: string) {
@@ -1296,6 +1314,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     : 'dry-run';
   const profilePath = parsed.options.profile ? String(parsed.options.profile) : null;
   const historicalBatchRef = collectHistoricalBatchRef(parsed);
+  const waiver = collectWaiverOutOfScopeDelivery(parsed);
   const explicitHistoricalDeliveryRefs = collectHistoricalDeliveryRefs(parsed);
   const historicalBatchMatchedCommits = historicalBatchRef
     ? loadHistoricalBatchMatchedCommits(cwd, taskId, historicalBatchRef)
@@ -1369,6 +1388,9 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     taskId,
     actorId: actorId || '<actor>',
     historicalDeliveryRefs,
+    historicalBatchRef,
+    waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery,
+    waiverReason: waiver.waiverReason,
     planningAuthorityDeliveryGate,
     delegationContract,
     diagnosis: {
@@ -1408,6 +1430,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     closebackPlan,
     previewCommitBundle,
     historicalDeliveryRefs,
+    waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery,
+    waiverReason: waiver.waiverReason,
     planningAuthorityDeliveryGate
   });
 
@@ -1472,6 +1496,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       historicalDeliveryRepo: closebackPlan.planningAuthorityDeliveryGate.ok
         ? closebackPlan.planningAuthorityDeliveryGate.repoRoot
         : null,
+      waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery,
+      waiverReason: waiver.waiverReason,
       planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
       forceImport: diagnosis.bucket === 'stale-import'
     });

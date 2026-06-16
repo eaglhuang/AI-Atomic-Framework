@@ -22,6 +22,8 @@ export default defineCommandSpec({
         { flag: '--historical-delivery', value: 'commit', summary: 'For taskflow close: verify an earlier delivery commit through tasks close or reconcile.', repeatable: true },
         { flag: '--delivery-commit', value: 'commit', summary: 'Alias for --historical-delivery on taskflow close.' },
         { flag: '--historical-batch', value: 'batchId-or-path', summary: 'For taskflow close: consume a task slice produced by evidence historical-batch, reuse its matched delivery commits, and treat the slice as the operator close-readiness source.' },
+        { flag: '--waiver-out-of-scope-delivery', summary: 'For taskflow close with historical delivery or historical batch: allow a multi-task delivery commit when this task slice has matched deliverables; requires --reason.' },
+        { flag: '--reason', value: 'text', summary: 'Required explanation for --waiver-out-of-scope-delivery.' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption
@@ -32,6 +34,7 @@ export default defineCommandSpec({
         'node atm.mjs taskflow open --write --profile planning/taskflow.profile.json --task-id TASK-ADOPTER-0002 --output tasks/TASK-ADOPTER-0002.task.md --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --dry-run --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-delivery abc123 --write --json',
+        'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --waiver-out-of-scope-delivery --reason "multi-task historical delivery" --write --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --dry-run --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --write --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --write --no-commit --json'

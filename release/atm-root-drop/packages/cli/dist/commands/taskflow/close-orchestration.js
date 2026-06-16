@@ -20,6 +20,12 @@ function buildTasksCloseCommand(input) {
     if (input.historicalDeliveryRepo) {
         parts.push(`--historical-delivery-repo ${input.historicalDeliveryRepo}`);
     }
+    if (input.waiverOutOfScopeDelivery) {
+        parts.push('--waiver-out-of-scope-delivery');
+        if (input.waiverReason) {
+            parts.push(`--reason ${JSON.stringify(input.waiverReason)}`);
+        }
+    }
     return parts.join(' ');
 }
 function buildTasksReconcileCommand(input) {
@@ -78,7 +84,10 @@ export function buildClosebackPlan(input) {
             taskId: input.taskId,
             actorId: input.actorId,
             historicalDeliveryRefs: input.historicalDeliveryRefs,
-            historicalDeliveryRepo: input.planningAuthorityDeliveryGate?.repoRoot ?? null
+            historicalBatchRef: input.historicalBatchRef ?? null,
+            historicalDeliveryRepo: input.planningAuthorityDeliveryGate?.repoRoot ?? null,
+            waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
+            waiverReason: input.waiverReason ?? null
         });
         followUpSteps.push('close-live-ledger');
         if (planningMirrorPath) {
@@ -212,6 +221,12 @@ export function buildCloseBackendArgv(input) {
     }
     if (input.historicalDeliveryRepo) {
         argv.push('--historical-delivery-repo', input.historicalDeliveryRepo);
+    }
+    if (input.waiverOutOfScopeDelivery) {
+        argv.push('--waiver-out-of-scope-delivery');
+        if (input.waiverReason) {
+            argv.push('--reason', input.waiverReason);
+        }
     }
     return argv;
 }

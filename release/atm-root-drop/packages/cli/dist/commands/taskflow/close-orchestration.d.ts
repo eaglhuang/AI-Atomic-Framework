@@ -48,6 +48,7 @@ export declare function buildClosebackPlan(input: {
     taskId: string;
     actorId: string;
     historicalDeliveryRefs: string[];
+    historicalBatchRef?: string | null;
     planningAuthorityDeliveryGate?: {
         required: boolean;
         ok: boolean;
@@ -55,6 +56,8 @@ export declare function buildClosebackPlan(input: {
         matchedFiles: string[];
         reason: string | null;
     };
+    waiverOutOfScopeDelivery?: boolean;
+    waiverReason?: string | null;
     delegationContract: TaskflowDelegationContract;
     diagnosis: {
         bucket: TaskResidueBucket;
@@ -95,6 +98,8 @@ export declare function buildCloseBackendArgv(input: {
     historicalDeliveryRefs: string[];
     historicalBatchRef?: string | null;
     historicalDeliveryRepo?: string | null;
+    waiverOutOfScopeDelivery?: boolean;
+    waiverReason?: string | null;
     planningMirrorPath: string | null;
     forceImport: boolean;
 }): string[];
