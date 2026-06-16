@@ -1057,13 +1057,41 @@
       "capability": "CLI route takeover integration: steward identity, route/task ownership evidence in takeover success/failure/human-required output, human-required verdict gate returning structured ATM_ROUTE_HUMAN_REQUIRED message with owningRouteId/owningTaskId.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0009"
+    },
+    {
+      "path_pattern": "docs/reports/mao-parallel-routing-benchmark.md",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由基準的人類可讀報告，彙整 catch rate、能力覆蓋、tier 覆蓋、情境矩陣與剩餘風險，並明確反映 TASK-MAO-0009 的 steward 能力。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-parallel-routing/**",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由基準 fixture 套件，涵蓋 conflict matrix、route freeze/resume、steward apply/blocked 與 M5 runner-extension placeholder 情境。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
+    },
+    {
+      "path_pattern": "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由基準 runner：離線載入 fixture、執行 conflict / route / steward 模擬、計算延遲與安全性統計，並供 validator 與報告渲染重用。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
+    },
+    {
+      "path_pattern": "scripts/validate-mao-parallel-routing.ts",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO 並行路由 validator：驗證 fixture pack、阻擋 false-safe regression、執行完整 benchmark，並輸出 docs/reports/mao-parallel-routing-benchmark.md。",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0010"
     }
   ],
   "summary": {
-    "total_production_paths": 166,
-    "mapped_paths": 166,
+    "total_production_paths": 170,
+    "mapped_paths": 170,
     "coverage_percentage": 100,
-    "atoms_defined": 108,
+    "atoms_defined": 109,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true
