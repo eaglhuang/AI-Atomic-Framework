@@ -193,7 +193,8 @@ function buildTaskflowCloseWriteReadinessHint(input) {
             status: taskStatus,
             claimState: claim.state,
             claimActorId: claim.actorId,
-            hasActiveSession: Boolean(activeSession?.sessionId)
+            hasActiveSession: Boolean(activeSession?.sessionId),
+            allowHistoricalCloseback: input.historicalDeliveryRefs.length > 0
         });
         if (!admission.ok) {
             blockers.push({
@@ -458,10 +459,27 @@ function extractTaskStringList(taskDocument, key) {
         ? value.map((entry) => typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '').filter(Boolean)
         : [];
 }
+function isCanonicalTaskflowDeliverableCandidate(value) {
+    const normalized = value.trim().replace(/\\/g, '/');
+    if (!normalized)
+        return false;
+    if (normalized.startsWith('.atm/'))
+        return false;
+    if (/[\\/]$/.test(normalized))
+        return false;
+    return true;
+}
+function extractTaskflowDeliverables(taskDocument) {
+    const explicit = extractTaskStringList(taskDocument, 'deliverables');
+    if (explicit.length > 0)
+        return explicit;
+    const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
+    return uniqueSorted(scopePaths.filter(isCanonicalTaskflowDeliverableCandidate));
+}
 function extractTaskflowDeclaredFiles(taskDocument) {
     return uniqueSorted([
         ...extractTaskStringList(taskDocument, 'scopePaths'),
-        ...extractTaskStringList(taskDocument, 'deliverables'),
+        ...extractTaskflowDeliverables(taskDocument),
         ...extractTaskStringList(taskDocument, 'targetAllowedFiles')
     ].filter((file) => !file.startsWith('.atm/')));
 }
@@ -708,10 +726,12 @@ function buildTaskflowCommitBundle(input) {
     catch (err) {
         // If it cannot load, we'll mark as failClosed later
     }
-    const deliverables = extractTaskStringList(taskDocument, 'deliverables');
+    const deliverables = extractTaskflowDeliverables(taskDocument);
     const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
     const targetAllowedFiles = extractTaskStringList(taskDocument, 'targetAllowedFiles');
     const dirtyFiles = getDirtyFiles(targetRepoRoot);
+    const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
+    const historicalCloseback = historicalCommitted.length > 0;
     let allowed = targetAllowedFiles;
     if (allowed.length === 0) {
         allowed = scopePaths;
@@ -766,10 +786,15 @@ function buildTaskflowCommitBundle(input) {
         else {
             excludedDirtyFiles.push(file);
             if (inScope) {
-                scopeAmendmentCandidateFiles.push(file);
-                metadataFailClosed = true;
-                failClosedReason = `Scope amendment required: dirty file "${file}" is inside task scope but is not declared in deliverables and targetAllowedFiles.`;
-                excludedReasons[file] = 'inside scope but not declared/allowed (fail-closed trigger)';
+                if (historicalCloseback) {
+                    excludedReasons[file] = 'inside scope but outside declared deliverables; excluded as advisory residue during historical closeback';
+                }
+                else {
+                    scopeAmendmentCandidateFiles.push(file);
+                    metadataFailClosed = true;
+                    failClosedReason = `Scope amendment required: dirty file "${file}" is inside task scope but is not declared in deliverables and targetAllowedFiles.`;
+                    excludedReasons[file] = 'inside scope but not declared/allowed (fail-closed trigger)';
+                }
             }
             else {
                 excludedReasons[file] = 'outside task scope; excluded from governed bundle and must be left untouched';
@@ -784,7 +809,6 @@ function buildTaskflowCommitBundle(input) {
         reason: failClosedReason
     });
     // 3. Historical delivery subtraction
-    const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
     const finalDeliveryFiles = targetDeliveryFiles.filter((file) => !historicalCommitted.some((h) => taskflowPathMatches(file, h)));
     // 4. Build target stage files
     const targetStageFiles = uniqueSorted([

@@ -66,6 +66,26 @@ result = evaluateTaskDoneCloseAdmission({
     hasActiveSession: true
 });
 assert(result.ok, 'running task with active owner claim and session must allow done close');
+result = evaluateTaskDoneCloseAdmission({
+    taskId: 'TASK-LIFE',
+    actorId: 'captain',
+    status: 'planned',
+    claimState: null,
+    claimActorId: null,
+    hasActiveSession: false,
+    allowHistoricalCloseback: true
+});
+assert(result.ok, 'historical closeback must allow imported planned tasks without a live claim');
+result = evaluateTaskDoneCloseAdmission({
+    taskId: 'TASK-LIFE',
+    actorId: 'captain',
+    status: 'blocked',
+    claimState: null,
+    claimActorId: null,
+    hasActiveSession: false,
+    allowHistoricalCloseback: true
+});
+assert(result.ok, 'historical closeback must allow imported blocked tasks when historical delivery is verified');
 result = evaluateTaskResetAdmission({ taskId: 'TASK-LIFE', fromStatus: 'done', toStatus: 'open' });
 if (result.ok)
     fail('done task reset must require reopen flow');

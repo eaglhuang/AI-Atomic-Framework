@@ -77,6 +77,21 @@ export function evaluateTaskClaimAdmission(input) {
 }
 export function evaluateTaskDoneCloseAdmission(input) {
     const status = normalizeTaskLifecycleStatus(input.status);
+    if (input.allowHistoricalCloseback) {
+        const allowedHistoricalStatuses = new Set([
+            'planned',
+            'open',
+            'in_progress',
+            'reserved',
+            'ready',
+            'running',
+            'review',
+            'blocked'
+        ]);
+        if (allowedHistoricalStatuses.has(status)) {
+            return { ok: true, reason: `${status}-to-done-historical-closeback` };
+        }
+    }
     if (status === 'planned') {
         return {
             ok: false,

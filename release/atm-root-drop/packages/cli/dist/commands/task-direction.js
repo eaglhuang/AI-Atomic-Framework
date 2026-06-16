@@ -268,7 +268,7 @@ export function readActiveTaskDirectionLocks(cwd) {
     }
     return dedupeDirectionLocks(locks);
 }
-export function assertTaskCloseAllowedByDirection(cwd, taskId, actorId) {
+export function assertTaskCloseAllowedByDirection(cwd, taskId, actorId, options = {}) {
     const activeQueue = findActiveTaskQueue(cwd, null, { taskId });
     if (activeQueue) {
         const currentTaskId = activeQueue.taskIds[activeQueue.currentIndex] ?? null;
@@ -281,6 +281,9 @@ export function assertTaskCloseAllowedByDirection(cwd, taskId, actorId) {
     }
     const matchingLock = readGovernanceDirectionLockForTask(cwd, taskId);
     if (!matchingLock) {
+        if (options.allowHistoricalCloseback) {
+            return;
+        }
         const sidecarPath = path.join(cwd, '.atm', 'runtime', 'task-direction-locks', `${taskId}.json`);
         if (existsSync(sidecarPath)) {
             throw new CliError('ATM_TASK_CLOSE_INVALID_DIRECTION_LOCK_SOURCE', `Task ${taskId} cannot close as done from a standalone direction lock sidecar.`, {

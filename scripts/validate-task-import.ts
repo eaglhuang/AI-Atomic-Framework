@@ -138,6 +138,64 @@ async function main() {
   }
   assertImportedTaskContract(singleTask, 'single-card dry-run');
 
+  const legacyScopeOnlyCard = path.join(tmpdir(), `atm-task-import-legacy-${process.pid}.md`);
+  writeFileSync(legacyScopeOnlyCard, [
+    '---',
+    'task_id: TASK-LEGACY-DELIVERABLE-0001',
+    'title: Legacy allowed_files closeback fixture',
+    'status: planned',
+    'allowed_files:',
+    '  - packages/cli/src/commands/evidence.ts',
+    '  - packages/cli/src/commands/taskflow.ts',
+    'validators:',
+    '  - npm run typecheck',
+    '---',
+    '',
+    '# TASK-LEGACY-DELIVERABLE-0001',
+    ''
+  ].join('\n'), 'utf8');
+  const legacyScopeOnlyResult = await expectOk('import', ['--from', legacyScopeOnlyCard, '--dry-run', '--cwd', root]);
+  const legacyScopeOnlyTask = (legacyScopeOnlyResult.evidence as {
+    manifest: { tasks: ReadonlyArray<{ workItemId: string; deliverables: readonly string[]; importDiagnostics?: readonly { code: string }[] }> };
+  }).manifest.tasks[0];
+  if (!legacyScopeOnlyTask
+    || legacyScopeOnlyTask.workItemId !== 'TASK-LEGACY-DELIVERABLE-0001'
+    || !legacyScopeOnlyTask.deliverables.includes('packages/cli/src/commands/evidence.ts')
+    || !legacyScopeOnlyTask.deliverables.includes('packages/cli/src/commands/taskflow.ts')) {
+    fail(`legacy allowed_files card must infer canonical deliverables from file-shaped scope paths, got ${JSON.stringify(legacyScopeOnlyTask)}.`);
+  }
+  if (!legacyScopeOnlyTask.importDiagnostics?.some((entry) => entry.code === 'ATM_TASK_IMPORT_LEGACY_SCOPE_DELIVERABLES_INFERRED')) {
+    fail(`legacy allowed_files card must record inferred deliverable diagnostic, got ${JSON.stringify(legacyScopeOnlyTask.importDiagnostics)}.`);
+  }
+
+  const legacyMixedScopeCard = path.join(tmpdir(), `atm-task-import-legacy-mixed-${process.pid}.md`);
+  writeFileSync(legacyMixedScopeCard, [
+    '---',
+    'task_id: TASK-LEGACY-DELIVERABLE-0002',
+    'title: Legacy allowed_files mixed governance scope fixture',
+    'status: planned',
+    'allowed_files:',
+    '  - packages/cli/src/commands/evidence.ts',
+    '  - .atm/history/evidence/historical-batches/',
+    '  - .atm/history/evidence/TASK-LEGACY-DELIVERABLE-0002.json',
+    'validators:',
+    '  - npm run typecheck',
+    '---',
+    '',
+    '# TASK-LEGACY-DELIVERABLE-0002',
+    ''
+  ].join('\n'), 'utf8');
+  const legacyMixedScopeResult = await expectOk('import', ['--from', legacyMixedScopeCard, '--dry-run', '--cwd', root]);
+  const legacyMixedScopeTask = (legacyMixedScopeResult.evidence as {
+    manifest: { tasks: ReadonlyArray<{ workItemId: string; deliverables: readonly string[]; importDiagnostics?: readonly { code: string }[] }> };
+  }).manifest.tasks[0];
+  if (!legacyMixedScopeTask
+    || legacyMixedScopeTask.workItemId !== 'TASK-LEGACY-DELIVERABLE-0002'
+    || !legacyMixedScopeTask.deliverables.includes('packages/cli/src/commands/evidence.ts')
+    || legacyMixedScopeTask.deliverables.some((entry) => entry.startsWith('.atm/'))) {
+    fail(`legacy mixed governance scope must infer only canonical source deliverables, got ${JSON.stringify(legacyMixedScopeTask)}.`);
+  }
+
   const dispatchMetadataResult = await expectOk('import', ['--from', dispatchMetadataCard, '--dry-run', '--cwd', root]);
   const dispatchMetadataTask = (dispatchMetadataResult.evidence as {
     manifest: {

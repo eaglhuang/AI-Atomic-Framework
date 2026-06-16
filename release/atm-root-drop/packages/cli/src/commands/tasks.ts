@@ -328,6 +328,22 @@ const tagsHeaders = ['tags', 'labels', '標籤'];
 const taskIdPattern = /^(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 const taskIdAnywherePattern = /(?:TASK-)?[A-Z][A-Z0-9-]*-\d{2,}/;
 
+function isCanonicalDeliverableCandidate(value: string): boolean {
+  const normalized = normalizeRelativePath(value);
+  if (!normalized) return false;
+  if (normalized.startsWith('.atm/')) return false;
+  if (/[\\/]$/.test(normalized)) return false;
+  return true;
+}
+
+function inferLegacyDeliverablesFromScope(scopePaths: readonly string[]): readonly string[] {
+  if (scopePaths.length === 0) return [];
+  const normalized = uniqueStrings(scopePaths.map(normalizeRelativePath).filter(Boolean));
+  if (normalized.length === 0) return [];
+  const inferred = normalized.filter(isCanonicalDeliverableCandidate);
+  return inferred;
+}
+
 export async function runTasks(argv: string[]): Promise<CommandResult> {
   return dispatchTasksAction(argv, {
     close: runTasksClose,
@@ -2130,6 +2146,7 @@ async function runTasksClose(argv: string[]) {
     }
     effectiveHistoricalDeliveryRefs = uniqueStrings([...effectiveHistoricalDeliveryRefs, ...historicalBatchSlice.matchedCommits]);
   }
+  const allowHistoricalCloseback = effectiveHistoricalDeliveryRefs.length > 0 || Boolean(options.historicalBatchRef);
   const protectedCloseFlags = [
     ...(effectiveHistoricalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
     ...(options.historicalBatchRef ? ['--historical-batch'] : []),
@@ -2248,7 +2265,8 @@ async function runTasksClose(argv: string[]) {
       status: taskDocument.status,
       claimState: currentClaim?.state ?? null,
       claimActorId: currentClaim?.actorId ?? null,
-      hasActiveSession: Boolean(activeSession?.sessionId)
+      hasActiveSession: Boolean(activeSession?.sessionId),
+      allowHistoricalCloseback
     });
     if (!doneCloseAdmission.ok) {
       throw new CliError(doneCloseAdmission.code, doneCloseAdmission.message, {
@@ -2256,7 +2274,9 @@ async function runTasksClose(argv: string[]) {
         details: doneCloseAdmission.details
       });
     }
-    assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId);
+    assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId, {
+      allowHistoricalCloseback
+    });
   }
 
   const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
@@ -5204,6 +5224,18 @@ function parseSingleCard(input: {
   } else {
     deliverables = uniqueStrings(bodyDeliverables.map(normalizeYamlScalar));
   }
+  const inferredLegacyDeliverables = deliverables.length === 0
+    ? inferLegacyDeliverablesFromScope(frontMatterScopePaths.map(normalizeYamlScalar))
+    : [];
+  if (deliverables.length === 0 && inferredLegacyDeliverables.length > 0) {
+    deliverables = inferredLegacyDeliverables;
+    cardImportDiagnostics.push({
+      code: 'ATM_TASK_IMPORT_LEGACY_SCOPE_DELIVERABLES_INFERRED',
+      severity: 'warning',
+      message: 'No explicit deliverables were declared; ATM inferred deliverables from legacy scopePaths/allowed_files because every entry was file-shaped.',
+      field: 'deliverables'
+    });
+  }
   const notes = collectText(sections, notesHeaders) ?? null;
   const evidenceFrontMatter = frontMatter.data.evidence && typeof frontMatter.data.evidence === 'object' && !Array.isArray(frontMatter.data.evidence)
     ? frontMatter.data.evidence as Record<string, unknown>
@@ -5251,6 +5283,14 @@ function parseSingleCard(input: {
       alias: 'allowed_files',
       canonical: 'scopePaths'
     });
+    if (deliverables.length === 0) {
+      importDiagnostics.push({
+        code: 'ATM_TASK_IMPORT_LEGACY_SCOPE_DELIVERABLES_REQUIRED',
+        severity: 'warning',
+        message: 'Legacy allowed_files card did not expose a file-only deliverable boundary; add explicit deliverables for future historical closeback.',
+        field: 'deliverables'
+      });
+    }
   }
   if (frontMatter.data.blocked_by !== undefined && frontMatter.data.depends_on === undefined && frontMatter.data.dependencies === undefined) {
     importDiagnostics.push({
@@ -5950,6 +5990,9 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
     deliverables = uniqueStrings(frontMatterDeliverables.map(normalizeYamlScalar));
   } else {
     deliverables = uniqueStrings(bodyDeliverables.map(normalizeYamlScalar));
+  }
+  if (deliverables.length === 0) {
+    deliverables = inferLegacyDeliverablesFromScope(scopePaths.map(normalizeYamlScalar));
   }
 
   const notes = collectText(sections, notesHeaders) ?? null;

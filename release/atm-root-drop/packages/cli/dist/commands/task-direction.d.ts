@@ -115,7 +115,9 @@ export interface TaskDirectionAllowedFilesMismatch {
 }
 export declare function diagnoseTaskDirectionLockAllowedFiles(cwd: string, taskId: string): TaskDirectionAllowedFilesDiagnosis;
 export declare function readActiveTaskDirectionLocks(cwd: string): readonly TaskDirectionLock[];
-export declare function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, actorId: string): void;
+export declare function assertTaskCloseAllowedByDirection(cwd: string, taskId: string, actorId: string, options?: {
+    readonly allowHistoricalCloseback?: boolean;
+}): void;
 export declare function buildAllowedFilesForTask(task: TaskDirectionTask): readonly string[];
 /**
  * TASK-AAO-0058：回傳任務自身治理路徑（task self-allow）的 canonical 三條路徑。

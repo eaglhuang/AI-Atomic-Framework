@@ -33,4 +33,5 @@ export declare function evaluateTaskDoneCloseAdmission(input: {
     readonly claimState: string | null;
     readonly claimActorId: string | null;
     readonly hasActiveSession: boolean;
+    readonly allowHistoricalCloseback?: boolean;
 }): TaskLifecycleAdmission;

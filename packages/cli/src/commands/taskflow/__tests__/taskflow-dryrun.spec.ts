@@ -468,6 +468,148 @@ assert.ok(batchLaneClose.evidence.governedCommitBundle.planningRepo.stageFiles.i
 const batchLanePlanningCard = readFileSync(batchLaneFixture.planPath, 'utf8');
 assert.ok(batchLanePlanningCard.includes(`delivery_commit: "${batchLaneFixture.deliveryCommit}"`), 'historical-batch close must still write the matched delivery commit onto the planning card');
 
+const legacyBatchLaneFixture = await makeDualRepoCloseFixture('historical-batch-legacy-scope', { closePlanningStatus: 'planned' });
+const legacyBatchTaskPath = path.join(legacyBatchLaneFixture.targetRepo, '.atm/history/tasks', `${legacyBatchLaneFixture.taskId}.json`);
+const legacyBatchTaskDocument = JSON.parse(readFileSync(legacyBatchTaskPath, 'utf8'));
+delete legacyBatchTaskDocument.deliverables;
+legacyBatchTaskDocument.legacyImportAliases = { allowed_files: ['src/deliver.txt'] };
+writeJson(legacyBatchTaskPath, legacyBatchTaskDocument);
+const legacyBatchId = 'hist-batch-legacy-scope';
+writeJson(path.join(legacyBatchLaneFixture.targetRepo, '.atm/history/evidence/historical-batches', `${legacyBatchId}.json`), {
+  schemaId: 'atm.historicalBatchEvidence.v1',
+  batchId: legacyBatchId,
+  taskIds: [legacyBatchLaneFixture.taskId],
+  commits: [legacyBatchLaneFixture.deliveryCommit],
+  tasks: [{
+    taskId: legacyBatchLaneFixture.taskId,
+    ok: true,
+    matchedCommits: [legacyBatchLaneFixture.deliveryCommit],
+    matchedFiles: ['src/deliver.txt'],
+    outOfScopeFiles: [],
+    declaredDeliverables: ['src/deliver.txt'],
+    declaredScopeFiles: ['src/deliver.txt'],
+    matchedDeliverables: ['src/deliver.txt'],
+    missingCoverage: [],
+    coverageStatus: 'complete',
+    validatorClaims: [{ gate: 'validate:cli', kind: 'taskSpecific', satisfied: true, requiredForClose: true }],
+    taskSpecificValidationPasses: ['validate:cli'],
+    batchWideValidationPasses: [],
+    advisoryValidationPasses: [],
+    atomHealthClaims: [{ atomOrMapId: 'atm.historical-batch-evidence', kind: 'owner', generatedByTask: true, validatorHealthy: true }],
+    okToRecordEvidence: true,
+    okToCloseTask: true,
+    diagnosticOnly: false
+  }]
+});
+const legacyBatchDryRun = await runTaskflow([
+  'close',
+  '--cwd', legacyBatchLaneFixture.targetRepo,
+  '--profile', legacyBatchLaneFixture.profilePath,
+  '--task', legacyBatchLaneFixture.taskId,
+  '--actor', 'validator',
+  '--historical-batch', legacyBatchId,
+  '--json'
+]) as any;
+assert.equal(legacyBatchDryRun.ok, true, 'historical-batch close must accept imported legacy scope-only tasks when every scope entry is file-shaped');
+assert.equal(legacyBatchDryRun.evidence.writeReadinessHint.status, 'ready', 'legacy scope-only historical-batch close should synthesize a canonical deliverable boundary');
+
+const legacyHistoricalCloseFixture = await makeDualRepoCloseFixture('historical-batch-planned-ledger', { closePlanningStatus: 'planned' });
+const legacyHistoricalTaskPath = path.join(legacyHistoricalCloseFixture.targetRepo, '.atm/history/tasks', `${legacyHistoricalCloseFixture.taskId}.json`);
+const legacyHistoricalTaskDocument = JSON.parse(readFileSync(legacyHistoricalTaskPath, 'utf8'));
+legacyHistoricalTaskDocument.status = 'planned';
+delete legacyHistoricalTaskDocument.claim;
+writeJson(legacyHistoricalTaskPath, legacyHistoricalTaskDocument);
+const legacyHistoricalLockPath = path.join(legacyHistoricalCloseFixture.targetRepo, '.atm/runtime/locks', `${legacyHistoricalCloseFixture.taskId}.lock.json`);
+rmSync(legacyHistoricalLockPath, { force: true });
+const plannedLedgerBatchId = 'hist-batch-planned-ledger';
+writeJson(path.join(legacyHistoricalCloseFixture.targetRepo, '.atm/history/evidence/historical-batches', `${plannedLedgerBatchId}.json`), {
+  schemaId: 'atm.historicalBatchEvidence.v1',
+  batchId: plannedLedgerBatchId,
+  taskIds: [legacyHistoricalCloseFixture.taskId],
+  commits: [legacyHistoricalCloseFixture.deliveryCommit],
+  tasks: [{
+    taskId: legacyHistoricalCloseFixture.taskId,
+    ok: true,
+    matchedCommits: [legacyHistoricalCloseFixture.deliveryCommit],
+    matchedFiles: ['src/deliver.txt'],
+    outOfScopeFiles: [],
+    declaredDeliverables: ['src/deliver.txt'],
+    declaredScopeFiles: ['src/deliver.txt'],
+    matchedDeliverables: ['src/deliver.txt'],
+    missingCoverage: [],
+    coverageStatus: 'complete',
+    validatorClaims: [{ gate: 'validate:cli', kind: 'taskSpecific', satisfied: true, requiredForClose: true }],
+    taskSpecificValidationPasses: ['validate:cli'],
+    batchWideValidationPasses: [],
+    advisoryValidationPasses: [],
+    atomHealthClaims: [{ atomOrMapId: 'atm.historical-batch-evidence', kind: 'owner', generatedByTask: true, validatorHealthy: true }],
+    okToRecordEvidence: true,
+    okToCloseTask: true,
+    diagnosticOnly: false
+  }]
+});
+const plannedLedgerClose = await runTaskflow([
+  'close',
+  '--cwd', legacyHistoricalCloseFixture.targetRepo,
+  '--profile', legacyHistoricalCloseFixture.profilePath,
+  '--task', legacyHistoricalCloseFixture.taskId,
+  '--actor', 'validator',
+  '--historical-batch', plannedLedgerBatchId,
+  '--write',
+  '--no-commit',
+  '--json'
+]) as any;
+assert.equal(plannedLedgerClose.ok, true, 'historical-batch close must bridge imported planned tasks without a live claim or direction lock');
+assert.equal(plannedLedgerClose.evidence.backendResult?.ok, true, 'backend close must succeed for imported planned tasks under historical closeback');
+assert.equal(plannedLedgerClose.evidence.governedCommitBundle.failClosed, false, 'historical planned closeback must not fail closed after lifecycle bridging');
+
+const historicalResidualFixture = await makeDualRepoCloseFixture('historical-batch-residual-scope', { closePlanningStatus: 'planned' });
+const historicalResidualTaskPath = path.join(historicalResidualFixture.targetRepo, '.atm/history/tasks', `${historicalResidualFixture.taskId}.json`);
+const historicalResidualTaskDocument = JSON.parse(readFileSync(historicalResidualTaskPath, 'utf8'));
+historicalResidualTaskDocument.scopePaths = ['src/deliver.txt', 'docs/governance/atm-bug-and-optimization-backlog.md'];
+historicalResidualTaskDocument.targetAllowedFiles = ['src/deliver.txt', 'docs/governance/atm-bug-and-optimization-backlog.md'];
+historicalResidualTaskDocument.deliverables = ['src/deliver.txt'];
+writeJson(historicalResidualTaskPath, historicalResidualTaskDocument);
+writeText(path.join(historicalResidualFixture.targetRepo, 'docs/governance/atm-bug-and-optimization-backlog.md'), 'later unrelated residue\n');
+const residualBatchId = 'hist-batch-residual-scope';
+writeJson(path.join(historicalResidualFixture.targetRepo, '.atm/history/evidence/historical-batches', `${residualBatchId}.json`), {
+  schemaId: 'atm.historicalBatchEvidence.v1',
+  batchId: residualBatchId,
+  taskIds: [historicalResidualFixture.taskId],
+  commits: [historicalResidualFixture.deliveryCommit],
+  tasks: [{
+    taskId: historicalResidualFixture.taskId,
+    ok: true,
+    matchedCommits: [historicalResidualFixture.deliveryCommit],
+    matchedFiles: ['src/deliver.txt'],
+    outOfScopeFiles: [],
+    declaredDeliverables: ['src/deliver.txt'],
+    declaredScopeFiles: ['src/deliver.txt', 'docs/governance/atm-bug-and-optimization-backlog.md'],
+    matchedDeliverables: ['src/deliver.txt'],
+    missingCoverage: [],
+    coverageStatus: 'complete',
+    validatorClaims: [{ gate: 'validate:cli', kind: 'taskSpecific', satisfied: true, requiredForClose: true }],
+    taskSpecificValidationPasses: ['validate:cli'],
+    batchWideValidationPasses: [],
+    advisoryValidationPasses: [],
+    atomHealthClaims: [{ atomOrMapId: 'atm.historical-batch-evidence', kind: 'owner', generatedByTask: true, validatorHealthy: true }],
+    okToRecordEvidence: true,
+    okToCloseTask: true,
+    diagnosticOnly: false
+  }]
+});
+const residualDryRun = await runTaskflow([
+  'close',
+  '--cwd', historicalResidualFixture.targetRepo,
+  '--profile', historicalResidualFixture.profilePath,
+  '--task', historicalResidualFixture.taskId,
+  '--actor', 'validator',
+  '--historical-batch', residualBatchId,
+  '--json'
+]) as any;
+assert.equal(residualDryRun.ok, true, 'historical-batch close must tolerate later in-scope residue outside declared historical deliverables');
+assert.equal(residualDryRun.evidence.governedCommitBundle.failClosed, false, 'historical residual in-scope files should downgrade to advisory residue instead of fail-closed metadata');
+
 const stageOnlyFixture = await makeDualRepoCloseFixture('stageonly');
 const stageOnlyTargetHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: stageOnlyFixture.targetRepo, encoding: 'utf8' }).trim();
 const stageOnlyPlanningHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: stageOnlyFixture.planningRepo, encoding: 'utf8' }).trim();
