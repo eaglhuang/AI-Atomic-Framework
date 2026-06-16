@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-16T03-53-52-353Z-close-aeb2b78d11ff",
+  "taskId": "TASK-CID-0108",
+  "action": "close",
+  "actorId": "antigravity-gemini-3.5-flash",
+  "sessionId": "session-20260616034850-antigravity-gemini-3.5-flash-TASK-CID-0108-e7913a42fa",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0108.json",
+  "taskSha256": "sha256:ca402440ab39bd315e887bdf2de34bf16a5acf95014ac1a7b47d6783fe216f31",
+  "createdAt": "2026-06-16T03:53:52.353Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0108 --actor antigravity-gemini-3.5-flash --status done --historical-delivery 446c2a171463af03e2a43e5d8e4759cfdaa6b91a --historical-delivery 917e54c3e23f9929652c636435642f59d974a8bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260616034850-antigravity-gemini-3.5-flash-TASK-CID-0108-e7913a42fa",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0108.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "test",
+      "typecheck"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-16T03:53:52.349Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0108-atomization-governance-dogfood-and-adoption-gate.task.md",
+        ".atm/history/evidence/**",
+        ".atm/history/evidence/TASK-CID-0108.*",
+        ".atm/history/task-events/TASK-CID-0108/**",
+        ".atm/history/tasks/TASK-CID-0108.json",
+        "docs/reports/**",
+        "packages/cli/src/commands/**/__tests__/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/**/__tests__/**"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "test",
+        "typecheck"
+      ]
+    }
+  }
+}

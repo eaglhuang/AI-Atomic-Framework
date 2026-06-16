@@ -1,0 +1,138 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0108",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "446c2a171463af03e2a43e5d8e4759cfdaa6b91a",
+  "governedTreeSha": "c0d2607a313f061e58c73a8b5112b570c36b0a2e",
+  "targetCommitDelta": {
+    "currentCommitSha": "446c2a171463af03e2a43e5d8e4759cfdaa6b91a",
+    "parentCommitShas": [
+      "446c2a171463af03e2a43e5d8e4759cfdaa6b91a"
+    ],
+    "governedTreeSha": "c0d2607a313f061e58c73a8b5112b570c36b0a2e",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CID-0108.json",
+      ".atm/history/task-events/TASK-CID-0108/2026-06-16T03-46-36-817Z-import-0a3b45b69da2.json",
+      ".atm/history/task-events/TASK-CID-0108/2026-06-16T03-48-43-693Z-import-b5b828debd3c.json",
+      ".atm/history/task-events/TASK-CID-0108/2026-06-16T03-48-50-685Z-reserve-bbbf7fa39400.json",
+      ".atm/history/task-events/TASK-CID-0108/2026-06-16T03-48-50-688Z-promote-b5b9f63de051.json",
+      ".atm/history/task-events/TASK-CID-0108/2026-06-16T03-48-50-716Z-claim-e9be93e51ca3.json",
+      ".atm/history/tasks/TASK-CID-0108.json",
+      "docs/reports/atomization-dogfood-adoption-report.md",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm test",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:be1ba63c73723e9b984f2e9babf7de280781a6c2e9610533c4806ed7c290a808",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm test",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:086b0c6436ed59341ba45dbd481aa5cc930c880105cae87369290e07320f00d3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm test",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b05365c2717ec40ce408ed6dab74d85b6682db71f2127a7b46e74e4e947d8ff9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "test",
+    "typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "git diff --check",
+    "test",
+    "typecheck"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-16T03:53:52.349Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0108-atomization-governance-dogfood-and-adoption-gate.task.md",
+      ".atm/history/evidence/**",
+      ".atm/history/evidence/TASK-CID-0108.*",
+      ".atm/history/task-events/TASK-CID-0108/**",
+      ".atm/history/tasks/TASK-CID-0108.json",
+      "docs/reports/**",
+      "packages/cli/src/commands/**/__tests__/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/**/__tests__/**"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "test",
+      "typecheck"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0108.json",
+  "closedAt": "2026-06-16T03:53:52.349Z",
+  "closedByActor": "antigravity-gemini-3.5-flash",
+  "sessionId": "session-20260616034850-antigravity-gemini-3.5-flash-TASK-CID-0108-e7913a42fa",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "446c2a171463af03e2a43e5d8e4759cfdaa6b91a",
+    "taskMatchedFiles": [
+      "docs/reports/atomization-dogfood-adoption-report.md"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
