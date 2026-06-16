@@ -60,7 +60,7 @@ import { runCache } from './commands/cache.ts';
 import { runHealthReport } from './commands/health-report.ts';
 import { runTaskflow } from './commands/taskflow.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
-import { applyOutputProjectionFlagsFromArgv, CliError, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
+import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 import { runIdentity } from './commands/identity.ts';
@@ -139,24 +139,27 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   const commandArgs = stripFormatFlags(rawCommandArgs);
 
   if (!commandName || commandName === '--help' || commandName === '--json' || commandName === '--pretty') {
-    writeResult(createGlobalHelpResult(process.cwd()), io.stdout, outputFormat);
-    return 0;
+    const result = enrichCommandResult(createGlobalHelpResult(process.cwd()));
+    writeResult(result, io.stdout, outputFormat);
+    return result.exitCode;
   }
 
   if (commandName === '--version' || commandName === '-v') {
-    writeResult(createVersionResult(process.cwd()), io.stdout, outputFormat);
-    return 0;
+    const result = enrichCommandResult(createVersionResult(process.cwd()));
+    writeResult(result, io.stdout, outputFormat);
+    return result.exitCode;
   }
 
   if (commandName === 'help') {
     const targetCommand = commandArgs.find((arg: any) => !arg.startsWith('-'));
     if (!targetCommand) {
-      writeResult(createGlobalHelpResult(process.cwd()), io.stdout, outputFormat);
-      return 0;
+      const result = enrichCommandResult(createGlobalHelpResult(process.cwd()));
+      writeResult(result, io.stdout, outputFormat);
+      return result.exitCode;
     }
     const spec = getCommandSpec(targetCommand);
     if (!spec) {
-      const result = makeResult({
+      const result = enrichCommandResult(makeResult({
         ok: false,
         command: 'help',
         cwd: process.cwd(),
@@ -164,17 +167,18 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         evidence: {
           commands: Object.keys(cliCommandRunners)
         }
-      });
+      }));
       writeResult(result, io.stderr, outputFormat);
-      return 2;
+      return result.exitCode;
     }
-    writeResult(makeHelpResult(spec, process.cwd()), io.stdout, outputFormat);
-    return 0;
+    const result = enrichCommandResult(makeHelpResult(spec, process.cwd()));
+    writeResult(result, io.stdout, outputFormat);
+    return result.exitCode;
   }
 
   const runner = cliCommandRunners[commandName];
   if (!runner) {
-    const result = makeResult({
+    const result = enrichCommandResult(makeResult({
       ok: false,
       command: commandName,
       cwd: process.cwd(),
@@ -182,46 +186,47 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
       evidence: {
         commands: Object.keys(cliCommandRunners)
       }
-    });
+    }));
     writeResult(result, io.stderr, outputFormat);
-    return 2;
+    return result.exitCode;
   }
 
   if (commandArgs.includes('--help') || commandArgs.includes('-h')) {
     const spec = getCommandSpec(commandName);
     if (!spec) {
-      const result = makeResult({
+      const result = enrichCommandResult(makeResult({
         ok: false,
         command: commandName,
         cwd: process.cwd(),
         messages: [message('error', 'ATM_CLI_HELP_NOT_FOUND', `No help spec found for ${commandName}.`)],
         evidence: {}
-      });
+      }));
       writeResult(result, io.stderr, outputFormat);
-      return 2;
+      return result.exitCode;
     }
-    writeResult(makeHelpResult(spec, process.cwd()), io.stdout, outputFormat);
-    return 0;
+    const result = enrichCommandResult(makeHelpResult(spec, process.cwd()));
+    writeResult(result, io.stdout, outputFormat);
+    return result.exitCode;
   }
 
   if (commandName !== 'doctor') {
     const trustIntegrity = checkStartupIntegrity(resolveBundledIntegrityRoot());
     if (!trustIntegrity.ok) {
-      const result = makeResult({
+      const result = enrichCommandResult(makeResult({
         ok: false,
         command: commandName,
         cwd: process.cwd(),
         messages: [message('error', 'ATM_RELEASE_INTEGRITY_FAILED', 'Bundled ATM release integrity check failed; refusing to run non-read-only commands.', { mode: trustIntegrity.mode })],
         evidence: { trustIntegrity }
-      });
+      }));
       writeResult(result, io.stderr, outputFormat);
-      return 1;
+      return result.exitCode;
     }
   }
 
   const knownBadStatus = checkStartupKnownBadVersion();
   if (!knownBadStatus.ok && !isKnownBadReadOnlyCommand(commandName, commandArgs)) {
-    const result = makeResult({
+    const result = enrichCommandResult(makeResult({
       ok: false,
       command: commandName,
       cwd: process.cwd(),
@@ -233,28 +238,28 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         mode: knownBadStatus.mode
       })],
       evidence: { knownBadStatus }
-    });
+    }));
     writeResult(result, io.stderr, outputFormat);
-    return 1;
+    return result.exitCode;
   }
 
   try {
-    const result = await runner(commandArgs);
+    const result = enrichCommandResult(await runner(commandArgs));
     writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
-    return result.ok ? 0 : 1;
+    return result.exitCode;
   } catch (error) {
     const cliError = error instanceof CliError
       ? error
       : new CliError('ATM_CLI_UNHANDLED', error instanceof Error ? error.message : String(error));
-    const result = makeResult({
+    const result = enrichCommandResult(makeResult({
       ok: false,
       command: commandName,
       cwd: process.cwd(),
       messages: [message('error', cliError.code, cliError.message, cliError.details)],
       evidence: {}
-    });
+    }), { cliErrorExitCode: cliError.exitCode });
     writeResult(result, io.stderr, outputFormat);
-    return cliError.exitCode;
+    return result.exitCode;
   }
 }
 
