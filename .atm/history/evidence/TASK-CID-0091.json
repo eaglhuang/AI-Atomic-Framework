@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-CID-0091",
-  "updatedAt": "2026-06-15T17:13:09.004Z",
+  "updatedAt": "2026-06-16T06:47:04.185Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -164,6 +164,56 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:3661f4040ecdfd19ddc6c23aa4f67947afbfe11282e100f313ce1cac52378cce",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Close-health evidence for TASK-CID-0091.",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260615171149-captain-TASK-CID-0091-33f8135afb",
+      "createdAt": "2026-06-16T06:47:04.185Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260615171149-captain-TASK-CID-0091-33f8135afb",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker-format-adapter-rfc",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-16T06:47:04.232Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e8c710ff523061b6574e618bea15efc8b6c4c7c85337f2e941fc808848ddf749",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
