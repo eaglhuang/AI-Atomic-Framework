@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0035",
+  "title": "Staged cross-file consistency and session residue guardrails",
+  "status": "done",
+  "milestone": "M3",
+  "dependencies": [],
+  "acceptance": [
+    "Session-end and resume checks report orphan staged residue with an actionable recovery hint.",
+    "Stage-time checks reject the partial broker/team-lane style mismatch that caused the source-first runner failure.",
+    "Valid staged sets for a single governed task still pass.",
+    "Regression coverage covers the observed partial-stage incident class.",
+    "The guardrail remains a thin CLI/hook addition and does not expand into a separate workflow engine."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/command-specs/framework-mode.spec.ts",
+    "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+    "scripts/validate-framework-development-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/command-specs/framework-mode.spec.ts",
+    "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+    "scripts/validate-framework-development-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-framework-development-governance.ts",
+    "node --strip-types packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Auto-stash on framework-mode release",
+    "Integration manifest enforcement",
+    "Batch checkpoint or closeback changes"
+  ],
+  "nonGoals": [
+    "Do not create a second task lifecycle.",
+    "Do not auto-commit user work.",
+    "Do not solve the entire broker/team-lane integration backlog in this card."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert staged-residue guardrail changes, tests, and atom-map updates.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.framework-session-residue-guardrails-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0035-staged-cross-file-consistency-and-session-residue-guardrails.task.md",
+    "sectionTitle": "TASK-MAO-0035",
+    "headingLine": 54,
+    "hash": "921be0d72728c47b"
+  },
+  "importedAt": "2026-06-16T09:05:00.300Z",
+  "lastTransitionId": "2026-06-16T09-23-16-307Z-close-cce05ff298fa",
+  "lastTransitionAt": "2026-06-16T09:23:16.307Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "antigravity-gemini-3.5-flash",
+    "leaseId": "lease-afa50196dc90",
+    "claimedAt": "2026-06-16T09:06:03.643Z",
+    "heartbeatAt": "2026-06-16T09:23:16.305Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0035.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+      "packages/cli/src/commands/command-specs/framework-mode.spec.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-framework-development-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "owner": "antigravity-gemini-3.5-flash",
+  "startedAt": "2026-06-16T09:06:03.643Z",
+  "startedByActor": "antigravity-gemini-3.5-flash",
+  "startedBySessionId": "session-20260616090603-antigravity-gemini-3.5-flash-TASK-MAO-0035-bb4832a8ba",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0035",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0035.*",
+      ".atm/history/task-events/TASK-MAO-0035/**",
+      ".atm/history/tasks/TASK-MAO-0035.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+      "packages/cli/src/commands/command-specs/framework-mode.spec.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-framework-development-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6dcf375d993e7fd4c819cf56aacbb45f2653efa797f0a2a387a17b13aa722ee0",
+    "actorId": "antigravity-gemini-3.5-flash",
+    "createdAt": "2026-06-16T09:06:03.675Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-16T09:23:16.305Z",
+  "closedByActor": "antigravity-gemini-3.5-flash",
+  "closedBySessionId": "session-20260616090603-antigravity-gemini-3.5-flash-TASK-MAO-0035-bb4832a8ba",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0035.closure-packet.json"
+}
