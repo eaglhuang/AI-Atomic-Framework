@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, appendFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, appendFileSync, statSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -519,6 +519,7 @@ function runPreCommitHook(cwd: string) {
     : blockingFrameworkIssues.includes('framework-stale-lock-cleanup-required') && releasableStaleLock
       ? buildFrameworkStaleCleanupCommand(releasableStaleLock, frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit')
     : null;
+  const crossFileConsistencyFindings = checkStageTimeCrossFileConsistency(root, stagedFiles);
   // TASK-AAO-0136: only staged or invariant audit findings block the commit;
   // tree-wide pre-existing audit findings get demoted to advisory warnings.
   const stagedFilesSet = new Set(stagedFiles);
@@ -541,7 +542,8 @@ function runPreCommitHook(cwd: string) {
     && taskCardStatusReport.ok
     && sameFileClaimReport.ok
     && blockingTaskAuditFindings.length === 0
-    && failedValidatorRuns.length === 0;
+    && failedValidatorRuns.length === 0
+    && crossFileConsistencyFindings.length === 0;
   const evidenceWrite = ok && stagedFiles.length > 0
     ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
     : null;
@@ -567,7 +569,8 @@ function runPreCommitHook(cwd: string) {
     taskAuditFindings: taskAudit.findings,
     failedValidatorRuns,
     stagedFiles,
-    advisoryFindingsSink: advisoryFindings
+    advisoryFindingsSink: advisoryFindings,
+    crossFileConsistencyFindings
   });
   const failureEnvelope = ok
     ? null
@@ -618,6 +621,7 @@ function runPreCommitHook(cwd: string) {
           taskAuditFindings: taskAudit.findings.length,
           failedValidators: failedValidatorRuns.map((entry) => entry.command),
           gitIndexDiagnostic,
+          crossFileConsistencyFindings: crossFileConsistencyFindings.length,
           // TASK-AAO-0136: blockingStagedFindings is the operator-facing split.
           blockingStagedFindings: blockingFindings,
           blockingFindings,
@@ -660,6 +664,7 @@ function runPreCommitHook(cwd: string) {
       taskAudit,
       commandRuns,
       blockingFindings,
+      crossFileConsistencyFindings,
       failureEnvelope,
       evidenceWrite
     }
@@ -687,6 +692,7 @@ function buildPreCommitBlockingFindings(input: {
   readonly failedValidatorRuns: readonly CommandRunReport[];
   readonly stagedFiles: readonly string[];
   readonly advisoryFindingsSink: PreCommitAdvisoryFinding[];
+  readonly crossFileConsistencyFindings: readonly PreCommitBlockingFinding[];
 }): readonly PreCommitBlockingFinding[] {
   const findings: PreCommitBlockingFinding[] = [];
   if (!input.gitIndexDiagnostic.ok) {
@@ -699,6 +705,7 @@ function buildPreCommitBlockingFindings(input: {
       data: input.gitIndexDiagnostic
     });
   }
+  findings.push(...input.crossFileConsistencyFindings);
   findings.push(...input.commitAttributionFindings);
   for (const finding of input.emergencyUseAuditFindings) {
     findings.push({
@@ -3043,4 +3050,176 @@ function requireValue(argv: string[], index: number, flag: string) {
     throw new CliError('ATM_CLI_USAGE', `hook command requires a value for ${flag}`, { exitCode: 2 });
   }
   return value;
+}
+
+function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly string[]): PreCommitBlockingFinding[] {
+  const findings: PreCommitBlockingFinding[] = [];
+  const statusResult = spawnSync('git', ['status', '--short'], { cwd: root, encoding: 'utf8' });
+  const statusLines = String(statusResult.stdout || '').split(/\r?\n/).filter(Boolean);
+  const unstagedModified = new Set<string>();
+  const untrackedFiles = new Set<string>();
+  const deletedFiles = new Set<string>();
+
+  for (const line of statusLines) {
+    if (line.length < 3) continue;
+    const xStatus = line[0];
+    const yStatus = line[1];
+    const filePath = normalizeRelativePath(line.slice(3).trim());
+    if (!filePath) continue;
+
+    if (xStatus === '?' && yStatus === '?') {
+      untrackedFiles.add(filePath);
+    } else if (yStatus === 'M') {
+      unstagedModified.add(filePath);
+    } else if (yStatus === 'D') {
+      deletedFiles.add(filePath);
+    }
+  }
+
+  const stagedTsJsFiles = stagedFiles.filter(f => /\.(ts|tsx|js|jsx)$/.test(f));
+
+  for (const stagedFile of stagedTsJsFiles) {
+    const content = readGitObjectText(root, `:${stagedFile}`);
+    if (!content) continue;
+
+    const importRegex = /import\s+(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]/g;
+    const requireRegex = /require\(['"]([^'"]+)['"]\)/g;
+    const dynamicImportRegex = /import\(['"]([^'"]+)['"]\)/g;
+
+    const imports: { path: string; symbols: string[] }[] = [];
+
+    let match;
+    while ((match = importRegex.exec(content)) !== null) {
+      const symbolsStr = match[1];
+      const importPath = match[2];
+      if (importPath.startsWith('.')) {
+        const parsedSymbols = parseImportSymbols(symbolsStr);
+        imports.push({ path: importPath, symbols: parsedSymbols });
+      }
+    }
+
+    while ((match = requireRegex.exec(content)) !== null) {
+      const importPath = match[1];
+      if (importPath.startsWith('.')) {
+        imports.push({ path: importPath, symbols: ['*'] });
+      }
+    }
+
+    while ((match = dynamicImportRegex.exec(content)) !== null) {
+      const importPath = match[1];
+      if (importPath.startsWith('.')) {
+        imports.push({ path: importPath, symbols: ['*'] });
+      }
+    }
+
+    for (const imp of imports) {
+      const resolvedFile = resolveLocalImportFile(root, stagedFile, imp.path);
+      if (!resolvedFile) {
+        continue;
+      }
+
+      if (untrackedFiles.has(resolvedFile)) {
+        findings.push({
+          code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
+          source: 'cross-file-consistency',
+          file: stagedFile,
+          detail: `Stage-time cross-file consistency failure in ${stagedFile}: references untracked local file ${resolvedFile} which will not be committed. Please stage ${resolvedFile} first.`,
+          classification: 'current-task'
+        });
+        continue;
+      }
+
+      if (deletedFiles.has(resolvedFile)) {
+        findings.push({
+          code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
+          source: 'cross-file-consistency',
+          file: stagedFile,
+          detail: `Stage-time cross-file consistency failure in ${stagedFile}: references deleted local file ${resolvedFile}.`,
+          classification: 'current-task'
+        });
+        continue;
+      }
+
+      if (unstagedModified.has(resolvedFile)) {
+        const diffLines = runGitLines(root, ['diff', '--', resolvedFile]);
+        const changedLines = diffLines.filter(line => {
+          return (line.startsWith('+') || line.startsWith('-')) && !line.startsWith('+++') && !line.startsWith('---');
+        }).map(line => line.slice(1));
+
+        const diffText = changedLines.join('\n');
+        const missingSymbols: string[] = [];
+        for (const sym of imp.symbols) {
+          if (sym === '*') {
+            missingSymbols.push('*');
+            break;
+          }
+
+          const symbolRegex = new RegExp(`\\b${sym}\\b`);
+          if (symbolRegex.test(diffText)) {
+            missingSymbols.push(sym);
+          }
+        }
+
+        if (missingSymbols.length > 0) {
+          findings.push({
+            code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
+            source: 'cross-file-consistency',
+            file: stagedFile,
+            detail: `Stage-time cross-file consistency failure in ${stagedFile}: missing staged changes for symbol(s) "${missingSymbols.join(', ')}" imported from ${resolvedFile} (which has unstaged changes modifying these symbols). Please stage ${resolvedFile}.`,
+            classification: 'current-task'
+          });
+        }
+      }
+    }
+  }
+
+  return findings;
+}
+
+function parseImportSymbols(symbolsStr: string | undefined): string[] {
+  if (!symbolsStr) return ['*'];
+  const trimmed = symbolsStr.trim();
+  if (trimmed.startsWith('*')) return ['*'];
+
+  const symbols: string[] = [];
+  const bracesMatch = /\{([\s\S]*?)\}/.exec(trimmed);
+  if (bracesMatch) {
+    const namedParts = bracesMatch[1].split(',');
+    for (const part of namedParts) {
+      const cleanPart = part.trim();
+      if (!cleanPart) continue;
+      const sym = cleanPart.split(/\s+as\s+/)[0].trim();
+      if (sym) symbols.push(sym);
+    }
+    const outside = trimmed.replace(/\{[\s\S]*?\}/, '').trim();
+    if (outside) {
+      const cleanOutside = outside.replace(/,$/, '').trim();
+      if (cleanOutside) symbols.push('default');
+    }
+  } else {
+    if (trimmed) {
+      if (trimmed.includes('*')) {
+        symbols.push('*');
+      } else {
+        symbols.push('default');
+      }
+    }
+  }
+  return symbols;
+}
+
+function resolveLocalImportFile(root: string, stagedFile: string, importPath: string): string | null {
+  const dir = path.dirname(path.join(root, stagedFile));
+  const resolvedBase = path.resolve(dir, importPath);
+  const extensions = ['.ts', '.tsx', '.d.ts', '.js', '.jsx', '/index.ts', '/index.js'];
+  if (existsSync(resolvedBase) && statSync(resolvedBase).isFile()) {
+    return normalizeRelativePath(relativePathFrom(root, resolvedBase));
+  }
+  for (const ext of extensions) {
+    const candidate = resolvedBase + ext;
+    if (existsSync(candidate) && statSync(candidate).isFile()) {
+      return normalizeRelativePath(relativePathFrom(root, candidate));
+    }
+  }
+  return null;
 }

@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import {
   auditTasks,
   createClosurePacket,
@@ -43,6 +44,15 @@ function makeHostRepo(parent: string, name: string) {
     name: name,
     type: 'module'
   });
+  try {
+    execFileSync('git', ['init', '-q'], { cwd: repo });
+    execFileSync('git', ['config', '--local', 'user.name', 'test-actor'], { cwd: repo });
+    execFileSync('git', ['config', '--local', 'user.email', 'test-actor@example.local'], { cwd: repo });
+    execFileSync('git', ['add', '.'], { cwd: repo });
+    execFileSync('git', ['commit', '-m', 'initial'], { cwd: repo });
+  } catch {
+    // fallback
+  }
   return repo;
 }
 
@@ -64,6 +74,15 @@ function makeFrameworkRepo(parent: string, name = 'ai-atomic-framework') {
   });
   mkdirSync(path.join(repo, 'release', 'atm-onefile'), { recursive: true });
   writeFileSync(path.join(repo, 'release', 'atm-onefile', 'atm.mjs'), '#!/usr/bin/env node\n', 'utf8');
+  try {
+    execFileSync('git', ['init', '-q'], { cwd: repo });
+    execFileSync('git', ['config', '--local', 'user.name', 'test-actor'], { cwd: repo });
+    execFileSync('git', ['config', '--local', 'user.email', 'test-actor@example.local'], { cwd: repo });
+    execFileSync('git', ['add', '.'], { cwd: repo });
+    execFileSync('git', ['commit', '-m', 'initial'], { cwd: repo });
+  } catch {
+    // fallback
+  }
   return repo;
 }
 
@@ -293,6 +312,10 @@ try {
     allowedFiles: ['packages/core/src/index.ts'],
     prompt: 'TASK-X-0004'
   });
+  writeFileSync(path.join(frameworkWithoutRunner, 'packages/core/src/index.ts'), 'export const core = false;\n', 'utf8');
+  execFileSync('git', ['add', 'packages/core/src/index.ts'], { cwd: frameworkWithoutRunner });
+  execFileSync('git', ['commit', '-m', 'deliver critical change'], { cwd: frameworkWithoutRunner });
+
   try {
     await runTasks(['close', '--cwd', frameworkWithoutRunner, '--task', 'TASK-X-0004', '--actor', 'test-agent', '--status', 'done']);
     fail('critical framework task close should fail without a pinned runner');
@@ -435,6 +458,13 @@ try {
   assert(commandStatus.ok === true, 'framework-mode status command must report ok=true');
   const commandEvidence = commandStatus.evidence as { report?: { mode?: string } };
   assert(commandEvidence.report?.mode === 'required', 'framework-mode command must report required for packages/core file scope');
+
+  // Verify that claim/release run successfully on frameworkRepo fixture
+  const claimStatus = await runFrameworkMode(['claim', '--cwd', frameworkRepo, '--actor', 'test-agent', '--files', 'packages/core/src/index.ts', '--reason', 'validate-framework-governance-test', '--json']);
+  assert(claimStatus.ok === true, 'framework-mode claim command must report ok=true');
+
+  const releaseStatus = await runFrameworkMode(['release', '--cwd', frameworkRepo, '--actor', 'test-agent', '--json']);
+  assert(releaseStatus.ok === true, 'framework-mode release command must report ok=true');
 
   if (!process.exitCode) {
     console.log(`[framework-development-governance:${mode}] ok (framework mode detector, task audit, cross-repo closure, and closure packet verified)`);

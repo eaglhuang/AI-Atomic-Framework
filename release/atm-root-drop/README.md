@@ -227,6 +227,30 @@ ATM is organized around contracts first. Implementations may vary, but the seman
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full layer model.
 
+## Historical Batch Lane
+
+For repositories migrating legacy work or completing offline task batches, ATM supports a **historical batch lane**. This allows operators to verify and close tasks using historical commit evidence rather than requiring a live active workspace mutation.
+
+### Core Operations
+
+1. **Author Batch Envelope:**
+   Generate a verified historical batch JSON envelope by specifying the target tasks and commit range:
+   ```bash
+   node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor <actor-id> --validator-command "npm test" --write --json
+   ```
+
+2. **Close Task via Batch:**
+   Consume the generated historical batch slice to transition the task status to done:
+   ```bash
+   node atm.mjs taskflow close --task TASK-A --actor <actor-id> --historical-batch hist-batch-YYYY-MM-DD.json --write --json
+   ```
+
+### Key Concepts
+
+- **Coverage Status:** The batch validator maps the file diffs of the matched commits against each task's declared deliverables. If any file is missing, the task is marked as `partial`. It only becomes `complete` (and close-ready) when all declared deliverables are fully matched by the commit history.
+- **Diagnostic-Only Behavior:** By default, if the batch validation lacks complete file coverage, the task will refuse to close unless an emergency approval is provided.
+- **Validator Mapping:** Each command run in the batch is hashed and recorded, ensuring historical test execution can be proven cryptographically.
+
 ## Adopter Guidance
 
 ATM is designed to cooperate with the systems a repository already has.

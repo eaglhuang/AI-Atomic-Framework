@@ -2,7 +2,7 @@ import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
     name: 'framework-mode',
-    summary: 'Inspect or claim ATM framework-development hard gates for critical source changes.',
+    summary: 'Inspect, claim, or release ATM framework-development hard gates for critical source changes, including staged residue warnings.',
     positional: [
         { name: 'action', summary: 'status | claim | release', required: true }
     ],

@@ -122,7 +122,11 @@
     "generate:error-codes": "node --strip-types scripts/generate-error-code-index.ts",
     "generate:wrappers": "node --strip-types scripts/generate-wrappers.ts",
     "sync:registry-versions": "node --strip-types scripts/backfill-registry-versions.ts",
-    "health:post-merge": "node --strip-types scripts/check-main-health.ts"
+    "health:post-merge": "node --strip-types scripts/check-main-health.ts",
+    "scan:broker-runs": "node --strip-types scripts/scan-broker-runs.ts",
+    "scan:broker-runs:3klife-log": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-broker-run-log-scan.ps1 -LogDir \"C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\"",
+    "scan:broker-runs:3klife-log:auto": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-broker-run-log-scan.ps1 -LogDir \"C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\" -RunOnce",
+    "automation:broker-run-log-scan": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-broker-run-log-scan-automation.ps1 -LogDir \"C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\""
   },
   "devDependencies": {
     "ajv": "^8.17.1",

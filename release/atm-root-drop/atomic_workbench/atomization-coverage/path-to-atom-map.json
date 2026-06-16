@@ -10,6 +10,13 @@
   },
   "mappings": [
     {
+      "path_pattern": "packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts",
+      "atom_id": "atm.validator-envelope-map",
+      "capability": "Regression test for staged cross-file consistency and session residue warnings",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0035"
+    },
+    {
       "path_pattern": ".atm/history/evidence/git-head.jsonl",
       "atom_id": "atm.git-head-evidence-jsonl",
       "capability": "Append-only JSONL evidence log with git union merge driver, replaces single-file git-head.json hotspot to eliminate push merge conflicts",
@@ -1008,13 +1015,34 @@
       "atom_id": "atom-integration-playbook",
       "capability": "Reusable playbook fragments included by every editor adapter skill manifest",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "schemas/patch-envelope.schema.json",
+      "atom_id": "atm.mao-patch-envelope-map",
+      "capability": "JSON Schema (atm.patchEnvelope.v1) for structured agent WIP envelopes — schemaId/specVersion/envelopeId/taskId/actorId/mode (metadata-only|textual-diff)/wipState (partial|complete)/snapshotDir/targetFiles/patchText/metadata{freezeId,capturedAt,confidence,partialReason}; covers valid + partial WIP positives and missing required-field negatives via scripts/validate-schemas.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0008"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/patch-envelope.ts",
+      "atom_id": "atm.mao-patch-envelope-map",
+      "capability": "Patch envelope module: PatchEnvelope type + createPatchEnvelope/isMetadataOnlyEnvelope/validatePatchEnvelope (existing surface from 803ffc335) + summarizePatchEnvelope/comparePatchEnvelopes (new helpers for MAO-0008 acceptance bullet 3); pure functions, no fs mutation; envelope contract consumable by steward arbitration without forcing M5 to fork a second schema (additive partialReason / capturedAt slots) — TASK-MAO-0008 ledger-closeback of historical delivery in commit 803ffc335 + new impl commit.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0008"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "atom_id": "atm.mao-patch-envelope-map",
+      "capability": "Regression coverage for patch envelope: 8 named tests covering valid textual-diff envelope, partial-WIP metadata-only envelope, missing taskId/actorId/freezeId rejection, textual-diff-without-patchText rejection, summarize digest stability, compare divergence detection (scalar fields + targetFiles array + metadata sub-fields).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0008"
     }
   ],
   "summary": {
-    "total_production_paths": 160,
-    "mapped_paths": 160,
+    "total_production_paths": 163,
+    "mapped_paths": 163,
     "coverage_percentage": 100,
-    "atoms_defined": 106,
+    "atoms_defined": 107,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true

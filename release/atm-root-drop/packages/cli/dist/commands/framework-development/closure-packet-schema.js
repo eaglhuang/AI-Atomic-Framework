@@ -183,16 +183,26 @@ export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTas
             // Missing link metadata only reduces future classification precision.
         }
     }
+    const stagedFiles = runGitLines(root, ['diff', '--cached', '--name-only']).map((f) => normalizeRelativePath(f)).filter(Boolean);
+    const stagedResidues = stagedFiles.filter(f => !scopedFiles.includes(f));
+    const claimMessages = [
+        message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_ACQUIRED', 'Temporary framework-development runtime lock acquired.', {
+            taskId,
+            actorId,
+            files: scopedFiles,
+            ...(resolvedLinkedTaskId ? { linkedTaskId: resolvedLinkedTaskId } : {})
+        })
+    ];
+    if (stagedResidues.length > 0) {
+        claimMessages.push(message('warn', 'ATM_FRAMEWORK_STAGED_RESIDUE_DETECTED', `Warning: Staged residue detected outside claimed scope: ${stagedResidues.join(', ')}. Please adopt, stash, or widen the scope.`, {
+            stagedResidues
+        }));
+    }
     return makeResult({
         ok: true,
         command: 'framework-mode',
         cwd: root,
-        messages: [message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_ACQUIRED', 'Temporary framework-development runtime lock acquired.', {
-                taskId,
-                actorId,
-                files: scopedFiles,
-                ...(resolvedLinkedTaskId ? { linkedTaskId: resolvedLinkedTaskId } : {})
-            })],
+        messages: claimMessages,
         evidence: {
             action: 'claim',
             taskId,
@@ -213,14 +223,23 @@ export async function runFrameworkTempRelease(cwd, actor) {
     const adapter = createLocalGovernanceAdapter({ repositoryRoot: root });
     const taskId = frameworkTempTaskId(actorId);
     const result = await resolveValue(adapter.stores.lockStore.releaseLock(taskId, actorId));
+    const stagedFiles = runGitLines(root, ['diff', '--cached', '--name-only']).map((f) => normalizeRelativePath(f)).filter(Boolean);
+    const releaseMessages = [
+        message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_RELEASED', 'Temporary framework-development runtime lock released.', {
+            taskId,
+            actorId
+        })
+    ];
+    if (stagedFiles.length > 0) {
+        releaseMessages.push(message('warn', 'ATM_FRAMEWORK_STAGED_RESIDUE_AT_RELEASE', `Warning: Staged files remain in index at session end: ${stagedFiles.join(', ')}. Please commit, stash, or reset them.`, {
+            stagedFiles
+        }));
+    }
     return makeResult({
         ok: true,
         command: 'framework-mode',
         cwd: root,
-        messages: [message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_RELEASED', 'Temporary framework-development runtime lock released.', {
-                taskId,
-                actorId
-            })],
+        messages: releaseMessages,
         evidence: {
             action: 'release',
             taskId,
