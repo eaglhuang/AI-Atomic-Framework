@@ -236,6 +236,7 @@ export interface MutationRequest {
   readonly migration: MigrationRecord;
   readonly requestId: string;
   readonly actorId: string;
+  readonly taskId?: string;
   readonly filePath: string;
   readonly op: string;
   readonly target: string;
@@ -348,6 +349,36 @@ export interface MutationBatchPlan {
   readonly batches: readonly MutationBatch[];
   readonly queued: readonly string[];
   readonly blocked: readonly string[];
+  readonly requestConflictKeys?: readonly {
+    readonly requestId: string;
+    readonly conflictKeys: readonly ConflictKey[];
+  }[];
+}
+
+export interface BrokerOperationRunRecord {
+  readonly schemaId: 'atm.brokerOperationRunRecord.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly runId: string;
+  readonly planId: string;
+  readonly request_identity: readonly string[];
+  readonly actor_ids: readonly string[];
+  readonly request_files: readonly string[];
+  readonly adapter_choice: string;
+  readonly applied_files: readonly string[];
+  readonly lane_decision: string;
+  readonly merge_verdict: MergeVerdict;
+  readonly evidence_path: string;
+  readonly task_ids?: readonly string[];
+}
+
+export interface BrokerOperationRunRecordEnvelope {
+  readonly schemaId: 'atm.brokerOperationRunRecordEnvelope.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly runId: string;
+  readonly planId: string;
+  readonly records: readonly BrokerOperationRunRecord[];
 }
 
 /**

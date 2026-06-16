@@ -45,6 +45,27 @@ function testSameRowQueued() {
   console.log('ok: same pointer => one applied, the other queued');
 }
 
+function testRequestConflictKeysPreserved() {
+  const registry = defaultAdapterRegistry();
+  const requests = [
+    makeRequest({ requestId: 'r1', filePath: 'data.json', op: 'upsert', target: '/a', value: 1 }),
+    makeRequest({ requestId: 'r2', filePath: 'data.json', op: 'upsert', target: '/b', value: 2 })
+  ];
+  const fileContents = { 'data.json': '{"a":0,"b":0}' };
+  const plan = planMutationBatch({ registry, requests, fileContents });
+  assert.equal(Array.isArray(plan.requestConflictKeys), true);
+  assert.equal(plan.requestConflictKeys?.length, 2);
+  const requestConflictKeys = plan.requestConflictKeys ?? [];
+  const requestConflictKeyMap = new Map(requestConflictKeys.map((entry) => [entry.requestId, entry.conflictKeys]));
+  assert.equal(requestConflictKeyMap.get('r1')?.length, 1);
+  assert.equal(requestConflictKeyMap.get('r2')?.length, 1);
+  const r1Key = requestConflictKeyMap.get('r1')?.[0]?.key;
+  const r2Key = requestConflictKeyMap.get('r2')?.[0]?.key;
+  assert.notEqual(r1Key, r2Key);
+  assert.ok((plan.batches[0]?.conflictKeys ?? []).length >= 2);
+  console.log('ok: request-level conflict keys are preserved for each request');
+}
+
 function testCasPreventsLostUpdate() {
   const baseContents = '{"a":0}';
   const baseHash = hashContent(baseContents);
@@ -75,6 +96,7 @@ function testUnknownFormatFailsClosed() {
 
 testDeterministicPlan();
 testSameRowQueued();
+testRequestConflictKeysPreserved();
 testCasPreventsLostUpdate();
 testUnknownFormatFailsClosed();
 

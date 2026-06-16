@@ -2,7 +2,8 @@ import path from 'node:path';
 import { calculateBrokerDecision } from './decision.ts';
 import { buildVirtualAtomInUseRegistry, loadRegistry } from './registry.ts';
 import { readGitHeadCommit } from './steward.ts';
-import type { BrokerDecision, WriteIntent, WriteIntentAtomRef } from './types.ts';
+import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
+import type { WriteIntent, WriteIntentAtomRef } from './types.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 
 export const DEFAULT_TEAM_STEWARD_ID = 'neutral-write-steward';
@@ -68,6 +69,60 @@ export interface TeamBrokerFinding {
   readonly code: string;
   readonly detail: string;
   readonly paths?: string[];
+}
+
+export interface BrokerRunRecordInput {
+  readonly runId: string;
+  readonly planId: string;
+  readonly request: MutationRequest;
+  readonly adapterChoice: string;
+  readonly laneDecision: string;
+  readonly mergeVerdict: MergeVerdict;
+  readonly evidencePath: string;
+  readonly appliedFiles?: readonly string[];
+}
+
+export function buildTeamBrokerRunRecord(input: BrokerRunRecordInput): BrokerOperationRunRecord {
+  const taskId = input.request.taskId?.trim();
+  return {
+    schemaId: 'atm.brokerOperationRunRecord.v1',
+    specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'team lane run record'
+    },
+    runId: input.runId,
+    planId: input.planId,
+    request_identity: [input.request.requestId],
+    actor_ids: [input.request.actorId],
+    request_files: [input.request.filePath],
+    adapter_choice: input.adapterChoice,
+    applied_files: input.appliedFiles ?? [input.request.filePath],
+    lane_decision: input.laneDecision,
+    merge_verdict: input.mergeVerdict,
+    evidence_path: input.evidencePath,
+    ...(taskId ? { task_ids: [taskId] } : {})
+  };
+}
+
+export function buildTeamBrokerRunRecordEnvelope(input: {
+  readonly runId: string;
+  readonly planId: string;
+  readonly records: readonly BrokerOperationRunRecord[];
+}): BrokerOperationRunRecordEnvelope {
+  return {
+    schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+    specVersion: '0.1.0',
+    migration: {
+      strategy: 'none',
+      fromVersion: null,
+      notes: 'team lane run record'
+    },
+    runId: input.runId,
+    planId: input.planId,
+    records: [...input.records]
+  };
 }
 
 export function buildTeamWriteIntent(input: {
