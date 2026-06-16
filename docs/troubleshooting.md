@@ -75,9 +75,12 @@ Each entry follows the same shape:
 ### Exit code 2 from a CLI command
 
 - **Symptom:** `node atm.mjs <command> ...` exits with status 2.
-- **Diagnose:** Exit code 2 means **usage error** by policy — bad flag,
+- **Diagnose:** Read the JSON `severity` and `exitCode` fields together.
+  Exit code `2` means **usage error** (`severity: usage-error`) — bad flag,
   missing required argument, or an action against an uninitialized repo.
-  The `message.code` field in the JSON output names the specific check.
+  Exit code `1` with `severity: blocked` means governance routing blocked the
+  action; follow `evidence.nextAction` instead of treating it as a validator
+  failure. The `message.code` field names the specific check.
 - **Fix:** Check the `messages[].text` field for the corrective instruction.
   Common cases: missing `--pack`, missing `--task`, no `.atm/config.json`
   yet (run `bootstrap` first).

@@ -389,8 +389,26 @@
     },
     {
       "path_pattern": "packages/cli/src/commands/shared.ts",
-      "atom_id": "atm.task-ledger-governance-map",
-      "capability": "shared command helpers, option parser parseOptions, output-json file writer redirection (TASK-AAO-0065), and structured CliError usage diagnostics envelopes",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "shared command helpers, CliError envelopes, enrichCommandResult severity/exitCode/blocking/diagnostics contract (TASK-MAO-0036), option parser parseOptions, output-json projection",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/_common.ts",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "shared command-spec options documenting JSON result contract fields",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "docs/cli-error-policy.md",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "canonical CLI result contract and exit-code policy SSoT",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "tests/cli/cli-result-contract.test.ts",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "release-smoke coverage for success, advisory, blocked, usage-error, and failure result shapes",
       "coverage_status": "active"
     },
     {
