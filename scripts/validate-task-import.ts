@@ -718,6 +718,6 @@ function assertImportedTaskContract(task: {
   }
   if (task.atomizationImpact?.ownerAtomOrMap !== 'atm.task-ledger-governance-map'
     || !(task.atomizationImpact?.mapUpdates ?? []).includes('atomic_workbench/atomization-coverage/path-to-atom-map.json')) {
-    fail(`${label} must preserve atomizationImpact metadata.`);
+    fail(`${label} must preserve atomizationImpact metadata from camelCase or snake_case frontmatter.`);
   }
 }

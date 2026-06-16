@@ -4544,8 +4544,9 @@ function parseSingleCard(input) {
     const planningReadOnlyPaths = parseYamlList(frontMatter.data.planningReadOnlyPaths ?? frontMatter.data.planning_read_only_paths);
     const outOfScope = parseYamlList(frontMatter.data.outOfScope ?? frontMatter.data.out_of_scope ?? frontMatter.data.forbidden_files);
     const nonGoals = parseYamlList(frontMatter.data.nonGoals ?? frontMatter.data.non_goals);
-    const atomizationImpactFrontMatter = frontMatter.data.atomizationImpact && typeof frontMatter.data.atomizationImpact === 'object' && !Array.isArray(frontMatter.data.atomizationImpact)
-        ? frontMatter.data.atomizationImpact
+    const rawAtomizationImpact = frontMatter.data.atomizationImpact ?? frontMatter.data.atomization_impact;
+    const atomizationImpactFrontMatter = rawAtomizationImpact && typeof rawAtomizationImpact === 'object' && !Array.isArray(rawAtomizationImpact)
+        ? rawAtomizationImpact
         : {};
     const mapUpdates = parseYamlList(frontMatter.data.mapUpdates
         ?? frontMatter.data.map_updates
@@ -5241,8 +5242,9 @@ function parseSingleCardFromPlugin(parsed, importedAt) {
     const planningReadOnlyPaths = parseYamlList(frontData.planningReadOnlyPaths ?? frontData.planning_read_only_paths);
     const outOfScope = parseYamlList(frontData.outOfScope ?? frontData.out_of_scope ?? frontData.forbidden_files);
     const nonGoals = parseYamlList(frontData.nonGoals ?? frontData.non_goals);
-    const atomizationImpactFrontMatter = frontData.atomizationImpact && typeof frontData.atomizationImpact === 'object' && !Array.isArray(frontData.atomizationImpact)
-        ? frontData.atomizationImpact
+    const rawAtomizationImpact = frontData.atomizationImpact ?? frontData.atomization_impact;
+    const atomizationImpactFrontMatter = rawAtomizationImpact && typeof rawAtomizationImpact === 'object' && !Array.isArray(rawAtomizationImpact)
+        ? rawAtomizationImpact
         : {};
     const mapUpdates = parseYamlList(frontData.mapUpdates
         ?? frontData.map_updates

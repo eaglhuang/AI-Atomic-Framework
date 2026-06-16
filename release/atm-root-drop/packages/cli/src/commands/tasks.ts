@@ -5192,8 +5192,9 @@ function parseSingleCard(input: {
   const planningReadOnlyPaths = parseYamlList(frontMatter.data.planningReadOnlyPaths ?? frontMatter.data.planning_read_only_paths);
   const outOfScope = parseYamlList(frontMatter.data.outOfScope ?? frontMatter.data.out_of_scope ?? frontMatter.data.forbidden_files);
   const nonGoals = parseYamlList(frontMatter.data.nonGoals ?? frontMatter.data.non_goals);
-  const atomizationImpactFrontMatter = frontMatter.data.atomizationImpact && typeof frontMatter.data.atomizationImpact === 'object' && !Array.isArray(frontMatter.data.atomizationImpact)
-    ? frontMatter.data.atomizationImpact as Record<string, unknown>
+  const rawAtomizationImpact = frontMatter.data.atomizationImpact ?? frontMatter.data.atomization_impact;
+  const atomizationImpactFrontMatter = rawAtomizationImpact && typeof rawAtomizationImpact === 'object' && !Array.isArray(rawAtomizationImpact)
+    ? rawAtomizationImpact as Record<string, unknown>
     : {};
   const mapUpdates = parseYamlList(
     frontMatter.data.mapUpdates
@@ -5969,8 +5970,9 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
   const outOfScope = parseYamlList(frontData.outOfScope ?? frontData.out_of_scope ?? frontData.forbidden_files);
   const nonGoals = parseYamlList(frontData.nonGoals ?? frontData.non_goals);
 
-  const atomizationImpactFrontMatter = frontData.atomizationImpact && typeof frontData.atomizationImpact === 'object' && !Array.isArray(frontData.atomizationImpact)
-    ? frontData.atomizationImpact as Record<string, unknown>
+  const rawAtomizationImpact = frontData.atomizationImpact ?? frontData.atomization_impact;
+  const atomizationImpactFrontMatter = rawAtomizationImpact && typeof rawAtomizationImpact === 'object' && !Array.isArray(rawAtomizationImpact)
+    ? rawAtomizationImpact as Record<string, unknown>
     : {};
   const mapUpdates = parseYamlList(
     frontData.mapUpdates

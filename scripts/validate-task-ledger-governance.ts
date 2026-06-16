@@ -1246,9 +1246,9 @@ try {
     'rollback:',
     '  strategy: revert-commit',
     '  notes: "Restore previous projection on regression."',
-    'atomizationImpact:',
-    '  ownerAtomOrMap: "atm.task-ledger-governance-map"',
-    '  mapUpdates:',
+    'atomization_impact:',
+    '  owner_atom_or_map: "atm.task-ledger-governance-map"',
+    '  map_updates:',
     '    - "atomic_workbench/atomization-coverage/path-to-atom-map.json"',
     'outOfScope:',
     '  - "Changing task-card authoring format"',
@@ -1267,8 +1267,8 @@ try {
   assert(importedTask.planningRepo === 'PlanningRepoExample', 'import must preserve planning_repo as planningRepo');
   assert(importedTask.closureAuthority === 'target_repo', 'import must preserve closure_authority as closureAuthority');
   assert(Array.isArray(importedTask.outOfScope) && importedTask.outOfScope[0]?.includes('task-card authoring format'), 'import must preserve outOfScope as machine field');
-  assert(importedTask.atomizationImpact?.ownerAtomOrMap === 'atm.task-ledger-governance-map', 'import must preserve nested atomizationImpact.ownerAtomOrMap');
-  assert(Array.isArray(importedTask.atomizationImpact?.mapUpdates) && importedTask.atomizationImpact.mapUpdates.includes('atomic_workbench/atomization-coverage/path-to-atom-map.json'), 'import must preserve nested atomizationImpact.mapUpdates');
+  assert(importedTask.atomizationImpact?.ownerAtomOrMap === 'atm.task-ledger-governance-map', 'import must preserve nested snake_case atomization_impact.owner_atom_or_map');
+  assert(Array.isArray(importedTask.atomizationImpact?.mapUpdates) && importedTask.atomizationImpact.mapUpdates.includes('atomic_workbench/atomization-coverage/path-to-atom-map.json'), 'import must preserve nested snake_case atomization_impact.map_updates');
 
   const writeImport = await runTasks(['import', '--cwd', fidelityRepo, '--from', path.join('docs', 'plan', 'tasks', 'TASK-IMPORT-0001.task.md'), '--write', '--json']);
   assert(writeImport.ok === true, 'tasks import --write must succeed for fidelity card');
