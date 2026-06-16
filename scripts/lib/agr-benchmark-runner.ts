@@ -15,7 +15,8 @@ export type ComposeVerdict =
   | 'parallel-safe'
   | 'needs-steward'
   | 'blocked-cid-conflict'
-  | 'blocked-shared-surface';
+  | 'blocked-shared-surface'
+  | 'human-required';
 
 export type RegistryVerdict =
   | 'parallel-safe'

@@ -117,7 +117,7 @@ export interface MergePlan {
   readonly migration: MigrationRecord;
   readonly mergePlanId: string;
   readonly inputProposals: readonly string[];
-  readonly verdict: 'parallel-safe' | 'needs-steward' | 'blocked-cid-conflict' | 'blocked-shared-surface';
+  readonly verdict: 'parallel-safe' | 'needs-steward' | 'blocked-cid-conflict' | 'blocked-shared-surface' | 'human-required';
   readonly conflicts: readonly ConflictDetail[];
   readonly applyMethod: 'patch-apply' | 'ast-rewrite' | 'git-three-way-fallback' | 'steward-authored-final-patch';
   readonly requiredEvidence: readonly string[];

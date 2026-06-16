@@ -1036,13 +1036,34 @@
       "capability": "Regression coverage for patch envelope: 8 named tests covering valid textual-diff envelope, partial-WIP metadata-only envelope, missing taskId/actorId/freezeId rejection, textual-diff-without-patchText rejection, summarize digest stability, compare divergence detection (scalar fields + targetFiles array + metadata sub-fields).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0008"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/steward.ts",
+      "atom_id": "atm.mao-steward-arbitration-map",
+      "capability": "Steward arbitration flow: StewardArbitrationVerdict (apply | merge-required | blocked | human-required), StewardIdentity & checkStewardPermission (neutral + derived-artifact-writer identity gates), arbitrateStewardRequest top-level entry point wrapping planning + identity + apply with route/task evidence links, planStewardApply/applyStewardPlan lower-level building blocks, executeBrokerScopedWrite for scoped derived-artifact writes, applyUnifiedPatch for patch application, human-required fail-closed enforcement.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0009"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+      "atom_id": "atm.mao-steward-arbitration-map",
+      "capability": "Regression coverage for steward arbitration: 13 named tests covering safe apply, unsafe block (blocked-cid-conflict), scope lock mismatch, human-required fail-closed, neutral steward identity validation, empty stewardId rejection, derived-artifact-writer auth requirement, derived-artifact-writer with taskId, arbitrateStewardRequest apply with route/task links, arbitrateStewardRequest human-required, arbitrateStewardRequest blocked by identity, arbitrateStewardRequest merge-required, blocked-shared-surface verdict.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0009"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/route.ts",
+      "atom_id": "atm.mao-steward-arbitration-map",
+      "capability": "CLI route takeover integration: steward identity, route/task ownership evidence in takeover success/failure/human-required output, human-required verdict gate returning structured ATM_ROUTE_HUMAN_REQUIRED message with owningRouteId/owningTaskId.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0009"
     }
   ],
   "summary": {
-    "total_production_paths": 163,
-    "mapped_paths": 163,
+    "total_production_paths": 166,
+    "mapped_paths": 166,
     "coverage_percentage": 100,
-    "atoms_defined": 107,
+    "atoms_defined": 108,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import type { RouteClaimIntent, RouteContext, RouteContextState, RouteResourceSet } from '../../../core/src/routing/index.ts';
 import { applyStewardPlan } from '../../../core/src/broker/steward.ts';
+import type { StewardIdentity } from '../../../core/src/broker/steward.ts';
 import type { MergePlan, PatchProposal } from '../../../core/src/broker/types.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
@@ -99,6 +100,28 @@ function runTakeover(options: ReturnType<typeof parseRouteArgs>) {
       details: { verdict: mergePlan.verdict }
     });
   }
+  if (mergePlan.verdict === 'human-required') {
+    return makeResult({
+      ok: false,
+      command: 'route',
+      cwd: options.cwd,
+      messages: [
+        message('warn', 'ATM_ROUTE_HUMAN_REQUIRED', 'Steward takeover cannot proceed: merge plan verdict is human-required. Human intervention needed.', {
+          verdict: mergePlan.verdict,
+          stewardId: options.stewardId ?? 'neutral-write-steward',
+          owningRouteId: options.routeId ?? null,
+          owningTaskId: options.taskId ?? null
+        })
+      ],
+      evidence: {
+        action: 'takeover',
+        verdict: 'human-required',
+        stewardId: options.stewardId ?? 'neutral-write-steward',
+        owningRouteId: options.routeId ?? null,
+        owningTaskId: options.taskId ?? null
+      }
+    });
+  }
 
   const proposal = JSON.parse(readFileSync(proposalPath, 'utf8')) as PatchProposal;
   const proposals = [proposal];
@@ -129,12 +152,18 @@ function runTakeover(options: ReturnType<typeof parseRouteArgs>) {
       cwd: options.cwd,
       messages: [
         message('error', 'ATM_ROUTE_TAKEOVER_FAILED', 'Steward takeover merge failed.', {
-          blockedReasons: applyResult.evidence.blockedReasons
+          blockedReasons: applyResult.evidence.blockedReasons,
+          stewardId,
+          owningRouteId: options.routeId ?? null,
+          owningTaskId: options.taskId ?? null
         })
       ],
       evidence: {
         action: 'takeover',
-        applyResult
+        applyResult,
+        stewardId,
+        owningRouteId: options.routeId ?? null,
+        owningTaskId: options.taskId ?? null
       }
     });
   }
@@ -186,13 +215,20 @@ function runTakeover(options: ReturnType<typeof parseRouteArgs>) {
     command: 'route',
     cwd: options.cwd,
     messages: [
-      message('info', 'ATM_ROUTE_TAKEOVER_SUCCESS', 'Steward takeover successfully applied and verified via validator gates.')
+      message('info', 'ATM_ROUTE_TAKEOVER_SUCCESS', 'Steward takeover successfully applied and verified via validator gates.', {
+        stewardId,
+        owningRouteId: options.routeId ?? null,
+        owningTaskId: options.taskId ?? null
+      })
     ],
     evidence: {
       action: 'takeover',
       applyResult,
       validatorResults,
-      rolledBack: false
+      rolledBack: false,
+      stewardId,
+      owningRouteId: options.routeId ?? null,
+      owningTaskId: options.taskId ?? null
     }
   });
 }
