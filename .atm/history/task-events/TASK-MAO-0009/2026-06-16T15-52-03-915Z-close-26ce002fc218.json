@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-16T15-52-03-915Z-close-26ce002fc218",
+  "taskId": "TASK-MAO-0009",
+  "action": "close",
+  "actorId": "cursor-composer-2.5",
+  "sessionId": "session-20260616155026-cursor-composer-2.5-TASK-MAO-0009-31f56ae19f",
+  "fromStatus": "planned",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0009.json",
+  "taskSha256": "sha256:457f32234790788fdcec90f6f405e7cbce9677ebaef69da23b5cc5834e8dc3de",
+  "createdAt": "2026-06-16T15:52:03.915Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0009 --actor cursor-composer-2.5 --status done --historical-delivery 240b6b436752876acd58a2fff99940b9aef47c6c --historical-delivery 83a6e161c696aa16612a45d81675de8c42749342",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260616155026-cursor-composer-2.5-TASK-MAO-0009-31f56ae19f",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0009.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+      "node --strip-types tests/cli/next-route-selector.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "git diff --check",
+      "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-16T15:52:03.912Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0009-steward-arbitration-flow.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/route.ts",
+        "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/route.ts",
+        "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "requiredGates": [
+        "git diff --check",
+        "node --strip-types packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+        "typecheck",
+        "validate:cli",
+        "validate:prompt-scoped-next"
+      ]
+    }
+  }
+}
