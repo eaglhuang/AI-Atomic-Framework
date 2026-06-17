@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0023",
+  "title": "Team knowledge retention and disk budget guard",
+  "status": "running",
+  "milestone": "M5K",
+  "dependencies": [
+    "TASK-TEAM-0021"
+  ],
+  "acceptance": [
+    "`team knowledge stats` reports shard and runtime cache footprint.",
+    "`team knowledge compact --dry-run` can identify stale / superseded / archive-candidate shards without mutating canonical source by default.",
+    "Runtime budget breaches produce explicit diagnostics.",
+    "Optional embedding cache, if present, is treated as runtime-only and prunable.",
+    "The feature does not delete or rewrite task evidence or task cards."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team-knowledge.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-governance-local.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team-knowledge.ts",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-governance-local.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-governance-local.ts",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "node atm.mjs team knowledge stats --json",
+    "node atm.mjs team knowledge compact --dry-run --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Deleting canonical lesson shards automatically without human review",
+    "External object storage or remote vector DB",
+    "Changing evidence or closure semantics"
+  ],
+  "nonGoals": [
+    "Do not make vector retrieval mandatory",
+    "Do not store generated caches in committed deliverables"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert retention/compact/stats/budget logic and map updates.",
+  "dispatchPattern": {
+    "shape": "dual-agent (Phase 0 budget planner + Phase 1 builder)",
+    "rationale": "Retention rules and disk budgets should be reasoned about first, because once cache growth begins the fix is harder than the prevention.",
+    "phase0": {
+      "lane": "helper (read-only sidecar)",
+      "allowedFiles": [
+        "docs/ai_atomic_framework/team-agents/團隊自動化代理分工計畫.md",
+        "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0023-*.task.md"
+      ],
+      "commitBudget": 0,
+      "output": "Phase 1 brief defining shard size caps, runtime cache budget, stale/compact policy, and compact safety rules."
+    },
+    "phase1": {
+      "lane": "external builder 001-006",
+      "forbiddenFiles": [
+        "C:/Users/User/3KLife/**",
+        ".atm/history/**"
+      ],
+      "allowedFilesStrict": true,
+      "commitBudget": 2,
+      "commitLayout": [
+        "commit_1: stats/compact/budget logic",
+        "commit_2: validator/map + close evidence"
+      ]
+    }
+  },
+  "conditionReview": [
+    "Compact is safe by default and supports dry-run",
+    "Budget breach produces explicit diagnostics",
+    "Generated cache remains disposable and rebuildable"
+  ],
+  "mailboxAssignee": "001",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-knowledge-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card is the anti-bloat line. Knowledge that cannot be compacted, measured, and pruned will eventually stop being queried.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0023-team-knowledge-retention-disk-budget-guard.task.md",
+    "sectionTitle": "TASK-TEAM-0023",
+    "headingLine": 79,
+    "hash": "7c0c4b22998bd466"
+  },
+  "importedAt": "2026-06-17T16:55:18.208Z",
+  "lastTransitionId": "2026-06-17T18-03-09-852Z-claim-f3fd99f2f600",
+  "lastTransitionAt": "2026-06-17T18:03:09.852Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-17T18:03:09.814Z",
+  "promotedAt": "2026-06-17T18:03:09.817Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-ae965803e67c",
+    "claimedAt": "2026-06-17T18:03:09.820Z",
+    "heartbeatAt": "2026-06-17T18:03:09.820Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0023.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team-knowledge.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "scripts/validate-governance-local.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-17T18:03:09.820Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260617180309-captain-TASK-TEAM-0023-4a056a4c86",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0023",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0023.*",
+      ".atm/history/task-events/TASK-TEAM-0023/**",
+      ".atm/history/tasks/TASK-TEAM-0023.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team-knowledge.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "scripts/validate-governance-local.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "475f215cea12a037325396e1ea373cab3995002cd430724b00bb84564f338baf",
+    "actorId": "captain",
+    "createdAt": "2026-06-17T18:03:09.851Z",
+    "status": "active"
+  }
+}

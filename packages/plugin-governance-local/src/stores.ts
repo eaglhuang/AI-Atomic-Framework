@@ -34,6 +34,9 @@ import type { LocalGovernanceConfig } from './index';
 import { resolveLocalGovernanceLayout } from './layout.ts';
 import { isArtifactVersionKind, resolveDataAndArtifactVersions, isValidSemverVersionString } from './versioning.ts';
 
+const CANONICAL_KNOWLEDGE_ROOT = '.atm/knowledge';
+const GENERATED_KNOWLEDGE_CACHE_ROOT = '.atm/runtime/knowledge';
+
 export function createLocalGovernanceStores(config: LocalGovernanceConfig): GovernanceStores {
   const repositoryRoot = path.resolve(config.repositoryRoot);
   const layout = resolveLocalGovernanceLayout(config.layout);
@@ -493,16 +496,20 @@ function normalizeRelativePath(filePath: string): string {
 
 function assertCanonicalShardInput(filePath: string): void {
   const normalized = normalizeRelativePath(filePath);
-  if (normalized === '.atm/runtime/knowledge' || normalized.startsWith('.atm/runtime/knowledge/')) {
-    throw new Error('Generated knowledge cache paths under .atm/runtime/knowledge/** cannot be used as canonical shard input. Use .atm/knowledge/** for canonical Team knowledge shards.');
+  if (isInsideRelativeRoot(normalized, GENERATED_KNOWLEDGE_CACHE_ROOT)) {
+    throw new Error(`Generated knowledge cache paths under ${GENERATED_KNOWLEDGE_CACHE_ROOT}/** cannot be used as canonical shard input. Use ${CANONICAL_KNOWLEDGE_ROOT}/** for canonical Team knowledge shards.`);
   }
 }
 
 function assertGeneratedKnowledgeCacheOutput(filePath: string): void {
   const normalized = normalizeRelativePath(filePath);
-  if (normalized === '.atm/knowledge' || normalized.startsWith('.atm/knowledge/')) {
-    throw new Error('Shard indexes are generated artifacts. Write Team knowledge indexes under .atm/runtime/knowledge/**, not canonical .atm/knowledge/**.');
+  if (isInsideRelativeRoot(normalized, CANONICAL_KNOWLEDGE_ROOT)) {
+    throw new Error(`Shard indexes are generated artifacts. Write Team knowledge indexes under ${GENERATED_KNOWLEDGE_CACHE_ROOT}/**, not canonical ${CANONICAL_KNOWLEDGE_ROOT}/**.`);
   }
+}
+
+function isInsideRelativeRoot(filePath: string, root: string): boolean {
+  return filePath === root || filePath.startsWith(`${root}/`);
 }
 
 function writeJsonFile(filePath: string, value: unknown) {

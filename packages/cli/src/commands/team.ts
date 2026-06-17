@@ -350,6 +350,11 @@ const builtInRecipes: TeamRecipe[] = [
 ];
 
 export async function runTeam(argv: string[]) {
+  if (String(argv[0] ?? '').toLowerCase() === 'knowledge') {
+    const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
+    return runTeamKnowledge(argv.slice(1), cwd);
+  }
+
   const spec = getCommandSpec('team');
   const parsed = parseArgsForCommand(spec, argv);
   const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
@@ -515,6 +520,14 @@ export async function runTeam(argv: string[]) {
       brokerLane: teamPlan.brokerLane
     }
   });
+}
+
+function readOptionValue(argv: string[], flag: string): string | undefined {
+  const index = argv.indexOf(flag);
+  if (index < 0) {
+    return undefined;
+  }
+  return argv[index + 1];
 }
 
 async function buildTeamPlanningContext(input: {

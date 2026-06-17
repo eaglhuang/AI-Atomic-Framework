@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, parseArgsForCommand, readJsonFile } from './shared.ts';
 import { defineCommandSpec } from './shared.ts';
@@ -47,11 +47,26 @@ type KnowledgeIndex = {
   entries: KnowledgeIndexEntry[];
 };
 
+type KnowledgeShardRetention = {
+  path: string;
+  title: string;
+  status: string | null;
+  supersededBy: string | null;
+  archiveCandidate: boolean;
+  reasons: string[];
+  bytes: number;
+};
+
+type RuntimeBudgetStatus = 'ok' | 'warning' | 'hard-limit';
+
+const DEFAULT_RUNTIME_WARNING_BYTES = 5 * 1024 * 1024;
+const DEFAULT_RUNTIME_HARD_LIMIT_BYTES = 20 * 1024 * 1024;
+
 const teamKnowledgeSpec = defineCommandSpec({
   name: 'team knowledge',
-  summary: 'Build or query the advisory Team Agents knowledge index.',
+  summary: 'Build, query, inspect, or compact the advisory Team Agents knowledge index.',
   positional: [
-    { name: 'action', summary: 'Knowledge action. Supports: build, query.' }
+    { name: 'action', summary: 'Knowledge action. Supports: build, query, stats, compact.' }
   ],
   options: [
     { flag: '--cwd', value: 'path', summary: 'Repository root.' },
@@ -67,6 +82,8 @@ const teamKnowledgeSpec = defineCommandSpec({
     { flag: '--path', value: 'glob', summary: 'Metadata path filter.' },
     { flag: '--atom', value: 'id', summary: 'Metadata atom filter.' },
     { flag: '--validator', value: 'command', summary: 'Metadata validator filter.' },
+    { flag: '--warning-bytes', value: 'n', summary: 'Runtime cache warning threshold for stats/compact.' },
+    { flag: '--budget-bytes', value: 'n', summary: 'Runtime cache hard-limit threshold for stats/compact.' },
     { flag: '--json', summary: 'Return JSON output.' },
     { flag: '--pretty', summary: 'Return pretty JSON output.' },
     { flag: '--help', summary: 'Show help.' }
@@ -84,7 +101,13 @@ export async function runTeamKnowledge(argv: string[], inheritedCwd?: string) {
   if (action === 'query') {
     return runKnowledgeQuery(parsed.options, cwd);
   }
-  throw new CliError('ATM_CLI_USAGE', 'team knowledge supports: build, query', { exitCode: 2 });
+  if (action === 'stats') {
+    return runKnowledgeStats(parsed.options, cwd);
+  }
+  if (action === 'compact') {
+    return runKnowledgeCompact(parsed.options, cwd);
+  }
+  throw new CliError('ATM_CLI_USAGE', 'team knowledge supports: build, query, stats, compact', { exitCode: 2 });
 }
 
 export function buildTeamKnowledgeSummary(input: {
@@ -251,6 +274,83 @@ function runKnowledgeQuery(options: Record<string, unknown>, cwd: string) {
   });
 }
 
+function runKnowledgeStats(options: Record<string, unknown>, cwd: string) {
+  const stats = buildKnowledgeStats(cwd, options);
+  const level = stats.budget.status === 'hard-limit' ? 'error' : stats.budget.status === 'warning' ? 'warn' : 'info';
+  const code = stats.budget.status === 'hard-limit'
+    ? 'ATM_TEAM_KNOWLEDGE_RUNTIME_BUDGET_HARD_LIMIT'
+    : stats.budget.status === 'warning'
+      ? 'ATM_TEAM_KNOWLEDGE_RUNTIME_BUDGET_WARNING'
+      : 'ATM_TEAM_KNOWLEDGE_STATS_READY';
+  return makeResult({
+    ok: true,
+    command: 'team',
+    cwd,
+    messages: [
+      message(level, code, 'Team knowledge stats completed. Runtime cache budget diagnostics are advisory and explicit.', {
+        shardCount: stats.shardCount,
+        runtimeCacheBytes: stats.runtimeCacheBytes,
+        status: stats.budget.status
+      })
+    ],
+    evidence: {
+      action: 'knowledge.stats',
+      ...stats
+    }
+  });
+}
+
+function runKnowledgeCompact(options: Record<string, unknown>, cwd: string) {
+  const stats = buildKnowledgeStats(cwd, options);
+  const outputs = resolveKnowledgeOutputs(cwd);
+  const dryRun = Boolean(options['dry-run']) || !Boolean(options.write);
+  const runtimePrunableFiles = stats.runtimeFiles.filter((entry) => isRuntimePrunableCache(entry.path));
+  const archiveCandidates = stats.shards.filter((entry) => entry.archiveCandidate);
+  const prunedRuntimeFiles: string[] = [];
+
+  if (!dryRun) {
+    for (const entry of runtimePrunableFiles) {
+      const absolutePath = path.resolve(cwd, entry.path);
+      if (!isInsidePath(outputs.runtimeRoot, absolutePath)) {
+        throw new CliError('ATM_TEAM_KNOWLEDGE_COMPACT_PATH_ESCAPE', 'Knowledge compact refused to prune a path outside .atm/runtime/knowledge.', {
+          details: { path: entry.path }
+        });
+      }
+      rmSync(absolutePath, { force: true });
+      prunedRuntimeFiles.push(entry.path);
+    }
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'team',
+    cwd,
+    messages: [
+      message('info', dryRun ? 'ATM_TEAM_KNOWLEDGE_COMPACT_DRY_RUN' : 'ATM_TEAM_KNOWLEDGE_RUNTIME_CACHE_PRUNED', dryRun
+        ? 'Team knowledge compact dry-run completed. Canonical shards were not mutated.'
+        : 'Team knowledge compact pruned disposable runtime cache files only. Canonical shards were not mutated.', {
+        archiveCandidateCount: archiveCandidates.length,
+        runtimePrunableCount: runtimePrunableFiles.length
+      })
+    ],
+    evidence: {
+      action: 'knowledge.compact',
+      advisoryOnly: true,
+      dryRun,
+      canonicalMutated: false,
+      runtimeCacheMutated: !dryRun,
+      prunedRuntimeFiles,
+      runtimePrunableFiles,
+      archiveCandidates,
+      staleShardCount: stats.staleShardCount,
+      supersededShardCount: stats.supersededShardCount,
+      budget: stats.budget,
+      canonicalRoot: stats.canonicalRoot,
+      runtimeRoot: stats.runtimeRoot
+    }
+  });
+}
+
 function buildKnowledgeIndex(cwd: string, scope: string): KnowledgeIndex {
   const root = path.join(cwd, '.atm', 'knowledge');
   const files = existsSync(root) ? walkFiles(root).filter((file) => /\.(md|json)$/i.test(file)) : [];
@@ -262,6 +362,70 @@ function buildKnowledgeIndex(cwd: string, scope: string): KnowledgeIndex {
     advisoryOnly: true,
     canonicalRoot: '.atm/knowledge',
     entries
+  };
+}
+
+function buildKnowledgeStats(cwd: string, options: Record<string, unknown>) {
+  const outputs = resolveKnowledgeOutputs(cwd);
+  const shardFiles = existsSync(outputs.canonicalRoot) ? walkFiles(outputs.canonicalRoot).filter(isKnowledgeShardFile) : [];
+  const runtimeFiles = existsSync(outputs.runtimeRoot) ? walkFiles(outputs.runtimeRoot) : [];
+  const shards = shardFiles.map((file) => inspectKnowledgeShard(cwd, file));
+  const runtimeFileStats = runtimeFiles.map((file) => ({
+    path: normalizePath(path.relative(cwd, file)),
+    bytes: fileSize(file),
+    prunable: isRuntimePrunableCache(normalizePath(path.relative(cwd, file)))
+  }));
+  const runtimeCacheBytes = runtimeFileStats.reduce((sum, entry) => sum + entry.bytes, 0);
+  const runtimeIndexBytes = existsSync(outputs.indexPath) ? fileSize(outputs.indexPath) : 0;
+  const embeddingCacheBytes = runtimeFileStats
+    .filter((entry) => /embedding|vector/i.test(entry.path))
+    .reduce((sum, entry) => sum + entry.bytes, 0);
+  const warningBytes = parseByteLimit(options.warningBytes ?? options['warning-bytes'], DEFAULT_RUNTIME_WARNING_BYTES);
+  const hardLimitBytes = parseByteLimit(options.budgetBytes ?? options['budget-bytes'], DEFAULT_RUNTIME_HARD_LIMIT_BYTES);
+  const budget = evaluateRuntimeBudget(runtimeCacheBytes, warningBytes, Math.max(warningBytes, hardLimitBytes));
+
+  return {
+    schemaId: 'atm.teamKnowledgeStats.v1',
+    advisoryOnly: true,
+    canonicalRoot: outputs.canonicalRootRelative,
+    runtimeRoot: outputs.runtimeRootRelative,
+    shardCount: shards.length,
+    runtimeIndexBytes,
+    runtimeCacheBytes,
+    embeddingCacheBytes,
+    staleShardCount: shards.filter((entry) => entry.reasons.includes('status:stale')).length,
+    supersededShardCount: shards.filter((entry) => entry.supersededBy || entry.reasons.includes('status:superseded')).length,
+    archiveCandidateCount: shards.filter((entry) => entry.archiveCandidate).length,
+    budget,
+    shards,
+    runtimeFiles: runtimeFileStats
+  };
+}
+
+function inspectKnowledgeShard(cwd: string, file: string): KnowledgeShardRetention {
+  const relativePath = normalizePath(path.relative(cwd, file));
+  const body = readFileSync(file, 'utf8');
+  const title = body.match(/^#\s+(.+)$/m)?.[1]?.trim() || path.basename(relativePath);
+  const status = extractField(body, ['status', 'retention'])?.toLowerCase() ?? null;
+  const supersededBy = extractField(body, ['supersededBy', 'superseded-by', 'replacedBy', 'replaced-by']) ?? null;
+  const reasons: string[] = [];
+  if (status && /stale|deprecated|retired|archive|superseded/.test(status)) {
+    reasons.push(`status:${status.includes('superseded') ? 'superseded' : status.includes('stale') ? 'stale' : 'archive-candidate'}`);
+  }
+  if (supersededBy) {
+    reasons.push('superseded-by');
+  }
+  if (/stale|deprecated|retired|archive|superseded/i.test(relativePath)) {
+    reasons.push('path-marker');
+  }
+  return {
+    path: relativePath,
+    title,
+    status,
+    supersededBy,
+    archiveCandidate: reasons.length > 0,
+    reasons,
+    bytes: fileSize(file)
   };
 }
 
@@ -414,6 +578,34 @@ function parsePositiveInteger(value: unknown, fallback: number, max: number): nu
   return Math.min(parsed, max);
 }
 
+function parseByteLimit(value: unknown, fallback: number): number {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return parsed;
+}
+
+function evaluateRuntimeBudget(runtimeCacheBytes: number, warningBytes: number, hardLimitBytes: number): {
+  runtimeCacheBytes: number;
+  warningBytes: number;
+  hardLimitBytes: number;
+  status: RuntimeBudgetStatus;
+  diagnostic: string;
+} {
+  const status: RuntimeBudgetStatus = runtimeCacheBytes >= hardLimitBytes
+    ? 'hard-limit'
+    : runtimeCacheBytes >= warningBytes
+      ? 'warning'
+      : 'ok';
+  const diagnostic = status === 'ok'
+    ? 'Runtime knowledge cache is within the configured disk budget.'
+    : status === 'warning'
+      ? 'Runtime knowledge cache crossed the warning threshold; run compact dry-run and review prunable cache files.'
+      : 'Runtime knowledge cache crossed the hard limit; prune generated runtime cache before relying on fresh advisory knowledge.';
+  return { runtimeCacheBytes, warningBytes, hardLimitBytes, status, diagnostic };
+}
+
 function stringOption(value: unknown): string | undefined {
   const text = String(value ?? '').trim();
   return text || undefined;
@@ -428,6 +620,7 @@ function resolveKnowledgeOutputs(cwd: string) {
     canonicalRoot,
     canonicalRootRelative: '.atm/knowledge',
     runtimeRoot,
+    runtimeRootRelative: '.atm/runtime/knowledge',
     manifestPath,
     indexPath,
     manifestRelative: '.atm/runtime/knowledge/team-knowledge-manifest.json',
@@ -457,6 +650,34 @@ function walkFiles(dir: string): string[] {
     }
   }
   return files;
+}
+
+function isKnowledgeShardFile(file: string): boolean {
+  return /\.(md|json)$/i.test(file);
+}
+
+function fileSize(file: string): number {
+  try {
+    return statSync(file).size;
+  } catch {
+    return 0;
+  }
+}
+
+function isRuntimePrunableCache(filePath: string): boolean {
+  const normalized = normalizePath(filePath);
+  if (!normalized.startsWith('.atm/runtime/knowledge/')) {
+    return false;
+  }
+  if (normalized.endsWith('/team-knowledge-index.json') || normalized.endsWith('/team-knowledge-manifest.json')) {
+    return false;
+  }
+  return /embedding|vector|cache|tmp|scratch/i.test(normalized);
+}
+
+function isInsidePath(root: string, candidate: string): boolean {
+  const relative = path.relative(path.resolve(root), path.resolve(candidate));
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function tokenize(value: string): string[] {

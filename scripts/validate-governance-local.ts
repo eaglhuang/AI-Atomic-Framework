@@ -97,11 +97,19 @@ try {
   assert(stableStringify(stores.shardStore.readShard('.atm/knowledge/team/example.json')) === stableStringify({ lesson: 'canonical knowledge shard' }), 'shard store must allow canonical Team knowledge shards');
   stores.shardStore.rebuildIndex('.atm/runtime/knowledge/index.json');
   assert(existsSync(path.join(hostRepo, '.atm/runtime/knowledge/index.json')), 'shard store must allow generated Team knowledge indexes under runtime cache');
+  stores.shardStore.rebuildIndex('.atm/runtime/knowledge/embeddings/cache-index.json');
+  assert(existsSync(path.join(hostRepo, '.atm/runtime/knowledge/embeddings/cache-index.json')), 'shard store must allow disposable generated Team knowledge cache indexes under runtime cache');
   try {
     stores.shardStore.readShard('.atm/runtime/knowledge/index.json');
     fail('shard store must reject generated Team knowledge cache as canonical shard input');
   } catch (error) {
     assert(String((error as Error).message).includes('.atm/runtime/knowledge'), 'runtime knowledge cache rejection must name the generated cache root');
+  }
+  try {
+    stores.shardStore.readShard('.atm/runtime/knowledge/embeddings/cache-index.json');
+    fail('shard store must reject nested generated Team knowledge cache as canonical shard input');
+  } catch (error) {
+    assert(String((error as Error).message).includes('.atm/runtime/knowledge'), 'nested runtime knowledge cache rejection must name the generated cache root');
   }
   try {
     stores.shardStore.rebuildIndex('.atm/knowledge/index.json');
