@@ -163,7 +163,26 @@ This records a `scope-amendment` event with its class, phase, and `mode: normal`
 
 ## Step 6: Preview the close
 
-Before closing, dry-run the close. This is the same idea as Step 1, applied to the closeback:
+Before closing, run the read-only pre-close checkpoint first. It does not mutate the worktree:
+
+```bash
+node atm.mjs taskflow pre-close \
+  --task TASK-XXXX-0001 \
+  --actor <actor> \
+  --json
+```
+
+**What you see:**
+
+- `scopeTrackedDirtyFiles`: in-scope delivery still dirty and blocking close.
+- `unexpectedStagedTasks`: foreign task governance bundles already staged in git index.
+- `mixedDeliveryCommit` / `missingApprovalLease`: historical delivery needs waiver approval.
+- `staleEvidence`: required validators missing fresh command-backed evidence.
+- `writeRollbackSummary`: what to verify if `--write` partially succeeds.
+
+Remediation must stay scoped. Do not use broad `git checkout -- .`, `git restore .`, or silent unstage of another agent's close bundle. Defer foreign staged files explicitly and confirm the other agent can restage afterward.
+
+Then dry-run the close. This is the same idea as Step 1, applied to the closeback:
 
 ```bash
 node atm.mjs taskflow close \
@@ -295,3 +314,21 @@ node atm.mjs taskflow close --task TASK-... --actor <actor> --write --no-commit 
 That's the whole normal workflow. Seven steps, three commands you really need to remember (`taskflow open`, `next`, `taskflow close`), and one promise from ATM: governed work goes through the official lanes, and the daily path does not require touching governance files by hand.
 
 If a step does not feel smooth, that is a product gap, not a user error — please report it. This guide is the contract; the CLI should keep getting closer to it.
+
+## Running several cards in parallel (Team Agents Wave Mode)
+
+When several cards are safe to advance together, a coordinator can schedule them
+as a wave instead of one-at-a-time:
+
+```bash
+# Plan an ordered wave from declared task metadata
+node atm.mjs team wave plan TASK-...,TASK-...,TASK-... --json
+
+# Dispatch the first admissible wave (records a coordinator-owned envelope)
+node atm.mjs team wave dispatch TASK-...,TASK-... --actor <coordinator> --json
+```
+
+Wave Mode only schedules and admits parallel work — it fails closed on unsafe
+combinations and still routes closeout through `batch checkpoint` / `taskflow
+close`. It is not a closeout shortcut. See `docs/TEAM_AGENTS_WAVE_MODE.md` for
+the full operator guide.
