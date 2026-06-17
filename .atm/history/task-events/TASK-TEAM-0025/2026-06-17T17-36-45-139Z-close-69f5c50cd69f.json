@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T17-36-45-139Z-close-69f5c50cd69f",
+  "taskId": "TASK-TEAM-0025",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260617171421-captain-TASK-TEAM-0025-8ea46e2ac5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0025.json",
+  "taskSha256": "sha256:61bb4bb3e5ad2d72405db47c86316d53a71122fc9dad2a48f5c1c99348ff8da8",
+  "createdAt": "2026-06-17T17:36:45.139Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0025 --actor captain --status done --historical-delivery dd67b530d422f1ec0b52f301d9e27ff65a88ac8e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617171421-captain-TASK-TEAM-0025-8ea46e2ac5",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0025.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-import",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T17:36:45.135Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0025-task-import-dispatch-metadata-preservation.task.md",
+        ".atm/history/evidence/TASK-TEAM-0025.*",
+        ".atm/history/task-events/TASK-TEAM-0025/**",
+        ".atm/history/tasks/TASK-TEAM-0025.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

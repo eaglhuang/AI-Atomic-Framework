@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TEAM-0025",
   "title": "Task import dispatch metadata preservation",
-  "status": "running",
+  "status": "done",
   "milestone": "M4K",
   "dependencies": [
     "TASK-TEAM-0017",
@@ -115,8 +115,8 @@
     "hash": "4b99e86e40aca0e0"
   },
   "importedAt": "2026-06-17T16:55:19.547Z",
-  "lastTransitionId": "2026-06-17T17-14-21-643Z-claim-939e3cd9242d",
-  "lastTransitionAt": "2026-06-17T17:14:21.643Z",
+  "lastTransitionId": "2026-06-17T17-36-45-139Z-close-69f5c50cd69f",
+  "lastTransitionAt": "2026-06-17T17:36:45.139Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-17T17:14:21.589Z",
@@ -125,7 +125,7 @@
     "actorId": "captain",
     "leaseId": "lease-99222893fff4",
     "claimedAt": "2026-06-17T17:14:21.599Z",
-    "heartbeatAt": "2026-06-17T17:14:21.599Z",
+    "heartbeatAt": "2026-06-17T17:36:45.137Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TEAM-0025.json",
@@ -136,8 +136,8 @@
       "scripts/validate-task-import.ts",
       "scripts/validate-task-ledger-governance.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "TASK-TEAM-0025 delivery commit includes linked lifecycle/residue validator surfaces added by normal scope amendments so required task-ledger governance validation remains hard-gated; no unrelated task feature is claimed."
   },
   "startedAt": "2026-06-17T17:14:21.599Z",
   "startedByActor": "captain",
@@ -168,5 +168,10 @@
     "actorId": "captain",
     "createdAt": "2026-06-17T17:14:21.643Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-17T17:36:45.137Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260617171421-captain-TASK-TEAM-0025-8ea46e2ac5",
+  "closeReason": "TASK-TEAM-0025 delivery commit includes linked lifecycle/residue validator surfaces added by normal scope amendments so required task-ledger governance validation remains hard-gated; no unrelated task feature is claimed.",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0025.closure-packet.json"
 }
