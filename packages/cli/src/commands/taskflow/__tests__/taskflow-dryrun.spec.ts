@@ -367,6 +367,35 @@ assert.ok(dryRunClose.evidence.governedCommitBundle.planningRepo.stageFiles.incl
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.targetRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage target repo');
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.planningRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage planning repo');
 
+const secondCloseHintFixture = await makeDualRepoCloseFixture('second-close-hint', { closePlanningStatus: 'planned' });
+const secondCloseHintDryRun = await runTaskflow([
+  'close',
+  '--cwd', secondCloseHintFixture.targetRepo,
+  '--profile', secondCloseHintFixture.profilePath,
+  '--task', secondCloseHintFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(secondCloseHintDryRun.ok, true, 'post-delivery second close dry-run must succeed');
+assert.equal(
+  secondCloseHintDryRun.evidence.closebackPlan.historicalDeliveryGate.required,
+  true,
+  'post-delivery second close must require historical delivery before write'
+);
+const historicalDeliveryBlocker = secondCloseHintDryRun.evidence.writeReadinessHint.blockers.find(
+  (entry: { code: string }) => entry.code === 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED'
+);
+assert.ok(historicalDeliveryBlocker, 'post-delivery second close must surface historical-delivery blocker');
+assert.ok(
+  historicalDeliveryBlocker.requiredCommand.includes(secondCloseHintFixture.deliveryCommit),
+  'historical-delivery blocker must promote the detected delivery SHA in requiredCommand'
+);
+assert.equal(
+  secondCloseHintDryRun.evidence.writeReadinessHint.nextCommand,
+  historicalDeliveryBlocker.requiredCommand,
+  'writeReadinessHint.nextCommand must match the promoted historical-delivery command'
+);
+
 const normalLaneFixture = await makeDualRepoCloseFixture('normal-lane-planned', { closePlanningStatus: 'planned' });
 const normalLaneDryRun = await runTaskflow([
   'close',

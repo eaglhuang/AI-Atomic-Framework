@@ -10,7 +10,11 @@ import {
   runTasksRosterUpdate
 } from './tasks/public-surface.ts';
 import { evaluateTaskDoneCloseAdmission } from './tasks/lifecycle-state.ts';
-import { inspectHistoricalDelivery, expandDirectoryDeliverableDeclarations } from './tasks/historical-delivery.ts';
+import {
+  detectHistoricalDeliveryCommit,
+  expandDirectoryDeliverableDeclarations,
+  inspectHistoricalDelivery
+} from './tasks/historical-delivery.ts';
 import {
   assertClosebackPlanningPathReady,
   buildCloseBackendArgv,
@@ -145,6 +149,37 @@ function buildRosterSyncCommand(input: {
   }
   parts.push('--json');
   return parts.join(' ');
+}
+
+async function runRosterSyncFollowUp(input: {
+  command: string;
+  cwd: string;
+  indexPath: string;
+  fromPath: string;
+  messages: ReturnType<typeof message>[];
+}): Promise<{
+  mode: 'follow-up-command';
+  command: string;
+  result: Awaited<ReturnType<typeof runTasksRosterUpdate>>;
+}> {
+  const result = await runTasksRosterUpdate([
+    '--cwd', input.cwd,
+    '--index', input.indexPath,
+    '--from', input.fromPath
+  ]);
+  if (!result.ok) {
+    input.messages.push(message(
+      'warn',
+      'ATM_TASKFLOW_ROSTER_SYNC_FOLLOWUP_FAILED',
+      `${input.command} returned non-ok result; please rerun this follow-up command manually.`,
+      { command: input.command, indexPath: input.indexPath, fromPath: input.fromPath }
+    ));
+  }
+  return {
+    mode: 'follow-up-command',
+    command: input.command,
+    result
+  };
 }
 
 function buildTasksImportCommand(input: {
@@ -392,28 +427,52 @@ function buildTaskflowCloseWriteReadinessHint(input: {
     }
   }
 
+  const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
+  const planningMirrorPath = input.closebackPlan.writerBoundary.planningMirrorPath
+    ?? input.closebackPlan.closebackPathResolution?.planningMirrorPath
+    ?? null;
+  const planningResolved = planningMirrorPath ? resolvePlanningPath(input.cwd, planningMirrorPath) : { repoRoot: null, relativePath: null };
   const hasUncommittedDeliverables = input.previewCommitBundle.targetDeliveryFiles.length > 0;
   if (
     input.closebackPlan.historicalDeliveryGate.required
     && !hasUncommittedDeliverables
     && input.historicalDeliveryRefs.length === 0
   ) {
+    const detectedDelivery = detectHistoricalDeliveryCommit({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      declaredFiles,
+      planningRepoRoot: planningResolved.repoRoot,
+      planningRelativePath: planningResolved.relativePath
+    });
+    const historicalRefHint = detectedDelivery.ref ?? '<commit>';
+    const detectedSummary = detectedDelivery.ref
+      ? `Framework delivery already landed at ${detectedDelivery.ref}; taskflow close --write requires --historical-delivery before backend close can proceed.`
+      : 'Framework delivery already landed; taskflow close --write will require --historical-delivery before backend close can proceed.';
     blockers.push({
       code: 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED',
-      summary: 'Framework delivery already landed; taskflow close --write will require --historical-delivery before backend close can proceed.',
-      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery <commit> --write --json`
+      summary: detectedSummary,
+      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery ${historicalRefHint} --write --json`
     });
   }
 
   if (input.planningAuthorityDeliveryGate.required && !input.planningAuthorityDeliveryGate.ok) {
+    const detectedPlanningDelivery = input.planningAuthorityDeliveryGate.repoRoot
+      ? detectHistoricalDeliveryCommit({
+        cwd: input.planningAuthorityDeliveryGate.repoRoot,
+        taskId: input.taskId,
+        declaredFiles,
+        planningRepoRoot: planningResolved.repoRoot,
+        planningRelativePath: planningResolved.relativePath
+      })
+      : { ref: null, commitSha: null, source: null };
+    const planningRefHint = detectedPlanningDelivery.ref ?? '<planning-repo-commit>';
     blockers.push({
       code: 'ATM_TASKFLOW_CLOSE_PLANNING_DELIVERY_REQUIRED',
       summary: input.planningAuthorityDeliveryGate.reason ?? 'Planning-authority close requires a verifiable planning-repo historical delivery commit.',
-      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery <planning-repo-commit> --write --json`
+      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery ${planningRefHint} --write --json`
     });
   }
-
-  const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
   const historicalRef = input.historicalDeliveryRefs[0] ?? null;
   if (historicalRef && declaredFiles.length > 0) {
     const historicalReport = inspectHistoricalDelivery({
@@ -1660,19 +1719,22 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       })
       : null;
     let rosterCloseback: Record<string, unknown> | null = null;
+    const closeMessages: ReturnType<typeof message>[] = [];
+    const planningRosterPaths = closebackPlan.writerBoundary.rosterClosebackCommand && closebackPlan.writerBoundary.rosterIndexPath && closebackPlan.writerBoundary.planningMirrorPath
+      ? resolvePlanningRosterPaths({
+        cwd,
+        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+        rosterIndexPath: closebackPlan.writerBoundary.rosterIndexPath
+      })
+      : null;
     if (
       closebackPlan.writerBoundary.rosterClosebackCommand
       && closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
       && closebackPlan.writerBoundary.rosterIndexPath
       && closebackPlan.writerBoundary.planningMirrorPath
     ) {
-      const planningRosterPaths = resolvePlanningRosterPaths({
-        cwd,
-        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
-        rosterIndexPath: closebackPlan.writerBoundary.rosterIndexPath
-      });
-      if (!planningRosterPaths.repoRoot || !planningRosterPaths.indexPath || !planningRosterPaths.fromPath) {
-        throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_ROSTER_UNRESOLVED', planningRosterPaths.reason ?? 'taskflow close could not resolve planning roster paths.', {
+      if (!planningRosterPaths?.repoRoot || !planningRosterPaths?.indexPath || !planningRosterPaths?.fromPath) {
+        throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_ROSTER_UNRESOLVED', planningRosterPaths?.reason ?? 'taskflow close could not resolve planning roster paths.', {
           exitCode: 1,
           details: { closebackPlan }
         });
@@ -1690,10 +1752,30 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       closebackPlan.writerBoundary.rosterClosebackCommand
       && closebackPlan.writerBoundary.rosterSyncPolicy === 'follow-up-command'
     ) {
-      rosterCloseback = {
-        mode: 'follow-up-command',
-        command: closebackPlan.writerBoundary.rosterClosebackCommand
-      };
+      if (!planningRosterPaths?.repoRoot || !planningRosterPaths.indexPath || !planningRosterPaths.fromPath) {
+        closeMessages.push(message(
+          'warn',
+          'ATM_TASKFLOW_CLOSE_ROSTER_SYNC_FOLLOWUP_UNRESOLVED',
+          'taskflow close --write could not resolve planning roster paths for the follow-up sync; please rerun the roster update command manually.',
+          { command: closebackPlan.writerBoundary.rosterClosebackCommand }
+        ));
+        rosterCloseback = {
+          mode: 'follow-up-command',
+          command: closebackPlan.writerBoundary.rosterClosebackCommand
+        };
+      } else {
+        const command = buildRosterSyncCommand({
+          indexPath: planningRosterPaths.indexPath,
+          fromPath: planningRosterPaths.fromPath
+        });
+        rosterCloseback = await runRosterSyncFollowUp({
+          command,
+          cwd: planningRosterPaths.repoRoot,
+          indexPath: planningRosterPaths.indexPath,
+          fromPath: planningRosterPaths.fromPath,
+          messages: closeMessages
+        });
+      }
     }
     const commitBundleInput = buildTaskflowCommitBundle({
       cwd,
@@ -1736,6 +1818,22 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         }
       };
     const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+    closeMessages.push(
+      message(
+        writeOk ? 'info' : 'error',
+        writeOk
+          ? 'ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED'
+          : closeWriteTransaction.phase === 'rolled_back'
+            ? 'ATM_TASKFLOW_CLOSE_WRITE_ROLLED_BACK'
+            : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED',
+        writeOk
+          ? `taskflow close orchestrated ${closebackPlan.backendSurface} for ${taskId}.`
+          : closeWriteTransaction.phase === 'rolled_back'
+            ? `taskflow close --write rolled back ${taskId} after a commit-bundle failure; ledger close state was restored.`
+            : `taskflow close write failed for ${taskId}.`,
+        { closeMode: closebackPlan.closeMode, backendSurface: closebackPlan.backendSurface }
+      )
+    );
     const releasedCloseWindowLock = releaseCloseWindowStagedIndexLock({
       cwd,
       taskId,
@@ -1750,22 +1848,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         command: 'taskflow close',
         cwd,
         mode: 'write',
-        messages: [
-          message(
-            writeOk ? 'info' : 'error',
-            writeOk
-              ? 'ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED'
-              : closeWriteTransaction.phase === 'rolled_back'
-                ? 'ATM_TASKFLOW_CLOSE_WRITE_ROLLED_BACK'
-                : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED',
-            writeOk
-              ? `taskflow close orchestrated ${closebackPlan.backendSurface} for ${taskId}.`
-              : closeWriteTransaction.phase === 'rolled_back'
-                ? `taskflow close --write rolled back ${taskId} after a commit-bundle failure; ledger close state was restored.`
-                : `taskflow close write failed for ${taskId}.`,
-            { closeMode: closebackPlan.closeMode, backendSurface: closebackPlan.backendSurface }
-          )
-        ],
+        messages: closeMessages,
         evidence: {
           closeMode: closebackPlan.closeMode,
           writeSupport,
@@ -2016,6 +2099,14 @@ export async function runTaskflow(argv: string[] = []) {
 
     const effectiveRosterIndex = rosterIndexPath ?? delegationContract.policy.rosterSync.indexPath;
     let rosterSync: Record<string, unknown> | null = null;
+    const writeMessages = [
+      message(
+        'info',
+        'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED',
+        `taskflow open orchestrated tasks new generation at ${resolved.outputPath}.`,
+        { openerMode, generationSurface: 'tasks-new', runtimeImported: true }
+      )
+    ];
     if (delegationContract.policy.rosterSyncPolicy === 'inline' && effectiveRosterIndex) {
       const rosterResult = await runTasksRosterUpdate([
         '--cwd', cwd,
@@ -2028,10 +2119,14 @@ export async function runTaskflow(argv: string[] = []) {
         result: rosterResult
       };
     } else if (delegationContract.policy.rosterSyncPolicy === 'follow-up-command' && effectiveRosterIndex) {
-      rosterSync = {
-        mode: 'follow-up-command',
-        command: buildRosterSyncCommand({ indexPath: effectiveRosterIndex, fromPath: resolved.outputPath })
-      };
+      const command = buildRosterSyncCommand({ indexPath: effectiveRosterIndex, fromPath: resolved.outputPath });
+      rosterSync = await runRosterSyncFollowUp({
+        command,
+        cwd,
+        indexPath: effectiveRosterIndex,
+        fromPath: resolved.outputPath,
+        messages: writeMessages
+      });
     }
 
     return {
@@ -2040,14 +2135,7 @@ export async function runTaskflow(argv: string[] = []) {
         command: 'taskflow open',
         cwd,
         mode: 'write',
-        messages: [
-          message(
-            'info',
-            'ATM_TASKFLOW_OPEN_WRITE_ORCHESTRATED',
-            `taskflow open orchestrated tasks new generation at ${resolved.outputPath}.`,
-            { openerMode, generationSurface: 'tasks-new', runtimeImported: true }
-          )
-        ],
+        messages: writeMessages,
         evidence: {
           openerMode,
           writeSupport,

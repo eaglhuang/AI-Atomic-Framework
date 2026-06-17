@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { isTaskCloseGovernanceCriticalPath, type HistoricalDeliveryProvenance } from '../framework-development.ts';
 import { isTaskDirectionPathCandidate } from '../task-direction.ts';
@@ -181,6 +181,109 @@ export function inspectHistoricalDelivery(input: {
     fileBuckets,
     waiverApplied
   };
+}
+
+export interface DetectedHistoricalDeliveryCommit {
+  readonly ref: string | null;
+  readonly commitSha: string | null;
+  readonly source: 'planning-card' | 'git-log-trailer' | 'git-log-scope' | null;
+}
+
+export function readPlanningCardDeliveryCommit(repoRoot: string, relativePlanningPath: string): string | null {
+  const absolutePath = path.resolve(repoRoot, relativePlanningPath);
+  if (!existsSync(absolutePath)) return null;
+  const content = readFileSync(absolutePath, 'utf8');
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return null;
+  const lineMatch = match[1].match(/^delivery_commit:\s*(?:"([^"]*)"|'([^']*)'|(\S+))\s*$/m);
+  return (lineMatch?.[1] ?? lineMatch?.[2] ?? lineMatch?.[3] ?? '').trim() || null;
+}
+
+export function detectHistoricalDeliveryCommit(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly declaredFiles: readonly string[];
+  readonly planningRepoRoot?: string | null;
+  readonly planningRelativePath?: string | null;
+  readonly searchLimit?: number;
+}): DetectedHistoricalDeliveryCommit {
+  const limit = input.searchLimit ?? 40;
+  const verify = (requestedRef: string): string | null => verifyScopedHistoricalDeliveryRef({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    requestedRef,
+    declaredFiles: input.declaredFiles
+  });
+
+  if (input.planningRepoRoot && input.planningRelativePath) {
+    const fromCard = readPlanningCardDeliveryCommit(input.planningRepoRoot, input.planningRelativePath);
+    if (fromCard) {
+      const commitSha = verify(fromCard);
+      if (commitSha) {
+        return { ref: fromCard, commitSha, source: 'planning-card' };
+      }
+    }
+  }
+
+  for (const sha of listCommitsWithTaskTrailer(input.cwd, input.taskId, limit)) {
+    const commitSha = verify(sha);
+    if (commitSha) {
+      return { ref: sha, commitSha, source: 'git-log-trailer' };
+    }
+  }
+
+  for (const sha of listRecentCommitShas(input.cwd, limit)) {
+    const commitSha = verify(sha);
+    if (commitSha) {
+      return { ref: sha, commitSha, source: 'git-log-scope' };
+    }
+  }
+
+  return { ref: null, commitSha: null, source: null };
+}
+
+function verifyScopedHistoricalDeliveryRef(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly requestedRef: string;
+  readonly declaredFiles: readonly string[];
+}): string | null {
+  if (input.declaredFiles.length === 0) return null;
+  const report = inspectHistoricalDelivery({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    requestedRef: input.requestedRef,
+    declaredFiles: input.declaredFiles,
+    enforceDeclaredScope: true,
+    waiverOutOfScopeDelivery: false,
+    waiverReason: null
+  });
+  if (!report.ok) return null;
+  return report.commitSha ?? input.requestedRef;
+}
+
+function listRecentCommitShas(cwd: string, limit: number): readonly string[] {
+  return readGitLines(cwd, ['log', `-n`, String(limit), '--format=%H']);
+}
+
+function listCommitsWithTaskTrailer(cwd: string, taskId: string, limit: number): readonly string[] {
+  return readGitLines(cwd, [
+    'log',
+    `-n`,
+    String(limit),
+    `--grep=ATM-Task: ${taskId}`,
+    '--format=%H',
+    '--extended-regexp'
+  ]);
+}
+
+function readGitLines(cwd: string, args: readonly string[]): readonly string[] {
+  try {
+    const output = execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    return uniqueStrings(output.split(/\r?\n/));
+  } catch {
+    return [];
+  }
 }
 
 export function buildHistoricalDeliveryProvenance(
