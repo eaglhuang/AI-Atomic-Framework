@@ -250,6 +250,20 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamPlan",
+      "atom_id": "team.knowledge-preflight-brief",
+      "capability": "Team plan exposes compact advisory knowledgeSummary hits for Captain/Planner preflight without sending full corpus to implementers.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0022"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-knowledge.ts#buildTeamKnowledgeSummary",
+      "atom_id": "team.knowledge-preflight-brief",
+      "capability": "Builds compact advisory-only Team knowledge summaries with top hits, reasons, snippets, follow-up query command, and missing-index build guidance.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0022"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecAtomizationPlanner",
       "atom_id": "team.spec.atomization-planner",
       "capability": "Command-spec examples and notes for atomization planner advisory output.",
@@ -344,6 +358,13 @@
       "atom_id": "atm.next-router-map",
       "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts#embedTeamRecommendation",
+      "atom_id": "atm.next-guidance-map",
+      "capability": "Captain-facing next guidance embeds advisory Team knowledge summaries in teamRecommendation without changing task routing or close gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0022"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/next.spec.ts",

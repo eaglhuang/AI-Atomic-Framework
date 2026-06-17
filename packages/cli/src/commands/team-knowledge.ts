@@ -12,6 +12,23 @@ type KnowledgeMetadata = {
   validators: string[];
 };
 
+export type TeamKnowledgeSummary = {
+  schemaId: 'atm.teamKnowledgeSummary.v1';
+  advisoryOnly: true;
+  taskId: string;
+  indexStatus: 'ready' | 'missing';
+  top: number;
+  hits: Array<{
+    path: string;
+    title: string;
+    score: number;
+    reason: string;
+    snippet: string;
+  }>;
+  followUpCommand: string;
+  buildCommand?: string;
+};
+
 type KnowledgeIndexEntry = {
   id: string;
   path: string;
@@ -68,6 +85,61 @@ export async function runTeamKnowledge(argv: string[], inheritedCwd?: string) {
     return runKnowledgeQuery(parsed.options, cwd);
   }
   throw new CliError('ATM_CLI_USAGE', 'team knowledge supports: build, query', { exitCode: 2 });
+}
+
+export function buildTeamKnowledgeSummary(input: {
+  cwd: string;
+  taskId: string;
+  top?: number;
+}): TeamKnowledgeSummary {
+  const cwd = path.resolve(input.cwd);
+  const taskId = input.taskId.trim();
+  const top = parsePositiveInteger(input.top, 3, 3);
+  const outputs = resolveKnowledgeOutputs(cwd);
+  const followUpCommand = `node atm.mjs team knowledge query --task ${taskId} --top ${top} --json`;
+  const buildCommand = 'node atm.mjs team knowledge build --scope project --dry-run --json';
+  if (!taskId || !existsSync(outputs.indexPath)) {
+    return {
+      schemaId: 'atm.teamKnowledgeSummary.v1',
+      advisoryOnly: true,
+      taskId,
+      indexStatus: 'missing',
+      top,
+      hits: [],
+      followUpCommand,
+      buildCommand
+    };
+  }
+  const index = readJsonFile(outputs.indexPath) as KnowledgeIndex | null;
+  if (!index || !Array.isArray(index.entries)) {
+    return {
+      schemaId: 'atm.teamKnowledgeSummary.v1',
+      advisoryOnly: true,
+      taskId,
+      indexStatus: 'missing',
+      top,
+      hits: [],
+      followUpCommand,
+      buildCommand
+    };
+  }
+  const query = deriveQueryText(cwd, { task: taskId });
+  const hits = rankKnowledgeHits(index.entries, query, buildFilters({}), top, cwd).map((hit) => ({
+    path: hit.path,
+    title: hit.title,
+    score: hit.score,
+    reason: summarizeHitReason(hit, taskId),
+    snippet: hit.snippet
+  }));
+  return {
+    schemaId: 'atm.teamKnowledgeSummary.v1',
+    advisoryOnly: true,
+    taskId,
+    indexStatus: 'ready',
+    top,
+    hits,
+    followUpCommand
+  };
 }
 
 function runKnowledgeBuild(options: Record<string, unknown>, cwd: string) {
@@ -273,6 +345,16 @@ function rankKnowledgeHits(
       metadata: hit.entry.metadata,
       snippet: readSnippet(path.join(cwd, hit.entry.path), tokens)
     }));
+}
+
+function summarizeHitReason(hit: { metadata?: KnowledgeMetadata; score: number }, taskId: string): string {
+  const domains = hit.metadata?.domain ? [`domain ${hit.metadata.domain}`] : [];
+  const atoms = hit.metadata?.atoms?.slice(0, 2).map((atom) => `atom ${atom}`) ?? [];
+  const parts = [...domains, ...atoms];
+  if (parts.length === 0) {
+    return `Lexical match for ${taskId}; score ${hit.score}.`;
+  }
+  return `Matched ${parts.join(', ')}; score ${hit.score}.`;
 }
 
 function metadataMatches(metadata: KnowledgeMetadata, filters: ReturnType<typeof buildFilters>): boolean {

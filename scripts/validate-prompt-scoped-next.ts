@@ -48,6 +48,10 @@ function assertTeamRecommendation(action: any, expectedChannel: string, expected
   assert(String(recommendation?.start).includes('team start'), 'teamRecommendation.start must suggest team start');
   assert(String(recommendation?.status).includes('team status'), 'teamRecommendation.status must suggest team status');
   assert(recommendation?.channel === expectedChannel, `teamRecommendation channel must be ${expectedChannel}`);
+  assert(recommendation?.knowledgeSummary?.schemaId === 'atm.teamKnowledgeSummary.v1', 'teamRecommendation must expose compact knowledgeSummary');
+  assert(recommendation?.knowledgeSummary?.advisoryOnly === true, 'knowledgeSummary must stay advisory-only');
+  assert(typeof recommendation?.knowledgeSummary?.followUpCommand === 'string' && recommendation.knowledgeSummary.followUpCommand.includes('team knowledge query'), 'knowledgeSummary must include an inspect follow-up command');
+  assert(recommendation?.knowledgeSummary?.indexStatus === 'missing' || Array.isArray(recommendation?.knowledgeSummary?.hits), 'knowledgeSummary must be stable when no knowledge index exists');
   if (expectedTaskId) {
     assert(recommendation?.taskId === expectedTaskId, `teamRecommendation taskId must be ${expectedTaskId}`);
   }

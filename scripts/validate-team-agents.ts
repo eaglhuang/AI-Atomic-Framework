@@ -670,6 +670,25 @@ async function main() {
       assert.equal(queryEvidence?.hits?.[0]?.path, '.atm/knowledge/team/routing.md');
       assert.equal(typeof queryEvidence?.hits?.[0]?.snippet, 'string');
       assert.equal(Object.hasOwn(queryEvidence.hits[0], 'searchText'), false);
+
+      mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
+      writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', 'TASK-KNOW-0001.json'), `${JSON.stringify({
+        schemaId: 'atm.taskLedger.v1',
+        workItemId: 'TASK-KNOW-0001',
+        title: 'Team routing knowledge task',
+        status: 'ready',
+        scopePaths: ['packages/cli/src/commands/team.ts'],
+        deliverables: ['packages/cli/src/commands/team.ts'],
+        validators: ['node --strip-types scripts/validate-team-agents.ts --case knowledge-build-query'],
+        acceptance: ['Captain brief shows advisory knowledge hits.']
+      }, null, 2)}\n`, 'utf8');
+      const plan = await runTeam(['plan', '--task', 'TASK-KNOW-0001', '--cwd', cwd, '--json']);
+      const planEvidence = plan.evidence as any;
+      assert.equal(planEvidence?.teamPlan?.knowledgeSummary?.schemaId, 'atm.teamKnowledgeSummary.v1');
+      assert.equal(planEvidence?.teamPlan?.knowledgeSummary?.advisoryOnly, true);
+      assert.equal(planEvidence?.teamPlan?.knowledgeSummary?.top, 3);
+      assert.ok(Array.isArray(planEvidence?.teamPlan?.knowledgeSummary?.hits));
+      assert.ok(String(planEvidence?.teamPlan?.knowledgeSummary?.followUpCommand).includes('team knowledge query'));
     } finally {
       rmSync(cwd, { recursive: true, force: true });
     }

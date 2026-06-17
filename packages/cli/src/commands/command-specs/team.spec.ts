@@ -122,10 +122,11 @@ export const teamSpecNextRecommendation = {
 
 export const teamSpecKnowledgeBuildQuery = {
   summary:
-    'Advisory Team knowledge build/query surface. Build discovers canonical .atm/knowledge shards and query ranks compact hits from generated runtime cache without becoming a task gate.',
+    'Advisory Team knowledge build/query surface. Build discovers canonical .atm/knowledge shards; query and team plan expose compact Captain-facing hits from generated runtime cache without becoming a task gate.',
   examples: [
     'node atm.mjs team knowledge build --scope project --dry-run --json',
-    'node atm.mjs team knowledge query --task TASK-AAO-0005 --top 5 --json'
+    'node atm.mjs team knowledge query --task TASK-AAO-0005 --top 5 --json',
+    'node atm.mjs team plan --task TASK-AAO-0005 --json'
   ]
 };
 

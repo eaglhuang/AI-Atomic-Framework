@@ -56,6 +56,7 @@ import {
   writeQuickfixLock
 } from './work-channels.ts';
 import { buildTeamRecommendation, type TeamRecommendation } from './team.ts';
+import { buildTeamKnowledgeSummary } from './team-knowledge.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
 import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './tasks/public-surface.ts';
@@ -1054,6 +1055,11 @@ async function claimNextImportedTask(input: {
     reason: recommendedChannel === 'batch'
       ? 'Batch queue-head work can use a current-task team, but ATM still owns checkpoint and advance.'
       : 'This task can use an optional team run for role/permission coordination.',
+    knowledgeSummary: buildTeamKnowledgeSummary({
+      cwd: input.cwd,
+      taskId: claimableTask.workItemId,
+      top: 3
+    }),
     parallelAdvisory
   });
   const userNotice = buildFirstUseUserNotice(nextAction as any);
@@ -1347,7 +1353,14 @@ function buildPromptScopedNextResult(input: {
       blockedCommands: blockedMutationCommands()
     }, {
       taskId: queueHeadTaskId,
-      channel: 'batch'
+      channel: 'batch',
+      ...(queueHeadTaskId ? {
+        knowledgeSummary: buildTeamKnowledgeSummary({
+          cwd: input.cwd,
+          taskId: queueHeadTaskId,
+          top: 3
+        })
+      } : {})
     });
     return makeResult({
       ok: true,
@@ -1631,7 +1644,12 @@ function buildPromptScopedNextResult(input: {
       blockedCommands: blockedMutationCommands()
     }, {
       taskId: queueHeadTaskId ?? selectedTask.workItemId,
-      channel: 'batch'
+      channel: 'batch',
+      knowledgeSummary: buildTeamKnowledgeSummary({
+        cwd: input.cwd,
+        taskId: queueHeadTaskId ?? selectedTask.workItemId,
+        top: 3
+      })
     });
     return makeResult({
       ok: true,
@@ -1697,7 +1715,12 @@ function buildPromptScopedNextResult(input: {
     blockedCommands: blockedMutationCommands()
   }, {
     taskId: selectedTask.workItemId,
-    channel: 'normal'
+    channel: 'normal',
+    knowledgeSummary: buildTeamKnowledgeSummary({
+      cwd: input.cwd,
+      taskId: selectedTask.workItemId,
+      top: 3
+    })
   });
   return makeResult({
     ok: true,
@@ -4002,7 +4025,10 @@ function buildNextMessages(
         start: nextAction.teamRecommendation.start,
         status: nextAction.teamRecommendation.status,
         recipeId: nextAction.teamRecommendation.recipeId,
-        taskId: nextAction.teamRecommendation.taskId
+        taskId: nextAction.teamRecommendation.taskId,
+        ...(nextAction.teamRecommendation.knowledgeSummary ? {
+          knowledgeSummary: nextAction.teamRecommendation.knowledgeSummary
+        } : {})
       }
     ));
   }

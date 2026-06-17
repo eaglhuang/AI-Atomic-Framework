@@ -13,7 +13,7 @@ import {
 import { getCommandSpec } from './command-specs.ts';
 import { runTasks } from './tasks.ts';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
-import { runTeamKnowledge } from './team-knowledge.ts';
+import { buildTeamKnowledgeSummary, runTeamKnowledge, type TeamKnowledgeSummary } from './team-knowledge.ts';
 import { runTeamWave } from './team-wave.ts';
 import {
   buildTeamBrokerEvidence,
@@ -243,6 +243,7 @@ export type TeamRecommendation = {
   readonly status: string;
   readonly validate: string;
   readonly constraints: readonly string[];
+  readonly knowledgeSummary?: TeamKnowledgeSummary;
   readonly parallelAdvisory?: unknown;
 };
 
@@ -272,6 +273,7 @@ export function buildTeamRecommendation(input: {
   readonly channel: TeamRecommendationChannel;
   readonly reason?: string;
   readonly enabled?: boolean;
+  readonly knowledgeSummary?: TeamKnowledgeSummary;
   readonly parallelAdvisory?: unknown;
 }): TeamRecommendation | null {
   const taskId = typeof input.taskId === 'string' ? input.taskId.trim() : '';
@@ -294,6 +296,7 @@ export function buildTeamRecommendation(input: {
     validate: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
     start: `node atm.mjs team start --task ${quotedTask} --actor ${actorId} --recipe ${recipeId} --json`,
     status: 'node atm.mjs team status --compact --json',
+    ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
     ...(input.parallelAdvisory ? { parallelAdvisory: input.parallelAdvisory } : {}),
     constraints: [
       'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
@@ -583,7 +586,12 @@ async function buildTeamPlanningContext(input: {
     recipe,
     writePaths,
     validation,
-    brokerLane
+    brokerLane,
+    knowledgeSummary: buildTeamKnowledgeSummary({
+      cwd: input.cwd,
+      taskId: String(task.workItemId ?? task.taskId ?? input.taskId),
+      top: 3
+    })
   });
 
   return {
@@ -1119,6 +1127,7 @@ function buildTeamPlan(input: {
   writePaths: string[];
   validation: { ok: boolean; findings: PermissionFinding[] };
   brokerLane: TeamBrokerLaneEvidence;
+  knowledgeSummary?: TeamKnowledgeSummary;
 }) {
   const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
   const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
@@ -1132,6 +1141,7 @@ function buildTeamPlan(input: {
     agents: input.recipe.agents,
     captainDecision,
     implementerSelector,
+    ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
     requiredRoles: crewBriefingContract.requiredRoles,
     optionalRoles: crewBriefingContract.optionalRoles,
     briefingContract: crewBriefingContract,
