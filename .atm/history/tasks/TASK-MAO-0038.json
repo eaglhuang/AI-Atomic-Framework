@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0038",
   "title": "Closeback orchestration route correctness",
-  "status": "running",
+  "status": "done",
   "milestone": "M7",
   "dependencies": [
     "TASK-MAO-0036"
@@ -76,8 +76,8 @@
     "hash": "59efb04aea9d18ae"
   },
   "importedAt": "2026-06-16T16:59:18.478Z",
-  "lastTransitionId": "2026-06-17T01-22-33-571Z-claim-4c9613710c91",
-  "lastTransitionAt": "2026-06-17T01:22:33.571Z",
+  "lastTransitionId": "2026-06-17T01-46-29-768Z-close-5bf738dd81f0",
+  "lastTransitionAt": "2026-06-17T01:46:29.768Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "agent-007",
   "reservedAt": "2026-06-17T01:22:30.157Z",
@@ -86,7 +86,7 @@
     "actorId": "agent-007",
     "leaseId": "lease-a496a1757060",
     "claimedAt": "2026-06-17T01:22:33.543Z",
-    "heartbeatAt": "2026-06-17T01:22:33.543Z",
+    "heartbeatAt": "2026-06-17T01:46:29.766Z",
     "ttlSeconds": 1800,
     "files": [
       "packages/cli/src/commands/taskflow/close-orchestration.ts",
@@ -98,8 +98,8 @@
       "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-16T16:59:22.494Z",
   "startedByActor": "agent-007",
@@ -132,5 +132,9 @@
     "actorId": "agent-007",
     "createdAt": "2026-06-17T01:22:33.571Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-17T01:46:29.766Z",
+  "closedByActor": "agent-007",
+  "closedBySessionId": "session-20260617012233-agent-007-TASK-MAO-0038-b027a013c0",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0038.closure-packet.json"
 }
