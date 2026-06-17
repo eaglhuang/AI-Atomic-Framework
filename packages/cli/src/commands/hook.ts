@@ -3105,7 +3105,7 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
     const content = readGitObjectText(root, `:${stagedFile}`);
     if (!content) continue;
 
-    const importRegex = /import\s+(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]/g;
+    const importRegex = /(?:^|\n)\s*import\s+(?:type\s+)?(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]/g;
     const requireRegex = /require\(['"]([^'"]+)['"]\)/g;
     const dynamicImportRegex = /import\(['"]([^'"]+)['"]\)/g;
 
@@ -3177,7 +3177,7 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
             break;
           }
 
-          const symbolRegex = new RegExp(`\\b${sym}\\b`);
+          const symbolRegex = new RegExp(`\\b${escapeRegExp(sym)}\\b`);
           if (symbolRegex.test(diffText)) {
             missingSymbols.push(sym);
           }
@@ -3199,6 +3199,14 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
   return findings;
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function isLikelyImportSymbol(value: string): boolean {
+  return /^[A-Za-z_$][\w$]*$/.test(value) || value === 'default' || value === '*';
+}
+
 function parseImportSymbols(symbolsStr: string | undefined): string[] {
   if (!symbolsStr) return ['*'];
   const trimmed = symbolsStr.trim();
@@ -3212,7 +3220,7 @@ function parseImportSymbols(symbolsStr: string | undefined): string[] {
       const cleanPart = part.trim();
       if (!cleanPart) continue;
       const sym = cleanPart.split(/\s+as\s+/)[0].trim();
-      if (sym) symbols.push(sym);
+      if (sym && isLikelyImportSymbol(sym)) symbols.push(sym);
     }
     const outside = trimmed.replace(/\{[\s\S]*?\}/, '').trim();
     if (outside) {
