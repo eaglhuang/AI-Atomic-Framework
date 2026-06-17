@@ -1175,6 +1175,20 @@
       "source_task": "TASK-MAO-0040"
     },
     {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.close-write-atomicity-map",
+      "capability": "Fail-closed taskflow close --write transaction with rollback snapshot, commit phase, and closeWriteTransaction reporting.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "atom_id": "atm.close-write-atomicity-map",
+      "capability": "Regression coverage for close write success, rollback, and partial backend failure branches.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0050"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
       "atom_id": "atm.closeback-route-correctness-map",
       "capability": "Guard repair-closure packet helper by throwing ATM_REPAIR_CLOSURE_NOT_CLOSE when ledger is not done.",

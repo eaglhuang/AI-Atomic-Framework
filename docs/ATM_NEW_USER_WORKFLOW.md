@@ -179,6 +179,7 @@ node atm.mjs taskflow pre-close \
 - `mixedDeliveryCommit` / `missingApprovalLease`: historical delivery needs waiver approval.
 - `staleEvidence`: required validators missing fresh command-backed evidence.
 - `writeRollbackSummary`: what to verify if `--write` partially succeeds.
+- `closeWriteTransaction` (on `--write`): transaction phase `pending`, `committed`, or `rolled_back`. If the governed commit bundle fails after backend close, ATM restores the prior ledger close state instead of leaving a done task stranded on disk.
 
 Remediation must stay scoped. Do not use broad `git checkout -- .`, `git restore .`, or silent unstage of another agent's close bundle. Defer foreign staged files explicitly and confirm the other agent can restage afterward.
 

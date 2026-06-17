@@ -117,6 +117,10 @@ node atm.mjs tasks close \
 `taskflow close` is still the normal operator lane. `tasks close` remains the
 backend surface.
 
+When using `taskflow close --write`, inspect `closeWriteTransaction` in the
+JSON result. A commit-bundle failure rolls back the close transition and leaves
+the task not-done instead of reporting success with a stranded done ledger.
+
 ## Relationship to ordinary evidence
 
 Historical batch does not replace normal evidence capture. It fills the gap

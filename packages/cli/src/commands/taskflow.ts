@@ -15,7 +15,9 @@ import {
   assertClosebackPlanningPathReady,
   buildCloseBackendArgv,
   buildClosebackPlan,
+  buildCloseWriteRollbackSnapshot,
   buildTaskflowCloseDiagnostics,
+  executeCloseWriteCommitPhase,
   resolveClosebackPlanningPath,
   resolveCloseWriteSupport
 } from './taskflow/close-orchestration.ts';
@@ -849,6 +851,24 @@ function quoteYamlString(value: string): string {
   return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
+function capturePlanningCardSnapshot(input: {
+  cwd: string;
+  planningMirrorPath: string | null;
+}): { absolutePath: string; previousContent: string } | null {
+  const planning = resolvePlanningPath(input.cwd, input.planningMirrorPath);
+  if (!planning.repoRoot || !planning.relativePath) {
+    return null;
+  }
+  const absolutePath = path.resolve(planning.repoRoot, planning.relativePath);
+  if (!existsSync(absolutePath)) {
+    return null;
+  }
+  return {
+    absolutePath,
+    previousContent: readFileSync(absolutePath, 'utf8')
+  };
+}
+
 function upsertFrontmatterField(frontmatter: string, key: string, value: string): string {
   const pattern = new RegExp(`^${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:.*$`, 'm');
   if (pattern.test(frontmatter)) {
@@ -1552,6 +1572,12 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         }
       });
     }
+    const taskLedgerPath = path.join(cwd, '.atm/history/tasks', `${taskId}.json`);
+    const previousTaskContent = existsSync(taskLedgerPath) ? readFileSync(taskLedgerPath, 'utf8') : '';
+    const planningCardSnapshot = capturePlanningCardSnapshot({
+      cwd,
+      planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath
+    });
     const preCloseDeliveryCommit = await commitTaskflowDeliveryFiles({
       bundle: previewCommitBundle,
       actorId,
@@ -1576,6 +1602,13 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       forceImport: diagnosis.bucket === 'stale-import'
     });
     const backendResult = await withTaskflowOperatorLane(() => runTasks(backendArgv));
+    const rollbackSnapshot = buildCloseWriteRollbackSnapshot({
+      cwd,
+      taskId,
+      previousTaskContent,
+      backendEvidence: backendResult.evidence as Record<string, unknown> | undefined,
+      planningCard: planningCardSnapshot
+    });
     const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok
       ? applyPlanningCardCloseback({
         cwd,
@@ -1620,37 +1653,66 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         command: closebackPlan.writerBoundary.rosterClosebackCommand
       };
     }
-    const governedCommitBundle = await finalizeTaskflowCommitBundle({
-      bundle: buildTaskflowCommitBundle({
+    const commitBundleInput = buildTaskflowCommitBundle({
+      cwd,
+      taskId,
+      actorId,
+      commitMode,
+      planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
+      rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
+        ? closebackPlan.writerBoundary.rosterIndexPath
+        : null,
+      backendResult: backendResult as unknown as Record<string, unknown>,
+      historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
+      historicalBatchRef
+    });
+    const { bundle: governedCommitBundle, transaction: closeWriteTransaction } = backendResult.ok
+      ? await executeCloseWriteCommitPhase({
         cwd,
         taskId,
-        actorId,
-        commitMode,
-        planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
-        rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
-          ? closebackPlan.writerBoundary.rosterIndexPath
-          : null,
-        backendResult: backendResult as unknown as Record<string, unknown>,
-        historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
-        historicalBatchRef
-      }),
-      actorId,
-      taskId
-    });
+        snapshot: rollbackSnapshot,
+        commit: () => finalizeTaskflowCommitBundle({
+          bundle: commitBundleInput,
+          actorId,
+          taskId
+        })
+      })
+      : {
+        bundle: commitBundleInput,
+        transaction: {
+          schemaId: 'atm.closeWriteTransaction.v1' as const,
+          taskId,
+          phase: 'pending' as const,
+          ok: false,
+          failureStep: 'backend-close',
+          failureCode: 'ATM_TASKFLOW_CLOSE_WRITE_FAILED',
+          rolledBackArtifacts: [],
+          recoveryCommand: diagnosis.nextCommand,
+          backendCloseApplied: false,
+          commitBundleApplied: false
+        }
+      };
+    const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
 
     return {
       ...makeResult({
-        ok: backendResult.ok,
+        ok: writeOk,
         command: 'taskflow close',
         cwd,
         mode: 'write',
         messages: [
           message(
-            backendResult.ok ? 'info' : 'error',
-            backendResult.ok ? 'ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED' : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED',
-            backendResult.ok
+            writeOk ? 'info' : 'error',
+            writeOk
+              ? 'ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED'
+              : closeWriteTransaction.phase === 'rolled_back'
+                ? 'ATM_TASKFLOW_CLOSE_WRITE_ROLLED_BACK'
+                : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED',
+            writeOk
               ? `taskflow close orchestrated ${closebackPlan.backendSurface} for ${taskId}.`
-              : `taskflow close write failed for ${taskId}.`,
+              : closeWriteTransaction.phase === 'rolled_back'
+                ? `taskflow close --write rolled back ${taskId} after a commit-bundle failure; ledger close state was restored.`
+                : `taskflow close write failed for ${taskId}.`,
             { closeMode: closebackPlan.closeMode, backendSurface: closebackPlan.backendSurface }
           )
         ],
@@ -1666,6 +1728,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           planningCardCloseback,
           rosterCloseback,
           governedCommitBundle,
+          closeWriteTransaction,
           residueDiagnosis: enrichedDiagnosis,
           closebackPathResolution,
           ...(profileData ? { profile: profileData } : {})
