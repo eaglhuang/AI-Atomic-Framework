@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T03-48-31-664Z-close-7f53ae1b060b",
+  "taskId": "TASK-MAO-0023",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260617033703-claude-code-opus-4-7-TASK-MAO-0023-6b46e5855e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0023.json",
+  "taskSha256": "sha256:c06b854ae31489df27798d866eb9d68ffe21449947f6ee996c6d32f7c3aa143c",
+  "createdAt": "2026-06-17T03:48:31.664Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0023 --actor claude-code-opus-4-7 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617033703-claude-code-opus-4-7-TASK-MAO-0023-6b46e5855e",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0023.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:neutrality"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T03:48:31.660Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0023-team-agents-wave-mode-architecture-contract.task.md",
+        ".atm/history/evidence/TASK-MAO-0023.*",
+        ".atm/history/task-events/TASK-MAO-0023/**",
+        ".atm/history/tasks/TASK-MAO-0023.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/specs/mao-logical-routing-v1.md",
+        "docs/specs/team-agents-wave-mode-v1.md",
+        "docs/tasks/"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
