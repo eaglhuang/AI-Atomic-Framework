@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T06-02-47-989Z-close-e5c5c4c9dfd0",
+  "taskId": "TASK-MAO-0039",
+  "action": "close",
+  "actorId": "cursor-composer-2.5",
+  "sessionId": "session-20260617054909-cursor-composer-2.5-TASK-MAO-0039-0fa558b7d7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0039.json",
+  "taskSha256": "sha256:4366d3a7d6b223868ba4e4235a8ba9317cca415cbd12a09da3562da0116cc158",
+  "createdAt": "2026-06-17T06:02:47.989Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0039 --actor cursor-composer-2.5 --status done --historical-delivery cf1259d0d5ad3c910aefb97b1ba8900c2b61167b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617054909-cursor-composer-2.5-TASK-MAO-0039-0fa558b7d7",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0039.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:neutrality"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T06:02:47.981Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0039-historical-close-dry-run-remediation.task.md",
+        ".atm/history/evidence/TASK-MAO-0039.*",
+        ".atm/history/task-events/TASK-MAO-0039/**",
+        ".atm/history/tasks/TASK-MAO-0039.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/ATM_NEW_USER_WORKFLOW.md",
+        "docs/governance/historical-batch-evidence.md",
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "tests/cli-fixtures/help-snapshots/command-list.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "tests/cli-fixtures/help-snapshots/command-list.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
