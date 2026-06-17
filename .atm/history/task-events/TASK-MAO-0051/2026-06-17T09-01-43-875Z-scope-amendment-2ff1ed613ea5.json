@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T09-01-43-875Z-scope-amendment-2ff1ed613ea5",
+  "taskId": "TASK-MAO-0051",
+  "action": "scope-amendment",
+  "actorId": "cursor-composer-2.5",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0051.json",
+  "taskSha256": "sha256:8909c5d8931759214841c76ba302459ae767c0c78c8e11fa0d8311059212922c",
+  "createdAt": "2026-06-17T09:01:43.875Z",
+  "command": "node atm.mjs tasks scope add --task TASK-MAO-0051 --actor cursor-composer-2.5 --add packages/cli/src/commands/taskflow.ts --class linked-surface --phase during-implementation --reason \"taskflow close --write integrates close-window lock acquire/release\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "taskflow close --write integrates close-window lock acquire/release"
+  }
+}

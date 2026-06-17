@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0051",
+  "title": "Close window exclusive staged index lock",
+  "status": "done",
+  "milestone": "M7",
+  "dependencies": [
+    "TASK-MAO-0039",
+    "TASK-MAO-0040",
+    "TASK-MAO-0050"
+  ],
+  "acceptance": [
+    "Concurrent staging attempts are blocked while a close window is active.",
+    "Operators can see which foreign staged tasks caused the block.",
+    "The lock lifecycle is auditable and leaves no orphan close-window state.",
+    "Tests cover acquire, block, defer, release, and rollback behavior."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/tasks/close-window-lock.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+    "docs/ATM_NEW_USER_WORKFLOW.md",
+    "docs/governance/git-governance-contract.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/tasks/close-window-lock.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+    "docs/ATM_NEW_USER_WORKFLOW.md",
+    "docs/governance/git-governance-contract.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Blocking other agents from making ordinary dirty edits outside the close window",
+    "Silent unstage of foreign files",
+    "Changing task claim ownership semantics"
+  ],
+  "nonGoals": [
+    "Do not create a second task lifecycle.",
+    "Do not let close open a wider staging race."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert close window lock behavior, diagnostics, tests, docs, and atom-map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.close-window-lock-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0051-close-window-exclusive-staged-index-lock.task.md",
+    "sectionTitle": "TASK-MAO-0051",
+    "headingLine": 62,
+    "hash": "c238fadd38d238a3"
+  },
+  "importedAt": "2026-06-17T09:00:43.039Z",
+  "lastTransitionId": "2026-06-17T09-07-17-990Z-close-b1a8dde65eb0",
+  "lastTransitionAt": "2026-06-17T09:07:17.990Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-composer-2.5",
+  "reservedAt": "2026-06-17T09:00:58.042Z",
+  "promotedAt": "2026-06-17T09:00:58.560Z",
+  "claim": {
+    "actorId": "cursor-composer-2.5",
+    "leaseId": "lease-f5f7d8fb7434",
+    "claimedAt": "2026-06-17T09:00:59.268Z",
+    "heartbeatAt": "2026-06-17T09:07:17.987Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/governance/git-governance-contract.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-17T09:00:59.268Z",
+  "startedByActor": "cursor-composer-2.5",
+  "startedBySessionId": "session-20260617090059-cursor-composer-2.5-TASK-MAO-0051-f90410d670",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0051",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0051.*",
+      ".atm/history/task-events/TASK-MAO-0051/**",
+      ".atm/history/tasks/TASK-MAO-0051.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/governance/git-governance-contract.md",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "29574f6c82e4058fdcd83f3ce869a096f30b0bcb4a13eb1416a2a25f78a17f01",
+    "actorId": "cursor-composer-2.5",
+    "createdAt": "2026-06-17T09:00:59.310Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-17T09:07:17.987Z",
+  "closedByActor": "cursor-composer-2.5",
+  "closedBySessionId": "session-20260617090059-cursor-composer-2.5-TASK-MAO-0051-f90410d670",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0051.closure-packet.json"
+}
