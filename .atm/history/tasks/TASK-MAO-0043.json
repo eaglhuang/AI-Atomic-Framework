@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0043",
   "title": "Claim repair diagnose/write and lifecycle owner rule",
-  "status": "running",
+  "status": "done",
   "milestone": "M7",
   "dependencies": [
     "TASK-MAO-0039"
@@ -74,8 +74,8 @@
     "hash": "d61681fce94a0843"
   },
   "importedAt": "2026-06-17T16:22:25.312Z",
-  "lastTransitionId": "2026-06-17T16-23-27-007Z-claim-387dde814ba4",
-  "lastTransitionAt": "2026-06-17T16:23:27.007Z",
+  "lastTransitionId": "2026-06-17T16-45-19-997Z-close-00df001873c5",
+  "lastTransitionAt": "2026-06-17T16:45:19.997Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "cursor-gpt-5.2",
   "reservedAt": "2026-06-17T16:23:19.002Z",
@@ -84,7 +84,7 @@
     "actorId": "cursor-gpt-5.2",
     "leaseId": "lease-d84d55bb1786",
     "claimedAt": "2026-06-17T16:23:26.973Z",
-    "heartbeatAt": "2026-06-17T16:23:26.973Z",
+    "heartbeatAt": "2026-06-17T16:45:19.994Z",
     "ttlSeconds": 1800,
     "files": [
       "packages/cli/src/commands/tasks.ts",
@@ -97,8 +97,8 @@
       "tests/cli/tasks-repair-claim.test.ts",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Delivery commit includes scope-amendment repair-claim surfaces recorded in runtime lock before task ledger sync"
   },
   "startedAt": "2026-06-17T16:23:26.973Z",
   "startedByActor": "cursor-gpt-5.2",
@@ -132,5 +132,10 @@
     "actorId": "cursor-gpt-5.2",
     "createdAt": "2026-06-17T16:23:27.007Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-17T16:45:19.994Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260617162326-cursor-gpt-5.2-TASK-MAO-0043-ce06f2786e",
+  "closeReason": "Delivery commit includes scope-amendment repair-claim surfaces recorded in runtime lock before task ledger sync",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0043.closure-packet.json"
 }
