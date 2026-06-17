@@ -41,6 +41,40 @@ If `git commit` or the pre-commit hook still detects a missing ATM identity
 profile, the failure includes a `requiredCommand` for `node atm.mjs identity set`
 using the repo-local git `user.name` and `user.email` when available.
 
+## Task-Scoped Commit Bundles
+
+`git commit --task <id>` resolves a task-scoped bundle before writing. Use
+`--dry-run` first to inspect `stageFiles`, `skippedExternalDirtyFiles`,
+`unexpectedStagedTasks`, and a copyable host git command with trailers in the
+message body.
+
+Auto-stage only the current task lane:
+
+```bash
+node atm.mjs git commit \
+  --task <task-id> \
+  --actor <actor-id> \
+  --message "<summary>" \
+  --auto-stage \
+  --json
+```
+
+When the index already contains another task's staged close bundle, defer it
+explicitly instead of silently unstaging:
+
+```bash
+node atm.mjs git commit \
+  --task <task-id> \
+  --actor <actor-id> \
+  --message "<summary>" \
+  --defer-foreign-staged \
+  --json
+```
+
+ATM executes git through `ATM_GIT_EXECUTABLE` when set, otherwise `git.exe` on
+Windows, and always returns `copyableCommitCommand` using `-m` trailers when
+host `--trailer` support is unavailable.
+
 ## Scope Amendment Audit Lane
 
 A claim locks a fixed list of `allowedFiles`. When linked surfaces appear during

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, resolveActorId, writeRuntimeIdentityDefault } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
@@ -9,6 +9,52 @@ import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
+
+export function resolveGitExecutable(): string {
+  const configured = process.env.ATM_GIT_EXECUTABLE?.trim();
+  if (configured && existsSync(configured)) {
+    return configured;
+  }
+  if (process.platform === 'win32') {
+    const windowsGit = 'C:\\Program Files\\Git\\cmd\\git.exe';
+    if (existsSync(windowsGit)) {
+      return windowsGit;
+    }
+  }
+  return 'git';
+}
+
+function runGitCommand(cwd: string, args: readonly string[], stdio: ['ignore', 'pipe', 'pipe'] | ['ignore', 'pipe', 'ignore'] = ['ignore', 'pipe', 'ignore']): string {
+  return execFileSync(resolveGitExecutable(), args, {
+    cwd,
+    encoding: 'utf8',
+    stdio
+  });
+}
+
+export interface GitUnexpectedStagedTaskReport {
+  readonly taskId: string;
+  readonly stagedFiles: readonly string[];
+  readonly restoreChoice: string;
+  readonly deferCommand: string;
+}
+
+export interface TaskScopedCommitBundleReport {
+  readonly schemaId: 'atm.taskScopedCommitBundle.v1';
+  readonly taskId: string;
+  readonly ok: boolean;
+  readonly apply: boolean;
+  readonly stageFiles: readonly string[];
+  readonly skippedExternalDirtyFiles: readonly string[];
+  readonly unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[];
+  readonly outOfScopeStagedFiles: readonly string[];
+  readonly governanceBundleWarnings: readonly string[];
+  readonly blockedCode: string | null;
+  readonly blockedSummary: string | null;
+  readonly gitExecutable: string;
+  readonly copyableCommitCommand: string | null;
+  readonly deferredForeignStagedSnapshot: string | null;
+}
 
 type TaskClaimRecord = {
   actorId: string;
@@ -333,6 +379,76 @@ function runGitCommit(options: ParsedGitOptions) {
     });
   }
   if (options.taskId && taskDocument && !bypassesActiveSession) {
+    const bundleReport = resolveTaskScopedCommitBundle({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      taskDocument,
+      apply: !options.dryRun && (options.autoStage || options.deferForeignStaged),
+      autoStage: options.autoStage,
+      deferForeignStaged: options.deferForeignStaged,
+      message: options.message,
+      actorId,
+      trailers: [
+        `ATM-Actor: ${actorId}`,
+        `ATM-Task: ${options.taskId}`,
+        ...(claimForTrailers?.leaseId ? [`ATM-Claim: ${claimForTrailers.leaseId}`] : []),
+        ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : [])
+      ]
+    });
+    const copyableCommitCommand = bundleReport.copyableCommitCommand;
+    if (options.dryRun) {
+      return makeResult({
+        ok: bundleReport.ok,
+        command: 'git',
+        cwd: options.cwd,
+        messages: [bundleReport.ok
+          ? message('info', 'ATM_GIT_COMMIT_BUNDLE_DRY_RUN', `git commit dry-run for ${options.taskId} resolved a task-scoped bundle without mutating the index.`, {
+            taskId: options.taskId,
+            stageFiles: bundleReport.stageFiles,
+            skippedExternalDirtyFiles: bundleReport.skippedExternalDirtyFiles
+          })
+          : message('error', bundleReport.blockedCode ?? 'ATM_GIT_COMMIT_BUNDLE_BLOCKED', bundleReport.blockedSummary ?? 'Task-scoped commit bundle resolver blocked the commit.', {
+            commitBundle: bundleReport
+          })],
+        evidence: {
+          action: 'commit',
+          dryRun: true,
+          actorId,
+          taskId: options.taskId,
+          sessionId: session?.sessionId ?? null,
+          commitBundle: bundleReport,
+          copyableCommitCommand
+        }
+      });
+    }
+    if (!bundleReport.ok) {
+      throw new CliError(bundleReport.blockedCode ?? 'ATM_GIT_COMMIT_BUNDLE_BLOCKED', bundleReport.blockedSummary ?? 'Task-scoped commit bundle resolver blocked the commit.', {
+        exitCode: 1,
+        details: {
+          actorId,
+          taskId: options.taskId,
+          sessionId: session?.sessionId ?? null,
+          commitBundle: bundleReport,
+          copyableCommitCommand,
+          unexpectedStagedTasks: bundleReport.unexpectedStagedTasks,
+          skippedExternalDirtyFiles: bundleReport.skippedExternalDirtyFiles
+        }
+      });
+    }
+    const stagedBundleInspection = inspectTaskScopedStagedGovernanceBundle(options.cwd, options.taskId, taskDocument);
+    if (!stagedBundleInspection.ok) {
+      throw new CliError(stagedBundleInspection.code, stagedBundleInspection.summary, {
+        exitCode: 1,
+        details: {
+          actorId,
+          taskId: options.taskId,
+          sessionId: session?.sessionId ?? null,
+          ...stagedBundleInspection.details,
+          copyableCommitCommand,
+          governanceBundleWarnings: stagedBundleInspection.warnings
+        }
+      });
+    }
     const stagingInspection = inspectTaskScopedUnstagedCommit(options.cwd, options.taskId, taskDocument);
     if (stagingInspection?.kind === 'staging-required') {
       throw new CliError(
@@ -345,7 +461,10 @@ function runGitCommit(options: ParsedGitOptions) {
             taskId: options.taskId,
             sessionId: session?.sessionId ?? null,
             inScopeDirtyFiles: stagingInspection.inScopeDirtyFiles,
-            requiredCommand: stagingInspection.requiredCommand
+            skippedExternalDirtyFiles: stagingInspection.skippedExternalDirtyFiles,
+            requiredCommand: stagingInspection.requiredCommand,
+            autoStageCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --task ${quoteCliValue(options.taskId)} --message ${quoteCliValue(options.message)} --auto-stage --json`,
+            copyableCommitCommand
           }
         }
       );
@@ -353,7 +472,7 @@ function runGitCommit(options: ParsedGitOptions) {
     if (stagingInspection?.kind === 'mixed-scope') {
       throw new CliError(
         'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS',
-        `git commit for ${options.taskId} found task-scoped dirty files mixed with out-of-scope dirty files; stage only in-scope files manually before retrying.`,
+        `git commit for ${options.taskId} found out-of-scope files already staged with task-scoped work; defer foreign staged files or stage only in-scope files manually before retrying.`,
         {
           exitCode: 1,
           details: {
@@ -361,7 +480,9 @@ function runGitCommit(options: ParsedGitOptions) {
             taskId: options.taskId,
             sessionId: session?.sessionId ?? null,
             inScopeDirtyFiles: stagingInspection.inScopeDirtyFiles,
-            outOfScopeDirtyFiles: stagingInspection.outOfScopeDirtyFiles
+            outOfScopeStagedFiles: stagingInspection.outOfScopeStagedFiles,
+            deferForeignStagedCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --task ${quoteCliValue(options.taskId)} --message ${quoteCliValue(options.message)} --defer-foreign-staged --json`,
+            copyableCommitCommand
           }
         }
       );
@@ -383,7 +504,7 @@ function runGitCommit(options: ParsedGitOptions) {
   ];
   let protectedOverrideOutcome: ReturnType<typeof recordProtectedOverrideOutcome> | null = null;
   try {
-    execFileSync('git', args, {
+    execFileSync(resolveGitExecutable(), args, {
       cwd: options.cwd,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -435,6 +556,13 @@ function runGitCommit(options: ParsedGitOptions) {
         sessionId: session?.sessionId ?? null,
         stdout,
         stderr,
+        gitExecutable: resolveGitExecutable(),
+        copyableCommitCommand: buildCopyableGitCommitCommand({
+          cwd: options.cwd,
+          message: options.message,
+          trailers,
+          noVerify: options.noVerify
+        }),
         protectedOverrideOutcome
       }
     });
@@ -482,6 +610,13 @@ function runGitCommit(options: ParsedGitOptions) {
       commitSha,
       trailers,
       git: profile,
+      gitExecutable: resolveGitExecutable(),
+      copyableCommitCommand: buildCopyableGitCommitCommand({
+        cwd: options.cwd,
+        message: options.message,
+        trailers,
+        noVerify: options.noVerify
+      }),
       protectedOverrideAudit: protectedOverrideAudit?.protectedOverrideAudit ?? null,
       protectedOverrideOutcome
     }
@@ -501,6 +636,9 @@ interface ParsedGitOptions {
   readonly emergencyApproval: string | null;
   readonly overrideReason: string | null;
   readonly checkTrailers: boolean;
+  readonly autoStage: boolean;
+  readonly deferForeignStaged: boolean;
+  readonly dryRun: boolean;
 }
 
 function parseGitOptions(argv: string[]): ParsedGitOptions {
@@ -516,7 +654,10 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     noVerify: false,
     emergencyApproval: null as string | null,
     overrideReason: null as string | null,
-    checkTrailers: true
+    checkTrailers: true,
+    autoStage: false,
+    deferForeignStaged: false,
+    dryRun: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -571,6 +712,18 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     }
     if (arg === '--no-trailers') {
       options.checkTrailers = false;
+      continue;
+    }
+    if (arg === '--auto-stage') {
+      options.autoStage = true;
+      continue;
+    }
+    if (arg === '--defer-foreign-staged') {
+      options.deferForeignStaged = true;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      options.dryRun = true;
       continue;
     }
     if (arg === '--json' || arg === '--pretty') {
@@ -830,56 +983,298 @@ function readStagedJsonFile(cwd: string, relativeFile: string): Record<string, u
 
 function readStagedFiles(cwd: string): readonly string[] {
   try {
-    return execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'], {
-      cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
-    }).split(/\r?\n/).map(normalizeRelativePath).filter(Boolean).sort((left, right) => left.localeCompare(right));
+    return runGitCommand(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'])
+      .split(/\r?\n/).map(normalizeRelativePath).filter(Boolean).sort((left, right) => left.localeCompare(right));
   } catch {
     return [];
   }
 }
 
+function readStagedDiffNames(cwd: string, diffFilter: string): readonly string[] {
+  try {
+    return runGitCommand(cwd, ['diff', '--cached', '--name-only', `--diff-filter=${diffFilter}`])
+      .split(/\r?\n/).map(normalizeRelativePath).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function extractGovernanceTaskIdFromPath(filePath: string): string | null {
+  const normalized = normalizeRelativePath(filePath);
+  if (!normalized.startsWith('.atm/history/')) return null;
+  const tasksMatch = normalized.match(/^\.atm\/history\/tasks\/([^/]+)\.json$/i);
+  if (tasksMatch) return tasksMatch[1].toUpperCase();
+  const evidenceMatch = normalized.match(/^\.atm\/history\/evidence\/([^/.]+)(?:\.[^/]+)?$/i);
+  if (evidenceMatch) return evidenceMatch[1].toUpperCase();
+  const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
+  if (eventMatch) return eventMatch[1].toUpperCase();
+  return null;
+}
+
+function isAllowedGovernanceArtifactPath(filePath: string, taskId: string): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  const normalizedTaskId = taskId.toLowerCase();
+  const lower = normalized.toLowerCase();
+  if (lower === `.atm/history/tasks/${normalizedTaskId}.json`) return true;
+  if (lower === `.atm/history/evidence/${normalizedTaskId}.json`) return true;
+  if (lower === `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`) return true;
+  if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json')) return true;
+  return isIgnorableCommitStagingSideEffect(normalized, taskId);
+}
+
+function isFileAllowedInTaskBundle(filePath: string, taskId: string, declaredScope: readonly string[]): boolean {
+  if (isAllowedGovernanceArtifactPath(filePath, taskId)) return true;
+  return declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope));
+}
+
+function buildCopyableGitCommitCommand(input: {
+  cwd: string;
+  message: string;
+  trailers: readonly string[];
+  noVerify?: boolean;
+}): string {
+  const cwdFlag = path.resolve(input.cwd) === path.resolve(process.cwd())
+    ? ''
+    : ` -C ${quoteCliValue(input.cwd)}`;
+  const gitExecutable = quoteCliValue(resolveGitExecutable());
+  const body = [input.message, ...input.trailers].join('\n\n');
+  return `${gitExecutable}${cwdFlag} commit${input.noVerify ? ' --no-verify' : ''} -m ${quoteCliValue(input.message)} -m ${quoteCliValue(body)}`;
+}
+
+function buildUnexpectedStagedTasksForGitCommit(
+  cwd: string,
+  taskId: string,
+  declaredScope: readonly string[],
+  stagedFiles: readonly string[]
+): GitUnexpectedStagedTaskReport[] {
+  const grouped = new Map<string, string[]>();
+  for (const filePath of stagedFiles) {
+    if (isFileAllowedInTaskBundle(filePath, taskId, declaredScope)) continue;
+    const foreignTaskId = extractGovernanceTaskIdFromPath(filePath);
+    if (!foreignTaskId || foreignTaskId === taskId.toUpperCase()) continue;
+    const bucket = grouped.get(foreignTaskId) ?? [];
+    bucket.push(filePath);
+    grouped.set(foreignTaskId, bucket);
+  }
+  return [...grouped.entries()].map(([foreignTaskId, files]) => {
+    const uniqueFiles = uniqueSorted(files);
+    return {
+      taskId: foreignTaskId,
+      stagedFiles: uniqueFiles,
+      restoreChoice: `Do not silently unstage ${foreignTaskId}. Either wait for that agent to commit, or defer foreign staged files through --defer-foreign-staged and confirm the other agent can restage afterward.`,
+      deferCommand: `${quoteCliValue(resolveGitExecutable())} restore --staged -- ${uniqueFiles.map(quoteCliValue).join(' ')}`
+    };
+  });
+}
+
+function deferForeignStagedFiles(
+  cwd: string,
+  taskId: string,
+  unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[]
+): string | null {
+  if (unexpectedStagedTasks.length === 0) return null;
+  const files = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
+  const snapshotPath = `.atm/runtime/snapshots/foreign-staged-${taskId}-${Date.now()}.json`;
+  mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
+  writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({
+    schemaId: 'atm.foreignStagedSnapshot.v1',
+    taskId,
+    createdAt: new Date().toISOString(),
+    files
+  }, null, 2)}\n`, 'utf8');
+  runGitCommand(cwd, ['restore', '--staged', '--', ...files], ['ignore', 'pipe', 'pipe']);
+  return snapshotPath;
+}
+
+export function resolveTaskScopedCommitBundle(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+  apply: boolean;
+  autoStage: boolean;
+  deferForeignStaged: boolean;
+  message: string;
+  actorId: string;
+  trailers: readonly string[];
+}): TaskScopedCommitBundleReport {
+  const declaredScope = resolveTaskDeclaredScope(input.cwd, input.taskId, input.taskDocument);
+  const gitExecutable = resolveGitExecutable();
+  const copyableCommitCommand = buildCopyableGitCommitCommand({
+    cwd: input.cwd,
+    message: input.message,
+    trailers: input.trailers
+  });
+  let stagedFiles = readStagedFiles(input.cwd);
+  let unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
+  let deferredForeignStagedSnapshot: string | null = null;
+  if (input.deferForeignStaged && unexpectedStagedTasks.length > 0 && input.apply) {
+    deferredForeignStagedSnapshot = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedTasks);
+    stagedFiles = readStagedFiles(input.cwd);
+    unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
+  }
+  const dirtyFiles = listTaskScopedWorktreeDirtyFiles(input.cwd);
+  const stagedSet = new Set(stagedFiles);
+  const unstagedDirtyFiles = dirtyFiles.filter((filePath) => !stagedSet.has(filePath));
+  const inScopeUnstagedDirty = unstagedDirtyFiles.filter((filePath) =>
+    declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
+    || isAllowedGovernanceArtifactPath(filePath, input.taskId)
+  );
+  const skippedExternalDirtyFiles = unstagedDirtyFiles.filter((filePath) =>
+    !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
+    && !isIgnorableCommitStagingSideEffect(filePath, input.taskId)
+  );
+  const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope));
+  const outOfScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) =>
+    !isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope)
+  );
+  const governanceBundleWarnings: string[] = [];
+  const stageCandidates = input.autoStage ? uniqueSorted(inScopeUnstagedDirty) : [];
+
+  let blockedCode: string | null = null;
+  let blockedSummary: string | null = null;
+  if (unexpectedStagedTasks.length > 0 && !input.deferForeignStaged) {
+    blockedCode = 'ATM_GIT_COMMIT_FOREIGN_STAGED_TASKS';
+    blockedSummary = `git commit for ${input.taskId} found staged governance files for other tasks (${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}). Use --defer-foreign-staged under a governed command or wait for the other agent to commit.`;
+  } else if (outOfScopeStagedFiles.length > 0 || outOfScopeStagedDeletions.length > 0) {
+    blockedCode = 'ATM_GIT_COMMIT_OUT_OF_SCOPE_STAGED';
+    blockedSummary = `git commit for ${input.taskId} found out-of-scope source changes already staged; stage only task-allowed files or defer foreign staged bundles explicitly.`;
+  }
+
+  if (!blockedCode && input.apply && stageCandidates.length > 0) {
+    runGitCommand(input.cwd, ['add', '--', ...stageCandidates], ['ignore', 'pipe', 'pipe']);
+    stagedFiles = readStagedFiles(input.cwd);
+  }
+
+  if (!blockedCode && unexpectedStagedTasks.length > 0) {
+    governanceBundleWarnings.push(`Foreign staged tasks remain in the index: ${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}`);
+  }
+
+  return {
+    schemaId: 'atm.taskScopedCommitBundle.v1',
+    taskId: input.taskId,
+    ok: blockedCode === null,
+    apply: input.apply,
+    stageFiles: input.apply && input.autoStage ? stageCandidates : inScopeUnstagedDirty,
+    skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),
+    unexpectedStagedTasks,
+    outOfScopeStagedFiles: uniqueSorted([...outOfScopeStagedFiles, ...outOfScopeStagedDeletions]),
+    governanceBundleWarnings,
+    blockedCode,
+    blockedSummary,
+    gitExecutable,
+    copyableCommitCommand,
+    deferredForeignStagedSnapshot
+  };
+}
+
+function inspectTaskScopedStagedGovernanceBundle(
+  cwd: string,
+  taskId: string,
+  taskDocument: Record<string, unknown>
+): {
+  ok: boolean;
+  code: string;
+  summary: string;
+  warnings: readonly string[];
+  details: Record<string, unknown>;
+} {
+  const stagedFiles = readStagedFiles(cwd);
+  const claim = parseTaskClaim(taskDocument.claim);
+  const warnings: string[] = [];
+  const mismatchedTaskIds: string[] = [];
+  if (claim?.state === 'active') {
+    for (const filePath of stagedFiles) {
+      if (!isAllowedGovernanceArtifactPath(filePath, taskId)) continue;
+      const stagedTaskId = extractGovernanceTaskIdFromPath(filePath);
+      if (stagedTaskId && stagedTaskId !== taskId.toUpperCase()) {
+        mismatchedTaskIds.push(filePath);
+      }
+      const json = readStagedJsonFile(cwd, filePath);
+      if (json && typeof json.taskId === 'string' && json.taskId !== taskId) {
+        mismatchedTaskIds.push(filePath);
+      }
+      if (json && typeof json.workItemId === 'string' && json.workItemId !== taskId) {
+        mismatchedTaskIds.push(filePath);
+      }
+    }
+    const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
+    const outOfScopeStaged = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
+    if (outOfScopeStaged.length > 0) {
+      warnings.push(`Pre-commit warning: staged files outside allowedFiles for ${taskId}: ${outOfScopeStaged.join(', ')}`);
+      return {
+        ok: false,
+        code: 'ATM_GIT_COMMIT_GOVERNANCE_BUNDLE_TASK_MISMATCH',
+        summary: `git commit for ${taskId} found staged files outside the active claim allowedFiles or with mismatched governance task ids.`,
+        warnings,
+        details: {
+          outOfScopeStagedFiles: uniqueSorted(outOfScopeStaged),
+          mismatchedTaskIds: uniqueSorted(mismatchedTaskIds)
+        }
+      };
+    }
+    if (mismatchedTaskIds.length > 0) {
+      return {
+        ok: false,
+        code: 'ATM_GIT_COMMIT_GOVERNANCE_BUNDLE_TASK_MISMATCH',
+        summary: `git commit for ${taskId} found staged governance artifacts whose task ids do not match the active claim.`,
+        warnings,
+        details: {
+          mismatchedTaskIds: uniqueSorted(mismatchedTaskIds)
+        }
+      };
+    }
+  }
+  return {
+    ok: true,
+    code: 'ATM_GIT_COMMIT_GOVERNANCE_BUNDLE_OK',
+    summary: `Staged governance bundle for ${taskId} passed task-id consistency checks.`,
+    warnings,
+    details: {}
+  };
+}
+
 type TaskScopedStagingInspection =
-  | { readonly kind: 'staging-required'; readonly inScopeDirtyFiles: readonly string[]; readonly requiredCommand: string }
-  | { readonly kind: 'mixed-scope'; readonly inScopeDirtyFiles: readonly string[]; readonly outOfScopeDirtyFiles: readonly string[] };
+  | { readonly kind: 'staging-required'; readonly inScopeDirtyFiles: readonly string[]; readonly skippedExternalDirtyFiles: readonly string[]; readonly requiredCommand: string }
+  | { readonly kind: 'mixed-scope'; readonly inScopeDirtyFiles: readonly string[]; readonly outOfScopeStagedFiles: readonly string[] };
 
 function inspectTaskScopedUnstagedCommit(
   cwd: string,
   taskId: string,
   taskDocument: Record<string, unknown>
 ): TaskScopedStagingInspection | null {
-  if (readStagedFiles(cwd).length > 0) {
-    return null;
-  }
+  const stagedFiles = readStagedFiles(cwd);
   const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
-  if (declaredScope.length === 0) {
-    return null;
-  }
   const dirtyFiles = listTaskScopedWorktreeDirtyFiles(cwd);
-  if (dirtyFiles.length === 0) {
+  if (dirtyFiles.length === 0 && stagedFiles.length === 0) {
     return null;
   }
   const deliverableDirtyFiles = dirtyFiles.filter((filePath) =>
     declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
   );
-  if (deliverableDirtyFiles.length === 0) {
-    return null;
-  }
-  const blockingOutOfScopeDirtyFiles = dirtyFiles.filter((filePath) =>
+  const skippedExternalDirtyFiles = dirtyFiles.filter((filePath) =>
     !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
     && !isIgnorableCommitStagingSideEffect(filePath, taskId)
   );
-  if (blockingOutOfScopeDirtyFiles.length > 0) {
+  const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
+  const unstagedInScopeDirty = deliverableDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
+
+  if (outOfScopeStagedFiles.length > 0 && (unstagedInScopeDirty.length > 0 || stagedFiles.some((file) => isFileAllowedInTaskBundle(file, taskId, declaredScope)))) {
     return {
       kind: 'mixed-scope',
-      inScopeDirtyFiles: uniqueSorted(deliverableDirtyFiles),
-      outOfScopeDirtyFiles: uniqueSorted(blockingOutOfScopeDirtyFiles)
+      inScopeDirtyFiles: uniqueSorted(unstagedInScopeDirty.length > 0 ? unstagedInScopeDirty : deliverableDirtyFiles),
+      outOfScopeStagedFiles: uniqueSorted(outOfScopeStagedFiles)
     };
+  }
+  if (stagedFiles.length > 0) {
+    return null;
+  }
+  if (deliverableDirtyFiles.length === 0) {
+    return null;
   }
   return {
     kind: 'staging-required',
     inScopeDirtyFiles: uniqueSorted(deliverableDirtyFiles),
+    skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),
     requiredCommand: buildTaskScopedStagingRequiredCommand(cwd, deliverableDirtyFiles)
   };
 }
@@ -932,7 +1327,7 @@ function buildTaskScopedStagingRequiredCommand(cwd: string, files: readonly stri
   const cwdFlag = path.resolve(cwd) === path.resolve(process.cwd())
     ? ''
     : ` -C ${quoteCliValue(cwd)}`;
-  return `git${cwdFlag} add -- ${normalizedFiles.map(quoteCliValue).join(' ')}`;
+  return `${quoteCliValue(resolveGitExecutable())}${cwdFlag} add -- ${normalizedFiles.map(quoteCliValue).join(' ')}`;
 }
 
 function pathMatchesTaskScope(filePath: string, scope: string): boolean {
@@ -954,11 +1349,8 @@ function pathMatchesTaskScope(filePath: string, scope: string): boolean {
 
 function readGitNameOnly(cwd: string, args: readonly string[]): readonly string[] {
   try {
-    return execFileSync('git', args, {
-      cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
-    }).split(/\r?\n/).map(normalizeRelativePath).filter(Boolean);
+    return runGitCommand(cwd, args)
+      .split(/\r?\n/).map(normalizeRelativePath).filter(Boolean);
   } catch {
     return [];
   }
