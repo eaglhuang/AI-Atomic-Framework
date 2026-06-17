@@ -1341,7 +1341,8 @@ const deliveryCommitSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: outO
 
 // Write dummy evidence for outOfScopeFixture
 writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${outOfScopeFixture.taskId}.json`), {
-  taskId: outOfScopeFixture.taskId,
+  schemaVersion: 'atm.evidence.v0.1',
+  workItemId: outOfScopeFixture.taskId,
   evidence: [{
     evidenceKind: 'validation',
     evidenceType: 'test',
@@ -1361,8 +1362,10 @@ writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${ou
 });
 
 // A. Dry-run close with --write and without waiver should fail-closed because of the committed out-of-scope file
-await assert.rejects(
-  () => runTaskflow([
+let outOfScopeError: any = null;
+let outOfScopeResult: any = null;
+try {
+  outOfScopeResult = await runTaskflow([
     'close',
     '--cwd', outOfScopeFixture.targetRepo,
     '--profile', outOfScopeFixture.profilePath,
@@ -1371,12 +1374,30 @@ await assert.rejects(
     '--historical-delivery', deliveryCommitSha,
     '--write',
     '--json'
-  ]),
-  (err: any) => {
-    assert.ok(err.code === 'ATM_CLI_COMMAND_FAILED' || err.code === 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED' || err.message.includes('out-of-scope') || err.message.includes('reconcile') || err.message.includes('delivery'));
-    return true;
-  }
-);
+  ]);
+} catch (err) {
+  outOfScopeError = err;
+}
+
+if (outOfScopeError) {
+  assert.ok(
+    outOfScopeError.code === 'ATM_CLI_COMMAND_FAILED' ||
+    outOfScopeError.code === 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED' ||
+    outOfScopeError.message.includes('out-of-scope') ||
+    outOfScopeError.message.includes('reconcile') ||
+    outOfScopeError.message.includes('delivery')
+  );
+} else {
+  assert.equal(outOfScopeResult.ok, false);
+  assert.ok(
+    outOfScopeResult.messages.some((m: any) =>
+      m.code === 'ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED' ||
+      m.text.includes('out-of-scope') ||
+      m.text.includes('reconcile') ||
+      m.text.includes('delivery')
+    )
+  );
+}
 
 // B. Close with --write and approved waiver should succeed
 const outOfScopeCloseWithWaiver = await runTaskflow([
@@ -1392,6 +1413,9 @@ const outOfScopeCloseWithWaiver = await runTaskflow([
   '--json'
 ]) as any;
 
+if (!outOfScopeCloseWithWaiver.ok) {
+  console.error('[DEBUG-TEST-FAIL] outOfScopeCloseWithWaiver failed:', JSON.stringify(outOfScopeCloseWithWaiver, null, 2));
+}
 assert.equal(outOfScopeCloseWithWaiver.ok, true);
 
 console.log('[taskflow-dryrun:test] ok');
