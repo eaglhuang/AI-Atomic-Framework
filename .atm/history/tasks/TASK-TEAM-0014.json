@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0014",
+  "title": "Atomic police patrol reports",
+  "status": "running",
+  "milestone": "M6",
+  "dependencies": [
+    "TASK-TEAM-0013"
+  ],
+  "acceptance": [
+    "Patrol output includes run id, patrol team, severity, findings, safe-to-proceed, suggested command, and follow-up.",
+    "Patrols are explicitly read-only and report `mutations: []`.",
+    "The command can run for claim-preflight, close-preflight, big-script, and daily-noon patrol modes.",
+    "Findings distinguish warnings from blockers.",
+    "Patrol can report missing required artifacts and retry-budget exhaustion risk without closing or reopening any route itself.",
+    "Patrol reports do not alter `.atm/runtime/**` or `.atm/history/**`."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case patrol-report",
+    "node atm.mjs team patrol --task TASK-TEAM-0014 --json",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Recurring automation scheduling",
+    "Automatic source mutation by police agents",
+    "Closing tasks from patrol output"
+  ],
+  "nonGoals": [
+    "Do not create a second evidence system",
+    "Do not replace validators with patrol text"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert patrol command/report changes and map updates.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card gives the police team a voice, not a baton, and prepares the later rework-loop cards to rely on patrol as a diagnostic surface rather than a second scheduler.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0014-atomic-police-patrol-reports.task.md",
+    "sectionTitle": "TASK-TEAM-0014",
+    "headingLine": 48,
+    "hash": "a1c46b19a7adec80"
+  },
+  "importedAt": "2026-06-17T16:55:14.120Z",
+  "lastTransitionId": "2026-06-17T18-27-55-680Z-claim-682f0f350806",
+  "lastTransitionAt": "2026-06-17T18:27:55.680Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-17T18:27:55.637Z",
+  "promotedAt": "2026-06-17T18:27:55.642Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-8f25e0774fec",
+    "claimedAt": "2026-06-17T18:27:55.644Z",
+    "heartbeatAt": "2026-06-17T18:27:55.644Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0014.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-17T18:27:55.644Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260617182755-captain-TASK-TEAM-0014-0ef3ec861c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0014",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0014.*",
+      ".atm/history/task-events/TASK-TEAM-0014/**",
+      ".atm/history/tasks/TASK-TEAM-0014.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bc30180da3543d1eb19a93b30a94036d24c061eb327e17a41e21c165b039bfeb",
+    "actorId": "captain",
+    "createdAt": "2026-06-17T18:27:55.679Z",
+    "status": "active"
+  }
+}

@@ -9,7 +9,7 @@ export const teamSpecCommandSurface = {
     {
       name: 'action',
       summary:
-        'Team action. Supports: plan, start, status, validate, wave, knowledge. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
+        'Team action. Supports: plan, start, status, validate, patrol, wave, knowledge. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
     }
   ],
   options: [
@@ -17,7 +17,8 @@ export const teamSpecCommandSurface = {
     { flag: '--task', value: 'id', summary: 'Task id to plan, validate, or start a team for.' },
     { flag: '--recipe', value: 'id', summary: 'Optional team recipe id. Defaults to a language-aware built-in recipe.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for team start.' },
-    { flag: '--team', value: 'id', summary: 'Team run id for status.' },
+    { flag: '--team', value: 'id', summary: 'Team run id for status or patrol.' },
+    { flag: '--mode', value: 'name', summary: 'Team patrol mode: claim-preflight, close-preflight, big-script, or daily-noon.' },
     { flag: '--compact', summary: 'Return a compact status payload.' },
     { flag: '--scope', value: 'name', summary: 'Knowledge build scope for team knowledge build.' },
     { flag: '--dry-run', summary: 'Run team knowledge build without writing generated runtime cache files.' },
@@ -111,6 +112,15 @@ export const teamSpecRuntimeStatus = {
   ]
 };
 
+export const teamSpecPatrolReport = {
+  summary:
+    'Read-only Team patrol report for runtime mode, rework readiness, missing artifacts, retry-budget risk, and close/claim preflight guidance (TASK-TEAM-0014).',
+  examples: [
+    'node atm.mjs team patrol --task TASK-TEAM-0014 --json',
+    'node atm.mjs team patrol --task TASK-TEAM-0014 --mode close-preflight --json'
+  ]
+};
+
 export const teamSpecNextRecommendation = {
   summary:
     'Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands (TASK-TEAM-0015).',
@@ -142,6 +152,7 @@ export default defineCommandSpec({
     ...teamSpecPermissionValidation.examples,
     ...teamSpecClaimGateParity.examples,
     ...teamSpecRuntimeStatus.examples,
+    ...teamSpecPatrolReport.examples,
     ...teamSpecNextRecommendation.examples,
     ...teamSpecKnowledgeBuildQuery.examples
   ]

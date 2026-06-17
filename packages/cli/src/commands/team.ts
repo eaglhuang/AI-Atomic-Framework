@@ -101,6 +101,19 @@ type TeamImplementerSelector = {
   };
 };
 
+type TeamPatrolMode = 'claim-preflight' | 'close-preflight' | 'big-script' | 'daily-noon';
+
+type TeamPatrolFindingLevel = 'info' | 'warning' | 'blocker';
+
+type TeamPatrolFinding = {
+  level: TeamPatrolFindingLevel;
+  code: string;
+  category: 'runtime-mode' | 'artifact-gap' | 'retry-budget' | 'rework-state' | 'scope' | 'evidence';
+  summary: string;
+  suggestedCommand: string | null;
+  details?: Record<string, unknown>;
+};
+
 const teamPermissionCatalog: TeamPermissionDefinition[] = [
   { id: 'task.lifecycle', mode: 'exclusive' },
   { id: 'git.write', mode: 'exclusive' },
@@ -205,6 +218,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team.ts#buildTeamStatusResult',
     capability: 'Read-only team run status surface.',
     downstreamTasks: ['TASK-TEAM-0011']
+  },
+  'team.patrol-report': {
+    anchor: 'packages/cli/src/commands/team.ts#buildTeamPatrolReport',
+    capability: 'Read-only patrol report for runtime mode, rework readiness, missing artifacts, and retry-budget risk.',
+    downstreamTasks: ['TASK-TEAM-0014']
   },
   'team.permission-lease-validator': {
     anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
@@ -370,8 +388,8 @@ export async function runTeam(argv: string[]) {
     return runTeamKnowledge(knowledgeArgv, cwd);
   }
 
-  if (!['plan', 'start', 'status', 'validate'].includes(action)) {
-    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, wave, knowledge', { exitCode: 2 });
+  if (!['plan', 'start', 'status', 'validate', 'patrol'].includes(action)) {
+    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge', { exitCode: 2 });
   }
 
   if (action === 'status') {
@@ -385,6 +403,15 @@ export async function runTeam(argv: string[]) {
   const taskId = String(parsed.options.task ?? '').trim();
   if (!taskId) {
     throw new CliError('ATM_TEAM_TASK_REQUIRED', `team ${action} requires --task <id>.`, { exitCode: 2 });
+  }
+
+  if (action === 'patrol') {
+    return buildTeamPatrolResult({
+      cwd,
+      taskId,
+      mode: normalizeTeamPatrolMode(parsed.options.mode),
+      requestedTeamRunId: String(parsed.options.team ?? '').trim()
+    });
   }
 
   const context = await buildTeamPlanningContext({
@@ -1841,6 +1868,141 @@ export function buildTeamStatusResult(input: {
   });
 }
 
+export function buildTeamPatrolResult(input: {
+  cwd: string;
+  taskId: string;
+  mode: TeamPatrolMode;
+  requestedTeamRunId: string;
+}) {
+  const report = buildTeamPatrolReport(input);
+  return makeResult({
+    ok: true,
+    command: 'team',
+    cwd: input.cwd,
+    messages: [
+      message(report.safeToProceed ? 'info' : 'warning', report.safeToProceed ? 'ATM_TEAM_PATROL_READY' : 'ATM_TEAM_PATROL_FINDINGS', report.safeToProceed
+        ? 'Team patrol completed with no blocking findings. No runtime or history state was written.'
+        : 'Team patrol found follow-up items. No runtime or history state was written.', {
+        taskId: input.taskId,
+        mode: input.mode,
+        severity: report.severity,
+        findingCount: report.findings.length
+      })
+    ],
+    evidence: report
+  });
+}
+
+export function buildTeamPatrolReport(input: {
+  cwd: string;
+  taskId: string;
+  mode: TeamPatrolMode;
+  requestedTeamRunId: string;
+}) {
+  const findings: TeamPatrolFinding[] = [];
+  const taskPath = path.join(input.cwd, '.atm', 'history', 'tasks', `${input.taskId}.json`);
+  const evidencePath = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.json`);
+  const closurePacketPath = path.join(input.cwd, '.atm', 'history', 'closure-packets', `${input.taskId}.json`);
+  const taskExists = existsSync(taskPath);
+  const evidenceExists = existsSync(evidencePath);
+  const closurePacketExists = existsSync(closurePacketPath);
+  const task = taskExists ? readJsonFile(taskPath, 'ATM_TEAM_TASK_INVALID') : null;
+  const taskSummary = task ? summarizeTask(input.taskId, task) : { taskId: input.taskId, title: input.taskId, status: null, targetRepo: null, sourcePlanPath: null };
+  const writePaths = task ? deriveWritePaths(task, input.cwd) : [];
+  const largeScriptRisk = evaluateLargeScriptRisk(writePaths);
+  const teamRun = input.requestedTeamRunId ? readTeamRun(input.cwd, input.requestedTeamRunId) : findLatestTeamRunForTask(input.cwd, input.taskId);
+
+  if (!taskExists) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker',
+      code: 'ATM_TEAM_PATROL_TASK_MISSING',
+      category: 'artifact-gap',
+      summary: `Task ledger is missing for ${input.taskId}.`,
+      suggestedCommand: `node atm.mjs next --task ${quoteCliValue(input.taskId)} --json`,
+      details: { path: path.relative(input.cwd, taskPath).replace(/\\/g, '/') }
+    }));
+  }
+
+  if (!evidenceExists) {
+    findings.push(teamPatrolFinding({
+      level: input.mode === 'close-preflight' ? 'blocker' : 'warning',
+      code: 'ATM_TEAM_PATROL_EVIDENCE_MISSING',
+      category: 'evidence',
+      summary: `Command-backed evidence file is not present for ${input.taskId}.`,
+      suggestedCommand: `node atm.mjs evidence run --task ${quoteCliValue(input.taskId)} --actor <actor> -- <validator-command>`,
+      details: { path: path.relative(input.cwd, evidencePath).replace(/\\/g, '/') }
+    }));
+  }
+
+  if (input.mode === 'close-preflight' && !closurePacketExists) {
+    findings.push(teamPatrolFinding({
+      level: 'warning',
+      code: 'ATM_TEAM_PATROL_CLOSURE_PACKET_MISSING',
+      category: 'artifact-gap',
+      summary: `Closure packet has not been materialized for ${input.taskId}.`,
+      suggestedCommand: `node atm.mjs taskflow pre-close --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
+      details: { path: path.relative(input.cwd, closurePacketPath).replace(/\\/g, '/') }
+    }));
+  }
+
+  if (!teamRun) {
+    findings.push(teamPatrolFinding({
+      level: 'info',
+      code: 'ATM_TEAM_PATROL_NO_TEAM_RUN',
+      category: 'runtime-mode',
+      summary: 'No matching active team runtime record was found; patrol continues from ledger artifacts only.',
+      suggestedCommand: `node atm.mjs team start --task ${quoteCliValue(input.taskId)} --actor <actor> --json`
+    }));
+  } else {
+    findings.push(...buildTeamRunPatrolFindings(teamRun, input));
+  }
+
+  if (input.mode === 'big-script' || largeScriptRisk.level === 'high') {
+    findings.push(teamPatrolFinding({
+      level: largeScriptRisk.level === 'high' ? 'warning' : 'info',
+      code: largeScriptRisk.level === 'high' ? 'ATM_TEAM_PATROL_LARGE_SCRIPT_RISK' : 'ATM_TEAM_PATROL_SCOPE_LOW_RISK',
+      category: 'scope',
+      summary: largeScriptRisk.level === 'high'
+        ? 'Task write scope has large-script or hot-file risk and should receive extra review.'
+        : 'Task write scope does not exceed the large-script threshold.',
+      suggestedCommand: largeScriptRisk.level === 'high'
+        ? `node atm.mjs team plan --task ${quoteCliValue(input.taskId)} --json`
+        : null,
+      details: { writePaths, largeScriptRisk }
+    }));
+  }
+
+  const severity = summarizePatrolSeverity(findings);
+  return {
+    schemaId: 'atm.teamPatrolReport.v1',
+    action: 'patrol',
+    readOnly: true,
+    runtimeWritten: false,
+    historyWritten: false,
+    agentsSpawned: false,
+    mutations: [],
+    taskId: input.taskId,
+    runId: `patrol-${input.taskId}-${input.mode}`,
+    patrolTeam: ['atomic-police', 'scope-guardian', 'evidence-auditor', 'runtime-sentinel'],
+    mode: input.mode,
+    severity,
+    safeToProceed: severity !== 'blocker',
+    findings,
+    suggestedCommand: suggestedPatrolCommand(input.taskId, input.mode, severity),
+    followUp: buildTeamPatrolFollowUp(input.taskId, input.mode, findings),
+    task: taskSummary,
+    inspected: {
+      taskPath: path.relative(input.cwd, taskPath).replace(/\\/g, '/'),
+      evidencePath: path.relative(input.cwd, evidencePath).replace(/\\/g, '/'),
+      closurePacketPath: path.relative(input.cwd, closurePacketPath).replace(/\\/g, '/'),
+      teamRunId: teamRun?.teamRunId ?? null,
+      teamRunPath: teamRun?.teamRunId ? `.atm/runtime/team-runs/${teamRun.teamRunId}.json` : null,
+      runtimeRoot: '.atm/runtime',
+      historyRoot: '.atm/history'
+    }
+  };
+}
+
 function listTeamRuns(cwd: string) {
   const directory = teamRunsDirectory(cwd);
   if (!existsSync(directory)) return [];
@@ -1848,6 +2010,13 @@ function listTeamRuns(cwd: string) {
     .filter((entry) => entry.endsWith('.json'))
     .sort((left, right) => left.localeCompare(right))
     .map((entry) => readJsonFile(path.join(directory, entry), 'ATM_TEAM_RUN_INVALID'));
+}
+
+function findLatestTeamRunForTask(cwd: string, taskId: string) {
+  const runs = listTeamRuns(cwd)
+    .filter((run: any) => run.taskId === taskId)
+    .sort((left: any, right: any) => String(right.updatedAt ?? right.createdAt ?? '').localeCompare(String(left.updatedAt ?? left.createdAt ?? '')));
+  return runs[0] ?? null;
 }
 
 function readTeamRun(cwd: string, teamRunId: string) {
@@ -1859,6 +2028,109 @@ function readTeamRun(cwd: string, teamRunId: string) {
     });
   }
   return readJsonFile(filePath, 'ATM_TEAM_RUN_INVALID');
+}
+
+function normalizeTeamPatrolMode(value: unknown): TeamPatrolMode {
+  const mode = String(value ?? 'claim-preflight').trim();
+  if (['claim-preflight', 'close-preflight', 'big-script', 'daily-noon'].includes(mode)) {
+    return mode as TeamPatrolMode;
+  }
+  throw new CliError('ATM_TEAM_PATROL_MODE_INVALID', `Unsupported team patrol mode: ${mode}`, {
+    exitCode: 2,
+    details: { supportedModes: ['claim-preflight', 'close-preflight', 'big-script', 'daily-noon'] }
+  });
+}
+
+function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode: TeamPatrolMode }): TeamPatrolFinding[] {
+  const findings: TeamPatrolFinding[] = [];
+  if (teamRun.executionMode !== 'manual-team') {
+    findings.push(teamPatrolFinding({
+      level: 'warning',
+      code: 'ATM_TEAM_PATROL_RUNTIME_MODE_UNEXPECTED',
+      category: 'runtime-mode',
+      summary: `Team run ${teamRun.teamRunId} is not in manual-team execution mode.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      details: { executionMode: teamRun.executionMode ?? null }
+    }));
+  }
+  if (teamRun.agentsSpawned === true) {
+    findings.push(teamPatrolFinding({
+      level: 'warning',
+      code: 'ATM_TEAM_PATROL_AGENTS_SPAWNED',
+      category: 'runtime-mode',
+      summary: `Team run ${teamRun.teamRunId} reports spawned agents; coordinator should verify advisory role boundaries.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`
+    }));
+  }
+  const remaining = extractRetryBudgetRemaining(teamRun);
+  if (remaining !== null && remaining <= 0) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker',
+      code: 'ATM_TEAM_PATROL_RETRY_BUDGET_EXHAUSTED',
+      category: 'retry-budget',
+      summary: `Team run ${teamRun.teamRunId} has no retry budget remaining.`,
+      suggestedCommand: `node atm.mjs team patrol --task ${quoteCliValue(input.taskId)} --mode close-preflight --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      details: { retryBudgetRemaining: remaining }
+    }));
+  }
+  const reworkStatus = String(teamRun.reworkRoute?.status ?? teamRun.reworkStatus ?? '').trim();
+  if (['needs-rework', 'blocked', 'stale'].includes(reworkStatus)) {
+    findings.push(teamPatrolFinding({
+      level: reworkStatus === 'blocked' ? 'blocker' : 'warning',
+      code: 'ATM_TEAM_PATROL_REWORK_ROUTE_ATTENTION',
+      category: 'rework-state',
+      summary: `Team run ${teamRun.teamRunId} rework route is ${reworkStatus}.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      details: { reworkStatus }
+    }));
+  }
+  return findings;
+}
+
+function extractRetryBudgetRemaining(teamRun: any): number | null {
+  const candidates = [
+    teamRun.retryBudget?.remaining,
+    teamRun.reworkRoute?.retryBudgetRemaining,
+    teamRun.reworkRoute?.retryBudget?.remaining
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+function teamPatrolFinding(input: TeamPatrolFinding): TeamPatrolFinding {
+  return input;
+}
+
+function summarizePatrolSeverity(findings: TeamPatrolFinding[]): TeamPatrolFindingLevel {
+  if (findings.some((finding) => finding.level === 'blocker')) return 'blocker';
+  if (findings.some((finding) => finding.level === 'warning')) return 'warning';
+  return 'info';
+}
+
+function suggestedPatrolCommand(taskId: string, mode: TeamPatrolMode, severity: TeamPatrolFindingLevel) {
+  if (severity === 'blocker') {
+    return `node atm.mjs taskflow pre-close --task ${quoteCliValue(taskId)} --actor <actor> --json`;
+  }
+  if (mode === 'claim-preflight') {
+    return `node atm.mjs next --claim --task ${quoteCliValue(taskId)} --actor <actor> --json`;
+  }
+  if (mode === 'close-preflight') {
+    return `node atm.mjs taskflow pre-close --task ${quoteCliValue(taskId)} --actor <actor> --json`;
+  }
+  return `node atm.mjs team patrol --task ${quoteCliValue(taskId)} --mode ${mode} --json`;
+}
+
+function buildTeamPatrolFollowUp(taskId: string, mode: TeamPatrolMode, findings: TeamPatrolFinding[]) {
+  const commands = uniqueStrings(findings.map((finding) => finding.suggestedCommand).filter((entry): entry is string => Boolean(entry)));
+  if (commands.length > 0) return commands;
+  if (mode === 'close-preflight') {
+    return [`node atm.mjs taskflow pre-close --task ${quoteCliValue(taskId)} --actor <actor> --json`];
+  }
+  return [`node atm.mjs team plan --task ${quoteCliValue(taskId)} --json`];
 }
 
 function compactTeamRun(run: any) {

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
@@ -856,6 +856,86 @@ async function main() {
     return;
   }
 
+  if (taskCase === 'patrol-report') {
+    const cwd = path.join(process.cwd(), '.atm-temp', 'validate-team-patrol');
+    const taskId = 'TASK-PATROL-0001';
+    const teamRunId = 'team-patrol-fixture';
+    rmSync(cwd, { recursive: true, force: true });
+    mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
+    mkdirSync(path.join(cwd, '.atm', 'runtime', 'team-runs'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), `${JSON.stringify({
+      schemaId: 'atm.taskLedger.v1',
+      workItemId: taskId,
+      title: 'Patrol report fixture',
+      status: 'running',
+      planningRepo: 'AI-Atomic-Framework',
+      targetRepo: 'AI-Atomic-Framework',
+      targetAllowedFiles: [
+        'packages/cli/src/commands/team.ts',
+        'packages/cli/src/commands/command-specs/team.spec.ts',
+        'scripts/validate-team-agents.ts',
+        'atomic_workbench/atomization-coverage/path-to-atom-map.json'
+      ],
+      deliverables: ['packages/cli/src/commands/team.ts'],
+      validators: ['node --strip-types scripts/validate-team-agents.ts --case patrol-report'],
+      acceptance: ['Patrol output is read-only and reports runtime findings.']
+    }, null, 2)}\n`, 'utf8');
+    writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRunId}.json`), `${JSON.stringify({
+      schemaId: 'atm.teamRun.v1',
+      teamRunId,
+      taskId,
+      actorId: 'captain',
+      status: 'active',
+      executionMode: 'manual-team',
+      agentsSpawned: false,
+      retryBudget: { remaining: 0, limit: 2 },
+      reworkRoute: { status: 'needs-rework' },
+      createdAt: '2026-06-18T00:00:00.000Z',
+      updatedAt: '2026-06-18T00:00:00.000Z'
+    }, null, 2)}\n`, 'utf8');
+
+    try {
+      const beforeHistory = listRelativeFiles(path.join(cwd, '.atm', 'history'));
+      const beforeRuntime = listRelativeFiles(path.join(cwd, '.atm', 'runtime'));
+      const patrol = await runTeam(['patrol', '--task', taskId, '--team', teamRunId, '--cwd', cwd, '--json']);
+      const evidence = patrol.evidence as any;
+      assert.equal(patrol.ok, true);
+      assert.equal(evidence?.schemaId, 'atm.teamPatrolReport.v1');
+      assert.equal(evidence?.action, 'patrol');
+      assert.equal(evidence?.readOnly, true);
+      assert.equal(evidence?.runtimeWritten, false);
+      assert.equal(evidence?.historyWritten, false);
+      assert.equal(evidence?.agentsSpawned, false);
+      assert.deepEqual(evidence?.mutations, []);
+      assert.equal(evidence?.taskId, taskId);
+      assert.equal(evidence?.runId, `patrol-${taskId}-claim-preflight`);
+      assert.ok(Array.isArray(evidence?.patrolTeam) && evidence.patrolTeam.includes('atomic-police'));
+      assert.equal(evidence?.mode, 'claim-preflight');
+      assert.equal(evidence?.severity, 'blocker');
+      assert.equal(evidence?.safeToProceed, false);
+      assert.ok(evidence?.findings?.some((finding: any) => finding.level === 'blocker' && finding.category === 'retry-budget'));
+      assert.ok(evidence?.findings?.some((finding: any) => finding.level === 'warning' && finding.category === 'rework-state'));
+      assert.ok(evidence?.findings?.some((finding: any) => finding.category === 'scope'));
+      assert.equal(typeof evidence?.suggestedCommand, 'string');
+      assert.ok(Array.isArray(evidence?.followUp) && evidence.followUp.length > 0);
+      assert.deepEqual(listRelativeFiles(path.join(cwd, '.atm', 'history')), beforeHistory);
+      assert.deepEqual(listRelativeFiles(path.join(cwd, '.atm', 'runtime')), beforeRuntime);
+
+      for (const mode of ['close-preflight', 'big-script', 'daily-noon']) {
+        const modeResult = await runTeam(['patrol', '--task', taskId, '--mode', mode, '--cwd', cwd, '--json']);
+        const modeEvidence = modeResult.evidence as any;
+        assert.equal(modeResult.ok, true);
+        assert.equal(modeEvidence?.mode, mode);
+        assert.deepEqual(modeEvidence?.mutations, []);
+      }
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+
+    console.log('[validate-team-agents] ok (patrol-report)');
+    return;
+  }
+
   fail(`unsupported or missing --case value: ${taskCase}`);
 }
 
@@ -943,6 +1023,25 @@ function safeBrokerLane(): any {
     stewardId: null,
     composerPath: null
   };
+}
+
+function listRelativeFiles(root: string): string[] {
+  if (!existsSync(root)) return [];
+  const files: string[] = [];
+  const visit = (current: string) => {
+    for (const entry of readdirSync(current)) {
+      const fullPath = path.join(current, entry);
+      const relative = path.relative(root, fullPath).replace(/\\/g, '/');
+      const stat = statSync(fullPath);
+      if (stat.isDirectory()) {
+        visit(fullPath);
+      } else {
+        files.push(relative);
+      }
+    }
+  };
+  visit(root);
+  return files.sort((left, right) => left.localeCompare(right));
 }
 
 function fail(message: string): never {
