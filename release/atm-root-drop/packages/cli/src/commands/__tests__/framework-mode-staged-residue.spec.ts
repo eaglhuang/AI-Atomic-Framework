@@ -98,9 +98,64 @@ async function testCrossFileConsistency() {
   }
 }
 
+async function testCrossFileConsistencyIgnoresTemplateLiteralImportLookalikes() {
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-consistency-lookalike-test-'));
+  try {
+    initGitRepo(tempRoot);
+
+    const closeOrchestrationFile = 'packages/cli/src/commands/taskflow/close-orchestration.ts';
+    const taskflowFile = 'packages/cli/src/commands/taskflow.ts';
+    mkdirSync(path.join(tempRoot, 'packages/cli/src/commands/taskflow'), { recursive: true });
+
+    writeFileSync(
+      path.join(tempRoot, closeOrchestrationFile),
+      'export const alpha = 1;\n',
+      'utf8'
+    );
+    writeFileSync(
+      path.join(tempRoot, taskflowFile),
+      [
+        'import { alpha } from "./taskflow/close-orchestration.ts";',
+        'const lookalike = `',
+        'import { validatorSurfaces } from "./taskflow/close-orchestration.ts";',
+        '`;',
+        'console.log(alpha, lookalike);',
+        ''
+      ].join('\n'),
+      'utf8'
+    );
+    execFileSync('git', ['add', closeOrchestrationFile, taskflowFile], { cwd: tempRoot });
+    execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempRoot });
+
+    writeFileSync(
+      path.join(tempRoot, closeOrchestrationFile),
+      [
+        'export const alpha = 1;',
+        'export const validatorSurfaces = [',
+        '  "runtime"',
+        '];',
+        ''
+      ].join('\n'),
+      'utf8'
+    );
+
+    execFileSync('git', ['add', taskflowFile], { cwd: tempRoot });
+
+    const hookResult = await runHook(['pre-commit', '--cwd', tempRoot]) as any;
+    assert.equal(hookResult.ok, true, 'template literal lookalike imports must not trigger cross-file inconsistency');
+    const hasConsistencyError = hookResult.evidence.blockingFindings.some(
+      (finding: any) => finding.code === 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY'
+    );
+    assert.ok(!hasConsistencyError, 'template literal lookalike import text must be ignored');
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
+
 async function main() {
   await testSessionResidueWarnings();
   await testCrossFileConsistency();
+  await testCrossFileConsistencyIgnoresTemplateLiteralImportLookalikes();
   console.log('[framework-mode-staged-residue] all assertions passed.');
 }
 

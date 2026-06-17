@@ -1,0 +1,62 @@
+import { validateAtmCorePatchEnvelope } from './patch-envelope-atm-core.js';
+import { resolveRunnerRef } from './runner-ref-store.js';
+export function submitRunnerPatch(input) {
+    const base = {
+        schemaId: 'atm.runnerSubmitDecision.v1',
+        envelopeId: input.envelope.base.envelopeId
+    };
+    const structural = validateAtmCorePatchEnvelope(input.envelope);
+    if (!structural.ok) {
+        return {
+            ...base,
+            verdict: 'reject-malformed',
+            reason: structural.reason,
+            resolvedTargetRefHead: null,
+            suggestedNextAction: 'fix the patch envelope and resubmit'
+        };
+    }
+    const target = input.envelope.atmCore.targetRunnerRef;
+    const frozen = new Set(input.frozenRefs ?? []);
+    if (target && frozen.has(target)) {
+        return {
+            ...base,
+            verdict: 'freeze-await-rebase',
+            reason: `target ref ${target} is currently frozen`,
+            resolvedTargetRefHead: null,
+            suggestedNextAction: 'await freeze release; rebase onto new target head when resumed'
+        };
+    }
+    // Stale-base check: declared source commit (if any) must equal the current
+    // resolved head of the target ref, otherwise the agent has been working off
+    // an older base and the patch may not apply cleanly.
+    if (target) {
+        const kind = target.startsWith('in-dev/') ? 'control' : 'version';
+        const head = resolveRunnerRef(input.refStore, target, kind);
+        const resolvedHead = head?.sourceCommit ?? null;
+        const declared = input.envelope.atmCore.declaredSourceCommit;
+        if (declared && resolvedHead && declared !== resolvedHead) {
+            return {
+                ...base,
+                verdict: 'reject-stale-base',
+                reason: `declared source commit ${declared} is behind target ref head ${resolvedHead}`,
+                resolvedTargetRefHead: resolvedHead,
+                suggestedNextAction: 'rebase patch envelope on the latest target head and resubmit'
+            };
+        }
+        return {
+            ...base,
+            verdict: 'accept',
+            reason: 'patch envelope passes admission',
+            resolvedTargetRefHead: resolvedHead,
+            suggestedNextAction: 'forward to steward rebuild lane'
+        };
+    }
+    // No target ref — patch is a non-publishing patch-only submit; allow.
+    return {
+        ...base,
+        verdict: 'accept',
+        reason: 'non-publishing patch admitted',
+        resolvedTargetRefHead: null,
+        suggestedNextAction: 'forward to steward rebuild lane'
+    };
+}

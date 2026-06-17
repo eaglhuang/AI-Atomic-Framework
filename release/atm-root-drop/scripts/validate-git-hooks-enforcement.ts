@@ -594,6 +594,17 @@ try {
   runGit(closureRepo, ['commit', '--no-verify', '-m', 'repair mismatched closure packet']);
   const repairedClosureRange = runCli(closureRepo, ['guard', 'commit-range', '--base', 'HEAD~2', '--head', 'HEAD', '--json'], { allowFailure: true });
   assert(repairedClosureRange.status === 0, `commit-range guard must accept an explicit closure packet repair follow-up\nstdout:\n${repairedClosureRange.stdout}\nstderr:\n${repairedClosureRange.stderr}`);
+
+  const protectedOverrideAudit = parsePayload(runCli(root, ['emergency', 'audit', '--json']));
+  assert(protectedOverrideAudit.ok === true, 'emergency audit must list protected override audit events');
+  assert(Array.isArray(protectedOverrideAudit.evidence?.events), 'emergency audit evidence must include events array');
+  const blockedNoVerify = parsePayload(runCli(root, ['git', 'commit', '--actor', 'fixture-agent', '--message', 'blocked no-verify', '--no-verify', '--json'], { allowFailure: true }));
+  assert(blockedNoVerify.ok === false, 'git commit --no-verify without emergency approval must fail closed');
+  assert(
+    JSON.stringify(blockedNoVerify.messages ?? []).includes('ATM_EMERGENCY_LANE_APPROVAL_REQUIRED')
+      || JSON.stringify(blockedNoVerify).includes('ATM_EMERGENCY_LANE_APPROVAL_REQUIRED'),
+    'blocked git commit --no-verify must surface emergency approval requirement'
+  );
 } finally {
   if (!process.exitCode) {
     rmSync(tempRoot, { recursive: true, force: true });

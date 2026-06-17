@@ -61,6 +61,24 @@ const generated = await plugin.generate!(intent);
 assert.equal(generated.taskId, 'TASK-AAO-9999');
 assert.ok(generated.content);
 
+const defaultIntent = {
+  cwd: process.cwd(),
+  templateKey: 'aao-l2-split',
+  fields: {
+    task_id: 'TASK-AAO-7777',
+    title: 'Default Dependency Template',
+    scope_path: 'packages/cli/src/commands/tasks.ts',
+    test_path: 'tests/cli/tasks-new.test.ts',
+    atom_id: 'atm.markdown-task-source-plugin',
+    capability: 'Template generation',
+    goal: 'Default opener cards should not invent bogus dependencies.',
+    sourcePath: 'tasks/TASK-AAO-7777.task.md'
+  }
+};
+const defaultGenerated = await plugin.generate!(defaultIntent);
+assert.match(defaultGenerated.content, /depends_on:\s*\[\]/m, 'default generated cards must use empty depends_on instead of placeholder task ids');
+assert.ok(defaultGenerated.content.includes('validate:git-head-evidence'), 'default generated cards must list validate:git-head-evidence');
+
 // 進行反向解析 (Round-trip)
 const parsedBack = await plugin.parse!({
   cwd: process.cwd(),

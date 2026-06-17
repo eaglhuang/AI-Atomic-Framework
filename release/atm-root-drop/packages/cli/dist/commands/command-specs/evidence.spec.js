@@ -2,7 +2,7 @@ import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
     name: 'evidence',
-    summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, or author historical-batch envelopes that later feed the taskflow close / tasks close operator lane.',
+    summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, or author historical-batch envelopes that later feed the taskflow close / tasks close operator lane. Successful fresh evidence updates the per-task bundle manifest at .atm/history/evidence/<taskId>.bundle-manifest.json.',
     positional: [
         { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | historical-batch', required: true }
     ],

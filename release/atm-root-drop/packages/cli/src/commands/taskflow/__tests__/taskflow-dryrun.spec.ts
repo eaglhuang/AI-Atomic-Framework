@@ -367,6 +367,35 @@ assert.ok(dryRunClose.evidence.governedCommitBundle.planningRepo.stageFiles.incl
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.targetRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage target repo');
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.planningRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage planning repo');
 
+const secondCloseHintFixture = await makeDualRepoCloseFixture('second-close-hint', { closePlanningStatus: 'planned' });
+const secondCloseHintDryRun = await runTaskflow([
+  'close',
+  '--cwd', secondCloseHintFixture.targetRepo,
+  '--profile', secondCloseHintFixture.profilePath,
+  '--task', secondCloseHintFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(secondCloseHintDryRun.ok, true, 'post-delivery second close dry-run must succeed');
+assert.equal(
+  secondCloseHintDryRun.evidence.closebackPlan.historicalDeliveryGate.required,
+  true,
+  'post-delivery second close must require historical delivery before write'
+);
+const historicalDeliveryBlocker = secondCloseHintDryRun.evidence.writeReadinessHint.blockers.find(
+  (entry: { code: string }) => entry.code === 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED'
+);
+assert.ok(historicalDeliveryBlocker, 'post-delivery second close must surface historical-delivery blocker');
+assert.ok(
+  historicalDeliveryBlocker.requiredCommand.includes(secondCloseHintFixture.deliveryCommit),
+  'historical-delivery blocker must promote the detected delivery SHA in requiredCommand'
+);
+assert.equal(
+  secondCloseHintDryRun.evidence.writeReadinessHint.nextCommand,
+  historicalDeliveryBlocker.requiredCommand,
+  'writeReadinessHint.nextCommand must match the promoted historical-delivery command'
+);
+
 const normalLaneFixture = await makeDualRepoCloseFixture('normal-lane-planned', { closePlanningStatus: 'planned' });
 const normalLaneDryRun = await runTaskflow([
   'close',
@@ -443,7 +472,10 @@ const batchLaneDryRun = await runTaskflow([
 assert.equal(batchLaneDryRun.ok, true, 'taskflow close dry-run must accept historical-batch as a close-ready operator source');
 assert.equal(batchLaneDryRun.evidence.closeMode, 'normal-close', 'historical-batch close should behave like a normal close once the matched delivery commits satisfy the historical delivery gate');
 assert.equal(batchLaneDryRun.evidence.closebackPlan.backendSurface, 'tasks-close', 'historical-batch close should route through tasks-close when the live ledger is still active');
-assert.equal(batchLaneDryRun.evidence.writeReadinessHint.status, 'ready', 'historical-batch dry-run should satisfy the historical delivery gate');
+assert.ok(
+  batchLaneDryRun.evidence.writeReadinessHint.blockers.every((entry: any) => entry.code !== 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED'),
+  'historical-batch dry-run should clear the historical-delivery gate before write'
+);
 assert.equal(batchLaneDryRun.evidence.closebackPlan.historicalDeliveryGate.required, false, 'historical-batch dry-run should clear the historical-delivery gate before write');
 assert.deepEqual(batchLaneDryRun.evidence.governedCommitBundle.targetDeliveryFiles, [], 'historical-batch close should reuse matched commits rather than stage fresh deliverables');
 const batchLaneClose = await runTaskflow([
@@ -513,7 +545,10 @@ const legacyBatchDryRun = await runTaskflow([
   '--json'
 ]) as any;
 assert.equal(legacyBatchDryRun.ok, true, 'historical-batch close must accept imported legacy scope-only tasks when every scope entry is file-shaped');
-assert.equal(legacyBatchDryRun.evidence.writeReadinessHint.status, 'ready', 'legacy scope-only historical-batch close should synthesize a canonical deliverable boundary');
+assert.ok(
+  legacyBatchDryRun.evidence.writeReadinessHint.blockers.every((entry: any) => entry.code !== 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED'),
+  'legacy scope-only historical-batch close should synthesize a canonical deliverable boundary'
+);
 
 const legacyHistoricalCloseFixture = await makeDualRepoCloseFixture('historical-batch-planned-ledger', { closePlanningStatus: 'planned' });
 const legacyHistoricalTaskPath = path.join(legacyHistoricalCloseFixture.targetRepo, '.atm/history/tasks', `${legacyHistoricalCloseFixture.taskId}.json`);
@@ -649,37 +684,41 @@ assert.ok(
 const targetIndexContaminationFixture = await makeDualRepoCloseFixture('target-index-contamination');
 writeText(path.join(targetIndexContaminationFixture.targetRepo, 'pre-staged-target.txt'), 'must not commit\n');
 execFileSync('git', ['add', 'pre-staged-target.txt'], { cwd: targetIndexContaminationFixture.targetRepo, stdio: 'ignore' });
-await assert.rejects(
-  () => runTaskflow([
-    'close',
-    '--cwd', targetIndexContaminationFixture.targetRepo,
-    '--profile', targetIndexContaminationFixture.profilePath,
-    '--task', targetIndexContaminationFixture.taskId,
-    '--actor', 'validator',
-    '--historical-delivery', targetIndexContaminationFixture.deliveryCommit,
-    '--write',
-    '--json'
-  ]),
-  (err: any) => err.code === 'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED' && err.details?.indexIsolation?.unexpectedStagedFiles?.includes('pre-staged-target.txt'),
-  'target repo unrelated pre-staged files must fail closed before auto-commit'
+const targetIndexContamination = await runTaskflow([
+  'close',
+  '--cwd', targetIndexContaminationFixture.targetRepo,
+  '--profile', targetIndexContaminationFixture.profilePath,
+  '--task', targetIndexContaminationFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', targetIndexContaminationFixture.deliveryCommit,
+  '--write',
+  '--json'
+]) as any;
+assert.equal(targetIndexContamination.ok, false, 'target repo unrelated pre-staged files must fail closed before auto-commit');
+assert.equal(
+  targetIndexContamination.evidence.closeWriteTransaction.failureCode,
+  'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED',
+  'index isolation failures must surface through closeWriteTransaction'
 );
 
 const planningIndexContaminationFixture = await makeDualRepoCloseFixture('planning-index-contamination');
 writeText(path.join(planningIndexContaminationFixture.planningRepo, 'docs/tasks/pre-staged-planning.md'), 'must not commit\n');
 execFileSync('git', ['add', 'docs/tasks/pre-staged-planning.md'], { cwd: planningIndexContaminationFixture.planningRepo, stdio: 'ignore' });
-await assert.rejects(
-  () => runTaskflow([
-    'close',
-    '--cwd', planningIndexContaminationFixture.targetRepo,
-    '--profile', planningIndexContaminationFixture.profilePath,
-    '--task', planningIndexContaminationFixture.taskId,
-    '--actor', 'validator',
-    '--historical-delivery', planningIndexContaminationFixture.deliveryCommit,
-    '--write',
-    '--json'
-  ]),
-  (err: any) => err.code === 'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED' && err.details?.indexIsolation?.unexpectedStagedFiles?.includes('docs/tasks/pre-staged-planning.md'),
-  'planning repo unrelated pre-staged files must fail closed before auto-commit'
+const planningIndexContamination = await runTaskflow([
+  'close',
+  '--cwd', planningIndexContaminationFixture.targetRepo,
+  '--profile', planningIndexContaminationFixture.profilePath,
+  '--task', planningIndexContaminationFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', planningIndexContaminationFixture.deliveryCommit,
+  '--write',
+  '--json'
+]) as any;
+assert.equal(planningIndexContamination.ok, false, 'planning repo unrelated pre-staged files must fail closed before auto-commit');
+assert.equal(
+  planningIndexContamination.evidence.closeWriteTransaction.failureCode,
+  'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED',
+  'planning index isolation failures must surface through closeWriteTransaction'
 );
 
 const expectedPreStagedFixture = await makeDualRepoCloseFixture('expected-pre-staged');
@@ -1425,5 +1464,71 @@ if (!outOfScopeCloseWithWaiver.ok) {
   console.error('[DEBUG-TEST-FAIL] outOfScopeCloseWithWaiver failed:', JSON.stringify(outOfScopeCloseWithWaiver, null, 2));
 }
 assert.equal(outOfScopeCloseWithWaiver.ok, true);
+
+const preCloseForeignFixture = await makeDualRepoCloseFixture('precheck-foreign-staged');
+writeText(path.join(preCloseForeignFixture.targetRepo, '.atm/history/tasks/TASK-FOREIGN-0001.json'), '{"workItemId":"TASK-FOREIGN-0001"}\n');
+execFileSync('git', ['add', '.atm/history/tasks/TASK-FOREIGN-0001.json'], { cwd: preCloseForeignFixture.targetRepo, stdio: 'ignore' });
+const preCloseForeign = await runTaskflow([
+  'pre-close',
+  '--cwd', preCloseForeignFixture.targetRepo,
+  '--profile', preCloseForeignFixture.profilePath,
+  '--task', preCloseForeignFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', preCloseForeignFixture.deliveryCommit,
+  '--json'
+]) as any;
+assert.equal(preCloseForeign.command, 'taskflow pre-close');
+assert.equal(preCloseForeign.schemaId, 'atm.taskflowPreCloseResult.v1');
+assert.equal(preCloseForeign.ok, false, 'foreign staged governance must block pre-close');
+assert.ok(preCloseForeign.evidence.historicalClosePreflight.blockers.some((entry: any) => entry.id === 'unexpectedStagedTasks'));
+assert.deepEqual(preCloseForeign.evidence.historicalClosePreflight.unexpectedStagedTasks.map((entry: any) => entry.taskId), ['TASK-FOREIGN-0001']);
+assert.ok(preCloseForeign.evidence.historicalClosePreflight.writeRollbackSummary.operatorWarnings.some((entry: string) => entry.includes('silently unstage')));
+
+const preCloseNonBundleFixture = await makeDualRepoCloseFixture('precheck-nonbundle-staged');
+writeText(path.join(preCloseNonBundleFixture.targetRepo, 'packages/cli/src/commands/hook-hotfix.ts'), 'export const hotfix = true;\n');
+execFileSync('git', ['add', 'packages/cli/src/commands/hook-hotfix.ts'], { cwd: preCloseNonBundleFixture.targetRepo, stdio: 'ignore' });
+const preCloseNonBundle = await runTaskflow([
+  'pre-close',
+  '--cwd', preCloseNonBundleFixture.targetRepo,
+  '--profile', preCloseNonBundleFixture.profilePath,
+  '--task', preCloseNonBundleFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', preCloseNonBundleFixture.deliveryCommit,
+  '--json'
+]) as any;
+assert.equal(preCloseNonBundle.ok, false, 'non-bundle staged source files must block pre-close');
+assert.ok(preCloseNonBundle.evidence.historicalClosePreflight.blockers.some((entry: any) => entry.id === 'unexpectedStagedNonBundleFiles'));
+assert.ok(
+  preCloseNonBundle.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_PRECLOSE_UNEXPECTED_STAGED_FILES'),
+  'dry-run writeReadinessHint must surface non-bundle staged blockers'
+);
+assert.ok(
+  preCloseNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.restoreCommand?.includes('restore --staged'),
+  'non-bundle staged remediation must include git restore --staged command'
+);
+
+const preCloseMixed = await runTaskflow([
+  'pre-close',
+  '--cwd', outOfScopeFixture.targetRepo,
+  '--profile', outOfScopeFixture.profilePath,
+  '--task', outOfScopeFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', deliveryCommitSha,
+  '--json'
+]) as any;
+assert.equal(preCloseMixed.ok, false, 'mixed historical delivery without waiver must block pre-close');
+assert.ok(preCloseMixed.evidence.historicalClosePreflight.blockers.some((entry: any) => entry.id === 'mixedDeliveryCommit'));
+
+const closeDryRunMixed = await runTaskflow([
+  'close',
+  '--cwd', outOfScopeFixture.targetRepo,
+  '--profile', outOfScopeFixture.profilePath,
+  '--task', outOfScopeFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', deliveryCommitSha,
+  '--json'
+]) as any;
+assert.equal(closeDryRunMixed.evidence.historicalClosePreflight.schemaId, 'atm.historicalClosePreflight.v1');
+assert.ok(closeDryRunMixed.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT'));
 
 console.log('[taskflow-dryrun:test] ok');

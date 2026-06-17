@@ -4,7 +4,7 @@ export default defineCommandSpec({
     name: 'emergency',
     summary: 'Manage short-lived human-approved emergency maintenance leases for protected backend surfaces. Normal operators should use taskflow open/close; emergency approvals are for repair-only backend use.',
     positional: [
-        { name: 'action', summary: 'approve | show | revoke | permissions', required: true }
+        { name: 'action', summary: 'approve | show | revoke | permissions | audit', required: true }
     ],
     options: [
         commonCwdOption,
@@ -28,6 +28,7 @@ export default defineCommandSpec({
         'node atm.mjs emergency permissions --json',
         'node atm.mjs emergency approve --task TASK-CID-0043 --actor 007 --permission backend.tasks.reconcile --approval-text "Human approved TASK-CID-0043 reconcile" --reason "Historical closeback repair" --json',
         'node atm.mjs emergency show --lease EMG-TASK-CID-0043-abc123 --json',
+        'node atm.mjs emergency audit --task TASK-MAO-0037 --json',
         'node atm.mjs emergency revoke --lease EMG-TASK-CID-0043-abc123 --actor captain --json'
     ]
 });

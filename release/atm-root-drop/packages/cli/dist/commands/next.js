@@ -3051,6 +3051,14 @@ function buildAgentPackHint(status, command, reason) {
         reason
     };
 }
+function buildTaskflowCloseOperatorCommands(taskId, actor) {
+    const id = taskId || '<task-id>';
+    return {
+        preClose: `node atm.mjs taskflow pre-close --task ${id} --actor ${actor} --json`,
+        dryRun: `node atm.mjs taskflow close --task ${id} --actor ${actor} --json`,
+        write: `node atm.mjs taskflow close --task ${id} --actor ${actor} --write --json`
+    };
+}
 function buildTaskDeliveryPrinciple(input) {
     return {
         schemaId: 'atm.taskDeliveryPrinciple.v1',
@@ -3067,7 +3075,7 @@ function buildTaskDeliveryPrinciple(input) {
         ],
         nextStep: input.channel === 'batch'
             ? 'Work only on the current queue head, produce its real deliverables, then run node atm.mjs batch checkpoint --actor <id> --json.'
-            : 'Produce the task deliverables, run required validators, then close with node atm.mjs tasks close --status done.'
+            : 'Run taskflow pre-close, then taskflow close dry-run (no --write), read evidence.writeReadinessHint.blockers[].requiredCommand, then taskflow close --write.'
     };
 }
 function buildMirrorSyncNextAction(input) {
@@ -3160,6 +3168,8 @@ function buildMirrorSyncNextAction(input) {
 function buildChannelPlaybook(input) {
     const actor = input.actorPlaceholder ?? '<id>';
     const prompt = input.originalPrompt?.trim() || '<current user prompt>';
+    const taskId = input.taskId ?? '<task-id>';
+    const closeOps = buildTaskflowCloseOperatorCommands(taskId, actor);
     if (input.channel === 'fast') {
         return {
             schemaId: 'atm.channelPlaybook.v1',
@@ -3271,30 +3281,41 @@ function buildChannelPlaybook(input) {
         channel: 'normal',
         title: 'Single-task playbook',
         mustFollow: true,
-        summary: 'Use this for one explicit task card. ATM owns the claim and task close sequence.',
+        summary: 'Use this for one explicit task card. Preview close with taskflow pre-close and taskflow close dry-run before --write.',
         steps: [
             `Run: node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
             'Work only on the claimed task and its allowed files.',
             'Implement the real non-.atm deliverables.',
             'Run required validators or a focused reproducible verification command.',
             'Add command-backed evidence.',
-            `Run: node atm.mjs tasks close --task ${input.taskId ?? '<task-id>'} --actor ${actor} --status done --json`,
-            'Commit the deliverables plus matching task/evidence/task-events files.'
+            `Run: ${closeOps.preClose}`,
+            `Run: ${closeOps.dryRun} and read evidence.writeReadinessHint.blockers[].requiredCommand`,
+            `When ready: ${closeOps.write}`
         ],
         doNot: [
             'Do not manually reserve/promote/claim before next --claim.',
-            'Do not close without real non-.atm deliverables.',
+            'Do not call tasks close directly for normal closeback; taskflow close owns the operator lane.',
+            'Do not run taskflow close --write before dry-run/pre-close when blockers are unknown.',
             'Do not commit task closure separately from the deliverable it proves.'
         ],
         commandSequence: [
             `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
             '<implement task deliverables>',
-            'node atm.mjs evidence add --task <task-id> --actor <id> --kind test --freshness fresh --summary "<what passed>" --artifacts <real-files> --validators <validator-name> --command "<command>" --exit-code 0 --stdout-sha256 sha256:<hash> --stderr-sha256 sha256:<hash> --json',
-            `node atm.mjs tasks close --task ${input.taskId ?? '<task-id>'} --actor ${actor} --status done --json`,
+            'node atm.mjs evidence run --task <task-id> --actor <id> --command "<validator>" --validators "<name>" --json',
+            closeOps.preClose,
+            closeOps.dryRun,
+            closeOps.write,
             'git add <deliverables> .atm/history/tasks/<task-id>.json .atm/history/evidence/<task-id>.json .atm/history/task-events/<task-id>/',
             'git commit -m "<scope>: complete <task-id>"'
         ],
-        commitTiming: 'Commit only after tasks close succeeds.'
+        closePreview: {
+            schemaId: 'atm.taskflowClosePreviewPlaybook.v1',
+            preCloseCommand: closeOps.preClose,
+            dryRunCommand: closeOps.dryRun,
+            writeCommand: closeOps.write,
+            hintField: 'evidence.writeReadinessHint.blockers[].requiredCommand'
+        },
+        commitTiming: 'Commit only after taskflow close --write succeeds and the governed bundle is committed.'
     };
 }
 function embedTeamRecommendation(nextAction, input) {

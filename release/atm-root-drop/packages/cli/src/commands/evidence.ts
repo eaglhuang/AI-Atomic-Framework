@@ -35,6 +35,47 @@ interface EvidenceEnvelope {
   readonly evidence: readonly Record<string, unknown>[];
 }
 
+export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'atm.evidenceBundleManifest.v1';
+
+export interface EvidenceBundleManifest {
+  readonly schemaId: typeof EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID;
+  readonly taskId: string;
+  readonly updatedAt: string;
+  readonly updatedBy: string;
+  readonly freshValidationPasses: readonly string[];
+  readonly staleValidationPasses: readonly string[];
+  readonly commandRuns: readonly Record<string, unknown>[];
+  readonly artifactPaths: readonly string[];
+}
+
+export function evidenceBundleManifestRelativePath(taskId: string): string {
+  return `.atm/history/evidence/${taskId}.bundle-manifest.json`;
+}
+
+export function evidenceBundleManifestPathForTask(cwd: string, taskId: string): string {
+  return path.join(cwd, evidenceBundleManifestRelativePath(taskId));
+}
+
+export function readEvidenceBundleManifest(cwd: string, taskId: string): EvidenceBundleManifest | null {
+  const manifestPath = evidenceBundleManifestPathForTask(cwd, taskId);
+  if (!existsSync(manifestPath)) return null;
+  const parsed = JSON.parse(readFileSync(manifestPath, 'utf8')) as unknown;
+  if (!isRecord(parsed) || parsed.schemaId !== EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID) return null;
+  if (typeof parsed.taskId !== 'string' || parsed.taskId !== taskId) return null;
+  return {
+    schemaId: EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID,
+    taskId,
+    updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : new Date(0).toISOString(),
+    updatedBy: typeof parsed.updatedBy === 'string' ? parsed.updatedBy : 'unknown',
+    freshValidationPasses: readStringArray(parsed.freshValidationPasses),
+    staleValidationPasses: readStringArray(parsed.staleValidationPasses),
+    commandRuns: Array.isArray(parsed.commandRuns)
+      ? parsed.commandRuns.filter(isRecord)
+      : [],
+    artifactPaths: readStringArray(parsed.artifactPaths).map((entry) => normalizeRelativePath(entry))
+  };
+}
+
 interface CommandRunEvidenceInput {
   readonly command: string;
   readonly cwd?: string;
@@ -1051,7 +1092,17 @@ function runEvidenceAdd(argv: string[]) {
       evidence: mergedEvidence
     };
     writeEvidenceEnvelope(evidencePath, envelope);
-    return mergedEvidence;
+    const bundleManifest = upsertEvidenceBundleManifest({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId,
+      updatedAt: nowIso,
+      freshness: options.freshness,
+      validationPasses,
+      commandRuns,
+      artifactPaths: options.artifacts
+    });
+    return { mergedEvidence, bundleManifest };
   });
   return makeResult({
     ok: true,
@@ -1071,9 +1122,13 @@ function runEvidenceAdd(argv: string[]) {
       freshness: options.freshness,
       sessionId: session?.sessionId ?? null,
       evidencePath: relativePathFrom(options.cwd, evidencePath),
-      evidenceCount: nextEvidence.length,
+      evidenceCount: nextEvidence.mergedEvidence.length,
       commandRunCount: commandRuns.length,
-      commandRunCache
+      commandRunCache,
+      bundleManifestPath: nextEvidence.bundleManifest
+        ? relativePathFrom(options.cwd, evidenceBundleManifestPathForTask(options.cwd, options.taskId))
+        : null,
+      bundleManifest: nextEvidence.bundleManifest
     }
   });
 }
@@ -2296,6 +2351,96 @@ function normalizeEvidenceFreshness(value: string): EvidenceFreshness {
 
 function evidencePathForTask(cwd: string, taskId: string) {
   return path.join(cwd, '.atm', 'history', 'evidence', `${taskId}.json`);
+}
+
+function readStringArray(value: unknown): readonly string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0);
+}
+
+function hasCommandRunProofForBundle(run: CommandRunEvidenceInput): boolean {
+  return typeof run.exitCode === 'number'
+    && run.exitCode === 0
+    && typeof run.stdoutSha256 === 'string'
+    && run.stdoutSha256.length > 0
+    && typeof run.stderrSha256 === 'string'
+    && run.stderrSha256.length > 0;
+}
+
+function serializeBundleCommandRun(run: CommandRunEvidenceInput): Record<string, unknown> {
+  return {
+    command: run.command,
+    exitCode: run.exitCode,
+    stdoutSha256: run.stdoutSha256,
+    stderrSha256: run.stderrSha256,
+    validators: Array.isArray(run.validators) ? [...run.validators] : [],
+    generatedAt: run.generatedAt ?? null,
+    runnerKind: run.runnerKind ?? null,
+    sourceCommit: run.sourceCommit ?? null,
+    cached: run.cached === true
+  };
+}
+
+function upsertEvidenceBundleManifest(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  updatedAt: string;
+  freshness: EvidenceFreshness;
+  validationPasses: readonly string[];
+  commandRuns: readonly CommandRunEvidenceInput[];
+  artifactPaths: readonly string[];
+}): EvidenceBundleManifest | null {
+  if (input.validationPasses.length === 0 && input.commandRuns.length === 0 && input.artifactPaths.length === 0) {
+    return readEvidenceBundleManifest(input.cwd, input.taskId);
+  }
+
+  const existing = readEvidenceBundleManifest(input.cwd, input.taskId);
+  const freshValidationPasses = new Set(existing?.freshValidationPasses ?? []);
+  const staleValidationPasses = new Set(existing?.staleValidationPasses ?? []);
+  const commandRuns = [...(existing?.commandRuns ?? [])];
+  const artifactPaths = new Set([
+    ...(existing?.artifactPaths ?? []),
+    ...input.artifactPaths.map((entry) => normalizeRelativePath(entry)).filter(Boolean)
+  ]);
+
+  const proofBackedRuns = input.commandRuns.filter(hasCommandRunProofForBundle);
+  const treatAsFresh = input.freshness === 'fresh' && proofBackedRuns.length > 0;
+
+  for (const pass of input.validationPasses) {
+    const canonical = canonicalizeValidatorIdentity(pass);
+    if (treatAsFresh) {
+      freshValidationPasses.add(canonical);
+      staleValidationPasses.delete(canonical);
+      continue;
+    }
+    if (!freshValidationPasses.has(canonical)) {
+      staleValidationPasses.add(canonical);
+    }
+  }
+
+  for (const run of proofBackedRuns) {
+    commandRuns.push(serializeBundleCommandRun(run));
+  }
+
+  const manifest: EvidenceBundleManifest = {
+    schemaId: EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID,
+    taskId: input.taskId,
+    updatedAt: input.updatedAt,
+    updatedBy: input.actorId,
+    freshValidationPasses: uniqueStrings([...freshValidationPasses]),
+    staleValidationPasses: uniqueStrings([...staleValidationPasses]),
+    commandRuns,
+    artifactPaths: uniqueStrings([...artifactPaths])
+  };
+  writeEvidenceBundleManifest(input.cwd, manifest);
+  return manifest;
+}
+
+function writeEvidenceBundleManifest(cwd: string, manifest: EvidenceBundleManifest) {
+  const manifestPath = evidenceBundleManifestPathForTask(cwd, manifest.taskId);
+  mkdirSync(path.dirname(manifestPath), { recursive: true });
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 }
 
 function evidenceWriteLockPath(cwd: string, taskId: string) {

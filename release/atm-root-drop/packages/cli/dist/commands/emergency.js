@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { CliError, makeResult, message } from './shared.js';
 import { createEmergencyLease, listEmergencyLeases, readEmergencyLease, revokeEmergencyLease } from './emergency/leases.js';
+import { listProtectedOverrideAuditEvents } from './emergency/protected-override-audit.js';
 import { emergencyPermissionRegistry, listEmergencyPermissionIds } from './emergency/registry.js';
 export async function runEmergency(argv) {
     const options = parseEmergencyOptions(argv);
@@ -11,6 +12,29 @@ export async function runEmergency(argv) {
             cwd: options.cwd,
             messages: [message('info', 'ATM_EMERGENCY_PERMISSIONS', 'Listed emergency permission registry.')],
             evidence: { permissions: emergencyPermissionRegistry }
+        });
+    }
+    if (options.action === 'audit') {
+        const events = listProtectedOverrideAuditEvents(options.cwd, {
+            taskId: options.taskId,
+            leaseId: options.leaseId,
+            limit: 100
+        });
+        return makeResult({
+            ok: true,
+            command: 'emergency',
+            cwd: options.cwd,
+            messages: [message('info', 'ATM_PROTECTED_OVERRIDE_AUDIT_LISTED', `Loaded ${events.length} protected override audit event(s).`, {
+                    taskId: options.taskId,
+                    leaseId: options.leaseId,
+                    count: events.length
+                })],
+            evidence: {
+                action: 'audit',
+                taskId: options.taskId,
+                leaseId: options.leaseId,
+                events
+            }
         });
     }
     if (options.action === 'show') {
@@ -159,13 +183,13 @@ function parseEmergencyOptions(argv) {
         if (state.action) {
             throw new CliError('ATM_CLI_USAGE', 'emergency accepts only one action.', { exitCode: 2 });
         }
-        if (arg !== 'approve' && arg !== 'show' && arg !== 'revoke' && arg !== 'permissions') {
-            throw new CliError('ATM_CLI_USAGE', 'emergency supports: approve, show, revoke, permissions.', { exitCode: 2 });
+        if (arg !== 'approve' && arg !== 'show' && arg !== 'revoke' && arg !== 'permissions' && arg !== 'audit') {
+            throw new CliError('ATM_CLI_USAGE', 'emergency supports: approve, show, revoke, permissions, audit.', { exitCode: 2 });
         }
         state.action = arg;
     }
     if (!state.action) {
-        throw new CliError('ATM_CLI_USAGE', 'emergency supports: approve, show, revoke, permissions.', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'emergency supports: approve, show, revoke, permissions, audit.', { exitCode: 2 });
     }
     return {
         ...state,

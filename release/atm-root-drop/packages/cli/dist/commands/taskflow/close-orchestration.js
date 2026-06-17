@@ -1,8 +1,12 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { resolveTaskflowCloseBackend, resolveTaskflowCloseMode, taskflowCloseEvidenceValidators, taskflowCloseGovernanceEvidenceValidator } from '../tasks/surface-invariants.js';
 import { extractFrontMatter, normalizeTaskId } from '../tasks/task-import-validators.js';
-import { CliError } from '../shared.js';
+import { CliError, relativePathFrom } from '../shared.js';
+import { releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
+import { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestPathForTask, evidenceBundleManifestRelativePath, readEvidenceBundleManifest } from '../evidence.js';
+import { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory } from '../tasks/historical-delivery.js';
 function buildTasksCloseCommand(input) {
     const parts = [
         'node atm.mjs tasks close',
@@ -450,3 +454,165 @@ export function resolveCloseWriteSupport(input) {
     }
     return { requested: true, allowed: true, reason: 'closeback prerequisites satisfied' };
 }
+function resolveGitExecutableForRollback() {
+    const configured = process.env.ATM_GIT_EXECUTABLE?.trim();
+    if (configured && existsSync(configured)) {
+        return configured;
+    }
+    if (process.platform === 'win32') {
+        const windowsGit = 'C:\\Program Files\\Git\\cmd\\git.exe';
+        if (existsSync(windowsGit)) {
+            return windowsGit;
+        }
+    }
+    return 'git';
+}
+export function buildCloseWriteRollbackSnapshot(input) {
+    const evidence = input.backendEvidence ?? {};
+    const stagedArtifacts = uniqueRelativePaths([
+        typeof evidence.taskPath === 'string' ? evidence.taskPath : `.atm/history/tasks/${input.taskId}.json`,
+        typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null,
+        typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null,
+        `.atm/history/evidence/${input.taskId}.json`,
+        ...(input.extraStagedArtifacts ?? [])
+    ]);
+    return {
+        taskPath: `.atm/history/tasks/${input.taskId}.json`,
+        previousTaskContent: input.previousTaskContent,
+        transitionPath: typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null,
+        closurePacketPath: typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null,
+        closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null,
+        closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
+        planningCard: input.planningCard,
+        stagedArtifacts
+    };
+}
+function uniqueRelativePaths(values) {
+    return [...new Set(values.map((entry) => (typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '')).filter(Boolean))];
+}
+export function rollbackCloseWriteTransaction(input) {
+    const rolledBackArtifacts = [];
+    const taskAbsolutePath = path.resolve(input.cwd, input.snapshot.taskPath);
+    writeFileSync(taskAbsolutePath, input.snapshot.previousTaskContent, 'utf8');
+    rolledBackArtifacts.push(relativePathFrom(input.cwd, taskAbsolutePath));
+    for (const artifactPath of [input.snapshot.transitionPath, input.snapshot.closurePacketPath]) {
+        if (!artifactPath)
+            continue;
+        const absolutePath = path.resolve(input.cwd, artifactPath);
+        if (existsSync(absolutePath)) {
+            unlinkSync(absolutePath);
+            rolledBackArtifacts.push(relativePathFrom(input.cwd, absolutePath));
+        }
+    }
+    if (input.snapshot.closeCommitWindowPath) {
+        const windowAbsolutePath = path.resolve(input.cwd, input.snapshot.closeCommitWindowPath);
+        if (existsSync(windowAbsolutePath)) {
+            unlinkSync(windowAbsolutePath);
+            rolledBackArtifacts.push(relativePathFrom(input.cwd, windowAbsolutePath));
+        }
+    }
+    if (input.snapshot.planningCard) {
+        writeFileSync(input.snapshot.planningCard.absolutePath, input.snapshot.planningCard.previousContent, 'utf8');
+        rolledBackArtifacts.push(input.snapshot.planningCard.absolutePath);
+    }
+    const staged = uniqueRelativePaths(input.snapshot.stagedArtifacts);
+    if (staged.length > 0) {
+        try {
+            execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...staged], {
+                cwd: input.cwd,
+                stdio: ['ignore', 'pipe', 'pipe']
+            });
+            rolledBackArtifacts.push(...staged.map((entry) => `${entry} (unstaged)`));
+        }
+        catch {
+            // preserve rollback report even if index cleanup fails
+        }
+    }
+    if (input.snapshot.closeWindowStagedIndexLockActive) {
+        const released = releaseCloseWindowStagedIndexLock({
+            cwd: input.cwd,
+            taskId: input.taskId,
+            actorId: input.actorId ?? 'rollback',
+            outcome: 'rolled_back'
+        });
+        if (released) {
+            rolledBackArtifacts.push('.atm/runtime/locks/close-window-staged-index.lock.json (released)');
+        }
+    }
+    return {
+        schemaId: 'atm.closeWriteTransaction.v1',
+        taskId: input.taskId,
+        phase: 'rolled_back',
+        ok: false,
+        failureStep: input.failureStep,
+        failureCode: input.failureCode,
+        rolledBackArtifacts,
+        recoveryCommand: `node atm.mjs tasks status --task ${input.taskId} --json`,
+        backendCloseApplied: true,
+        commitBundleApplied: false
+    };
+}
+export async function executeCloseWriteCommitPhase(input) {
+    try {
+        const bundle = await input.commit();
+        if (bundle.failClosed) {
+            return {
+                bundle,
+                transaction: rollbackCloseWriteTransaction({
+                    cwd: input.cwd,
+                    taskId: input.taskId,
+                    actorId: input.actorId,
+                    snapshot: input.snapshot,
+                    failureStep: 'commit-bundle',
+                    failureCode: 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_FAILED',
+                    failureReason: 'Governed target/planning commit bundle did not complete.'
+                })
+            };
+        }
+        return {
+            bundle,
+            transaction: {
+                schemaId: 'atm.closeWriteTransaction.v1',
+                taskId: input.taskId,
+                phase: 'committed',
+                ok: true,
+                failureStep: null,
+                failureCode: null,
+                rolledBackArtifacts: [],
+                recoveryCommand: null,
+                backendCloseApplied: true,
+                commitBundleApplied: true
+            }
+        };
+    }
+    catch (error) {
+        const failureCode = error instanceof CliError ? error.code : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED';
+        const failureReason = error instanceof Error ? error.message : String(error);
+        return {
+            bundle: { failClosed: true },
+            transaction: rollbackCloseWriteTransaction({
+                cwd: input.cwd,
+                taskId: input.taskId,
+                actorId: input.actorId,
+                snapshot: input.snapshot,
+                failureStep: 'commit-bundle',
+                failureCode,
+                failureReason
+            })
+        };
+    }
+}
+// === TASK-MAO-0041 evidence-bundle-manifest (cursor-composer-2.5) START ===
+// 0041 close-orchestration hooks live in this region only.
+export { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestRelativePath, evidenceBundleManifestPathForTask, readEvidenceBundleManifest };
+export { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory };
+export function listOptionalEvidenceBundleGovernanceArtifacts(cwd, taskId) {
+    const relativePath = evidenceBundleManifestRelativePath(taskId);
+    return existsSync(path.join(cwd, relativePath)) ? [relativePath] : [];
+}
+// === TASK-MAO-0041 evidence-bundle-manifest END ===
+// === TASK-MAO-0042 validator-scope-taxonomy (antigravity-gemini-3.5-flash) START ===
+// 0042 close gating taxonomy hooks live in this region only.
+export { getValidatorScope } from '../validate.js';
+// === TASK-MAO-0042 validator-scope-taxonomy END ===
+export { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers } from './historical-close-preflight.js';

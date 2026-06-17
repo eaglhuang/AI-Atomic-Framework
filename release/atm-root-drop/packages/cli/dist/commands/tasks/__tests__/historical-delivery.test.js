@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from 'nod
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { categorizeHistoricalCommitFiles, inspectHistoricalDelivery } from '../historical-delivery.js';
+import { categorizeHistoricalCommitFiles, detectHistoricalDeliveryCommit, inspectHistoricalDelivery, readPlanningCardDeliveryCommit } from '../historical-delivery.js';
 import { runEvidence } from '../../evidence.js';
 import { createClaimRecord } from '../task-ledger-readers.js';
 import { upsertActorWorkSession } from '../../actor-session.js';
@@ -240,5 +240,41 @@ try {
 }
 finally {
     rmSync(repo, { recursive: true, force: true });
+}
+const detectionRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-historical-delivery-detect-'));
+try {
+    git(detectionRepo, ['init']);
+    mkdirSync(path.join(detectionRepo, 'src'), { recursive: true });
+    writeFileSync(path.join(detectionRepo, 'src', 'task-owned.ts'), 'export const owned = true;\n', 'utf8');
+    commitAll(detectionRepo, 'base');
+    writeFileSync(path.join(detectionRepo, 'src', 'task-owned.ts'), 'export const owned = true;\nexport const v2 = true;\n', 'utf8');
+    const deliveryCommit = commitAll(detectionRepo, `deliver TASK-HIST\n\nATM-Task: TASK-HIST`);
+    const detected = detectHistoricalDeliveryCommit({
+        cwd: detectionRepo,
+        taskId: 'TASK-HIST',
+        declaredFiles
+    });
+    assertEqual(detected.ref, deliveryCommit, 'detectHistoricalDeliveryCommit must return scoped delivery commit');
+    assertEqual(detected.source, 'git-log-trailer', 'ATM-Task trailer commits must be preferred');
+}
+finally {
+    rmSync(detectionRepo, { recursive: true, force: true });
+}
+const planningCardRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-historical-delivery-planning-card-'));
+try {
+    git(planningCardRepo, ['init']);
+    mkdirSync(path.join(planningCardRepo, 'docs', 'tasks'), { recursive: true });
+    writeFileSync(path.join(planningCardRepo, 'docs', 'tasks', 'TASK-HIST.task.md'), [
+        '---',
+        'task_id: TASK-HIST',
+        'delivery_commit: "abc123def"',
+        '---',
+        '# TASK-HIST',
+        ''
+    ].join('\n'), 'utf8');
+    assertEqual(readPlanningCardDeliveryCommit(planningCardRepo, 'docs/tasks/TASK-HIST.task.md'), 'abc123def', 'readPlanningCardDeliveryCommit must parse quoted delivery_commit frontmatter');
+}
+finally {
+    rmSync(planningCardRepo, { recursive: true, force: true });
 }
 console.log('[historical-delivery.test] ok');

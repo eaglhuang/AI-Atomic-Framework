@@ -5,7 +5,7 @@ status: planned
 priority: P1
 closure_authority: target_repo
 depends_on:
-  - {{depends_on}}
+{{depends_on_yaml}}
 scopePaths:
   - "{{scope_path}}"
 deliverables:
@@ -13,6 +13,7 @@ deliverables:
 validators:
   - "npm run typecheck"
   - "npm run validate:cli"
+  - "npm run validate:git-head-evidence"
   - "npm run test -- {{test_path}}"
   - "git diff --check"
 atomizationImpact:

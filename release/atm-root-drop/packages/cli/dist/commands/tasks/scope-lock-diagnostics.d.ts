@@ -51,5 +51,10 @@ export declare function evaluateFrameworkCloseDirtyGuard(input: {
     readonly trackedDirtyFiles: readonly string[];
     readonly allowedAdvisoryGovernanceFiles?: readonly string[];
 }): FrameworkCloseDirtyGuardReport;
+export declare function summarizeCloseWindowLockRemediation(input: {
+    cwd: string;
+    taskId: string;
+    actorId: string;
+}): TaskScopeDiagnosticRemediation;
 export declare function attachDirtyGuardToScopedDiffIsolation(isolation: TaskCloseScopedDiffIsolationReport | null, dirtyGuard: FrameworkCloseDirtyGuardReport, ignoredUntrackedFiles: readonly string[]): TaskCloseScopedDiffIsolationReport | null;
 export {};

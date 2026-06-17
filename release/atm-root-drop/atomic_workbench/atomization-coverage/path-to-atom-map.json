@@ -1140,6 +1140,97 @@
       "source_task": "TASK-MAO-0038"
     },
     {
+      "path_pattern": "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "atom_id": "atm.historical-close-preflight-map",
+      "capability": "Read-only historical close pre-close summary with scopeTrackedDirtyFiles, unexpectedStagedTasks, mixedDeliveryCommit, staleEvidence, missingApprovalLease, and writeRollbackSummary.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0039"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "atom_id": "atm.historical-close-preflight-map",
+      "capability": "Expose scoped dirty-file remediation hints consumed by taskflow pre-close.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0039"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/git-governance.ts",
+      "atom_id": "atm.task-scoped-commit-bundle-map",
+      "capability": "Resolve task-scoped commit bundles with auto-stage, foreign-staged defer, governance bundle task-id checks, and copyable host git commit commands.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0040"
+    },
+    {
+      "path_pattern": "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "atom_id": "atm.task-scoped-commit-bundle-map",
+      "capability": "Regression coverage for shared-worktree dirty files, auto-stage, and defer-foreign-staged behavior.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0040"
+    },
+    {
+      "path_pattern": "docs/governance/git-governance-contract.md",
+      "atom_id": "atm.task-scoped-commit-bundle-map",
+      "capability": "Document task-scoped commit bundle resolver, auto-stage, defer-foreign-staged, and host git executable fallback.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0040"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.close-write-atomicity-map",
+      "capability": "Fail-closed taskflow close --write transaction with rollback snapshot, commit phase, and closeWriteTransaction reporting.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "atom_id": "atm.close-write-atomicity-map",
+      "capability": "Regression coverage for close write success, rollback, and partial backend failure branches.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Exclusive close-window staged-index lock with foreign-staged inspection, governed defer snapshots, and release outcomes committed, rolled_back, or aborted.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Acquire and release close-window staged-index lock around taskflow close --write staging and commit phases.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Release close-window staged-index lock during close write rollback snapshots.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Close-window lock remediation hints for foreign staged tasks and active lock holders.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Regression coverage for close-window lock acquire, block, defer, release, and rollback release.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "docs/governance/git-governance-contract.md",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Document close-window staged-index lock lifecycle and --defer-foreign-staged operator path.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
       "atom_id": "atm.closeback-route-correctness-map",
       "capability": "Guard repair-closure packet helper by throwing ATM_REPAIR_CLOSURE_NOT_CLOSE when ledger is not done.",
@@ -1166,13 +1257,279 @@
       "capability": "Regression tests for repair closure check and closeback plan waiver pass-through validation.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#buildScopeAmendmentCommand",
+      "atom_id": "atm.build-scope-amendment-command",
+      "capability": "Builds reproducible 'node atm.mjs tasks scope add|repair' command strings with proper flag quoting; shared by normal audit lane (mode=normal) and emergency maintenance lane (mode=repair) to guarantee format consistency across both channels (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-option-parsers.ts#parseScopeRepairOptions",
+      "atom_id": "atm.task-option-parsers-map",
+      "capability": "Parses 'tasks scope repair' CLI flags: --add (csv paths), --reason (required), --emergency-approval (required), --task, --actor, --cwd; enforces non-empty reason and non-empty emergency-approval at parse time (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks.ts#runTasksScopeRepair",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "tasks scope repair — emergency maintenance lane requiring --emergency-approval; asserts assertEmergencyApproval gate (backend.tasks.scopeAmend), widens active taskDirectionLock.allowedFiles, and records scope-amendment event with amendmentMode='repair' so reviewers can distinguish routine scope-add from governed emergency overrides (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks.ts#readScopeAmendmentEvents",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "Reads all scope-amendment transition events for a task from the task-events directory and returns typed TaskScopeAmendmentSnapshot array for status triangulation and closeback evidence (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/residue-diagnostics.ts#TaskScopeAmendmentSnapshot",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "TaskScopeAmendmentSnapshot interface and amendmentHistory field in TaskStatusTriangulation: aggregates all scope-amendment events per task so closeback and status commands can surface full amendment history with class, phase, mode, reason, addedPaths, actorId, and timestamp (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/task-ledger.ts#ScopeAmendmentMetadata",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "ScopeAmendmentMetadata type and amendmentMetadata field on appendTaskTransitionEvent input: carries amendmentClass, amendmentPhase, amendmentMode ('normal'|'repair'), and optional reason into the scope-amendment event record for full audit traceability (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/emergency/protected-override-audit.ts",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Append-only protected override audit ledger for --no-verify, emergency lease consumption, hook safe-mode bypasses, and authorized-but-failed outcomes with repair candidates (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/emergency/gate.ts#assertEmergencyApproval",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Emergency approval gate records protected override authorization events alongside emergency lease consumption before protected backend mutations proceed (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/git-governance.ts#runGitCommit",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Governed git commit wrapper requires emergency approval for --no-verify, records authorized/succeeded/failed protected override outcomes, and surfaces repair candidates when hook bypass leaves deferred checks (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook.ts#writePrePushSafeModeReport",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Pre-push safe mode bypass writes protected override audit events with actor, reason, skipped checks, and follow-up repair guidance (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/emergency.ts#runEmergency",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "emergency audit action lists protected override audit events filtered by task or lease for operator review (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-planner.ts",
+      "atom_id": "atm.team-wave-planner-map",
+      "capability": "Team Agents Wave Mode candidate planner and DAG grouping: greedy ordered-wave scheduler over declared task metadata enforcing dependency, scope-overlap, same-atom write/write, target-repo, closure-authority, and generated-artifact safety rules; fails closed on unknown overlap (TASK-MAO-0024).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0024"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-wave.ts",
+      "atom_id": "atm.team-wave-planner-map",
+      "capability": "team wave plan CLI surface: reads declared task-ledger metadata and produces a wave plan via the broker wave planner, delegated from the team command (TASK-MAO-0024).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0024"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-envelope.ts",
+      "atom_id": "atm.team-wave-envelope-map",
+      "capability": "Team Wave Envelope: wraps a planned wave plus per-worker patch-envelope references and execution states into one coordinator record; enforces single target repo, single closure authority, and disjoint member deliverables; conforms to schemas/team-wave-envelope.schema.json (TASK-MAO-0025).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0025"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-admission.ts",
+      "atom_id": "atm.team-wave-admission-map",
+      "capability": "Team Agents Wave Mode broker admission: layers the broker logical conflict matrix over the wave planner metadata rules to admit or fail-closed each member across dependency, scope-overlap, CID-conflict, generated-artifact, closure-authority, target-repo, missing-worker-report, and missing-validator categories (TASK-MAO-0026).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0026"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",
+      "atom_id": "atm.team-wave-runtime-map",
+      "capability": "Wave Mode runtime record + dispatch surface (team wave dispatch writes a coordinator-owned wave envelope to .atm/runtime/team-waves) plus the safe/unsafe/mixed/envelope self-check run on every validate-team-agents invocation (TASK-MAO-0027).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0027"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-worker-report.ts",
+      "atom_id": "atm.team-worker-report-map",
+      "capability": "Team worker report ingestion contract: per-card worker outcome (changed files, validator runs with first failing diagnostic, deviations, execution state) with consistency validation and effective-state reconciliation that downgrades an inconsistent done claim to needs-review; conforms to schemas/team-worker-report.schema.json (TASK-MAO-0028).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0028"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-evidence.ts",
+      "atom_id": "atm.team-wave-evidence-map",
+      "capability": "Per-task evidence slicing from a wave diff: attributes every changed file to exactly one member by declared scope (directory-prefix aware, append-safe files excepted); unattributed or ambiguous files force the whole wave to needs-review so no member is checkpointed done (TASK-MAO-0029).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0029"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-checkpoint.ts",
+      "atom_id": "atm.team-wave-checkpoint-map",
+      "capability": "Wave checkpoint partial-completion semantics: combines worker reports and the wave evidence slice into per-member states (done/partial/blocked/not-started/needs-review); only done members with clean attributed evidence are close-ready; never closes a card, only prepares input for batch checkpoint / taskflow close (TASK-MAO-0030).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0030"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-wave.ts#assertCoordinatorOnly",
+      "atom_id": "atm.team-wave-closeout-guard-map",
+      "capability": "Coordinator-only git / closeout guard: only the coordinator role may perform git-write, task-closeout, or checkpoint; worker/validator/reviewer roles fail closed, preserving existing hooks / batch checkpoint / taskflow close as the lifecycle authority (TASK-MAO-0031).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0031"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#validator-reviewer-roles",
+      "atom_id": "atm.team-wave-roles-map",
+      "capability": "Validator and reviewer Team Agents roles for waves: advisory roles asserted to be non-privileged (no git-write or task-closeout) via the coordinator-only guard, validated on every validate-team-agents run (TASK-MAO-0032).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0032"
+    },
+    {
+      "path_pattern": "scripts/validate-team-wave-mode.ts",
+      "atom_id": "atm.team-wave-dogfood-map",
+      "capability": "Team Agents Wave Mode dogfood benchmark: drives plan→admit→envelope→worker-report→evidence-slice→checkpoint over broker-format-adapter-shaped fixtures, asserting safe/unsafe/mixed/per-task-slicing/close-readiness end to end (TASK-MAO-0033).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0033"
+    },
+    {
+      "path_pattern": "docs/TEAM_AGENTS_WAVE_MODE.md",
+      "atom_id": "atm.team-wave-operator-docs-map",
+      "capability": "Team Agents Wave Mode operator guide and migration notes: distinguishes single-task / batch queue-head / Team Agents advisory / Wave Mode, documents roles, workflow, and fail-closed safety rules, and states Wave Mode is not a closeout shortcut (TASK-MAO-0034).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0034"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/validate.ts",
+      "atom_id": "atm.validator-scope-taxonomy-map",
+      "capability": "Validator scope taxonomy classifying validators into task-local, global-advisory, release-blocking, and diagnostic scopes.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0042"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/evidence.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Persist task-bound evidence bundle manifests with fresh versus stale validator passes after successful evidence run/add.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Expand directory-style deliverables into explicit file manifests for closeback metadata validation.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Expose evidence bundle manifest and directory deliverable expansion hooks for governed close orchestration.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "tests/cli/evidence-bundle-manifest.test.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Regression coverage for evidence bundle manifest freshness rules and directory deliverable expansion.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "docs/governance/evidence-gates.md",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Document evidence bundle manifest and directory deliverable expansion behavior for close gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-ref-store.ts",
+      "atom_id": "atm.runner-ref-store-map",
+      "capability": "Runner ref publish primitive: append-only ledger of (refName, kind, sourceCommit, artifactSha256, publisher) entries with immutable version refs and mutable control refs; resolver returns latest entry per (refName, kind) (TASK-MAO-0014).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0014"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/patch-envelope-atm-core.ts",
+      "atom_id": "atm.patch-envelope-atm-core-map",
+      "capability": "ATM core specialization of the patch envelope: adds scopeClass, publishIntent, targetRunnerRef, declaredSourceCommit annotation atop the v1 base envelope without modifying it; validates version-publish/in-dev-bump/release-only invariants (TASK-MAO-0015).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0015"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-submit-pipeline.ts",
+      "atom_id": "atm.runner-submit-pipeline-map",
+      "capability": "Runner submit-patch pipeline admission: validates ATM-core annotation, checks frozen ref freeze-await, compares declared source commit to current ref head for stale-base rejection, emits accept/reject-malformed/reject-conflict/reject-stale-base/freeze-await-rebase verdicts (TASK-MAO-0016).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0016"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-version-state.ts",
+      "atom_id": "atm.runner-version-state-map",
+      "capability": "Runner version stream state machine: in-dev → rc-stabilizing → rc-frozen → published → retired lifecycle with rollback-rc; lease acquire restricted to live states; deterministic history append (TASK-MAO-0017).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0017"
+    },
+    {
+      "path_pattern": "tests/cli/closure-runner-binding.test.ts",
+      "atom_id": "atm.closure-runner-binding-map",
+      "capability": "Closure-packet runner binding contract test: pins commandRuns.runnerVersion and targetRepoIdentity/targetCommit as the dual-binding fields that let a closure packet declare which runner version produced its evidence (TASK-MAO-0018).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0018"
+    },
+    {
+      "path_pattern": "tests/cli/cross-repo-dual-binding-close.test.ts",
+      "atom_id": "atm.cross-repo-dual-binding-close-map",
+      "capability": "Cross-repo dual-binding closure structural test: locks planningMirrorPath, planningStatus, planningAuthorityDeliveryGate, and the planning-mirror-adopter-flow backend switch in close-orchestration.ts so cross-repo close maintains its contract (TASK-MAO-0019).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0019"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-bootstrap.ts",
+      "atom_id": "atm.runner-bootstrap-map",
+      "capability": "Runner bootstrap self-update recovery analyzer: pure analysis producing no-recovery/rollback-rc-to-in-dev/reseed-from-version/quarantine decisions plus findings; mutations are delegated to the existing operator lane (TASK-MAO-0020).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0020"
+    },
+    {
+      "path_pattern": "scripts/validate-runner-broker-failures.ts",
+      "atom_id": "atm.runner-broker-failures-map",
+      "capability": "Runner broker failure-mode coverage validator: discovers fixtures under scripts/fixtures/runner-broker-failures/ and exercises submit-pipeline + bootstrap analyzer to verify each documented failure reaches its expected verdict / decision (TASK-MAO-0021).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0021"
+    },
+    {
+      "path_pattern": "scripts/validate-external-core-pipeline.ts",
+      "atom_id": "atm.external-core-pipeline-map",
+      "capability": "External core contributor pipeline CI gate: validates contributor patch envelopes against upstream in-dev/HEAD, rejects release-only direct modifications, and admits well-formed patch-only submits before the steward rebuild lane (TASK-MAO-0022).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0022"
     }
   ],
   "summary": {
-    "total_production_paths": 170,
-    "mapped_paths": 170,
+    "total_production_paths": 183,
+    "mapped_paths": 183,
     "coverage_percentage": 100,
-    "atoms_defined": 109,
+    "atoms_defined": 111,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true

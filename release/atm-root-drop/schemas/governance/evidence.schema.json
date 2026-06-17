@@ -177,6 +177,81 @@
           "format": "date-time"
         }
       }
+    },
+    "evidenceBundleManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "taskId",
+        "updatedAt",
+        "updatedBy",
+        "freshValidationPasses",
+        "staleValidationPasses",
+        "commandRuns",
+        "artifactPaths"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.evidenceBundleManifest.v1"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "freshValidationPasses": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        },
+        "staleValidationPasses": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        },
+        "commandRuns": {
+          "type": "array",
+          "items": { "type": "object" },
+          "default": []
+        },
+        "artifactPaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        }
+      }
+    },
+    "directoryDeliverableManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaId", "declaredPath", "files", "missingFiles"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.directoryDeliverableManifest.v1"
+        },
+        "declaredPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "files": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        },
+        "missingFiles": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        }
+      }
     }
   }
 }

@@ -1,0 +1,13 @@
+{
+  "fixtureId": "release-only-modification",
+  "scenario": "external contributor tries to modify release/** directly with textual diff",
+  "patchEnvelope": {
+    "scopeClass": "release-only",
+    "publishIntent": "patch-only",
+    "targetRunnerRef": null,
+    "declaredSourceCommit": "upstream-head",
+    "mode": "textual-diff"
+  },
+  "expectedVerdict": "reject-malformed",
+  "expectedReasonPattern": "release-only"
+}

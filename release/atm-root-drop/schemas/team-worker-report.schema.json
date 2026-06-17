@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atm.teamWorkerReport.v1",
+  "title": "ATM Team Worker Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "reportId",
+    "taskId",
+    "workerActorId",
+    "executionState",
+    "changedFiles",
+    "validatorRuns",
+    "metadata"
+  ],
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": { "enum": ["none", "additive", "breaking"] },
+        "fromVersion": { "type": ["string", "null"], "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "schemaId": { "const": "atm.teamWorkerReport.v1" },
+    "specVersion": { "const": "0.1.0" },
+    "migration": { "$ref": "#/$defs/migration" },
+    "reportId": { "type": "string", "minLength": 1 },
+    "taskId": { "type": "string", "minLength": 1 },
+    "workerActorId": { "type": "string", "minLength": 1 },
+    "executionState": {
+      "type": "string",
+      "enum": ["done", "partial", "blocked", "not-started", "needs-review"]
+    },
+    "changedFiles": { "type": "array", "items": { "type": "string" } },
+    "validatorRuns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "passed"],
+        "properties": {
+          "command": { "type": "string", "minLength": 1 },
+          "passed": { "type": "boolean" },
+          "firstFailingDiagnostic": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "deviations": { "type": "array", "items": { "type": "string" } },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reportedAt", "waveId"],
+      "properties": {
+        "reportedAt": { "type": "string" },
+        "waveId": { "type": ["string", "null"] },
+        "notes": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -31,3 +31,20 @@ node atm.mjs tasks close --task ATM-GOV-0104 --actor codex-main --status done --
 - `close`: at least one non-waiver evidence record.
 - `commit`: non-waiver evidence plus at least one verification record (`test`, `artifact`, `attestation`, or `commit`).
 - `pr`: at least one `review` evidence and at least one verification record.
+
+## Evidence Bundle Manifest
+
+Successful `evidence run` and fresh `evidence add` commands update
+`.atm/history/evidence/<taskId>.bundle-manifest.json` with task-bound validator
+passes and command-run proof. The manifest separates `freshValidationPasses`
+from `staleValidationPasses` so historical-reference or draft evidence cannot be
+treated as fresh live proof.
+
+Directory-style deliverables are expanded into an explicit file manifest before
+taskflow close metadata validation. Empty or missing directory deliverables
+remain fail-closed, but fixture folders with real files can close when their
+contents match the expanded manifest.
+
+## Validator Scope Taxonomy
+
+ATM classifies validator gates into task-local, release-blocking, global-advisory, and diagnostic scopes.

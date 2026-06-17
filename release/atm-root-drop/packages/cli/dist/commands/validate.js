@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { validateAtomRefReadability } from '../../../core/dist/registry/atom-ref-readability.js';
 import { runFrameworkDevelopmentValidation } from './framework-development.js';
@@ -17,6 +17,11 @@ const requiredAtomicSpecFields = [
     'hashLock'
 ];
 export function runValidate(argv) {
+    if (argv.includes('taxonomy')) {
+        const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
+        const taskId = valueAfter(argv, '--task');
+        return runValidateTaxonomy(repo, taskId);
+    }
     if (argv.includes('atom-callsite-readability')) {
         const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
         const report = validateAtomRefReadability(path.resolve(repo));
@@ -230,4 +235,121 @@ function requireStringPattern(errors, value, pattern, checkPath, code) {
     if (typeof value !== 'string' || !pattern.test(value)) {
         errors.push({ code, path: checkPath, text: `${checkPath} does not match the required pattern.` });
     }
+}
+function runValidateTaxonomy(repo, taskId) {
+    const resolvedCwd = path.resolve(repo);
+    let touchedFiles = [];
+    if (taskId) {
+        const taskPath = path.resolve(resolvedCwd, '.atm', 'history', 'tasks', `${taskId.trim()}.json`);
+        if (existsSync(taskPath)) {
+            try {
+                const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+                if (taskDocument && typeof taskDocument === 'object') {
+                    const readList = (key) => {
+                        const value = taskDocument[key];
+                        if (!Array.isArray(value))
+                            return [];
+                        return value.filter((entry) => typeof entry === 'string');
+                    };
+                    const uniq = (arr) => [...new Set(arr.map((s) => s.trim()).filter(Boolean))];
+                    touchedFiles = uniq([
+                        ...readList('deliverables'),
+                        ...readList('scopePaths'),
+                        ...readList('targetAllowedFiles')
+                    ]);
+                }
+            }
+            catch {
+                // ignore JSON parse errors
+            }
+        }
+    }
+    const standardGates = [
+        'typecheck',
+        'validate:cli',
+        'validate:git-head-evidence',
+        'validate:neutrality',
+        'doctor',
+        'framework-development',
+        'tasks-audit',
+        'validate:integration-adapter',
+        'validate:skill-templates',
+        'validate:root-drop-release',
+        'validate:onefile-release'
+    ];
+    const taxonomy = {};
+    const descriptions = {
+        'typecheck': 'TypeScript compilation and static type validation.',
+        'validate:cli': 'CLI integration tests and help snapshot validation.',
+        'validate:git-head-evidence': 'Git HEAD backfill verification.',
+        'validate:neutrality': 'Vocabulary neutrality validation to prevent downstream leak.',
+        'doctor': 'Repository environment setup diagnostics.',
+        'framework-development': 'Framework development consistency checks.',
+        'tasks-audit': 'Task status and lifecycle synchronization audit.',
+        'validate:integration-adapter': 'Release-blocking integration adapter validation.',
+        'validate:skill-templates': 'Release-blocking skill template validation.',
+        'validate:root-drop-release': 'Release-blocking root drop release check.',
+        'validate:onefile-release': 'Release-blocking onefile single bundle check.'
+    };
+    for (const gate of standardGates) {
+        const scope = getValidatorScope(gate, touchedFiles);
+        taxonomy[gate] = {
+            scope,
+            description: descriptions[gate] ?? 'Validator check.'
+        };
+    }
+    return makeResult({
+        ok: true,
+        command: 'validate',
+        cwd: resolvedCwd,
+        messages: [
+            message('info', 'ATM_VALIDATE_TAXONOMY_OK', `Loaded validator scope taxonomy${taskId ? ` for task ${taskId}` : ''}.`)
+        ],
+        evidence: {
+            validation: 'taxonomy',
+            taskId: taskId ?? null,
+            taxonomy
+        }
+    });
+}
+/**
+ * TASK-MAO-0042: 依據 Validator Scope Taxonomy 分類 gate 的範疇
+ */
+export function getValidatorScope(gateName, touchedFiles = []) {
+    const gate = gateName.trim();
+    // 1. Release blocking
+    if (gate === 'validate:integration-adapter' ||
+        gate === 'validate:skill-templates' ||
+        gate === 'validate:root-drop-release' ||
+        gate === 'validate:onefile-release') {
+        return 'release-blocking';
+    }
+    // 2. Neutrality special case (touched protected surface makes it task-local)
+    if (gate === 'validate:neutrality') {
+        const hasProtected = touchedFiles.some((file) => {
+            const normalized = file.replace(/\\/g, '/');
+            return (normalized.startsWith('packages/core/') ||
+                normalized.startsWith('packages/plugin-rule-guard/') ||
+                normalized === 'scripts/validate-neutrality-scanner.ts' ||
+                normalized === 'specs/neutrality-scanner.atom.json' ||
+                normalized === 'tests/neutrality.fixture.json');
+        });
+        return hasProtected ? 'task-local' : 'global-advisory';
+    }
+    // 3. Task Local
+    if (gate === 'typecheck' ||
+        gate === 'validate:cli' ||
+        gate === 'validate:git-head-evidence' ||
+        gate.startsWith('validate:')) {
+        return 'task-local';
+    }
+    // 4. Global Advisory
+    if (gate === 'doctor' ||
+        gate === 'framework-development' ||
+        gate === 'tasks-audit' ||
+        gate === 'git-head-evidence') {
+        return 'global-advisory';
+    }
+    // Default to diagnostic
+    return 'diagnostic';
 }

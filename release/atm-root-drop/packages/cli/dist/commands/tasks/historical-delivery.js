@@ -1,7 +1,10 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import path from 'node:path';
 import { isTaskCloseGovernanceCriticalPath } from '../framework-development.js';
 import { isTaskDirectionPathCandidate } from '../task-direction.js';
 import { normalizeRelativePath } from './task-file-io-helpers.js';
+export const DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID = 'atm.directoryDeliverableManifest.v1';
 const EMPTY_HISTORICAL_DELIVERY_BUCKETS = {
     taskMatchedFiles: [],
     governanceFiles: [],
@@ -128,6 +131,86 @@ export function inspectHistoricalDelivery(input) {
         waiverApplied
     };
 }
+export function readPlanningCardDeliveryCommit(repoRoot, relativePlanningPath) {
+    const absolutePath = path.resolve(repoRoot, relativePlanningPath);
+    if (!existsSync(absolutePath))
+        return null;
+    const content = readFileSync(absolutePath, 'utf8');
+    const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    if (!match)
+        return null;
+    const lineMatch = match[1].match(/^delivery_commit:\s*(?:"([^"]*)"|'([^']*)'|(\S+))\s*$/m);
+    return (lineMatch?.[1] ?? lineMatch?.[2] ?? lineMatch?.[3] ?? '').trim() || null;
+}
+export function detectHistoricalDeliveryCommit(input) {
+    const limit = input.searchLimit ?? 40;
+    const verify = (requestedRef) => verifyScopedHistoricalDeliveryRef({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        requestedRef,
+        declaredFiles: input.declaredFiles
+    });
+    if (input.planningRepoRoot && input.planningRelativePath) {
+        const fromCard = readPlanningCardDeliveryCommit(input.planningRepoRoot, input.planningRelativePath);
+        if (fromCard) {
+            const commitSha = verify(fromCard);
+            if (commitSha) {
+                return { ref: fromCard, commitSha, source: 'planning-card' };
+            }
+        }
+    }
+    for (const sha of listCommitsWithTaskTrailer(input.cwd, input.taskId, limit)) {
+        const commitSha = verify(sha);
+        if (commitSha) {
+            return { ref: sha, commitSha, source: 'git-log-trailer' };
+        }
+    }
+    for (const sha of listRecentCommitShas(input.cwd, limit)) {
+        const commitSha = verify(sha);
+        if (commitSha) {
+            return { ref: sha, commitSha, source: 'git-log-scope' };
+        }
+    }
+    return { ref: null, commitSha: null, source: null };
+}
+function verifyScopedHistoricalDeliveryRef(input) {
+    if (input.declaredFiles.length === 0)
+        return null;
+    const report = inspectHistoricalDelivery({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        requestedRef: input.requestedRef,
+        declaredFiles: input.declaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: false,
+        waiverReason: null
+    });
+    if (!report.ok)
+        return null;
+    return report.commitSha ?? input.requestedRef;
+}
+function listRecentCommitShas(cwd, limit) {
+    return readGitLines(cwd, ['log', `-n`, String(limit), '--format=%H']);
+}
+function listCommitsWithTaskTrailer(cwd, taskId, limit) {
+    return readGitLines(cwd, [
+        'log',
+        `-n`,
+        String(limit),
+        `--grep=ATM-Task: ${taskId}`,
+        '--format=%H',
+        '--extended-regexp'
+    ]);
+}
+function readGitLines(cwd, args) {
+    try {
+        const output = execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+        return uniqueStrings(output.split(/\r?\n/));
+    }
+    catch {
+        return [];
+    }
+}
 export function buildHistoricalDeliveryProvenance(report, waiverReason) {
     if (!report?.commitSha)
         return null;
@@ -140,6 +223,78 @@ export function buildHistoricalDeliveryProvenance(report, waiverReason) {
         outOfScopeSourceFiles: [...report.fileBuckets.outOfScopeSourceFiles],
         waivedOutOfScopeFiles: report.waiverApplied ? [...report.fileBuckets.outOfScopeSourceFiles] : [],
         waiverReason: report.waiverApplied ? (waiverReason?.trim() || null) : null
+    };
+}
+export function isDirectoryStyleDeliverableDeclaration(repoRoot, declaredPath) {
+    const normalized = normalizeRelativePath(declaredPath).replace(/\/+$/, '');
+    if (!normalized)
+        return false;
+    if (declaredPath.replace(/\\/g, '/').trim().endsWith('/'))
+        return true;
+    const absolutePath = path.resolve(repoRoot, normalized);
+    try {
+        return existsSync(absolutePath) && statSync(absolutePath).isDirectory();
+    }
+    catch {
+        return false;
+    }
+}
+export function listFilesUnderDeclaredDirectory(repoRoot, declaredPath) {
+    const normalized = normalizeRelativePath(declaredPath).replace(/\/+$/, '');
+    if (!normalized)
+        return [];
+    const absoluteDirectory = path.resolve(repoRoot, normalized);
+    if (!existsSync(absoluteDirectory) || !statSync(absoluteDirectory).isDirectory())
+        return [];
+    return listFilesRecursively(repoRoot, normalized);
+}
+export function expandDirectoryDeliverableDeclarations(repoRoot, deliverables) {
+    const directoryManifests = [];
+    const effectiveDeliverables = [];
+    const expandedFiles = [];
+    for (const declared of deliverables) {
+        const normalizedDeclared = normalizeRelativePath(declared).replace(/\/+$/, '');
+        if (!normalizedDeclared)
+            continue;
+        if (!isDirectoryStyleDeliverableDeclaration(repoRoot, declared)) {
+            effectiveDeliverables.push(normalizedDeclared);
+            continue;
+        }
+        const files = listFilesUnderDeclaredDirectory(repoRoot, normalizedDeclared);
+        const missingFiles = files.filter((filePath) => !existsSync(path.resolve(repoRoot, filePath)));
+        if (files.length === 0) {
+            return {
+                ok: false,
+                failClosedReason: `Task metadata error: directory deliverable "${declared}" is empty or missing on disk.`,
+                effectiveDeliverables: [],
+                directoryManifests: [],
+                expandedFiles: []
+            };
+        }
+        if (missingFiles.length > 0) {
+            return {
+                ok: false,
+                failClosedReason: `Task metadata error: directory deliverable "${declared}" is missing files (${missingFiles.join(', ')}).`,
+                effectiveDeliverables: [],
+                directoryManifests: [],
+                expandedFiles: []
+            };
+        }
+        directoryManifests.push({
+            schemaId: DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID,
+            declaredPath: normalizedDeclared,
+            files,
+            missingFiles
+        });
+        effectiveDeliverables.push(normalizedDeclared);
+        expandedFiles.push(...files);
+    }
+    return {
+        ok: true,
+        failClosedReason: null,
+        effectiveDeliverables: uniqueStrings(effectiveDeliverables),
+        directoryManifests,
+        expandedFiles: uniqueStrings(expandedFiles)
     };
 }
 export function pathMatchesTaskScope(filePath, scope) {
@@ -205,4 +360,33 @@ function readGitNameOnly(cwd, args) {
 }
 function uniqueStrings(values) {
     return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
+}
+function listFilesRecursively(repoRoot, relativeDirectory) {
+    const absoluteDirectory = path.resolve(repoRoot, relativeDirectory);
+    if (!existsSync(absoluteDirectory) || !statSync(absoluteDirectory).isDirectory())
+        return [];
+    const files = [];
+    for (const entry of readdirSync(absoluteDirectory, { withFileTypes: true })) {
+        if (entry.name === '.git' || entry.name === 'node_modules')
+            continue;
+        const relativePath = path.posix.join(relativeDirectory.replace(/\\/g, '/'), entry.name);
+        const absolutePath = path.resolve(repoRoot, relativePath);
+        if (entry.isDirectory()) {
+            files.push(...listFilesRecursively(repoRoot, relativePath));
+        }
+        else if (entry.isFile()) {
+            files.push(normalizeRelativePath(relativePath));
+        }
+        else if (entry.isSymbolicLink()) {
+            try {
+                if (statSync(absolutePath).isFile()) {
+                    files.push(normalizeRelativePath(relativePath));
+                }
+            }
+            catch {
+                // ignore broken symlinks during manifest expansion
+            }
+        }
+    }
+    return uniqueStrings(files);
 }

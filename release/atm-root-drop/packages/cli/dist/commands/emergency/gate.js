@@ -1,6 +1,13 @@
 import { CliError } from '../shared.js';
 import { isTaskflowOperatorLaneActive } from './context.js';
 import { consumeEmergencyLease } from './leases.js';
+import { recordProtectedOverrideAuthorization, recordProtectedOverrideCompletion } from './protected-override-audit.js';
+export function recordProtectedOverrideOutcome(input) {
+    return recordProtectedOverrideCompletion({
+        ...input,
+        parentEventId: input.parentEventId
+    });
+}
 export function assertEmergencyApproval(input) {
     if (input.allowTaskflowOperatorLane !== false && isTaskflowOperatorLaneActive()) {
         return null;
@@ -17,7 +24,7 @@ export function assertEmergencyApproval(input) {
             }
         });
     }
-    return consumeEmergencyLease({
+    const consumed = consumeEmergencyLease({
         cwd: input.cwd,
         leaseId: input.emergencyApproval,
         permission: input.permission,
@@ -28,4 +35,22 @@ export function assertEmergencyApproval(input) {
         reason: input.reason ?? null,
         command: input.command ?? null
     });
+    const protectedOverrideAudit = recordProtectedOverrideAuthorization({
+        cwd: input.cwd,
+        actorId: input.actorId ?? null,
+        taskId: input.taskId ?? null,
+        surface: input.surface,
+        command: input.command ?? null,
+        flags: input.flags ?? [],
+        permission: input.permission,
+        leaseId: input.emergencyApproval ?? null,
+        reason: input.reason ?? null,
+        skippedChecks: ['protected-backend-surface', input.permission],
+        touchedFiles: [],
+        emergencyUsePath: consumed.usePath
+    });
+    return {
+        ...consumed,
+        protectedOverrideAudit
+    };
 }

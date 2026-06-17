@@ -1,0 +1,8 @@
+{
+  "fixtureId": "orphan-head-recovery",
+  "scenario": "in-dev/HEAD points at an unreachable commit",
+  "inDevHeadCommit": "orphan-commit",
+  "reachableCommits": ["a", "b"],
+  "expectedDecision": "rollback-rc-to-in-dev",
+  "expectedFinding": "in-dev-head-orphaned"
+}

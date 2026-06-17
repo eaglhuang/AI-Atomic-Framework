@@ -4,6 +4,7 @@ import { relativePathFrom } from '../shared.js';
 import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.js';
 import { normalizeRelativePath } from './task-file-io-helpers.js';
 import { pathMatchesTaskScope } from './historical-delivery.js';
+import { readCloseWindowStagedIndexLockReport } from './close-window-lock.js';
 const dirtyBucketStrategies = [
     {
         id: 'governanceTrackedDirtyFiles',
@@ -90,8 +91,30 @@ export function evaluateFrameworkCloseDirtyGuard(input) {
             safeToAutoStage: false,
             operatorSummary: ok
                 ? 'No in-scope or closure-governance tracked dirty files block close.'
-                : 'Commit the task-scoped delivery or closure-governance files through the governed delivery lane before closing done.'
+                : 'Commit the task-scoped delivery or closure-governance files through the governed delivery lane before closing done. Run taskflow pre-close to classify scope drift versus foreign staged bundles. During taskflow close --write, only the active close task may stage governed bundles while the close-window staged-index lock is held; defer foreign staged files explicitly with --defer-foreign-staged when the other agent can restage afterward.'
         }
+    };
+}
+export function summarizeCloseWindowLockRemediation(input) {
+    const lock = readCloseWindowStagedIndexLockReport(input.cwd);
+    if (!lock || lock.status !== 'active') {
+        return {
+            requiredCommand: null,
+            safeToAutoStage: false,
+            operatorSummary: 'No close-window staged-index lock is active.'
+        };
+    }
+    if (lock.taskId === input.taskId) {
+        return {
+            requiredCommand: null,
+            safeToAutoStage: false,
+            operatorSummary: `${input.taskId} currently owns the close-window staged-index lock until taskflow close releases it.`
+        };
+    }
+    return {
+        requiredCommand: `node atm.mjs tasks status --task ${lock.taskId} --json`,
+        safeToAutoStage: false,
+        operatorSummary: `Close-window staged-index lock held by ${lock.taskId} blocks ${input.taskId} from staging governed bundles. Wait for release or inspect the holder with tasks status.`
     };
 }
 export function attachDirtyGuardToScopedDiffIsolation(isolation, dirtyGuard, ignoredUntrackedFiles) {

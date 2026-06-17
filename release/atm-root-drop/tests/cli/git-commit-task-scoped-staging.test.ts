@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
+import { resolveTaskScopedCommitBundle, runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempDir = path.resolve(root, '.atm-temp-test-git-commit-task-scoped-staging');
@@ -52,10 +52,11 @@ try {
   });
 
   const taskId = 'TASK-GIT-STAGING-0141';
+  const foreignTaskId = 'TASK-FOREIGN-0001';
   const scopedFile = 'src/task-scoped-staging.ts';
   const sessionId = 'session-git-staging-0141';
   const leaseId = 'lease-git-staging-0141';
-  writeJson(path.join(tempDir, '.atm/history/tasks', `${taskId}.json`), {
+  const taskDocument = {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId: taskId,
     title: 'git commit task-scoped staging fixture',
@@ -69,7 +70,8 @@ try {
       state: 'active',
       files: [scopedFile]
     }
-  });
+  };
+  writeJson(path.join(tempDir, '.atm/history/tasks', `${taskId}.json`), taskDocument);
   writeJson(path.join(tempDir, '.atm/runtime/sessions', `${sessionId}.json`), {
     schemaId: 'atm.actorWorkSession.v1',
     specVersion: '0.1.0',
@@ -102,42 +104,104 @@ try {
   const unstagedDetails = (await unstagedCommit).details ?? {};
   assert.ok(Array.isArray(unstagedDetails.inScopeDirtyFiles) && (unstagedDetails.inScopeDirtyFiles as string[]).includes(scopedFile));
   assert.ok(String(unstagedDetails.requiredCommand).includes(scopedFile));
-  assert.ok(String(unstagedDetails.requiredCommand).includes('git'));
-  assert.ok(String(unstagedDetails.requiredCommand).includes('add --'));
+  assert.ok(String(unstagedDetails.copyableCommitCommand).includes('-m'));
 
   const outsideFile = 'notes/out-of-scope.txt';
   mkdirSync(path.join(tempDir, 'notes'), { recursive: true });
   writeFileSync(path.join(tempDir, outsideFile), 'outside scope\n', 'utf8');
-  const mixedCommit = expectCliError(
+  const sharedWorktreeCommit = expectCliError(
     runAtmGit([
       'commit',
       '--cwd', tempDir,
       '--actor', 'fixture-agent',
       '--task', taskId,
       '--session', sessionId,
-      '--message', 'feat: mixed scope attempt',
+      '--message', 'feat: shared worktree dirty only',
       '--json'
     ]),
-    'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS'
+    'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED'
   );
-  const mixedDetails = (await mixedCommit).details ?? {};
-  assert.deepEqual(mixedDetails.inScopeDirtyFiles, [scopedFile]);
-  assert.deepEqual(mixedDetails.outOfScopeDirtyFiles, [outsideFile]);
-  assert.equal(mixedDetails.requiredCommand, undefined);
+  const sharedDetails = (await sharedWorktreeCommit).details ?? {};
+  assert.deepEqual(sharedDetails.inScopeDirtyFiles, [scopedFile]);
+  assert.deepEqual(sharedDetails.skippedExternalDirtyFiles, [outsideFile]);
 
-  runGit(tempDir, ['add', scopedFile]);
-  const stagedCommit = await runAtmGit([
+  const dryRun = await runAtmGit([
     'commit',
     '--cwd', tempDir,
     '--actor', 'fixture-agent',
     '--task', taskId,
     '--session', sessionId,
     '--message', 'feat: scoped deliverable',
-    '--no-verify',
+    '--dry-run',
+    '--auto-stage',
     '--json'
   ]);
-  assert.equal(stagedCommit.ok, true);
-  assert.equal(typeof stagedCommit.evidence?.commitSha, 'string');
+  assert.equal(dryRun.ok, true);
+  assert.equal((dryRun.evidence as any).commitBundle.schemaId, 'atm.taskScopedCommitBundle.v1');
+  assert.deepEqual((dryRun.evidence as any).commitBundle.stageFiles, [scopedFile]);
+  assert.deepEqual((dryRun.evidence as any).commitBundle.skippedExternalDirtyFiles, [outsideFile]);
+
+  const autoStageCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: scoped deliverable',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert.equal(autoStageCommit.ok, true);
+  assert.equal(typeof autoStageCommit.evidence?.commitSha, 'string');
+  assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
+
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "again";\n', 'utf8');
+  const foreignEvidence = `.atm/history/evidence/${foreignTaskId}.json`;
+  writeJson(path.join(tempDir, foreignEvidence), { taskId: foreignTaskId, evidence: [] });
+  runGit(tempDir, ['add', foreignEvidence]);
+  const foreignBlocked = expectCliError(
+    runAtmGit([
+      'commit',
+      '--cwd', tempDir,
+      '--actor', 'fixture-agent',
+      '--task', taskId,
+      '--session', sessionId,
+      '--message', 'feat: foreign staged bundle',
+      '--auto-stage',
+      '--json'
+    ]),
+    'ATM_GIT_COMMIT_FOREIGN_STAGED_TASKS'
+  );
+  const foreignDetails = (await foreignBlocked).details ?? {};
+  assert.ok(Array.isArray(foreignDetails.unexpectedStagedTasks));
+
+  const bundle = resolveTaskScopedCommitBundle({
+    cwd: tempDir,
+    taskId,
+    taskDocument,
+    apply: true,
+    autoStage: false,
+    deferForeignStaged: true,
+    message: 'feat: defer foreign staged',
+    actorId: 'fixture-agent',
+    trailers: [`ATM-Actor: fixture-agent`, `ATM-Task: ${taskId}`]
+  });
+  assert.equal(bundle.ok, true);
+  assert.ok(bundle.deferredForeignStagedSnapshot);
+  assert.equal(readFileSync(path.join(tempDir, foreignEvidence), 'utf8').includes(foreignTaskId), true);
+
+  const deferredCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: after defer foreign staged',
+    '--auto-stage',
+    '--defer-foreign-staged',
+    '--json'
+  ]);
+  assert.equal(deferredCommit.ok, true);
 
   console.log('[git-commit-task-scoped-staging] ok');
 } finally {

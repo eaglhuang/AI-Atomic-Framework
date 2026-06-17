@@ -64,7 +64,16 @@ export class AtmMarkdownTaskSourcePlugin {
     }
     async generate(intent) {
         const templateKey = intent.templateKey || 'aao-l2-split';
-        const fields = intent.fields || {};
+        const rawFields = intent.fields || {};
+        const dependsOn = typeof rawFields.depends_on === 'string' ? rawFields.depends_on.trim() : '';
+        const fields = {
+            ...rawFields,
+            depends_on_yaml: typeof rawFields.depends_on_yaml === 'string'
+                ? rawFields.depends_on_yaml
+                : dependsOn
+                    ? `  - ${dependsOn}`
+                    : '[]'
+        };
         const template = loadTemplate(templateKey);
         const content = applyIntent(template, fields);
         const taskId = fields.task_id || 'TASK-UNKNOWN-0000';

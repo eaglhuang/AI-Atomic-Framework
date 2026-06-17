@@ -8,6 +8,7 @@ import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-regis
 import { resolveActorWorkSession } from './actor-session.js';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.js';
 import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, relativePathFrom } from './shared.js';
+import { buildProtectedOverrideRepairCandidate, recordProtectedOverrideAuditEvent } from './emergency/protected-override-audit.js';
 import { diagnoseTaskDirectionLockAllowedFiles, isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.js';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.js';
 import { runContextMapAdvisor } from './hook/context-map-advisor.js';
@@ -1797,6 +1798,25 @@ function writePrePushSafeModeReport(cwd, input) {
         pushRefs: input.pushRefs
     };
     writeFileSync(absolutePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+    recordProtectedOverrideAuditEvent({
+        cwd: root,
+        actorId: input.actorId,
+        taskId: null,
+        surface: 'hook pre-push safe-mode',
+        command: 'node atm.mjs hook pre-push --json',
+        flags: ['ATM_FRAMEWORK_PUSH_GUARD_SAFE_MODE'],
+        permission: null,
+        leaseId: null,
+        reason: input.reason,
+        skippedChecks: ['pre-push-commit-range-guard', 'git-head-evidence-range-check'],
+        touchedFiles: [relativePathFrom(root, absolutePath)],
+        outcome: 'authorized',
+        repairCandidate: buildProtectedOverrideRepairCandidate({
+            summary: 'Pre-push safe mode bypassed protected branch guard; rerun pre-push without safe mode after fixing findings.',
+            suggestedCommand: 'node atm.mjs hook pre-push --base <base> --head HEAD --json',
+            deferredChecks: ['pre-push-commit-range-guard', 'git-head-evidence-range-check']
+        })
+    });
     return relativePathFrom(root, absolutePath);
 }
 // TASK-CID-0024: decide staged ownership when multiple active claims may cover
@@ -2701,19 +2721,11 @@ function checkStageTimeCrossFileConsistency(root, stagedFiles) {
         const content = readGitObjectText(root, `:${stagedFile}`);
         if (!content)
             continue;
-        const importRegex = /import\s+(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]/g;
+        const imports = collectStaticImportSymbols(content)
+            .filter((entry) => entry.path.startsWith('.'));
         const requireRegex = /require\(['"]([^'"]+)['"]\)/g;
         const dynamicImportRegex = /import\(['"]([^'"]+)['"]\)/g;
-        const imports = [];
         let match;
-        while ((match = importRegex.exec(content)) !== null) {
-            const symbolsStr = match[1];
-            const importPath = match[2];
-            if (importPath.startsWith('.')) {
-                const parsedSymbols = parseImportSymbols(symbolsStr);
-                imports.push({ path: importPath, symbols: parsedSymbols });
-            }
-        }
         while ((match = requireRegex.exec(content)) !== null) {
             const importPath = match[1];
             if (importPath.startsWith('.')) {
@@ -2763,7 +2775,7 @@ function checkStageTimeCrossFileConsistency(root, stagedFiles) {
                         missingSymbols.push('*');
                         break;
                     }
-                    const symbolRegex = new RegExp(`\\b${sym}\\b`);
+                    const symbolRegex = new RegExp(`\\b${escapeRegExp(sym)}\\b`);
                     if (symbolRegex.test(diffText)) {
                         missingSymbols.push(sym);
                     }
@@ -2782,10 +2794,18 @@ function checkStageTimeCrossFileConsistency(root, stagedFiles) {
     }
     return findings;
 }
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function isLikelyImportSymbol(value) {
+    return /^[A-Za-z_$][\w$]*$/.test(value) || value === 'default' || value === '*';
+}
 function parseImportSymbols(symbolsStr) {
     if (!symbolsStr)
         return ['*'];
     const trimmed = symbolsStr.trim();
+    if (!trimmed)
+        return ['*'];
     if (trimmed.startsWith('*'))
         return ['*'];
     const symbols = [];
@@ -2797,7 +2817,7 @@ function parseImportSymbols(symbolsStr) {
             if (!cleanPart)
                 continue;
             const sym = cleanPart.split(/\s+as\s+/)[0].trim();
-            if (sym)
+            if (sym && isLikelyImportSymbol(sym))
                 symbols.push(sym);
         }
         const outside = trimmed.replace(/\{[\s\S]*?\}/, '').trim();
@@ -2807,17 +2827,189 @@ function parseImportSymbols(symbolsStr) {
                 symbols.push('default');
         }
     }
-    else {
-        if (trimmed) {
-            if (trimmed.includes('*')) {
-                symbols.push('*');
-            }
-            else {
-                symbols.push('default');
-            }
+    else if (trimmed) {
+        if (trimmed.includes('*')) {
+            symbols.push('*');
+        }
+        else {
+            symbols.push('default');
         }
     }
     return symbols;
+}
+function collectStaticImportSymbols(content) {
+    const imports = [];
+    const statementRegex = /^\s*import\s+(?:type\s+)?(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]\s*;?\s*$/;
+    for (const statement of collectImportStatements(content)) {
+        const match = statementRegex.exec(statement);
+        if (!match) {
+            continue;
+        }
+        imports.push({
+            path: match[2],
+            symbols: parseImportSymbols(match[1])
+        });
+    }
+    return imports;
+}
+function collectImportStatements(content) {
+    const statements = [];
+    const length = content.length;
+    let index = 0;
+    while (index < length) {
+        const current = content[index];
+        const next = content[index + 1];
+        if (current === '/' && next === '/') {
+            index += 2;
+            while (index < length && content[index] !== '\n') {
+                index += 1;
+            }
+            continue;
+        }
+        if (current === '/' && next === '*') {
+            index += 2;
+            while (index < length && !(content[index] === '*' && content[index + 1] === '/')) {
+                index += 1;
+            }
+            index += 2;
+            continue;
+        }
+        if (current === '\'' || current === '"' || current === '`') {
+            index = skipStringLiteral(content, index);
+            continue;
+        }
+        if (isImportKeywordAt(content, index)) {
+            const start = index;
+            index += 'import'.length;
+            index = skipImportStatementTail(content, index);
+            statements.push(content.slice(start, index));
+            continue;
+        }
+        index += 1;
+    }
+    return statements;
+}
+function skipImportStatementTail(content, startIndex) {
+    const length = content.length;
+    let index = startIndex;
+    let mode = 'normal';
+    let templateDepth = 0;
+    while (index < length) {
+        const current = content[index];
+        const next = content[index + 1];
+        if (mode === 'normal') {
+            if (current === '/' && next === '/') {
+                mode = 'line-comment';
+                index += 2;
+                continue;
+            }
+            if (current === '/' && next === '*') {
+                mode = 'block-comment';
+                index += 2;
+                continue;
+            }
+            if (current === '\'') {
+                mode = 'single';
+                index += 1;
+                continue;
+            }
+            if (current === '"') {
+                mode = 'double';
+                index += 1;
+                continue;
+            }
+            if (current === '`') {
+                mode = 'template';
+                templateDepth = 0;
+                index += 1;
+                continue;
+            }
+            if (current === ';') {
+                return index + 1;
+            }
+        }
+        else if (mode === 'single') {
+            if (current === '\\') {
+                index += 2;
+                continue;
+            }
+            if (current === '\'') {
+                mode = 'normal';
+            }
+        }
+        else if (mode === 'double') {
+            if (current === '\\') {
+                index += 2;
+                continue;
+            }
+            if (current === '"') {
+                mode = 'normal';
+            }
+        }
+        else if (mode === 'template') {
+            if (current === '\\') {
+                index += 2;
+                continue;
+            }
+            if (current === '$' && next === '{') {
+                templateDepth += 1;
+                index += 2;
+                continue;
+            }
+            if (current === '}' && templateDepth > 0) {
+                templateDepth -= 1;
+                index += 1;
+                continue;
+            }
+            if (current === '`' && templateDepth === 0) {
+                mode = 'normal';
+            }
+        }
+        else if (mode === 'line-comment') {
+            if (current === '\n') {
+                mode = 'normal';
+            }
+        }
+        else if (mode === 'block-comment') {
+            if (current === '*' && next === '/') {
+                mode = 'normal';
+                index += 2;
+                continue;
+            }
+        }
+        index += 1;
+    }
+    return index;
+}
+function skipStringLiteral(content, startIndex) {
+    const quote = content[startIndex];
+    let index = startIndex + 1;
+    while (index < content.length) {
+        const current = content[index];
+        if (current === '\\') {
+            index += 2;
+            continue;
+        }
+        if (current === quote) {
+            return index + 1;
+        }
+        index += 1;
+    }
+    return index;
+}
+function isImportKeywordAt(content, index) {
+    if (content.slice(index, index + 'import'.length) !== 'import') {
+        return false;
+    }
+    const before = content[index - 1];
+    const after = content[index + 'import'.length];
+    if (before && /[A-Za-z0-9_$]/.test(before)) {
+        return false;
+    }
+    if (after && /[A-Za-z0-9_$]/.test(after)) {
+        return false;
+    }
+    return true;
 }
 function resolveLocalImportFile(root, stagedFile, importPath) {
     const dir = path.dirname(path.join(root, stagedFile));

@@ -21,7 +21,8 @@ import { attachDirtyGuardToScopedDiffIsolation, buildCloseScopedDiffIsolation, e
 import { buildResidueClassification, buildResidueDiagnosisEvidenceFromTriangulation } from './tasks/residue-diagnostics.js';
 import { dispatchTasksAction } from './tasks/command-dispatch.js';
 import { runAtmGit } from './git-governance.js';
-import { assertEmergencyApproval } from './emergency/gate.js';
+import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.js';
+import { recordFailedProtectedOverrideAttempt } from './emergency/protected-override-audit.js';
 import { emergencyRoot, readEmergencyLease } from './emergency/leases.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.js';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.js';
@@ -349,23 +350,35 @@ function isCliErrorWithCode(error, codePrefix) {
     return error instanceof CliError && typeof error.code === 'string' && error.code.startsWith(codePrefix);
 }
 function recordFailedEmergencyUseAttempt(input) {
+    const auditPath = recordFailedProtectedOverrideAttempt({
+        cwd: input.cwd,
+        leaseId: input.leaseId,
+        permission: input.permission,
+        surface: input.surface,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        reason: input.reason,
+        command: input.command,
+        flags: input.flags,
+        failureCode: input.failureCode
+    });
     if (!input.leaseId)
-        return null;
+        return auditPath;
     try {
         const lease = readEmergencyLease(input.cwd, input.leaseId);
         if (lease.status !== 'active')
-            return null;
+            return auditPath;
         if (lease.permission !== input.permission)
-            return null;
+            return auditPath;
         if (lease.taskId && lease.taskId !== input.taskId)
-            return null;
+            return auditPath;
         if (input.actorId && lease.actorId !== input.actorId)
-            return null;
+            return auditPath;
         const usedCount = typeof lease.usedCount === 'number' ? lease.usedCount : Number(lease.usedCount ?? 0);
         if (!Number.isFinite(usedCount) || usedCount >= lease.maxUses)
-            return null;
+            return auditPath;
         if (Date.parse(lease.expiresAt) <= Date.now())
-            return null;
+            return auditPath;
         const usedAt = new Date().toISOString();
         const usePath = path.join(emergencyRoot(input.cwd), 'uses', `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
         mkdirSync(path.dirname(usePath), { recursive: true });
@@ -394,7 +407,7 @@ function recordFailedEmergencyUseAttempt(input) {
         return relativePathFrom(input.cwd, usePath);
     }
     catch {
-        return null;
+        return auditPath;
     }
 }
 export function loadTaskDocumentOrThrow(cwd, taskId) {
@@ -2276,6 +2289,25 @@ async function runTasksClose(argv) {
         const taskQueue = options.status === 'done'
             ? advanceTaskQueueAfterClose(options.cwd, options.taskId, { batchId: owningBatch?.batchId ?? options.batchId })
             : null;
+        let protectedOverrideOutcome = null;
+        if (emergencyUse?.protectedOverrideAudit?.event?.eventId) {
+            protectedOverrideOutcome = recordProtectedOverrideOutcome({
+                cwd: options.cwd,
+                parentEventId: emergencyUse.protectedOverrideAudit.event.eventId,
+                actorId,
+                taskId: options.taskId,
+                surface: protectedCloseSurface,
+                command: protectedCloseCommand,
+                flags: protectedCloseFlags,
+                permission: 'backend.tasks.close',
+                leaseId: options.emergencyApproval,
+                reason: options.reason ?? 'Direct close backend historical-delivery path.',
+                skippedChecks: ['taskflow-operator-lane', 'protected-backend-surface'],
+                touchedFiles: closeArtifactFiles,
+                outcome: 'succeeded',
+                emergencyUsePath: emergencyUse.usePath
+            });
+        }
         return makeResult({
             ok: true,
             command: 'tasks',
@@ -2301,6 +2333,7 @@ async function runTasksClose(argv) {
                 // critical changes were in-scope vs isolated as advisory unrelated changes.
                 closeScopedDiffIsolation,
                 emergencyUse,
+                protectedOverrideOutcome,
                 failedEmergencyAuditPath,
                 taskQueue,
                 historicalBatchSlice
@@ -5771,7 +5804,9 @@ export async function generateTaskCard(input) {
         fields: {
             task_id: input.taskId,
             title: input.title || 'New Task',
-            depends_on: input.dependsOn || 'TASK-AAO-0000',
+            depends_on_yaml: input.dependsOn?.trim()
+                ? `  - ${input.dependsOn.trim()}`
+                : '[]',
             scope_path: input.scopePath || 'src/main.ts',
             test_path: input.testPath || 'tests/main.test.ts',
             atom_id: input.atomId || 'atm.unowned',

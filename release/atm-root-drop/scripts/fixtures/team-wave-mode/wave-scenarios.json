@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.teamWaveDogfoodFixture.v1",
+  "description": "Dogfood scenarios for Team Agents Wave Mode, modeled on the broker-format-adapter family shape (multiple sibling cards delivering disjoint adapter files plus a shared coverage map).",
+  "appendSafePaths": ["atomic_workbench/atomization-coverage/path-to-atom-map.json"],
+  "scenarios": [
+    {
+      "name": "safe-wave",
+      "expect": { "wavesAtLeast": 1, "firstWaveSize": 2, "admitAll": true },
+      "cards": [
+        {
+          "taskId": "TASK-ADAPTER-A",
+          "dependencies": [],
+          "scopePaths": ["packages/core/src/broker/adapters/format-a.ts", "atomic_workbench/atomization-coverage/path-to-atom-map.json"],
+          "deliverables": ["packages/core/src/broker/adapters/format-a.ts"],
+          "validators": ["npm run typecheck"],
+          "targetRepo": "AI-Atomic-Framework",
+          "closureAuthority": "target_repo",
+          "ownerAtomOrMap": "atm.adapter-format-a-map"
+        },
+        {
+          "taskId": "TASK-ADAPTER-B",
+          "dependencies": [],
+          "scopePaths": ["packages/core/src/broker/adapters/format-b.ts", "atomic_workbench/atomization-coverage/path-to-atom-map.json"],
+          "deliverables": ["packages/core/src/broker/adapters/format-b.ts"],
+          "validators": ["npm run typecheck"],
+          "targetRepo": "AI-Atomic-Framework",
+          "closureAuthority": "target_repo",
+          "ownerAtomOrMap": "atm.adapter-format-b-map"
+        }
+      ]
+    },
+    {
+      "name": "unsafe-wave-same-deliverable",
+      "expect": { "admitAll": false, "admittedCount": 1 },
+      "cards": [
+        {
+          "taskId": "TASK-ADAPTER-C",
+          "dependencies": [],
+          "scopePaths": ["packages/core/src/broker/adapters/shared-registry.ts"],
+          "deliverables": ["packages/core/src/broker/adapters/shared-registry.ts"],
+          "validators": ["npm run typecheck"],
+          "targetRepo": "AI-Atomic-Framework",
+          "closureAuthority": "target_repo",
+          "ownerAtomOrMap": "atm.adapter-registry-map"
+        },
+        {
+          "taskId": "TASK-ADAPTER-D",
+          "dependencies": [],
+          "scopePaths": ["packages/core/src/broker/adapters/shared-registry.ts"],
+          "deliverables": ["packages/core/src/broker/adapters/shared-registry.ts"],
+          "validators": ["npm run typecheck"],
+          "targetRepo": "AI-Atomic-Framework",
+          "closureAuthority": "target_repo",
+          "ownerAtomOrMap": "atm.adapter-registry-map"
+        }
+      ]
+    },
+    {
+      "name": "mixed-wave-dependency",
+      "expect": { "admitAll": false, "admittedCount": 1, "deferredHasDependency": true },
+      "cards": [
+        {
+          "taskId": "TASK-ADAPTER-E",
+          "dependencies": [],
+          "scopePaths": ["packages/core/src/broker/adapters/format-e.ts"],
+          "deliverables": ["packages/core/src/broker/adapters/format-e.ts"],
+          "validators": ["npm run typecheck"],
+          "targetRepo": "AI-Atomic-Framework",
+          "closureAuthority": "target_repo",
+          "ownerAtomOrMap": "atm.adapter-format-e-map"
+        },
+        {
+          "taskId": "TASK-ADAPTER-F",
+          "dependencies": ["TASK-ADAPTER-OPEN"],
+          "scopePaths": ["packages/core/src/broker/adapters/format-f.ts"],
+          "deliverables": ["packages/core/src/broker/adapters/format-f.ts"],
+          "validators": ["npm run typecheck"],
+          "targetRepo": "AI-Atomic-Framework",
+          "closureAuthority": "target_repo",
+          "ownerAtomOrMap": "atm.adapter-format-f-map"
+        }
+      ]
+    }
+  ]
+}

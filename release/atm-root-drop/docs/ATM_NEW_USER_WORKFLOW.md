@@ -153,9 +153,38 @@ node atm.mjs evidence run --task TASK-XXXX-0001 --actor <actor> --command "npm r
 
 Running `npm run typecheck` in a plain terminal can help you debug, but it is not task evidence until ATM captures it with `evidence run`. `evidence add` is the raw/manual surface for operators who already have the exact command, exit code, and sha256 output digests.
 
+If the work pulls in a linked surface that was not in the original `allowedFiles` (a doc, a help snapshot, a test, or a generated artifact), widen the scope through the audited lane instead of editing the lock by hand:
+
+```bash
+node atm.mjs tasks scope add --task TASK-XXXX-0001 --actor <actor> --add docs/foo.md --class doc-sync --phase during-implementation --reason "linked doc" --json
+```
+
+This records a `scope-amendment` event with its class, phase, and `mode: normal`, and that history stays visible at closeout. `tasks scope repair` is the protected emergency variant — it needs `--emergency-approval` and `--reason` and records `mode: repair`. Reach for it only when a human approved a maintenance exception.
+
 ## Step 6: Preview the close
 
-Before closing, dry-run the close. This is the same idea as Step 1, applied to the closeback:
+Before closing, run the read-only pre-close checkpoint first. It does not mutate the worktree:
+
+```bash
+node atm.mjs taskflow pre-close \
+  --task TASK-XXXX-0001 \
+  --actor <actor> \
+  --json
+```
+
+**What you see:**
+
+- `scopeTrackedDirtyFiles`: in-scope delivery still dirty and blocking close.
+- `unexpectedStagedTasks`: foreign task governance bundles already staged in git index.
+- `mixedDeliveryCommit` / `missingApprovalLease`: historical delivery needs waiver approval.
+- `staleEvidence`: required validators missing fresh command-backed evidence.
+- `writeRollbackSummary`: what to verify if `--write` partially succeeds.
+- `closeWriteTransaction` (on `--write`): transaction phase `pending`, `committed`, or `rolled_back`. If the governed commit bundle fails after backend close, ATM restores the prior ledger close state instead of leaving a done task stranded on disk.
+- `closeWindowLock` / `releasedCloseWindowLock` (on `--write`): exclusive staged-index lock acquired before delivery staging; only the active close task may stage governed bundles until release.
+
+Remediation must stay scoped. Do not use broad `git checkout -- .`, `git restore .`, or silent unstage of another agent's close bundle. Defer foreign staged files explicitly with `taskflow close --defer-foreign-staged` and confirm the other agent can restage afterward.
+
+Then dry-run the close. This is the same idea as Step 1, applied to the closeback:
 
 ```bash
 node atm.mjs taskflow close \
@@ -187,6 +216,7 @@ node atm.mjs taskflow close \
 
 **What ATM does, by default:**
 
+- Acquires an exclusive close-window staged-index lock before staging.
 - Computes the dual-repo governed commit bundle (`atm.taskflowGovernedCommitBundle.v1`).
 - **Exact-stages** the listed files in the target repo and the planning repo. Unrelated dirty files are *not* staged.
 - **Auto-commits** both repos with deterministic, governed commit messages.
@@ -238,6 +268,7 @@ These rules exist because they have been violated, and each violation cost a rea
 - **Do not call `tasks close`, `tasks reconcile`, or `tasks repair-closure` as the normal path.** Those are protected backend / emergency surfaces. The official operator lanes are `taskflow open` and `taskflow close`. The backend commands exist for repair and edge cases — they are not your daily driver.
 - **`tasks new` and `tasks import` are not protected, but they are still not the normal operator path.** `tasks new` is the **low-level template generator** (no governed lifecycle, no runtime import). `tasks import` is the **runtime synchronization surface** (loads a planning markdown into the target ledger). `taskflow open --write` already calls both internally — invoke them directly only when you have a clear reason (e.g. generating a template offline).
 - **Do not use `--force`, `--no-verify`, broad cleanup commands, historical waivers, or `git reset --hard`** unless a human approved emergency maintenance for that specific scope.
+- When `--no-verify` is unavoidable, obtain `backend.gitHookBypass` approval (`node atm.mjs emergency approve ... --allowed-flag --no-verify`) and pass `--emergency-approval` to `node atm.mjs git commit`. Inspect the audit trail with `node atm.mjs emergency audit --json`. Authorization is not completion: check `outcome` for `authorized`, `succeeded`, or `failed` plus any `repairCandidate`.
 - **Do not claim "source done", "planning done", or "mailbox done" as governed done.** Governed done means the target repo ledger is closed *and* a closure packet exists *and* a close event was recorded. Anything less is not done.
 
 If you find yourself reaching for any of the above, stop and report to the human.
@@ -286,3 +317,21 @@ node atm.mjs taskflow close --task TASK-... --actor <actor> --write --no-commit 
 That's the whole normal workflow. Seven steps, three commands you really need to remember (`taskflow open`, `next`, `taskflow close`), and one promise from ATM: governed work goes through the official lanes, and the daily path does not require touching governance files by hand.
 
 If a step does not feel smooth, that is a product gap, not a user error — please report it. This guide is the contract; the CLI should keep getting closer to it.
+
+## Running several cards in parallel (Team Agents Wave Mode)
+
+When several cards are safe to advance together, a coordinator can schedule them
+as a wave instead of one-at-a-time:
+
+```bash
+# Plan an ordered wave from declared task metadata
+node atm.mjs team wave plan TASK-...,TASK-...,TASK-... --json
+
+# Dispatch the first admissible wave (records a coordinator-owned envelope)
+node atm.mjs team wave dispatch TASK-...,TASK-... --actor <coordinator> --json
+```
+
+Wave Mode only schedules and admits parallel work — it fails closed on unsafe
+combinations and still routes closeout through `batch checkpoint` / `taskflow
+close`. It is not a closeout shortcut. See `docs/TEAM_AGENTS_WAVE_MODE.md` for
+the full operator guide.

@@ -5,6 +5,7 @@ import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, read
 import { getCommandSpec } from './command-specs.js';
 import { runTasks } from './tasks.js';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.js';
+import { runTeamWave } from './team-wave.js';
 import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../core/dist/broker/team-lane.js';
 const teamPermissionCatalog = [
     { id: 'task.lifecycle', mode: 'exclusive' },
@@ -215,8 +216,12 @@ export async function runTeam(argv) {
     const parsed = parseArgsForCommand(spec, argv);
     const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
     const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
+    if (action === 'wave') {
+        // TASK-MAO-0024: Team Agents Wave Mode planning surface.
+        return runTeamWave(parsed.positional.slice(1).map(String), cwd);
+    }
     if (!['plan', 'start', 'status', 'validate'].includes(action)) {
-        throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, wave', { exitCode: 2 });
     }
     if (action === 'status') {
         return buildTeamStatusResult({

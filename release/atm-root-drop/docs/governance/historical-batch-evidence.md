@@ -82,7 +82,17 @@ incomplete slice into a closable slice.
 
 ## Closing from a historical batch slice
 
-Once a task has a close-ready slice, the operator lane can reuse it:
+Once a task has a close-ready slice, run pre-close before any write:
+
+```bash
+node atm.mjs taskflow pre-close \
+  --task TASK-A \
+  --actor codex-main \
+  --historical-batch <batch-id-or-path> \
+  --json
+```
+
+Then dry-run the close:
 
 ```bash
 node atm.mjs taskflow close \
@@ -107,9 +117,23 @@ node atm.mjs tasks close \
 `taskflow close` is still the normal operator lane. `tasks close` remains the
 backend surface.
 
+When using `taskflow close --write`, inspect `closeWriteTransaction` in the
+JSON result. A commit-bundle failure rolls back the close transition and leaves
+the task not-done instead of reporting success with a stranded done ledger.
+
 ## Relationship to ordinary evidence
 
 Historical batch does not replace normal evidence capture. It fills the gap
 when real delivery timing and governance timing diverged. For ordinary work,
 use `evidence run` or `evidence add` during the task itself and close through
 the standard path.
+
+## Relationship to scope amendments
+
+A historical-batch close still reads the task's scope-amendment history. When a
+task grows linked surfaces (docs, help snapshots, tests, or generated artifacts)
+through `tasks scope add`, each amendment records its class, phase, and
+`mode: normal`, and that history stays visible in the close plan. This keeps the
+strict-lane discipline intact: a reviewer can separate normal audited scope
+growth from a genuine maintenance exception (`tasks scope repair`,
+`mode: repair`) even when the real delivery landed as one batch.

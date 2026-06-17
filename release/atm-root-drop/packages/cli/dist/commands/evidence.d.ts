@@ -1,5 +1,19 @@
 export type EvidenceGate = 'close' | 'commit' | 'pr';
 type CanonicalEvidenceKind = 'test' | 'artifact' | 'attestation' | 'review' | 'commit' | 'waiver' | 'other';
+export declare const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = "atm.evidenceBundleManifest.v1";
+export interface EvidenceBundleManifest {
+    readonly schemaId: typeof EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID;
+    readonly taskId: string;
+    readonly updatedAt: string;
+    readonly updatedBy: string;
+    readonly freshValidationPasses: readonly string[];
+    readonly staleValidationPasses: readonly string[];
+    readonly commandRuns: readonly Record<string, unknown>[];
+    readonly artifactPaths: readonly string[];
+}
+export declare function evidenceBundleManifestRelativePath(taskId: string): string;
+export declare function evidenceBundleManifestPathForTask(cwd: string, taskId: string): string;
+export declare function readEvidenceBundleManifest(cwd: string, taskId: string): EvidenceBundleManifest | null;
 export interface EvidenceGateResult {
     readonly ok: boolean;
     readonly gate: EvidenceGate;
