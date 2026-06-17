@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.mutationRequest.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "parallel-0041-0042 phase2 real paths"
+  },
+  "requestId": "REQ-0041-EVIDENCE-GATES",
+  "actorId": "cursor-composer-2.5",
+  "filePath": "docs/governance/evidence-gates.md",
+  "op": "insertAfterHeading",
+  "target": "## Gate Rules",
+  "value": "\n## Evidence Bundle Manifest\n\nSuccessful `evidence run` and fresh `evidence add` commands update\n`.atm/history/evidence/<taskId>.bundle-manifest.json` with task-bound validator\npasses and command-run proof. The manifest separates `freshValidationPasses`\nfrom `staleValidationPasses` so historical-reference or draft evidence cannot be\ntreated as fresh live proof.\n\nDirectory-style deliverables are expanded into an explicit file manifest before\ntaskflow close metadata validation. Empty or missing directory deliverables\nremain fail-closed, but fixture folders with real files can close when their\ncontents match the expanded manifest.\n"
+}

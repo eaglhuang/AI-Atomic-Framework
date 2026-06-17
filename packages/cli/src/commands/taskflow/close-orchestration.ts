@@ -864,6 +864,158 @@ export async function executeCloseWriteCommitPhase<TBundle extends { failClosed?
   }
 }
 
+export const TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID = 'atm.taskCloseCompletionChecklist.v1';
+
+export type TaskCloseCompletionChecklistFieldId =
+  | 'ledger-done'
+  | 'target-governance-committed'
+  | 'planning-mirror-committed'
+  | 'lifecycle-events-recorded'
+  | 'delivery-sha'
+  | 'waiver-reason';
+
+export interface TaskCloseCompletionChecklistField {
+  readonly id: TaskCloseCompletionChecklistFieldId;
+  readonly ok: boolean;
+  readonly value: string | null;
+  readonly detail: string | null;
+}
+
+export interface TaskCloseCompletionChecklist {
+  readonly schemaId: typeof TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID;
+  readonly taskId: string;
+  readonly partialClose: boolean;
+  readonly summary: string;
+  readonly fields: readonly TaskCloseCompletionChecklistField[];
+}
+
+function normalizeLifecycleStatus(value: string | null | undefined): string | null {
+  const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+  return normalized || null;
+}
+
+function readClosurePacketRecord(cwd: string, relativePath: string | null): Record<string, unknown> | null {
+  if (!relativePath) return null;
+  const absolutePath = path.isAbsolute(relativePath) ? relativePath : path.join(cwd, relativePath);
+  if (!existsSync(absolutePath)) return null;
+  try {
+    return JSON.parse(readFileSync(absolutePath, 'utf8')) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function readCloseTransitionCommand(cwd: string, taskId: string, transitionId: string | null): string | null {
+  if (!transitionId) return null;
+  const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${transitionId}.json`);
+  if (!existsSync(eventPath)) return null;
+  try {
+    const event = JSON.parse(readFileSync(eventPath, 'utf8')) as Record<string, unknown>;
+    return typeof event.command === 'string' ? event.command : null;
+  } catch {
+    return null;
+  }
+}
+
+function closeCommandUsedWaiver(command: string | null): boolean {
+  return Boolean(command && /--waiver-out-of-scope-delivery\b/.test(command));
+}
+
+export function buildCloseCompletionChecklist(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+  triangulation: {
+    liveLedger: { status: string | null };
+    planningFrontmatter: { status: string | null; source: string | null };
+    lastTransitionEvent: { action: string | null; createdAt: string | null } | null;
+  };
+}): TaskCloseCompletionChecklist {
+  const ledgerStatus = normalizeLifecycleStatus(typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null);
+  const planningStatus = normalizeLifecycleStatus(input.triangulation.planningFrontmatter.status);
+  const ledgerDone = ledgerStatus === 'done';
+  const closurePacketPath = typeof input.taskDocument.closurePacket === 'string'
+    ? input.taskDocument.closurePacket
+    : null;
+  const closurePacket = readClosurePacketRecord(input.cwd, closurePacketPath);
+  const targetCommit = typeof closurePacket?.targetCommit === 'string'
+    ? closurePacket.targetCommit
+    : (typeof input.taskDocument.delivery_commit === 'string' ? input.taskDocument.delivery_commit : null);
+  const closeReason = typeof input.taskDocument.closeReason === 'string' ? input.taskDocument.closeReason.trim() : '';
+  const lastTransitionId = typeof input.taskDocument.lastTransitionId === 'string' ? input.taskDocument.lastTransitionId : null;
+  const closeCommand = readCloseTransitionCommand(input.cwd, input.taskId, lastTransitionId);
+  const waiverRequired = closeCommandUsedWaiver(closeCommand);
+  const closeEventRecorded = input.triangulation.lastTransitionEvent?.action === 'close'
+    && Boolean(lastTransitionId)
+    && existsSync(path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId, `${lastTransitionId}.json`));
+  const targetGovernanceCommitted = Boolean(closurePacketPath && existsSync(
+    path.isAbsolute(closurePacketPath) ? closurePacketPath : path.join(input.cwd, closurePacketPath)
+  ));
+  const planningMirrorCommitted = !ledgerDone || planningStatus === 'done';
+  const fields: TaskCloseCompletionChecklistField[] = [
+    {
+      id: 'ledger-done',
+      ok: ledgerDone,
+      value: ledgerStatus,
+      detail: ledgerDone ? 'Live ledger records done.' : 'Live ledger is not done yet.'
+    },
+    {
+      id: 'target-governance-committed',
+      ok: targetGovernanceCommitted,
+      value: closurePacketPath,
+      detail: targetGovernanceCommitted
+        ? 'Closure packet is present in the target repo.'
+        : 'Closure packet is missing; target governance close may be incomplete.'
+    },
+    {
+      id: 'planning-mirror-committed',
+      ok: planningMirrorCommitted,
+      value: input.triangulation.planningFrontmatter.status,
+      detail: planningMirrorCommitted
+        ? 'Planning mirror agrees with governed close state.'
+        : 'Planning mirror is not done while the live ledger is done.'
+    },
+    {
+      id: 'lifecycle-events-recorded',
+      ok: closeEventRecorded,
+      value: lastTransitionId,
+      detail: closeEventRecorded
+        ? 'Close transition event is recorded under .atm/history/task-events.'
+        : 'No close transition event is recorded for this task.'
+    },
+    {
+      id: 'delivery-sha',
+      ok: Boolean(targetCommit),
+      value: targetCommit,
+      detail: targetCommit
+        ? 'Delivery commit SHA is recorded in closure provenance.'
+        : 'Delivery SHA is missing from closure provenance.'
+    },
+    {
+      id: 'waiver-reason',
+      ok: !waiverRequired || Boolean(closeReason),
+      value: closeReason || null,
+      detail: waiverRequired
+        ? (closeReason ? 'Waiver reason is recorded for out-of-scope delivery.' : 'Waiver was used but no durable reason is recorded.')
+        : 'No out-of-scope delivery waiver was required.'
+    }
+  ];
+  const requiredFields = fields.filter((entry) => entry.id !== 'waiver-reason' || waiverRequired);
+  const partialClose = ledgerDone && requiredFields.some((entry) => !entry.ok);
+  const summary = partialClose
+    ? 'Task ledger is done, but close completion checklist shows a partial close.'
+    : ledgerDone
+      ? 'Task close completion checklist is satisfied.'
+      : 'Task is not done; close completion checklist is informational only.';
+  return {
+    schemaId: TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID,
+    taskId: input.taskId,
+    partialClose,
+    summary,
+    fields
+  };
+}
+
 // === TASK-MAO-0041 evidence-bundle-manifest (cursor-composer-2.5) START ===
 // 0041 close-orchestration hooks live in this region only.
 export {

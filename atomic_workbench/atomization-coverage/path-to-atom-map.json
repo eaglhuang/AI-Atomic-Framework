@@ -48,6 +48,20 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "docs/governance/team-agents/knowledge-index-contract.md",
+      "atom_id": "atm.team-agents-knowledge-map",
+      "capability": "Team Agents advisory knowledge storage boundary, separating canonical .atm/knowledge shards from generated .atm/runtime/knowledge caches and forbidding second-registry authority",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0020"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/templates/README.md",
+      "atom_id": "atm.team-agents-knowledge-map",
+      "capability": "Template-level Team knowledge guidance for Markdown-first advisory shards, canonical roots, generated cache roots, and non-authoritative usage",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0020"
+    },
+    {
       "path_pattern": "docs/governance/team-agents/templates/agent-report-template.md",
       "atom_id": "atm.team-agents-template-map",
       "capability": "Canonical agent report template for role, status, files read/changed, commands, findings, blockers, and recommendation",
@@ -77,10 +91,10 @@
     },
     {
       "path_pattern": "docs/governance/team-agents/templates/team-memory-shard-template.md",
-      "atom_id": "atm.team-agents-template-map",
-      "capability": "Canonical team memory shard template for retained operational memory, validation, and retention rules",
+      "atom_id": "atm.team-agents-knowledge-map",
+      "capability": "Canonical team memory shard template for retained advisory knowledge, canonical/runtime storage boundaries, validation, and retention rules",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0005"
+      "source_task": "TASK-TEAM-0020"
     },
     {
       "path_pattern": "docs/governance/team-agents/templates/team-summary-template.md",
@@ -1551,11 +1565,32 @@
       "capability": "Operator guidance: closeout has one lifecycle owner; tasks repair-claim is diagnose-first recovery, not a close shortcut.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/task-view.ts",
+      "atom_id": "atm.task-view-dashboard-map",
+      "capability": "Read-only task dashboard over status triangulation, evidence blockers, close completion checklist, and next safe operator command.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0044"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.task-view-dashboard-map",
+      "capability": "Close completion checklist builder for ledger, governance, planning mirror, lifecycle events, delivery SHA, and waiver reason.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0044"
+    },
+    {
+      "path_pattern": "tests/cli/task-view-dashboard.test.ts",
+      "atom_id": "atm.task-view-dashboard-map",
+      "capability": "Regression coverage for task-view dashboard and close completion checklist.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0044"
     }
   ],
   "summary": {
-    "total_production_paths": 187,
-    "mapped_paths": 187,
+    "total_production_paths": 190,
+    "mapped_paths": 190,
     "coverage_percentage": 100,
     "atoms_defined": 111,
     "atoms_with_evidence": 0,

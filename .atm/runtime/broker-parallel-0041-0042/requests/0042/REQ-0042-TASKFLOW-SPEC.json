@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.mutationRequest.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "parallel-0041-0042 phase2"
+  },
+  "requestId": "REQ-0042-TASKFLOW-SPEC",
+  "actorId": "antigravity-gemini-3.5-flash",
+  "filePath": "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+  "op": "replaceRange",
+  "target": "11:11",
+  "value": "  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow pre-close is the read-only first checkpoint before historical close --write; it reports scopeTrackedDirtyFiles, unexpectedStagedTasks, mixedDeliveryCommit, staleEvidence, and missingApprovalLease without mutating the worktree. taskflow close --write acquires an exclusive close-window staged-index lock before staging, blocks competing stage operations, and releases the lock on commit, rollback, or abort while surfacing closeWriteTransaction phase pending, committed, or rolled_back in JSON. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths. taskflow close enforces evidence bundle manifest validation and validator scope taxonomy.',"
+}

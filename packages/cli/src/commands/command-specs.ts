@@ -66,6 +66,7 @@ import reviewSpec from './command-specs/review.spec.ts';
 import agentPackSpec from './command-specs/agent-pack.spec.ts';
 import reviewAdvisorySpec from './command-specs/review-advisory.spec.ts';
 import taskflowSpec from './command-specs/taskflow.spec.ts';
+import taskViewSpec from './command-specs/task-view.spec.ts';
 import brokerSpec from './command-specs/broker.spec.ts';
 import routeSpec from './command-specs/route.spec.ts';
 
@@ -137,6 +138,7 @@ export const commandSpecs = Object.freeze({
   welcome: welcomeSpec,
   verify: verifySpec,
   taskflow: withVisibility(taskflowSpec, 'internal'),
+  'task-view': taskViewSpec,
   broker: brokerSpec,
   route: routeSpec,
 });

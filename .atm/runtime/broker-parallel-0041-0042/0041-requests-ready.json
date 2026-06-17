@@ -1,0 +1,30 @@
+{
+  "schemaId": "atm.brokerParallelLaneReady.v1",
+  "experimentId": "parallel-0041-0042-2026-06-17",
+  "phase": 2,
+  "agent": "0041",
+  "actorId": "cursor-composer-2.5",
+  "readyAt": "2026-06-17T11:00:00.000Z",
+  "baseCommit": "82fb0f3990bd9b231900dd3270f1ab6a8800572e",
+  "requestDir": ".atm/runtime/broker-parallel-0041-0042/requests/0041",
+  "requestFiles": [
+    "01-REQ-0041-EVIDENCE-GATES.json",
+    "02-REQ-0041-ATOMMAP-EVIDENCE.json",
+    "03-REQ-0041-ATOMMAP-HISTORICAL.json",
+    "04-REQ-0041-ATOMMAP-CLOSE-ORCH.json",
+    "05-REQ-0041-ATOMMAP-TEST.json",
+    "06-REQ-0041-ATOMMAP-DOCS.json",
+    "07-REQ-0041-ATOMMAP-SUMMARY.json",
+    "08-REQ-0041-ATOMMAP-SUMMARY-MAPPED.json",
+    "09-REQ-0041-CLOSE-ORCH-IMPORTS.json",
+    "10-REQ-0041-CLOSE-ORCH-BLOCK.json",
+    "11-REQ-0041-TASKFLOW-SPEC.json"
+  ],
+  "exclusiveDirtyFiles": [
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/tasks/historical-delivery.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "tests/cli/evidence-bundle-manifest.test.ts"
+  ],
+  "status": "requests-ready"
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.mutationRequest.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "parallel-0041-0042 phase2 real paths"
+  },
+  "requestId": "REQ-0041-ATOMMAP-EVIDENCE",
+  "actorId": "cursor-composer-2.5",
+  "filePath": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+  "op": "upsert",
+  "target": "/mappings/220",
+  "value": {
+    "path_pattern": "packages/cli/src/commands/evidence.ts",
+    "atom_id": "atm.evidence-bundle-manifest-map",
+    "capability": "Persist task-bound evidence bundle manifests with fresh versus stale validator passes after successful evidence run/add.",
+    "coverage_status": "active",
+    "source_task": "TASK-MAO-0041"
+  }
+}

@@ -163,6 +163,17 @@ This records a `scope-amendment` event with its class, phase, and `mode: normal`
 
 ## Step 6: Preview the close
 
+When you need one read-only answer for "where is this task?" without chaining `next`, `tasks status`, `evidence show`, and `doctor`, use:
+
+```bash
+node atm.mjs task-view \
+  --task TASK-XXXX-0001 \
+  --actor <actor> \
+  --json
+```
+
+`task-view` is **read-only**. It summarizes live ledger status, planning mirror status, residue bucket, evidence blockers, the close completion checklist (ledger done, target governance committed, planning mirror committed, lifecycle events, delivery SHA, waiver reason), and the next safe operator command. It does **not** claim, repair, close, or replace `next` routing.
+
 Before closing, run the read-only pre-close checkpoint first. It does not mutate the worktree:
 
 ```bash
@@ -266,6 +277,7 @@ These rules exist because they have been violated, and each violation cost a rea
 - **Do not edit `.atm/history/**` by hand.** Ever. Even when "just fixing one field" looks tempting. Governance writes are CLI-only.
 - **Do not skip `next`.** The router exists so two agents do not claim the same scope. If you bypass it, you will eventually corrupt the queue.
 - **Do not call `tasks close`, `tasks reconcile`, or `tasks repair-closure` as the normal path.** Those are protected backend / emergency surfaces. The official operator lanes are `taskflow open` and `taskflow close`. The backend commands exist for repair and edge cases — they are not your daily driver.
+- **`task-view` is read-only visibility, not a second lifecycle.** Use it to understand one task's status, evidence blockers, partial close state, and the next safe command. Use `next` for routing and `taskflow` for governed open/close.
 - **`tasks repair-claim` is diagnose-first operator recovery, not a close shortcut.** Default mode reports stale, dangling, expired, or conflicting claim drift without mutation. Use `--write --reason` only when diagnosis shows repairable drift and no valid active lease blocks repair. Closeout still has one lifecycle owner; other agents stay read-only until handoff, release, or governed repair clears drift.
 - **`tasks new` and `tasks import` are not protected, but they are still not the normal operator path.** `tasks new` is the **low-level template generator** (no governed lifecycle, no runtime import). `tasks import` is the **runtime synchronization surface** (loads a planning markdown into the target ledger). `taskflow open --write` already calls both internally — invoke them directly only when you have a clear reason (e.g. generating a template offline).
 - **Do not use `--force`, `--no-verify`, broad cleanup commands, historical waivers, or `git reset --hard`** unless a human approved emergency maintenance for that specific scope.
