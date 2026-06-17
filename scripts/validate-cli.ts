@@ -678,6 +678,15 @@ try {
   assert(validateRepo.parsed.ok === true, 'validate after init must report ok=true');
   assertMessageCode(validateRepo, 'ATM_VALIDATE_REPOSITORY_OK');
 
+  const validateTaxonomy = await runAtm(['validate', 'taxonomy', '--json'], blankRepo);
+  assert(validateTaxonomy.exitCode === 0, 'validate taxonomy must exit 0');
+  assertReadable(validateTaxonomy, 'validate');
+  assert(validateTaxonomy.parsed.ok === true, 'validate taxonomy must report ok=true');
+  assert(validateTaxonomy.parsed.evidence.validation === 'taxonomy', 'validate taxonomy must identify validation type');
+  assert(validateTaxonomy.parsed.evidence.taxonomy['typecheck'].scope === 'task-local', 'typecheck must default to task-local scope');
+  assert(validateTaxonomy.parsed.evidence.taxonomy['validate:neutrality'].scope === 'global-advisory', 'neutrality must default to global-advisory when no protected files touched');
+  assertMessageCode(validateTaxonomy, 'ATM_VALIDATE_TAXONOMY_OK');
+
   const integrationRepo = path.join(tempRoot, 'integration-repo');
   mkdirSync(integrationRepo, { recursive: true });
   const integrationList = await runAtm(['integration', 'list', '--cwd', integrationRepo], integrationRepo);

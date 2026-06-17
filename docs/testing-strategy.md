@@ -25,6 +25,13 @@ trade-off, not in whichever directory feels closest.
 - **Changing the bootstrap / self-governance loop** → run the **self-host
   alpha** smoke. This is the most expensive layer and the highest signal.
 
+## Validator Scope Taxonomy and Gating
+
+ATM classifies validators into distinct scopes to control close gating:
+- **Task-Local & Release-Blocking**: Required to pass for task close.
+- **Global-Advisory & Diagnostic**: Ran for repository health and documented, but do not prevent task closure unless explicitly declared in the task card.
+- **Neutrality Scan**: Promoted dynamically to task-local if core protected surfaces (e.g. packages/core) are touched.
+
 ## Speed budget
 
 | Layer | Per-test budget | Total runtime budget |
