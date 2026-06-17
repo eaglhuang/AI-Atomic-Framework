@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T04-57-59-282Z-close-5ae199771d32",
+  "taskId": "TASK-MAO-0029",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260617045521-claude-code-opus-4-7-TASK-MAO-0029-81810208ab",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0029.json",
+  "taskSha256": "sha256:fbf69f4a83be4f666763ebf17194faf0f4bbf8bf1af2921709c294c0e7d18003",
+  "createdAt": "2026-06-17T04:57:59.282Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0029 --actor claude-code-opus-4-7 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617045521-claude-code-opus-4-7-TASK-MAO-0029-81810208ab",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0029.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "team-wave-evidence-test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T04:57:59.276Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0029-per-task-evidence-slicing-from-wave-diff.task.md",
+        ".atm/history/evidence/TASK-MAO-0029.*",
+        ".atm/history/task-events/TASK-MAO-0029/**",
+        ".atm/history/tasks/TASK-MAO-0029.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/core/src/broker/__tests__/team-wave-evidence.test.ts",
+        "packages/core/src/broker/team-wave-evidence.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence.ts",
+        "packages/core/src/broker/__tests__/team-wave-evidence.test.ts",
+        "packages/core/src/broker/team-wave-evidence.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
