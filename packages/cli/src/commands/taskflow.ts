@@ -33,6 +33,10 @@ import {
   resolveHostOpenerPolicyDecision
 } from './taskflow/host-opener-policy.ts';
 import { buildTaskflowCommitMessage } from './taskflow/commit-messages.ts';
+import {
+  buildHistoricalClosePreflight,
+  preflightBlockersToWriteReadinessBlockers
+} from './taskflow/historical-close-preflight.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { runAtmGit } from './git-governance.ts';
@@ -1314,7 +1318,7 @@ async function finalizeTaskflowCommitBundle(input: {
   });
 }
 
-async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, cwd: string) {
+async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, cwd: string, surface: 'close' | 'pre-close' = 'close') {
   const taskId = parsed.options.task ? String(parsed.options.task) : '';
   const actorId = parsed.options.actor ? String(parsed.options.actor) : '';
   const writeRequested = !!parsed.options.write;
@@ -1335,7 +1339,10 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   ]);
 
   if (!taskId) {
-    throw new CliError('ATM_CLI_USAGE', 'taskflow close requires --task <work-item-id>.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', `taskflow ${surface} requires --task <work-item-id>.`, { exitCode: 2 });
+  }
+  if (surface === 'pre-close' && !actorId) {
+    throw new CliError('ATM_CLI_USAGE', 'taskflow pre-close requires --actor <id>.', { exitCode: 2 });
   }
 
   let profileData: TaskflowProfileV1 | null = null;
@@ -1433,7 +1440,17 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   });
 
   const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
-  const writeReadinessHint = buildTaskflowCloseWriteReadinessHint({
+  const historicalClosePreflight = buildHistoricalClosePreflight({
+    cwd,
+    taskId,
+    actorId: actorId || '<actor>',
+    taskDocument,
+    previewCommitBundle,
+    historicalDeliveryRefs,
+    waiverOutOfScopeDelivery: waiver.waiverOutOfScopeDelivery,
+    waiverReason: waiver.waiverReason
+  });
+  let writeReadinessHint = buildTaskflowCloseWriteReadinessHint({
     cwd,
     taskId,
     actorId,
@@ -1445,6 +1462,52 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     waiverReason: waiver.waiverReason,
     planningAuthorityDeliveryGate
   });
+  if (historicalClosePreflight.operationalBlockers.length > 0) {
+    const mergedBlockers = [
+      ...writeReadinessHint.blockers,
+      ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)
+    ];
+    writeReadinessHint = {
+      ...writeReadinessHint,
+      status: 'blocked',
+      summary: `taskflow close --write has ${mergedBlockers.length} known blocker(s) that dry-run can already disclose.`,
+      blockers: mergedBlockers,
+      nextCommand: mergedBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand
+    };
+  }
+
+  if (surface === 'pre-close') {
+    return {
+      ...makeResult({
+        ok: historicalClosePreflight.ok,
+        command: 'taskflow pre-close',
+        cwd,
+        mode: 'pre-close',
+        messages: [
+          message(
+            historicalClosePreflight.ok ? 'info' : 'warn',
+            historicalClosePreflight.ok ? 'ATM_TASKFLOW_PRECLOSE_READY' : 'ATM_TASKFLOW_PRECLOSE_BLOCKED',
+            historicalClosePreflight.ok
+              ? `taskflow pre-close found no blockers for ${taskId}; inspect writeRollbackSummary before --write.`
+              : `taskflow pre-close found ${historicalClosePreflight.blockers.length} blocker(s) for ${taskId}; resolve them before taskflow close --write.`,
+            { taskId, blockerCount: historicalClosePreflight.blockers.length }
+          )
+        ],
+        evidence: {
+          historicalClosePreflight,
+          writeReadinessHint,
+          closebackPlan,
+          governedCommitBundle: previewCommitBundle,
+          residueDiagnosis: enrichedDiagnosis,
+          closebackPathResolution,
+          ...(profileData ? { profile: profileData } : {})
+        }
+      }),
+      schemaId: 'atm.taskflowPreCloseResult.v1',
+      writeEnabled: false,
+      historicalClosePreflight
+    };
+  }
 
   const writeSupport = resolveCloseWriteSupport({
     writeRequested,
@@ -1644,6 +1707,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         diagnostics,
         closebackPlan,
         governedCommitBundle: previewCommitBundle,
+        historicalClosePreflight,
         residueDiagnosis: enrichedDiagnosis,
         closebackPathResolution,
         ...(profileData ? { profile: profileData } : {})
@@ -1664,10 +1728,13 @@ export async function runTaskflow(argv: string[] = []) {
 
   const action = parsed.positional[0];
   if (action === 'close') {
-    return runTaskflowClose(parsed, cwd);
+    return runTaskflowClose(parsed, cwd, 'close');
+  }
+  if (action === 'pre-close') {
+    return runTaskflowClose(parsed, cwd, 'pre-close');
   }
   if (action !== 'open') {
-    throw new CliError('ATM_CLI_USAGE', `Unknown taskflow action: ${action}. Supported actions: open, close.`, { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', `Unknown taskflow action: ${action}. Supported actions: open, close, pre-close.`, { exitCode: 2 });
   }
 
   const writeRequested = !!parsed.options.write;

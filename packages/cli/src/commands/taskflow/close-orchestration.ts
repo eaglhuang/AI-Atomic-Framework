@@ -639,3 +639,10 @@ export function resolveCloseWriteSupport(input: {
   }
   return { requested: true, allowed: true, reason: 'closeback prerequisites satisfied' };
 }
+
+export {
+  buildHistoricalClosePreflight,
+  preflightBlockersToWriteReadinessBlockers,
+  type HistoricalClosePreflightSummary,
+  type HistoricalClosePreflightBlocker
+} from './historical-close-preflight.ts';

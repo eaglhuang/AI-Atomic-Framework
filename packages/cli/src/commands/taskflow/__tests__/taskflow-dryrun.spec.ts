@@ -1426,4 +1426,47 @@ if (!outOfScopeCloseWithWaiver.ok) {
 }
 assert.equal(outOfScopeCloseWithWaiver.ok, true);
 
+const preCloseForeignFixture = await makeDualRepoCloseFixture('precheck-foreign-staged');
+writeText(path.join(preCloseForeignFixture.targetRepo, '.atm/history/tasks/TASK-FOREIGN-0001.json'), '{"workItemId":"TASK-FOREIGN-0001"}\n');
+execFileSync('git', ['add', '.atm/history/tasks/TASK-FOREIGN-0001.json'], { cwd: preCloseForeignFixture.targetRepo, stdio: 'ignore' });
+const preCloseForeign = await runTaskflow([
+  'pre-close',
+  '--cwd', preCloseForeignFixture.targetRepo,
+  '--profile', preCloseForeignFixture.profilePath,
+  '--task', preCloseForeignFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', preCloseForeignFixture.deliveryCommit,
+  '--json'
+]) as any;
+assert.equal(preCloseForeign.command, 'taskflow pre-close');
+assert.equal(preCloseForeign.schemaId, 'atm.taskflowPreCloseResult.v1');
+assert.equal(preCloseForeign.ok, false, 'foreign staged governance must block pre-close');
+assert.ok(preCloseForeign.evidence.historicalClosePreflight.blockers.some((entry: any) => entry.id === 'unexpectedStagedTasks'));
+assert.deepEqual(preCloseForeign.evidence.historicalClosePreflight.unexpectedStagedTasks.map((entry: any) => entry.taskId), ['TASK-FOREIGN-0001']);
+assert.ok(preCloseForeign.evidence.historicalClosePreflight.writeRollbackSummary.operatorWarnings.some((entry: string) => entry.includes('silently unstage')));
+
+const preCloseMixed = await runTaskflow([
+  'pre-close',
+  '--cwd', outOfScopeFixture.targetRepo,
+  '--profile', outOfScopeFixture.profilePath,
+  '--task', outOfScopeFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', deliveryCommitSha,
+  '--json'
+]) as any;
+assert.equal(preCloseMixed.ok, false, 'mixed historical delivery without waiver must block pre-close');
+assert.ok(preCloseMixed.evidence.historicalClosePreflight.blockers.some((entry: any) => entry.id === 'mixedDeliveryCommit'));
+
+const closeDryRunMixed = await runTaskflow([
+  'close',
+  '--cwd', outOfScopeFixture.targetRepo,
+  '--profile', outOfScopeFixture.profilePath,
+  '--task', outOfScopeFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', deliveryCommitSha,
+  '--json'
+]) as any;
+assert.equal(closeDryRunMixed.evidence.historicalClosePreflight.schemaId, 'atm.historicalClosePreflight.v1');
+assert.ok(closeDryRunMixed.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT'));
+
 console.log('[taskflow-dryrun:test] ok');

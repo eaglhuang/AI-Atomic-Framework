@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'taskflow',
-  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow close is the normal closeback lane with dual-repo governed commit bundle, may delegate protected backend surfaces internally, and can consume evidence historical-batch slices as operator-approved historical delivery proof. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
+  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow pre-close is the read-only first checkpoint before historical close --write; it reports scopeTrackedDirtyFiles, unexpectedStagedTasks, mixedDeliveryCommit, staleEvidence, and missingApprovalLease without mutating the worktree. taskflow close is the normal closeback lane with dual-repo governed commit bundle, may delegate protected backend surfaces internally, and can consume evidence historical-batch slices as operator-approved historical delivery proof. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
   positional: [
-    { name: 'action', summary: 'open | close', required: true }
+    { name: 'action', summary: 'open | close | pre-close', required: true }
   ],
   options: [
     commonCwdOption,
@@ -39,6 +39,7 @@ export default defineCommandSpec({
     'node atm.mjs taskflow open --dry-run --profile planning/taskflow.profile.json --json',
     'node atm.mjs taskflow open --write --profile planning/taskflow.profile.json --task-id TASK-ADOPTER-0002 --output tasks/TASK-ADOPTER-0002.task.md --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --dry-run --json',
+    'node atm.mjs taskflow pre-close --task TASK-ADOPTER-0001 --actor codex-main --historical-delivery abc123 --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-delivery abc123 --write --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --waiver-out-of-scope-delivery --reason "multi-task historical delivery" --write --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --dry-run --json',

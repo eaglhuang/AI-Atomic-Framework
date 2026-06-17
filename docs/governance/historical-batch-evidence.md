@@ -82,7 +82,17 @@ incomplete slice into a closable slice.
 
 ## Closing from a historical batch slice
 
-Once a task has a close-ready slice, the operator lane can reuse it:
+Once a task has a close-ready slice, run pre-close before any write:
+
+```bash
+node atm.mjs taskflow pre-close \
+  --task TASK-A \
+  --actor codex-main \
+  --historical-batch <batch-id-or-path> \
+  --json
+```
+
+Then dry-run the close:
 
 ```bash
 node atm.mjs taskflow close \

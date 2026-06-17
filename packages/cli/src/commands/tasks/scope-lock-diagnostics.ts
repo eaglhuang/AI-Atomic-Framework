@@ -177,7 +177,7 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
       safeToAutoStage: false,
       operatorSummary: ok
         ? 'No in-scope or closure-governance tracked dirty files block close.'
-        : 'Commit the task-scoped delivery or closure-governance files through the governed delivery lane before closing done.'
+        : 'Commit the task-scoped delivery or closure-governance files through the governed delivery lane before closing done. Run taskflow pre-close to classify scope drift versus foreign staged bundles.'
     }
   };
 }
