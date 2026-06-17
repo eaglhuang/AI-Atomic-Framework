@@ -1418,11 +1418,53 @@
       "capability": "Team Agents Wave Mode operator guide and migration notes: distinguishes single-task / batch queue-head / Team Agents advisory / Wave Mode, documents roles, workflow, and fail-closed safety rules, and states Wave Mode is not a closeout shortcut (TASK-MAO-0034).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0034"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/validate.ts",
+      "atom_id": "atm.validator-scope-taxonomy-map",
+      "capability": "Validator scope taxonomy classifying validators into task-local, global-advisory, release-blocking, and diagnostic scopes.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0042"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/evidence.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Persist task-bound evidence bundle manifests with fresh versus stale validator passes after successful evidence run/add.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/historical-delivery.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Expand directory-style deliverables into explicit file manifests for closeback metadata validation.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Expose evidence bundle manifest and directory deliverable expansion hooks for governed close orchestration.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "tests/cli/evidence-bundle-manifest.test.ts",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Regression coverage for evidence bundle manifest freshness rules and directory deliverable expansion.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "docs/governance/evidence-gates.md",
+      "atom_id": "atm.evidence-bundle-manifest-map",
+      "capability": "Document evidence bundle manifest and directory deliverable expansion behavior for close gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0041"
     }
   ],
   "summary": {
-    "total_production_paths": 177,
-    "mapped_paths": 177,
+    "total_production_paths": 183,
+    "mapped_paths": 183,
     "coverage_percentage": 100,
     "atoms_defined": 111,
     "atoms_with_evidence": 0,

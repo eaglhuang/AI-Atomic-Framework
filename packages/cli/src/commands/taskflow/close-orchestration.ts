@@ -14,6 +14,21 @@ import {
 import { extractFrontMatter, normalizeTaskId } from '../tasks/task-import-validators.ts';
 import { CliError, relativePathFrom } from '../shared.ts';
 import { releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.ts';
+import {
+  EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID,
+  evidenceBundleManifestPathForTask,
+  evidenceBundleManifestRelativePath,
+  readEvidenceBundleManifest,
+  type EvidenceBundleManifest
+} from '../evidence.ts';
+import {
+  DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID,
+  expandDirectoryDeliverableDeclarations,
+  isDirectoryStyleDeliverableDeclaration,
+  listFilesUnderDeclaredDirectory,
+  type DirectoryDeliverableExpansion,
+  type DirectoryDeliverableManifestEntry
+} from '../tasks/historical-delivery.ts';
 
 export type ClosebackPlanningPathRoute =
   | 'source-plan-path'
@@ -848,6 +863,35 @@ export async function executeCloseWriteCommitPhase<TBundle extends { failClosed?
     };
   }
 }
+
+// === TASK-MAO-0041 evidence-bundle-manifest (cursor-composer-2.5) START ===
+// 0041 close-orchestration hooks live in this region only.
+export {
+  EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID,
+  evidenceBundleManifestRelativePath,
+  evidenceBundleManifestPathForTask,
+  readEvidenceBundleManifest,
+  type EvidenceBundleManifest
+};
+export {
+  DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID,
+  expandDirectoryDeliverableDeclarations,
+  isDirectoryStyleDeliverableDeclaration,
+  listFilesUnderDeclaredDirectory,
+  type DirectoryDeliverableExpansion,
+  type DirectoryDeliverableManifestEntry
+};
+
+export function listOptionalEvidenceBundleGovernanceArtifacts(cwd: string, taskId: string): readonly string[] {
+  const relativePath = evidenceBundleManifestRelativePath(taskId);
+  return existsSync(path.join(cwd, relativePath)) ? [relativePath] : [];
+}
+// === TASK-MAO-0041 evidence-bundle-manifest END ===
+
+// === TASK-MAO-0042 validator-scope-taxonomy (antigravity-gemini-3.5-flash) START ===
+// 0042 close gating taxonomy hooks live in this region only.
+export { getValidatorScope } from '../validate.ts';
+// === TASK-MAO-0042 validator-scope-taxonomy END ===
 
 export {
   buildHistoricalClosePreflight,

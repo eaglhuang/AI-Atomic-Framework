@@ -1,7 +1,26 @@
 import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import path from 'node:path';
 import { isTaskCloseGovernanceCriticalPath, type HistoricalDeliveryProvenance } from '../framework-development.ts';
 import { isTaskDirectionPathCandidate } from '../task-direction.ts';
 import { normalizeRelativePath } from './task-file-io-helpers.ts';
+
+export const DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID = 'atm.directoryDeliverableManifest.v1';
+
+export interface DirectoryDeliverableManifestEntry {
+  readonly schemaId: typeof DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID;
+  readonly declaredPath: string;
+  readonly files: readonly string[];
+  readonly missingFiles: readonly string[];
+}
+
+export interface DirectoryDeliverableExpansion {
+  readonly ok: boolean;
+  readonly failClosedReason: string | null;
+  readonly effectiveDeliverables: readonly string[];
+  readonly directoryManifests: readonly DirectoryDeliverableManifestEntry[];
+  readonly expandedFiles: readonly string[];
+}
 
 export interface HistoricalDeliveryFileBuckets {
   readonly taskMatchedFiles: readonly string[];
@@ -181,6 +200,80 @@ export function buildHistoricalDeliveryProvenance(
   };
 }
 
+export function isDirectoryStyleDeliverableDeclaration(repoRoot: string, declaredPath: string): boolean {
+  const normalized = normalizeRelativePath(declaredPath).replace(/\/+$/, '');
+  if (!normalized) return false;
+  if (declaredPath.replace(/\\/g, '/').trim().endsWith('/')) return true;
+  const absolutePath = path.resolve(repoRoot, normalized);
+  try {
+    return existsSync(absolutePath) && statSync(absolutePath).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+export function listFilesUnderDeclaredDirectory(repoRoot: string, declaredPath: string): readonly string[] {
+  const normalized = normalizeRelativePath(declaredPath).replace(/\/+$/, '');
+  if (!normalized) return [];
+  const absoluteDirectory = path.resolve(repoRoot, normalized);
+  if (!existsSync(absoluteDirectory) || !statSync(absoluteDirectory).isDirectory()) return [];
+  return listFilesRecursively(repoRoot, normalized);
+}
+
+export function expandDirectoryDeliverableDeclarations(
+  repoRoot: string,
+  deliverables: readonly string[]
+): DirectoryDeliverableExpansion {
+  const directoryManifests: DirectoryDeliverableManifestEntry[] = [];
+  const effectiveDeliverables: string[] = [];
+  const expandedFiles: string[] = [];
+
+  for (const declared of deliverables) {
+    const normalizedDeclared = normalizeRelativePath(declared).replace(/\/+$/, '');
+    if (!normalizedDeclared) continue;
+    if (!isDirectoryStyleDeliverableDeclaration(repoRoot, declared)) {
+      effectiveDeliverables.push(normalizedDeclared);
+      continue;
+    }
+    const files = listFilesUnderDeclaredDirectory(repoRoot, normalizedDeclared);
+    const missingFiles = files.filter((filePath) => !existsSync(path.resolve(repoRoot, filePath)));
+    if (files.length === 0) {
+      return {
+        ok: false,
+        failClosedReason: `Task metadata error: directory deliverable "${declared}" is empty or missing on disk.`,
+        effectiveDeliverables: [],
+        directoryManifests: [],
+        expandedFiles: []
+      };
+    }
+    if (missingFiles.length > 0) {
+      return {
+        ok: false,
+        failClosedReason: `Task metadata error: directory deliverable "${declared}" is missing files (${missingFiles.join(', ')}).`,
+        effectiveDeliverables: [],
+        directoryManifests: [],
+        expandedFiles: []
+      };
+    }
+    directoryManifests.push({
+      schemaId: DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID,
+      declaredPath: normalizedDeclared,
+      files,
+      missingFiles
+    });
+    effectiveDeliverables.push(normalizedDeclared);
+    expandedFiles.push(...files);
+  }
+
+  return {
+    ok: true,
+    failClosedReason: null,
+    effectiveDeliverables: uniqueStrings(effectiveDeliverables),
+    directoryManifests,
+    expandedFiles: uniqueStrings(expandedFiles)
+  };
+}
+
 export function pathMatchesTaskScope(filePath: string, scope: string): boolean {
   const file = normalizeRelativePath(filePath).toLowerCase();
   const candidate = normalizeRelativePath(scope).toLowerCase();
@@ -238,4 +331,29 @@ function readGitNameOnly(cwd: string, args: readonly string[]): readonly string[
 
 function uniqueStrings(values: readonly string[]): readonly string[] {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
+}
+
+function listFilesRecursively(repoRoot: string, relativeDirectory: string): readonly string[] {
+  const absoluteDirectory = path.resolve(repoRoot, relativeDirectory);
+  if (!existsSync(absoluteDirectory) || !statSync(absoluteDirectory).isDirectory()) return [];
+  const files: string[] = [];
+  for (const entry of readdirSync(absoluteDirectory, { withFileTypes: true })) {
+    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+    const relativePath = path.posix.join(relativeDirectory.replace(/\\/g, '/'), entry.name);
+    const absolutePath = path.resolve(repoRoot, relativePath);
+    if (entry.isDirectory()) {
+      files.push(...listFilesRecursively(repoRoot, relativePath));
+    } else if (entry.isFile()) {
+      files.push(normalizeRelativePath(relativePath));
+    } else if (entry.isSymbolicLink()) {
+      try {
+        if (statSync(absolutePath).isFile()) {
+          files.push(normalizeRelativePath(relativePath));
+        }
+      } catch {
+        // ignore broken symlinks during manifest expansion
+      }
+    }
+  }
+  return uniqueStrings(files);
 }
