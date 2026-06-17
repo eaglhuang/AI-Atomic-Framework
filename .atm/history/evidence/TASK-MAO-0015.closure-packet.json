@@ -1,0 +1,152 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0015",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "93f602c1db52d26e07514762e53de8c5f616198a",
+  "governedTreeSha": "14e03d19aa292d4378dabf37c6be74463451466b",
+  "targetCommitDelta": {
+    "currentCommitSha": "93f602c1db52d26e07514762e53de8c5f616198a",
+    "parentCommitShas": [
+      "93f602c1db52d26e07514762e53de8c5f616198a"
+    ],
+    "governedTreeSha": "14e03d19aa292d4378dabf37c6be74463451466b",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-MAO-0015.json",
+      ".atm/history/evidence/TASK-MAO-0023.json",
+      ".atm/history/evidence/TASK-MAO-0024.json",
+      ".atm/history/evidence/TASK-MAO-0025.json",
+      ".atm/history/evidence/TASK-MAO-0026.json",
+      ".atm/history/evidence/TASK-MAO-0027.json",
+      ".atm/history/evidence/TASK-MAO-0029.json",
+      ".atm/history/evidence/TASK-MAO-0030.json",
+      ".atm/history/evidence/TASK-MAO-0031.json",
+      ".atm/history/evidence/TASK-MAO-0032.json",
+      ".atm/history/evidence/TASK-MAO-0033.json",
+      ".atm/history/evidence/TASK-MAO-0034.json",
+      ".atm/history/tasks/TASK-MAO-0028.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/mao-parallel-routing-benchmark.md",
+      "packages/core/src/broker/__tests__/patch-envelope-atm-core.test.ts",
+      "packages/core/src/broker/patch-envelope-atm-core.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3b76fb1efddbc7a84c981c881a484df437f2c08178eb1e883d8854ff7474ca1e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/patch-envelope-atm-core.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c2cc635094b66a598224ddc87f5f85a88167a13d2552fab5644ec6d8ebe87511",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "patch-envelope-atm-core-test",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-17T15:31:57.360Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0015-patch-envelope-atm-core-specialization.task.md",
+      ".atm/history/evidence/TASK-MAO-0015.*",
+      ".atm/history/task-events/TASK-MAO-0015/**",
+      ".atm/history/tasks/TASK-MAO-0015.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/patch-envelope-atm-core.test.ts",
+      "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "packages/core/src/broker/patch-envelope-atm-core.ts",
+      "packages/core/src/broker/patch-envelope.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/patch-envelope.schema.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/__tests__/patch-envelope-atm-core.test.ts",
+      "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "packages/core/src/broker/patch-envelope-atm-core.ts",
+      "packages/core/src/broker/patch-envelope.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/patch-envelope.schema.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0015.json",
+  "closedAt": "2026-06-17T15:31:57.360Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "sessionId": "session-20260617151927-claude-code-opus-4-7-TASK-MAO-0015-9194fdf6a7",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
