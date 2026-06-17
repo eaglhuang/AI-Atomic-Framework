@@ -47,6 +47,27 @@ type KnowledgeIndex = {
   entries: KnowledgeIndexEntry[];
 };
 
+type KnowledgeHit = {
+  path: string;
+  title: string;
+  score: number;
+  metadata: KnowledgeMetadata;
+  snippet: string;
+  semanticScore?: number;
+  lexicalScore?: number;
+  rerankApplied?: boolean;
+};
+
+type KnowledgeEmbeddingCache = {
+  schemaId: 'atm.teamKnowledgeEmbeddingCache.v1';
+  generatedAt?: string;
+  advisoryOnly?: true;
+  entries: Array<{
+    path: string;
+    vector: Record<string, number>;
+  }>;
+};
+
 type KnowledgeShardRetention = {
   path: string;
   title: string;
@@ -82,6 +103,7 @@ const teamKnowledgeSpec = defineCommandSpec({
     { flag: '--path', value: 'glob', summary: 'Metadata path filter.' },
     { flag: '--atom', value: 'id', summary: 'Metadata atom filter.' },
     { flag: '--validator', value: 'command', summary: 'Metadata validator filter.' },
+    { flag: '--vector-rerank', summary: 'Opt in to runtime-cache hybrid rerank after lexical shortlist ranking.' },
     { flag: '--warning-bytes', value: 'n', summary: 'Runtime cache warning threshold for stats/compact.' },
     { flag: '--budget-bytes', value: 'n', summary: 'Runtime cache hard-limit threshold for stats/compact.' },
     { flag: '--json', summary: 'Return JSON output.' },
@@ -221,6 +243,7 @@ function runKnowledgeQuery(options: Record<string, unknown>, cwd: string) {
   const top = parsePositiveInteger(options.top, 5, 20);
   const query = deriveQueryText(cwd, options);
   const filters = buildFilters(options);
+  const hybridRequest = buildHybridRequest(options);
 
   if (!existsSync(outputs.indexPath)) {
     return makeResult({
@@ -240,6 +263,12 @@ function runKnowledgeQuery(options: Record<string, unknown>, cwd: string) {
         query,
         filters,
         top,
+        hybridRetrieval: {
+          requested: hybridRequest.enabled,
+          applied: false,
+          fallback: hybridRequest.enabled ? 'lexical-index-missing' : 'not-requested',
+          lexicalBaselineRequired: true
+        },
         hits: []
       }
     });
@@ -251,7 +280,26 @@ function runKnowledgeQuery(options: Record<string, unknown>, cwd: string) {
       details: { indexPath: outputs.indexRelative }
     });
   }
-  const hits = rankKnowledgeHits(index.entries, query, filters, top, cwd);
+  const lexicalShortlist = rankKnowledgeHits(index.entries, query, filters, hybridRequest.enabled ? Math.min(top * 3, 50) : top, cwd);
+  const rerank = hybridRequest.enabled
+    ? applyHybridRerank({
+      cwd,
+      outputs,
+      query,
+      lexicalShortlist,
+      top
+    })
+    : {
+      hits: lexicalShortlist.slice(0, top),
+      evidence: {
+        requested: false,
+        applied: false,
+        fallback: 'not-requested',
+        lexicalBaselineRequired: true,
+        lexicalShortlistSize: lexicalShortlist.length
+      }
+    };
+  const hits = rerank.hits;
   return makeResult({
     ok: true,
     command: 'team',
@@ -259,7 +307,9 @@ function runKnowledgeQuery(options: Record<string, unknown>, cwd: string) {
     messages: [
       message('info', 'ATM_TEAM_KNOWLEDGE_QUERY_READY', 'Team knowledge query completed with advisory-only ranked hits.', {
         hitCount: hits.length,
-        top
+        top,
+        hybridRerank: hybridRequest.enabled,
+        hybridApplied: rerank.evidence.applied
       })
     ],
     evidence: {
@@ -269,6 +319,7 @@ function runKnowledgeQuery(options: Record<string, unknown>, cwd: string) {
       query,
       filters,
       top,
+      hybridRetrieval: rerank.evidence,
       hits
     }
   });
@@ -494,7 +545,7 @@ function rankKnowledgeHits(
   filters: ReturnType<typeof buildFilters>,
   top: number,
   cwd: string
-) {
+): KnowledgeHit[] {
   const tokens = tokenize(query);
   return entries
     .filter((entry) => metadataMatches(entry.metadata, filters))
@@ -509,6 +560,115 @@ function rankKnowledgeHits(
       metadata: hit.entry.metadata,
       snippet: readSnippet(path.join(cwd, hit.entry.path), tokens)
     }));
+}
+
+function buildHybridRequest(options: Record<string, unknown>): { enabled: boolean } {
+  return { enabled: Boolean(options.vectorRerank ?? options['vector-rerank']) };
+}
+
+function applyHybridRerank(input: {
+  cwd: string;
+  outputs: ReturnType<typeof resolveKnowledgeOutputs>;
+  query: string;
+  lexicalShortlist: KnowledgeHit[];
+  top: number;
+}): { hits: KnowledgeHit[]; evidence: Record<string, unknown> } {
+  const cache = readEmbeddingCache(input.outputs.embeddingCachePath);
+  if (!cache) {
+    return {
+      hits: input.lexicalShortlist.slice(0, input.top),
+      evidence: {
+        requested: true,
+        applied: false,
+        fallback: 'embedding-cache-missing-or-invalid',
+        lexicalBaselineRequired: true,
+        lexicalShortlistSize: input.lexicalShortlist.length,
+        embeddingCache: input.outputs.embeddingCacheRelative
+      }
+    };
+  }
+
+  const queryVector = vectorizeText(input.query);
+  const vectorsByPath = new Map(cache.entries.map((entry) => [normalizePath(entry.path), entry.vector]));
+  const reranked = input.lexicalShortlist
+    .map((hit) => {
+      const vector = vectorsByPath.get(normalizePath(hit.path));
+      const semanticScore = vector ? cosineSimilarity(queryVector, vector) : 0;
+      return {
+        ...hit,
+        lexicalScore: hit.score,
+        semanticScore,
+        rerankApplied: true,
+        score: Number((hit.score + semanticScore * 20).toFixed(6))
+      };
+    })
+    .sort((left, right) => right.score - left.score || right.lexicalScore! - left.lexicalScore! || left.path.localeCompare(right.path))
+    .slice(0, input.top);
+
+  return {
+    hits: reranked,
+    evidence: {
+      requested: true,
+      applied: true,
+      fallback: null,
+      lexicalBaselineRequired: true,
+      lexicalShortlistSize: input.lexicalShortlist.length,
+      embeddingCache: input.outputs.embeddingCacheRelative,
+      embeddingCount: cache.entries.length
+    }
+  };
+}
+
+function readEmbeddingCache(cachePath: string): KnowledgeEmbeddingCache | null {
+  if (!existsSync(cachePath)) {
+    return null;
+  }
+  const parsed = readJsonFile(cachePath) as KnowledgeEmbeddingCache | null;
+  if (!parsed || parsed.schemaId !== 'atm.teamKnowledgeEmbeddingCache.v1' || !Array.isArray(parsed.entries)) {
+    return null;
+  }
+  const entries = parsed.entries.filter(isVectorRecord).map((entry) => ({
+    path: normalizePath(entry.path),
+    vector: entry.vector
+  }));
+  return { ...parsed, entries };
+}
+
+function isVectorRecord(entry: unknown): entry is { path: string; vector: Record<string, number> } {
+  if (!entry || typeof entry !== 'object') {
+    return false;
+  }
+  const candidate = entry as { path?: unknown; vector?: unknown };
+  return typeof candidate.path === 'string'
+    && Boolean(candidate.vector)
+    && typeof candidate.vector === 'object'
+    && Object.values(candidate.vector as Record<string, unknown>).every((value) => typeof value === 'number' && Number.isFinite(value));
+}
+
+function vectorizeText(value: string): Record<string, number> {
+  const vector: Record<string, number> = {};
+  for (const token of tokenize(value)) {
+    vector[token] = (vector[token] ?? 0) + 1;
+  }
+  return vector;
+}
+
+function cosineSimilarity(left: Record<string, number>, right: Record<string, number>): number {
+  const keys = new Set([...Object.keys(left), ...Object.keys(right)]);
+  let dot = 0;
+  let leftNorm = 0;
+  let rightNorm = 0;
+  for (const key of keys) {
+    const leftValue = left[key] ?? 0;
+    const rightValue = right[key] ?? 0;
+    dot += leftValue * rightValue;
+    leftNorm += leftValue * leftValue;
+    rightNorm += rightValue * rightValue;
+  }
+  if (leftNorm === 0 || rightNorm === 0) {
+    return 0;
+  }
+  return dot / (Math.sqrt(leftNorm) * Math.sqrt(rightNorm));
 }
 
 function summarizeHitReason(hit: { metadata?: KnowledgeMetadata; score: number }, taskId: string): string {
@@ -616,6 +776,7 @@ function resolveKnowledgeOutputs(cwd: string) {
   const runtimeRoot = path.join(cwd, '.atm', 'runtime', 'knowledge');
   const manifestPath = path.join(runtimeRoot, 'team-knowledge-manifest.json');
   const indexPath = path.join(runtimeRoot, 'team-knowledge-index.json');
+  const embeddingCachePath = path.join(runtimeRoot, 'team-knowledge-embeddings.json');
   return {
     canonicalRoot,
     canonicalRootRelative: '.atm/knowledge',
@@ -623,8 +784,10 @@ function resolveKnowledgeOutputs(cwd: string) {
     runtimeRootRelative: '.atm/runtime/knowledge',
     manifestPath,
     indexPath,
+    embeddingCachePath,
     manifestRelative: '.atm/runtime/knowledge/team-knowledge-manifest.json',
-    indexRelative: '.atm/runtime/knowledge/team-knowledge-index.json'
+    indexRelative: '.atm/runtime/knowledge/team-knowledge-index.json',
+    embeddingCacheRelative: '.atm/runtime/knowledge/team-knowledge-embeddings.json'
   };
 }
 
@@ -635,7 +798,8 @@ function buildManifest(index: KnowledgeIndex, outputs: ReturnType<typeof resolve
     generatedAt: index.generatedAt,
     shardCount: index.entries.length,
     canonicalRoot: outputs.canonicalRootRelative,
-    lexicalIndex: outputs.indexRelative
+    lexicalIndex: outputs.indexRelative,
+    optionalEmbeddingCache: outputs.embeddingCacheRelative
   };
 }
 

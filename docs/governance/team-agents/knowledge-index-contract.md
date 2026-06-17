@@ -41,6 +41,26 @@ canonical shard input. This keeps the storage rhythm loose while authoring
 lessons and tight at build/close time: agents can draft useful notes freely, but
 the index source of truth stays reviewable and deterministic.
 
+## Hybrid Retrieval
+
+Hybrid retrieval is explicit opt-in only. The lexical index remains the baseline:
+queries first build a lexical shortlist from canonical-shard metadata and
+content, then optional vector rerank may reorder only that shortlist. Vector
+signals must never replace lexical filtering, widen task scope, or change task
+truth.
+
+Embedding caches are generated runtime artifacts under
+`.atm/runtime/knowledge/**`. The default cache path is
+`.atm/runtime/knowledge/team-knowledge-embeddings.json`; it is advisory,
+rebuildable, size-budgeted by `team knowledge stats`, and prunable by
+`team knowledge compact`. Generated embeddings must not be committed as
+canonical shards or promoted into `.atm/knowledge/**`.
+
+When embeddings are missing, disabled, stale, malformed, or outside the runtime
+cache boundary, retrieval degrades to lexical-only results. The command evidence
+must report whether vector rerank was requested, whether it was applied, the
+lexical shortlist size, and the fallback reason when rerank is not used.
+
 ## Minimal Shard Shape
 
 Each shard should state:

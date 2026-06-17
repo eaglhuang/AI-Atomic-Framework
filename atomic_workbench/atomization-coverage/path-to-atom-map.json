@@ -675,6 +675,20 @@
       "source_task": "TASK-TEAM-0023"
     },
     {
+      "path_pattern": "packages/cli/src/commands/team-knowledge.ts#hybridRetrievalOptIn",
+      "atom_id": "team.knowledge-hybrid-rerank",
+      "capability": "Optional vector rerank runs only over the lexical shortlist, reads runtime-only embedding cache, reports fallback evidence, and degrades to lexical-only when disabled or missing.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0024"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/knowledge-index-contract.md#hybrid-retrieval",
+      "atom_id": "team.knowledge-hybrid-rerank",
+      "capability": "Hybrid retrieval contract keeps lexical filtering as the baseline, generated embeddings runtime-only, opt-in explicit, and missing embeddings fail-soft to lexical results.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0024"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
       "atom_id": "team.recipe-permission-model",
       "capability": "Recipe catalog validation and scoped permission lease planning.",
