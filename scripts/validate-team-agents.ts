@@ -7,6 +7,7 @@ import { assessLieutenantEscalation, buildAtomizationChecklist, runTeam, selectT
 import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
+import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
@@ -647,7 +648,22 @@ function validateWaveMode(): void {
   });
   if (!validateTeamWaveEnvelope(env).ok) fail('wave-mode: clean wave envelope must validate');
 
-  console.log('[validate-team-agents] wave-mode checks ok (safe / unsafe / mixed / envelope)');
+  // TASK-MAO-0032: validator / reviewer Team Agents roles are advisory — only the
+  // coordinator may perform privileged git / closeout / checkpoint actions.
+  if (!assertCoordinatorOnly('coordinator', 'task-closeout').allowed) {
+    fail('wave-mode: coordinator must be allowed to drive closeout');
+  }
+  const advisoryRoles: WaveRole[] = ['worker', 'validator', 'reviewer'];
+  for (const role of advisoryRoles) {
+    if (assertCoordinatorOnly(role, 'git-write').allowed) {
+      fail(`wave-mode: advisory role ${role} must not be allowed git-write`);
+    }
+    if (assertCoordinatorOnly(role, 'task-closeout').allowed) {
+      fail(`wave-mode: advisory role ${role} must not be allowed task-closeout`);
+    }
+  }
+
+  console.log('[validate-team-agents] wave-mode checks ok (safe / unsafe / mixed / envelope / roles)');
 }
 
 function safeBrokerLane(): any {
