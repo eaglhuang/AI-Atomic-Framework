@@ -70,7 +70,8 @@ const schemaEntries: Record<string, string> = {
   'broker-conflict-key': 'schemas/broker/conflict-key.schema.json',
   'broker-merge-decision': 'schemas/broker/merge-decision.schema.json',
   'broker-mutation-batch-plan': 'schemas/broker/mutation-batch-plan.schema.json',
-  'team-wave-envelope': 'schemas/team-wave-envelope.schema.json'
+  'team-wave-envelope': 'schemas/team-wave-envelope.schema.json',
+  'team-worker-report': 'schemas/team-worker-report.schema.json'
 };
 
 const supportSchemaEntries: Record<string, string> = {
