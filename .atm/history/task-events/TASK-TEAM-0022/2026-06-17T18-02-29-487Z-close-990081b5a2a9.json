@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T18-02-29-487Z-close-990081b5a2a9",
+  "taskId": "TASK-TEAM-0022",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260617175001-captain-TASK-TEAM-0022-85b26d1f43",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0022.json",
+  "taskSha256": "sha256:ce7ac1aae13f5729f3b5e0f509058d297d95e6c3d4cc25b30965eba5a06c4037",
+  "createdAt": "2026-06-17T18:02:29.487Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0022 --actor captain --status done --historical-delivery 4233812e207ba197408e34052c11c5028110eca7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617175001-captain-TASK-TEAM-0022-85b26d1f43",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0022.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "framework-development",
+      "git diff --check",
+      "node atm.mjs next --task TASK-TEAM-0022 --json",
+      "node atm.mjs team plan --task TASK-AAO-0005 --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T18:02:29.483Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0022-captain-knowledge-preflight-brief-integration.task.md",
+        ".atm/history/evidence/TASK-TEAM-0022.*",
+        ".atm/history/task-events/TASK-TEAM-0022/**",
+        ".atm/history/tasks/TASK-TEAM-0022.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/team-knowledge.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/team-knowledge.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
