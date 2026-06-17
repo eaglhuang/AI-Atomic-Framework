@@ -153,6 +153,14 @@ node atm.mjs evidence run --task TASK-XXXX-0001 --actor <actor> --command "npm r
 
 Running `npm run typecheck` in a plain terminal can help you debug, but it is not task evidence until ATM captures it with `evidence run`. `evidence add` is the raw/manual surface for operators who already have the exact command, exit code, and sha256 output digests.
 
+If the work pulls in a linked surface that was not in the original `allowedFiles` (a doc, a help snapshot, a test, or a generated artifact), widen the scope through the audited lane instead of editing the lock by hand:
+
+```bash
+node atm.mjs tasks scope add --task TASK-XXXX-0001 --actor <actor> --add docs/foo.md --class doc-sync --phase during-implementation --reason "linked doc" --json
+```
+
+This records a `scope-amendment` event with its class, phase, and `mode: normal`, and that history stays visible at closeout. `tasks scope repair` is the protected emergency variant — it needs `--emergency-approval` and `--reason` and records `mode: repair`. Reach for it only when a human approved a maintenance exception.
+
 ## Step 6: Preview the close
 
 Before closing, dry-run the close. This is the same idea as Step 1, applied to the closeback:

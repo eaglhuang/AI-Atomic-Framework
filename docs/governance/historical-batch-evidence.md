@@ -113,3 +113,13 @@ Historical batch does not replace normal evidence capture. It fills the gap
 when real delivery timing and governance timing diverged. For ordinary work,
 use `evidence run` or `evidence add` during the task itself and close through
 the standard path.
+
+## Relationship to scope amendments
+
+A historical-batch close still reads the task's scope-amendment history. When a
+task grows linked surfaces (docs, help snapshots, tests, or generated artifacts)
+through `tasks scope add`, each amendment records its class, phase, and
+`mode: normal`, and that history stays visible in the close plan. This keeps the
+strict-lane discipline intact: a reviewer can separate normal audited scope
+growth from a genuine maintenance exception (`tasks scope repair`,
+`mode: repair`) even when the real delivery landed as one batch.
