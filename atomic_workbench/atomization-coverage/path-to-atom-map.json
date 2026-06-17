@@ -1208,6 +1208,41 @@
       "capability": "ScopeAmendmentMetadata type and amendmentMetadata field on appendTaskTransitionEvent input: carries amendmentClass, amendmentPhase, amendmentMode ('normal'|'repair'), and optional reason into the scope-amendment event record for full audit traceability (TASK-MAO-0049).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/emergency/protected-override-audit.ts",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Append-only protected override audit ledger for --no-verify, emergency lease consumption, hook safe-mode bypasses, and authorized-but-failed outcomes with repair candidates (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/emergency/gate.ts#assertEmergencyApproval",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Emergency approval gate records protected override authorization events alongside emergency lease consumption before protected backend mutations proceed (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/git-governance.ts#runGitCommit",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Governed git commit wrapper requires emergency approval for --no-verify, records authorized/succeeded/failed protected override outcomes, and surfaces repair candidates when hook bypass leaves deferred checks (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/hook.ts#writePrePushSafeModeReport",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "Pre-push safe mode bypass writes protected override audit events with actor, reason, skipped checks, and follow-up repair guidance (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/emergency.ts#runEmergency",
+      "atom_id": "atm.protected-override-audit-map",
+      "capability": "emergency audit action lists protected override audit events filtered by task or lease for operator review (TASK-MAO-0037).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0037"
     }
   ],
   "summary": {
