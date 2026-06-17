@@ -1,0 +1,217 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0037",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "fe5873c862906cb4be05b21eecaf4412e1b95ff9",
+  "governedTreeSha": "0ac94644956bac8d5e2c5c792ae25d275ddc1f7d",
+  "targetCommitDelta": {
+    "currentCommitSha": "fe5873c862906cb4be05b21eecaf4412e1b95ff9",
+    "parentCommitShas": [
+      "fe5873c862906cb4be05b21eecaf4412e1b95ff9"
+    ],
+    "governedTreeSha": "0ac94644956bac8d5e2c5c792ae25d275ddc1f7d",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-MAO-0028.closure-packet.json",
+      ".atm/history/evidence/TASK-MAO-0028.json",
+      ".atm/history/evidence/TASK-MAO-0037.json",
+      ".atm/history/task-events/TASK-MAO-0028/2026-06-17T04-48-31-202Z-close-65a7e3b32230.json",
+      ".atm/history/task-events/TASK-MAO-0037/2026-06-17T03-33-24-517Z-import-aeead86c70d1.json",
+      ".atm/history/task-events/TASK-MAO-0037/2026-06-17T03-33-39-258Z-reserve-c56c2596c3f1.json",
+      ".atm/history/task-events/TASK-MAO-0037/2026-06-17T03-33-39-624Z-promote-057e4c843f60.json",
+      ".atm/history/task-events/TASK-MAO-0037/2026-06-17T03-33-47-687Z-claim-4eff0f06f0c0.json",
+      ".atm/history/task-events/TASK-MAO-0037/2026-06-17T04-02-25-761Z-scope-amendment-f7a94b92e76a.json",
+      ".atm/history/task-events/TASK-MAO-0037/2026-06-17T04-37-59-438Z-scope-amendment-ef0883ad8cfc.json",
+      ".atm/history/tasks/TASK-MAO-0028.json",
+      ".atm/history/tasks/TASK-MAO-0037.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "packages/cli/src/commands/command-specs/emergency.spec.ts",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/emergency.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-hooks-enforcement.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-git-hooks-enforcement.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b036713a5cda6ad6436a93a495d6da9ae3d4794c2f49289a3ad043ced27c5ad4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:git-hooks-enforcement"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-17T04:48:48.533Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0037-protected-override-audit-ledger.task.md",
+      ".atm/history/evidence/TASK-MAO-0037.*",
+      ".atm/history/task-events/TASK-MAO-0037/**",
+      ".atm/history/tasks/TASK-MAO-0037.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/command-specs/emergency.spec.ts",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/emergency.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli-fixtures/help-snapshots/command-list.json",
+      "tests/cli-fixtures/help-snapshots/explain.json",
+      "tests/cli-fixtures/help-snapshots/guide.json",
+      "tests/cli-fixtures/help-snapshots/migrate.json",
+      "tests/cli-fixtures/help-snapshots/next.json",
+      "tests/cli-fixtures/help-snapshots/orient.json",
+      "tests/cli-fixtures/help-snapshots/registry.json",
+      "tests/cli-fixtures/help-snapshots/start.json",
+      "tests/cli-fixtures/help-snapshots/upgrade.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/atm.ts",
+      "packages/cli/src/commands/command-specs/emergency.spec.ts",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/emergency.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "tests/cli-fixtures/help-snapshots/broker.json",
+      "tests/cli-fixtures/help-snapshots/command-list.json",
+      "tests/cli-fixtures/help-snapshots/explain.json",
+      "tests/cli-fixtures/help-snapshots/guide.json",
+      "tests/cli-fixtures/help-snapshots/migrate.json",
+      "tests/cli-fixtures/help-snapshots/next.json",
+      "tests/cli-fixtures/help-snapshots/orient.json",
+      "tests/cli-fixtures/help-snapshots/registry.json",
+      "tests/cli-fixtures/help-snapshots/start.json",
+      "tests/cli-fixtures/help-snapshots/upgrade.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0037.json",
+  "closedAt": "2026-06-17T04:48:48.534Z",
+  "closedByActor": "cursor-composer-2.5",
+  "sessionId": "session-20260617033347-cursor-composer-2.5-TASK-MAO-0037-9eee6d915a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "44deeace12b04d084c5822003e7d7a589dffc357",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "packages/cli/src/commands/command-specs/emergency.spec.ts",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/emergency.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-hooks-enforcement.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/cli/src/commands/emergency/gate.ts",
+      "packages/cli/src/commands/emergency/protected-override-audit.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/team-wave-planner.test.ts",
+      "packages/core/src/broker/team-wave-planner.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/cli/src/commands/emergency/gate.ts",
+      "packages/cli/src/commands/emergency/protected-override-audit.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/team-wave-planner.test.ts",
+      "packages/core/src/broker/team-wave-planner.ts"
+    ],
+    "waiverReason": "Mixed delivery commit 44deeace1 includes TASK-MAO-0024 team-wave files already closed by Agent004; 0037 protected-override-audit scope is isolated via historical close waiver."
+  },
+  "teamSummary": null
+}
