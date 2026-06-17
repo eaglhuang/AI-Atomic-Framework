@@ -163,6 +163,15 @@ function classifyTaskResidue(input: {
 
   if (planningDone && !liveDone) {
     if (hasHistoricalCloseArtifacts) {
+      if (closurePacket && activeClaim) {
+        return {
+          bucket: 'complete-but-unfinalized',
+          truth: 'closure artifacts exist while the live ledger has not finalized done',
+          residue: 'The task has close artifacts but still carries an active operator claim and an unfinished live ledger status.',
+          nextCommand: 'node atm.mjs tasks reconcile --task <id> --json',
+          reason: 'A close transition appears to have been prepared without finalizing ledger state, so reconcile must inspect the delivery before mutating state.'
+        };
+      }
       return {
         bucket: 'closeback-finalize',
         truth: 'closure packet exists but ledger is not done',

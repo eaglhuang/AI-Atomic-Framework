@@ -86,18 +86,30 @@ result = evaluateTaskDoneCloseAdmission({
   hasActiveSession: false,
   allowHistoricalCloseback: true
 });
-assert(result.ok, 'historical closeback must allow imported planned tasks without a live claim');
+if (result.ok) fail('historical closeback without active claim must fail closed');
+assert(result.code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', 'historical closeback without active claim must require reclaim');
+
+result = evaluateTaskDoneCloseAdmission({
+  taskId: 'TASK-LIFE',
+  actorId: 'captain',
+  status: 'planned',
+  claimState: 'active',
+  claimActorId: 'captain',
+  hasActiveSession: false,
+  allowHistoricalCloseback: true
+});
+assert(result.ok, 'historical closeback must allow imported planned tasks after actor claim, even without a live work session');
 
 result = evaluateTaskDoneCloseAdmission({
   taskId: 'TASK-LIFE',
   actorId: 'captain',
   status: 'blocked',
-  claimState: null,
-  claimActorId: null,
+  claimState: 'active',
+  claimActorId: 'captain',
   hasActiveSession: false,
   allowHistoricalCloseback: true
 });
-assert(result.ok, 'historical closeback must allow imported blocked tasks when historical delivery is verified');
+assert(result.ok, 'historical closeback must allow imported blocked tasks when historical delivery is verified and claimed by actor');
 
 result = evaluateTaskResetAdmission({ taskId: 'TASK-LIFE', fromStatus: 'done', toStatus: 'open' });
 if (result.ok) fail('done task reset must require reopen flow');

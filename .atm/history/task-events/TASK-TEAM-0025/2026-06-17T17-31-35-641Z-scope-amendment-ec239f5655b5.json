@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T17-31-35-641Z-scope-amendment-ec239f5655b5",
+  "taskId": "TASK-TEAM-0025",
+  "action": "scope-amendment",
+  "actorId": "captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0025.json",
+  "taskSha256": "sha256:0004a041d7f451fac83c5f3edf8d750aa62a78ffb07610cf9471dd96069c1e4e",
+  "createdAt": "2026-06-17T17:31:35.641Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TEAM-0025 --actor captain --add packages/cli/src/commands/tasks/lifecycle-state.ts --reason \"Correct scope amendment path for historical closeback claim gate source.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Correct scope amendment path for historical closeback claim gate source."
+  }
+}

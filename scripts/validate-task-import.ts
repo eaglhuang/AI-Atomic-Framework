@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { classifyGuidanceIntent } from '../packages/core/src/guidance/intent-classifier.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runTasks } from '../packages/cli/src/commands/tasks.ts';
+import { runEmergency } from '../packages/cli/src/commands/emergency.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -34,6 +35,24 @@ async function expectThrow(action: string, argv: string[], expectedCode: string)
       fail(`tasks ${action} ${argv.join(' ')} expected ${expectedCode} but threw ${code ?? 'unknown'}: ${(error as Error).message}`);
     }
   }
+}
+
+async function createImportWriteLease(cwd: string, allowedFlags: readonly string[], reason: string): Promise<string> {
+  const approval = await runEmergency([
+    'approve',
+    '--cwd', cwd,
+    '--actor', 'validator',
+    '--permission', 'backend.tasks.import.write',
+    ...allowedFlags.flatMap((flag) => ['--allowed-flag', flag]),
+    '--approval-text', 'Human approved validator import write test',
+    '--reason', reason
+  ]);
+  const leaseId = (approval.evidence as { lease?: { leaseId?: string } })?.lease?.leaseId;
+  if (!approval.ok || !leaseId) {
+    fail(`emergency approve for import write failed: ${JSON.stringify(approval)}`);
+    throw new Error('unreachable');
+  }
+  return leaseId;
 }
 
 async function main() {
@@ -322,7 +341,8 @@ async function main() {
       fail('rerunning import without source changes should emit ATM_TASKS_IMPORT_UNCHANGED diagnostics.');
     }
 
-    const resetImport = await expectOk('import', ['--from', npcPlan, '--write', '--force', '--reset-open', '--cwd', tempWorkspace]);
+    const resetLeaseId = await createImportWriteLease(tempWorkspace, ['--force', '--reset-open'], 'validator verifies protected reset-open import behavior');
+    const resetImport = await expectOk('import', ['--from', npcPlan, '--write', '--force', '--reset-open', '--emergency-approval', resetLeaseId, '--cwd', tempWorkspace]);
     const resetWritten = (resetImport.evidence as { writtenPaths: readonly string[] }).writtenPaths;
     if (resetWritten.length !== 2) {
       fail(`--reset-open import expected to rewrite 2 task files, got ${resetWritten.length}.`);
@@ -419,7 +439,8 @@ deliverables:
     };
     writeFileSync(activeTaskPath, JSON.stringify(claimedTaskJson, null, 2), 'utf8');
 
-    await expectOk('import', ['--from', npcPlan, '--write', '--force', '--cwd', tempWorkspace]);
+    const forceLeaseId = await createImportWriteLease(tempWorkspace, ['--force'], 'validator verifies protected force import active claim refresh behavior');
+    await expectOk('import', ['--from', npcPlan, '--write', '--force', '--emergency-approval', forceLeaseId, '--cwd', tempWorkspace]);
 
     const refreshedTaskJson = JSON.parse(readFileSync(activeTaskPath, 'utf8'));
     if (refreshedTaskJson.status !== 'running') {
@@ -524,7 +545,8 @@ Use TEAM-0026 as a safe mirror/import lane.
 - packages/cli/src/commands/next.ts
 `, 'utf8');
 
-    await expectOk('import', ['--from', routeHygieneTeamPlanPath, '--write', '--force', '--cwd', tempWorkspace]);
+    const teamHygieneLeaseId = await createImportWriteLease(tempWorkspace, ['--force'], 'validator verifies TEAM-0026 route hygiene force import behavior');
+    await expectOk('import', ['--from', routeHygieneTeamPlanPath, '--write', '--force', '--emergency-approval', teamHygieneLeaseId, '--cwd', tempWorkspace]);
     const teamHygieneNextResult = await runNext(['--cwd', tempWorkspace, '--prompt', 'TASK-TEAM-0026']);
     const teamHygieneTask = (teamHygieneNextResult.evidence as {
       importedTaskQueue?: {
@@ -564,7 +586,8 @@ scopePaths:
 This is a planning-repo contract. The CID word here must not synthesize a target alias.
 `, 'utf8');
 
-    await expectOk('import', ['--from', routeHygieneCidPlanPath, '--write', '--force', '--cwd', tempWorkspace]);
+    const cidHygieneLeaseId = await createImportWriteLease(tempWorkspace, ['--force'], 'validator verifies planning_repo-only CID route hygiene force import behavior');
+    await expectOk('import', ['--from', routeHygieneCidPlanPath, '--write', '--force', '--emergency-approval', cidHygieneLeaseId, '--cwd', tempWorkspace]);
     const cidHygieneNextResult = await runNext(['--cwd', tempWorkspace, '--prompt', 'TASK-CID-0005']);
     const cidEvidence = cidHygieneNextResult.evidence as {
       nextAction?: { status?: string; recommendedChannel?: string };
@@ -641,13 +664,15 @@ This is a planning-repo contract. The CID word here must not synthesize a target
       fail(`TASK-AAO-0135 regression: default import --write must emit IMPORT_SKIPPED_ACTIVE_CLAIM for ${claimGuardTaskId}.`);
     }
 
-    await expectOk('import', ['--from', claimGuardPlanPath, '--write', '--force', '--cwd', tempWorkspace]);
+    const claimGuardForceLeaseId = await createImportWriteLease(tempWorkspace, ['--force'], 'validator verifies force import preserves active claims');
+    await expectOk('import', ['--from', claimGuardPlanPath, '--write', '--force', '--emergency-approval', claimGuardForceLeaseId, '--cwd', tempWorkspace]);
     const claimGuardAfterForce = JSON.parse(readFileSync(claimGuardTaskPath, 'utf8'));
     if (claimGuardAfterForce.claim?.leaseId !== 'lease-claim-guard-01' || claimGuardAfterForce.status !== 'running') {
       fail('TASK-AAO-0135 regression: --force must not overwrite active claim state.');
     }
 
-    const claimGuardOverwrite = await expectOk('import', ['--from', claimGuardPlanPath, '--write', '--force', '--force-overwrite-claims', '--cwd', tempWorkspace]);
+    const claimGuardOverwriteLeaseId = await createImportWriteLease(tempWorkspace, ['--force', '--force-overwrite-claims'], 'validator verifies force-overwrite-claims import displacement behavior');
+    const claimGuardOverwrite = await expectOk('import', ['--from', claimGuardPlanPath, '--write', '--force', '--force-overwrite-claims', '--emergency-approval', claimGuardOverwriteLeaseId, '--cwd', tempWorkspace]);
     const claimGuardOverwriteDiagnostics = (claimGuardOverwrite.evidence as {
       manifest: { diagnostics: ReadonlyArray<{ code: string }> }
     }).manifest.diagnostics;

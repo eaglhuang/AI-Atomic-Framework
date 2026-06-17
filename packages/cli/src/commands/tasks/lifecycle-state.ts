@@ -129,7 +129,19 @@ export function evaluateTaskDoneCloseAdmission(input: {
       'blocked'
     ]);
     if (allowedHistoricalStatuses.has(status)) {
-      return { ok: true, reason: `${status}-to-done-historical-closeback` };
+      if (input.claimState === 'active' && input.claimActorId === input.actorId) {
+        return { ok: true, reason: `${status}-to-done-historical-closeback` };
+      }
+      return {
+        ok: false,
+        code: 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED',
+        message: `Task ${input.taskId} cannot be historically closed as done without an active claim owned by ${input.actorId}.`,
+        details: {
+          taskId: input.taskId,
+          actorId: input.actorId,
+          requiredCommand: `node atm.mjs next --claim --actor ${input.actorId} --prompt "${input.taskId}" --json`
+        }
+      };
     }
   }
   if (status === 'planned') {

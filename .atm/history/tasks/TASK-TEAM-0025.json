@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0025",
+  "title": "Task import dispatch metadata preservation",
+  "status": "running",
+  "milestone": "M4K",
+  "dependencies": [
+    "TASK-TEAM-0017",
+    "TASK-TEAM-0020"
+  ],
+  "acceptance": [
+    "`tasks import --dry-run` manifest preserves structured `dispatchPattern` and `conditionReview` for cards that declare those machine fields.",
+    "`tasks import --write` persists the same compact fields into `.atm/history/tasks/<TASK>.json`.",
+    "Cards without dispatch metadata continue to import without regressions.",
+    "The canonical JSON stays compact; freeform body prose is not duplicated into dispatch fields.",
+    "A sidecar can reconstruct Phase 0 / Phase 1 kickoff rules from canonical task JSON alone."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "scripts/validate-task-import.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "scripts/validate-task-import.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:task-import",
+    "npm run validate:task-ledger-governance",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Knowledge query/build/runtime behavior",
+    "Automatic sidecar spawning or lifecycle claim automation",
+    "Generic passthrough of arbitrary frontmatter into ledger JSON",
+    "next / playbook output redesign"
+  ],
+  "nonGoals": [
+    "Do not make dispatch metadata authoritative over lifecycle, scope locks, or evidence",
+    "Do not store long prose briefs, chat transcripts, or corpus bodies inside canonical task JSON"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert dispatch metadata projection, validator updates, tasks spec wording, and atom map changes together.",
+  "dispatchPattern": {
+    "shape": "dual-agent (Phase 0 ledger contract planner + Phase 1 builder)",
+    "rationale": "The sidecar contract should be normalized first by a read-only planner so Phase 1 only implements compact, bounded ledger fields instead of inventing an unstructured passthrough.",
+    "phase0": {
+      "lane": "helper (read-only sidecar)",
+      "allowedFiles": [
+        "docs/ai_atomic_framework/team-agents/團隊自動化代理分工計畫.md",
+        "docs/ai_atomic_framework/team-agents/tasks/README.md",
+        "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0025-*.task.md"
+      ],
+      "commitBudget": 0,
+      "output": "Phase 1 brief defining exact dispatchPattern / conditionReview JSON shape, alias normalization, backward compatibility, and payload size guard."
+    },
+    "phase1": {
+      "lane": "external builder 001-006",
+      "forbiddenFiles": [
+        "C:/Users/User/3KLife/**",
+        ".atm/runtime/**",
+        ".atm/history/**"
+      ],
+      "allowedFilesStrict": true,
+      "commitBudget": 2,
+      "commitLayout": [
+        "commit_1: tasks import + task ledger projection",
+        "commit_2: validator/spec/map + close evidence"
+      ]
+    }
+  },
+  "conditionReview": [
+    "dry-run manifest preserves structured dispatch metadata with stable camelCase field names",
+    "write mode persists the same compact metadata to canonical task JSON",
+    "cards without dispatch metadata remain backward compatible",
+    "payload stays compact and does not duplicate freeform Markdown body content"
+  ],
+  "mailboxAssignee": "001",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-governance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card is the bridge from \"sidecar reads Markdown plus ledger\" to \"sidecar can trust canonical ledger JSON as its only runtime-facing task surface.\"",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0025-task-import-dispatch-metadata-preservation.task.md",
+    "sectionTitle": "TASK-TEAM-0025",
+    "headingLine": 82,
+    "hash": "4b99e86e40aca0e0"
+  },
+  "importedAt": "2026-06-17T16:55:19.547Z",
+  "lastTransitionId": "2026-06-17T17-14-21-643Z-claim-939e3cd9242d",
+  "lastTransitionAt": "2026-06-17T17:14:21.643Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-17T17:14:21.589Z",
+  "promotedAt": "2026-06-17T17:14:21.594Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-99222893fff4",
+    "claimedAt": "2026-06-17T17:14:21.599Z",
+    "heartbeatAt": "2026-06-17T17:14:21.599Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0025.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-17T17:14:21.599Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260617171421-captain-TASK-TEAM-0025-8ea46e2ac5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0025",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0025.*",
+      ".atm/history/task-events/TASK-TEAM-0025/**",
+      ".atm/history/tasks/TASK-TEAM-0025.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-markdown-helpers.ts",
+      "scripts/validate-task-import.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "cf47da27219e111e5296349d2da68ed73bc01f45f2ea0bc0f7f2753b4a0d683f",
+    "actorId": "captain",
+    "createdAt": "2026-06-17T17:14:21.643Z",
+    "status": "active"
+  }
+}
