@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T12-31-20-199Z-close-0b20bdb8e1cd",
+  "taskId": "TASK-MAO-0041",
+  "action": "close",
+  "actorId": "cursor-composer-2.5",
+  "sessionId": "session-20260617093928-cursor-composer-2.5-TASK-MAO-0041-1130a9bf84",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0041.json",
+  "taskSha256": "sha256:13edb7eb851f11746e472fab3d81da7fd8dcb2cfe13e166636e7fb71d1e9e869",
+  "createdAt": "2026-06-17T12:31:20.199Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0041 --actor cursor-composer-2.5 --status done --historical-delivery 72f80446fd290d6aac39570edee27fcafca39e49",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617093928-cursor-composer-2.5-TASK-MAO-0041-1130a9bf84",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0041.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "evidence-bundle-manifest.test.ts",
+      "git diff --check",
+      "node --strip-types tests/cli/evidence-bundle-manifest.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T12:31:20.194Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0041-evidence-bundle-and-directory-deliverables.task.md",
+        ".atm/history/evidence/TASK-MAO-0041.*",
+        ".atm/history/task-events/TASK-MAO-0041/**",
+        ".atm/history/tasks/TASK-MAO-0041.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/evidence-gates.md",
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks/historical-delivery.ts",
+        "schemas/governance/evidence.schema.json",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "tests/cli/evidence-bundle-manifest.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/evidence.spec.ts",
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks/historical-delivery.ts",
+        "schemas/governance/evidence.schema.json",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "tests/cli/evidence-bundle-manifest.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
