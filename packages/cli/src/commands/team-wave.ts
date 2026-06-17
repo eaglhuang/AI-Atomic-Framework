@@ -92,6 +92,32 @@ export function buildWavePlanFromTaskIds(
 
 const WAVE_RUNTIME_DIR = '.atm/runtime/team-waves';
 
+// TASK-MAO-0031: coordinator-only git / closeout guard. Wave Mode roles other
+// than the coordinator must never perform git writes or drive task closeout;
+// the existing hooks, batch checkpoint, and taskflow close remain the lifecycle
+// authority. This guard is a pure check the dispatch surface and tests use to
+// fail closed before any write-capable action.
+export type WaveRole = 'coordinator' | 'worker' | 'validator' | 'reviewer';
+export type WavePrivilegedAction = 'git-write' | 'task-closeout' | 'checkpoint';
+
+export interface CoordinatorGuardResult {
+  readonly allowed: boolean;
+  readonly reason: string;
+}
+
+export function assertCoordinatorOnly(
+  role: WaveRole,
+  action: WavePrivilegedAction
+): CoordinatorGuardResult {
+  if (role === 'coordinator') {
+    return { allowed: true, reason: `coordinator may perform ${action}` };
+  }
+  return {
+    allowed: false,
+    reason: `role ${role} may not perform ${action}; Wave Mode reserves git writes and closeout for the coordinator`
+  };
+}
+
 /**
  * Build admission decision + per-wave envelopes for the first planned wave.
  * TASK-MAO-0027: this is the dispatch surface that turns a metadata wave plan
