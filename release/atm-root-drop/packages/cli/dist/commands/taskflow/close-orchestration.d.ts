@@ -13,6 +13,17 @@ export interface ClosebackPlanningPathResolution {
     };
 }
 export type { TaskflowCloseBackend, TaskflowCloseMode };
+/** closeback 摘要中暴露的單筆範圍增修紀錄，讓 reviewer 在收口時區分正常 linked-surface 成長與可疑 scope drift。 */
+export interface TaskScopeAmendmentSummary {
+    transitionId: string;
+    actorId: string | null;
+    createdAt: string;
+    addedPaths: string[];
+    amendmentClass: string | null;
+    amendmentPhase: string | null;
+    amendmentMode: 'normal' | 'repair' | null;
+    reason: string | null;
+}
 export interface TaskflowClosebackPlan {
     closeMode: TaskflowCloseMode;
     backendSurface: TaskflowCloseBackend;
@@ -42,6 +53,8 @@ export interface TaskflowClosebackPlan {
     };
     evidenceValidators: string[];
     residue: Pick<TaskResidueClassification, 'bucket' | 'truth' | 'residue' | 'reason' | 'nextCommand'>;
+    /** 該任務已記錄的範圍增修歷史（依時間順序），收口摘要中可見。 */
+    amendmentHistory: TaskScopeAmendmentSummary[];
     closebackPathResolution?: ClosebackPlanningPathResolution;
 }
 export declare function buildClosebackPlan(input: {
@@ -76,6 +89,7 @@ export declare function buildClosebackPlan(input: {
             divergence: Array<{
                 field: string;
             }>;
+            amendmentHistory?: ReadonlyArray<TaskScopeAmendmentSummary>;
         };
     };
     closebackPathResolution?: ClosebackPlanningPathResolution;

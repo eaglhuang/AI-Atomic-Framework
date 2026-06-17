@@ -113,6 +113,31 @@ const incomplete = buildResidueClassification({
 });
 assert(incomplete.bucket === 'source-done-governance-incomplete', 'done without provenance must surface governance gap');
 assert(incomplete.residue.includes('Missing proof segments'), 'governance gap must name missing proof segments');
+const closebackFinalize = buildResidueClassification({
+    cwd: process.cwd(),
+    taskId: 'TASK-RES',
+    taskDocument: taskDocument(),
+    liveLedger: {
+        status: 'running',
+        claimState: 'active',
+        lastTransitionId: 'claim-1',
+        lastTransitionAt: '2026-06-13T00:00:00.000Z'
+    },
+    planningFrontmatter: {
+        status: 'done',
+        source: '../planning/tasks/TASK-RES.task.md'
+    },
+    lastTransitionEvent: {
+        action: 'claim',
+        actorId: 'captain',
+        createdAt: '2026-06-13T00:00:00.000Z',
+        fromStatus: 'ready',
+        toStatus: 'running'
+    },
+    divergence: []
+});
+assert(closebackFinalize.bucket === 'closeback-finalize', 'planning record done but ledger running must classify as closeback-finalize');
+assert(closebackFinalize.nextCommand === 'node atm.mjs taskflow close --task TASK-RES --json', 'closeback-finalize command must point to taskflow close');
 const triangulation = {
     ssot: 'liveLedger',
     liveLedger: {
@@ -134,7 +159,8 @@ const triangulation = {
         }
     ],
     recommendation: 'node atm.mjs tasks import --from <plan.md> --write --json',
-    residueClassification: ambiguous
+    residueClassification: ambiguous,
+    amendmentHistory: []
 };
 const evidence = buildResidueDiagnosisEvidenceFromTriangulation({
     taskId: 'TASK-RES',

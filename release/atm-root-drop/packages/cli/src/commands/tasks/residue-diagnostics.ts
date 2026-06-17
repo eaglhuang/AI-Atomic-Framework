@@ -6,6 +6,7 @@ import {
 export type TaskResidueBucket =
   | 'no-residue'
   | 'complete-but-unfinalized'
+  | 'closeback-finalize'
   | 'source-done-governance-incomplete'
   | 'planning-mirror-only'
   | 'interrupted-close'
@@ -49,6 +50,18 @@ export interface TaskResidueDivergence {
   lastTransitionEvent?: string | null;
 }
 
+/** 單筆 scope-amendment 事件的可讀快照（供 status 與 closeback 輸出使用）。 */
+export interface TaskScopeAmendmentSnapshot {
+  transitionId: string;
+  actorId: string | null;
+  createdAt: string;
+  addedPaths: string[];
+  amendmentClass: string | null;
+  amendmentPhase: string | null;
+  amendmentMode: 'normal' | 'repair' | null;
+  reason: string | null;
+}
+
 export interface TaskStatusTriangulation {
   ssot: 'liveLedger';
   liveLedger: TaskResidueLedgerSnapshot;
@@ -57,6 +70,8 @@ export interface TaskStatusTriangulation {
   divergence: TaskResidueDivergence[];
   recommendation: string | null;
   residueClassification: TaskResidueClassification;
+  /** 所有已記錄的範圍增修歷史（按時間順序排列）。 */
+  amendmentHistory: TaskScopeAmendmentSnapshot[];
 }
 
 export interface TaskResidueDiagnosisEvidence {
@@ -147,20 +162,21 @@ function classifyTaskResidue(input: {
   );
 
   if (planningDone && !liveDone) {
+    if (hasHistoricalCloseArtifacts) {
+      return {
+        bucket: 'closeback-finalize',
+        truth: 'closure packet exists but ledger is not done',
+        residue: 'The closure packet is prepared but the live ledger has not recorded the done status.',
+        nextCommand: 'node atm.mjs taskflow close --task <id> --json',
+        reason: 'Closure packet exists, so the task should be finalized via taskflow close.'
+      };
+    }
     return {
-      bucket: hasHistoricalCloseArtifacts || activeClaim
-        ? 'complete-but-unfinalized'
-        : 'stale-import',
-      truth: 'planning-mirror says done, live ledger has not finished finalization',
-      residue: hasHistoricalCloseArtifacts || activeClaim
-        ? 'There is enough close-path residue to point the operator at reconcile or repair.'
-        : 'The imported planning mirror is ahead of the live ledger.',
-      nextCommand: hasHistoricalCloseArtifacts || activeClaim
-        ? 'node atm.mjs tasks reconcile --task <id> --actor <actor> --delivery-commit <sha> --json'
-        : 'node atm.mjs tasks import --from <plan.md> --write --json',
-      reason: hasHistoricalCloseArtifacts || activeClaim
-        ? 'Historical close artifacts or an active claim remain, so the task is substantively done but not finalized.'
-        : 'Planning mirror is done, but the live ledger still needs import reconciliation.'
+      bucket: 'closeback-finalize',
+      truth: 'planning record says done but target ledger is not done',
+      residue: 'Planning record is done, but the live ledger is not done.',
+      nextCommand: 'node atm.mjs taskflow close --task <id> --json',
+      reason: 'Planning record says done, so the task should be finalized via taskflow close.'
     };
   }
 

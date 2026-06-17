@@ -28,12 +28,12 @@ import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-
 import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/normalize-string-value-helper.js';
 import { normalizeTaskDocumentId as delegatedNormalizeTaskDocumentId } from './tasks/normalize-task-document-id-helper.js';
 import { sha256 as delegatedSha256 } from './tasks/sha256-helper.js';
-import { assertLocalTaskLedgerEnabled as delegatedAssertLocalTaskLedgerEnabled, buildTaskTransitionCommand as delegatedBuildTaskTransitionCommand, createClosureTransitionMetadata as delegatedCreateClosureTransitionMetadata, normalizeWorkItemStatus as delegatedNormalizeWorkItemStatus, inspectTaskVerifyStatus as delegatedInspectTaskVerifyStatus } from './tasks/task-transition-helpers.js';
+import { assertLocalTaskLedgerEnabled as delegatedAssertLocalTaskLedgerEnabled, buildTaskTransitionCommand as delegatedBuildTaskTransitionCommand, buildScopeAmendmentCommand as delegatedBuildScopeAmendmentCommand, createClosureTransitionMetadata as delegatedCreateClosureTransitionMetadata, normalizeWorkItemStatus as delegatedNormalizeWorkItemStatus, inspectTaskVerifyStatus as delegatedInspectTaskVerifyStatus } from './tasks/task-transition-helpers.js';
 import { readGitScalar as delegatedReadGitScalar, listCommittedFilesSinceClaim as delegatedListCommittedFilesSinceClaim } from './tasks/task-git-helpers.js';
 import { collectKeyValue as delegatedCollectKeyValue, collectKeyValueFromLines as delegatedCollectKeyValueFromLines, createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata, parseDispatchMetadataFromPlanText } from './tasks/task-markdown-helpers.js';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.js';
 import { coerceStatus, extractFrontMatter, extractTaskDeclaredFiles, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, taskIdsEqual, parseMarkdownTableCells, parseYamlList, validateDeliverablesList, parseContextMap } from './tasks/task-import-validators.js';
-import { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
+import { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseScopeAddOptions, parseScopeRepairOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
 const validStatuses = new Set(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
 const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria', '驗收', '驗收條件'];
 const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes', '交付物', '產物', '輸出'];
@@ -141,6 +141,57 @@ function readLastTransitionEventRecord(cwd, taskId, transitionId) {
     if (!existsSync(eventPath))
         return null;
     return JSON.parse(readFileSync(eventPath, 'utf8'));
+}
+/**
+ * 讀取指定任務的所有 scope-amendment 事件，依時間順序排列。
+ * 供 `buildTaskStatusTriangulation` 與 closeback 輸出使用，讓 reviewer 能區分
+ * 正常 linked-surface 成長與可疑 scope drift。
+ */
+function readScopeAmendmentEvents(cwd, taskId) {
+    const policy = readTaskLedgerPolicy(cwd);
+    const eventDir = path.join(cwd, policy.eventRoot, taskId);
+    if (!existsSync(eventDir))
+        return [];
+    let files;
+    try {
+        files = readdirSync(eventDir)
+            .filter((f) => f.includes('scope-amendment') && f.endsWith('.json'))
+            .sort();
+    }
+    catch {
+        return [];
+    }
+    const snapshots = [];
+    for (const f of files) {
+        try {
+            const raw = JSON.parse(readFileSync(path.join(eventDir, f), 'utf8'));
+            if (raw.action !== 'scope-amendment')
+                continue;
+            const meta = raw.amendmentMetadata;
+            // 從 command 字串解析 addedPaths（向下相容未帶 metadata 的舊事件）
+            const command = typeof raw.command === 'string' ? raw.command : '';
+            const addMatch = /--add\s+([^\s]+)/.exec(command);
+            const addedPaths = addMatch
+                ? addMatch[1].split(',').map((p) => p.trim()).filter(Boolean)
+                : [];
+            snapshots.push({
+                transitionId: typeof raw.transitionId === 'string' ? raw.transitionId : f.replace('.json', ''),
+                actorId: typeof raw.actorId === 'string' ? raw.actorId : null,
+                createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : '',
+                addedPaths,
+                amendmentClass: typeof meta?.amendmentClass === 'string' ? meta.amendmentClass : null,
+                amendmentPhase: typeof meta?.amendmentPhase === 'string' ? meta.amendmentPhase : null,
+                amendmentMode: meta?.amendmentMode === 'normal' || meta?.amendmentMode === 'repair'
+                    ? meta.amendmentMode
+                    : null,
+                reason: typeof meta?.reason === 'string' ? meta.reason : null
+            });
+        }
+        catch {
+            // 跳過無法解析的事件檔
+        }
+    }
+    return snapshots;
 }
 function normalizeParityLifecycleValue(value) {
     const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
@@ -262,6 +313,7 @@ function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
                 ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
                 : `node atm.mjs tasks import --from <plan.md> --write --json`)
             : null;
+    const amendmentHistory = readScopeAmendmentEvents(cwd, taskId);
     return {
         ssot: 'liveLedger',
         liveLedger,
@@ -269,7 +321,8 @@ function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
         planningFrontmatter,
         divergence,
         recommendation,
-        residueClassification: parityOverride?.residueClassification ?? residueClassification
+        residueClassification: parityOverride?.residueClassification ?? residueClassification,
+        amendmentHistory
     };
 }
 async function recordStaleRunnerOverride(input) {
@@ -2311,10 +2364,13 @@ async function runTasksScope(argv) {
     if (subAction === 'add') {
         return runTasksScopeAdd(argv.slice(1));
     }
-    if (!subAction) {
-        throw new CliError('ATM_CLI_USAGE', 'tasks scope requires a sub-action: add', { exitCode: 2 });
+    if (subAction === 'repair') {
+        return runTasksScopeRepair(argv.slice(1));
     }
-    throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add`, { exitCode: 2 });
+    if (!subAction) {
+        throw new CliError('ATM_CLI_USAGE', 'tasks scope requires a sub-action: add | repair', { exitCode: 2 });
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add, repair`, { exitCode: 2 });
 }
 function runTasksScopeAdd(argv) {
     const options = parseScopeAddOptions(argv);
@@ -2363,11 +2419,25 @@ function runTasksScopeAdd(argv) {
     const updatedEmbeddedLock = { ...embeddedLockRecord, allowedFiles: [...mergedAllowed] };
     const updatedOuterLock = { ...outerLock, taskDirectionLock: updatedEmbeddedLock };
     writeFileSync(lockPath, `${JSON.stringify(updatedOuterLock, null, 2)}\n`, 'utf8');
-    // 記錄 scope-amendment 轉換事件
+    // 記錄 scope-amendment 轉換事件（包含可稽核的 amendment metadata）
     const taskPath = taskPathFor(options.cwd, options.taskId);
+    const amendmentMetadata = {
+        amendmentClass: options.amendmentClass ?? 'linked-surface',
+        amendmentPhase: options.amendmentPhase ?? 'during-implementation',
+        amendmentMode: 'normal',
+        ...(options.reason ? { reason: options.reason } : {})
+    };
     if (existsSync(taskPath)) {
         const taskDocument = readJsonRecord(taskPath);
-        const commandLine = `node atm.mjs tasks scope add --task ${options.taskId} --actor ${actorId} --add ${options.addPaths.join(',')} --json`;
+        const commandLine = buildScopeAmendmentCommand({
+            mode: 'normal',
+            taskId: options.taskId,
+            actorId,
+            addPaths: options.addPaths,
+            amendmentClass: options.amendmentClass,
+            amendmentPhase: options.amendmentPhase,
+            reason: options.reason
+        });
         appendTaskTransitionEvent({
             cwd: options.cwd,
             taskId: options.taskId,
@@ -2377,7 +2447,8 @@ function runTasksScopeAdd(argv) {
             toStatus: String(taskDocument.status ?? 'running'),
             taskPath,
             taskDocument,
-            command: commandLine
+            command: commandLine,
+            amendmentMetadata
         });
     }
     return makeResult({
@@ -2393,16 +2464,142 @@ function runTasksScopeAdd(argv) {
                 addedPaths,
                 alreadyPresent,
                 allowedFiles: mergedAllowed,
+                amendmentMetadata,
                 requiredCommand: `node atm.mjs tasks scope add --task ${options.taskId} --actor ${actorId} --add <paths> --json`
             })
         ],
         evidence: {
             action: 'scope-amendment',
+            amendmentMode: 'normal',
             taskId: options.taskId,
             actorId,
             addedPaths,
             alreadyPresent,
-            allowedFiles: mergedAllowed
+            allowedFiles: mergedAllowed,
+            amendmentMetadata
+        }
+    });
+}
+/**
+ * `tasks scope repair` — 維護緊急通道（需 --emergency-approval 與 --reason）。
+ * 語意與 `tasks scope add` 相同，但記錄 `amendmentMode: 'repair'` 以區分
+ * 正常稽核通道與緊急維護通道，讓 reviewer 能識別真正的治理例外。
+ */
+function runTasksScopeRepair(argv) {
+    const options = parseScopeRepairOptions(argv);
+    const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+    if (!resolvedActor) {
+        throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks scope repair requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+    }
+    const actorId = resolvedActor.actorId;
+    // 強制 emergency approval 檢查（parseScopeRepairOptions 已確保 emergencyApproval 非空）
+    assertEmergencyApproval({
+        cwd: options.cwd,
+        surface: 'tasks scope repair',
+        permission: 'backend.tasks.scopeAmend',
+        taskId: options.taskId,
+        actorId,
+        emergencyApproval: options.emergencyApproval,
+        flags: ['--add', '--reason'],
+        reason: options.reason,
+        command: `node atm.mjs tasks scope repair --task ${options.taskId} --actor ${actorId} --add ${options.addPaths.join(',')} --reason "${options.reason}" --emergency-approval ${options.emergencyApproval} --json`
+    });
+    const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
+    if (!existsSync(lockPath)) {
+        throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `No active direction lock found for task ${options.taskId}. The task must be claimed before repairing its scope.`, {
+            exitCode: 1,
+            details: { taskId: options.taskId }
+        });
+    }
+    let outerLock;
+    try {
+        outerLock = JSON.parse(readFileSync(lockPath, 'utf8'));
+    }
+    catch {
+        throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Could not read direction lock for task ${options.taskId}.`, {
+            exitCode: 1,
+            details: { taskId: options.taskId }
+        });
+    }
+    if (outerLock.released === true || outerLock.status === 'released') {
+        throw new CliError('ATM_SCOPE_AMENDMENT_LOCK_RELEASED', `Task ${options.taskId} direction lock is released; claim the task first.`, {
+            exitCode: 1,
+            details: { taskId: options.taskId }
+        });
+    }
+    const embeddedLock = outerLock.taskDirectionLock;
+    if (!embeddedLock || typeof embeddedLock !== 'object' || Array.isArray(embeddedLock)) {
+        throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Lock file for ${options.taskId} does not contain an embedded taskDirectionLock.`, {
+            exitCode: 1,
+            details: { taskId: options.taskId }
+        });
+    }
+    const embeddedLockRecord = embeddedLock;
+    const existingAllowed = sanitizeTaskDirectionAllowedFiles(Array.isArray(embeddedLockRecord.allowedFiles) ? embeddedLockRecord.allowedFiles : []);
+    const requestedPaths = sanitizeTaskDirectionAllowedFiles(options.addPaths);
+    const addedPaths = requestedPaths.filter((p) => !existingAllowed.includes(p));
+    const alreadyPresent = requestedPaths.filter((p) => existingAllowed.includes(p));
+    const mergedAllowed = sanitizeTaskDirectionAllowedFiles([...existingAllowed, ...requestedPaths]);
+    const updatedEmbeddedLock = { ...embeddedLockRecord, allowedFiles: [...mergedAllowed] };
+    const updatedOuterLock = { ...outerLock, taskDirectionLock: updatedEmbeddedLock };
+    writeFileSync(lockPath, `${JSON.stringify(updatedOuterLock, null, 2)}\n`, 'utf8');
+    // 記錄 scope-amendment 事件（amendmentMode: 'repair'，讓歷史可查）
+    const taskPath = taskPathFor(options.cwd, options.taskId);
+    const amendmentMetadata = {
+        amendmentClass: 'linked-surface',
+        amendmentPhase: 'during-implementation',
+        amendmentMode: 'repair',
+        reason: options.reason
+    };
+    if (existsSync(taskPath)) {
+        const taskDocument = readJsonRecord(taskPath);
+        const commandLine = buildScopeAmendmentCommand({
+            mode: 'repair',
+            taskId: options.taskId,
+            actorId,
+            addPaths: options.addPaths,
+            reason: options.reason,
+            emergencyApproval: options.emergencyApproval
+        });
+        appendTaskTransitionEvent({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            action: 'scope-amendment',
+            actorId,
+            fromStatus: String(taskDocument.status ?? 'running'),
+            toStatus: String(taskDocument.status ?? 'running'),
+            taskPath,
+            taskDocument,
+            command: commandLine,
+            amendmentMetadata
+        });
+    }
+    return makeResult({
+        ok: true,
+        command: 'tasks',
+        cwd: options.cwd,
+        messages: [
+            message('info', 'ATM_SCOPE_REPAIR_APPLIED', addedPaths.length > 0
+                ? `Scope repair applied for ${options.taskId}: ${addedPaths.length} path(s) added to allowedFiles (maintenance lane).`
+                : `Scope repair for ${options.taskId}: all requested paths were already in allowedFiles.`, {
+                taskId: options.taskId,
+                actorId,
+                addedPaths,
+                alreadyPresent,
+                allowedFiles: mergedAllowed,
+                amendmentMetadata,
+                requiredCommand: `node atm.mjs tasks scope repair --task ${options.taskId} --actor ${actorId} --add <paths> --reason "<reason>" --emergency-approval <leaseId> --json`
+            })
+        ],
+        evidence: {
+            action: 'scope-amendment',
+            amendmentMode: 'repair',
+            taskId: options.taskId,
+            actorId,
+            addedPaths,
+            alreadyPresent,
+            allowedFiles: mergedAllowed,
+            amendmentMetadata
         }
     });
 }
@@ -4019,6 +4216,9 @@ function assertLocalTaskLedgerEnabled(cwd, action) {
 }
 function buildTaskTransitionCommand(input) {
     return delegatedBuildTaskTransitionCommand(input);
+}
+function buildScopeAmendmentCommand(input) {
+    return delegatedBuildScopeAmendmentCommand(input);
 }
 function quoteCommandValue(value) {
     return /^[A-Za-z0-9._:/\\-]+$/.test(value)
@@ -5653,5 +5853,5 @@ async function runTasksNew(argv) {
         }
     });
 }
-export { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseHistoricalDeliveryRefs, parseScopeAddOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
+export { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseHistoricalDeliveryRefs, parseScopeAddOptions, parseScopeRepairOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
 export { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline };

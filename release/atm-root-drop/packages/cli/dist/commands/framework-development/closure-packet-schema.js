@@ -1363,6 +1363,18 @@ export function repairClosurePacketForTask(input) {
     const packetPath = resolveClosurePacketPath(cwd, taskId);
     const packetAbsolutePath = path.join(cwd, packetPath);
     let parsed = readJsonIfExists(packetAbsolutePath);
+    const taskDocPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    const taskDocument = readJsonIfExists(taskDocPath);
+    if (parsed && taskDocument && taskDocument.status !== 'done') {
+        throw new CliError('ATM_REPAIR_CLOSURE_NOT_CLOSE', `Task ${taskId} has an existing closure packet but its ledger status is '${taskDocument.status}' (not done). Use taskflow close to finalize this task.`, {
+            exitCode: 1,
+            details: {
+                taskId,
+                ledgerStatus: taskDocument.status,
+                remediation: 'Run taskflow close to perform closeback finalization instead of repairing.'
+            }
+        });
+    }
     if (!parsed) {
         // Attempt to reconstruct the closure packet from the transition event
         const taskDocPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);

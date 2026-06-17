@@ -389,8 +389,26 @@
     },
     {
       "path_pattern": "packages/cli/src/commands/shared.ts",
-      "atom_id": "atm.task-ledger-governance-map",
-      "capability": "shared command helpers, option parser parseOptions, output-json file writer redirection (TASK-AAO-0065), and structured CliError usage diagnostics envelopes",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "shared command helpers, CliError envelopes, enrichCommandResult severity/exitCode/blocking/diagnostics contract (TASK-MAO-0036), option parser parseOptions, output-json projection",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/_common.ts",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "shared command-spec options documenting JSON result contract fields",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "docs/cli-error-policy.md",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "canonical CLI result contract and exit-code policy SSoT",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "tests/cli/cli-result-contract.test.ts",
+      "atom_id": "atm.cli-result-contract-map",
+      "capability": "release-smoke coverage for success, advisory, blocked, usage-error, and failure result shapes",
       "coverage_status": "active"
     },
     {
@@ -1099,6 +1117,55 @@
       "capability": "MAO 並行路由 validator：驗證 fixture pack、阻擋 false-safe regression、執行完整 benchmark，並輸出 docs/reports/mao-parallel-routing-benchmark.md。",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0010"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.closeback-route-correctness-map",
+      "capability": "Pass through out-of-scope-delivery waiver flags and reason in closeback plan building.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+      "atom_id": "atm.closeback-route-correctness-map",
+      "capability": "Introduce closeback-finalize residue classification bucket for unfinalized but done planning tasks.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/surface-invariants.ts",
+      "atom_id": "atm.closeback-route-correctness-map",
+      "capability": "Assign closeback-finalize to tasks-close backend and historical-delivery-close mode.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "atom_id": "atm.closeback-route-correctness-map",
+      "capability": "Guard repair-closure packet helper by throwing ATM_REPAIR_CLOSURE_NOT_CLOSE when ledger is not done.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "atom_id": "atm.closeback-route-correctness-map",
+      "capability": "Regression tests for committed out-of-scope delivery with approved waiver in taskflow close dry-run and write mode.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+      "atom_id": "atm.closeback-route-correctness-map",
+      "capability": "Test coverage for closeback-finalize residue bucket diagnostic logic.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "tests/cli/taskflow-close-orchestration.test.ts",
+      "atom_id": "atm.closeback-route-correctness-map",
+      "capability": "Regression tests for repair closure check and closeback plan waiver pass-through validation.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0038"
     }
   ],
   "summary": {

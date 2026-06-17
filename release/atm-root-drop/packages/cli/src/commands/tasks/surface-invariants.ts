@@ -39,6 +39,9 @@ export function resolveTaskflowCloseBackend(
   if (bucket === 'complete-but-unfinalized') {
     return 'tasks-reconcile';
   }
+  if (bucket === 'closeback-finalize') {
+    return 'tasks-close';
+  }
   return 'tasks-close';
 }
 
@@ -54,6 +57,9 @@ export function resolveTaskflowCloseMode(input: {
   const planningStatus = normalizeLifecycleStatus(input.planningStatus ?? null);
   const activeLiveLedger = isActiveLedgerStatus(liveStatus);
   const openPlanningMirror = isOpenPlanningStatus(planningStatus);
+  if (input.bucket === 'closeback-finalize') {
+    return 'historical-delivery-close';
+  }
   if (input.bucket === 'ambiguous-manual-review') {
     if (input.planningAuthorityDeliveryOk && input.historicalDeliveryRefs.length > 0) {
       return 'historical-delivery-close';

@@ -72,7 +72,8 @@ export function appendTaskTransitionEvent(input) {
         command: input.command ?? `atm tasks ${input.action}`,
         ...(typeof input.taskDocument.originProvider === 'string' ? { originProvider: input.taskDocument.originProvider } : {}),
         ...(typeof input.taskDocument.originTaskId === 'string' ? { originTaskId: input.taskDocument.originTaskId } : {}),
-        ...(input.closureMetadata ? { closure: input.closureMetadata } : {})
+        ...(input.closureMetadata ? { closure: input.closureMetadata } : {}),
+        ...(input.amendmentMetadata ? { amendmentMetadata: input.amendmentMetadata } : {})
     };
     mkdirSync(eventRoot, { recursive: true });
     writeFileSync(eventAbsolute, `${JSON.stringify(event, null, 2)}\n`, 'utf8');

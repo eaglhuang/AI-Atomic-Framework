@@ -1,22 +1,45 @@
 # CLI Error Policy
 
 Every public ATM CLI command (`node atm.mjs <command> --json`) follows a
-single, deterministic error contract. This document is the SSoT for that
+single, deterministic result contract. This document is the SSoT for that
 contract; the runtime implementation lives in
 [`packages/cli/src/commands/shared.ts`](../packages/cli/src/commands/shared.ts)
-as the `CliError` class.
+as `CliError`, `enrichCommandResult`, and `resolveCommandExitCode`.
 
 ## Output envelope
 
-When a command fails, the CLI emits the same JSON envelope shape it uses for
-success, but with `ok: false` and at least one `level: "error"` message:
+Every command emits the same top-level JSON shape. Successful and failed
+commands both include the normalized result-contract fields:
+
+```jsonc
+{
+  "ok": true,
+  "severity": "success",
+  "exitCode": 0,
+  "blocking": false,
+  "command": "<subcommand-name>",
+  "mode": "standalone",
+  "cwd": "/abs/path",
+  "messages": [ /* info | warn | error entries */ ],
+  "evidence": { /* command-specific payload */ },
+  "diagnostics": {
+    "errorCodes": [],
+    "warningCodes": [],
+    "infoCodes": ["ATM_CLI_HELP_READY"]
+  }
+}
+```
+
+When a command fails, `ok` is `false`, `blocking` is usually `true`, and at
+least one `level: "error"` message is present:
 
 ```jsonc
 {
   "ok": false,
+  "severity": "failure",
+  "exitCode": 1,
+  "blocking": true,
   "command": "<subcommand-name>",
-  "mode": "standalone",
-  "cwd": "/abs/path",
   "messages": [
     {
       "level": "error",
@@ -25,19 +48,38 @@ success, but with `ok: false` and at least one `level: "error"` message:
       "data": { /* optional structured details */ }
     }
   ],
-  "evidence": { /* optional partial evidence collected before the failure */ }
+  "diagnostics": {
+    "errorCodes": ["ATM_<STABLE_CODE>"],
+    "warningCodes": [],
+    "infoCodes": []
+  }
 }
 ```
 
-The process exit code is set from `CliError.exitCode`.
+The process exit code always matches the JSON `exitCode` field.
+
+## Severity policy
+
+| `severity` | Meaning | Typical `ok` | Typical `exitCode` | `blocking` |
+|---|---|---|---|---|
+| `success` | Command completed without warnings | `true` | `0` | `false` |
+| `advisory` | Command completed but surfaced warnings | `true` | `0` | `false` |
+| `blocked` | Governance or lifecycle blocked the action; operator should follow `evidence.nextAction` | `false` | `1` | `true` |
+| `usage-error` | Invocation was invalid | `false` | `2` | `true` |
+| `failure` | Runtime, validator, or environment failure | `false` | `1` | `true` |
+
+`advisory` exists so agents can treat warning-only success (`ok: true` with
+`warn` messages) as non-blocking without guessing from exit code alone.
+`blocked` separates governance-state blockers from content or validator
+failures (backlog `ATM-BUG-2026-06-16-011`).
 
 ## Exit code policy
 
 | Exit code | Meaning | When |
 |---|---|---|
-| `0` | success | command finished without throwing |
-| `1` | runtime failure | something went wrong while doing the work (filesystem error, schema validation failure, validator failure) |
-| `2` | **usage error** | the invocation itself was wrong: bad CLI arguments, unknown subcommand, missing required `--flag`, action on uninitialized repo where the fix is "run the right command first" |
+| `0` | success or advisory | `severity` is `success` or `advisory` |
+| `1` | runtime failure or blocked action | `severity` is `failure` or `blocked` |
+| `2` | **usage error** | `severity` is `usage-error`: bad CLI arguments, unknown subcommand, missing required `--flag`, action on uninitialized repo where the fix is "run the right command first" |
 
 Other exit codes (`3+`) are reserved. Do not introduce a new exit code
 without a release-train bump.

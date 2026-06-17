@@ -65,6 +65,29 @@ export interface CommandResult {
     messages: CommandMessage[];
     evidence: Record<string, unknown>;
 }
+/** Public CLI result severity — part of the machine-readable result contract. */
+export type CliResultSeverity = 'success' | 'advisory' | 'blocked' | 'usage-error' | 'failure';
+export interface CliResultDiagnostics {
+    errorCodes: string[];
+    warningCodes: string[];
+    infoCodes: string[];
+}
+/** Normalized CLI envelope fields appended to every command result. */
+export interface EnrichedCommandResult extends CommandResult {
+    severity: CliResultSeverity;
+    exitCode: number;
+    blocking: boolean;
+    diagnostics: CliResultDiagnostics;
+}
+export declare function resolveCommandExitCode(input: {
+    ok: boolean;
+    messages?: readonly CommandMessage[];
+    evidence?: Record<string, unknown>;
+    cliErrorExitCode?: number;
+}): number;
+export declare function enrichCommandResult(result: CommandResult, options?: {
+    cliErrorExitCode?: number;
+}): EnrichedCommandResult;
 export declare function message(level: MessageLevel | string, code: string, text: string, data?: unknown): CommandMessage;
 export declare function resolveValue<T>(value: T | Promise<T>): Promise<T>;
 export declare function makeResult({ ok, command, cwd, mode, messages, evidence }: {

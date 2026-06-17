@@ -10,6 +10,10 @@
  * strings ARE part of the public help output (invariant I1). The
  * help-snapshot fixtures under `tests/cli-fixtures/help-snapshots/`
  * gate accidental drift.
+ *
+ * Result contract: every `--json` response includes `ok`, `severity`,
+ * `exitCode`, `blocking`, and `diagnostics` in addition to `messages`
+ * and `evidence`. See `docs/cli-error-policy.md`.
  */
 export declare const commonJsonOption: {
     flag: string;

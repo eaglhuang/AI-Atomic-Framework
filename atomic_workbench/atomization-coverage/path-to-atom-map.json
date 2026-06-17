@@ -1166,13 +1166,55 @@
       "capability": "Regression tests for repair closure check and closeback plan waiver pass-through validation.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#buildScopeAmendmentCommand",
+      "atom_id": "atm.build-scope-amendment-command",
+      "capability": "Builds reproducible 'node atm.mjs tasks scope add|repair' command strings with proper flag quoting; shared by normal audit lane (mode=normal) and emergency maintenance lane (mode=repair) to guarantee format consistency across both channels (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-option-parsers.ts#parseScopeRepairOptions",
+      "atom_id": "atm.task-option-parsers-map",
+      "capability": "Parses 'tasks scope repair' CLI flags: --add (csv paths), --reason (required), --emergency-approval (required), --task, --actor, --cwd; enforces non-empty reason and non-empty emergency-approval at parse time (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks.ts#runTasksScopeRepair",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "tasks scope repair — emergency maintenance lane requiring --emergency-approval; asserts assertEmergencyApproval gate (backend.tasks.scopeAmend), widens active taskDirectionLock.allowedFiles, and records scope-amendment event with amendmentMode='repair' so reviewers can distinguish routine scope-add from governed emergency overrides (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks.ts#readScopeAmendmentEvents",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "Reads all scope-amendment transition events for a task from the task-events directory and returns typed TaskScopeAmendmentSnapshot array for status triangulation and closeback evidence (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/residue-diagnostics.ts#TaskScopeAmendmentSnapshot",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "TaskScopeAmendmentSnapshot interface and amendmentHistory field in TaskStatusTriangulation: aggregates all scope-amendment events per task so closeback and status commands can surface full amendment history with class, phase, mode, reason, addedPaths, actorId, and timestamp (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/task-ledger.ts#ScopeAmendmentMetadata",
+      "atom_id": "atm.task-scope-amendment-audit-map",
+      "capability": "ScopeAmendmentMetadata type and amendmentMetadata field on appendTaskTransitionEvent input: carries amendmentClass, amendmentPhase, amendmentMode ('normal'|'repair'), and optional reason into the scope-amendment event record for full audit traceability (TASK-MAO-0049).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0049"
     }
   ],
   "summary": {
-    "total_production_paths": 170,
-    "mapped_paths": 170,
+    "total_production_paths": 177,
+    "mapped_paths": 177,
     "coverage_percentage": 100,
-    "atoms_defined": 109,
+    "atoms_defined": 111,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true

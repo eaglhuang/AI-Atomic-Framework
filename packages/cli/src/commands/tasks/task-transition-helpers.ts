@@ -86,6 +86,47 @@ export function buildTaskTransitionCommand(input: {
 }
 
 /**
+ * 建構 `tasks scope add` / `tasks scope repair` 的可重現指令字串。
+ * 正常稽核通道（add）帶 class/phase/reason；維護通道（repair）帶 reason 與
+ * emergency-approval。供稽核事件 command 欄位與輸出 requiredCommand 使用，確保兩條
+ * 通道的指令格式一致。
+ */
+export function buildScopeAmendmentCommand(input: {
+  readonly mode: 'normal' | 'repair';
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly addPaths: readonly string[];
+  readonly amendmentClass?: string | null;
+  readonly amendmentPhase?: string | null;
+  readonly reason?: string | null;
+  readonly emergencyApproval?: string | null;
+}): string {
+  const subAction = input.mode === 'repair' ? 'repair' : 'add';
+  const parts = [
+    'node', 'atm.mjs', 'tasks', 'scope', subAction,
+    '--task', quoteCommandValue(input.taskId),
+    '--actor', quoteCommandValue(input.actorId),
+    '--add', quoteCommandValue(input.addPaths.join(','))
+  ];
+  if (input.mode === 'normal') {
+    if (input.amendmentClass) {
+      parts.push('--class', quoteCommandValue(input.amendmentClass));
+    }
+    if (input.amendmentPhase) {
+      parts.push('--phase', quoteCommandValue(input.amendmentPhase));
+    }
+  }
+  if (input.reason) {
+    parts.push('--reason', quoteCommandValue(input.reason));
+  }
+  if (input.mode === 'repair' && input.emergencyApproval) {
+    parts.push('--emergency-approval', quoteCommandValue(input.emergencyApproval));
+  }
+  parts.push('--json');
+  return parts.join(' ');
+}
+
+/**
  * Packs metadata for task closure transitions.
  */
 export function createClosureTransitionMetadata(

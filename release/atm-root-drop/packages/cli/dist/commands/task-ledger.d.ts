@@ -15,6 +15,17 @@ export interface TaskLedgerPolicy {
     readonly eventRoot: string;
     readonly externalTasks: readonly ExternalTaskReference[];
 }
+/** 可稽核的範圍增修後設資料（task-scope-amendment 事件專用）。 */
+export interface ScopeAmendmentMetadata {
+    /** 修改類型：doc-sync | help-snapshot-sync | test-alignment | generated-artifact | linked-surface */
+    readonly amendmentClass: string;
+    /** 修改階段：pre-implementation | during-implementation | closeout */
+    readonly amendmentPhase: string;
+    /** 修改通道：normal（正規稽核）| repair（維護緊急通道） */
+    readonly amendmentMode: 'normal' | 'repair';
+    /** 可選的人類可讀原因說明 */
+    readonly reason?: string;
+}
 export interface TaskTransitionEvent {
     readonly schemaId: 'atm.taskTransition.v1';
     readonly specVersion: '0.1.0';
@@ -32,6 +43,8 @@ export interface TaskTransitionEvent {
     readonly originProvider?: string;
     readonly originTaskId?: string;
     readonly closure?: TaskTransitionClosureMetadata;
+    /** 僅在 action === 'scope-amendment' 時存在 */
+    readonly amendmentMetadata?: ScopeAmendmentMetadata;
 }
 export interface TaskTransitionRequiredGatesSnapshot {
     readonly schemaId: 'atm.requiredGatesSnapshot.v1';
@@ -75,6 +88,8 @@ export declare function appendTaskTransitionEvent(input: {
     readonly closureMetadata?: TaskTransitionClosureMetadata | null;
     readonly createdAt?: string;
     readonly transitionId?: string;
+    /** scope-amendment 事件的可稽核後設資料 */
+    readonly amendmentMetadata?: ScopeAmendmentMetadata | null;
 }): {
     transitionId: string;
     eventPath: string;

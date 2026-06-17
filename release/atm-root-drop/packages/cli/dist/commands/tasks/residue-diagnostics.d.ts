@@ -1,4 +1,4 @@
-export type TaskResidueBucket = 'no-residue' | 'complete-but-unfinalized' | 'source-done-governance-incomplete' | 'planning-mirror-only' | 'interrupted-close' | 'stale-import' | 'ambiguous-manual-review';
+export type TaskResidueBucket = 'no-residue' | 'complete-but-unfinalized' | 'closeback-finalize' | 'source-done-governance-incomplete' | 'planning-mirror-only' | 'interrupted-close' | 'stale-import' | 'ambiguous-manual-review';
 export interface TaskResidueClassification {
     bucket: TaskResidueBucket;
     truth: string;
@@ -31,6 +31,17 @@ export interface TaskResidueDivergence {
     planningFrontmatter?: string | null;
     lastTransitionEvent?: string | null;
 }
+/** 單筆 scope-amendment 事件的可讀快照（供 status 與 closeback 輸出使用）。 */
+export interface TaskScopeAmendmentSnapshot {
+    transitionId: string;
+    actorId: string | null;
+    createdAt: string;
+    addedPaths: string[];
+    amendmentClass: string | null;
+    amendmentPhase: string | null;
+    amendmentMode: 'normal' | 'repair' | null;
+    reason: string | null;
+}
 export interface TaskStatusTriangulation {
     ssot: 'liveLedger';
     liveLedger: TaskResidueLedgerSnapshot;
@@ -39,6 +50,8 @@ export interface TaskStatusTriangulation {
     divergence: TaskResidueDivergence[];
     recommendation: string | null;
     residueClassification: TaskResidueClassification;
+    /** 所有已記錄的範圍增修歷史（按時間順序排列）。 */
+    amendmentHistory: TaskScopeAmendmentSnapshot[];
 }
 export interface TaskResidueDiagnosisEvidence {
     readonly schemaId: 'atm.taskResidueDiagnosis.v1';

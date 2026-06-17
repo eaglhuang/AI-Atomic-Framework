@@ -174,7 +174,8 @@ const triangulation: TaskStatusTriangulation = {
     }
   ],
   recommendation: 'node atm.mjs tasks import --from <plan.md> --write --json',
-  residueClassification: ambiguous
+  residueClassification: ambiguous,
+  amendmentHistory: []
 };
 const evidence = buildResidueDiagnosisEvidenceFromTriangulation({
   taskId: 'TASK-RES',

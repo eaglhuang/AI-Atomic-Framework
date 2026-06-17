@@ -118,6 +118,90 @@ export class CliError extends Error {
         this.details = options.details ?? {};
     }
 }
+const BLOCKED_ACTION_MESSAGE_CODES = new Set([
+    'ATM_NEXT_FRAMEWORK_TARGET_REPO_REQUIRED',
+    'ATM_GUIDANCE_NEXT_BLOCKED',
+    'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED',
+    'ATM_NEXT_CLAIM_BLOCKED',
+    'ATM_BROKER_LIFECYCLE_BLOCKED',
+    'ATM_TASK_CLAIM_DEPENDENCY_BLOCKED',
+    'ATM_TEAM_START_CLAIM_DEPENDENCY_BLOCKED',
+    'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED'
+]);
+const USAGE_ERROR_MESSAGE_CODES = new Set([
+    'ATM_CLI_USAGE',
+    'ATM_CLI_UNKNOWN_COMMAND',
+    'ATM_CLI_HELP_NOT_FOUND'
+]);
+function collectMessageCodes(messages, level) {
+    return messages
+        .filter((entry) => entry.level === level)
+        .map((entry) => entry.code)
+        .filter((code) => typeof code === 'string' && code.length > 0);
+}
+function hasBlockedActionSignal(result) {
+    const nextAction = result.evidence?.nextAction;
+    if (nextAction?.status === 'blocked') {
+        return true;
+    }
+    return result.messages.some((entry) => {
+        if (entry.level !== 'error') {
+            return false;
+        }
+        if (BLOCKED_ACTION_MESSAGE_CODES.has(entry.code)) {
+            return true;
+        }
+        return /_BLOCKED$/.test(entry.code) && !USAGE_ERROR_MESSAGE_CODES.has(entry.code);
+    });
+}
+function resolveSeverityFromResult(result, exitCode) {
+    if (exitCode === 2) {
+        return 'usage-error';
+    }
+    if (!result.ok) {
+        return hasBlockedActionSignal(result) ? 'blocked' : 'failure';
+    }
+    const warningCodes = collectMessageCodes(result.messages, 'warn');
+    if (warningCodes.length > 0) {
+        return 'advisory';
+    }
+    return 'success';
+}
+export function resolveCommandExitCode(input) {
+    if (typeof input.cliErrorExitCode === 'number') {
+        return input.cliErrorExitCode;
+    }
+    if (input.ok) {
+        return 0;
+    }
+    const errorCodes = collectMessageCodes(input.messages ?? [], 'error');
+    if (errorCodes.some((code) => USAGE_ERROR_MESSAGE_CODES.has(code))) {
+        return 2;
+    }
+    return 1;
+}
+export function enrichCommandResult(result, options = {}) {
+    const exitCode = resolveCommandExitCode({
+        ok: result.ok,
+        messages: result.messages,
+        evidence: result.evidence,
+        cliErrorExitCode: options.cliErrorExitCode
+    });
+    const severity = resolveSeverityFromResult(result, exitCode);
+    const diagnostics = {
+        errorCodes: collectMessageCodes(result.messages, 'error'),
+        warningCodes: collectMessageCodes(result.messages, 'warn'),
+        infoCodes: collectMessageCodes(result.messages, 'info')
+    };
+    const blocking = severity === 'blocked' || severity === 'failure' || severity === 'usage-error';
+    return {
+        ...result,
+        severity,
+        exitCode,
+        blocking,
+        diagnostics
+    };
+}
 export function message(level, code, text, data = {}) {
     return { level, code, text, data: data };
 }
@@ -277,14 +361,29 @@ export function makeHelpResult(spec, cwd = process.cwd()) {
     });
 }
 export function writeResult(result, stream, outputFormat = 'json', projectionOptions) {
-    let projectedResult = result;
+    const enriched = 'severity' in result && 'exitCode' in result && 'blocking' in result && 'diagnostics' in result
+        ? result
+        : enrichCommandResult(result);
+    let projectedResult = enriched;
     const summary = projectionOptions?.summary ?? globalSummaryProjection;
     const fields = projectionOptions?.fields ?? globalFieldsProjection;
     if (fields && fields.length > 0) {
-        projectedResult = projectFields(result, fields);
+        projectedResult = {
+            ...projectFields(enriched, fields),
+            severity: enriched.severity,
+            exitCode: enriched.exitCode,
+            blocking: enriched.blocking,
+            diagnostics: enriched.diagnostics
+        };
     }
     else if (summary) {
-        projectedResult = projectSummary(result);
+        projectedResult = {
+            ...projectSummary(enriched),
+            severity: enriched.severity,
+            exitCode: enriched.exitCode,
+            blocking: enriched.blocking,
+            diagnostics: enriched.diagnostics
+        };
     }
     if (outputJsonPath) {
         try {
