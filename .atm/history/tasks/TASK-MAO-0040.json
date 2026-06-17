@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0040",
+  "title": "Task-scoped commit bundle resolver, foreign-staged restore, and host git compatibility",
+  "status": "done",
+  "milestone": "M7",
+  "dependencies": [
+    "TASK-MAO-0036",
+    "TASK-MAO-0039"
+  ],
+  "acceptance": [
+    "Shared worktree dirty files no longer cause `STAGING_AMBIGUOUS` when they are",
+    "The mixed delivery commits observed in 0009 and 0010 are flagged before merge,",
+    "The resolver cannot become a new bypass path.",
+    "Host git incompatibility no longer leaves the operator without a usable copy"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "tests/cli-fixtures/help-snapshots/command-list.json",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "docs/governance/git-governance-contract.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "tests/cli-fixtures/help-snapshots/command-list.json",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "docs/governance/git-governance-contract.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "npm run validate:neutrality",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Using git add .",
+    "Staging out-of-scope source changes",
+    "Auto-committing user work"
+  ],
+  "nonGoals": [
+    "Do not bypass task allowedFiles with convenience staging."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert commit bundle resolver, auto-stage behavior, docs, tests, and atom-map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-scoped-commit-bundle-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0040-task-scoped-commit-bundle-resolver.task.md",
+    "sectionTitle": "TASK-MAO-0040",
+    "headingLine": 55,
+    "hash": "bf05cfc94f5670e8"
+  },
+  "importedAt": "2026-06-17T06:10:59.841Z",
+  "lastTransitionId": "2026-06-17T06-21-05-739Z-close-456e76fded83",
+  "lastTransitionAt": "2026-06-17T06:21:05.739Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-composer-2.5",
+  "reservedAt": "2026-06-17T06:11:18.995Z",
+  "promotedAt": "2026-06-17T06:11:19.433Z",
+  "claim": {
+    "actorId": "cursor-composer-2.5",
+    "leaseId": "lease-7964e6f34c2c",
+    "claimedAt": "2026-06-17T06:11:19.864Z",
+    "heartbeatAt": "2026-06-17T06:21:05.737Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0040.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-17T06:11:19.864Z",
+  "startedByActor": "cursor-composer-2.5",
+  "startedBySessionId": "session-20260617061119-cursor-composer-2.5-TASK-MAO-0040-3bef35ab64",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0040",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0040.*",
+      ".atm/history/task-events/TASK-MAO-0040/**",
+      ".atm/history/tasks/TASK-MAO-0040.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "454edce4cfea7561899d69070736202e4a2bd5e87efc1daaeebee2fc50941e9a",
+    "actorId": "cursor-composer-2.5",
+    "createdAt": "2026-06-17T06:11:19.895Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-17T06:21:05.737Z",
+  "closedByActor": "cursor-composer-2.5",
+  "closedBySessionId": "session-20260617061119-cursor-composer-2.5-TASK-MAO-0040-3bef35ab64",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0040.closure-packet.json"
+}
