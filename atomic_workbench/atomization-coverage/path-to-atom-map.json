@@ -1460,6 +1460,69 @@
       "capability": "Document evidence bundle manifest and directory deliverable expansion behavior for close gates.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0041"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-ref-store.ts",
+      "atom_id": "atm.runner-ref-store-map",
+      "capability": "Runner ref publish primitive: append-only ledger of (refName, kind, sourceCommit, artifactSha256, publisher) entries with immutable version refs and mutable control refs; resolver returns latest entry per (refName, kind) (TASK-MAO-0014).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0014"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/patch-envelope-atm-core.ts",
+      "atom_id": "atm.patch-envelope-atm-core-map",
+      "capability": "ATM core specialization of the patch envelope: adds scopeClass, publishIntent, targetRunnerRef, declaredSourceCommit annotation atop the v1 base envelope without modifying it; validates version-publish/in-dev-bump/release-only invariants (TASK-MAO-0015).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0015"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-submit-pipeline.ts",
+      "atom_id": "atm.runner-submit-pipeline-map",
+      "capability": "Runner submit-patch pipeline admission: validates ATM-core annotation, checks frozen ref freeze-await, compares declared source commit to current ref head for stale-base rejection, emits accept/reject-malformed/reject-conflict/reject-stale-base/freeze-await-rebase verdicts (TASK-MAO-0016).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0016"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-version-state.ts",
+      "atom_id": "atm.runner-version-state-map",
+      "capability": "Runner version stream state machine: in-dev → rc-stabilizing → rc-frozen → published → retired lifecycle with rollback-rc; lease acquire restricted to live states; deterministic history append (TASK-MAO-0017).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0017"
+    },
+    {
+      "path_pattern": "tests/cli/closure-runner-binding.test.ts",
+      "atom_id": "atm.closure-runner-binding-map",
+      "capability": "Closure-packet runner binding contract test: pins commandRuns.runnerVersion and targetRepoIdentity/targetCommit as the dual-binding fields that let a closure packet declare which runner version produced its evidence (TASK-MAO-0018).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0018"
+    },
+    {
+      "path_pattern": "tests/cli/cross-repo-dual-binding-close.test.ts",
+      "atom_id": "atm.cross-repo-dual-binding-close-map",
+      "capability": "Cross-repo dual-binding closure structural test: locks planningMirrorPath, planningStatus, planningAuthorityDeliveryGate, and the planning-mirror-adopter-flow backend switch in close-orchestration.ts so cross-repo close maintains its contract (TASK-MAO-0019).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0019"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/runner-bootstrap.ts",
+      "atom_id": "atm.runner-bootstrap-map",
+      "capability": "Runner bootstrap self-update recovery analyzer: pure analysis producing no-recovery/rollback-rc-to-in-dev/reseed-from-version/quarantine decisions plus findings; mutations are delegated to the existing operator lane (TASK-MAO-0020).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0020"
+    },
+    {
+      "path_pattern": "scripts/validate-runner-broker-failures.ts",
+      "atom_id": "atm.runner-broker-failures-map",
+      "capability": "Runner broker failure-mode coverage validator: discovers fixtures under scripts/fixtures/runner-broker-failures/ and exercises submit-pipeline + bootstrap analyzer to verify each documented failure reaches its expected verdict / decision (TASK-MAO-0021).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0021"
+    },
+    {
+      "path_pattern": "scripts/validate-external-core-pipeline.ts",
+      "atom_id": "atm.external-core-pipeline-map",
+      "capability": "External core contributor pipeline CI gate: validates contributor patch envelopes against upstream in-dev/HEAD, rejects release-only direct modifications, and admits well-formed patch-only submits before the steward rebuild lane (TASK-MAO-0022).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0022"
     }
   ],
   "summary": {
