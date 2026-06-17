@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T05-06-30-790Z-close-8ebf0cb70f3a",
+  "taskId": "TASK-MAO-0030",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260617045841-claude-code-opus-4-7-TASK-MAO-0030-ce03b6e116",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0030.json",
+  "taskSha256": "sha256:6873df2480e81becc53f82b8c37e62d6f21fe25cc251077a7f5d95a217cd76da",
+  "createdAt": "2026-06-17T05:06:30.790Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0030 --actor claude-code-opus-4-7 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617045841-claude-code-opus-4-7-TASK-MAO-0030-ce03b6e116",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0030.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "team-wave-checkpoint-test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T05:06:30.784Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0030-wave-checkpoint-partial-completion-semantics.task.md",
+        ".atm/history/evidence/TASK-MAO-0030.*",
+        ".atm/history/task-events/TASK-MAO-0030/**",
+        ".atm/history/tasks/TASK-MAO-0030.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/team-wave.ts",
+        "packages/core/src/broker/__tests__/team-wave-checkpoint.test.ts",
+        "packages/core/src/broker/team-wave-checkpoint.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/team-wave.ts",
+        "packages/core/src/broker/__tests__/team-wave-checkpoint.test.ts",
+        "packages/core/src/broker/team-wave-checkpoint.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

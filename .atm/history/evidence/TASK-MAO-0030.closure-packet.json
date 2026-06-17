@@ -1,0 +1,126 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0030",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "832dbf2a4208b97d0cfa51854870242814d9702e",
+  "governedTreeSha": "588f563f25386d079e622c5aad1a2f3d1124ce38",
+  "targetCommitDelta": {
+    "currentCommitSha": "832dbf2a4208b97d0cfa51854870242814d9702e",
+    "parentCommitShas": [
+      "832dbf2a4208b97d0cfa51854870242814d9702e"
+    ],
+    "governedTreeSha": "588f563f25386d079e622c5aad1a2f3d1124ce38",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-MAO-0030.json",
+      ".atm/history/tasks/TASK-MAO-0028.json",
+      "packages/core/src/broker/__tests__/team-wave-checkpoint.test.ts",
+      "packages/core/src/broker/team-wave-checkpoint.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/team-wave-checkpoint.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1ca09bb447c2e1386837df1c3786e522fb59a90ce7d4ba260ef166116fbb97aa",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "team-wave-checkpoint-test",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-17T05:06:30.784Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0030-wave-checkpoint-partial-completion-semantics.task.md",
+      ".atm/history/evidence/TASK-MAO-0030.*",
+      ".atm/history/task-events/TASK-MAO-0030/**",
+      ".atm/history/tasks/TASK-MAO-0030.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/core/src/broker/__tests__/team-wave-checkpoint.test.ts",
+      "packages/core/src/broker/team-wave-checkpoint.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/core/src/broker/__tests__/team-wave-checkpoint.test.ts",
+      "packages/core/src/broker/team-wave-checkpoint.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0030.json",
+  "closedAt": "2026-06-17T05:06:30.785Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "sessionId": "session-20260617045841-claude-code-opus-4-7-TASK-MAO-0030-ce03b6e116",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
