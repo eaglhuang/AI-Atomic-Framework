@@ -6626,7 +6626,9 @@ export async function generateTaskCard(input: GenerateTaskCardInput): Promise<Ge
     fields: {
       task_id: input.taskId,
       title: input.title || 'New Task',
-      depends_on: input.dependsOn || 'TASK-AAO-0000',
+      depends_on_yaml: input.dependsOn?.trim()
+        ? `  - ${input.dependsOn.trim()}`
+        : '[]',
       scope_path: input.scopePath || 'src/main.ts',
       test_path: input.testPath || 'tests/main.test.ts',
       atom_id: input.atomId || 'atm.unowned',

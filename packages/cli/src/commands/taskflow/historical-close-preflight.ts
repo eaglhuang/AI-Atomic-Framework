@@ -23,12 +23,13 @@ interface PreflightCommitBundle {
 export type HistoricalClosePreflightBlockerId =
   | 'scopeTrackedDirtyFiles'
   | 'unexpectedStagedTasks'
+  | 'unexpectedStagedNonBundleFiles'
   | 'mixedDeliveryCommit'
   | 'staleEvidence'
   | 'missingApprovalLease';
 
 export interface HistoricalClosePreflightRemediationChoice {
-  readonly id: 'restore-accidental-drift' | 'commit-scoped-delivery' | 'defer-foreign-staged' | 'request-waiver' | 'refresh-evidence';
+  readonly id: 'restore-accidental-drift' | 'commit-scoped-delivery' | 'defer-foreign-staged' | 'request-waiver' | 'refresh-evidence' | 'restore-accidental-staged';
   readonly summary: string;
   readonly requiredCommand: string | null;
 }
@@ -50,6 +51,13 @@ export interface UnexpectedStagedTaskReport {
   readonly deferCommand: string;
 }
 
+export interface UnexpectedNonBundleStagedRepoReport {
+  readonly repoRoot: string;
+  readonly repoKind: 'target' | 'planning';
+  readonly stagedFiles: readonly string[];
+  readonly restoreCommand: string;
+}
+
 export interface HistoricalCloseWriteRollbackSummary {
   readonly schemaId: 'atm.historicalCloseWriteRollbackSummary.v1';
   readonly summary: string;
@@ -65,6 +73,7 @@ export interface HistoricalClosePreflightSummary {
   readonly operationalBlockers: readonly HistoricalClosePreflightBlocker[];
   readonly scopeTrackedDirtyFiles: readonly string[];
   readonly unexpectedStagedTasks: readonly UnexpectedStagedTaskReport[];
+  readonly unexpectedNonBundleStaged: readonly UnexpectedNonBundleStagedRepoReport[];
   readonly mixedDeliveryCommit: TaskHistoricalDeliveryReport | null;
   readonly staleEvidence: readonly string[];
   readonly missingApprovalLease: boolean;
@@ -148,6 +157,64 @@ function buildUnexpectedStagedTasks(input: {
     restoreChoice: `Do not silently unstage ${foreignTaskId}. Either wait for that agent to commit, or run git restore --staged on only those paths and confirm the other agent can restage their close bundle afterward.`,
     deferCommand: `git restore --staged ${files.map((entry) => JSON.stringify(entry)).join(' ')}`
   }));
+}
+
+function buildUnexpectedNonBundleStagedFiles(input: {
+  taskId: string;
+  targetRepoRoot: string;
+  planningRepoRoot: string | null;
+  previewCommitBundle: PreflightCommitBundle;
+}): UnexpectedNonBundleStagedRepoReport[] {
+  const repos: Array<{ repoRoot: string; repoKind: 'target' | 'planning'; stageFiles: readonly string[] }> = [
+    {
+      repoRoot: input.targetRepoRoot,
+      repoKind: 'target',
+      stageFiles: input.previewCommitBundle.targetRepo.stageFiles
+    },
+    ...(input.planningRepoRoot
+      ? [{
+        repoRoot: input.planningRepoRoot,
+        repoKind: 'planning' as const,
+        stageFiles: input.previewCommitBundle.planningRepo.stageFiles
+      }]
+      : [])
+  ];
+  const reports: UnexpectedNonBundleStagedRepoReport[] = [];
+  for (const repo of repos) {
+    const expected = new Set(existingBundleFiles(repo.repoRoot, repo.stageFiles));
+    const unexpected = readStagedFiles(repo.repoRoot).filter((file) => {
+      if (expected.has(file)) return false;
+      const foreignTaskId = extractGovernanceTaskId(file);
+      return !foreignTaskId || foreignTaskId === normalizeTaskId(input.taskId);
+    });
+    if (unexpected.length === 0) continue;
+    reports.push({
+      repoRoot: repo.repoRoot,
+      repoKind: repo.repoKind,
+      stagedFiles: uniqueStrings(unexpected),
+      restoreCommand: `git -C ${JSON.stringify(repo.repoRoot)} restore --staged -- ${unexpected.map((entry) => JSON.stringify(entry)).join(' ')}`
+    });
+  }
+  return reports;
+}
+
+function buildUnexpectedNonBundleStagedBlocker(
+  reports: readonly UnexpectedNonBundleStagedRepoReport[]
+): HistoricalClosePreflightBlocker | null {
+  if (reports.length === 0) return null;
+  const files = uniqueStrings(reports.flatMap((entry) => entry.stagedFiles));
+  return {
+    id: 'unexpectedStagedNonBundleFiles',
+    code: 'ATM_TASKFLOW_PRECLOSE_UNEXPECTED_STAGED_FILES',
+    summary: `Git index contains staged files outside the close bundle (${files.join(', ')}). taskflow close --write will fail with INDEX_NOT_ISOLATED until they are unstaged or committed separately.`,
+    files,
+    remediationChoices: reports.map((entry) => ({
+      id: 'restore-accidental-staged' as const,
+      summary: `Unstage unrelated files in the ${entry.repoKind} repo only; do not use broad git reset.`,
+      requiredCommand: entry.restoreCommand
+    })),
+    requiredCommand: reports[0]?.restoreCommand ?? null
+  };
 }
 
 function buildScopeDirtyBlocker(input: {
@@ -315,6 +382,12 @@ export function buildHistoricalClosePreflight(input: {
     planningRepoRoot: input.previewCommitBundle.planningRepo.repoRoot,
     previewCommitBundle: input.previewCommitBundle
   });
+  const unexpectedNonBundleStaged = buildUnexpectedNonBundleStagedFiles({
+    taskId: input.taskId,
+    targetRepoRoot: input.cwd,
+    planningRepoRoot: input.previewCommitBundle.planningRepo.repoRoot,
+    previewCommitBundle: input.previewCommitBundle
+  });
   const historicalRef = input.historicalDeliveryRefs[0] ?? null;
   const mixedDeliveryCommit = historicalRef
     ? inspectHistoricalDelivery({
@@ -341,6 +414,7 @@ export function buildHistoricalClosePreflight(input: {
   const operationalBlockers = [
     buildScopeDirtyBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
     buildUnexpectedStagedBlocker(unexpectedStagedTasks),
+    buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
     buildMixedDeliveryBlocker({
       taskId: input.taskId,
       actorId: input.actorId,
@@ -365,6 +439,7 @@ export function buildHistoricalClosePreflight(input: {
     operationalBlockers,
     scopeTrackedDirtyFiles: dirtyGuard.scopeTrackedDirtyFiles,
     unexpectedStagedTasks,
+    unexpectedNonBundleStaged,
     mixedDeliveryCommit,
     staleEvidence,
     missingApprovalLease,
@@ -376,7 +451,7 @@ export function buildHistoricalClosePreflight(input: {
 export function preflightBlockersToWriteReadinessBlockers(
   preflight: HistoricalClosePreflightSummary
 ): Array<{ code: string; summary: string; requiredCommand: string | null }> {
-  return preflight.operationalBlockers.map((blocker) => ({
+  return preflight.blockers.map((blocker) => ({
     code: blocker.code,
     summary: blocker.summary,
     requiredCommand: blocker.requiredCommand

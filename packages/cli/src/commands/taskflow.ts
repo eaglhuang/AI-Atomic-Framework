@@ -10,7 +10,7 @@ import {
   runTasksRosterUpdate
 } from './tasks/public-surface.ts';
 import { evaluateTaskDoneCloseAdmission } from './tasks/lifecycle-state.ts';
-import { inspectHistoricalDelivery } from './tasks/historical-delivery.ts';
+import { inspectHistoricalDelivery, expandDirectoryDeliverableDeclarations } from './tasks/historical-delivery.ts';
 import {
   assertClosebackPlanningPathReady,
   buildCloseBackendArgv,
@@ -18,6 +18,7 @@ import {
   buildCloseWriteRollbackSnapshot,
   buildTaskflowCloseDiagnostics,
   executeCloseWriteCommitPhase,
+  listOptionalEvidenceBundleGovernanceArtifacts,
   resolveClosebackPlanningPath,
   resolveCloseWriteSupport
 } from './taskflow/close-orchestration.ts';
@@ -634,13 +635,19 @@ function verifyRepoIndexIsolation(repo: TaskflowCommitRepoBundle, phase: 'pre-st
   const isolation = buildIndexIsolation(repo, readStagedFiles(repo.repoRoot));
   const nextRepo = { ...repo, indexIsolation: isolation };
   if (!isolation.verified) {
+    const restoreCommand = isolation.unexpectedStagedFiles.length > 0
+      ? `git restore --staged -- ${isolation.unexpectedStagedFiles.map((entry) => JSON.stringify(entry)).join(' ')}`
+      : null;
     throw new CliError('ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED', `taskflow close ${phase} index isolation failed; unexpected staged files would be included in the governed commit.`, {
       exitCode: 1,
       details: {
         repoRoot: repo.repoRoot,
         phase,
         indexIsolation: isolation,
-        remediation: 'Unstage unrelated files or commit them separately, then rerun taskflow close.'
+        restoreCommand,
+        remediation: restoreCommand
+          ? `Unstage unrelated files, then rerun taskflow close: ${restoreCommand}`
+          : 'Unstage unrelated files or commit them separately, then rerun taskflow close.'
       }
     });
   }
@@ -734,14 +741,6 @@ function taskflowPathMatches(filePath: string, declaredPath: string): boolean {
   const declared = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
   if (!file || !declared) return false;
   return file === declared || file.startsWith(`${declared}/`);
-}
-
-function isDirectoryStyleDeclaration(repoRoot: string, declaredPath: string): boolean {
-  const normalized = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '');
-  if (!normalized) return false;
-  if (normalized.endsWith('/')) return true;
-  const absolutePath = path.resolve(repoRoot, normalized);
-  return existsSync(absolutePath) && statSync(absolutePath).isDirectory();
 }
 
 function buildScopeAmendmentProposal(input: {
@@ -1037,6 +1036,7 @@ function buildTaskflowCommitBundle(input: {
     `.atm/history/tasks/${input.taskId}.json`,
     `.atm/history/evidence/${input.taskId}.json`,
     `.atm/history/evidence/${input.taskId}.closure-packet.json`,
+    ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
     ...(historicalBatchStageFile ? [historicalBatchStageFile] : []),
     ...listExistingFilesRecursively(targetRepoRoot, `.atm/history/task-events/${input.taskId}`),
     ...extractBackendStageFiles(input.backendResult ?? null)
@@ -1054,7 +1054,14 @@ function buildTaskflowCommitBundle(input: {
     failClosedReason = 'Task metadata error: "deliverables" list is empty or missing.';
   }
 
-  for (const del of deliverables) {
+  const directoryExpansion = expandDirectoryDeliverableDeclarations(targetRepoRoot, deliverables);
+  if (!directoryExpansion.ok) {
+    metadataFailClosed = true;
+    failClosedReason = directoryExpansion.failClosedReason;
+  }
+  const effectiveDeliverables = directoryExpansion.ok ? directoryExpansion.effectiveDeliverables : deliverables;
+
+  for (const del of effectiveDeliverables) {
     const isAllowed = allowed.some((all) => taskflowPathMatches(del, all));
     if (!isAllowed) {
       metadataFailClosed = true;
@@ -1062,17 +1069,11 @@ function buildTaskflowCommitBundle(input: {
     }
   }
 
-  const hasPlanningFile = deliverables.some(del => del.startsWith('docs/tasks/') || del.endsWith('.task.md'));
-  const hasTargetFile = deliverables.some(del => !del.startsWith('docs/tasks/') && !del.endsWith('.task.md'));
+  const hasPlanningFile = effectiveDeliverables.some(del => del.startsWith('docs/tasks/') || del.endsWith('.task.md'));
+  const hasTargetFile = effectiveDeliverables.some(del => !del.startsWith('docs/tasks/') && !del.endsWith('.task.md'));
   if (hasPlanningFile && hasTargetFile) {
     metadataFailClosed = true;
     failClosedReason = 'Task metadata error: deliverables contain mixed planning-path and target-path declarations.';
-  }
-
-  const hasDirectoryDeclarations = deliverables.some((del) => isDirectoryStyleDeclaration(targetRepoRoot, del));
-  if (hasDirectoryDeclarations) {
-    metadataFailClosed = true;
-    failClosedReason = 'Task metadata error: deliverables contain directory-style declarations which are ambiguous.';
   }
 
   // 2. Classify dirty files
@@ -1081,7 +1082,7 @@ function buildTaskflowCommitBundle(input: {
       continue;
     }
     const inScope = scopePaths.some((sp) => taskflowPathMatches(file, sp));
-    const isDeclared = deliverables.some((del) => taskflowPathMatches(file, del));
+    const isDeclared = effectiveDeliverables.some((del) => taskflowPathMatches(file, del));
     const isAllowed = allowed.some((all) => taskflowPathMatches(file, all));
 
     if (isDeclared && isAllowed) {
@@ -1496,7 +1497,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     waiverReason: waiver.waiverReason,
     planningAuthorityDeliveryGate
   });
-  if (historicalClosePreflight.operationalBlockers.length > 0) {
+  if (historicalClosePreflight.blockers.length > 0) {
     const mergedBlockers = [
       ...writeReadinessHint.blockers,
       ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)
