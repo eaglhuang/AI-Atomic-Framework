@@ -3105,21 +3105,12 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
     const content = readGitObjectText(root, `:${stagedFile}`);
     if (!content) continue;
 
-    const importRegex = /(?:^|\n)\s*import\s+(?:type\s+)?(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]/g;
+    const imports = collectStaticImportSymbols(content)
+      .filter((entry) => entry.path.startsWith('.'));
     const requireRegex = /require\(['"]([^'"]+)['"]\)/g;
     const dynamicImportRegex = /import\(['"]([^'"]+)['"]\)/g;
 
-    const imports: { path: string; symbols: string[] }[] = [];
-
     let match;
-    while ((match = importRegex.exec(content)) !== null) {
-      const symbolsStr = match[1];
-      const importPath = match[2];
-      if (importPath.startsWith('.')) {
-        const parsedSymbols = parseImportSymbols(symbolsStr);
-        imports.push({ path: importPath, symbols: parsedSymbols });
-      }
-    }
 
     while ((match = requireRegex.exec(content)) !== null) {
       const importPath = match[1];
@@ -3210,6 +3201,7 @@ function isLikelyImportSymbol(value: string): boolean {
 function parseImportSymbols(symbolsStr: string | undefined): string[] {
   if (!symbolsStr) return ['*'];
   const trimmed = symbolsStr.trim();
+  if (!trimmed) return ['*'];
   if (trimmed.startsWith('*')) return ['*'];
 
   const symbols: string[] = [];
@@ -3227,16 +3219,201 @@ function parseImportSymbols(symbolsStr: string | undefined): string[] {
       const cleanOutside = outside.replace(/,$/, '').trim();
       if (cleanOutside) symbols.push('default');
     }
-  } else {
-    if (trimmed) {
-      if (trimmed.includes('*')) {
-        symbols.push('*');
-      } else {
-        symbols.push('default');
-      }
+  } else if (trimmed) {
+    if (trimmed.includes('*')) {
+      symbols.push('*');
+    } else {
+      symbols.push('default');
     }
   }
   return symbols;
+}
+
+function collectStaticImportSymbols(content: string): { path: string; symbols: string[] }[] {
+  const imports: { path: string; symbols: string[] }[] = [];
+  const statementRegex = /^\s*import\s+(?:type\s+)?(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]\s*;?\s*$/;
+
+  for (const statement of collectImportStatements(content)) {
+    const match = statementRegex.exec(statement);
+    if (!match) {
+      continue;
+    }
+    imports.push({
+      path: match[2],
+      symbols: parseImportSymbols(match[1])
+    });
+  }
+
+  return imports;
+}
+
+function collectImportStatements(content: string): string[] {
+  const statements: string[] = [];
+  const length = content.length;
+  let index = 0;
+
+  while (index < length) {
+    const current = content[index];
+    const next = content[index + 1];
+
+    if (current === '/' && next === '/') {
+      index += 2;
+      while (index < length && content[index] !== '\n') {
+        index += 1;
+      }
+      continue;
+    }
+
+    if (current === '/' && next === '*') {
+      index += 2;
+      while (index < length && !(content[index] === '*' && content[index + 1] === '/')) {
+        index += 1;
+      }
+      index += 2;
+      continue;
+    }
+
+    if (current === '\'' || current === '"' || current === '`') {
+      index = skipStringLiteral(content, index);
+      continue;
+    }
+
+    if (isImportKeywordAt(content, index)) {
+      const start = index;
+      index += 'import'.length;
+      index = skipImportStatementTail(content, index);
+      statements.push(content.slice(start, index));
+      continue;
+    }
+
+    index += 1;
+  }
+
+  return statements;
+}
+
+function skipImportStatementTail(content: string, startIndex: number): number {
+  const length = content.length;
+  let index = startIndex;
+  let mode: 'normal' | 'single' | 'double' | 'template' | 'line-comment' | 'block-comment' = 'normal';
+  let templateDepth = 0;
+
+  while (index < length) {
+    const current = content[index];
+    const next = content[index + 1];
+
+    if (mode === 'normal') {
+      if (current === '/' && next === '/') {
+        mode = 'line-comment';
+        index += 2;
+        continue;
+      }
+      if (current === '/' && next === '*') {
+        mode = 'block-comment';
+        index += 2;
+        continue;
+      }
+      if (current === '\'') {
+        mode = 'single';
+        index += 1;
+        continue;
+      }
+      if (current === '"') {
+        mode = 'double';
+        index += 1;
+        continue;
+      }
+      if (current === '`') {
+        mode = 'template';
+        templateDepth = 0;
+        index += 1;
+        continue;
+      }
+      if (current === ';') {
+        return index + 1;
+      }
+    } else if (mode === 'single') {
+      if (current === '\\') {
+        index += 2;
+        continue;
+      }
+      if (current === '\'') {
+        mode = 'normal';
+      }
+    } else if (mode === 'double') {
+      if (current === '\\') {
+        index += 2;
+        continue;
+      }
+      if (current === '"') {
+        mode = 'normal';
+      }
+    } else if (mode === 'template') {
+      if (current === '\\') {
+        index += 2;
+        continue;
+      }
+      if (current === '$' && next === '{') {
+        templateDepth += 1;
+        index += 2;
+        continue;
+      }
+      if (current === '}' && templateDepth > 0) {
+        templateDepth -= 1;
+        index += 1;
+        continue;
+      }
+      if (current === '`' && templateDepth === 0) {
+        mode = 'normal';
+      }
+    } else if (mode === 'line-comment') {
+      if (current === '\n') {
+        mode = 'normal';
+      }
+    } else if (mode === 'block-comment') {
+      if (current === '*' && next === '/') {
+        mode = 'normal';
+        index += 2;
+        continue;
+      }
+    }
+
+    index += 1;
+  }
+
+  return index;
+}
+
+function skipStringLiteral(content: string, startIndex: number): number {
+  const quote = content[startIndex];
+  let index = startIndex + 1;
+  while (index < content.length) {
+    const current = content[index];
+    if (current === '\\') {
+      index += 2;
+      continue;
+    }
+    if (current === quote) {
+      return index + 1;
+    }
+    index += 1;
+  }
+  return index;
+}
+
+function isImportKeywordAt(content: string, index: number): boolean {
+  if (content.slice(index, index + 'import'.length) !== 'import') {
+    return false;
+  }
+  const before = content[index - 1];
+  const after = content[index + 'import'.length];
+  if (before && /[A-Za-z0-9_$]/.test(before)) {
+    return false;
+  }
+  if (after && /[A-Za-z0-9_$]/.test(after)) {
+    return false;
+  }
+  return true;
 }
 
 function resolveLocalImportFile(root: string, stagedFile: string, importPath: string): string | null {
