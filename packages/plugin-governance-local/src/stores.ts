@@ -209,15 +209,18 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     initialize: () => initializeStore('shard store'),
     healthCheck: () => capabilityResult(`Shard store is ready at ${layout.shardStorePath}.`),
     readShard(shardPath) {
+      assertCanonicalShardInput(shardPath);
       const absolutePath = resolveRepoPath(repositoryRoot, shardPath);
       return existsSync(absolutePath) ? readUnknownFile(absolutePath) : null;
     },
     writeShard(shardPath, value) {
+      assertCanonicalShardInput(shardPath);
       ensureAllDirectories();
       writeUnknownFile(resolveRepoPath(repositoryRoot, shardPath), value);
       return capabilityResult(`Wrote shard ${normalizeRelativePath(shardPath)}.`);
     },
     rebuildIndex(indexPath) {
+      assertGeneratedKnowledgeCacheOutput(indexPath);
       ensureAllDirectories();
       const entries = listFilesRecursive(absoluteLayout.shardStorePath).map((filePath) => relativePathFrom(repositoryRoot, filePath));
       writeJsonFile(resolveRepoPath(repositoryRoot, indexPath), {
@@ -486,6 +489,20 @@ function relativePathFrom(repositoryRoot: string, filePath: string): string {
 
 function normalizeRelativePath(filePath: string): string {
   return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function assertCanonicalShardInput(filePath: string): void {
+  const normalized = normalizeRelativePath(filePath);
+  if (normalized === '.atm/runtime/knowledge' || normalized.startsWith('.atm/runtime/knowledge/')) {
+    throw new Error('Generated knowledge cache paths under .atm/runtime/knowledge/** cannot be used as canonical shard input. Use .atm/knowledge/** for canonical Team knowledge shards.');
+  }
+}
+
+function assertGeneratedKnowledgeCacheOutput(filePath: string): void {
+  const normalized = normalizeRelativePath(filePath);
+  if (normalized === '.atm/knowledge' || normalized.startsWith('.atm/knowledge/')) {
+    throw new Error('Shard indexes are generated artifacts. Write Team knowledge indexes under .atm/runtime/knowledge/**, not canonical .atm/knowledge/**.');
+  }
 }
 
 function writeJsonFile(filePath: string, value: unknown) {

@@ -3,11 +3,16 @@
 
 Advisory-only memory shard template for coordination notes. This document does not replace closure evidence, task ledgers, or ATM task status records.
 
+Canonical shards created from this template belong under `.atm/knowledge/**`.
+Generated indexes and caches belong under `.atm/runtime/knowledge/**` and must
+not be treated as canonical shard input.
+
 ## Knowledge Scope
 
 - Task ID: `TASK-TEAM-0005`
 - Repo ID: `AI-Atomic-Framework`
 - Domain: `<domain or subsystem>`
+- Authority: advisory-only; not a registry, task store, promotion path, claim source, or closure authority
 
 ## Retrieval / Path Hints
 

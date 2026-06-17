@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
@@ -585,6 +585,27 @@ async function main() {
     }
 
     console.log('[validate-team-agents] ok (closure-summary)');
+    return;
+  }
+
+  if (taskCase === 'knowledge-boundary') {
+    const contract = readFileSync(path.join(process.cwd(), 'docs/governance/team-agents/knowledge-index-contract.md'), 'utf8');
+    const templatesReadme = readFileSync(path.join(process.cwd(), 'docs/governance/team-agents/templates/README.md'), 'utf8');
+    const shardTemplate = readFileSync(path.join(process.cwd(), 'docs/governance/team-agents/templates/team-memory-shard-template.md'), 'utf8');
+
+    for (const content of [contract, templatesReadme, shardTemplate]) {
+      assert.ok(content.includes('.atm/knowledge/**'));
+      assert.ok(content.includes('.atm/runtime/knowledge/**'));
+      assert.match(content, /advisory/i);
+    }
+
+    assert.match(contract, /not a second task\s+registry|never a second task\s+registry/i);
+    assert.match(contract, /promotion path/i);
+    assert.match(contract, /closure authority/i);
+    assert.match(templatesReadme, /cache-only/i);
+    assert.match(shardTemplate, /Authority: advisory-only/);
+
+    console.log('[validate-team-agents] ok (knowledge-boundary)');
     return;
   }
 
