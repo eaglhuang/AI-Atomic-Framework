@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0020",
+  "title": "Team knowledge storage boundary and index contract",
+  "status": "done",
+  "milestone": "M2K",
+  "dependencies": [
+    "TASK-TEAM-0005",
+    "TASK-TEAM-0017"
+  ],
+  "acceptance": [
+    "The contract defines canonical shard roots under `.atm/knowledge/**` and generated cache roots under `.atm/runtime/knowledge/**`.",
+    "The contract distinguishes framework-only knowledge from project/adopter-local knowledge.",
+    "The templates remain Markdown-first and advisory-only.",
+    "The validators reject any attempt to treat generated runtime cache as canonical knowledge input.",
+    "The docs explicitly state that the knowledge layer is not a second registry, task store, or promotion path."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/knowledge-index-contract.md",
+    "docs/governance/team-agents/templates/README.md",
+    "docs/governance/team-agents/templates/team-memory-shard-template.md",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-governance-local.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/knowledge-index-contract.md",
+    "docs/governance/team-agents/templates/README.md",
+    "docs/governance/team-agents/templates/team-memory-shard-template.md",
+    "packages/plugin-governance-local/src/stores.ts",
+    "scripts/validate-governance-local.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-governance-local.ts",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Knowledge query engine implementation",
+    "Vector retrieval or embedding cache",
+    "next / playbook guidance integration",
+    "Automatic mutation of .atm/runtime/** outside generated cache roots"
+  ],
+  "nonGoals": [
+    "Do not create a second registry, task store, or promotion path",
+    "Do not make knowledge hits authoritative over task cards or evidence"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove knowledge contract doc, template/readme alignment, store path changes, validator updates, and atom map entries.",
+  "dispatchPattern": {
+    "shape": "dual-agent (Phase 0 knowledge planner + Phase 1 builder)",
+    "rationale": "The boundary contract must be precise before runtime query work starts; a read-only sidecar can prepare the storage and guard brief while the builder only touches target-repo files.",
+    "phase0": {
+      "lane": "helper (read-only sidecar)",
+      "allowedFiles": [
+        "docs/ai_atomic_framework/team-agents/團隊自動化代理分工計畫.md",
+        "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0020-*.task.md"
+      ],
+      "commitBudget": 0,
+      "output": "Phase 1 brief covering canonical shard roots, runtime cache roots, framework/project split, and no-second-registry guard."
+    },
+    "phase1": {
+      "lane": "external builder 001-006",
+      "forbiddenFiles": [
+        "C:/Users/User/3KLife/**",
+        ".atm/runtime/**",
+        ".atm/history/**"
+      ],
+      "allowedFilesStrict": true,
+      "commitBudget": 2,
+      "commitLayout": [
+        "commit_1: knowledge contract doc + template/readme alignment",
+        "commit_2: stores/validators/map + close evidence"
+      ]
+    }
+  },
+  "conditionReview": [
+    "Canonical lesson roots and generated cache roots are defined separately",
+    "Framework lesson and project lesson roots are both explicit",
+    "No file under .atm/history/** becomes part of the contract",
+    "No line describes knowledge as a new registry or authority source"
+  ],
+  "mailboxAssignee": "001",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-knowledge-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card is the boundary contract for all later knowledge tasks. Query, compact, captain brief, and optional vector rerank all depend on this line being drawn first.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0020-team-knowledge-storage-boundary-index-contract.task.md",
+    "sectionTitle": "TASK-TEAM-0020",
+    "headingLine": 82,
+    "hash": "e321a57835182895"
+  },
+  "importedAt": "2026-06-17T16:55:16.739Z",
+  "lastTransitionId": "2026-06-17T17-12-14-022Z-close-41caecd9431b",
+  "lastTransitionAt": "2026-06-17T17:12:14.022Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-17T16:58:42.774Z",
+  "promotedAt": "2026-06-17T16:58:42.777Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-d4c01279951f",
+    "claimedAt": "2026-06-17T16:58:42.780Z",
+    "heartbeatAt": "2026-06-17T17:12:14.019Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0020.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/knowledge-index-contract.md",
+      "docs/governance/team-agents/templates/README.md",
+      "docs/governance/team-agents/templates/team-memory-shard-template.md",
+      "packages/plugin-governance-local/src/stores.ts",
+      "scripts/validate-governance-local.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-17T16:58:42.780Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260617165842-captain-TASK-TEAM-0020-1c2c5ed211",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0020",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0020.*",
+      ".atm/history/task-events/TASK-TEAM-0020/**",
+      ".atm/history/tasks/TASK-TEAM-0020.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/knowledge-index-contract.md",
+      "docs/governance/team-agents/templates/README.md",
+      "docs/governance/team-agents/templates/team-memory-shard-template.md",
+      "packages/plugin-governance-local/src/stores.ts",
+      "scripts/validate-governance-local.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "78989baf87d2773e4a71cce0ef4ef0f098d7a211d10e71c44e6d8fe8bacf62c2",
+    "actorId": "captain",
+    "createdAt": "2026-06-17T16:58:42.820Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-17T17:12:14.019Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260617165842-captain-TASK-TEAM-0020-1c2c5ed211",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0020.closure-packet.json"
+}
