@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0042",
+  "title": "Validator scope taxonomy and close gating",
+  "status": "done",
+  "milestone": "M7",
+  "dependencies": [
+    "TASK-MAO-0036"
+  ],
+  "acceptance": [
+    "A task that does not touch a global advisory surface can close while recording",
+    "Release-critical failures still block.",
+    "The taxonomy is exposed in JSON output and command docs."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/validate.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/command-specs/validate.spec.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "tests/cli-fixtures/help-snapshots/command-list.json",
+    "scripts/validate-cli.ts",
+    "docs/governance/evidence-gates.md",
+    "docs/testing-strategy.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/validate.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/command-specs/validate.spec.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "tests/cli-fixtures/help-snapshots/command-list.json",
+    "scripts/validate-cli.ts",
+    "docs/governance/evidence-gates.md",
+    "docs/testing-strategy.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:neutrality",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Downgrading release-blocking checks to advisory",
+    "Hiding validator failures",
+    "Suppressing protected-surface neutrality checks for touched files"
+  ],
+  "nonGoals": [
+    "Do not make global repo health invisible."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert validator taxonomy, close-gate policy, docs, tests, and atom-map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-scope-taxonomy-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0042-validator-scope-taxonomy.task.md",
+    "sectionTitle": "TASK-MAO-0042",
+    "headingLine": 57,
+    "hash": "4147a2585e8f7eaa"
+  },
+  "importedAt": "2026-06-17T09:37:53.533Z",
+  "lastTransitionId": "2026-06-17T13-32-59-260Z-close-66465bc3f059",
+  "lastTransitionAt": "2026-06-17T13:32:59.260Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "antigravity-gemini-3.5-flash",
+  "reservedAt": "2026-06-17T09:50:44.118Z",
+  "promotedAt": "2026-06-17T09:50:45.951Z",
+  "claim": {
+    "actorId": "antigravity-gemini-3.5-flash",
+    "leaseId": "lease-b0dc4515cd31",
+    "claimedAt": "2026-06-17T09:50:49.032Z",
+    "heartbeatAt": "2026-06-17T13:32:59.258Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/validate.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "tests/cli-fixtures/help-snapshots/command-list.json",
+      "scripts/validate-cli.ts",
+      "docs/governance/evidence-gates.md",
+      "docs/testing-strategy.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "state": "released",
+    "reason": "parallel-0041-0042 broker merge"
+  },
+  "startedAt": "2026-06-17T09:50:49.032Z",
+  "startedByActor": "antigravity-gemini-3.5-flash",
+  "startedBySessionId": "session-20260617095049-antigravity-gemini-3.5-flash-TASK-MAO-0042-1997eb25a8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0042",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0042.*",
+      ".atm/history/task-events/TASK-MAO-0042/**",
+      ".atm/history/tasks/TASK-MAO-0042.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/evidence-gates.md",
+      "docs/testing-strategy.md",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/command-specs/validate.spec.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/validate.ts",
+      "scripts/validate-cli.ts",
+      "tests/cli-fixtures/help-snapshots/command-list.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "67233adaf1517b34df7776de4c736dcba129c9cdf3210fec8baab007ae474156",
+    "actorId": "antigravity-gemini-3.5-flash",
+    "createdAt": "2026-06-17T09:50:49.068Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-17T13:32:59.258Z",
+  "closedByActor": "antigravity-gemini-3.5-flash",
+  "closedBySessionId": "session-20260617095049-antigravity-gemini-3.5-flash-TASK-MAO-0042-1997eb25a8",
+  "closeReason": "parallel-0041-0042 broker merge",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0042.closure-packet.json"
+}
