@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T02-56-54-871Z-scope-amendment-d1f2244c8039",
+  "taskId": "TASK-MAO-0049",
+  "action": "scope-amendment",
+  "actorId": "augment-code",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0049.json",
+  "taskSha256": "sha256:91ece1fbc278700f95cfe4b44a8949e1c8a21d2903b117a9b45cee59c3ec7923",
+  "createdAt": "2026-06-17T02:56:54.871Z",
+  "command": "node atm.mjs tasks scope add --task TASK-MAO-0049 --actor augment-code --add \"packages/cli/src/commands/task-ledger.ts,packages/cli/src/commands/taskflow/close-orchestration.ts,packages/cli/src/commands/tasks.ts,packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts,packages/cli/src/commands/tasks/residue-diagnostics.ts,packages/cli/src/commands/tasks/task-option-parsers.ts,packages/cli/src/commands/tasks/task-transition-helpers.ts,atomic_workbench/atomization-coverage/path-to-atom-map.json\" --class linked-surface --phase during-implementation --reason \"MAO-0049: audit-lane implementation requires edits to task-ledger (ScopeAmendmentMetadata), residue-diagnostics (TaskScopeAmendmentSnapshot + amendmentHistory), task-option-parsers (parseScopeRepairOptions), task-transition-helpers (buildScopeAmendmentCommand), tasks.ts (runTasksScopeRepair + readScopeAmendmentEvents), close-orchestration (amendmentHistory pass-through), and atom-map coverage\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "MAO-0049: audit-lane implementation requires edits to task-ledger (ScopeAmendmentMetadata), residue-diagnostics (TaskScopeAmendmentSnapshot + amendmentHistory), task-option-parsers (parseScopeRepairOptions), task-transition-helpers (buildScopeAmendmentCommand), tasks.ts (runTasksScopeRepair + readScopeAmendmentEvents), close-orchestration (amendmentHistory pass-through), and atom-map coverage"
+  }
+}
