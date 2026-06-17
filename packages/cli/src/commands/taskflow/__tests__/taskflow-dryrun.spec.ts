@@ -1325,4 +1325,73 @@ assert.equal(extensionlessDryRun.ok, true);
 assert.deepEqual(extensionlessDryRun.evidence.governedCommitBundle.targetDeliveryFiles, ['Dockerfile']);
 assert.equal(extensionlessDryRun.evidence.governedCommitBundle.scopeAmendment.required, false);
 
+// 4. Out-of-scope files in historical delivery with and without waiver
+const outOfScopeFixture = await makeUncommittedDeliverablesFixture('outofscope', (doc) => {
+  doc.scopePaths = ['src/deliver.txt', 'src/other.txt'];
+  doc.deliverables = ['src/deliver.txt'];
+  doc.targetAllowedFiles = ['src/deliver.txt'];
+});
+
+// Commit the out-of-scope and deliverable changes to Git to simulate a historical delivery
+writeText(path.join(outOfScopeFixture.targetRepo, 'src/other.txt'), 'modified out of scope\n');
+writeText(path.join(outOfScopeFixture.targetRepo, 'src/deliver.txt'), 'content\n');
+execFileSync('git', ['add', '.'], { cwd: outOfScopeFixture.targetRepo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'historical delivery with out of scope file'], { cwd: outOfScopeFixture.targetRepo, stdio: 'ignore' });
+const deliveryCommitSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: outOfScopeFixture.targetRepo, encoding: 'utf8' }).trim();
+
+// Write dummy evidence for outOfScopeFixture
+writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${outOfScopeFixture.taskId}.json`), {
+  taskId: outOfScopeFixture.taskId,
+  evidence: [{
+    evidenceKind: 'validation',
+    evidenceType: 'test',
+    summary: 'out-of-scope close fixture evidence',
+    producedBy: 'validator',
+    freshness: 'fresh',
+    validationPasses: ['validate:cli'],
+    artifactPaths: ['src/deliver.txt'],
+    createdAt: new Date().toISOString(),
+    commandRuns: [{
+      command: 'validate out-of-scope close fixture',
+      exitCode: 0,
+      stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+      stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+    }]
+  }]
+});
+
+// A. Dry-run close with --write and without waiver should fail-closed because of the committed out-of-scope file
+await assert.rejects(
+  () => runTaskflow([
+    'close',
+    '--cwd', outOfScopeFixture.targetRepo,
+    '--profile', outOfScopeFixture.profilePath,
+    '--task', outOfScopeFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', deliveryCommitSha,
+    '--write',
+    '--json'
+  ]),
+  (err: any) => {
+    assert.ok(err.code === 'ATM_CLI_COMMAND_FAILED' || err.code === 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED' || err.message.includes('out-of-scope') || err.message.includes('reconcile') || err.message.includes('delivery'));
+    return true;
+  }
+);
+
+// B. Close with --write and approved waiver should succeed
+const outOfScopeCloseWithWaiver = await runTaskflow([
+  'close',
+  '--cwd', outOfScopeFixture.targetRepo,
+  '--profile', outOfScopeFixture.profilePath,
+  '--task', outOfScopeFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', deliveryCommitSha,
+  '--waiver-out-of-scope-delivery',
+  '--reason', 'approved waiver for testing',
+  '--write',
+  '--json'
+]) as any;
+
+assert.equal(outOfScopeCloseWithWaiver.ok, true);
+
 console.log('[taskflow-dryrun:test] ok');

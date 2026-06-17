@@ -102,6 +102,8 @@ function buildTasksReconcileCommand(input: {
   taskId: string;
   actorId: string;
   deliveryCommit?: string | null;
+  waiverOutOfScopeDelivery?: boolean;
+  waiverReason?: string | null;
 }): string {
   const parts = [
     'node atm.mjs tasks reconcile',
@@ -111,6 +113,12 @@ function buildTasksReconcileCommand(input: {
   ];
   if (input.deliveryCommit) {
     parts.push(`--delivery-commit ${input.deliveryCommit}`);
+  }
+  if (input.waiverOutOfScopeDelivery) {
+    parts.push('--waiver-out-of-scope-delivery');
+    if (input.waiverReason) {
+      parts.push(`--reason ${JSON.stringify(input.waiverReason)}`);
+    }
   }
   return parts.join(' ');
 }
@@ -208,7 +216,9 @@ export function buildClosebackPlan(input: {
     backendCommand = buildTasksReconcileCommand({
       taskId: input.taskId,
       actorId: input.actorId,
-      deliveryCommit: input.historicalDeliveryRefs[0] ?? null
+      deliveryCommit: input.historicalDeliveryRefs[0] ?? null,
+      waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
+      waiverReason: input.waiverReason ?? null
     });
     followUpSteps.push('reconcile-historical-delivery');
   } else if (backendSurface === 'tasks-import') {

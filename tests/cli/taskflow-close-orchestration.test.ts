@@ -64,6 +64,7 @@ try {
     workItemId: mirrorTaskId,
     title: 'Planning mirror closeback fixture',
     status: 'done',
+    closureAuthority: 'planning_repo',
     related_plan: mirrorPlan,
     source: { planPath: mirrorPlan, sectionTitle: mirrorTaskId, headingLine: 1, hash: 'fixture' }
   });
@@ -105,8 +106,8 @@ try {
     '--historical-delivery', 'abc123def456'
   ]) as any;
   assert.equal(historicalDryRun.evidence.closeMode, 'historical-delivery-close');
-  assert.equal(historicalDryRun.evidence.closebackPlan.backendSurface, 'tasks-reconcile');
-  assert.ok(historicalDryRun.evidence.closebackPlan.backendCommand.includes('tasks reconcile'));
+  assert.equal(historicalDryRun.evidence.closebackPlan.backendSurface, 'tasks-close');
+  assert.ok(historicalDryRun.evidence.closebackPlan.backendCommand.includes('tasks close'));
 
   const ambiguousTaskId = 'TASK-CLOSE-ORCH-0004';
   writePlanningCard('docs/tasks/TASK-CLOSE-ORCH-0004.task.md', ambiguousTaskId, 'open');
@@ -135,6 +136,105 @@ try {
     () => runTaskflow(['close', '--cwd', tempDir, '--task', ambiguousTaskId, '--actor', 'fixture-agent', '--write']),
     (err: any) => err.code === 'ATM_TASKFLOW_CLOSE_AMBIGUOUS_RESIDUE'
   );
+
+  // -------------------------------------------------------------
+  // Test Case 5: Repair closure throws ATM_REPAIR_CLOSURE_NOT_CLOSE when ledger is not done
+  // -------------------------------------------------------------
+  const { mkdtempSync } = await import('node:fs');
+  const os = await import('node:os');
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-test-repair-'));
+  try {
+    writeJson(path.join(tempRoot, '.atm/history/tasks/TASK-REPAIR.json'), {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: 'TASK-REPAIR',
+      status: 'running'
+    });
+
+    mkdirSync(path.join(tempRoot, '.atm/history/evidence'), { recursive: true });
+    writeJson(path.join(tempRoot, '.atm/history/evidence/TASK-REPAIR.closure-packet.json'), {
+      schemaId: 'atm.closurePacket.v1',
+      taskId: 'TASK-REPAIR'
+    });
+
+    const { repairClosurePacketForTask } = await import('../../packages/cli/src/commands/framework-development/closure-packet-schema.ts');
+    await assert.rejects(
+      async () => {
+        repairClosurePacketForTask({
+          cwd: tempRoot,
+          taskId: 'TASK-REPAIR',
+          actorId: 'validator'
+        });
+      },
+      (err: any) => {
+        assert.equal(err.code, 'ATM_REPAIR_CLOSURE_NOT_CLOSE');
+        assert.ok(err.message.includes('Use taskflow close to finalize this task'));
+        return true;
+      }
+    );
+  } finally {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+
+  // -------------------------------------------------------------
+  // Test Case 6: Verification of closeback plan waiver pass-through (reconcile / close)
+  // -------------------------------------------------------------
+  const { buildClosebackPlan } = await import('../../packages/cli/src/commands/taskflow/close-orchestration.ts');
+  const contract: any = {
+    policy: {
+      rosterSyncPolicy: 'none',
+      rosterSync: { indexPath: null }
+    }
+  };
+
+  const plan = buildClosebackPlan({
+    taskId: 'TASK-WAIVER',
+    actorId: 'validator',
+    historicalDeliveryRefs: ['commit-123'],
+    delegationContract: contract,
+    waiverOutOfScopeDelivery: true,
+    waiverReason: 'Waiver testing reason',
+    diagnosis: {
+      bucket: 'complete-but-unfinalized',
+      truth: 'truth',
+      residue: 'residue',
+      reason: 'reason',
+      nextCommand: '',
+      triangulation: {
+        liveLedger: { status: 'running' },
+        planningFrontmatter: { status: 'done', source: null },
+        divergence: []
+      }
+    }
+  });
+
+  assert.equal(plan.backendSurface, 'tasks-reconcile');
+  assert.ok(plan.backendCommand.includes('--waiver-out-of-scope-delivery'));
+  assert.ok(plan.backendCommand.includes('--reason "Waiver testing reason"'));
+
+  const planClose = buildClosebackPlan({
+    taskId: 'TASK-WAIVER-CLOSE',
+    actorId: 'validator',
+    historicalDeliveryRefs: ['commit-456'],
+    delegationContract: contract,
+    waiverOutOfScopeDelivery: true,
+    waiverReason: 'Close waiver testing reason',
+    diagnosis: {
+      bucket: 'closeback-finalize',
+      truth: 'truth',
+      residue: 'residue',
+      reason: 'reason',
+      nextCommand: '',
+      triangulation: {
+        liveLedger: { status: 'running' },
+        planningFrontmatter: { status: 'done', source: null },
+        divergence: []
+      }
+    }
+  });
+
+  assert.equal(planClose.backendSurface, 'tasks-close');
+  assert.ok(planClose.backendCommand.includes('--waiver-out-of-scope-delivery'));
+  assert.ok(planClose.backendCommand.includes('--reason "Close waiver testing reason"'));
 } finally {
   rmSync(tempDir, { recursive: true, force: true });
 }
