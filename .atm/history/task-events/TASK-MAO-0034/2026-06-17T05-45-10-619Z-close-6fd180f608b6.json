@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T05-45-10-619Z-close-6fd180f608b6",
+  "taskId": "TASK-MAO-0034",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260617054109-claude-code-opus-4-7-TASK-MAO-0034-0a6b4f9f44",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0034.json",
+  "taskSha256": "sha256:d9d1266bd351a3b92f4968ea462f2290e7683b21f358db91dd9f4db94d78b4cd",
+  "createdAt": "2026-06-17T05:45:10.619Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0034 --actor claude-code-opus-4-7 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617054109-claude-code-opus-4-7-TASK-MAO-0034-0a6b4f9f44",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0034.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:neutrality"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T05:45:10.615Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0034-operator-docs-and-migration-guide-for-team-agents-wave-mode.task.md",
+        ".atm/history/evidence/TASK-MAO-0034.*",
+        ".atm/history/task-events/TASK-MAO-0034/**",
+        ".atm/history/tasks/TASK-MAO-0034.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/AGENT_PACK_ONBOARDING.md",
+        "docs/ATM_NEW_USER_WORKFLOW.md",
+        "docs/TEAM_AGENTS_WAVE_MODE.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

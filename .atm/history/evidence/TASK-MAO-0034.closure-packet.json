@@ -1,0 +1,127 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MAO-0034",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6003cc2173c3f4b1c2a4fe8ad3322710aab4c5ec",
+  "governedTreeSha": "3a67fc7a205bc33cd4ecdf548cf94d6f7f696389",
+  "targetCommitDelta": {
+    "currentCommitSha": "6003cc2173c3f4b1c2a4fe8ad3322710aab4c5ec",
+    "parentCommitShas": [
+      "6003cc2173c3f4b1c2a4fe8ad3322710aab4c5ec"
+    ],
+    "governedTreeSha": "3a67fc7a205bc33cd4ecdf548cf94d6f7f696389",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-MAO-0034.json",
+      ".atm/history/tasks/TASK-MAO-0028.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/governance/historical-batch-evidence.md",
+      "docs/TEAM_AGENTS_WAVE_MODE.md",
+      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:neutrality",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b8b1cf82e8926928003ab1f46c4660413ac676ceaefacea7391f1f28501c008c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:neutrality"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-17T05:45:10.615Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0034-operator-docs-and-migration-guide-for-team-agents-wave-mode.task.md",
+      ".atm/history/evidence/TASK-MAO-0034.*",
+      ".atm/history/task-events/TASK-MAO-0034/**",
+      ".atm/history/tasks/TASK-MAO-0034.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/AGENT_PACK_ONBOARDING.md",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/TEAM_AGENTS_WAVE_MODE.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MAO-0034.json",
+  "closedAt": "2026-06-17T05:45:10.616Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "sessionId": "session-20260617054109-claude-code-opus-4-7-TASK-MAO-0034-0a6b4f9f44",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}
