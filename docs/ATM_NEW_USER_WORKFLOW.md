@@ -288,6 +288,226 @@ If you find yourself reaching for any of the above, stop and report to the human
 
 ---
 
+## Closeback operator runbook
+
+This section is the operator-facing runbook for the closeback path that landed
+in M7 (`TASK-MAO-0038` through `TASK-MAO-0044`). Use it when delivery already
+happened, when you are closing a historical slice, or when you need a
+chat-independent checklist instead of memory.
+
+### Normal lane vs protected backend
+
+| Lane | Commands | When to use |
+|---|---|---|
+| **Normal operator** | `taskflow pre-close`, `taskflow close`, `task-view` | Every day. Preview, close, and verify without hand-editing ledger files. |
+| **Protected backend** | `tasks close`, `tasks reconcile`, `tasks repair-closure` | Emergency repair, residue recovery, or automation that already has human approval. Not the daily driver. |
+
+`task-view` is read-only visibility. `taskflow close --write` is the governed
+close authority. Backend commands exist for repair; they do not replace the
+operator lane.
+
+### End-to-end closeback sequence
+
+Follow this order. Skipping a step is how partial closes and stranded ledgers
+happen.
+
+**0. Actor adoption**
+
+```bash
+node atm.mjs identity set --actor <actor> --git-name "<name>" --git-email "<email>" --json
+node atm.mjs git prepare --task <task-id> --actor <actor> --json
+```
+
+**1. Claim and scope lock**
+
+Hold a valid active claim before delivery or closeout mutation. Widen linked
+surfaces through `tasks scope add`, not by editing lock files.
+
+**2. Implement and record evidence**
+
+Run validators through `evidence run` (or governed `evidence add`) while the
+claim is active. Chat summaries and bare terminal reruns are not evidence.
+
+**3. Delivery commit (task-scoped)**
+
+Use the governed commit wrapper, not bare `git commit`:
+
+```bash
+node atm.mjs git commit \
+  --task <task-id> \
+  --actor <actor> \
+  --message "<delivery summary>" \
+  --auto-stage \
+  --json
+```
+
+When the index already holds another task's staged close bundle, defer it
+explicitly (see [Foreign staged restore protocol](#foreign-staged-restore-protocol)).
+
+**4. Pre-close checkpoint (read-only)**
+
+```bash
+node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json
+```
+
+Read the blocker summary before any `--write`:
+
+| Field | Meaning |
+|---|---|
+| `scopeTrackedDirtyFiles` | In-scope delivery still dirty; fix or stage through governed paths. |
+| `unexpectedStagedTasks` | Foreign task governance bundles in the index. |
+| `mixedDeliveryCommit` / `missingApprovalLease` | Historical or out-of-scope delivery needs waiver approval. |
+| `staleEvidence` | Required validators missing fresh command-backed evidence. |
+| `writeRollbackSummary` | What to verify if `--write` partially succeeds. |
+
+**5. Scoped remediation**
+
+Fix only what pre-close names. Do **not** use broad `git checkout -- .`,
+`git restore .`, or silent unstage of another agent's bundle. Use
+`tasks scope add` for linked surfaces, `git commit --defer-foreign-staged` for
+foreign index entries during delivery, and `taskflow close --defer-foreign-staged`
+during close.
+
+**6. Dry-run close**
+
+```bash
+node atm.mjs taskflow close --task <task-id> --actor <actor> --dry-run --json
+```
+
+Inspect `closeMode`:
+
+- `normal-close` — proceed with `--write`.
+- `historical-delivery-close` — delivery landed before governance; use
+  `--historical-delivery` or a historical-batch slice (see below).
+- `planning-mirror-sync-repair` — planning card out of sync; repair mirror
+  before close.
+- `residue-repair` — interrupted close; backend `tasks repair-closure` may be
+  needed under human direction.
+- `ambiguous-manual-review` — **stop**; do not force-close.
+
+**7. Governed close**
+
+```bash
+node atm.mjs taskflow close --task <task-id> --actor <actor> --write --json
+```
+
+On success, ATM acquires the close-window staged-index lock, exact-stages the
+dual-repo bundle, auto-commits (unless `--no-commit`), and records
+`closeWriteTransaction` phase `committed`.
+
+**8. Verification**
+
+```bash
+node atm.mjs task-view --task <task-id> --actor <actor> --json
+```
+
+Confirm `closeCompletionChecklist.partialClose` is `false` and every required
+checklist field is `ok: true`.
+
+### Historical closeback
+
+When real delivery landed before governance caught up:
+
+1. Build or reuse a historical-batch envelope when multiple tasks share one
+   delivery commit (`evidence historical-batch --write`).
+2. Run `taskflow pre-close` and `taskflow close` with
+   `--historical-batch <batch-id-or-path>` (or `--historical-delivery` for a
+   single-task waiver path when pre-close names it).
+3. Inspect `closeWriteTransaction`. A commit-bundle failure rolls back the close
+   transition instead of leaving a done ledger on disk with uncommitted governance.
+
+See `docs/governance/historical-batch-evidence.md` for envelope rules.
+
+### One bundle approval vs separate approvals
+
+| Situation | Approval shape |
+|---|---|
+| Single task, live evidence, clean dry-run | One `taskflow close --write` bundle (target + planning) is enough. |
+| Single task, out-of-scope or mixed delivery | Separate human approval for the waiver (`--waiver-out-of-scope-delivery` or historical-delivery lease) **before** close `--write`. |
+| Multiple tasks, one delivery commit | One `evidence historical-batch` envelope, then **per-task** `taskflow close --historical-batch` (each task still gets its own close event and checklist). |
+| Foreign staged governance in the index | Defer under operator control (`--defer-foreign-staged`); confirm the owning agent can restage. Not a substitute for waiver approval. |
+| Emergency backend (`tasks repair-closure`, `tasks reset`, hook bypass) | Separate emergency lease per protected surface; never fold into a normal close bundle. |
+
+A single closeback bundle approval covers **one task's** governed target +
+planning closeout artifacts. It does not authorize hook bypass, backend repair,
+or another task's staged bundle.
+
+### Banned patterns
+
+These patterns are explicitly blocked or unsafe. Do not use them on the normal
+path:
+
+| Banned pattern | Why | Use instead |
+|---|---|---|
+| `tasks repair-closure` as "close" | Backend residue repair, not lifecycle close. | `taskflow close --write` after pre-close is clean. |
+| Hand-editing `.atm/history/**` | Breaks audit trail and triangulation. | `tasks import`, `evidence run`, `taskflow close`. |
+| Claim then close with governance dirty uncommitted | Produces partial close or `DIRTY_WORKTREE` blockers. | Commit delivery + evidence through governed wrappers first. |
+| Bare `git commit` for ledger mutations | Missing trailers, claim binding, and hook contracts. | `node atm.mjs git commit --task ...`. |
+| Broad `git restore .` / `git checkout -- .` | Destroys another agent's in-progress or staged work. | Scoped fixes named by `pre-close`. |
+| `tasks close` as daily driver | Skips dual-repo bundle and planning mirror orchestration. | `taskflow close`. |
+| Force-close on `ambiguous-manual-review` | Hides unresolved triangulation. | `task-view` + human decision. |
+
+### Foreign staged restore protocol
+
+When `unexpectedStagedTasks` or the close-window lock reports foreign staged
+governance files:
+
+1. **Identify** the owning task from pre-close / dry-run JSON (do not guess from
+   `git status` alone).
+2. **Prefer waiting** for the owning agent to finish or release its close window.
+3. **If you must proceed**, use the governed defer path so ATM snapshots files
+   before unstaging:
+
+```bash
+# During delivery commit
+node atm.mjs git commit \
+  --task <your-task> \
+  --actor <actor> \
+  --defer-foreign-staged \
+  --message "<delivery>" \
+  --json
+
+# During close
+node atm.mjs taskflow close \
+  --task <your-task> \
+  --actor <actor> \
+  --defer-foreign-staged \
+  --write \
+  --json
+```
+
+4. **After close**, tell the deferred task owner to restage from the snapshot
+   path under `.atm/runtime/snapshots/close-window-foreign-staged-*` or from
+   their working tree. Do not delete those snapshots until the owner confirms.
+5. **Never** silently `git restore --staged` on governance paths outside this
+   protocol.
+
+`--defer-foreign-staged` is appropriate when foreign bundles are **operator-known
+and intentional** (parallel agents, batch waves) and you have a handoff plan. It
+is not appropriate as a default cleanup or as a way to hide unrelated dirty
+files — fix or scope those through `tasks scope add` and task-scoped commits.
+
+### Close completion checklist
+
+After close, `task-view` and `taskflow close` expose
+`closeCompletionChecklist` (`atm.taskCloseCompletionChecklist.v1`):
+
+| Field id | Satisfied when |
+|---|---|
+| `ledger-done` | Live ledger status is `done`. |
+| `target-governance-committed` | Closure packet exists in the target repo. |
+| `planning-mirror-committed` | Planning mirror status agrees (`done` when ledger is done). |
+| `lifecycle-events-recorded` | Close transition event exists under `.atm/history/task-events/`. |
+| `delivery-sha` | Delivery commit SHA is recorded in closure provenance. |
+| `waiver-reason` | Required only when close used an out-of-scope delivery waiver; must have a durable reason. |
+
+`partialClose: true` means the ledger says `done` but at least one checklist
+field failed — treat as **not** fully closed until repaired. Backend
+`tasks repair-closure` may be relevant only under human-directed residue repair,
+not as a substitute for finishing the checklist.
+
+---
+
 ## Emergency maintenance
 
 There is a separate lane for legacy recovery, residue repair, stale lock cleanup, waiver issuance, and runner recovery. It is intentionally not part of the daily workflow.
@@ -325,7 +545,16 @@ node atm.mjs taskflow close --task TASK-... --actor <actor> --write --json
 
 # Close + stage only (no commit; for Captain review or emergency repair)
 node atm.mjs taskflow close --task TASK-... --actor <actor> --write --no-commit --json
+
+# Read-only task dashboard (status, blockers, close checklist)
+node atm.mjs task-view --task TASK-... --actor <actor> --json
+
+# Pre-close checkpoint (read-only blockers before --write)
+node atm.mjs taskflow pre-close --task TASK-... --actor <actor> --json
 ```
+
+For the full closeback sequence, banned patterns, foreign staged restore, and
+close completion checklist, see [Closeback operator runbook](#closeback-operator-runbook).
 
 That's the whole normal workflow. Seven steps, three commands you really need to remember (`taskflow open`, `next`, `taskflow close`), and one promise from ATM: governed work goes through the official lanes, and the daily path does not require touching governance files by hand.
 

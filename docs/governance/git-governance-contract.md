@@ -102,6 +102,51 @@ ATM snapshots deferred files under `.atm/runtime/snapshots/close-window-foreign-
 before unstaging them from the index. Do not silently unstage another agent's
 close bundle outside this governed path.
 
+### Foreign staged restore protocol
+
+Use this when pre-close or the close-window lock reports `unexpectedStagedTasks`
+or blocks acquisition because foreign governance bundles are already staged.
+
+1. Read the owning task ids from JSON (`unexpectedStagedTasks`); do not infer
+   from a raw `git status` alone.
+2. Prefer waiting for the owning agent to finish its close window.
+3. When you must proceed under operator control, defer explicitly:
+
+```bash
+node atm.mjs git commit \
+  --task <your-task> \
+  --actor <actor-id> \
+  --defer-foreign-staged \
+  --message "<delivery>" \
+  --json
+```
+
+or during close:
+
+```bash
+node atm.mjs taskflow close \
+  --task <your-task> \
+  --actor <actor-id> \
+  --defer-foreign-staged \
+  --write \
+  --json
+```
+
+4. ATM writes a snapshot under `.atm/runtime/snapshots/close-window-foreign-staged-*`
+   before unstaging. After your commit or close completes, notify the deferred
+   task owner so they can restage from the snapshot or their working tree.
+5. Do not use broad `git restore --staged .` or `git checkout -- .` on governance
+   paths. Do not delete defer snapshots until the owner confirms recovery.
+
+`--defer-foreign-staged` is for known parallel close windows with a handoff plan.
+It is not a substitute for fixing in-scope dirty files or obtaining waiver
+approval for out-of-scope delivery.
+
+Banned on the normal path: bare `git commit` for ledger mutations; silent
+unstage of another task's bundle; claiming then closing while governance
+artifacts remain dirty and uncommitted. See `docs/ATM_NEW_USER_WORKFLOW.md`
+(Closeback operator runbook) for the full banned-pattern table.
+
 ## Scope Amendment Audit Lane
 
 A claim locks a fixed list of `allowedFiles`. When linked surfaces appear during

@@ -42,12 +42,14 @@ The guard checks that:
 | `node atm.mjs baseline` | Manage redteam baselines for framework work. |
 | `node atm.mjs batch` | Inspect, repair, resume, or checkpoint a batch run. |
 | `node atm.mjs bootstrap` | Create or refresh the default bootstrap pack. |
+| `node atm.mjs broker` | Broker daemon and steward surfaces for governed writes. |
 | `node atm.mjs budget` | Evaluate context budget policy for governed work. |
 | `node atm.mjs cache` | Manage guide and one-file runtime caches. |
 | `node atm.mjs candidates` | Rank legacy source candidates and emit evidence. |
 | `node atm.mjs create` | Create and register an atom. |
 | `node atm.mjs create-map` | Create and register an atomic map. |
 | `node atm.mjs doctor` | Inspect repository readiness and trust signals. |
+| `node atm.mjs emergency` | Manage human-approved emergency maintenance leases. |
 | `node atm.mjs evidence` | Add or verify task evidence. |
 | `node atm.mjs experience` | Extract reviewable learning artifacts from evidence. |
 | `node atm.mjs explain` | Explain guidance blocks and missing evidence. |
@@ -74,10 +76,13 @@ The guard checks that:
 | `node atm.mjs review` | Inspect or decide upgrade proposal review packets. |
 | `node atm.mjs review-advisory` | Generate non-blocking semantic advisory findings. |
 | `node atm.mjs rollback` | Plan or apply rollback for registry targets. |
+| `node atm.mjs route` | Route governed actions through ATM policy. |
 | `node atm.mjs self-host-alpha` | Verify self-hosting alpha criteria. |
 | `node atm.mjs spec` | Validate atomic specs or supported reports. |
 | `node atm.mjs start` | Start a guidance session for a concrete goal. |
 | `node atm.mjs status` | Inspect ATM repository status. |
+| `node atm.mjs task-view` | Read-only task dashboard for status, blockers, and close checklist. |
+| `node atm.mjs taskflow` | Governed dual-repo task open, pre-close, and closeback. |
 | `node atm.mjs tasks` | Manage task import, queues, claims, evidence gates, and closure. |
 | `node atm.mjs team` | Plan or start scoped team agents. |
 | `node atm.mjs telemetry` | Manage opt-in CLI telemetry. |

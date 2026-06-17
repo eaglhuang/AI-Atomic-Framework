@@ -137,7 +137,7 @@ export const commandSpecs = Object.freeze({
   validate: validateSpec,
   welcome: welcomeSpec,
   verify: verifySpec,
-  taskflow: withVisibility(taskflowSpec, 'internal'),
+  taskflow: taskflowSpec,
   'task-view': taskViewSpec,
   broker: brokerSpec,
   route: routeSpec,

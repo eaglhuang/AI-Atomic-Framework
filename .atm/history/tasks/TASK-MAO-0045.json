@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0045",
+  "title": "Closeback operator runbook and banned-pattern guide",
+  "status": "running",
+  "milestone": "M7",
+  "dependencies": [
+    "TASK-MAO-0038",
+    "TASK-MAO-0039",
+    "TASK-MAO-0040"
+  ],
+  "acceptance": [
+    "Operators can run a historical closeback without relying on chat-only memory.",
+    "Docs point to taskflow as the normal lane and label backend commands as",
+    "The runbook reflects the implemented behavior from `TASK-MAO-0038` through",
+    "`TASK-MAO-0044`, including the pre-close blocker summary and the foreign"
+  ],
+  "deliverables": [
+    "docs/ATM_NEW_USER_WORKFLOW.md",
+    "docs/governance/historical-batch-evidence.md",
+    "docs/governance/git-governance-contract.md",
+    "docs/HOST_GOVERNANCE_INTEGRATION.md",
+    "packages/cli/README.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/ATM_NEW_USER_WORKFLOW.md",
+    "docs/governance/historical-batch-evidence.md",
+    "docs/governance/git-governance-contract.md",
+    "docs/HOST_GOVERNANCE_INTEGRATION.md",
+    "packages/cli/README.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run validate:neutrality",
+    "npm run validate:docs-command-drift",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Documenting backend protected commands as normal daily-driver routes",
+    "Recommending broad destructive cleanup",
+    "Claiming unimplemented CLI features are available"
+  ],
+  "nonGoals": [
+    "Do not change source behavior in this documentation-only task."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert closeback runbook docs and atom-map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.closeback-operator-runbook-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0045-closeback-operator-runbook.task.md",
+    "sectionTitle": "TASK-MAO-0045",
+    "headingLine": 54,
+    "hash": "a0877144de876a8b"
+  },
+  "importedAt": "2026-06-17T17:14:39.584Z",
+  "lastTransitionId": "2026-06-17T17-15-50-820Z-claim-aec2542aef7a",
+  "lastTransitionAt": "2026-06-17T17:15:50.820Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-17T17:15:40.665Z",
+  "promotedAt": "2026-06-17T17:15:50.292Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-61c393083a02",
+    "claimedAt": "2026-06-17T17:15:50.778Z",
+    "heartbeatAt": "2026-06-17T17:15:50.778Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/governance/historical-batch-evidence.md",
+      "docs/governance/git-governance-contract.md",
+      "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "packages/cli/README.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-17T17:15:50.778Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260617171550-cursor-gpt-5.2-TASK-MAO-0045-2596a1d7ea",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0045",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0045.*",
+      ".atm/history/task-events/TASK-MAO-0045/**",
+      ".atm/history/tasks/TASK-MAO-0045.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "docs/governance/git-governance-contract.md",
+      "docs/governance/historical-batch-evidence.md",
+      "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "packages/cli/README.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7a11594f003862596f466221d62f54d46f9c3f383d68c36a4fdd933a1277b256",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-17T17:15:50.819Z",
+    "status": "active"
+  }
+}

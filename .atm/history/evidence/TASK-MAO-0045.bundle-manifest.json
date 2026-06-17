@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-MAO-0045",
+  "updatedAt": "2026-06-17T17:24:23.166Z",
+  "updatedBy": "cursor-gpt-5.2",
+  "freshValidationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:docs-command-drift",
+    "validate:neutrality"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run validate:neutrality",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b8b1cf82e8926928003ab1f46c4660413ac676ceaefacea7391f1f28501c008c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:neutrality"
+      ],
+      "generatedAt": "2026-06-17T17:18:07.479Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-06-17T17:18:11.273Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-06-17T17:24:21.944Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-docs-command-drift.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bd5fa952487d246de5d6bce555c499d0683ed91c2cc06e017b960f7f03be5b4e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:docs-command-drift"
+      ],
+      "generatedAt": "2026-06-17T17:24:23.233Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
