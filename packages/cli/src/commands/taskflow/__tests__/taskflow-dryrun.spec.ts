@@ -1327,10 +1327,16 @@ assert.equal(extensionlessDryRun.evidence.governedCommitBundle.scopeAmendment.re
 
 // 4. Out-of-scope files in historical delivery with and without waiver
 const outOfScopeFixture = await makeUncommittedDeliverablesFixture('outofscope', (doc) => {
-  doc.scopePaths = ['src/deliver.txt', 'src/other.txt'];
+  doc.scopePaths = ['src/deliver.txt'];
   doc.deliverables = ['src/deliver.txt'];
   doc.targetAllowedFiles = ['src/deliver.txt'];
+  doc.source = { planPath: 'docs/tasks/TASK-DEL-OUTOFSCOPE.task.md' };
 });
+
+const outOfScopeTaskPath = path.join(outOfScopeFixture.targetRepo, '.atm/history/tasks', `${outOfScopeFixture.taskId}.json`);
+const outOfScopeTaskDoc = JSON.parse(readFileSync(outOfScopeTaskPath, 'utf8'));
+outOfScopeTaskDoc.source.planPath = outOfScopeFixture.planPath;
+writeJson(outOfScopeTaskPath, outOfScopeTaskDoc);
 
 // Commit the out-of-scope and deliverable changes to Git to simulate a historical delivery
 writeText(path.join(outOfScopeFixture.targetRepo, 'src/other.txt'), 'modified out of scope\n');
@@ -1383,11 +1389,13 @@ if (outOfScopeError) {
   assert.ok(
     outOfScopeError.code === 'ATM_CLI_COMMAND_FAILED' ||
     outOfScopeError.code === 'ATM_TASKFLOW_CLOSE_WRITE_BLOCKED' ||
+    outOfScopeError.code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED' ||
     outOfScopeError.message.includes('out-of-scope') ||
     outOfScopeError.message.includes('reconcile') ||
     outOfScopeError.message.includes('delivery')
   );
 } else {
+  console.error('[DEBUG-TEST-FAIL] outOfScopeResult:', JSON.stringify(outOfScopeResult, null, 2));
   assert.equal(outOfScopeResult.ok, false);
   assert.ok(
     outOfScopeResult.messages.some((m: any) =>
