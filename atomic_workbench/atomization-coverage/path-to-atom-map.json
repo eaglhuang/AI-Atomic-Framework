@@ -1285,6 +1285,34 @@
       "capability": "Team worker report ingestion contract: per-card worker outcome (changed files, validator runs with first failing diagnostic, deviations, execution state) with consistency validation and effective-state reconciliation that downgrades an inconsistent done claim to needs-review; conforms to schemas/team-worker-report.schema.json (TASK-MAO-0028).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0028"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-evidence.ts",
+      "atom_id": "atm.team-wave-evidence-map",
+      "capability": "Per-task evidence slicing from a wave diff: attributes every changed file to exactly one member by declared scope (directory-prefix aware, append-safe files excepted); unattributed or ambiguous files force the whole wave to needs-review so no member is checkpointed done (TASK-MAO-0029).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0029"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-checkpoint.ts",
+      "atom_id": "atm.team-wave-checkpoint-map",
+      "capability": "Wave checkpoint partial-completion semantics: combines worker reports and the wave evidence slice into per-member states (done/partial/blocked/not-started/needs-review); only done members with clean attributed evidence are close-ready; never closes a card, only prepares input for batch checkpoint / taskflow close (TASK-MAO-0030).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0030"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-wave.ts#assertCoordinatorOnly",
+      "atom_id": "atm.team-wave-closeout-guard-map",
+      "capability": "Coordinator-only git / closeout guard: only the coordinator role may perform git-write, task-closeout, or checkpoint; worker/validator/reviewer roles fail closed, preserving existing hooks / batch checkpoint / taskflow close as the lifecycle authority (TASK-MAO-0031).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0031"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#validator-reviewer-roles",
+      "atom_id": "atm.team-wave-roles-map",
+      "capability": "Validator and reviewer Team Agents roles for waves: advisory roles asserted to be non-privileged (no git-write or task-closeout) via the coordinator-only guard, validated on every validate-team-agents run (TASK-MAO-0032).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0032"
     }
   ],
   "summary": {
