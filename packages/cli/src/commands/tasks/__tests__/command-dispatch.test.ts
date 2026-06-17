@@ -33,6 +33,7 @@ const handlers = {
   claimLifecycle: (action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) => handler(action)(argv),
   reconcile: handler('reconcile'),
   repairClosure: handler('repair-closure'),
+  repairClaim: handler('repair-claim'),
   show: handler('show'),
   status: handler('status'),
   finalize: handler('finalize'),

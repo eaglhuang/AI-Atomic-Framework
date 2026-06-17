@@ -141,3 +141,34 @@ node atm.mjs tasks scope repair \
 `tasks scope repair` records `mode: repair` and refuses to run without both
 `--emergency-approval` and `--reason`. Use `tasks scope add` for ordinary linked
 surfaces; reserve `tasks scope repair` for approved maintenance exceptions.
+
+## Lifecycle Owner and Claim Repair
+
+Closeout has one lifecycle owner: the actor holding a **valid active claim** and
+work session for the task. That owner alone may mutate scoped deliverables, add
+command-backed evidence, and run `taskflow close --write`. Other agents remain
+read-only unless the task is handed off, released, or repaired through governed
+recovery.
+
+Diagnose claim drift without mutation:
+
+```bash
+node atm.mjs tasks repair-claim --task <task-id> --actor <actor-id> --json
+```
+
+When the diagnosis reports repairable drift (expired lease, dangling lock,
+stale `running` status without a claim, orphaned session) and **no valid
+active claim blocks repair**, apply an auditable repair:
+
+```bash
+node atm.mjs tasks repair-claim \
+  --task <task-id> \
+  --actor <actor-id> \
+  --write \
+  --reason "documented drift recovery" \
+  --json
+```
+
+`tasks repair-claim` records a `repair-claim` transition with before/after
+claim state. It does not replace `taskflow close` and cannot silently take over
+an active valid lease.

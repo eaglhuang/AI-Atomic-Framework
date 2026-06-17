@@ -1523,11 +1523,39 @@
       "capability": "External core contributor pipeline CI gate: validates contributor patch envelopes against upstream in-dev/HEAD, rejects release-only direct modifications, and admits well-formed patch-only submits before the steward rebuild lane (TASK-MAO-0022).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0022"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Diagnose-first claim repair for stale, dangling, expired, and conflicting claim drift; apply auditable repair only when no valid active lease blocks.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "tests/cli/tasks-repair-claim.test.ts",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Regression coverage for tasks repair-claim diagnose/write and lifecycle-owner blocking rules.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "docs/governance/git-governance-contract.md",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Document lifecycle owner rules and tasks repair-claim diagnose/write operator path.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "docs/ATM_NEW_USER_WORKFLOW.md",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Operator guidance: closeout has one lifecycle owner; tasks repair-claim is diagnose-first recovery, not a close shortcut.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
     }
   ],
   "summary": {
-    "total_production_paths": 183,
-    "mapped_paths": 183,
+    "total_production_paths": 187,
+    "mapped_paths": 187,
     "coverage_percentage": 100,
     "atoms_defined": 111,
     "atoms_with_evidence": 0,
