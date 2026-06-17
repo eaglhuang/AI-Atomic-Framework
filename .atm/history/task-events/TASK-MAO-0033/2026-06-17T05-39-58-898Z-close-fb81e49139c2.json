@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T05-39-58-898Z-close-fb81e49139c2",
+  "taskId": "TASK-MAO-0033",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260617053628-claude-code-opus-4-7-TASK-MAO-0033-16cbd2b89e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0033.json",
+  "taskSha256": "sha256:7ccfa0acf2f970c4d6658ba0c9b0ad66e38f136afaeb6206c957dba174820965",
+  "createdAt": "2026-06-17T05:39:58.898Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0033 --actor claude-code-opus-4-7 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617053628-claude-code-opus-4-7-TASK-MAO-0033-16cbd2b89e",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0033.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate-team-wave-mode",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T05:39:58.891Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0033-team-wave-dogfood-benchmark-with-cid-phase-b-shape.task.md",
+        ".atm/history/evidence/TASK-MAO-0033.*",
+        ".atm/history/task-events/TASK-MAO-0033/**",
+        ".atm/history/tasks/TASK-MAO-0033.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/reports/team-wave-mode-dogfood.md",
+        "scripts/fixtures/team-wave-mode/",
+        "scripts/fixtures/team-wave-mode/wave-scenarios.json",
+        "scripts/validate-team-wave-mode.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/fixtures/team-wave-mode/",
+        "scripts/fixtures/team-wave-mode/wave-scenarios.json",
+        "scripts/validate-team-wave-mode.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
