@@ -180,8 +180,9 @@ node atm.mjs taskflow pre-close \
 - `staleEvidence`: required validators missing fresh command-backed evidence.
 - `writeRollbackSummary`: what to verify if `--write` partially succeeds.
 - `closeWriteTransaction` (on `--write`): transaction phase `pending`, `committed`, or `rolled_back`. If the governed commit bundle fails after backend close, ATM restores the prior ledger close state instead of leaving a done task stranded on disk.
+- `closeWindowLock` / `releasedCloseWindowLock` (on `--write`): exclusive staged-index lock acquired before delivery staging; only the active close task may stage governed bundles until release.
 
-Remediation must stay scoped. Do not use broad `git checkout -- .`, `git restore .`, or silent unstage of another agent's close bundle. Defer foreign staged files explicitly and confirm the other agent can restage afterward.
+Remediation must stay scoped. Do not use broad `git checkout -- .`, `git restore .`, or silent unstage of another agent's close bundle. Defer foreign staged files explicitly with `taskflow close --defer-foreign-staged` and confirm the other agent can restage afterward.
 
 Then dry-run the close. This is the same idea as Step 1, applied to the closeback:
 
@@ -215,6 +216,7 @@ node atm.mjs taskflow close \
 
 **What ATM does, by default:**
 
+- Acquires an exclusive close-window staged-index lock before staging.
 - Computes the dual-repo governed commit bundle (`atm.taskflowGovernedCommitBundle.v1`).
 - **Exact-stages** the listed files in the target repo and the planning repo. Unrelated dirty files are *not* staged.
 - **Auto-commits** both repos with deterministic, governed commit messages.

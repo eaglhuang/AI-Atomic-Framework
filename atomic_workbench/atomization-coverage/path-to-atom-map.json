@@ -1189,6 +1189,48 @@
       "source_task": "TASK-MAO-0050"
     },
     {
+      "path_pattern": "packages/cli/src/commands/tasks/close-window-lock.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Exclusive close-window staged-index lock with foreign-staged inspection, governed defer snapshots, and release outcomes committed, rolled_back, or aborted.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Acquire and release close-window staged-index lock around taskflow close --write staging and commit phases.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Release close-window staged-index lock during close write rollback snapshots.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Close-window lock remediation hints for foreign staged tasks and active lock holders.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/__tests__/taskflow-close-window-lock.test.ts",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Regression coverage for close-window lock acquire, block, defer, release, and rollback release.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
+      "path_pattern": "docs/governance/git-governance-contract.md",
+      "atom_id": "atm.close-window-lock-map",
+      "capability": "Document close-window staged-index lock lifecycle and --defer-foreign-staged operator path.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0051"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
       "atom_id": "atm.closeback-route-correctness-map",
       "capability": "Guard repair-closure packet helper by throwing ATM_REPAIR_CLOSURE_NOT_CLOSE when ledger is not done.",

@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'taskflow',
-  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow pre-close is the read-only first checkpoint before historical close --write; it reports scopeTrackedDirtyFiles, unexpectedStagedTasks, mixedDeliveryCommit, staleEvidence, and missingApprovalLease without mutating the worktree. taskflow close --write runs as a fail-closed transaction: verify the bundle, apply backend close, commit target/planning mirrors, and roll back close state when any commit step fails while surfacing closeWriteTransaction phase pending, committed, or rolled_back in JSON. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
+  summary: 'Official operator lane for governed task open and close. taskflow open is the normal opener lane; its dry-run returns a writeReadinessHint that names exactly what is missing when --write would fail closed. taskflow pre-close is the read-only first checkpoint before historical close --write; it reports scopeTrackedDirtyFiles, unexpectedStagedTasks, mixedDeliveryCommit, staleEvidence, and missingApprovalLease without mutating the worktree. taskflow close --write acquires an exclusive close-window staged-index lock before staging, blocks competing stage operations, and releases the lock on commit, rollback, or abort while surfacing closeWriteTransaction phase pending, committed, or rolled_back in JSON. tasks new is a low-level template generator surface (no governed lifecycle). tasks import is the runtime synchronization surface (backend). Direct tasks close, tasks reconcile, tasks repair-closure are protected backend / emergency surfaces and must not be used as normal operator paths.',
   positional: [
     { name: 'action', summary: 'open | close | pre-close', required: true }
   ],
@@ -29,6 +29,7 @@ export default defineCommandSpec({
     { flag: '--delivery-commit', value: 'commit', summary: 'Alias for --historical-delivery on taskflow close.' },
     { flag: '--historical-batch', value: 'batchId-or-path', summary: 'For taskflow close: consume a task slice produced by evidence historical-batch, reuse its matched delivery commits, and treat the slice as the operator close-readiness source.' },
     { flag: '--waiver-out-of-scope-delivery', summary: 'For taskflow close with historical delivery or historical batch: allow a multi-task delivery commit when this task slice has matched deliverables; requires --reason.' },
+    { flag: '--defer-foreign-staged', summary: 'For taskflow close --write: snapshot and unstage foreign task governance files in the index before acquiring the close-window staged-index lock.' },
     { flag: '--reason', value: 'text', summary: 'Required explanation for --waiver-out-of-scope-delivery.' },
     commonJsonOption,
     commonPrettyOption,
@@ -44,6 +45,6 @@ export default defineCommandSpec({
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --waiver-out-of-scope-delivery --reason "multi-task historical delivery" --write --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --dry-run --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --write --json',
-    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --write --no-commit --json'
+    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-staged --write --json',
   ]
 });

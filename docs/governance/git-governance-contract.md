@@ -75,6 +75,33 @@ ATM executes git through `ATM_GIT_EXECUTABLE` when set, otherwise `git.exe` on
 Windows, and always returns `copyableCommitCommand` using `-m` trailers when
 host `--trailer` support is unavailable.
 
+## Close Window Staged-Index Lock
+
+`taskflow close --write` acquires an exclusive staged-index lock at
+`.atm/runtime/locks/close-window-staged-index.lock.json` before any governed
+staging begins. While the lock is active:
+
+- Only the active close task may stage governed bundles.
+- Foreign staged governance files block acquisition unless the operator defers
+  them explicitly.
+- The lock releases on committed close, rolled-back commit bundle, or aborted
+  close.
+
+Defer foreign staged governance files under operator control:
+
+```bash
+node atm.mjs taskflow close \
+  --task <task-id> \
+  --actor <actor-id> \
+  --defer-foreign-staged \
+  --write \
+  --json
+```
+
+ATM snapshots deferred files under `.atm/runtime/snapshots/close-window-foreign-staged-*`
+before unstaging them from the index. Do not silently unstage another agent's
+close bundle outside this governed path.
+
 ## Scope Amendment Audit Lane
 
 A claim locks a fixed list of `allowedFiles`. When linked surfaces appear during

@@ -43,6 +43,12 @@ import { resolveActorWorkSession } from './actor-session.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { runAtmGit } from './git-governance.ts';
 import { quoteCliValue, relativePathFrom } from './shared.ts';
+import {
+  acquireCloseWindowStagedIndexLock,
+  assertCloseWindowStagingAllowed,
+  releaseCloseWindowStagedIndexLock,
+  type CloseWindowStagedIndexLockReport
+} from './tasks/close-window-lock.ts';
 
 type TaskflowCommitMode = 'auto-commit' | 'stage-only' | 'dry-run';
 
@@ -1187,7 +1193,14 @@ function assertCommitBundleReady(bundle: TaskflowGovernedCommitBundle) {
   }
 }
 
-function stageRepoBundle(repo: TaskflowCommitRepoBundle): TaskflowCommitRepoBundle {
+function stageRepoBundle(repo: TaskflowCommitRepoBundle, taskId?: string): TaskflowCommitRepoBundle {
+  if (repo.repoRoot && taskId) {
+    assertCloseWindowStagingAllowed({
+      cwd: repo.repoRoot,
+      taskId,
+      operation: 'taskflow close bundle staging'
+    });
+  }
   if (!repo.repoRoot || repo.stageFiles.length === 0) {
     return { ...repo, status: 'uncomputed' };
   }
@@ -1291,7 +1304,7 @@ async function commitTaskflowDeliveryFiles(input: {
     status: 'uncomputed'
   };
   const preflight = verifyRepoIndexIsolation(deliveryBundle, 'pre-stage');
-  const staged = verifyRepoIndexIsolation(stageRepoBundle(preflight), 'post-stage');
+  const staged = verifyRepoIndexIsolation(stageRepoBundle(preflight, input.taskId), 'post-stage');
   if (staged.status !== 'staged') {
     return null;
   }
@@ -1321,8 +1334,8 @@ async function finalizeTaskflowCommitBundle(input: {
   assertCommitBundleReady(input.bundle);
   const preflightTarget = verifyRepoIndexIsolation(input.bundle.targetRepo, 'pre-stage');
   const preflightPlanning = verifyRepoIndexIsolation(input.bundle.planningRepo, 'pre-stage');
-  const stagedTarget = verifyRepoIndexIsolation(stageRepoBundle(preflightTarget), 'post-stage');
-  const stagedPlanning = verifyRepoIndexIsolation(stageRepoBundle(preflightPlanning), 'post-stage');
+  const stagedTarget = verifyRepoIndexIsolation(stageRepoBundle(preflightTarget, input.taskId), 'post-stage');
+  const stagedPlanning = verifyRepoIndexIsolation(stageRepoBundle(preflightPlanning, input.taskId), 'post-stage');
   const stagedBundle: TaskflowGovernedCommitBundle = {
     ...input.bundle,
     targetRepo: stagedTarget,
@@ -1343,6 +1356,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   const actorId = parsed.options.actor ? String(parsed.options.actor) : '';
   const writeRequested = !!parsed.options.write;
   const noCommitRequested = !!parsed.options.noCommit;
+  const deferForeignStaged = parsed.options.deferForeignStaged === true;
   const commitMode: TaskflowCommitMode = writeRequested
     ? noCommitRequested ? 'stage-only' : 'auto-commit'
     : 'dry-run';
@@ -1578,6 +1592,32 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       cwd,
       planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath
     });
+    const expectedCloseWindowStageFiles = uniqueSorted([
+      ...previewCommitBundle.targetRepo.stageFiles,
+      ...previewCommitBundle.targetDeliveryFiles,
+      ...previewCommitBundle.targetGovernanceFiles
+    ]);
+    let closeWindowLock: CloseWindowStagedIndexLockReport | null = null;
+    let closeWindowLockReleased = false;
+    try {
+      closeWindowLock = acquireCloseWindowStagedIndexLock({
+        cwd,
+        taskId,
+        actorId,
+        expectedStageFiles: expectedCloseWindowStageFiles,
+        deferForeignStaged
+      });
+      if (!closeWindowLock.ok) {
+        throw new CliError(closeWindowLock.blockedCode ?? 'ATM_CLOSE_WINDOW_STAGED_INDEX_BLOCKED', closeWindowLock.blockedSummary ?? 'Close window staged-index lock could not be acquired.', {
+          exitCode: 1,
+          details: {
+            taskId,
+            actorId,
+            closeWindowLock,
+            deferForeignStagedCommand: `node atm.mjs taskflow close --task ${taskId} --actor ${quoteCliValue(actorId)} --defer-foreign-staged --write --json`
+          }
+        });
+      }
     const preCloseDeliveryCommit = await commitTaskflowDeliveryFiles({
       bundle: previewCommitBundle,
       actorId,
@@ -1607,7 +1647,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       taskId,
       previousTaskContent,
       backendEvidence: backendResult.evidence as Record<string, unknown> | undefined,
-      planningCard: planningCardSnapshot
+      planningCard: planningCardSnapshot,
+      closeWindowStagedIndexLockActive: closeWindowLock?.ok === true
     });
     const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok
       ? applyPlanningCardCloseback({
@@ -1670,6 +1711,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       ? await executeCloseWriteCommitPhase({
         cwd,
         taskId,
+        actorId,
         snapshot: rollbackSnapshot,
         commit: () => finalizeTaskflowCommitBundle({
           bundle: commitBundleInput,
@@ -1693,6 +1735,13 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         }
       };
     const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+    const releasedCloseWindowLock = releaseCloseWindowStagedIndexLock({
+      cwd,
+      taskId,
+      actorId,
+      outcome: writeOk ? 'committed' : closeWriteTransaction.phase === 'rolled_back' ? 'rolled_back' : 'aborted'
+    });
+    closeWindowLockReleased = true;
 
     return {
       ...makeResult({
@@ -1729,6 +1778,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           rosterCloseback,
           governedCommitBundle,
           closeWriteTransaction,
+          closeWindowLock,
+          releasedCloseWindowLock,
           residueDiagnosis: enrichedDiagnosis,
           closebackPathResolution,
           ...(profileData ? { profile: profileData } : {})
@@ -1737,6 +1788,16 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       schemaId: 'atm.taskflowCloseResult.v1',
       writeEnabled: true
     };
+    } finally {
+      if (closeWindowLock?.ok && !closeWindowLockReleased) {
+        releaseCloseWindowStagedIndexLock({
+          cwd,
+          taskId,
+          actorId,
+          outcome: 'aborted'
+        });
+      }
+    }
   }
 
   return {

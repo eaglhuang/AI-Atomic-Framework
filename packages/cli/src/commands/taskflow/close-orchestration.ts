@@ -13,6 +13,7 @@ import {
 } from '../tasks/surface-invariants.ts';
 import { extractFrontMatter, normalizeTaskId } from '../tasks/task-import-validators.ts';
 import { CliError, relativePathFrom } from '../shared.ts';
+import { releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.ts';
 
 export type ClosebackPlanningPathRoute =
   | 'source-plan-path'
@@ -649,6 +650,7 @@ export interface CloseWriteRollbackSnapshot {
   readonly transitionPath: string | null;
   readonly closurePacketPath: string | null;
   readonly closeCommitWindowPath: string | null;
+  readonly closeWindowStagedIndexLockActive: boolean;
   readonly planningCard: {
     readonly absolutePath: string;
     readonly previousContent: string;
@@ -690,6 +692,7 @@ export function buildCloseWriteRollbackSnapshot(input: {
   backendEvidence: Record<string, unknown> | null | undefined;
   planningCard: CloseWriteRollbackSnapshot['planningCard'];
   extraStagedArtifacts?: readonly string[];
+  closeWindowStagedIndexLockActive?: boolean;
 }): CloseWriteRollbackSnapshot {
   const evidence = input.backendEvidence ?? {};
   const stagedArtifacts = uniqueRelativePaths([
@@ -705,6 +708,7 @@ export function buildCloseWriteRollbackSnapshot(input: {
     transitionPath: typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null,
     closurePacketPath: typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null,
     closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null,
+    closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
     planningCard: input.planningCard,
     stagedArtifacts
   };
@@ -717,6 +721,7 @@ function uniqueRelativePaths(values: readonly (string | null | undefined)[]): st
 export function rollbackCloseWriteTransaction(input: {
   cwd: string;
   taskId: string;
+  actorId?: string;
   snapshot: CloseWriteRollbackSnapshot;
   failureStep: string;
   failureCode: string;
@@ -762,6 +767,18 @@ export function rollbackCloseWriteTransaction(input: {
     }
   }
 
+  if (input.snapshot.closeWindowStagedIndexLockActive) {
+    const released = releaseCloseWindowStagedIndexLock({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      actorId: input.actorId ?? 'rollback',
+      outcome: 'rolled_back'
+    });
+    if (released) {
+      rolledBackArtifacts.push('.atm/runtime/locks/close-window-staged-index.lock.json (released)');
+    }
+  }
+
   return {
     schemaId: 'atm.closeWriteTransaction.v1',
     taskId: input.taskId,
@@ -779,6 +796,7 @@ export function rollbackCloseWriteTransaction(input: {
 export async function executeCloseWriteCommitPhase<TBundle extends { failClosed?: boolean }>(input: {
   cwd: string;
   taskId: string;
+  actorId?: string;
   snapshot: CloseWriteRollbackSnapshot;
   commit: () => Promise<TBundle>;
 }): Promise<{ bundle: TBundle; transaction: CloseWriteTransactionReport }> {
@@ -790,6 +808,7 @@ export async function executeCloseWriteCommitPhase<TBundle extends { failClosed?
         transaction: rollbackCloseWriteTransaction({
           cwd: input.cwd,
           taskId: input.taskId,
+          actorId: input.actorId,
           snapshot: input.snapshot,
           failureStep: 'commit-bundle',
           failureCode: 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_FAILED',
@@ -820,6 +839,7 @@ export async function executeCloseWriteCommitPhase<TBundle extends { failClosed?
       transaction: rollbackCloseWriteTransaction({
         cwd: input.cwd,
         taskId: input.taskId,
+        actorId: input.actorId,
         snapshot: input.snapshot,
         failureStep: 'commit-bundle',
         failureCode,
