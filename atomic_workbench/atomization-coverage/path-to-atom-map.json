@@ -1264,6 +1264,27 @@
       "capability": "Team Wave Envelope: wraps a planned wave plus per-worker patch-envelope references and execution states into one coordinator record; enforces single target repo, single closure authority, and disjoint member deliverables; conforms to schemas/team-wave-envelope.schema.json (TASK-MAO-0025).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0025"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-admission.ts",
+      "atom_id": "atm.team-wave-admission-map",
+      "capability": "Team Agents Wave Mode broker admission: layers the broker logical conflict matrix over the wave planner metadata rules to admit or fail-closed each member across dependency, scope-overlap, CID-conflict, generated-artifact, closure-authority, target-repo, missing-worker-report, and missing-validator categories (TASK-MAO-0026).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0026"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",
+      "atom_id": "atm.team-wave-runtime-map",
+      "capability": "Wave Mode runtime record + dispatch surface (team wave dispatch writes a coordinator-owned wave envelope to .atm/runtime/team-waves) plus the safe/unsafe/mixed/envelope self-check run on every validate-team-agents invocation (TASK-MAO-0027).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0027"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-worker-report.ts",
+      "atom_id": "atm.team-worker-report-map",
+      "capability": "Team worker report ingestion contract: per-card worker outcome (changed files, validator runs with first failing diagnostic, deviations, execution state) with consistency validation and effective-state reconciliation that downgrades an inconsistent done claim to needs-review; conforms to schemas/team-worker-report.schema.json (TASK-MAO-0028).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0028"
     }
   ],
   "summary": {
