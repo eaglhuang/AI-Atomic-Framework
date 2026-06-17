@@ -4,12 +4,19 @@ import path from 'node:path';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { assessLieutenantEscalation, buildAtomizationChecklist, runTeam, selectTeamImplementer, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
+import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
+import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
 await main();
 
 async function main() {
+  // TASK-MAO-0027: Team Agents Wave Mode runtime self-check. Runs on every
+  // invocation so any caller of this validator also asserts wave behavior.
+  validateWaveMode();
+
   if (taskCase === 'lieutenant-escalation') {
     const lowRiskTask = {
       workItemId: 'TASK-TEAM-0008-SMALL',
@@ -586,6 +593,61 @@ async function main() {
 function getArg(flag: string): string | undefined {
   const index = process.argv.indexOf(flag);
   return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+function waveCard(over: Partial<WaveCandidateCard> & { taskId: string }): WaveCandidateCard {
+  return {
+    taskId: over.taskId,
+    dependencies: over.dependencies ?? [],
+    scopePaths: over.scopePaths ?? [`src/${over.taskId}.ts`],
+    deliverables: over.deliverables ?? [`src/${over.taskId}.ts`],
+    validators: over.validators ?? ['npm run typecheck'],
+    targetRepo: over.targetRepo ?? 'repo-x',
+    closureAuthority: over.closureAuthority ?? 'target_repo',
+    ownerAtomOrMap: over.ownerAtomOrMap ?? null
+  };
+}
+
+function validateWaveMode(): void {
+  // Safe wave: disjoint cards plan into one wave and admit fully.
+  const safePlan = planWaves({ cards: [waveCard({ taskId: 'T-A' }), waveCard({ taskId: 'T-B' })] });
+  if (safePlan.waves.length !== 1) fail('wave-mode: safe wave must plan into one wave');
+  const safe = admitWave({ members: [{ card: waveCard({ taskId: 'T-A' }) }, { card: waveCard({ taskId: 'T-B' }) }] });
+  if (!safe.ok || safe.admitted.length !== 2) fail('wave-mode: safe wave must admit all members');
+
+  // Unsafe wave: same deliverable fails closed.
+  const unsafe = admitWave({
+    members: [
+      { card: waveCard({ taskId: 'T-A', scopePaths: ['s.ts'], deliverables: ['s.ts'] }) },
+      { card: waveCard({ taskId: 'T-B', scopePaths: ['s.ts'], deliverables: ['s.ts'] }) }
+    ]
+  });
+  if (unsafe.admitted.length !== 1 || unsafe.rejected.length !== 1) {
+    fail('wave-mode: unsafe wave must reject the conflicting member');
+  }
+
+  // Mixed wave: dependency-blocked member is deferred.
+  const mixed = admitWave({
+    members: [{ card: waveCard({ taskId: 'T-A' }) }, { card: waveCard({ taskId: 'T-B', dependencies: ['T-OPEN'] }) }]
+  });
+  if (!mixed.admitted.includes('T-A') || !mixed.rejected.some((r) => r.taskId === 'T-B')) {
+    fail('wave-mode: mixed wave must admit ready and defer blocked members');
+  }
+
+  // Envelope: validates and enforces disjoint deliverables.
+  const env = createTeamWaveEnvelope({
+    coordinatorActorId: 'coordinator',
+    targetRepo: 'repo-x',
+    closureAuthority: 'target_repo',
+    waveIndex: 0,
+    members: [
+      { taskId: 'T-A', workerActorId: null, scopePaths: ['a.ts'], deliverables: ['a.ts'], patchEnvelopeId: null },
+      { taskId: 'T-B', workerActorId: null, scopePaths: ['b.ts'], deliverables: ['b.ts'], patchEnvelopeId: null }
+    ]
+  });
+  if (!validateTeamWaveEnvelope(env).ok) fail('wave-mode: clean wave envelope must validate');
+
+  console.log('[validate-team-agents] wave-mode checks ok (safe / unsafe / mixed / envelope)');
 }
 
 function safeBrokerLane(): any {
