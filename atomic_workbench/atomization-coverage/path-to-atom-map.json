@@ -1243,6 +1243,27 @@
       "capability": "emergency audit action lists protected override audit events filtered by task or lease for operator review (TASK-MAO-0037).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0037"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-planner.ts",
+      "atom_id": "atm.team-wave-planner-map",
+      "capability": "Team Agents Wave Mode candidate planner and DAG grouping: greedy ordered-wave scheduler over declared task metadata enforcing dependency, scope-overlap, same-atom write/write, target-repo, closure-authority, and generated-artifact safety rules; fails closed on unknown overlap (TASK-MAO-0024).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0024"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-wave.ts",
+      "atom_id": "atm.team-wave-planner-map",
+      "capability": "team wave plan CLI surface: reads declared task-ledger metadata and produces a wave plan via the broker wave planner, delegated from the team command (TASK-MAO-0024).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0024"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-wave-envelope.ts",
+      "atom_id": "atm.team-wave-envelope-map",
+      "capability": "Team Wave Envelope: wraps a planned wave plus per-worker patch-envelope references and execution states into one coordinator record; enforces single target repo, single closure authority, and disjoint member deliverables; conforms to schemas/team-wave-envelope.schema.json (TASK-MAO-0025).",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0025"
     }
   ],
   "summary": {

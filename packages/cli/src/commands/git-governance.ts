@@ -6,6 +6,8 @@ import { resolveActorWorkSession } from './actor-session.ts';
 import { findCloseCommitWindowCoveringPaths } from './framework-development.ts';
 import { getCanonicalAllowedFilesForTask, sanitizeTaskDirectionAllowedFiles } from './task-direction.ts';
 import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
+import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
+import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
 type TaskClaimRecord = {
@@ -280,6 +282,21 @@ function runGitCommit(options: ParsedGitOptions) {
     throw new CliError('ATM_CLI_USAGE', 'git commit requires --message <summary>.', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  const commitCommand = `node atm.mjs git commit --actor ${actorId}${options.taskId ? ` --task ${options.taskId}` : ''} --message ${quoteCliValue(options.message)}${options.noVerify ? ' --no-verify' : ''} --json`;
+  let protectedOverrideAudit: ReturnType<typeof assertEmergencyApproval> | null = null;
+  if (options.noVerify) {
+    protectedOverrideAudit = assertEmergencyApproval({
+      cwd: options.cwd,
+      surface: 'git commit --no-verify',
+      permission: 'backend.gitHookBypass',
+      taskId: options.taskId,
+      actorId,
+      emergencyApproval: options.emergencyApproval,
+      flags: ['--no-verify'],
+      reason: options.overrideReason ?? 'Governed git hook bypass for emergency recovery.',
+      command: commitCommand
+    });
+  }
   const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
   const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord);
   if (!profile.gitName || !profile.gitEmail) {
@@ -364,6 +381,7 @@ function runGitCommit(options: ParsedGitOptions) {
     '--message',
     trailers.join('\n')
   ];
+  let protectedOverrideOutcome: ReturnType<typeof recordProtectedOverrideOutcome> | null = null;
   try {
     execFileSync('git', args, {
       cwd: options.cwd,
@@ -383,6 +401,30 @@ function runGitCommit(options: ParsedGitOptions) {
       }
     });
   } catch (error) {
+    if (protectedOverrideAudit?.protectedOverrideAudit?.event?.eventId) {
+      protectedOverrideOutcome = recordProtectedOverrideOutcome({
+        cwd: options.cwd,
+        parentEventId: protectedOverrideAudit.protectedOverrideAudit.event.eventId,
+        actorId,
+        taskId: options.taskId,
+        surface: 'git commit --no-verify',
+        command: commitCommand,
+        flags: ['--no-verify'],
+        permission: 'backend.gitHookBypass',
+        leaseId: options.emergencyApproval,
+        reason: options.overrideReason ?? 'Governed git hook bypass for emergency recovery.',
+        skippedChecks: ['pre-commit-hook', 'framework-development-gates'],
+        touchedFiles: [],
+        outcome: 'failed',
+        failureCode: 'ATM_GIT_COMMIT_FAILED',
+        emergencyUsePath: protectedOverrideAudit.usePath,
+        repairCandidate: buildProtectedOverrideRepairCandidate({
+          summary: 'Git commit failed after an authorized hook bypass; fix the commit error and retry without --no-verify when hooks can pass.',
+          suggestedCommand: `node atm.mjs git commit --actor ${actorId}${options.taskId ? ` --task ${options.taskId}` : ''} --message ${quoteCliValue(options.message)} --json`,
+          deferredChecks: ['pre-commit-hook', 'framework-development-gates']
+        })
+      });
+    }
     const stderr = error instanceof Error && 'stderr' in error ? String((error as any).stderr ?? '') : '';
     const stdout = error instanceof Error && 'stdout' in error ? String((error as any).stdout ?? '') : '';
     throw new CliError('ATM_GIT_COMMIT_FAILED', 'ATM git commit wrapper failed.', {
@@ -392,8 +434,32 @@ function runGitCommit(options: ParsedGitOptions) {
         taskId: options.taskId,
         sessionId: session?.sessionId ?? null,
         stdout,
-        stderr
+        stderr,
+        protectedOverrideOutcome
       }
+    });
+  }
+  if (protectedOverrideAudit?.protectedOverrideAudit?.event?.eventId) {
+    protectedOverrideOutcome = recordProtectedOverrideOutcome({
+      cwd: options.cwd,
+      parentEventId: protectedOverrideAudit.protectedOverrideAudit.event.eventId,
+      actorId,
+      taskId: options.taskId,
+      surface: 'git commit --no-verify',
+      command: commitCommand,
+      flags: ['--no-verify'],
+      permission: 'backend.gitHookBypass',
+      leaseId: options.emergencyApproval,
+      reason: options.overrideReason ?? 'Governed git hook bypass for emergency recovery.',
+      skippedChecks: ['pre-commit-hook', 'framework-development-gates'],
+      touchedFiles: [],
+      outcome: 'succeeded',
+      emergencyUsePath: protectedOverrideAudit.usePath,
+      repairCandidate: buildProtectedOverrideRepairCandidate({
+        summary: 'Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.',
+        suggestedCommand: 'node atm.mjs doctor --json',
+        deferredChecks: ['pre-commit-hook', 'framework-development-gates']
+      })
     });
   }
   const commitSha = readHeadCommitSha(options.cwd);
@@ -415,7 +481,9 @@ function runGitCommit(options: ParsedGitOptions) {
       sessionId: session?.sessionId ?? null,
       commitSha,
       trailers,
-      git: profile
+      git: profile,
+      protectedOverrideAudit: protectedOverrideAudit?.protectedOverrideAudit ?? null,
+      protectedOverrideOutcome
     }
   });
 }
@@ -430,6 +498,8 @@ interface ParsedGitOptions {
   readonly sessionId: string | null;
   readonly message: string | null;
   readonly noVerify: boolean;
+  readonly emergencyApproval: string | null;
+  readonly overrideReason: string | null;
   readonly checkTrailers: boolean;
 }
 
@@ -444,6 +514,8 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     sessionId: null as string | null,
     message: null as string | null,
     noVerify: false,
+    emergencyApproval: null as string | null,
+    overrideReason: null as string | null,
     checkTrailers: true
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -485,6 +557,16 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     }
     if (arg === '--no-verify') {
       options.noVerify = true;
+      continue;
+    }
+    if (arg === '--emergency-approval' || arg === '--lease') {
+      options.emergencyApproval = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.overrideReason = requireValue(argv, index, '--reason');
+      index += 1;
       continue;
     }
     if (arg === '--no-trailers') {

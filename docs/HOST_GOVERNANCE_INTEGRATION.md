@@ -153,6 +153,14 @@ restore.
 recovery. It should not be documented or used as the standard historical ledger
 restore flow.
 
+Protected override audit (`TASK-MAO-0037`):
+
+- Every governed bypass writes append-only events under `.atm/history/protected-override-audit/`.
+- `node atm.mjs emergency audit --json` lists authorization, success, and failure outcomes with `failureCode` when an authorized operation still fails.
+- `node atm.mjs git commit --no-verify` requires `--emergency-approval <leaseId>` with `backend.gitHookBypass` permission; authorization records `outcome: authorized`, completion records `succeeded` or `failed`.
+- Pre-push safe mode (`ATM_FRAMEWORK_PUSH_GUARD_SAFE_MODE`) also records an audit event when actor and reason metadata are present.
+- Human approval authorizes an operation; ATM records whether the operation actually completed.
+
 When the check applies, evidence can match the latest commit in either of these
 ways:
 

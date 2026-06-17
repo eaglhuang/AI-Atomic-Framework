@@ -13,6 +13,7 @@ import {
 import { getCommandSpec } from './command-specs.ts';
 import { runTasks } from './tasks.ts';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
+import { runTeamWave } from './team-wave.ts';
 import {
   buildTeamBrokerEvidence,
   brokerLaneToFindings,
@@ -345,8 +346,13 @@ export async function runTeam(argv: string[]) {
   const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
 
+  if (action === 'wave') {
+    // TASK-MAO-0024: Team Agents Wave Mode planning surface.
+    return runTeamWave(parsed.positional.slice(1).map(String), cwd);
+  }
+
   if (!['plan', 'start', 'status', 'validate'].includes(action)) {
-    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, wave', { exitCode: 2 });
   }
 
   if (action === 'status') {

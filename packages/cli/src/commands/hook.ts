@@ -23,6 +23,10 @@ import { resolveActorWorkSession } from './actor-session.ts';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.ts';
 import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, relativePathFrom } from './shared.ts';
 import {
+  buildProtectedOverrideRepairCandidate,
+  recordProtectedOverrideAuditEvent
+} from './emergency/protected-override-audit.ts';
+import {
   diagnoseTaskDirectionLockAllowedFiles,
   isPlanningMirrorPath,
   isTaskDirectionPathCandidate,
@@ -2138,6 +2142,25 @@ function writePrePushSafeModeReport(cwd: string, input: {
     pushRefs: input.pushRefs
   };
   writeFileSync(absolutePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  recordProtectedOverrideAuditEvent({
+    cwd: root,
+    actorId: input.actorId,
+    taskId: null,
+    surface: 'hook pre-push safe-mode',
+    command: 'node atm.mjs hook pre-push --json',
+    flags: ['ATM_FRAMEWORK_PUSH_GUARD_SAFE_MODE'],
+    permission: null,
+    leaseId: null,
+    reason: input.reason,
+    skippedChecks: ['pre-push-commit-range-guard', 'git-head-evidence-range-check'],
+    touchedFiles: [relativePathFrom(root, absolutePath)],
+    outcome: 'authorized',
+    repairCandidate: buildProtectedOverrideRepairCandidate({
+      summary: 'Pre-push safe mode bypassed protected branch guard; rerun pre-push without safe mode after fixing findings.',
+      suggestedCommand: 'node atm.mjs hook pre-push --base <base> --head HEAD --json',
+      deferredChecks: ['pre-push-commit-range-guard', 'git-head-evidence-range-check']
+    })
+  });
   return relativePathFrom(root, absolutePath);
 }
 

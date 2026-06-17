@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0024",
   "title": "Wave candidate planner and DAG grouping",
-  "status": "planned",
+  "status": "running",
   "milestone": "M6",
   "dependencies": [
     "TASK-MAO-0023"
@@ -62,7 +62,55 @@
     "hash": "640b453964a1fbc1"
   },
   "importedAt": "2026-06-15T16:41:33.714Z",
-  "lastTransitionId": "2026-06-15T16-41-33-719Z-import-12c6314899ae",
-  "lastTransitionAt": "2026-06-15T16:41:33.719Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-17T04-09-15-884Z-claim-217cb4169e68",
+  "lastTransitionAt": "2026-06-17T04:09:15.884Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-code-opus-4-7",
+  "reservedAt": "2026-06-17T04:09:14.067Z",
+  "promotedAt": "2026-06-17T04:09:14.492Z",
+  "claim": {
+    "actorId": "claude-code-opus-4-7",
+    "leaseId": "lease-68a0029d91ae",
+    "claimedAt": "2026-06-17T04:09:15.849Z",
+    "heartbeatAt": "2026-06-17T04:09:15.849Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/core/src/broker/team-wave-planner.ts",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/team-wave-planner.test.ts",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-17T04:09:15.849Z",
+  "startedByActor": "claude-code-opus-4-7",
+  "startedBySessionId": "session-20260617040915-claude-code-opus-4-7-TASK-MAO-0024-c85acc1dd6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0024",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0024.*",
+      ".atm/history/task-events/TASK-MAO-0024/**",
+      ".atm/history/tasks/TASK-MAO-0024.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team-wave.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/team-wave-planner.test.ts",
+      "packages/core/src/broker/team-wave-planner.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "084fed2aead75fa18865a45cdaddb01a0d70dc587916dbfdb49156a5950f4b47",
+    "actorId": "claude-code-opus-4-7",
+    "createdAt": "2026-06-17T04:09:15.883Z",
+    "status": "active"
+  }
 }
