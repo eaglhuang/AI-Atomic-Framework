@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-TEAM-0025",
-  "updatedAt": "2026-06-17T17:31:02.311Z",
+  "updatedAt": "2026-06-17T17:33:38.650Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -276,6 +276,62 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:e348be17aab88cca55ae0420be2c91f8d90689e5428d66a1282034c3468f9b19",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "captain",
+      "sessionId": "session-20260617171421-captain-TASK-TEAM-0025-8ea46e2ac5",
+      "createdAt": "2026-06-17T17:33:38.650Z",
+      "details": {
+        "actorId": "captain",
+        "sessionId": "session-20260617171421-captain-TASK-TEAM-0025-8ea46e2ac5",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-06-17T17:33:38.717Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:78ebd27d431f50c4ea5151f620ed4fb035658eae5b1ac0bc02673de50002372a",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

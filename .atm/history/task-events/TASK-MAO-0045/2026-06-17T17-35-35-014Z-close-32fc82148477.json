@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T17-35-35-014Z-close-32fc82148477",
+  "taskId": "TASK-MAO-0045",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260617171550-cursor-gpt-5.2-TASK-MAO-0045-2596a1d7ea",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0045.json",
+  "taskSha256": "sha256:1a0c8973db76f0fc31b0408f61377aeda31c39751f6342ec2fe58c26c5f5a18d",
+  "createdAt": "2026-06-17T17:35:35.014Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0045 --actor cursor-gpt-5.2 --status done --historical-delivery bba1bf74d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617171550-cursor-gpt-5.2-TASK-MAO-0045-2596a1d7ea",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0045.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:docs-command-drift",
+      "validate:git-head-evidence",
+      "validate:neutrality"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T17:35:35.009Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0045-closeback-operator-runbook.task.md",
+        ".atm/history/evidence/TASK-MAO-0045.*",
+        ".atm/history/task-events/TASK-MAO-0045/**",
+        ".atm/history/tasks/TASK-MAO-0045.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/ATM_NEW_USER_WORKFLOW.md",
+        "docs/governance/git-governance-contract.md",
+        "docs/governance/historical-batch-evidence.md",
+        "docs/HOST_GOVERNANCE_INTEGRATION.md",
+        "packages/cli/README.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
