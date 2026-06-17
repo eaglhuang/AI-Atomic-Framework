@@ -6544,7 +6544,7 @@ export async function runTasksRosterUpdate(argv: string[]): Promise<CommandResul
   const updated = updatedLines.join('\n');
 
   if (dryRun) {
-    const afterHash = createHash('sha256').update(original).digest('hex');
+    const afterHash = createHash('sha256').update(updated).digest('hex');
     return makeResult({
       ok: true,
       command: 'tasks roster update',

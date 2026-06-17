@@ -190,6 +190,8 @@ async function assertTasksRosterUpdateContract() {
     ]);
     assert(dryRun.ok === true, 'tasks roster update dry-run must succeed');
     assert(dryRun.evidence.dryRun === true, 'tasks roster update dry-run must report dryRun=true');
+    assert(typeof dryRun.evidence.beforeHash === 'string', 'tasks roster update dry-run must report beforeHash');
+    assert(typeof dryRun.evidence.afterHash === 'string', 'tasks roster update dry-run must report afterHash');
     const afterDryRunHash = createHash('sha256').update(readFileSync(indexPath, 'utf8')).digest('hex');
     assert(beforeHash === afterDryRunHash, 'tasks roster update dry-run must not write README');
 
@@ -205,6 +207,15 @@ async function assertTasksRosterUpdateContract() {
     const updated = readFileSync(indexPath, 'utf8');
     assert(updated.includes('updated roster title'), 'tasks roster update write must refresh title cell');
     assert(updated.includes('TASK-ROSTER-0000'), 'tasks roster update write must refresh depends cell');
+
+    const writeAfterHash = createHash('sha256').update(updated).digest('hex');
+    const dryRunAfterHash = typeof dryRun.evidence.afterHash === 'string'
+      ? dryRun.evidence.afterHash.replace('sha256:', '')
+      : '';
+    const dryRunUnchanged = dryRun.evidence.unchanged === true;
+    assert(dryRunUnchanged || dryRunAfterHash === writeAfterHash, 'dry-run afterHash should match the prospective written index when updates exist');
+    assert(!dryRunUnchanged || dryRunAfterHash === beforeHash, 'dry-run afterHash should remain beforeHash when no row changes are needed');
+    assert(writeResult.evidence.afterHash === `sha256:${writeAfterHash}`, 'tasks roster update write should report final index hash');
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }

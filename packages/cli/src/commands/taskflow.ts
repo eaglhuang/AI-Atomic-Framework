@@ -162,11 +162,34 @@ async function runRosterSyncFollowUp(input: {
   command: string;
   result: Awaited<ReturnType<typeof runTasksRosterUpdate>>;
 }> {
-  const result = await runTasksRosterUpdate([
-    '--cwd', input.cwd,
-    '--index', input.indexPath,
-    '--from', input.fromPath
-  ]);
+  let result: Awaited<ReturnType<typeof runTasksRosterUpdate>> | null = null;
+  try {
+    result = await runTasksRosterUpdate([
+      '--cwd', input.cwd,
+      '--index', input.indexPath,
+      '--from', input.fromPath
+    ]);
+  } catch (error: unknown) {
+    const caught = error instanceof Error
+      ? { message: error.message, name: error.name }
+      : { message: String(error), name: 'UnknownError' };
+    result = makeResult({
+      ok: false,
+      command: 'tasks roster update',
+      cwd: input.cwd,
+      mode: 'standalone',
+      messages: [
+        message('error', 'ATM_TASK_ROSTER_SYNC_FOLLOWUP_EXCEPTION', `Roster follow-up command failed before writing: ${caught.message}`, caught)
+      ],
+      evidence: {
+        indexPath: input.indexPath,
+        fromPath: input.fromPath,
+        followUpCommand: input.command,
+        syncMode: 'follow-up-command',
+        failure: caught
+      }
+    });
+  }
   if (!result.ok) {
     input.messages.push(message(
       'warn',
