@@ -9,7 +9,7 @@ export const teamSpecCommandSurface = {
     {
       name: 'action',
       summary:
-        'Team action. Supports: plan, start, status, validate. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
+        'Team action. Supports: plan, start, status, validate, wave, knowledge. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
     }
   ],
   options: [
@@ -19,6 +19,17 @@ export const teamSpecCommandSurface = {
     { flag: '--actor', value: 'id', summary: 'Actor id for team start.' },
     { flag: '--team', value: 'id', summary: 'Team run id for status.' },
     { flag: '--compact', summary: 'Return a compact status payload.' },
+    { flag: '--scope', value: 'name', summary: 'Knowledge build scope for team knowledge build.' },
+    { flag: '--dry-run', summary: 'Run team knowledge build without writing generated runtime cache files.' },
+    { flag: '--write', summary: 'Write team knowledge generated cache files under .atm/runtime/knowledge.' },
+    { flag: '--query', value: 'text', summary: 'Literal advisory query text for team knowledge query.' },
+    { flag: '--top', value: 'n', summary: 'Maximum advisory team knowledge hits to return.' },
+    { flag: '--repo', value: 'name', summary: 'Team knowledge metadata filter.' },
+    { flag: '--channel', value: 'name', summary: 'Team knowledge metadata filter.' },
+    { flag: '--domain', value: 'name', summary: 'Team knowledge metadata filter.' },
+    { flag: '--path', value: 'glob', summary: 'Team knowledge metadata path filter.' },
+    { flag: '--atom', value: 'id', summary: 'Team knowledge metadata atom filter.' },
+    { flag: '--validator', value: 'command', summary: 'Team knowledge metadata validator filter.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -109,6 +120,15 @@ export const teamSpecNextRecommendation = {
   ]
 };
 
+export const teamSpecKnowledgeBuildQuery = {
+  summary:
+    'Advisory Team knowledge build/query surface. Build discovers canonical .atm/knowledge shards and query ranks compact hits from generated runtime cache without becoming a task gate.',
+  examples: [
+    'node atm.mjs team knowledge build --scope project --dry-run --json',
+    'node atm.mjs team knowledge query --task TASK-AAO-0005 --top 5 --json'
+  ]
+};
+
 export default defineCommandSpec({
   ...teamSpecCommandSurface,
   examples: [
@@ -121,6 +141,7 @@ export default defineCommandSpec({
     ...teamSpecPermissionValidation.examples,
     ...teamSpecClaimGateParity.examples,
     ...teamSpecRuntimeStatus.examples,
-    ...teamSpecNextRecommendation.examples
+    ...teamSpecNextRecommendation.examples,
+    ...teamSpecKnowledgeBuildQuery.examples
   ]
 });

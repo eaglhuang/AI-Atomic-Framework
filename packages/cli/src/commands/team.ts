@@ -13,6 +13,7 @@ import {
 import { getCommandSpec } from './command-specs.ts';
 import { runTasks } from './tasks.ts';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
+import { runTeamKnowledge } from './team-knowledge.ts';
 import { runTeamWave } from './team-wave.ts';
 import {
   buildTeamBrokerEvidence,
@@ -219,6 +220,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team.ts#buildTeamRecommendation',
     capability: 'Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.',
     downstreamTasks: ['TASK-TEAM-0015']
+  },
+  'team.knowledge-build-query': {
+    anchor: 'packages/cli/src/commands/team-knowledge.ts#runTeamKnowledge',
+    capability: 'Advisory Team Agents knowledge build/query dry-run surface with metadata filtering and lexical ranking.',
+    downstreamTasks: ['TASK-TEAM-0021']
   }
 } as const;
 
@@ -351,8 +357,13 @@ export async function runTeam(argv: string[]) {
     return runTeamWave(parsed.positional.slice(1).map(String), cwd);
   }
 
+  if (action === 'knowledge') {
+    const knowledgeArgv = argv[0]?.toLowerCase() === 'knowledge' ? argv.slice(1) : parsed.positional.slice(1).map(String);
+    return runTeamKnowledge(knowledgeArgv, cwd);
+  }
+
   if (!['plan', 'start', 'status', 'validate'].includes(action)) {
-    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, wave', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, wave, knowledge', { exitCode: 2 });
   }
 
   if (action === 'status') {

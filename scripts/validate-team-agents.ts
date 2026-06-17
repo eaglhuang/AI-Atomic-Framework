@@ -609,6 +609,75 @@ async function main() {
     return;
   }
 
+  if (taskCase === 'knowledge-build-query') {
+    const cwd = path.join(process.cwd(), '.atm-temp', 'validate-team-knowledge');
+    rmSync(cwd, { recursive: true, force: true });
+    mkdirSync(path.join(cwd, '.atm', 'knowledge', 'team'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'knowledge', 'team', 'routing.md'), [
+      '# Team routing knowledge',
+      'repo: AI-Atomic-Framework',
+      'channel: normal',
+      'domain: team-agents',
+      'paths: packages/cli/src/commands/team.ts, scripts/validate-team-agents.ts',
+      'atoms: team.knowledge-build-query',
+      'validators: npm run validate:cli, node --strip-types scripts/validate-team-agents.ts',
+      '',
+      'Use this advisory shard when a Team Agents task needs metadata filtering before lexical ranking.'
+    ].join('\n'), 'utf8');
+
+    try {
+      const dryRun = await runTeam(['knowledge', 'build', '--scope', 'project', '--dry-run', '--cwd', cwd, '--json']);
+      const dryEvidence = dryRun.evidence as any;
+      assert.equal(dryRun.ok, true);
+      assert.equal(dryEvidence?.action, 'knowledge.build');
+      assert.equal(dryEvidence?.advisoryOnly, true);
+      assert.equal(dryEvidence?.dryRun, true);
+      assert.equal(dryEvidence?.shardCount, 1);
+      assert.equal(existsSync(path.join(cwd, '.atm', 'runtime', 'knowledge', 'team-knowledge-index.json')), false);
+
+      const missingQuery = await runTeam(['knowledge', 'query', '--query', 'metadata filtering lexical ranking', '--top', '5', '--cwd', cwd, '--json']);
+      const missingEvidence = missingQuery.evidence as any;
+      assert.equal(missingQuery.ok, true);
+      assert.equal(missingEvidence?.indexStatus, 'missing');
+      assert.ok(missingQuery.messages.some((entry: any) => entry.code === 'ATM_TEAM_KNOWLEDGE_INDEX_MISSING'));
+      assert.ok(String(missingEvidence?.buildCommand).includes('team knowledge build'));
+
+      const writeBuild = await runTeam(['knowledge', 'build', '--scope', 'project', '--write', '--cwd', cwd, '--json']);
+      assert.equal(writeBuild.ok, true);
+      assert.equal(existsSync(path.join(cwd, '.atm', 'runtime', 'knowledge', 'team-knowledge-index.json')), true);
+
+      const query = await runTeam([
+        'knowledge',
+        'query',
+        '--query',
+        'metadata filtering lexical ranking',
+        '--domain',
+        'team-agents',
+        '--atom',
+        'team.knowledge-build-query',
+        '--top',
+        '5',
+        '--cwd',
+        cwd,
+        '--json'
+      ]);
+      const queryEvidence = query.evidence as any;
+      assert.equal(query.ok, true);
+      assert.equal(queryEvidence?.action, 'knowledge.query');
+      assert.equal(queryEvidence?.advisoryOnly, true);
+      assert.equal(queryEvidence?.indexStatus, 'ready');
+      assert.equal(queryEvidence?.hits?.length, 1);
+      assert.equal(queryEvidence?.hits?.[0]?.path, '.atm/knowledge/team/routing.md');
+      assert.equal(typeof queryEvidence?.hits?.[0]?.snippet, 'string');
+      assert.equal(Object.hasOwn(queryEvidence.hits[0], 'searchText'), false);
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+
+    console.log('[validate-team-agents] ok (knowledge-build-query)');
+    return;
+  }
+
   fail(`unsupported or missing --case value: ${taskCase}`);
 }
 

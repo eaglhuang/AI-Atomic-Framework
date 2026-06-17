@@ -303,6 +303,13 @@ assert(taskflowUsageText.includes('writeReadinessHint'), 'taskflow --help must r
 assert(taskflowUsageText.includes('low-level template generator surface'), 'taskflow --help must label tasks new as a low-level template generator surface');
 assert(taskflowUsageText.includes('runtime synchronization surface'), 'taskflow --help must label tasks import as a runtime synchronization (backend) surface');
 
+const teamHelp = await runAtm(['team', '--help'], root);
+const teamUsageText = JSON.stringify(teamHelp.parsed.evidence?.usage ?? {});
+assert(teamUsageText.includes('knowledge'), 'team --help must list the team knowledge action');
+assert(teamUsageText.includes('team knowledge build'), 'team --help examples must show team knowledge build usage');
+assert(teamUsageText.includes('team knowledge query'), 'team --help examples must show team knowledge query usage');
+assert(teamUsageText.includes('--dry-run'), 'team --help must document advisory knowledge dry-run');
+
 const lifecycleStateTest = spawnSync(
   process.execPath,
   ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts')],
