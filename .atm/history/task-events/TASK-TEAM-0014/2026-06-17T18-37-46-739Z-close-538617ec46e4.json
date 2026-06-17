@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T18-37-46-739Z-close-538617ec46e4",
+  "taskId": "TASK-TEAM-0014",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260617182755-captain-TASK-TEAM-0014-0ef3ec861c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0014.json",
+  "taskSha256": "sha256:98356a817d5e65a0c8118b71ce50e10dc911766a5900b8a5b12d51aec980744c",
+  "createdAt": "2026-06-17T18:37:46.739Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0014 --actor captain --status done --historical-delivery e09dad80fd3e378dd3cefbeb9d342b068dc53232",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617182755-captain-TASK-TEAM-0014-0ef3ec861c",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0014.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node atm.mjs team patrol --task TASK-TEAM-0014 --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T18:37:46.736Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0014-atomic-police-patrol-reports.task.md",
+        ".atm/history/evidence/TASK-TEAM-0014.*",
+        ".atm/history/task-events/TASK-TEAM-0014/**",
+        ".atm/history/tasks/TASK-TEAM-0014.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
