@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T06-20-35-267Z-close-85f92dd44ecf",
+  "taskId": "TASK-CID-0094",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618061536-captain-TASK-CID-0094-3de49ba22a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0094.json",
+  "taskSha256": "sha256:125fd27c057c19d4e384a27218801e7a6ddc11c5707e6876c2bfd6106720ce53",
+  "createdAt": "2026-06-18T06:20:35.267Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0094 --actor captain --status done --historical-delivery 31fd89ff0b359edf8641e0a6c11d4449c11a9ca8 --historical-delivery ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618061536-captain-TASK-CID-0094-3de49ba22a",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0094.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T06:20:35.263Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0094-path-to-atom-map-domain-adapter.task.md",
+        ".atm/history/evidence/TASK-CID-0094.*",
+        ".atm/history/task-events/TASK-CID-0094/**",
+        ".atm/history/tasks/TASK-CID-0094.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+        "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+        "packages/core/src/broker/adapters/atom-map.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
