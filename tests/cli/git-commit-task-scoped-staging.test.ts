@@ -89,6 +89,42 @@ try {
   runGit(tempDir, ['add', '.atm']);
   runGit(tempDir, ['commit', '-m', 'chore: bootstrap staging fixture']);
 
+  const importedTaskId = 'TASK-OPEN-0001';
+  writeJson(path.join(tempDir, '.atm/history/tasks', `${importedTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: importedTaskId,
+    title: 'imported planned task fixture',
+    status: 'planned',
+    source: {
+      planPath: 'docs/tasks/TASK-OPEN-0001.task.md',
+      sectionTitle: importedTaskId,
+      headingLine: 1,
+      hash: 'imported-planned-task-fixture'
+    }
+  });
+  writeJson(path.join(tempDir, '.atm/history/task-events', importedTaskId, '2026-06-18T00-00-00-000Z-import-fixture.json'), {
+    schemaId: 'atm.taskTransition.v1',
+    taskId: importedTaskId,
+    transitionId: '2026-06-18T00-00-00-000Z-import-fixture',
+    action: 'import',
+    actorId: 'fixture-agent',
+    createdAt: '2026-06-18T00:00:00.000Z',
+    fromStatus: null,
+    toStatus: 'planned',
+    command: 'node atm.mjs tasks import --from docs/tasks/TASK-OPEN-0001.task.md --write --json'
+  });
+  runGit(tempDir, ['add', `.atm/history/tasks/${importedTaskId}.json`, `.atm/history/task-events/${importedTaskId}`]);
+  const importCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', importedTaskId,
+    '--message', 'chore(task): import planned task fixture',
+    '--json'
+  ]);
+  assert.equal(importCommit.ok, true, 'ATM git wrapper must commit task import bundles without claiming the new planned task');
+  assert.equal(typeof importCommit.evidence?.commitSha, 'string');
+
   const unstagedCommit = expectCliError(
     runAtmGit([
       'commit',

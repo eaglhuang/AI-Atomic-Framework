@@ -29,6 +29,7 @@ export default defineCommandSpec({
     { flag: '--delivery-commit', value: 'commit', summary: 'Alias for --historical-delivery on taskflow close.' },
     { flag: '--historical-batch', value: 'batchId-or-path', summary: 'For taskflow close: consume a task slice produced by evidence historical-batch, reuse its matched delivery commits, and treat the slice as the operator close-readiness source.' },
     { flag: '--waiver-out-of-scope-delivery', summary: 'For taskflow close with historical delivery or historical batch: allow a multi-task delivery commit when this task slice has matched deliverables; requires --reason.' },
+    { flag: '--waive-out-of-scope', summary: 'Alias for --waiver-out-of-scope-delivery.' },
     { flag: '--defer-foreign-staged', summary: 'For taskflow close --write: snapshot and unstage foreign task governance files in the index before acquiring the close-window staged-index lock.' },
     { flag: '--auto-evidence', summary: 'For taskflow close --write: auto-run missing task-card declared validators through evidence run before backend close. Dry-run and pre-close always expose autoEvidencePlan when --actor is supplied; --validators on evidence run remains an override for extra evidence.' },
     { flag: '--reason', value: 'text', summary: 'Required explanation for --waiver-out-of-scope-delivery.' },

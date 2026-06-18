@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0143",
+  "title": "Close absorbs regenerable artifacts and correct planning mirror edits",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0141"
+  ],
+  "acceptance": [
+    "Same-task bundle manifests generated during evidence/close preparation do not block close as ordinary dirty files.",
+    "Correct planning mirror edits are detected as matching the closeback result and can be included in the final governed bundle.",
+    "Incorrect planning mirror edits remain blockers with a clear remediation command.",
+    "Foreign staged task bundles remain first-class blockers unless the operator explicitly uses the defer protocol."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+    "packages/cli/src/commands/tasks/lifecycle-state.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+    "packages/cli/src/commands/tasks/__tests__/planning-mirror-close-diagnostics.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/tasks/planning-mirror-close-diagnostics.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+    "packages/cli/src/commands/tasks/__tests__/planning-mirror-close-diagnostics.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+    "git diff --check"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Allowing arbitrary dirty planning files to bypass close checks.",
+    "Making taskflow close ignore task ledger or evidence JSON corruption."
+  ],
+  "nonGoals": [
+    "Do not remove dirty-tree checks. Only classify close-owned transient files and correct same-task mirror edits more precisely."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "contextMap": {
+    "primary": [],
+    "tests": []
+  },
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-close-map",
+    "mapUpdates": [
+      "path_pattern: \"packages/cli/src/commands/taskflow/**"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0143-close-absorbs-regenerable-artifacts-and-correct-planning-mirror-edits.task.md",
+    "sectionTitle": "TASK-AAO-0143",
+    "headingLine": 59,
+    "hash": "16c57589bd967536"
+  },
+  "importedAt": "2026-06-18T06:50:06.713Z",
+  "lastTransitionId": "2026-06-18T06-50-59-719Z-claim-4c811bd89e9c",
+  "lastTransitionAt": "2026-06-18T06:50:59.719Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-18T06:50:58.536Z",
+  "promotedAt": "2026-06-18T06:50:59.125Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-809cfbcfb167",
+    "claimedAt": "2026-06-18T06:50:59.681Z",
+    "heartbeatAt": "2026-06-18T06:50:59.681Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0143.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T06:50:59.681Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260618065059-cursor-gpt-5.2-TASK-AAO-0143-3eb2204098",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0143",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0143.*",
+      ".atm/history/task-events/TASK-AAO-0143/**",
+      ".atm/history/tasks/TASK-AAO-0143.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "eb5259baf1657f18a41a9afa228a0e5179bdd8811346f0a8ef267035282c80d3",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-18T06:50:59.719Z",
+    "status": "active"
+  }
+}

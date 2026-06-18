@@ -551,7 +551,7 @@ function collectHistoricalBatchRef(parsed: ReturnType<typeof parseArgsForCommand
 }
 
 function collectWaiverOutOfScopeDelivery(parsed: ReturnType<typeof parseArgsForCommand>) {
-  const waiverOutOfScopeDelivery = parsed.options.waiverOutOfScopeDelivery === true;
+  const waiverOutOfScopeDelivery = parsed.options.waiverOutOfScopeDelivery === true || parsed.options.waiveOutOfScope === true;
   const reason = typeof parsed.options.reason === 'string' && parsed.options.reason.trim()
     ? parsed.options.reason.trim()
     : null;

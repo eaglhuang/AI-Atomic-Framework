@@ -1531,4 +1531,18 @@ const closeDryRunMixed = await runTaskflow([
 assert.equal(closeDryRunMixed.evidence.historicalClosePreflight.schemaId, 'atm.historicalClosePreflight.v1');
 assert.ok(closeDryRunMixed.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT'));
 
+const closeDryRunMixedWithWaiverAlias = await runTaskflow([
+  'close',
+  '--cwd', outOfScopeFixture.targetRepo,
+  '--profile', outOfScopeFixture.profilePath,
+  '--task', outOfScopeFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', deliveryCommitSha,
+  '--waive-out-of-scope',
+  '--reason', 'approved alias waiver for testing',
+  '--json'
+]) as any;
+assert.equal(closeDryRunMixedWithWaiverAlias.ok, true, 'taskflow close must accept --waive-out-of-scope as a waiver alias');
+assert.equal(closeDryRunMixedWithWaiverAlias.evidence.closebackPlan.waiverOutOfScopeDelivery, true);
+
 console.log('[taskflow-dryrun:test] ok');

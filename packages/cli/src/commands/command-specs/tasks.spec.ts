@@ -50,6 +50,7 @@ export default defineCommandSpec({
     { flag: '--historical-batch', value: 'batchId-or-path', summary: 'For tasks close done: consume an evidence historical-batch task slice and derive the matched delivery commits plus close-readiness verdict.' },
     { flag: '--historical-delivery-repo', value: 'path', summary: 'For planning-repo authority closeback, verify --historical-delivery against this repo root instead of the target repo.' },
     { flag: '--waiver-out-of-scope-delivery', summary: 'Allow historical delivery when the commit also contains unrelated source files; requires --reason.' },
+    { flag: '--waive-out-of-scope', summary: 'Alias for --waiver-out-of-scope-delivery.' },
     { flag: '--scope', value: 'taskId', summary: 'For tasks repair-closure, limit dirty-tree blocking to files overlapping the scoped task claim/direction lock/deliverables; unrelated dirty files become warnings.' },
     { flag: '--amend', summary: 'For tasks repair-closure, explicitly request HEAD rewrite after staging the repaired packet. ATM fails safely when no amend-capable governed wrapper is available.' },
     { flag: '--no-amend', summary: 'Compatibility alias for the default stage-only tasks repair-closure flow.' },

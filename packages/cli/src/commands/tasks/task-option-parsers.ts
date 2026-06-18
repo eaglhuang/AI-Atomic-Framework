@@ -98,7 +98,7 @@ export function parseReconcileOptions(argv: string[]) {
       index += 1;
       continue;
     }
-    if (arg === '--waiver-out-of-scope-delivery') {
+    if (arg === '--waiver-out-of-scope-delivery' || arg === '--waive-out-of-scope') {
       options.waiverOutOfScopeDelivery = true;
       continue;
     }
@@ -558,7 +558,7 @@ export function parseCloseOptions(argv: string[]) {
       index += 1;
       continue;
     }
-    if (arg === '--waiver-out-of-scope-delivery') {
+    if (arg === '--waiver-out-of-scope-delivery' || arg === '--waive-out-of-scope') {
       options.waiverOutOfScopeDelivery = true;
       continue;
     }

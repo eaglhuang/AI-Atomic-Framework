@@ -855,7 +855,6 @@ function inspectMirrorSyncOnlyStagedArtifacts(cwd: string, taskId: string): Mirr
   const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
   let hasTaskLedger = false;
   let hasImportEvent = false;
-  let hasImportReport = false;
   for (const file of stagedFiles) {
     const normalized = normalizeRelativePath(file);
     const lower = normalized.toLowerCase();
@@ -868,14 +867,12 @@ function inspectMirrorSyncOnlyStagedArtifacts(cwd: string, taskId: string): Mirr
       continue;
     }
     if (lower.startsWith('.atm/history/reports/task-import/') && lower.endsWith('.json') && taskImportReportReferencesTask(cwd, normalized, taskId)) {
-      hasImportReport = true;
       continue;
     }
     return { ok: false, taskId, stagedFiles, reason: `unexpected-staged-file:${normalized}` };
   }
   if (!hasTaskLedger) return { ok: false, taskId, stagedFiles, reason: 'missing-task-ledger' };
   if (!hasImportEvent) return { ok: false, taskId, stagedFiles, reason: 'missing-import-event' };
-  if (!hasImportReport) return { ok: false, taskId, stagedFiles, reason: 'missing-task-import-report' };
   return { ok: true, taskId, stagedFiles, reason: null };
 }
 
@@ -1017,6 +1014,7 @@ function isAllowedGovernanceArtifactPath(filePath: string, taskId: string): bool
   const lower = normalized.toLowerCase();
   if (lower === `.atm/history/tasks/${normalizedTaskId}.json`) return true;
   if (lower === `.atm/history/evidence/${normalizedTaskId}.json`) return true;
+  if (lower === `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`) return true;
   if (lower === `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`) return true;
   if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json')) return true;
   return isIgnorableCommitStagingSideEffect(normalized, taskId);
