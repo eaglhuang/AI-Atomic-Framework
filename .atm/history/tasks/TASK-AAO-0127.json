@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0127",
+  "title": "frozen runner alignment after TASK-AAO-0126",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0126"
+  ],
+  "acceptance": [
+    "The framework build completes successfully in AI-Atomic-Framework.",
+    "The stable runner route for this card no longer reports a stale runner notice.",
+    "Target-repo diff contains only declared onefile runner outputs.",
+    "No source command surfaces, task lifecycle source surfaces, runtime noise, or TEAM mirror/import residue are staged or committed."
+  ],
+  "deliverables": [
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json"
+  ],
+  "scopePaths": [
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "packages/cli/src/**",
+    "packages/core/src/**",
+    "scripts/**",
+    "scratch/**",
+    ".playwright-mcp/**"
+  ],
+  "nonGoals": [
+    "Do not modify framework source in this card.",
+    "Do not repair or rewrite old closure packets.",
+    "Do not include TEAM mirror/import residue."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0127-frozen-runner-alignment-after-task-aao-0126.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "TASK-AAO-0126 fixed the deliverable gate so declared runner release outputs can count as real task deliverables. Because that card changed framework TypeScript source, the frozen runner must be rebuilt in a separate card.\n\nTASK-AAO-0125 proved the runner-sync lane shape: source changes and runner outputs stay in different task cards, and the target-repo delivery commit should contain only scoped runner output files.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0127-frozen-runner-alignment-after-task-aao-0126.task.md",
+    "sectionTitle": "TASK-AAO-0127",
+    "headingLine": 56,
+    "hash": "4ec38b7fb4a562eb"
+  },
+  "importedAt": "2026-06-18T16:04:28.614Z",
+  "lastTransitionId": "2026-06-18T16-17-56-549Z-close-06f4b18ea498",
+  "lastTransitionAt": "2026-06-18T16:17:56.549Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-18T16:04:29.199Z",
+  "promotedAt": "2026-06-18T16:04:29.799Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-3b8681a394a4",
+    "claimedAt": "2026-06-18T16:11:46.762Z",
+    "heartbeatAt": "2026-06-18T16:17:56.545Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0127.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-18T16:11:46.762Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260618161146-cursor-gpt-5.2-TASK-AAO-0127-bf6cc50e6d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0127",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0127.*",
+      ".atm/history/task-events/TASK-AAO-0127/**",
+      ".atm/history/tasks/TASK-AAO-0127.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9d654ea18c43eb793a0013ff3a1cd9adb6953e2705ef7554688e8cb469f67446",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-18T16:11:49.601Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-18T16:17:56.546Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260618161146-cursor-gpt-5.2-TASK-AAO-0127-bf6cc50e6d",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0127.closure-packet.json"
+}
