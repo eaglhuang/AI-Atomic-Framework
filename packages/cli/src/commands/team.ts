@@ -21,6 +21,10 @@ import {
   evaluateTeamBrokerLane
 } from '../../../core/src/broker/team-lane.ts';
 import type { TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
+import {
+  resolveNodejsTeamWorkerAdapter,
+  type TeamWorkerAdapterContract
+} from '../../../core/src/team-runtime/nodejs-worker-adapter.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -195,6 +199,7 @@ type TeamRuntimeContract = {
   agentsSpawned: boolean;
   executionSurface: 'agent-runtime' | 'editor-subagent' | 'broker-governance';
   selectionReason: string;
+  workerAdapter: TeamWorkerAdapterContract;
   artifactHandoff: TeamArtifactHandoffContract;
   retryBudget: TeamRetryBudgetContract;
   editorSubagentBridge: TeamEditorSubagentBridgeContract;
@@ -735,24 +740,29 @@ export function buildTeamRuntimeContract(input: {
   const sdkId = normalizeOptionalRuntimeString(input.sdkId);
   const modelId = normalizeOptionalRuntimeString(input.modelId);
   const editorBridgeDisabled = Boolean(input.editorBridgeDisabled);
-  const agentsSpawned = runtimeMode !== 'broker-only';
-  const executionSurface = runtimeMode === 'real-agent'
-    ? 'agent-runtime'
-    : runtimeMode === 'editor-subagent'
-      ? 'editor-subagent'
-      : 'broker-governance';
-
-  return {
-    schemaId: 'atm.teamRuntimeContract.v1',
+  const workerAdapter = resolveNodejsTeamWorkerAdapter({
     runtimeMode,
     runtimeLanguage,
     runtimeAdapterId,
     providerId,
     sdkId,
-    modelId,
+    modelId
+  });
+  const agentsSpawned = workerAdapter.agentsSpawned;
+  const executionSurface = workerAdapter.executionSurface;
+
+  return {
+    schemaId: 'atm.teamRuntimeContract.v1',
+    runtimeMode,
+    runtimeLanguage,
+    runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId,
+    providerId: providerId ?? workerAdapter.providerId,
+    sdkId: sdkId ?? workerAdapter.sdkId,
+    modelId: modelId ?? workerAdapter.modelId,
     agentsSpawned,
     executionSurface,
-    selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId }),
+    selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId }),
+    workerAdapter,
     artifactHandoff: buildTeamArtifactHandoffContract({
       recipe: input.recipe,
       requiredRoles: ['implementer', 'reviewer', 'validator', 'evidence-collector'],

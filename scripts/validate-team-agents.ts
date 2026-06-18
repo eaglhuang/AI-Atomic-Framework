@@ -5,6 +5,7 @@ import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence } from '../packages/cli/src/commands/evidence.ts';
 import { assessLieutenantEscalation, buildAtomizationChecklist, buildTeamArtifactHandoffContract, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
 import {
   validateScopeLeaseEpoch,
   validateScopeLeaseFencing,
@@ -907,6 +908,55 @@ async function main() {
     assert.ok(implementerEnvelope.artifactMetadata.producesTo.includes('validator'));
 
     console.log('[validate-team-agents] ok (artifact-handoff-retry)');
+    return;
+  }
+
+  if (taskCase === 'nodejs-worker-adapter') {
+    const nodeAdapter = resolveNodejsTeamWorkerAdapter({
+      runtimeMode: 'real-agent',
+      runtimeLanguage: 'node',
+      providerId: 'local',
+      sdkId: 'nodejs-reference',
+      modelId: 'fixture-model'
+    });
+    assert.equal(nodeAdapter.schemaId, 'atm.teamWorkerAdapterContract.v1');
+    assert.equal(nodeAdapter.adapterId, 'atm.node.reference-worker');
+    assert.equal(nodeAdapter.executionSurface, 'agent-runtime');
+    assert.equal(nodeAdapter.spawnStrategy, 'spawn-worker');
+    assert.equal(nodeAdapter.agentsSpawned, true);
+    assert.equal(nodeAdapter.vendorNeutral, true);
+    assert.equal(nodeAdapter.artifactContractPreserved, true);
+    assert.equal(nodeAdapter.retryContractPreserved, true);
+
+    const brokerFallback = resolveNodejsTeamWorkerAdapter({ runtimeMode: 'broker-only' });
+    assert.equal(brokerFallback.adapterId, 'atm.node.broker-only-fallback');
+    assert.equal(brokerFallback.executionSurface, 'broker-governance');
+    assert.equal(brokerFallback.spawnStrategy, 'disabled');
+    assert.equal(brokerFallback.agentsSpawned, false);
+    assert.equal(brokerFallback.brokerFallback.enabled, true);
+    for (const preserved of ['broker', 'permission-leases', 'validators', 'police', 'evidence', 'artifact-contract', 'retry-contract']) {
+      assert.ok(brokerFallback.brokerFallback.preservesGovernance.includes(preserved), `broker fallback must preserve ${preserved}`);
+    }
+
+    const realRuntime = buildTeamRuntimeContract({ runtimeMode: 'real-agent', runtimeLanguage: 'node' });
+    assert.equal(realRuntime.runtimeAdapterId, 'atm.node.reference-worker');
+    assert.equal(realRuntime.providerId, 'local');
+    assert.equal(realRuntime.sdkId, 'nodejs');
+    assert.equal(realRuntime.modelId, 'provider-selected');
+    assert.equal(realRuntime.workerAdapter.adapterId, 'atm.node.reference-worker');
+    assert.equal(realRuntime.agentsSpawned, true);
+    assert.equal(realRuntime.artifactHandoff.schemaId, 'atm.teamArtifactHandoffContract.v1');
+    assert.equal(realRuntime.retryBudget.schemaId, 'atm.teamRetryBudgetContract.v1');
+
+    const brokerRuntime = buildTeamRuntimeContract({ runtimeMode: 'broker-only' });
+    assert.equal(brokerRuntime.runtimeAdapterId, 'atm.node.broker-only-fallback');
+    assert.equal(brokerRuntime.workerAdapter.brokerFallback.enabled, true);
+    assert.equal(brokerRuntime.agentsSpawned, false);
+    assert.equal(brokerRuntime.executionSurface, 'broker-governance');
+    assert.equal(brokerRuntime.artifactHandoff.schemaId, realRuntime.artifactHandoff.schemaId);
+    assert.equal(brokerRuntime.retryBudget.schemaId, realRuntime.retryBudget.schemaId);
+
+    console.log('[validate-team-agents] ok (nodejs-worker-adapter)');
     return;
   }
 
