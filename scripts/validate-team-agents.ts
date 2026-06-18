@@ -4,6 +4,12 @@ import path from 'node:path';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { assessLieutenantEscalation, buildAtomizationChecklist, runTeam, selectTeamImplementer, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import {
+  validateScopeLeaseEpoch,
+  validateScopeLeaseFencing,
+  type ScopeLeaseRegistryEntry,
+  type ScopeLeaseRunMode
+} from '../packages/core/src/governance/scope-lock.ts';
 import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
@@ -389,6 +395,83 @@ async function main() {
     assert.ok(evidence?.suggestedPermissionLeases?.some((lease: any) => lease.permission === 'file.write'));
 
     console.log('[validate-team-agents] ok (file-write-scope)');
+    return;
+  }
+
+  if (taskCase === 'fencing-deadlock') {
+    const runModes: ScopeLeaseRunMode[] = ['real-agent', 'editor-subagent', 'broker-only'];
+    for (const runMode of runModes) {
+      const duplicateOwner = validateScopeLeaseFencing([
+        scopeLease({ leaseId: `${runMode}-a`, runMode, owner: { instanceId: 'agent-a', worktreeId: 'wt-a' } }),
+        scopeLease({ leaseId: `${runMode}-b`, runMode, owner: { instanceId: 'agent-b', worktreeId: 'wt-b' } })
+      ]);
+      assert.equal(duplicateOwner.ok, false);
+      assert.ok(duplicateOwner.findings.some((finding) => finding.code === 'ATM_SCOPE_LEASE_DUPLICATE_EXCLUSIVE_OWNER'));
+
+      const staleEpoch = validateScopeLeaseEpoch({
+        leaseId: `${runMode}-epoch`,
+        runMode,
+        expectedEpoch: 20,
+        actualEpoch: 19
+      });
+      assert.equal(staleEpoch.ok, false);
+      const staleFinding = staleEpoch.findings.find((finding) => finding.code === 'ATM_SCOPE_LEASE_STALE_EPOCH');
+      assert.equal(staleFinding?.expectedEpoch, 20);
+      assert.equal(staleFinding?.actualEpoch, 19);
+
+      const cycle = validateScopeLeaseFencing([
+        scopeLease({ leaseId: `${runMode}-cycle-a`, runMode, resourceKey: 'src/a.ts', waitsFor: [`${runMode}-cycle-b`] }),
+        scopeLease({ leaseId: `${runMode}-cycle-b`, runMode, resourceKey: 'src/b.ts', waitsFor: [`${runMode}-cycle-a`] })
+      ]);
+      assert.equal(cycle.ok, false);
+      assert.ok(cycle.findings.some((finding) => finding.code === 'ATM_SCOPE_LEASE_WAIT_FOR_CYCLE'));
+
+      const tombstone = validateScopeLeaseFencing([
+        scopeLease({ leaseId: `${runMode}-released`, runMode, status: 'released', leaseEpoch: 10 }),
+        scopeLease({ leaseId: `${runMode}-reacquire`, runMode, leaseEpoch: 10 })
+      ]);
+      assert.equal(tombstone.ok, false);
+      assert.ok(tombstone.findings.some((finding) => finding.code === 'ATM_SCOPE_LEASE_TOMBSTONE_REACQUIRE'));
+    }
+
+    const acyclic = validateScopeLeaseFencing([
+      scopeLease({ leaseId: 'acyclic-a', resourceKey: 'src/a.ts', waitsFor: ['acyclic-b'] }),
+      scopeLease({ leaseId: 'acyclic-b', resourceKey: 'src/b.ts' })
+    ]);
+    assert.equal(acyclic.ok, true);
+
+    const outsideAllowedFiles = validateScopeLeaseFencing([
+      scopeLease({
+        leaseId: 'outside-scope',
+        allowedFiles: ['packages/cli/src/commands/team.ts'],
+        writeSet: ['packages/cli/src/commands/next.ts']
+      })
+    ]);
+    assert.equal(outsideAllowedFiles.ok, false);
+    assert.ok(outsideAllowedFiles.findings.some((finding) => finding.code === 'ATM_SCOPE_LEASE_ALLOWED_FILES_VIOLATION'));
+
+    console.log('[validate-team-agents] ok (fencing-deadlock)');
+    return;
+  }
+
+  if (taskCase === 'active-resource-index-readonly') {
+    const beforeStatus = await runTeam(['status', '--compact', '--cwd', process.cwd(), '--json']);
+    const beforeEvidence = beforeStatus.evidence as any;
+    const plan = await runTeam(['plan', '--task', 'TASK-TEAM-0018', '--cwd', process.cwd(), '--json']);
+    const validate = await runTeam(['validate', '--task', 'TASK-TEAM-0018', '--cwd', process.cwd(), '--json']);
+    const afterStatus = await runTeam(['status', '--compact', '--cwd', process.cwd(), '--json']);
+    const afterEvidence = afterStatus.evidence as any;
+
+    assert.equal(plan.ok, true);
+    assert.equal(validate.ok, true);
+    assert.equal(beforeEvidence?.teamRunCount, afterEvidence?.teamRunCount);
+    assert.equal((plan.evidence as any)?.runtimeWritten, false);
+    assert.equal((validate.evidence as any)?.runtimeWritten, false);
+    assert.equal((plan.evidence as any)?.agentsSpawned, false);
+    assert.equal((validate.evidence as any)?.agentsSpawned, false);
+    assert.equal((plan.evidence as any)?.teamPlan?.brokerLane?.safeToStart, true);
+
+    console.log('[validate-team-agents] ok (active-resource-index-readonly)');
     return;
   }
 
@@ -954,6 +1037,22 @@ function waveCard(over: Partial<WaveCandidateCard> & { taskId: string }): WaveCa
     targetRepo: over.targetRepo ?? 'repo-x',
     closureAuthority: over.closureAuthority ?? 'target_repo',
     ownerAtomOrMap: over.ownerAtomOrMap ?? null
+  };
+}
+
+function scopeLease(over: Partial<ScopeLeaseRegistryEntry> & { leaseId: string }): ScopeLeaseRegistryEntry {
+  return {
+    leaseId: over.leaseId,
+    taskId: over.taskId ?? 'TASK-TEAM-0018',
+    resourceKey: over.resourceKey ?? 'packages/cli/src/commands/team.ts',
+    owner: over.owner ?? { instanceId: 'agent-a', worktreeId: 'wt-a' },
+    runMode: over.runMode ?? 'real-agent',
+    leaseEpoch: over.leaseEpoch ?? 1,
+    status: over.status ?? 'active',
+    allowedFiles: over.allowedFiles ?? ['packages/cli/src/commands/team.ts'],
+    writeSet: over.writeSet ?? ['packages/cli/src/commands/team.ts'],
+    ...(over.waitsFor ? { waitsFor: over.waitsFor } : {}),
+    ...(over.releasedAt ? { releasedAt: over.releasedAt } : {})
   };
 }
 

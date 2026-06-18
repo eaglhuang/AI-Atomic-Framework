@@ -76,6 +76,15 @@ export const teamSpecPermissionValidation = {
   ]
 };
 
+export const teamSpecLeaseFencing = {
+  summary:
+    'Team lease fencing and deadlock contract diagnostics cover duplicate exclusive owners, stale lease epochs, wait-for cycles, released tombstones, and allowedFiles write boundaries across real-agent, editor-subagent, and broker-only runs.',
+  examples: [
+    'node --strip-types scripts/validate-team-agents.ts --case fencing-deadlock',
+    'node --strip-types scripts/validate-team-agents.ts --case active-resource-index-readonly'
+  ]
+};
+
 export const teamSpecBrokerLane = {
   summary:
     'Plan and start evaluate broker lanes; blocked CID conflicts fail closed before a run starts, and broker verdicts outrank Coordinator decisions inside broker-governed conflict domains (team.plan-broker-lane).',
@@ -150,6 +159,7 @@ export default defineCommandSpec({
     ...teamSpecCaptainDecision.examples,
     ...teamSpecLieutenantEscalation.examples,
     ...teamSpecPermissionValidation.examples,
+    ...teamSpecLeaseFencing.examples,
     ...teamSpecClaimGateParity.examples,
     ...teamSpecRuntimeStatus.examples,
     ...teamSpecPatrolReport.examples,

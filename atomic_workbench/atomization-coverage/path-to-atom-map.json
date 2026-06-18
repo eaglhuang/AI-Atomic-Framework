@@ -299,6 +299,13 @@
       "source_task": "TASK-TEAM-0027"
     },
     {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecLeaseFencing",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Command-spec examples for Team lease fencing and deadlock diagnostics validators.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecRuntimeStatus",
       "atom_id": "team.spec.runtime-status",
       "capability": "Command-spec examples for read-only team run status.",
@@ -1446,6 +1453,48 @@
       "capability": "Team Agents Wave Mode broker admission: layers the broker logical conflict matrix over the wave planner metadata rules to admit or fail-closed each member across dependency, scope-overlap, CID-conflict, generated-artifact, closure-authority, target-repo, missing-worker-report, and missing-validator categories (TASK-MAO-0026).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0026"
+    },
+    {
+      "path_pattern": "packages/core/src/governance/scope-lock.ts#validateScopeLeaseFencing",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Pure Team lease fencing diagnostics for duplicate exclusive owners, tombstone stale reacquire attempts, allowedFiles write violations, and wait-for graph cycles.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "packages/core/src/governance/scope-lock.ts#validateScopeLeaseEpoch",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Stale epoch release or transfer guard returning expected and actual epoch diagnostics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "packages/plugin-governance-local/src/stores.ts#acquireLock",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Local governance scope lock acquisition stamps leaseEpoch for Team fencing diagnostics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "packages/plugin-governance-local/src/stores.ts#releaseLock",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Local governance scope lock release records tombstone status and releaseEpoch so stale runs cannot silently reacquire ownership.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#fencing-deadlock",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Validator case proving duplicate owners, stale epochs, wait-for cycles, tombstone reacquire prevention, allowedFiles violations, and real-agent/editor-subagent/broker-only diagnostics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#active-resource-index-readonly",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Validator case proving Team plan/validate consume Active Resource Index and Scope Lease Registry read-only without promoting, claiming, closing, or rewriting ledger/runtime state.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
     },
     {
       "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",

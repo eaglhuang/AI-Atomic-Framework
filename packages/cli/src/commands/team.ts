@@ -234,6 +234,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     capability: 'Deterministic file.write lease scope validation against task allowed files before team runtime start.',
     downstreamTasks: ['TASK-TEAM-0013']
   },
+  'team.lease-fencing-deadlock-contract': {
+    anchor: 'packages/core/src/governance/scope-lock.ts#validateScopeLeaseFencing',
+    capability: 'Team lease fencing diagnostics for duplicate exclusive owners, stale lease epochs, wait-for cycles, released tombstones, and allowedFiles write boundaries across real-agent, editor-subagent, and broker-only runs.',
+    downstreamTasks: ['TASK-TEAM-0018']
+  },
   'team.next-recommendation': {
     anchor: 'packages/cli/src/commands/team.ts#buildTeamRecommendation',
     capability: 'Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.',

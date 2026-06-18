@@ -105,6 +105,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       ensureAllDirectories();
       const filePath = path.join(absoluteLayout.lockStorePath, `${workItem.workItemId}.lock.json`);
       const timestamp = now();
+      const leaseEpoch = Date.parse(timestamp);
       const record: ScopeLockRecord = {
         schemaId: 'atm.governanceScopeLock',
         specVersion: '0.1.0',
@@ -118,10 +119,11 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
         lockedAt: timestamp,
         actorId: actor,
         leaseId: `lease-${timestamp.replace(/[:.]/g, '-')}`,
+        leaseEpoch,
         heartbeatAt: timestamp,
         ttlSeconds: 1800,
         files: Array.from(new Set(files.map((filePath) => normalizeRelativePath(filePath)).filter(Boolean)))
-      };
+      } as ScopeLockRecord;
       if (existsSync(filePath)) {
         const existing = readJsonFile(filePath) as Record<string, unknown>;
         if (isReleasedLockRecord(existing)) {
@@ -172,7 +174,8 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
         released: true,
         status: 'released',
         releasedAt: timestamp,
-        releasedBy: actor
+        releasedBy: actor,
+        releaseEpoch: Date.parse(timestamp)
       });
       return capabilityResult(`Released scope lock for ${workItemId}.`);
     }
