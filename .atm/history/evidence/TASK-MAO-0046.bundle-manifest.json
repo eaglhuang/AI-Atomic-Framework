@@ -1,0 +1,151 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-MAO-0046",
+  "updatedAt": "2026-06-18T04:17:00.070Z",
+  "updatedBy": "cursor-gpt-5.2",
+  "freshValidationPasses": [
+    "freeze-protocol",
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+    "node --strip-types tests/cli/route-freeze-runtime.test.ts",
+    "route-freeze-runtime",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:neutrality"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-06-18T04:09:07.072Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-06-18T04:09:53.676Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d3fe5bcfe8446c9c71f07c8f3106bee85b44e6072e8bc1e9eaad974cb862bc7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "freeze-protocol"
+      ],
+      "generatedAt": "2026-06-18T04:09:54.683Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:neutrality",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b8b1cf82e8926928003ab1f46c4660413ac676ceaefacea7391f1f28501c008c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:neutrality"
+      ],
+      "generatedAt": "2026-06-18T04:09:59.585Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-06-18T04:10:01.204Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/route-freeze-runtime.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:448b23cfe814e34bb0193ba310eef71b7c290ec730534a5239b784abde5cb096",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "route-freeze-runtime"
+      ],
+      "generatedAt": "2026-06-18T04:12:35.861Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-06-18T04:13:14.026Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-06-18T04:15:33.813Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d3fe5bcfe8446c9c71f07c8f3106bee85b44e6072e8bc1e9eaad974cb862bc7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts"
+      ],
+      "generatedAt": "2026-06-18T04:16:54.769Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/route-freeze-runtime.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:448b23cfe814e34bb0193ba310eef71b7c290ec730534a5239b784abde5cb096",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/route-freeze-runtime.test.ts"
+      ],
+      "generatedAt": "2026-06-18T04:17:00.276Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
