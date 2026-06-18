@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0022",
+  "title": "external core contributor pipeline",
+  "status": "running",
+  "milestone": "M5",
+  "dependencies": [
+    "TASK-MAO-0017",
+    "TASK-MAO-0018"
+  ],
+  "acceptance": [
+    "The docs distinguish docs/examples contributions from core-runner contributions.",
+    "The fixture proves external patch extraction produces the same envelope shape accepted by the Broker.",
+    "Direct external edits to `release/**` are rejected.",
+    "Neutrality validation passes for new public docs.",
+    "The task stays deferred until internal workflows have already validated the heavier Broker path."
+  ],
+  "deliverables": [
+    "docs/CONTRIBUTING_CORE.md",
+    "scripts/validate-external-core-pipeline.ts",
+    "tests/fixtures/external-core-pipeline/",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    ".github/workflows/",
+    "docs/HOST_GOVERNANCE_INTEGRATION.md",
+    "docs/CONTRIBUTING_CORE.md",
+    "scripts/validate-external-core-pipeline.ts",
+    "tests/fixtures/external-core-pipeline/",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-external-core-pipeline.ts --mode validate",
+    "npm run validate:external-golden",
+    "npm run validate:neutrality",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Opening external core writes before Broker hardening is proven",
+    "Bypassing branch protection",
+    "Accepting direct `release/**` edits from external contributors"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert external pipeline docs, workflow/validator changes, fixtures, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.external-core-contributor-pipeline-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0022-external-core-contributor-pipeline.task.md",
+    "sectionTitle": "TASK-MAO-0022",
+    "headingLine": 48,
+    "hash": "0530142cda02a91d"
+  },
+  "importedAt": "2026-06-17T15:12:37.993Z",
+  "lastTransitionId": "2026-06-18T05-35-05-143Z-claim-41820b2f6f5e",
+  "lastTransitionAt": "2026-06-18T05:35:05.143Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-code-opus-4-7",
+  "reservedAt": "2026-06-18T05:35:02.818Z",
+  "promotedAt": "2026-06-18T05:35:03.716Z",
+  "claim": {
+    "actorId": "claude-code-opus-4-7",
+    "leaseId": "lease-16c4175bd53c",
+    "claimedAt": "2026-06-18T05:35:05.097Z",
+    "heartbeatAt": "2026-06-18T05:35:05.097Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "scripts/validate-external-core-pipeline.ts",
+      "docs/CONTRIBUTING_CORE.md"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T05:35:05.097Z",
+  "startedByActor": "claude-code-opus-4-7",
+  "startedBySessionId": "session-20260618053505-claude-code-opus-4-7-TASK-MAO-0022-84f00821f7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0022",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0022.*",
+      ".atm/history/task-events/TASK-MAO-0022/**",
+      ".atm/history/tasks/TASK-MAO-0022.json",
+      "docs/CONTRIBUTING_CORE.md",
+      "scripts/validate-external-core-pipeline.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4bfe2a8766960e644b2e7eb0406d5d9981d9b4b2105965594bc685ffc9f1e2a8",
+    "actorId": "claude-code-opus-4-7",
+    "createdAt": "2026-06-18T05:35:05.142Z",
+    "status": "active"
+  }
+}
