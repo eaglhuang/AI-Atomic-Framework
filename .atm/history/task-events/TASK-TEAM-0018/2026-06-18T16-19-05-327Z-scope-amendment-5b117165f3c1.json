@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T16-19-05-327Z-scope-amendment-5b117165f3c1",
+  "taskId": "TASK-TEAM-0018",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0018.json",
+  "taskSha256": "sha256:9e8201174cdded6a7e6ad7faf621a1af487aa77ebbd7b160cf685a0c99af52a1",
+  "createdAt": "2026-06-18T16:19:05.327Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TEAM-0018 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/tasks.ts,scripts/validate-task-ledger-governance.ts\" --reason \"Repair TASK-TEAM-0018 close residue: planning draft should be treated as open parity while an active claim defines the governed lane.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Repair TASK-TEAM-0018 close residue: planning draft should be treated as open parity while an active claim defines the governed lane."
+  }
+}
