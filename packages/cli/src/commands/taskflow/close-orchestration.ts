@@ -88,6 +88,8 @@ export interface TaskflowClosebackPlan {
     matchedFiles: string[];
     reason: string | null;
   };
+  waiverOutOfScopeDelivery: boolean;
+  waiverReason: string | null;
   evidenceValidators: string[];
   residue: Pick<TaskResidueClassification, 'bucket' | 'truth' | 'residue' | 'reason' | 'nextCommand'>;
   /** 該任務已記錄的範圍增修歷史（依時間順序），收口摘要中可見。 */
@@ -309,6 +311,8 @@ export function buildClosebackPlan(input: {
       matchedFiles: [],
       reason: null
     },
+    waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
+    waiverReason: input.waiverReason ?? null,
     evidenceValidators,
     residue: {
       bucket: input.diagnosis.bucket,
