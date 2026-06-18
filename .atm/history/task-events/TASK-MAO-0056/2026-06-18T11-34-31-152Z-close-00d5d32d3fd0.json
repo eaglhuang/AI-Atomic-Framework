@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T11-34-31-152Z-close-00d5d32d3fd0",
+  "taskId": "TASK-MAO-0056",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618111747-captain-TASK-MAO-0056-442899cf64",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0056.json",
+  "taskSha256": "sha256:be88564fe01c35864bad3ea3e3bbc0870b0a27115051d80d15e1241116d966db",
+  "createdAt": "2026-06-18T11:34:31.152Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0056 --actor captain --status done --historical-delivery 1f07c32b1c5c271dc9e27d42985a654bd22efc40",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618111747-captain-TASK-MAO-0056-442899cf64",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0056.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/tasks-scope-add-error-clarity.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T11:34:31.147Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0056-scope-amendment-error-clarity-and-claim-first.task.md",
+        ".atm/history/evidence/TASK-MAO-0056.*",
+        ".atm/history/task-events/TASK-MAO-0056/**",
+        ".atm/history/tasks/TASK-MAO-0056.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/ATM_NEW_USER_WORKFLOW.md",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "tests/cli/task-scope-amendment.test.ts",
+        "tests/cli/tasks-scope-add-error-clarity.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "tests/cli/task-scope-amendment.test.ts",
+        "tests/cli/tasks-scope-add-error-clarity.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
