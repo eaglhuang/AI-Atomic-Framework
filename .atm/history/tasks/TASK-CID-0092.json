@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0092",
   "title": "Mutation broker adapter registry contract",
-  "status": "ready",
+  "status": "running",
   "milestone": "M19",
   "dependencies": [
     "TASK-CID-0091"
@@ -69,10 +69,64 @@
     "hash": "017cc039b5be6acd"
   },
   "importedAt": "2026-06-15T16:54:21.070Z",
-  "lastTransitionId": "2026-06-15T16-55-03-569Z-promote-beb257351b44",
-  "lastTransitionAt": "2026-06-15T16:55:03.569Z",
+  "lastTransitionId": "2026-06-18T05-45-44-800Z-claim-4160046f27f7",
+  "lastTransitionAt": "2026-06-18T05:45:44.800Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-15T16:54:42.190Z",
-  "promotedAt": "2026-06-15T16:55:03.568Z"
+  "promotedAt": "2026-06-15T16:55:03.568Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-c3a38d93c919",
+    "claimedAt": "2026-06-18T05:45:44.761Z",
+    "heartbeatAt": "2026-06-18T05:45:44.761Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0092.json",
+      "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+      "packages/core/src/broker/adapters/fallback-file-lock.ts",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/conflict-key.schema.json",
+      "schemas/broker/merge-decision.schema.json",
+      "schemas/broker/mutation-request.schema.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T05:45:44.761Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260618054544-captain-TASK-CID-0092-2e4bc9ea64",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0092",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0092.*",
+      ".atm/history/task-events/TASK-CID-0092/**",
+      ".atm/history/tasks/TASK-CID-0092.json",
+      "packages/core/src/broker/__tests__/adapter-registry.test.ts",
+      "packages/core/src/broker/adapters/fallback-file-lock.ts",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/conflict-key.schema.json",
+      "schemas/broker/merge-decision.schema.json",
+      "schemas/broker/mutation-request.schema.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f48f1cdafd4842b2a4561f5dfb2720928751638494f73aa3d2d3cb1446d9debb",
+    "actorId": "captain",
+    "createdAt": "2026-06-18T05:45:44.799Z",
+    "status": "active"
+  }
 }
