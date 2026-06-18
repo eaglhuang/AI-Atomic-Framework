@@ -1691,13 +1691,48 @@
       "capability": "CLI README operator lane table for taskflow, pre-close, task-view, and governed git commit.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/route.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "Route pause/resume runtime integration with broker freeze protocol and freeze sidecar persistence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/freeze.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "Freeze signal, acknowledgement, decision, and resume helpers consumed by route pause/resume.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/types.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "RouteFreezeRuntimeRecord sidecar contract for freeze protocol state outside route context schema.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "tests/cli/route-freeze-runtime.test.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "CLI regression proving route pause/resume exercises freeze.ts and emits freezeProtocol evidence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "docs/specs/mao-logical-routing-v1.md",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "Document route pause/resume freeze protocol runtime and reserved deferred features.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
     }
   ],
   "summary": {
-    "total_production_paths": 195,
-    "mapped_paths": 195,
+    "total_production_paths": 200,
+    "mapped_paths": 200,
     "coverage_percentage": 100,
-    "atoms_defined": 112,
+    "atoms_defined": 113,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true
