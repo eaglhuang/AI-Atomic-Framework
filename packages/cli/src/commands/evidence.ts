@@ -640,6 +640,216 @@ export function computeMissingValidatorReport(
   };
 }
 
+// ===== TASK-AAO-0142: Auto-run declared validators into evidence before close =====
+
+export type AutoEvidenceDisposition =
+  | 'to-run'
+  | 'already-satisfied'
+  | 'skipped-out-of-scope'
+  | 'requires-approval';
+
+export interface AutoEvidencePlanEntry {
+  readonly validator: string;
+  readonly disposition: AutoEvidenceDisposition;
+  readonly command: string | null;
+  readonly evidenceState: ValidatorEvidenceState;
+  readonly reason: string;
+  readonly requiredCommand: string | null;
+}
+
+export interface AutoEvidencePlan {
+  readonly schemaId: 'atm.autoEvidencePlan.v1';
+  readonly taskId: string;
+  readonly mode: 'dry-run' | 'execute';
+  readonly ok: boolean;
+  readonly toRun: readonly AutoEvidencePlanEntry[];
+  readonly alreadySatisfied: readonly AutoEvidencePlanEntry[];
+  readonly skippedOutOfScope: readonly AutoEvidencePlanEntry[];
+  readonly requiresApproval: readonly AutoEvidencePlanEntry[];
+  readonly remediationCommand: string | null;
+}
+
+export interface AutoEvidenceExecutionResult {
+  readonly schemaId: 'atm.autoEvidenceExecution.v1';
+  readonly taskId: string;
+  readonly ok: boolean;
+  readonly plan: AutoEvidencePlan;
+  readonly runs: ReadonlyArray<{
+    readonly validator: string;
+    readonly command: string;
+    readonly ok: boolean;
+    readonly errorCode?: string;
+  }>;
+  readonly failedValidator: string | null;
+  readonly remediationCommand: string | null;
+}
+
+function validatorRequiresOperatorApproval(gate: string, command: string): boolean {
+  if (gate === 'git-head-evidence') return true;
+  return /<[^>]+>/.test(command);
+}
+
+function readTaskDeclaredValidatorGates(cwd: string, taskId: string): string[] {
+  const taskDocument = readTaskDocument(cwd, taskId);
+  if (!taskDocument || !Array.isArray(taskDocument.validators)) return [];
+  return (taskDocument.validators as unknown[])
+    .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    .map((entry) => canonicalizeValidatorIdentity(entry.trim()))
+    .filter(Boolean);
+}
+
+function isTaskDeclaredValidatorGate(gate: string, taskDeclared: readonly string[]): boolean {
+  return taskDeclared.includes(gate);
+}
+
+function canAutoRunDeclaredValidator(gate: string, command: string, taskDeclared: readonly string[]): boolean {
+  if (validatorRequiresOperatorApproval(gate, command)) return false;
+  if (detectAutoLinkedValidator(command)) return true;
+  if (isTaskDeclaredValidatorGate(gate, taskDeclared)) return true;
+  if (looksLikeLiteralValidatorCommand(gate)) return true;
+  return false;
+}
+
+function buildAutoEvidenceRequiredCommand(taskId: string, actorId: string, command: string, validator: string): string {
+  const escapedCommand = quoteForShell(command);
+  if (detectAutoLinkedValidator(command)) {
+    return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --json`;
+  }
+  const escapedGate = quoteForShell(validator);
+  return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --validators ${escapedGate} --json`;
+}
+
+export function buildAutoEvidencePlan(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  mode?: 'dry-run' | 'execute';
+}): AutoEvidencePlan {
+  const resolvedCwd = path.resolve(input.cwd);
+  const report = computeMissingValidatorReport(resolvedCwd, input.taskId, input.actorId);
+  const taskDeclared = readTaskDeclaredValidatorGates(resolvedCwd, input.taskId);
+  const toRun: AutoEvidencePlanEntry[] = [];
+  const alreadySatisfied: AutoEvidencePlanEntry[] = [];
+  const skippedOutOfScope: AutoEvidencePlanEntry[] = [];
+  const requiresApproval: AutoEvidencePlanEntry[] = [];
+
+  for (const entry of report.validators) {
+    const command = entry.expectedCommand;
+    const requiredCommand = entry.evidenceState === 'pass'
+      ? null
+      : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, entry.name);
+    const base = {
+      validator: entry.name,
+      command,
+      evidenceState: entry.evidenceState,
+      requiredCommand
+    };
+
+    if (entry.evidenceState === 'pass') {
+      alreadySatisfied.push({
+        ...base,
+        disposition: 'already-satisfied',
+        reason: 'Validator evidence is fresh and command-backed.'
+      });
+      continue;
+    }
+
+    if (!entry.closureRequired) {
+      skippedOutOfScope.push({
+        ...base,
+        disposition: 'skipped-out-of-scope',
+        reason: 'Advisory validator outside task-card closure baseline; auto-evidence does not run it without explicit operator opt-in.'
+      });
+      continue;
+    }
+
+    if (!canAutoRunDeclaredValidator(entry.name, command, taskDeclared)) {
+      requiresApproval.push({
+        ...base,
+        disposition: 'requires-approval',
+        reason: 'Validator requires explicit operator approval or cannot be mapped to a safe auto-run command.'
+      });
+      continue;
+    }
+
+    toRun.push({
+      ...base,
+      disposition: 'to-run',
+      reason: 'Declared closure-required validator is missing fresh command-backed evidence and can be auto-run.'
+    });
+  }
+
+  const remediationCommand = toRun[0]?.requiredCommand
+    ?? requiresApproval[0]?.requiredCommand
+    ?? report.blockingFindings[0]?.requiredCommand
+    ?? null;
+
+  return {
+    schemaId: 'atm.autoEvidencePlan.v1',
+    taskId: input.taskId,
+    mode: input.mode ?? 'dry-run',
+    ok: toRun.length === 0 && requiresApproval.length === 0 && report.ok,
+    toRun,
+    alreadySatisfied,
+    skippedOutOfScope,
+    requiresApproval,
+    remediationCommand
+  };
+}
+
+export function executeAutoEvidencePlan(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+}): AutoEvidenceExecutionResult {
+  const resolvedCwd = path.resolve(input.cwd);
+  const plan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+  const runs: AutoEvidenceExecutionResult['runs'][number][] = [];
+
+  for (const entry of plan.toRun) {
+    if (!entry.command) continue;
+    try {
+      runEvidenceRun([
+        '--cwd', resolvedCwd,
+        '--task', input.taskId,
+        '--actor', input.actorId,
+        '--command', entry.command,
+        '--json'
+      ]);
+      runs.push({ validator: entry.validator, command: entry.command, ok: true });
+    } catch (error) {
+      const errorCode = error instanceof CliError ? error.code : 'ATM_AUTO_EVIDENCE_RUN_FAILED';
+      const remediationCommand = buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, entry.command, entry.validator);
+      return {
+        schemaId: 'atm.autoEvidenceExecution.v1',
+        taskId: input.taskId,
+        ok: false,
+        plan,
+        runs: [...runs, { validator: entry.validator, command: entry.command, ok: false, errorCode }],
+        failedValidator: entry.validator,
+        remediationCommand
+      };
+    }
+  }
+
+  const refreshedPlan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+  const executedValidators = new Set(runs.filter((run) => run.ok).map((run) => run.validator));
+  const pendingAutoRun = refreshedPlan.toRun.filter((entry) => !executedValidators.has(entry.validator));
+  const ok = runs.every((run) => run.ok)
+    && runs.length === plan.toRun.length
+    && pendingAutoRun.length === 0
+    && refreshedPlan.requiresApproval.length === 0;
+  return {
+    schemaId: 'atm.autoEvidenceExecution.v1',
+    taskId: input.taskId,
+    ok,
+    plan: refreshedPlan,
+    runs,
+    failedValidator: null,
+    remediationCommand: ok ? null : refreshedPlan.remediationCommand
+  };
+}
+
 /** evidence missing --task <id> --actor <actor> 的執行邏輯 */
 function runEvidenceMissing(argv: string[]) {
   let cwd = '.';
@@ -762,6 +972,7 @@ function runEvidenceRun(argv: string[]) {
   // 3. 呼叫 evidence add 邏輯 (透過建構 argv 再呼叫 runEvidenceAdd)
   // 這樣可以確保寫入格式、sessionId、git commit 等邏輯一致
   const addArgv = [
+    '--cwd', resolvedCwd,
     '--task', resolvedTaskId,
     '--actor', actorId,
     '--kind', options.kind,

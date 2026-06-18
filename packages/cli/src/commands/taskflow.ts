@@ -26,6 +26,7 @@ import {
   resolveClosebackPlanningPath,
   resolveCloseWriteSupport
 } from './taskflow/close-orchestration.ts';
+import { buildAutoEvidencePlan, executeAutoEvidencePlan } from './evidence.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 import {
   buildDelegationContract,
@@ -1440,6 +1441,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   const actorId = parsed.options.actor ? String(parsed.options.actor) : '';
   const writeRequested = !!parsed.options.write;
   const noCommitRequested = !!parsed.options.noCommit;
+  const autoEvidenceRequested = parsed.options.autoEvidence === true;
   const deferForeignStaged = parsed.options.deferForeignStaged === true;
   const commitMode: TaskflowCommitMode = writeRequested
     ? noCommitRequested ? 'stage-only' : 'auto-commit'
@@ -1595,6 +1597,15 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     };
   }
 
+  const autoEvidencePlan = actorId
+    ? buildAutoEvidencePlan({
+      cwd,
+      taskId,
+      actorId,
+      mode: writeRequested && autoEvidenceRequested ? 'execute' : 'dry-run'
+    })
+    : null;
+
   if (surface === 'pre-close') {
     return {
       ...makeResult({
@@ -1619,6 +1630,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           governedCommitBundle: previewCommitBundle,
           residueDiagnosis: enrichedDiagnosis,
           closebackPathResolution,
+          ...(autoEvidencePlan ? { autoEvidencePlan } : {}),
           ...(profileData ? { profile: profileData } : {})
         }
       }),
@@ -1661,6 +1673,28 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   }
 
   if (writeRequested && writeSupport.allowed) {
+    let autoEvidenceExecution = null;
+    if (autoEvidenceRequested) {
+      if (!actorId) {
+        throw new CliError('ATM_CLI_USAGE', 'taskflow close --auto-evidence requires --actor <id>.', { exitCode: 2 });
+      }
+      autoEvidenceExecution = executeAutoEvidencePlan({ cwd, taskId, actorId });
+      if (!autoEvidenceExecution.ok) {
+        throw new CliError(
+          'ATM_TASKFLOW_AUTO_EVIDENCE_FAILED',
+          `Auto-evidence could not satisfy declared validators for ${taskId}.`,
+          {
+            exitCode: 1,
+            details: {
+              taskId,
+              failedValidator: autoEvidenceExecution.failedValidator,
+              remediationCommand: autoEvidenceExecution.remediationCommand,
+              autoEvidenceExecution
+            }
+          }
+        );
+      }
+    }
     if (previewCommitBundle.targetDeliveryFiles.length > 0 && commitMode !== 'auto-commit') {
       throw new CliError('ATM_TASKFLOW_CLOSE_DELIVERY_COMMIT_REQUIRED', 'taskflow close --write --no-commit cannot close dirty source deliverables because backend close requires a delivery commit first. Rerun without --no-commit or commit through the governed taskflow close operator lane.', {
         exitCode: 1,
@@ -1892,6 +1926,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           releasedCloseWindowLock,
           residueDiagnosis: enrichedDiagnosis,
           closebackPathResolution,
+          ...(autoEvidenceExecution ? { autoEvidenceExecution, autoEvidencePlan: autoEvidenceExecution.plan } : {}),
           ...(profileData ? { profile: profileData } : {})
         }
       }),
@@ -1944,6 +1979,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         historicalClosePreflight,
         residueDiagnosis: enrichedDiagnosis,
         closebackPathResolution,
+        ...(autoEvidencePlan ? { autoEvidencePlan } : {}),
         ...(profileData ? { profile: profileData } : {})
       }
     }),
