@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T15-51-19-859Z-close-90d7ae1a6fa7",
+  "taskId": "TASK-AAO-0119",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260618154704-cursor-gpt-5.2-TASK-AAO-0119-1c1703b1cd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0119.json",
+  "taskSha256": "sha256:2f9c5f1d6175bafd17bfde0a8eb37645718c18a056792ce5f40742e116a37047",
+  "createdAt": "2026-06-18T15:51:19.859Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0119 --actor cursor-gpt-5.2 --status done --historical-delivery ae15e9869",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618154704-cursor-gpt-5.2-TASK-AAO-0119-1c1703b1cd",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0119.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T15:51:19.849Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0119-frozen-runner-alignment-for-atm-runner-sync-required.task.md",
+        ".atm/history/evidence/TASK-AAO-0119.*",
+        ".atm/history/task-events/TASK-AAO-0119/**",
+        ".atm/history/tasks/TASK-AAO-0119.json",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
