@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 
 const stableRunner: string = readFileSync('atm.mjs', 'utf8');
 const devRunner: string = readFileSync('atm.dev.mjs', 'utf8');
-const frameworkDevelopment: string = readFileSync('packages/cli/src/commands/framework-development.ts', 'utf8');
+const frameworkDevelopment: string = [
+  readFileSync('packages/cli/src/commands/framework-development.ts', 'utf8'),
+  readFileSync('packages/cli/src/commands/framework-development/closure-packet-schema.ts', 'utf8')
+].join('\n');
 const cliFixture: { entrypoint?: string } = JSON.parse(readFileSync('tests/cli-fixtures/cli-mvp.fixture.json', 'utf8')) as { entrypoint?: string };
 
 assert.match(stableRunner, /release['"], ['"]atm-onefile['"], ['"]atm\.mjs/, 'atm.mjs should prefer the frozen onefile release runner.');
