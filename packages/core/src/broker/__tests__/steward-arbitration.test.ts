@@ -9,6 +9,7 @@ import {
   checkStewardPermission,
   arbitrateStewardRequest
 } from '../steward.ts';
+import { createHandoffPatchEnvelope, validatePatchEnvelope } from '../index.ts';
 import type { StewardIdentity } from '../steward.ts';
 import type { MergePlan, PatchProposal } from '../types.ts';
 
@@ -450,6 +451,18 @@ function runTests() {
     console.log('  ✅ Test Case 13: blocked-shared-surface produces blocked verdict - PASSED');
   } finally {
     cleanupTempFile();
+  }
+
+  // Test Case 14: broker public surface exports patch envelope handoff helpers
+  {
+    const envelope = createHandoffPatchEnvelope({
+      taskId: 'TASK-BROKER-INDEX',
+      actorId: 'steward-test',
+      freezeId: 'freeze-index'
+    });
+    assert.equal(validatePatchEnvelope(envelope).ok, true);
+    assert.equal(envelope.mode, 'metadata-only');
+    console.log('  ✅ Test Case 14: broker index exports patch envelope handoff API - PASSED');
   }
 
   console.log('All steward arbitration tests completed successfully.');

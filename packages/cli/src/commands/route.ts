@@ -7,18 +7,26 @@ import {
   acknowledgeFreeze,
   createFreezeSignal,
   resolveFreezeDecision,
-  resumeFreeze
+  resumeFreeze,
+  resolveFreezeSnapshotDefaults
 } from '../../../core/src/broker/freeze.ts';
+import type { PatchEnvelope } from '../../../core/src/broker/patch-envelope.ts';
+import {
+  comparePatchEnvelopes,
+  createHandoffPatchEnvelope,
+  summarizePatchEnvelope,
+  validatePatchEnvelope
+} from '../../../core/src/broker/patch-envelope.ts';
 import type { RouteFreezeRuntimeRecord } from '../../../core/src/broker/types.ts';
 import { createRouteFreezeRuntimeRecord } from '../../../core/src/broker/types.ts';
 import type { StewardIdentity } from '../../../core/src/broker/steward.ts';
 import type { MergePlan, PatchProposal } from '../../../core/src/broker/types.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
-type RouteLifecycleAction = 'open' | 'status' | 'list' | 'pause' | 'resume' | 'abandon';
+type RouteLifecycleAction = 'open' | 'status' | 'list' | 'pause' | 'resume' | 'abandon' | 'handoff';
 type RouteAction = RouteLifecycleAction | 'takeover';
 
-const lifecycleActions = new Set<RouteLifecycleAction>(['open', 'status', 'list', 'pause', 'resume', 'abandon']);
+const lifecycleActions = new Set<RouteLifecycleAction>(['open', 'status', 'list', 'pause', 'resume', 'abandon', 'handoff']);
 const routeFileNamePattern = /^route-[A-Za-z0-9._:-]+\.json$/;
 
 export async function runRoute(argv: string[]) {
@@ -64,13 +72,34 @@ function runLifecycleRoute(options: ReturnType<typeof parseRouteArgs>) {
 
   if (options.action === 'pause') {
     const freezeRuntime = buildRouteFreezeRuntime(route, options);
-    const updated = transitionRoute(route, 'frozen', options, freezeRuntime.resolution);
+    const handoff = buildRoutePatchEnvelopeHandoff(route, freezeRuntime, options);
+    const updated = {
+      ...transitionRoute(route, 'frozen', options, freezeRuntime.resolution),
+      patchEnvelopeRef: handoff.envelopeRef
+    };
     const routePath = routeContextPath(options.cwd, route.routeId);
     writeJson(routePath, updated);
     writeRouteFreezeRuntime(options.cwd, freezeRuntime);
+    writePatchEnvelopeFile(options.cwd, route.routeId, handoff.envelope);
     return makeLifecycleResult(options.cwd, 'pause', 'ATM_ROUTE_PAUSED', `Paused route ${route.routeId}.`, {
       route: updated,
-      freezeProtocol: serializeFreezeProtocolEvidence(freezeRuntime)
+      freezeProtocol: serializeFreezeProtocolEvidence(freezeRuntime),
+      patchEnvelopeHandoff: handoff.evidence
+    });
+  }
+
+  if (options.action === 'handoff') {
+    const handoff = runRoutePatchEnvelopeHandoff(route, options);
+    const updated = {
+      ...route,
+      patchEnvelopeRef: handoff.envelopeRef,
+      updatedAt: new Date().toISOString()
+    };
+    writeJson(routeContextPath(options.cwd, route.routeId), updated);
+    writePatchEnvelopeFile(options.cwd, route.routeId, handoff.envelope);
+    return makeLifecycleResult(options.cwd, 'handoff', 'ATM_ROUTE_PATCH_ENVELOPE_HANDOFF', `Recorded patch envelope handoff for route ${route.routeId}.`, {
+      route: updated,
+      patchEnvelopeHandoff: handoff.evidence
     });
   }
 
@@ -99,7 +128,7 @@ function runLifecycleRoute(options: ReturnType<typeof parseRouteArgs>) {
     return makeLifecycleResult(options.cwd, 'abandon', 'ATM_ROUTE_ABANDONED', `Abandoned route ${route.routeId}.`, { route: updated });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'route supports open, status, list, pause, resume, abandon, and takeover.', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'route supports open, status, list, pause, resume, abandon, handoff, and takeover.', { exitCode: 2 });
 }
 
 function runTakeover(options: ReturnType<typeof parseRouteArgs>) {
@@ -543,7 +572,99 @@ function serializeFreezeProtocolEvidence(record: RouteFreezeRuntimeRecord) {
     ack: record.ack,
     resolution: record.resolution,
     pauseReason: record.pauseReason,
-    snapshotDefaultsReserved: 'patch-envelope submission and WIP snapshot apply remain deferred to later MAO tasks'
+    snapshotDefaultsReserved: 'WIP snapshot apply to worktree remains deferred; handoff records metadata-only envelopes only'
+  };
+}
+
+function routePatchEnvelopePath(cwd: string, routeId: string) {
+  return path.join(routeContextDir(cwd), `${sanitizeRouteFileName(routeId)}.patch-envelope.json`);
+}
+
+function writePatchEnvelopeFile(cwd: string, routeId: string, envelope: PatchEnvelope) {
+  writeJson(routePatchEnvelopePath(cwd, routeId), envelope);
+}
+
+function readPatchEnvelopeFile(cwd: string, routeId: string): PatchEnvelope {
+  const envelopePath = routePatchEnvelopePath(cwd, routeId);
+  if (!existsSync(envelopePath)) {
+    throw new CliError('ATM_ROUTE_PATCH_ENVELOPE_MISSING', `Route ${routeId} has no patch envelope file.`, {
+      exitCode: 1,
+      details: { routeId, envelopePath: relativePath(cwd, envelopePath) }
+    });
+  }
+  return JSON.parse(readFileSync(envelopePath, 'utf8')) as PatchEnvelope;
+}
+
+function buildRoutePatchEnvelopeHandoff(
+  route: RouteContext,
+  freezeRuntime: RouteFreezeRuntimeRecord,
+  options: ReturnType<typeof parseRouteArgs>
+) {
+  const actorId = options.actorId ?? route.actorId;
+  const targetFiles = unique([
+    ...route.declaredWriteSet.files,
+    ...route.declaredReadSet.files
+  ]);
+  const envelope = createHandoffPatchEnvelope({
+    taskId: route.taskId,
+    actorId,
+    freezeId: freezeRuntime.signal.freezeId,
+    targetFiles,
+    snapshotDir: resolveFreezeSnapshotDefaults().snapshotDir,
+    partialReason: options.reason ?? 'route pause handoff metadata-only envelope'
+  });
+  const validation = validatePatchEnvelope(envelope);
+  if (!validation.ok) {
+    throw new CliError('ATM_ROUTE_PATCH_ENVELOPE_INVALID', validation.reason, {
+      exitCode: 1,
+      details: { routeId: route.routeId, envelopeId: envelope.envelopeId }
+    });
+  }
+  const envelopeRef = relativePath(options.cwd, routePatchEnvelopePath(options.cwd, route.routeId));
+  return {
+    envelope,
+    envelopeRef,
+    evidence: serializePatchEnvelopeHandoffEvidence(envelope, envelopeRef, validation, null)
+  };
+}
+
+function runRoutePatchEnvelopeHandoff(route: RouteContext, options: ReturnType<typeof parseRouteArgs>) {
+  const freezeRuntime = readRouteFreezeRuntime(options.cwd, route.routeId);
+  const envelope = buildRoutePatchEnvelopeHandoff(route, freezeRuntime, options);
+  let comparison: { readonly equal: boolean; readonly divergences: readonly { field: string; left: unknown; right: unknown }[] } | null = null;
+  if (options.patchEnvelopeRef) {
+    const comparePath = path.resolve(options.cwd, options.patchEnvelopeRef);
+    if (!existsSync(comparePath)) {
+      throw new CliError('ATM_FILE_NOT_FOUND', `Patch envelope compare file not found: ${options.patchEnvelopeRef}`, { exitCode: 1 });
+    }
+    const baseline = JSON.parse(readFileSync(comparePath, 'utf8')) as PatchEnvelope;
+    comparison = comparePatchEnvelopes(baseline, envelope.envelope);
+  }
+  return {
+    ...envelope,
+    evidence: serializePatchEnvelopeHandoffEvidence(
+      envelope.envelope,
+      envelope.envelopeRef,
+      validatePatchEnvelope(envelope.envelope),
+      comparison
+    )
+  };
+}
+
+function serializePatchEnvelopeHandoffEvidence(
+  envelope: PatchEnvelope,
+  envelopeRef: string,
+  validation: ReturnType<typeof validatePatchEnvelope>,
+  comparison: ReturnType<typeof comparePatchEnvelopes> | null
+) {
+  return {
+    schemaId: 'atm.routePatchEnvelopeHandoff.v1',
+    envelopeRef,
+    envelope,
+    summary: summarizePatchEnvelope(envelope),
+    validation,
+    comparison,
+    applyOutOfScope: 'Patch envelopes are handoff records only; worktree apply and steward merge remain separate lanes.'
   };
 }
 
@@ -721,7 +842,7 @@ function parseRouteArgs(argv: string[]) {
   }
 
   if (!state.action) {
-    throw new CliError('ATM_CLI_USAGE', 'route requires an action: open, status, list, pause, resume, abandon, or takeover.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'route requires an action: open, status, list, pause, resume, abandon, handoff, or takeover.', { exitCode: 2 });
   }
 
   return {
@@ -735,7 +856,7 @@ function parseAction(value: string): RouteAction {
   if (value === 'takeover' || lifecycleActions.has(value as RouteLifecycleAction)) {
     return value as RouteAction;
   }
-  throw new CliError('ATM_CLI_USAGE', 'route supports open, status, list, pause, resume, abandon, and takeover.', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'route supports open, status, list, pause, resume, abandon, handoff, and takeover.', { exitCode: 2 });
 }
 
 function parseClaimIntent(value: string): RouteClaimIntent {

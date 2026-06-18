@@ -1,3 +1,5 @@
+import { resolveFreezeSnapshotDefaults } from './freeze.ts';
+
 export type PatchEnvelopeMode = 'metadata-only' | 'textual-diff';
 export type PatchEnvelopeWipState = 'partial' | 'complete';
 
@@ -137,4 +139,28 @@ export function validatePatchEnvelope(envelope: PatchEnvelope): { readonly ok: b
     return { ok: false, reason: 'textual-diff envelope must carry patchText' };
   }
   return { ok: true, reason: 'patch envelope accepted' };
+}
+
+export function createHandoffPatchEnvelope(input: {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly freezeId: string;
+  readonly targetFiles?: readonly string[];
+  readonly snapshotDir?: string;
+  readonly partialReason?: string;
+  readonly capturedAt?: string;
+}): PatchEnvelope {
+  const defaults = resolveFreezeSnapshotDefaults();
+  return createPatchEnvelope({
+    taskId: input.taskId,
+    actorId: input.actorId,
+    freezeId: input.freezeId,
+    targetFiles: input.targetFiles ?? [],
+    snapshotDir: input.snapshotDir ?? defaults.snapshotDir,
+    patchText: null,
+    wipState: 'partial',
+    confidence: 'medium',
+    partialReason: input.partialReason ?? 'route handoff metadata-only envelope; worktree apply remains out of scope',
+    capturedAt: input.capturedAt
+  });
 }
