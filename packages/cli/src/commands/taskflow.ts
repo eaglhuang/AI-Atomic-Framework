@@ -1088,6 +1088,7 @@ function buildTaskflowCommitBundle(input: {
   backendResult?: Record<string, unknown> | null;
   historicalDeliveryRefs?: string[];
   historicalBatchRef?: string | null;
+  planningAuthorityDeliveryOk?: boolean;
 }): TaskflowGovernedCommitBundle {
   const targetRepoRoot = path.resolve(input.cwd);
 
@@ -1153,7 +1154,7 @@ function buildTaskflowCommitBundle(input: {
 
   const hasPlanningFile = effectiveDeliverables.some(del => del.startsWith('docs/tasks/') || del.endsWith('.task.md'));
   const hasTargetFile = effectiveDeliverables.some(del => !del.startsWith('docs/tasks/') && !del.endsWith('.task.md'));
-  if (hasPlanningFile && hasTargetFile) {
+  if (!input.planningAuthorityDeliveryOk && hasPlanningFile && hasTargetFile) {
     metadataFailClosed = true;
     failClosedReason = 'Task metadata error: deliverables contain mixed planning-path and target-path declarations.';
   }
@@ -1553,7 +1554,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       ? closebackPlan.writerBoundary.rosterIndexPath
       : null,
     historicalDeliveryRefs,
-    historicalBatchRef
+    historicalBatchRef,
+    planningAuthorityDeliveryOk: planningAuthorityDeliveryGate.ok
   });
 
   const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
@@ -1811,7 +1813,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         : null,
       backendResult: backendResult as unknown as Record<string, unknown>,
       historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
-      historicalBatchRef
+      historicalBatchRef,
+      planningAuthorityDeliveryOk: planningAuthorityDeliveryGate.ok
     });
     const { bundle: governedCommitBundle, transaction: closeWriteTransaction } = backendResult.ok
       ? await executeCloseWriteCommitPhase({

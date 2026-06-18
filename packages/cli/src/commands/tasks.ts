@@ -118,6 +118,7 @@ import {
   readGitScalar as delegatedReadGitScalar,
   listCommittedFilesSinceClaim as delegatedListCommittedFilesSinceClaim
 } from './tasks/task-git-helpers.ts';
+import { readCloseWindowStagedIndexLockReport } from './tasks/close-window-lock.ts';
 import {
   collectKeyValue as delegatedCollectKeyValue,
   collectKeyValueFromLines as delegatedCollectKeyValueFromLines,
@@ -2368,6 +2369,25 @@ async function runTasksReset(argv: string[]) {
   });
 }
 
+function readDeferredForeignStagedFilesForActiveCloseWindow(cwd: string, taskId: string): string[] {
+  const lock = readCloseWindowStagedIndexLockReport(cwd);
+  if (!lock || lock.status !== 'active') return [];
+  if (lock.taskId !== normalizeTaskId(taskId)) return [];
+  if (!lock.foreignStagedSnapshotPath) return [];
+  const snapshotPath = path.resolve(cwd, lock.foreignStagedSnapshotPath);
+  if (!existsSync(snapshotPath)) return [];
+  try {
+    const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8')) as Record<string, unknown>;
+    if (snapshot.schemaId !== 'atm.closeWindowForeignStagedSnapshot.v1') return [];
+    const files = Array.isArray(snapshot.files) ? snapshot.files : [];
+    return [...new Set(files
+      .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      .map((entry) => entry.replace(/\\/g, '/')))];
+  } catch {
+    return [];
+  }
+}
+
 async function runTasksClose(argv: string[]) {
   const options = parseCloseOptions(argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -2569,7 +2589,10 @@ async function runTasksClose(argv: string[]) {
   if (frameworkStatus?.repoRole === 'framework') {
     const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
     const allowedAdvisoryGovernanceFiles = options.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0
-      ? [`.atm/history/evidence/${options.taskId}.json`]
+      ? [
+          `.atm/history/evidence/${options.taskId}.json`,
+          ...readDeferredForeignStagedFilesForActiveCloseWindow(options.cwd, options.taskId)
+        ]
       : [];
     const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
       cwd: options.cwd,
