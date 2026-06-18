@@ -1,0 +1,86 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T04-29-40-724Z-close-4bc51f899d4b",
+  "taskId": "TASK-MAO-0046",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260618040824-cursor-gpt-5.2-TASK-MAO-0046-644e97f329",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0046.json",
+  "taskSha256": "sha256:caebb6abb83fc0c355c1a3c6fdaefc3bb7f92ff26eb10c387132bf0897e4cba1",
+  "createdAt": "2026-06-18T04:29:40.724Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0046 --actor cursor-gpt-5.2 --status done --historical-delivery 36d05bf81",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618040824-cursor-gpt-5.2-TASK-MAO-0046-644e97f329",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0046.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "freeze-protocol",
+      "git diff --check",
+      "node --strip-types packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+      "node --strip-types tests/cli/route-freeze-runtime.test.ts",
+      "route-freeze-runtime",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:neutrality"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T04:29:40.718Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0046-route-freeze-protocol-runtime-integration.task.md",
+        ".atm/history/evidence/TASK-MAO-0046.*",
+        ".atm/history/task-events/TASK-MAO-0046/**",
+        ".atm/history/tasks/TASK-MAO-0046.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/ATM_NEW_USER_WORKFLOW.md",
+        "docs/specs/mao-logical-routing-v1.md",
+        "packages/cli/src/commands/command-specs/route.spec.ts",
+        "packages/cli/src/commands/route.ts",
+        "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+        "packages/core/src/broker/freeze.ts",
+        "packages/core/src/broker/types.ts",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "tests/cli/route-freeze-runtime.test.ts",
+        "tests/cli/route-lifecycle.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/route.spec.ts",
+        "packages/cli/src/commands/route.ts",
+        "packages/core/src/broker/__tests__/freeze-protocol.test.ts",
+        "packages/core/src/broker/freeze.ts",
+        "packages/core/src/broker/types.ts",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "tests/cli/route-freeze-runtime.test.ts",
+        "tests/cli/route-lifecycle.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
