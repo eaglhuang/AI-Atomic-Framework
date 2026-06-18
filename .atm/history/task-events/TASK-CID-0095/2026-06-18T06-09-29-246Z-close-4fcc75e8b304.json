@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T06-09-29-246Z-close-4fcc75e8b304",
+  "taskId": "TASK-CID-0095",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618060330-captain-TASK-CID-0095-75b9ebcf25",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0095.json",
+  "taskSha256": "sha256:a6ffdb432e4eacbe7a72ad672c196052394422343750611916b0a7218325caa4",
+  "createdAt": "2026-06-18T06:09:29.246Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0095 --actor captain --status done --historical-delivery 31fd89ff0b359edf8641e0a6c11d4449c11a9ca8 --historical-delivery ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618060330-captain-TASK-CID-0095-75b9ebcf25",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0095.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T06:09:29.238Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0095-text-range-adapter-conservative-merge-rules.task.md",
+        ".atm/history/evidence/TASK-CID-0095.*",
+        ".atm/history/task-events/TASK-CID-0095/**",
+        ".atm/history/tasks/TASK-CID-0095.json",
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/text-range.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/text-range-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/text-range.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
