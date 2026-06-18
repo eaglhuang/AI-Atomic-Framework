@@ -5,6 +5,7 @@ import type { ActorKind, ActorRecord, ActorRegistryDocument } from '@ai-atomic-f
 
 export const actorRegistryRelativePath = '.atm/catalog/registry/actors.json' as const;
 export const runtimeIdentityRelativePath = '.atm/runtime/identity/default.json' as const;
+export const runtimeActorIdentityDirectoryRelativePath = '.atm/runtime/identity/actors' as const;
 export const actorIdEnvVar = 'ATM_ACTOR_ID' as const;
 export const legacyActorIdEnvVar = 'AGENT_IDENTITY' as const;
 
@@ -130,6 +131,40 @@ export function writeRuntimeIdentityDefault(cwd: string, document: RuntimeIdenti
   mkdirSync(path.dirname(absolutePath), { recursive: true });
   writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
   return runtimeIdentityRelativePath;
+}
+
+export function runtimeIdentityActorRelativePath(actorId: string): string {
+  return `${runtimeActorIdentityDirectoryRelativePath}/${actorId}.json`;
+}
+
+export function readRuntimeIdentityForActor(cwd: string, actorId: string): RuntimeIdentityDefaultDocument | null {
+  const absolutePath = path.join(path.resolve(cwd), runtimeIdentityActorRelativePath(actorId));
+  if (!existsSync(absolutePath)) return null;
+  try {
+    const parsed = JSON.parse(readFileSync(absolutePath, 'utf8')) as Partial<RuntimeIdentityDefaultDocument>;
+    const parsedActorId = sanitizeOptional(parsed.actorId);
+    if (!parsedActorId) return null;
+    return {
+      schemaId: 'atm.identityDefault.v1',
+      specVersion: '0.1.0',
+      actorId: parsedActorId,
+      gitName: sanitizeOptional(parsed.gitName) ?? null,
+      gitEmail: sanitizeOptional(parsed.gitEmail) ?? null,
+      editor: sanitizeOptional(parsed.editor) ?? null,
+      provider: sanitizeOptional(parsed.provider) ?? null,
+      activeSessionId: sanitizeOptional(parsed.activeSessionId) ?? null,
+      updatedAt: sanitizeOptional(parsed.updatedAt) ?? new Date().toISOString()
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function writeRuntimeIdentityForActor(cwd: string, actorId: string, document: RuntimeIdentityDefaultDocument): string {
+  const absolutePath = path.join(path.resolve(cwd), runtimeIdentityActorRelativePath(actorId));
+  mkdirSync(path.dirname(absolutePath), { recursive: true });
+  writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+  return runtimeIdentityActorRelativePath(actorId);
 }
 
 export function resolveActorId(inputActorId?: string | null, cwd?: string | null): ResolvedActorId | null {

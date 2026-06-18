@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T11-07-21-836Z-scope-amendment-8a1250d50083",
+  "taskId": "TASK-MAO-0053",
+  "action": "scope-amendment",
+  "actorId": "captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0053.json",
+  "taskSha256": "sha256:2e9edd73849ef8fc7431dd345e7e422197061a3005fd50e16ad4b046ec1b9359",
+  "createdAt": "2026-06-18T11:07:21.836Z",
+  "command": "node atm.mjs tasks scope add --task TASK-MAO-0053 --actor captain --add packages/cli/src/commands/actor-registry.ts --class linked-surface --phase during-implementation --reason \"TASK-MAO-0053 per-actor identity routing requires actor runtime identity storage helpers\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-MAO-0053 per-actor identity routing requires actor runtime identity storage helpers"
+  }
+}

@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, resolveActorId, writeRuntimeIdentityDefault } from './actor-registry.ts';
+import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { findCloseCommitWindowCoveringPaths } from './framework-development.ts';
 import { getCanonicalAllowedFilesForTask, sanitizeTaskDirectionAllowedFiles } from './task-direction.ts';
@@ -276,9 +276,12 @@ function runGitPrepare(options: ParsedGitOptions) {
   }
   const actorId = resolvedActor.actorId;
   const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
-  const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord);
-  const nextName = options.gitName ?? profile.gitName ?? null;
-  const nextEmail = options.gitEmail ?? profile.gitEmail ?? null;
+  const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord, {
+    explicitGitName: options.gitName,
+    explicitGitEmail: options.gitEmail
+  });
+  const nextName = profile.gitName;
+  const nextEmail = profile.gitEmail;
   if (!nextName || !nextEmail) {
     throw new CliError('ATM_GIT_PREPARE_IDENTITY_MISSING', 'git prepare requires git name/email from actor registry, repo default identity, or explicit --name/--email.', {
       exitCode: 2,
@@ -286,8 +289,6 @@ function runGitPrepare(options: ParsedGitOptions) {
     });
   }
 
-  writeGitConfig(options.cwd, 'user.name', nextName);
-  writeGitConfig(options.cwd, 'user.email', nextEmail);
   const identityPath = options.gitName !== null && options.gitEmail !== null
     ? writePreparedRuntimeIdentity(options.cwd, actorId, nextName, nextEmail, actorRecord)
     : null;
@@ -313,7 +314,7 @@ function runGitPrepare(options: ParsedGitOptions) {
     ok: true,
     command: 'git',
     cwd: options.cwd,
-    messages: [message('info', 'ATM_GIT_PREPARED', 'Repo-local git identity has been prepared for the resolved actor.', {
+    messages: [message('info', 'ATM_GIT_PREPARED', 'Actor git identity has been prepared for the resolved actor.', {
       actorId,
       gitName: nextName,
       gitEmail: nextEmail,
@@ -358,7 +359,10 @@ function runGitCommit(options: ParsedGitOptions) {
     });
   }
   const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
-  const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord);
+  const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord, {
+    explicitGitName: options.gitName,
+    explicitGitEmail: options.gitEmail
+  });
   if (!profile.gitName || !profile.gitEmail) {
     throw new CliError('ATM_GIT_COMMIT_IDENTITY_MISSING', 'git commit requires a resolved git identity profile. Run identity set or actor register first.', {
       exitCode: 2,
@@ -601,6 +605,17 @@ function runGitCommit(options: ParsedGitOptions) {
             trailers,
             noVerify: options.noVerify
           }),
+          hostGitCompatibilityGuidance: buildHostGitCompatibilityGuidance({
+            gitExecutable: resolveGitExecutable(),
+            stderr,
+            stdout,
+            copyableCommitCommand: buildCopyableGitCommitCommand({
+              cwd: options.cwd,
+              message: options.message,
+              trailers,
+              noVerify: options.noVerify
+            })
+          }),
           protectedOverrideOutcome
         }
       });
@@ -619,6 +634,17 @@ function runGitCommit(options: ParsedGitOptions) {
           message: options.message,
           trailers,
           noVerify: options.noVerify
+        }),
+        hostGitCompatibilityGuidance: buildHostGitCompatibilityGuidance({
+          gitExecutable: resolveGitExecutable(),
+          stderr,
+          stdout,
+          copyableCommitCommand: buildCopyableGitCommitCommand({
+            cwd: options.cwd,
+            message: options.message,
+            trailers,
+            noVerify: options.noVerify
+          })
         }),
         protectedOverrideOutcome
       }
@@ -807,16 +833,43 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
   };
 }
 
-function resolveGitIdentityProfile(cwd: string, actorId: string, actorRecord: ReturnType<typeof findActorByResolvedId>): GitIdentityProfile {
-  const defaultIdentity = readRuntimeIdentityDefault(cwd);
-  if (actorRecord?.gitName || actorRecord?.gitEmail) {
-    const defaultMatches = defaultIdentity?.actorId === actorId;
+function resolveGitIdentityProfile(
+  cwd: string,
+  actorId: string,
+  actorRecord: ReturnType<typeof findActorByResolvedId>,
+  overrides?: { explicitGitName?: string | null; explicitGitEmail?: string | null }
+): GitIdentityProfile {
+  const explicitGitName = overrides?.explicitGitName?.trim() || null;
+  const explicitGitEmail = overrides?.explicitGitEmail?.trim() || null;
+  if (explicitGitName || explicitGitEmail) {
     return {
-      gitName: actorRecord.gitName ?? (defaultMatches ? defaultIdentity?.gitName ?? null : null),
-      gitEmail: actorRecord.gitEmail ?? (defaultMatches ? defaultIdentity?.gitEmail ?? null : null)
+      gitName: explicitGitName,
+      gitEmail: explicitGitEmail
     };
   }
-  if (defaultIdentity?.actorId === actorId) {
+  const envGitName = process.env.ATM_GIT_NAME?.trim() || null;
+  const envGitEmail = process.env.ATM_GIT_EMAIL?.trim() || null;
+  if (envGitName || envGitEmail) {
+    return {
+      gitName: envGitName,
+      gitEmail: envGitEmail
+    };
+  }
+  const actorIdentity = readRuntimeIdentityForActor(cwd, actorId);
+  if (actorIdentity?.gitName || actorIdentity?.gitEmail) {
+    return {
+      gitName: actorIdentity.gitName ?? null,
+      gitEmail: actorIdentity.gitEmail ?? null
+    };
+  }
+  if (actorRecord?.gitName || actorRecord?.gitEmail) {
+    return {
+      gitName: actorRecord.gitName ?? null,
+      gitEmail: actorRecord.gitEmail ?? null
+    };
+  }
+  const defaultIdentity = readRuntimeIdentityDefault(cwd);
+  if (defaultIdentity?.gitName || defaultIdentity?.gitEmail) {
     return {
       gitName: defaultIdentity.gitName ?? null,
       gitEmail: defaultIdentity.gitEmail ?? null
@@ -835,17 +888,16 @@ function writePreparedRuntimeIdentity(
   gitEmail: string,
   actorRecord: ReturnType<typeof findActorByResolvedId>
 ) {
-  const existing = readRuntimeIdentityDefault(cwd);
-  const existingMatchesActor = existing?.actorId === actorId;
-  return writeRuntimeIdentityDefault(cwd, {
+  const existing = readRuntimeIdentityForActor(cwd, actorId) ?? readRuntimeIdentityDefault(cwd);
+  return writeRuntimeIdentityForActor(cwd, actorId, {
     schemaId: 'atm.identityDefault.v1',
     specVersion: '0.1.0',
     actorId,
     gitName,
     gitEmail,
-    editor: (existingMatchesActor ? existing?.editor : null) ?? actorRecord?.editor ?? null,
-    provider: (existingMatchesActor ? existing?.provider : null) ?? actorRecord?.provider ?? null,
-    activeSessionId: existingMatchesActor ? existing?.activeSessionId ?? null : null,
+    editor: existing?.editor ?? actorRecord?.editor ?? null,
+    provider: existing?.provider ?? actorRecord?.provider ?? null,
+    activeSessionId: existing?.activeSessionId ?? null,
     updatedAt: new Date().toISOString()
   });
 }
@@ -1080,6 +1132,27 @@ function isAllowedGovernanceArtifactPath(filePath: string, taskId: string): bool
 function isFileAllowedInTaskBundle(filePath: string, taskId: string, declaredScope: readonly string[]): boolean {
   if (isAllowedGovernanceArtifactPath(filePath, taskId)) return true;
   return declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope));
+}
+
+function buildHostGitCompatibilityGuidance(input: {
+  readonly gitExecutable: string;
+  readonly stderr: string;
+  readonly stdout: string;
+  readonly copyableCommitCommand: string;
+}): string {
+  const lines = [
+    `ATM shells out to host git (${input.gitExecutable}) with author/committer env vars and ATM_COMMIT_* attribution; do not rely on IDE-injected git flags.`,
+    'Prefer `node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json` so trailers and claim binding stay governed.',
+    `If the wrapper cannot complete, inspect copyableCommitCommand only when hooks can still pass: ${input.copyableCommitCommand}`
+  ];
+  const combined = `${input.stderr}\n${input.stdout}`.toLowerCase();
+  if (combined.includes('trailer') && (combined.includes('unknown option') || combined.includes('unrecognized'))) {
+    lines.push('Host git rejected trailer flags injected by the editor shell; rerun through node atm.mjs git commit instead of a wrapped git commit command.');
+  }
+  if (combined.includes('cannot lock ref') && combined.includes('head')) {
+    lines.push('Another writer advanced HEAD; retry the same node atm.mjs git commit command after the branch queue clears.');
+  }
+  return lines.join(' ');
 }
 
 function buildCopyableGitCommitCommand(input: {

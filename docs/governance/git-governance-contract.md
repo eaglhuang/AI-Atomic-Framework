@@ -4,14 +4,15 @@ ATM git governance aligns actor identity, task claim ownership, and commit metad
 
 ## Commands
 
-Prepare repo-local git identity:
+Prepare actor git identity:
 
 ```bash
 node atm.mjs git prepare --task <task-id> --actor <actor-id> --json
 ```
 
-When `git prepare` receives explicit `--name` and `--email` values, it also
-seeds the repo runtime identity profile for that actor:
+When `git prepare` receives explicit `--name` and `--email` values, it seeds
+the per-actor runtime identity profile at
+`.atm/runtime/identity/actors/<actor-id>.json`:
 
 ```bash
 node atm.mjs git prepare --actor <actor-id> --name "Agent Name" --email agent@example.local --json
@@ -36,10 +37,25 @@ node atm.mjs git check --task <task-id> --actor <actor-id> --no-trailers --json
 - `ATM-Claim: <lease-id>` (when task claim exists)
 - `ATM-Evidence: <reference>`
 
+Identity resolution order for `git prepare` / `git commit` is:
+
+1. explicit `--name` + `--email`
+2. `ATM_GIT_NAME` + `ATM_GIT_EMAIL`
+3. `.atm/runtime/identity/actors/<actor-id>.json`
+4. compatibility fallback `.atm/runtime/identity/default.json`
+
+`identity set --actor <actor-id>` writes only the per-actor file. Omit
+`--actor` to update the compatibility `default.json` lane for single-agent
+workflows.
+
 `git prepare` returns trailer hints so editors and humans can copy them into commit messages.
 If `git commit` or the pre-commit hook still detects a missing ATM identity
 profile, the failure includes a `requiredCommand` for `node atm.mjs identity set`
 using the repo-local git `user.name` and `user.email` when available.
+
+`git commit` shells out with `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`,
+`GIT_COMMITTER_NAME`, `GIT_COMMITTER_EMAIL`, so commit attribution does not
+depend on the current repo-local `git config user.*` value.
 
 ## Task-Scoped Commit Bundles
 
@@ -146,6 +162,24 @@ Banned on the normal path: bare `git commit` for ledger mutations; silent
 unstage of another task's bundle; claiming then closing while governance
 artifacts remain dirty and uncommitted. See `docs/ATM_NEW_USER_WORKFLOW.md`
 (Closeback operator runbook) for the full banned-pattern table.
+
+## Direct `git commit` vs `node atm.mjs git commit`
+
+| Lane | When to use |
+|---|---|
+| **ATM wrapper** | Governed task delivery, evidence bundles, ledger/event mutations, closeback commits, and any staged `.atm/history/**` task or evidence file. |
+| **Direct git** | Read-only commands (`status`, `diff`, `log`, `show`), emergency inspection, and non-governed maintenance outside ATM history paths. |
+
+The pre-commit hook emits `ATM_GIT_COMMIT_WRAPPER_REQUIRED` when staged files
+need governed attribution. It does **not** block read-only git use.
+
+When the wrapper fails, inspect JSON `copyableCommitCommand` and
+`hostGitCompatibilityGuidance`. Prefer retrying `node atm.mjs git commit` before
+copying a bare git command—especially when the host shell injects unsupported
+`--trailer` flags.
+
+Release mirror hygiene after builds is documented in
+`docs/governance/build-release-hygiene.md`.
 
 ## Scope Amendment Audit Lane
 

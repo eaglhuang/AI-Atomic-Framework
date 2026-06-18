@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0053",
+  "title": "Per-actor identity slot routing for parallel-agent commits",
+  "status": "running",
+  "milestone": "M8",
+  "dependencies": [
+    "TASK-MAO-0049"
+  ],
+  "acceptance": [
+    "Two concurrent processes calling `identity set --actor A` and",
+    "`git commit --actor A` with no env vars, no `--name`, no `--email` resolves",
+    "`git config user.name` can be modified between `identity set` and",
+    "A regression test simulates the race (two child processes each running",
+    "Field-test note: re-running TASK-MAO-0014..0022 closeback under this lane"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/identity.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "tests/cli/identity-per-actor-routing.test.ts",
+    "docs/governance/git-governance-contract.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/identity.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/actor.ts",
+    "packages/cli/src/commands/command-specs/identity.spec.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "tests/cli/identity-per-actor-routing.test.ts",
+    "docs/governance/git-governance-contract.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Cross-machine identity federation (only repo-local per-actor routing).",
+    "Replacing the actor registry; per-actor identity files live alongside it."
+  ],
+  "nonGoals": [
+    "Do not change task ledger / claim / session per-actor semantics — those are already actor-isolated."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert per-actor identity routing; restore default.json single-slot fallback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.per-actor-identity-routing-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "ATM has already separated **task ledger**, **claim**, **session**, and\n**task-event** state per actor (see TASK-MAO-0005/0009/0049). However, the git\nidentity profile is still a single shared slot at\n`.atm/runtime/identity/default.json`. When two agents run concurrently:\n\n1. Agent A calls `identity set --actor A`; default.json now says A.\n2. Agent B calls `identity set --actor B`; default.json now says B.\n3. Agent A calls `git commit --actor A`; wrapper reads default.json → sees B →\n   either rejects with `ATM_GIT_COMMIT_IDENTITY_MISSING` or attributes A's\n   commit to B's identity.\n\nField evidence: TASK-MAO-0014..0022 closeback (claude-code-opus-4-7) lost an\nestimated 30% of wall-clock time to identity race with cursor-gpt-5.2 working\non TASK-MAO-0046 in parallel.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0053-per-actor-identity-slot-routing.task.md",
+    "sectionTitle": "TASK-MAO-0053",
+    "headingLine": 51,
+    "hash": "f6986d006e3d4d38"
+  },
+  "importedAt": "2026-06-18T10:58:40.858Z",
+  "lastTransitionId": "2026-06-18T10-58-48-113Z-claim-265c5501606b",
+  "lastTransitionAt": "2026-06-18T10:58:48.113Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-18T10:58:47.369Z",
+  "promotedAt": "2026-06-18T10:58:47.372Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-fde64a78f82a",
+    "claimedAt": "2026-06-18T10:58:47.375Z",
+    "heartbeatAt": "2026-06-18T10:58:47.375Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0053.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/git-governance-contract.md",
+      "packages/cli/src/commands/actor.ts",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/command-specs/identity.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/identity.ts",
+      "tests/cli/identity-per-actor-routing.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T10:58:47.375Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260618105847-captain-TASK-MAO-0053-77c603b6ac",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0053",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0053.*",
+      ".atm/history/task-events/TASK-MAO-0053/**",
+      ".atm/history/tasks/TASK-MAO-0053.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/git-governance-contract.md",
+      "packages/cli/src/commands/actor.ts",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/command-specs/identity.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/identity.ts",
+      "tests/cli/identity-per-actor-routing.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "4753cacc4c1b63a9a9649740ce601a96eb7bedd147c674201ca30e4c0d22a675",
+    "actorId": "captain",
+    "createdAt": "2026-06-18T10:58:48.112Z",
+    "status": "active"
+  }
+}
