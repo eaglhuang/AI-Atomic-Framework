@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T05-42-28-051Z-close-a4e44863ec7b",
+  "taskId": "TASK-MAO-0022",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260618053505-claude-code-opus-4-7-TASK-MAO-0022-84f00821f7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0022.json",
+  "taskSha256": "sha256:4c78faf48d0ce15a2571c11b52104dfefb01c449ece76d38910d8d09d4078e01",
+  "createdAt": "2026-06-18T05:42:28.051Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0022 --actor claude-code-opus-4-7 --status done --historical-delivery f8ec923b86c62f040dfcdfd52bedacaf08c4651f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618053505-claude-code-opus-4-7-TASK-MAO-0022-84f00821f7",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0022.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate-external-core-pipeline",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T05:42:28.043Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0022-external-core-contributor-pipeline.task.md",
+        ".atm/history/evidence/TASK-MAO-0022.*",
+        ".atm/history/task-events/TASK-MAO-0022/**",
+        ".atm/history/tasks/TASK-MAO-0022.json",
+        ".github/workflows/",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/CONTRIBUTING_CORE.md",
+        "docs/HOST_GOVERNANCE_INTEGRATION.md",
+        "scripts/validate-external-core-pipeline.ts",
+        "tests/fixtures/external-core-pipeline/"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-external-core-pipeline.ts",
+        "tests/fixtures/external-core-pipeline/"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
