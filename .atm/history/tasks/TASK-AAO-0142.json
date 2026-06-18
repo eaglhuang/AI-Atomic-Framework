@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0142",
   "title": "Auto-run declared validators into evidence before close",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-AAO-0015",
@@ -78,13 +78,13 @@
     "actorId": "cursor-gpt-5.2",
     "leaseId": "lease-fa15b8c15f6a",
     "claimedAt": "2026-06-18T05:58:04.417Z",
-    "heartbeatAt": "2026-06-18T05:58:04.417Z",
+    "heartbeatAt": "2026-06-18T06:27:44.395Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0142.json"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "delivery commit includes git-head.jsonl governance sidecar alongside scoped source deliverables"
   },
   "owner": "cursor-gpt-5.2",
   "startedAt": "2026-06-18T05:58:04.417Z",
@@ -110,7 +110,12 @@
     "createdAt": "2026-06-18T05:58:04.450Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-06-18T06-25-38-378Z-import-476d1248ff0f",
-  "lastTransitionAt": "2026-06-18T06:25:38.378Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-18T06-27-44-399Z-close-d6721cfc5fa8",
+  "lastTransitionAt": "2026-06-18T06:27:44.399Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-06-18T06:27:44.395Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260618055804-cursor-gpt-5.2-TASK-AAO-0142-c148e9c5f1",
+  "closeReason": "delivery commit includes git-head.jsonl governance sidecar alongside scoped source deliverables",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0142.closure-packet.json"
 }

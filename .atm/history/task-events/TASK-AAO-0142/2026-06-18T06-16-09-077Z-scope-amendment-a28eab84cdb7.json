@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T06-16-09-077Z-scope-amendment-a28eab84cdb7",
+  "taskId": "TASK-AAO-0142",
+  "action": "scope-amendment",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0142.json",
+  "taskSha256": "sha256:8b0ccb94cfd256e3caf08c7b3c23c5df127877f8c1fc5d32a96d9c4d039b7a43",
+  "createdAt": "2026-06-18T06:16:09.077Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0142 --actor cursor-gpt-5.2 --add atomic_workbench/atomization-coverage/path-to-atom-map.json --reason \"ensure atom map in scope\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ensure atom map in scope"
+  }
+}
