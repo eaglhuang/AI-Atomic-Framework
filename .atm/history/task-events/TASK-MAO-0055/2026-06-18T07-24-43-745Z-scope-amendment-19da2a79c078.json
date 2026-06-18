@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T07-24-43-745Z-scope-amendment-19da2a79c078",
+  "taskId": "TASK-MAO-0055",
+  "action": "scope-amendment",
+  "actorId": "captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0055.json",
+  "taskSha256": "sha256:3a47f1d2ef5785b3366da5552d2e2cfbf82576871d02aca0b64ffc8a7f96835f",
+  "createdAt": "2026-06-18T07:24:43.745Z",
+  "command": "node atm.mjs tasks scope add --task TASK-MAO-0055 --actor captain --add \"packages/cli/src/commands/tasks/lifecycle-state.ts,packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts\" --reason \"TASK-MAO-0055 owns verified historical closeback claim friction; lifecycle admission and focused regression are the smallest repair surface.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-MAO-0055 owns verified historical closeback claim friction; lifecycle admission and focused regression are the smallest repair surface."
+  }
+}

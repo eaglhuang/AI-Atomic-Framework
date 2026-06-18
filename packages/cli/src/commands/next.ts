@@ -114,6 +114,7 @@ export async function runNext(argv: any) {
   const claimIntentExtraction = extractClaimIntentFlag(Array.isArray(argv) ? argv : []);
   argv = claimIntentExtraction.argv;
   const claimIntent = claimIntentExtraction.claimIntent;
+  const autoIntent = claimIntentExtraction.autoIntent;
   const outputFlagIndex = argv.indexOf('--output');
   if (outputFlagIndex !== -1) {
     const nextArg = argv[outputFlagIndex + 1];
@@ -136,7 +137,7 @@ export async function runNext(argv: any) {
     intentPath: options.intent,
     explicitTaskIds
   });
-  const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent, claimIntent);
+  const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent, claimIntent ?? 'write');
   const scopedTargetRepo = importedTaskQueue.promptScope?.targetRepo ?? null;
   const earlyFrameworkStatus = createFrameworkModeStatus({
     cwd: options.cwd,
@@ -165,6 +166,7 @@ export async function runNext(argv: any) {
       cwd: options.cwd,
       actor: options.agent,
       claimIntent,
+      autoIntent,
       taskIntent,
       importedTaskQueue,
       integrationBootstrap,
@@ -271,11 +273,16 @@ export async function runNext(argv: any) {
 // conflicts are downgraded to advisory instead of blocking the claim.
 export type NextClaimIntent = 'write' | 'closeout-only';
 
-function extractClaimIntentFlag(argv: readonly any[]): { argv: any[]; claimIntent: NextClaimIntent } {
+function extractClaimIntentFlag(argv: readonly any[]): { argv: any[]; claimIntent: NextClaimIntent | null; autoIntent: boolean } {
   const remaining: any[] = [];
-  let claimIntent: NextClaimIntent = 'write';
+  let claimIntent: NextClaimIntent | null = null;
+  let autoIntent = true;
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
+    if (arg === '--auto-intent') {
+      autoIntent = true;
+      continue;
+    }
     if (arg === '--claim-intent') {
       const raw = String(argv[index + 1] ?? '').trim().toLowerCase();
       const normalized = raw === 'no-more-mutation' ? 'closeout-only' : raw;
@@ -286,16 +293,18 @@ function extractClaimIntentFlag(argv: readonly any[]): { argv: any[]; claimInten
         });
       }
       claimIntent = normalized;
+      autoIntent = false;
       index += 1;
       continue;
     }
     if (arg === '--closeout-only' || arg === '--no-more-mutation') {
       claimIntent = 'closeout-only';
+      autoIntent = false;
       continue;
     }
     remaining.push(arg);
   }
-  return { argv: remaining, claimIntent };
+  return { argv: remaining, claimIntent, autoIntent };
 }
 
 function withRunnerMode<T extends { evidence?: any; messages?: any[] }>(result: T, cwd: string): T {
@@ -502,13 +511,15 @@ function buildCrossRepoFrameworkNextResult(input: {
 async function claimNextImportedTask(input: {
   readonly cwd: string;
   readonly actor: string | undefined;
-  readonly claimIntent?: NextClaimIntent;
+  readonly claimIntent?: NextClaimIntent | null;
+  readonly autoIntent?: boolean;
   readonly taskIntent: TaskIntent | null;
   readonly importedTaskQueue: ImportedTaskQueue;
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
   const claimIntent: NextClaimIntent = input.claimIntent ?? 'write';
+  const autoIntent = input.autoIntent !== false && input.claimIntent == null;
   const promptText = input.taskIntent?.userPrompt?.trim() ?? '';
   const quickfixScope = promptText ? resolveQuickfixScope(promptText) : [];
   if (!input.importedTaskQueue.claimableTask
@@ -906,8 +917,7 @@ async function claimNextImportedTask(input: {
       claimableTask.workItemId,
       '--actor',
       resolvedActor.actorId,
-      '--claim-intent',
-      claimIntent,
+      ...(autoIntent ? ['--auto-intent'] : ['--claim-intent', claimIntent]),
       '--files',
       Array.from(new Set([
         claimableTask.taskPath,
@@ -972,6 +982,9 @@ async function claimNextImportedTask(input: {
   const claimEvidence = claimResult && typeof claimResult === 'object' && 'evidence' in claimResult && claimResult.evidence && typeof claimResult.evidence === 'object'
     ? claimResult.evidence as Record<string, unknown>
     : null;
+  const resolvedClaimIntent = typeof claimEvidence?.claimIntent === 'string'
+    ? claimEvidence.claimIntent
+    : claimIntent;
   const claimRecord = claimEvidence && typeof claimEvidence.claim === 'object' && claimEvidence.claim
     ? claimEvidence.claim as Record<string, unknown>
     : null;
@@ -1008,7 +1021,7 @@ async function claimNextImportedTask(input: {
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
     reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
     recommendedChannel,
-    claimIntent,
+    claimIntent: resolvedClaimIntent,
     riskLevel: recommendedChannel === 'batch' ? 'high' : 'medium',
     playbook: buildChannelPlaybook({
       channel: recommendedChannel,
@@ -1086,7 +1099,7 @@ async function claimNextImportedTask(input: {
         taskId: claimableTask.workItemId,
         actorId: resolvedActor.actorId,
         recommendedChannel: nextAction.recommendedChannel,
-        claimIntent,
+        claimIntent: resolvedClaimIntent,
         batchCheckpointCommand: nextAction.recommendedChannel === 'batch'
           ? 'node atm.mjs batch checkpoint --actor <id> --json'
           : null,
@@ -1101,7 +1114,7 @@ async function claimNextImportedTask(input: {
     ),
     evidence: {
       nextAction,
-      claimIntent,
+      claimIntent: resolvedClaimIntent,
       claimPreparation,
       claimResult: claimResult.evidence,
       taskDirectionLock: directionLock,
@@ -1331,13 +1344,13 @@ function buildPromptScopedNextResult(input: {
     const nextAction = embedTeamRecommendation({
       status: 'task-queue-ready',
       command: queueHeadTask
-        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --json`
+        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --auto-intent --json`
         : 'node atm.mjs next --prompt "<current user prompt>" --json',
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
       recommendedChannel: 'batch',
       riskLevel: 'high',
       requiredCommand: queueHeadTask
-        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --json`
+        ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --auto-intent --json`
         : 'node atm.mjs next --prompt "<current user prompt>" --json',
       batchInstruction: 'This is a batch run. Do not switch to per-task normal flow. After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks reserve/promote/claim/close.',
       playbook: buildChannelPlaybook({
@@ -1623,7 +1636,7 @@ function buildPromptScopedNextResult(input: {
     };
     const nextAction = embedTeamRecommendation({
       status: 'task-batch-context-active',
-      command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --json`,
+      command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --auto-intent --json`,
       reason: `task ${selectedTask.workItemId} belongs to active batch ${activeBatch.batchId}; continue through the current batch queue head`,
       recommendedChannel: 'batch',
       riskLevel: 'high',
@@ -1642,7 +1655,7 @@ function buildPromptScopedNextResult(input: {
       }),
       selectedTask,
       targetRepo: selectedTask.targetRepo,
-      requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --json`,
+      requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --auto-intent --json`,
       taskQueue,
       queueId: activeQueue?.queueId ?? activeBatch.batchId,
       batchId: activeBatch.batchId,
@@ -1698,9 +1711,9 @@ function buildPromptScopedNextResult(input: {
     ? input.taskIntent.explicitTaskIds[0]
     : null;
   const normalClaimCommand = explicitTaskSelector
-    ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --json`
-    : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --json`;
-  const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --json`;
+    ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --auto-intent --json`
+    : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --auto-intent --json`;
+  const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --auto-intent --json`;
   const nextAction = embedTeamRecommendation({
     status: 'task-route-ready',
     command: normalClaimCommand,
@@ -1905,7 +1918,7 @@ function buildPromptRequiredNextResult(input: {
     batchInstruction: 'If the user asked for all task cards, a whole plan, or multiple tasks, rerun with the original prompt so ATM can return recommendedChannel=batch and require batch checkpoint.',
     allowedCommands: [
       'node atm.mjs next --prompt "<current user prompt>" --json',
-      'node atm.mjs next --claim --actor <id> --prompt "<current user prompt>" --json'
+      'node atm.mjs next --claim --actor <id> --prompt "<current user prompt>" --auto-intent --json'
     ],
     blockedCommands: [
       'manual tasks reserve/promote/claim/close loops without prompt-scoped next',
@@ -3629,6 +3642,7 @@ function buildChannelPlaybook(input: {
   const actor = input.actorPlaceholder ?? '<id>';
   const prompt = input.originalPrompt?.trim() || '<current user prompt>';
   const taskId = input.taskId ?? '<task-id>';
+  const defaultClaimCommand = `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --auto-intent --json`;
   const closeOps = buildTaskflowCloseOperatorCommands(taskId, actor);
   if (input.channel === 'fast') {
     return {
@@ -3638,7 +3652,7 @@ function buildChannelPlaybook(input: {
       mustFollow: true,
       summary: 'Use this only for small, low-risk edits. It is not a task-card closure path.',
       steps: [
-        `Run: node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+        `Run: ${defaultClaimCommand}`,
         'Edit only the allowed files returned by ATM.',
         'Run the smallest relevant validator for the touched file.',
         'Commit only the real non-.atm diff and any required git-head evidence.'
@@ -3649,7 +3663,7 @@ function buildChannelPlaybook(input: {
         'Do not expand the scope after the quickfix lock is created.'
       ],
       commandSequence: [
-        `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+        defaultClaimCommand,
         '<edit allowed files>',
         '<run focused validator>',
         'git add <changed files>',
@@ -3663,7 +3677,7 @@ function buildChannelPlaybook(input: {
     const batchState = input.batchState ?? 'queue-head-active';
     const batchLabel = input.batchId ? `batch ${input.batchId}` : 'this batch';
     const isRepairState = batchState === 'repair-required';
-    const batchClaimCommand = `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`;
+    const batchClaimCommand = defaultClaimCommand;
     const batchRepairCommand = `node atm.mjs batch repair --actor ${actor}${input.batchId ? ` --batch ${input.batchId}` : ''} --json`;
     const stateSummary = batchState === 'queue-preview'
       ? 'This is a batch preview. Claim the queue head, then work one task at a time.'
@@ -3743,7 +3757,7 @@ function buildChannelPlaybook(input: {
     mustFollow: true,
     summary: 'Use this for one explicit task card. Preview close with taskflow pre-close and taskflow close dry-run before --write.',
     steps: [
-      `Run: node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+      `Run: ${defaultClaimCommand}`,
       'Work only on the claimed task and its allowed files.',
       'Implement the real non-.atm deliverables.',
       'Run required validators or a focused reproducible verification command.',
@@ -3759,7 +3773,7 @@ function buildChannelPlaybook(input: {
       'Do not commit task closure separately from the deliverable it proves.'
     ],
     commandSequence: [
-      `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
+      defaultClaimCommand,
       '<implement task deliverables>',
       'node atm.mjs evidence run --task <task-id> --actor <id> --command "<validator>" --json',
       closeOps.preClose,

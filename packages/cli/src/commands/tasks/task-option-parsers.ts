@@ -822,7 +822,9 @@ export function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release'
     // TASK-CID-0024: closeout-only / no-more-mutation claim intent. 'write' is
     // the normal mutating claim; 'closeout-only' is a non-mutating claim whose
     // deliverable already landed and only governed closeout work remains.
-    claimIntent: 'write' as 'write' | 'closeout-only'
+    claimIntent: 'write' as 'write' | 'closeout-only',
+    autoIntent: false,
+    claimIntentExplicit: false
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -870,11 +872,20 @@ export function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release'
       options.reservedOk = true;
       continue;
     }
+    if (arg === '--auto-intent') {
+      if (action !== 'claim') {
+        throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option --auto-intent`, { exitCode: 2 });
+      }
+      options.autoIntent = true;
+      continue;
+    }
     if (arg === '--closeout-only' || arg === '--no-more-mutation') {
       if (action !== 'claim') {
         throw new CliError('ATM_CLI_USAGE', `tasks ${action} does not support option ${arg}`, { exitCode: 2 });
       }
       options.claimIntent = 'closeout-only';
+      options.claimIntentExplicit = true;
+      options.autoIntent = false;
       continue;
     }
 
@@ -891,6 +902,8 @@ export function parseClaimLifecycleOptions(action: 'claim' | 'renew' | 'release'
         });
       }
       options.claimIntent = normalized;
+      options.claimIntentExplicit = true;
+      options.autoIntent = false;
       index += 1;
       continue;
     }

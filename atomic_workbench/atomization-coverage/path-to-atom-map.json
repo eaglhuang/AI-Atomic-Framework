@@ -240,7 +240,7 @@
     {
       "path_pattern": "packages/cli/src/commands/command-specs/tasks.spec.ts",
       "atom_id": "atm.task-direction-map",
-      "capability": "tasks command surface specification including scope add sub-command with --add csv option (TASK-AAO-0010).",
+      "capability": "tasks command surface specification including scope add sub-command with --add csv option and claim auto-intent surface documentation (TASK-AAO-0010, TASK-MAO-0055).",
       "coverage_status": "active"
     },
     {
@@ -356,7 +356,7 @@
     {
       "path_pattern": "packages/cli/src/commands/next.ts",
       "atom_id": "atm.next-router-map",
-      "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
+      "capability": "next-action routing, task scope resolution, public decisionTrail contract, and default --auto-intent claim guidance for task routes.",
       "coverage_status": "active"
     },
     {
@@ -369,7 +369,7 @@
     {
       "path_pattern": "packages/cli/src/commands/command-specs/next.spec.ts",
       "atom_id": "atm.next-router-map",
-      "capability": "next command CLI surface specification: summary, options (--claim, --actor, --prompt, --task, --tasks, --intent, --output), and canonical usage examples covering prompt-scoped, explicit-task, quickfix, batch, and claim flows (TASK-MAO-0004).",
+      "capability": "next command CLI surface specification: summary, options (--claim, --actor, --auto-intent, --claim-intent, --prompt, --task, --tasks, --intent, --output), and canonical usage examples covering prompt-scoped, explicit-task, quickfix, batch, and claim flows (TASK-MAO-0004, TASK-MAO-0055).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0004"
     },
@@ -473,7 +473,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-ledger-governance-map",
-      "capability": "tasks import/reconcile; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
+      "capability": "tasks import/reconcile and claim lifecycle governance; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; claim auto-intent resolves write vs closeout-only from in-scope dirty files and deliverables already in HEAD; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
       "coverage_status": "active"
     },
     {
@@ -1632,7 +1632,7 @@
     {
       "path_pattern": "docs/ATM_NEW_USER_WORKFLOW.md",
       "atom_id": "atm.claim-repair-lifecycle-owner-map",
-      "capability": "Operator guidance: closeout has one lifecycle owner; tasks repair-claim is diagnose-first recovery, not a close shortcut.",
+      "capability": "Operator guidance: closeout has one lifecycle owner; next --claim defaults to auto-intent for write vs closeout-only routing; tasks repair-claim is diagnose-first recovery, not a close shortcut.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0043"
     },

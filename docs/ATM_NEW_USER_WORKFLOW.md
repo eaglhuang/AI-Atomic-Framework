@@ -118,6 +118,7 @@ If `next` already resolved to a single task, claim with the explicit task id (re
 node atm.mjs next --claim \
   --actor <actor> \
   --task TASK-XXXX-0001 \
+  --auto-intent \
   --json
 ```
 
@@ -127,8 +128,15 @@ The prompt form still works and is useful when the human did not specify a task 
 node atm.mjs next --claim \
   --actor <actor> \
   --prompt "Export CSV report" \
+  --auto-intent \
   --json
 ```
+
+`--auto-intent` is the normal default lane for task claims: ATM checks whether
+the task still has in-scope dirty source changes (`write`) or whether declared
+deliverables already landed cleanly in HEAD (`closeout-only`). If you already
+know you need the closeout lane, you can still override with
+`--claim-intent closeout-only`.
 
 **What ATM does:**
 

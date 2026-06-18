@@ -4200,11 +4200,32 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         details: { taskId: options.taskId, actorId: currentClaim.actorId, leaseId: currentClaim.leaseId }
       });
     }
+    const claimIntentResolution = resolveTaskClaimIntent({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      taskDocument,
+      requestedClaimIntent: options.claimIntent,
+      autoIntent: options.autoIntent === true && options.claimIntentExplicit !== true,
+      explicitClaimIntent: options.claimIntentExplicit === true
+    });
+    if (options.claimIntentExplicit === true
+      && options.claimIntent === 'closeout-only'
+      && claimIntentResolution.dirtyInScopeFiles.length > 0) {
+      throw new CliError('ATM_CLAIM_INTENT_CONFLICT', `closeout-only claim requires a clean in-scope source tree. Found dirty: ${claimIntentResolution.dirtyInScopeFiles.join(', ')}. Re-claim with --claim-intent write or revert those changes first.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          claimIntent: options.claimIntent,
+          dirtyInScopeFiles: claimIntentResolution.dirtyInScopeFiles,
+          requiredCommand: `node atm.mjs tasks claim --task ${options.taskId} --actor ${actorId} --claim-intent write --files <scoped-files> --json`
+        }
+      });
+    }
     const claimAdmission = evaluateTaskClaimAdmission({
       taskId: options.taskId,
       actorId,
       status: String(taskDocument.status ?? ''),
-      claimIntent: options.claimIntent
+      claimIntent: claimIntentResolution.resolvedClaimIntent
     });
     if (!claimAdmission.ok) {
       throw new CliError(claimAdmission.code, claimAdmission.message, {
@@ -4247,7 +4268,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         ttlSeconds: options.ttlSeconds,
         timestamp: nowIso
       }),
-      intent: options.claimIntent
+      intent: claimIntentResolution.resolvedClaimIntent
     };
     try {
       await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
@@ -4308,13 +4329,14 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       messages: [message('info', 'ATM_TASKS_CLAIM_ACQUIRED', `Claim acquired for ${options.taskId}.`, {
         taskId: options.taskId,
         actorId,
-        claimIntent: options.claimIntent
+        claimIntent: claimIntentResolution.resolvedClaimIntent
       })],
       evidence: {
         action,
         taskId: options.taskId,
         actorId,
-        claimIntent: options.claimIntent,
+        claimIntent: claimIntentResolution.resolvedClaimIntent,
+        claimIntentResolution,
         claim,
         taskPath: relativeTaskPath,
         transitionPath,
@@ -4751,6 +4773,89 @@ function evaluateFrameworkDeliveryWindow(input: {
         ? `Remove unrelated framework critical diffs or add the real deliverable paths to the task scope before rerunning ${checkpointCommand}. If the scoped delivery already landed, use ${historicalCommand}.`
         : `Normal framework critical tasks close in two phases: first create a governed delivery commit with ${normalDeliveryCommitCommand}; then close with ${normalHistoricalCloseCommand}. Batch checkpoint commands are only for --from-batch-checkpoint closures.`
   };
+}
+
+interface TaskClaimIntentResolution {
+  readonly requestedClaimIntent: 'write' | 'closeout-only';
+  readonly resolvedClaimIntent: 'write' | 'closeout-only';
+  readonly autoIntent: boolean;
+  readonly explicitClaimIntent: boolean;
+  readonly reason: string;
+  readonly dirtyInScopeFiles: readonly string[];
+  readonly declaredDeliverableFiles: readonly string[];
+  readonly deliverablesTrackedInHead: readonly string[];
+  readonly missingDeliverables: readonly string[];
+}
+
+function resolveTaskClaimIntent(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly taskDocument: Record<string, unknown>;
+  readonly requestedClaimIntent: 'write' | 'closeout-only';
+  readonly autoIntent: boolean;
+  readonly explicitClaimIntent: boolean;
+}): TaskClaimIntentResolution {
+  const declaredFiles = normalizeTaskScopePaths(input.cwd, extractTaskCloseDeclaredFiles(input.taskDocument, input.cwd, input.taskId));
+  const source = input.taskDocument.source && typeof input.taskDocument.source === 'object' && !Array.isArray(input.taskDocument.source)
+    ? input.taskDocument.source as Record<string, unknown>
+    : {};
+  const planPath = typeof source.planPath === 'string' ? normalizeRelativePath(source.planPath) : '';
+  const inScopeSourceFiles = declaredFiles.filter((filePath) => !filePath.startsWith('.atm/') && filePath !== planPath);
+  const dirtyFiles = uniqueStrings([
+    ...readGitNameOnly(input.cwd, ['diff', '--name-only', '--cached']),
+    ...readGitNameOnly(input.cwd, ['diff', '--name-only']),
+    ...readGitNameOnly(input.cwd, ['ls-files', '-o', '--exclude-standard'])
+  ]).filter((filePath) => inScopeSourceFiles.some((declared) => pathMatchesTaskScope(filePath, declared)));
+  const declaredDeliverableFiles = extractStringList(input.taskDocument.deliverables)
+    .map(normalizeRelativePath)
+    .filter((filePath) => Boolean(filePath) && !filePath.startsWith('.atm/'));
+  const deliverablesTrackedInHead = declaredDeliverableFiles.filter((filePath) => isTaskClaimDeliverableTrackedInHead(input.cwd, filePath));
+  const missingDeliverables = declaredDeliverableFiles.filter((filePath) => !deliverablesTrackedInHead.includes(filePath));
+  if (!input.autoIntent) {
+    return {
+      requestedClaimIntent: input.requestedClaimIntent,
+      resolvedClaimIntent: input.requestedClaimIntent,
+      autoIntent: false,
+      explicitClaimIntent: input.explicitClaimIntent,
+      reason: input.explicitClaimIntent ? 'explicit-claim-intent' : 'default-write-claim-intent',
+      dirtyInScopeFiles: dirtyFiles,
+      declaredDeliverableFiles,
+      deliverablesTrackedInHead,
+      missingDeliverables
+    };
+  }
+  const resolvedClaimIntent = dirtyFiles.length > 0
+    ? 'write'
+    : declaredDeliverableFiles.length > 0 && missingDeliverables.length === 0
+      ? 'closeout-only'
+      : 'write';
+  return {
+    requestedClaimIntent: input.requestedClaimIntent,
+    resolvedClaimIntent,
+    autoIntent: true,
+    explicitClaimIntent: false,
+    reason: dirtyFiles.length > 0
+      ? deliverablesTrackedInHead.length > 0
+        ? 'dirty-in-scope-source-overrides-closeout'
+        : 'dirty-in-scope-source'
+      : declaredDeliverableFiles.length > 0 && missingDeliverables.length === 0
+        ? 'deliverables-already-in-head'
+        : 'deliverables-not-yet-landed',
+    dirtyInScopeFiles: dirtyFiles,
+    declaredDeliverableFiles,
+    deliverablesTrackedInHead,
+    missingDeliverables
+  };
+}
+
+function isTaskClaimDeliverableTrackedInHead(cwd: string, filePath: string): boolean {
+  if (!filePath || /[*?[\]{}]/.test(filePath)) return false;
+  try {
+    execFileSync('git', ['-C', cwd, 'cat-file', '-e', `HEAD:${filePath}`], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function evaluateTaskDeliverableGate(input: {
