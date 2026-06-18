@@ -671,6 +671,7 @@ export interface CloseWriteRollbackSnapshot {
     readonly previousContent: string;
   } | null;
   readonly stagedArtifacts: readonly string[];
+  readonly preCloseStagedFiles: readonly string[];
 }
 
 export interface CloseWriteTransactionReport {
@@ -708,6 +709,7 @@ export function buildCloseWriteRollbackSnapshot(input: {
   planningCard: CloseWriteRollbackSnapshot['planningCard'];
   extraStagedArtifacts?: readonly string[];
   closeWindowStagedIndexLockActive?: boolean;
+  preCloseStagedFiles?: readonly string[];
 }): CloseWriteRollbackSnapshot {
   const evidence = input.backendEvidence ?? {};
   const stagedArtifacts = uniqueRelativePaths([
@@ -725,12 +727,45 @@ export function buildCloseWriteRollbackSnapshot(input: {
     closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null,
     closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
     planningCard: input.planningCard,
-    stagedArtifacts
+    stagedArtifacts,
+    preCloseStagedFiles: uniqueRelativePaths(input.preCloseStagedFiles ?? [])
   };
 }
 
 function uniqueRelativePaths(values: readonly (string | null | undefined)[]): string[] {
   return [...new Set(values.map((entry) => (typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '')).filter(Boolean))];
+}
+
+function readRollbackStagedFiles(cwd: string): readonly string[] {
+  try {
+    const output = execFileSync(resolveGitExecutableForRollback(), ['diff', '--cached', '--name-only'], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    return uniqueRelativePaths(output.split(/\r?\n/));
+  } catch {
+    return [];
+  }
+}
+
+function restoreRollbackIndexBaseline(input: {
+  readonly cwd: string;
+  readonly preCloseStagedFiles: readonly string[];
+  readonly rolledBackArtifacts: string[];
+}) {
+  const baseline = new Set(uniqueRelativePaths(input.preCloseStagedFiles));
+  const unexpected = readRollbackStagedFiles(input.cwd).filter((entry) => !baseline.has(entry));
+  if (unexpected.length === 0) return;
+  try {
+    execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...unexpected], {
+      cwd: input.cwd,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    input.rolledBackArtifacts.push(...unexpected.map((entry) => `${entry} (unstaged rollback-baseline)`));
+  } catch {
+    // preserve rollback report even if index cleanup fails
+  }
 }
 
 export function rollbackCloseWriteTransaction(input: {
@@ -769,7 +804,8 @@ export function rollbackCloseWriteTransaction(input: {
     rolledBackArtifacts.push(input.snapshot.planningCard.absolutePath);
   }
 
-  const staged = uniqueRelativePaths(input.snapshot.stagedArtifacts);
+  const preCloseStaged = new Set(input.snapshot.preCloseStagedFiles);
+  const staged = uniqueRelativePaths(input.snapshot.stagedArtifacts).filter((entry) => !preCloseStaged.has(entry));
   if (staged.length > 0) {
     try {
       execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...staged], {
@@ -781,6 +817,11 @@ export function rollbackCloseWriteTransaction(input: {
       // preserve rollback report even if index cleanup fails
     }
   }
+  restoreRollbackIndexBaseline({
+    cwd: input.cwd,
+    preCloseStagedFiles: input.snapshot.preCloseStagedFiles,
+    rolledBackArtifacts
+  });
 
   if (input.snapshot.closeWindowStagedIndexLockActive) {
     const released = releaseCloseWindowStagedIndexLock({

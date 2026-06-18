@@ -1468,7 +1468,7 @@ async function runTasksDeliverAndClose(argv: string[]): Promise<CommandResult> {
     }
     deliveryCommitSha = resolved;
   } else {
-    const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
+    const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId);
     const declaredPaths = sanitizeTaskDirectionAllowedFiles(taskDeclaredFiles);
     const modifiedUnstaged = readGitNameOnly(options.cwd, ['diff', '--name-only']).filter((f) =>
       declaredPaths.length === 0 || declaredPaths.some((d) => pathMatchesTaskScope(f, d))
@@ -2551,7 +2551,7 @@ async function runTasksClose(argv: string[]) {
     });
   }
 
-  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument);
+  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId);
   const activeFrameworkStatus = options.status === 'done'
     ? createFrameworkModeStatus({ cwd: options.cwd })
     : null;

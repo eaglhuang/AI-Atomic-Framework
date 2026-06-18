@@ -1855,6 +1855,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           }
         });
       }
+    const preCloseStagedFiles = readStagedFiles(cwd);
     const preCloseDeliveryCommit = await commitTaskflowDeliveryFiles({
       bundle: previewCommitBundle,
       actorId,
@@ -1885,7 +1886,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       previousTaskContent,
       backendEvidence: backendResult.evidence as Record<string, unknown> | undefined,
       planningCard: planningCardSnapshot,
-      closeWindowStagedIndexLockActive: closeWindowLock?.ok === true
+      closeWindowStagedIndexLockActive: closeWindowLock?.ok === true,
+      preCloseStagedFiles
     });
     const planningCardCloseback = closebackPlan.backendSurface === 'tasks-close' && backendResult.ok
       ? applyPlanningCardCloseback({
