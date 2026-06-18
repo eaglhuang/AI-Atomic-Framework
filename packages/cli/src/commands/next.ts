@@ -3643,9 +3643,9 @@ function buildChannelPlaybook(input: {
         '<edit allowed files>',
         '<run focused validator>',
         'git add <changed files>',
-        'git commit -m "<message>"'
+        `node atm.mjs git commit --actor ${actor} --message "<message>" --json`
       ],
-      commitTiming: 'Commit after the focused validator passes.'
+      commitTiming: 'Commit after the focused validator passes. Prefer the ATM git wrapper for governed framework work so commit trailers and fallback guidance stay consistent.'
     };
   }
   if (input.channel === 'batch') {
@@ -3669,7 +3669,7 @@ function buildChannelPlaybook(input: {
         'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
         'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
-        'git commit -m "<scope>: complete <queue-head-task-id>"'
+        `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`
       ]
       : [
         batchClaimCommand,
@@ -3678,7 +3678,7 @@ function buildChannelPlaybook(input: {
         'git add <deliverables> .atm/history/evidence/<queue-head-task-id>.json',
         `node atm.mjs batch checkpoint --actor ${actor} --json`,
         'git add .atm/history/tasks/<queue-head-task-id>.json .atm/history/task-events/<queue-head-task-id>/',
-        'git commit -m "<scope>: complete <queue-head-task-id>"'
+        `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`
       ];
     return {
       schemaId: 'atm.channelPlaybook.v1',
@@ -3751,12 +3751,12 @@ function buildChannelPlaybook(input: {
     commandSequence: [
       `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --json`,
       '<implement task deliverables>',
-      'node atm.mjs evidence run --task <task-id> --actor <id> --command "<validator>" --validators "<name>" --json',
+      'node atm.mjs evidence run --task <task-id> --actor <id> --command "<validator>" --json',
       closeOps.preClose,
       closeOps.dryRun,
       closeOps.write,
       'git add <deliverables> .atm/history/tasks/<task-id>.json .atm/history/evidence/<task-id>.json .atm/history/task-events/<task-id>/',
-      'git commit -m "<scope>: complete <task-id>"'
+      `node atm.mjs git commit --actor ${actor} --task <task-id> --message "<scope>: complete <task-id>" --json`
     ],
     closePreview: {
       schemaId: 'atm.taskflowClosePreviewPlaybook.v1',

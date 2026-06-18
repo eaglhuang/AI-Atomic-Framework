@@ -1383,6 +1383,23 @@ try {
     assert(secondRecord.details.validationPasses.includes('typecheck'), 'must include typecheck');
     assert(!secondRecord.details.validationPasses.includes('validate:cli'), 'must not include validate:cli if custom validators provided');
 
+    const importedTaskPath = path.join(autoLinkTempWorkspace, '.atm/history/tasks/TASK-AAO-0063.json');
+    const importedTask = JSON.parse(readFileSync(importedTaskPath, 'utf8'));
+    importedTask.validators = [...(Array.isArray(importedTask.validators) ? importedTask.validators : []), 'node --version'];
+    writeJson(importedTaskPath, importedTask);
+
+    const runRes = await runAtm([
+      'evidence', 'run',
+      '--task', 'TASK-AAO-0063',
+      '--actor', 'Antigravity',
+      '--command', 'node --version'
+    ], autoLinkTempWorkspace);
+    assert(runRes.parsed.ok === true, 'evidence run without --validators must auto-link task-declared command validators');
+
+    const evidenceContentAfterRun = JSON.parse(readFileSync(evidenceJsonPath, 'utf8'));
+    const thirdRecord = evidenceContentAfterRun.evidence[2];
+    assert(thirdRecord.details.validationPasses.includes('node --version'), 'task-declared literal command validator must auto-link');
+
     // 2.3: --output-json file writer flag tests
     const outputJsonTestPath = path.join(autoLinkTempWorkspace, 'output-test.json');
     const statusRes = await runAtmSpawned(['tasks', 'queue', 'status', '--output-json', outputJsonTestPath], autoLinkTempWorkspace);

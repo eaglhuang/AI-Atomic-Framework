@@ -27,6 +27,7 @@ const dirtyGuard = evaluateFrameworkCloseDirtyGuard({
   trackedDirtyFiles: [
     'packages/cli/src/commands/tasks.ts',
     '.atm/history/evidence/TASK-CID-0056.json',
+    '.atm/history/evidence/TASK-CID-0056.bundle-manifest.json',
     'release/atm-onefile/atm.mjs',
     'scripts/unrelated.ts'
   ]
@@ -36,6 +37,7 @@ assert(!dirtyGuard.ok, 'in-scope and same-task governance files must block close
 assert(dirtyGuard.reason === 'blocking-dirty-files-present', 'blocking reason must be stable');
 assert(dirtyGuard.scopeTrackedDirtyFiles.includes('packages/cli/src/commands/tasks.ts'), 'scope file must be in scope bucket');
 assert(dirtyGuard.governanceTrackedDirtyFiles.includes('.atm/history/evidence/TASK-CID-0056.json'), 'same-task evidence must be governance bucket');
+assert(dirtyGuard.advisoryTrackedDirtyFiles.includes('.atm/history/evidence/TASK-CID-0056.bundle-manifest.json'), 'same-task bundle manifest must be advisory');
 assert(dirtyGuard.generatedArtifactFiles.includes('release/atm-onefile/atm.mjs'), 'release runner output must be generated artifact bucket');
 assert(dirtyGuard.advisoryTrackedDirtyFiles.includes('scripts/unrelated.ts'), 'unrelated source must be advisory bucket');
 assert(dirtyGuard.remediation.requiredCommand?.includes('node atm.mjs git commit'), 'blocking guard must expose governed commit command');

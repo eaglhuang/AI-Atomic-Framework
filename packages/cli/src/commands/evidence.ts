@@ -244,6 +244,7 @@ function isClosureRequiredValidator(gate: string, taskDeclaredValidators: readon
 
 /** 依 gate 名稱回傳對應的執行指令（human-readable 提示用） */
 function resolveValidatorExpectedCommand(gate: string): string {
+  if (looksLikeLiteralValidatorCommand(gate)) return gate;
   if (gate === 'typecheck') return 'npm run typecheck';
   if (gate === 'git diff --check') return 'git diff --check';
   if (gate.startsWith('validate:')) return `npm run ${gate}`;
@@ -252,6 +253,13 @@ function resolveValidatorExpectedCommand(gate: string): string {
   if (gate === 'doctor') return 'node atm.mjs doctor --json';
   if (gate === 'git-head-evidence') return 'node atm.mjs evidence git-head-backfill --actor <actor> --json';
   return `node atm.mjs ${gate} --json`;
+}
+
+function looksLikeLiteralValidatorCommand(value: string): boolean {
+  const normalized = normalizeValidatorToken(value);
+  return /^(?:node|npm|git|npx|pnpm|yarn|powershell(?:\.exe)?|pwsh(?:\.exe)?)\s+/i.test(normalized)
+    || normalized.startsWith('./')
+    || normalized.startsWith('.\\');
 }
 
 /** evidence validators --list --task <id> 的執行邏輯 */
@@ -687,6 +695,13 @@ function runEvidenceRun(argv: string[]) {
   const actorId = resolvedActor.actorId;
   const resolvedCwd = path.resolve(options.cwd);
   const resolvedTaskId = options.taskId.trim();
+  if (options.validators.length === 0) {
+    options.validators = resolveEvidenceAutoValidators({
+      cwd: resolvedCwd,
+      taskId: resolvedTaskId,
+      command: options.command
+    });
+  }
 
   // 1. 檢查是否要重用最近一次的執行結果
   let reusedRun: CommandRunEvidenceInput | null = null;
@@ -999,10 +1014,11 @@ function runEvidenceAdd(argv: string[]) {
 
   // Auto-link logic for evidence add
   if (options.validators.length === 0 && options.commandRun) {
-    const autoVal = detectAutoLinkedValidator(options.commandRun.command);
-    if (autoVal) {
-      options.validators = [autoVal];
-    }
+    options.validators = resolveEvidenceAutoValidators({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      command: options.commandRun.command
+    });
   }
 
   const commandRuns = normalizeEvidenceCommandRuns({
@@ -2668,4 +2684,27 @@ export function detectAutoLinkedValidator(command: string): string | null {
     return gate;
   }
   return null;
+}
+
+function resolveEvidenceAutoValidators(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly command: string;
+}): string[] {
+  const autoLinked = detectAutoLinkedValidator(input.command);
+  if (autoLinked) return [autoLinked];
+
+  const taskDocument = readTaskDocument(input.cwd, input.taskId);
+  if (!taskDocument || !Array.isArray(taskDocument.validators)) return [];
+
+  const commandCanonical = canonicalizeValidatorIdentity(input.command);
+  const commandNormalized = normalizeValidatorToken(input.command);
+  for (const entry of taskDocument.validators) {
+    if (typeof entry !== 'string' || !entry.trim()) continue;
+    const declaredCanonical = canonicalizeValidatorIdentity(entry);
+    if (declaredCanonical && declaredCanonical === commandCanonical) return [declaredCanonical];
+    if (normalizeValidatorToken(entry) === commandNormalized) return [declaredCanonical || entry.trim()];
+  }
+
+  return [];
 }
