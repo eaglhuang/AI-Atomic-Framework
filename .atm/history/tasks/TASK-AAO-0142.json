@@ -4,7 +4,12 @@
   "title": "Auto-run declared validators into evidence before close",
   "status": "running",
   "milestone": null,
-  "dependencies": [],
+  "dependencies": [
+    "TASK-AAO-0015",
+    "TASK-AAO-0016",
+    "TASK-AAO-0017",
+    "TASK-AAO-0140"
+  ],
   "acceptance": [
     "`taskflow pre-close` or `taskflow close --dry-run` exposes an auto-evidence plan for missing required validators.",
     "A write/execute mode records successful required validators as command-backed evidence without asking for manual `--validators` when the command maps to a declared validator.",
@@ -12,19 +17,19 @@
     "Existing explicit `--validators` behavior still works as an override for extra evidence outside the task-card baseline."
   ],
   "deliverables": [
-    "A governed close/pre-close auto-evidence mode that discovers task-card declared validators and runs the missing required ones without requiring the operator to pass --validators by hand.",
-    "A dry-run plan that lists validators to run, already-satisfied validators, skipped out-of-scope validators, and commands that require explicit operator approval.",
-    "Command-backed evidence records for successful auto-runs, using the same validator identity normalization as evidence validators --list and evidence missing.",
-    "CLI help/spec updates showing that --validators is an override, not the normal happy path."
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "tests/cli/taskflow-auto-evidence.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
   ],
   "scopePaths": [
     "packages/cli/src/commands/evidence.ts",
     "packages/cli/src/commands/taskflow.ts",
-    "packages/cli/src/commands/taskflow/**",
-    "packages/cli/src/commands/command-specs/evidence.spec.ts",
     "packages/cli/src/commands/command-specs/taskflow.spec.ts",
-    "scripts/validate-cli.ts",
-    "tests/**"
+    "tests/cli/taskflow-auto-evidence.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "scripts/validate-cli.ts"
   ],
   "validators": [
     "npm run typecheck",
@@ -66,15 +71,9 @@
     "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0142-auto-run-declared-validators-into-evidence-before-close.task.md",
     "sectionTitle": "TASK-AAO-0142",
     "headingLine": 61,
-    "hash": "dd3f4de55766966d"
+    "hash": "077e73fb2a52b174"
   },
-  "importedAt": "2026-06-18T05:54:45.944Z",
-  "lastTransitionId": "2026-06-18T05-58-04-450Z-claim-b750c41d5dc9",
-  "lastTransitionAt": "2026-06-18T05:58:04.450Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "cursor-gpt-5.2",
-  "reservedAt": "2026-06-18T05:54:56.684Z",
-  "promotedAt": "2026-06-18T05:54:57.296Z",
+  "importedAt": "2026-06-18T06:25:38.373Z",
   "claim": {
     "actorId": "cursor-gpt-5.2",
     "leaseId": "lease-fa15b8c15f6a",
@@ -87,8 +86,8 @@
     "state": "active",
     "intent": "write"
   },
+  "owner": "cursor-gpt-5.2",
   "startedAt": "2026-06-18T05:58:04.417Z",
-  "startedByActor": "cursor-gpt-5.2",
   "startedBySessionId": "session-20260618055804-cursor-gpt-5.2-TASK-AAO-0142-c148e9c5f1",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -110,5 +109,8 @@
     "actorId": "cursor-gpt-5.2",
     "createdAt": "2026-06-18T05:58:04.450Z",
     "status": "active"
-  }
+  },
+  "lastTransitionId": "2026-06-18T06-25-38-378Z-import-476d1248ff0f",
+  "lastTransitionAt": "2026-06-18T06:25:38.378Z",
+  "ledgerContractVersion": "task-ledger/v1"
 }
