@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0097",
   "title": "Broker batch planner, CAS, and atomic write evidence",
-  "status": "planned",
+  "status": "running",
   "milestone": "M19",
   "dependencies": [
     "TASK-CID-0093",
@@ -73,7 +73,66 @@
     "hash": "a76216dc2208fe66"
   },
   "importedAt": "2026-06-15T16:53:16.659Z",
-  "lastTransitionId": "2026-06-15T16-53-16-664Z-import-ac641b63d123",
-  "lastTransitionAt": "2026-06-15T16:53:16.664Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-18T06-21-02-263Z-claim-da8970039278",
+  "lastTransitionAt": "2026-06-18T06:21:02.263Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-18T06:21:02.225Z",
+  "promotedAt": "2026-06-18T06:21:02.228Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-70eac35e51dd",
+    "claimedAt": "2026-06-18T06:21:02.231Z",
+    "heartbeatAt": "2026-06-18T06:21:02.231Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0097.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/adapters/cas.ts",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/apply-evidence.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/mutation-batch-plan.schema.json",
+      "scripts/validate-schemas.ts"
+    ],
+    "state": "active",
+    "intent": "closeout-only"
+  },
+  "startedAt": "2026-06-18T06:21:02.231Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260618062102-captain-TASK-CID-0097-1600d5d8b6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0097",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0097.*",
+      ".atm/history/task-events/TASK-CID-0097/**",
+      ".atm/history/tasks/TASK-CID-0097.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/adapters/batch-planner.ts",
+      "packages/core/src/broker/adapters/cas.ts",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/apply-evidence.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/mutation-batch-plan.schema.json",
+      "scripts/validate-schemas.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e7c620ce31dad75caae6892a9f7b8f2383f3581cc2ffc9047e16de5ccbca4f55",
+    "actorId": "captain",
+    "createdAt": "2026-06-18T06:21:02.263Z",
+    "status": "active"
+  }
 }
