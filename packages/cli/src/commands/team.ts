@@ -107,6 +107,43 @@ type TeamPatrolFindingLevel = 'info' | 'warning' | 'blocker';
 
 type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
 
+type TeamReworkRouteStatus =
+  | 'work-in-progress'
+  | 'needs-rework'
+  | 'revalidate-pending'
+  | 'ready-for-close'
+  | 'blocked'
+  | 'escalated';
+
+type TeamReworkFinding = {
+  source: 'reviewer' | 'validator';
+  id: string;
+  blocking?: boolean;
+  passed?: boolean;
+  severity?: 'info' | 'warning' | 'error' | 'blocker';
+  summary?: string;
+};
+
+type TeamReworkTransition = {
+  from: TeamReworkRouteStatus;
+  to: TeamReworkRouteStatus;
+  reason: string;
+  findingIds: string[];
+};
+
+type TeamReworkRoute = {
+  schemaId: 'atm.teamReworkRoute.v1';
+  status: TeamReworkRouteStatus;
+  retryBudget: {
+    maxAttempts: number;
+    used: number;
+    remaining: number;
+  };
+  requiredChecksPassed: boolean;
+  findings: TeamReworkFinding[];
+  transitions: TeamReworkTransition[];
+};
+
 type TeamRuntimeContract = {
   schemaId: 'atm.teamRuntimeContract.v1';
   runtimeMode: TeamRuntimeMode;
@@ -684,6 +721,143 @@ export function buildTeamRuntimeContract(input: {
       evidenceRequired: String(input.evidenceRequired ?? 'command-backed')
     })
   };
+}
+
+export function buildTeamReworkRouteStateMachine(input: {
+  findings?: readonly TeamReworkFinding[];
+  requiredChecksPassed?: boolean;
+  retryBudgetMax?: number;
+  retryBudgetUsed?: number;
+  previousStatus?: TeamReworkRouteStatus;
+}): TeamReworkRoute {
+  const maxAttempts = normalizeRetryBudget(input.retryBudgetMax, 1);
+  const used = normalizeRetryBudget(input.retryBudgetUsed, 0);
+  const remaining = Math.max(0, maxAttempts - used);
+  const findings = normalizeTeamReworkFindings(input.findings ?? []);
+  const requiredChecksPassed = input.requiredChecksPassed === true;
+  const startingStatus = input.previousStatus ?? 'work-in-progress';
+  const blockingReviewerFindings = findings.filter((finding) => finding.source === 'reviewer' && isBlockingReworkFinding(finding));
+  const failedValidatorFindings = findings.filter((finding) => finding.source === 'validator' && finding.passed === false);
+  const blockingFindings = [...blockingReviewerFindings, ...failedValidatorFindings];
+  const transitions: TeamReworkTransition[] = [];
+  let status = startingStatus;
+
+  if (blockingFindings.length > 0) {
+    status = pushTeamReworkTransition({
+      transitions,
+      from: status,
+      to: remaining <= 0 ? 'blocked' : 'needs-rework',
+      reason: remaining <= 0
+        ? 'retry budget exhausted while blocking reviewer or validator findings remain'
+        : 'blocking reviewer or validator findings require implementation rework',
+      findingIds: blockingFindings.map((finding) => finding.id)
+    });
+  } else if (status === 'needs-rework') {
+    status = pushTeamReworkTransition({
+      transitions,
+      from: status,
+      to: 'revalidate-pending',
+      reason: 'rework completed; validation must rerun before close readiness',
+      findingIds: []
+    });
+  }
+
+  if ((status === 'work-in-progress' || status === 'revalidate-pending') && requiredChecksPassed) {
+    status = pushTeamReworkTransition({
+      transitions,
+      from: status,
+      to: 'ready-for-close',
+      reason: 'required reviewer and validator checks passed',
+      findingIds: []
+    });
+  } else if (status === 'revalidate-pending' && remaining <= 0) {
+    status = pushTeamReworkTransition({
+      transitions,
+      from: status,
+      to: 'escalated',
+      reason: 'revalidation is pending but retry budget is exhausted',
+      findingIds: []
+    });
+  }
+
+  return {
+    schemaId: 'atm.teamReworkRoute.v1',
+    status,
+    retryBudget: {
+      maxAttempts,
+      used,
+      remaining
+    },
+    requiredChecksPassed,
+    findings,
+    transitions
+  };
+}
+
+export function transitionTeamReworkRoute(
+  current: TeamReworkRoute,
+  input: {
+    findings?: readonly TeamReworkFinding[];
+    requiredChecksPassed?: boolean;
+    retryBudgetUsed?: number;
+  }
+): TeamReworkRoute {
+  const next = buildTeamReworkRouteStateMachine({
+    findings: input.findings ?? current.findings,
+    requiredChecksPassed: input.requiredChecksPassed ?? current.requiredChecksPassed,
+    retryBudgetMax: current.retryBudget.maxAttempts,
+    retryBudgetUsed: input.retryBudgetUsed ?? current.retryBudget.used,
+    previousStatus: current.status
+  });
+  return {
+    ...next,
+    transitions: [...current.transitions, ...next.transitions]
+  };
+}
+
+function normalizeTeamReworkFindings(findings: readonly TeamReworkFinding[]): TeamReworkFinding[] {
+  return findings.map((finding, index) => ({
+    source: finding.source === 'validator' ? 'validator' : 'reviewer',
+    id: String(finding.id || `${finding.source || 'finding'}-${index + 1}`),
+    blocking: finding.blocking === true,
+    passed: typeof finding.passed === 'boolean' ? finding.passed : undefined,
+    severity: normalizeFindingSeverity(finding.severity),
+    summary: typeof finding.summary === 'string' ? finding.summary : undefined
+  }));
+}
+
+function normalizeFindingSeverity(value: unknown): TeamReworkFinding['severity'] {
+  return value === 'info' || value === 'warning' || value === 'error' || value === 'blocker'
+    ? value
+    : undefined;
+}
+
+function isBlockingReworkFinding(finding: TeamReworkFinding): boolean {
+  return finding.blocking === true || finding.severity === 'error' || finding.severity === 'blocker';
+}
+
+function normalizeRetryBudget(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? Math.floor(value)
+    : fallback;
+}
+
+function pushTeamReworkTransition(input: {
+  transitions: TeamReworkTransition[];
+  from: TeamReworkRouteStatus;
+  to: TeamReworkRouteStatus;
+  reason: string;
+  findingIds: string[];
+}): TeamReworkRouteStatus {
+  if (input.from !== input.to) {
+    input.transitions.push({
+      from: input.from,
+      to: input.to,
+      reason: input.reason,
+      findingIds: input.findingIds
+    });
+  }
+  return input.to;
 }
 
 function buildEditorSubagentBridgeContract(input: {
@@ -2047,6 +2221,12 @@ export function writeTeamRun(input: {
     validation: input.validation,
     brokerLane: input.teamPlan.brokerLane,
     captainDecision: input.teamPlan.captainDecision,
+    reworkRoute: buildTeamReworkRouteStateMachine({
+      findings: [],
+      requiredChecksPassed: false,
+      retryBudgetMax: 1,
+      retryBudgetUsed: 0
+    }),
     agentReports: [],
     patrolFindings: [],
     evidenceCuratorSummary: null,
@@ -2306,6 +2486,16 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       category: 'rework-state',
       summary: `Team run ${teamRun.teamRunId} rework route is ${reworkStatus}.`,
       suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      details: { reworkStatus }
+    }));
+  }
+  if (reworkStatus === 'ready-for-close' && input.mode === 'close-preflight') {
+    findings.push(teamPatrolFinding({
+      level: 'info',
+      code: 'ATM_TEAM_PATROL_REWORK_ROUTE_READY_FOR_CLOSE',
+      category: 'rework-state',
+      summary: `Team run ${teamRun.teamRunId} rework route is ready-for-close.`,
+      suggestedCommand: `node atm.mjs taskflow pre-close --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
       details: { reworkStatus }
     }));
   }

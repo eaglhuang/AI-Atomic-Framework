@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import path from 'node:path';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
-import { assessLieutenantEscalation, buildAtomizationChecklist, buildTeamRuntimeContract, runTeam, selectTeamImplementer, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { assessLieutenantEscalation, buildAtomizationChecklist, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import {
   validateScopeLeaseEpoch,
   validateScopeLeaseFencing,
@@ -720,6 +720,93 @@ async function main() {
     assert.equal(disabledContract.executionSurface, 'editor-subagent');
 
     console.log('[validate-team-agents] ok (editor-subagent-bridge)');
+    return;
+  }
+
+  if (taskCase === 'rework-route-state-machine') {
+    const needsRework = buildTeamReworkRouteStateMachine({
+      findings: [
+        {
+          source: 'reviewer',
+          id: 'reviewer-blocking-finding',
+          blocking: true,
+          severity: 'blocker',
+          summary: 'Reviewer found an implementation gap.'
+        },
+        {
+          source: 'validator',
+          id: 'validator-failure',
+          passed: false,
+          severity: 'error',
+          summary: 'Focused validator failed.'
+        }
+      ],
+      requiredChecksPassed: false,
+      retryBudgetMax: 2,
+      retryBudgetUsed: 0
+    });
+    assert.equal(needsRework.schemaId, 'atm.teamReworkRoute.v1');
+    assert.equal(needsRework.status, 'needs-rework');
+    assert.equal(needsRework.transitions[0].from, 'work-in-progress');
+    assert.equal(needsRework.transitions[0].to, 'needs-rework');
+    assert.deepEqual(needsRework.transitions[0].findingIds, ['reviewer-blocking-finding', 'validator-failure']);
+
+    const readyForClose = transitionTeamReworkRoute(needsRework, {
+      findings: [
+        {
+          source: 'validator',
+          id: 'validator-revalidation-pass',
+          passed: true,
+          severity: 'info',
+          summary: 'Focused validators passed after rework.'
+        }
+      ],
+      requiredChecksPassed: true,
+      retryBudgetUsed: 1
+    });
+    assert.equal(readyForClose.status, 'ready-for-close');
+    assert.ok(
+      readyForClose.transitions.some((entry: any) => entry.from === 'needs-rework' && entry.to === 'revalidate-pending'),
+      'rework completion must route through revalidate-pending'
+    );
+    assert.ok(
+      readyForClose.transitions.some((entry: any) => entry.to === 'ready-for-close'),
+      'required checks passing must formally route to ready-for-close'
+    );
+
+    const blocked = buildTeamReworkRouteStateMachine({
+      findings: [
+        {
+          source: 'validator',
+          id: 'retry-exhausted-validator-failure',
+          passed: false,
+          severity: 'error'
+        }
+      ],
+      retryBudgetMax: 1,
+      retryBudgetUsed: 1
+    });
+    assert.equal(blocked.status, 'blocked');
+    assert.equal(blocked.retryBudget.remaining, 0);
+    assert.ok(
+      blocked.transitions.some((entry: any) => entry.to === 'blocked'),
+      'retry exhaustion must route to blocked instead of looping'
+    );
+
+    const reviewerTextOnly = buildTeamReworkRouteStateMachine({
+      findings: [
+        {
+          source: 'reviewer',
+          id: 'advisory-review-note',
+          blocking: false,
+          severity: 'info'
+        }
+      ],
+      requiredChecksPassed: false
+    });
+    assert.notEqual(reviewerTextOnly.status, 'ready-for-close');
+
+    console.log('[validate-team-agents] ok (rework-route-state-machine)');
     return;
   }
 
