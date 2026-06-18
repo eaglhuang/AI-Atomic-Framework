@@ -759,6 +759,27 @@
       "source_task": "TASK-TEAM-0035"
     },
     {
+      "path_pattern": "examples/team-runtime/README.md",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "Polyglot Team runtime example guide states Node.js remains the default runtime while Python and C# reference adapters preserve broker, lease, validator, police, evidence, artifact, retry, and closure authority requirements.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
+    },
+    {
+      "path_pattern": "examples/team-runtime/python-reference-worker-adapter.py",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "Python reference Team worker adapter metadata expresses atm.teamWorkerAdapterContract.v1 without weakening broker, permission lease, evidence, validator, artifact, retry, or closure authority gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
+    },
+    {
+      "path_pattern": "examples/team-runtime/csharp-reference-worker-adapter.cs",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "C# reference Team worker adapter metadata expresses atm.teamWorkerAdapterContract.v1 without weakening broker, permission lease, evidence, validator, artifact, retry, or closure authority gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts#buildTeamClosureAttestation",
       "atom_id": "team.sandbox-attestation-closure-contract",
       "capability": "Team closure attestation metadata records runtime mode, language, adapter, provider, SDK, model, runner kind, runtime version, sandbox policy hash, signer, reviewer independence, and explicit command-backed evidence requirements without treating local runtime wrappers as secure sandbox proof.",
@@ -1537,6 +1558,13 @@
       "capability": "Validator case proving Team plan/validate consume Active Resource Index and Scope Lease Registry read-only without promoting, claiming, closing, or rewriting ledger/runtime state.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#polyglot-worker-examples",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "Validator case proving Python and C# Team worker adapter examples use the same adapter schema as Node.js, keep Node.js as default, and preserve broker, lease, validator, police, evidence, artifact, retry, and closure authority gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
     },
     {
       "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",
