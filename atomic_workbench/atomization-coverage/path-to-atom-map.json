@@ -1726,6 +1726,41 @@
       "capability": "Document route pause/resume freeze protocol runtime and reserved deferred features.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/index.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Broker public surface exporting patch envelope and freeze helpers for runtime handoff consumers.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/route.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Route pause/handoff runtime integration creating and comparing metadata-only patch envelopes.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "tests/cli/route-patch-envelope-handoff.test.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "CLI regression proving route pause/handoff emits valid patch envelope handoff evidence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Core regression for createHandoffPatchEnvelope via broker index export.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/route.spec.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Route command spec documenting handoff action and apply-out-of-scope boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
     }
   ],
   "summary": {
