@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T06-15-11-084Z-close-5a731d331306",
+  "taskId": "TASK-CID-0096",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618061106-captain-TASK-CID-0096-663ba2defe",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0096.json",
+  "taskSha256": "sha256:841b63c0ec61c5c75a395095e080b4de357bb07c3c0933e0a24c67e69fdccf54",
+  "createdAt": "2026-06-18T06:15:11.084Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0096 --actor captain --status done --historical-delivery 31fd89ff0b359edf8641e0a6c11d4449c11a9ca8 --historical-delivery ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618061106-captain-TASK-CID-0096-663ba2defe",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0096.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T06:15:11.079Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0096-numeric-scalar-adapter-commutative-operations.task.md",
+        ".atm/history/evidence/TASK-CID-0096.*",
+        ".atm/history/task-events/TASK-CID-0096/**",
+        ".atm/history/tasks/TASK-CID-0096.json",
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/numeric-scalar-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/numeric-scalar.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
