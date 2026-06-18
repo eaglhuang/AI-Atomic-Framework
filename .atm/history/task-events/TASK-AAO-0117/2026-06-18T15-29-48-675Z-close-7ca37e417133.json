@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T15-29-48-675Z-close-7ca37e417133",
+  "taskId": "TASK-AAO-0117",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260618152632-cursor-gpt-5.2-TASK-AAO-0117-009e39dee2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0117.json",
+  "taskSha256": "sha256:5a244ffbeed85c77145d6a86948dd01e7c35eff5cbfbc6160fab2973ae3c2566",
+  "createdAt": "2026-06-18T15:29:48.675Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0117 --actor cursor-gpt-5.2 --status done --historical-delivery d8e46172a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618152632-cursor-gpt-5.2-TASK-AAO-0117-009e39dee2",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0117.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T15:29:48.668Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0117-taskflow-profile-release-pollution-cleanup.task.md",
+        ".atm/history/evidence/TASK-AAO-0117.*",
+        ".atm/history/task-events/TASK-AAO-0117/**",
+        ".atm/history/tasks/TASK-AAO-0117.json",
+        "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/README.onefile.md",
+        "release/atm-onefile/release-manifest.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
