@@ -1,0 +1,90 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T04-43-19-741Z-close-1edc9d9c56a8",
+  "taskId": "TASK-MAO-0047",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260618043723-cursor-gpt-5.2-TASK-MAO-0047-fbca421968",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0047.json",
+  "taskSha256": "sha256:f51dee7b7a4a200484e0e453f51e36b4f8d6a1a8290a20f89582a06fe2617d8d",
+  "createdAt": "2026-06-18T04:43:19.741Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0047 --actor cursor-gpt-5.2 --status done --historical-delivery a4975ae04",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618043723-cursor-gpt-5.2-TASK-MAO-0047-fbca421968",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0047.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "node --strip-types tests/cli/route-patch-envelope-handoff.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:neutrality",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T04:43:19.735Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0047-patch-envelope-broker-handoff-integration.task.md",
+        ".atm/history/evidence/TASK-MAO-0047.*",
+        ".atm/history/task-events/TASK-MAO-0047/**",
+        ".atm/history/tasks/TASK-MAO-0047.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/specs/mao-logical-routing-v1.md",
+        "packages/cli/src/commands/command-specs/route.spec.ts",
+        "packages/cli/src/commands/route.ts",
+        "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+        "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/patch-envelope.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/patch-envelope.schema.json",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "tests/cli/route-patch-envelope-handoff.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/route.spec.ts",
+        "packages/cli/src/commands/route.ts",
+        "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+        "packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/core/src/broker/patch-envelope.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/patch-envelope.schema.json",
+        "tests/cli-fixtures/help-snapshots/command-list.json",
+        "tests/cli/route-patch-envelope-handoff.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
