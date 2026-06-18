@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0058",
   "title": "governed branch commit queue and HEAD race recovery",
-  "status": "running",
+  "status": "done",
   "milestone": "M8",
   "dependencies": [],
   "acceptance": [
@@ -58,8 +58,8 @@
     "hash": "f1a364780315b4be"
   },
   "importedAt": "2026-06-18T10:12:00.740Z",
-  "lastTransitionId": "2026-06-18T10-12-02-492Z-claim-e0091675db89",
-  "lastTransitionAt": "2026-06-18T10:12:02.492Z",
+  "lastTransitionId": "2026-06-18T10-21-28-374Z-close-d99f1d6acd8d",
+  "lastTransitionAt": "2026-06-18T10:21:28.374Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-18T10:12:02.442Z",
@@ -68,7 +68,7 @@
     "actorId": "captain",
     "leaseId": "lease-c671849df6d8",
     "claimedAt": "2026-06-18T10:12:02.449Z",
-    "heartbeatAt": "2026-06-18T10:12:02.449Z",
+    "heartbeatAt": "2026-06-18T10:21:28.372Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-MAO-0058.json",
@@ -76,8 +76,8 @@
       "packages/cli/src/commands/git-governance.ts",
       "tests/cli/git-commit-task-scoped-staging.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-18T10:12:02.449Z",
   "startedByActor": "captain",
@@ -105,5 +105,9 @@
     "actorId": "captain",
     "createdAt": "2026-06-18T10:12:02.492Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T10:21:28.372Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260618101202-captain-TASK-MAO-0058-4547ed784c",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0058.closure-packet.json"
 }

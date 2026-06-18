@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T10-21-28-374Z-close-d99f1d6acd8d",
+  "taskId": "TASK-MAO-0058",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618101202-captain-TASK-MAO-0058-4547ed784c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0058.json",
+  "taskSha256": "sha256:9b0230e49bb568d13e17e8bceffc35f2b1cfc4bb1677c65d96ce3415148aad7c",
+  "createdAt": "2026-06-18T10:21:28.374Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0058 --actor captain --status done --historical-delivery 4a02d28882d6e33278eae77263c30340af79d0b8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618101202-captain-TASK-MAO-0058-4547ed784c",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0058.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T10:21:28.369Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0058-governed-branch-commit-queue-and-head-race-recovery.task.md",
+        ".atm/history/evidence/TASK-MAO-0058.*",
+        ".atm/history/task-events/TASK-MAO-0058/**",
+        ".atm/history/tasks/TASK-MAO-0058.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
