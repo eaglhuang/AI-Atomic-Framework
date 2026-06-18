@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T04-54-39-977Z-scope-amendment-4e02a9dd443e",
+  "taskId": "TASK-MAO-0048",
+  "action": "scope-amendment",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0048.json",
+  "taskSha256": "sha256:a61c3d8f4f706dd021be7f613da0702ebb4c1f70d942fb6e982a0e93a825c335",
+  "createdAt": "2026-06-18T04:54:39.977Z",
+  "command": "node atm.mjs tasks scope add --task TASK-MAO-0048 --actor cursor-gpt-5.2 --add \"scripts/fixtures/mao-parallel-routing/event-replay/01-broker-shared-file-conflict.replay.json,scripts/fixtures/mao-parallel-routing/event-replay/02-broker-disjoint-parallel-safe.replay.json,scripts/fixtures/mao-parallel-routing/event-replay/03-task-claim-file-overlap.replay.json,scripts/fixtures/mao-parallel-routing/event-replay/04-freeze-protocol-route-history.replay.json,scripts/fixtures/mao-parallel-routing/event-replay/05-patch-envelope-handoff-metadata.replay.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

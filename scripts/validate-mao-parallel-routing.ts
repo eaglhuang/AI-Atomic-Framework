@@ -2,12 +2,16 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   evaluateMaoParallelScenario,
+  evaluateEventReplayScenario,
   listMaoParallelRoutingScenarioFiles,
   loadAllMaoParallelRoutingScenarios,
+  loadAllMaoEventReplayScenarios,
+  loadMaoEventReplayManifest,
+  loadMaoEventReplayScenario,
   loadMaoParallelRoutingManifest,
   loadMaoParallelRoutingScenario,
   renderMaoParallelRoutingBenchmarkMarkdown,
-  runMaoParallelRoutingBenchmarkSuite
+  runCombinedMaoBenchmarkSuite
 } from './lib/mao-parallel-routing-benchmark-runner.ts';
 import { createValidator } from './lib/validator-harness.ts';
 
@@ -46,21 +50,34 @@ function ensureFixturePack(): void {
     harness.assert(Boolean(scenario.groundTruth), `${scenarioFile} must define groundTruth`);
     harness.assert(Boolean(scenario.expected), `${scenarioFile} must define expected outcomes`);
   }
+
+  harness.requireFile('scripts/fixtures/mao-parallel-routing/event-replay.manifest.json');
+  const replayManifest = loadMaoEventReplayManifest(harness.root);
+  harness.assert(replayManifest.replays.length >= 3, 'event replay manifest must contain at least 3 replay fixtures');
+
+  for (const replayFile of replayManifest.replays) {
+    const replay = loadMaoEventReplayScenario(harness.root, replayFile);
+    harness.assert(replay.layer === 'event-replay', `${replayFile} must set layer=event-replay`);
+    harness.assert(Boolean(replay.replayProvenance?.sanitizedFrom), `${replayFile} must define replayProvenance.sanitizedFrom`);
+    harness.assert(Boolean(replay.replayKind), `${replayFile} must define replayKind`);
+    harness.assert(Boolean(replay.expected), `${replayFile} must define expected outcomes`);
+  }
 }
 
 function runBenchmarkGate(): void {
-  const scenarios = loadAllMaoParallelRoutingScenarios(harness.root);
-  const report = runMaoParallelRoutingBenchmarkSuite(harness.root);
+  const staticScenarios = loadAllMaoParallelRoutingScenarios(harness.root);
+  const replayScenarios = loadAllMaoEventReplayScenarios(harness.root);
+  const combined = runCombinedMaoBenchmarkSuite(harness.root);
 
-  if (report.falseSafeRegressions.length > 0) {
-    harness.fail(`false-safe regression gate failed: ${report.falseSafeRegressions.join(', ')}`);
+  for (const regression of [...combined.staticReport.falseSafeRegressions, ...combined.eventReplayReport.falseSafeRegressions]) {
+    harness.fail(`false-safe regression gate failed: ${regression}`);
   }
 
-  if (report.expectationFailures.length > 0) {
-    harness.fail(`benchmark expectation failures: ${report.expectationFailures.join(', ')}`);
+  for (const failure of [...combined.staticReport.expectationFailures, ...combined.eventReplayReport.expectationFailures]) {
+    harness.fail(`benchmark expectation failures: ${failure}`);
   }
 
-  for (const scenario of scenarios) {
+  for (const scenario of staticScenarios) {
     const result = evaluateMaoParallelScenario(scenario);
     if (!result.matchedExpectation) {
       harness.fail(
@@ -69,13 +86,26 @@ function runBenchmarkGate(): void {
     }
   }
 
+  for (const scenario of replayScenarios) {
+    const result = evaluateEventReplayScenario(scenario);
+    if (!result.matchedExpectation) {
+      harness.fail(
+        `${scenario.id} replay did not match expected routing outcome (${result.routingVerdict} / validator ${result.validatorOutcome})`
+      );
+    }
+  }
+
   const reportPath = path.join(harness.root, 'docs/reports/mao-parallel-routing-benchmark.md');
   mkdirSync(path.dirname(reportPath), { recursive: true });
-  writeFileSync(reportPath, `${renderMaoParallelRoutingBenchmarkMarkdown(report, scenarios)}\n`, 'utf8');
+  writeFileSync(
+    reportPath,
+    `${renderMaoParallelRoutingBenchmarkMarkdown(combined, staticScenarios, replayScenarios)}\n`,
+    'utf8'
+  );
   harness.assert(existsSync(reportPath), 'benchmark report must be written to docs/reports/mao-parallel-routing-benchmark.md');
 
   harness.ok(
-    `scenarios=${report.scenarioCount} catchRate=${report.catchRate.catchRatePercent}% shipSafe=${report.shipSafe} avgLatencyNs=${report.latency.averageNs}`
+    `static=${combined.staticReport.scenarioCount} replay=${combined.eventReplayReport.scenarioCount} staticCatch=${combined.staticReport.catchRate.catchRatePercent}% replayCatch=${combined.eventReplayReport.catchRate.catchRatePercent}% shipSafe=${combined.combinedShipSafe}`
   );
 }
 

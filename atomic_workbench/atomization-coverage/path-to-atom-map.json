@@ -1761,6 +1761,41 @@
       "capability": "Route command spec documenting handoff action and apply-out-of-scope boundary.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-parallel-routing/event-replay.manifest.json",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Event replay manifest listing sanitized task-event and broker-evidence replay fixtures.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-parallel-routing/event-replay/**",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Sanitized deterministic replay fixtures sourced from ATM task events and broker evidence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Event replay benchmark runner evaluating freeze, patch envelope, and broker conflict replays.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/validate-mao-parallel-routing.ts",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Combined static and event-replay MAO benchmark validator with separate catch-rate reporting.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "docs/reports/mao-parallel-routing-benchmark.md",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Benchmark report distinguishing hand-authored static coverage from sanitized event replay coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
     }
   ],
   "summary": {
