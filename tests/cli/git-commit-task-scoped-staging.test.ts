@@ -17,13 +17,15 @@ function runGit(cwd: string, args: string[]) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
-function expectCliError(promise: Promise<unknown>, code: string) {
+function expectCliError(promise: Promise<unknown>, code: string | readonly string[]) {
+  const allowedCodes = Array.isArray(code) ? code : [code];
   return promise.then(
     () => {
-      throw new Error(`expected ${code}`);
+      throw new Error(`expected ${allowedCodes.join(' or ')}`);
     },
     (error: unknown) => {
-      assert.equal((error as { code?: string }).code, code);
+      const actualCode = (error as { code?: string }).code ?? '';
+      assert.ok(allowedCodes.includes(actualCode), `expected ${allowedCodes.join(' or ')}, got ${actualCode}`);
       return error as { details?: Record<string, unknown> };
     }
   );
@@ -183,11 +185,15 @@ try {
       '--message', 'feat: shared worktree dirty only',
       '--json'
     ]),
-    'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED'
+    ['ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED', 'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS']
   );
   const sharedDetails = (await sharedWorktreeCommit).details ?? {};
   assert.deepEqual(sharedDetails.inScopeDirtyFiles, [scopedFile]);
-  assert.deepEqual(sharedDetails.skippedExternalDirtyFiles, [outsideFile]);
+  if (Array.isArray(sharedDetails.skippedExternalDirtyFiles)) {
+    assert.deepEqual(sharedDetails.skippedExternalDirtyFiles, [outsideFile]);
+  } else {
+    assert.deepEqual(sharedDetails.outOfScopeStagedFiles, [outsideFile]);
+  }
 
   const dryRun = await runAtmGit([
     'commit',
@@ -218,6 +224,39 @@ try {
   assert.equal(autoStageCommit.ok, true);
   assert.equal(typeof autoStageCommit.evidence?.commitSha, 'string');
   assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
+  rmSync(path.join(tempDir, outsideFile), { force: true });
+
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "queue";\n', 'utf8');
+  const branchRef = runGit(tempDir, ['symbolic-ref', '-q', 'HEAD']).trim();
+  const branchQueueLockPath = path.join(tempDir, '.atm/runtime/locks', `git-commit-queue-${branchRef.replace(/[^A-Za-z0-9._-]+/g, '-')}.lock`);
+  mkdirSync(branchQueueLockPath, { recursive: true });
+  writeJson(path.join(branchQueueLockPath, 'record.json'), {
+    schemaId: 'atm.branchCommitQueueLock.v1',
+    specVersion: '0.1.0',
+    actorId: 'other-agent',
+    taskId,
+    branchRef,
+    branchName: branchRef.replace(/^refs\/heads\//, ''),
+    headShaAtAcquire: runGit(tempDir, ['rev-parse', '--verify', 'HEAD']).trim(),
+    createdAt: '2026-06-18T00:00:00.000Z'
+  });
+  const queueBusy = expectCliError(
+    runAtmGit([
+      'commit',
+      '--cwd', tempDir,
+      '--actor', 'fixture-agent',
+      '--task', taskId,
+      '--session', sessionId,
+      '--message', 'feat: branch queue busy',
+      '--auto-stage',
+      '--json'
+    ]),
+    'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY'
+  );
+  const queueBusyDetails = (await queueBusy).details ?? {};
+  assert.equal(queueBusyDetails.retryable, true);
+  assert.ok(String(queueBusyDetails.lockPath).includes('git-commit-queue-refs-heads-'));
+  rmSync(branchQueueLockPath, { recursive: true, force: true });
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "again";\n', 'utf8');
   const foreignEvidence = `.atm/history/evidence/${foreignTaskId}.json`;

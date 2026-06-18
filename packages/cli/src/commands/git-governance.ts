@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, resolveActorId, writeRuntimeIdentityDefault } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
@@ -31,6 +31,9 @@ function runGitCommand(cwd: string, args: readonly string[], stdio: ['ignore', '
     stdio
   });
 }
+
+const branchCommitQueueLockTimeoutMs = 15_000;
+const branchCommitQueueLockRetryMs = 200;
 
 export interface GitUnexpectedStagedTaskReport {
   readonly taskId: string;
@@ -65,6 +68,17 @@ type TaskClaimRecord = {
 interface GitIdentityProfile {
   readonly gitName: string | null;
   readonly gitEmail: string | null;
+}
+
+interface BranchCommitQueueLockRecord {
+  readonly schemaId: 'atm.branchCommitQueueLock.v1';
+  readonly specVersion: '0.1.0';
+  readonly actorId: string;
+  readonly taskId: string | null;
+  readonly branchRef: string;
+  readonly branchName: string;
+  readonly headShaAtAcquire: string | null;
+  readonly createdAt: string;
 }
 
 interface MirrorSyncOnlyStagedArtifactsReport {
@@ -354,6 +368,8 @@ function runGitCommit(options: ParsedGitOptions) {
       }
     });
   }
+  const gitName = profile.gitName;
+  const gitEmail = profile.gitEmail;
   const taskDocument = options.taskId ? readTaskDocument(options.cwd, options.taskId) : null;
   const claim = taskDocument ? parseTaskClaim(taskDocument.claim) : null;
   const stagedMirrorSync = options.taskId ? inspectMirrorSyncOnlyStagedArtifacts(options.cwd, options.taskId) : null;
@@ -503,25 +519,40 @@ function runGitCommit(options: ParsedGitOptions) {
     trailers.join('\n')
   ];
   let protectedOverrideOutcome: ReturnType<typeof recordProtectedOverrideOutcome> | null = null;
+  const branchRef = readHeadBranchRef(options.cwd);
+  const branchName = branchRef ? branchRef.replace(/^refs\/heads\//, '') : 'detached-head';
+  const headShaBeforeCommit = readHeadCommitSha(options.cwd);
   try {
-    execFileSync(resolveGitExecutable(), args, {
+    withBranchCommitQueueLock({
       cwd: options.cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-      env: {
-        ...process.env,
-        GIT_AUTHOR_NAME: profile.gitName,
-        GIT_AUTHOR_EMAIL: profile.gitEmail,
-        GIT_COMMITTER_NAME: profile.gitName,
-        GIT_COMMITTER_EMAIL: profile.gitEmail,
-        ATM_COMMIT_ACTOR_ID: actorId,
-        ATM_COMMIT_TASK_ID: options.taskId ?? '',
-        ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
-        ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
-        ATM_COMMIT_TRAILERS: trailers.join('\n')
-      }
+      actorId,
+      taskId: options.taskId,
+      branchRef,
+      branchName,
+      headShaAtAcquire: headShaBeforeCommit
+    }, () => {
+      execFileSync(resolveGitExecutable(), args, {
+        cwd: options.cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: {
+          ...process.env,
+          GIT_AUTHOR_NAME: gitName,
+          GIT_AUTHOR_EMAIL: gitEmail,
+          GIT_COMMITTER_NAME: gitName,
+          GIT_COMMITTER_EMAIL: gitEmail,
+          ATM_COMMIT_ACTOR_ID: actorId,
+          ATM_COMMIT_TASK_ID: options.taskId ?? '',
+          ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
+          ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
+          ATM_COMMIT_TRAILERS: trailers.join('\n')
+        }
+      });
     });
   } catch (error) {
+    if (error instanceof CliError && (error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY' || error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE')) {
+      throw error;
+    }
     if (protectedOverrideAudit?.protectedOverrideAudit?.event?.eventId) {
       protectedOverrideOutcome = recordProtectedOverrideOutcome({
         cwd: options.cwd,
@@ -548,6 +579,32 @@ function runGitCommit(options: ParsedGitOptions) {
     }
     const stderr = error instanceof Error && 'stderr' in error ? String((error as any).stderr ?? '') : '';
     const stdout = error instanceof Error && 'stdout' in error ? String((error as any).stdout ?? '') : '';
+    if (isHeadRaceCommitFailure(stderr)) {
+      throw new CliError('ATM_GIT_COMMIT_BRANCH_QUEUE_RACE', 'Another governed commit advanced HEAD during this commit attempt. Retry through the ATM commit lane after the active writer finishes.', {
+        exitCode: 1,
+        details: {
+          actorId,
+          taskId: options.taskId,
+          sessionId: session?.sessionId ?? null,
+          branchRef,
+          branchName,
+          headShaBeforeCommit,
+          headShaAfterFailure: readHeadCommitSha(options.cwd),
+          retryable: true,
+          requiredCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)}${options.taskId ? ` --task ${quoteCliValue(options.taskId)}` : ''} --message ${quoteCliValue(options.message)}${options.noVerify ? ' --no-verify' : ''} --json`,
+          stdout,
+          stderr,
+          gitExecutable: resolveGitExecutable(),
+          copyableCommitCommand: buildCopyableGitCommitCommand({
+            cwd: options.cwd,
+            message: options.message,
+            trailers,
+            noVerify: options.noVerify
+          }),
+          protectedOverrideOutcome
+        }
+      });
+    }
     throw new CliError('ATM_GIT_COMMIT_FAILED', 'ATM git commit wrapper failed.', {
       exitCode: 1,
       details: {
@@ -1399,6 +1456,69 @@ function writeGitConfig(cwd: string, key: 'user.name' | 'user.email', value: str
   });
 }
 
+function branchCommitQueueLockPath(cwd: string, branchRef: string | null): string {
+  const rawName = branchRef && branchRef.trim().length > 0 ? branchRef : 'detached-head';
+  const safeName = rawName.replace(/[^A-Za-z0-9._-]+/g, '-');
+  return path.join(cwd, '.atm', 'runtime', 'locks', `git-commit-queue-${safeName}.lock`);
+}
+
+function withBranchCommitQueueLock<T>(input: {
+  readonly cwd: string;
+  readonly actorId: string;
+  readonly taskId: string | null;
+  readonly branchRef: string | null;
+  readonly branchName: string;
+  readonly headShaAtAcquire: string | null;
+}, operation: () => T): T {
+  const lockPath = branchCommitQueueLockPath(input.cwd, input.branchRef);
+  mkdirSync(path.dirname(lockPath), { recursive: true });
+  const startedAt = Date.now();
+  while (true) {
+    try {
+      mkdirSync(lockPath, { recursive: false });
+      const record: BranchCommitQueueLockRecord = {
+        schemaId: 'atm.branchCommitQueueLock.v1',
+        specVersion: '0.1.0',
+        actorId: input.actorId,
+        taskId: input.taskId,
+        branchRef: input.branchRef ?? 'detached-head',
+        branchName: input.branchName,
+        headShaAtAcquire: input.headShaAtAcquire,
+        createdAt: new Date().toISOString()
+      };
+      writeFileSync(path.join(lockPath, 'record.json'), `${JSON.stringify(record, null, 2)}\n`, 'utf8');
+      break;
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? String((error as { code?: unknown }).code ?? '') : '';
+      if (code !== 'EEXIST' && code !== 'EACCES') {
+        throw error;
+      }
+      if ((Date.now() - startedAt) >= branchCommitQueueLockTimeoutMs) {
+        throw new CliError('ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', `Another ATM commit is already finalizing ${input.branchName}; retry after the active writer finishes.`, {
+          exitCode: 1,
+          details: {
+            actorId: input.actorId,
+            taskId: input.taskId,
+            branchRef: input.branchRef,
+            branchName: input.branchName,
+            headShaAtAcquire: input.headShaAtAcquire,
+            headShaCurrent: readHeadCommitSha(input.cwd),
+            lockPath: relativePathFrom(input.cwd, lockPath),
+            retryable: true,
+            requiredCommand: 'Retry the same node atm.mjs git commit command after the active writer releases the branch queue lock.'
+          }
+        });
+      }
+      sleepMs(branchCommitQueueLockRetryMs);
+    }
+  }
+  try {
+    return operation();
+  } finally {
+    rmSync(lockPath, { recursive: true, force: true });
+  }
+}
+
 function readHeadCommitMessage(cwd: string): string | null {
   try {
     return execFileSync('git', ['log', '-1', '--pretty=%B'], {
@@ -1406,6 +1526,19 @@ function readHeadCommitMessage(cwd: string): string | null {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore']
     });
+  } catch {
+    return null;
+  }
+}
+
+function readHeadBranchRef(cwd: string): string | null {
+  try {
+    const value = execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    return value || null;
   } catch {
     return null;
   }
@@ -1422,6 +1555,10 @@ function readHeadCommitSha(cwd: string): string | null {
   } catch {
     return null;
   }
+}
+
+function isHeadRaceCommitFailure(stderr: string): boolean {
+  return /cannot lock ref 'HEAD'/i.test(stderr) && /expected /i.test(stderr) && / is at /i.test(stderr);
 }
 
 function parseTrailers(commitMessage: string | null): Readonly<Record<string, readonly string[]>> {
@@ -1464,4 +1601,8 @@ function requireValue(argv: string[], index: number, flag: string) {
     throw new CliError('ATM_CLI_USAGE', `git requires a value for ${flag}`, { exitCode: 2 });
   }
   return value;
+}
+
+function sleepMs(ms: number) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
