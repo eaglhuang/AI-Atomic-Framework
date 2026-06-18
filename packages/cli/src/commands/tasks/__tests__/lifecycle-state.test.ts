@@ -86,8 +86,21 @@ result = evaluateTaskDoneCloseAdmission({
   hasActiveSession: false,
   allowHistoricalCloseback: true
 });
-if (result.ok) fail('historical closeback without active claim must fail closed');
-assert(result.code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', 'historical closeback without claim must return active-claim-required code');
+assert(result.ok, 'verified historical closeback must allow unclaimed imported planned tasks without a live work session');
+if (!result.ok) fail('historical closeback without claim should be allowed before checking reason');
+assert(result.reason === 'planned-to-done-historical-closeback-unclaimed', 'historical closeback without claim must expose stable unclaimed reason');
+
+result = evaluateTaskDoneCloseAdmission({
+  taskId: 'TASK-LIFE',
+  actorId: 'captain',
+  status: 'planned',
+  claimState: 'active',
+  claimActorId: 'other-agent',
+  hasActiveSession: false,
+  allowHistoricalCloseback: true
+});
+if (result.ok) fail('historical closeback must not bypass another actor active claim');
+assert(result.code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', 'historical closeback with foreign active claim must return active-claim-required code');
 
 result = evaluateTaskDoneCloseAdmission({
   taskId: 'TASK-LIFE',

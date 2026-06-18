@@ -132,10 +132,13 @@ export function evaluateTaskDoneCloseAdmission(input: {
       if (input.claimState === 'active' && input.claimActorId === input.actorId) {
         return { ok: true, reason: `${status}-to-done-historical-closeback` };
       }
+      if (input.claimState !== 'active') {
+        return { ok: true, reason: `${status}-to-done-historical-closeback-unclaimed` };
+      }
       return {
         ok: false,
         code: 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED',
-        message: `Task ${input.taskId} cannot be closed as done without an active claim owned by ${input.actorId}, even when historical delivery is supplied.`,
+        message: `Task ${input.taskId} cannot be closed as done while active claim is owned by ${input.claimActorId ?? 'another actor'}, even when historical delivery is supplied.`,
         details: {
           taskId: input.taskId,
           actorId: input.actorId,

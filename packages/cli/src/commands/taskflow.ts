@@ -982,7 +982,9 @@ function inspectPlanningAuthorityDelivery(input: {
   if (input.historicalDeliveryRefs.length === 0) {
     return { required: true, ok: false, repoRoot: planning.repoRoot, matchedFiles: [], reason: 'planning authority close requires --historical-delivery <planning-repo-commit>' };
   }
-  const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
+  const planningMirrorFile = planning.relativePath?.replace(/\\/g, '/') ?? null;
+  const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument)
+    .filter((entry) => entry.replace(/\\/g, '/') !== planningMirrorFile);
   const matchedFiles: string[] = [];
   for (const ref of input.historicalDeliveryRefs) {
     const commitSha = tryGitScalar(planning.repoRoot, ['rev-parse', '--verify', `${ref}^{commit}`]);
