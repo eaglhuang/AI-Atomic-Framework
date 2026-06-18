@@ -105,6 +105,21 @@ type TeamPatrolMode = 'claim-preflight' | 'close-preflight' | 'big-script' | 'da
 
 type TeamPatrolFindingLevel = 'info' | 'warning' | 'blocker';
 
+type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
+
+type TeamRuntimeContract = {
+  schemaId: 'atm.teamRuntimeContract.v1';
+  runtimeMode: TeamRuntimeMode;
+  runtimeLanguage: string;
+  runtimeAdapterId: string | null;
+  providerId: string | null;
+  sdkId: string | null;
+  modelId: string | null;
+  agentsSpawned: boolean;
+  executionSurface: 'agent-runtime' | 'editor-subagent' | 'broker-governance';
+  selectionReason: string;
+};
+
 type TeamPatrolFinding = {
   level: TeamPatrolFindingLevel;
   code: string;
@@ -218,6 +233,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team.ts#buildTeamStatusResult',
     capability: 'Read-only team run status surface.',
     downstreamTasks: ['TASK-TEAM-0011']
+  },
+  'team.runtime-mode-contract': {
+    anchor: 'packages/cli/src/commands/team.ts#buildTeamRuntimeContract',
+    capability: 'Neutral Team runtime mode and adapter metadata contract for real-agent, editor-subagent, and broker-only execution surfaces.',
+    downstreamTasks: ['TASK-TEAM-0031']
   },
   'team.patrol-report': {
     anchor: 'packages/cli/src/commands/team.ts#buildTeamPatrolReport',
@@ -427,6 +447,14 @@ export async function runTeam(argv: string[]) {
   });
   const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
   const ok = validation.findings.every((finding) => finding.level !== 'error');
+  const runtimeContract = buildTeamRuntimeContract({
+    runtimeMode: parsed.options.runtimeMode,
+    runtimeLanguage: parsed.options.runtimeLanguage,
+    runtimeAdapterId: parsed.options.runtimeAdapter,
+    providerId: parsed.options.provider,
+    sdkId: parsed.options.sdk,
+    modelId: parsed.options.model
+  });
 
   if (action === 'validate') {
     const permissionOk = permissionValidation.ok;
@@ -460,7 +488,8 @@ export async function runTeam(argv: string[]) {
         safeToStart,
         relatedFindings: nonPermissionFindings,
         suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
-        brokerLane: teamPlan.brokerLane
+        brokerLane: teamPlan.brokerLane,
+        runtimeContract
       }
     });
   }
@@ -490,7 +519,8 @@ export async function runTeam(argv: string[]) {
           recipe,
           validation,
           teamPlan,
-          brokerLane: teamPlan.brokerLane
+          brokerLane: teamPlan.brokerLane,
+          runtimeContract
         }
       });
     }
@@ -501,7 +531,8 @@ export async function runTeam(argv: string[]) {
       task,
       recipe,
       teamPlan,
-      validation
+      validation,
+      runtimeContract
     });
     return makeResult({
       ok: true,
@@ -517,10 +548,11 @@ export async function runTeam(argv: string[]) {
       evidence: {
         action: 'start',
         runtimeWritten: true,
-        agentsSpawned: false,
+        agentsSpawned: runtimeContract.agentsSpawned,
         teamRunPath: `.atm/runtime/team-runs/${teamRun.teamRunId}.json`,
         teamRun,
-        brokerLane: teamPlan.brokerLane
+        brokerLane: teamPlan.brokerLane,
+        runtimeContract
       }
     });
   }
@@ -549,6 +581,7 @@ export async function runTeam(argv: string[]) {
       permissionCatalog: teamPermissionCatalog,
       validation,
       teamPlan,
+      runtimeContract,
       brokerLane: teamPlan.brokerLane
     }
   });
@@ -560,6 +593,72 @@ function readOptionValue(argv: string[], flag: string): string | undefined {
     return undefined;
   }
   return argv[index + 1];
+}
+
+export function buildTeamRuntimeContract(input: {
+  runtimeMode?: unknown;
+  runtimeLanguage?: unknown;
+  runtimeAdapterId?: unknown;
+  providerId?: unknown;
+  sdkId?: unknown;
+  modelId?: unknown;
+}): TeamRuntimeContract {
+  const runtimeMode = normalizeTeamRuntimeMode(input.runtimeMode);
+  const runtimeLanguage = normalizeOptionalRuntimeString(input.runtimeLanguage) ?? 'node';
+  const runtimeAdapterId = normalizeOptionalRuntimeString(input.runtimeAdapterId);
+  const providerId = normalizeOptionalRuntimeString(input.providerId);
+  const sdkId = normalizeOptionalRuntimeString(input.sdkId);
+  const modelId = normalizeOptionalRuntimeString(input.modelId);
+  const agentsSpawned = runtimeMode !== 'broker-only';
+  const executionSurface = runtimeMode === 'real-agent'
+    ? 'agent-runtime'
+    : runtimeMode === 'editor-subagent'
+      ? 'editor-subagent'
+      : 'broker-governance';
+
+  return {
+    schemaId: 'atm.teamRuntimeContract.v1',
+    runtimeMode,
+    runtimeLanguage,
+    runtimeAdapterId,
+    providerId,
+    sdkId,
+    modelId,
+    agentsSpawned,
+    executionSurface,
+    selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId })
+  };
+}
+
+function normalizeTeamRuntimeMode(value: unknown): TeamRuntimeMode {
+  const normalized = String(value ?? 'broker-only').trim();
+  if (normalized === 'real-agent' || normalized === 'editor-subagent' || normalized === 'broker-only') {
+    return normalized;
+  }
+  throw new CliError('ATM_TEAM_RUNTIME_MODE_INVALID', `Unsupported team runtime mode: ${normalized}`, {
+    exitCode: 2,
+    details: { supportedModes: ['real-agent', 'editor-subagent', 'broker-only'] }
+  });
+}
+
+function normalizeOptionalRuntimeString(value: unknown): string | null {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function describeRuntimeSelection(input: {
+  runtimeMode: TeamRuntimeMode;
+  runtimeLanguage: string;
+  runtimeAdapterId: string | null;
+}): string {
+  const adapter = input.runtimeAdapterId ?? 'no adapter override';
+  if (input.runtimeMode === 'broker-only') {
+    return `broker-only selected; no agents are spawned, language=${input.runtimeLanguage}, ${adapter}`;
+  }
+  if (input.runtimeMode === 'editor-subagent') {
+    return `editor-subagent selected; adapter metadata is advisory, language=${input.runtimeLanguage}, ${adapter}`;
+  }
+  return `real-agent selected; adapter metadata is advisory until a worker bridge consumes it, language=${input.runtimeLanguage}, ${adapter}`;
 }
 
 async function buildTeamPlanningContext(input: {
@@ -1797,6 +1896,7 @@ export function writeTeamRun(input: {
   recipe: TeamRecipe;
   teamPlan: ReturnType<typeof buildTeamPlan>;
   validation: { ok: boolean; findings: PermissionFinding[] };
+  runtimeContract: TeamRuntimeContract;
 }) {
   const now = new Date().toISOString();
   const teamRunId = createTeamRunId(input.taskId, input.actorId, now);
@@ -1810,7 +1910,15 @@ export function writeTeamRun(input: {
     recipeId: input.recipe.recipeId,
     status: 'active',
     executionMode: 'manual-team',
-    agentsSpawned: false,
+    executionSurface: input.runtimeContract.executionSurface,
+    runtimeMode: input.runtimeContract.runtimeMode,
+    runtimeLanguage: input.runtimeContract.runtimeLanguage,
+    runtimeAdapterId: input.runtimeContract.runtimeAdapterId,
+    providerId: input.runtimeContract.providerId,
+    sdkId: input.runtimeContract.sdkId,
+    modelId: input.runtimeContract.modelId,
+    runtimeContract: input.runtimeContract,
+    agentsSpawned: input.runtimeContract.agentsSpawned,
     runtimeWritten: true,
     task: summarizeTask(input.taskId, input.task),
     roles: input.recipe.agents.map((agent) => ({
@@ -1831,7 +1939,7 @@ export function writeTeamRun(input: {
     evidenceCuratorSummary: null,
     teamSummary: {
       decision: input.teamPlan.captainDecision.reason,
-      implementationSummary: 'Team runtime started; closure remains governed by command-backed evidence.',
+      implementationSummary: `${input.runtimeContract.selectionReason}; closure remains governed by command-backed evidence.`,
       validators: normalizeStringArray(input.task.validators),
       evidence: [],
       risk: input.teamPlan.captainDecision.escalationRequired ? 'medium' : 'low',

@@ -17,6 +17,12 @@ export const teamSpecCommandSurface = {
     { flag: '--task', value: 'id', summary: 'Task id to plan, validate, or start a team for.' },
     { flag: '--recipe', value: 'id', summary: 'Optional team recipe id. Defaults to a language-aware built-in recipe.' },
     { flag: '--actor', value: 'id', summary: 'Actor id for team start.' },
+    { flag: '--runtime-mode', value: 'mode', summary: 'Team runtime mode: real-agent, editor-subagent, or broker-only. Defaults to broker-only.' },
+    { flag: '--runtime-language', value: 'name', summary: 'Runtime language contract for this team run. Defaults to node.' },
+    { flag: '--runtime-adapter', value: 'id', summary: 'Vendor-neutral runtime adapter id recorded on the team run.' },
+    { flag: '--provider', value: 'id', summary: 'Optional provider metadata recorded on the runtime contract.' },
+    { flag: '--sdk', value: 'id', summary: 'Optional SDK metadata recorded on the runtime contract.' },
+    { flag: '--model', value: 'id', summary: 'Optional model metadata recorded on the runtime contract.' },
     { flag: '--team', value: 'id', summary: 'Team run id for status or patrol.' },
     { flag: '--mode', value: 'name', summary: 'Team patrol mode: claim-preflight, close-preflight, big-script, or daily-noon.' },
     { flag: '--compact', summary: 'Return a compact status payload.' },
@@ -114,9 +120,10 @@ export const teamSpecLieutenantEscalation = {
 
 export const teamSpecRuntimeStatus = {
   summary:
-    'Start and inspect a manual team runtime record without spawning subagents (TASK-TEAM-0011 owns team.start-runtime-state and team.status-runtime-read).',
+    'Start and inspect a team runtime record with neutral runtime mode and adapter metadata (TASK-TEAM-0011 owns status; TASK-TEAM-0031 owns runtime contract fields).',
   examples: [
     'node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json',
+    'node atm.mjs team start --task TASK-TEAM-0031 --actor codex-main --runtime-mode broker-only --runtime-adapter atm.node.broker --json',
     'node atm.mjs team status --compact --json'
   ]
 };
