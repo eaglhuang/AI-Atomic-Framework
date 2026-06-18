@@ -36,6 +36,7 @@ interface EvidenceEnvelope {
 }
 
 export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'atm.evidenceBundleManifest.v1';
+export const TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID = 'atm.teamArtifactHandoffEvidence.v1';
 
 export interface EvidenceBundleManifest {
   readonly schemaId: typeof EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID;
@@ -46,6 +47,36 @@ export interface EvidenceBundleManifest {
   readonly staleValidationPasses: readonly string[];
   readonly commandRuns: readonly Record<string, unknown>[];
   readonly artifactPaths: readonly string[];
+}
+
+export interface TeamArtifactHandoffEvidence {
+  readonly schemaId: typeof TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID;
+  readonly producedArtifacts: readonly string[];
+  readonly missingArtifacts: readonly string[];
+  readonly retryBudgetStatus: string;
+  readonly escalationTarget: string | null;
+  readonly closeAllowed: boolean;
+}
+
+export function buildTeamArtifactHandoffEvidence(input: {
+  producedArtifacts?: readonly string[];
+  missingArtifacts?: readonly string[];
+  retryBudgetStatus?: unknown;
+  escalationTarget?: unknown;
+  closeAllowed?: unknown;
+}): TeamArtifactHandoffEvidence {
+  return {
+    schemaId: TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID,
+    producedArtifacts: readStringArray(input.producedArtifacts),
+    missingArtifacts: readStringArray(input.missingArtifacts),
+    retryBudgetStatus: typeof input.retryBudgetStatus === 'string' && input.retryBudgetStatus.trim().length > 0
+      ? input.retryBudgetStatus.trim()
+      : 'unknown',
+    escalationTarget: typeof input.escalationTarget === 'string' && input.escalationTarget.trim().length > 0
+      ? input.escalationTarget.trim()
+      : null,
+    closeAllowed: input.closeAllowed === true
+  };
 }
 
 export function evidenceBundleManifestRelativePath(taskId: string): string {

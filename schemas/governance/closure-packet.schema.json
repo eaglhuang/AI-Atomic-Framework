@@ -59,6 +59,32 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
     },
+    "teamArtifactHandoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "producedArtifacts",
+        "missingArtifacts",
+        "retryBudgetStatus",
+        "escalationTarget",
+        "closeAllowed"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.teamArtifactHandoffEvidence.v1" },
+        "producedArtifacts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "missingArtifacts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "retryBudgetStatus": { "enum": ["within-budget", "escalation-required", "unknown"] },
+        "escalationTarget": { "type": ["string", "null"] },
+        "closeAllowed": { "type": "boolean" }
+      }
+    },
     "evidencePath": { "type": "string", "minLength": 1 },
     "closedAt": { "type": "string", "minLength": 1 },
     "closedByActor": { "type": "string", "minLength": 1 }

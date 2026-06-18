@@ -144,6 +144,46 @@ type TeamReworkRoute = {
   transitions: TeamReworkTransition[];
 };
 
+type TeamRoleArtifactContract = {
+  schemaId: 'atm.teamRoleArtifactContract.v1';
+  agentId: string;
+  role: string;
+  consumesFrom: string[];
+  producesTo: string[];
+  requiredArtifacts: string[];
+};
+
+type TeamArtifactHandoffFinding = {
+  level: 'info' | 'warning' | 'error';
+  code: string;
+  role: string;
+  agentId: string;
+  artifact: string | null;
+  blocking: boolean;
+  summary: string;
+};
+
+type TeamArtifactHandoffContract = {
+  schemaId: 'atm.teamArtifactHandoffContract.v1';
+  requiredRoles: string[];
+  roleContracts: TeamRoleArtifactContract[];
+  findings: TeamArtifactHandoffFinding[];
+  closeAllowed: boolean;
+};
+
+type TeamRetryBudgetContract = {
+  schemaId: 'atm.teamRetryBudgetContract.v1';
+  maxReworkCycles: number;
+  maxValidatorReruns: number;
+  maxReviewerReturns: number;
+  usedReworkCycles: number;
+  usedValidatorReruns: number;
+  usedReviewerReturns: number;
+  exhausted: boolean;
+  escalationTarget: string | null;
+  status: 'within-budget' | 'escalation-required';
+};
+
 type TeamRuntimeContract = {
   schemaId: 'atm.teamRuntimeContract.v1';
   runtimeMode: TeamRuntimeMode;
@@ -155,6 +195,8 @@ type TeamRuntimeContract = {
   agentsSpawned: boolean;
   executionSurface: 'agent-runtime' | 'editor-subagent' | 'broker-governance';
   selectionReason: string;
+  artifactHandoff: TeamArtifactHandoffContract;
+  retryBudget: TeamRetryBudgetContract;
   editorSubagentBridge: TeamEditorSubagentBridgeContract;
 };
 
@@ -173,6 +215,9 @@ type TeamEditorSubagentRoleEnvelope = {
   artifactMetadata: {
     expectedReports: string[];
     evidenceRequired: string;
+    consumesFrom: string[];
+    producesTo: string[];
+    requiredArtifacts: string[];
   };
   retryMetadata: {
     retryPolicy: 'atm-governed';
@@ -708,6 +753,12 @@ export function buildTeamRuntimeContract(input: {
     agentsSpawned,
     executionSurface,
     selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId }),
+    artifactHandoff: buildTeamArtifactHandoffContract({
+      recipe: input.recipe,
+      requiredRoles: ['implementer', 'reviewer', 'validator', 'evidence-collector'],
+      producedArtifacts: []
+    }),
+    retryBudget: buildTeamRetryBudgetContract({}),
     editorSubagentBridge: buildEditorSubagentBridgeContract({
       enabled: runtimeMode === 'editor-subagent' && !editorBridgeDisabled,
       disabledReason: runtimeMode !== 'editor-subagent'
@@ -720,6 +771,93 @@ export function buildTeamRuntimeContract(input: {
       permissionLeases: input.permissionLeases ?? [],
       evidenceRequired: String(input.evidenceRequired ?? 'command-backed')
     })
+  };
+}
+
+export function buildTeamArtifactHandoffContract(input: {
+  recipe?: TeamRecipe;
+  requiredRoles?: readonly string[];
+  producedArtifacts?: readonly string[];
+}): TeamArtifactHandoffContract {
+  const requiredRoles = uniqueStrings((input.requiredRoles ?? ['implementer', 'reviewer', 'validator', 'evidence-collector'])
+    .map((entry) => String(entry).trim())
+    .filter(Boolean));
+  const recipeAgents = input.recipe?.agents ?? [];
+  const roleContracts = requiredRoles.map((role) => {
+    const agent = recipeAgents.find((entry) => entry.role === role);
+    return buildTeamRoleArtifactContract({
+      agentId: agent?.agentId ?? role,
+      role
+    });
+  });
+  const findings = validateTeamArtifactHandoff({
+    roleContracts,
+    producedArtifacts: input.producedArtifacts ?? []
+  });
+  return {
+    schemaId: 'atm.teamArtifactHandoffContract.v1',
+    requiredRoles,
+    roleContracts,
+    findings,
+    closeAllowed: findings.every((finding) => !finding.blocking)
+  };
+}
+
+export function validateTeamArtifactHandoff(input: {
+  roleContracts: readonly TeamRoleArtifactContract[];
+  producedArtifacts?: readonly string[];
+}): TeamArtifactHandoffFinding[] {
+  const producedArtifacts = new Set((input.producedArtifacts ?? []).map((entry) => normalizeArtifactName(entry)).filter(Boolean));
+  const findings: TeamArtifactHandoffFinding[] = [];
+  for (const contract of input.roleContracts) {
+    for (const artifact of contract.requiredArtifacts) {
+      const normalizedArtifact = normalizeArtifactName(artifact);
+      if (!producedArtifacts.has(normalizedArtifact)) {
+        findings.push({
+          level: 'error',
+          code: 'missing-required-artifact',
+          role: contract.role,
+          agentId: contract.agentId,
+          artifact,
+          blocking: true,
+          summary: `${contract.role} requires artifact '${artifact}' before close.`
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+export function buildTeamRetryBudgetContract(input: {
+  maxReworkCycles?: unknown;
+  maxValidatorReruns?: unknown;
+  maxReviewerReturns?: unknown;
+  usedReworkCycles?: unknown;
+  usedValidatorReruns?: unknown;
+  usedReviewerReturns?: unknown;
+  escalationTarget?: unknown;
+}): TeamRetryBudgetContract {
+  const maxReworkCycles = normalizeRetryBudget(input.maxReworkCycles, 1);
+  const maxValidatorReruns = normalizeRetryBudget(input.maxValidatorReruns, 1);
+  const maxReviewerReturns = normalizeRetryBudget(input.maxReviewerReturns, 1);
+  const usedReworkCycles = normalizeRetryBudget(input.usedReworkCycles, 0);
+  const usedValidatorReruns = normalizeRetryBudget(input.usedValidatorReruns, 0);
+  const usedReviewerReturns = normalizeRetryBudget(input.usedReviewerReturns, 0);
+  const exhausted = usedReworkCycles >= maxReworkCycles
+    || usedValidatorReruns >= maxValidatorReruns
+    || usedReviewerReturns >= maxReviewerReturns;
+  const escalationTarget = normalizeOptionalRuntimeString(input.escalationTarget) ?? 'captain';
+  return {
+    schemaId: 'atm.teamRetryBudgetContract.v1',
+    maxReworkCycles,
+    maxValidatorReruns,
+    maxReviewerReturns,
+    usedReworkCycles,
+    usedValidatorReruns,
+    usedReviewerReturns,
+    exhausted,
+    escalationTarget: exhausted ? escalationTarget : null,
+    status: exhausted ? 'escalation-required' : 'within-budget'
   };
 }
 
@@ -792,6 +930,65 @@ export function buildTeamReworkRouteStateMachine(input: {
     findings,
     transitions
   };
+}
+
+function buildTeamRoleArtifactContract(input: {
+  agentId: string;
+  role: string;
+}): TeamRoleArtifactContract {
+  const role = input.role;
+  if (role === 'implementer') {
+    return {
+      schemaId: 'atm.teamRoleArtifactContract.v1',
+      agentId: input.agentId,
+      role,
+      consumesFrom: ['task-card', 'team-plan', 'scope-locks'],
+      producesTo: ['reviewer', 'validator', 'evidence-collector'],
+      requiredArtifacts: ['implementation-diff', 'implementation-notes']
+    };
+  }
+  if (role === 'reviewer') {
+    return {
+      schemaId: 'atm.teamRoleArtifactContract.v1',
+      agentId: input.agentId,
+      role,
+      consumesFrom: ['implementation-diff', 'implementation-notes'],
+      producesTo: ['implementer', 'evidence-collector'],
+      requiredArtifacts: ['review-findings']
+    };
+  }
+  if (role === 'validator') {
+    return {
+      schemaId: 'atm.teamRoleArtifactContract.v1',
+      agentId: input.agentId,
+      role,
+      consumesFrom: ['implementation-diff', 'validator-commands'],
+      producesTo: ['evidence-collector'],
+      requiredArtifacts: ['validator-results']
+    };
+  }
+  if (role === 'evidence-collector') {
+    return {
+      schemaId: 'atm.teamRoleArtifactContract.v1',
+      agentId: input.agentId,
+      role,
+      consumesFrom: ['review-findings', 'validator-results'],
+      producesTo: ['closure-packet'],
+      requiredArtifacts: ['command-backed-evidence', 'closure-packet']
+    };
+  }
+  return {
+    schemaId: 'atm.teamRoleArtifactContract.v1',
+    agentId: input.agentId,
+    role,
+    consumesFrom: ['team-plan'],
+    producesTo: ['team-summary'],
+    requiredArtifacts: ['role-report']
+  };
+}
+
+function normalizeArtifactName(value: unknown): string {
+  return String(value ?? '').trim().toLowerCase();
 }
 
 export function transitionTeamReworkRoute(
@@ -879,6 +1076,10 @@ function buildEditorSubagentBridgeContract(input: {
   }
   const roleEnvelopes = (input.recipe?.agents ?? []).map((agent) => {
     const permissionLeases = leasesByAgent.get(agent.agentId) ?? [];
+    const artifactContract = buildTeamRoleArtifactContract({
+      agentId: agent.agentId,
+      role: agent.role
+    });
     return {
       schemaId: 'atm.teamEditorSubagentRoleEnvelope.v1' as const,
       agentId: agent.agentId,
@@ -897,7 +1098,10 @@ function buildEditorSubagentBridgeContract(input: {
           'validator evidence',
           'team summary'
         ],
-        evidenceRequired: input.evidenceRequired
+        evidenceRequired: input.evidenceRequired,
+        consumesFrom: artifactContract.consumesFrom,
+        producesTo: artifactContract.producesTo,
+        requiredArtifacts: artifactContract.requiredArtifacts
       },
       retryMetadata: {
         retryPolicy: 'atm-governed' as const,
@@ -2205,6 +2409,8 @@ export function writeTeamRun(input: {
     sdkId: input.runtimeContract.sdkId,
     modelId: input.runtimeContract.modelId,
     runtimeContract: input.runtimeContract,
+    artifactHandoff: input.runtimeContract.artifactHandoff,
+    retryBudget: input.runtimeContract.retryBudget,
     agentsSpawned: input.runtimeContract.agentsSpawned,
     runtimeWritten: true,
     task: summarizeTask(input.taskId, input.task),
@@ -2224,7 +2430,7 @@ export function writeTeamRun(input: {
     reworkRoute: buildTeamReworkRouteStateMachine({
       findings: [],
       requiredChecksPassed: false,
-      retryBudgetMax: 1,
+      retryBudgetMax: input.runtimeContract.retryBudget.maxReworkCycles,
       retryBudgetUsed: 0
     }),
     agentReports: [],
@@ -2467,6 +2673,27 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`
     }));
   }
+  const artifactFindings = Array.isArray(teamRun.artifactHandoff?.findings)
+    ? teamRun.artifactHandoff.findings
+    : Array.isArray(teamRun.runtimeContract?.artifactHandoff?.findings)
+      ? teamRun.runtimeContract.artifactHandoff.findings
+      : [];
+  for (const artifactFinding of artifactFindings) {
+    if (artifactFinding?.blocking === true) {
+      findings.push(teamPatrolFinding({
+        level: input.mode === 'close-preflight' ? 'blocker' : 'warning',
+        code: 'ATM_TEAM_PATROL_ARTIFACT_HANDOFF_BLOCKED',
+        category: 'artifact-gap',
+        summary: String(artifactFinding.summary ?? 'Team role artifact handoff has a missing required artifact.'),
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        details: {
+          role: artifactFinding.role ?? null,
+          agentId: artifactFinding.agentId ?? null,
+          artifact: artifactFinding.artifact ?? null
+        }
+      }));
+    }
+  }
   const remaining = extractRetryBudgetRemaining(teamRun);
   if (remaining !== null && remaining <= 0) {
     findings.push(teamPatrolFinding({
@@ -2503,8 +2730,11 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
 }
 
 function extractRetryBudgetRemaining(teamRun: any): number | null {
+  const retryBudget = teamRun.retryBudget ?? teamRun.runtimeContract?.retryBudget;
+  if (retryBudget?.status === 'escalation-required' || retryBudget?.exhausted === true) {
+    return 0;
+  }
   const candidates = [
-    teamRun.retryBudget?.remaining,
     teamRun.reworkRoute?.retryBudgetRemaining,
     teamRun.reworkRoute?.retryBudget?.remaining
   ];
