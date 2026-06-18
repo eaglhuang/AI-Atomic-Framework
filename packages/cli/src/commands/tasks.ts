@@ -2591,6 +2591,7 @@ async function runTasksClose(argv: string[]) {
     const allowedAdvisoryGovernanceFiles = options.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0
       ? [
           `.atm/history/evidence/${options.taskId}.json`,
+          `.atm/history/tasks/${options.taskId}.json`,
           ...readDeferredForeignStagedFilesForActiveCloseWindow(options.cwd, options.taskId)
         ]
       : [];
