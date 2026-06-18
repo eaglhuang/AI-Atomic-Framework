@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import path from 'node:path';
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
-import { findCloseCommitWindowCoveringPaths } from './framework-development.ts';
+import { findCloseCommitWindowCoveringPaths, readActiveCloseCommitWindows } from './framework-development.ts';
 import { getCanonicalAllowedFilesForTask, sanitizeTaskDirectionAllowedFiles } from './task-direction.ts';
 import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
@@ -1063,6 +1063,10 @@ function inspectCloseCommitWindowStagedArtifacts(
   if (stagedFiles.length === 0) {
     return { ok: false, taskId, stagedFiles, reason: 'no-staged-files' };
   }
+  const activeTaskWindow = readActiveCloseCommitWindows(cwd).find((entry) => entry.taskId === taskId) ?? null;
+  if (activeTaskWindow && stagedFiles.every((filePath) => isAllowedGovernanceArtifactPath(filePath, taskId))) {
+    return { ok: true, taskId, stagedFiles, reason: 'active-close-commit-window-governance-bundle' };
+  }
   const windowRecord = findCloseCommitWindowCoveringPaths(cwd, stagedFiles);
   if (!windowRecord) {
     return { ok: false, taskId, stagedFiles, reason: 'no-covering-window' };
@@ -1385,8 +1389,26 @@ function inspectTaskScopedUnstagedCommit(
   );
   const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
   const unstagedInScopeDirty = deliverableDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
+  const unstagedDeliverableDirty = unstagedInScopeDirty.filter((filePath) =>
+    !isAllowedGovernanceArtifactPath(filePath, taskId)
+  );
 
-  if (outOfScopeStagedFiles.length > 0 && (unstagedInScopeDirty.length > 0 || stagedFiles.some((file) => isFileAllowedInTaskBundle(file, taskId, declaredScope)))) {
+  const stagedDeliverableFiles = stagedFiles.filter((filePath) => !isAllowedGovernanceArtifactPath(filePath, taskId));
+
+  if (
+    skippedExternalDirtyFiles.length > 0
+    && unstagedDeliverableDirty.length > 0
+    && outOfScopeStagedFiles.length === 0
+    && stagedDeliverableFiles.length === 0
+  ) {
+    return {
+      kind: 'mixed-scope',
+      inScopeDirtyFiles: uniqueSorted(unstagedDeliverableDirty),
+      outOfScopeStagedFiles: uniqueSorted(skippedExternalDirtyFiles)
+    };
+  }
+
+  if (outOfScopeStagedFiles.length > 0 && (unstagedDeliverableDirty.length > 0 || stagedFiles.some((file) => isFileAllowedInTaskBundle(file, taskId, declaredScope)))) {
     return {
       kind: 'mixed-scope',
       inScopeDirtyFiles: uniqueSorted(unstagedInScopeDirty.length > 0 ? unstagedInScopeDirty : deliverableDirtyFiles),

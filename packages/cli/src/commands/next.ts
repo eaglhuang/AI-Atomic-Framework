@@ -3669,7 +3669,11 @@ function buildChannelPlaybook(input: {
         'git add <changed files>',
         `node atm.mjs git commit --actor ${actor} --message "<message>" --json`
       ],
-      commitTiming: 'Commit after the focused validator passes. Prefer the ATM git wrapper for governed framework work so commit trailers and fallback guidance stay consistent.'
+      commitTiming: 'Commit after the focused validator passes. Prefer `node atm.mjs git commit` for governed framework work; bare `git commit` is for read-only inspection or non-governed maintenance only.',
+      governedGitEntrypoint: {
+        preferredCommand: `node atm.mjs git commit --actor ${actor} --message "<message>" --json`,
+        directGitPolicy: 'Direct git remains available for read-only commands and non-governed maintenance. When staging .atm/history/** task or evidence files, use the ATM wrapper so trailers and claim binding stay consistent.'
+      }
     };
   }
   if (input.channel === 'batch') {
@@ -3747,7 +3751,11 @@ function buildChannelPlaybook(input: {
         ? 'Repair the batch runtime first, then stage deliverables before checkpoint; commit once after batch checkpoint succeeds.'
         : 'Stage deliverables before checkpoint; commit once after batch checkpoint succeeds.',
       checkpointCommand: `node atm.mjs batch checkpoint --actor ${actor} --json`,
-      repairCommand: batchRepairCommand
+      repairCommand: batchRepairCommand,
+      governedGitEntrypoint: {
+        preferredCommand: `node atm.mjs git commit --actor ${actor} --task <queue-head-task-id> --message "<scope>: complete <queue-head-task-id>" --json`,
+        directGitPolicy: 'Batch delivery commits must use the ATM wrapper after checkpoint; bare git commit is not banned for read-only inspection.'
+      }
     };
   }
   return {
@@ -3789,7 +3797,12 @@ function buildChannelPlaybook(input: {
       writeCommand: closeOps.write,
       hintField: 'evidence.writeReadinessHint.blockers[].requiredCommand'
     },
-    commitTiming: 'Commit only after taskflow close --write succeeds and the governed bundle is committed.'
+    commitTiming: 'Commit only after taskflow close --write succeeds and the governed bundle is committed.',
+    governedGitEntrypoint: {
+      preferredCommand: `node atm.mjs git commit --actor ${actor} --task <task-id> --message "<scope>: complete <task-id>" --json`,
+      directGitPolicy: 'Use taskflow close --write for normal closure. Bare git commit is not banned globally, but governed task/evidence bundles must use the ATM wrapper.',
+      fallbackFields: ['copyableCommitCommand', 'hostGitCompatibilityGuidance']
+    }
   };
 }
 

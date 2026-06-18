@@ -2593,7 +2593,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
       const wrapperRequired: PreCommitBlockingFinding = {
         code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED',
         source: 'commit-attribution',
-        detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently.',
+        detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently. Direct git commit remains valid for read-only git and non-governed maintenance.',
         requiredCommand: `node atm.mjs git commit --actor <id> --task ${stagedTaskIds[0]} --message "<summary>" --json`,
         classification: 'current-task'
       };
@@ -2613,7 +2613,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
     findings.push({
       code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED',
       source: 'commit-attribution',
-      detail: 'Governed task commits must use node atm.mjs git commit --actor <id> --task <task> --message "<summary>" so ATM can bind author, session, claim, and trailers consistently.',
+      detail: 'Governed task commits must use node atm.mjs git commit --actor <id> --task <task> --message "<summary>" so ATM can bind author, session, claim, and trailers consistently. Bare git commit is not banned for inspection or non-governed files.',
       requiredCommand: 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json',
       classification: 'current-task'
     });

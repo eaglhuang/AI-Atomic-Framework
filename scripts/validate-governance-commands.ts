@@ -156,6 +156,31 @@ function writeJson(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+function writePlanningCard(repo: string, taskId: string, title: string, scopePaths: readonly string[] = ['notes/governance.txt']) {
+  const taskDir = path.join(repo, 'docs', 'tasks');
+  mkdirSync(taskDir, { recursive: true });
+  const cardPath = path.join(taskDir, `${taskId.toLowerCase()}-fixture.task.md`);
+  const yamlList = (values: readonly string[]) => values.map((value) => `  - ${value}`).join('\n');
+  writeFileSync(cardPath, [
+    '---',
+    `task_id: ${taskId}`,
+    `title: ${title}`,
+    'status: planned',
+    'scopePaths:',
+    yamlList(scopePaths),
+    'deliverables:',
+    yamlList(scopePaths),
+    '---',
+    '',
+    `## ${taskId} ${title}`,
+    '',
+    '## Acceptance',
+    '- Fixture task card for governance command validation.',
+    ''
+  ].join('\n'), 'utf8');
+  return cardPath;
+}
+
 const tempRoot = createTempWorkspace('atm-governance-commands-');
 try {
   const repo = path.join(tempRoot, 'repo');
@@ -168,6 +193,25 @@ try {
   const bootstrap = runAtm(['bootstrap', '--cwd', repo, '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'bootstrap must exit 0 for governance command validation');
   assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true for governance command validation');
+  const fixtureTaskCards = [
+    ['ATM-GOV-0102', 'Renew release test', ['notes/governance.txt']],
+    ['ATM-GOV-0103', 'Reservation test', ['notes/governance.txt']],
+    ['ATM-GOV-0108', 'Handoff test', ['notes/governance.txt']],
+    ['ATM-GOV-0109', 'Takeover test', ['notes/governance.txt']],
+    ['ATM-GOV-0110', 'Artifact-only closure guard', ['atomic_workbench/evidence/artifact-only.json']],
+    ['ATM-GOV-0111', 'Historical delivery code close test', ['src/historical-delivery.ts']],
+    ['ATM-GOV-0112', 'Closeout-only claim intent surface test', ['notes/closeout-intent.txt']],
+    ['ATM-GOV-0113', 'Closeout-only claim intent alias test', ['notes/closeout-intent-alias.txt']],
+    ['ATM-GOV-0114', 'Closeout-only no-more-mutation alias test', ['notes/no-more-mutation.txt']],
+    ['ATM-GOV-RECONCILE', 'Reconcile close window regression', ['src/reconcile-close-window.ts']],
+    ['ATM-GOV-STAGING-0141', 'Task-scoped staging diagnostics', ['src/task-scoped-staging.ts']]
+  ] as const;
+  for (const [taskId, title, scopePaths] of fixtureTaskCards) {
+    const cardPath = writePlanningCard(repo, taskId, title, scopePaths);
+    const imported = runAtm(['tasks', 'import', '--cwd', repo, '--from', cardPath, '--write', '--json']);
+    assert(imported.exitCode === 0, `fixture task import must exit 0 for ${taskId}`);
+    assert(imported.parsed.ok === true, `fixture task import must report ok=true for ${taskId}`);
+  }
   assert(runGit(repo, ['add', '.']).exitCode === 0, 'fixture bootstrap files must be stageable');
   assert(runGit(repo, ['commit', '-m', 'chore: bootstrap fixture']).exitCode === 0, 'fixture bootstrap commit must succeed');
 
@@ -343,6 +387,8 @@ try {
   assert(registerActor.parsed.ok === true, 'actor register must report ok=true');
   assert(runGit(repo, ['config', 'user.name', 'fixture-agent']).exitCode === 0, 'fixture git user.name must match the registered actor before governed commits');
   assert(runGit(repo, ['config', 'user.email', 'fixture-agent@example.com']).exitCode === 0, 'fixture git user.email must match the registered actor before governed commits');
+  assert(runGit(repo, ['add', '.atm/catalog/registry/actors.json']).exitCode === 0, 'fixture actor registry must be stageable');
+  assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: register fixture actor']).exitCode === 0, 'fixture actor registry commit must succeed');
 
   const explicitIdentityPrepare = runAtm([
     'git',
@@ -359,8 +405,9 @@ try {
   ]);
   assert(explicitIdentityPrepare.exitCode === 0, 'git prepare with explicit name/email must exit 0');
   assert(explicitIdentityPrepare.parsed.ok === true, 'git prepare with explicit name/email must report ok=true');
-  assert(explicitIdentityPrepare.parsed.evidence?.identityPath === '.atm/runtime/identity/default.json', 'explicit git prepare must report the runtime identity path');
-  const preparedIdentity = JSON.parse(readFileSync(path.join(repo, '.atm', 'runtime', 'identity', 'default.json'), 'utf8'));
+  assert(explicitIdentityPrepare.parsed.evidence?.identityPath, 'explicit git prepare must report the runtime identity path');
+  const preparedIdentityPath = String(explicitIdentityPrepare.parsed.evidence?.identityPath);
+  const preparedIdentity = JSON.parse(readFileSync(path.join(repo, preparedIdentityPath), 'utf8'));
   assert(preparedIdentity.actorId === 'prepare-only-agent', 'explicit git prepare must seed the runtime identity actor');
   assert(preparedIdentity.gitName === 'Prepare Only', 'explicit git prepare must seed the runtime identity git name');
   assert(preparedIdentity.gitEmail === 'prepare-only@example.com', 'explicit git prepare must seed the runtime identity git email');
@@ -541,6 +588,7 @@ try {
   assert(!(restoreCommit.parsed.evidence?.trailers ?? []).some((entry: string) => entry.startsWith('ATM-Session: ') || entry.startsWith('ATM-Claim: ')), 'historical ledger restore must not write stale claim or session trailers');
 
   const reconcileTaskId = 'ATM-GOV-RECONCILE';
+  assert(runGit(repo, ['restore', '--staged', '.']).exitCode === 0, 'reconcile fixture must start without foreign staged bundles');
   const reconcileReserve = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--title', 'Reconcile close window regression', '--json']);
   assert(reconcileReserve.exitCode === 0, 'reconcile fixture reserve must exit 0');
   const reconcilePromote = runAtm(['tasks', 'promote', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--json']);
@@ -550,15 +598,40 @@ try {
   writeFileSync(reconcileSourcePath, 'export const reconcileCloseWindow = true;\n', 'utf8');
   const reconcileClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--files', 'src/reconcile-close-window.ts', '--json']);
   assert(reconcileClaim.exitCode === 0, 'reconcile fixture claim must exit 0');
+  const reconcileTaskPath = path.join(repo, '.atm', 'history', 'tasks', `${reconcileTaskId}.json`);
+  const reconcileTaskDocument = JSON.parse(readFileSync(reconcileTaskPath, 'utf8'));
+  reconcileTaskDocument.scopePaths = ['src/reconcile-close-window.ts'];
+  reconcileTaskDocument.deliverables = ['src/reconcile-close-window.ts'];
+  writeFileSync(reconcileTaskPath, `${JSON.stringify(reconcileTaskDocument, null, 2)}\n`, 'utf8');
   assert(runGit(repo, ['add', 'src/reconcile-close-window.ts']).exitCode === 0, 'reconcile fixture source file must stage');
   const reconcileDeliveryCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'feat: reconcile delivery fixture', '--json']);
   assert(reconcileDeliveryCommit.exitCode === 0, 'reconcile fixture delivery commit must exit 0');
   const reconcileDeliverySha = String(reconcileDeliveryCommit.parsed.evidence?.commitSha ?? '');
   assert(reconcileDeliverySha.length > 0, 'reconcile fixture delivery commit must return commit sha');
-  const reconcileClose = runAtm(['tasks', 'reconcile', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--json']);
+  const reconcileApproval = runAtm([
+    'emergency',
+    'approve',
+    '--cwd',
+    repo,
+    '--permission',
+    'backend.tasks.reconcile',
+    '--actor',
+    'fixture-agent',
+    '--task',
+    reconcileTaskId,
+    '--approval-text',
+    'Human fixture approval for protected reconcile regression validation.',
+    '--reason',
+    'Validate protected reconcile closeback behavior in an isolated fixture repository.',
+    '--json'
+  ]);
+  assert(reconcileApproval.exitCode === 0, 'reconcile fixture emergency approval must exit 0');
+  const reconcileApprovalLease = String(reconcileApproval.parsed.evidence?.lease?.leaseId ?? reconcileApproval.parsed.evidence?.leaseId ?? '');
+  assert(reconcileApprovalLease.length > 0, 'reconcile fixture emergency approval must return a lease id');
+  const reconcileClose = runAtm(['tasks', 'reconcile', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--emergency-approval', reconcileApprovalLease, '--json']);
   assert(reconcileClose.exitCode === 0, 'tasks reconcile must exit 0 for close-commit-window regression fixture');
   assert(reconcileClose.parsed.ok === true, 'tasks reconcile must report ok=true for close-commit-window regression fixture');
-  const reconcileCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'chore: reconcile closure packet commit', '--json']);
+  const reconcileCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'chore: reconcile closure packet commit', '--defer-foreign-staged', '--json']);
   assert(reconcileCommit.exitCode === 0, 'close-commit-window reconcile packet must commit without reopening a dead session');
   assert(reconcileCommit.parsed.ok === true, 'close-commit-window reconcile packet commit must report ok=true');
   assert(reconcileCommit.parsed.evidence?.sessionId === null, 'close-commit-window reconcile packet commit must not require a revived session');
@@ -732,9 +805,31 @@ try {
   const historicalCloseWithoutCommit = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--json']);
   assert(historicalCloseWithoutCommit.exitCode === 1, 'historical delivery close without a delivery commit must fail when there is no current deliverable diff');
   assert(historicalCloseWithoutCommit.parsed.messages?.[0]?.code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', 'historical delivery close without commit must report deliverable diff requirement');
-  const historicalClose = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--historical-delivery', historicalDeliveryCommit, '--json']);
-  assert(historicalClose.exitCode === 0, 'historical delivery close with a scoped delivery commit must exit 0');
-  assert(historicalClose.parsed.ok === true, 'historical delivery close with a scoped delivery commit must report ok=true');
+  const historicalCloseApproval = runAtm([
+    'emergency',
+    'approve',
+    '--cwd',
+    repo,
+    '--permission',
+    'backend.tasks.close',
+    '--actor',
+    'fixture-agent',
+    '--task',
+    'ATM-GOV-0111',
+    '--approval-text',
+    'Human fixture approval for protected historical close validation.',
+    '--reason',
+    'Validate protected historical-delivery close behavior in an isolated fixture repository.',
+    '--allowed-flag',
+    '--historical-delivery',
+    '--json'
+  ]);
+  assert(historicalCloseApproval.exitCode === 0, 'historical delivery close emergency approval must exit 0');
+  const historicalCloseApprovalLease = String(historicalCloseApproval.parsed.evidence?.lease?.leaseId ?? historicalCloseApproval.parsed.evidence?.leaseId ?? '');
+  assert(historicalCloseApprovalLease.length > 0, 'historical delivery close emergency approval must return a lease id');
+  const historicalClose = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--historical-delivery', historicalDeliveryCommit, '--emergency-approval', historicalCloseApprovalLease, '--json']);
+  assert(historicalClose.exitCode === 0, `historical delivery close with a scoped delivery commit must exit 0: ${JSON.stringify(historicalClose.parsed)}`);
+  assert(historicalClose.parsed.ok === true, `historical delivery close with a scoped delivery commit must report ok=true: ${JSON.stringify(historicalClose.parsed)}`);
   const historicalCloseGate = historicalClose.parsed.evidence?.deliverableGate ?? {};
   assert(historicalCloseGate.reason === 'historical-delivery-diff-present', 'historical delivery close must report historical-delivery-diff-present');
   assert((historicalCloseGate.deliverableFiles ?? []).includes('src/historical-delivery.ts'), 'historical delivery close must include scoped historical deliverable file');
@@ -820,7 +915,7 @@ try {
     'title: "Residue status fixture"',
     'status: done',
     '---',
-    '# ATM-GOV-RESIDUE-0001',
+    '## ATM-GOV-RESIDUE-0001 Residue status fixture',
     ''
   ].join('\n'), 'utf8');
   writeJson(path.join(residueRepo, '.atm', 'history', 'tasks', 'ATM-GOV-RESIDUE-0001.json'), {
@@ -836,6 +931,10 @@ try {
     claim: {
       actorId: 'fixture-agent',
       leaseId: 'lease-residue-0001',
+      claimedAt: '2026-06-10T00:00:00.000Z',
+      heartbeatAt: '2026-06-10T00:00:00.000Z',
+      ttlSeconds: 31536000,
+      files: ['src/residue-fixture.ts'],
       state: 'active'
     },
     source: {
@@ -848,14 +947,14 @@ try {
   const residueStatus = runAtm(['tasks', 'status', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
   assert(residueStatus.exitCode === 0, 'tasks status residue fixture must exit 0');
   assert(residueStatus.parsed.ok === true, 'tasks status residue fixture must report ok=true');
-  assert(residueStatus.parsed.evidence.residueClassification.bucket === 'complete-but-unfinalized', 'tasks status residue fixture must classify complete-but-unfinalized');
-  assert(String(residueStatus.parsed.evidence.residueClassification.nextCommand ?? '').includes('tasks reconcile'), 'tasks status residue fixture must point to reconcile');
+  assert(residueStatus.parsed.evidence.residueClassification.bucket === 'complete-but-unfinalized', `tasks status residue fixture must classify complete-but-unfinalized: ${JSON.stringify(residueStatus.parsed.evidence.residueClassification)}`);
+  assert(String(residueStatus.parsed.evidence.residueClassification.nextCommand ?? '').includes('tasks reconcile'), `tasks status residue fixture must point to reconcile: ${JSON.stringify(residueStatus.parsed.evidence.residueClassification)}`);
   assert(String(residueStatus.parsed.evidence.residueClassification.nextCommand ?? '').includes('ATM-GOV-RESIDUE-0001'), 'tasks status residue fixture must materialize task id in next command');
 
   const residueFinalize = runAtm(['tasks', 'finalize', 'diagnose', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
   assert(residueFinalize.exitCode === 0, 'tasks finalize diagnose residue fixture must exit 0');
   assert(residueFinalize.parsed.evidence.schemaId === 'atm.taskResidueDiagnosis.v1', 'tasks finalize diagnose must emit atm.taskResidueDiagnosis.v1');
-  assert(residueFinalize.parsed.evidence.bucket === 'complete-but-unfinalized', 'tasks finalize diagnose must classify complete-but-unfinalized');
+  assert(residueFinalize.parsed.evidence.bucket === 'complete-but-unfinalized', `tasks finalize diagnose must classify complete-but-unfinalized: ${JSON.stringify(residueFinalize.parsed.evidence)}`);
   assert(residueFinalize.parsed.evidence.autoMutationAllowed === false, 'tasks finalize diagnose must not allow auto mutation');
 
   const staticEvidenceArtifactPath = path.join(repo, 'atomic_workbench', 'evidence', 'ATM-GOV-IMPERSONATE.json');
