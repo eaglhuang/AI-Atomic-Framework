@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T10-56-52-235Z-close-a4790cab323b",
+  "taskId": "TASK-MAO-0055",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618072436-captain-TASK-MAO-0055-61c8efbb69",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0055.json",
+  "taskSha256": "sha256:cf9eac5eb4596ff40c3631d340a0838174c50def679fb37981fbb6bfc13197ee",
+  "createdAt": "2026-06-18T10:56:52.235Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0055 --actor captain --status done --historical-delivery 8bffe6b81",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618072436-captain-TASK-MAO-0055-61c8efbb69",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0055.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "node --strip-types tests/cli/tasks-claim-auto-intent.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T10:56:52.229Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0055-tasks-claim-auto-intent-and-closeout-safety.task.md",
+        ".atm/history/evidence/TASK-MAO-0055.*",
+        ".atm/history/task-events/TASK-MAO-0055/**",
+        ".atm/history/tasks/TASK-MAO-0055.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/ATM_NEW_USER_WORKFLOW.md",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "tests/cli/tasks-claim-auto-intent.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "tests/cli/tasks-claim-auto-intent.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0055",
   "title": "tasks claim auto-intent and closeout-only mutation safety",
-  "status": "running",
+  "status": "done",
   "milestone": "M8",
   "dependencies": [
     "TASK-MAO-0049"
@@ -67,8 +67,8 @@
     "hash": "b6ab81a545a9e173"
   },
   "importedAt": "2026-06-18T07:24:34.099Z",
-  "lastTransitionId": "2026-06-18T07-24-36-187Z-claim-0f8a2a0c4872",
-  "lastTransitionAt": "2026-06-18T07:24:36.187Z",
+  "lastTransitionId": "2026-06-18T10-56-52-235Z-close-a4790cab323b",
+  "lastTransitionAt": "2026-06-18T10:56:52.235Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-18T07:24:36.149Z",
@@ -77,7 +77,7 @@
     "actorId": "captain",
     "leaseId": "lease-51963e2ce8ef",
     "claimedAt": "2026-06-18T07:24:36.155Z",
-    "heartbeatAt": "2026-06-18T07:24:36.155Z",
+    "heartbeatAt": "2026-06-18T10:56:52.231Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-MAO-0055.json",
@@ -89,8 +89,8 @@
       "packages/cli/src/commands/tasks.ts",
       "tests/cli/tasks-claim-auto-intent.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "delivery commit included ATM git-head evidence sidecar for governed wrapper commit and close-owned governance metadata outside task source scope"
   },
   "startedAt": "2026-06-18T07:24:36.155Z",
   "startedByActor": "captain",
@@ -122,5 +122,10 @@
     "actorId": "captain",
     "createdAt": "2026-06-18T07:24:36.187Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T10:56:52.232Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260618072436-captain-TASK-MAO-0055-61c8efbb69",
+  "closeReason": "delivery commit included ATM git-head evidence sidecar for governed wrapper commit and close-owned governance metadata outside task source scope",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0055.closure-packet.json"
 }
