@@ -86,7 +86,8 @@ result = evaluateTaskDoneCloseAdmission({
   hasActiveSession: false,
   allowHistoricalCloseback: true
 });
-assert(result.ok, 'verified historical closeback must not require a live claim for imported planned task cleanup');
+if (result.ok) fail('historical closeback without active claim must fail closed');
+assert(result.code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED', 'historical closeback without claim must return active-claim-required code');
 
 result = evaluateTaskDoneCloseAdmission({
   taskId: 'TASK-LIFE',
