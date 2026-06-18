@@ -1,0 +1,87 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T16-50-16-422Z-close-29a4ba95591f",
+  "taskId": "TASK-TEAM-0018",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260618155801-codex-gpt-5.4-mini-TASK-TEAM-0018-d85259bb27",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0018.json",
+  "taskSha256": "sha256:5dfd67f3d99e3346860cc7c9b49ddaf2ae90b7be488e87d42ab26a431b7d47e2",
+  "createdAt": "2026-06-18T16:50:16.422Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0018 --actor codex-gpt-5.4-mini --status done --historical-delivery bff419f43e6a8d620a7d0b6e4022d010e1b64257",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618155801-codex-gpt-5.4-mini-TASK-TEAM-0018-d85259bb27",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0018.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-local",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T16:50:16.412Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0018-team-lease-fencing-deadlock-contract.task.md",
+        ".atm/history/evidence/TASK-TEAM-0018.*",
+        ".atm/history/task-events/TASK-TEAM-0018/**",
+        ".atm/history/tasks/TASK-TEAM-0018.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/cli/src/commands/tasks/surface-invariants.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/governance/scope-lock.ts",
+        "packages/plugin-governance-local/src/stores.ts",
+        "scripts/validate-governance-local.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/cli/src/commands/tasks/surface-invariants.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/governance/scope-lock.ts",
+        "packages/plugin-governance-local/src/stores.ts",
+        "scripts/validate-governance-local.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
