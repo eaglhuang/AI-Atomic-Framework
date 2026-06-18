@@ -45,6 +45,10 @@ import {
   buildHistoricalClosePreflight,
   preflightBlockersToWriteReadinessBlockers
 } from './taskflow/historical-close-preflight.ts';
+import {
+  buildPlanningMirrorClosebackExpectation,
+  classifyPlanningMirrorPreEdit
+} from './tasks/planning-mirror-close-diagnostics.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { runAtmGit } from './git-governance.ts';
@@ -111,7 +115,7 @@ interface TaskflowDeliveryCommit {
 }
 
 interface PlanningCardCloseback {
-  mode: 'frontmatter-closeback';
+  mode: 'frontmatter-closeback' | 'frontmatter-pre-edit-absorbed';
   repoRoot: string;
   relativePath: string;
   updatedFields: string[];
@@ -984,6 +988,23 @@ function applyPlanningCardCloseback(input: {
     });
   }
   const content = readFileSync(absolutePath, 'utf8');
+  const expectation = buildPlanningMirrorClosebackExpectation(
+    input.actorId,
+    input.historicalDeliveryRefs[0] ?? null
+  );
+  const preEditClassification = classifyPlanningMirrorPreEdit({
+    relativePath: planning.relativePath,
+    fileContent: content,
+    expectation
+  });
+  if (preEditClassification === 'correct-pre-edit') {
+    return {
+      mode: 'frontmatter-pre-edit-absorbed',
+      repoRoot: planning.repoRoot,
+      relativePath: planning.relativePath,
+      updatedFields: ['status', 'completed_at', 'completed_by_agent', ...(expectation.deliveryCommit ? ['delivery_commit'] : [])]
+    };
+  }
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n)?/);
   if (!match) {
     throw new CliError('ATM_TASKFLOW_CLOSE_PLANNING_FRONTMATTER_MISSING', 'taskflow close requires planning card frontmatter for governed closeback.', {

@@ -8,6 +8,7 @@ import {
   evaluateFrameworkCloseDirtyGuard,
   type FrameworkCloseDirtyGuardReport
 } from '../tasks/scope-lock-diagnostics.ts';
+import { evaluatePlanningMirrorDirtyFiles } from '../tasks/planning-mirror-close-diagnostics.ts';
 import { inspectHistoricalDelivery, type TaskHistoricalDeliveryReport } from '../tasks/historical-delivery.ts';
 
 interface PreflightCommitRepoBundle {
@@ -22,6 +23,7 @@ interface PreflightCommitBundle {
 
 export type HistoricalClosePreflightBlockerId =
   | 'scopeTrackedDirtyFiles'
+  | 'incorrectPlanningMirrorPreEdit'
   | 'unexpectedStagedTasks'
   | 'unexpectedStagedNonBundleFiles'
   | 'mixedDeliveryCommit'
@@ -217,6 +219,28 @@ function buildUnexpectedNonBundleStagedBlocker(
   };
 }
 
+function buildIncorrectPlanningMirrorBlocker(input: {
+  taskId: string;
+  actorId: string;
+  dirtyGuard: FrameworkCloseDirtyGuardReport;
+}): HistoricalClosePreflightBlocker | null {
+  if (input.dirtyGuard.incorrectPlanningMirrorPreEditFiles.length === 0) return null;
+  return {
+    id: 'incorrectPlanningMirrorPreEdit',
+    code: 'ATM_TASKFLOW_PRECLOSE_PLANNING_MIRROR_PREEDIT_INVALID',
+    summary: 'Planning mirror edits do not match the governed closeback result; incorrect pre-edits remain blockers.',
+    files: input.dirtyGuard.incorrectPlanningMirrorPreEditFiles,
+    remediationChoices: [
+      {
+        id: 'restore-accidental-drift',
+        summary: 'Restore the planning card frontmatter to the active claim state, then rerun taskflow close --dry-run.',
+        requiredCommand: input.dirtyGuard.remediation.requiredCommand
+      }
+    ],
+    requiredCommand: input.dirtyGuard.remediation.requiredCommand
+  };
+}
+
 function buildScopeDirtyBlocker(input: {
   taskId: string;
   actorId: string;
@@ -364,6 +388,16 @@ export function buildHistoricalClosePreflight(input: {
     ...(input.previewCommitBundle.planningRepo.repoRoot ? input.previewCommitBundle.planningRepo.stageFiles : [])
   ]);
   const trackedDirtyFiles = readTrackedDirtyFiles(input.cwd);
+  const planningMirrorRelativePath = input.previewCommitBundle.planningRepo.stageFiles[0] ?? null;
+  const planningMirrorDirty = evaluatePlanningMirrorDirtyFiles({
+    planningRepoRoot: input.previewCommitBundle.planningRepo.repoRoot,
+    planningMirrorRelativePath,
+    trackedDirtyFiles: input.previewCommitBundle.planningRepo.repoRoot
+      ? readTrackedDirtyFiles(input.previewCommitBundle.planningRepo.repoRoot)
+      : [],
+    actorId: input.actorId,
+    historicalDeliveryRef: input.historicalDeliveryRefs[0] ?? null
+  });
   const dirtyGuard = evaluateFrameworkCloseDirtyGuard({
     cwd: input.cwd,
     taskId: input.taskId,
@@ -374,7 +408,9 @@ export function buildHistoricalClosePreflight(input: {
       ...(input.historicalDeliveryRefs.length > 0
         ? [`.atm/history/evidence/${input.taskId}.json`]
         : [])
-    ])
+    ]),
+    correctPlanningMirrorPreEditFiles: planningMirrorDirty.correctPlanningMirrorPreEditFiles,
+    incorrectPlanningMirrorPreEditFiles: planningMirrorDirty.incorrectPlanningMirrorPreEditFiles
   });
   const unexpectedStagedTasks = buildUnexpectedStagedTasks({
     taskId: input.taskId,
@@ -413,6 +449,7 @@ export function buildHistoricalClosePreflight(input: {
 
   const operationalBlockers = [
     buildScopeDirtyBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
+    buildIncorrectPlanningMirrorBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
     buildUnexpectedStagedBlocker(unexpectedStagedTasks),
     buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
     buildMixedDeliveryBlocker({
@@ -434,7 +471,7 @@ export function buildHistoricalClosePreflight(input: {
   return {
     schemaId: 'atm.historicalClosePreflight.v1',
     taskId: input.taskId,
-    ok: blockers.length === 0,
+    ok: blockers.length === 0 && dirtyGuard.ok,
     blockers,
     operationalBlockers,
     scopeTrackedDirtyFiles: dirtyGuard.scopeTrackedDirtyFiles,
