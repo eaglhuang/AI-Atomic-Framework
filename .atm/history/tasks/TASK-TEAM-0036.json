@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0036",
+  "title": "Python and C# reference worker adapter examples",
+  "status": "done",
+  "milestone": "M7R",
+  "dependencies": [
+    "TASK-TEAM-0035",
+    "TASK-TEAM-0019"
+  ],
+  "acceptance": [
+    "Python and C# examples can express the same runtime metadata contract as the Node.js adapter.",
+    "Docs clearly state that Node.js remains the default runtime.",
+    "Example adaptors do not weaken lease, evidence, or closure requirements."
+  ],
+  "deliverables": [
+    "docs/ai_atomic_framework/**",
+    "examples/**",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/ai_atomic_framework/**",
+    "examples/**",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts --case polyglot-worker-examples",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Making Python or C# the default ATM runtime",
+    "Parity claims beyond the documented example surface",
+    "Vendor-specific lock-in"
+  ],
+  "nonGoals": [
+    "Do not replace Node.js as the default runtime",
+    "Do not change closure authority rules"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert example adapters, docs, and validation references.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "This card exists so multi-language support is demonstrated, not just promised.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0036-python-and-csharp-reference-worker-adapter-examples.task.md",
+    "sectionTitle": "TASK-TEAM-0036",
+    "headingLine": 47,
+    "hash": "1bbb4ab1b4eb0a30"
+  },
+  "importedAt": "2026-06-17T16:55:22.872Z",
+  "lastTransitionId": "2026-06-18T18-37-12-454Z-close-3fe5dc3d48da",
+  "lastTransitionAt": "2026-06-18T18:37:12.454Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-18T18:29:40.219Z",
+  "promotedAt": "2026-06-18T18:29:40.222Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-a68225bb6a16",
+    "claimedAt": "2026-06-18T18:29:40.225Z",
+    "heartbeatAt": "2026-06-18T18:37:12.451Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0036.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "examples/**",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-18T18:29:40.225Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260618182940-codex-gpt-5.4-mini-TASK-TEAM-0036-356d63e1dd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0036",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0036.*",
+      ".atm/history/task-events/TASK-TEAM-0036/**",
+      ".atm/history/tasks/TASK-TEAM-0036.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "examples/**",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2a70e47ec17506000fb0502ecbcb4b5aad3c5ba657d4a2632e41aeed56dc7519",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-18T18:29:41.140Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-18T18:37:12.451Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260618182940-codex-gpt-5.4-mini-TASK-TEAM-0036-356d63e1dd",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0036.closure-packet.json"
+}
