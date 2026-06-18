@@ -85,6 +85,68 @@
         "closeAllowed": { "type": "boolean" }
       }
     },
+    "teamClosureAttestation": {
+      "description": "Optional Team Agents runtime attestation for closure review. This metadata enriches review context only; local runtime wrappers are not secure sandbox proof by themselves and command-backed evidence remains required.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "teamRunId",
+        "runtimeMode",
+        "runtimeLanguage",
+        "runtimeAdapterId",
+        "providerId",
+        "sdkId",
+        "modelId",
+        "runnerKind",
+        "runtimeVersion",
+        "sandboxPolicyHash",
+        "attestationSigner",
+        "reviewerIndependence",
+        "attestedAt",
+        "localRuntimeWrapperIsSecureSandboxProof",
+        "commandBackedEvidenceRequired"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.teamClosureAttestation.v1" },
+        "teamRunId": { "type": "string", "minLength": 1 },
+        "runtimeMode": { "enum": ["real-agent", "editor-subagent", "broker-only"] },
+        "runtimeLanguage": { "type": "string", "minLength": 1 },
+        "runtimeAdapterId": { "type": ["string", "null"] },
+        "providerId": { "type": ["string", "null"] },
+        "sdkId": { "type": ["string", "null"] },
+        "modelId": { "type": ["string", "null"] },
+        "runnerKind": { "type": "string", "minLength": 1 },
+        "runtimeVersion": { "type": ["string", "null"] },
+        "sandboxPolicyHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "attestationSigner": { "type": "string", "minLength": 1 },
+        "reviewerIndependence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "required",
+            "satisfied",
+            "policy",
+            "reviewerProviderId",
+            "reviewerModelId",
+            "reviewerRuntimeAdapterId",
+            "reason"
+          ],
+          "properties": {
+            "required": { "type": "boolean" },
+            "satisfied": { "type": "boolean" },
+            "policy": { "type": "string", "minLength": 1 },
+            "reviewerProviderId": { "type": ["string", "null"] },
+            "reviewerModelId": { "type": ["string", "null"] },
+            "reviewerRuntimeAdapterId": { "type": ["string", "null"] },
+            "reason": { "type": "string", "minLength": 1 }
+          }
+        },
+        "attestedAt": { "type": "string", "minLength": 1 },
+        "localRuntimeWrapperIsSecureSandboxProof": { "const": false },
+        "commandBackedEvidenceRequired": { "const": true }
+      }
+    },
     "evidencePath": { "type": "string", "minLength": 1 },
     "closedAt": { "type": "string", "minLength": 1 },
     "closedByActor": { "type": "string", "minLength": 1 }

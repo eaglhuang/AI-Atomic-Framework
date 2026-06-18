@@ -10,6 +10,11 @@ import {
   readJsonFile,
   writeJsonFile
 } from './shared.ts';
+import {
+  TEAM_CLOSURE_ATTESTATION_SCHEMA_ID,
+  type TeamClosureAttestationEvidence,
+  type TeamClosureReviewerIndependenceEvidence
+} from './evidence.ts';
 import { getCommandSpec } from './command-specs.ts';
 import { runTasks } from './tasks.ts';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
@@ -203,6 +208,23 @@ type TeamRuntimeContract = {
   artifactHandoff: TeamArtifactHandoffContract;
   retryBudget: TeamRetryBudgetContract;
   editorSubagentBridge: TeamEditorSubagentBridgeContract;
+};
+
+type TeamClosureAttestationInput = {
+  teamRunId?: unknown;
+  runtimeContract?: Partial<TeamRuntimeContract> | null;
+  runtimeMode?: unknown;
+  runtimeLanguage?: unknown;
+  runtimeAdapterId?: unknown;
+  providerId?: unknown;
+  sdkId?: unknown;
+  modelId?: unknown;
+  runnerKind?: unknown;
+  runtimeVersion?: unknown;
+  sandboxPolicyHash?: unknown;
+  attestationSigner?: unknown;
+  reviewerIndependence?: Partial<TeamClosureReviewerIndependenceEvidence> | null;
+  attestedAt?: unknown;
 };
 
 type TeamEditorSubagentRoleEnvelope = {
@@ -781,6 +803,61 @@ export function buildTeamRuntimeContract(input: {
       permissionLeases: input.permissionLeases ?? [],
       evidenceRequired: String(input.evidenceRequired ?? 'command-backed')
     })
+  };
+}
+
+export function buildTeamClosureAttestation(input: TeamClosureAttestationInput): TeamClosureAttestationEvidence {
+  const runtime = input.runtimeContract ?? null;
+  const runtimeMode = normalizeTeamRuntimeMode(input.runtimeMode ?? runtime?.runtimeMode);
+  const runtimeLanguage = normalizeOptionalRuntimeString(input.runtimeLanguage ?? runtime?.runtimeLanguage) ?? 'node';
+  const runtimeAdapterId = normalizeOptionalRuntimeString(input.runtimeAdapterId ?? runtime?.runtimeAdapterId);
+  const providerId = normalizeOptionalRuntimeString(input.providerId ?? runtime?.providerId);
+  const sdkId = normalizeOptionalRuntimeString(input.sdkId ?? runtime?.sdkId);
+  const modelId = normalizeOptionalRuntimeString(input.modelId ?? runtime?.modelId);
+  const runnerKind = normalizeOptionalRuntimeString(input.runnerKind) ?? (runtime?.agentsSpawned ? 'team-agent-runtime' : 'broker-governance');
+  const sandboxPolicyHash = normalizeOptionalRuntimeString(input.sandboxPolicyHash)
+    ?? createHash('sha256')
+      .update([
+        'local-runtime-wrapper-is-not-secure-sandbox-proof',
+        runtimeMode,
+        runtimeLanguage,
+        runtimeAdapterId ?? '',
+        providerId ?? '',
+        sdkId ?? '',
+        modelId ?? ''
+      ].join('\n'))
+      .digest('hex');
+  return {
+    schemaId: TEAM_CLOSURE_ATTESTATION_SCHEMA_ID,
+    teamRunId: normalizeOptionalRuntimeString(input.teamRunId) ?? 'manual-team-run',
+    runtimeMode,
+    runtimeLanguage,
+    runtimeAdapterId,
+    providerId,
+    sdkId,
+    modelId,
+    runnerKind,
+    runtimeVersion: normalizeOptionalRuntimeString(input.runtimeVersion),
+    sandboxPolicyHash: `sha256:${sandboxPolicyHash.replace(/^sha256:/, '')}`,
+    attestationSigner: normalizeOptionalRuntimeString(input.attestationSigner) ?? 'coordinator',
+    reviewerIndependence: buildReviewerIndependenceAttestation(input.reviewerIndependence),
+    attestedAt: normalizeOptionalRuntimeString(input.attestedAt) ?? new Date().toISOString(),
+    localRuntimeWrapperIsSecureSandboxProof: false,
+    commandBackedEvidenceRequired: true
+  };
+}
+
+function buildReviewerIndependenceAttestation(input: Partial<TeamClosureReviewerIndependenceEvidence> | null | undefined): TeamClosureReviewerIndependenceEvidence {
+  const required = input?.required !== false;
+  const satisfied = input?.satisfied === true;
+  return {
+    required,
+    satisfied,
+    policy: normalizeOptionalRuntimeString(input?.policy) ?? 'reviewer-runtime-and-model-independent-from-implementer-when-required',
+    reviewerProviderId: normalizeOptionalRuntimeString(input?.reviewerProviderId),
+    reviewerModelId: normalizeOptionalRuntimeString(input?.reviewerModelId),
+    reviewerRuntimeAdapterId: normalizeOptionalRuntimeString(input?.reviewerRuntimeAdapterId),
+    reason: normalizeOptionalRuntimeString(input?.reason) ?? (satisfied ? 'reviewer independence policy satisfied' : 'reviewer independence policy unsatisfied')
   };
 }
 

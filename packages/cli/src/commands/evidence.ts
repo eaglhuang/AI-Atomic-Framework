@@ -37,6 +37,7 @@ interface EvidenceEnvelope {
 
 export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'atm.evidenceBundleManifest.v1';
 export const TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID = 'atm.teamArtifactHandoffEvidence.v1';
+export const TEAM_CLOSURE_ATTESTATION_SCHEMA_ID = 'atm.teamClosureAttestation.v1';
 
 export interface EvidenceBundleManifest {
   readonly schemaId: typeof EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID;
@@ -56,6 +57,35 @@ export interface TeamArtifactHandoffEvidence {
   readonly retryBudgetStatus: string;
   readonly escalationTarget: string | null;
   readonly closeAllowed: boolean;
+}
+
+export interface TeamClosureReviewerIndependenceEvidence {
+  readonly required: boolean;
+  readonly satisfied: boolean;
+  readonly policy: string;
+  readonly reviewerProviderId: string | null;
+  readonly reviewerModelId: string | null;
+  readonly reviewerRuntimeAdapterId: string | null;
+  readonly reason: string;
+}
+
+export interface TeamClosureAttestationEvidence {
+  readonly schemaId: typeof TEAM_CLOSURE_ATTESTATION_SCHEMA_ID;
+  readonly teamRunId: string;
+  readonly runtimeMode: string;
+  readonly runtimeLanguage: string;
+  readonly runtimeAdapterId: string | null;
+  readonly providerId: string | null;
+  readonly sdkId: string | null;
+  readonly modelId: string | null;
+  readonly runnerKind: string;
+  readonly runtimeVersion: string | null;
+  readonly sandboxPolicyHash: string;
+  readonly attestationSigner: string;
+  readonly reviewerIndependence: TeamClosureReviewerIndependenceEvidence;
+  readonly attestedAt: string;
+  readonly localRuntimeWrapperIsSecureSandboxProof: false;
+  readonly commandBackedEvidenceRequired: true;
 }
 
 export function buildTeamArtifactHandoffEvidence(input: {
@@ -1192,6 +1222,7 @@ export function verifyTaskEvidence(input: {
   const reopenedRedteamTask = detectReopenedOrRedteamTask(input.taskDocument);
   const codeOrFrameworkTask = Boolean(input.frameworkTask) || detectCodeOrFrameworkTask(input.taskDocument, input.taskDeclaredFiles ?? []);
   const healthyAtomEvidence = hasHealthyAtomEvidence(input.taskDocument ?? null, bundle.evidence);
+  const hasTeamClosureAttestationRecord = bundle.evidence.some(hasTeamClosureAttestation);
   const missing: string[] = [];
   if (input.gate === 'close') {
     if (nonWaiver <= 0) {
@@ -1204,6 +1235,9 @@ export function verifyTaskEvidence(input: {
       missing.push('artifact-only-evidence-not-allowed');
     }
     if (codeOrFrameworkTask && (counts.test + counts.commit + counts.attestation + commandRunEvidenceCount) <= 0) {
+      missing.push('code-or-framework-runnable-evidence');
+    }
+    if (codeOrFrameworkTask && hasTeamClosureAttestationRecord && commandRunEvidenceCount <= 0) {
       missing.push('code-or-framework-runnable-evidence');
     }
     if (!healthyAtomEvidence) {
@@ -2871,8 +2905,19 @@ function isCommandRunProof(value: unknown) {
   const candidate = value as Record<string, unknown>;
   return typeof candidate.command === 'string'
     && typeof candidate.exitCode === 'number'
+    && candidate.exitCode === 0
     && isSha256(candidate.stdoutSha256)
     && isSha256(candidate.stderrSha256);
+}
+
+function hasTeamClosureAttestation(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (isRecord(value.details)) {
+    if (value.details.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID) return true;
+    if (isRecord(value.details.teamClosureAttestation) && value.details.teamClosureAttestation.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID) return true;
+  }
+  if (isRecord(value.teamClosureAttestation) && value.teamClosureAttestation.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID) return true;
+  return false;
 }
 
 function isSha256(value: unknown): value is string {
