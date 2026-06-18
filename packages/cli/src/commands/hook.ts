@@ -464,8 +464,11 @@ function runPreCommitHook(cwd: string) {
   // artifacts after the regular direction lock has already released.
   const activeCloseCommitWindows = readActiveCloseCommitWindows(root);
   const closeCommitWindowAllowedFiles = uniqueSorted(activeCloseCommitWindows.flatMap((win) => win.allowedFiles));
+  const taskOpenImportBundle = inspectTaskOpenImportBundleStagedArtifacts(root, stagedFiles);
   const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
-    ? stagedFiles
+    ? taskOpenImportBundle.ok
+      ? []
+      : stagedFiles
       .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
       .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
       .filter((entry) => !isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles))
@@ -653,6 +656,7 @@ function runPreCommitHook(cwd: string) {
       directionLockPlanningMirrorPaths,
       directionLockAllowedFilesDiagnoses,
       directionLockAllowedFilesMismatches,
+      taskOpenImportBundle,
       planningMirrorDriftFiles,
       activeQuickfixLock,
       directionLockDriftFiles,
@@ -2890,7 +2894,6 @@ function inspectMirrorSyncOnlyStagedArtifacts(cwd: string, taskId: string, stage
   const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
   let hasTaskLedger = false;
   let hasImportEvent = false;
-  let hasImportReport = false;
   for (const file of stagedFiles) {
     const normalized = normalizeRelativePath(file);
     const lower = normalized.toLowerCase();
@@ -2903,14 +2906,27 @@ function inspectMirrorSyncOnlyStagedArtifacts(cwd: string, taskId: string, stage
       continue;
     }
     if (lower.startsWith('.atm/history/reports/task-import/') && lower.endsWith('.json') && taskImportReportReferencesTask(cwd, normalized, taskId)) {
-      hasImportReport = true;
       continue;
     }
     return { ok: false, reason: `unexpected-staged-file:${normalized}` };
   }
   return {
-    ok: hasTaskLedger && hasImportEvent && hasImportReport,
-    reason: hasTaskLedger && hasImportEvent && hasImportReport ? null : 'incomplete-mirror-sync-artifacts'
+    ok: hasTaskLedger && hasImportEvent,
+    reason: hasTaskLedger && hasImportEvent ? null : 'incomplete-mirror-sync-artifacts'
+  };
+}
+
+function inspectTaskOpenImportBundleStagedArtifacts(cwd: string, stagedFiles: readonly string[]) {
+  const taskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+  if (taskIds.length !== 1) {
+    return { ok: false, taskId: null, reason: taskIds.length === 0 ? 'no-task-id' : 'multiple-task-ids' };
+  }
+  const taskId = taskIds[0];
+  const report = inspectMirrorSyncOnlyStagedArtifacts(cwd, taskId, stagedFiles);
+  return {
+    ok: report.ok,
+    taskId,
+    reason: report.reason
   };
 }
 

@@ -89,6 +89,34 @@ try {
   runGit(tempDir, ['add', '.atm']);
   runGit(tempDir, ['commit', '-m', 'chore: bootstrap staging fixture']);
 
+  writeJson(path.join(tempDir, '.atm/runtime/locks/TASK-UNRELATED-LOCK.lock.json'), {
+    schemaId: 'atm.governanceScopeLock',
+    specVersion: '0.1.0',
+    workItemId: 'TASK-UNRELATED-LOCK',
+    lockedBy: 'other-agent',
+    actorId: 'other-agent',
+    leaseId: 'lease-unrelated-lock',
+    lockedAt: '2026-06-18T00:00:00.000Z',
+    heartbeatAt: '2026-06-18T00:00:00.000Z',
+    ttlSeconds: 999999999,
+    status: 'active',
+    files: ['src/unrelated.ts'],
+    taskDirectionLock: {
+      schemaId: 'atm.taskDirectionLock.v1',
+      specVersion: '0.1.0',
+      taskId: 'TASK-UNRELATED-LOCK',
+      allowedFiles: ['src/unrelated.ts'],
+      planningReadOnlyPaths: [],
+      planningMirrorPaths: [],
+      allowPlanningMirror: false,
+      actorId: 'other-agent',
+      createdAt: '2026-06-18T00:00:00.000Z',
+      status: 'active'
+    }
+  });
+  runGit(tempDir, ['add', '.atm/runtime/locks/TASK-UNRELATED-LOCK.lock.json']);
+  runGit(tempDir, ['commit', '-m', 'chore: add unrelated active direction lock fixture']);
+
   const importedTaskId = 'TASK-OPEN-0001';
   writeJson(path.join(tempDir, '.atm/history/tasks', `${importedTaskId}.json`), {
     schemaVersion: 'atm.workItem.v0.2',
