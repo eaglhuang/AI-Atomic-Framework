@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0129",
+  "title": "taskflow open task-plan generation and opener delegation dry-run",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [],
+  "acceptance": [
+    "The Phase 0 planning card opens cleanly and only updates the planning ledger/shard for 0129.",
+    "The follow-up Phase 1 scope stays limited to taskflow open planning and opener delegation dry-run surfaces.",
+    "`next`, `tasks`, and `task-direction` remain outside this card's Phase 1 write scope.",
+    "AAF source remains untouched in Phase 0."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/next.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/task-direction.ts",
+    "C:/Users/User/AI-Atomic-Framework/.atm/history/**",
+    "C:/Users/User/AI-Atomic-Framework/release/**",
+    "3KLife opener import / require / spawn",
+    "write mode / ledger mutation / shard mutation"
+  ],
+  "nonGoals": [
+    "Do not mutate AAF source in Phase 0.",
+    "Do not touch TASK-AAO-0128.",
+    "Do not fold opener implementation work into this card.",
+    "Do not widen the Phase 1 scope beyond taskflow open planning and opener delegation dry-run."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0129-taskflow-open-task-plan-generation-and-opener-delegation-dry-run.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-41.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
+  "tags": [],
+  "notes": "Taskflow needs a governed path for opening task plans and delegating opener dry-runs without widening route-visible scope into `next`, `tasks`, or `task-direction`.\nThis card defines the planning anchor for that workflow.\nIt does not touch AAF source in Phase 0.\nIt does not bundle opener implementation work into the planning card.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0129-taskflow-open-task-plan-generation-and-opener-delegation-dry-run.task.md",
+    "sectionTitle": "TASK-AAO-0129",
+    "headingLine": 54,
+    "hash": "1d45f2c3a086539d"
+  },
+  "importedAt": "2026-06-18T16:39:46.525Z",
+  "lastTransitionId": "2026-06-18T16-46-06-338Z-close-73c9dd41c20d",
+  "lastTransitionAt": "2026-06-18T16:46:06.338Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-18T16:40:15.470Z",
+  "promotedAt": "2026-06-18T16:40:16.291Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-058a606356fc",
+    "claimedAt": "2026-06-18T16:40:20.748Z",
+    "heartbeatAt": "2026-06-18T16:46:06.333Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0129.json",
+      "packages/cli/src/commands/taskflow.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-18T16:40:20.748Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260618164020-cursor-gpt-5.2-TASK-AAO-0129-f2b50558cd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0129",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0129.*",
+      ".atm/history/task-events/TASK-AAO-0129/**",
+      ".atm/history/tasks/TASK-AAO-0129.json",
+      "packages/cli/src/commands/taskflow.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "76683e1e2f6f4c401d571ab57576870385242bde61ccb73e3dc070203aba35ad",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-18T16:40:21.083Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-18T16:46:06.333Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260618164020-cursor-gpt-5.2-TASK-AAO-0129-f2b50558cd",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0129.closure-packet.json"
+}
