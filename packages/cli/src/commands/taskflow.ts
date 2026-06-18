@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.ts';
@@ -112,6 +113,20 @@ interface TaskflowDeliveryCommit {
   commitMessage: string;
   commitSha: string | null;
   status: 'committed';
+}
+
+interface DeferredGovernanceDirtyFile {
+  file: string;
+  snapshotPath: string;
+  originalSha256: string;
+  restoredAt: string | null;
+}
+
+interface DeferredGovernanceDirtyReport {
+  schemaId: 'atm.deferredGovernanceDirty.v1';
+  requested: boolean;
+  files: DeferredGovernanceDirtyFile[];
+  restored: boolean;
 }
 
 interface PlanningCardCloseback {
@@ -692,6 +707,84 @@ function runGitOrThrow(cwd: string, args: readonly string[]) {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
   });
+}
+
+function sha256Text(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function listUnstagedDirtyFiles(repoRoot: string): string[] {
+  const output = tryGitScalar(repoRoot, ['diff', '--name-only']) ?? '';
+  return uniqueSorted(output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean));
+}
+
+function isDeferrableGovernanceDirtyFile(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, '/').toLowerCase();
+  if (normalized === '.atm/history/evidence/git-head.jsonl') return true;
+  if (/^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(normalized)) return true;
+  return false;
+}
+
+function deferGovernanceDirtyFiles(repoRoot: string, requested: boolean): DeferredGovernanceDirtyReport {
+  const report: DeferredGovernanceDirtyReport = {
+    schemaId: 'atm.deferredGovernanceDirty.v1',
+    requested,
+    files: [],
+    restored: false
+  };
+  if (!requested) return report;
+  const candidates = listUnstagedDirtyFiles(repoRoot).filter(isDeferrableGovernanceDirtyFile);
+  if (candidates.length === 0) {
+    report.restored = true;
+    return report;
+  }
+  const snapshotRoot = path.join(repoRoot, '.atm', 'runtime', 'snapshots');
+  mkdirSync(snapshotRoot, { recursive: true });
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  for (const file of candidates) {
+    const absolutePath = path.join(repoRoot, file);
+    const content = existsSync(absolutePath) ? readFileSync(absolutePath, 'utf8') : '';
+    const snapshotPath = path.join(snapshotRoot, `close-window-governance-dirty-${timestamp}-${file.replace(/[\\/]/g, '__')}.json`);
+    writeFileSync(snapshotPath, `${JSON.stringify({
+      schemaId: 'atm.closeWindowGovernanceDirtySnapshot.v1',
+      file,
+      originalSha256: sha256Text(content),
+      content,
+      createdAt: new Date().toISOString(),
+      restoredAt: null
+    }, null, 2)}\n`, 'utf8');
+    runGitOrThrow(repoRoot, ['checkout', 'HEAD', '--', file]);
+    report.files.push({
+      file,
+      snapshotPath: normalizeRepoRelativePath(repoRoot, snapshotPath),
+      originalSha256: sha256Text(content),
+      restoredAt: null
+    });
+  }
+  return report;
+}
+
+function restoreDeferredGovernanceDirtyFiles(repoRoot: string, report: DeferredGovernanceDirtyReport): DeferredGovernanceDirtyReport {
+  if (report.restored || report.files.length === 0) {
+    return { ...report, restored: true };
+  }
+  const restoredAt = new Date().toISOString();
+  const files = report.files.map((entry) => {
+    const snapshotPath = path.join(repoRoot, entry.snapshotPath);
+    const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8')) as Record<string, unknown>;
+    const file = typeof snapshot.file === 'string' ? snapshot.file : entry.file;
+    const content = typeof snapshot.content === 'string' ? snapshot.content : '';
+    const absolutePath = path.join(repoRoot, file);
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, content, 'utf8');
+    writeFileSync(snapshotPath, `${JSON.stringify({ ...snapshot, restoredAt }, null, 2)}\n`, 'utf8');
+    return { ...entry, restoredAt };
+  });
+  return {
+    ...report,
+    files,
+    restored: true
+  };
 }
 
 function readStagedFiles(repoRoot: string): string[] {
@@ -1463,7 +1556,9 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   const writeRequested = !!parsed.options.write;
   const noCommitRequested = !!parsed.options.noCommit;
   const autoEvidenceRequested = parsed.options.autoEvidence === true;
-  const deferForeignStaged = parsed.options.deferForeignStaged === true;
+  const deferForeignState = parsed.options.deferForeignState === true;
+  const deferForeignStaged = parsed.options.deferForeignStaged === true || deferForeignState;
+  const deferGovernanceDirty = parsed.options.deferGovernanceDirty === true || deferForeignState;
   const commitMode: TaskflowCommitMode = writeRequested
     ? noCommitRequested ? 'stage-only' : 'auto-commit'
     : 'dry-run';
@@ -1739,6 +1834,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     ]);
     let closeWindowLock: CloseWindowStagedIndexLockReport | null = null;
     let closeWindowLockReleased = false;
+    let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty);
+    let deferredGovernanceDirtyRestored = false;
     try {
       closeWindowLock = acquireCloseWindowStagedIndexLock({
         cwd,
@@ -1922,6 +2019,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       outcome: writeOk ? 'committed' : closeWriteTransaction.phase === 'rolled_back' ? 'rolled_back' : 'aborted'
     });
     closeWindowLockReleased = true;
+    deferredGovernanceDirty = restoreDeferredGovernanceDirtyFiles(cwd, deferredGovernanceDirty);
+    deferredGovernanceDirtyRestored = true;
 
     return {
       ...makeResult({
@@ -1945,6 +2044,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           closeWriteTransaction,
           closeWindowLock,
           releasedCloseWindowLock,
+          deferredGovernanceDirty,
           residueDiagnosis: enrichedDiagnosis,
           closebackPathResolution,
           ...(autoEvidenceExecution ? { autoEvidenceExecution, autoEvidencePlan: autoEvidenceExecution.plan } : {}),
@@ -1962,6 +2062,9 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           actorId,
           outcome: 'aborted'
         });
+      }
+      if (!deferredGovernanceDirtyRestored) {
+        restoreDeferredGovernanceDirtyFiles(cwd, deferredGovernanceDirty);
       }
     }
   }

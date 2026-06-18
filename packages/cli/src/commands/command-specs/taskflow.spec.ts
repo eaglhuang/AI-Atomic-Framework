@@ -31,6 +31,8 @@ export default defineCommandSpec({
     { flag: '--waiver-out-of-scope-delivery', summary: 'For taskflow close with historical delivery or historical batch: allow a multi-task delivery commit when this task slice has matched deliverables; requires --reason.' },
     { flag: '--waive-out-of-scope', summary: 'Alias for --waiver-out-of-scope-delivery.' },
     { flag: '--defer-foreign-staged', summary: 'For taskflow close --write: snapshot and unstage foreign task governance files in the index before acquiring the close-window staged-index lock.' },
+    { flag: '--defer-governance-dirty', summary: 'For taskflow close --write: snapshot, temporarily restore, and then reapply deferrable governance dirty files such as git-head evidence.' },
+    { flag: '--defer-foreign-state', summary: 'Alias for --defer-foreign-staged plus --defer-governance-dirty.' },
     { flag: '--auto-evidence', summary: 'For taskflow close --write: auto-run missing task-card declared validators through evidence run before backend close. Dry-run and pre-close always expose autoEvidencePlan when --actor is supplied; --validators on evidence run remains an override for extra evidence.' },
     { flag: '--reason', value: 'text', summary: 'Required explanation for --waiver-out-of-scope-delivery.' },
     commonJsonOption,
@@ -48,5 +50,6 @@ export default defineCommandSpec({
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --dry-run --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --write --json',
     'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-staged --write --json',
+    'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-state --write --json',
   ]
 });
