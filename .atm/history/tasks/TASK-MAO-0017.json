@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0017",
   "title": "runner version stream state machine",
-  "status": "running",
+  "status": "done",
   "milestone": "M5",
   "dependencies": [
     "TASK-MAO-0014",
@@ -66,8 +66,8 @@
     "hash": "f2a3db2a44998b7e"
   },
   "importedAt": "2026-06-17T15:12:32.634Z",
-  "lastTransitionId": "2026-06-18T04-01-08-255Z-claim-a73928651549",
-  "lastTransitionAt": "2026-06-18T04:01:08.255Z",
+  "lastTransitionId": "2026-06-18T04-07-48-735Z-close-977b6162a18d",
+  "lastTransitionAt": "2026-06-18T04:07:48.735Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "claude-code-opus-4-7",
   "reservedAt": "2026-06-18T04:01:06.780Z",
@@ -76,15 +76,15 @@
     "actorId": "claude-code-opus-4-7",
     "leaseId": "lease-999e2008591e",
     "claimedAt": "2026-06-18T04:01:08.220Z",
-    "heartbeatAt": "2026-06-18T04:01:08.220Z",
+    "heartbeatAt": "2026-06-18T04:07:48.731Z",
     "ttlSeconds": 1800,
     "files": [
       "packages/core/src/broker/runner-version-state.ts",
       "packages/core/src/broker/__tests__/runner-version-state.test.ts",
       "tests/cli/runner-version-lease.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-18T04:01:08.220Z",
   "startedByActor": "claude-code-opus-4-7",
@@ -112,5 +112,9 @@
     "actorId": "claude-code-opus-4-7",
     "createdAt": "2026-06-18T04:01:08.254Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T04:07:48.731Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "closedBySessionId": "session-20260618040108-claude-code-opus-4-7-TASK-MAO-0017-088953bd0a",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0017.closure-packet.json"
 }
