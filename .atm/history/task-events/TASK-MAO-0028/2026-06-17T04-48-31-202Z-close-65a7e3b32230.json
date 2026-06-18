@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-17T04-48-31-202Z-close-65a7e3b32230",
+  "taskId": "TASK-MAO-0028",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260617044432-claude-code-opus-4-7-TASK-MAO-0028-a462029e82",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0028.json",
+  "taskSha256": "sha256:7fb8d1af075e077531d4ae6694f73f2da22ab23874c03d19da2178790cf33d44",
+  "createdAt": "2026-06-17T04:48:31.202Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0028 --actor claude-code-opus-4-7 --status done",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260617044432-claude-code-opus-4-7-TASK-MAO-0028-a462029e82",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0028.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "team-worker-report-test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-17T04:48:31.197Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0028-worker-report-ingestion-contract.task.md",
+        ".atm/history/evidence/TASK-MAO-0028.*",
+        ".atm/history/task-events/TASK-MAO-0028/**",
+        ".atm/history/tasks/TASK-MAO-0028.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/core/src/broker/__tests__/team-worker-report.test.ts",
+        "packages/core/src/broker/team-worker-report.ts",
+        "schemas/team-worker-report.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/team-worker-report.test.ts",
+        "packages/core/src/broker/team-worker-report.ts",
+        "schemas/team-worker-report.schema.json",
+        "scripts/validate-schemas.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
