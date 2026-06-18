@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0097",
   "title": "Broker batch planner, CAS, and atomic write evidence",
-  "status": "running",
+  "status": "done",
   "milestone": "M19",
   "dependencies": [
     "TASK-CID-0093",
@@ -73,8 +73,8 @@
     "hash": "a76216dc2208fe66"
   },
   "importedAt": "2026-06-15T16:53:16.659Z",
-  "lastTransitionId": "2026-06-18T06-21-02-263Z-claim-da8970039278",
-  "lastTransitionAt": "2026-06-18T06:21:02.263Z",
+  "lastTransitionId": "2026-06-18T06-23-35-799Z-close-95733bec4655",
+  "lastTransitionAt": "2026-06-18T06:23:35.799Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-18T06:21:02.225Z",
@@ -83,7 +83,7 @@
     "actorId": "captain",
     "leaseId": "lease-70eac35e51dd",
     "claimedAt": "2026-06-18T06:21:02.231Z",
-    "heartbeatAt": "2026-06-18T06:21:02.231Z",
+    "heartbeatAt": "2026-06-18T06:23:35.796Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0097.json",
@@ -98,8 +98,8 @@
       "schemas/broker/mutation-batch-plan.schema.json",
       "scripts/validate-schemas.ts"
     ],
-    "state": "active",
-    "intent": "closeout-only"
+    "state": "released",
+    "reason": "Historical batch hist-batch-2026-06-15T17-28-20-007Z marks TASK-CID-0097 ok with matched deliverables and waived shared out-of-scope files."
   },
   "startedAt": "2026-06-18T06:21:02.231Z",
   "startedByActor": "captain",
@@ -134,5 +134,10 @@
     "actorId": "captain",
     "createdAt": "2026-06-18T06:21:02.263Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T06:23:35.796Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260618062102-captain-TASK-CID-0097-1600d5d8b6",
+  "closeReason": "Historical batch hist-batch-2026-06-15T17-28-20-007Z marks TASK-CID-0097 ok with matched deliverables and waived shared out-of-scope files.",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0097.closure-packet.json"
 }
